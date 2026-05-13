@@ -1,0 +1,1908 @@
+{
+  "commander": "Kinnan, Bonder Prodigy",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 2 corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime.",
+  "fetched_at": "2026-05-13T19:16:12Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy",
+      "header": "Average Deck for Kinnan, Bonder Prodigy",
+      "total_card_count": 100,
+      "num_decks_avg": 19226,
+      "deck_entries": 93
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy/budget",
+      "header": "Average Deck for Kinnan, Bonder Prodigy - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 1922,
+      "deck_entries": 78
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy/cedh",
+      "header": "Average Deck for Kinnan, Bonder Prodigy - cEDH",
+      "total_card_count": 100,
+      "num_decks_avg": 3713,
+      "deck_entries": 99
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy/combo",
+      "header": "Average Deck for Kinnan, Bonder Prodigy - Combo",
+      "total_card_count": 100,
+      "num_decks_avg": 814,
+      "deck_entries": 97
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy",
+      "source_deck_key": "edhrec_kinnan_default_average",
+      "power_lane": "edhrec_average_default",
+      "theme": "simic_ramp_combo_value",
+      "cards": [
+        {
+          "name": "Kinnan, Bonder Prodigy",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ancient Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Badgermole Cub",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basalt Monolith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloom Tender",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chord of Calling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chrome Mox",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City of Brass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Clever Impersonator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossal Skyturtle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consecrated Sphinx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Delighted Halfling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dramatic Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Spirit Guide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Endurance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enduring Vitality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabricate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Mastermind",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fierce Guardianship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Finale of Devastation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flusterstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Force of Negation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Force of Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 4,
+          "board": "main"
+        },
+        {
+          "name": "Freed from the Real",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fyndhorn Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gaea's Cradle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gemstone Caverns",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Green Sun's Zenith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "High Fae Trickster",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hullbreaker Horror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Llanowar Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Petal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Confluence",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Drain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mental Misstep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mindbreak Trap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirage Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirrormade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonsilver Key",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Amber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Opal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Remora",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Rhythm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nyxbloom Ancient",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Otawara, Soaring City",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pact of Negation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Metamorph",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seedborn Muse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sink into Stupor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spellskite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Springleaf Drum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swan Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sylvan Library",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Curiosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret the Seeker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The One Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrasios, Triton Hero",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tidespout Tyrant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transmute Artifact",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trophy Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tropical Island",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valley Floodcaller",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Veil of Summer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Void Winnower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Walking Ballista",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wan Shi Tong, Librarian",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wandering Archaic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Waterlogged Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Worldly Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy/budget",
+      "source_deck_key": "edhrec_kinnan_budget_average",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_budget_mana_dorks_big_mana",
+      "cards": [
+        {
+          "name": "Kinnan, Bonder Prodigy",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Denial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Scrapgorger",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basalt Monolith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blue Sun's Zenith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossal Skyturtle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Devoted Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dispel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dramatic Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drift of Phantasms",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enduring Vitality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabricate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 12,
+          "board": "main"
+        },
+        {
+          "name": "Freed from the Real",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fyndhorn Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gretchen Titchwillow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gyre Engineer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hinterland Harbor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hullbreaker Horror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ilysian Caryatid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Incubation Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 12,
+          "board": "main"
+        },
+        {
+          "name": "Kenrith's Transformation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kogla, the Titan Ape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Koma, Cosmos Serpent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Leyline of Abundance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Llanowar Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Leak",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Maraleaf Pixie",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirage Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonsilver Key",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Muddle the Mixture",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Murkfiend Liege",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset, Parter of Veils",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Claim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Neoform",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ornithopter of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Paradise Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pemmin's Aura",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Poison Dart Frog",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Preordain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prophet of Distortion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reality Shift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reclamation Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Regrowth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Resculpt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reshape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seedborn Muse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spectral Sailor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spell Pierce",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Springleaf Drum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Curiosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Mystery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terastodon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thorn Mammoth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thought Vessel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tidespout Tyrant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trophy Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vineglimmer Snarl",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy/cedh",
+      "source_deck_key": "edhrec_kinnan_cedh_average",
+      "power_lane": "edhrec_average_cedh",
+      "theme": "cedh_fast_mana_combo_lane",
+      "cards": [
+        {
+          "name": "Kinnan, Bonder Prodigy",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ancient Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basalt Monolith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloom Tender",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chain of Vapor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chord of Calling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chrome Mox",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City of Brass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Clever Impersonator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossal Skyturtle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consecrated Sphinx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Copy Artifact",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Delighted Halfling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dramatic Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Spirit Guide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Endurance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enduring Vitality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabricate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Mastermind",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fierce Guardianship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Finale of Devastation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flusterstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Force of Negation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Force of Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fyndhorn Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gaea's Cradle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gemstone Caverns",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Green Sun's Zenith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grim Monolith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "High Fae Trickster",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hullbreaker Horror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hydroelectric Specimen",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Into the Flood Maw",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Invasion of Ikoria",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 2,
+          "board": "main"
+        },
+        {
+          "name": "Llanowar Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Petal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Confluence",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Drain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mental Misstep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Minamo, School at Water's Edge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mindbreak Trap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirage Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirrormade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonsilver Key",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Amber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Opal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Remora",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Rhythm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nyxbloom Ancient",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Otawara, Soaring City",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pact of Negation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Metamorph",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seedborn Muse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sink into Stupor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spellskite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Springleaf Drum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swan Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Curiosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret the Seeker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The One Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrasios, Triton Hero",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tidespout Tyrant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transmute Artifact",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trophy Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tropical Island",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valley Floodcaller",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Veil of Summer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wan Shi Tong, Librarian",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wandering Archaic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Waterlogged Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wooded Foothills",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Worldly Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/kinnan-bonder-prodigy/combo",
+      "source_deck_key": "edhrec_kinnan_combo_average",
+      "power_lane": "edhrec_average_combo",
+      "theme": "combo_mana_dorks_outlets",
+      "cards": [
+        {
+          "name": "Kinnan, Bonder Prodigy",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ancient Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basalt Monolith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloom Tender",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chain of Vapor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chord of Calling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chrome Mox",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City of Brass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Clever Impersonator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossal Skyturtle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consecrated Sphinx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Delighted Halfling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dramatic Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drift of Phantasms",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Spirit Guide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Endurance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enduring Vitality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabricate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Mastermind",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fierce Guardianship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Finale of Devastation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flusterstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Force of Negation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Force of Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 2,
+          "board": "main"
+        },
+        {
+          "name": "Freed from the Real",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fyndhorn Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gaea's Cradle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gemstone Caverns",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Green Sun's Zenith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "High Fae Trickster",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hullbreaker Horror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Invasion of Ikoria",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Llanowar Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Petal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Confluence",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Drain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mental Misstep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mindbreak Trap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirage Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirrormade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonsilver Key",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Amber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Opal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Remora",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Rhythm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nyxbloom Ancient",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Otawara, Soaring City",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pact of Negation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Metamorph",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seedborn Muse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sink into Stupor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spellskite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Springleaf Drum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swan Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sylvan Library",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Curiosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret the Seeker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The One Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrasios, Triton Hero",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tidespout Tyrant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transmute Artifact",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trophy Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tropical Island",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valley Floodcaller",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Veil of Summer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Void Winnower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wan Shi Tong, Librarian",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wandering Archaic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Waterlogged Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wooded Foothills",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Worldly Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}

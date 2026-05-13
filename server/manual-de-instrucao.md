@@ -14854,3 +14854,50 @@ mas ainda nao esta promovida para mini-batch controlado enquanto faltar
 `runtime_public_gate_passed=true`. Rollback pratico, se necessario, deve remover
 apenas as `source_deck_key` do corpus Zimone aplicado, preservando cards,
 legalidades e profiles.
+
+## 119. Commander Reference Sprint 2 corpus prep offline - 2026-05-13
+
+Foi preparado um batch offline de corpora para:
+
+- `Kinnan, Bonder Prodigy`;
+- `Korvold, Fae-Cursed King`;
+- `Muldrotha, the Gravetide`;
+- `Yuriko, the Tiger's Shadow`;
+- `Winota, Joiner of Forces`;
+- `Atraxa, Praetors' Voice`.
+
+Escopo: somente pesquisa publica de baixo volume, JSON offline e `--dry-run`.
+Nao houve `--apply`, idempotencia, public proof, scorecard, alteracao de runtime,
+scanner, camera, OCR, app mobile ou contrato app-facing.
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_sprint2_2026-05-13/kinnan_bonder_prodigy/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint2_2026-05-13/korvold_fae_cursed_king/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint2_2026-05-13/muldrotha_the_gravetide/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint2_2026-05-13/yuriko_the_tigers_shadow/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint2_2026-05-13/winota_joiner_of_forces/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint2_2026-05-13/atraxa_praetors_voice/corpus.json`.
+
+Resultado dos dry-runs:
+
+- Kinnan: `PASS`, 4/4 decks aceitos;
+- Korvold: `PASS`, 4/4 decks aceitos;
+- Muldrotha: `PASS`, 4/4 decks aceitos;
+- Yuriko: `PASS`, 4/4 decks aceitos;
+- Winota: `PASS`, 4/4 decks aceitos;
+- Atraxa: `PASS`, 5/5 decks aceitos.
+
+Todos os dry-runs preservaram `db_mutations=false`,
+`commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0` e
+`singleton_violations={}`.
+
+Riscos documentados:
+
+- Kinnan/Winota podem puxar shell cEDH/stax; manter lanes separadas por bracket;
+- Atraxa precisa separar counters, superfriends e infect;
+- fontes EDHREC nao devem ser copiadas em runtime, apenas agregadas em etapa
+  futura depois de apply/scorecard.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_CORPUS_PREP_2026-05-13.md`.

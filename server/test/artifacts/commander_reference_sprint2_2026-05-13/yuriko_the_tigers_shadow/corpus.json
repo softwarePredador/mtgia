@@ -1,0 +1,1733 @@
+{
+  "commander": "Yuriko, the Tiger's Shadow",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 2 corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime.",
+  "fetched_at": "2026-05-13T19:16:12Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow",
+      "header": "Average Deck for Yuriko, the Tiger's Shadow",
+      "total_card_count": 100,
+      "num_decks_avg": 30921,
+      "deck_entries": 85
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow/ninjas",
+      "header": "Average Deck for Yuriko, the Tiger's Shadow - Ninjas",
+      "total_card_count": 100,
+      "num_decks_avg": 2332,
+      "deck_entries": 83
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow/topdeck",
+      "header": "Average Deck for Yuriko, the Tiger's Shadow - Topdeck",
+      "total_card_count": 100,
+      "num_decks_avg": 311,
+      "deck_entries": 86
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow/budget",
+      "header": "Average Deck for Yuriko, the Tiger's Shadow - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 3092,
+      "deck_entries": 78
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow",
+      "source_deck_key": "edhrec_yuriko_default_average",
+      "power_lane": "edhrec_average_default",
+      "theme": "dimir_ninja_topdeck_tempo",
+      "cards": [
+        {
+          "name": "Yuriko, the Tiger's Shadow",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Baleful Strix",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Changeling Outcast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Choked Estuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Clearwater Pathway",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commandeer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commit // Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consign // Oblivion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cover of Darkness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dark Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darkwater Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deadly Rollick",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Demonic Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dig Through Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drowned Catacomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fallen Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fell the Profane",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fierce Guardianship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gingerbrute",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Higure, the Still Wind",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ingenious Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ink-Eyes, Servant of Oni",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 10,
+          "board": "main"
+        },
+        {
+          "name": "Kaito, Bane of Nightmares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lim-Dûl's Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Petal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misdirection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Cloaked Herald",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Syndicate Naga",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mistblade Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moon-Circuit Hacker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Morphic Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mothdust Changeling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Remora",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystical Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nashi, Moon Sage's Scion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ninja of the Deep Hours",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ornithopter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Otawara, Soaring City",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prosperous Thief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakashima's Student",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Satoru, the Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scroll Rack",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sea Gate Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sensei's Divining Top",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadow of Mortality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shizo, Death's Storehouse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silent-Blade Oni",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silver-Fur Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sink into Stupor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullsnatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slither Blade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoke Shroud",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Snuff Out",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spectral Sailor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sunken Hollow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 7,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Dominance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temporal Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temporal Trespass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tetsuko Umezawa, Fugitive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Faced Shadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Throat Slitter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tormented Soul",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Cruise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Triton Shorestalker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underground River",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vampiric Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wingcrafter",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow/ninjas",
+      "source_deck_key": "edhrec_yuriko_ninjas_average",
+      "power_lane": "edhrec_average_ninjas",
+      "theme": "ninja_typal_combat_triggers",
+      "cards": [
+        {
+          "name": "Yuriko, the Tiger's Shadow",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Access Tunnel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Aqueous Form",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Baleful Strix",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Biting-Palm Ninja",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Changeling Outcast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Choked Estuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commit // Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consign // Oblivion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cover of Darkness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cunning Evasion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darkwater Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deadly Rollick",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dig Through Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Aqueduct",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dokuchi Silencer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drowned Catacomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enter the Enigma",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fallen Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fierce Guardianship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Halimar Depths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Higure, the Still Wind",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ingenious Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ink-Eyes, Servant of Oni",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 11,
+          "board": "main"
+        },
+        {
+          "name": "Kaito Shizuki",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kaito, Bane of Nightmares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lim-Dûl's Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misdirection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Cloaked Herald",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Syndicate Naga",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mistblade Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moon-Circuit Hacker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonblade Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonsnare Specialist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Morphic Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystical Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nashi, Moon Sage's Scion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ninja of the Deep Hours",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ornithopter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phantom Ninja",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prosperous Thief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakashima's Student",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Satoru Umezawa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Satoru, the Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scroll Rack",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sensei's Divining Top",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadow of Mortality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shipwreck Marsh",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silent-Blade Oni",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silver-Fur Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullsnatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slither Blade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoke Shroud",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sunken Hollow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 8,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Dominance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Deceit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temporal Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temporal Trespass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tetsuko Umezawa, Fugitive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thought Vessel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Faced Shadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Throat Slitter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Cruise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Triton Shorestalker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underground River",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vampiric Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow/topdeck",
+      "source_deck_key": "edhrec_yuriko_topdeck_average",
+      "power_lane": "edhrec_average_topdeck",
+      "theme": "topdeck_manipulation_damage",
+      "cards": [
+        {
+          "name": "Yuriko, the Tiger's Shadow",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Aqueous Form",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Adaptation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Baleful Strix",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainsurge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Castle Vantress",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Changeling Outcast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Choked Estuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Clearwater Pathway",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commandeer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commit // Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consign // Oblivion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cunning Evasion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darkwater Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Diabolic Vision",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dig Through Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Aqueduct",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Discovery // Dispersal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dream Cache",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drowned Catacomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fallen Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fell the Profane",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gingerbrute",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Halimar Depths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ingenious Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 9,
+          "board": "main"
+        },
+        {
+          "name": "Kaito, Bane of Nightmares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lim-Dûl's Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misdirection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Cloaked Herald",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Syndicate Naga",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mistblade Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moon-Circuit Hacker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mothdust Changeling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Murderous Cut",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Sanctuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystical Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ninja of the Deep Hours",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ornithopter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Portent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Preordain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prosperous Thief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sage Owl",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakashima's Student",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scroll Rack",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sensei's Divining Top",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadow of Mortality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silent-Blade Oni",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silver-Fur Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sink into Stupor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siren Stormtamer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullsnatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slither Blade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoke Shroud",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spectral Sailor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sunken Hollow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 7,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Dominance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Telling Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Deceit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temporal Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temporal Trespass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tetsuko Umezawa, Fugitive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Faced Shadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tormented Soul",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Cruise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trickery Charm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Triton Shorestalker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underground River",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vampiric Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wingcrafter",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/yuriko-the-tigers-shadow/budget",
+      "source_deck_key": "edhrec_yuriko_budget_average",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_budget_ninjas",
+      "cards": [
+        {
+          "name": "Yuriko, the Tiger's Shadow",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Aqueous Form",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Adaptation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Biting-Palm Ninja",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainsurge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Changeling Outcast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Choked Estuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commander's Sphere",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commit // Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Connive // Concoct",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consign // Oblivion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cunning Evasion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Curtains' Call",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darkwater Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dig Through Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Aqueduct",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dimir Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Discovery // Dispersal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dismal Backwater",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dispel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dokuchi Silencer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faerie Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fallen Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Familiar's Ruse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Far // Away",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Feed the Swarm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gingerbrute",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Halimar Depths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ingenious Infiltrator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 14,
+          "board": "main"
+        },
+        {
+          "name": "Kaito, Dancing Shadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Cloaked Herald",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mist-Syndicate Naga",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mistblade Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moon-Circuit Hacker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonblade Shinobi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moonsnare Specialist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mothdust Changeling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Murderous Cut",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nashi, Moon Sage's Scion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezumi Prowler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ninja of the Deep Hours",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ornithopter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phantom Ninja",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Portent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prosperous Thief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rags // Riches",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Satoru Umezawa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadow of Mortality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silent-Blade Oni",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silver-Fur Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullsnatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slither Blade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoke Shroud",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spectral Sailor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spell Pierce",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sunken Hollow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 10,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Dominance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Telling Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Deceit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tetsuko Umezawa, Fugitive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Faced Shadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tormented Soul",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Cruise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Triton Shorestalker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wingcrafter",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}

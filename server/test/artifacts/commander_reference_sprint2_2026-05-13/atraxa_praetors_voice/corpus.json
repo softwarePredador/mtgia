@@ -1,0 +1,2359 @@
+{
+  "commander": "Atraxa, Praetors' Voice",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 2 corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime.",
+  "fetched_at": "2026-05-13T19:16:12Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice",
+      "header": "Average Deck for Atraxa, Praetors' Voice",
+      "total_card_count": 100,
+      "num_decks_avg": 41130,
+      "deck_entries": 91
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/plus-1-plus-1-counters",
+      "header": "Average Deck for Atraxa, Praetors' Voice - +1/+1 Counters",
+      "total_card_count": 100,
+      "num_decks_avg": 2615,
+      "deck_entries": 92
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/planeswalkers",
+      "header": "Average Deck for Atraxa, Praetors' Voice - Planeswalkers",
+      "total_card_count": 100,
+      "num_decks_avg": 3113,
+      "deck_entries": 94
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/infect",
+      "header": "Average Deck for Atraxa, Praetors' Voice - Infect",
+      "total_card_count": 100,
+      "num_decks_avg": 5496,
+      "deck_entries": 92
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/budget",
+      "header": "Average Deck for Atraxa, Praetors' Voice - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 4113,
+      "deck_entries": 85
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice",
+      "source_deck_key": "edhrec_atraxa_default_average",
+      "power_lane": "edhrec_average_default",
+      "theme": "wubg_proliferate_goodstuff",
+      "cards": [
+        {
+          "name": "Atraxa, Praetors' Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ajani, Sleeper Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Astral Cornucopia",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blightbelly Rat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloated Contaminator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brokers Ascendancy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cankerbloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chromatic Lantern",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contagion Engine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contaminant Grafter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deepglow Skate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Doubling Season",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamtide Whale",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drown in Ichor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Everflowing Chalice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolution Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Experimental Augury",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ezuri, Stalker of Spheres",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flux Channeler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 4,
+          "board": "main"
+        },
+        {
+          "name": "Glistening Sphere",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Godless Shrine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hallowed Fountain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ichor Rats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Indatha Triome",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inexorable Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Infectious Bite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Infectious Inquiry",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Innkeeper's Talent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Ixhel, Scion of Atraxa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karn's Bastion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marsh Flats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Metastatic Evangel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset, Parter of Veils",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norn's Decree",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oko, Thief of Crowns",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opulent Palace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path of Ancestry",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyresis Outbreak",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Swarmlord",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plague Stinger",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prologue to Phyresis",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Raffine's Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sandsteppe Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seaside Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skithiryx, the Blight Dragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skrelv, Defector Mite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smothering Tithe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spara's Headquarters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tainted Observer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tamiyo, Field Researcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi's Protection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi, Master of Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tekuthal, Inquiry Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple Garden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret's Gambit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrummingbird",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unnatural Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Venerated Rotpriest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Voidwing Hybrid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vorinclex, Monstrous Raider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska's Fall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska, Betrayal's Sting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zagoth Triome",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/plus-1-plus-1-counters",
+      "source_deck_key": "edhrec_atraxa_plus_1_plus_1_counters_average",
+      "power_lane": "edhrec_average_plus_1_plus_1_counters",
+      "theme": "plus1_counters_proliferate",
+      "cards": [
+        {
+          "name": "Atraxa, Praetors' Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abzan Falconer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ajani, the Greathearted",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Sanctum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Astral Cornucopia",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Branching Evolution",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brokers Ascendancy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cankerbloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cathars' Crusade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Champion of Lambholt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chromatic Lantern",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Corpsejack Menace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crystalline Crawler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Damning Verdict",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deepglow Skate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Doubling Season",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamtide Whale",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Everflowing Chalice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolution Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolution Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Experimental Augury",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ezuri, Stalker of Spheres",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fathom Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flux Channeler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Forgotten Ancient",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Godless Shrine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gyre Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hallowed Fountain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hardened Scales",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Herald of Secret Streams",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heroic Intervention",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Incubation Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Indatha Triome",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inexorable Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Innkeeper's Talent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inspiring Call",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Kalonian Hydra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kami of Whispered Hopes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karn's Bastion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Managorger Hydra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marsh Flats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Master Biomancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Metastatic Evangel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mikaeus, the Lunarch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opulent Palace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ozolith, the Shattered Spire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Raffine's Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ripples of Potential",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sandsteppe Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seaside Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shalai, Voice of Plenty",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Ascendancy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spara's Headquarters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tamiyo, Field Researcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi's Protection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tekuthal, Inquiry Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple Garden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret's Gambit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Ozolith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Three Visits",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrummingbird",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unnatural Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vorinclex, Monstrous Raider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska, Betrayal's Sting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Winding Constrictor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zagoth Triome",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/planeswalkers",
+      "source_deck_key": "edhrec_atraxa_planeswalkers_average",
+      "power_lane": "edhrec_average_planeswalkers",
+      "theme": "superfriends_proliferate",
+      "cards": [
+        {
+          "name": "Atraxa, Praetors' Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ajani, Sleeper Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashiok, Dream Render",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Assassin's Trophy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Astral Cornucopia",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloom Tender",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brokers Ascendancy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Carth the Lion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chromatic Lantern",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deepglow Skate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Demonic Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Doubling Season",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamtide Whale",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elspeth, Sun's Champion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Everflowing Chalice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolution Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ezuri, Stalker of Spheres",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farewell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flux Channeler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Godless Shrine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hallowed Fountain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ichormoon Gauntlet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Indatha Triome",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inexorable Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Interplanar Beacon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Karn's Bastion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kaya the Inexorable",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lae'zel, Vlaakith's Champion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Drain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marsh Flats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset Transcendent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset, Parter of Veils",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oath of Nissa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oath of Teferi",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oko, Thief of Crowns",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 2,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Raffine's Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reflecting Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rings of Brighthearth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ripples of Potential",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sea of Clouds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shalai, Voice of Plenty",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smothering Tithe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spara's Headquarters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spark Double",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Supreme Verdict",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 2,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tamiyo, Field Researcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tamiyo, the Moon Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi's Protection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi, Hero of Dominaria",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi, Master of Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi, Temporal Archmage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi, Time Raveler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi, Who Slows the Sunset",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tekuthal, Inquiry Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple Garden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret's Gambit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Chain Veil",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Eternal Wanderer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Three Visits",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrummingbird",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ugin, the Spirit Dragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Undergrowth Stadium",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vorinclex, Monstrous Raider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska, Betrayal's Sting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wrenn and Realmbreaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zagoth Triome",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/infect",
+      "source_deck_key": "edhrec_atraxa_infect_average",
+      "power_lane": "edhrec_average_infect",
+      "theme": "infect_poison_proliferate",
+      "cards": [
+        {
+          "name": "Atraxa, Praetors' Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ajani, Sleeper Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Sanctum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Astral Cornucopia",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Atomize",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bilious Skulldweller",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blightbelly Rat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloated Contaminator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cankerbloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chromatic Lantern",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contagion Engine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contaminant Grafter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contentious Plan",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamtide Whale",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drown in Ichor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Everflowing Chalice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolution Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Experimental Augury",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ezuri, Stalker of Spheres",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Strand",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flux Channeler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Glistening Sphere",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Godless Shrine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hallowed Fountain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ichor Rats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Indatha Triome",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inexorable Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Infectious Bite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Infectious Inquiry",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Ixhel, Scion of Atraxa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karn's Bastion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marsh Flats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Metastatic Evangel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Necrogen Rotpriest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norn's Decree",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opulent Palace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path of Ancestry",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyresis Outbreak",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Arena",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Swarmlord",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plague Stinger",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prologue to Phyresis",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Radstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Raffine's Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sandsteppe Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skithiryx, the Blight Dragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skrelv's Hive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skrelv, Defector Mite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smothering Tithe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spara's Headquarters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tainted Observer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tainted Strike",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tekuthal, Inquiry Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple Garden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret's Gambit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thirsting Roots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrummingbird",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tyrranax Rex",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unnatural Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Venerated Rotpriest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vishgraz, the Doomhive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Voidwing Hybrid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vorinclex, Monstrous Raider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska's Fall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska, Betrayal's Sting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Watery Grave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "White Sun's Twilight",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zagoth Triome",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/atraxa-praetors-voice/budget",
+      "source_deck_key": "edhrec_atraxa_budget_average",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_budget_proliferate",
+      "cards": [
+        {
+          "name": "Atraxa, Praetors' Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ajani, Sleeper Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Sanctum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Astral Cornucopia",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bilious Skulldweller",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blightbelly Rat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Agent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloated Contaminator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brokers Ascendancy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cankerbloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Canopy Vista",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chromatic Lantern",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commander's Sphere",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contagion Clasp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Contentious Plan",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deepglow Skate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamtide Whale",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Drown in Ichor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Everflowing Chalice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolution Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Experimental Augury",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ezuri, Stalker of Spheres",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fathom Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flux Channeler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Grateful Apparition",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hardened Scales",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ichor Rats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inexorable Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Infectious Bite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Infectious Inquiry",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Ixhel, Scion of Atraxa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karn's Bastion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Metastatic Evangel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mortify",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myr Convert",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Necrogen Communion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Necrogen Rotpriest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norn's Decree",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opulent Palace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path of Ancestry",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pestilent Syphoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plague Stinger",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 4,
+          "board": "main"
+        },
+        {
+          "name": "Prairie Stream",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prologue to Phyresis",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampant Growth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reject Imperfection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Replicating Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sandsteppe Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scheming Aspirant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seaside Citadel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skrelv's Hive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skrelv, Defector Mite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sunken Hollow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tainted Observer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tamiyo, Field Researcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tekuthal, Inquiry Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tezzeret's Gambit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Seedcore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thirsting Roots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrummingbird",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unnatural Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Venerated Rotpriest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vishgraz, the Doomhive",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vivid Creek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vivid Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vivid Meadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Voidwing Hybrid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska's Fall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vraska, Betrayal's Sting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whisper of the Dross",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}

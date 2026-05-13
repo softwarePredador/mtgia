@@ -1,0 +1,1858 @@
+{
+  "commander": "Korvold, Fae-Cursed King",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 2 corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime.",
+  "fetched_at": "2026-05-13T19:16:12Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king",
+      "header": "Average Deck for Korvold, Fae-Cursed King",
+      "total_card_count": 100,
+      "num_decks_avg": 19646,
+      "deck_entries": 91
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king/treasure",
+      "header": "Average Deck for Korvold, Fae-Cursed King - Treasure",
+      "total_card_count": 100,
+      "num_decks_avg": 2290,
+      "deck_entries": 88
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king/sacrifice",
+      "header": "Average Deck for Korvold, Fae-Cursed King - Sacrifice",
+      "total_card_count": 100,
+      "num_decks_avg": 2308,
+      "deck_entries": 94
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king/budget",
+      "header": "Average Deck for Korvold, Fae-Cursed King - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 1964,
+      "deck_entries": 84
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king",
+      "source_deck_key": "edhrec_korvold_default_average",
+      "power_lane": "edhrec_average_default",
+      "theme": "jund_sacrifice_treasure_value",
+      "cards": [
+        {
+          "name": "Korvold, Fae-Cursed King",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrupt Decay",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Academy Manufactor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashnod's Altar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Assassin's Trophy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Awakening Zone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Black Market Connections",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Crypt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodstained Mire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bootleggers' Stash",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Braids, Arisen Nightmare",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chatterfang, Squirrel General",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cinder Glade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Culling Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dark Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deadly Dispute",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deathrite Shaman",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Delighted Halfling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Demonic Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Diabolic Intent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragonskull Summit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eldritch Evolution",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabled Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 4,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goldspan Dragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heroic Intervention",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ignoble Hierarch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impulsive Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Juri, Master of the Revue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Petal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Luxury Suite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mahadi, Emporium Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mayhem Devil",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirkwood Bats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 4,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Old Gnawbone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Altar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pitiless Plunderer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Professional Face-Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ragavan, Nimble Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reanimate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reassembling Skeleton",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Revel in Riches",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhythm of the Wild",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruthless Technomancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoldering Marsh",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Squee, the Immortal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stomping Ground",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 4,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Reaver Cleaver",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Undergrowth Stadium",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underworld Breach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vampiric Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Victimize",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Viscera Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Warren Soultrader",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wooded Foothills",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Woodland Cemetery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Worldly Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Xorn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ziatora's Proving Ground",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ziatora, the Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zulaport Cutthroat",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king/treasure",
+      "source_deck_key": "edhrec_korvold_treasure_average",
+      "power_lane": "edhrec_average_treasure",
+      "theme": "treasure_sacrifice_draw_engine",
+      "cards": [
+        {
+          "name": "Korvold, Fae-Cursed King",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Academy Manufactor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ancient Copper Dragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashnod's Altar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Assassin's Trophy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Awakening Zone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Black Market Connections",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Crypt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodstained Mire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bootleggers' Stash",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chatterfang, Squirrel General",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cinder Glade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crime Novelist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dark Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deadly Dispute",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Demonic Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Diabolic Intent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Doubling Season",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragonskull Summit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabled Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goldspan Dragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grim Hireling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heroic Intervention",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ignoble Hierarch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impulsive Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Juri, Master of the Revue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Luxury Suite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mahadi, Emporium Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marionette Apprentice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mayhem Devil",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirkwood Bats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Old Gnawbone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Altar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Phyrexian Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pitiless Plunderer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Professional Face-Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ragavan, Nimble Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reanimate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reassembling Skeleton",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Revel in Riches",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhythm of the Wild",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruthless Technomancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Savage Lands",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoldering Marsh",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spire Garden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stomping Ground",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 5,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Reaver Cleaver",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thought Vessel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Toxic Deluge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Undergrowth Stadium",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vampiric Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Victimize",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Viscera Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Warren Soultrader",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wooded Foothills",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Xorn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ziatora's Proving Ground",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ziatora, the Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zulaport Cutthroat",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king/sacrifice",
+      "source_deck_key": "edhrec_korvold_sacrifice_average",
+      "power_lane": "edhrec_average_sacrifice",
+      "theme": "sacrifice_aristocrats_value",
+      "cards": [
+        {
+          "name": "Korvold, Fae-Cursed King",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrupt Decay",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ancient Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Animate Dead",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arid Mesa",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashnod's Altar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Assassin's Trophy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Badlands",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bayou",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birds of Paradise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Crypt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodstained Mire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chatterfang, Squirrel General",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chrome Mox",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chthonian Nightmare",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City of Brass",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Culling Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Culling the Weak",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dark Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deathrite Shaman",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Delighted Halfling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Demonic Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Diabolic Intent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dockside Extortionist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dosan the Falling Leaf",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eldritch Evolution",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elves of Deep Shadow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elvish Spirit Guide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emergence Zone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Entomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Finale of Devastation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Food Chain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Gamble",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gemstone Caverns",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ignoble Hierarch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Imperial Seal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impulsive Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Petal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Confluence",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Crypt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Vault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marsh Flats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mayhem Devil",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Mox Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mox Opal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Necropotence",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Noxious Revival",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Orcish Bowmasters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Overgrown Tomb",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pitiless Plunderer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Polluted Delta",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Praetor's Grasp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pyroblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ragavan, Nimble Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reanimate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Red Elemental Blast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruthless Technomancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simian Spirit Guide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skirk Prospector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Squee, the Immortal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stomping Ground",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 3,
+          "board": "main"
+        },
+        {
+          "name": "Taiga",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tinder Wall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underworld Breach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unearth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vampiric Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Veil of Summer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Catacombs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Viscera Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Warren Soultrader",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wheel of Fortune",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windswept Heath",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wishclaw Talisman",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wooded Foothills",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Worldly Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zulaport Cutthroat",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/korvold-fae-cursed-king/budget",
+      "source_deck_key": "edhrec_korvold_budget_average",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_budget_jund_sacrifice",
+      "cards": [
+        {
+          "name": "Korvold, Fae-Cursed King",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Academy Manufactor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Accursed Marauder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Awakening Zone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bastion of Remembrance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Big Score",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bojuka Bog",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bootleggers' Stash",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Braids, Arisen Nightmare",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brass's Bounty",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cinder Glade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commander's Sphere",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deadly Dispute",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreadhorde Invasion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evendo Brushrazer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exploration Broodship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 7,
+          "board": "main"
+        },
+        {
+          "name": "Gilded Goose",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Greedy Freebooter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hearthhull, the Worldseed",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Horizon Explorer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ignoble Hierarch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impulsive Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jund Panorama",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Juri, Master of the Revue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karplusan Forest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama's Reach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Llanowar Elves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Llanowar Wastes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mahadi, Emporium Master",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mayhem Devil",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mazirek, Kraul Death Priest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mirkwood Bats",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Moldervine Reclamation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 6,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pitiless Plunderer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plaguecrafter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Planetary Annihilation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prossh, Skyraider of Kher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Putrefy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampant Growth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reassembling Skeleton",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhythm of the Wild",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Riveteers Overlook",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Roiling Regrowth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Savage Lands",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Smoldering Marsh",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Solemn Simulacrum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Springbloom Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swamp",
+          "quantity": 6,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Syr Konrad, the Grim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Szarel, Genesis Shepherd",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Malady",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terminate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Tracker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twisted Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vernal Fen",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Victimize",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Village Rites",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Viscera Seer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Witch's Oven",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Woodland Cemetery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ziatora, the Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zulaport Cutthroat",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}
