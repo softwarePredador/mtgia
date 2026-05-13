@@ -3,6 +3,37 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference app value Android runtime
+
+### O Porquê
+- Era necessario provar no app real que os comandantes promovidos no mini-batch
+  Commander Reference continuam gerando valor no fluxo mobile completo, usando
+  `commander_name`, backend publico e validacao de deck salvo sem
+  scanner/camera/OCR.
+
+### O Como
+- `master` foi sincronizada por fast-forward (`Already up to date`) e o backend
+  publico respondeu `/health` com
+  `git_sha=0ac7fa972daed1c16850d0384976aaedee9978a5`.
+- No Android fisico `SM A135M` (`R58T300SREH`, Android 14/API 34), o harness
+  `app/integration_test/commander_reference_app_value_runtime_test.dart`
+  executou register/login pela UI e gerou/salvou/abriu/validou Prosper, Edgar e
+  Aesi com `commander_name`.
+- Credenciais QA, tokens, e-mail completo, prompts completos e decklists
+  completas nao foram persistidos; a evidencia armazenada e sanitizada em
+  `app/doc/runtime_flow_handoffs/commander_reference_app_value_2026-05-13.md`.
+- Foi corrigido o save mobile para usar o comandante informado pelo usuario como
+  `is_commander=true` quando `generated_deck.commander` vier ausente,
+  preservando compatibilidade com respostas legadas.
+
+### Resultado
+- Resultado operacional: **PASS**.
+- Prosper, Edgar e Aesi: preview, save, Deck Details e validate PASS; 99 cartas
+  no main, 100 totais, comandante fora das 99, 0 off-identity e
+  `validation_ok=true`.
+- Sem raw 4xx/5xx exposto ao usuario, sem overflow, sem modal preso e sem uso
+  de scanner/camera/OCR.
+
 ## 2026-05-13 — Commander Reference Sprint 2 Final
 
 ### O Porquê

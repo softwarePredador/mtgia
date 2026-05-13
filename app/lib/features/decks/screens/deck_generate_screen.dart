@@ -264,17 +264,40 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           _generatedDeck!['generated_deck'] as Map<String, dynamic>;
       final cardsList = generatedDeckData['cards'] as List;
       final commander = generatedDeckData['commander'];
+      final selectedCommanderName = _selectedCommanderName();
+      final generatedCommanderName =
+          commander is Map ? commander['name']?.toString().trim() : null;
+      final commanderNameToSave =
+          (generatedCommanderName != null && generatedCommanderName.isNotEmpty)
+              ? generatedCommanderName
+              : selectedCommanderName;
 
       // Convert to format expected by createDeck API
       final cardsToAdd =
-          cardsList.map((card) {
-            return {'name': card['name'], 'quantity': card['quantity'] ?? 1};
-          }).toList();
+          cardsList
+              .where((card) {
+                if (commanderNameToSave == null ||
+                    commanderNameToSave.isEmpty ||
+                    card is! Map) {
+                  return true;
+                }
+                final cardName = card['name']?.toString().trim();
+                return cardName?.toLowerCase() !=
+                    commanderNameToSave.toLowerCase();
+              })
+              .map((card) {
+                return {
+                  'name': card['name'],
+                  'quantity': card['quantity'] ?? 1,
+                };
+              })
+              .toList();
 
-      // Se vier comandante explicitamente, salva marcado (is_commander=true).
-      if (commander is Map && commander['name'] != null) {
+      // Se vier comandante explicitamente, ou se o usuario informou o comandante
+      // para Commander/Brawl, salva marcado (is_commander=true) e fora das 99.
+      if (commanderNameToSave != null && commanderNameToSave.isNotEmpty) {
         cardsToAdd.insert(0, {
-          'name': commander['name'],
+          'name': commanderNameToSave,
           'quantity': 1,
           'is_commander': true,
         });
