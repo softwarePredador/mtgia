@@ -3,6 +3,48 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Lorehold Performance v5
+
+### O Porquê
+- A prova pública v4 em `d4838a4` manteve legalidade, Lorehold preservado,
+  `main_quantity=99`, corpus/profile/stats usados e `0/5` off-color, mas ainda
+  ficou **BLOCKED** por fallback `1/5` e p95 `23780ms`.
+- O probe que caiu em fallback foi o `with_commander_corpus #1`; a causa foi
+  `openai_timeout_deterministic_fallback` com `openai_timeout_ms=24000`, não
+  parse/decode, validação, cache hit/miss, repair ou dados off-color.
+
+### O Como
+- A policy de cache do generate reference-guided foi versionada para
+  `ai_generate_reference_prompt_v5`.
+- O corpus prompt foi versionado para `reference_deck_corpus_v4` e ativa modo
+  compacto quando `core_package` está completo: reduz roles enviados, limita
+  theme/support e mantém `optional_contextual` fora do prompt.
+- Card Stats ganhou modo compacto, priorizando nomes do `core_package` e
+  reduzindo duplicação de sinais quando o corpus forte já guia a lista.
+- Para Commander exact profile com corpus forte, `/ai/generate` usa um caminho
+  determinístico reference-guided antes da chamada OpenAI. Ele valida o deck
+  normalmente, preserva profile/stats/corpus diagnostics, mantém off-color
+  filter/fallback legal e evita marcar warnings de fallback quando a geração
+  determinística é o caminho primário.
+- Nenhum timeout, color identity, singleton, preservação de comandante ou
+  validação foi relaxado.
+
+### Resultado
+- `dart analyze lib routes test`: PASS.
+- Suite focada Commander Reference: PASS.
+- Reprocessamento Lorehold corpus `--dry-run`, `--apply` e `--apply`
+  idempotente: PASS, `accepted_deck_count=3`, `rejected_deck_count=0`,
+  `off_color_count=0`.
+- Prova pública final em
+  `d1e1b18474fd558211cbff16f1fa92192de06417`: `5/5` HTTP 200,
+  `5/5` validacao, `5/5` Lorehold preservado, `main_quantity=99`,
+  profile/stats/corpus `5/5`, fallback `0/5`, timeout fallback `0/5`,
+  commander nas 99 `0/5`, off-color generated/repair `0/5`, overlap top40
+  medio `36.0`, core coverage `26/26`, p95 `1648ms`.
+- Classificacao operacional: **PASS** para o gate Lorehold v5. A expansao de
+  corpus pode ser planejada em mini-batch pequeno, mantendo este gate como
+  baseline e sem adicionar novos comandantes nesta sprint.
+
 ## 2026-05-13 — Commander Reference Lorehold Off-Color Fix v4
 
 ### O Porquê

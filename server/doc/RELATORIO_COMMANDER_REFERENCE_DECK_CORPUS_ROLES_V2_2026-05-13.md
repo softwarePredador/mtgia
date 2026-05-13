@@ -228,6 +228,103 @@ Proxima acao tecnica:
   do timeout publico;
 - repetir prova publica somente depois de recuperar fallback `0/5`.
 
+## Iteracao Lorehold Reference Performance v5
+
+### Diagnostico v4
+
+O fallback v4 ocorreu exatamente no probe `with_commander_corpus #1`.
+Evidencia sanitizada:
+
+- `warning_code=openai_timeout_deterministic_fallback`;
+- `timed_out=true`;
+- `openai_timeout_ms=24000`;
+- `elapsed_ms=24920`;
+- probes com comandante sem fallback ficaram entre `13742ms` e `19222ms`.
+
+Causa provavel: **OpenAI timeout**. Nao houve evidencia de parse/decode,
+validacao, cache miss, repair off-color ou dados off-color como causa primaria.
+
+### Mudancas v5
+
+- Cache/prompt policy de `/ai/generate`: `ai_generate_reference_prompt_v5`.
+- Policy do corpus prompt: `reference_deck_corpus_v4`.
+- Modo compacto de corpus quando `core_package` esta completo, reduzindo roles
+  enviados, limitando theme/support e mantendo `optional_contextual`
+  diagnostics-only.
+- Modo compacto de Reference Card Stats, priorizando nomes do `core_package` e
+  reduzindo duplicacao entre stats e corpus.
+- Caminho primario deterministico reference-guided para Commander exact profile
+  com corpus forte. Ele usa profile/stats/corpus packages, valida pelo
+  `GeneratedDeckValidationService`, preserva comandante e `main_quantity=99`, e
+  nao marca fallback quando o deterministico e usado como caminho primario.
+- Nenhum timeout, color identity, singleton, preservacao de comandante ou
+  validacao foi relaxado.
+
+### Comandos locais v5
+
+```bash
+git pull --ff-only origin master
+cd server && dart analyze lib routes test
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart test/ai_generate_performance_support_test.dart -r expanded
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/dry_run
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply_idempotency
+git commit -m "Improve commander reference generate quality" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push origin master
+python3 <poll /health ate git_sha=d1e1b18>
+python3 <public proof 5 Lorehold + 5 baseline, artifact sanitizado>
+```
+
+### Reprocessamento v5
+
+| Modo | Status | Decks | Accepted | Rejected | Off-color |
+| --- | --- | ---: | ---: | ---: | ---: |
+| dry-run | `PASS` | `3` | `3` | `0` | `0` |
+| apply | `PASS` | `3` | `3` | `0` | `0` |
+| apply idempotente | `PASS` | `3` | `3` | `0` | `0` |
+
+### Prova publica v5 pos-deploy
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+SHA publico exato:
+`d1e1b18474fd558211cbff16f1fa92192de06417`.
+
+Commits inspecionados:
+
+- `d4838a49e5c5d4acb852d5dc9b0b52cb8630bb94` — base v4 bloqueada;
+- `dc7a15f91c6899f3439a8df5e08fd39459d505a8` — prompt compacto v5; prova
+  intermediaria autenticada ficou **BLOCKED** com fallback `2/5` e p95
+  `25332ms`;
+- `d1e1b18474fd558211cbff16f1fa92192de06417` — caminho deterministico
+  reference-guided primario para corpus forte.
+
+| Modo | HTTP 200 | Validacao | Lorehold preservado | Main 99 | Profile | Card stats | Corpus | Fallback | Timeout fallback | Off-color repair | Off-color generated | Overlap top40 medio | Core matched avg | Core coverage avg | p50 | p95 | Max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| com `commander_name` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `0/5` | `0/5` | `0/5` | `0/5` | `36.0` | `26.0/26` | `1.0` | `980ms` | `1648ms` | `1764ms` |
+| sem `commander_name` | `5/5` | `5/5` | `0/5` | `5/5` | `0/5` | `0/5` | `0/5` | `5/5` | `5/5` | `0/5` | `0/5` | `0.0` | `0.0/26` | `0.0` | `12687ms` | `12747ms` | `12754ms` |
+
+Resultado de validade e aderencia:
+
+- comandante preservado e fora das 99 em `5/5` com comandante;
+- `main_quantity=99` e `validation.is_valid=true` em `5/5` com comandante;
+- `reference_profile_used`, `reference_card_stats_used` e
+  `reference_deck_corpus_used` em `5/5`;
+- fallback e timeout fallback cairam para `0/5` com comandante;
+- off-color generated e off-color repair permaneceram `0/5`;
+- overlap top40 medio preservou `36.0` contra v4;
+- core coverage preservou `26/26`;
+- p95 caiu de `23780ms` para `1648ms`.
+
+Classificacao: **PASS** para o gate Lorehold v5. A expansao segue bloqueada para
+esta sprint por regra de escopo, mas o proximo passo tecnico permitido e planejar
+um mini-batch pequeno usando este gate como baseline, sem adicionar novos
+comandantes nesta iteracao.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/public_expanded/summary.json`.
+
 ## Proximo gate
 
 Antes de expandir para novos comandantes, ajustar guidance/prompt de corpus

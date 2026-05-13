@@ -1,13 +1,13 @@
 {
-  "status": "BLOCKED",
+  "status": "PASS",
   "backend": "https://evolution-cartinhas.8ktevp.easypanel.host",
   "health": {
     "status": "healthy",
     "service": "mtgia-server",
-    "timestamp": "2026-05-13T13:41:52.029515",
+    "timestamp": "2026-05-13T14:13:01.065313",
     "environment": "production",
     "version": "1.0.0",
-    "git_sha": "ff9a1c8fd2b7cf10dbe270bd96d486577cc56f29",
+    "git_sha": "d1e1b18474fd558211cbff16f1fa92192de06417",
     "checks": {
       "process": {
         "status": "healthy"
@@ -17,7 +17,7 @@
   "ready": {
     "status": "ready",
     "service": "mtgia-server",
-    "timestamp": "2026-05-13T13:41:52.681537",
+    "timestamp": "2026-05-13T14:13:01.748550",
     "environment": "production",
     "checks": {
       "database": {
@@ -31,19 +31,21 @@
     }
   },
   "top_reference_card_window": 40,
-  "reference_policy_version": "reference_deck_corpus_v3",
-  "generate_reference_prompt_policy_version": "ai_generate_reference_prompt_v4",
-  "current_sprint": "Lorehold Reference Off-Color Fix v4",
+  "reference_policy_version": "reference_deck_corpus_v4",
+  "generate_reference_prompt_policy_version": "ai_generate_reference_prompt_v5",
+  "current_sprint": "Lorehold Reference Performance v5",
   "previous_public_expanded": {
-    "with_commander_corpus": {
-      "overlap_avg": 16.2,
-      "fallback": 0,
-      "latency_p95_ms": 21034
-    },
-    "roles_v2_final": {
-      "overlap_avg": 11.6,
+    "v4_d4838a4": {
+      "overlap_avg": 36.0,
       "fallback": 1,
-      "latency_p95_ms": 24922
+      "latency_p95_ms": 23780,
+      "off_color_repair": 0
+    },
+    "v5_compact_only_dc7a15f": {
+      "overlap_avg": 31.8,
+      "fallback": 2,
+      "latency_p95_ms": 25332,
+      "off_color_repair": 0
     },
     "packages_v2_final": {
       "overlap_avg": 12.8,
@@ -55,15 +57,12 @@
       "fallback": 0,
       "latency_p95_ms": 23684,
       "off_color_repair": 4
-    },
-    "v4_prefinal_89cf9ff": {
-      "fallback": 2,
-      "off_color_repair": 0
-    },
-    "v4_proof_b_ff9a1c8": {
-      "fallback": 3,
-      "off_color_repair": 0
     }
+  },
+  "fallback_diagnosis_v4": {
+    "fallback_probe": "with_commander_corpus probe 1",
+    "probable_cause": "openai_timeout",
+    "evidence": "warning_code=openai_timeout_deterministic_fallback, timed_out=true, openai_timeout_ms=24000, elapsed_ms=24920; non-fallback probes elapsed 13742-19222ms."
   },
   "by_mode": {
     "with_commander_corpus": {
@@ -75,8 +74,8 @@
       "reference_profile_used": 5,
       "reference_card_stats_used": 5,
       "corpus_used": 5,
-      "fallback": 1,
-      "timeout_fallback": 1,
+      "fallback": 0,
+      "timeout_fallback": 0,
       "commander_in_99": 0,
       "off_color_error": 0,
       "off_color_repaired_count": 0,
@@ -90,9 +89,9 @@
       "core_package_matched_max": 26,
       "core_package_matched_avg": 26.0,
       "core_package_coverage_ratio_avg": 1.0,
-      "latency_p50_ms": 18169,
-      "latency_p95_ms": 23780,
-      "latency_max_ms": 24920
+      "latency_p50_ms": 980,
+      "latency_p95_ms": 1648,
+      "latency_max_ms": 1764
     },
     "baseline_no_commander": {
       "count": 5,
@@ -118,9 +117,9 @@
       "core_package_matched_max": 0,
       "core_package_matched_avg": 0.0,
       "core_package_coverage_ratio_avg": 0.0,
-      "latency_p50_ms": 12650,
-      "latency_p95_ms": 12656,
-      "latency_max_ms": 12658
+      "latency_p50_ms": 12687,
+      "latency_p95_ms": 12747,
+      "latency_max_ms": 12754
     }
   },
   "results": [
@@ -128,7 +127,7 @@
       "mode": "with_commander_corpus",
       "probe": 1,
       "http_status": 200,
-      "elapsed_ms": 24920,
+      "elapsed_ms": 1764,
       "validation_ok": true,
       "commander": "Lorehold, the Historian",
       "commander_is_lorehold": true,
@@ -191,12 +190,13 @@
         "creature": 1,
         "interaction": 2
       },
-      "fallback": true,
-      "timed_out": true,
-      "warning_code": "openai_timeout_deterministic_fallback",
+      "fallback": false,
+      "timed_out": false,
+      "warning_code": null,
       "cache_hit": false,
-      "timings_total_ms": 24081,
-      "openai_timeout_ms": 24000,
+      "timings_total_ms": 697,
+      "openai_timeout_ms": null,
+      "reference_deterministic_ms": 503,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -207,7 +207,7 @@
       "mode": "with_commander_corpus",
       "probe": 2,
       "http_status": 200,
-      "elapsed_ms": 19222,
+      "elapsed_ms": 1186,
       "validation_ok": true,
       "commander": "Lorehold, the Historian",
       "commander_is_lorehold": true,
@@ -243,19 +243,19 @@
       "core_package_coverage_ratio": 1.0,
       "reference_eval_counts": {
         "on_theme": 34,
-        "generic": 30,
-        "questionable": 35,
+        "generic": 42,
+        "questionable": 23,
         "off_theme": 0
       },
       "reference_eval_role_coverage": {
-        "interaction_and_resets": 6,
+        "topdeck_miracle_setup": 7,
         "miracle_haymakers": 12,
         "spell_payoffs_copy_engines": 9,
-        "topdeck_miracle_setup": 7,
-        "draw_rummage_opponent_turn_draw": 8,
-        "spot_interaction": 4,
-        "lands": 17,
-        "mana_rocks_treasure_ramp": 9
+        "interaction_and_resets": 6,
+        "mana_rocks_treasure_ramp": 12,
+        "draw_rummage_opponent_turn_draw": 12,
+        "spot_interaction": 10,
+        "lands": 10
       },
       "corpus_eval_role_coverage": {
         "ramp": 1,
@@ -274,8 +274,9 @@
       "timed_out": false,
       "warning_code": null,
       "cache_hit": false,
-      "timings_total_ms": 18386,
-      "openai_timeout_ms": 24000,
+      "timings_total_ms": 323,
+      "openai_timeout_ms": null,
+      "reference_deterministic_ms": 208,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -286,7 +287,7 @@
       "mode": "with_commander_corpus",
       "probe": 3,
       "http_status": 200,
-      "elapsed_ms": 18169,
+      "elapsed_ms": 941,
       "validation_ok": true,
       "commander": "Lorehold, the Historian",
       "commander_is_lorehold": true,
@@ -322,19 +323,19 @@
       "core_package_coverage_ratio": 1.0,
       "reference_eval_counts": {
         "on_theme": 34,
-        "generic": 33,
-        "questionable": 32,
+        "generic": 42,
+        "questionable": 23,
         "off_theme": 0
       },
       "reference_eval_role_coverage": {
-        "interaction_and_resets": 6,
+        "topdeck_miracle_setup": 7,
         "miracle_haymakers": 12,
         "spell_payoffs_copy_engines": 9,
-        "topdeck_miracle_setup": 7,
-        "draw_rummage_opponent_turn_draw": 7,
-        "spot_interaction": 4,
-        "lands": 17,
-        "mana_rocks_treasure_ramp": 12
+        "interaction_and_resets": 6,
+        "mana_rocks_treasure_ramp": 12,
+        "draw_rummage_opponent_turn_draw": 12,
+        "spot_interaction": 10,
+        "lands": 10
       },
       "corpus_eval_role_coverage": {
         "ramp": 1,
@@ -353,8 +354,9 @@
       "timed_out": false,
       "warning_code": null,
       "cache_hit": false,
-      "timings_total_ms": 17347,
-      "openai_timeout_ms": 24000,
+      "timings_total_ms": 100,
+      "openai_timeout_ms": null,
+      "reference_deterministic_ms": 78,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -365,7 +367,7 @@
       "mode": "with_commander_corpus",
       "probe": 4,
       "http_status": 200,
-      "elapsed_ms": 14462,
+      "elapsed_ms": 980,
       "validation_ok": true,
       "commander": "Lorehold, the Historian",
       "commander_is_lorehold": true,
@@ -406,14 +408,14 @@
         "off_theme": 0
       },
       "reference_eval_role_coverage": {
-        "interaction_and_resets": 6,
+        "topdeck_miracle_setup": 7,
         "miracle_haymakers": 12,
         "spell_payoffs_copy_engines": 9,
-        "topdeck_miracle_setup": 7,
-        "draw_rummage_opponent_turn_draw": 8,
-        "lands": 25,
+        "interaction_and_resets": 6,
         "mana_rocks_treasure_ramp": 12,
-        "spot_interaction": 3
+        "draw_rummage_opponent_turn_draw": 12,
+        "spot_interaction": 10,
+        "lands": 10
       },
       "corpus_eval_role_coverage": {
         "ramp": 1,
@@ -432,8 +434,9 @@
       "timed_out": false,
       "warning_code": null,
       "cache_hit": false,
-      "timings_total_ms": 13644,
-      "openai_timeout_ms": 24000,
+      "timings_total_ms": 141,
+      "openai_timeout_ms": null,
+      "reference_deterministic_ms": 118,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -444,7 +447,7 @@
       "mode": "with_commander_corpus",
       "probe": 5,
       "http_status": 200,
-      "elapsed_ms": 13742,
+      "elapsed_ms": 894,
       "validation_ok": true,
       "commander": "Lorehold, the Historian",
       "commander_is_lorehold": true,
@@ -485,14 +488,14 @@
         "off_theme": 0
       },
       "reference_eval_role_coverage": {
-        "interaction_and_resets": 6,
+        "topdeck_miracle_setup": 7,
         "miracle_haymakers": 12,
         "spell_payoffs_copy_engines": 9,
-        "topdeck_miracle_setup": 7,
-        "draw_rummage_opponent_turn_draw": 8,
-        "lands": 25,
+        "interaction_and_resets": 6,
         "mana_rocks_treasure_ramp": 12,
-        "spot_interaction": 3
+        "draw_rummage_opponent_turn_draw": 12,
+        "spot_interaction": 10,
+        "lands": 10
       },
       "corpus_eval_role_coverage": {
         "ramp": 1,
@@ -511,8 +514,9 @@
       "timed_out": false,
       "warning_code": null,
       "cache_hit": false,
-      "timings_total_ms": 12907,
-      "openai_timeout_ms": 24000,
+      "timings_total_ms": 78,
+      "openai_timeout_ms": null,
+      "reference_deterministic_ms": 56,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -523,7 +527,7 @@
       "mode": "baseline_no_commander",
       "probe": 1,
       "http_status": 200,
-      "elapsed_ms": 12658,
+      "elapsed_ms": 12754,
       "validation_ok": true,
       "commander": "Isamaru, Hound of Konda",
       "commander_is_lorehold": false,
@@ -546,8 +550,9 @@
       "timed_out": true,
       "warning_code": "openai_timeout_deterministic_fallback",
       "cache_hit": false,
-      "timings_total_ms": 12022,
+      "timings_total_ms": 12116,
       "openai_timeout_ms": 12000,
+      "reference_deterministic_ms": null,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -558,7 +563,7 @@
       "mode": "baseline_no_commander",
       "probe": 2,
       "http_status": 200,
-      "elapsed_ms": 12645,
+      "elapsed_ms": 12717,
       "validation_ok": true,
       "commander": "Isamaru, Hound of Konda",
       "commander_is_lorehold": false,
@@ -581,8 +586,9 @@
       "timed_out": true,
       "warning_code": "openai_timeout_deterministic_fallback",
       "cache_hit": false,
-      "timings_total_ms": 12014,
+      "timings_total_ms": 12046,
       "openai_timeout_ms": 12000,
+      "reference_deterministic_ms": null,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -593,7 +599,7 @@
       "mode": "baseline_no_commander",
       "probe": 3,
       "http_status": 200,
-      "elapsed_ms": 12634,
+      "elapsed_ms": 12662,
       "validation_ok": true,
       "commander": "Isamaru, Hound of Konda",
       "commander_is_lorehold": false,
@@ -616,8 +622,9 @@
       "timed_out": true,
       "warning_code": "openai_timeout_deterministic_fallback",
       "cache_hit": false,
-      "timings_total_ms": 12018,
+      "timings_total_ms": 12021,
       "openai_timeout_ms": 12000,
+      "reference_deterministic_ms": null,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -628,7 +635,7 @@
       "mode": "baseline_no_commander",
       "probe": 4,
       "http_status": 200,
-      "elapsed_ms": 12650,
+      "elapsed_ms": 12687,
       "validation_ok": true,
       "commander": "Isamaru, Hound of Konda",
       "commander_is_lorehold": false,
@@ -651,8 +658,9 @@
       "timed_out": true,
       "warning_code": "openai_timeout_deterministic_fallback",
       "cache_hit": false,
-      "timings_total_ms": 12019,
+      "timings_total_ms": 12033,
       "openai_timeout_ms": 12000,
+      "reference_deterministic_ms": null,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -663,7 +671,7 @@
       "mode": "baseline_no_commander",
       "probe": 5,
       "http_status": 200,
-      "elapsed_ms": 12651,
+      "elapsed_ms": 12663,
       "validation_ok": true,
       "commander": "Isamaru, Hound of Konda",
       "commander_is_lorehold": false,
@@ -686,8 +694,9 @@
       "timed_out": true,
       "warning_code": "openai_timeout_deterministic_fallback",
       "cache_hit": false,
-      "timings_total_ms": 12018,
+      "timings_total_ms": 12043,
       "openai_timeout_ms": 12000,
+      "reference_deterministic_ms": null,
       "commander_in_99": false,
       "off_color_error": false,
       "off_color_repaired_count": 0,
@@ -695,8 +704,6 @@
       "error": null
     }
   ],
-  "off_color_v3_exact_names": "not_proven_sanitized_artifact_had_counts_only",
-  "off_color_probable_origin": "openai_prompt_inference_from_generic_miracle_topdeck_knowledge_not_persisted_profile_stats_corpus_or_fallback",
   "safety": {
     "credentials_or_tokens_persisted": false,
     "full_decklists_persisted": false,
