@@ -2,18 +2,19 @@
 
 ## Verdict
 
-**PASS WITH RISKS.**
+**PASS.**
 
 O corpus offline de `Aesi, Tyrant of Gyre Strait` foi montado com 4 paginas
 publicas EDHREC Average Deck, validado em `--dry-run`, aplicado com sucesso e
-reaplicado para prova de idempotencia. O scorecard read-only ficou em
-`PASS_WITH_RISKS` porque ainda falta prova publica 5x para liberar expansao.
+reaplicado para prova de idempotencia. A prova publica 5x de `/ai/generate`
+passou no backend publico e o scorecard read-only final ficou em `score=100`,
+`ready_for_mini_batch`.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, rotas app-facing e runtime de geracao ficaram
-fora do escopo. O trabalho foi restrito a corpus/reference pipeline e
-documentacao.
+Scanner, camera, OCR, app mobile e criacao/aplicacao de deck no app ficaram
+fora do escopo. O trabalho cobriu corpus/reference pipeline, prova publica
+sanitizada de `/ai/generate` e documentacao.
 
 ## Fontes consultadas
 
@@ -135,6 +136,78 @@ Resultado:
 Artifact:
 `server/test/artifacts/commander_reference_readiness_aesi_after_corpus_2026-05-13/readiness_scorecard_summary.json`
 
+## Public proof
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`
+
+SHA testado:
+`5ff2e53b4a4f18ecd3b7d5e330fd34da06c634fb`
+
+Comando operacional executado: prova sanitaria 5x `POST /ai/generate` com
+`format=Commander`, `bracket=3`, `commander_name='Aesi, Tyrant of Gyre Strait'`
+e prompt focado em lands/ramp/value, extra land drops, landfall payoffs,
+interaction e win conditions Simic. Um usuario QA descartavel foi criado apenas
+em memoria para obter JWT; token, e-mail, senha, prompt completo e decklists nao
+foram salvos.
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| health_status | `200` |
+| HTTP 200 | 5/5 |
+| validation OK | 5/5 |
+| commander preserved | 5/5 |
+| main quantity 99 | 5/5 |
+| reference profile used | 5/5 |
+| reference card stats used | 5/5 |
+| reference deck corpus used | 5/5 |
+| deterministic fallback marker | 5/5 |
+| timeout fallback | 0/5 |
+| invalid cards | 0 |
+| off-identity cards | 0 |
+| p50 | 987ms |
+| p95 | 1234ms |
+
+O payload publico marcou `is_mock=true`, mas sem timeout, sem erro de validacao
+e com profile/stats/corpus ativos. Isso foi classificado como caminho
+deterministico reference-guided, nao como fallback de timeout.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/public_proof/summary.json`
+
+## Readiness scorecard final
+
+Comando:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Aesi, Tyrant of Gyre Strait' \
+  --runtime-summary=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/public_proof/summary.json \
+  --artifact-dir=test/artifacts/commander_reference_readiness_aesi_public_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS` |
+| score | 100 |
+| readiness status | `ready_for_mini_batch` |
+| expansion_ready | `true` |
+| blockers | `[]` |
+| warnings | `[]` |
+| runtime_public_gate_passed | `true` |
+| corpus_accepted_deck_count | 4 |
+| corpus_core_package_count | 31 |
+| deterministic_deck_valid | `true` |
+| deterministic_main_quantity | 99 |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_aesi_public_2026-05-13/readiness_scorecard_summary.json`
+
 ## Achados derivados da web
 
 As paginas EDHREC Average Deck provam contexto Commander por fonte e formato da
@@ -172,8 +245,9 @@ Padroes arriscados ou nao transferiveis:
 - nao copiar decklist em runtime; usar apenas sinais agregados de roles,
   top cards e pacotes.
 
-## Proximo passo
+## Decisao
 
-Executar prova publica 5x com `commander_name='Aesi, Tyrant of Gyre Strait'`.
-Sem essa prova, Aesi permanece com corpus aplicado e score alto, mas ainda nao
-esta liberado para expansao (`expansion_ready=false`).
+`Aesi, Tyrant of Gyre Strait` esta promovido para mini-batch controlado. A
+promocao nao altera o contrato de `/ai/generate`; o app continua usando
+`generated_deck` e `validation` como fonte de verdade e tratando diagnostics
+como opcionais.
