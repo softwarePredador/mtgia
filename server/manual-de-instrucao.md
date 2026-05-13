@@ -3,6 +3,42 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Edgar Prova Publica e Promocao
+
+### O Porquê
+- Edgar Markov ja tinha corpus aplicado e scorecard local `score=98`, mas ainda
+  estava bloqueado pela ausencia de prova publica 5x de `/ai/generate`.
+- A decisao de promocao precisava ser tomada por scorecard, sem registrar
+  secrets, JWT, e-mail QA completo, prompt completo ou decklists geradas.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- O backend publico `https://evolution-cartinhas.8ktevp.easypanel.host` foi
+  validado via `/health`, retornando `git_sha`
+  `eeb31238fc5df045af95cedd563bf3ee87b30a32`.
+- Foi criado usuario QA descartavel somente em memoria para autenticar a prova;
+  credenciais e token nao foram persistidos.
+- Foram executados 5 probes `POST /ai/generate` com `format=Commander`,
+  `bracket=3` e `commander_name='Edgar Markov'`.
+- O artifact publico salvo contem apenas resumo sanitizado:
+  `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/public_proof/summary.json`.
+- O scorecard foi reexecutado com `--runtime-summary` em
+  `test/artifacts/commander_reference_readiness_edgar_public_2026-05-13`.
+- Scanner/camera/OCR, app mobile e `/ai/optimize` permaneceram fora do escopo.
+
+### Resultado
+- Prova publica: **PASS**, 5/5 HTTP 200, 5/5 `validation_ok`, 5/5 comandante
+  preservado, 5/5 `main_quantity=99`, 5/5 profile/stats/corpus usados,
+  fallback deterministico 5/5, timeout fallback 0/5, invalid/off-identity 0,
+  p50 `866ms`, p95 `867ms`.
+- Scorecard final: **PASS**, `score=100`,
+  `status=ready_for_mini_batch`, `expansion_ready=true`, `blockers=[]`,
+  `warnings=[]`, `runtime_public_gate_passed=true`.
+- Decisao: Edgar Markov esta promovido para mini-batch controlado.
+- Nao houve mudanca de shape em `/ai/generate`; o contrato atual em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece valido.
+
 ## 2026-05-13 — Commander Reference Edgar Corpus Apply e Readiness
 
 ### O Porquê

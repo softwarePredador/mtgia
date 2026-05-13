@@ -2,20 +2,21 @@
 
 ## Verdict
 
-**PASS WITH RISKS.**
+**PASS.**
 
 O corpus offline de `Edgar Markov` foi montado com 4 paginas publicas EDHREC
 Average Deck, revalidado em `--dry-run`, aplicado com sucesso e reaplicado para
 prova de idempotencia. O scorecard read-only apos corpus ficou em
 `PASS_WITH_RISKS`, `score=98`, bloqueado apenas pela ausencia de prova publica
-5x de `/ai/generate`.
+5x de `/ai/generate`. A prova publica sanitizada foi executada em seguida contra
+o backend publico e promoveu Edgar para `ready_for_mini_batch` com `score=100`.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, prova publica de `/ai/generate` e
-`/ai/optimize` ficaram fora do escopo. A entrega cobriu o corpus/reference
-pipeline, escrita idempotente nas tabelas de reference corpus e scorecard
-read-only para deixar Edgar pronto para prova publica sanitizada.
+Scanner, camera, OCR, app mobile e `/ai/optimize` ficaram fora do escopo. A
+entrega cobriu o corpus/reference pipeline, escrita idempotente nas tabelas de
+reference corpus, prova publica sanitizada de `/ai/generate` e scorecard final
+para decisao de promocao.
 
 ## Fontes consultadas
 
@@ -162,6 +163,82 @@ Resultado:
 Artifact:
 `server/test/artifacts/commander_reference_readiness_edgar_after_corpus_2026-05-13/readiness_scorecard_summary.json`
 
+## Prova publica sanitizada de `/ai/generate`
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`
+
+Health:
+
+| Metric | Value |
+| --- | ---: |
+| health_status | 200 |
+| backend_git_sha | `eeb31238fc5df045af95cedd563bf3ee87b30a32` |
+
+Prova executada com usuario QA descartavel criado apenas em memoria, sem
+registrar credenciais, token, e-mail completo, prompt completo ou decklists. Os
+5 probes usaram `format=Commander`, `bracket=3` e
+`commander_name='Edgar Markov'`, com prompt focado em vampire typal, token
+pressure, aristocrats, anthem/lord effects, sacrifice payoffs,
+draw/ramp/removal/protection Mardu e win conditions coerentes.
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS` |
+| http_200 | 5/5 |
+| validation_ok | 5/5 |
+| commander_preserved | 5/5 |
+| main_quantity_99 | 5/5 |
+| profile_used | 5/5 |
+| stats_used | 5/5 |
+| corpus_used | 5/5 |
+| fallback_count | 5/5 |
+| timeout_fallback_count | 0/5 |
+| invalid_cards_total | 0 |
+| off_identity_total | 0 |
+| p50 | 866ms |
+| p95 | 867ms |
+
+O payload publico marcou `is_mock=true`, mas sem timeout, sem erro de validacao
+e com profile/stats/corpus ativos. Pela regra do scorecard v2, isso e caminho
+deterministico reference-guided valido, nao fallback de timeout.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/public_proof/summary.json`
+
+## Readiness scorecard final
+
+Comando:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Edgar Markov' \
+  --runtime-summary=test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/public_proof/summary.json \
+  --artifact-dir=test/artifacts/commander_reference_readiness_edgar_public_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS` |
+| score | 100 |
+| readiness status | `ready_for_mini_batch` |
+| expansion_ready | `true` |
+| blockers | `[]` |
+| warnings | `[]` |
+| runtime_public_gate_passed | `true` |
+| corpus_accepted_deck_count | 4 |
+| corpus_core_package_count | 40 |
+| deterministic_deck_valid | `true` |
+| deterministic_main_quantity | 99 |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_edgar_public_2026-05-13/readiness_scorecard_summary.json`
+
 ## Achados derivados da web
 
 As paginas EDHREC Average Deck provam contexto Commander pela propria fonte,
@@ -205,11 +282,9 @@ Padroes arriscados ou nao transferiveis:
 - nao copiar decklists em runtime; usar apenas sinais agregados de roles,
   recorrencia e pacotes.
 
-## Proxima etapa tecnica minima
+## Decisao final
 
-1. Executar prova publica sanitizada 5x de `/ai/generate` com
-   `commander_name='Edgar Markov'`, sem persistir token, prompt completo ou
-   decklists.
-2. Reexecutar o readiness scorecard com `--runtime-summary` da prova publica.
-3. Promover Edgar somente se o scorecard final ficar `PASS`, sem blockers e sem
-   warnings.
+Edgar Markov esta promovido para mini-batch controlado. Nao houve mudanca de
+shape em `/ai/generate`; a prova apenas confirmou o contrato publico ja
+documentado com diagnosticos opcionais de Commander Reference Profile, Card
+Stats e Deck Corpus.
