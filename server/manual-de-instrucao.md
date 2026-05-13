@@ -3,6 +3,38 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 3 plan
+
+### O Porquê
+- A decisao post-Sprint 2 liberou Sprint 3 apenas como **GO condicionado** para
+  discovery/corpus pequenos, mantendo **NO-GO** para promocao ampla ou guidance
+  forte sem repetir todos os gates por comandante.
+- Era necessario transformar essa decisao em uma fila objetiva, diversa por
+  cores/arquetipos e segura para execucao futura, sem aplicar no banco nem criar
+  corpus nesta rodada.
+
+### O Como
+- Foram lidos a decisao post-Sprint 2, o relatorio final Sprint 2, o readiness
+  scorecard, o summary sanitizado do scorecard, o tracker Sprint 2, o Anchor 30,
+  o contexto de produto e este manual.
+- Foi criado
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_PLAN_2026-05-13.md` com 12 candidatos
+  priorizados em 3 lotes de 4:
+  `Krenko`, `Light-Paws`, `Niv-Mizzet`, `Teysa`, `Meren`, `Korvold retry`,
+  `Sythis`, `Urza`, `Brago`, `Feather`, `Jodah` e `Ghave`.
+- O plano separa fatos locais provados, achados web-derived nao revalidados ao
+  vivo nesta tarefa e interpretacao operacional, marcando disponibilidade de
+  corpus como esperada ate prova offline/sanitizada.
+
+### Resultado
+- Resultado operacional: **PASS WITH RISKS**.
+- Nenhum corpus foi criado, nenhum artifact de decklist foi persistido, nenhuma
+  mutacao de banco foi executada e nenhum endpoint app-facing, scanner, camera
+  ou OCR foi alterado.
+- Sprint 3 fica autorizado apenas para proxima execucao controlada em lote de 4,
+  com dry-run, apply, idempotencia, public proof 5/5 e scorecard final antes de
+  qualquer promocao.
+
 ## 2026-05-13 — Commander Reference post-Sprint 2 decision
 
 ### O Porquê
