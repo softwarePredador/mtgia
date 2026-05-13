@@ -165,7 +165,68 @@ cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=tes
 
 ### Gate pre-prova publica
 
-Status: **not_proven** ate deploy e prova publica expandida do novo SHA.
+Status antes do deploy: **not_proven**.
+
+### Prova publica v4 pos-deploy
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+SHA publico exato:
+`ff9a1c8fd2b7cf10dbe270bd96d486577cc56f29`.
+
+Commits inspecionados:
+
+- `d611b421a1757c4a8b6a52e3f21e6409db400ca5` — base no inicio da sprint;
+- `89cf9ff80f3d*` — pre-validacao off-color e prompt policy v3; prova
+  prefinal removeu auto-reparo off-color mas teve fallback `2/5`;
+- `ff9a1c8fd2b7cf10dbe270bd96d486577cc56f29` — prompt policy v4 com package
+  names/counts no profile prompt.
+
+Comandos adicionais executados:
+
+```bash
+git commit -m "Improve commander reference generate quality" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push origin master
+python3 <poll /health ate git_sha=89cf9ff>
+python3 <public proof 5 Lorehold + 5 baseline, artifact sanitizado>
+cd server && dart format lib/ai/commander_reference_profile_support.dart routes/ai/generate/index.dart test/commander_reference_profile_support_test.dart
+cd server && dart analyze lib routes test
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart test/ai_generate_performance_support_test.dart -r expanded
+git commit -m "Improve commander reference generate quality" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push origin master
+python3 <poll /health ate git_sha=ff9a1c8>
+python3 <public proof 5 Lorehold + 5 baseline, artifact sanitizado>
+```
+
+| Modo | HTTP 200 | Validacao | Lorehold preservado | Main 99 | Profile | Card stats | Corpus | Fallback | Timeout fallback | Off-color repair | Off-color generated | Overlap top40 medio | Core matched avg | Core coverage avg | p50 | p95 | Max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| com `commander_name` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `1/5` | `1/5` | `0/5` | `0/5` | `36.0` | `26.0/26` | `1.0` | `18169ms` | `23780ms` | `24920ms` |
+| sem `commander_name` | `5/5` | `5/5` | `0/5` | `5/5` | `0/5` | `0/5` | `0/5` | `5/5` | `5/5` | `0/5` | `0/5` | `0.0` | `0.0/26` | `0.0` | `12650ms` | `12656ms` | `12658ms` |
+
+Resultado de validade e aderencia:
+
+- comandante preservado e fora das 99 em `5/5` com comandante;
+- `main_quantity=99` e `validation.is_valid=true` em `5/5` com comandante;
+- `reference_profile_used`, `reference_card_stats_used` e
+  `reference_deck_corpus_used` em `5/5`;
+- auto-reparo off-color caiu de `4/5` em v3 para `0/5` em v4;
+- fallback piorou de `0/5` em v3 para `1/5` em v4 final;
+- p95 `23780ms`, acima do alvo preferencial `<=22000ms`;
+- nomes exatos das cartas off-color v3 permanecem **not_proven** porque o
+  artefato anterior guardou apenas contagem sanitizada.
+
+Classificacao: **BLOCKED** para expansao. A correcao resolveu o sintoma de
+auto-reparo off-color no validator, mas nao atingiu os gates de fallback e
+latencia. Nao expandir para novos comandantes.
+
+Proxima acao tecnica:
+
+- preservar o filtro pre-validacao identity-safe;
+- reduzir latencia/fallback sem aumentar timeout, possivelmente movendo mais
+  selecao para deterministico/cache ou usando retry deterministico compacto antes
+  do timeout publico;
+- repetir prova publica somente depois de recuperar fallback `0/5`.
 
 ## Proximo gate
 

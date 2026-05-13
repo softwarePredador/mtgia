@@ -31,13 +31,19 @@
 - Nenhuma regra de validacao, color identity, singleton, preservacao do
   comandante ou timeout foi relaxada.
 
-### Resultado local
+### Resultado
 - `dart analyze lib routes test`: PASS.
 - Suite focada Commander Reference: PASS.
 - Reprocessamento Lorehold corpus `--dry-run`, `--apply` e `--apply`
   idempotente: PASS, `accepted_deck_count=3`, `rejected_deck_count=0`,
   `off_color_count=0`.
-- Prova publica pos-deploy: **not_proven** ate o deploy do novo SHA.
+- Prova publica final em
+  `ff9a1c8fd2b7cf10dbe270bd96d486577cc56f29`: `5/5` HTTP 200,
+  `5/5` validacao, `5/5` Lorehold preservado, `main_quantity=99` e
+  `0/5` auto-reparo off-color; fallback ficou `1/5` e p95 `23780ms`.
+- Classificacao operacional: **BLOCKED** para expansao. A correcao eliminou o
+  reparo off-color observado, mas nao atingiu o gate de fallback `0/5` nem o
+  alvo preferencial de p95 `<=22000ms`.
 
 ## 2026-05-13 — Commander Reference Generate Quality Lorehold v3
 
