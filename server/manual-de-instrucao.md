@@ -3,6 +3,43 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 2 Public Proof
+
+### O Porquê
+- Os corpora Sprint 2 de Kinnan, Korvold, Muldrotha, Yuriko, Winota e Atraxa
+  ja estavam aplicados, mas a promocao dependia de prova publica sanitizada 5/5
+  de `/ai/generate` e scorecard final com `--runtime-summary`.
+
+### O Como
+- `master` foi sincronizada por fast-forward e o backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host` respondeu `/health` com
+  `git_sha=f280a97f865f87eb9e1dfcbe65765c5828ff93a4`.
+- Foi criado usuario QA descartavel em memoria para autenticar `/ai/generate`;
+  token, e-mail, senha, prompt completo e decklists nao foram persistidos.
+- Cada comandante recebeu 5 probes com `format=Commander`, `bracket=3` e
+  `commander_name` exato. Os artifacts gravados em
+  `server/test/artifacts/commander_reference_sprint2_2026-05-13/<safe_commander>/public_proof/summary.json`
+  contem somente contagens, flags, timings e marcadores de seguranca.
+- O primeiro lote encontrou rate limit publico de IA (`10` chamadas/minuto);
+  Yuriko, Winota e Atraxa foram reexecutados em janelas controladas. Korvold foi
+  reexecutado em janela limpa para confirmar que o risco era do caminho
+  runtime/core package, nao apenas do rate limit.
+- O runner
+  `bin/commander_reference_readiness_scorecard.dart` foi executado por
+  comandante com `--runtime-summary` e output em `readiness_public/`.
+- Nao houve mudanca de shape em `/ai/generate`; por isso
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` nao foi alterado.
+
+### Resultado
+- Resultado operacional: **PASS WITH RISKS**.
+- Promovidos com `score=100`, `status=ready_for_mini_batch` e
+  `promoted=true`: Kinnan, Muldrotha, Yuriko, Winota e Atraxa.
+- Korvold permaneceu `promoted=false`, com `score=90`,
+  `core_package_weak` e `public_runtime_gate_not_passed`
+  (`timeout_fallback_count=2/5`, p95 `24991ms`).
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_PUBLIC_PROOF_2026-05-13.md`.
+
 ## 2026-05-13 — Commander Reference Sprint 2 Apply Controlado
 
 ### O Porquê

@@ -59,7 +59,7 @@ Status inicial do Sprint 2: todos os campos comecam em `PENDING`.
 | 3 | `Niv-Mizzet, Parun` | Izzet spellslinger/combo | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
 | 4 | `Teysa Karlov` | Orzhov aristocrats/tokens | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
 | 5 | `Meren of Clan Nel Toth` | Golgari graveyard recursion/sacrifice value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
-| 6 | `Kinnan, Bonder Prodigy` | Simic ramp/combo with explicit casual/cEDH lanes | DONE | DONE | DONE | DONE | PENDING | PENDING | PENDING |
+| 6 | `Kinnan, Bonder Prodigy` | Simic ramp/combo with explicit casual/cEDH lanes | DONE | DONE | DONE | DONE | DONE | DONE | true |
 
 ## Corpus prep batch offline - 2026-05-13
 
@@ -67,14 +67,14 @@ Batch preparado sem apply no banco. Todos os artifacts usam fontes publicas
 EDHREC Average Deck coletadas uma vez em baixo volume e salvas offline em
 `server/test/artifacts/commander_reference_sprint2_2026-05-13/<safe_commander>/corpus.json`.
 
-| Commander | Decks | corpus_prepared | dry_run | dry_run_recheck | apply | idempotency | readiness_after_corpus | Observacao |
-| --- | ---: | --- | --- | --- | --- | --- | --- | --- |
-| `Kinnan, Bonder Prodigy` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | Inclui lanes default, budget, combo e cEDH; cEDH nao deve virar default casual. |
-| `Korvold, Fae-Cursed King` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | Jund sacrifice/treasure/value aplicado; scorecard ainda aponta `core_package_weak`. |
-| `Muldrotha, the Gravetide` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | Sultai graveyard recursion/self-mill aplicado. |
-| `Yuriko, the Tiger's Shadow` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | Dimir ninjas/topdeck aplicado. |
-| `Winota, Joiner of Forces` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | Boros humans/hatebears aplicado; stax nao deve virar casual default. |
-| `Atraxa, Praetors' Voice` | 5 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | Counters, superfriends e infect mantidos como lanes separadas. |
+| Commander | Decks | corpus_prepared | dry_run | dry_run_recheck | apply | idempotency | readiness_after_corpus | public_proof | readiness_public | promoted |
+| --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `Kinnan, Bonder Prodigy` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | PASS | PASS, score 100 | true |
+| `Korvold, Fae-Cursed King` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | PASS_WITH_RISKS | PASS_WITH_RISKS, score 90 | false |
+| `Muldrotha, the Gravetide` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | PASS | PASS, score 100 | true |
+| `Yuriko, the Tiger's Shadow` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | PASS | PASS, score 100 | true |
+| `Winota, Joiner of Forces` | 4 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | PASS | PASS, score 100 | true |
+| `Atraxa, Praetors' Voice` | 5 | DONE | DONE | DONE | DONE | DONE | PASS_WITH_RISKS | PASS | PASS, score 100 | true |
 
 Dry-run consolidado: todos os decks aceitos com `commander_quantity=1`,
 `main_quantity=99`, `unresolved=0`, `off_color=0`,
@@ -109,12 +109,34 @@ registrou `all_pass=true`, com `accepted_rows=expected_decks`,
 `main_quantity_99_rows` iguais ao total esperado de decks por comandante.
 
 O scorecard pos-corpus foi executado sem `--runtime-summary`, por isso nao
-substitui a etapa de `public_proof` nem a decisao final de promocao. Todos os
-comandantes continuam com `promoted=PENDING` ate prova publica sanitizada e
-scorecard final.
+substituia a etapa de `public_proof` nem a decisao final de promocao. A prova
+publica final abaixo supersede esse estado: cinco comandantes foram promovidos
+com `promoted=true`; Korvold permanece bloqueado.
 
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_APPLY_2026-05-13.md`.
+
+## Prova publica e decisao de promocao - 2026-05-13
+
+Backend publico: `https://evolution-cartinhas.8ktevp.easypanel.host`.
+SHA validado: `f280a97f865f87eb9e1dfcbe65765c5828ff93a4`.
+
+Artifacts sanitizados:
+`server/test/artifacts/commander_reference_sprint2_2026-05-13/<safe_commander>/public_proof/summary.json`
+e
+`server/test/artifacts/commander_reference_sprint2_2026-05-13/<safe_commander>/readiness_public/readiness_scorecard_summary.json`.
+
+| Commander | Public proof | Scorecard final | Decisao |
+| --- | --- | --- | --- |
+| `Kinnan, Bonder Prodigy` | PASS, 5/5 HTTP/validation/commander/main/profile/stats/corpus, timeout 0/5 | PASS, score 100, `ready_for_mini_batch` | `promoted=true` |
+| `Korvold, Fae-Cursed King` | PASS_WITH_RISKS, 5/5 HTTP/validation/commander/main/profile/stats/corpus, timeout 2/5 | PASS_WITH_RISKS, score 90, `core_package_weak`, `public_runtime_gate_not_passed` | `promoted=false` |
+| `Muldrotha, the Gravetide` | PASS, 5/5 HTTP/validation/commander/main/profile/stats/corpus, timeout 0/5 | PASS, score 100, `ready_for_mini_batch` | `promoted=true` |
+| `Yuriko, the Tiger's Shadow` | PASS, 5/5 HTTP/validation/commander/main/profile/stats/corpus, timeout 0/5 | PASS, score 100, `ready_for_mini_batch` | `promoted=true` |
+| `Winota, Joiner of Forces` | PASS, 5/5 HTTP/validation/commander/main/profile/stats/corpus, timeout 0/5 | PASS, score 100, `ready_for_mini_batch` | `promoted=true` |
+| `Atraxa, Praetors' Voice` | PASS, 5/5 HTTP/validation/commander/main/profile/stats/corpus, timeout 0/5 | PASS, score 100, `ready_for_mini_batch` | `promoted=true` |
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_PUBLIC_PROOF_2026-05-13.md`.
 
 ## Observacoes por alvo
 
