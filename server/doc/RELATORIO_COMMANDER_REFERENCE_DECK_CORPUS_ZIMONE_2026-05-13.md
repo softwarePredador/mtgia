@@ -1,0 +1,172 @@
+# Commander Reference Deck Corpus - Zimone, Infinite Analyst - 2026-05-13
+
+## Verdict
+
+**PASS.**
+
+O corpus offline de `Zimone, Infinite Analyst` foi montado com 5 paginas
+publicas EDHREC Average Deck, validado em `--dry-run` e mantido sem aplicacao no
+banco nesta etapa. O artifact final e uma projecao local-resolvivel: as paginas
+EDHREC originais usam cartas novas de Secrets of Strixhaven que o banco local
+ainda nao resolve; esses slots foram substituidos por cartas Simic on-theme ja
+resolviveis localmente.
+
+## Scope
+
+Scanner, camera, OCR, app mobile, rotas app-facing, `/ai/optimize`, prova
+publica de `/ai/generate` e escrita no banco ficaram fora do escopo. O trabalho
+cobriu pesquisa de baixo volume, montagem do JSON offline, dry-run DB-backed e
+documentacao.
+
+## Fontes consultadas
+
+Fontes publicas Commander, coletadas uma vez em baixo volume para analise
+offline:
+
+| Fonte | Uso |
+| --- | --- |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst` | incluido |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst/plus-1-plus-1-counters` | incluido |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst/x-spells` | incluido |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst/big-mana` | incluido |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst/budget` | incluido |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst/lands` | excluido: amostra publica de apenas 1 deck medio |
+| `https://edhrec.com/average-decks/zimone-infinite-analyst/landfall` | excluido: 404 |
+| `https://edhrec.com/commanders/zimone-infinite-analyst` | contexto Commander e tags publicas |
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json`
+
+## Criterios de inclusao
+
+- fonte publica explicitamente rotulada como EDHREC Average Deck para
+  `Zimone, Infinite Analyst`;
+- commander em zona de comando com quantidade `1`;
+- main deck com quantidade total `99`;
+- deck total com quantidade `100`;
+- identidade Simic/GU sem cartas fora de cor;
+- sem violacao singleton fora de terrenos basicos;
+- uso somente offline: o runtime nao faz scraping nem depende de EDHREC ou API
+  nao oficial.
+
+## Fatos locais comprovados
+
+Dry-run executado:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json \
+  --dry-run \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS` |
+| mode | `dry_run` |
+| db_mutations | `false` |
+| deck_count | 5 |
+| accepted_deck_count | 5 |
+| rejected_deck_count | 0 |
+| commander_quantity | 1 em 5/5 |
+| main_quantity | 99 em 5/5 |
+| unresolved_count | 0 em 5/5 |
+| off_color_count | 0 em 5/5 |
+| singleton_violations | `{}` em 5/5 |
+
+O comandante resolveu localmente como `Zimone, Infinite Analyst`, preservando a
+identidade GU esperada.
+
+Artifact de validacao:
+`server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run/zimone_infinite_analyst_dry_run_summary.json`
+
+## Decks aceitos
+
+| Deck key | Source | Lane | Replacements |
+| --- | --- | --- | ---: |
+| `edhrec_zimone_default_average` | `https://edhrec.com/average-decks/zimone-infinite-analyst` | `edhrec_average_default` | 13 |
+| `edhrec_zimone_plus_1_plus_1_counters_average` | `https://edhrec.com/average-decks/zimone-infinite-analyst/plus-1-plus-1-counters` | `edhrec_average_plus_1_plus_1_counters` | 12 |
+| `edhrec_zimone_x_spells_average` | `https://edhrec.com/average-decks/zimone-infinite-analyst/x-spells` | `edhrec_average_x_spells` | 12 |
+| `edhrec_zimone_big_mana_average` | `https://edhrec.com/average-decks/zimone-infinite-analyst/big-mana` | `edhrec_average_big_mana` | 11 |
+| `edhrec_zimone_budget_average` | `https://edhrec.com/average-decks/zimone-infinite-analyst/budget` | `edhrec_average_budget` | 12 |
+
+## Unresolved e correcao local-resolvivel
+
+A primeira validacao rejeitou 5/5 decks apenas por `unresolved_cards`. Nao houve
+off-color nem singleton violation. As cartas ausentes no banco local em
+2026-05-13 foram:
+
+| Unresolved source card |
+| --- |
+| `Brass Infiniscope` |
+| `Expansion Algorithm` |
+| `Geometer's Arthropod` |
+| `Kinetic Ooze` |
+| `Lattice Library` |
+| `Mind into Matter` |
+| `Nev, the Practical Dean` |
+| `Nexus Mentality` |
+| `Owlin Spiralmancer` |
+| `Paradox Gardens` |
+| `Quandrix Charm` |
+| `Striding Shotcaller` |
+| `Turbulent Wilderness` |
+| `Yavimaya Bloomsage` |
+
+Para nao aplicar backfill nesta etapa, o JSON final foi marcado como
+`edhrec_average_deck_local_resolvable_projection`. Cada slot unresolved recebeu
+substituto Simic on-theme ja resolvivel localmente; o proprio artifact registra
+`local_resolution_replacements` por deck.
+
+## Achados derivados da web
+
+As paginas EDHREC Average Deck provam contexto Commander por fonte, titulo,
+`total_card_count=100` e commander no primeiro slot da lista media. As tags e
+listas publicas apontam para o mesmo nucleo estrategico:
+
+- X spells como eixo principal de escala;
+- suporte de +1/+1 counters para aumentar Zimone e baratear futuros X spells;
+- ramp e big mana para converter desconto em mesa, compra e finalizacao;
+- Hydras, clones e payoffs escalaveis como finalizadores flexiveis;
+- budget como lane casual separada, nao como prova cEDH.
+
+## Interpretacao estrategica
+
+Zimone nao deve ser tratada como Simic goodstuff generico. A malicia do deck e
+criar um ciclo de crescimento: conjurar X spells, colocar counters em Zimone,
+reduzir o proximo X spell e transformar mana extra em draw, criaturas grandes ou
+finishers. Counter doublers e proliferate sao aceleradores desse motor, nao um
+plano independente. Linhas de mana infinita para X spell existem como risco de
+poder, mas nao foram provadas como default Commander/casual pelas fontes usadas.
+
+Padroes uteis para absorver futuramente em `optimize`/`generate`:
+
+- manter densidade real de X spells e payoffs escalaveis;
+- priorizar ramp que ajuda big turns: rocks Simic, land ramp e dorks que escalam
+  com counters;
+- valorizar pacote de counters: `Hardened Scales`, `Branching Evolution`,
+  `The Ozolith`, `Evolution Sage`, `Kami of Whispered Hopes` e
+  `Forgotten Ancient`;
+- separar lane budget de average/big mana para nao forcar cartas premium em
+  pedidos casuais.
+
+Padroes arriscados ou nao transferiveis:
+
+- nao colapsar Zimone em landfall Simic, porque `/lands` tinha amostra media de
+  apenas 1 deck e `/landfall` nao estava disponivel;
+- nao promover combo/cEDH sem fonte explicita e lane separada;
+- nao copiar decklists em runtime; usar apenas sinais agregados de roles,
+  recorrencia e pacotes.
+
+## Proximo passo minimo
+
+1. Se a decisao for promover Zimone, executar `--apply` em etapa separada e
+   idempotente, depois rodar scorecard read-only.
+2. Opcionalmente auditar backfill oficial das cartas Secrets of Strixhaven
+   unresolved via Scryfall, caso o objetivo seja substituir a projecao por listas
+   EDHREC mais fieis.
+3. So depois de corpus aplicado e scorecard favoravel, executar prova publica
+   sanitizada 5x de `/ai/generate` com `commander_name='Zimone, Infinite Analyst'`.

@@ -3,6 +3,48 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Zimone Corpus Offline
+
+### O Porquê
+- `Zimone, Infinite Analyst` estava no mini-batch candidato com profile/card
+  stats resolvidos, mas sem corpus aceito; o scorecard marcava
+  `corpus_missing`, `core_package_weak` e `public_runtime_proof_missing`.
+- O objetivo era preparar somente o corpus offline, seguindo o fluxo
+  Lorehold/Prosper/Aesi/Edgar/Dina, sem aplicar no banco e sem depender de API
+  nao oficial em runtime.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- Foram consultadas em baixo volume paginas publicas EDHREC Average Deck para
+  default, +1/+1 counters, X spells, big mana e budget, alem da pagina Commander
+  como contexto. A pagina `lands` foi excluida por baixa amostra e `landfall`
+  retornou 404.
+- Foi criado o artifact
+  `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json`.
+- A primeira validacao rejeitou 5/5 decks apenas por cartas novas de Secrets of
+  Strixhaven ainda nao resolvidas localmente; nao houve off-color nem singleton
+  violation.
+- Para nao aplicar backfill nesta etapa, o corpus final foi marcado como
+  `edhrec_average_deck_local_resolvable_projection` e substituiu os slots
+  unresolved por cartas Simic de X-spells/counters/ramp/value ja resolviveis
+  localmente.
+- O runner `bin/commander_reference_deck_corpus.dart` foi executado apenas em
+  `--dry-run`; nenhum `--apply` foi executado.
+- Scanner/camera/OCR, app mobile, rotas app-facing e `/ai/optimize`
+  permaneceram fora do escopo.
+
+### Resultado
+- Dry-run:
+  `dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run`.
+- **PASS**: 5/5 decks aceitos, `commander_quantity=1`,
+  `main_quantity=99`, `unresolved_count=0`, `off_color_count=0`,
+  `singleton_violations={}` e `db_mutations=false`.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_ZIMONE_2026-05-13.md`.
+- Proximo passo: aplicar o corpus em etapa separada, rodar scorecard read-only e
+  somente depois executar prova publica sanitizada 5x de `/ai/generate`.
+
 ## 2026-05-13 — Commander Reference Dina Corpus Apply e Readiness
 
 ### O Porquê
