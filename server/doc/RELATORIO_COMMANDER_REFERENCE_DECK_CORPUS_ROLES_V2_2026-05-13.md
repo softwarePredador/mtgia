@@ -227,3 +227,65 @@ entre profile expected packages, card stats e corpus core.
 
 Artifact:
 `server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/public_expanded/summary.json`.
+
+## Iteracao Lorehold Reference Adherence v3
+
+### Diagnostico v2
+
+O artefato packages v2 tinha fallback `0/5` e p95 `17931ms`, mas a aderencia
+top40 media ficou `12.8`. A leitura foi que o modelo recebia core/theme/support
+com budgets parecidos e sem uma metrica pos-validacao de cobertura de core. O
+`core_package` tinha 26 sinais, mas parte importante do primeiro bloco era land
+ou papel generico, enquanto `optional_contextual` continuava citado no prompt.
+
+### Mudancas implementadas
+
+- Prompt/cache policy `reference_deck_corpus_v3:*`.
+- Prompt v3 remove `optional_contextual` do texto enviado ao modelo, filtra lands
+  da media de roles e limita core promptado a no maximo 2 lands.
+- Ordenacao de prompt prioriza roles nao-land de core:
+  `miracle_topdeck`, `big_spell_payoff`, `spellslinger/ritual_treasure`,
+  `tutor/exile_value/draw_value`, `ramp`, interacao/protecao e depois lands.
+- Classificador do corpus reconhece `tutor` e alguns removals/protecoes
+  Lorehold que antes caiam como `other`.
+- Diagnostics opcionais de runtime adicionados:
+  `reference_deck_corpus_evaluation.{policy_version,core_package_available,
+  core_package_matched,core_package_coverage_ratio,package_coverage,
+  role_coverage}`.
+- Nenhuma mudanca em timeout, validacao, singleton, color identity ou preservacao
+  do comandante.
+
+### Comandos executados na iteracao v3
+
+```bash
+cd server && dart format lib/ai/commander_reference_deck_corpus_support.dart routes/ai/generate/index.dart test/commander_reference_deck_corpus_support_test.dart
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_card_stats_support_test.dart -r expanded
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/dry_run
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply_idempotency
+cd server && dart analyze lib routes test
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart test/ai_generate_performance_support_test.dart -r expanded
+```
+
+### Reprocessamento v3
+
+| Modo | Status | Decks | Accepted | Rejected |
+| --- | --- | ---: | ---: | ---: |
+| dry-run | `PASS` | `3` | `3` | `0` |
+| apply | `PASS` | `3` | `3` | `0` |
+| apply idempotente | `PASS` | `3` | `3` | `0` |
+
+Roles agregados apos v3:
+
+- `other`: `9.67` (v2: `13.00`);
+- `tutor`: `3.67`;
+- `interaction`: `5.33`;
+- `big_spell_payoff`: `7.67`;
+- `ritual_treasure`: `10.00`;
+- `miracle_topdeck`: `4.33`.
+
+### Gate
+
+Status antes da prova publica do novo SHA: **not_proven**. A expansao para novos
+comandantes continua bloqueada ate a prova publica medir fallback, latencia,
+overlap, core package coverage e role coverage.

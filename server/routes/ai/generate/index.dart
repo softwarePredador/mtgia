@@ -570,6 +570,10 @@ $metaContext
         cardMetadataByName: evaluationMetadata,
       ).toJson();
     }
+    final referenceDeckCorpusDiagnostics = _buildReferenceDeckCorpusDiagnostics(
+      generatedDeck: validation.generatedDeck,
+      guidance: referenceDeckCorpusGuidance,
+    );
 
     final responseBody = <String, dynamic>{
       'prompt': prompt,
@@ -591,8 +595,7 @@ $metaContext
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
-          referenceDeckCorpusDiagnostics:
-              referenceDeckCorpusGuidance?.toDiagnostics(),
+          referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeckEvaluation: referenceDeckEvaluation,
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
@@ -947,6 +950,23 @@ Future<void> _processAiGenerateAsyncJob({
   );
 }
 
+Map<String, dynamic>? _buildReferenceDeckCorpusDiagnostics({
+  required Map<String, dynamic> generatedDeck,
+  required CommanderReferenceDeckCorpusGuidance? guidance,
+}) {
+  final diagnostics = guidance?.toDiagnostics();
+  if (diagnostics == null) return null;
+  final evaluation = evaluateGeneratedDeckAgainstReferenceCorpusPackages(
+    generatedDeck: generatedDeck,
+    guidance: guidance,
+  );
+  if (evaluation == null) return diagnostics;
+  return {
+    ...diagnostics,
+    'reference_deck_corpus_evaluation': evaluation,
+  };
+}
+
 Uri _resolveInternalGenerateUrl(Request request) {
   return resolveAiGenerateInternalUrl(
     headers: request.headers,
@@ -1034,6 +1054,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         cardMetadataByName: evaluationMetadata,
       ).toJson();
     }
+    final referenceDeckCorpusDiagnostics = _buildReferenceDeckCorpusDiagnostics(
+      generatedDeck: validation.generatedDeck,
+      guidance: referenceDeckCorpusGuidance,
+    );
 
     return {
       'prompt': prompt,
@@ -1056,8 +1080,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
-          referenceDeckCorpusDiagnostics:
-              referenceDeckCorpusGuidance?.toDiagnostics(),
+          referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeckEvaluation: referenceDeckEvaluation,
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
@@ -1094,8 +1117,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
-          referenceDeckCorpusDiagnostics:
-              referenceDeckCorpusGuidance?.toDiagnostics(),
+          referenceDeckCorpusDiagnostics: _buildReferenceDeckCorpusDiagnostics(
+            generatedDeck: mockDeck,
+            guidance: referenceDeckCorpusGuidance,
+          ),
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(

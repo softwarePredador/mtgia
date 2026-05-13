@@ -3,6 +3,40 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Generate Quality Lorehold v3
+
+### O Porquê
+- A prova publica packages v2 recuperou fallback `0/5` e reduziu p95 para
+  `17931ms`, mas o overlap top40 medio ficou `12.8`, abaixo da melhor prova
+  anterior `16.2`.
+- O artefato mostrou que o corpus tinha `core_package=26`, mas o prompt v2 ainda
+  competia sinais de core, theme e support com peso semelhante e nao media
+  cobertura de core/package no resultado validado.
+
+### O Como
+- `commander_reference_deck_corpus_support.dart` passou para policy/cache
+  `reference_deck_corpus_v3:*`.
+- O prompt v3 removeu `optional_contextual` do prompt, filtra lands da media de
+  roles enviada, limita core a no maximo 2 lands e prioriza roles nao-land de
+  core antes de theme/support.
+- O classificador do corpus passou a reconhecer `tutor` e alguns removals
+  Lorehold que caiam em `other`, reduzindo ruido antes do apply.
+- `/ai/generate` agora adiciona diagnostics opcionais e sanitizados de
+  `reference_deck_corpus_evaluation`, com cobertura de core package,
+  package coverage e role coverage calculados apos a validacao.
+- Nenhuma regra de validacao, singleton, identidade de cor, preservacao de
+  comandante ou timeout foi relaxada.
+
+### Resultado
+- Testes deterministas cobrem prompt v3 sem decklist copiada, ranking de core
+  nao-land, cache v3 e avaliacao de coverage.
+- O corpus Lorehold foi reprocessado em `--dry-run`, `--apply` e `--apply`
+  idempotente com `status=PASS`, `accepted_deck_count=3`,
+  `rejected_deck_count=0`, `unresolved_count=0` e `off_color_count=0`.
+- `dart analyze lib routes test` e a suite focada de Commander Reference
+  passaram localmente.
+- Status antes da prova publica do novo SHA: **not_proven**.
+
 ## 2026-05-13 — Commander Reference Generate Quality Lorehold v2
 
 ### O Porquê

@@ -2,8 +2,8 @@
   "status": "PASS",
   "mode": "apply",
   "db_mutations": true,
-  "started_at": "2026-05-13T12:22:11.722957Z",
-  "finished_at": "2026-05-13T12:25:15.563016Z",
+  "started_at": "2026-05-13T12:50:43.890033Z",
+  "finished_at": "2026-05-13T12:53:37.499261Z",
   "artifact_dir": "test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply",
   "deck_count": 3,
   "accepted_deck_count": 3,
@@ -35,15 +35,16 @@
         "lands": 25,
         "ramp": 6,
         "draw_value": 4,
-        "creature": 9,
+        "creature": 8,
         "board_wipe": 3,
         "win_condition": 1,
-        "other": 17,
+        "other": 13,
         "protection": 2,
         "big_spell_payoff": 4,
+        "tutor": 6,
         "ritual_treasure": 10,
-        "recursion": 6,
-        "interaction": 5,
+        "recursion": 4,
+        "interaction": 6,
         "miracle_topdeck": 3
       },
       "accepted": true,
@@ -79,12 +80,13 @@
         "ritual_treasure": 11,
         "protection": 3,
         "miracle_topdeck": 6,
-        "other": 7,
-        "interaction": 4,
+        "tutor": 2,
+        "interaction": 5,
         "draw_value": 2,
         "board_wipe": 2,
         "creature": 1,
-        "recursion": 2
+        "recursion": 2,
+        "other": 4
       },
       "accepted": true,
       "rejection_reasons": []
@@ -118,9 +120,10 @@
         "ritual_treasure": 9,
         "protection": 6,
         "big_spell_payoff": 9,
-        "other": 15,
-        "recursion": 5,
-        "interaction": 4,
+        "other": 12,
+        "tutor": 3,
+        "recursion": 4,
+        "interaction": 5,
         "miracle_topdeck": 4,
         "win_condition": 1,
         "spellslinger": 1,
@@ -141,15 +144,16 @@
         "lands": 32.0,
         "ramp": 3.67,
         "draw_value": 2.67,
-        "creature": 3.67,
+        "creature": 3.33,
         "board_wipe": 2.0,
         "win_condition": 1.33,
-        "other": 13.0,
+        "other": 9.67,
         "protection": 3.67,
         "big_spell_payoff": 7.67,
+        "tutor": 3.67,
         "ritual_treasure": 10.0,
-        "recursion": 4.33,
-        "interaction": 4.33,
+        "recursion": 3.33,
+        "interaction": 5.33,
         "miracle_topdeck": 4.33
       },
       "top_cards": [
@@ -205,7 +209,7 @@
           "card_name": "Enlightened Tutor",
           "deck_count": 3,
           "total_quantity": 3,
-          "role": "other"
+          "role": "tutor"
         },
         {
           "card_name": "Esper Sentinel",
@@ -217,7 +221,7 @@
           "card_name": "Gamble",
           "deck_count": 3,
           "total_quantity": 3,
-          "role": "other"
+          "role": "tutor"
         },
         {
           "card_name": "Gemstone Caverns",
@@ -259,7 +263,7 @@
           "card_name": "Redirect Lightning",
           "deck_count": 3,
           "total_quantity": 3,
-          "role": "other"
+          "role": "interaction"
         },
         {
           "card_name": "Sacred Foundry",
@@ -385,7 +389,7 @@
           "card_name": "Goblin Engineer",
           "deck_count": 2,
           "total_quantity": 2,
-          "role": "recursion"
+          "role": "tutor"
         },
         {
           "card_name": "Simian Spirit Guide",

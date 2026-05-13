@@ -10,6 +10,8 @@ import 'commander_reference_card_stats_support.dart';
 const commanderReferenceDecksTable = 'commander_reference_decks';
 const commanderReferenceDeckCardsTable = 'commander_reference_deck_cards';
 const commanderReferenceDeckAnalysisTable = 'commander_reference_deck_analysis';
+const commanderReferenceDeckCorpusPromptPolicyVersion =
+    'reference_deck_corpus_v3';
 
 const basicLandNames = {
   'plains',
@@ -425,6 +427,7 @@ String? commanderReferenceDeckCorpusCacheVersion(
   final packages = guidance.packages;
   final material = jsonEncode({
     'source': guidance.source,
+    'prompt_policy': commanderReferenceDeckCorpusPromptPolicyVersion,
     'commander': normalizeCommanderReferenceDeckText(guidance.commanderName),
     'accepted_deck_count': guidance.acceptedDeckCount,
     'average_role_counts': guidance.averageRoleCounts,
@@ -441,7 +444,7 @@ String? commanderReferenceDeckCorpusCacheVersion(
     'packages': packages.toCacheMaterial(),
     'theme_counts': guidance.themeCounts,
   });
-  return 'reference_deck_corpus_v2:${sha256.convert(utf8.encode(material)).toString().substring(0, 12)}';
+  return '$commanderReferenceDeckCorpusPromptPolicyVersion:${sha256.convert(utf8.encode(material)).toString().substring(0, 12)}';
 }
 
 String buildCommanderReferenceDeckCorpusPrompt(
@@ -452,6 +455,7 @@ String buildCommanderReferenceDeckCorpusPrompt(
   final roleLines = guidance.averageRoleCounts.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
   final roles = roleLines
+      .where((entry) => entry.key != 'lands')
       .take(6)
       .map((entry) => '- ${entry.key}: ${entry.value.toStringAsFixed(1)} avg')
       .join('\n');
@@ -459,33 +463,37 @@ String buildCommanderReferenceDeckCorpusPrompt(
     'core_package',
     packages.corePackage,
     acceptedDeckCount: guidance.acceptedDeckCount,
-    limit: 8,
+    limit: 12,
+    maxLands: 2,
   );
   final theme = _formatCorpusPackagePromptLine(
     'theme_package',
     packages.themePackage,
     acceptedDeckCount: guidance.acceptedDeckCount,
-    limit: 8,
+    limit: 6,
+    maxLands: 0,
   );
   final support = _formatCorpusPackagePromptLine(
     'support_package',
     packages.supportPackage,
     acceptedDeckCount: guidance.acceptedDeckCount,
-    limit: 8,
+    limit: 5,
+    maxLands: 0,
   );
 
   return '''
-Reference deck corpus v2 active for ${guidance.commanderName}:
+Reference deck corpus v3 active for ${guidance.commanderName}:
 - Corpus size: ${guidance.acceptedDeckCount} accepted public reference decks.
 - Use this as aggregate structure only, not as a decklist to copy.
-- Average role shape, top signals only:
+- Average nonland role shape, top signals only:
 $roles
 - Package priority:
 $core
 $theme
 $support
-- optional_contextual is diagnostics-only; use it only to fill genuine curve/function gaps.
-- Prefer core/theme cards that fit role balance. Keep final deck coherent and legal; do not force every recurrent card.
+- First look at nonland core_package engines, setup, payoffs and ramp before theme/support. Core lands are mana-base options only; do not overfill basics.
+- optional_contextual is excluded from the prompt and remains diagnostics-only; use it only to fill genuine curve/function gaps.
+- Prefer core cards that fit role balance, then theme, then support. Keep final deck coherent and legal; do not force every recurrent card.
 ''';
 }
 
@@ -544,6 +552,7 @@ const _themeCorpusRoles = {
 };
 
 const _supportCorpusRoles = {
+  'tutor',
   'ramp',
   'interaction',
   'interaction_and_resets',
@@ -591,9 +600,14 @@ String _formatCorpusPackagePromptLine(
   List<Map<String, dynamic>> cards, {
   required int acceptedDeckCount,
   required int limit,
+  required int maxLands,
 }) {
   if (cards.isEmpty) return '- $label: not_proven';
-  final formatted = cards
+  final formatted = _promptOrderedCorpusCards(
+    cards,
+    limit: limit,
+    maxLands: maxLands,
+  )
       .take(limit)
       .map((card) {
         final name = card['card_name']?.toString().trim();
@@ -606,6 +620,179 @@ String _formatCorpusPackagePromptLine(
       .whereType<String>()
       .join(', ');
   return '- $label: $formatted';
+}
+
+List<Map<String, dynamic>> _promptOrderedCorpusCards(
+  List<Map<String, dynamic>> cards, {
+  required int limit,
+  required int maxLands,
+}) {
+  if (limit <= 0) return const [];
+  final sorted = cards.map((card) => Map<String, dynamic>.from(card)).toList()
+    ..sort(_compareCorpusCardsForPrompt);
+  final nonLands = sorted
+      .where((card) => card['role']?.toString().toLowerCase() != 'lands')
+      .toList(growable: false);
+  final lands = sorted
+      .where((card) => card['role']?.toString().toLowerCase() == 'lands')
+      .toList(growable: false);
+  if (maxLands <= 0) return nonLands.take(limit).toList(growable: false);
+
+  final nonLandBudget = (limit - maxLands).clamp(0, limit);
+  final selected = <Map<String, dynamic>>[
+    ...nonLands.take(nonLandBudget),
+    ...lands.take(limit - nonLandBudget),
+  ];
+  if (selected.length < limit) {
+    final selectedNames = selected
+        .map((card) => normalizeCommanderReferenceDeckText(
+            card['card_name']?.toString() ?? ''))
+        .toSet();
+    selected.addAll(
+      nonLands.where((card) {
+        final name = normalizeCommanderReferenceDeckText(
+          card['card_name']?.toString() ?? '',
+        );
+        return name.isNotEmpty && !selectedNames.contains(name);
+      }).take(limit - selected.length),
+    );
+  }
+  return selected.take(limit).toList(growable: false);
+}
+
+int _compareCorpusCardsForPrompt(
+    Map<String, dynamic> a, Map<String, dynamic> b) {
+  final roleCompare = _corpusPromptRolePriority(a['role']?.toString() ?? '')
+      .compareTo(_corpusPromptRolePriority(b['role']?.toString() ?? ''));
+  if (roleCompare != 0) return roleCompare;
+  final deckCountCompare =
+      _intValue(b['deck_count']).compareTo(_intValue(a['deck_count']));
+  if (deckCountCompare != 0) return deckCountCompare;
+  final quantityCompare =
+      _intValue(b['total_quantity']).compareTo(_intValue(a['total_quantity']));
+  if (quantityCompare != 0) return quantityCompare;
+  return (a['card_name']?.toString() ?? '')
+      .compareTo(b['card_name']?.toString() ?? '');
+}
+
+int _corpusPromptRolePriority(String role) {
+  return switch (role.trim().toLowerCase()) {
+    'miracle_topdeck' => 0,
+    'big_spell_payoff' => 1,
+    'spellslinger' || 'ritual_treasure' => 2,
+    'tutor' || 'exile_value' || 'draw_value' => 3,
+    'ramp' => 4,
+    'interaction' ||
+    'interaction_and_resets' ||
+    'board_wipe' ||
+    'protection' =>
+      5,
+    'recursion' => 6,
+    'win_condition' || 'creature' => 7,
+    'lands' => 9,
+    _ => 8,
+  };
+}
+
+Map<String, dynamic>? evaluateGeneratedDeckAgainstReferenceCorpusPackages({
+  required Map<String, dynamic> generatedDeck,
+  required CommanderReferenceDeckCorpusGuidance? guidance,
+}) {
+  if (guidance == null || !guidance.isUsable) return null;
+  final packages = guidance.packages;
+  final generatedNames = <String, int>{};
+  final cards = generatedDeck['cards'] is List
+      ? (generatedDeck['cards'] as List)
+      : const <dynamic>[];
+  for (final rawCard in cards) {
+    if (rawCard is! Map) continue;
+    final name = rawCard['name']?.toString().trim() ?? '';
+    if (name.isEmpty) continue;
+    final quantityRaw = rawCard['quantity'];
+    final quantity = quantityRaw is int
+        ? quantityRaw
+        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    final normalized = normalizeCommanderReferenceDeckText(name);
+    if (normalized.isEmpty) continue;
+    generatedNames[normalized] = (generatedNames[normalized] ?? 0) + quantity;
+  }
+
+  final packageCoverage = {
+    'core_package': _evaluateCorpusPackageCoverage(
+      packages.corePackage,
+      generatedNames,
+    ),
+    'theme_package': _evaluateCorpusPackageCoverage(
+      packages.themePackage,
+      generatedNames,
+    ),
+    'support_package': _evaluateCorpusPackageCoverage(
+      packages.supportPackage,
+      generatedNames,
+    ),
+    'optional_contextual': _evaluateCorpusPackageCoverage(
+      packages.optionalContextual,
+      generatedNames,
+    ),
+  };
+  final core = packageCoverage['core_package']!;
+  final roleCoverage = <String, int>{};
+  for (final coverage in packageCoverage.values) {
+    final matchedCards = coverage['matched_cards'];
+    if (matchedCards is! List) continue;
+    for (final rawCard in matchedCards) {
+      if (rawCard is! Map) continue;
+      final role = rawCard['role']?.toString().trim();
+      if (role == null || role.isEmpty) continue;
+      roleCoverage[role] = (roleCoverage[role] ?? 0) +
+          (rawCard['quantity'] is int ? rawCard['quantity'] as int : 1);
+    }
+  }
+  return {
+    'policy_version': commanderReferenceDeckCorpusPromptPolicyVersion,
+    'core_package_available': core['available'],
+    'core_package_matched': core['matched'],
+    'core_package_coverage_ratio': core['coverage_ratio'],
+    'package_coverage': packageCoverage,
+    'role_coverage': roleCoverage,
+  };
+}
+
+Map<String, dynamic> _evaluateCorpusPackageCoverage(
+  List<Map<String, dynamic>> package,
+  Map<String, int> generatedNames,
+) {
+  final available = package.length;
+  final matched = <Map<String, dynamic>>[];
+  final missed = <Map<String, dynamic>>[];
+  for (final card in package) {
+    final name = card['card_name']?.toString().trim() ?? '';
+    if (name.isEmpty) continue;
+    final normalized = normalizeCommanderReferenceDeckText(name);
+    final quantity = generatedNames[normalized];
+    final item = {
+      'card_name': name,
+      'role': card['role']?.toString(),
+      'deck_count': _intValue(card['deck_count']),
+      if (quantity != null && quantity > 0) 'quantity': quantity,
+    };
+    if (quantity != null && quantity > 0) {
+      matched.add(item);
+    } else {
+      missed.add(item);
+    }
+  }
+
+  final matchedCount = matched.length;
+  return {
+    'available': available,
+    'matched': matchedCount,
+    'coverage_ratio': available == 0
+        ? 0.0
+        : double.parse((matchedCount / available).toStringAsFixed(4)),
+    'matched_cards': matched.take(12).toList(growable: false),
+    'missed_top_cards': missed.take(12).toList(growable: false),
+  };
 }
 
 CommanderReferenceDeckAnalysis analyzeCommanderReferenceDeck({
@@ -790,6 +977,17 @@ String classifyCommanderReferenceDeckCardRole(
     return 'protection';
   }
   if (_containsAny(normalized, const [
+        'enlightened tutor',
+        'gamble',
+        'idyllic tutor',
+        'imperial recruiter',
+        'goblin engineer',
+      ]) ||
+      oracle.contains('search your library') &&
+          !oracle.contains('basic land')) {
+    return 'tutor';
+  }
+  if (_containsAny(normalized, const [
     'apex of power',
     'dance with calamity',
     'hit the mother lode',
@@ -852,8 +1050,6 @@ String classifyCommanderReferenceDeckCardRole(
         'underworld breach',
         'sevinne s reclamation',
         'reconstruct history',
-        'goblin welder',
-        'goblin engineer',
         'sun titan',
         'restore balance',
         'restoration seminar',
@@ -929,7 +1125,13 @@ String classifyCommanderReferenceDeckCardRole(
       oracle.contains('deals ') && oracle.contains('to each creature')) {
     return 'board_wipe';
   }
-  if (oracle.contains('destroy target') ||
+  if (_containsAny(normalized, const [
+        'redirect lightning',
+        'pyroblast',
+        'red elemental blast',
+        'wear // tear',
+      ]) ||
+      oracle.contains('destroy target') ||
       oracle.contains('exile target') ||
       oracle.contains('counter target') ||
       oracle.contains('deals ') && oracle.contains('any target')) {
