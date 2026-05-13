@@ -3,6 +3,27 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Abertura do Sprint 2 Commander Reference Expansion
+
+### O Porquê
+- O Sprint 1 Commander Reference fechou com Lorehold, Prosper, Aesi, Edgar, Dina
+  e Zimone promovidos para mini-batch controlado, mas a expansao precisa continuar
+  bloqueada por gate por comandante.
+
+### O Como
+- Foi criado o tracker documental
+  `server/doc/COMMANDER_REFERENCE_SPRINT2_TRACKER_2026-05-13.md`.
+- A fila inicial do Sprint 2 ficou com Krenko, Light-Paws, Niv-Mizzet, Teysa,
+  Meren e Kinnan, todos com status inicial `PENDING` nas etapas
+  `corpus_prepared`, `dry_run`, `apply`, `idempotency`, `public_proof`,
+  `readiness_scorecard` e `promoted`.
+- Nao houve alteracao de runtime, app mobile, endpoints, scanner, camera ou OCR.
+
+### Resultado
+- Resultado operacional da abertura: **PASS WITH RISKS**.
+- O risco principal permanece a expansao indevida sem repetir o gate completo do
+  Sprint 1; o rollback documental e operacional esta descrito no tracker.
+
 ## 2026-05-13 — Commander Reference Mini-Batch Coverage e Gate de Expansao
 
 ### O Porquê
