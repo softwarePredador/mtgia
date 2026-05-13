@@ -3,6 +3,46 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 2 Final
+
+### O Porquê
+- O Sprint 2 Commander Reference Expansion precisava ser fechado formalmente com
+  uma decisao unica de PASS/PASS WITH RISKS/BLOCKED, consolidando corpus,
+  apply/idempotencia, public proof, scorecard, contrato `/ai/generate`, riscos e
+  fila recomendada para Sprint 3.
+
+### O Como
+- Foram consolidados os relatorios de corpus prep, apply/idempotencia e public
+  proof, alem do tracker Sprint 2, do contrato operacional
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` e deste manual.
+- Foi criado o relatorio final
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_FINAL_2026-05-13.md`.
+- O tracker `server/doc/COMMANDER_REFERENCE_SPRINT2_TRACKER_2026-05-13.md` foi
+  atualizado com o fechamento **PASS WITH RISKS**.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e nao precisou mudar:
+  nao houve alteracao de metodo/rota, request body, response fields, data source
+  ou consumer mobile de `/ai/generate`.
+
+### Regra Operacional Refinada para Sprint 3
+- Sprint 3 so deve adicionar/promover novos comandantes depois de repetir, por
+  comandante, corpus publico/offline, dry-run DB-backed PASS, apply,
+  idempotencia, public proof sanitizado 5/5 de `POST /ai/generate` com
+  `commander_name` e scorecard final PASS.
+- Promocao exige `score=100`, `status=ready_for_mini_batch`,
+  `expansion_ready=true`, blockers/warnings vazios, comandante preservado,
+  `main_quantity=99`, profile/stats/corpus usados, invalid/off-identity `0` e
+  timeout fallback `0`.
+- Qualquer comandante com core package fraco, runtime gate incompleto ou fallback
+  de timeout fica bloqueado ou **PASS WITH RISKS**, mas nao vira guidance forte.
+
+### Resultado
+- Resultado operacional final: **PASS WITH RISKS**.
+- Promovidos: Kinnan, Muldrotha, Yuriko, Winota e Atraxa.
+- Bloqueado: Korvold, por `core_package_weak`,
+  `public_runtime_gate_not_passed` e timeout fallback `2/5`.
+- Fila recomendada para Sprint 3: Krenko, Light-Paws, Niv-Mizzet, Teysa Karlov,
+  Meren e retry de Korvold apos reforco do core package.
+
 ## 2026-05-13 — Commander Reference Sprint 2 Public Proof
 
 ### O Porquê

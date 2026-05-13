@@ -178,3 +178,31 @@ Relatorio:
 **PASS WITH RISKS** para abertura do Sprint 2: a fila esta definida e todos os
 alvos iniciam bloqueados por gate (`PENDING`). Os riscos sao conhecidos e a
 promocao continua condicionada a provas por comandante.
+
+## Status final de fechamento
+
+**PASS WITH RISKS** para fechamento formal do Sprint 2 Commander Reference
+Expansion.
+
+Relatorio final:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_FINAL_2026-05-13.md`.
+
+| Resultado | Commander | Decisao final |
+| --- | --- | --- |
+| PASS | `Kinnan, Bonder Prodigy` | `promoted=true`, score 100, `ready_for_mini_batch` |
+| PASS WITH RISKS | `Korvold, Fae-Cursed King` | `promoted=false`, bloqueado por `core_package_weak` e `public_runtime_gate_not_passed` |
+| PASS | `Muldrotha, the Gravetide` | `promoted=true`, score 100, `ready_for_mini_batch` |
+| PASS | `Yuriko, the Tiger's Shadow` | `promoted=true`, score 100, `ready_for_mini_batch` |
+| PASS | `Winota, Joiner of Forces` | `promoted=true`, score 100, `ready_for_mini_batch` |
+| PASS | `Atraxa, Praetors' Voice` | `promoted=true`, score 100, `ready_for_mini_batch` |
+
+Cinco comandantes foram promovidos; Korvold permanece bloqueado ate reforcar o
+core package e repetir public proof com timeout fallback `0/5`.
+
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e permaneceu estavel:
+nao houve mudanca em metodo/rota, request body, response fields, data source ou
+consumer mobile de `/ai/generate`.
+
+Sprint 3 so deve adicionar/promover novos comandantes depois de corpus
+publico/offline, dry-run PASS, apply, idempotencia, public proof sanitizado 5/5
+e scorecard final PASS por comandante.
