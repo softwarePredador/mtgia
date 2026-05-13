@@ -14666,3 +14666,69 @@ Artifacts:
 Decisao: Dina esta promovida para mini-batch controlado. Nao houve mudanca de
 shape em `/ai/generate`; `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece
 valido para o contrato atual.
+
+## 118. Zimone corpus aplicado e pronto para prova publica - 2026-05-13
+
+Foi revalidado e aplicado o corpus offline de `Zimone, Infinite Analyst` a partir
+de 5 paginas publicas EDHREC Average Deck previamente normalizadas como projecao
+local-resolvivel. O fluxo permaneceu offline e DB-backed; nao houve scraping em
+runtime, alteracao de rotas app-facing, scanner/camera/OCR, `/ai/optimize` ou
+mudanca de contrato em `/ai/generate`.
+
+Comandos executados:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run
+dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply
+dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply_idempotency
+dart run bin/commander_reference_readiness_scorecard.dart --commander='Zimone, Infinite Analyst' --artifact-dir=test/artifacts/commander_reference_readiness_zimone_after_corpus_2026-05-13
+```
+
+Gates de corpus:
+
+- dry-run: `PASS`, `deck_count=5`, `accepted_deck_count=5`,
+  `rejected_deck_count=0`, `db_mutations=false`;
+- apply: `PASS`, `deck_count=5`, `accepted_deck_count=5`,
+  `rejected_deck_count=0`, `db_mutations=true`;
+- apply idempotente: `PASS`, `deck_count=5`, `accepted_deck_count=5`,
+  `rejected_deck_count=0`, `db_mutations=true`;
+- todos os decks aceitos mantiveram `commander_quantity=1`,
+  `main_quantity=99`, `unresolved=0`, `off_color=0` e
+  `singleton_violations={}`.
+
+Contagens DB-backed apos a reaplicacao idempotente:
+
+- `commander_reference_decks` para Zimone: `5`;
+- `commander_reference_decks` aceitos para Zimone: `5`;
+- `commander_reference_deck_cards` para Zimone: `431`;
+- `commander_reference_deck_analysis` para Zimone: `1`;
+- analysis `deck_count=5` e `accepted_deck_count=5`.
+
+Scorecard apos corpus:
+
+- `status=PASS_WITH_RISKS`;
+- `score=98`;
+- `readiness status=profile_ready_needs_proof`;
+- `expansion_ready=false`;
+- `blockers=[]`;
+- `warnings=[public_runtime_proof_missing]`;
+- `card_stats_count=42`;
+- `card_stats_unresolved_count=0`;
+- `corpus_accepted_deck_count=5`;
+- `corpus_core_package_count=40`;
+- `deterministic_deck_valid=true`;
+- `deterministic_main_quantity=99`.
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run/zimone_infinite_analyst_dry_run_summary.json`;
+- `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply/zimone_infinite_analyst_apply_summary.json`;
+- `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply_idempotency/zimone_infinite_analyst_apply_summary.json`;
+- `server/test/artifacts/commander_reference_readiness_zimone_after_corpus_2026-05-13/readiness_scorecard_summary.json`.
+
+Decisao: Zimone esta pronta para prova publica sanitizada 5x de `/ai/generate`,
+mas ainda nao esta promovida para mini-batch controlado enquanto faltar
+`runtime_public_gate_passed=true`. Rollback pratico, se necessario, deve remover
+apenas as `source_deck_key` do corpus Zimone aplicado, preservando cards,
+legalidades e profiles.

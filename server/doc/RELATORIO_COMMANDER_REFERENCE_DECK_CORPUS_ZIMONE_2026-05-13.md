@@ -2,21 +2,23 @@
 
 ## Verdict
 
-**PASS.**
+**PASS WITH RISKS.**
 
 O corpus offline de `Zimone, Infinite Analyst` foi montado com 5 paginas
-publicas EDHREC Average Deck, validado em `--dry-run` e mantido sem aplicacao no
-banco nesta etapa. O artifact final e uma projecao local-resolvivel: as paginas
-EDHREC originais usam cartas novas de Secrets of Strixhaven que o banco local
-ainda nao resolve; esses slots foram substituidos por cartas Simic on-theme ja
-resolviveis localmente.
+publicas EDHREC Average Deck, revalidado em `--dry-run`, aplicado com sucesso e
+reaplicado para prova de idempotencia. O scorecard read-only apos corpus ficou
+em `PASS_WITH_RISKS`, `score=98`, bloqueado apenas pela ausencia de prova
+publica 5x de `/ai/generate`. O artifact final continua sendo uma projecao
+local-resolvivel: as paginas EDHREC originais usam cartas novas de Secrets of
+Strixhaven que o banco local ainda nao resolve; esses slots foram substituidos
+por cartas Simic on-theme ja resolviveis localmente.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, rotas app-facing, `/ai/optimize`, prova
-publica de `/ai/generate` e escrita no banco ficaram fora do escopo. O trabalho
-cobriu pesquisa de baixo volume, montagem do JSON offline, dry-run DB-backed e
-documentacao.
+Scanner, camera, OCR, app mobile, rotas app-facing, `/ai/optimize` e prova
+publica de `/ai/generate` ficaram fora do escopo. O trabalho cobriu pesquisa de
+baixo volume, montagem do JSON offline, dry-run DB-backed, apply idempotente,
+scorecard read-only e documentacao.
 
 ## Fontes consultadas
 
@@ -82,6 +84,86 @@ identidade GU esperada.
 
 Artifact de validacao:
 `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run/zimone_infinite_analyst_dry_run_summary.json`
+
+Apply executado apos o dry-run PASS:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply
+```
+
+Apply idempotente executado em seguida:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/zimone_edhrec_average_corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply_idempotency
+```
+
+Resultado dos tres passos:
+
+| Step | status | db_mutations | deck_count | accepted_deck_count | rejected_deck_count | gates |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| dry-run | `PASS` | `false` | 5 | 5 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+| apply | `PASS` | `true` | 5 | 5 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+| apply idempotency | `PASS` | `true` | 5 | 5 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/dry_run/zimone_infinite_analyst_dry_run_summary.json`
+- `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply/zimone_infinite_analyst_apply_summary.json`
+- `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/apply_idempotency/zimone_infinite_analyst_apply_summary.json`
+
+A escrita foi aditiva/idempotente por upsert do runner. Rollback pratico, se
+necessario, deve remover apenas os registros das `source_deck_key` do corpus
+Zimone aplicado, preservando cards, legalidades e profiles.
+
+Contagens DB-backed apos apply/idempotencia:
+
+| Scope | Count |
+| --- | ---: |
+| pre-apply dry-run baseline | `deck_count=5`, `accepted_deck_count=5`, `db_mutations=false` |
+| `commander_reference_decks` para Zimone | 5 |
+| `commander_reference_decks` aceitos para Zimone | 5 |
+| `commander_reference_deck_cards` para Zimone | 431 |
+| `commander_reference_deck_analysis` para Zimone | 1 |
+| analysis `deck_count` / `accepted_deck_count` | `5` / `5` |
+
+## Readiness scorecard apos apply
+
+Comando:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Zimone, Infinite Analyst' \
+  --artifact-dir=test/artifacts/commander_reference_readiness_zimone_after_corpus_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS_WITH_RISKS` |
+| score | 98 |
+| readiness status | `profile_ready_needs_proof` |
+| expansion_ready | `false` |
+| blockers | `[]` |
+| warnings | `public_runtime_proof_missing` |
+| card_stats_count | 42 |
+| card_stats_unresolved_count | 0 |
+| corpus_accepted_deck_count | 5 |
+| corpus_core_package_count | 40 |
+| deterministic_deck_valid | `true` |
+| deterministic_main_quantity | 99 |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_zimone_after_corpus_2026-05-13/readiness_scorecard_summary.json`
 
 ## Decks aceitos
 
@@ -163,10 +245,9 @@ Padroes arriscados ou nao transferiveis:
 
 ## Proximo passo minimo
 
-1. Se a decisao for promover Zimone, executar `--apply` em etapa separada e
-   idempotente, depois rodar scorecard read-only.
+1. Executar prova publica sanitizada 5x de `/ai/generate` com
+   `commander_name='Zimone, Infinite Analyst'`, sem registrar token, e-mail,
+   senha, prompt completo ou decklists.
 2. Opcionalmente auditar backfill oficial das cartas Secrets of Strixhaven
    unresolved via Scryfall, caso o objetivo seja substituir a projecao por listas
    EDHREC mais fieis.
-3. So depois de corpus aplicado e scorecard favoravel, executar prova publica
-   sanitizada 5x de `/ai/generate` com `commander_name='Zimone, Infinite Analyst'`.
