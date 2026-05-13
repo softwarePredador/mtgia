@@ -303,6 +303,8 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
 String buildCommanderReferenceProfilePrompt(Map<String, dynamic> profile) {
   final commander = _profileCommanderName(profile);
   final identity = _profileColorIdentity(profile);
+  final identityText =
+      identity.isEmpty ? 'the profile color identity' : identity.join('/');
   final themes = _themeNames(profile).take(6).join(', ');
   final roleTargets = _formatRoleTargets(profile['role_targets']);
   final packages = _formatExpectedPackages(profile['expected_packages']);
@@ -312,7 +314,8 @@ String buildCommanderReferenceProfilePrompt(Map<String, dynamic> profile) {
 Commander reference profile active:
 - Use exactly "$commander" as the Commander.
 - Format is Commander; total deck must be exactly 100 cards including the Commander.
-- Color identity is exactly ${identity.isEmpty ? 'the profile color identity' : identity.join('/')}. Never include cards outside this color identity or banned Commander cards.
+- Color identity is exactly $identityText. Every nonland, split, MDFC, adventure, aftermath or back-face card must be legal inside $identityText.
+- Never include cards outside this color identity or banned Commander cards. If a familiar miracle/topdeck staple is off-color, replace it with an on-color or colorless alternative instead of relying on validator repair.
 - Core themes: $themes.
 - Role targets: $roleTargets.
 - Prioritize these package signals when legal and budget/bracket appropriate: $packages.

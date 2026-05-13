@@ -25,6 +25,9 @@ import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 
+const _aiGenerateReferencePromptPolicyVersion =
+    'ai_generate_reference_prompt_v2';
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
@@ -804,6 +807,7 @@ String? _buildReferenceGenerateCacheVersion({
     referenceDeckCorpusGuidance,
   );
   return [
+    _aiGenerateReferencePromptPolicyVersion,
     profileVersion,
     if (statsVersion != null) statsVersion,
     if (corpusVersion != null) corpusVersion,

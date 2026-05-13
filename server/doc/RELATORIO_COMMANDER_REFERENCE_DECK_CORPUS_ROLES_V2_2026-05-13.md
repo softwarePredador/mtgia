@@ -252,6 +252,11 @@ ou papel generico, enquanto `optional_contextual` continuava citado no prompt.
   `reference_deck_corpus_evaluation.{policy_version,core_package_available,
   core_package_matched,core_package_coverage_ratio,package_coverage,
   role_coverage}`.
+- A primeira prova publica v3 em `be8e3ca` recuperou overlap medio `15.6` e
+  manteve fallback `0/5`, mas acionou auto-reparo off-color em `5/5` respostas e
+  p95 `23574ms`; antes de nova prova, o prompt de Commander Reference Profile
+  foi reforcado para split/MDFC/adventure/aftermath/back-face e a cache key de
+  generate reference-guided passou a incluir `ai_generate_reference_prompt_v2`.
 - Nenhuma mudanca em timeout, validacao, singleton, color identity ou preservacao
   do comandante.
 

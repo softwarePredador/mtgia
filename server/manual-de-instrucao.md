@@ -19,6 +19,13 @@
 - O prompt v3 removeu `optional_contextual` do prompt, filtra lands da media de
   roles enviada, limita core a no maximo 2 lands e prioriza roles nao-land de
   core antes de theme/support.
+- Depois da primeira prova publica v3 mostrar auto-reparo off-color em `5/5`
+  respostas, o prompt de Commander Reference Profile foi reforcado para exigir
+  identidade em cartas split/MDFC/adventure/aftermath/back-face e substituir
+  staples off-color por alternativas on-color/colorless.
+- A chave de cache do generate reference-guided passou a incluir
+  `ai_generate_reference_prompt_v2`, evitando reaproveitar respostas do prompt
+  anterior.
 - O classificador do corpus passou a reconhecer `tutor` e alguns removals
   Lorehold que caiam em `other`, reduzindo ruido antes do apply.
 - `/ai/generate` agora adiciona diagnostics opcionais e sanitizados de
@@ -35,7 +42,10 @@
   `rejected_deck_count=0`, `unresolved_count=0` e `off_color_count=0`.
 - `dart analyze lib routes test` e a suite focada de Commander Reference
   passaram localmente.
-- Status antes da prova publica do novo SHA: **not_proven**.
+- Primeira prova publica v3 em `be8e3ca` melhorou overlap medio para `15.6` e
+  manteve fallback `0/5`, mas teve auto-reparo off-color em `5/5` e p95
+  `23574ms`; classificada como bloqueada para expansao ate nova prova do prompt
+  reforcado.
 
 ## 2026-05-13 — Commander Reference Generate Quality Lorehold v2
 
