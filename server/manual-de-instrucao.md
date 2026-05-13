@@ -3,6 +3,50 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Zimone Prova Publica e Promocao
+
+### O Porquê
+- Zimone, Infinite Analyst ja tinha corpus aplicado e scorecard local
+  `score=98`, mas ainda estava bloqueada pela ausencia de prova publica 5x de
+  `/ai/generate`.
+- A decisao de promocao precisava ser tomada por scorecard, sem registrar
+  secrets, JWT, e-mail QA completo, prompt completo ou decklists geradas.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- O backend publico `https://evolution-cartinhas.8ktevp.easypanel.host` foi
+  validado via `/health`, retornando `git_sha`
+  `e49affd0650541f5e6da6e15fdd09a9b58e2d6f4`.
+- Foi criado usuario QA descartavel somente em memoria para autenticar a prova;
+  credenciais e token nao foram persistidos.
+- Foram executados 5 probes `POST /ai/generate` com `format=Commander`,
+  `bracket=3` e `commander_name='Zimone, Infinite Analyst'`, focados em
+  X-spells, +1/+1 counters, Simic ramp, card draw, mana scaling,
+  interaction/protection e win conditions coerentes.
+- O artifact publico salvo contem apenas resumo sanitizado:
+  `server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/public_proof/summary.json`.
+- O scorecard foi reexecutado com `--runtime-summary` em
+  `test/artifacts/commander_reference_readiness_zimone_public_2026-05-13`.
+- Scanner/camera/OCR, app mobile, rotas app-facing e `/ai/optimize`
+  permaneceram fora do escopo.
+
+### Resultado
+- Prova publica: **PASS**, 5/5 HTTP 200, 5/5 `validation_ok`, 5/5 comandante
+  preservado, 5/5 `main_quantity=99`, 5/5 profile/stats/corpus usados,
+  fallback deterministico 5/5, timeout fallback 0/5, invalid/off-identity 0,
+  p50 `878ms`, p95 `1185ms`.
+- Scorecard final: **PASS**, `score=100`,
+  `status=ready_for_mini_batch`, `expansion_ready=true`, `blockers=[]`,
+  `warnings=[]`, `runtime_public_gate_passed=true`.
+- Decisao: Zimone, Infinite Analyst esta promovida para mini-batch controlado.
+- Nao houve mudanca de shape em `/ai/generate`; o contrato atual em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece valido.
+- Resultado operacional: **PASS**. O artifact continua sendo uma projecao
+  local-resolvivel, nao uma copia literal das paginas EDHREC Average Deck.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_ZIMONE_2026-05-13.md`.
+
 ## 2026-05-13 — Commander Reference Zimone Corpus Offline
 
 ### O Porquê

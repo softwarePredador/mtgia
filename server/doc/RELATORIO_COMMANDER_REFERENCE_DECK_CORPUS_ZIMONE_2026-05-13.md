@@ -2,23 +2,26 @@
 
 ## Verdict
 
-**PASS WITH RISKS.**
+**PASS.**
 
 O corpus offline de `Zimone, Infinite Analyst` foi montado com 5 paginas
 publicas EDHREC Average Deck, revalidado em `--dry-run`, aplicado com sucesso e
-reaplicado para prova de idempotencia. O scorecard read-only apos corpus ficou
-em `PASS_WITH_RISKS`, `score=98`, bloqueado apenas pela ausencia de prova
-publica 5x de `/ai/generate`. O artifact final continua sendo uma projecao
-local-resolvivel: as paginas EDHREC originais usam cartas novas de Secrets of
-Strixhaven que o banco local ainda nao resolve; esses slots foram substituidos
-por cartas Simic on-theme ja resolviveis localmente.
+reaplicado para prova de idempotencia. A prova publica sanitizada 5x de
+`/ai/generate` no backend publico passou, e o scorecard final retornou
+`PASS`, `score=100`, `status=ready_for_mini_batch`.
+
+Decisao: `Zimone, Infinite Analyst` esta promovida para mini-batch controlado.
+O artifact final continua sendo uma projecao local-resolvivel: as paginas EDHREC
+originais usam cartas novas de Secrets of Strixhaven que o banco local ainda nao
+resolve; esses slots foram substituidos por cartas Simic on-theme ja
+resolviveis localmente.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, rotas app-facing, `/ai/optimize` e prova
-publica de `/ai/generate` ficaram fora do escopo. O trabalho cobriu pesquisa de
-baixo volume, montagem do JSON offline, dry-run DB-backed, apply idempotente,
-scorecard read-only e documentacao.
+Scanner, camera, OCR, app mobile, rotas app-facing e `/ai/optimize` ficaram
+fora do escopo. O trabalho cobriu pesquisa de baixo volume, montagem do JSON
+offline, dry-run DB-backed, apply idempotente, prova publica sanitizada de
+`/ai/generate`, scorecard read-only e documentacao.
 
 ## Fontes consultadas
 
@@ -165,6 +168,64 @@ Resultado:
 Artifact:
 `server/test/artifacts/commander_reference_readiness_zimone_after_corpus_2026-05-13/readiness_scorecard_summary.json`
 
+## Prova publica de `/ai/generate` e promocao
+
+Backend publico validado:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+| Metric | Value |
+| --- | ---: |
+| `/health` HTTP status | `200` |
+| backend `git_sha` | `e49affd0650541f5e6da6e15fdd09a9b58e2d6f4` |
+| probes | 5 |
+| HTTP 200 | 5/5 |
+| validation_ok | 5/5 |
+| commander_preserved | 5/5 |
+| main_quantity_99 | 5/5 |
+| profile_used | 5/5 |
+| stats_used | 5/5 |
+| corpus_used | 5/5 |
+| fallback_count | 5/5 |
+| timeout_fallback_count | 0 |
+| invalid_cards_total | 0 |
+| off_identity_total | 0 |
+| p50 | `878ms` |
+| p95 | `1185ms` |
+
+Artifact sanitizado:
+`server/test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/public_proof/summary.json`.
+
+O usuario QA descartavel foi criado apenas em memoria. O artifact nao registra
+token, e-mail, senha, prompt completo nem decklist gerada.
+
+Scorecard final:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Zimone, Infinite Analyst' \
+  --runtime-summary=test/artifacts/commander_reference_deck_corpus_zimone_2026-05-13/public_proof/summary.json \
+  --artifact-dir=test/artifacts/commander_reference_readiness_zimone_public_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS` |
+| score | 100 |
+| readiness status | `ready_for_mini_batch` |
+| expansion_ready | `true` |
+| blockers | `[]` |
+| warnings | `[]` |
+| runtime_public_gate_passed | `true` |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_zimone_public_2026-05-13/readiness_scorecard_summary.json`.
+
+Nao houve mudanca de shape em `/ai/generate`; o contrato atual em
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece valido.
+
 ## Decks aceitos
 
 | Deck key | Source | Lane | Replacements |
@@ -245,9 +306,6 @@ Padroes arriscados ou nao transferiveis:
 
 ## Proximo passo minimo
 
-1. Executar prova publica sanitizada 5x de `/ai/generate` com
-   `commander_name='Zimone, Infinite Analyst'`, sem registrar token, e-mail,
-   senha, prompt completo ou decklists.
-2. Opcionalmente auditar backfill oficial das cartas Secrets of Strixhaven
+1. Opcionalmente auditar backfill oficial das cartas Secrets of Strixhaven
    unresolved via Scryfall, caso o objetivo seja substituir a projecao por listas
    EDHREC mais fieis.
