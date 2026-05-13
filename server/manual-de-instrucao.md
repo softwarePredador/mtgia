@@ -9,9 +9,9 @@
 - Dina, Essence Brewer estava no mini-batch candidato com scorecard
   `profile_ready_needs_proof` e ja tinha dry-run offline aceito, mas ainda sem
   corpus aplicado.
-- O objetivo era aplicar com seguranca o corpus preparado, provar idempotencia e
-  deixar Dina pronta para a prova publica sanitizada, sem scraping agressivo e
-  sem depender de API nao oficial em runtime.
+- O objetivo era aplicar com seguranca o corpus preparado, provar idempotencia,
+  executar a prova publica sanitizada de `/ai/generate` e decidir a promocao por
+  scorecard, sem scraping agressivo e sem depender de API nao oficial em runtime.
 
 ### O Como
 - `master` foi sincronizada com `origin/master` por fast-forward antes da
@@ -36,8 +36,19 @@
   para confirmar idempotencia.
 - Em seguida, `bin/commander_reference_readiness_scorecard.dart` foi rodado em
   modo read-only para `Dina, Essence Brewer`.
-- Scanner/camera/OCR, app mobile, rotas app-facing, `/ai/optimize` e prova
-  publica de `/ai/generate` ficaram fora do escopo.
+- O backend publico `https://evolution-cartinhas.8ktevp.easypanel.host` foi
+  validado via `/health`, retornando `git_sha`
+  `d64ee0af4d487b379bef03c3e38327991798e276`.
+- Foi criado usuario QA descartavel somente em memoria para autenticar a prova;
+  credenciais e token nao foram persistidos.
+- Foram executados 5 probes `POST /ai/generate` com `format=Commander`,
+  `bracket=3` e `commander_name='Dina, Essence Brewer'`.
+- O artifact publico salvo contem apenas resumo sanitizado:
+  `server/test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/public_proof/summary.json`.
+- O scorecard foi reexecutado com `--runtime-summary` em
+  `test/artifacts/commander_reference_readiness_dina_public_2026-05-13`.
+- Scanner/camera/OCR, app mobile, rotas app-facing e `/ai/optimize`
+  permaneceram fora do escopo.
 
 ### Resultado
 - Dry-run:
@@ -54,21 +65,28 @@
   `singleton_violations={}`.
 - Contagens DB-backed: pre-apply Dina `decks=0`, `cards=0`, `analysis=0`;
   post-apply Dina `decks=5`, `accepted=5`, `cards=433`, `analysis=1`.
-- Scorecard:
+- Scorecard inicial:
   `test/artifacts/commander_reference_readiness_dina_after_corpus_2026-05-13/readiness_scorecard_summary.json`.
-- Readiness final: **PASS_WITH_RISKS**, `score=98`,
+- Readiness inicial: **PASS_WITH_RISKS**, `score=98`,
   `status=profile_ready_needs_proof`, `expansion_ready=false`,
   `blockers=[]`, `warnings=["public_runtime_proof_missing"]`,
   `card_stats_count=39`, `card_stats_unresolved_count=0`,
   `corpus_accepted_deck_count=5`, `corpus_core_package_count=40`,
   `deterministic_deck_valid=true` e `deterministic_main_quantity=99`.
-- Resultado operacional permanece **PASS WITH RISKS**, porque a prova publica
-  5x ainda nao foi executada e o artifact e uma projecao local-resolvivel, nao
-  uma copia literal das paginas EDHREC Average Deck.
+- Prova publica: **PASS**, 5/5 HTTP 200, 5/5 `validation_ok`, 5/5 comandante
+  preservado, 5/5 `main_quantity=99`, 5/5 profile/stats/corpus usados,
+  fallback deterministico 5/5, timeout fallback 0/5, invalid/off-identity 0,
+  p50 `1018ms`, p95 `1354ms`.
+- Scorecard final: **PASS**, `score=100`,
+  `status=ready_for_mini_batch`, `expansion_ready=true`, `blockers=[]`,
+  `warnings=[]`, `runtime_public_gate_passed=true`.
+- Decisao: Dina, Essence Brewer esta promovida para mini-batch controlado. Nao
+  houve mudanca de shape em `/ai/generate`; o contrato atual em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece valido.
+- Resultado operacional: **PASS**. O artifact continua sendo uma projecao
+  local-resolvivel, nao uma copia literal das paginas EDHREC Average Deck.
 - Relatorio:
   `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_DINA_2026-05-13.md`.
-- Proximo passo: executar prova publica sanitizada 5x de `/ai/generate` para
-  `Dina, Essence Brewer` e reexecutar o scorecard com `--runtime-summary`.
 
 ## 2026-05-13 — Commander Reference Edgar Prova Publica e Promocao
 

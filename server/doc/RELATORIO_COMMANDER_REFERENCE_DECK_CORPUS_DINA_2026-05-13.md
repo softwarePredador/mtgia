@@ -170,7 +170,7 @@ Backend publico:
 `https://evolution-cartinhas.8ktevp.easypanel.host`
 
 SHA testado:
-`ea793ff2943ff693ad953a823a3ecea350a96e2f`
+`d64ee0af4d487b379bef03c3e38327991798e276`
 
 Comando operacional executado: prova sanitaria 5x `POST /ai/generate` com
 `format=Commander`, `bracket=3`, `commander_name='Dina, Essence Brewer'` e
@@ -195,8 +195,8 @@ Resultado:
 | timeout fallback | 0/5 |
 | invalid cards | 0 |
 | off-identity cards | 0 |
-| p50 | 973ms |
-| p95 | 1315ms |
+| p50 | 1018ms |
+| p95 | 1354ms |
 
 O payload publico marcou `is_mock=true` em 5/5, mas sem timeout, sem erro de
 validacao e com profile/stats/corpus ativos. Pelo scorecard v2, isso e caminho
