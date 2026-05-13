@@ -602,6 +602,34 @@ String classifyCommanderReferenceDeckCardRole(
   final oracle = metadata?['oracle_text']?.toString().toLowerCase() ?? '';
   if (typeLine.contains('land')) return 'lands';
   if (_containsAny(normalized, const [
+    'deflecting swat',
+    'bolt bend',
+    'teferi s protection',
+    'teferi\'s protection',
+    'flawless maneuver',
+    'boros charm',
+  ])) {
+    return 'protection';
+  }
+  if (_containsAny(normalized, const [
+    'apex of power',
+    'dance with calamity',
+    'hit the mother lode',
+    'improvisation capstone',
+    'rise of the eldrazi',
+    'soulfire eruption',
+    'worldfire',
+    'storm herd',
+    'call forth the tempest',
+    'volcanic vision',
+    'insurrection',
+    'invincible hymn',
+    'deploy to the front',
+    'gideon s phalanx',
+  ])) {
+    return 'big_spell_payoff';
+  }
+  if (_containsAny(normalized, const [
         'sensei s divining top',
         'sensei\'s divining top',
         'scroll rack',
@@ -618,24 +646,8 @@ String classifyCommanderReferenceDeckCardRole(
       oracle.contains('the first card you draw')) {
     return 'miracle_topdeck';
   }
-  if (_containsAny(normalized, const [
-        'apex of power',
-        'dance with calamity',
-        'hit the mother lode',
-        'improvisation capstone',
-        'rise of the eldrazi',
-        'soulfire eruption',
-        'worldfire',
-        'storm herd',
-        'call forth the tempest',
-        'volcanic vision',
-        'insurrection',
-        'invincible hymn',
-        'deploy to the front',
-        'gideon s phalanx',
-      ]) ||
-      (oracle.contains('without paying') &&
-          (typeLine.contains('instant') || typeLine.contains('sorcery'))) ||
+  if ((oracle.contains('without paying') &&
+          (oracle.contains('mana value') || oracle.contains('discover'))) ||
       oracle.contains('mana value 7 or greater')) {
     return 'big_spell_payoff';
   }

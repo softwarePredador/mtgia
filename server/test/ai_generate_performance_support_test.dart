@@ -154,7 +154,7 @@ void main() {
         referenceGuidanceEnabled: true,
       );
 
-      expect(selection.timeout, equals(const Duration(seconds: 20)));
+      expect(selection.timeout, equals(const Duration(seconds: 24)));
       expect(
         selection.envKey,
         equals('OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS'),

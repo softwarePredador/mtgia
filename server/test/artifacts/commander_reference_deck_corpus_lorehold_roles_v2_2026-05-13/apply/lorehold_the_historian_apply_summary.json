@@ -2,8 +2,8 @@
   "status": "PASS",
   "mode": "apply",
   "db_mutations": true,
-  "started_at": "2026-05-13T11:33:50.179875Z",
-  "finished_at": "2026-05-13T11:36:48.875326Z",
+  "started_at": "2026-05-13T11:52:15.012878Z",
+  "finished_at": "2026-05-13T11:55:14.425098Z",
   "artifact_dir": "test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply",
   "deck_count": 3,
   "accepted_deck_count": 3,
@@ -38,12 +38,13 @@
         "creature": 9,
         "board_wipe": 3,
         "win_condition": 1,
-        "other": 18,
-        "miracle_topdeck": 6,
-        "big_spell_payoff": 2,
+        "other": 17,
+        "protection": 2,
+        "big_spell_payoff": 4,
         "ritual_treasure": 10,
         "recursion": 6,
-        "interaction": 5
+        "interaction": 5,
+        "miracle_topdeck": 3
       },
       "accepted": true,
       "rejection_reasons": []
@@ -76,14 +77,14 @@
         "spellslinger": 6,
         "ramp": 3,
         "ritual_treasure": 11,
-        "miracle_topdeck": 8,
-        "protection": 2,
+        "protection": 3,
+        "miracle_topdeck": 6,
         "other": 7,
         "interaction": 4,
         "draw_value": 2,
         "board_wipe": 2,
         "creature": 1,
-        "recursion": 1
+        "recursion": 2
       },
       "accepted": true,
       "rejection_reasons": []
@@ -109,18 +110,18 @@
       "off_color_card_names": [],
       "singleton_violations": {},
       "role_summary": {
-        "exile_value": 4,
+        "exile_value": 5,
         "ramp": 2,
         "draw_value": 2,
         "lands": 35,
         "board_wipe": 1,
         "ritual_treasure": 9,
+        "protection": 6,
+        "big_spell_payoff": 9,
         "other": 15,
-        "protection": 4,
-        "miracle_topdeck": 7,
-        "big_spell_payoff": 11,
-        "recursion": 3,
+        "recursion": 5,
         "interaction": 4,
+        "miracle_topdeck": 4,
         "win_condition": 1,
         "spellslinger": 1,
         "creature": 1
@@ -135,7 +136,7 @@
       "deck_count": 3,
       "accepted_deck_count": 3,
       "average_role_counts": {
-        "exile_value": 3.33,
+        "exile_value": 3.67,
         "spellslinger": 3.67,
         "lands": 32.0,
         "ramp": 3.67,
@@ -143,13 +144,13 @@
         "creature": 3.67,
         "board_wipe": 2.0,
         "win_condition": 1.33,
-        "other": 13.33,
-        "miracle_topdeck": 7.0,
+        "other": 13.0,
+        "protection": 3.67,
         "big_spell_payoff": 7.67,
         "ritual_treasure": 10.0,
-        "recursion": 3.33,
+        "recursion": 4.33,
         "interaction": 4.33,
-        "protection": 2.0
+        "miracle_topdeck": 4.33
       },
       "top_cards": [
         {
@@ -180,7 +181,7 @@
           "card_name": "Call Forth the Tempest",
           "deck_count": 3,
           "total_quantity": 3,
-          "role": "miracle_topdeck"
+          "role": "big_spell_payoff"
         },
         {
           "card_name": "Command Tower",
@@ -198,7 +199,7 @@
           "card_name": "Deflecting Swat",
           "deck_count": 3,
           "total_quantity": 3,
-          "role": "big_spell_payoff"
+          "role": "protection"
         },
         {
           "card_name": "Enlightened Tutor",
@@ -228,7 +229,7 @@
           "card_name": "Hit the Mother Lode",
           "deck_count": 3,
           "total_quantity": 3,
-          "role": "miracle_topdeck"
+          "role": "big_spell_payoff"
         },
         {
           "card_name": "Library of Leng",
@@ -378,7 +379,7 @@
           "card_name": "Bolt Bend",
           "deck_count": 2,
           "total_quantity": 2,
-          "role": "other"
+          "role": "protection"
         },
         {
           "card_name": "Goblin Engineer",

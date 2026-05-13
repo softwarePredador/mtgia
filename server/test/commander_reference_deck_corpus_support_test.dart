@@ -264,6 +264,31 @@ void main() {
       );
       expect(
         classifyCommanderReferenceDeckCardRole(
+          'Call Forth the Tempest',
+          _card(
+            id: 'tempest-id',
+            name: 'Call Forth the Tempest',
+            typeLine: 'Sorcery',
+            oracleText: 'Discover 8.',
+          ),
+        ),
+        equals('big_spell_payoff'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          'Deflecting Swat',
+          _card(
+            id: 'swat-id',
+            name: 'Deflecting Swat',
+            typeLine: 'Instant',
+            oracleText:
+                'If you control a commander, you may cast this spell without paying its mana cost.',
+          ),
+        ),
+        equals('protection'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
           "Jeska's Will",
           _card(
             id: 'jeska-id',

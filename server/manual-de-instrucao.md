@@ -13955,15 +13955,25 @@ Roles adicionados:
 - `recursion`;
 - `ritual_treasure`.
 
-Resultado no corpus Lorehold:
+Resultado no corpus Lorehold apos correcao de falsos positivos:
 
-- `other`: `27.00` -> `13.33`;
-- `miracle_topdeck`: `7.00`;
+- `other`: `27.00` -> `13.00`;
+- `miracle_topdeck`: `4.33`;
 - `big_spell_payoff`: `7.67`;
 - `ritual_treasure`: `10.00`;
 - `spellslinger`: `3.67`;
-- `exile_value`: `3.33`;
-- `recursion`: `3.33`.
+- `exile_value`: `3.67`;
+- `recursion`: `4.33`;
+- `protection`: `3.67`.
+
+Correcoes especificas:
+
+- `Deflecting Swat` agora classifica como `protection`, nao
+  `big_spell_payoff`;
+- `Hit the Mother Lode` e `Call Forth the Tempest` agora priorizam
+  `big_spell_payoff`;
+- timeout default do caminho OpenAI com referencia Commander/Brawl subiu de
+  `20s` para `24s`; o caminho legado sem referencia nao mudou.
 
 Gates:
 
@@ -13976,4 +13986,7 @@ Gates:
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_ROLES_V2_2026-05-13.md`.
 
-Proximo gate: deploy publico e repetir a prova ampliada de `/ai/generate`.
+Primeira prova publica v2 antes do timeout de `24s` preservou deck valido e
+Lorehold como comandante, mas subiu fallback por timeout. Proximo gate:
+deploy publico e repetir a prova ampliada de `/ai/generate`; nao expandir
+corpus enquanto fallback/latencia nao estiverem aceitaveis.
