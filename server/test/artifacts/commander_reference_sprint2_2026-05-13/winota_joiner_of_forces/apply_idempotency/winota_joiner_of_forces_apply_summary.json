@@ -1,0 +1,434 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-13T19:31:09.726188Z",
+  "finished_at": "2026-05-13T19:31:22.551741Z",
+  "artifact_dir": "test/artifacts/commander_reference_sprint2_2026-05-13/winota_joiner_of_forces/apply_idempotency",
+  "deck_count": 4,
+  "accepted_deck_count": 4,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_winota_default_average",
+      "commander_name": "Winota, Joiner of Forces",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/winota-joiner-of-forces",
+      "power_lane": "edhrec_average_default",
+      "theme": "boros_combat_trigger_humans",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "385f6c86-5678-4bb1-a991-ac2c58097581",
+        "card_name": "Winota, Joiner of Forces"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 85,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "miracle_topdeck": 1,
+        "interaction": 8,
+        "creature": 30,
+        "protection": 8,
+        "win_condition": 2,
+        "ramp": 4,
+        "draw_value": 2,
+        "lands": 32,
+        "board_wipe": 1,
+        "other": 6,
+        "tutor": 1,
+        "ritual_treasure": 4,
+        "recursion": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_winota_humans_average",
+      "commander_name": "Winota, Joiner of Forces",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/winota-joiner-of-forces/humans",
+      "power_lane": "edhrec_average_humans",
+      "theme": "human_payoff_nonhuman_enablers",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "385f6c86-5678-4bb1-a991-ac2c58097581",
+        "card_name": "Winota, Joiner of Forces"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 81,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "miracle_topdeck": 1,
+        "creature": 27,
+        "protection": 10,
+        "win_condition": 2,
+        "ramp": 4,
+        "lands": 34,
+        "other": 12,
+        "interaction": 6,
+        "draw_value": 2,
+        "recursion": 1,
+        "ritual_treasure": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_winota_hatebears_average",
+      "commander_name": "Winota, Joiner of Forces",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/winota-joiner-of-forces/hatebears",
+      "power_lane": "edhrec_average_hatebears",
+      "theme": "hatebears_stax_combat_pressure",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "385f6c86-5678-4bb1-a991-ac2c58097581",
+        "card_name": "Winota, Joiner of Forces"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 86,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "miracle_topdeck": 1,
+        "interaction": 8,
+        "protection": 9,
+        "lands": 32,
+        "win_condition": 2,
+        "ramp": 4,
+        "draw_value": 2,
+        "creature": 31,
+        "other": 4,
+        "tutor": 2,
+        "ritual_treasure": 4,
+        "recursion": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_winota_budget_average",
+      "commander_name": "Winota, Joiner of Forces",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/winota-joiner-of-forces/budget",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_budget_winota_combat",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "385f6c86-5678-4bb1-a991-ac2c58097581",
+        "card_name": "Winota, Joiner of Forces"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 72,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "miracle_topdeck": 1,
+        "interaction": 12,
+        "creature": 32,
+        "protection": 4,
+        "win_condition": 3,
+        "ramp": 3,
+        "other": 7,
+        "lands": 36,
+        "recursion": 2
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Winota, Joiner of Forces": {
+      "commander_name": "Winota, Joiner of Forces",
+      "deck_count": 4,
+      "accepted_deck_count": 4,
+      "average_role_counts": {
+        "miracle_topdeck": 1.0,
+        "interaction": 8.5,
+        "creature": 30.0,
+        "protection": 7.75,
+        "win_condition": 2.25,
+        "ramp": 3.75,
+        "draw_value": 1.5,
+        "lands": 33.5,
+        "board_wipe": 0.25,
+        "other": 7.25,
+        "tutor": 0.75,
+        "ritual_treasure": 2.25,
+        "recursion": 1.25
+      },
+      "top_cards": [
+        {
+          "card_name": "Thalia, Guardian of Thraben",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Alseid of Life's Bounty",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "protection"
+        },
+        {
+          "card_name": "Angrath's Marauders",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Aven Mindcensor",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Blade Historian",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Cathar Commando",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Clifftop Retreat",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Command Tower",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Deafening Silence",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "other"
+        },
+        {
+          "card_name": "Exotic Orchard",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Gingerbrute",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Legion Warboss",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Lena, Selfless Champion",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "protection"
+        },
+        {
+          "card_name": "Loyal Apprentice",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Ornithopter",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Ornithopter of Paradise",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Path to Exile",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Phoenix Chick",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Rograkh, Son of Rohgahh",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Signal Pest",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Swords to Plowshares",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Talisman of Conviction",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Myrel, Shield of Argive",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "creature"
+        },
+        {
+          "card_name": "Mishra's Factory",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Esper Sentinel",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Flare of Fortitude",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "protection"
+        },
+        {
+          "card_name": "Furycalm Snarl",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Blinkmoth Nexus",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Goblin Rabblemaster",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "creature"
+        },
+        {
+          "card_name": "Goldnight Commander",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "creature"
+        },
+        {
+          "card_name": "Grand Abolisher",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "creature"
+        },
+        {
+          "card_name": "Boromir, Warden of the Tower",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "protection"
+        },
+        {
+          "card_name": "Boros Signet",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Mother of Runes",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "protection"
+        },
+        {
+          "card_name": "Abrade",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Needleverge Pathway",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Arid Mesa",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        }
+      ],
+      "theme_counts": {
+        "boros_combat_trigger_humans": 1,
+        "human_payoff_nonhuman_enablers": 1,
+        "hatebears_stax_combat_pressure": 1,
+        "casual_budget_winota_combat": 1
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

@@ -1,0 +1,77 @@
+{
+    "all_pass": true,
+    "by_commander": {
+        "Kinnan, Bonder Prodigy": {
+            "pass": true,
+            "deck_rows": 4,
+            "accepted_rows": 4,
+            "analysis_rows": 1,
+            "expected_decks": 4,
+            "off_color_total": 0,
+            "unresolved_total": 0,
+            "singleton_clean_rows": 4,
+            "main_quantity_99_rows": 4,
+            "commander_quantity_one_rows": 4
+        },
+        "Atraxa, Praetors' Voice": {
+            "pass": true,
+            "deck_rows": 5,
+            "accepted_rows": 5,
+            "analysis_rows": 1,
+            "expected_decks": 5,
+            "off_color_total": 0,
+            "unresolved_total": 0,
+            "singleton_clean_rows": 5,
+            "main_quantity_99_rows": 5,
+            "commander_quantity_one_rows": 5
+        },
+        "Korvold, Fae-Cursed King": {
+            "pass": true,
+            "deck_rows": 4,
+            "accepted_rows": 4,
+            "analysis_rows": 1,
+            "expected_decks": 4,
+            "off_color_total": 0,
+            "unresolved_total": 0,
+            "singleton_clean_rows": 4,
+            "main_quantity_99_rows": 4,
+            "commander_quantity_one_rows": 4
+        },
+        "Muldrotha, the Gravetide": {
+            "pass": true,
+            "deck_rows": 4,
+            "accepted_rows": 4,
+            "analysis_rows": 1,
+            "expected_decks": 4,
+            "off_color_total": 0,
+            "unresolved_total": 0,
+            "singleton_clean_rows": 4,
+            "main_quantity_99_rows": 4,
+            "commander_quantity_one_rows": 4
+        },
+        "Winota, Joiner of Forces": {
+            "pass": true,
+            "deck_rows": 4,
+            "accepted_rows": 4,
+            "analysis_rows": 1,
+            "expected_decks": 4,
+            "off_color_total": 0,
+            "unresolved_total": 0,
+            "singleton_clean_rows": 4,
+            "main_quantity_99_rows": 4,
+            "commander_quantity_one_rows": 4
+        },
+        "Yuriko, the Tiger's Shadow": {
+            "pass": true,
+            "deck_rows": 4,
+            "accepted_rows": 4,
+            "analysis_rows": 1,
+            "expected_decks": 4,
+            "off_color_total": 0,
+            "unresolved_total": 0,
+            "singleton_clean_rows": 4,
+            "main_quantity_99_rows": 4,
+            "commander_quantity_one_rows": 4
+        }
+    }
+}

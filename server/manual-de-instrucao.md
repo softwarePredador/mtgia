@@ -3,6 +3,48 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 2 Apply Controlado
+
+### O Porquê
+- Os corpora Sprint 2 de Kinnan, Korvold, Muldrotha, Yuriko, Winota e Atraxa
+  ja tinham passado no dry-run offline, mas ainda precisavam de apply seguro,
+  prova de idempotencia e scorecard pos-corpus antes de qualquer etapa publica.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- Cada corpus em
+  `server/test/artifacts/commander_reference_sprint2_2026-05-13/<safe_commander>/corpus.json`
+  foi revalidado em `dry_run_recheck/`.
+- Somente depois do novo `PASS`, o runner
+  `bin/commander_reference_deck_corpus.dart` foi executado com `--apply` em
+  `apply/` e repetido em `apply_idempotency/`.
+- As contagens DB-backed dos alvos foram registradas antes e depois:
+  `0` decks/cards/analises antes; apos apply/idempotencia, `25` linhas em
+  `commander_reference_decks`, `2181` em
+  `commander_reference_deck_cards` e `6` em
+  `commander_reference_deck_analysis`.
+- O artifact
+  `server/test/artifacts/commander_reference_sprint2_2026-05-13/db_counts/db_integrity_after_apply.json`
+  confirmou `all_pass=true`, `accepted_rows=expected_decks`,
+  `unresolved_total=0`, `off_color_total=0`, comandante `1`, main `99` e
+  singleton limpo para todos os alvos.
+- O scorecard pos-corpus foi executado sem `--runtime-summary` em
+  `readiness_after_corpus/` para cada comandante.
+- Nao houve mudanca de codigo, app mobile, endpoints app-facing, scanner,
+  camera, OCR, `cards`, `sets` ou legalidades.
+
+### Resultado
+- Resultado operacional: **PASS WITH RISKS**.
+- Apply/idempotencia: **PASS** para 25/25 decks.
+- Readiness pos-corpus: todos ficaram `PASS_WITH_RISKS` por
+  `public_runtime_proof_missing`; Korvold tambem ficou com
+  `core_package_weak`.
+- Nenhum comandante foi promovido nesta etapa; `public_proof` e scorecard final
+  continuam obrigatorios antes de `promoted=DONE`.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_APPLY_2026-05-13.md`.
+
 ## 2026-05-13 — Abertura do Sprint 2 Commander Reference Expansion
 
 ### O Porquê
