@@ -601,6 +601,122 @@ String classifyCommanderReferenceDeckCardRole(
   final typeLine = metadata?['type_line']?.toString().toLowerCase() ?? '';
   final oracle = metadata?['oracle_text']?.toString().toLowerCase() ?? '';
   if (typeLine.contains('land')) return 'lands';
+  if (_containsAny(normalized, const [
+        'sensei s divining top',
+        'sensei\'s divining top',
+        'scroll rack',
+        'galvanoth',
+        'primal amulet',
+        'dragon s rage channeler',
+        'dragon\'s rage channeler',
+        'library of leng',
+        'hidden retreat',
+      ]) ||
+      oracle.contains('look at the top') ||
+      oracle.contains('reveal the top') ||
+      oracle.contains('from the top of your library') ||
+      oracle.contains('the first card you draw')) {
+    return 'miracle_topdeck';
+  }
+  if (_containsAny(normalized, const [
+        'apex of power',
+        'dance with calamity',
+        'hit the mother lode',
+        'improvisation capstone',
+        'rise of the eldrazi',
+        'soulfire eruption',
+        'worldfire',
+        'storm herd',
+        'call forth the tempest',
+        'volcanic vision',
+        'insurrection',
+        'invincible hymn',
+        'deploy to the front',
+        'gideon s phalanx',
+      ]) ||
+      (oracle.contains('without paying') &&
+          (typeLine.contains('instant') || typeLine.contains('sorcery'))) ||
+      oracle.contains('mana value 7 or greater')) {
+    return 'big_spell_payoff';
+  }
+  if (_containsAny(normalized, const [
+        'arcane bombardment',
+        'double vision',
+        'dualcaster mage',
+        'reverberate',
+        'twinflame',
+        'mizzix s mastery',
+        'storm kiln artist',
+        'aetherflux reservoir',
+        'grinding station',
+      ]) ||
+      oracle.contains('copy target instant') ||
+      oracle.contains('copy target sorcery') ||
+      oracle.contains('whenever you cast or copy') ||
+      oracle.contains('whenever you cast an instant') ||
+      oracle.contains('whenever you cast a sorcery') ||
+      oracle.contains('storm')) {
+    return 'spellslinger';
+  }
+  if (_containsAny(normalized, const [
+        'underworld breach',
+        'sevinne s reclamation',
+        'reconstruct history',
+        'goblin welder',
+        'goblin engineer',
+        'sun titan',
+        'restore balance',
+        'restoration seminar',
+      ]) ||
+      oracle.contains('from your graveyard') ||
+      oracle.contains('return target') && oracle.contains('graveyard') ||
+      oracle.contains('escape')) {
+    return 'recursion';
+  }
+  if (_containsAny(normalized, const [
+        'jeska s will',
+        'jeska\'s will',
+        'brass s bounty',
+        'big score',
+        'unexpected windfall',
+        'seize the spoils',
+        'strike it rich',
+        'descent into avernus',
+        'mana geyser',
+        'desperate ritual',
+        'pyretic ritual',
+        'rite of flame',
+        'seething song',
+        'simian spirit guide',
+        'lion s eye diamond',
+        'lion\'s eye diamond',
+        'lotus petal',
+      ]) ||
+      oracle.contains('create a treasure token') ||
+      oracle.contains('create two treasure tokens') ||
+      oracle.contains('add {r}{r}') ||
+      oracle.contains('add {r}{r}{r}') ||
+      oracle.contains('add one mana for each')) {
+    return 'ritual_treasure';
+  }
+  if (_containsAny(normalized, const [
+        'monument to endurance',
+        'naktamun lorespinner',
+        'wheel of fortune',
+        'wheel of fate',
+        'reforge the soul',
+        'valakut awakening',
+        'faithless looting',
+        'surly badgersaur',
+        'bender s waterskin',
+        'bender\'s waterskin',
+      ]) ||
+      oracle.contains('exile the top') ||
+      oracle.contains('you may play that card') ||
+      oracle.contains('you may cast that card') ||
+      oracle.contains('discard') && oracle.contains('draw')) {
+    return 'exile_value';
+  }
   if (_containsAny(normalized, const ['sol ring', 'signet', 'talisman']) ||
       oracle.contains('add {') ||
       oracle.contains('treasure token') ||

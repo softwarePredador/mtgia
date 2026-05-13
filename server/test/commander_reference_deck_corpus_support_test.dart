@@ -225,6 +225,81 @@ void main() {
       expect(diagnostics['accepted_reference_deck_count'], equals(3));
       expect(cacheVersion, startsWith('reference_deck_corpus_v1:'));
     });
+
+    test('classifies Lorehold-specific roles before generic buckets', () {
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          "Sensei's Divining Top",
+          _card(
+            id: 'top-id',
+            name: "Sensei's Divining Top",
+            typeLine: 'Artifact',
+          ),
+        ),
+        equals('miracle_topdeck'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          'Arcane Bombardment',
+          _card(
+            id: 'bombardment-id',
+            name: 'Arcane Bombardment',
+            typeLine: 'Enchantment',
+            oracleText: 'Whenever you cast your first instant or sorcery spell',
+          ),
+        ),
+        equals('spellslinger'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          'Hit the Mother Lode',
+          _card(
+            id: 'mother-lode-id',
+            name: 'Hit the Mother Lode',
+            typeLine: 'Sorcery',
+            oracleText: 'Discover 10.',
+          ),
+        ),
+        equals('big_spell_payoff'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          "Jeska's Will",
+          _card(
+            id: 'jeska-id',
+            name: "Jeska's Will",
+            typeLine: 'Sorcery',
+            oracleText: 'Add {R} for each card in target opponent hand.',
+          ),
+        ),
+        equals('ritual_treasure'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          'Underworld Breach',
+          _card(
+            id: 'breach-id',
+            name: 'Underworld Breach',
+            typeLine: 'Enchantment',
+            oracleText: 'Each nonland card in your graveyard has escape.',
+          ),
+        ),
+        equals('recursion'),
+      );
+      expect(
+        classifyCommanderReferenceDeckCardRole(
+          'Wheel of Fortune',
+          _card(
+            id: 'wheel-id',
+            name: 'Wheel of Fortune',
+            typeLine: 'Sorcery',
+            oracleText:
+                'Each player discards their hand, then draws seven cards.',
+          ),
+        ),
+        equals('exile_value'),
+      );
+    });
   });
 }
 

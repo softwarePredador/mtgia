@@ -13940,3 +13940,40 @@ em refinar roles para reduzir `other` antes de expandir em massa.
 
 Artifact:
 `server/test/artifacts/commander_reference_deck_corpus_guidance_lorehold_2026-05-12/public_expanded/summary.json`.
+
+## 114. Lorehold corpus roles v2 - 2026-05-13
+
+O classificador do Commander Reference Deck Corpus foi refinado para reduzir
+`other` antes de expandir para novos comandantes.
+
+Roles adicionados:
+
+- `spellslinger`;
+- `miracle_topdeck`;
+- `exile_value`;
+- `big_spell_payoff`;
+- `recursion`;
+- `ritual_treasure`.
+
+Resultado no corpus Lorehold:
+
+- `other`: `27.00` -> `13.33`;
+- `miracle_topdeck`: `7.00`;
+- `big_spell_payoff`: `7.67`;
+- `ritual_treasure`: `10.00`;
+- `spellslinger`: `3.67`;
+- `exile_value`: `3.33`;
+- `recursion`: `3.33`.
+
+Gates:
+
+- dry-run: 3/3 decks aceitos;
+- apply: 3/3 decks aceitos;
+- apply idempotente: 3/3 decks aceitos;
+- `unresolved=0`;
+- `off_color=0`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_ROLES_V2_2026-05-13.md`.
+
+Proximo gate: deploy publico e repetir a prova ampliada de `/ai/generate`.
