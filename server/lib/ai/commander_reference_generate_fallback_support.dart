@@ -1,6 +1,74 @@
 import 'commander_reference_card_stats_support.dart';
 import 'commander_reference_deck_corpus_support.dart';
 import 'commander_reference_profile_support.dart';
+import '../color_identity.dart';
+
+class ReferenceGeneratedCardsIdentityFilterResult {
+  const ReferenceGeneratedCardsIdentityFilterResult({
+    required this.cards,
+    required this.removedOffColorNames,
+  });
+
+  final List<Map<String, dynamic>> cards;
+  final List<String> removedOffColorNames;
+
+  int get removedOffColorCount => removedOffColorNames.length;
+}
+
+ReferenceGeneratedCardsIdentityFilterResult
+    filterReferenceGeneratedCardsByCommanderIdentity({
+  required Map<String, dynamic> profile,
+  required String commanderName,
+  required List<Map<String, dynamic>> cards,
+  required Map<String, Map<String, dynamic>> resolvedCardsByName,
+}) {
+  final commanderIdentity = _profileColorIdentity(profile).toSet();
+  if (commanderIdentity.isEmpty) {
+    return ReferenceGeneratedCardsIdentityFilterResult(
+      cards: cards.map(Map<String, dynamic>.from).toList(growable: false),
+      removedOffColorNames: const [],
+    );
+  }
+
+  final filtered = <Map<String, dynamic>>[];
+  final removed = <String>{};
+  final normalizedCommander =
+      normalizeCommanderReferenceCardName(commanderName);
+
+  for (final card in cards) {
+    final name = card['name']?.toString().trim() ?? '';
+    if (name.isEmpty) continue;
+    if (normalizeCommanderReferenceCardName(name) == normalizedCommander) {
+      continue;
+    }
+
+    final resolved = _findResolvedCard(name, resolvedCardsByName);
+    if (resolved == null) {
+      filtered.add(Map<String, dynamic>.from(card));
+      continue;
+    }
+
+    final identity = resolveCardColorIdentity(
+      colorIdentity: _metadataStringIterable(resolved['color_identity']),
+      colors: _metadataStringIterable(resolved['colors']),
+      oracleText: resolved['oracle_text']?.toString(),
+      manaCost: resolved['mana_cost']?.toString(),
+    );
+    if (!isWithinCommanderIdentity(
+      cardIdentity: identity,
+      commanderIdentity: commanderIdentity,
+    )) {
+      removed.add(name);
+      continue;
+    }
+    filtered.add(Map<String, dynamic>.from(card));
+  }
+
+  return ReferenceGeneratedCardsIdentityFilterResult(
+    cards: filtered,
+    removedOffColorNames: removed.toList()..sort(),
+  );
+}
 
 Map<String, dynamic> buildDeterministicReferenceDeck({
   required Map<String, dynamic> profile,
@@ -14,18 +82,22 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
           .trim();
   final nonLands = <String>[];
   final seen = <String>{};
+  final avoidedExampleNames = _profileAvoidExampleNames(profile);
 
   void addCard(String? rawName) {
     final name = rawName?.trim();
     if (name == null || name.isEmpty) return;
-    if (normalizeCommanderReferenceCardName(name) ==
-        normalizeCommanderReferenceCardName(commanderName)) {
+    final normalizedName = normalizeCommanderReferenceCardName(name);
+    if (normalizedName == normalizeCommanderReferenceCardName(commanderName)) {
       return;
     }
-    if (basicLandNames.contains(normalizeCommanderReferenceCardName(name))) {
+    if (avoidedExampleNames.contains(normalizedName)) {
       return;
     }
-    if (!seen.add(normalizeCommanderReferenceCardName(name))) return;
+    if (basicLandNames.contains(normalizedName)) {
+      return;
+    }
+    if (!seen.add(normalizedName)) return;
     nonLands.add(name);
   }
 
@@ -223,6 +295,7 @@ List<Map<String, dynamic>> _buildBasicLandFallbackCards({
     final land = colorToBasic[color.toUpperCase()];
     if (land != null) basics.add(land);
   }
+
   if (basics.isEmpty) basics.add('Wastes');
 
   final per = (total / basics.length).floor();
@@ -242,4 +315,49 @@ List<Map<String, dynamic>> _buildBasicLandFallbackCards({
   }
 
   return cards;
+}
+
+Map<String, dynamic>? _findResolvedCard(
+  String cardName,
+  Map<String, Map<String, dynamic>> resolvedCardsByName,
+) {
+  final aliases = commanderReferenceCardLookupAliases(cardName);
+  for (final alias in aliases) {
+    final direct = resolvedCardsByName[alias];
+    if (direct != null) return direct;
+  }
+  final normalized = normalizeCommanderReferenceCardName(cardName);
+  for (final entry in resolvedCardsByName.entries) {
+    if (normalizeCommanderReferenceCardName(entry.key) == normalized) {
+      return entry.value;
+    }
+    final resolvedName = entry.value['name']?.toString();
+    if (resolvedName != null &&
+        normalizeCommanderReferenceCardName(resolvedName) == normalized) {
+      return entry.value;
+    }
+  }
+  return null;
+}
+
+Iterable<String> _metadataStringIterable(dynamic raw) {
+  if (raw == null) return const <String>[];
+  if (raw is Iterable) return raw.map((value) => value.toString());
+  return [raw.toString()];
+}
+
+Set<String> _profileAvoidExampleNames(Map<String, dynamic> profile) {
+  final raw = profile['avoid_patterns'];
+  if (raw is! Iterable) return const {};
+  final names = <String>{};
+  for (final item in raw) {
+    if (item is! Map) continue;
+    final examples = item['examples'];
+    if (examples is! Iterable) continue;
+    for (final rawExample in examples) {
+      final name = normalizeCommanderReferenceCardName(rawExample.toString());
+      if (name.isNotEmpty) names.add(name);
+    }
+  }
+  return names;
 }

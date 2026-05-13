@@ -120,6 +120,8 @@ void main() {
       expect(prompt, contains('Color identity is exactly R/W'));
       expect(prompt, contains('Every nonland, split, MDFC'));
       expect(prompt, contains('replace it with an on-color or colorless'));
+      expect(prompt, contains('do not infer cards from generic off-color'));
+      expect(prompt, contains('if color identity is uncertain, omit'));
       expect(prompt, contains('boros_miracle_big_spells'));
       expect(prompt, contains('topdeck_miracle_setup'));
       expect(prompt, contains('blue_miracle_package'));

@@ -26,7 +26,7 @@ import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
-    'ai_generate_reference_prompt_v2';
+    'ai_generate_reference_prompt_v3';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -513,7 +513,7 @@ $metaContext
       return apiError(502, 'OpenAI returned invalid deck JSON');
     }
     final commanderRaw = deckList['commander'];
-    final cards =
+    var cards =
         (deckList['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
     String? commanderName;
@@ -535,6 +535,21 @@ $metaContext
         '$referenceCommanderName before validation.',
       );
       commanderName = referenceCommanderName;
+    }
+
+    if (referenceProfile != null && commanderName != null) {
+      final identityFilterStopwatch = Stopwatch()..start();
+      cards = await _filterAndRefillReferenceGeneratedCards(
+        pool: pool,
+        format: format,
+        cards: cards,
+        commanderName: commanderName,
+        referenceProfile: referenceProfile,
+        referenceCardStats: referenceCardStats,
+        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+      );
+      timings['reference_identity_filter_ms'] =
+          identityFilterStopwatch.elapsedMilliseconds;
     }
 
     final validationService = GeneratedDeckValidationService(
@@ -978,6 +993,103 @@ Uri _resolveInternalGenerateUrl(Request request) {
     configuredBaseUrl: Platform.environment['AI_GENERATE_INTERNAL_BASE_URL'],
     fallbackPort: Platform.environment['PORT']?.trim(),
   );
+}
+
+Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
+  required Pool pool,
+  required String format,
+  required List<Map<String, dynamic>> cards,
+  required String commanderName,
+  required Map<String, dynamic> referenceProfile,
+  required List<CommanderReferenceCardStat> referenceCardStats,
+  required CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+}) async {
+  final normalizedFormat = normalizeAiGenerateFormat(format);
+  if (normalizedFormat != 'commander' && normalizedFormat != 'brawl') {
+    return cards;
+  }
+
+  final lookupNames = <String>{commanderName};
+  for (final card in cards) {
+    final name = card['name']?.toString().trim();
+    if (name == null || name.isEmpty) continue;
+    lookupNames.add(name);
+    lookupNames.addAll(commanderReferenceCardLookupAliases(name));
+  }
+  final resolvedCardsByName = lookupNames.isEmpty
+      ? <String, Map<String, dynamic>>{}
+      : await resolveImportCardNames(
+          pool,
+          [
+            for (final name in lookupNames) {'name': name}
+          ],
+          preferredFormat: format,
+        );
+  final normalizedResolvedCardsByName = resolvedCardsByName.map(
+    (key, value) => MapEntry(normalizeCommanderReferenceCardName(key), value),
+  );
+
+  final filtered = filterReferenceGeneratedCardsByCommanderIdentity(
+    profile: referenceProfile,
+    commanderName: commanderName,
+    cards: cards,
+    resolvedCardsByName: normalizedResolvedCardsByName,
+  ).cards;
+
+  final targetMainQuantity = normalizedFormat == 'brawl' ? 59 : 99;
+  final currentQuantity = _generatedMainQuantity(filtered);
+  if (currentQuantity >= targetMainQuantity) {
+    return filtered;
+  }
+
+  final fillerDeck = buildDeterministicReferenceDeck(
+    profile: referenceProfile,
+    referenceCardStats: referenceCardStats,
+    referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    targetMainQuantity: targetMainQuantity,
+  );
+  final filled = filtered.map(Map<String, dynamic>.from).toList();
+  final seen = filled
+      .map((card) => normalizeCommanderReferenceCardName(
+            card['name']?.toString() ?? '',
+          ))
+      .where((name) => name.isNotEmpty)
+      .toSet();
+  var missing = targetMainQuantity - currentQuantity;
+  final fillerCards =
+      (fillerDeck['cards'] as List?)?.whereType<Map>() ?? const <Map>[];
+  for (final rawCard in fillerCards) {
+    if (missing <= 0) break;
+    final name = rawCard['name']?.toString().trim() ?? '';
+    if (name.isEmpty) continue;
+    final normalizedName = normalizeCommanderReferenceCardName(name);
+    if (normalizedName == normalizeCommanderReferenceCardName(commanderName)) {
+      continue;
+    }
+    final isBasic = basicLandNames.contains(normalizedName);
+    if (!isBasic && !seen.add(normalizedName)) continue;
+    final quantityRaw = rawCard['quantity'];
+    final quantity = quantityRaw is int
+        ? quantityRaw
+        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    if (quantity <= 0) continue;
+    final addQuantity = quantity > missing ? missing : quantity;
+    filled.add({'name': name, 'quantity': addQuantity});
+    missing -= addQuantity;
+  }
+  return filled;
+}
+
+int _generatedMainQuantity(List<Map<String, dynamic>> cards) {
+  var total = 0;
+  for (final card in cards) {
+    final quantityRaw = card['quantity'];
+    final quantity = quantityRaw is int
+        ? quantityRaw
+        : int.tryParse(quantityRaw?.toString() ?? '') ?? 1;
+    if (quantity > 0) total += quantity;
+  }
+  return total;
 }
 
 Future<Map<String, dynamic>> _buildMockGenerateResponse({

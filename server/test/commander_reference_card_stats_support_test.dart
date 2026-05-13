@@ -244,6 +244,94 @@ void main() {
           greaterThan(0));
     });
 
+    test('filters off-color generated cards before reference validation repair',
+        () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 5, 13, 12),
+      );
+      final result = filterReferenceGeneratedCardsByCommanderIdentity(
+        profile: profile,
+        commanderName: loreholdReferenceCommanderName,
+        cards: [
+          {'name': loreholdReferenceCommanderName, 'quantity': 1},
+          {'name': "Sensei's Divining Top", 'quantity': 1},
+          {'name': 'Temporal Mastery', 'quantity': 1},
+          {'name': 'Swords to Plowshares', 'quantity': 1},
+          {'name': 'Unknown Local Test Card', 'quantity': 1},
+        ],
+        resolvedCardsByName: {
+          'sensei\'s divining top': _resolvedCard(
+            id: 'top-id',
+            name: "Sensei's Divining Top",
+          ),
+          'temporal mastery': _resolvedCard(
+            id: 'temporal-id',
+            name: 'Temporal Mastery',
+            colorIdentity: const ['U'],
+            typeLine: 'Sorcery',
+          ),
+          'swords to plowshares': _resolvedCard(
+            id: 'swords-id',
+            name: 'Swords to Plowshares',
+            colorIdentity: const ['W'],
+            typeLine: 'Instant',
+          ),
+        },
+      );
+
+      expect(result.removedOffColorNames, equals(['Temporal Mastery']));
+      expect(
+        result.cards.map((card) => card['name']),
+        containsAll([
+          "Sensei's Divining Top",
+          'Swords to Plowshares',
+          'Unknown Local Test Card',
+        ]),
+      );
+      expect(
+        result.cards.map((card) => card['name']),
+        isNot(contains(loreholdReferenceCommanderName)),
+      );
+      expect(
+        result.cards.map((card) => card['name']),
+        isNot(contains('Temporal Mastery')),
+      );
+    });
+
+    test('reference fallback skips avoid-pattern examples from candidate stats',
+        () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 5, 13, 12),
+      );
+      final deck = buildDeterministicReferenceDeck(
+        profile: profile,
+        targetMainQuantity: 12,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Temporal Mastery',
+            cardId: 'temporal-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 99,
+            confidence: 'high',
+          ),
+          _stat(
+            cardName: "Sensei's Divining Top",
+            cardId: 'top-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 94,
+            confidence: 'high',
+          ),
+        ],
+      );
+      final cardNames =
+          ((deck['cards'] as List).cast<Map>()).map((card) => card['name']);
+
+      expect(cardNames, contains("Sensei's Divining Top"));
+      expect(cardNames, isNot(contains('Temporal Mastery')));
+    });
+
     test('flattens generic commander package stats', () {
       final profile = buildCommanderReferenceProfilePayload(
         commanderName: 'Test Commander',

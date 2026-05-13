@@ -316,6 +316,7 @@ Commander reference profile active:
 - Format is Commander; total deck must be exactly 100 cards including the Commander.
 - Color identity is exactly $identityText. Every nonland, split, MDFC, adventure, aftermath or back-face card must be legal inside $identityText.
 - Never include cards outside this color identity or banned Commander cards. If a familiar miracle/topdeck staple is off-color, replace it with an on-color or colorless alternative instead of relying on validator repair.
+- For this reference-guided build, do not infer cards from generic off-color miracle, tutor, cantrip, extra-turn, ramp or draw packages. Use only $identityText/colorless cards and legal lands that match the commander identity; if color identity is uncertain, omit the card.
 - Core themes: $themes.
 - Role targets: $roleTargets.
 - Prioritize these package signals when legal and budget/bracket appropriate: $packages.

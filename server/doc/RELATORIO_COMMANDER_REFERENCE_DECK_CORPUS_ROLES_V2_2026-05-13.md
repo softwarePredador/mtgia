@@ -101,6 +101,69 @@ overlap e latencia contra a rodada anterior. Nao expandir corpus ainda.
 Artifact:
 `server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/public_expanded/summary.json`.
 
+## Iteracao Lorehold Reference Off-Color Fix v4
+
+### Diagnostico v3
+
+O artefato publico v3 mostrou `5/5` HTTP 200, `5/5`
+`validation.is_valid=true`, `5/5` Lorehold preservado, `main_quantity=99` e
+fallback `0/5`, mas tambem registrou auto-reparo off-color em `4/5` probes com
+comandante. O artefato sanitizado nao preservou nomes de cartas e nao ha
+decklists brutas versionadas; portanto os nomes exatos das cartas removidas em
+v3 ficam **not_proven**.
+
+A auditoria local dos sinais persistidos indica:
+
+- Reference Card Stats de Lorehold ja possui auditoria off-color antes do apply;
+- o corpus Lorehold continua aceito com `off_color_count=0`;
+- o fallback deterministico manual e Boros/colorless, mas podia aceitar uma carta
+  ruim se ela entrasse futuramente por stats/corpus/profile;
+- a causa mais provavel do reparo publico v3 e inferencia do modelo a partir de
+  conhecimento generico de miracle/topdeck, nao uma carta off-color persistida em
+  profile/card_stats/corpus. Probabilidade por origem:
+  - profile/card_stats/corpus: **not_proven** para nomes, baixo sinal local;
+  - archetype reuse: nao usado nos probes exatos de Lorehold;
+  - fallback: nao usado nos probes v3 com comandante;
+  - prompt/OpenAI: causa mais provavel porque o reparo ocorreu antes do validator
+    em respostas OpenAI sem fallback.
+
+### Mudancas v4
+
+- Cache/prompt policy de `/ai/generate` com reference guidance:
+  `ai_generate_reference_prompt_v3`.
+- Prompt do Commander Reference Profile reforcado para proibir inferencia de
+  pacotes genericos off-color e omitir carta com identidade incerta.
+- Pre-validacao reference-guided filtra a lista candidata da OpenAI contra a
+  identidade do profile antes do `GeneratedDeckValidationService`; se a remocao
+  deixa a lista curta, recompõe com fallback deterministico reference-guided.
+- Fallback deterministico ignora exemplos de `avoid_patterns`, reduzindo risco de
+  candidatos off-color caso dados ruins cheguem por stats/corpus/profile.
+- Nenhum timeout foi aumentado e nenhuma validacao foi enfraquecida.
+
+### Comandos locais v4
+
+```bash
+cd server && dart format lib/ai/commander_reference_generate_fallback_support.dart lib/ai/commander_reference_profile_support.dart routes/ai/generate/index.dart test/commander_reference_card_stats_support_test.dart test/commander_reference_profile_support_test.dart
+cd server && dart test test/commander_reference_card_stats_support_test.dart test/commander_reference_profile_support_test.dart -r expanded
+cd server && dart analyze lib routes test
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart test/ai_generate_performance_support_test.dart -r expanded
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/dry_run
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply_idempotency
+```
+
+### Reprocessamento v4
+
+| Modo | Status | Decks | Accepted | Rejected | Off-color |
+| --- | --- | ---: | ---: | ---: | ---: |
+| dry-run | `PASS` | `3` | `3` | `0` | `0` |
+| apply | `PASS` | `3` | `3` | `0` | `0` |
+| apply idempotente | `PASS` | `3` | `3` | `0` | `0` |
+
+### Gate pre-prova publica
+
+Status: **not_proven** ate deploy e prova publica expandida do novo SHA.
+
 ## Proximo gate
 
 Antes de expandir para novos comandantes, ajustar guidance/prompt de corpus

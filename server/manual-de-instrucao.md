@@ -3,6 +3,39 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Lorehold Off-Color Fix v4
+
+### O Porquê
+- A prova publica v3 preservou Lorehold, `main_quantity=99`,
+  `validation.is_valid=true` e fallback `0/5`, mas o validator ainda precisou
+  auto-reparar cartas fora da identidade Boros em `4/5` probes.
+- O artefato sanitizado v3 registrou apenas contagem de off-color, sem nomes das
+  cartas; portanto os nomes exatos dos reparos anteriores permanecem
+  **not_proven**.
+
+### O Como
+- A policy de cache do generate reference-guided foi versionada para
+  `ai_generate_reference_prompt_v3`.
+- O prompt de Commander Reference passou a proibir inferencia a partir de pacotes
+  genericos off-color de miracle/tutor/cantrip/extra-turn/ramp/draw e a orientar
+  omissao quando a identidade de cor for incerta.
+- Antes da validacao final, `/ai/generate` filtra respostas OpenAI com exact
+  Commander Reference Profile contra a identidade do profile e remove comandante
+  duplicado/off-color da lista candidata; se a lista fica curta, recompõe usando
+  fallback deterministico reference-guided ja legal.
+- O fallback deterministico ignora exemplos de `avoid_patterns`, evitando que
+  exemplos off-color virem candidatos em cenarios de dados ruins.
+- Nenhuma regra de validacao, color identity, singleton, preservacao do
+  comandante ou timeout foi relaxada.
+
+### Resultado local
+- `dart analyze lib routes test`: PASS.
+- Suite focada Commander Reference: PASS.
+- Reprocessamento Lorehold corpus `--dry-run`, `--apply` e `--apply`
+  idempotente: PASS, `accepted_deck_count=3`, `rejected_deck_count=0`,
+  `off_color_count=0`.
+- Prova publica pos-deploy: **not_proven** ate o deploy do novo SHA.
+
 ## 2026-05-13 — Commander Reference Generate Quality Lorehold v3
 
 ### O Porquê
