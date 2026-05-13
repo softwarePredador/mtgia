@@ -2,11 +2,12 @@
 
 ## Verdict
 
-**PASS.**
+**PASS WITH RISKS.**
 
 O corpus offline de `Aesi, Tyrant of Gyre Strait` foi montado com 4 paginas
-publicas EDHREC Average Deck e validado em `--dry-run`. Nenhuma mutacao de banco
-foi executada nesta etapa.
+publicas EDHREC Average Deck, validado em `--dry-run`, aplicado com sucesso e
+reaplicado para prova de idempotencia. O scorecard read-only ficou em
+`PASS_WITH_RISKS` porque ainda falta prova publica 5x para liberar expansao.
 
 ## Scope
 
@@ -71,6 +72,69 @@ O comandante resolveu localmente como
 `Aesi, Tyrant of Gyre Strait // Aesi, Tyrant of Gyre Strait`, preservando a
 primeira face esperada.
 
+Apply executado apos o dry-run PASS:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/aesi_edhrec_average_corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/apply
+```
+
+Apply idempotente executado em seguida:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/aesi_edhrec_average_corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/apply_idempotency
+```
+
+Resultado dos tres passos:
+
+| Step | status | db_mutations | deck_count | accepted_deck_count | rejected_deck_count | gates |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| dry-run | `PASS` | `false` | 4 | 4 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+| apply | `PASS` | `true` | 4 | 4 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+| apply idempotency | `PASS` | `true` | 4 | 4 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/dry_run/aesi_tyrant_of_gyre_strait_dry_run_summary.json`
+- `server/test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/apply/aesi_tyrant_of_gyre_strait_apply_summary.json`
+- `server/test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/apply_idempotency/aesi_tyrant_of_gyre_strait_apply_summary.json`
+
+## Readiness scorecard apos apply
+
+Comando:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Aesi, Tyrant of Gyre Strait' \
+  --artifact-dir=test/artifacts/commander_reference_readiness_aesi_after_corpus_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS_WITH_RISKS` |
+| score | 98 |
+| readiness status | `profile_ready_needs_proof` |
+| expansion_ready | `false` |
+| blockers | `[]` |
+| warnings | `public_runtime_proof_missing` |
+| corpus_accepted_deck_count | 4 |
+| corpus_core_package_count | 31 |
+| deterministic_deck_valid | `true` |
+| deterministic_main_quantity | 99 |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_aesi_after_corpus_2026-05-13/readiness_scorecard_summary.json`
+
 ## Achados derivados da web
 
 As paginas EDHREC Average Deck provam contexto Commander por fonte e formato da
@@ -110,6 +174,6 @@ Padroes arriscados ou nao transferiveis:
 
 ## Proximo passo
 
-Rodar scorecard read-only para Aesi usando o corpus aceito. Se o score continuar
-bloqueado apenas por prova publica, planejar uma prova publica 5/5 separada
-antes de qualquer `--apply` ou promocao de deterministic/reference-guided path.
+Executar prova publica 5x com `commander_name='Aesi, Tyrant of Gyre Strait'`.
+Sem essa prova, Aesi permanece com corpus aplicado e score alto, mas ainda nao
+esta liberado para expansao (`expansion_ready=false`).

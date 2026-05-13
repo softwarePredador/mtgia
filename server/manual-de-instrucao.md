@@ -3,6 +3,49 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Aesi Corpus Apply e Readiness
+
+### O Porquê
+- Aesi ja tinha corpus offline validado em dry-run, mas ainda nao aplicado.
+- O objetivo operacional era aplicar o corpus com seguranca, provar
+  idempotencia e medir prontidao com scorecard read-only antes de qualquer
+  expansao.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- O artifact
+  `server/test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/aesi_edhrec_average_corpus.json`
+  foi confirmado localmente.
+- O runner `bin/commander_reference_deck_corpus.dart` foi reexecutado em
+  `--dry-run`; somente apos `PASS`, o corpus foi aplicado em
+  `test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/apply`.
+- O mesmo `--apply` foi repetido em
+  `test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/apply_idempotency`
+  para confirmar que a operacao permanece segura para reexecucao.
+- Em seguida, `bin/commander_reference_readiness_scorecard.dart` foi rodado em
+  modo read-only para `Aesi, Tyrant of Gyre Strait`.
+- Nenhum ajuste de codigo foi necessario; scanner/camera/OCR, app mobile e
+  rotas app-facing permaneceram fora do escopo.
+
+### Resultado
+- Dry-run: **PASS**, `deck_count=4`, `accepted_deck_count=4`,
+  `rejected_deck_count=0`, `db_mutations=false`.
+- Apply: **PASS**, `deck_count=4`, `accepted_deck_count=4`,
+  `rejected_deck_count=0`, `db_mutations=true`.
+- Apply idempotente: **PASS**, `deck_count=4`, `accepted_deck_count=4`,
+  `rejected_deck_count=0`, `db_mutations=true`.
+- Nos tres passos, todos os decks mantiveram `commander_quantity=1`,
+  `main_quantity=99`, `unresolved_count=0`, `off_color_count=0` e
+  `singleton_violations={}`.
+- Scorecard:
+  `test/artifacts/commander_reference_readiness_aesi_after_corpus_2026-05-13/readiness_scorecard_summary.json`.
+- Readiness final: **PASS_WITH_RISKS**, `score=98`,
+  `status=profile_ready_needs_proof`, `expansion_ready=false`,
+  `blockers=[]`, `warnings=["public_runtime_proof_missing"]`.
+- Proximo passo obrigatorio antes de promover Aesi: executar prova publica 5x
+  com `commander_name='Aesi, Tyrant of Gyre Strait'`.
+
 ## 2026-05-13 — Commander Reference Deck Corpus Aesi
 
 ### O Porquê
