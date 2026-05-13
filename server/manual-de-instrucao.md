@@ -3,6 +3,43 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 3 Lote A public proof
+
+### O Porquê
+- Os quatro comandantes Sprint 3 Lote A ja estavam aplicados e idempotentes,
+  mas ainda faltava prova publica 5/5 de `/ai/generate` e promocao por
+  scorecard com runtime summary.
+- A prova precisava confirmar comportamento no backend publico sem expor
+  secrets, tokens, e-mail QA completo, prompts completos ou decklists.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o `/health` publico retornou
+  `git_sha=ac8318386d33f2b31425989fbe5dd3500ca56213`, igual ao HEAD local.
+- Foi usado um usuario QA descartavel mantido apenas em memoria para autenticar
+  `POST /ai/generate`; o token e credenciais nao foram persistidos.
+- Para `Krenko, Mob Boss`, `Light-Paws, Emperor's Voice`,
+  `Niv-Mizzet, Parun` e `Teysa Karlov`, foram executadas 5 probes publicas com
+  `format=Commander`, `bracket=3`, `commander_name` exato e prompt tematico
+  nao persistido.
+- Os artifacts `public_proof/summary.json` registram somente metricas
+  sanitizadas: HTTP, validacao, preservacao do comandante, main 99,
+  profile/stats/corpus, fallback, timeout, invalid/off-identity e p50/p95.
+- Em seguida, `bin/commander_reference_readiness_scorecard.dart` foi executado
+  com `--runtime-summary` para cada comandante em `readiness_public/`.
+- `API_CONTRACTS_AND_DATA_MAP.md` foi consultado e nao alterado porque nao houve
+  mudanca de contrato, payload, response shape ou consumidor mobile.
+
+### Resultado
+- Resultado operacional: **PASS**.
+- Os quatro comandantes retornaram 5/5 HTTP 200, `validation_ok`,
+  comandante preservado, `main_quantity=99`, profile/stats/corpus ativos,
+  `timeout_fallback_count=0`, `invalid_cards_total=0` e
+  `off_identity_total=0`.
+- Scorecard final: score 100, `ready_for_mini_batch`, `warnings=[]`,
+  `blockers=[]` e `promoted=true` para os quatro comandantes.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_PUBLIC_PROOF_2026-05-13.md`.
+
 ## 2026-05-13 — Commander Reference Sprint 3 Lote A apply controlado
 
 ### O Porquê

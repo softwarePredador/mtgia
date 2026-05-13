@@ -19,10 +19,10 @@ camera ou OCR.
 
 | Prioridade | Commander | Lote | Cobertura esperada | corpus_prepared | dry_run | apply | idempotency | public_proof | readiness_scorecard | promoted |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `Krenko, Mob Boss` | A | Mono-red goblin typal/go-wide tokens/haste | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
-| 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
-| 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
-| 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
+| 1 | `Krenko, Mob Boss` | A | Mono-red goblin typal/go-wide tokens/haste | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
@@ -46,13 +46,20 @@ e
 | `Niv-Mizzet, Parun` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
 | `Teysa Karlov` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
 
-## Bloqueio de promocao
+## Historico de promocao
 
 Lote A saiu de **corpus_prepared/dry_run only** para apply controlado em
 2026-05-13. `--apply` e idempotencia passaram para todos os quatro comandantes,
 mas public proof permanece `NOT_RUN` e o readiness scorecard pos-apply ficou
 `PASS_WITH_RISKS` por `public_runtime_proof_missing`; portanto nenhum comandante
 do Sprint 3 esta promovido ou autorizado como guidance forte.
+
+Atualizacao posterior em 2026-05-13: a prova publica 5/5 de `/ai/generate`
+passou para os quatro comandantes aplicados do Lote A no backend publico
+`ac8318386d33f2b31425989fbe5dd3500ca56213`. Os scorecards com
+`--runtime-summary` retornaram `score=100`, `ready_for_mini_batch`,
+`warnings=[]` e `blockers=[]`; portanto Krenko, Light-Paws, Niv-Mizzet e Teysa
+foram promovidos para mini-batch controlado.
 
 ## Lote A apply + readiness pos-corpus - 2026-05-13
 
@@ -67,3 +74,17 @@ Artifacts novos:
 | `Light-Paws, Emperor's Voice` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
 | `Niv-Mizzet, Parun` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
 | `Teysa Karlov` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+
+## Lote A public proof + promocao - 2026-05-13
+
+Artifacts novos:
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/public_proof/summary.json`
+e
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/readiness_public/readiness_scorecard_summary.json`.
+
+| Commander | Public proof | Runtime gates | p50/p95 | Readiness publico | Promoted |
+| --- | --- | --- | --- | --- | --- |
+| `Krenko, Mob Boss` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 888ms / 1233ms | score 100, `ready_for_mini_batch` | true |
+| `Light-Paws, Emperor's Voice` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 873ms / 952ms | score 100, `ready_for_mini_batch` | true |
+| `Niv-Mizzet, Parun` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 857ms / 981ms | score 100, `ready_for_mini_batch` | true |
+| `Teysa Karlov` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 856ms / 908ms | score 100, `ready_for_mini_batch` | true |
