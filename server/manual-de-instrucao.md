@@ -44,8 +44,15 @@
   passaram localmente.
 - Primeira prova publica v3 em `be8e3ca` melhorou overlap medio para `15.6` e
   manteve fallback `0/5`, mas teve auto-reparo off-color em `5/5` e p95
-  `23574ms`; classificada como bloqueada para expansao ate nova prova do prompt
-  reforcado.
+  `23574ms`.
+- A prova publica final em
+  `036ff6570fc2257f7397252940c5424a157d4bad` manteve `5/5` HTTP 200,
+  `5/5` validacao, `5/5` Lorehold preservado, `main_quantity=99` e fallback
+  `0/5`; overlap medio ficou `14.6` e core coverage media `12.4/26`.
+- Classificacao operacional: **BLOCKED** para expansao. Motivos: auto-reparo
+  off-color ainda ocorreu em `4/5` probes e p95 subiu para `23684ms`, acima do
+  alvo preferencial. Nao expandir corpus ate reduzir off-color antes do
+  validator e recuperar latencia.
 
 ## 2026-05-13 — Commander Reference Generate Quality Lorehold v2
 

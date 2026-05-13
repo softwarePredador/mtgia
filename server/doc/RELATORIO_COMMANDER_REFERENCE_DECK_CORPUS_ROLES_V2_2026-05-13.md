@@ -289,8 +289,68 @@ Roles agregados apos v3:
 - `ritual_treasure`: `10.00`;
 - `miracle_topdeck`: `4.33`.
 
-### Gate
+### Prova publica v3 final
 
-Status antes da prova publica do novo SHA: **not_proven**. A expansao para novos
-comandantes continua bloqueada ate a prova publica medir fallback, latencia,
-overlap, core package coverage e role coverage.
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+SHA publico exato:
+`036ff6570fc2257f7397252940c5424a157d4bad`.
+
+Commits inspecionados:
+
+- `104c146` — base sincronizada no inicio da sprint;
+- `be8e3cabc52f3485b62e25ac7f9332f04ff96fc0` — v3 prefinal, melhorou
+  overlap mas mostrou auto-reparo off-color;
+- `036ff6570fc2257f7397252940c5424a157d4bad` — prompt de identidade reforcado.
+
+Comandos adicionais executados:
+
+```bash
+git commit -m "Improve commander reference generate quality" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push origin master
+python3 <poll /health ate git_sha=be8e3ca>
+python3 <public proof 5 Lorehold + 5 baseline, artifact sanitizado>
+cd server && dart analyze lib routes test
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart test/ai_generate_performance_support_test.dart -r expanded
+git commit -m "Improve commander reference generate quality" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push origin master
+python3 <poll /health ate git_sha=036ff65>
+python3 <public proof 5 Lorehold + 5 baseline, artifact sanitizado>
+```
+
+| Modo | HTTP 200 | Validacao | Lorehold preservado | Main 99 | Profile | Card stats | Corpus | Fallback | Timeout fallback | Off-color repair | Overlap top40 medio | Core matched avg | Core coverage avg | p50 | p95 | Max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| com `commander_name` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `0/5` | `0/5` | `4/5` | `14.6` | `12.4/26` | `0.4769` | `19621ms` | `23684ms` | `24456ms` |
+| sem `commander_name` | `5/5` | `5/5` | `0/5` | `5/5` | `0/5` | `0/5` | `0/5` | `5/5` | `5/5` | `0/5` | `0.0` | `0.0/26` | `0.0` | `12649ms` | `12678ms` | `12685ms` |
+
+Resultado de validade e aderencia:
+
+- comandante preservado e fora das 99 em `5/5`;
+- `main_quantity=99` e `validation.is_valid=true` em `5/5`;
+- fallback `0/5`, melhor que Roles v2 e igual packages v2;
+- overlap top40 medio `14.6`, melhor que packages v2 `12.8`, mas ainda abaixo
+  da melhor prova anterior `16.2`;
+- core package matched medio `12.4/26`, claramente acima do baseline `0.0/26`;
+- role coverage observou `miracle_topdeck`, `big_spell_payoff`,
+  `ritual_treasure`, `tutor`, `draw_value`, `ramp`, `lands` e interacao em
+  diferentes probes;
+- p95 `23684ms`, acima do alvo preferencial `<=20000ms` e acima de packages v2
+  `17931ms`;
+- auto-reparo off-color apareceu em `4/5` respostas com comandante, apesar da
+  lista final validada ficar legal apos reparo.
+
+Classificacao: **BLOCKED** para expansao de corpus. A sprint melhorou aderencia
+top40 e core coverage sem perder fallback, mas nao atingiu o gate de off-color e
+latencia. Nao expandir para novos comandantes.
+
+Proxima acao tecnica:
+
+- reduzir causas de off-color antes do validator, possivelmente com allowlist
+  R/W/colorless derivada dos pacotes ou retry deterministico quando houver
+  `Auto-reparo: removidas ... fora da identidade de cor`;
+- medir se uma selecao ainda mais compacta de prompt reduz p95 sem derrubar
+  overlap/core coverage.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/public_expanded/summary.json`.
