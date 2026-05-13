@@ -3,6 +3,39 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Deck Corpus Aesi
+
+### O Porquê
+- Prosper foi aprovado como segundo comandante de referencia e recomendou Aesi
+  como proximo candidato seguro por ter pacotes publicos claros de
+  lands/ramp/value.
+- O scorecard do mini-batch marcava Aesi como
+  `profile_ready_needs_proof`, com `corpus_missing` e `core_package_weak`.
+- A etapa precisava seguir o fluxo Lorehold/Prosper sem aplicar no banco, sem
+  scraping agressivo e sem dependencia runtime de API nao oficial.
+
+### O Como
+- `master` foi sincronizada com `origin/master` antes da execucao.
+- Foram consultadas quatro paginas publicas EDHREC Average Deck em baixo volume:
+  default, landfall, lands matter e budget.
+- Foi criado o artifact offline
+  `server/test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/aesi_edhrec_average_corpus.json`
+  com 4 decks, `source_url`, `source_deck_key`, `power_lane`, `theme` e
+  `cards[]` com `quantity`/`board`.
+- Nenhuma rota app-facing, scanner/camera/OCR ou fluxo mobile foi alterado.
+- Nenhum `--apply` foi executado.
+
+### Resultado
+- Dry-run:
+  `dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/aesi_edhrec_average_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/dry_run`.
+- **PASS**: 4/4 decks aceitos, `commander_quantity=1`,
+  `main_quantity=99`, `unresolved_count=0`, `off_color_count=0` e
+  `singleton_violations={}`.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_AESI_2026-05-13.md`.
+- Proximo passo: rodar scorecard read-only para Aesi e, se adequado, planejar
+  prova publica 5/5 antes de qualquer apply/promocao.
+
 ## 2026-05-13 — Commander Reference Lorehold Performance v5
 
 ### O Porquê

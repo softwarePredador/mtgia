@@ -1,0 +1,1618 @@
+{
+  "commander": "Aesi, Tyrant of Gyre Strait",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline corpus analysis; runtime generation consumes aggregate role/card signals only, not copied decklists.",
+  "fetched_at": "2026-05-13T15:20:10Z",
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/aesi-tyrant-of-gyre-strait",
+      "source_deck_key": "edhrec_aesi_default_average",
+      "power_lane": "edhrec_average_default",
+      "theme": "lands_ramp_draw_value",
+      "cards": [
+        {
+          "name": "Aesi, Tyrant of Gyre Strait",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ancient Greenwarden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Denial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arixmethes, Slumbering Isle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashaya, Soul of the Wild",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Avenger of Zendikar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Azusa, Lost but Seeking",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Woodland",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Broken Bond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Burgeoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coiling Oracle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coral Atoll",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivator Colossus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamroot Cascade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dryad of the Ilysian Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Entish Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exploration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Explore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabled Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 13,
+          "board": "main"
+        },
+        {
+          "name": "Growth Spiral",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heroic Intervention",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hinterland Harbor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 10,
+          "board": "main"
+        },
+        {
+          "name": "Jungle Basin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Khalni Heart Expedition",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama of the East Tree",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama's Reach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Koma, Cosmos Serpent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loot, Exuberant Explorer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Cobra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Meloku the Clouded Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mossborn Hydra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Murkfiend Liege",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oracle of Mul Daya",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampaging Baloths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampant Growth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ramunap Excavator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reclamation Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Coralhelm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Kazandu",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Roil Elemental",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scourge of Fleets",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scute Swarm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Charm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Growth Chamber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tatyova, Benthic Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thornwood Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thought Vessel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Three Visits",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Urban Evolution",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whelming Wave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wrenn and Seven",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zendikar's Roil",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/aesi-tyrant-of-gyre-strait/landfall",
+      "source_deck_key": "edhrec_aesi_landfall_average",
+      "power_lane": "edhrec_average_landfall",
+      "theme": "landfall_extra_land_payoffs",
+      "cards": [
+        {
+          "name": "Aesi, Tyrant of Gyre Strait",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ancient Greenwarden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Denial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arixmethes, Slumbering Isle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Avenger of Zendikar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Azusa, Lost but Seeking",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Woodland",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Broken Bond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Burgeoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coiling Oracle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Conduit of Worlds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coral Atoll",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Courser of Kruphix",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivator Colossus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamroot Cascade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Druid Class",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dryad of the Ilysian Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Entish Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exploration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Explore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabled Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 13,
+          "board": "main"
+        },
+        {
+          "name": "Greensleeves, Maro-Sorcerer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Growth Spiral",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hinterland Harbor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 10,
+          "board": "main"
+        },
+        {
+          "name": "Jungle Basin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Khalni Heart Expedition",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama of the East Tree",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama's Reach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Koma, Cosmos Serpent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loot, Exuberant Explorer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Cobra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Meloku the Clouded Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mossborn Hydra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Murkfiend Liege",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oracle of Mul Daya",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampaging Baloths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampant Growth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ramunap Excavator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Coralhelm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Kazandu",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Roil Elemental",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scourge of Fleets",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scute Swarm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Charm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Growth Chamber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Springheart Nantuko",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tatyova, Benthic Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Three Visits",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Urban Evolution",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whelming Wave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wrenn and Seven",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zendikar's Roil",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/aesi-tyrant-of-gyre-strait/lands",
+      "source_deck_key": "edhrec_aesi_lands_average",
+      "power_lane": "edhrec_average_lands_matter",
+      "theme": "lands_matter_recursion_utility",
+      "cards": [
+        {
+          "name": "Aesi, Tyrant of Gyre Strait",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ancient Greenwarden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Denial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arixmethes, Slumbering Isle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashaya, Soul of the Wild",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Avenger of Zendikar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Azusa, Lost but Seeking",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Woodland",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Breeding Pool",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Broken Bond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Burgeoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coiling Oracle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Conduit of Worlds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crop Rotation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crucible of Worlds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivator Colossus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dreamroot Cascade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dryad of the Ilysian Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Entish Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exploration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Explore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fabled Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Farseek",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Field of the Dead",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flooded Grove",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 10,
+          "board": "main"
+        },
+        {
+          "name": "Growth Spiral",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Guildless Commons",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heroic Intervention",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hinterland Harbor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 8,
+          "board": "main"
+        },
+        {
+          "name": "Khalni Heart Expedition",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama of the East Tree",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama's Reach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Koma, Cosmos Serpent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loot, Exuberant Explorer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lotus Cobra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Drain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Meloku the Clouded Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Misty Rainforest",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mossborn Hydra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Sanctuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nature's Lore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oboro, Palace in the Clouds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Oracle of Mul Daya",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pongify",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampaging Baloths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampant Growth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ramunap Excavator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rejuvenating Springs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Coralhelm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Roil Elemental",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Scout",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scapeshift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scute Swarm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Growth Chamber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skyshroud Claim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spelunking",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tatyova, Benthic Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Three Visits",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tireless Provisioner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wayward Swordtooth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whelming Wave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Wrenn and Seven",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Coast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya, Cradle of Growth",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/aesi-tyrant-of-gyre-strait/budget",
+      "source_deck_key": "edhrec_aesi_budget_average",
+      "power_lane": "edhrec_average_budget",
+      "theme": "budget_lands_ramp_draw",
+      "cards": [
+        {
+          "name": "Aesi, Tyrant of Gyre Strait",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Acidic Slime",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Denial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arixmethes, Slumbering Isle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Avenger of Zendikar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beast Within",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blighted Woodland",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Broken Bond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coiling Oracle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Compulsive Research",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coral Atoll",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cultivate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Elder Deep-Fiend",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eternal Witness",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Evolving Wilds",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Explore",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fact or Fiction",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fathom Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forest",
+          "quantity": 16,
+          "board": "main"
+        },
+        {
+          "name": "Growth Spiral",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harmonize",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Into the Roil",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ior Ruin Expedition",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 13,
+          "board": "main"
+        },
+        {
+          "name": "Jungle Basin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Khalni Heart Expedition",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kodama's Reach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Meloku the Clouded Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Memorial to Genius",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molimo, Maro-Sorcerer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mulldrifter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Murkfiend Liege",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nezahal, Primal Tide",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Peel from Reality",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampaging Baloths",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rampant Growth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ramunap Excavator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reclamation Sage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Coralhelm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retreat to Kazandu",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sakura-Tribe Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scourge of Fleets",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scute Swarm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Search for Tomorrow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seer's Sundial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shipbreaker Kraken",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Charm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Growth Chamber",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Guildgate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Simic Sky Swallower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slinn Voda, the Rising Deep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spitting Image",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sporemound",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stormtide Leviathan",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tatyova, Benthic Druid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terastodon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Terramorphic Expanse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thornwood Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trench Behemoth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tromokratis",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Urban Evolution",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Verdant Sun's Avatar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whelming Wave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Woodland Stream",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Yavimaya Elder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Zendikar's Roil",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}
