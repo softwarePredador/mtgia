@@ -166,6 +166,64 @@ Artifacts atualizados:
 
 ### Gate
 
-Status antes da prova publica do novo SHA: **not_proven**. A expansao de corpus
-continua bloqueada ate repetir a matriz publica com 5 probes
-`commander_name=Lorehold, the Historian` e 5 baselines sem `commander_name`.
+Status antes da prova publica do novo SHA: **not_proven**.
+
+## Prova publica packages v2 pos-deploy
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+SHA publico exato: `5cbd8a99b39c7a5d655dd08b79f15a48bfc9e23f`.
+
+Commits inspecionados:
+
+- `140d3b1eed4d0aed29bed188aa95d8e0f1987d12` — base sincronizada antes da
+  sprint;
+- `5cbd8a99b39c7a5d655dd08b79f15a48bfc9e23f` — deploy publico packages v2;
+- `353ab5737e40240f0374c854164ecb79cf701be2` — prova publica Roles v2 final
+  usada como regressao imediata.
+
+Comandos adicionais executados:
+
+```bash
+git commit -m "Improve commander reference generate quality" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push origin master
+python3 <poll /health ate git_sha=5cbd8a9>
+python3 <public proof 5 Lorehold + 5 baseline, artifact sanitizado>
+```
+
+| Modo | HTTP 200 | Validacao | Lorehold preservado | Main 99 | Profile | Card stats | Corpus | Fallback | Timeout fallback | Overlap top40 medio | p50 | p95 | Max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| com `commander_name` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `5/5` | `0/5` | `0/5` | `12.8` | `16363ms` | `17931ms` | `18244ms` |
+| sem `commander_name` | `5/5` | `5/5` | `0/5` | `5/5` | `0/5` | `0/5` | `0/5` | `5/5` | `5/5` | `0.0` | `12685ms` | `12716ms` | `12722ms` |
+
+Resultado de seguranca e validade:
+
+- sem comandante nas 99 em `10/10`;
+- sem erro de identidade de cor observado em `10/10`;
+- corpus packages expostos em diagnostics no caminho com comandante:
+  `core_package=26`, `theme_package=5`, `support_package=5`,
+  `optional_contextual=4`;
+- `reference_deck_evaluation.off_theme=0` em `5/5` com comandante;
+- role coverage com comandante cobriu consistentemente
+  `topdeck_miracle_setup`, `miracle_haymakers`,
+  `spell_payoffs_copy_engines`, `interaction_and_resets` e `lands`;
+- baseline sem comandante permaneceu valido, mas caiu sempre em fallback e nao
+  ativou profile/card stats/corpus.
+
+Comparacao:
+
+- contra Roles v2 final, packages v2 melhorou fallback `1/5 -> 0/5`, p95
+  `24922ms -> 17931ms` e overlap `11.6 -> 12.8`;
+- contra a melhor prova anterior, packages v2 ainda nao recuperou overlap
+  `16.2`, embora tenha mantido fallback `0/5` e melhorado p95
+  `21034ms -> 17931ms`.
+
+Classificacao: **PASS WITH RISKS**. A expansao para novos comandantes continua
+bloqueada porque a aderencia top40 ainda nao bateu a melhor prova publica
+anterior. O proximo passo tecnico e ajustar a selecao do prompt para aumentar
+aderencia sem sacrificar fallback/latencia, possivelmente reduzindo duplicidade
+entre profile expected packages, card stats e corpus core.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/public_expanded/summary.json`.

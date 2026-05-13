@@ -39,8 +39,17 @@
   `unresolved_count=0`, `off_color_count=0` e sem violacoes singleton.
 - O contrato app-facing recebeu apenas diagnostics opcionais/aditivos; o app
   deve continuar usando `generated_deck` e `validation` como fonte de verdade.
-- A expansao para novos comandantes permanece bloqueada ate a prova publica do
-  novo SHA recuperar fallback/aderencia/latencia ou justificar risco.
+- Deploy publico em
+  `5cbd8a99b39c7a5d655dd08b79f15a48bfc9e23f` retornou `HTTP 200`, comandante
+  preservado, `main_quantity=99`, `validation.is_valid=true`,
+  `reference_profile_used=true`, `reference_card_stats_used=true` e
+  `reference_deck_corpus_used=true` em `5/5` probes Lorehold.
+- Packages v2 recuperou fallback (`1/5 -> 0/5`) e p95 (`24922ms -> 17931ms`)
+  contra Roles v2, mas overlap top40 medio ficou `12.8`, ainda abaixo da melhor
+  prova anterior `16.2`.
+- Classificacao operacional: **PASS WITH RISKS**. A expansao para novos
+  comandantes permanece bloqueada ate recuperar aderencia top40 ou justificar
+  explicitamente o risco.
 
 ## 2026-05-12 — Commander Reference Profiles Anchor 30 Batch B
 

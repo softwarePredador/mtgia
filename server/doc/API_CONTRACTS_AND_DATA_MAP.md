@@ -175,6 +175,11 @@ v1 prompt/cache material is intentionally bypassed. The deterministic fallback
 for exact profiles now prefers reference card stats plus corpus core/theme/support
 packages before falling back to profile packages/basic lands; validation,
 singleton, commander preservation and color identity remain backend-enforced.
+Public proof on deploy `5cbd8a99b39c7a5d655dd08b79f15a48bfc9e23f` returned
+5/5 Lorehold probes with these diagnostics active, `validation.is_valid=true`,
+`main_quantity=99`, no fallback and no commander in the 99; overlap top40 stayed
+below the strongest previous proof, so corpus expansion remains blocked by
+quality evidence rather than contract compatibility.
 
 Public archetype reuse quality proof for `POST /ai/generate`: on
 2026-05-11, backend `f3bac2bb2fa8de53430acd940732a77e1cd2e133` returned a
