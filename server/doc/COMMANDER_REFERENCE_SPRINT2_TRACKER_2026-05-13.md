@@ -24,6 +24,8 @@ payload, scanner, camera ou OCR.
 - `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_ZIMONE_2026-05-13.md`
 - `app/doc/runtime_flow_handoffs/lorehold_reference_stats_sm_a135m_2026-05-11.md`
 - `app/doc/runtime_flow_handoffs/lorehold_final_deck_validation_sm_a135m_2026-05-11.md`
+- `app/doc/runtime_flow_handoffs/commander_reference_app_value_2026-05-13.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_VALUE_COMPARISON_2026-05-13.md`
 
 ## Criterios de aceite
 
@@ -44,7 +46,11 @@ forem provados e documentados:
    `status=ready_for_mini_batch`, `expansion_ready=true`, blockers/warnings
    vazios, `validation_ok`, comandante preservado, `main_quantity=99`,
    profile/stats/corpus usados, invalid/off-identity `0` e timeout fallback `0`.
-7. Compatibilidade preservada: `/ai/generate` continua usando `generated_deck` e
+7. Prova de valor app e comparativo publico lidos antes de abrir/promover sprint
+   seguinte: app runtime deve provar preview/save/details/validate sem
+   scanner/camera/OCR, e comparativo publico deve provar vantagem de
+   `commander_name` sobre prompt-only sem alterar contrato app-facing.
+8. Compatibilidade preservada: `/ai/generate` continua usando `generated_deck` e
    `validation` como fonte de verdade; diagnostics de Commander Reference seguem
    opcionais/experimentais.
 
@@ -187,14 +193,14 @@ Expansion.
 Relatorio final:
 `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_FINAL_2026-05-13.md`.
 
-| Resultado | Commander | Decisao final |
-| --- | --- | --- |
-| PASS | `Kinnan, Bonder Prodigy` | `promoted=true`, score 100, `ready_for_mini_batch` |
-| PASS WITH RISKS | `Korvold, Fae-Cursed King` | `promoted=false`, bloqueado por `core_package_weak` e `public_runtime_gate_not_passed` |
-| PASS | `Muldrotha, the Gravetide` | `promoted=true`, score 100, `ready_for_mini_batch` |
-| PASS | `Yuriko, the Tiger's Shadow` | `promoted=true`, score 100, `ready_for_mini_batch` |
-| PASS | `Winota, Joiner of Forces` | `promoted=true`, score 100, `ready_for_mini_batch` |
-| PASS | `Atraxa, Praetors' Voice` | `promoted=true`, score 100, `ready_for_mini_batch` |
+| Resultado | Commander | Decisao final | App Value Proof | Value Comparison |
+| --- | --- | --- | --- | --- |
+| PASS | `Kinnan, Bonder Prodigy` | `promoted=true`, score 100, `ready_for_mini_batch` | Flow-level PASS lido; nao houve prova app target-specific neste fechamento | Contract-level PASS lido; `commander_name` segue obrigatorio para valor percebido |
+| PASS WITH RISKS | `Korvold, Fae-Cursed King` | `promoted=false`, bloqueado por `core_package_weak` e `public_runtime_gate_not_passed` | Flow-level PASS lido; alvo continua bloqueado ate nova prova apos reforco | Contract-level PASS lido; nao compensa timeout/core package fraco |
+| PASS | `Muldrotha, the Gravetide` | `promoted=true`, score 100, `ready_for_mini_batch` | Flow-level PASS lido; nao houve prova app target-specific neste fechamento | Contract-level PASS lido; `commander_name` segue obrigatorio para valor percebido |
+| PASS | `Yuriko, the Tiger's Shadow` | `promoted=true`, score 100, `ready_for_mini_batch` | Flow-level PASS lido; nao houve prova app target-specific neste fechamento | Contract-level PASS lido; `commander_name` segue obrigatorio para valor percebido |
+| PASS | `Winota, Joiner of Forces` | `promoted=true`, score 100, `ready_for_mini_batch` | Flow-level PASS lido; nao houve prova app target-specific neste fechamento | Contract-level PASS lido; `commander_name` segue obrigatorio para valor percebido |
+| PASS | `Atraxa, Praetors' Voice` | `promoted=true`, score 100, `ready_for_mini_batch` | Flow-level PASS lido; nao houve prova app target-specific neste fechamento | Contract-level PASS lido; `commander_name` segue obrigatorio para valor percebido |
 
 Cinco comandantes foram promovidos; Korvold permanece bloqueado ate reforcar o
 core package e repetir public proof com timeout fallback `0/5`.
@@ -203,6 +209,13 @@ core package e repetir public proof com timeout fallback `0/5`.
 nao houve mudanca em metodo/rota, request body, response fields, data source ou
 consumer mobile de `/ai/generate`.
 
-Sprint 3 so deve adicionar/promover novos comandantes depois de corpus
+As provas complementares de valor foram lidas:
+`app/doc/runtime_flow_handoffs/commander_reference_app_value_2026-05-13.md`
+registrou PASS no fluxo app preview/save/details/validate com `commander_name`, e
+`server/doc/RELATORIO_COMMANDER_REFERENCE_VALUE_COMPARISON_2026-05-13.md`
+registrou PASS no comparativo publico com `commander_name` contra prompt-only.
+
+Sprint 3 nao deve iniciar sem prova de valor app PASS e comparativo publico PASS
+atualizados. Depois disso, so deve adicionar/promover novos comandantes com corpus
 publico/offline, dry-run PASS, apply, idempotencia, public proof sanitizado 5/5
 e scorecard final PASS por comandante.

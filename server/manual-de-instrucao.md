@@ -3,6 +3,48 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference post-Sprint 2 decision
+
+### O Porquê
+- Era necessario transformar as provas de valor no app e o comparativo publico em
+  uma regra de decisao antes de abrir Sprint 3, evitando expansao de Commander
+  Reference sem evidencia de UX e de diferenca real contra prompt-only.
+
+### O Como
+- Foram lidos
+  `app/doc/runtime_flow_handoffs/commander_reference_app_value_2026-05-13.md`,
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_VALUE_COMPARISON_2026-05-13.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT2_TRACKER_2026-05-13.md` e
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- O tracker Sprint 2 recebeu as colunas **App Value Proof** e
+  **Value Comparison** no fechamento, com transparencia de que as provas sao
+  flow-level/contract-level e nao substituem public proof por comandante.
+- Foi criado
+  `server/doc/COMMANDER_REFERENCE_POST_SPRINT2_DECISION_2026-05-13.md` com
+  decisao **PASS WITH RISKS**: GO condicionado para Sprint 3 controlado e NO-GO
+  para promocao ampla sem gates.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` nao foi alterado porque nao houve
+  drift real de `/ai/generate`, diagnostics, async jobs, response shape ou
+  consumer mobile app-facing.
+
+### Regra Operacional para Sprint 3
+- Nao iniciar Sprint 3 sem prova de valor app PASS e comparativo publico PASS
+  atualizados.
+- A prova de valor app deve cobrir preview, save, Deck Details e validate com
+  `commander_name`, sem scanner/camera/OCR e sem expor secrets, tokens, prompts
+  completos ou decklists geradas.
+- O comparativo publico deve provar vantagem de `commander_name` contra baseline
+  prompt-only em preservacao do comandante, profile/stats/corpus, latencia e
+  timeout fallback.
+- Mesmo com essas provas, cada comandante novo ainda precisa corpus
+  publico/offline, dry-run PASS, apply, idempotencia, public proof 5/5 e
+  scorecard final PASS antes de virar guidance forte.
+
+### Resultado
+- Resultado operacional: **PASS WITH RISKS**.
+- Sprint 3 pode seguir apenas em batch pequeno e controlado; expansao em massa,
+  promocao automatica ou diagnostics obrigatorios continuam **NO-GO**.
+
 ## 2026-05-13 — Commander Reference value comparison público
 
 ### O Porquê
