@@ -3,6 +3,47 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Dina Corpus Offline
+
+### O Porquê
+- Dina, Essence Brewer estava no mini-batch candidato com scorecard
+  `profile_ready_needs_proof`, mas ainda sem corpus aceito.
+- O objetivo era repetir a etapa offline do fluxo Lorehold/Prosper/Aesi/Edgar
+  sem aplicar no banco, sem scraping agressivo e sem depender de API nao oficial
+  em runtime.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- Foram consultadas cinco paginas publicas EDHREC Average Deck em baixo volume:
+  default, sacrifice, aristocrats, budget e tokens, mais a pagina Commander como
+  contexto.
+- Foi criado o artifact
+  `server/test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/dina_edhrec_average_corpus.json`.
+- A primeira validacao rejeitou 5/5 decks apenas por cartas novas de Secrets of
+  Strixhaven ainda nao resolvidas localmente; nao houve off-color nem singleton
+  violation.
+- Para nao aplicar backfill nem mutar o banco nesta etapa, o corpus final foi
+  marcado como `edhrec_average_deck_local_resolvable_projection` e substituiu os
+  slots unresolved por staples Golgari de sacrificio/value ja resolviveis
+  localmente.
+- Nenhum `--apply` foi executado. Scanner/camera/OCR, app mobile, rotas
+  app-facing, `/ai/optimize` e prova publica de `/ai/generate` ficaram fora do
+  escopo.
+
+### Resultado
+- Dry-run:
+  `dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/dina_edhrec_average_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/dry_run`.
+- **PASS**: 5/5 decks aceitos, `commander_quantity=1`,
+  `main_quantity=99`, `unresolved_count=0`, `off_color_count=0` e
+  `singleton_violations={}`.
+- Resultado operacional: **PASS WITH RISKS**, porque o artifact e uma projecao
+  local-resolvivel, nao uma copia literal das paginas EDHREC Average Deck.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_DINA_2026-05-13.md`.
+- Proximo passo: decidir entre backfill oficial das cartas unresolved ou aplicar
+  conscientemente a projecao antes de rodar scorecard/readiness para promocao.
+
 ## 2026-05-13 — Commander Reference Edgar Prova Publica e Promocao
 
 ### O Porquê
