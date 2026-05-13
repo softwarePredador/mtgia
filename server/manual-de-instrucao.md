@@ -3,6 +3,38 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference value comparison público
+
+### O Porquê
+- Era necessario comparar a qualidade publica de `POST /ai/generate` com e sem
+  `commander_name` para os seis comandantes promovidos no mini-batch Commander
+  Reference: Prosper, Edgar, Aesi, Dina, Zimone e Lorehold.
+
+### O Como
+- `master` foi sincronizada e o backend publico respondeu `/health` com o mesmo
+  commit local `ff2adcfabb44e1ebedbe63dfe59eddffe77703bf`.
+- Foi criado um usuario QA descartavel em memoria; credenciais, token e e-mail
+  completo nao foram registrados.
+- Para cada comandante foram executados 3 probes sync com `commander_name` e 3
+  probes baseline sem `commander_name`, usando prompts equivalentes, sem salvar
+  prompts completos, respostas brutas ou decklists.
+- O resumo sanitizado foi salvo em
+  `server/test/artifacts/commander_reference_value_comparison_2026-05-13/summary.json`
+  e o relatorio em
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_VALUE_COMPARISON_2026-05-13.md`.
+
+### Resultado
+- Resultado operacional: **PASS**.
+- Com `commander_name`: 18/18 HTTP 200, validacao OK, comandante preservado,
+  main com 99 cartas, profile/stats/corpus ativos, 0 invalid/off-identity,
+  0 timeout fallback, p50 946ms e p95 1084ms.
+- Baseline sem `commander_name`: 18/18 HTTP 200 e validacao OK, mas apenas 1/18
+  preservou o comandante, 0/18 ativou profile/stats/corpus, houve 17/18 timeout
+  fallbacks, 1 carta invalida reparada/removida e p50 12648ms / p95 12714ms.
+- Conclusao de produto: o usuario percebe melhora clara quando o app envia
+  `commander_name`; prompt textual sozinho nao garante preservacao, tema nem
+  latencia aceitavel.
+
 ## 2026-05-13 — Commander Reference app value Android runtime
 
 ### O Porquê
