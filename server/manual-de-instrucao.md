@@ -3,14 +3,15 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
-## 2026-05-13 — Commander Reference Dina Corpus Offline
+## 2026-05-13 — Commander Reference Dina Corpus Apply e Readiness
 
 ### O Porquê
 - Dina, Essence Brewer estava no mini-batch candidato com scorecard
-  `profile_ready_needs_proof`, mas ainda sem corpus aceito.
-- O objetivo era repetir a etapa offline do fluxo Lorehold/Prosper/Aesi/Edgar
-  sem aplicar no banco, sem scraping agressivo e sem depender de API nao oficial
-  em runtime.
+  `profile_ready_needs_proof` e ja tinha dry-run offline aceito, mas ainda sem
+  corpus aplicado.
+- O objetivo era aplicar com seguranca o corpus preparado, provar idempotencia e
+  deixar Dina pronta para a prova publica sanitizada, sem scraping agressivo e
+  sem depender de API nao oficial em runtime.
 
 ### O Como
 - `master` foi sincronizada com `origin/master` por fast-forward antes da
@@ -23,13 +24,20 @@
 - A primeira validacao rejeitou 5/5 decks apenas por cartas novas de Secrets of
   Strixhaven ainda nao resolvidas localmente; nao houve off-color nem singleton
   violation.
-- Para nao aplicar backfill nem mutar o banco nesta etapa, o corpus final foi
+- Para nao aplicar backfill de cartas ausentes nesta etapa, o corpus final foi
   marcado como `edhrec_average_deck_local_resolvable_projection` e substituiu os
   slots unresolved por staples Golgari de sacrificio/value ja resolviveis
   localmente.
-- Nenhum `--apply` foi executado. Scanner/camera/OCR, app mobile, rotas
-  app-facing, `/ai/optimize` e prova publica de `/ai/generate` ficaram fora do
-  escopo.
+- O runner `bin/commander_reference_deck_corpus.dart` foi reexecutado em
+  `--dry-run`; somente apos `PASS`, o corpus foi aplicado em
+  `test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/apply`.
+- O mesmo `--apply` foi repetido em
+  `test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/apply_idempotency`
+  para confirmar idempotencia.
+- Em seguida, `bin/commander_reference_readiness_scorecard.dart` foi rodado em
+  modo read-only para `Dina, Essence Brewer`.
+- Scanner/camera/OCR, app mobile, rotas app-facing, `/ai/optimize` e prova
+  publica de `/ai/generate` ficaram fora do escopo.
 
 ### Resultado
 - Dry-run:
@@ -37,12 +45,30 @@
 - **PASS**: 5/5 decks aceitos, `commander_quantity=1`,
   `main_quantity=99`, `unresolved_count=0`, `off_color_count=0` e
   `singleton_violations={}`.
-- Resultado operacional: **PASS WITH RISKS**, porque o artifact e uma projecao
-  local-resolvivel, nao uma copia literal das paginas EDHREC Average Deck.
+- Apply: **PASS**, `deck_count=5`, `accepted_deck_count=5`,
+  `rejected_deck_count=0`, `db_mutations=true`.
+- Apply idempotente: **PASS**, `deck_count=5`, `accepted_deck_count=5`,
+  `rejected_deck_count=0`, `db_mutations=true`.
+- Nos tres passos, todos os decks mantiveram `commander_quantity=1`,
+  `main_quantity=99`, `unresolved_count=0`, `off_color_count=0` e
+  `singleton_violations={}`.
+- Contagens DB-backed: pre-apply Dina `decks=0`, `cards=0`, `analysis=0`;
+  post-apply Dina `decks=5`, `accepted=5`, `cards=433`, `analysis=1`.
+- Scorecard:
+  `test/artifacts/commander_reference_readiness_dina_after_corpus_2026-05-13/readiness_scorecard_summary.json`.
+- Readiness final: **PASS_WITH_RISKS**, `score=98`,
+  `status=profile_ready_needs_proof`, `expansion_ready=false`,
+  `blockers=[]`, `warnings=["public_runtime_proof_missing"]`,
+  `card_stats_count=39`, `card_stats_unresolved_count=0`,
+  `corpus_accepted_deck_count=5`, `corpus_core_package_count=40`,
+  `deterministic_deck_valid=true` e `deterministic_main_quantity=99`.
+- Resultado operacional permanece **PASS WITH RISKS**, porque a prova publica
+  5x ainda nao foi executada e o artifact e uma projecao local-resolvivel, nao
+  uma copia literal das paginas EDHREC Average Deck.
 - Relatorio:
   `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_DINA_2026-05-13.md`.
-- Proximo passo: decidir entre backfill oficial das cartas unresolved ou aplicar
-  conscientemente a projecao antes de rodar scorecard/readiness para promocao.
+- Proximo passo: executar prova publica sanitizada 5x de `/ai/generate` para
+  `Dina, Essence Brewer` e reexecutar o scorecard com `--runtime-summary`.
 
 ## 2026-05-13 — Commander Reference Edgar Prova Publica e Promocao
 
