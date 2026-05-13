@@ -3,6 +3,63 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Mini-Batch Coverage e Gate de Expansao
+
+### O Porquê
+- O mini-batch Commander Reference fechou com Lorehold, Prosper, Aesi, Edgar,
+  Dina e Zimone promovidos, mas a promocao controlada nao deve virar expansao em
+  massa sem gate operacional repetivel.
+- Era necessario consolidar cobertura, provas publicas, p50/p95, scorecard,
+  riscos e contrato `/ai/generate` sem alterar runtime nem expor payload sensivel.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  consolidacao.
+- Foram lidos os relatorios de corpus/readiness de Lorehold, Prosper, Aesi,
+  Edgar, Dina e Zimone, os artifacts publicos sanitizados de readiness/proof, os
+  handoffs publicos de Lorehold e o contrato operacional em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- Foi criado o relatorio
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_MINI_BATCH_COVERAGE_2026-05-13.md`.
+- Nao houve drift app-facing em `/ai/generate`: o app continua usando
+  `generated_deck` e `validation` como fonte de verdade; diagnostics de profile,
+  card stats e corpus seguem opcionais/experimentais. Por isso,
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permaneceu sem alteracao.
+- Scanner/camera/OCR, rotas app-facing novas, app runtime novo e alteracoes de
+  backend runtime ficaram fora do escopo.
+
+### Regra Operacional de Expansao por Batch
+- Antes de liberar qualquer novo comandante para Commander Reference forte,
+  preparar corpus publico/offline com fontes Commander claras e sem copiar
+  decklists em runtime.
+- Rodar `bin/commander_reference_deck_corpus.dart --dry-run` e bloquear se houver
+  unresolved, off-color, `commander_quantity` diferente de 1, `main_quantity`
+  diferente de 99 ou singleton violations fora de terrenos basicos.
+- Executar `--apply` somente apos dry-run PASS e repetir `--apply` para provar
+  idempotencia.
+- Rodar `bin/commander_reference_readiness_scorecard.dart` em modo read-only.
+- Executar prova publica sanitizada 5/5 de `POST /ai/generate` com
+  `commander_name`, sem registrar token, email, senha, prompt completo ou
+  decklists.
+- Promover apenas com scorecard `PASS`, `score=100`,
+  `status=ready_for_mini_batch`, `expansion_ready=true`, blockers/warnings
+  vazios, public proof 5/5, `validation_ok`, comandante preservado,
+  `main_quantity=99`, profile/stats/corpus usados, invalid/off-identity `0` e
+  timeout fallback `0`.
+- Nao liberar expansao massiva sem esse gate completo; novos comandantes devem
+  entrar em batches pequenos com cobertura de cores/arquetipos e riscos
+  documentados.
+
+### Resultado
+- Resultado operacional: **PASS WITH RISKS**.
+- Comandantes prontos: Lorehold RW, Prosper BR, Aesi GU, Edgar BRW, Dina BG e
+  Zimone GU.
+- Cobertura: todas as cinco cores individuais aparecem no mini-batch, mas ainda
+  faltam mono-color, Azorius/Dimir/Izzet/Selesnya/Orzhov/Gruul, 4-color e
+  5-color com corpus+prova publica.
+- Proxima fila recomendada: Krenko, Light-Paws, Niv-Mizzet, Teysa Karlov, Meren
+  e Kinnan, nessa ordem aproximada e sempre passando pelo gate completo.
+
 ## 2026-05-13 — Commander Reference Zimone Prova Publica e Promocao
 
 ### O Porquê
