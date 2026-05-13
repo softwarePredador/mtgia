@@ -1,0 +1,450 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-13T15:07:00.257657Z",
+  "finished_at": "2026-05-13T15:07:13.053603Z",
+  "artifact_dir": "test/artifacts/commander_reference_deck_corpus_prosper_2026-05-13/apply_idempotency",
+  "deck_count": 4,
+  "accepted_deck_count": 4,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_prosper_optimized_average",
+      "commander_name": "Prosper, Tome-Bound",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/prosper-tome-bound/optimized",
+      "power_lane": "edhrec_average_optimized",
+      "theme": "optimized_combo_artifacts_treasure",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f9d76f06-9e0d-404c-a415-00db9bcd46d3",
+        "card_name": "Prosper, Tome-Bound"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 86,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "ritual_treasure": 12,
+        "ramp": 10,
+        "spellslinger": 2,
+        "lands": 33,
+        "interaction": 8,
+        "tutor": 5,
+        "board_wipe": 1,
+        "miracle_topdeck": 4,
+        "other": 5,
+        "creature": 5,
+        "protection": 1,
+        "recursion": 2,
+        "exile_value": 6,
+        "win_condition": 5,
+        "draw_value": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_prosper_control_average",
+      "commander_name": "Prosper, Tome-Bound",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/prosper-tome-bound/control",
+      "power_lane": "edhrec_average_control",
+      "theme": "control_exile_treasure",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f9d76f06-9e0d-404c-a415-00db9bcd46d3",
+        "card_name": "Prosper, Tome-Bound"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 85,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "ritual_treasure": 10,
+        "ramp": 12,
+        "interaction": 7,
+        "board_wipe": 1,
+        "lands": 34,
+        "miracle_topdeck": 4,
+        "other": 6,
+        "exile_value": 10,
+        "creature": 5,
+        "protection": 2,
+        "tutor": 1,
+        "recursion": 1,
+        "win_condition": 5,
+        "spellslinger": 1,
+        "draw_value": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_prosper_cedh_average",
+      "commander_name": "Prosper, Tome-Bound",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/prosper-tome-bound/cedh",
+      "power_lane": "edhrec_average_cedh",
+      "theme": "cedh_storm_treasure",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f9d76f06-9e0d-404c-a415-00db9bcd46d3",
+        "card_name": "Prosper, Tome-Bound"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 98,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "ritual_treasure": 10,
+        "miracle_topdeck": 4,
+        "lands": 28,
+        "other": 9,
+        "ramp": 10,
+        "tutor": 9,
+        "creature": 4,
+        "interaction": 9,
+        "protection": 1,
+        "spellslinger": 3,
+        "recursion": 4,
+        "exile_value": 8,
+        "draw_value": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_prosper_artifacts_average",
+      "commander_name": "Prosper, Tome-Bound",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/prosper-tome-bound/artifacts",
+      "power_lane": "edhrec_average_artifacts",
+      "theme": "artifacts_treasure_tokens",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f9d76f06-9e0d-404c-a415-00db9bcd46d3",
+        "card_name": "Prosper, Tome-Bound"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 88,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "ritual_treasure": 10,
+        "ramp": 11,
+        "interaction": 7,
+        "tutor": 3,
+        "board_wipe": 1,
+        "lands": 32,
+        "miracle_topdeck": 5,
+        "other": 6,
+        "creature": 7,
+        "protection": 2,
+        "exile_value": 9,
+        "recursion": 1,
+        "big_spell_payoff": 1,
+        "win_condition": 4,
+        "spellslinger": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Prosper, Tome-Bound": {
+      "commander_name": "Prosper, Tome-Bound",
+      "deck_count": 4,
+      "accepted_deck_count": 4,
+      "average_role_counts": {
+        "ritual_treasure": 10.5,
+        "ramp": 10.75,
+        "spellslinger": 1.75,
+        "lands": 31.75,
+        "interaction": 7.75,
+        "tutor": 4.5,
+        "board_wipe": 0.75,
+        "miracle_topdeck": 4.25,
+        "other": 6.5,
+        "creature": 5.25,
+        "protection": 1.5,
+        "recursion": 2.0,
+        "exile_value": 8.25,
+        "win_condition": 3.5,
+        "draw_value": 0.75,
+        "big_spell_payoff": 0.25
+      },
+      "top_cards": [
+        {
+          "card_name": "Xorn",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Birgi, God of Storytelling",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Blightstep Pathway",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Blood Crypt",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Bolas's Citadel",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Command Tower",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Crime Novelist",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Dark Ritual",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Dauthi Voidwalker",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Deadly Rollick",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Deflecting Swat",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "protection"
+        },
+        {
+          "card_name": "Demonic Tutor",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "tutor"
+        },
+        {
+          "card_name": "Exotic Orchard",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Feed the Swarm",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Fellwar Stone",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "other"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Light Up the Stage",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Luxury Suite",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Mayhem Devil",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Professional Face-Breaker",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Reckless Fireweaver",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Reckless Impulse",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "spellslinger"
+        },
+        {
+          "card_name": "Sulfurous Springs",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Talisman of Indulgence",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Nadier's Nightblade",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Marionette Master",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "creature"
+        },
+        {
+          "card_name": "Chandra, Torch of Defiance",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Foreboding Ruins",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Goldspan Dragon",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Grim Hireling",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Haunted Ridge",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Ignite the Future",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Chaos Warp",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Laelia, the Blade Reforged",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Lightning Greaves",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        }
+      ],
+      "theme_counts": {
+        "optimized_combo_artifacts_treasure": 1,
+        "control_exile_treasure": 1,
+        "cedh_storm_treasure": 1,
+        "artifacts_treasure_tokens": 1
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

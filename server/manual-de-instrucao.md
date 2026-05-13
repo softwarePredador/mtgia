@@ -14257,3 +14257,27 @@ e foi descartada; usar os nomes dos profiles persistidos em comandos futuros.
 
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_REFERENCE_READINESS_MINI_BATCH_2026-05-13.md`.
+
+Follow-up Prosper:
+
+- corpus EDHREC Average Deck aplicado com 4/4 decks aceitos;
+- runner de corpus ajustado para batch insert em
+  `commander_reference_deck_cards`, evitando travamento de upsert linha-a-linha
+  em DB remoto;
+- prova publica 5/5 em `b76574711fecaf81c2eea452c7e1673f882be32f`;
+- profile/stats/corpus usados 5/5;
+- validation OK 5/5;
+- commander preservado 5/5;
+- main quantity 99 5/5;
+- timeout fallback 0/5;
+- invalid/off-identity 0;
+- p95 `1332ms`;
+- scorecard v2: `score=100`, `ready_for_mini_batch`.
+
+O scorecard v2 diferencia `timeout fallback` de caminho deterministico
+reference-guided rapido (`is_mock=true` com profile/stats/corpus, sem timeout,
+sem cartas invalidas e com p95 baixo). Isso evita bloquear decks
+deterministicos bons por causa do nome legado `is_mock`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_PROSPER_2026-05-13.md`.

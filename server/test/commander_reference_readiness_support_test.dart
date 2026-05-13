@@ -107,5 +107,53 @@ void main() {
       expect(proof.backendSha, equals('abc123'));
       expect(proof.gatePassed, isTrue);
     });
+
+    test('accepts flat deterministic reference proof without timeout fallback',
+        () {
+      final proof = parseCommanderReferenceReadinessRuntimeProof({
+        'status': 'PASS',
+        'backend_git_sha': 'def456',
+        'http_200': 5,
+        'validation_ok': 5,
+        'commander_preserved': 5,
+        'main_quantity_99': 5,
+        'profile_used': 5,
+        'stats_used': 5,
+        'corpus_used': 5,
+        'fallback_count': 5,
+        'timeout_fallback_count': 0,
+        'invalid_cards_total': 0,
+        'off_identity_total': 0,
+        'p95_ms': 1332,
+      });
+
+      expect(proof, isNotNull);
+      expect(proof!.available, isTrue);
+      expect(proof.backendSha, equals('def456'));
+      expect(proof.gatePassed, isTrue);
+    });
+
+    test('rejects deterministic reference proof with high p95 latency', () {
+      final proof = parseCommanderReferenceReadinessRuntimeProof({
+        'status': 'PASS_WITH_RISKS',
+        'backend_git_sha': 'def456',
+        'http_200': 5,
+        'validation_ok': 5,
+        'commander_preserved': 5,
+        'main_quantity_99': 5,
+        'profile_used': 5,
+        'stats_used': 5,
+        'corpus_used': 5,
+        'fallback_count': 5,
+        'timeout_fallback_count': 0,
+        'invalid_cards_total': 0,
+        'off_identity_total': 0,
+        'p95_ms': 23000,
+      });
+
+      expect(proof, isNotNull);
+      expect(proof!.available, isTrue);
+      expect(proof.gatePassed, isFalse);
+    });
   });
 }

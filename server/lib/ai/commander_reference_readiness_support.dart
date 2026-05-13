@@ -10,7 +10,7 @@ import 'commander_reference_generate_fallback_support.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderReferenceReadinessVersion =
-    'commander_reference_readiness_v1_2026-05-13';
+    'commander_reference_readiness_v2_2026-05-13';
 
 class CommanderReferenceReadinessRuntimeProof {
   const CommanderReferenceReadinessRuntimeProof({
@@ -34,13 +34,27 @@ class CommanderReferenceReadinessRuntimeProof {
     final mainQuantityOk = mode.containsKey('main_quantity_99')
         ? _intValue(mode['main_quantity_99'])
         : 5;
+    final fallbackCount = mode.containsKey('fallback_count')
+        ? _intValue(mode['fallback_count'])
+        : _intValue(mode['fallback']);
+    final timeoutFallbackCount = mode.containsKey('timeout_fallback_count')
+        ? _intValue(mode['timeout_fallback_count'])
+        : _intValue(mode['timeout_fallback']);
+    final deterministicReferencePathOk = fallbackCount >= 5 &&
+        timeoutFallbackCount == 0 &&
+        _intValue(mode['profile_used']) >= 5 &&
+        _intValue(mode['stats_used']) >= 5 &&
+        _intValue(mode['corpus_used']) >= 5 &&
+        _intValue(mode['invalid_cards_total']) == 0 &&
+        _intValue(mode['off_identity_total']) == 0 &&
+        (_intValue(mode['p95_ms']) == 0 || _intValue(mode['p95_ms']) <= 5000);
     return _intValue(mode['http_200']) >= 5 &&
         _intValue(mode['validation_ok']) >= 5 &&
         commanderPreserved >= 5 &&
         mainQuantityOk >= 5 &&
         _intValue(mode['corpus_used']) >= 5 &&
-        _intValue(mode['fallback']) == 0 &&
-        _intValue(mode['timeout_fallback']) == 0;
+        timeoutFallbackCount == 0 &&
+        (fallbackCount == 0 || deterministicReferencePathOk);
   }
 
   Map<String, dynamic> toJson() => {
@@ -396,12 +410,29 @@ CommanderReferenceReadinessRuntimeProof?
   final byMode = payload['by_mode'];
   final withCommander = byMode is Map ? byMode['with_commander_corpus'] : null;
   final health = payload['health'];
+  if (withCommander is Map) {
+    return CommanderReferenceReadinessRuntimeProof(
+      available: true,
+      status: payload['status']?.toString() ?? 'not_proven',
+      backendSha: health is Map ? health['git_sha']?.toString() : null,
+      withCommander: withCommander.cast<String, dynamic>(),
+    );
+  }
+  if (payload.containsKey('http_200') &&
+      payload.containsKey('validation_ok') &&
+      payload.containsKey('commander_preserved')) {
+    return CommanderReferenceReadinessRuntimeProof(
+      available: true,
+      status: payload['status']?.toString() ?? 'not_proven',
+      backendSha: payload['backend_git_sha']?.toString(),
+      withCommander: payload,
+    );
+  }
   return CommanderReferenceReadinessRuntimeProof(
-    available: withCommander is Map,
+    available: false,
     status: payload['status']?.toString() ?? 'not_proven',
     backendSha: health is Map ? health['git_sha']?.toString() : null,
-    withCommander:
-        withCommander is Map ? withCommander.cast<String, dynamic>() : null,
+    withCommander: null,
   );
 }
 

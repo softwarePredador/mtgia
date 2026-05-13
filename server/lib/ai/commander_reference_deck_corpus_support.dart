@@ -1327,36 +1327,56 @@ Future<void> upsertCommanderReferenceDeckCorpus(
           'DELETE FROM commander_reference_deck_cards WHERE source_deck_key = @source_deck_key'),
       parameters: {'source_deck_key': analysis.deck.sourceDeckKey},
     );
-    for (final row in analysis.cardRows) {
-      await pool.execute(
-        Sql.named('''
-          INSERT INTO commander_reference_deck_cards (
-            source_deck_key,
-            board,
-            card_name,
-            card_name_normalized,
-            card_id,
-            quantity,
-            role,
-            unresolved,
-            off_color,
-            updated_at
-          ) VALUES (
-            @source_deck_key,
-            @board,
-            @card_name,
-            @card_name_normalized,
-            CAST(@card_id AS uuid),
-            @quantity,
-            @role,
-            @unresolved,
-            @off_color,
-            NOW()
-          )
-        '''),
-        parameters: row,
-      );
+    if (analysis.cardRows.isEmpty) {
+      continue;
     }
+    final rowsPayload = analysis.cardRows
+        .map(
+          (row) => {
+            ...row,
+            'card_id': row['card_id']?.toString() ?? '',
+          },
+        )
+        .toList(growable: false);
+    await pool.execute(
+      Sql.named('''
+        INSERT INTO commander_reference_deck_cards (
+          source_deck_key,
+          board,
+          card_name,
+          card_name_normalized,
+          card_id,
+          quantity,
+          role,
+          unresolved,
+          off_color,
+          updated_at
+        )
+        SELECT
+          source_deck_key,
+          board,
+          card_name,
+          card_name_normalized,
+          NULLIF(card_id, '')::uuid,
+          quantity,
+          role,
+          unresolved,
+          off_color,
+          NOW()
+        FROM jsonb_to_recordset(@rows::jsonb) AS row(
+          source_deck_key text,
+          board text,
+          card_name text,
+          card_name_normalized text,
+          card_id text,
+          quantity integer,
+          role text,
+          unresolved boolean,
+          off_color boolean
+        )
+      '''),
+      parameters: {'rows': jsonEncode(rowsPayload)},
+    );
   }
 
   final byCommander = <String, List<CommanderReferenceDeckAnalysis>>{};
