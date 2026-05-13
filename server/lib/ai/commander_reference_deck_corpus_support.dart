@@ -11,7 +11,7 @@ const commanderReferenceDecksTable = 'commander_reference_decks';
 const commanderReferenceDeckCardsTable = 'commander_reference_deck_cards';
 const commanderReferenceDeckAnalysisTable = 'commander_reference_deck_analysis';
 const commanderReferenceDeckCorpusPromptPolicyVersion =
-    'reference_deck_corpus_v3';
+    'reference_deck_corpus_v4';
 
 const basicLandNames = {
   'plains',
@@ -452,37 +452,41 @@ String buildCommanderReferenceDeckCorpusPrompt(
 ) {
   if (guidance == null || !guidance.isUsable) return '';
   final packages = guidance.packages;
+  final compact = shouldUseCompactCommanderReferenceCorpusPrompt(guidance);
   final roleLines = guidance.averageRoleCounts.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
   final roles = roleLines
       .where((entry) => entry.key != 'lands')
-      .take(6)
+      .take(compact ? 4 : 6)
       .map((entry) => '- ${entry.key}: ${entry.value.toStringAsFixed(1)} avg')
       .join('\n');
   final core = _formatCorpusPackagePromptLine(
     'core_package',
     packages.corePackage,
     acceptedDeckCount: guidance.acceptedDeckCount,
-    limit: 12,
+    limit: compact ? 14 : 12,
     maxLands: 2,
   );
   final theme = _formatCorpusPackagePromptLine(
     'theme_package',
     packages.themePackage,
     acceptedDeckCount: guidance.acceptedDeckCount,
-    limit: 6,
+    limit: compact ? 3 : 6,
     maxLands: 0,
   );
   final support = _formatCorpusPackagePromptLine(
     'support_package',
     packages.supportPackage,
     acceptedDeckCount: guidance.acceptedDeckCount,
-    limit: 5,
+    limit: compact ? 3 : 5,
     maxLands: 0,
   );
+  final compactLine = compact
+      ? '- Compact prompt mode active: core_package is complete enough; do not request optional_contextual or broad top-card bulk.'
+      : '- Standard prompt mode active: use compact aggregate package lists only.';
 
   return '''
-Reference deck corpus v3 active for ${guidance.commanderName}:
+Reference deck corpus v4 active for ${guidance.commanderName}:
 - Corpus size: ${guidance.acceptedDeckCount} accepted public reference decks.
 - Use this as aggregate structure only, not as a decklist to copy.
 - Average nonland role shape, top signals only:
@@ -491,10 +495,29 @@ $roles
 $core
 $theme
 $support
+$compactLine
 - First look at nonland core_package engines, setup, payoffs and ramp before theme/support. Core lands are mana-base options only; do not overfill basics.
 - optional_contextual is excluded from the prompt and remains diagnostics-only; use it only to fill genuine curve/function gaps.
 - Prefer core cards that fit role balance, then theme, then support. Keep final deck coherent and legal; do not force every recurrent card.
 ''';
+}
+
+bool shouldUseCompactCommanderReferenceCorpusPrompt(
+  CommanderReferenceDeckCorpusGuidance? guidance,
+) {
+  if (guidance == null || !guidance.isUsable) return false;
+  final packages = guidance.packages;
+  return guidance.acceptedDeckCount >= 3 && packages.corePackage.length >= 24;
+}
+
+Set<String> commanderReferenceCorpusCoreCardNames(
+  CommanderReferenceDeckCorpusGuidance? guidance,
+) {
+  if (guidance == null || !guidance.isUsable) return const {};
+  return guidance.packages.corePackage
+      .map((card) => card['card_name']?.toString().trim() ?? '')
+      .where((name) => name.isNotEmpty)
+      .toSet();
 }
 
 CommanderReferenceCorpusPackages buildCommanderReferenceCorpusPackages(

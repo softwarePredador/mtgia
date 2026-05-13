@@ -61,6 +61,26 @@ void main() {
       expect(loreholdProfile, isNot(contains('Lorehold')));
     });
 
+    test('reference prompt policy version changes cache key material', () {
+      final v4 = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+        commanderName: 'Lorehold, the Historian',
+        referenceProfileVersion:
+            'ai_generate_reference_prompt_v4:profile:stats:corpus',
+      );
+      final v5 = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+        commanderName: 'Lorehold, the Historian',
+        referenceProfileVersion:
+            'ai_generate_reference_prompt_v5:profile:stats:corpus',
+      );
+
+      expect(v5, isNot(equals(v4)));
+      expect(v5, startsWith('ai_generate:v1:'));
+    });
+
     test('returns cache hits as cloned payloads with cache metadata', () {
       final cacheKey = buildAiGenerateCacheKey(
         prompt: 'azorius control',

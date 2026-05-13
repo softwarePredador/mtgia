@@ -106,6 +106,41 @@ void main() {
       expect(prompt, contains('Do not force every card'));
     });
 
+    test('compact prompt caps package cards and prioritizes corpus core', () {
+      final stats = [
+        for (var i = 0; i < 8; i++)
+          _stat(
+            cardName: 'Setup Card $i',
+            cardId: 'setup-$i',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: (90 - i).toDouble(),
+            confidence: 'high',
+          ),
+        _stat(
+          cardName: 'Priority Core Card',
+          cardId: 'priority-id',
+          packageKey: 'topdeck_and_miracle_setup',
+          role: 'topdeck_miracle_setup',
+          score: 10,
+          confidence: 'high',
+        ),
+      ];
+
+      final compactPrompt = buildCommanderReferenceCardStatsPrompt(
+        stats,
+        compact: true,
+        priorityCardNames: const {'Priority Core Card'},
+      );
+      final fullPrompt = buildCommanderReferenceCardStatsPrompt(stats);
+
+      expect(compactPrompt, contains('Compact mode'));
+      expect(compactPrompt, contains('Priority Core Card'));
+      expect(compactPrompt, contains('Setup Card 4'));
+      expect(compactPrompt, isNot(contains('Setup Card 5')));
+      expect(fullPrompt, contains('Setup Card 7'));
+    });
+
     test('builds lower-confidence archetype reuse prompt', () {
       final prompt = buildCommanderReferenceArchetypeStatsPrompt(
         commanderName: 'Test Boros Commander',

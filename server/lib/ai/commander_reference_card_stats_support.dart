@@ -781,12 +781,22 @@ String? commanderReferenceCardStatsCacheVersion(
 }
 
 String buildCommanderReferenceCardStatsPrompt(
-  List<CommanderReferenceCardStat> stats,
-) {
+  List<CommanderReferenceCardStat> stats, {
+  bool compact = false,
+  Set<String> priorityCardNames = const {},
+}) {
+  final priorityNames = priorityCardNames
+      .map(normalizeCommanderReferenceCardName)
+      .where((name) => name.isNotEmpty)
+      .toSet();
   final usable = stats.where((stat) => !stat.unresolved).toList()
     ..sort((a, b) {
       final packageCompare = a.packageKey.compareTo(b.packageKey);
       if (packageCompare != 0) return packageCompare;
+      final aPriority = priorityNames.contains(a.cardNameNormalized) ? 0 : 1;
+      final bPriority = priorityNames.contains(b.cardNameNormalized) ? 0 : 1;
+      final priorityCompare = aPriority.compareTo(bPriority);
+      if (priorityCompare != 0) return priorityCompare;
       final scoreCompare = b.score.compareTo(a.score);
       if (scoreCompare != 0) return scoreCompare;
       return a.cardName.compareTo(b.cardName);
@@ -798,9 +808,10 @@ String buildCommanderReferenceCardStatsPrompt(
     byPackage.putIfAbsent(stat.packageKey, () => []).add(stat);
   }
 
+  final maxCardsPerPackage = compact ? 6 : 12;
   final packageLines = byPackage.entries.map((entry) {
     final cards = entry.value
-        .take(12)
+        .take(maxCardsPerPackage)
         .map((stat) =>
             '${stat.cardName} [${stat.role}, score ${stat.score.toStringAsFixed(0)}]')
         .join(', ');
@@ -808,9 +819,13 @@ String buildCommanderReferenceCardStatsPrompt(
   }).join('\n');
 
   final commanderName = usable.first.commanderName;
+  final modeLine = compact
+      ? 'Compact mode: package lists are capped because corpus core_package is strong; corpus core cards remain the primary signal.'
+      : 'Full mode: package lists provide expanded candidate guidance.';
   return '''
 Reference card stats v1 active for $commanderName:
 $packageLines
+$modeLine
 Use these normalized card stats as on-theme candidate pool and structured guidance when legal, bracket-appropriate and functional. Do not force every card; validation and deck balance remain mandatory.
 ''';
 }

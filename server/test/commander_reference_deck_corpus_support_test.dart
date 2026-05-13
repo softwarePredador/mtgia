@@ -243,7 +243,7 @@ void main() {
       expect(
           prompt, contains('Corpus size: 3 accepted public reference decks'));
       expect(prompt, contains('Use this as aggregate structure only'));
-      expect(prompt, contains('Reference deck corpus v3 active'));
+      expect(prompt, contains('Reference deck corpus v4 active'));
       expect(prompt, contains('ramp: 14.7 avg'));
       expect(prompt, isNot(contains('lands: 32.0 avg')));
       expect(prompt, contains('core_package'));
@@ -276,7 +276,65 @@ void main() {
       ]);
       expect(packages.optionalContextual.single['card_name'],
           equals('Test Context Card'));
-      expect(cacheVersion, startsWith('reference_deck_corpus_v3:'));
+      expect(cacheVersion, startsWith('reference_deck_corpus_v4:'));
+    });
+
+    test('uses compact prompt when core package is complete', () {
+      final topCards = <Map<String, dynamic>>[
+        for (var i = 0; i < 26; i++)
+          {
+            'card_name': 'Core Test Card $i',
+            'deck_count': 3,
+            'total_quantity': 3,
+            'role': i < 4 ? 'lands' : 'miracle_topdeck',
+          },
+        for (var i = 0; i < 4; i++)
+          {
+            'card_name': 'Theme Test Card $i',
+            'deck_count': 2,
+            'total_quantity': 2,
+            'role': 'spellslinger',
+          },
+        for (var i = 0; i < 6; i++)
+          {
+            'card_name': 'Support Test Card $i',
+            'deck_count': 1,
+            'total_quantity': 1,
+            'role': 'interaction',
+          },
+        {
+          'card_name': 'Optional Noise Card',
+          'deck_count': 1,
+          'total_quantity': 1,
+          'role': 'other',
+        },
+      ];
+      final guidance = CommanderReferenceDeckCorpusGuidance(
+        commanderName: 'Lorehold, the Historian',
+        source: 'unit_test',
+        deckCount: 3,
+        acceptedDeckCount: 3,
+        averageRoleCounts: const {
+          'lands': 32,
+          'ramp': 10,
+          'interaction': 6,
+          'draw_value': 5,
+          'other': 4,
+          'recursion': 3,
+        },
+        topCards: topCards,
+        themeCounts: const {'topdeck_big_spells': 3},
+      );
+
+      final prompt = buildCommanderReferenceDeckCorpusPrompt(guidance);
+
+      expect(shouldUseCompactCommanderReferenceCorpusPrompt(guidance), isTrue);
+      expect(prompt, contains('Compact prompt mode active'));
+      expect(prompt, isNot(contains('Optional Noise Card')));
+      expect(prompt, isNot(contains('recursion: 3.0 avg')));
+      expect(commanderReferenceCorpusCoreCardNames(guidance), hasLength(26));
+      expect(prompt, contains('Core Test Card 0'));
+      expect(prompt, isNot(contains('Core Test Card 25')));
     });
 
     test('evaluates generated deck coverage against corpus packages', () {
@@ -327,7 +385,7 @@ void main() {
       );
 
       expect(evaluation, isNotNull);
-      expect(evaluation!['policy_version'], equals('reference_deck_corpus_v3'));
+      expect(evaluation!['policy_version'], equals('reference_deck_corpus_v4'));
       expect(evaluation['core_package_available'], equals(2));
       expect(evaluation['core_package_matched'], equals(1));
       expect(evaluation['core_package_coverage_ratio'], equals(0.5));
