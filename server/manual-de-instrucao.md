@@ -3,6 +3,44 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 3 Lote A app runtime attempt
+
+### O Porquê
+- Depois da promocao publica dos quatro comandantes Sprint 3 Lote A, faltava
+  tentar a prova mobile real para dois comandantes de arquetipos diferentes,
+  consumindo o backend publico sem expor tokens, secrets, prompts completos ou
+  decklists.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host/health` retornou
+  `git_sha=9f4d56163d6d59c3297b2cea848a3d8cd5c7a143`, igual ao HEAD local.
+- Foi criado o harness
+  `app/integration_test/commander_reference_sprint3_lot_a_app_runtime_test.dart`
+  para `Krenko, Mob Boss` (mono-red Goblins aggro) e `Teysa Karlov` (Orzhov
+  aristocrats).
+- O harness cobre register/login pela UI, generate Commander com
+  `commander_name`, save, Deck Details e validacao via `/decks/:id/validate`,
+  com assertions para comandante fora das 99, 99 main, 100 totais,
+  `validation_ok` e 0 off-identity.
+- Foram feitas tentativas no Android fisico `SM A135M` (`R58T300SREH`) e no
+  fallback iPhone 15 Simulator
+  `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`; scanner/camera/OCR ficaram fora do
+  escopo.
+
+### Resultado
+- Resultado operacional: **BLOCKED**.
+- Android: build/install e `/health` passaram, mas o runner travou antes da
+  primeira interacao de UI apos o redirect para `/login`. O harness Android ja
+  existente `commander_reference_app_value_runtime_test.dart` reproduziu o mesmo
+  sintoma, indicando blocker ambiental do runner/device nesta sessao.
+- iPhone 15 Simulator: bloqueado por conflito de arquitetura nativa do
+  `MLImage.framework`/scanner no simulador Apple Silicon; a tentativa controlada
+  de permitir `arm64` foi revertida porque o framework linka objeto `arm64`
+  construido para device, nao simulator.
+- Evidencia sanitizada:
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_a_app_2026-05-13.md`.
+
 ## 2026-05-13 — Commander Reference Sprint 3 Lote A public proof
 
 ### O Porquê

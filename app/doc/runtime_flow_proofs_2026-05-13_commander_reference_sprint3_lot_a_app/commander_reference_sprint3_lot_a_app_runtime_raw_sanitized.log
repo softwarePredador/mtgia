@@ -1,0 +1,23 @@
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/commander_reference_sprint3_lot_a_app_runtime_test.dart
+Running Gradle task 'assembleDebug'...                             17.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...           7.3s
+00:00 +0: SM A135M runtime: Sprint 3 Lote A Commander Reference Krenko and Teysa
+COMMANDER_REFERENCE_LOT_A_APP_BASE_URL https://evolution-cartinhas.8ktevp.easypanel.host
+[⚠️ ApiClient] Firebase Performance indisponível; métricas HTTP desativadas nesta sessão. Detalhe: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/health
+[🌐 ApiClient] GET /health → 200 (1490ms)
+COMMANDER_REFERENCE_LOT_A_APP_HEALTH status=200 git_sha=9f4d56163d6d59c3297b2cea848a3d8cd5c7a143 latency_ms=1490
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedToken [redacted] false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+09:44 +0: SM A135M runtime: Sprint 3 Lote A Commander Reference Krenko and Teysa - did not complete [E]
+09:44 +0: (tearDownAll) - did not complete [E]
+09:44 +0: Some tests failed.
