@@ -119,14 +119,40 @@ explicita no corpus e no scorecard.
    `score<100` ou `public_runtime_gate_not_passed` fica `BLOCKED` ou
    `PASS WITH RISKS`, sem guidance forte.
 
+## Lote A - corpus prep executado em 2026-05-13
+
+Tracker:
+`server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_CORPUS_PREP_2026-05-13.md`.
+
+Artifacts:
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/corpus.json`
+e
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/dry_run/`.
+
+| Commander | corpus_prepared | dry_run | apply | idempotency | public_proof | readiness_scorecard | Promocao |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `Krenko, Mob Boss` | DONE | DONE, PASS | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
+| `Light-Paws, Emperor's Voice` | DONE | DONE, PASS | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
+| `Niv-Mizzet, Parun` | DONE | DONE, PASS | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
+| `Teysa Karlov` | DONE | DONE, PASS | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
+
+Todos os dry-runs do Lote A foram executados com `db_mutations=false`,
+comandante resolvido, `commander_quantity=1`, `main_quantity=99`,
+`unresolved=0`, `off_color=0` e `singleton_violations={}` em todos os decks.
+Nenhum corpus foi aplicado no banco.
+
 ## Menores proximas acoes tecnicas
 
-1. Criar tracker Sprint 3 somente quando for iniciar o Lote 1, com todos os campos
-   em `PENDING`.
-2. Rodar coleta offline/sanitizada do Lote 1 sem apply e sem banco mutado.
-3. Executar dry-run por comandante e registrar apenas summaries sanitizados.
-4. Repetir public proof e readiness scorecard final antes de qualquer promocao.
-5. Atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` apenas se houver mudanca
+1. Se o Lote A for continuar, rodar `--apply` controlado apenas para corpora que
+   continuarem PASS, seguido de idempotencia e contagens DB-backed.
+2. Executar public proof sanitizado 5/5 e readiness scorecard final por
+   comandante antes de qualquer promocao.
+3. Manter Niv-Mizzet com lane combo/control explicita para nao contaminar casual
+   Commander com default high-power.
+4. Atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` apenas se houver mudanca
    real de rota, payload, response shape, diagnostics app-facing, async job ou
    consumer mobile.
 

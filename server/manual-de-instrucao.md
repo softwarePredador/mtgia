@@ -3,6 +3,35 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 3 Lote A corpus prep
+
+### O Porquê
+- O plano Sprint 3 autorizava apenas preparacao offline em lote pequeno antes de
+  qualquer apply, public proof ou promocao.
+- O Lote A precisava cobrir lacunas mono-red, mono-white, UR spellslinger e WB
+  aristocrats com fontes Commander claras e dry-run DB-backed.
+
+### O Como
+- Foram coletadas paginas EDHREC Average Deck em baixo volume para
+  `Krenko, Mob Boss`, `Light-Paws, Emperor's Voice`, `Niv-Mizzet, Parun` e
+  `Teysa Karlov`.
+- Os corpora foram salvos em
+  `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/corpus.json`.
+- Para cada comandante foi executado
+  `dart run bin/commander_reference_deck_corpus.dart --dry-run`, salvando os
+  summaries em `dry_run/`.
+- O plano Sprint 3 foi atualizado e foi criado
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`.
+
+### Resultado
+- Resultado operacional: **PASS** para corpus prep/dry-run.
+- `Krenko` e `Light-Paws` passaram com 4/4 decks aceitos; `Niv-Mizzet` e
+  `Teysa` passaram com 5/5 decks aceitos.
+- Todos os dry-runs ficaram com `db_mutations=false`, `commander_quantity=1`,
+  `main_quantity=99`, `unresolved=0`, `off_color=0` e singleton limpo.
+- Nenhum corpus foi aplicado no banco, nenhum endpoint app-facing foi alterado e
+  scanner/camera/OCR permaneceram fora do escopo.
+
 ## 2026-05-13 — Commander Reference Sprint 3 plan
 
 ### O Porquê

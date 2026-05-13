@@ -1,0 +1,1512 @@
+{
+  "commander": "Light-Paws, Emperor's Voice",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline corpus analysis; runtime generation consumes aggregate role/card signals only, not copied decklists.",
+  "fetched_at": "2026-05-13T21:28:41Z",
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/light-paws-emperors-voice",
+      "source_deck_key": "edhrec_light_paws_default_average",
+      "power_lane": "edhrec_average_default",
+      "theme": "mono_white_aura_voltron",
+      "cards": [
+        {
+          "name": "Light-Paws, Emperor's Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Destiny",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archon of Sun's Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Ascension",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Benevolent Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blacksmith's Skill",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brilliant Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chains of Custody",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darksteel Mutation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Daybreak Coronet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eidolon of Countless Battles",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Esper Sentinel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ethereal Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Feather of Flight",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flickerform",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flickering Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Generous Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hall of Heliod's Generosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heliod's Pilgrim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Helm of the Gods",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero of Iroas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hyena Umbra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Idolized",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karametra's Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kor Spiritdancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Light of Promise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Law and Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mesa Enchantress",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mother of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "On Serra's Wings",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ossification",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pariah",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl-Ear, Imperial Advisor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 28,
+          "board": "main"
+        },
+        {
+          "name": "Rebuff the Wicked",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reprobation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retether",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sage's Reverie",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sentinel's Eyes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shardmage's Rescue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shield of Duty and Reason",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sigarda's Aid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Link",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Mantle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Starfield Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stoneskin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Timely Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transcendent Envoy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twinblade Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Umbra Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unquestioned Authority",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Winds of Rath",
+          "quantity": 1,
+          "board": "main"
+        }
+      ],
+      "source_proof": {
+        "header": "Average Deck for Light-Paws, Emperor's Voice",
+        "total_card_count": 100,
+        "deck_size_entries": 72,
+        "num_decks_avg": 11436
+      }
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/light-paws-emperors-voice/auras",
+      "source_deck_key": "edhrec_light_paws_auras_average",
+      "power_lane": "edhrec_average_auras",
+      "theme": "cheap_aura_tutor_chain",
+      "cards": [
+        {
+          "name": "Light-Paws, Emperor's Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Destiny",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archon of Sun's Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Ascension",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Benevolent Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blacksmith's Skill",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brilliant Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chains of Custody",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darksteel Mutation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Daybreak Coronet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eidolon of Countless Battles",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enlightened Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Esper Sentinel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ethereal Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Feather of Flight",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flickerform",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grand Abolisher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hall of Heliod's Generosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heliod's Pilgrim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Helm of the Gods",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero of Iroas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hyena Umbra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Idolized",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Idyllic Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karametra's Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kor Spiritdancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Light of Promise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Law and Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mesa Enchantress",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mother of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "On Serra's Wings",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ossification",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pariah",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl-Ear, Imperial Advisor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 27,
+          "board": "main"
+        },
+        {
+          "name": "Rebuff the Wicked",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reprobation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retether",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sage's Reverie",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sentinel's Eyes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Serra's Sanctum",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shardmage's Rescue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shield of Duty and Reason",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sigarda's Aid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Link",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Mantle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Starfield Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stoneskin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Timely Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transcendent Envoy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twinblade Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Umbra Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unquestioned Authority",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Winds of Rath",
+          "quantity": 1,
+          "board": "main"
+        }
+      ],
+      "source_proof": {
+        "header": "Average Deck for Light-Paws, Emperor's Voice - Auras",
+        "total_card_count": 100,
+        "deck_size_entries": 73,
+        "num_decks_avg": 3077
+      }
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/light-paws-emperors-voice/voltron",
+      "source_deck_key": "edhrec_light_paws_voltron_average",
+      "power_lane": "edhrec_average_voltron",
+      "theme": "voltron_evasion_protection",
+      "cards": [
+        {
+          "name": "Light-Paws, Emperor's Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Destiny",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Ascension",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Benevolent Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blacksmith's Skill",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chains of Custody",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Darksteel Mutation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Daybreak Coronet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eidolon of Countless Battles",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enlightened Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Esper Sentinel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ethereal Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Feather of Flight",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flickerform",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flickering Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grand Abolisher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gryff's Boon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hall of Heliod's Generosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heliod's Pilgrim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Helm of the Gods",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero of Iroas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hyena Umbra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Idolized",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karametra's Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kor Spiritdancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Light of Promise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Law and Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mesa Enchantress",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mistveil Plains",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mother of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "On Serra's Wings",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ossification",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pariah",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl-Ear, Imperial Advisor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 27,
+          "board": "main"
+        },
+        {
+          "name": "Rebuff the Wicked",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reprobation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Retether",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sage's Reverie",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sentinel's Eyes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shardmage's Rescue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shield of Duty and Reason",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sigarda's Aid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Link",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Mantle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Starfield Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stoneskin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Timely Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transcendent Envoy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twinblade Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Umbra Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unquestioned Authority",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Winds of Rath",
+          "quantity": 1,
+          "board": "main"
+        }
+      ],
+      "source_proof": {
+        "header": "Average Deck for Light-Paws, Emperor's Voice - Voltron",
+        "total_card_count": 100,
+        "deck_size_entries": 73,
+        "num_decks_avg": 1074
+      }
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/light-paws-emperors-voice/budget",
+      "source_deck_key": "edhrec_light_paws_budget_average",
+      "power_lane": "edhrec_average_budget",
+      "theme": "budget_auras_protection",
+      "cards": [
+        {
+          "name": "Light-Paws, Emperor's Voice",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Ajani's Chosen",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Angelic Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archon of Sun's Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Ascension",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Auramancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Benevolent Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blacksmith's Skill",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brilliant Restoration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cartouche of Solidarity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chains of Custody",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Conviction",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Disenchant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Divine Reckoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Eland Umbra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ethereal Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Face of Divinity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faith Unbroken",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Feather of Flight",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gryff's Boon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Heliod's Pilgrim",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero of Iroas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Holy Mantle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hyena Umbra",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Karametra's Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kor Spiritdancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Light of Promise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marble Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Law and Grace",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mesa Enchantress",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Minimus Containment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "On Serra's Wings",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ossification",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pearl-Ear, Imperial Advisor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pentarch Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 33,
+          "board": "main"
+        },
+        {
+          "name": "Planar Disruption",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reprobation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rune of Sustenance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sage's Reverie",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sentinel's Eyes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shardmage's Rescue",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shield of Duty and Reason",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spectral Steel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Link",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spirit Mantle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Starfield Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Starnheim Courser",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sun Titan",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Timely Ward",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Transcendent Envoy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twinblade Blessing",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unquestioned Authority",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Winds of Rath",
+          "quantity": 1,
+          "board": "main"
+        }
+      ],
+      "source_proof": {
+        "header": "Average Deck for Light-Paws, Emperor's Voice - Budget",
+        "total_card_count": 100,
+        "deck_size_entries": 67,
+        "num_decks_avg": 1143
+      }
+    }
+  ]
+}
