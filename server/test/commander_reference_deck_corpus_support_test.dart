@@ -205,6 +205,24 @@ void main() {
             'total_quantity': 3,
             'role': 'board_wipe',
           },
+          {
+            'card_name': 'Young Pyromancer',
+            'deck_count': 2,
+            'total_quantity': 2,
+            'role': 'spellslinger',
+          },
+          {
+            'card_name': 'Wear // Tear',
+            'deck_count': 1,
+            'total_quantity': 1,
+            'role': 'interaction',
+          },
+          {
+            'card_name': 'Test Context Card',
+            'deck_count': 1,
+            'total_quantity': 1,
+            'role': 'other',
+          },
         ],
         themeCounts: {
           'lorehold_reference_spellslinger_big_spells': 3,
@@ -214,16 +232,37 @@ void main() {
       final prompt = buildCommanderReferenceDeckCorpusPrompt(guidance);
       final diagnostics = guidance.toDiagnostics();
       final cacheVersion = commanderReferenceDeckCorpusCacheVersion(guidance);
+      final packages = guidance.packages;
 
       expect(
           prompt, contains('Corpus size: 3 accepted public reference decks'));
       expect(prompt, contains('Use this as aggregate structure only'));
       expect(prompt, contains('lands: 32.0 avg'));
+      expect(prompt, contains('core_package'));
       expect(prompt, contains('Arcane Signet [ramp] (3/3)'));
+      expect(prompt, contains('Call Forth the Tempest [board_wipe] (3/3)'));
+      expect(prompt, contains('theme_package'));
+      expect(prompt, contains('Young Pyromancer [spellslinger] (2/3)'));
+      expect(prompt, contains('support_package'));
+      expect(prompt, contains('Wear // Tear [interaction] (1/3)'));
+      expect(prompt, isNot(contains('Test Context Card')));
+      expect(prompt, contains('optional_contextual is diagnostics-only'));
       expect(prompt, isNot(contains('cards":')));
       expect(diagnostics['reference_deck_corpus_used'], isTrue);
       expect(diagnostics['accepted_reference_deck_count'], equals(3));
-      expect(cacheVersion, startsWith('reference_deck_corpus_v1:'));
+      expect(diagnostics['corpus_package_counts'], {
+        'core_package': 2,
+        'theme_package': 1,
+        'support_package': 1,
+        'optional_contextual': 1,
+      });
+      expect(packages.corePackage.map((card) => card['card_name']), [
+        'Arcane Signet',
+        'Call Forth the Tempest',
+      ]);
+      expect(packages.optionalContextual.single['card_name'],
+          equals('Test Context Card'));
+      expect(cacheVersion, startsWith('reference_deck_corpus_v2:'));
     });
 
     test('classifies Lorehold-specific roles before generic buckets', () {

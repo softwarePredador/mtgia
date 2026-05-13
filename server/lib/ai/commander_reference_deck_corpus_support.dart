@@ -179,6 +179,8 @@ class CommanderReferenceDeckCorpusGuidance {
   final Map<String, int> themeCounts;
 
   bool get isUsable => acceptedDeckCount > 0;
+  CommanderReferenceCorpusPackages get packages =>
+      buildCommanderReferenceCorpusPackages(this);
 
   Map<String, dynamic> toDiagnostics() => {
         'reference_deck_corpus_used': isUsable,
@@ -198,6 +200,49 @@ class CommanderReferenceDeckCorpusGuidance {
             )
             .toList(growable: false),
         'theme_counts': themeCounts,
+        'corpus_package_counts': packages.counts,
+        'corpus_packages': packages.toDiagnostics(),
+      };
+}
+
+class CommanderReferenceCorpusPackages {
+  const CommanderReferenceCorpusPackages({
+    required this.corePackage,
+    required this.themePackage,
+    required this.supportPackage,
+    required this.optionalContextual,
+  });
+
+  final List<Map<String, dynamic>> corePackage;
+  final List<Map<String, dynamic>> themePackage;
+  final List<Map<String, dynamic>> supportPackage;
+  final List<Map<String, dynamic>> optionalContextual;
+
+  Map<String, int> get counts => {
+        'core_package': corePackage.length,
+        'theme_package': themePackage.length,
+        'support_package': supportPackage.length,
+        'optional_contextual': optionalContextual.length,
+      };
+
+  Map<String, dynamic> toDiagnostics() => {
+        'core_package': _packageDiagnostics(corePackage, limit: 12),
+        'theme_package': _packageDiagnostics(themePackage, limit: 12),
+        'support_package': _packageDiagnostics(supportPackage, limit: 12),
+        'optional_contextual': _packageDiagnostics(
+          optionalContextual,
+          limit: 8,
+        ),
+      };
+
+  Map<String, dynamic> toCacheMaterial() => {
+        'core_package': _packageDiagnostics(corePackage, limit: 24),
+        'theme_package': _packageDiagnostics(themePackage, limit: 24),
+        'support_package': _packageDiagnostics(supportPackage, limit: 24),
+        'optional_contextual': _packageDiagnostics(
+          optionalContextual,
+          limit: 24,
+        ),
       };
 }
 
@@ -377,6 +422,7 @@ String? commanderReferenceDeckCorpusCacheVersion(
   CommanderReferenceDeckCorpusGuidance? guidance,
 ) {
   if (guidance == null || !guidance.isUsable) return null;
+  final packages = guidance.packages;
   final material = jsonEncode({
     'source': guidance.source,
     'commander': normalizeCommanderReferenceDeckText(guidance.commanderName),
@@ -392,42 +438,174 @@ String? commanderReferenceDeckCorpusCacheVersion(
           },
         )
         .toList(growable: false),
+    'packages': packages.toCacheMaterial(),
     'theme_counts': guidance.themeCounts,
   });
-  return 'reference_deck_corpus_v1:${sha256.convert(utf8.encode(material)).toString().substring(0, 12)}';
+  return 'reference_deck_corpus_v2:${sha256.convert(utf8.encode(material)).toString().substring(0, 12)}';
 }
 
 String buildCommanderReferenceDeckCorpusPrompt(
   CommanderReferenceDeckCorpusGuidance? guidance,
 ) {
   if (guidance == null || !guidance.isUsable) return '';
+  final packages = guidance.packages;
   final roleLines = guidance.averageRoleCounts.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
   final roles = roleLines
-      .take(10)
+      .take(6)
       .map((entry) => '- ${entry.key}: ${entry.value.toStringAsFixed(1)} avg')
       .join('\n');
-  final recurrentCards = guidance.topCards
-      .take(18)
+  final core = _formatCorpusPackagePromptLine(
+    'core_package',
+    packages.corePackage,
+    acceptedDeckCount: guidance.acceptedDeckCount,
+    limit: 8,
+  );
+  final theme = _formatCorpusPackagePromptLine(
+    'theme_package',
+    packages.themePackage,
+    acceptedDeckCount: guidance.acceptedDeckCount,
+    limit: 8,
+  );
+  final support = _formatCorpusPackagePromptLine(
+    'support_package',
+    packages.supportPackage,
+    acceptedDeckCount: guidance.acceptedDeckCount,
+    limit: 8,
+  );
+
+  return '''
+Reference deck corpus v2 active for ${guidance.commanderName}:
+- Corpus size: ${guidance.acceptedDeckCount} accepted public reference decks.
+- Use this as aggregate structure only, not as a decklist to copy.
+- Average role shape, top signals only:
+$roles
+- Package priority:
+$core
+$theme
+$support
+- optional_contextual is diagnostics-only; use it only to fill genuine curve/function gaps.
+- Prefer core/theme cards that fit role balance. Keep final deck coherent and legal; do not force every recurrent card.
+''';
+}
+
+CommanderReferenceCorpusPackages buildCommanderReferenceCorpusPackages(
+  CommanderReferenceDeckCorpusGuidance guidance,
+) {
+  final core = <Map<String, dynamic>>[];
+  final theme = <Map<String, dynamic>>[];
+  final support = <Map<String, dynamic>>[];
+  final optional = <Map<String, dynamic>>[];
+  final seen = <String>{};
+  final sorted = guidance.topCards
+      .map((card) => Map<String, dynamic>.from(card))
+      .where(
+          (card) => (card['card_name']?.toString().trim().isNotEmpty ?? false))
+      .toList(growable: false)
+    ..sort(_compareCorpusCards);
+  final coreThreshold = _corePackageDeckCountThreshold(
+    guidance.acceptedDeckCount,
+  );
+
+  for (final card in sorted) {
+    final normalized = normalizeCommanderReferenceDeckText(
+        card['card_name']?.toString() ?? '');
+    if (normalized.isEmpty || !seen.add(normalized)) continue;
+
+    final role = card['role']?.toString().trim().toLowerCase() ?? '';
+    final deckCount = _intValue(card['deck_count']);
+    if (deckCount >= coreThreshold) {
+      core.add(card);
+    } else if (_themeCorpusRoles.contains(role)) {
+      theme.add(card);
+    } else if (_supportCorpusRoles.contains(role)) {
+      support.add(card);
+    } else {
+      optional.add(card);
+    }
+  }
+
+  return CommanderReferenceCorpusPackages(
+    corePackage: core,
+    themePackage: theme,
+    supportPackage: support,
+    optionalContextual: optional,
+  );
+}
+
+const _themeCorpusRoles = {
+  'miracle_topdeck',
+  'big_spell_payoff',
+  'spellslinger',
+  'exile_value',
+  'ritual_treasure',
+  'recursion',
+  'win_condition',
+};
+
+const _supportCorpusRoles = {
+  'ramp',
+  'interaction',
+  'interaction_and_resets',
+  'board_wipe',
+  'draw_value',
+  'protection',
+  'creature',
+};
+
+int _corePackageDeckCountThreshold(int acceptedDeckCount) {
+  if (acceptedDeckCount <= 1) return 1;
+  final threshold = (acceptedDeckCount * 0.8).ceil();
+  return threshold < 2 ? 2 : threshold;
+}
+
+int _compareCorpusCards(Map<String, dynamic> a, Map<String, dynamic> b) {
+  final deckCountCompare =
+      _intValue(b['deck_count']).compareTo(_intValue(a['deck_count']));
+  if (deckCountCompare != 0) return deckCountCompare;
+  final quantityCompare =
+      _intValue(b['total_quantity']).compareTo(_intValue(a['total_quantity']));
+  if (quantityCompare != 0) return quantityCompare;
+  return (a['card_name']?.toString() ?? '')
+      .compareTo(b['card_name']?.toString() ?? '');
+}
+
+List<Map<String, dynamic>> _packageDiagnostics(
+  List<Map<String, dynamic>> cards, {
+  required int limit,
+}) {
+  return cards
+      .take(limit)
+      .map(
+        (card) => {
+          'card_name': card['card_name']?.toString(),
+          'deck_count': _intValue(card['deck_count']),
+          'role': card['role']?.toString(),
+        },
+      )
+      .toList(growable: false);
+}
+
+String _formatCorpusPackagePromptLine(
+  String label,
+  List<Map<String, dynamic>> cards, {
+  required int acceptedDeckCount,
+  required int limit,
+}) {
+  if (cards.isEmpty) return '- $label: not_proven';
+  final formatted = cards
+      .take(limit)
       .map((card) {
-        final name = card['card_name']?.toString();
-        final deckCount = _intValue(card['deck_count']);
-        final role = card['role']?.toString();
+        final name = card['card_name']?.toString().trim();
         if (name == null || name.isEmpty) return null;
-        return '$name${role == null || role.isEmpty ? '' : ' [$role]'} ($deckCount/${guidance.acceptedDeckCount})';
+        final role = card['role']?.toString().trim();
+        final deckCount = _intValue(card['deck_count']);
+        final roleSuffix = role == null || role.isEmpty ? '' : ' [$role]';
+        return '$name$roleSuffix ($deckCount/$acceptedDeckCount)';
       })
       .whereType<String>()
       .join(', ');
-
-  return '''
-Reference deck corpus v1 active for ${guidance.commanderName}:
-- Corpus size: ${guidance.acceptedDeckCount} accepted public reference decks.
-- Use this as aggregate structure only, not as a decklist to copy.
-- Average role shape:
-$roles
-- Recurrent package/card signals: $recurrentCards.
-- Keep final deck coherent and legal; do not force every recurrent card.
-''';
+  return '- $label: $formatted';
 }
 
 CommanderReferenceDeckAnalysis analyzeCommanderReferenceDeck({

@@ -1,4 +1,6 @@
 import 'package:server/ai/commander_reference_card_stats_support.dart';
+import 'package:server/ai/commander_reference_deck_corpus_support.dart';
+import 'package:server/ai/commander_reference_generate_fallback_support.dart';
 import 'package:server/ai/commander_reference_profile_support.dart';
 import 'package:test/test.dart';
 
@@ -157,6 +159,89 @@ void main() {
         equals([loreholdReferenceCommanderName]),
       );
       expect(diagnostics['archetype_confidence'], equals('medium_low'));
+    });
+
+    test(
+        'builds deterministic reference fallback from stats and corpus packages',
+        () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final deck = buildDeterministicReferenceDeck(
+        profile: profile,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Arcane Signet',
+            cardId: 'signet-id',
+            packageKey: 'ramp_package',
+            role: 'ramp',
+            score: 80,
+            confidence: 'high',
+          ),
+          _stat(
+            cardName: 'Lorehold, the Historian',
+            cardId: 'commander-id',
+            packageKey: 'commander_package',
+            role: 'commander',
+            score: 100,
+            confidence: 'high',
+          ),
+          _stat(
+            cardName: 'Scroll Rack',
+            cardId: 'rack-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 94,
+            confidence: 'high',
+          ),
+        ],
+        referenceDeckCorpusGuidance: const CommanderReferenceDeckCorpusGuidance(
+          commanderName: 'Lorehold, the Historian',
+          source: 'unit_test',
+          deckCount: 3,
+          acceptedDeckCount: 3,
+          averageRoleCounts: {'lands': 37},
+          topCards: [
+            {
+              'card_name': "Sensei's Divining Top",
+              'deck_count': 3,
+              'total_quantity': 3,
+              'role': 'miracle_topdeck',
+            },
+            {
+              'card_name': 'Young Pyromancer',
+              'deck_count': 2,
+              'total_quantity': 2,
+              'role': 'spellslinger',
+            },
+          ],
+          themeCounts: {'topdeck_big_spells': 3},
+        ),
+      );
+
+      expect((deck['commander'] as Map)['name'],
+          equals('Lorehold, the Historian'));
+      final cards = (deck['cards'] as List).cast<Map>();
+      final mainQuantity = cards.fold<int>(
+        0,
+        (total, card) => total + (card['quantity'] as int),
+      );
+      expect(mainQuantity, equals(99));
+      expect(cards.where((card) => card['name'] == 'Lorehold, the Historian'),
+          isEmpty);
+      expect(
+          cards.where((card) => card['name'] == 'Arcane Signet'), hasLength(1));
+      expect(
+          cards.where((card) => card['name'] == 'Scroll Rack'), hasLength(1));
+      expect(
+        cards.where((card) => card['name'] == "Sensei's Divining Top"),
+        hasLength(1),
+      );
+      expect(cards.where((card) => card['name'] == 'Plains').single['quantity'],
+          greaterThan(0));
+      expect(
+          cards.where((card) => card['name'] == 'Mountain').single['quantity'],
+          greaterThan(0));
     });
 
     test('flattens generic commander package stats', () {

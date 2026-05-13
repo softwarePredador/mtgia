@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Generate Quality Lorehold v2
+
+### O Porquê
+- A prova publica Roles v2 de Lorehold reduziu o bucket `other` no corpus, mas
+  piorou contra a melhor prova anterior: fallback `1/5`, overlap top40 medio
+  `11.6` e p95 `24922ms`, contra fallback `0/5`, overlap `16.2` e p95
+  `21034ms`.
+- A leitura tecnica foi que o prompt passou a receber sinais planos e ruidosos
+  demais: a taxonomia ficou melhor, mas sem separar recorrencia forte,
+  identidade tematica, suporte funcional e contexto opcional.
+
+### O Como
+- `server/lib/ai/commander_reference_deck_corpus_support.dart` passou a derivar
+  quatro pacotes agregados do corpus: `core_package`, `theme_package`,
+  `support_package` e `optional_contextual`.
+- O prompt de corpus mudou para `Reference deck corpus v2`, com menos roles,
+  sem lista plana de 18 cartas e com prioridade explicita para core/theme; o
+  bucket `optional_contextual` fica diagnostics-only para reduzir pressao.
+- A versao de cache do corpus mudou para `reference_deck_corpus_v2:*`, incluindo
+  os pacotes no material de hash.
+- O fallback deterministico reference-guided foi extraido para
+  `commander_reference_generate_fallback_support.dart` e agora prioriza
+  Reference Card Stats, corpus core/theme/support e depois expected packages,
+  mantendo dedupe, comandante fora das 99 e preenchimento por terrenos basicos.
+- `/ai/generate` continua validando via `GeneratedDeckValidationService`; nao
+  houve relaxamento de singleton, preservacao do comandante, identidade de cor
+  ou legalidade.
+
+### Resultado
+- Foram adicionados testes deterministas para separacao de pacotes, prompt/cache
+  v2 e fallback reference-guided.
+- O corpus Lorehold foi reprocessado em `--dry-run`, `--apply` e `--apply`
+  idempotente, todos com `status=PASS`, `accepted_deck_count=3`,
+  `unresolved_count=0`, `off_color_count=0` e sem violacoes singleton.
+- O contrato app-facing recebeu apenas diagnostics opcionais/aditivos; o app
+  deve continuar usando `generated_deck` e `validation` como fonte de verdade.
+- A expansao para novos comandantes permanece bloqueada ate a prova publica do
+  novo SHA recuperar fallback/aderencia/latencia ou justificar risco.
+
 ## 2026-05-12 — Commander Reference Profiles Anchor 30 Batch B
 
 ### O Porquê

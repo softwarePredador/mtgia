@@ -12,6 +12,7 @@ import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
+import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
@@ -975,6 +976,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
     format,
     requestedCommanderName: requestedCommanderName,
     referenceProfile: referenceProfile,
+    referenceCardStats: referenceCardStats,
+    referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
   );
 
   String? commanderName;
@@ -1113,12 +1116,18 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   String format, {
   String? requestedCommanderName,
   Map<String, dynamic>? referenceProfile,
+  List<CommanderReferenceCardStat> referenceCardStats = const [],
+  CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
 }) async {
   final normalized = format.trim().toLowerCase();
 
   if (normalized == 'commander' || normalized == 'edh') {
     if (referenceProfile != null) {
-      return _mockReferenceProfileDeck(referenceProfile);
+      return _mockReferenceProfileDeck(
+        referenceProfile,
+        referenceCardStats: referenceCardStats,
+        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+      );
     }
     final requestedCommander = requestedCommanderName?.trim();
     if (requestedCommander != null && requestedCommander.isNotEmpty) {
@@ -1186,130 +1195,28 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   };
 }
 
-Map<String, dynamic> _mockReferenceProfileDeck(Map<String, dynamic> profile) {
-  if (isLoreholdCommanderReferenceCandidate(profile['commander']?.toString())) {
-    return _mockLoreholdReferenceDeck();
-  }
-
+Map<String, dynamic> _mockReferenceProfileDeck(
+  Map<String, dynamic> profile, {
+  List<CommanderReferenceCardStat> referenceCardStats = const [],
+  CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+}) {
   final commanderName =
       (profile['commander'] ?? profile['commander_name'] ?? '')
           .toString()
           .trim();
-  final expectedPackages = profile['expected_packages'];
-  final nonLands = <String>[];
-  if (expectedPackages is Map) {
-    final entries = expectedPackages.entries.toList()
-      ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
-    for (final entry in entries) {
-      if (entry.value is! List) continue;
-      for (final rawCard in entry.value as List) {
-        final cardName = rawCard.toString().trim();
-        if (cardName.isEmpty || nonLands.contains(cardName)) continue;
-        nonLands.add(cardName);
-        if (nonLands.length >= 62) break;
-      }
-      if (nonLands.length >= 62) break;
-    }
+  if (commanderName.isEmpty) {
+    return {
+      'commander': {'name': 'Isamaru, Hound of Konda'},
+      'cards': [
+        {'name': 'Plains', 'quantity': 99},
+      ],
+    };
   }
-
-  final colors = (profile['color_identity'] as Iterable?)
-          ?.map((color) => color.toString().trim().toUpperCase())
-          .where((color) => color.isNotEmpty)
-          .toSet()
-          .toList() ??
-      const <String>[];
-  final basics = _buildBasicLandMockCards(
-    total: 99 - nonLands.length,
-    colors: colors.isEmpty ? const ['W'] : colors,
+  return buildDeterministicReferenceDeck(
+    profile: profile,
+    referenceCardStats: referenceCardStats,
+    referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
   );
-
-  return {
-    'commander': {
-      'name': commanderName.isEmpty ? 'Isamaru, Hound of Konda' : commanderName
-    },
-    'cards': [
-      for (final name in nonLands) {'name': name, 'quantity': 1},
-      ...basics,
-    ],
-  };
-}
-
-Map<String, dynamic> _mockLoreholdReferenceDeck() {
-  const nonLands = [
-    'Sol Ring',
-    'Arcane Signet',
-    'Boros Signet',
-    'Talisman of Conviction',
-    'Mind Stone',
-    'Fellwar Stone',
-    "Wayfarer's Bauble",
-    'Thought Vessel',
-    "Commander's Sphere",
-    'Marble Diamond',
-    'Fire Diamond',
-    "Sensei's Divining Top",
-    'Scroll Rack',
-    'Library of Leng',
-    'Brainstone',
-    'Temple Bell',
-    'Victory Chimes',
-    'Faithless Looting',
-    'Thrill of Possibility',
-    'Big Score',
-    'Unexpected Windfall',
-    'Seize the Spoils',
-    'Reckless Impulse',
-    "Wrenn's Resolve",
-    'Light Up the Stage',
-    'Esper Sentinel',
-    'Tocasia\'s Welcome',
-    'Swords to Plowshares',
-    'Path to Exile',
-    'Generous Gift',
-    'Chaos Warp',
-    'Wear // Tear',
-    'Blasphemous Act',
-    'Austere Command',
-    'Terminus',
-    'Bonfire of the Damned',
-    'Storm-Kiln Artist',
-    'Monastery Mentor',
-    'Young Pyromancer',
-    'Primal Amulet // Primal Wellspring',
-    "Pyromancer's Goggles",
-    'Double Vision',
-    "Sunbird's Invocation",
-    'Arcane Bombardment',
-    "Chandra, Hope's Beacon",
-    'Approach of the Second Sun',
-    'Storm Herd',
-    'Rise of the Eldrazi',
-    'Soulfire Eruption',
-    'Apex of Power',
-    'Volcanic Vision',
-    'Creative Technique',
-    'Dance with Calamity',
-    'Call Forth the Tempest',
-    "Brass's Bounty",
-    'Hit the Mother Lode',
-    "Mizzix's Mastery",
-    'Boros Charm',
-    'Swiftfoot Boots',
-    'Lightning Greaves',
-    'Teferi\'s Protection',
-    'Reconstruct History',
-  ];
-
-  final cards = [
-    for (final name in nonLands) {'name': name, 'quantity': 1},
-    {'name': 'Plains', 'quantity': 19},
-    {'name': 'Mountain', 'quantity': 18},
-  ];
-
-  return {
-    'commander': {'name': loreholdReferenceCommanderName},
-    'cards': cards,
-  };
 }
 
 Map<String, dynamic>? _bestResolvedCommanderCard({

@@ -111,3 +111,61 @@ para recuperar aderencia top40 sem depender de fallback. Candidatos:
 - medir `reference_deck_evaluation` por roles, nao apenas overlap top40;
 - repetir prova publica ate atingir fallback `0/5` ou justificar
   explicitamente a latencia/risco.
+
+## Iteracao de recuperacao — corpus packages v2
+
+### Diagnostico da regressao
+
+Roles v2 reduziu `other`, mas a prova publica nao melhorou porque o prompt ainda
+enviava uma lista plana de cartas recorrentes e medias de roles. Com roles mais
+granulares, sinais de alta recorrencia, identidade tematica e suporte funcional
+ficaram misturados com cartas contextuais de baixo valor. Isso aumentou pressao
+de prompt sem dizer ao modelo o que era core, o que era tematico e o que era
+apenas contexto.
+
+### Mudancas implementadas
+
+- Corpus guidance v2 separa sinais em `core_package`, `theme_package`,
+  `support_package` e `optional_contextual`.
+- O prompt de `/ai/generate` agora envia apenas top roles e linhas compactas de
+  core/theme/support; `optional_contextual` fica diagnostics-only.
+- A versao de cache mudou para `reference_deck_corpus_v2:*`, incluindo os
+  pacotes no material do hash.
+- O fallback deterministico reference-guided usa Reference Card Stats + corpus
+  core/theme/support antes de expected packages e terreno basico, em vez de
+  depender do filler generico.
+- Diagnostics opcionais adicionados:
+  `corpus_package_counts` e `corpus_packages.{core_package,theme_package,
+  support_package,optional_contextual}`.
+
+### Comandos executados na iteracao
+
+```bash
+git pull --ff-only origin master
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_card_stats_support_test.dart -r expanded
+cd server && dart analyze lib routes test
+cd server && dart test test/commander_reference_deck_corpus_support_test.dart test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart test/ai_generate_performance_support_test.dart -r expanded
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --dry-run --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/dry_run
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply
+cd server && dart run bin/commander_reference_deck_corpus.dart --corpus-json=test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/lorehold_edhrec_deckpreview_corpus.json --apply --artifact-dir=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply_idempotency
+```
+
+### Reprocessamento Lorehold
+
+| Modo | Status | Decks | Accepted | Rejected |
+| --- | --- | ---: | ---: | ---: |
+| dry-run | `PASS` | `3` | `3` | `0` |
+| apply | `PASS` | `3` | `3` | `0` |
+| apply idempotente | `PASS` | `3` | `3` | `0` |
+
+Artifacts atualizados:
+
+- `server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/dry_run/lorehold_the_historian_dry_run_summary.json`;
+- `server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply/lorehold_the_historian_apply_summary.json`;
+- `server/test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/apply_idempotency/lorehold_the_historian_apply_summary.json`.
+
+### Gate
+
+Status antes da prova publica do novo SHA: **not_proven**. A expansao de corpus
+continua bloqueada ate repetir a matriz publica com 5 probes
+`commander_name=Lorehold, the Historian` e 5 baselines sem `commander_name`.
