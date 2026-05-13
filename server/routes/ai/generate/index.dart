@@ -181,6 +181,46 @@ Future<Response> onRequest(RequestContext context) async {
       return Response.json(body: responseBody);
     }
 
+    if (_shouldUseReferenceGuidedDeterministicFastPath(
+      format: format,
+      referenceProfile: referenceProfile,
+      referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    )) {
+      final fastPathStopwatch = Stopwatch()..start();
+      final deterministicBody = await _buildMockGenerateResponse(
+        pool: pool,
+        prompt: prompt,
+        format: format,
+        requestedCommanderName: requestedCommanderName,
+        referenceProfile: referenceProfile,
+        referenceCardStats: referenceCardStats,
+        unresolvedReferenceCards: unresolvedReferenceCards,
+        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        archetypeReferenceStats: archetypeReferenceStats,
+        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+      );
+      timings['reference_deterministic_ms'] =
+          fastPathStopwatch.elapsedMilliseconds;
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      final responseBody = withAiGenerateRuntimeMetadata(
+        payload: deterministicBody,
+        cacheKey: cacheKey,
+        cacheHit: false,
+        timings: timings,
+      );
+      final deterministicValidation =
+          deterministicBody['validation'] as Map<String, dynamic>?;
+      if (deterministicValidation?['is_valid'] == true) {
+        writeAiGenerateCache(
+          cacheKey: cacheKey,
+          payload: responseBody,
+          ttl: cacheTtl,
+        );
+        return Response.json(body: responseBody);
+      }
+    }
+
     var metaContext = '';
     Map<String, dynamic>? metaReferenceContext;
 
@@ -1003,6 +1043,19 @@ Uri _resolveInternalGenerateUrl(Request request) {
   );
 }
 
+bool _shouldUseReferenceGuidedDeterministicFastPath({
+  required String format,
+  required Map<String, dynamic>? referenceProfile,
+  required CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+}) {
+  final normalizedFormat = normalizeAiGenerateFormat(format);
+  if (normalizedFormat != 'commander') return false;
+  if (referenceProfile == null) return false;
+  return shouldUseCompactCommanderReferenceCorpusPrompt(
+    referenceDeckCorpusGuidance,
+  );
+}
+
 Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
   required Pool pool,
   required String format,
@@ -1112,8 +1165,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
   List<String> archetypeSourceCommanderNames = const [],
   List<String> archetypeCommanderColorIdentity = const [],
-  required String warningCode,
-  required String warningMessage,
+  String? warningCode,
+  String? warningMessage,
 }) async {
   final mockDeck = await _mockGeneratedDeck(
     pool,
@@ -1150,8 +1203,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
     );
 
     final warnings = <String, dynamic>{
-      'code': warningCode,
-      'message': warningMessage,
+      if (warningCode != null) 'code': warningCode,
+      if (warningMessage != null) 'message': warningMessage,
       if (validation.warnings.isNotEmpty) 'messages': validation.warnings,
       if (validation.invalidCards.isNotEmpty)
         'invalid_cards': validation.invalidCards,
@@ -1213,7 +1266,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           sourceCommanderNames: archetypeSourceCommanderNames,
           commanderColorIdentity: archetypeCommanderColorIdentity,
         ),
-      'warnings': warnings,
+      if (warnings.isNotEmpty) 'warnings': warnings,
     };
   } catch (e) {
     return {
@@ -1252,10 +1305,11 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           sourceCommanderNames: archetypeSourceCommanderNames,
           commanderColorIdentity: archetypeCommanderColorIdentity,
         ),
-      'warnings': {
-        'code': warningCode,
-        'message': warningMessage,
-      },
+      if (warningCode != null || warningMessage != null)
+        'warnings': {
+          if (warningCode != null) 'code': warningCode,
+          if (warningMessage != null) 'message': warningMessage,
+        },
     };
   }
 }
