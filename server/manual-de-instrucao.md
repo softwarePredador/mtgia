@@ -14242,3 +14242,18 @@ cd server && dart run bin/commander_reference_readiness_scorecard.dart --command
 Regra operacional: antes de expandir Commander Reference para novos
 comandantes, rodar o scorecard. Se o status nao for `ready_for_mini_batch`,
 nao habilitar caminho deterministico forte sem plano/documentacao de risco.
+
+Rodada mini-batch corrigida:
+
+- `Dina, Essence Brewer`: score `78`, `profile_ready_needs_proof`;
+- `Zimone, Infinite Analyst`: score `78`, `profile_ready_needs_proof`;
+- `Prosper, Tome-Bound`: score `78`, `profile_ready_needs_proof`;
+- `Aesi, Tyrant of Gyre Strait`: score `78`, `profile_ready_needs_proof`;
+- `Edgar Markov`: score `78`, `profile_ready_needs_proof`.
+
+Nenhum foi promovido. Todos ainda precisam de corpus aceito, core package mais
+forte e prova publica. A primeira tentativa usou nomes antigos de Dina/Zimone
+e foi descartada; usar os nomes dos profiles persistidos em comandos futuros.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_READINESS_MINI_BATCH_2026-05-13.md`.
