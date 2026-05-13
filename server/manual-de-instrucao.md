@@ -15304,3 +15304,41 @@ Riscos documentados:
 
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT2_CORPUS_PREP_2026-05-13.md`.
+
+## 120. Commander Reference Sprint 3 Lote A fechamento parcial - 2026-05-13
+
+Foi consolidado o fechamento parcial do Sprint 3 Lote A em
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_FINAL_2026-05-13.md` e o
+tracker `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md` foi
+atualizado com a decisao para o proximo lote.
+
+Fontes lidas: plano/tracker Sprint 3, relatorios de corpus prep e public proof
+do Lote A, handoff app runtime Lote A, `app/doc/APP_AUDIT_2026-04-29.md`,
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md` e este manual. O API map permaneceu
+inalterado porque nao houve mudanca de rota, payload, response shape,
+diagnostics app-facing, data source ou consumidor mobile.
+
+Resultado consolidado: **PASS_WITH_RISKS**.
+
+- Backend/public proof: PASS. `Krenko, Mob Boss`,
+  `Light-Paws, Emperor's Voice`, `Niv-Mizzet, Parun` e `Teysa Karlov` passaram
+  em dry-run/apply/idempotencia, public proof 5/5 e readiness publico com
+  `score=100`, `ready_for_mini_batch`, timeout fallback 0/5,
+  invalid/off-identity 0 e p95 maximo 1233ms.
+- App runtime: BLOCKED. O harness Lote A foi criado para Krenko e Teysa, mas o
+  Android fisico travou antes da primeira interacao de UI e o iPhone 15 Simulator
+  ficou bloqueado por dependencia nativa MLImage/Scanner. Portanto register/login
+  real, Generate Commander via UI, save, Deck Details e `/decks/:id/validate`
+  nao foram provados nesta rodada.
+- Privacidade: nenhum token, JWT, prompt completo, decklist completa, e-mail QA,
+  Sentry DSN, `DATABASE_URL` ou `OPENAI_API_KEY` foi documentado.
+
+Decisao operacional: **GO condicionado** para iniciar o Lote B em modo
+backend/offline controlado com `Meren of Clan Nel Toth`,
+`Korvold, Fae-Cursed King` retry, `Sythis, Harvest's Hand` e
+`Urza, Lord High Artificer`. Continua **NO-GO** para declarar PASS completo de
+produto ou ampliar guidance sem ressalvas enquanto a prova app runtime estiver
+bloqueada. Cada comandante do Lote B deve repetir dry-run, apply, idempotencia,
+public proof 5/5 e readiness scorecard, bloqueando qualquer caso com
+`score<100`, fallback de timeout, warning relevante, unresolved/off-color,
+invalid cards ou core package fraco.

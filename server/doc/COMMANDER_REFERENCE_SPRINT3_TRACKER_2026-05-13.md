@@ -13,6 +13,9 @@ camera ou OCR.
 
 - `server/doc/COMMANDER_REFERENCE_SPRINT3_PLAN_2026-05-13.md`
 - `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_CORPUS_PREP_2026-05-13.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_PUBLIC_PROOF_2026-05-13.md`
+- `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_a_app_2026-05-13.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_FINAL_2026-05-13.md`
 - `server/bin/commander_reference_deck_corpus.dart`
 
 ## Status por comandante
@@ -88,3 +91,29 @@ e
 | `Light-Paws, Emperor's Voice` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 873ms / 952ms | score 100, `ready_for_mini_batch` | true |
 | `Niv-Mizzet, Parun` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 857ms / 981ms | score 100, `ready_for_mini_batch` | true |
 | `Teysa Karlov` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 856ms / 908ms | score 100, `ready_for_mini_batch` | true |
+
+## Fechamento parcial Lote A - 2026-05-13
+
+Relatorio final:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_FINAL_2026-05-13.md`.
+
+Resultado consolidado: **PASS_WITH_RISKS**.
+
+- Backend/public proof: PASS. Krenko, Light-Paws, Niv-Mizzet e Teysa foram
+  promovidos para mini-batch controlado com score 100,
+  `ready_for_mini_batch`, timeout fallback 0/5, invalid/off-identity 0 e p95
+  maximo 1233ms.
+- App runtime: BLOCKED. O harness especifico Lote A foi criado, mas Android
+  fisico travou antes da primeira interacao de UI e iPhone 15 Simulator ficou
+  bloqueado pela dependencia nativa MLImage/Scanner. Deck Details/validate via app
+  nao foi provado nesta rodada.
+- API map: consultado e mantido sem alteracao porque nao houve mudanca de rota,
+  payload, response shape, diagnostics app-facing, data source ou consumidor
+  mobile.
+
+Decisao para o Lote B: **GO condicionado** para corpus offline/backend,
+dry-run, apply, idempotencia, public proof e readiness scorecard de
+`Meren of Clan Nel Toth`, `Korvold, Fae-Cursed King` retry,
+`Sythis, Harvest's Hand` e `Urza, Lord High Artificer`. Continua **NO-GO** para
+declarar PASS completo de produto ou ampliar guidance sem ressalvas enquanto a
+prova app runtime permanecer bloqueada.
