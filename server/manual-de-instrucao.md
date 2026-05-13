@@ -14557,3 +14557,52 @@ Artifacts:
 Decisao: Aesi esta promovido para mini-batch controlado. Nao houve mudanca de
 shape em `/ai/generate`; `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece
 valido para o contrato atual.
+
+## 117. Dina corpus guidance prova publica e promocao - 2026-05-13
+
+Foi executada prova publica 5x de `POST /ai/generate` para
+`Dina, Essence Brewer` contra
+`https://evolution-cartinhas.8ktevp.easypanel.host` em
+`ea793ff2943ff693ad953a823a3ecea350a96e2f`.
+
+Payload operacional: `format=Commander`, `bracket=3`,
+`commander_name='Dina, Essence Brewer'` e prompt focado em sacrifice, lifegain
+drain, aristocrats, tokens, recursion, Golgari interaction, ramp/draw e win
+conditions coerentes. Foi criado usuario QA descartavel apenas para obter JWT em
+memoria; token, e-mail, senha, prompt completo e decklists nao foram gravados.
+
+Resultado:
+
+- `/health` publico retornou `200` com `git_sha` publico;
+- 5/5 `HTTP 200`;
+- 5/5 `validation.is_valid=true`;
+- 5/5 comandante preservado;
+- 5/5 `main_quantity=99`;
+- 5/5 `reference_profile_used=true`;
+- 5/5 `reference_card_stats_used=true`;
+- 5/5 `reference_deck_corpus_used=true`;
+- timeout fallback 0/5;
+- invalid/off-identity 0;
+- p50 `973ms`, p95 `1315ms`.
+
+O runtime retornou `is_mock=true` em 5/5, mas com profile/stats/corpus ativos,
+sem timeout e sem cartas invalidas. Conforme a regra do scorecard v2, isso e
+caminho deterministico reference-guided valido, nao fallback de timeout.
+
+Scorecard final:
+
+- `score=100`;
+- `status=ready_for_mini_batch`;
+- `expansion_ready=true`;
+- `blockers=[]`;
+- `warnings=[]`;
+- `runtime_public_gate_passed=true`.
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/public_proof/summary.json`;
+- `server/test/artifacts/commander_reference_readiness_dina_public_2026-05-13/readiness_scorecard_summary.json`.
+
+Decisao: Dina esta promovida para mini-batch controlado. Nao houve mudanca de
+shape em `/ai/generate`; `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece
+valido para o contrato atual.

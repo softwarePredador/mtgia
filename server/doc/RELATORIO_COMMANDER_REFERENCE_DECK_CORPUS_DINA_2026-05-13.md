@@ -2,23 +2,23 @@
 
 ## Verdict
 
-**PASS WITH RISKS.**
+**PASS.**
 
 O corpus offline de `Dina, Essence Brewer` foi montado a partir de 5 paginas
 publicas EDHREC Average Deck, revalidado em `--dry-run`, aplicado com sucesso e
-reaplicado para prova de idempotencia. O scorecard read-only apos corpus ficou
-em `PASS_WITH_RISKS`, `score=98`, bloqueado apenas pela ausencia de prova
-publica 5x de `/ai/generate`. O artifact final continua sendo uma projecao
-local-resolvivel: as paginas EDHREC originais continham cartas novas de Secrets
-of Strixhaven que o banco local ainda nao resolve; esses slots foram
+reaplicado para prova de idempotencia. A prova publica sanitizada 5x de
+`/ai/generate` passou contra o backend publico e o scorecard final retornou
+`score=100`, `status=ready_for_mini_batch`. O artifact final continua sendo uma
+projecao local-resolvivel: as paginas EDHREC originais continham cartas novas de
+Secrets of Strixhaven que o banco local ainda nao resolve; esses slots foram
 substituidos por staples Golgari de sacrificio/value ja resolviveis localmente
 para permitir que o corpus passe nos gates do runner.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, rotas app-facing, `/ai/optimize` e prova
-publica de `/ai/generate` ficaram fora do escopo. O trabalho cobriu corpus
-offline, dry-run DB-backed, apply idempotente, scorecard read-only e
+Scanner, camera, OCR, app mobile, rotas app-facing e `/ai/optimize` ficaram
+fora do escopo. O trabalho cobriu corpus offline, dry-run DB-backed, apply
+idempotente, prova publica sanitizada de `/ai/generate`, scorecard read-only e
 documentacao.
 
 ## Fontes consultadas
@@ -164,6 +164,82 @@ Resultado:
 Artifact:
 `server/test/artifacts/commander_reference_readiness_dina_after_corpus_2026-05-13/readiness_scorecard_summary.json`
 
+## Public proof
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`
+
+SHA testado:
+`ea793ff2943ff693ad953a823a3ecea350a96e2f`
+
+Comando operacional executado: prova sanitaria 5x `POST /ai/generate` com
+`format=Commander`, `bracket=3`, `commander_name='Dina, Essence Brewer'` e
+prompt focado em sacrifice, lifegain drain, aristocrats, tokens, recursion,
+Golgari interaction, ramp/draw e win conditions coerentes. Um usuario QA
+descartavel foi criado apenas em memoria para obter JWT; token, e-mail, senha,
+prompt completo e decklists nao foram salvos.
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| health_status | `200` |
+| HTTP 200 | 5/5 |
+| validation OK | 5/5 |
+| commander preserved | 5/5 |
+| main quantity 99 | 5/5 |
+| reference profile used | 5/5 |
+| reference card stats used | 5/5 |
+| reference deck corpus used | 5/5 |
+| deterministic fallback marker | 5/5 |
+| timeout fallback | 0/5 |
+| invalid cards | 0 |
+| off-identity cards | 0 |
+| p50 | 973ms |
+| p95 | 1315ms |
+
+O payload publico marcou `is_mock=true` em 5/5, mas sem timeout, sem erro de
+validacao e com profile/stats/corpus ativos. Pelo scorecard v2, isso e caminho
+deterministico reference-guided valido, nao fallback de timeout.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/public_proof/summary.json`
+
+## Readiness scorecard final
+
+Comando:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Dina, Essence Brewer' \
+  --runtime-summary=test/artifacts/commander_reference_deck_corpus_dina_2026-05-13/public_proof/summary.json \
+  --artifact-dir=test/artifacts/commander_reference_readiness_dina_public_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS` |
+| score | 100 |
+| readiness status | `ready_for_mini_batch` |
+| expansion_ready | `true` |
+| blockers | `[]` |
+| warnings | `[]` |
+| runtime_public_gate_passed | `true` |
+| corpus_accepted_deck_count | 5 |
+| corpus_core_package_count | 40 |
+| deterministic_deck_valid | `true` |
+| deterministic_main_quantity | 99 |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_dina_public_2026-05-13/readiness_scorecard_summary.json`
+
+Decisao: Dina esta promovida para mini-batch controlado. Nao houve mudanca de
+shape em `/ai/generate`; `server/doc/API_CONTRACTS_AND_DATA_MAP.md` permanece
+valido para o contrato atual.
+
 ## Unresolved e correcao local-resolvivel
 
 A primeira validacao rejeitou 5/5 decks apenas por `unresolved_cards`. Nao houve
@@ -245,18 +321,13 @@ Padroes arriscados ou nao transferiveis:
 - nao colapsar `Dina, Essence Brewer` em `Dina, Soul Steeper` ou em pacote
   lifegain-drain antigo;
 - nao tratar paginas Average Deck como cEDH;
-- nao promover guidance forte ate a prova publica confirmar que a projecao
-  local-resolvivel sustenta `/ai/generate` sem off-identity ou deck invalido;
 - nao copiar decklists em runtime; usar apenas sinais agregados de roles,
   recorrencia e pacotes.
 
 ## Proximo passo minimo
 
-1. Executar prova publica sanitizada 5x de `/ai/generate` para
-   `Dina, Essence Brewer`, sem registrar secrets, JWT, prompt completo ou
-   decklists.
-2. Reexecutar o scorecard com `--runtime-summary` da prova publica e promover
-   apenas se `runtime_public_gate_passed=true`.
-3. Opcionalmente auditar backfill oficial das cartas unresolved via Scryfall em
+1. Incluir Dina apenas em mini-batch controlado, monitorando regressao de
+   `reference_deck_corpus_used`, timeout fallback, invalid cards e off-identity.
+2. Opcionalmente auditar backfill oficial das cartas unresolved via Scryfall em
    etapa futura, se o objetivo for persistir listas EDHREC mais fieis que a
    projecao local-resolvivel aplicada.
