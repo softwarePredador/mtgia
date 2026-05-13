@@ -3,6 +3,49 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Sprint 3 Lote A apply controlado
+
+### O Porquê
+- Os corpora Sprint 3 Lote A ja tinham passado em dry-run e precisavam ser
+  aplicados com seguranca, provando novamente dry-run, apply idempotente e
+  readiness pos-corpus antes de qualquer promocao.
+- A execucao deveria manter scanner/camera/OCR fora do escopo e nao alterar
+  rotas app-facing nem contratos mobile.
+
+### O Como
+- A branch `master` foi sincronizada com `origin/master` antes da execucao.
+- Para `Krenko, Mob Boss`, `Light-Paws, Emperor's Voice`,
+  `Niv-Mizzet, Parun` e `Teysa Karlov`, o runner
+  `bin/commander_reference_deck_corpus.dart` foi executado em tres fases:
+  `dry_run_pre_apply/`, `apply/` e `apply_idempotency/`.
+- Cada summary foi validado contra os gates: `accepted_deck_count == deck_count`,
+  `rejected_deck_count=0`, `unresolved=0`, `off_color=0`,
+  `commander_quantity=1`, `main_quantity=99` e singleton vazio.
+- Apos o apply de idempotencia, uma consulta DB-backed confirmou nas tabelas de
+  corpus: Krenko 4/4, Light-Paws 4/4, Niv-Mizzet 5/5 e Teysa 5/5 decks aceitos,
+  todos com `unresolved=0`, `off_color=0`, `commander_quantity=1`,
+  `main_quantity=99` e `singleton_rows=0`.
+- O readiness pos-apply foi gerado com
+  `bin/commander_reference_readiness_scorecard.dart` em
+  `readiness_after_corpus/`, sem `--runtime-summary`.
+- O relatorio
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_CORPUS_PREP_2026-05-13.md`
+  e o tracker `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`
+  foram atualizados.
+
+### Resultado
+- Resultado operacional: **PASS WITH RISKS**.
+- Dry-run pre-apply, apply e apply de idempotencia passaram para os quatro
+  comandantes: Krenko e Light-Paws com 4/4 decks aceitos; Niv-Mizzet e Teysa
+  com 5/5 decks aceitos.
+- O scorecard pos-apply retornou score 98 e `profile_ready_needs_proof` para os
+  quatro comandantes, sem blockers, com o unico warning
+  `public_runtime_proof_missing`.
+- Nenhum comandante foi promovido; public proof continua `NOT_RUN`.
+- As mutacoes ficaram restritas aos upserts idempotentes das tabelas
+  `commander_reference_decks`, `commander_reference_deck_cards` e
+  `commander_reference_deck_analysis`.
+
 ## 2026-05-13 — Commander Reference Sprint 3 Lote A corpus prep
 
 ### O Porquê

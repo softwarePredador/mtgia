@@ -1,0 +1,487 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-13T21:33:39.096860Z",
+  "finished_at": "2026-05-13T21:33:53.425804Z",
+  "artifact_dir": "test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/niv_mizzet_parun/apply",
+  "deck_count": 5,
+  "accepted_deck_count": 5,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_niv_mizzet_parun_default_average",
+      "commander_name": "Niv-Mizzet, Parun",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/niv-mizzet-parun",
+      "power_lane": "edhrec_average_default",
+      "theme": "izzet_draw_damage_control",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "5c4d46e1-516c-4cad-84f7-c43ff7e6636b",
+        "card_name": "Niv-Mizzet, Parun"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 81,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 14,
+        "interaction": 11,
+        "ramp": 6,
+        "spellslinger": 7,
+        "exile_value": 5,
+        "board_wipe": 1,
+        "other": 6,
+        "lands": 35,
+        "miracle_topdeck": 6,
+        "recursion": 2,
+        "tutor": 2,
+        "creature": 2,
+        "win_condition": 2,
+        "protection": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_niv_mizzet_parun_spellslinger_average",
+      "commander_name": "Niv-Mizzet, Parun",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/niv-mizzet-parun/spellslinger",
+      "power_lane": "edhrec_average_spellslinger",
+      "theme": "spellslinger_cantrips_interaction",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "5c4d46e1-516c-4cad-84f7-c43ff7e6636b",
+        "card_name": "Niv-Mizzet, Parun"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 81,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 11,
+        "interaction": 10,
+        "ramp": 6,
+        "spellslinger": 10,
+        "exile_value": 6,
+        "board_wipe": 1,
+        "other": 6,
+        "lands": 35,
+        "miracle_topdeck": 5,
+        "win_condition": 3,
+        "recursion": 3,
+        "creature": 2,
+        "ritual_treasure": 1,
+        "tutor": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_niv_mizzet_parun_combo_average",
+      "commander_name": "Niv-Mizzet, Parun",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/niv-mizzet-parun/combo",
+      "power_lane": "edhrec_average_combo",
+      "theme": "explicit_combo_draw_damage",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "5c4d46e1-516c-4cad-84f7-c43ff7e6636b",
+        "card_name": "Niv-Mizzet, Parun"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 86,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 14,
+        "interaction": 14,
+        "ramp": 6,
+        "spellslinger": 4,
+        "exile_value": 4,
+        "board_wipe": 1,
+        "other": 8,
+        "lands": 33,
+        "miracle_topdeck": 6,
+        "protection": 1,
+        "recursion": 1,
+        "tutor": 2,
+        "creature": 3,
+        "win_condition": 2,
+        "ritual_treasure": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_niv_mizzet_parun_control_average",
+      "commander_name": "Niv-Mizzet, Parun",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/niv-mizzet-parun/control",
+      "power_lane": "edhrec_average_control",
+      "theme": "control_countermagic_draw_damage",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "5c4d46e1-516c-4cad-84f7-c43ff7e6636b",
+        "card_name": "Niv-Mizzet, Parun"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 87,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 13,
+        "ramp": 6,
+        "spellslinger": 4,
+        "exile_value": 4,
+        "board_wipe": 1,
+        "other": 8,
+        "lands": 32,
+        "interaction": 14,
+        "protection": 1,
+        "miracle_topdeck": 5,
+        "recursion": 1,
+        "tutor": 3,
+        "creature": 3,
+        "win_condition": 2,
+        "ritual_treasure": 3
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_niv_mizzet_parun_budget_average",
+      "commander_name": "Niv-Mizzet, Parun",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/niv-mizzet-parun/budget",
+      "power_lane": "edhrec_average_budget",
+      "theme": "budget_spellslinger_draw_damage",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "5c4d46e1-516c-4cad-84f7-c43ff7e6636b",
+        "card_name": "Niv-Mizzet, Parun"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 74,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 9,
+        "interaction": 11,
+        "other": 6,
+        "ramp": 7,
+        "spellslinger": 13,
+        "recursion": 3,
+        "board_wipe": 1,
+        "lands": 37,
+        "miracle_topdeck": 4,
+        "win_condition": 2,
+        "exile_value": 5,
+        "creature": 2
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Niv-Mizzet, Parun": {
+      "commander_name": "Niv-Mizzet, Parun",
+      "deck_count": 5,
+      "accepted_deck_count": 5,
+      "average_role_counts": {
+        "draw_value": 12.2,
+        "interaction": 12.0,
+        "ramp": 6.2,
+        "spellslinger": 7.6,
+        "exile_value": 4.8,
+        "board_wipe": 1.0,
+        "other": 6.8,
+        "lands": 34.4,
+        "miracle_topdeck": 5.2,
+        "recursion": 2.0,
+        "tutor": 1.6,
+        "creature": 2.4,
+        "win_condition": 2.2,
+        "protection": 0.6,
+        "ritual_treasure": 1.0
+      },
+      "top_cards": [
+        {
+          "card_name": "Thought Vessel",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Archmage Emeritus",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "spellslinger"
+        },
+        {
+          "card_name": "Brainstorm",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Chaos Warp",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Command Tower",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Commander's Sphere",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Counterspell",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Curiosity",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Faithless Looting",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Frantic Search",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Frostboil Snarl",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Goblin Electromancer",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Guttersnipe",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "spellslinger"
+        },
+        {
+          "card_name": "Izzet Boilerworks",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Izzet Charm",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Izzet Signet",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Lightning Bolt",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Negate",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Niv-Mizzet, the Firemind",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Opt",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Ponder",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Preordain",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Serum Visions",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "spellslinger"
+        },
+        {
+          "card_name": "Sulfur Falls",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Talisman of Creativity",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Tandem Lookout",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Temple of Epiphany",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Ophidian Eye",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Reliquary Tower",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Arcane Denial",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Training Center",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Vandalblast",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Harmonic Prodigy",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "An Offer You Can't Refuse",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Windfall",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Mystic Sanctuary",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Mystical Tutor",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "tutor"
+        }
+      ],
+      "theme_counts": {
+        "izzet_draw_damage_control": 1,
+        "spellslinger_cantrips_interaction": 1,
+        "explicit_combo_draw_damage": 1,
+        "control_countermagic_draw_damage": 1,
+        "budget_spellslinger_draw_damage": 1
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

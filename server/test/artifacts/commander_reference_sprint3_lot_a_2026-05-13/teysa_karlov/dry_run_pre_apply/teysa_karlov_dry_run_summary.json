@@ -1,0 +1,477 @@
+{
+  "status": "PASS",
+  "mode": "dry_run",
+  "db_mutations": false,
+  "started_at": "2026-05-13T21:33:06.337654Z",
+  "finished_at": "2026-05-13T21:33:08.064319Z",
+  "artifact_dir": "test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/teysa_karlov/dry_run_pre_apply",
+  "deck_count": 5,
+  "accepted_deck_count": 5,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_teysa_default_average",
+      "commander_name": "Teysa Karlov",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/teysa-karlov",
+      "power_lane": "edhrec_average_default",
+      "theme": "orzhov_aristocrats_tokens",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f2eda272-16c9-47eb-b14f-bb30af3c7043",
+        "card_name": "Teysa Karlov"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 82,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 14,
+        "interaction": 7,
+        "ramp": 10,
+        "protection": 2,
+        "win_condition": 7,
+        "other": 10,
+        "lands": 35,
+        "miracle_topdeck": 2,
+        "draw_value": 5,
+        "ritual_treasure": 4,
+        "tutor": 1,
+        "recursion": 3
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_teysa_aristocrats_average",
+      "commander_name": "Teysa Karlov",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/teysa-karlov/aristocrats",
+      "power_lane": "edhrec_average_aristocrats",
+      "theme": "death_triggers_drain_payoffs",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f2eda272-16c9-47eb-b14f-bb30af3c7043",
+        "card_name": "Teysa Karlov"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 84,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 14,
+        "draw_value": 6,
+        "interaction": 6,
+        "ramp": 11,
+        "protection": 2,
+        "win_condition": 8,
+        "lands": 34,
+        "miracle_topdeck": 2,
+        "other": 8,
+        "ritual_treasure": 4,
+        "tutor": 2,
+        "recursion": 3
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_teysa_tokens_average",
+      "commander_name": "Teysa Karlov",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/teysa-karlov/tokens",
+      "power_lane": "edhrec_average_tokens",
+      "theme": "token_density_death_triggers",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f2eda272-16c9-47eb-b14f-bb30af3c7043",
+        "card_name": "Teysa Karlov"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 82,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 13,
+        "draw_value": 5,
+        "interaction": 6,
+        "other": 10,
+        "ramp": 8,
+        "protection": 3,
+        "win_condition": 7,
+        "ritual_treasure": 5,
+        "lands": 36,
+        "miracle_topdeck": 2,
+        "tutor": 2,
+        "recursion": 3
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_teysa_sacrifice_average",
+      "commander_name": "Teysa Karlov",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/teysa-karlov/sacrifice",
+      "power_lane": "edhrec_average_sacrifice",
+      "theme": "sac_outlets_death_value",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f2eda272-16c9-47eb-b14f-bb30af3c7043",
+        "card_name": "Teysa Karlov"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 85,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 13,
+        "interaction": 7,
+        "other": 9,
+        "ramp": 11,
+        "protection": 2,
+        "win_condition": 7,
+        "ritual_treasure": 5,
+        "lands": 34,
+        "miracle_topdeck": 2,
+        "draw_value": 4,
+        "tutor": 2,
+        "recursion": 3,
+        "exile_value": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_teysa_budget_average",
+      "commander_name": "Teysa Karlov",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/teysa-karlov/budget",
+      "power_lane": "edhrec_average_budget",
+      "theme": "budget_aristocrats_tokens",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "f2eda272-16c9-47eb-b14f-bb30af3c7043",
+        "card_name": "Teysa Karlov"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 77,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 20,
+        "ramp": 8,
+        "board_wipe": 3,
+        "win_condition": 5,
+        "lands": 35,
+        "draw_value": 5,
+        "other": 10,
+        "ritual_treasure": 2,
+        "interaction": 5,
+        "recursion": 4,
+        "miracle_topdeck": 2,
+        "protection": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Teysa Karlov": {
+      "commander_name": "Teysa Karlov",
+      "deck_count": 5,
+      "accepted_deck_count": 5,
+      "average_role_counts": {
+        "creature": 14.8,
+        "interaction": 6.2,
+        "ramp": 9.6,
+        "protection": 2.0,
+        "win_condition": 6.8,
+        "other": 9.4,
+        "lands": 34.8,
+        "miracle_topdeck": 2.0,
+        "draw_value": 5.0,
+        "ritual_treasure": 4.0,
+        "tutor": 1.4,
+        "recursion": 3.2,
+        "exile_value": 0.2,
+        "board_wipe": 0.6
+      },
+      "top_cards": [
+        {
+          "card_name": "Skullclamp",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Bartolomé del Presidio",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Bastion of Remembrance",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Blood Artist",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Carrion Feeder",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Caves of Koilos",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Command Tower",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Cruel Celebrant",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Deadly Dispute",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Despark",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Ministrant of Obligation",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Doomed Traveler",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Elas il-Kor, Sadistic Pilgrim",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Viscera Seer",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Grim Haruspex",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Hallowed Spiritkeeper",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Hunted Witness",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Isolated Chapel",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Midnight Reaper",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Mirkwood Bats",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Orzhov Basilica",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Orzhov Enforcer",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Orzhov Signet",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Path to Exile",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Pitiless Plunderer",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ritual_treasure"
+        },
+        {
+          "card_name": "Yahenni, Undying Partisan",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "protection"
+        },
+        {
+          "card_name": "Rite of Oblivion",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Zulaport Cutthroat",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "win_condition"
+        },
+        {
+          "card_name": "Shineshadow Snarl",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Solemn Simulacrum",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Swords to Plowshares",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Syr Konrad, the Grim",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Tainted Field",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Talisman of Hierarchy",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Temple of Silence",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Teysa, Orzhov Scion",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Victimize",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Village Rites",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        }
+      ],
+      "theme_counts": {
+        "orzhov_aristocrats_tokens": 1,
+        "death_triggers_drain_payoffs": 1,
+        "token_density_death_triggers": 1,
+        "sac_outlets_death_value": 1,
+        "budget_aristocrats_tokens": 1
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

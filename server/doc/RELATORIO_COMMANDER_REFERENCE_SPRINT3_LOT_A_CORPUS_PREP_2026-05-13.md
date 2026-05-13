@@ -2,21 +2,30 @@
 
 ## Verdict
 
-**PASS.**
+**PASS** para corpus prep/dry-run inicial.
+
+Atualizacao pos-apply controlado: **PASS WITH RISKS**. Os quatro corpora
+continuaram PASS no dry-run pre-apply, foram aplicados com sucesso, passaram no
+apply de idempotencia e o scorecard pos-apply sem runtime summary ficou em
+`profile_ready_needs_proof` para todos os comandantes por
+`public_runtime_proof_missing`.
 
 Foram preparados corpora offline para `Krenko, Mob Boss`,
 `Light-Paws, Emperor's Voice`, `Niv-Mizzet, Parun` e `Teysa Karlov` em
 `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/corpus.json`.
 
-Nenhum corpus foi aplicado no banco. O unico gate executado foi `--dry-run`, com
-`db_mutations=false` para todos os comandantes.
+Na preparacao inicial, nenhum corpus foi aplicado no banco. O unico gate
+executado naquela etapa foi `--dry-run`, com `db_mutations=false` para todos os
+comandantes. A secao de atualizacao pos-apply abaixo registra a aplicacao
+controlada posterior.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, rotas app-facing, public proof,
-readiness scorecard, `--apply`, idempotencia e promocao ficaram fora do escopo.
-O trabalho cobriu pesquisa publica de baixo volume, montagem offline do JSON,
-dry-run DB-backed e documentacao.
+Scanner, camera, OCR, app mobile, rotas app-facing, public proof e promocao
+ficaram fora do escopo. A preparacao inicial cobriu pesquisa publica de baixo
+volume, montagem offline do JSON, dry-run DB-backed e documentacao; a atualizacao
+posterior cobriu `--apply`, idempotencia e readiness scorecard sem runtime
+summary.
 
 ## Fontes web consultadas
 
@@ -119,17 +128,95 @@ geradores de token/sacrifice deixa o deck generico.
 
 | Commander | Recomendacao |
 | --- | --- |
-| `Krenko, Mob Boss` | Prosseguir para apply controlado quando a janela permitir; risco baixo apos dry-run PASS, desde que haste/tokens/goblins continuem como core e combo nao vire default. |
-| `Light-Paws, Emperor's Voice` | Prosseguir para apply controlado com monitoramento de goodstuff; exigir public proof de aura/protection/evasion antes de promocao. |
-| `Niv-Mizzet, Parun` | **PASS WITH RISKS** para proximas etapas: dry-run esta limpo, mas apply/public proof devem provar separacao casual vs combo/control antes de qualquer guidance forte. |
-| `Teysa Karlov` | Prosseguir para apply controlado; risco baixo/medio, com foco em manter densidade equilibrada de fodder, sac outlets e drain payoffs. |
+| `Krenko, Mob Boss` | Apply/idempotencia PASS; exigir public proof de haste/tokens/goblins antes de promocao. |
+| `Light-Paws, Emperor's Voice` | Apply/idempotencia PASS; exigir public proof de aura/protection/evasion e monitorar goodstuff antes de promocao. |
+| `Niv-Mizzet, Parun` | Apply/idempotencia PASS, mas manter **PASS WITH RISKS** ate public proof provar separacao casual vs combo/control. |
+| `Teysa Karlov` | Apply/idempotencia PASS; exigir public proof com densidade equilibrada de fodder, sac outlets e drain payoffs. |
+
+## Atualizacao pos-apply controlado - 2026-05-13
+
+Comandos executados a partir de `server/`:
+
+```bash
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/corpus.json \
+  --dry-run \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/dry_run_pre_apply
+
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/apply
+
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/apply_idempotency
+
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commanders="Krenko, Mob Boss;Light-Paws, Emperor's Voice;Niv-Mizzet, Parun;Teysa Karlov" \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/readiness_after_corpus
+```
+
+O scorecard foi executado **sem** `--runtime-summary`, por isso public proof
+permanece explicitamente nao provado.
+
+### Dry-run pre-apply
+
+| Commander | Decks | Status | db_mutations | accepted/deck | unresolved | off_color | commander/main | singleton |
+| --- | ---: | --- | --- | --- | ---: | ---: | --- | --- |
+| `Krenko, Mob Boss` | 4 | PASS | false | 4/4 | 0 | 0 | 1/99 em 4/4 | `{}` em 4/4 |
+| `Light-Paws, Emperor's Voice` | 4 | PASS | false | 4/4 | 0 | 0 | 1/99 em 4/4 | `{}` em 4/4 |
+| `Niv-Mizzet, Parun` | 5 | PASS | false | 5/5 | 0 | 0 | 1/99 em 5/5 | `{}` em 5/5 |
+| `Teysa Karlov` | 5 | PASS | false | 5/5 | 0 | 0 | 1/99 em 5/5 | `{}` em 5/5 |
+
+### Apply e idempotencia
+
+| Commander | Apply | Apply artifact | Idempotency | Idempotency artifact |
+| --- | --- | --- | --- | --- |
+| `Krenko, Mob Boss` | PASS, 4/4 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/krenko_mob_boss/apply/krenko_mob_boss_apply_summary.json` | PASS, 4/4 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/krenko_mob_boss/apply_idempotency/krenko_mob_boss_apply_summary.json` |
+| `Light-Paws, Emperor's Voice` | PASS, 4/4 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/light_paws_emperor_s_voice/apply/light_paws_emperor_s_voice_apply_summary.json` | PASS, 4/4 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/light_paws_emperor_s_voice/apply_idempotency/light_paws_emperor_s_voice_apply_summary.json` |
+| `Niv-Mizzet, Parun` | PASS, 5/5 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/niv_mizzet_parun/apply/niv_mizzet_parun_apply_summary.json` | PASS, 5/5 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/niv_mizzet_parun/apply_idempotency/niv_mizzet_parun_apply_summary.json` |
+| `Teysa Karlov` | PASS, 5/5 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/teysa_karlov/apply/teysa_karlov_apply_summary.json` | PASS, 5/5 aceitos | `server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/teysa_karlov/apply_idempotency/teysa_karlov_apply_summary.json` |
+
+As mutacoes foram restritas aos upserts idempotentes de
+`commander_reference_decks`, `commander_reference_deck_cards` e
+`commander_reference_deck_analysis`. O rollback pratico e remover os
+`source_deck_key` do Lote A dessas tabelas; reaplicar os mesmos corpora e seguro
+porque o runner usa `ON CONFLICT` por chave estavel e recria as linhas de cards
+do deck antes de inserir a versao atual.
+
+### Contagens DB-backed pos-apply
+
+Consulta direta nas tabelas de corpus apos o apply de idempotencia:
+
+| Commander | commander_reference_decks | commander_reference_deck_analysis | unresolved | off_color | commander_qty | main_qty | singleton_rows |
+| --- | --- | --- | ---: | ---: | --- | --- | ---: |
+| `Krenko, Mob Boss` | 4 decks / 4 aceitos | 4/4 | 0 | 0 | 1-1 | 99-99 | 0 |
+| `Light-Paws, Emperor's Voice` | 4 decks / 4 aceitos | 4/4 | 0 | 0 | 1-1 | 99-99 | 0 |
+| `Niv-Mizzet, Parun` | 5 decks / 5 aceitos | 5/5 | 0 | 0 | 1-1 | 99-99 | 0 |
+| `Teysa Karlov` | 5 decks / 5 aceitos | 5/5 | 0 | 0 | 1-1 | 99-99 | 0 |
+
+### Readiness scorecard pos-apply
+
+Artifact:
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/readiness_after_corpus/readiness_scorecard_summary.json`.
+
+| Commander | Score | Status | Blockers | Warnings | Expansion ready |
+| --- | ---: | --- | --- | --- | --- |
+| `Krenko, Mob Boss` | 98 | `profile_ready_needs_proof` | `[]` | `public_runtime_proof_missing` | false |
+| `Light-Paws, Emperor's Voice` | 98 | `profile_ready_needs_proof` | `[]` | `public_runtime_proof_missing` | false |
+| `Niv-Mizzet, Parun` | 98 | `profile_ready_needs_proof` | `[]` | `public_runtime_proof_missing` | false |
+| `Teysa Karlov` | 98 | `profile_ready_needs_proof` | `[]` | `public_runtime_proof_missing` | false |
+
+Resultado consolidado: `PASS_WITH_RISKS`, `commander_count=4`, `ready_count=0`.
+Nenhum comandante foi promovido, pois public runtime proof permanece `NOT_RUN`.
 
 ## Proximas acoes tecnicas minimas
 
-1. Rodar `--apply` controlado somente se os quatro corpora continuarem PASS.
-2. Reexecutar idempotencia e registrar contagens DB-backed por `source_deck_key`.
-3. Executar public proof sanitizado 5/5 e readiness scorecard por comandante.
-4. Bloquear promocao de qualquer alvo com timeout fallback, blocker, warning
+1. Executar public proof sanitizado 5/5 por comandante com runtime summary.
+2. Reexecutar readiness scorecard com runtime summary.
+3. Bloquear promocao de qualquer alvo com timeout fallback, blocker, warning
    relevante, `score<100`, off-identity, invalid cards ou core package fraco.
-5. Atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` somente se houver
+4. Atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` somente se houver
    mudanca real de rota, payload, diagnostics app-facing ou consumidor mobile.

@@ -19,10 +19,10 @@ camera ou OCR.
 
 | Prioridade | Commander | Lote | Cobertura esperada | corpus_prepared | dry_run | apply | idempotency | public_proof | readiness_scorecard | promoted |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `Krenko, Mob Boss` | A | Mono-red goblin typal/go-wide tokens/haste | DONE | DONE | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
-| 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
-| 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
-| 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | false |
+| 1 | `Krenko, Mob Boss` | A | Mono-red goblin typal/go-wide tokens/haste | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
+| 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
+| 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
+| 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | DONE | DONE | NOT_RUN | PASS_WITH_RISKS | false |
 | 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
@@ -48,6 +48,22 @@ e
 
 ## Bloqueio de promocao
 
-Lote A esta **corpus_prepared/dry_run only**. `--apply`, idempotencia, public
-proof e readiness scorecard permanecem `NOT_RUN`; portanto nenhum comandante do
-Sprint 3 esta promovido ou autorizado como guidance forte.
+Lote A saiu de **corpus_prepared/dry_run only** para apply controlado em
+2026-05-13. `--apply` e idempotencia passaram para todos os quatro comandantes,
+mas public proof permanece `NOT_RUN` e o readiness scorecard pos-apply ficou
+`PASS_WITH_RISKS` por `public_runtime_proof_missing`; portanto nenhum comandante
+do Sprint 3 esta promovido ou autorizado como guidance forte.
+
+## Lote A apply + readiness pos-corpus - 2026-05-13
+
+Artifacts novos:
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/<safe_commander>/dry_run_pre_apply/`,
+`apply/`, `apply_idempotency/` e
+`server/test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/readiness_after_corpus/`.
+
+| Commander | Dry-run pre-apply | Apply | Idempotency | Readiness sem runtime summary |
+| --- | --- | --- | --- | --- |
+| `Krenko, Mob Boss` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+| `Light-Paws, Emperor's Voice` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+| `Niv-Mizzet, Parun` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+| `Teysa Karlov` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
