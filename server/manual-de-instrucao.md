@@ -3,6 +3,54 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-13 — Commander Reference Edgar Corpus Apply e Readiness
+
+### O Porquê
+- Edgar Markov ja tinha corpus offline validado em dry-run, mas ainda nao havia
+  sido aplicado no banco.
+- O objetivo operacional era aplicar o corpus com seguranca, provar
+  idempotencia e deixar o comandante pronto para a prova publica sanitizada.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward antes da
+  execucao.
+- O artifact
+  `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/edgar_edhrec_average_corpus.json`
+  foi confirmado localmente.
+- O runner `bin/commander_reference_deck_corpus.dart` foi reexecutado em
+  `--dry-run`; somente apos `PASS`, o corpus foi aplicado em
+  `test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/apply`.
+- O mesmo `--apply` foi repetido em
+  `test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/apply_idempotency`
+  para confirmar idempotencia.
+- Em seguida, `bin/commander_reference_readiness_scorecard.dart` foi rodado em
+  modo read-only para `Edgar Markov`.
+- Nenhum ajuste de codigo foi necessario; scanner/camera/OCR, app mobile e
+  rotas app-facing permaneceram fora do escopo.
+
+### Resultado
+- Dry-run: **PASS**, `deck_count=4`, `accepted_deck_count=4`,
+  `rejected_deck_count=0`, `db_mutations=false`.
+- Apply: **PASS**, `deck_count=4`, `accepted_deck_count=4`,
+  `rejected_deck_count=0`, `db_mutations=true`.
+- Apply idempotente: **PASS**, `deck_count=4`, `accepted_deck_count=4`,
+  `rejected_deck_count=0`, `db_mutations=true`.
+- Nos tres passos, todos os decks mantiveram `commander_quantity=1`,
+  `main_quantity=99`, `unresolved_count=0`, `off_color_count=0` e
+  `singleton_violations={}`.
+- Contagens DB-backed apos apply/idempotencia: 4 decks de referencia Edgar, 4
+  aceitos, 350 linhas em `commander_reference_deck_cards` e 1 linha agregada em
+  `commander_reference_deck_analysis`. A contagem direta de linhas DB antes do
+  primeiro `--apply` nao foi persistida; o dry-run sem mutacao foi usado como
+  baseline seguro antes da escrita.
+- Scorecard:
+  `test/artifacts/commander_reference_readiness_edgar_after_corpus_2026-05-13/readiness_scorecard_summary.json`.
+- Readiness final: **PASS_WITH_RISKS**, `score=98`,
+  `status=profile_ready_needs_proof`, `expansion_ready=false`,
+  `blockers=[]`, `warnings=["public_runtime_proof_missing"]`.
+- Proximo passo obrigatorio antes de promover Edgar: executar prova publica 5x
+  com `commander_name='Edgar Markov'`.
+
 ## 2026-05-13 — Commander Reference Aesi Corpus Apply e Readiness
 
 ### O Porquê

@@ -2,17 +2,20 @@
 
 ## Verdict
 
-**PASS.**
+**PASS WITH RISKS.**
 
-O corpus preliminar offline de `Edgar Markov` foi montado com 4 paginas
-publicas EDHREC Average Deck e validado somente em `--dry-run`. Nenhuma
-aplicacao no banco foi executada.
+O corpus offline de `Edgar Markov` foi montado com 4 paginas publicas EDHREC
+Average Deck, revalidado em `--dry-run`, aplicado com sucesso e reaplicado para
+prova de idempotencia. O scorecard read-only apos corpus ficou em
+`PASS_WITH_RISKS`, `score=98`, bloqueado apenas pela ausencia de prova publica
+5x de `/ai/generate`.
 
 ## Scope
 
-Scanner, camera, OCR, app mobile, runtime publico, `/ai/generate`, `/ai/optimize`
-e escrita nas tabelas de reference corpus ficaram fora do escopo. Esta entrega
-prepara apenas o JSON de corpus e o relatorio preliminar para a proxima etapa.
+Scanner, camera, OCR, app mobile, prova publica de `/ai/generate` e
+`/ai/optimize` ficaram fora do escopo. A entrega cobriu o corpus/reference
+pipeline, escrita idempotente nas tabelas de reference corpus e scorecard
+read-only para deixar Edgar pronto para prova publica sanitizada.
 
 ## Fontes consultadas
 
@@ -74,10 +77,90 @@ Resultado:
 | singleton_violations | `{}` em 4/4 |
 
 O comandante resolveu localmente como `Edgar Markov`, preservando a identidade
-Mardu esperada. Nenhum `--apply` foi executado.
+Mardu esperada.
 
 Artifact:
 `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/dry_run/edgar_markov_dry_run_summary.json`
+
+Apply executado apos o dry-run PASS:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/edgar_edhrec_average_corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/apply
+```
+
+Apply idempotente executado em seguida:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/edgar_edhrec_average_corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/apply_idempotency
+```
+
+Resultado dos tres passos:
+
+| Step | status | db_mutations | deck_count | accepted_deck_count | rejected_deck_count | gates |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| dry-run | `PASS` | `false` | 4 | 4 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+| apply | `PASS` | `true` | 4 | 4 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+| apply idempotency | `PASS` | `true` | 4 | 4 | 0 | `commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0`, `singleton_violations={}` |
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/dry_run/edgar_markov_dry_run_summary.json`
+- `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/apply/edgar_markov_apply_summary.json`
+- `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/apply_idempotency/edgar_markov_apply_summary.json`
+
+A escrita foi aditiva/idempotente por upsert do runner. Rollback pratico, se
+necessario, deve remover apenas os registros das `source_deck_key` do corpus
+Edgar aplicado, preservando cards, legalidades e profiles.
+
+Contagens DB-backed apos apply/idempotencia:
+
+| Scope | Count |
+| --- | ---: |
+| pre-apply dry-run baseline | `deck_count=4`, `accepted_deck_count=4`, `db_mutations=false` |
+| `commander_reference_decks` para Edgar | 4 |
+| `commander_reference_decks` aceitos para Edgar | 4 |
+| `commander_reference_deck_cards` para Edgar | 350 |
+| `commander_reference_deck_analysis` para Edgar | 1 |
+
+A contagem direta de linhas DB antes do primeiro `--apply` nao foi persistida;
+o dry-run sem mutacao foi usado como baseline seguro antes da escrita.
+
+## Readiness scorecard apos apply
+
+Comando:
+
+```bash
+cd server
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commander='Edgar Markov' \
+  --artifact-dir=test/artifacts/commander_reference_readiness_edgar_after_corpus_2026-05-13
+```
+
+Resultado:
+
+| Metric | Value |
+| --- | ---: |
+| status | `PASS_WITH_RISKS` |
+| score | 98 |
+| readiness status | `profile_ready_needs_proof` |
+| expansion_ready | `false` |
+| blockers | `[]` |
+| warnings | `public_runtime_proof_missing` |
+| corpus_accepted_deck_count | 4 |
+| corpus_core_package_count | 40 |
+| deterministic_deck_valid | `true` |
+| deterministic_main_quantity | 99 |
+
+Artifact:
+`server/test/artifacts/commander_reference_readiness_edgar_after_corpus_2026-05-13/readiness_scorecard_summary.json`
 
 ## Achados derivados da web
 
@@ -124,9 +207,9 @@ Padroes arriscados ou nao transferiveis:
 
 ## Proxima etapa tecnica minima
 
-1. Revisar o dry-run summary e, se aprovado, executar `--apply` em etapa
-   separada.
-2. Rodar idempotencia apos apply.
-3. Rodar readiness scorecard para Edgar.
-4. Fazer prova publica sanitizada de `/ai/generate` somente depois do corpus
-   aplicado.
+1. Executar prova publica sanitizada 5x de `/ai/generate` com
+   `commander_name='Edgar Markov'`, sem persistir token, prompt completo ou
+   decklists.
+2. Reexecutar o readiness scorecard com `--runtime-summary` da prova publica.
+3. Promover Edgar somente se o scorecard final ficar `PASS`, sem blockers e sem
+   warnings.

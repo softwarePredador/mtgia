@@ -1,0 +1,71 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "version": "commander_reference_readiness_v2_2026-05-13",
+  "mode": "read_only_scorecard",
+  "db_mutations": false,
+  "started_at": "2026-05-13T17:12:31.998550Z",
+  "finished_at": "2026-05-13T17:12:37.937141Z",
+  "artifact_dir": "test/artifacts/commander_reference_readiness_edgar_after_corpus_2026-05-13",
+  "commander_count": 1,
+  "ready_count": 0,
+  "scorecards": [
+    {
+      "version": "commander_reference_readiness_v2_2026-05-13",
+      "commander_name": "Edgar Markov",
+      "score": 98,
+      "status": "profile_ready_needs_proof",
+      "expansion_ready": false,
+      "gates": {
+        "commander_card_resolved": true,
+        "profile_available": true,
+        "profile_confidence_usable": true,
+        "profile_has_sources": true,
+        "profile_has_themes": true,
+        "profile_has_expected_packages": true,
+        "card_stats_available": true,
+        "card_stats_unresolved_zero": true,
+        "card_stats_packages_available": true,
+        "corpus_available": true,
+        "corpus_minimum_accepted_decks": true,
+        "corpus_core_package_strong": true,
+        "deterministic_deck_valid": true,
+        "deterministic_main_quantity_ok": true,
+        "runtime_public_gate_passed": false
+      },
+      "blockers": [],
+      "warnings": [
+        "public_runtime_proof_missing"
+      ],
+      "next_actions": [
+        "Executar prova publica 5x com commander_name."
+      ],
+      "inputs": {
+        "commander_name": "Edgar Markov",
+        "commander_card_resolved": true,
+        "profile_available": true,
+        "profile_confidence": "high",
+        "profile_source_count": 5,
+        "profile_theme_count": 3,
+        "profile_expected_package_count": 5,
+        "card_stats_count": 33,
+        "card_stats_unresolved_count": 0,
+        "card_stats_package_count": 5,
+        "corpus_available": true,
+        "corpus_accepted_deck_count": 4,
+        "corpus_core_package_count": 40,
+        "corpus_theme_package_count": 0,
+        "corpus_support_package_count": 0,
+        "deterministic_deck_valid": true,
+        "deterministic_main_quantity": 99,
+        "deterministic_warnings": []
+      },
+      "cache_key": "commander_reference_readiness:20d516f9c325a527"
+    }
+  ],
+  "safety": {
+    "no_runtime_code_changes": true,
+    "no_decklists_recorded": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}
