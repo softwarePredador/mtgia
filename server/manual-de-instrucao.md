@@ -14186,3 +14186,59 @@ Decisao: nao expandir corpus ainda. A taxonomia reduziu `other` e corrigiu
 roles, mas nao superou a prova publica anterior (`fallback 0/5`, overlap
 medio `16.2`, p95 `21034ms`). Proximo trabalho deve recuperar aderencia e
 latencia do prompt/guidance antes de novos comandantes.
+
+## 115. Commander Reference Readiness Scorecard - 2026-05-13
+
+Foi criada a Sprint 1 do plano Commander AI Optimization Strategy: scorecard
+read-only para decidir se um comandante pode entrar em mini-batch de expansao.
+
+Arquivos:
+
+- `server/lib/ai/commander_reference_readiness_support.dart`;
+- `server/bin/commander_reference_readiness_scorecard.dart`;
+- `server/test/commander_reference_readiness_support_test.dart`;
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_READINESS_SCORECARD_2026-05-13.md`.
+
+O score combina:
+
+- resolucao da carta do comandante;
+- profile disponivel e confidence utilizavel;
+- coverage de themes/packages do profile;
+- card stats resolvidos e sem unresolved;
+- corpus e decks aceitos;
+- forca do `core_package`;
+- fallback deterministico valido;
+- main com 99 cartas;
+- prova publica sanitizada quando fornecida.
+
+Status possiveis:
+
+- `ready_for_mini_batch`;
+- `profile_ready_needs_proof`;
+- `needs_data`;
+- `blocked`.
+
+Resultado Lorehold usando o artifact publico v5:
+
+- score `100`;
+- status `ready_for_mini_batch`;
+- blockers `[]`;
+- warnings `[]`;
+- `commander_card_resolved=true`;
+- `card_stats_count=34`;
+- `card_stats_unresolved_count=0`;
+- `corpus_accepted_deck_count=3`;
+- `corpus_core_package_count=26`;
+- `deterministic_deck_valid=true`;
+- `deterministic_main_quantity=99`;
+- `runtime_public_gate_passed=true`.
+
+Comando de referencia:
+
+```bash
+cd server && dart run bin/commander_reference_readiness_scorecard.dart --commander="Lorehold, the Historian" --runtime-summary=test/artifacts/commander_reference_deck_corpus_lorehold_roles_v2_2026-05-13/public_expanded/summary.json --artifact-dir=test/artifacts/commander_reference_readiness_2026-05-13
+```
+
+Regra operacional: antes de expandir Commander Reference para novos
+comandantes, rodar o scorecard. Se o status nao for `ready_for_mini_batch`,
+nao habilitar caminho deterministico forte sem plano/documentacao de risco.
