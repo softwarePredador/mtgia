@@ -495,14 +495,13 @@ String _formatRoleTargets(dynamic raw) {
 String _formatExpectedPackages(dynamic raw) {
   if (raw is! Map) return 'not provided';
   final entries = raw.entries.map((entry) {
-    final cards = entry.value is List
+    final count = entry.value is List
         ? (entry.value as List)
-            .map((card) => card.toString())
-            .where((card) => card.trim().isNotEmpty)
-            .take(8)
-            .join(', ')
-        : entry.value.toString();
-    return '${entry.key}: $cards';
+            .map((card) => card.toString().trim())
+            .where((card) => card.isNotEmpty)
+            .length
+        : 1;
+    return '${entry.key} ($count candidates)';
   }).toList()
     ..sort();
   return entries.take(6).join('; ');

@@ -15,10 +15,13 @@
 
 ### O Como
 - A policy de cache do generate reference-guided foi versionada para
-  `ai_generate_reference_prompt_v3`.
+  `ai_generate_reference_prompt_v4`.
 - O prompt de Commander Reference passou a proibir inferencia a partir de pacotes
   genericos off-color de miracle/tutor/cantrip/extra-turn/ramp/draw e a orientar
   omissao quando a identidade de cor for incerta.
+- O profile prompt passou a enviar apenas nomes/contagens dos pacotes esperados;
+  os nomes de cartas ficam nas Reference Card Stats e corpus packages para
+  reduzir pressao de prompt.
 - Antes da validacao final, `/ai/generate` filtra respostas OpenAI com exact
   Commander Reference Profile contra a identidade do profile e remove comandante
   duplicado/off-color da lista candidata; se a lista fica curta, recompõe usando

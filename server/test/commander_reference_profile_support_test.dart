@@ -124,6 +124,9 @@ void main() {
       expect(prompt, contains('if color identity is uncertain, omit'));
       expect(prompt, contains('boros_miracle_big_spells'));
       expect(prompt, contains('topdeck_miracle_setup'));
+      expect(prompt, contains('topdeck_and_miracle_setup (7 candidates)'));
+      expect(prompt, isNot(contains('Temporal Mastery')));
+      expect(prompt, isNot(contains('Brainstorm')));
       expect(prompt, contains('blue_miracle_package'));
       expect(prompt, contains('Do not copy a public decklist'));
     });

@@ -130,9 +130,12 @@ A auditoria local dos sinais persistidos indica:
 ### Mudancas v4
 
 - Cache/prompt policy de `/ai/generate` com reference guidance:
-  `ai_generate_reference_prompt_v3`.
+  `ai_generate_reference_prompt_v4`.
 - Prompt do Commander Reference Profile reforcado para proibir inferencia de
   pacotes genericos off-color e omitir carta com identidade incerta.
+- O profile prompt envia apenas nomes/contagens de pacotes esperados; nomes de
+  cartas ficam concentrados em Reference Card Stats e corpus packages, reduzindo
+  duplicidade de sinais.
 - Pre-validacao reference-guided filtra a lista candidata da OpenAI contra a
   identidade do profile antes do `GeneratedDeckValidationService`; se a remocao
   deixa a lista curta, recompõe com fallback deterministico reference-guided.

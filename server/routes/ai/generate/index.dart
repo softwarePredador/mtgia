@@ -26,7 +26,7 @@ import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
-    'ai_generate_reference_prompt_v3';
+    'ai_generate_reference_prompt_v4';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
