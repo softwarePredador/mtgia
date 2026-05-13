@@ -13990,3 +13990,16 @@ Primeira prova publica v2 antes do timeout de `24s` preservou deck valido e
 Lorehold como comandante, mas subiu fallback por timeout. Proximo gate:
 deploy publico e repetir a prova ampliada de `/ai/generate`; nao expandir
 corpus enquanto fallback/latencia nao estiverem aceitaveis.
+
+Prova publica pos-deploy em `353ab5737e407a802eaac78733bdde53303f9ab6`:
+
+- com `commander_name=Lorehold, the Historian`: 5/5 `HTTP 200`, 5/5 validos,
+  5/5 Lorehold preservado, 5/5 corpus ativo, fallback 1/5, overlap top40
+  medio `11.6`, p95 `24922ms`;
+- sem `commander_name`: 5/5 `HTTP 200`, 5/5 validos, 0/5 Lorehold preservado,
+  0/5 corpus ativo, fallback 5/5, overlap top40 medio `0.0`, p95 `12667ms`.
+
+Decisao: nao expandir corpus ainda. A taxonomia reduziu `other` e corrigiu
+roles, mas nao superou a prova publica anterior (`fallback 0/5`, overlap
+medio `16.2`, p95 `21034ms`). Proximo trabalho deve recuperar aderencia e
+latencia do prompt/guidance antes de novos comandantes.
