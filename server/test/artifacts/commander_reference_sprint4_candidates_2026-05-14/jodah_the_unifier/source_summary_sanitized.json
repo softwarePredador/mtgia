@@ -1,0 +1,42 @@
+{
+  "commander": "Jodah, the Unifier",
+  "source_note": "EDHREC average-deck aggregate corpus prepared for Sprint 4 Track C dry-run only; no apply in this step.",
+  "fetched_at": "2026-05-14T15:28:15.366746Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/jodah-the-unifier",
+      "header": "Average Deck for Jodah, the Unifier",
+      "total_card_count": 100,
+      "num_decks_avg": 29866,
+      "deck_entries": 94
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/jodah-the-unifier/legends",
+      "header": "Average Deck for Jodah, the Unifier - legends",
+      "total_card_count": 100,
+      "num_decks_avg": 5292,
+      "deck_entries": 95
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/jodah-the-unifier/historic",
+      "header": "Average Deck for Jodah, the Unifier - historic",
+      "total_card_count": 100,
+      "num_decks_avg": 923,
+      "deck_entries": 96
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/jodah-the-unifier/cascade",
+      "header": "Average Deck for Jodah, the Unifier - cascade",
+      "total_card_count": 100,
+      "num_decks_avg": 788,
+      "deck_entries": 97
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/jodah-the-unifier/budget",
+      "header": "Average Deck for Jodah, the Unifier - budget",
+      "total_card_count": 100,
+      "num_decks_avg": 2986,
+      "deck_entries": 88
+    }
+  ]
+}

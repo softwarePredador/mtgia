@@ -1,0 +1,35 @@
+{
+  "commander": "Feather, the Redeemed",
+  "source_note": "EDHREC average-deck aggregate corpus refined after dry-run unresolved filtering for Sprint 4 Track C; dry-run only, no apply.",
+  "fetched_at": "2026-05-14T15:31:56.414339Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/feather-the-redeemed/budget",
+      "header": "Average Deck for Feather, the Redeemed - budget",
+      "total_card_count": 100,
+      "num_decks_avg": 1302,
+      "deck_entries": 74
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/feather-the-redeemed/blink",
+      "header": "Average Deck for Feather, the Redeemed - blink",
+      "total_card_count": 100,
+      "num_decks_avg": 102,
+      "deck_entries": 82
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/feather-the-redeemed/flying",
+      "header": "Average Deck for Feather, the Redeemed - flying",
+      "total_card_count": 100,
+      "num_decks_avg": 43,
+      "deck_entries": 81
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/feather-the-redeemed/flash",
+      "header": "Average Deck for Feather, the Redeemed - flash",
+      "total_card_count": 100,
+      "num_decks_avg": 27,
+      "deck_entries": 77
+    }
+  ]
+}

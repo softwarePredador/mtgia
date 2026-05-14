@@ -298,6 +298,39 @@ avancar ao Lote D como se o Lote C tivesse fechado com dois promovidos.
   os demais bloqueados precisam de profile/card_stats/deterministic reference
   proof antes de novo public proof.
 
+## Handoff Sprint 4 coordenado - 2026-05-14
+
+Plano consolidado:
+`server/doc/COMMANDER_REFERENCE_SPRINT4_EXECUTION_PLAN_2026-05-14.md`.
+
+Relatorios por track:
+
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_A_COVERAGE_2026-05-14.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_B_PIPELINE_AUDIT_2026-05-14.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_C_CORPUS_DRY_RUN_2026-05-14.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_D_DATA_QUALITY_2026-05-14.md`
+- `app/doc/runtime_flow_handoffs/COMMANDER_REFERENCE_SPRINT4_TRACK_E_RUNTIME_PLAN_2026-05-14.md`
+
+Resultado: **PASS_WITH_RISKS** para planejamento Sprint 4 e **NO-APPLY** nesta
+rodada. Nao houve codigo, alteracao de contrato app-facing, apply de corpus,
+runtime publico novo ou promocao de comandante.
+
+| Commander | Track C dry-run | Track D data quality | Decisao Sprint 4 |
+| --- | --- | --- | --- |
+| `Feather, the Redeemed` | PASS 4/4, unresolved 0, off-color 0, singleton limpo, `db_mutations=false` | Profile/card_stats resolvidos | Primeiro candidato a apply controlado apos aprovacao |
+| `Miirym, Sentinel Wyrm` | PASS 5/5, unresolved 0, off-color 0, singleton limpo, `db_mutations=false` | Profile/card_stats resolvidos | Segundo candidato a apply controlado apos aprovacao |
+| `Ghave, Guru of Spores` | PASS 5/5, unresolved 0, off-color 0, singleton limpo, `db_mutations=false` | Sem profile/card_stats | Bloqueado ate backfill de profile/card_stats |
+| `Jodah, the Unifier` | PASS 5/5, unresolved 0, off-color 0, singleton limpo, `db_mutations=false` | Apenas profile legado `edhrec`, sem stats | Bloqueado ate profile Commander Reference novo + stats |
+
+Observacao de compliance: os `corpus.json` brutos gerados localmente para dry-run
+foram removidos do conjunto versionavel por conterem listas completas. Os
+artifacts mantidos sao summaries sanitizados e summaries de dry-run.
+
+Blockers antes de promocao Sprint 4: tratar OpenAI `429/5xx`, versionar cache do
+archetype path com prompt policy, reforcar dedupe/checklist de readiness, provar
+runtime iPhone 15 ou registrar fallback Android aceito, e executar public proof
+5/5 + scorecard `score=100` por comandante.
+
 ## Fechamento parcial Lote A - 2026-05-13
 
 Relatorio final:

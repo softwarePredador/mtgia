@@ -3,6 +3,55 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 4 plano coordenado
+
+### O Porquê
+- Depois do Sprint 3 Lote C fechar com apenas `Brago, King Eternal` promovido,
+  era necessario continuar a expansao Commander Reference com subagentes
+  paralelos, mas sem aplicar dados, mudar contrato app-facing ou promover
+  comandantes sem novos gates.
+- A orquestracao precisava preservar seguranca documental: sem tokens, JWT,
+  Sentry DSN, `DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo, prompts ou
+  decklists completas.
+
+### O Como
+- `master` foi sincronizada e permaneceu `ahead 5` de `origin/master` por commits
+  locais preexistentes.
+- Foram executados cinco tracks: cobertura de cores/arquetipos, auditoria de
+  pipeline, corpus dry-run, data quality e plano runtime app/public proof.
+- Cada track escreveu ou teve materializado um relatorio proprio datado em
+  `server/doc/` ou `app/doc/runtime_flow_handoffs/`.
+- Track C executou dry-run DB-backed para `Feather, the Redeemed`,
+  `Ghave, Guru of Spores`, `Jodah, the Unifier` e `Miirym, Sentinel Wyrm`, sem
+  `--apply` e com `db_mutations=false`.
+- Os `corpus.json` brutos usados localmente para dry-run foram removidos do
+  conjunto versionavel porque continham listas completas; os artifacts mantidos
+  sao summaries sanitizados e summaries de dry-run.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e nao foi alterado
+  porque nao houve mudanca de rota, payload, response shape, diagnostics
+  app-facing, data source ou consumidor mobile.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Plano consolidado criado:
+  `server/doc/COMMANDER_REFERENCE_SPRINT4_EXECUTION_PLAN_2026-05-14.md`.
+- Relatorios dos tracks:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_A_COVERAGE_2026-05-14.md`,
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_B_PIPELINE_AUDIT_2026-05-14.md`,
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_C_CORPUS_DRY_RUN_2026-05-14.md`,
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_TRACK_D_DATA_QUALITY_2026-05-14.md`
+  e
+  `app/doc/runtime_flow_handoffs/COMMANDER_REFERENCE_SPRINT4_TRACK_E_RUNTIME_PLAN_2026-05-14.md`.
+- Dry-run Sprint 4: Feather 4/4, Ghave 5/5, Jodah 5/5 e Miirym 5/5 aceitos,
+  todos com comandante 1, main 99, unresolved 0, off-color 0, singleton limpo e
+  `db_mutations=false`.
+- Ordem recomendada: Feather e Miirym primeiro por ja terem profile/card_stats;
+  Ghave e Jodah ficam bloqueados ate backfill de profile/card_stats.
+- Nenhum codigo foi alterado. Propostas de codigo para OpenAI `429/5xx`,
+  cache archetype, dedupe e checklist de readiness foram documentadas e nao
+  aplicadas.
+- Scanner, camera e OCR permaneceram fora do escopo.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote C final
 
 ### O Porquê

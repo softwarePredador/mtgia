@@ -1,0 +1,42 @@
+{
+  "commander": "Miirym, Sentinel Wyrm",
+  "source_note": "EDHREC average-deck aggregate corpus prepared for Sprint 4 Track C dry-run only; no apply in this step.",
+  "fetched_at": "2026-05-14T15:28:15.366746Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/miirym-sentinel-wyrm",
+      "header": "Average Deck for Miirym, Sentinel Wyrm",
+      "total_card_count": 100,
+      "num_decks_avg": 27088,
+      "deck_entries": 87
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/miirym-sentinel-wyrm/dragons",
+      "header": "Average Deck for Miirym, Sentinel Wyrm - dragons",
+      "total_card_count": 100,
+      "num_decks_avg": 5278,
+      "deck_entries": 88
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/miirym-sentinel-wyrm/clones",
+      "header": "Average Deck for Miirym, Sentinel Wyrm - clones",
+      "total_card_count": 100,
+      "num_decks_avg": 1139,
+      "deck_entries": 88
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/miirym-sentinel-wyrm/blink",
+      "header": "Average Deck for Miirym, Sentinel Wyrm - blink",
+      "total_card_count": 100,
+      "num_decks_avg": 167,
+      "deck_entries": 88
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/miirym-sentinel-wyrm/budget",
+      "header": "Average Deck for Miirym, Sentinel Wyrm - budget",
+      "total_card_count": 100,
+      "num_decks_avg": 2708,
+      "deck_entries": 83
+    }
+  ]
+}
