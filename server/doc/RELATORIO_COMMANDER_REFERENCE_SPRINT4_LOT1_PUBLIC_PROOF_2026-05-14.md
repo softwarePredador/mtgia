@@ -2,7 +2,7 @@
 
 ## Resultado
 
-**PASS_WITH_RISKS.**
+**PASS_WITH_RISKS backend / BLOCKED app runtime.**
 
 O Lote 1 promove somente `Miirym, Sentinel Wyrm` para
 `ready_for_mini_batch`. `Feather, the Redeemed` passou nos gates de
@@ -10,9 +10,12 @@ HTTP/validacao/comandante/main/profile/card_stats/corpus, mas nao foi promovido:
 na revalidacao do deploy atual o summary ficou `status=BLOCKED` por
 `invalid_cards_total=5` e p95 alto, apesar do scorecard atual retornar 100.
 
-Nao houve mudanca de contrato app-facing, scanner, camera ou OCR. Artifacts
-persistidos sao summaries sanitizados; corpora brutos temporarios ficaram fora do
-repositorio e foram removidos ao final.
+O harness app Sprint 4 Lote 1 foi criado para `Miirym, Sentinel Wyrm`, mas o
+runtime Android real ficou **BLOCKED** porque o device alvo `SM A135M`
+(`R58T300SREH`) nao estava conectado ao ADB/Flutter. Nao houve mudanca de
+contrato app-facing, scanner, camera ou OCR. Artifacts persistidos sao summaries
+sanitizados; corpora brutos temporarios ficaram fora do repositorio e foram
+removidos ao final.
 
 ## Contexto
 
@@ -20,6 +23,8 @@ repositorio e foram removidos ao final.
 - Branch alvo: `master`
 - Backend publico: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - Backend `/health.git_sha`: `b472db78ef21a9d4e2c3bc3feaac4e3c7d06b20f`
+- Backend `/health.git_sha` revalidado no bloqueio app:
+  `5c316ab6ac0b4513a91653faceacec11039ecae8`
 - API map consultado e mantido sem alteracao porque nao houve drift de rota,
   payload, response shape, diagnostics app-facing, data source ou consumidor
   mobile.
@@ -71,9 +76,24 @@ Observacao: Feather teve a rodada anterior preservada em
 
 ## Track E - runtime app Android SM A135M
 
-Runtime app nao foi executado nesta rodada. O proximo comando preparado cobre
-somente o promovido backend (`Miirym, Sentinel Wyrm`) e deve ser rodado apos criar
-ou adaptar o harness Sprint 4 Lote 1:
+Runtime app ficou **BLOCKED** nesta rodada. O harness
+`app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart` foi
+criado e cobre somente o promovido backend (`Miirym, Sentinel Wyrm`) com
+register/login, Generate Commander, preview, save, Deck Details e
+`/decks/:id/validate`.
+
+Validacao local focada:
+
+```bash
+cd app
+dart format integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart
+flutter analyze integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart --no-version-check
+flutter test test/features/decks/providers/deck_provider_test.dart --no-version-check
+```
+
+Resultado local: **PASS**.
+
+Comando Android solicitado:
 
 ```bash
 cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
@@ -92,6 +112,14 @@ flutter test integration_test/commander_reference_sprint4_lot1_app_runtime_test.
 adb -s R58T300SREH shell svc wifi enable
 ```
 
+Resultado Android: **BLOCKED antes do build/install**. `adb devices -l` nao
+listou `R58T300SREH`; `adb -s R58T300SREH get-state` e o comando Flutter
+retornaram device nao encontrado. O unico Android detectado foi outro aparelho
+(`M2006C3MG`, Android 10/API 29), nao usado como substituto do alvo.
+
+Evidencia sanitizada:
+`app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint4_lot1_app/`.
+
 ## Decisao final
 
 - **Promovido:** `Miirym, Sentinel Wyrm`.
@@ -99,4 +127,6 @@ adb -s R58T300SREH shell svc wifi enable
   `invalid_cards_total=5` e p95 alto, alem de historico de timeout fallback;
   `Ghave, Guru of Spores` e `Jodah, the Unifier` por falta de
   profile/card_stats utilizaveis.
-- **Resultado operacional:** **PASS_WITH_RISKS**.
+- **Resultado operacional backend:** **PASS_WITH_RISKS**.
+- **Resultado operacional app runtime:** **BLOCKED** por ausencia do device alvo
+  `R58T300SREH`.

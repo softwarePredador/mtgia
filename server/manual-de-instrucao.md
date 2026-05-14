@@ -3,6 +3,46 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 4 Lote 1 app runtime BLOCKED
+
+### O Porquê
+- Era necessario provar no app Android real o comandante promovido do Sprint 4
+  Lote 1 (`Miirym, Sentinel Wyrm`) contra o backend publico, sem expor secrets,
+  JWT, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo,
+  prompts brutos ou decklists completas.
+- Scanner, camera e OCR continuaram fora do escopo.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o `/health` publico respondeu
+  `git_sha=5c316ab6ac0b4513a91653faceacec11039ecae8`, alinhado ao HEAD local.
+- Foram relidos o relatorio public proof Sprint 4 Lote 1, o handoff app runtime,
+  o API contract/data map e este manual antes de alterar o app.
+- Foi criado
+  `app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart`
+  para register/login QA descartavel, Generate Commander com
+  `commander_name=Miirym, Sentinel Wyrm`, prompt Temur dragons ETB/copy,
+  feedback async, preview, save, Deck Details e `/decks/:id/validate`.
+- O harness valida `validation_ok=true`, `main_quantity=99`, `total=100`,
+  comandante unico fora das 99, `commander_in_99_count=0`, `off_identity=0`, sem
+  erro cru, sem dialog preso e sem excecao Flutter/overflow.
+- `flutter analyze` do harness e `flutter test` focado em
+  `test/features/decks/providers/deck_provider_test.dart` passaram.
+- O comando Android solicitado com `-d R58T300SREH` foi executado, mas ADB/Flutter
+  nao encontraram o device alvo. O unico Android listado foi outro aparelho
+  (`M2006C3MG`, Android 10/API 29), nao usado como substituto.
+
+### Resultado
+- Resultado operacional app runtime: **BLOCKED**.
+- Nao houve prova real de register/login, generate, preview, save, Deck Details
+  ou `/decks/:id/validate` no `SM A135M` porque `R58T300SREH` nao estava
+  conectado.
+- Evidencia sanitizada:
+  `app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint4_lot1_app/`.
+- Documentos atualizados:
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md` e
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_LOT1_PUBLIC_PROOF_2026-05-14.md`.
+
 ## 2026-05-14 — Commander Reference Sprint 4 Lote 1 public proof
 
 ### O Porquê

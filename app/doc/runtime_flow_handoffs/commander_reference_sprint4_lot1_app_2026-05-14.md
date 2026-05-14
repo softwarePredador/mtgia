@@ -2,34 +2,66 @@
 
 ## Resultado
 
-**PLAN-ONLY / PASS_WITH_RISKS.**
+**BLOCKED** em 2026-05-14T15:08-03:00.
 
-O backend promoveu somente `Miirym, Sentinel Wyrm` no Lote 1. O runtime app no
-Android fisico `SM A135M` ainda nao foi executado porque nao existe harness
-especifico Sprint 4 Lote 1 no repositorio.
+O harness especifico do Lote 1 foi criado para `Miirym, Sentinel Wyrm`, mas a
+prova no Android fisico solicitado nao executou porque o device alvo
+`SM A135M` (`R58T300SREH`) nao estava conectado ao ADB/Flutter. O unico Android
+detectado foi outro aparelho (`M2006C3MG`, Android 10/API 29), que nao substitui
+o alvo da prova.
 
-Scanner, camera e OCR permanecem fora do escopo.
+Scanner, camera e OCR permaneceram fora do escopo.
 
-## Alvo
+## Fontes lidas antes da validacao
 
-- Device: `SM A135M` (`R58T300SREH`)
-- Backend publico: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Backend `/health.git_sha` revalidado: `b472db78ef21a9d4e2c3bc3feaac4e3c7d06b20f`
-- Comandante promovido a cobrir: `Miirym, Sentinel Wyrm`
-- Comandantes nao promovidos nesta rodada: `Feather, the Redeemed`, `Ghave, Guru
-  of Spores`, `Jodah, the Unifier`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_LOT1_PUBLIC_PROOF_2026-05-14.md`
+- `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+- `server/manual-de-instrucao.md`
+- `app/doc/APP_AUDIT_2026-04-29.md`
+- `app/integration_test/commander_reference_sprint3_lot_c_app_runtime_test.dart`
+- `app/integration_test/runtime_test_helpers.dart`
 
-## Proximo comando de runtime
+## Repositorio/branch
 
-Criar/adaptar antes o harness
-`app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart`
-para cobrir register/login, Generate Commander com `commander_name`, preview,
-save, Deck Details e `/decks/:id/validate` para `Miirym, Sentinel Wyrm`.
+- Branch alvo: `master`.
+- HEAD local: `5c316ab6ac0b4513a91653faceacec11039ecae8`.
+- `origin/master`: `5c316ab6ac0b4513a91653faceacec11039ecae8`.
+- `git status` antes da mudanca: limpo e alinhado a `origin/master`.
+- Backend publico `/health`: HTTP 200, `status=healthy`,
+  `git_sha=5c316ab6ac0b4513a91653faceacec11039ecae8`.
+
+## Harness criado
+
+- Arquivo:
+  `app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart`.
+- Fluxo coberto: register/login QA descartavel pela UI, Generate Commander com
+  `commander_name=Miirym, Sentinel Wyrm`, prompt Temur dragons ETB/copy com
+  ramp/draw/removal/protection, feedback async, preview, save, Deck Details e
+  `/decks/:id/validate`.
+- Gates de API no harness: `validation_ok=true`, `main_quantity=99`,
+  `total=100`, `commander_count=1`, `commander_in_99_count=0` e
+  `off_identity=0`.
+- Gates de UI no harness: tela de preview, tela de detalhes, ausencia de erro cru,
+  `AlertDialog`/`SimpleDialog`/`Dialog` preso e excecao Flutter/overflow.
+
+## Validacao local focada
 
 ```bash
-cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
-adb -s R58T300SREH shell svc wifi disable
+cd app
+dart format integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart
+flutter analyze integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart --no-version-check
+flutter test test/features/decks/providers/deck_provider_test.dart --no-version-check
+```
 
+Resultado: **PASS**. O analyze nao encontrou issues e
+`deck_provider_test.dart` terminou com todos os testes passando.
+
+## Runtime Android solicitado
+
+Comando executado:
+
+```bash
 cd app
 flutter test integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart \
   -d R58T300SREH \
@@ -39,25 +71,35 @@ flutter test integration_test/commander_reference_sprint4_lot1_app_runtime_test.
   --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
   --reporter expanded \
   --no-version-check
-
-adb -s R58T300SREH shell svc wifi enable
 ```
 
-## Gates esperados
+Resultado: **BLOCKED antes do build/install**. `adb -s R58T300SREH get-state`,
+`adb -s R58T300SREH shell svc wifi disable`, o comando Flutter e o restore de
+Wi-Fi retornaram que o device `R58T300SREH` nao foi encontrado.
 
-- `/health` publico HTTP 200 e SHA alinhado ao deploy alvo.
-- Generate Commander usa `commander_name=Miirym, Sentinel Wyrm`.
-- Preview e save concluem sem erro bruto 4xx/5xx.
-- Deck Details mostra 99 cartas no main e comandante preservado fora das 99.
-- `/decks/:id/validate` retorna valido, invalid=0 e off-identity=0.
-- Logs/screenshots sanitizados, sem token, JWT, e-mail QA completo, prompt bruto
-  ou decklist completa.
+## Evidencia sanitizada
 
-## Riscos
+Diretorio:
 
-- iPhone 15 Simulator segue nao provado por blocker historico de
-  `MLImage.framework`/scanner.
-- Android fisico historicamente exigiu workaround de rede celular; reabilitar
-  Wi-Fi ao final.
-- `GET /decks/:id.commander_name` agregado segue instavel; usar lista
-  `commander`/`deck_cards.is_commander` e `/validate` como fonte de verdade.
+- `app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint4_lot1_app/`
+
+Arquivos:
+
+- `environment_blocker_sanitized.log`
+- `runtime_command_sanitized.log`
+
+Os logs foram redigidos para nao conter secrets, tokens, JWT, `SENTRY_DSN`,
+`DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo, prompt bruto ou decklist
+completa.
+
+## O que foi real, mockado e nao provado
+
+- Real: branch `master` sincronizada, `/health` publico HTTP 200, harness Sprint 4
+  Lote 1 criado, analyze/test focados passando e tentativa do comando Android
+  solicitado.
+- Mockado: nada.
+- Nao provado: app real no `SM A135M`/`R58T300SREH`, register/login runtime,
+  Generate Commander, preview, save, Deck Details e `/decks/:id/validate`, porque
+  o device alvo nao estava conectado.
+
+Resultado final desta rodada: **BLOCKED**.
