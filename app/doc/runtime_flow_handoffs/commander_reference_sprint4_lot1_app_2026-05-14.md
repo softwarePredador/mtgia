@@ -18,9 +18,12 @@ mantem e-mail QA completo, decklist completa, secrets, tokens, JWT,
 ## Repositorio/branch
 
 - Branch alvo: `master`.
-- HEAD local: `34576f51e710e10c950f787ae2f91aa6f77e3cba`.
-- `origin/master`: `34576f51e710e10c950f787ae2f91aa6f77e3cba`.
-- `git status` antes da mudanca: limpo e alinhado a `origin/master`.
+- Base sincronizada antes da mudanca:
+  `34576f51e710e10c950f787ae2f91aa6f77e3cba`.
+- Commit final do harness/documentacao em `master`:
+  `dd918fc5b9e95f0c1f551f48bd73752b817ab8b4`.
+- `git status` antes da mudanca e apos o push: limpo e alinhado a
+  `origin/master`.
 - Backend publico `/health`: HTTP 200, `status=healthy`,
   `git_sha=34576f51e710e10c950f787ae2f91aa6f77e3cba`,
   `latency_ms=1148`.
