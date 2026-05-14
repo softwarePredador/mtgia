@@ -1,0 +1,1749 @@
+{
+  "commander": "Veyran, Voice of Duality",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 3 Lot C corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime. Higher-signal EDHREC pages for default/spellslinger/spell-copy/storm were intentionally excluded from this artifact because the local card resolver rejected recent/unavailable card names during dry-run.",
+  "fetched_at": "2026-05-14T13:45:42Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/budget",
+      "header": "Average Deck for Veyran, Voice of Duality - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 1063,
+      "deck_entries": 77
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/voltron",
+      "header": "Average Deck for Veyran, Voice of Duality - Voltron",
+      "total_card_count": 100,
+      "num_decks_avg": 79,
+      "deck_entries": 84
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/midrange",
+      "header": "Average Deck for Veyran, Voice of Duality - Midrange",
+      "total_card_count": 100,
+      "num_decks_avg": 27,
+      "deck_entries": 86
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/treasure",
+      "header": "Average Deck for Veyran, Voice of Duality - Treasure",
+      "total_card_count": 100,
+      "num_decks_avg": 26,
+      "deck_entries": 83
+    }
+  ],
+  "excluded_source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality",
+      "reason": "dry-run rejected unresolved card: Resonating Lute"
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/spellslinger",
+      "reason": "dry-run rejected unresolved card: Resonating Lute"
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/spell-copy",
+      "reason": "dry-run rejected unresolved card: Resonating Lute"
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/storm",
+      "reason": "dry-run rejected unresolved card: Resonating Lute"
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/cantrips",
+      "reason": "dry-run rejected unresolved cards: Flashback, Resonating Lute"
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/prowess",
+      "reason": "dry-run rejected unresolved cards: Flashback, Resonating Lute"
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/budget",
+      "source_deck_key": "edhrec_veyran_voice_of_duality_budget_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_magecraft_spellslinger",
+      "cards": [
+        {
+          "name": "Veyran, Voice of Duality",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage Emeritus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Balmor, Battlemage Captain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cascade Bluffs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coruscation Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crash Through",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dig Through Time",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Electrostatic Field",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enter the Enigma",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Epic Experiment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Erebor Flamesmith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expedite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expressive Iteration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ferrous Lake",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Inscription",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Firebrand Archer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frantic Search",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frostboil Snarl",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Galvanic Iteration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Electromancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grapeshot",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Guttersnipe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harmonic Prodigy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 13,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Boilerworks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Charm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jori En, Ruin Diver",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kessig Flamebreather",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Bolt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Geyser",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Metallurgic Summonings",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mizzix's Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 12,
+          "board": "main"
+        },
+        {
+          "name": "Murmuring Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Niv-Mizzet, Parun",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pongify",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Preordain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prismari Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pyromancer's Goggles",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ral, Storm Conduit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Resculpt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Serum Visions",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shivan Reef",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slip Through Space",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Storm-Kiln Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stormcatch Mentor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sulfur Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swarm Intelligence",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftwater Cliffs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Creativity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talrand, Sky Summoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Epiphany",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Third Path Iconoclast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Year Storm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrill of Possibility",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Treasure Cruise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twinferno",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Young Pyromancer",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/voltron",
+      "source_deck_key": "edhrec_veyran_voice_of_duality_voltron_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_voltron",
+      "theme": "prowess_voltron_damage",
+      "cards": [
+        {
+          "name": "Veyran, Voice of Duality",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage Emeritus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Aria of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Balmor, Battlemage Captain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birgi, God of Storytelling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cascade Bluffs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coruscation Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crash Through",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crimson Wisps",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Electrostatic Field",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enter the Enigma",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expedite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expressive Iteration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Inscription",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fists of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flame of Anor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frantic Search",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frostboil Snarl",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gitaxian Probe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grapeshot",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Guttersnipe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harmonic Prodigy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 9,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Boilerworks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jori En, Ruin Diver",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kessig Flamebreather",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krark, the Thumbless",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Leap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Geyser",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mizzix's Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 9,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Sanctuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystical Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset's Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Niv-Mizzet, Parun",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pongify",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Preordain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prismari Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ral, Storm Conduit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rapid Hybridization",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Riverglide Pathway",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Serum Visions",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadow Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shivan Reef",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slip Through Space",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Snap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Steam Vents",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Storm-Kiln Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stormcarved Coast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sulfur Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Creativity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talrand, Sky Summoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Epiphany",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temur Battle Rage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thought Vessel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Year Storm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Training Center",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Twinferno",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underworld Breach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Urabrask",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windfall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Young Pyromancer",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/midrange",
+      "source_deck_key": "edhrec_veyran_voice_of_duality_midrange_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_midrange",
+      "theme": "spell_value_midrange",
+      "cards": [
+        {
+          "name": "Veyran, Voice of Duality",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Aetherflux Reservoir",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage Emeritus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Balmor, Battlemage Captain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birgi, God of Storytelling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cascade Bluffs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coruscation Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Crash Through",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragon's Rage Channeler",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Electrostatic Field",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enter the Enigma",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Exotic Orchard",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expedite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expressive Iteration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fierce Guardianship",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Inscription",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Islet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flame of Anor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flusterstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frantic Search",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frostboil Snarl",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gitaxian Probe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Electromancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grapeshot",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Guttersnipe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harmonic Prodigy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 8,
+          "board": "main"
+        },
+        {
+          "name": "Isochron Scepter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Boilerworks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krark, the Thumbless",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Bolt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mizzix's Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 8,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Remora",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mystical Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset's Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Niv-Mizzet, Parun",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Otawara, Soaring City",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pongify",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Preordain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ral, Crackling Wit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rapid Hybridization",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Riverglide Pathway",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Serum Visions",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadow Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shivan Reef",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slip Through Space",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Snap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Steam Vents",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Storm-Kiln Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stormcarved Coast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sulfur Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Creativity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talrand, Sky Summoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Temple of Epiphany",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Year Storm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thundering Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Training Center",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Underworld Breach",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut Awakening",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vivi Ornitier",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windfall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Young Pyromancer",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/veyran-voice-of-duality/treasure",
+      "source_deck_key": "edhrec_veyran_voice_of_duality_treasure_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_treasure",
+      "theme": "ritual_treasure_spell_chain",
+      "cards": [
+        {
+          "name": "Veyran, Voice of Duality",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "An Offer You Can't Refuse",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Denial",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage Emeritus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Archmage of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ashling, Flame Dancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Big Score",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Birgi, God of Storytelling",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brainstorm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brass's Bounty",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cascade Bluffs",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Consider",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Coruscation Mage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Counterspell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Curiosity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cyclonic Rift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Electrostatic Field",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expedite",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Expressive Iteration",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Inscription",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Flame of Anor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frantic Search",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Frostboil Snarl",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gitaxian Probe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Electromancer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grapeshot",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Guttersnipe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Harmonic Prodigy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Island",
+          "quantity": 10,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Boilerworks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Izzet Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kessig Flamebreather",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Bolt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mana Geyser",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mizzix's Mastery",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 9,
+          "board": "main"
+        },
+        {
+          "name": "Mystic Sanctuary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Narset's Reversal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Negate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Niv-Mizzet, Parun",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Opt",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Past in Flames",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pirate's Pillage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ponder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pongify",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Preordain",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Primal Amulet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prismari Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pyretic Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reliquary Tower",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rhystic Study",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Riverglide Pathway",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Saheeli, Sublime Artificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Scalding Tarn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seize the Spoils",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Serum Visions",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shivan Reef",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Snap",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Steam Vents",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Storm-Kiln Artist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stormcarved Coast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stormcatch Mentor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Strike It Rich",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sulfur Falls",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talisman of Creativity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Talrand, Sky Summoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Third Path Iconoclast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thought Vessel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thousand-Year Storm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Training Center",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Unexpected Windfall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Urabrask",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Windfall",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Young Pyromancer",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}

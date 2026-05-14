@@ -17,6 +17,7 @@ camera ou OCR.
 - `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_a_app_2026-05-13.md`
 - `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_FINAL_2026-05-13.md`
 - `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_AB_CONSOLIDATION_2026-05-14.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_CORPUS_PREP_2026-05-14.md`
 - `server/bin/commander_reference_deck_corpus.dart`
 
 ## Status por comandante
@@ -31,10 +32,10 @@ camera ou OCR.
 | 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
-| 9 | `Purphoros, God of the Forge` | C | Mono-red token payoff/burn sem repetir Goblin typal de Krenko | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 10 | `Brago, King Eternal` | C | Azorius blink/ETB value/control sem stax duro como default | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 11 | `Veyran, Voice of Duality` | C | Izzet magecraft/spell-copy/prowess sem repetir Niv draw-damage control | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 12 | `Balan, Wandering Knight` | C | Mono-white Equipment Voltron sem repetir Light-Paws aura tutor | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
+| 9 | `Purphoros, God of the Forge` | C | Mono-red token payoff/burn sem repetir Goblin typal de Krenko | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 10 | `Brago, King Eternal` | C | Azorius blink/ETB value/control sem stax duro como default | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 11 | `Veyran, Voice of Duality` | C | Izzet magecraft/spell-copy/prowess sem repetir Niv draw-damage control | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 12 | `Balan, Wandering Knight` | C | Mono-white Equipment Voltron sem repetir Light-Paws aura tutor | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
 
 ## Lote A corpus prep - 2026-05-13
 
@@ -189,6 +190,29 @@ Resultado consolidado: **PASS_WITH_RISKS**.
   `Veyran, Voice of Duality` e `Balan, Wandering Knight`, priorizando lacunas
   red tokens sem Goblin typal, Azorius blink/control, Izzet magecraft e
   mono-white Equipment sem repetir diretamente Krenko, Niv ou Light-Paws.
+
+## Lote C corpus prep/dry-run - 2026-05-14
+
+Artifacts:
+`server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/corpus.json`
+e
+`server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/dry_run/`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_CORPUS_PREP_2026-05-14.md`.
+
+| Commander | Decks | Dry-run | DB mutations | Commander/main | unresolved | off_color | singleton |
+| --- | ---: | --- | --- | --- | ---: | ---: | --- |
+| `Purphoros, God of the Forge` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
+| `Brago, King Eternal` | 4 | PASS | false | 1/99 em 4/4 | 0 | 0 | `{}` em 4/4 |
+| `Veyran, Voice of Duality` | 4 | PASS | false | 1/99 em 4/4 | 0 | 0 | `{}` em 4/4 |
+| `Balan, Wandering Knight` | 4 | PASS | false | 1/99 em 4/4 | 0 | 0 | `{}` em 4/4 |
+
+Na etapa de corpus prep, `--apply` nao foi executado por escopo e o Lote C ficou
+sem idempotencia, public proof, readiness final ou promocao. O resultado e
+**PASS_WITH_RISKS** porque Veyran precisou excluir fontes EDHREC high-signal
+default/spellslinger/spell-copy/storm por unresolved local de cartas recentes,
+embora o corpus final aceito esteja estruturalmente limpo.
 
 ## Fechamento parcial Lote A - 2026-05-13
 

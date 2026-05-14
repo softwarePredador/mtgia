@@ -15633,3 +15633,57 @@ bloqueada. Cada comandante do Lote B deve repetir dry-run, apply, idempotencia,
 public proof 5/5 e readiness scorecard, bloqueando qualquer caso com
 `score<100`, fallback de timeout, warning relevante, unresolved/off-color,
 invalid cards ou core package fraco.
+
+## 121. Commander Reference Sprint 3 Lote C corpus prep offline - 2026-05-14
+
+Foi preparado o Lote C do Commander Reference Sprint 3 em modo offline/dry-run
+para:
+
+- `Purphoros, God of the Forge`;
+- `Brago, King Eternal`;
+- `Veyran, Voice of Duality`;
+- `Balan, Wandering Knight`.
+
+Escopo: sync de `master`, releitura do contexto Sprint 3 A/B, pesquisa publica
+EDHREC Average Deck em baixo volume, corpus JSON offline, dry-run DB-backed e
+documentacao. Nao houve `--apply`, idempotencia, public proof, readiness
+scorecard, runtime app, alteracao de endpoint app-facing, scanner, camera ou
+OCR.
+
+Artifacts:
+
+- `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/purphoros_god_of_the_forge/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/brago_king_eternal/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/veyran_voice_of_duality/corpus.json`;
+- `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/balan_wandering_knight/corpus.json`;
+- dry-run summaries em `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/dry_run/`.
+
+Resultado dos dry-runs:
+
+- Purphoros: `PASS`, 5/5 decks aceitos;
+- Brago: `PASS`, 4/4 decks aceitos;
+- Veyran: `PASS`, 4/4 decks aceitos no corpus final, mas
+  **PASS_WITH_RISKS** no lote por exclusao das fontes EDHREC high-signal
+  default/spellslinger/spell-copy/storm que continham cartas ainda nao
+  resolvidas localmente (`Resonating Lute`/`Flashback`);
+- Balan: `PASS`, 4/4 decks aceitos.
+
+Todos os dry-runs finais preservaram `db_mutations=false`,
+`commander_quantity=1`, `main_quantity=99`, `unresolved=0`, `off_color=0` e
+`singleton_violations={}`.
+
+Riscos documentados:
+
+- Purphoros deve permanecer token-burn e nao Goblin typal/Krenko 2;
+- Brago deve preservar blink/ETB value e nao virar stax/combo casual default;
+- Veyran precisa de backfill/resolucao local ou fonte equivalente para recuperar
+  signal de spellslinger/spell-copy/storm antes de qualquer apply;
+- Balan deve ficar em Equipment Voltron, sem colapsar para Light-Paws/Auras.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_CORPUS_PREP_2026-05-14.md`.
+
+Decisao operacional: **PASS_WITH_RISKS** para corpus prep/dry-run do Lote C e
+**APPLY_NOT_RUN** por escopo. Proxima etapa minima e revisar packages, corrigir
+a lacuna Veyran se possivel, rerodar dry-run pre-apply e so entao avaliar
+`--apply` controlado em tarefa futura.

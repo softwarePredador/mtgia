@@ -1,0 +1,1914 @@
+{
+  "commander": "Purphoros, God of the Forge",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 3 Lot C corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime.",
+  "fetched_at": "2026-05-14T13:43:28Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge",
+      "header": "Average Deck for Purphoros, God of the Forge",
+      "total_card_count": 100,
+      "num_decks_avg": 4628,
+      "deck_entries": 74
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/tokens",
+      "header": "Average Deck for Purphoros, God of the Forge - Tokens",
+      "total_card_count": 100,
+      "num_decks_avg": 557,
+      "deck_entries": 73
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/burn",
+      "header": "Average Deck for Purphoros, God of the Forge - Burn",
+      "total_card_count": 100,
+      "num_decks_avg": 389,
+      "deck_entries": 74
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/budget",
+      "header": "Average Deck for Purphoros, God of the Forge - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 462,
+      "deck_entries": 69
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/aggro",
+      "header": "Average Deck for Purphoros, God of the Forge - Aggro",
+      "total_card_count": 100,
+      "num_decks_avg": 167,
+      "deck_entries": 75
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge",
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_default_average_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_default",
+      "theme": "token_burn",
+      "cards": [
+        {
+          "name": "Purphoros, God of the Forge",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Agate Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Hymn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beetleback Chief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Moon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Brightstone Ritual",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra's Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra, Acolyte of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City on Fire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cursed Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Den of the Bugbear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragon Fodder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dwarven Mine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Empty the Warrens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emrakul's Hatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Emancipation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fire Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Firecat Blitz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "General Kreat, the Boltbringer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Matron",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Rabblemaster",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Recruiter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Warchief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grinning Ignus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hazoret's Monument",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hordeling Outburst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Howlsquad Heavy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impact Tremors",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kher Keep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kiki-Jiki, Mirror Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko's Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Mob Boss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Tin Street Kingpin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Legion Warboss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loyal Apprentice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mechanized Warfare",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg Infestation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg War Marshal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molten Gatekeeper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 27,
+          "board": "main"
+        },
+        {
+          "name": "Neheb, the Eternal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norin the Wary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ojer Axonil, Deepest Might",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Panharmonicon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pashalik Mons",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruby Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Commander",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Lieutenant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skirk Prospector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullclamp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sokenzan, Crucible of Defiance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Solphim, Mayhem Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Song of Totentanz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tempt with Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrill of Possibility",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Torbran, Thane of Red Fell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut, the Molten Pinnacle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Witty Roastmaster",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/tokens",
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_tokens_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_tokens",
+      "theme": "token_burn",
+      "cards": [
+        {
+          "name": "Purphoros, God of the Forge",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Agate Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Hymn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beetleback Chief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Moon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra's Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra, Acolyte of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City on Fire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cursed Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Den of the Bugbear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragon Fodder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dwarven Mine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Empty the Warrens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emrakul's Hatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Emancipation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fire Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Firecat Blitz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "General Kreat, the Boltbringer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Matron",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Rally",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grinning Ignus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hazoret's Monument",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hordeling Outburst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impact Tremors",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kher Keep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kiki-Jiki, Mirror Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko's Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Mob Boss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Tin Street Kingpin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Legion Warboss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loyal Apprentice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mechanized Warfare",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg Infestation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg War Marshal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molten Gatekeeper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 28,
+          "board": "main"
+        },
+        {
+          "name": "Neheb, the Eternal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norin the Wary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ojer Axonil, Deepest Might",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Panharmonicon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pashalik Mons",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruby Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Commander",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Lieutenant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skirk Prospector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullclamp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sokenzan, Crucible of Defiance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Solphim, Mayhem Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Song of Totentanz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Spawn-Gang Commander",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tempt with Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrill of Possibility",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tilonalli's Summoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Torbran, Thane of Red Fell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Urabrask's Forge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut, the Molten Pinnacle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Weftstalker Ardent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Witty Roastmaster",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/burn",
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_burn_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_burn",
+      "theme": "token_damage_payoffs",
+      "cards": [
+        {
+          "name": "Purphoros, God of the Forge",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Agate Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Hymn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beetleback Chief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Moon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra's Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra, Acolyte of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City on Fire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cursed Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Den of the Bugbear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragon Fodder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dwarven Mine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Empty the Warrens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fable of the Mirror-Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Emancipation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fire Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Firecat Blitz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "General Kreat, the Boltbringer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Matron",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Warchief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grinning Ignus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hazoret's Monument",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hexing Squelcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hordeling Outburst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Howlsquad Heavy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Idol of Oblivion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impact Tremors",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Imperial Recruiter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kher Keep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kiki-Jiki, Mirror Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko's Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Mob Boss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Tin Street Kingpin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Legion Warboss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loyal Apprentice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg Infestation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg War Marshal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molten Gatekeeper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 27,
+          "board": "main"
+        },
+        {
+          "name": "Neheb, the Eternal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norin the Wary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ojer Axonil, Deepest Might",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Panharmonicon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pashalik Mons",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruby Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Commander",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Lieutenant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skirk Prospector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullclamp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sokenzan, Crucible of Defiance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Solphim, Mayhem Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Song of Totentanz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tempt with Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrill of Possibility",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Torbran, Thane of Red Fell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut Awakening",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut, the Molten Pinnacle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Weftstalker Ardent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Witty Roastmaster",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/budget",
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_budget_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_token_burn",
+      "cards": [
+        {
+          "name": "Purphoros, God of the Forge",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Anax, Hardened in the Forge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Hymn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beetleback Chief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra, Acolyte of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dictate of the Twin Gods",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragon Fodder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dwarven Mine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Empty the Warrens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emrakul's Hatcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fire Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Firecat Blitz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forgotten Cave",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Assault",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Matron",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Rabblemaster",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Rally",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Surprise",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin War Party",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Warchief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grinning Ignus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hazoret's Monument",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hordeling Outburst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impact Tremors",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impulsive Pilferer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Iron Myr",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kher Keep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko's Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Mob Boss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Tin Street Kingpin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Legion Warboss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Light Up the Stage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loyal Apprentice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mechanized Warfare",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg War Marshal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molten Birth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molten Gatekeeper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 32,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norin the Wary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Outpost Siege",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Panharmonicon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pashalik Mons",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Redcap Gutter-Dweller",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Reinforced Ronin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Searslicer Goblin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Commander",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Lieutenant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skirk Prospector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullclamp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Song of Totentanz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Squee, Dubious Monarch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tempt with Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thrill of Possibility",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tilonalli's Summoner",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Torbran, Thane of Red Fell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Witty Roastmaster",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "You See a Pair of Goblins",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Young Pyromancer",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/aggro",
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_aggro_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_aggro",
+      "theme": "go_wide_pressure",
+      "cards": [
+        {
+          "name": "Purphoros, God of the Forge",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "Abrade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Agate Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Battle Hymn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Beetleback Chief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blasphemous Act",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blood Moon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Castle Embereth",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra's Incinerator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chandra, Acolyte of Flame",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Chaos Warp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "City on Fire",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Conspicuous Snoop",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cursed Mirror",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Deflecting Swat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Den of the Bugbear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dragon Fodder",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dwarven Mine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Empty the Warrens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fable of the Mirror-Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Faithless Looting",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fellwar Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fiery Emancipation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Fire Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gamble",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "General Kreat, the Boltbringer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Bombardment",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Instigator",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Matron",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Goblin Warchief",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grinning Ignus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hazoret's Monument",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hexing Squelcher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hordeling Outburst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Howlsquad Heavy",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Impact Tremors",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Imperial Recruiter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Jeska's Will",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kher Keep",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kiki-Jiki, Mirror Breaker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko's Command",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Mob Boss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Krenko, Tin Street Kingpin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Legion Warboss",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loyal Apprentice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg Infestation",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mogg War Marshal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Molten Gatekeeper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mountain",
+          "quantity": 26,
+          "board": "main"
+        },
+        {
+          "name": "Neheb, the Eternal",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Norin the Wary",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ojer Axonil, Deepest Might",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Panharmonicon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Pashalik Mons",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ruby Medallion",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Searslicer Goblin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Seething Song",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Commander",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Siege-Gang Lieutenant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skirk Prospector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Skullclamp",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sokenzan, Crucible of Defiance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Solphim, Mayhem Dominus",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Song of Totentanz",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Tempt with Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Torbran, Thane of Red Fell",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut Awakening",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Valakut, the Molten Pinnacle",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Vandalblast",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Witty Roastmaster",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}

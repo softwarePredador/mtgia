@@ -1,0 +1,1543 @@
+{
+  "commander": "Balan, Wandering Knight",
+  "source_note": "EDHREC Average Deck pages fetched once at low volume for offline Commander Reference Sprint 3 Lot C corpus preparation. Runtime generation must consume only aggregate role/card signals after a future apply; this artifact is not applied to the database and does not require EDHREC or any unofficial API at runtime.",
+  "fetched_at": "2026-05-14T13:43:29Z",
+  "source_summaries": [
+    {
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight",
+      "header": "Average Deck for Balan, Wandering Knight",
+      "total_card_count": 100,
+      "num_decks_avg": 3734,
+      "deck_entries": 74
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight/equipment",
+      "header": "Average Deck for Balan, Wandering Knight - Equipment",
+      "total_card_count": 100,
+      "num_decks_avg": 1173,
+      "deck_entries": 74
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight/voltron",
+      "header": "Average Deck for Balan, Wandering Knight - Voltron",
+      "total_card_count": 100,
+      "num_decks_avg": 334,
+      "deck_entries": 76
+    },
+    {
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight/budget",
+      "header": "Average Deck for Balan, Wandering Knight - Budget",
+      "total_card_count": 100,
+      "num_decks_avg": 373,
+      "deck_entries": 70
+    }
+  ],
+  "decks": [
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight",
+      "source_deck_key": "edhrec_balan_wandering_knight_default_average_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_default",
+      "theme": "equipment_voltron",
+      "cards": [
+        {
+          "name": "Balan, Wandering Knight",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ardenn, Intrepid Archaeologist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Argentum Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Skyhunter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basilisk Collar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blackblade Reforged",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodforged Battle-Axe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Buried Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Caduceus, Staff of Hermes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cloudsteel Kirin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Codsworth, Handy Helper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossus Hammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commander's Plate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Disenchant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dispatch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Divine Reckoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emeria, the Sky Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enlightened Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Esper Sentinel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Excalibur, Sword of Eden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forge Anew",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Foundry Inspector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Generous Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grand Abolisher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hammer of Nazahn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero's Heirloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inventors' Fair",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kaldra Compleat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Knight of the White Orchid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Land Tax",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Leonin Abunas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lion Sash",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loxodon Warhammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Masterwork of Ingenuity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mithril Coat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Monumental Henge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mother of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nettlecyst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 27,
+          "board": "main"
+        },
+        {
+          "name": "Puresteel Paladin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Robe of Stars",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadowspear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sigarda's Aid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slash the Ranks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Steelshaper's Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stoneforge Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stonehewer Giant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Feast and Famine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Fire and Ice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of the Animist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi's Protection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Mycosynth Gardens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trailblazer's Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whispersilk Cloak",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight/equipment",
+      "source_deck_key": "edhrec_balan_wandering_knight_equipment_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_equipment",
+      "theme": "equipment_voltron",
+      "cards": [
+        {
+          "name": "Balan, Wandering Knight",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ardenn, Intrepid Archaeologist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Argentum Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Skyhunter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basilisk Collar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blackblade Reforged",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodforged Battle-Axe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Buried Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Caduceus, Staff of Hermes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cloudsteel Kirin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Codsworth, Handy Helper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossus Hammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commander's Plate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dispatch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Divine Reckoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emeria, the Sky Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enlightened Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Esper Sentinel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Excalibur, Sword of Eden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forge Anew",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Foundry Inspector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Generous Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grand Abolisher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hammer of Nazahn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inventors' Fair",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kaldra Compleat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Knight of the White Orchid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Land Tax",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Leonin Abunas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lion Sash",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loxodon Warhammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Masterwork of Ingenuity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mithril Coat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Monumental Henge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mother of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 27,
+          "board": "main"
+        },
+        {
+          "name": "Puresteel Paladin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rebuff the Wicked",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Robe of Stars",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadowspear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sigarda's Aid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slash the Ranks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Steelshaper's Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stoneforge Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stonehewer Giant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Feast and Famine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Fire and Ice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Forge and Frontier",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Hearth and Home",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of the Animist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi's Protection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Mycosynth Gardens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trailblazer's Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whispersilk Cloak",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight/voltron",
+      "source_deck_key": "edhrec_balan_wandering_knight_voltron_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_voltron",
+      "theme": "voltron_protection_evasion",
+      "cards": [
+        {
+          "name": "Balan, Wandering Knight",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Ancient Den",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Argentum Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Skyhunter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basilisk Collar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blackblade Reforged",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodforged Battle-Axe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Buried Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cloudsteel Kirin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Codsworth, Handy Helper",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossus Hammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Command Beacon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Commander's Plate",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dispatch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Divine Reckoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Emeria, the Sky Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Enlightened Tutor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Esper Sentinel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Excalibur, Sword of Eden",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forge Anew",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Foundry Inspector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Generous Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Grand Abolisher",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hammer of Nazahn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero's Heirloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Inventors' Fair",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kaldra Compleat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Knight of the White Orchid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Land Tax",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Leonin Abunas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lightning Greaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Lion Sash",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loxodon Warhammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Masterwork of Ingenuity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mithril Coat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Monumental Henge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mother of Runes",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nettlecyst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 25,
+          "board": "main"
+        },
+        {
+          "name": "Puresteel Paladin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rebuff the Wicked",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Robe of Stars",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Shadowspear",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sigarda's Aid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Silent Arbiter",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slash the Ranks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Steelshaper's Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stoneforge Mystic",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Stonehewer Giant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Feast and Famine",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Fire and Ice",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Hearth and Home",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of the Animist",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Teferi's Protection",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "The Mycosynth Gardens",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trailblazer's Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "War Room",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Whispersilk Cloak",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    },
+    {
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/balan-wandering-knight/budget",
+      "source_deck_key": "edhrec_balan_wandering_knight_budget_sprint3_lot_c_2026_05_14",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_equipment_voltron",
+      "cards": [
+        {
+          "name": "Balan, Wandering Knight",
+          "quantity": 1,
+          "board": "commander"
+        },
+        {
+          "name": "All That Glitters",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Arcane Signet",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Argentum Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Armored Ascension",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Basilisk Collar",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bastion Protector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blackblade Reforged",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Blacksmith's Skill",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Bloodforged Battle-Axe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Buried Ruin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Celestial Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Cloudsteel Kirin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Colossus Hammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha Capashen, Paragon",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Danitha, Benalia's Hope",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Disenchant",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Dispatch",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Divine Reckoning",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Explorer's Scope",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Forge Anew",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Foundry Inspector",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Generous Gift",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Gold Myr",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Golem-Skin Gauntlets",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Greataxe",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Haunted Cloak",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero's Blade",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Hero's Heirloom",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Indomitable Archangel",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kemba, Kha Enduring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Kemba, Kha Regent",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Knight of the White Orchid",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Leonin Abunas",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loran's Escape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Loxodon Warhammer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mantle of the Ancients",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Marble Diamond",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Avacyn",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mask of Memory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Masterwork of Ingenuity",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Maul of the Skyclaves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Mind Stone",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Monumental Henge",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Myriad Landscape",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Nettlecyst",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Open the Armory",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Path to Exile",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Plains",
+          "quantity": 31,
+          "board": "main"
+        },
+        {
+          "name": "Plate Armor",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Prowler's Helm",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Puresteel Paladin",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Relic Seeker",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Return to Dust",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Gloves",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Rogue's Passage",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Secret Rendezvous",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Short Bow",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Single Combat",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Slash the Ranks",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sol Ring",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sram, Senior Edificer",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Starnheim Courser",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sun Titan",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swiftfoot Boots",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Sword of Vengeance",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Swords to Plowshares",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Taj-Nar Swordsmith",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Thran Power Suit",
+          "quantity": 1,
+          "board": "main"
+        },
+        {
+          "name": "Trailblazer's Boots",
+          "quantity": 1,
+          "board": "main"
+        }
+      ]
+    }
+  ]
+}
