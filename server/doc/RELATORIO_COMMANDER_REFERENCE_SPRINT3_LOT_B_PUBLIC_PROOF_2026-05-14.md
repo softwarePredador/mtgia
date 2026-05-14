@@ -2,13 +2,15 @@
 
 ## Verdict
 
-**PASS.**
+**PASS_WITH_RISKS**, atualizado em 2026-05-14 com prova app runtime real.
 
 Os quatro comandantes Sprint 3 Lote B aplicados passaram na prova publica 5/5
 de `POST /ai/generate` no backend publico e foram promovidos pelo scorecard para
 `ready_for_mini_batch`: `Meren of Clan Nel Toth`,
 `Korvold, Fae-Cursed King`, `Sythis, Harvest's Hand` e
-`Urza, Lord High Artificer`.
+`Urza, Lord High Artificer`. Em 2026-05-14, `Urza, Lord High Artificer` e
+`Meren of Clan Nel Toth` tambem passaram por prova app runtime real no Android
+fisico `SM A135M`.
 
 ## Escopo e seguranca
 
@@ -16,9 +18,11 @@ de `POST /ai/generate` no backend publico e foram promovidos pelo scorecard para
   API map e manual, `/health`, `git_sha`, usuarios QA descartaveis mantidos em
   memoria, 5 probes publicas por comandante, summaries sanitizados, scorecard
   com `--runtime-summary` e decisao de promocao.
-- Fora do escopo: scanner, camera, OCR, app mobile runtime, alteracao de shape
-  de `/ai/generate`, decklists geradas, prompts completos, tokens, e-mails QA
-  completos, JWT, Sentry DSN, `DATABASE_URL` e `OPENAI_API_KEY`.
+- Fora do escopo da prova publica original: scanner, camera, OCR, app mobile
+  runtime, alteracao de shape de `/ai/generate`, decklists geradas, prompts
+  completos, tokens, e-mails QA completos, JWT, Sentry DSN, `DATABASE_URL` e
+  `OPENAI_API_KEY`. A prova app runtime complementar foi registrada em
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_b_app_2026-05-14.md`.
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e nao foi alterado,
   porque nao houve mudanca de contrato, payload, response shape, diagnostics
   app-facing, data source ou consumidor mobile.
@@ -81,6 +85,20 @@ em `public_proof_rate_limited_attempt/` e a prova final foi refeita com backoff.
 O rate limit e um risco operacional para scripts de auditoria em lote, nao um
 defeito de qualidade do deck gerado.
 
+## App runtime 2026-05-14
+
+| Item | Status | Evidencia | Impacto |
+| --- | --- | --- | --- |
+| App runtime Lote B fim a fim no `SM A135M` | PASS_WITH_RISKS | `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_b_app_2026-05-14.md` | Prova register/login -> Generate Commander -> preview -> save -> Deck Details -> validate para Urza/Meren no backend publico. |
+| Urza app/API | PASS | `validation_ok=true`, `main_qty=99`, `total_with_commander=100`, `commander_count=1`, `commander_in_99_count=0`, `off_identity_count=0` | Mono-blue artifacts/control provado no app. |
+| Meren app/API | PASS | `validation_ok=true`, `main_qty=99`, `total_with_commander=100`, `commander_count=1`, `commander_in_99_count=0`, `off_identity_count=0` | Golgari graveyard recursion provado no app. |
+
+Riscos app remanescentes: runtime publico usou rede celular no Android, mantendo
+o workaround ambiental do Wi-Fi documentado no Lote A; iPhone 15 Simulator nao
+foi usado porque o Android primario passou; `GET /decks/:id` retornou o
+comandante correto em `commander`, mas o campo agregado `commander_name` nao
+refletiu o comandante salvo.
+
 ## Artifacts
 
 | Commander | Public proof | Readiness final |
@@ -98,8 +116,9 @@ remanescentes:
 1. O rate limit publico exige backoff em provas de lote para evitar `429`.
 2. Urza continua exigindo monitoramento de lane/poder para nao contaminar
    Commander bracket 3 casual com pacote cEDH/stax como default.
-3. Esta prova nao substitui app runtime real; scanner/camera/OCR permaneceram
-   fora do escopo.
+3. App runtime real passou com risco ambiental de rede celular no Android; Wi-Fi
+   e iPhone 15 Simulator permanecem nao provados nesta rodada.
+4. Scanner/camera/OCR permaneceram fora do escopo.
 
 ## Decisao
 
@@ -110,4 +129,4 @@ Promovidos para mini-batch controlado:
 - `Sythis, Harvest's Hand`
 - `Urza, Lord High Artificer`
 
-Resultado final: **PASS**.
+Resultado final: **PASS_WITH_RISKS**.

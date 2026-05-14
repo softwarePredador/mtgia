@@ -1,0 +1,230 @@
+--- device precheck ---
+List of devices attached
+R58T300SREH            device usb:2-1 product:a13ub model:SM_A135M device:a13 transport_id:4
+
+--- disable wifi for cellular runtime workaround ---
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/commander_reference_sprint3_lot_b_app_runtime_test.dart
+Running Gradle task 'assembleDebug'...                             24.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...           7.2s
+00:00 +0: SM A135M runtime: Sprint 3 Lote B Commander Reference Urza and Meren
+COMMANDER_REFERENCE_LOT_B_APP_BASE_URL https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/health
+[🌐 ApiClient] GET /health → 200 (1684ms)
+COMMANDER_REFERENCE_LOT_B_APP_HEALTH status=200 git_sha=20dd4b9a40e9f8db050cf789755497dc2ff6a644 latency_ms=1684
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedToken exists: false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: login
+CAPTURE_START commander_reference_lot_b_01_login
+CAPTURE_CONVERT_BEGIN commander_reference_lot_b_01_login
+CAPTURE_CONVERT_DONE commander_reference_lot_b_01_login
+CAPTURE_TAKEN commander_reference_lot_b_01_login bytes=474513
+SCREENSHOT_BEGIN commander_reference_lot_b_01_login [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_01_login
+[🧭 Router] redirect: location=/register | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: register
+[🧭 Router] redirect: location=/login | status=AuthStatus.loading
+[🧭 Router] → null (status=AuthStatus.loading, aguardando)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/auth/register
+[🌐 ApiClient] POST /auth/register → 201 (1196ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🧭 Router] redirect: location=/login | status=AuthStatus.authenticated
+[🧭 Router] → /home (já autenticado)
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/market/movers?limit=5&min_price=1.0
+CAPTURE_START commander_reference_lot_b_02_registered
+[🌐 ApiClient] GET /notifications/count → 200 (1575ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (1949ms)
+[🌐 ApiClient] GET /decks → 200 (1374ms)
+CAPTURE_TAKEN commander_reference_lot_b_02_registered bytes=365350
+SCREENSHOT_BEGIN commander_reference_lot_b_02_registered [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_02_registered
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedToken exists: false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🌐 ApiClient] GET /market/movers?limit=5&min_price=1.0 → 200 (5161ms)
+[⚠️ SLOW REQUEST] GET /market/movers?limit=5&min_price=1.0 demorou 5161ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /market/movers?limit=5&min_price=1.0, status_code: 200, duration_ms: 5161, request_id: mob-651c6d2514c9b-b3bd6347, response_request_id: mob-651c6d2514c9b-b3bd6347}
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: login
+[📱 LoginScreen] _handleLogin() chamado
+[📱 LoginScreen] chamando authProvider.login()...
+[🔑 Auth] login() chamado email_domain=example.invalid
+[🧭 Router] redirect: location=/login | status=AuthStatus.loading
+[🧭 Router] → null (status=AuthStatus.loading, aguardando)
+[🔑 Auth] enviando POST /auth/login...
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/auth/login
+[🌐 ApiClient] POST /auth/login → 200 (493ms)
+[🔑 Auth] resposta recebida: statusCode=200
+[🔑 Auth] token recebido: sim
+[🔑 Auth] user parsed: qa_cmdref_lot_b_app_19e269c2e9a
+[🔑 Auth] credenciais salvas
+[🔑 Auth] status → authenticated ✅
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🧭 Router] redirect: location=/login | status=AuthStatus.authenticated
+[🧭 Router] → /home (já autenticado)
+[📱 LoginScreen] login retornou: success=true
+[📱 LoginScreen] ✅ login OK — aguardando redirect do GoRouter
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/market/movers?limit=5&min_price=1.0
+[🌐 ApiClient] GET /conversations/unread-count → 200 (826ms)
+[🌐 ApiClient] GET /notifications/count → 200 (836ms)
+[🌐 ApiClient] GET /decks → 200 (348ms)
+CAPTURE_START commander_reference_lot_b_03_logged_in
+CAPTURE_TAKEN commander_reference_lot_b_03_logged_in bytes=442642
+SCREENSHOT_BEGIN commander_reference_lot_b_03_logged_in [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_03_logged_in
+COMMANDER_REFERENCE_LOT_B_APP_AUTH_SUMMARY register_ui=true login_ui=true
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /decks → 200 (297ms)
+[🧭 Router] redirect: location=/decks/generate | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: generate
+[🌐 ApiClient] GET /market/movers?limit=5&min_price=1.0 → 200 (4536ms)
+[⚠️ SLOW REQUEST] GET /market/movers?limit=5&min_price=1.0 demorou 4536ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /market/movers?limit=5&min_price=1.0, status_code: 200, duration_ms: 4536, request_id: mob-651c6d2c069da-520d0a00, response_request_id: mob-651c6d2c069da-520d0a00}
+CAPTURE_START commander_reference_lot_b_urza_01_generate_screen
+CAPTURE_TAKEN commander_reference_lot_b_urza_01_generate_screen bytes=250669
+SCREENSHOT_BEGIN commander_reference_lot_b_urza_01_generate_screen [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_urza_01_generate_screen
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate
+[🌐 ApiClient] POST /ai/generate → 202 (508ms)
+ℹ️ [DeckGenerate] async accepted status=202 job_id=410e751090dc16eb116560e76f35b48b accepted_ms=508
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_accepted data={status_code: 202, job_id: 410e751090dc16eb116560e76f35b48b, accepted_ms: 508}
+ℹ️ [DeckGenerate] initial async feedback after 540ms
+COMMANDER_REFERENCE_LOT_B_APP_GENERATE_INITIAL_FEEDBACK commander="Urza, Lord High Artificer" archetype=artifacts_control elapsed_ms=887
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/410e751090dc16eb116560e76f35b48b
+[🌐 ApiClient] GET /ai/generate/jobs/410e751090dc16eb116560e76f35b48b → 200 (566ms)
+ℹ️ [DeckGenerate] async completed job_id=410e751090dc16eb116560e76f35b48b result_status=200 elapsed_ms=5619
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_completed data={job_id: 410e751090dc16eb116560e76f35b48b, result_status_code: 200, elapsed_ms: 5620}
+ℹ️ [DeckGenerate] reference diagnostics commander="Urza, Lord High Artificer" reference_profile_used=true reference_card_stats_used=true on_theme_candidate_count=37 unresolved_reference_cards=0
+CAPTURE_START commander_reference_lot_b_urza_02_preview
+CAPTURE_TAKEN commander_reference_lot_b_urza_02_preview bytes=257630
+SCREENSHOT_BEGIN commander_reference_lot_b_urza_02_preview [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_urza_02_preview
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/cards/resolve/batch
+[🌐 ApiClient] POST /cards/resolve/batch → 200 (636ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /decks → 200 (770ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/users/me/activation-events
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] ← POP: generate (12996ms)
+[⚠️ SLOW SCREEN] generate demorou 12s
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /users/me/activation-events → 201 (1516ms)
+[🌐 ApiClient] GET /decks → 200 (1733ms)
+[🌐 ApiClient] GET /decks → 200 (1652ms)
+[🧭 Router] redirect: location=/decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: :id
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d
+CAPTURE_START commander_reference_lot_b_urza_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] GET /decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d → 200 (937ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d/pricing
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d/validate
+CAPTURE_TAKEN commander_reference_lot_b_urza_03_details bytes=79467
+SCREENSHOT_BEGIN commander_reference_lot_b_urza_03_details [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_urza_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d
+[🌐 ApiClient] GET /notifications/count → 200 (1975ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (1981ms)
+[🌐 ApiClient] POST /decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d/pricing → 200 (680ms)
+[🌐 ApiClient] POST /decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d/validate → 200 (1484ms)
+[🌐 ApiClient] GET /decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d → 200 (1961ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d/validate
+[🌐 ApiClient] POST /decks/9eec03d2-b5fd-41d3-b987-482a3b69f07d/validate → 200 (331ms)
+COMMANDER_REFERENCE_LOT_B_APP_VALIDATE_SUMMARY {"deck_id":"9eec03d2-b5fd-41d3-b987-482a3b69f07d","commander":"Urza, Lord High Artificer","archetype":"artifacts_control","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Urza, Lord High Artificer"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+COMMANDER_REFERENCE_LOT_B_APP_RUNTIME_SUMMARY {"deck_id":"9eec03d2-b5fd-41d3-b987-482a3b69f07d","commander":"Urza, Lord High Artificer","archetype":"artifacts_control","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Urza, Lord High Artificer"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+[📱 Screen] ← POP: :id (5260ms)
+[⚠️ SLOW SCREEN] :id demorou 5s
+[🧭 Router] redirect: location=/decks/generate | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: generate
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] GET /notifications/count → 200 (314ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (320ms)
+CAPTURE_START commander_reference_lot_b_meren_01_generate_screen
+CAPTURE_TAKEN commander_reference_lot_b_meren_01_generate_screen bytes=250669
+SCREENSHOT_BEGIN commander_reference_lot_b_meren_01_generate_screen [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_meren_01_generate_screen
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate
+[🌐 ApiClient] POST /ai/generate → 202 (370ms)
+ℹ️ [DeckGenerate] async accepted status=202 job_id=7eb23f6393a054dcd34f27938555cddb accepted_ms=370
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_accepted data={status_code: 202, job_id: 7eb23f6393a054dcd34f27938555cddb, accepted_ms: 370}
+ℹ️ [DeckGenerate] initial async feedback after 374ms
+COMMANDER_REFERENCE_LOT_B_APP_GENERATE_INITIAL_FEEDBACK commander="Meren of Clan Nel Toth" archetype=graveyard_recursion elapsed_ms=654
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/7eb23f6393a054dcd34f27938555cddb
+[🌐 ApiClient] GET /ai/generate/jobs/7eb23f6393a054dcd34f27938555cddb → 200 (543ms)
+ℹ️ [DeckGenerate] async completed job_id=7eb23f6393a054dcd34f27938555cddb result_status=200 elapsed_ms=5560
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_completed data={job_id: 7eb23f6393a054dcd34f27938555cddb, result_status_code: 200, elapsed_ms: 5561}
+ℹ️ [DeckGenerate] reference diagnostics commander="Meren of Clan Nel Toth" reference_profile_used=true reference_card_stats_used=true on_theme_candidate_count=31 unresolved_reference_cards=0
+CAPTURE_START commander_reference_lot_b_meren_02_preview
+CAPTURE_TAKEN commander_reference_lot_b_meren_02_preview bytes=253640
+SCREENSHOT_BEGIN commander_reference_lot_b_meren_02_preview [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_meren_02_preview
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/cards/resolve/batch
+[🌐 ApiClient] POST /cards/resolve/batch → 200 (498ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /decks → 200 (547ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/users/me/activation-events
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] ← POP: generate (11972ms)
+[⚠️ SLOW SCREEN] generate demorou 11s
+[🌐 ApiClient] POST /users/me/activation-events → 201 (487ms)
+[🌐 ApiClient] GET /decks → 200 (496ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /decks → 200 (352ms)
+[🧭 Router] redirect: location=/decks/defdf699-8c5a-459b-8f84-cb4e69150a55 | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: :id
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/defdf699-8c5a-459b-8f84-cb4e69150a55
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/defdf699-8c5a-459b-8f84-cb4e69150a55/pricing
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/defdf699-8c5a-459b-8f84-cb4e69150a55/validate
+[🌐 ApiClient] POST /decks/defdf699-8c5a-459b-8f84-cb4e69150a55/pricing → 200 (548ms)
+CAPTURE_START commander_reference_lot_b_meren_03_details
+[🌐 ApiClient] POST /decks/defdf699-8c5a-459b-8f84-cb4e69150a55/validate → 200 (880ms)
+[🌐 ApiClient] GET /decks/defdf699-8c5a-459b-8f84-cb4e69150a55 → 200 (940ms)
+CAPTURE_TAKEN commander_reference_lot_b_meren_03_details bytes=79336
+SCREENSHOT_BEGIN commander_reference_lot_b_meren_03_details [png chunks stripped]
+SCREENSHOT_END commander_reference_lot_b_meren_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/defdf699-8c5a-459b-8f84-cb4e69150a55
+[🌐 ApiClient] GET /decks/defdf699-8c5a-459b-8f84-cb4e69150a55 → 200 (784ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/defdf699-8c5a-459b-8f84-cb4e69150a55/validate
+[🌐 ApiClient] POST /decks/defdf699-8c5a-459b-8f84-cb4e69150a55/validate → 200 (294ms)
+COMMANDER_REFERENCE_LOT_B_APP_VALIDATE_SUMMARY {"deck_id":"defdf699-8c5a-459b-8f84-cb4e69150a55","commander":"Meren of Clan Nel Toth","archetype":"graveyard_recursion","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Meren of Clan Nel Toth"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+COMMANDER_REFERENCE_LOT_B_APP_RUNTIME_SUMMARY {"deck_id":"defdf699-8c5a-459b-8f84-cb4e69150a55","commander":"Meren of Clan Nel Toth","archetype":"graveyard_recursion","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Meren of Clan Nel Toth"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+[📱 Screen] ← POP: :id (4193ms)
+[⚠️ SLOW SCREEN] :id demorou 4s
+COMMANDER_REFERENCE_LOT_B_APP_ALL_SUMMARIES [{"deck_id":"9eec03d2-b5fd-41d3-b987-482a3b69f07d","commander":"Urza, Lord High Artificer","archetype":"artifacts_control","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Urza, Lord High Artificer"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0},{"deck_id":"defdf699-8c5a-459b-8f84-cb4e69150a55","commander":"Meren of Clan Nel Toth","archetype":"graveyard_recursion","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Meren of Clan Nel Toth"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}]
+03:50 +1: (tearDownAll)
+03:51 +1: All tests passed!
+--- re-enable wifi ---

@@ -3,6 +3,56 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote B app runtime
+
+### O Porquê
+- Depois do Lote B passar em public proof e promocao backend, faltava provar no
+  app real dois comandantes promovidos consumindo o backend publico, sem expor
+  tokens, JWT, e-mails QA completos, prompts/decklists completas ou secrets.
+- A prova precisava cobrir register/login, Generate Commander com
+  `commander_name`, preview, save, Deck Details e `/decks/:id/validate` para
+  `Urza, Lord High Artificer` e `Meren of Clan Nel Toth`.
+
+### O Como
+- Foram consultados o API map, UI test surface map, APP audit, handoffs runtime,
+  relatorios Lote A/B e este manual; nao houve mudanca de contrato app-facing.
+- `master` local estava em
+  `20dd4b9a40e9f8db050cf789755497dc2ff6a644`, igual ao
+  `git_sha` retornado por
+  `https://evolution-cartinhas.8ktevp.easypanel.host/health`.
+- Foi criado
+  `app/integration_test/commander_reference_sprint3_lot_b_app_runtime_test.dart`
+  reutilizando `runtime_test_helpers.dart` e keys estaveis ja documentadas para
+  auth, Generate Commander, preview/save e abertura do deck salvo.
+- O runtime final rodou no Android fisico `SM A135M` (`R58T300SREH`, Android
+  14/API 34) contra o backend publico. O Wi-Fi foi desabilitado antes da prova
+  para usar rede celular, mantendo o workaround ambiental ja documentado no Lote
+  A; o Wi-Fi foi reabilitado ao final.
+- Screenshots e log sanitizado foram salvos em
+  `app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint3_lot_b_app/`.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Urza: register/login, generate, preview, save, details e validate passaram com
+  `validation_ok=true`, `main_qty=99`, `total_with_commander=100`,
+  `commander_count=1`, `commander_in_99_count=0` e `off_identity_count=0`.
+- Meren: register/login, generate, preview, save, details e validate passaram com
+  `validation_ok=true`, `main_qty=99`, `total_with_commander=100`,
+  `commander_count=1`, `commander_in_99_count=0` e `off_identity_count=0`.
+- `flutter analyze lib/features/decks test/features/decks integration_test
+  --no-version-check` e os testes focados de decks passaram.
+- O iPhone 15 Simulator
+  `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` estava disponivel como fallback, mas
+  nao foi usado porque o Android primario passou.
+- Riscos remanescentes: prova Android usou rede celular, Wi-Fi nao foi
+  reprovarado nesta rodada; `GET /decks/:id` trouxe o comandante correto na lista
+  `commander`, mas o campo agregado `commander_name` nao refletiu o comandante
+  salvo; scanner/camera/OCR ficaram fora do escopo.
+- Documentos atualizados:
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_b_app_2026-05-14.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md` e
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_PUBLIC_PROOF_2026-05-14.md`.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote B public proof e promocao
 
 ### O Porquê
