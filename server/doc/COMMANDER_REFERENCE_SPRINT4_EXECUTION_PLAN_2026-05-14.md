@@ -4,20 +4,27 @@
 
 **PASS_WITH_RISKS.**
 
-Sprint 4 fica autorizado apenas como expansao controlada e documental neste
-momento: os subagentes paralelos produziram cobertura, auditoria de pipeline,
-dry-run de corpus, data quality e plano runtime sem alterar contratos app-facing,
-sem aplicar corpus no banco e sem promover novos comandantes.
+Sprint 4 comecou como expansao controlada e documental: os subagentes paralelos
+produziram cobertura, auditoria de pipeline, dry-run de corpus, data quality e
+plano runtime sem alterar contratos app-facing. No Lote 1, apenas candidatos
+sem blockers entraram em apply/public proof, e somente `Miirym, Sentinel Wyrm`
+foi promovido.
 
 Nao houve mudanca de codigo. Propostas de codigo foram documentadas e nao
 aplicadas.
+
+Atualizacao Lote 1: `Miirym, Sentinel Wyrm` foi promovido para
+`ready_for_mini_batch` apos apply/idempotencia, public proof 5/5 e scorecard
+100. `Feather, the Redeemed` nao foi promovido porque o public proof repetiu
+`timeout_fallback_count=5`. `Ghave, Guru of Spores` e `Jodah, the Unifier`
+permanecem bloqueados por profile/card_stats ausentes ou legados.
 
 ## Contexto operacional
 
 - Repo: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia`
 - Branch alvo: `master`
 - Backend publico: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Estado local durante a orquestracao: `master...origin/master [ahead 5]`
+- Estado local no Lote 1: `master...origin/master`, alinhado antes da execucao.
 - Scanner, camera e OCR permaneceram fora do escopo.
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e nao foi alterado
   porque nao houve mudanca de rota, payload, response shape, data source,
@@ -147,8 +154,8 @@ dart run bin/commander_reference_readiness_scorecard.dart \
 
 ## Blockers
 
-- Sprint 4 nao deve promover nenhum candidato neste commit: houve apenas
-  planejamento, dry-run e auditoria.
+- Lote 1 promove apenas `Miirym, Sentinel Wyrm`; `Feather, the Redeemed`
+  permanece bloqueado por timeout fallback publico.
 - `Ghave` e `Jodah` precisam de profile/card_stats antes de qualquer apply.
 - iPhone 15 ainda depende de resolver ou contornar o blocker historico de
   `MLImage.framework`/scanner mantendo scanner/OCR fora do escopo.
@@ -158,5 +165,5 @@ dart run bin/commander_reference_readiness_scorecard.dart \
 ## Resultado final
 
 **PASS_WITH_RISKS.** A fila e os criterios de Sprint 4 estao definidos, os
-artifacts versionaveis foram sanitizados, e nao ha autorizacao para promocao ou
-apply ate os blockers acima serem fechados.
+artifacts versionaveis foram sanitizados, e a unica promocao autorizada no Lote
+1 e `Miirym, Sentinel Wyrm`.

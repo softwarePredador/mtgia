@@ -3,6 +3,53 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 4 Lote 1 public proof
+
+### O Porquê
+- O Sprint 4 precisava sair do planejamento para um Lote 1 controlado,
+  promovendo somente candidatos realmente prontos no backend publico.
+- Era obrigatorio excluir `Ghave, Guru of Spores` e `Jodah, the Unifier`
+  enquanto profile/card_stats estivessem ausentes ou legados, e preservar
+  seguranca documental sem secrets, JWT, Sentry DSN, `DATABASE_URL`,
+  `OPENAI_API_KEY`, e-mail QA completo, prompts ou decklists completas.
+
+### O Como
+- `master` foi sincronizada com `origin/master` e o `/health` publico respondeu
+  `git_sha=7b607404871168aa18d920ab71f7d70c63f325a5`, alinhado ao HEAD local.
+- Foram relidos plano Sprint 4, tracker Sprint 3/Sprint 4, API map e este
+  manual antes de qualquer apply.
+- Track A confirmou `Feather, the Redeemed` e `Miirym, Sentinel Wyrm` como
+  unicos elegiveis; `Ghave` e `Jodah` ficaram explicitamente bloqueados.
+- Corpora brutos foram regenerados temporariamente fora do repositorio apenas
+  para alimentar o runner; os arquivos temporarios foram removidos e os
+  artifacts versionados contem apenas summaries sanitizados.
+- Para Feather e Miirym foram executados dry-run pre-apply, `--apply`,
+  idempotencia e scorecard sem runtime. Depois, public proof 5/5 no backend
+  publico e scorecard com `--runtime-summary`.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e permaneceu
+  inalterado porque nao houve mudanca de contrato app-facing, payload, response
+  shape, diagnostics app-facing, data source ou consumidor mobile.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Promovido: `Miirym, Sentinel Wyrm` com public proof PASS, HTTP 200 5/5,
+  validation 5/5, comandante preservado 5/5, main 99 5/5, profile/stats/corpus
+  5/5, invalid/off-identity 0, timeout fallback 0, p50 848ms, p95 956ms e
+  scorecard 100 `ready_for_mini_batch`.
+- Bloqueado: `Feather, the Redeemed` com legalidade e profile/stats/corpus 5/5,
+  mas `timeout_fallback_count=5` em duas rodadas, p95 25045ms e scorecard 98
+  `profile_ready_needs_proof`.
+- Bloqueados sem apply: `Ghave, Guru of Spores` por falta de profile/card_stats
+  e `Jodah, the Unifier` por profile legado `edhrec` e ausencia de card_stats.
+- Documentos/artifacts atualizados:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_LOT1_PUBLIC_PROOF_2026-05-14.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT4_EXECUTION_PLAN_2026-05-14.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`,
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`
+  e
+  `server/test/artifacts/commander_reference_sprint4_lot1_2026-05-14/`.
+- Scanner, camera e OCR permaneceram fora do escopo.
+
 ## 2026-05-14 — Commander Reference Sprint 4 plano coordenado
 
 ### O Porquê

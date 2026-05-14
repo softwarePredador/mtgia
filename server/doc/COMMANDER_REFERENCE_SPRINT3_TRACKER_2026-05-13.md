@@ -331,6 +331,28 @@ archetype path com prompt policy, reforcar dedupe/checklist de readiness, provar
 runtime iPhone 15 ou registrar fallback Android aceito, e executar public proof
 5/5 + scorecard `score=100` por comandante.
 
+## Sprint 4 Lote 1 public proof + decisao - 2026-05-14
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_LOT1_PUBLIC_PROOF_2026-05-14.md`.
+
+Artifacts:
+`server/test/artifacts/commander_reference_sprint4_lot1_2026-05-14/`.
+
+| Commander | Apply/idempotencia | Public proof | p50/p95 | Readiness publico | Promoted |
+| --- | --- | --- | --- | --- | --- |
+| `Feather, the Redeemed` | PASS 4/4, unresolved=0, off_color=0, singleton limpo | BLOCKED: HTTP 200, validation, commander, main 99 e profile/stats/corpus 5/5; invalid/off-id 0; `timeout_fallback_count=5` em duas rodadas | 847ms / 25045ms | score 98, `profile_ready_needs_proof`, warning `public_runtime_gate_not_passed` | false |
+| `Miirym, Sentinel Wyrm` | PASS 5/5, unresolved=0, off_color=0, singleton limpo | PASS: HTTP 200, validation, commander, main 99 e profile/stats/corpus 5/5; invalid/off-id 0; timeout 0 | 848ms / 956ms | score 100, `ready_for_mini_batch`, blockers/warnings vazios | true |
+| `Ghave, Guru of Spores` | NOT_RUN | NOT_RUN | n/a | blocked por falta de profile/card_stats | false |
+| `Jodah, the Unifier` | NOT_RUN | NOT_RUN | n/a | blocked por profile legado `edhrec` e falta de card_stats | false |
+
+Resultado: **PASS_WITH_RISKS**. Promovido apenas `Miirym, Sentinel Wyrm`.
+`Feather, the Redeemed` nao deve ser tratado como promovido ate zerar timeout
+fallback em novo public proof e retornar score 100. Runtime app Android
+`SM A135M` ficou preparado em
+`app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`,
+mas nao foi executado nesta rodada.
+
 ## Fechamento parcial Lote A - 2026-05-13
 
 Relatorio final:
