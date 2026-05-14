@@ -3,6 +3,52 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 4 Lote 1 app runtime PASS_WITH_MINOR_HARNESS_FIX
+
+### O Porquê
+- A prova recebida para `Miirym, Sentinel Wyrm` ja mostrava os gates reais do
+  deck corretos (`validation_ok=true`, `main_quantity=99`, `total=100`,
+  `commander_count=1`, `commander_in_99_count=0`, `off_identity=0` e
+  `raw_commander_names=["Miirym, Sentinel Wyrm"]`), mas o campo
+  `deck_commander_name_matches` do harness podia reportar falso negativo por
+  depender do agregado `deck['commander_name']`.
+- Era necessario fechar o runtime no iPhone 15 Simulator contra o backend publico
+  sem expor secrets, tokens, JWT, `SENTRY_DSN`, `DATABASE_URL`,
+  `OPENAI_API_KEY`, e-mail QA completo ou decklist completa. Scanner, camera e
+  OCR continuaram fora do escopo.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com `status=healthy`,
+  `git_sha=34576f51e710e10c950f787ae2f91aa6f77e3cba` e `latency_ms=1148`.
+- O harness
+  `app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart`
+  foi corrigido para calcular `deck_commander_name_matches` a partir de
+  `raw_commander_names` normalizado, usando as entradas reais de `commander`
+  retornadas por `GET /decks/:id`. O agregado `deck['commander_name']` ficou
+  apenas como fallback para contagem efetiva quando a lista `commander` nao vier.
+- Foram executados `dart format`, `flutter analyze` focado no harness e
+  `flutter test test/features/decks/providers/deck_provider_test.dart`.
+- O harness foi rerodado no iPhone 15 Simulator
+  (`F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4) contra
+  `https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+### Resultado
+- Resultado operacional app runtime: **PASS_WITH_MINOR_HARNESS_FIX**.
+- Runtime iPhone 15 Simulator: `00:41 +1: All tests passed!`.
+- Summary sanitizado: `deck_id=<redacted-deck-id>`, `app_runtime_valid=true`,
+  `deck_commander_name_matches=true`,
+  `raw_commander_names=["Miirym, Sentinel Wyrm"]`, `validation_ok=true`,
+  `main_quantity=99`, `total=100`, `commander_count=1`,
+  `commander_in_99_count=0` e `off_identity=0`.
+- Latencias relevantes: `/health latency_ms=1148`, feedback inicial de Generate
+  Commander `elapsed_ms=587`; public proof backend Miirym p50 `849ms`, p95
+  `942ms`.
+- Documentos atualizados:
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md` e
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_LOT1_PUBLIC_PROOF_2026-05-14.md`.
+
 ## 2026-05-14 — Commander Reference Sprint 4 Lote 1 app runtime BLOCKED
 
 ### O Porquê

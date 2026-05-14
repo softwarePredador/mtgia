@@ -2,48 +2,42 @@
 
 ## Resultado
 
-**BLOCKED** em 2026-05-14T15:08-03:00.
+**PASS_WITH_MINOR_HARNESS_FIX** em 2026-05-14T16:40-03:00.
 
-O harness especifico do Lote 1 foi criado para `Miirym, Sentinel Wyrm`, mas a
-prova no Android fisico solicitado nao executou porque o device alvo
-`SM A135M` (`R58T300SREH`) nao estava conectado ao ADB/Flutter. O unico Android
-detectado foi outro aparelho (`M2006C3MG`, Android 10/API 29), que nao substitui
-o alvo da prova.
+O runtime real do Lote 1 passou no **iPhone 15 Simulator**
+(`F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4) contra o backend publico
+`https://evolution-cartinhas.8ktevp.easypanel.host`, cobrindo
+`Miirym, Sentinel Wyrm` de ponta a ponta: register/login pela UI, Generate
+Commander com `commander_name`, feedback async, preview, save, Deck Details e
+`/decks/:id/validate`.
 
-Scanner, camera e OCR permaneceram fora do escopo.
-
-## Fontes lidas antes da validacao
-
-- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT4_LOT1_PUBLIC_PROOF_2026-05-14.md`
-- `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`
-- `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
-- `server/manual-de-instrucao.md`
-- `app/doc/APP_AUDIT_2026-04-29.md`
-- `app/integration_test/commander_reference_sprint3_lot_c_app_runtime_test.dart`
-- `app/integration_test/runtime_test_helpers.dart`
+Scanner, camera e OCR permaneceram fora do escopo. Logs e documentacao abaixo
+mantem e-mail QA completo, decklist completa, secrets, tokens, JWT,
+`SENTRY_DSN`, `DATABASE_URL` e `OPENAI_API_KEY` fora do repositorio.
 
 ## Repositorio/branch
 
 - Branch alvo: `master`.
-- HEAD local: `5c316ab6ac0b4513a91653faceacec11039ecae8`.
-- `origin/master`: `5c316ab6ac0b4513a91653faceacec11039ecae8`.
+- HEAD local: `34576f51e710e10c950f787ae2f91aa6f77e3cba`.
+- `origin/master`: `34576f51e710e10c950f787ae2f91aa6f77e3cba`.
 - `git status` antes da mudanca: limpo e alinhado a `origin/master`.
 - Backend publico `/health`: HTTP 200, `status=healthy`,
-  `git_sha=5c316ab6ac0b4513a91653faceacec11039ecae8`.
+  `git_sha=34576f51e710e10c950f787ae2f91aa6f77e3cba`,
+  `latency_ms=1148`.
 
-## Harness criado
+## Correcao menor do harness
 
-- Arquivo:
-  `app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart`.
-- Fluxo coberto: register/login QA descartavel pela UI, Generate Commander com
-  `commander_name=Miirym, Sentinel Wyrm`, prompt Temur dragons ETB/copy com
-  ramp/draw/removal/protection, feedback async, preview, save, Deck Details e
-  `/decks/:id/validate`.
-- Gates de API no harness: `validation_ok=true`, `main_quantity=99`,
-  `total=100`, `commander_count=1`, `commander_in_99_count=0` e
-  `off_identity=0`.
-- Gates de UI no harness: tela de preview, tela de detalhes, ausencia de erro cru,
-  `AlertDialog`/`SimpleDialog`/`Dialog` preso e excecao Flutter/overflow.
+O campo `deck_commander_name_matches` do summary do harness foi corrigido para
+representar validacao real: agora ele compara o comandante esperado contra
+`raw_commander_names`, normalizado a partir das entradas reais de `commander` do
+`GET /decks/:id`. O campo agregado `deck['commander_name']` continua sendo usado
+somente como fallback para contar comandante quando a API nao enviar a lista
+`commander`, mas nao determina mais `deck_commander_name_matches`.
+
+Essa correcao remove a inconsistencia observada na prova recebida, onde os gates
+reais estavam corretos (`raw_commander_names=['Miirym, Sentinel Wyrm']`,
+`commander_count=1`, `commander_in_99_count=0`) apesar do campo antigo poder
+ficar falso por depender do agregado.
 
 ## Validacao local focada
 
@@ -57,14 +51,14 @@ flutter test test/features/decks/providers/deck_provider_test.dart --no-version-
 Resultado: **PASS**. O analyze nao encontrou issues e
 `deck_provider_test.dart` terminou com todos os testes passando.
 
-## Runtime Android solicitado
+## Runtime iPhone 15 Simulator
 
 Comando executado:
 
 ```bash
 cd app
 flutter test integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart \
-  -d R58T300SREH \
+  -d F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF \
   --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
   --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
   --dart-define=DISABLE_FIREBASE_STARTUP=true \
@@ -73,33 +67,40 @@ flutter test integration_test/commander_reference_sprint4_lot1_app_runtime_test.
   --no-version-check
 ```
 
-Resultado: **BLOCKED antes do build/install**. `adb -s R58T300SREH get-state`,
-`adb -s R58T300SREH shell svc wifi disable`, o comando Flutter e o restore de
-Wi-Fi retornaram que o device `R58T300SREH` nao foi encontrado.
+Resultado: **PASS** (`00:41 +1: All tests passed!`).
 
-## Evidencia sanitizada
+Latencias relevantes observadas:
 
-Diretorio:
+- `/health`: `latency_ms=1148`.
+- Feedback inicial de Generate Commander: `elapsed_ms=587`.
+- Public proof backend de Miirym ja documentado: p50 `849ms`, p95 `942ms`.
 
-- `app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint4_lot1_app/`
+Resumo final sanitizado:
 
-Arquivos:
-
-- `environment_blocker_sanitized.log`
-- `runtime_command_sanitized.log`
-
-Os logs foram redigidos para nao conter secrets, tokens, JWT, `SENTRY_DSN`,
-`DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo, prompt bruto ou decklist
-completa.
+```json
+{
+  "deck_id": "<redacted-deck-id>",
+  "commander": "Miirym, Sentinel Wyrm",
+  "archetype": "temur_dragons_etb_copy",
+  "app_runtime_valid": true,
+  "deck_commander_name_matches": true,
+  "raw_commander_entries": 1,
+  "raw_commander_names": ["Miirym, Sentinel Wyrm"],
+  "validation_ok": true,
+  "main_quantity": 99,
+  "total": 100,
+  "commander_count": 1,
+  "commander_in_99_count": 0,
+  "off_identity": 0
+}
+```
 
 ## O que foi real, mockado e nao provado
 
-- Real: branch `master` sincronizada, `/health` publico HTTP 200, harness Sprint 4
-  Lote 1 criado, analyze/test focados passando e tentativa do comando Android
-  solicitado.
+- Real: branch `master` sincronizada, backend publico `/health` HTTP 200,
+  harness corrigido, analyze/test focados passando e runtime completo no
+  iPhone 15 Simulator.
 - Mockado: nada.
-- Nao provado: app real no `SM A135M`/`R58T300SREH`, register/login runtime,
-  Generate Commander, preview, save, Deck Details e `/decks/:id/validate`, porque
-  o device alvo nao estava conectado.
+- Nao provado nesta rodada: scanner, camera e OCR, por estarem fora do escopo.
 
-Resultado final desta rodada: **BLOCKED**.
+Resultado final desta rodada: **PASS_WITH_MINOR_HARNESS_FIX**.

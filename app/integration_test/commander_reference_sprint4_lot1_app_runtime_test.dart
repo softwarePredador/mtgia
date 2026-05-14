@@ -382,8 +382,7 @@ Future<Map<String, dynamic>> _validateSavedDeck(
   final effectiveCommanders =
       commanders.isNotEmpty
           ? commanders
-          : (commanderNameField?.toLowerCase() ==
-              runtimeCase.commanderName.toLowerCase())
+          : _nameMatches(commanderNameField, runtimeCase.commanderName)
           ? [
             {'name': commanderNameField, 'quantity': 1},
           ]
@@ -411,6 +410,13 @@ Future<Map<String, dynamic>> _validateSavedDeck(
   final offIdentityCount = [...mainBoard, ...effectiveCommanders]
       .where((card) => _isOffIdentity(card, runtimeCase.allowedColors))
       .fold<int>(0, (total, card) => total + _quantity(card));
+  final rawCommanderNames = commanders
+      .map((card) => _cardName(card))
+      .where((name) => name.trim().isNotEmpty)
+      .toList(growable: false);
+  final deckCommanderNameMatches = rawCommanderNames.any(
+    (name) => _nameMatches(name, runtimeCase.commanderName),
+  );
 
   final summary = {
     'deck_id': deckId,
@@ -423,13 +429,9 @@ Future<Map<String, dynamic>> _validateSavedDeck(
         commanderCount == 1 &&
         commanderInMainCount == 0 &&
         offIdentityCount == 0,
-    'deck_commander_name_matches':
-        commanderNameField?.toLowerCase() ==
-        runtimeCase.commanderName.toLowerCase(),
+    'deck_commander_name_matches': deckCommanderNameMatches,
     'raw_commander_entries': commanders.length,
-    'raw_commander_names': commanders
-        .map((card) => _cardName(card))
-        .toList(growable: false),
+    'raw_commander_names': rawCommanderNames,
     'validation_ok': validationOk,
     'main_quantity': mainQty,
     'total': totalWithCommander,
@@ -471,7 +473,7 @@ Iterable<Map<String, dynamic>> _flattenMainBoard(
         .where(
           (item) =>
               item['is_commander'] != true &&
-              _normalizedName(item) != commanderName.toLowerCase(),
+              !_matchesCardName(item, commanderName),
         );
   }
 
@@ -500,7 +502,7 @@ Iterable<Map<String, dynamic>> _commanders(
         .where(
           (item) =>
               item['is_commander'] == true ||
-              _normalizedName(item) == commanderName.toLowerCase(),
+              _matchesCardName(item, commanderName),
         );
   }
 
@@ -513,19 +515,21 @@ int _quantity(Map<String, dynamic> card) {
   return int.tryParse(raw?.toString() ?? '') ?? 1;
 }
 
-String _normalizedName(Map<String, dynamic> card) {
-  return _cardName(card).trim().toLowerCase();
+bool _matchesCardName(Map<String, dynamic> card, String expectedName) {
+  return _nameMatches(_cardName(card), expectedName);
 }
 
-bool _matchesCardName(Map<String, dynamic> card, String expectedName) {
-  final expected = expectedName.trim().toLowerCase();
-  final normalized = _normalizedName(card);
+bool _nameMatches(String? rawName, String expectedName) {
+  final expected = _normalizeName(expectedName);
+  final normalized = _normalizeName(rawName ?? '');
   if (normalized == expected) return true;
   return normalized
       .split('//')
       .map((part) => part.trim())
       .any((part) => part == expected);
 }
+
+String _normalizeName(String name) => name.trim().toLowerCase();
 
 String _cardName(Map<String, dynamic> card) {
   final direct = card['name']?.toString();
