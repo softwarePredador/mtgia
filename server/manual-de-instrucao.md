@@ -3,6 +3,53 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote B public proof e promocao
+
+### O Porquê
+- Depois do Lote B aplicado e idempotente ficar em score 98 por falta de runtime
+  summary, era necessario executar a prova publica 5/5 de `POST /ai/generate`
+  por comandante e decidir promocao via scorecard.
+- O gate exigia `format=Commander`, `bracket=3`, `commander_name` exato,
+  comandante preservado, main deck 99, profile/stats/corpus usados,
+  invalid/off-identity 0, timeout fallback 0 e scorecard final 100.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com `git_sha=025d2c36e925793ba0779091527bd922180dc4f4`, igual ao
+  HEAD local.
+- Foram lidos o relatorio Lote B apply/corpus prep, o API map e este manual. O
+  API map permaneceu inalterado porque nao houve mudanca de contrato, payload,
+  response shape, diagnostics app-facing, data source ou consumidor mobile.
+- Para cada comandante Lote B foi criado usuario QA descartavel em memoria e
+  executadas 5 probes publicas sanitizadas de `/ai/generate`; os artifacts
+  persistem apenas contadores, timings e flags, sem token, e-mail completo,
+  prompt completo, decklist, JWT, Sentry DSN, `DATABASE_URL` ou `OPENAI_API_KEY`.
+- O scorecard foi executado por comandante com `--runtime-summary` apontando para
+  `public_proof/summary.json`, salvando `readiness_public/`.
+
+### Resultado
+- Resultado operacional: **PASS**.
+- Public proof final:
+  - Meren: 5/5 HTTP 200, validation, comandante, main 99, profile/stats/corpus;
+    invalid/off-identity 0, timeout 0, p50/p95 854ms/1238ms.
+  - Korvold: 5/5 HTTP 200, validation, comandante, main 99, profile/stats/corpus;
+    invalid/off-identity 0, timeout 0, p50/p95 878ms/942ms.
+  - Sythis: 5/5 HTTP 200, validation, comandante, main 99, profile/stats/corpus;
+    invalid/off-identity 0, timeout 0, p50/p95 651ms/667ms.
+  - Urza: 5/5 HTTP 200, validation, comandante, main 99, profile/stats/corpus;
+    invalid/off-identity 0, timeout 0, p50/p95 652ms/757ms.
+- Os quatro scorecards retornaram score 100, `ready_for_mini_batch`,
+  `warnings=[]`, `blockers=[]`; portanto Meren, Korvold, Sythis e Urza foram
+  promovidos no tracker para mini-batch controlado.
+- O primeiro disparo continuo encontrou rate limit publico `429` apos dez
+  chamadas; Sythis e Urza foram rerodados com backoff e os summaries
+  rate-limited ficaram preservados em `public_proof_rate_limited_attempt/`.
+- Documentos/artifacts atualizados:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_PUBLIC_PROOF_2026-05-14.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md` e
+  `server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/{public_proof,readiness_public}/`.
+- Scanner, camera, OCR e app runtime real permaneceram fora do escopo.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote B apply e readiness pos-corpus
 
 ### O Porquê

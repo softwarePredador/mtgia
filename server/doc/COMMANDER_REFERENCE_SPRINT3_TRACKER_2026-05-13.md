@@ -26,10 +26,10 @@ camera ou OCR.
 | 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
-| 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
-| 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
-| 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
-| 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
+| 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 9 | `Brago, King Eternal` | C | Azorius blink/ETB value/control | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 10 | `Feather, the Redeemed` | C | Boros spellslinger-Voltron/protection combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 11 | `Jodah, the Unifier` | C | Five-color legendary typal/value-combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
@@ -141,6 +141,27 @@ linhas historicas antes deste apply; o corpus Lote B validado nesta rodada foi
 
 Resultado: **PASS_WITH_RISKS** porque public proof/runtime summary nao foi
 executado por escopo. Nenhum comandante do Lote B foi promovido.
+
+## Lote B public proof + promocao - 2026-05-14
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_PUBLIC_PROOF_2026-05-14.md`.
+
+Artifacts novos:
+`server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/public_proof/summary.json`
+e
+`server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/readiness_public/readiness_scorecard_summary.json`.
+
+| Commander | Public proof | Runtime gates | p50/p95 | Readiness publico | Promoted |
+| --- | --- | --- | --- | --- | --- |
+| `Meren of Clan Nel Toth` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 854ms / 1238ms | score 100, `ready_for_mini_batch` | true |
+| `Korvold, Fae-Cursed King` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 878ms / 942ms | score 100, `ready_for_mini_batch` | true |
+| `Sythis, Harvest's Hand` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 651ms / 667ms | score 100, `ready_for_mini_batch` | true |
+| `Urza, Lord High Artificer` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 652ms / 757ms | score 100, `ready_for_mini_batch` | true |
+
+Observacao operacional: o primeiro disparo continuo encontrou rate limit publico
+`429` apos dez chamadas; Sythis e Urza foram rerodados com backoff e os summaries
+rate-limited ficaram preservados em `public_proof_rate_limited_attempt/`.
 
 ## Fechamento parcial Lote A - 2026-05-13
 
