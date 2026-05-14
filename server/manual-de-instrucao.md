@@ -3,6 +3,60 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote B apply e readiness pos-corpus
+
+### O Porquê
+- Depois do Lote B ter passado em dry-run offline, a proxima etapa autorizada era
+  aplicar somente os corpora ainda PASS, provar idempotencia e medir readiness
+  pos-corpus sem promover comandantes nem alterar runtime/app-facing.
+- O objetivo era enriquecer o caminho Commander Reference com corpora agregados
+  para `Meren of Clan Nel Toth`, `Korvold, Fae-Cursed King`, `Sythis, Harvest's
+  Hand` e `Urza, Lord High Artificer`, mantendo public proof, app runtime,
+  scanner, camera e OCR fora do escopo.
+
+### O Como
+- `master` local foi sincronizado com `origin/master` antes da execucao e estava
+  atualizado.
+- Foram relidos o plano Lote B, o relatorio de corpus prep Lote B, o fechamento
+  Lote A, este manual, `commander_reference_deck_corpus.dart` e
+  `commander_reference_readiness_scorecard.dart`.
+- Para cada comandante Lote B com dry-run PASS, foi executado novamente:
+  `--dry-run` em `dry_run_pre_apply/`, `--apply` em `apply/` e novo `--apply` em
+  `apply_idempotency/`.
+- Cada summary foi validado para exigir `accepted_deck_count == deck_count`,
+  `rejected_deck_count=0`, `unresolved=0`, `off_color=0`,
+  `commander_quantity=1`, `main_quantity=99` e `singleton_violations={}`.
+- O readiness scorecard foi executado sem runtime summary em
+  `server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/readiness_after_corpus/`.
+- O apply usou upsert/idempotencia nas tabelas `commander_reference_decks`,
+  `commander_reference_deck_cards` e `commander_reference_deck_analysis`; nao
+  criou novas linhas em `cards` e nao alterou contratos app/backend.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Dry-run pre-apply, apply e apply de idempotencia passaram:
+  - Meren: 3/3 decks aceitos, commander/main 1/99, unresolved 0, off_color 0,
+    singleton limpo.
+  - Korvold: 4/4 decks aceitos no corpus Lote B, commander/main 1/99,
+    unresolved 0, off_color 0, singleton limpo.
+  - Sythis: 5/5 decks aceitos, commander/main 1/99, unresolved 0, off_color 0,
+    singleton limpo.
+  - Urza: 5/5 decks aceitos, commander/main 1/99, unresolved 0, off_color 0,
+    singleton limpo.
+- Contagens DB-backed pos-apply totais por comandante: Meren 3/3, Korvold 8/8,
+  Sythis 5/5 e Urza 5/5 aceitos, todos com unresolved/off-color 0,
+  commander/main corretos e singleton sem violacoes. Korvold ja tinha 4 linhas
+  historicas antes desta rodada; o Lote B aplicado foi 4/4.
+- Readiness sem runtime summary: os quatro comandantes ficaram com score 98,
+  `profile_ready_needs_proof`, sem blockers e com warning unico
+  `public_runtime_proof_missing`.
+- Documentos atualizados:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_CORPUS_PREP_2026-05-14.md`
+  e `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`.
+- Nenhum token, JWT, Sentry DSN, `DATABASE_URL`, `OPENAI_API_KEY`, prompt
+  completo, payload sensivel, scanner/camera/OCR ou endpoint app-facing foi
+  alterado ou documentado.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote B corpus prep
 
 ### O Porquê

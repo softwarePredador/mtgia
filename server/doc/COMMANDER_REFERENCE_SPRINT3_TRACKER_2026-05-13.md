@@ -26,10 +26,10 @@ camera ou OCR.
 | 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
-| 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
-| 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
-| 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
-| 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
+| 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
+| 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
+| 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
 | 9 | `Brago, King Eternal` | C | Azorius blink/ETB value/control | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 10 | `Feather, the Redeemed` | C | Boros spellslinger-Voltron/protection combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 11 | `Jodah, the Unifier` | C | Five-color legendary typal/value-combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
@@ -110,10 +110,37 @@ Relatorios:
 | `Sythis, Harvest's Hand` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
 | `Urza, Lord High Artificer` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
 
-`--apply` nao foi executado por escopo; Lote B permanece sem idempotencia,
-public proof, readiness final ou promocao. Resultado: **PASS_WITH_RISKS** por
-Meren ter fontes especificas excluidas por unresolved local, Korvold carregar
-historico de core package fraco e Urza exigir lane high-power/combo explicita.
+Na etapa de corpus prep, `--apply` nao foi executado por escopo e o Lote B ficou
+sem idempotencia, public proof, readiness final ou promocao. O resultado daquela
+etapa foi **PASS_WITH_RISKS** por Meren ter fontes especificas excluidas por
+unresolved local, Korvold carregar historico de core package fraco e Urza exigir
+lane high-power/combo explicita.
+
+## Lote B apply + readiness pos-corpus - 2026-05-14
+
+Artifacts novos:
+`server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/dry_run_pre_apply/`,
+`apply/`, `apply_idempotency/` e
+`server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/readiness_after_corpus/`.
+
+Relatorio atualizado:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_CORPUS_PREP_2026-05-14.md`.
+
+| Commander | Dry-run pre-apply | Apply | Idempotency | Readiness sem runtime summary |
+| --- | --- | --- | --- | --- |
+| `Meren of Clan Nel Toth` | PASS 3/3, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 3/3 | PASS 3/3 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+| `Korvold, Fae-Cursed King` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+| `Sythis, Harvest's Hand` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+| `Urza, Lord High Artificer` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 | 98, `profile_ready_needs_proof`, warning `public_runtime_proof_missing` |
+
+Contagens DB-backed pos-apply: Meren 3/3, Korvold 8/8, Sythis 5/5 e Urza 5/5
+linhas aceitas totais por comandante, todas com unresolved/off-color 0,
+`commander_quantity=1`, `main_quantity=99` e singleton limpo. Korvold ja tinha 4
+linhas historicas antes deste apply; o corpus Lote B validado nesta rodada foi
+4/4 nos artifacts.
+
+Resultado: **PASS_WITH_RISKS** porque public proof/runtime summary nao foi
+executado por escopo. Nenhum comandante do Lote B foi promovido.
 
 ## Fechamento parcial Lote A - 2026-05-13
 
