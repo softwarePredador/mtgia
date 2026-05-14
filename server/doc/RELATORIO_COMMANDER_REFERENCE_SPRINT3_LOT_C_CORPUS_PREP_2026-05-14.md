@@ -2,28 +2,32 @@
 
 ## Verdict
 
-**PASS_WITH_RISKS** para corpus prep/dry-run inicial, sem apply no banco.
+**PASS_WITH_RISKS** para corpus prep, apply controlado, idempotencia e
+readiness scorecard pos-corpus sem runtime summary.
 
 Foram preparados corpora offline para `Purphoros, God of the Forge`,
 `Brago, King Eternal`, `Veyran, Voice of Duality` e
 `Balan, Wandering Knight` em
 `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/corpus.json`.
-Todos os dry-runs finais passaram com `db_mutations=false`, `commander_quantity=1`,
-`main_quantity=99`, `unresolved=0`, `off_color=0` e singleton limpo.
+Todos os dry-runs finais e o novo dry-run pre-apply passaram com
+`db_mutations=false`, `commander_quantity=1`, `main_quantity=99`,
+`unresolved=0`, `off_color=0` e singleton limpo. O apply foi executado em
+`apply/` e repetido em `apply_idempotency/`, com todos os corpora aceitos.
 
 O resultado nao e PASS pleno porque `Veyran, Voice of Duality` precisou excluir
 as fontes EDHREC mais fortes de default/spellslinger/spell-copy/storm por
-cartas recentes nao resolvidas localmente. O corpus final de Veyran e valido para
-dry-run, mas tem sinal estrategico mais fraco ate haver backfill/resolucao dessas
-cartas ou fonte alternativa confiavel.
+cartas recentes nao resolvidas localmente, e porque o readiness pos-corpus sem
+runtime summary ficou bloqueado para Balan, Purphoros e Veyran por falta de
+profile/card_stats/deterministic reference proof ja aplicados. Brago ficou
+`profile_ready_needs_proof` apenas por ausencia de public runtime proof.
 
 ## Escopo e seguranca
 
-- Incluido: sync de `master`, releitura do contexto obrigatorio, pesquisa publica
-  de baixo volume, corpus JSON offline, dry-run DB-backed, documentacao e
-  validacoes focadas.
-- Fora do escopo: `--apply`, idempotencia, public proof, readiness scorecard,
-  runtime app, endpoint app-facing, scanner, camera e OCR.
+- Incluido: sync de `master`, releitura do contexto obrigatorio, corpus JSON
+  offline existente, dry-run DB-backed pre-apply, `--apply`, idempotencia,
+  readiness scorecard sem runtime summary, documentacao e validacoes focadas.
+- Fora do escopo: public proof, runtime app, endpoint app-facing, scanner,
+  camera e OCR.
 - Nao foram persistidos ou documentados secrets, tokens, JWT, Sentry DSN,
   `DATABASE_URL`, `OPENAI_API_KEY`, credenciais QA, prompts completos ou payload
   sensivel.
@@ -142,14 +146,76 @@ inicial.
 | `Veyran, Voice of Duality` | **PASS_WITH_RISKS**; antes de apply, preferir backfill/resolucao local de `Resonating Lute`/`Flashback` ou nova fonte publica que recupere spellslinger/spell-copy/storm. |
 | `Balan, Wandering Knight` | **GO condicionado** para dry-run pre-apply futuro; corpus coerente de Equipment Voltron sem aura shell. |
 
+## Apply controlado + readiness pos-corpus - 2026-05-14
+
+Comandos principais executados:
+
+```bash
+cd server
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/corpus.json \
+  --dry-run \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/dry_run_pre_apply
+
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/apply
+
+dart run bin/commander_reference_deck_corpus.dart \
+  --corpus-json=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/corpus.json \
+  --apply \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/apply_idempotency
+
+dart run bin/commander_reference_readiness_scorecard.dart \
+  --commanders="Purphoros, God of the Forge;Brago, King Eternal;Veyran, Voice of Duality;Balan, Wandering Knight" \
+  --artifact-dir=test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/readiness_after_corpus
+```
+
+Pre-change DB counts para os quatro comandantes eram `0` linhas em
+`commander_reference_decks`. Post-apply/idempotencia DB-backed:
+
+| Commander | DB deck rows | accepted | unresolved_total | off_color_total | clean 1/99 rows |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `Balan, Wandering Knight` | 4 | 4 | 0 | 0 | 4 |
+| `Brago, King Eternal` | 4 | 4 | 0 | 0 | 4 |
+| `Purphoros, God of the Forge` | 5 | 5 | 0 | 0 | 5 |
+| `Veyran, Voice of Duality` | 4 | 4 | 0 | 0 | 4 |
+
+Resultados por fase:
+
+| Commander | Dry-run pre-apply | Apply | Idempotency |
+| --- | --- | --- | --- |
+| `Balan, Wandering Knight` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 |
+| `Brago, King Eternal` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 |
+| `Purphoros, God of the Forge` | PASS 5/5, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 5/5 | PASS 5/5 |
+| `Veyran, Voice of Duality` | PASS 4/4, unresolved=0, off_color=0, 1/99, singleton `{}` | PASS 4/4 | PASS 4/4 |
+
+`--apply` e idempotencia sao upserts por `source_deck_key`, com substituicao
+controlada das cartas do mesmo source deck e resumo agregado por comandante.
+Rollback pratico: rerodar um corpus anterior validado para os mesmos
+`source_deck_key` ou remover explicitamente essas keys se for necessario
+desfazer o lote; a operacao aplicada nesta rodada e idempotente.
+
+Readiness scorecard sem runtime summary:
+
+| Commander | Score | Status | Expansion ready | Warnings | Blockers |
+| --- | ---: | --- | --- | --- | --- |
+| `Balan, Wandering Knight` | 25 | `blocked` | false | `public_runtime_proof_missing` | `commander_card_not_resolved`, `profile_missing_or_below_confidence`, `card_stats_missing`, `deterministic_reference_deck_invalid`, `deterministic_main_quantity_not_99` |
+| `Brago, King Eternal` | 98 | `profile_ready_needs_proof` | false | `public_runtime_proof_missing` | nenhum |
+| `Purphoros, God of the Forge` | 25 | `blocked` | false | `public_runtime_proof_missing` | `commander_card_not_resolved`, `profile_missing_or_below_confidence`, `card_stats_missing`, `deterministic_reference_deck_invalid`, `deterministic_main_quantity_not_99` |
+| `Veyran, Voice of Duality` | 25 | `blocked` | false | `public_runtime_proof_missing` | `commander_card_not_resolved`, `profile_missing_or_below_confidence`, `card_stats_missing`, `deterministic_reference_deck_invalid`, `deterministic_main_quantity_not_99` |
+
+Nao houve ajuste de runner ou codigo nesta etapa.
+
 ## Proximas acoes tecnicas minimas
 
-1. Revisar manualmente os packages extraidos dos dry-runs, principalmente Veyran.
-2. Resolver/backfill cartas locais que bloquearam fontes Veyran high-signal ou
-   substituir por fonte publica equivalente antes de qualquer `--apply`.
-3. Em tarefa futura, rodar novo dry-run pre-apply e so entao `--apply`
-   controlado, seguido de idempotencia.
-4. Depois de apply futuro, executar public proof 5/5 e readiness scorecard com
+1. Aplicar ou preparar profiles/card_stats para Balan, Purphoros e Veyran antes
+   de qualquer public proof/promocao.
+2. Revisar manualmente os packages extraidos dos dry-runs, principalmente Veyran.
+3. Resolver/backfill cartas locais que bloquearam fontes Veyran high-signal ou
+   substituir por fonte publica equivalente antes de public proof/promocao.
+4. Executar public proof 5/5 e readiness scorecard com
    runtime summary; bloquear promocao com `score<100`, warning relevante,
    timeout fallback, invalid/off-identity, unresolved/off-color ou core package
    fraco.
@@ -158,5 +224,7 @@ inicial.
 
 Resultado final: **PASS_WITH_RISKS**.
 
-Lote C esta preparado em artifacts offline e provado por dry-run DB-backed sem
-mutacao de banco. `--apply` ficou explicitamente **APPLY_NOT_RUN** por escopo.
+Lote C esta preparado em artifacts offline, provado por dry-run DB-backed,
+aplicado com idempotencia e registrado no readiness scorecard pos-corpus. Nao ha
+promocao: Brago ainda precisa public proof, e Balan/Purphoros/Veyran precisam de
+profiles/card_stats/deterministic proof antes de runtime.

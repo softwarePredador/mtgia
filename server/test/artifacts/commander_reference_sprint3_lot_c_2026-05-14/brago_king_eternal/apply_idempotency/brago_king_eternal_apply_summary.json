@@ -1,0 +1,441 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-14T13:57:47.762586Z",
+  "finished_at": "2026-05-14T13:58:00.478329Z",
+  "artifact_dir": "test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/brago_king_eternal/apply_idempotency",
+  "deck_count": 4,
+  "accepted_deck_count": 4,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_brago_king_eternal_default_average_sprint3_lot_c_2026_05_14",
+      "commander_name": "Brago, King Eternal",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/brago-king-eternal",
+      "power_lane": "edhrec_average_default",
+      "theme": "blink_etb_value",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "d07078e4-c51a-4a3e-a7d0-a2ac2b1fe739",
+        "card_name": "Brago, King Eternal"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 82,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 17,
+        "lands": 34,
+        "draw_value": 9,
+        "ramp": 8,
+        "recursion": 3,
+        "exile_value": 1,
+        "interaction": 10,
+        "other": 10,
+        "win_condition": 1,
+        "board_wipe": 3,
+        "protection": 2,
+        "miracle_topdeck": 1,
+        "tutor": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_brago_king_eternal_blink_sprint3_lot_c_2026_05_14",
+      "commander_name": "Brago, King Eternal",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/brago-king-eternal/blink",
+      "power_lane": "edhrec_average_blink",
+      "theme": "blink_etb_value",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "d07078e4-c51a-4a3e-a7d0-a2ac2b1fe739",
+        "card_name": "Brago, King Eternal"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 82,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 17,
+        "lands": 35,
+        "draw_value": 9,
+        "other": 11,
+        "ramp": 7,
+        "recursion": 3,
+        "exile_value": 1,
+        "interaction": 10,
+        "win_condition": 1,
+        "protection": 2,
+        "miracle_topdeck": 1,
+        "board_wipe": 2,
+        "tutor": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_brago_king_eternal_control_sprint3_lot_c_2026_05_14",
+      "commander_name": "Brago, King Eternal",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/brago-king-eternal/control",
+      "power_lane": "edhrec_average_control",
+      "theme": "azorius_blink_control",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "d07078e4-c51a-4a3e-a7d0-a2ac2b1fe739",
+        "card_name": "Brago, King Eternal"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 84,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 13,
+        "lands": 34,
+        "draw_value": 10,
+        "other": 11,
+        "ramp": 8,
+        "recursion": 2,
+        "exile_value": 1,
+        "interaction": 10,
+        "win_condition": 2,
+        "tutor": 3,
+        "board_wipe": 3,
+        "protection": 2,
+        "miracle_topdeck": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_brago_king_eternal_budget_sprint3_lot_c_2026_05_14",
+      "commander_name": "Brago, King Eternal",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/brago-king-eternal/budget",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_blink_value",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "d07078e4-c51a-4a3e-a7d0-a2ac2b1fe739",
+        "card_name": "Brago, King Eternal"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 75,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "creature": 15,
+        "draw_value": 12,
+        "other": 5,
+        "miracle_topdeck": 3,
+        "ramp": 7,
+        "recursion": 3,
+        "lands": 37,
+        "interaction": 10,
+        "board_wipe": 2,
+        "exile_value": 1,
+        "spellslinger": 1,
+        "protection": 3,
+        "tutor": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Brago, King Eternal": {
+      "commander_name": "Brago, King Eternal",
+      "deck_count": 4,
+      "accepted_deck_count": 4,
+      "average_role_counts": {
+        "creature": 15.5,
+        "lands": 35.0,
+        "draw_value": 10.0,
+        "ramp": 7.5,
+        "recursion": 2.75,
+        "exile_value": 1.0,
+        "interaction": 10.0,
+        "other": 9.25,
+        "win_condition": 1.0,
+        "board_wipe": 2.5,
+        "protection": 2.25,
+        "miracle_topdeck": 1.5,
+        "tutor": 1.5,
+        "spellslinger": 0.25
+      },
+      "top_cards": [
+        {
+          "card_name": "Ephemerate",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Aether Channeler",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Archaeomancer",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Azorius Chancery",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Azorius Signet",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Cloud of Faeries",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Cloudblazer",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Cloudshift",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Command Tower",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Counterspell",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Cryogen Relic",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Soulherder",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Eerie Interlude",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "other"
+        },
+        {
+          "card_name": "Whirler Rogue",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Ghostly Flicker",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "other"
+        },
+        {
+          "card_name": "Glacial Fortress",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Lavinia of the Tenth",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "protection"
+        },
+        {
+          "card_name": "Mulldrifter",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Negate",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Omen of the Sea",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "miracle_topdeck"
+        },
+        {
+          "card_name": "Panharmonicon",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "other"
+        },
+        {
+          "card_name": "Path to Exile",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Peregrine Drake",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Port Town",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Prairie Stream",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Reality Acid",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "other"
+        },
+        {
+          "card_name": "Reflector Mage",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "creature"
+        },
+        {
+          "card_name": "Wall of Omens",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Rogue's Passage",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Solemn Simulacrum",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Spirited Companion",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Sun Titan",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Swiftfoot Boots",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "protection"
+        },
+        {
+          "card_name": "Swords to Plowshares",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Talisman of Progress",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Temple of Enlightenment",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "lands"
+        },
+        {
+          "card_name": "Thought Vessel",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Time Wipe",
+          "deck_count": 4,
+          "total_quantity": 4,
+          "role": "board_wipe"
+        }
+      ],
+      "theme_counts": {
+        "blink_etb_value": 2,
+        "azorius_blink_control": 1,
+        "casual_blink_value": 1
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

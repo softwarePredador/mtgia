@@ -1,0 +1,478 @@
+{
+  "status": "PASS",
+  "mode": "dry_run",
+  "db_mutations": false,
+  "started_at": "2026-05-14T13:51:28.952845Z",
+  "finished_at": "2026-05-14T13:54:27.109434Z",
+  "artifact_dir": "test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/purphoros_god_of_the_forge/dry_run_pre_apply",
+  "deck_count": 5,
+  "accepted_deck_count": 5,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_default_average_sprint3_lot_c_2026_05_14",
+      "commander_name": "Purphoros, God of the Forge",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge",
+      "power_lane": "edhrec_average_default",
+      "theme": "token_burn",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "c1839983-cb9a-492e-9eac-8a73e4ca9a6b",
+        "card_name": "Purphoros, God of the Forge"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 74,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "protection": 3,
+        "interaction": 6,
+        "creature": 17,
+        "ramp": 12,
+        "board_wipe": 2,
+        "other": 15,
+        "recursion": 4,
+        "lands": 34,
+        "spellslinger": 1,
+        "tutor": 2,
+        "exile_value": 2,
+        "ritual_treasure": 2
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_tokens_sprint3_lot_c_2026_05_14",
+      "commander_name": "Purphoros, God of the Forge",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/tokens",
+      "power_lane": "edhrec_average_tokens",
+      "theme": "token_burn",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "c1839983-cb9a-492e-9eac-8a73e4ca9a6b",
+        "card_name": "Purphoros, God of the Forge"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 73,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "protection": 3,
+        "interaction": 6,
+        "creature": 17,
+        "ramp": 11,
+        "board_wipe": 2,
+        "other": 16,
+        "recursion": 4,
+        "lands": 35,
+        "spellslinger": 1,
+        "tutor": 1,
+        "exile_value": 2,
+        "ritual_treasure": 2
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_burn_sprint3_lot_c_2026_05_14",
+      "commander_name": "Purphoros, God of the Forge",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/burn",
+      "power_lane": "edhrec_average_burn",
+      "theme": "token_damage_payoffs",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "c1839983-cb9a-492e-9eac-8a73e4ca9a6b",
+        "card_name": "Purphoros, God of the Forge"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 74,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "protection": 3,
+        "interaction": 6,
+        "creature": 18,
+        "ramp": 10,
+        "board_wipe": 2,
+        "other": 13,
+        "recursion": 4,
+        "lands": 34,
+        "spellslinger": 1,
+        "ritual_treasure": 3,
+        "tutor": 2,
+        "exile_value": 3,
+        "draw_value": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_budget_sprint3_lot_c_2026_05_14",
+      "commander_name": "Purphoros, God of the Forge",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/budget",
+      "power_lane": "edhrec_average_budget",
+      "theme": "casual_token_burn",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "c1839983-cb9a-492e-9eac-8a73e4ca9a6b",
+        "card_name": "Purphoros, God of the Forge"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 69,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "protection": 1,
+        "interaction": 5,
+        "creature": 15,
+        "ramp": 9,
+        "board_wipe": 1,
+        "recursion": 6,
+        "other": 17,
+        "win_condition": 1,
+        "lands": 36,
+        "spellslinger": 2,
+        "tutor": 1,
+        "exile_value": 6
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_purphoros_god_of_the_forge_aggro_sprint3_lot_c_2026_05_14",
+      "commander_name": "Purphoros, God of the Forge",
+      "source": "edhrec_average_deck",
+      "source_url": "https://edhrec.com/average-decks/purphoros-god-of-the-forge/aggro",
+      "power_lane": "edhrec_average_aggro",
+      "theme": "go_wide_pressure",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "c1839983-cb9a-492e-9eac-8a73e4ca9a6b",
+        "card_name": "Purphoros, God of the Forge"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 75,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "protection": 3,
+        "interaction": 6,
+        "creature": 18,
+        "ramp": 10,
+        "board_wipe": 2,
+        "other": 14,
+        "lands": 34,
+        "recursion": 3,
+        "miracle_topdeck": 1,
+        "spellslinger": 1,
+        "ritual_treasure": 3,
+        "tutor": 3,
+        "exile_value": 2
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Purphoros, God of the Forge": {
+      "commander_name": "Purphoros, God of the Forge",
+      "deck_count": 5,
+      "accepted_deck_count": 5,
+      "average_role_counts": {
+        "protection": 2.6,
+        "interaction": 5.8,
+        "creature": 17.0,
+        "ramp": 10.4,
+        "board_wipe": 1.8,
+        "other": 15.0,
+        "recursion": 4.2,
+        "lands": 34.6,
+        "spellslinger": 1.2,
+        "tutor": 1.8,
+        "exile_value": 3.0,
+        "ritual_treasure": 2.0,
+        "draw_value": 0.2,
+        "win_condition": 0.2,
+        "miracle_topdeck": 0.2
+      },
+      "top_cards": [
+        {
+          "card_name": "Goblin Bombardment",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Battle Hymn",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Beetleback Chief",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "board_wipe"
+        },
+        {
+          "card_name": "Witty Roastmaster",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Chandra, Acolyte of Flame",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Chaos Warp",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Dragon Fodder",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Dwarven Mine",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Empty the Warrens",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "spellslinger"
+        },
+        {
+          "card_name": "Faithless Looting",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Fire Diamond",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Torbran, Thane of Red Fell",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Goblin Instigator",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Goblin Matron",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "tutor"
+        },
+        {
+          "card_name": "Grinning Ignus",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Hazoret's Monument",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "exile_value"
+        },
+        {
+          "card_name": "Hordeling Outburst",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Abrade",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Impact Tremors",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Kher Keep",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "lands"
+        },
+        {
+          "card_name": "Krenko's Command",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Krenko, Mob Boss",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Krenko, Tin Street Kingpin",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Tempt with Vengeance",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Loyal Apprentice",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Mind Stone",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Mogg War Marshal",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Molten Gatekeeper",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "recursion"
+        },
+        {
+          "card_name": "Norin the Wary",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        },
+        {
+          "card_name": "Panharmonicon",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Pashalik Mons",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Siege-Gang Commander",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Siege-Gang Lieutenant",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Skirk Prospector",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Skullclamp",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Song of Totentanz",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "other"
+        },
+        {
+          "card_name": "Legion Warboss",
+          "deck_count": 5,
+          "total_quantity": 5,
+          "role": "creature"
+        }
+      ],
+      "theme_counts": {
+        "token_burn": 2,
+        "token_damage_payoffs": 1,
+        "casual_token_burn": 1,
+        "go_wide_pressure": 1
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

@@ -3,6 +3,54 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote C apply e readiness pos-corpus
+
+### O Porquê
+- Os corpora offline do Lote C ja tinham passado no dry-run DB-backed, mas ainda
+  faltava aplicar com seguranca apenas os comandantes aceitos, provar
+  idempotencia e gerar o scorecard de readiness pos-apply sem runtime summary.
+- A execucao precisava preservar seguranca documental: sem tokens, JWT,
+  Sentry DSN, `DATABASE_URL`, `OPENAI_API_KEY`, payload sensivel, scanner,
+  camera ou OCR.
+
+### O Como
+- `master` foi sincronizada com `origin/master` por fast-forward check e ja
+  estava atualizada.
+- Foram relidos o relatorio Lote C, tracker Sprint 3, este manual,
+  `server/bin/commander_reference_deck_corpus.dart` e
+  `server/bin/commander_reference_readiness_scorecard.dart`.
+- Para `Purphoros, God of the Forge`, `Brago, King Eternal`,
+  `Veyran, Voice of Duality` e `Balan, Wandering Knight`, o dry-run pre-apply foi
+  reexecutado em
+  `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/dry_run_pre_apply/`.
+- Como todos passaram, `--apply` foi executado em `apply/` e repetido em
+  `apply_idempotency/`. O runner usa upsert por `source_deck_key`, recria as
+  cartas daquele source deck e atualiza o agregado por comandante, portanto a
+  segunda execucao confirmou idempotencia.
+- O readiness scorecard foi executado sem runtime summary em
+  `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/readiness_after_corpus/`.
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_CORPUS_PREP_2026-05-14.md`
+  e `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md` foram
+  atualizados. Nao houve mudanca de endpoint, contrato app-facing, scanner,
+  camera, OCR ou runner.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Pre-change DB-backed para os quatro comandantes: 0 linhas em
+  `commander_reference_decks`.
+- Post-apply/idempotencia: Purphoros 5/5, Brago 4/4, Veyran 4/4 e Balan 4/4
+  linhas aceitas, todas com `unresolved=0`, `off_color=0`,
+  `commander_quantity=1`, `main_quantity=99` e singleton limpo.
+- Readiness sem runtime summary: Brago ficou `score=98`,
+  `profile_ready_needs_proof`, com warning `public_runtime_proof_missing`.
+  Balan, Purphoros e Veyran ficaram `score=25`, `blocked`, por ausencia de
+  profile/card_stats/deterministic reference proof ja aplicados, alem da falta de
+  public runtime proof.
+- Nenhum comandante do Lote C foi promovido nesta etapa. Proximos passos:
+  preparar/aplicar profiles e card_stats para Balan/Purphoros/Veyran, manter a
+  ressalva estrategica de Veyran ate reforcar fontes high-signal, e so depois
+  executar public proof 5/5 + readiness com runtime summary.
+
 ## 2026-05-14 — Commander Reference Sprint 3 consolidacao A+B e decisao Lote C
 
 ### O Porquê
