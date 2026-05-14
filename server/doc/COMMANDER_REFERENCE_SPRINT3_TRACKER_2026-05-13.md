@@ -32,10 +32,10 @@ camera ou OCR.
 | 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
-| 9 | `Purphoros, God of the Forge` | C | Mono-red token payoff/burn sem repetir Goblin typal de Krenko | DONE | DONE, PASS | DONE | DONE | PENDING | BLOCKED score 25 `blocked` | false |
-| 10 | `Brago, King Eternal` | C | Azorius blink/ETB value/control sem stax duro como default | DONE | DONE, PASS | DONE | DONE | PENDING | PASS_WITH_RISKS score 98 `profile_ready_needs_proof` | false |
-| 11 | `Veyran, Voice of Duality` | C | Izzet magecraft/spell-copy/prowess sem repetir Niv draw-damage control | DONE | DONE, PASS | DONE | DONE | PENDING | BLOCKED score 25 `blocked` | false |
-| 12 | `Balan, Wandering Knight` | C | Mono-white Equipment Voltron sem repetir Light-Paws aura tutor | DONE | DONE, PASS | DONE | DONE | PENDING | BLOCKED score 25 `blocked` | false |
+| 9 | `Purphoros, God of the Forge` | C | Mono-red token payoff/burn sem repetir Goblin typal de Krenko | DONE | DONE, PASS | DONE | DONE | BLOCKED 5/5 legal sem profile/stats/corpus | BLOCKED score 25 `blocked` | false |
+| 10 | `Brago, King Eternal` | C | Azorius blink/ETB value/control sem stax duro como default | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
+| 11 | `Veyran, Voice of Duality` | C | Izzet magecraft/spell-copy/prowess sem repetir Niv draw-damage control | DONE | DONE, PASS | DONE | DONE | BLOCKED 5/5 legal sem profile/stats/corpus | BLOCKED score 25 `blocked` | false |
+| 12 | `Balan, Wandering Knight` | C | Mono-white Equipment Voltron sem repetir Light-Paws aura tutor | DONE | DONE, PASS | DONE | DONE | BLOCKED 5/5 legal sem profile/stats/corpus | BLOCKED score 25 `blocked` | false |
 
 ## Lote A corpus prep - 2026-05-13
 
@@ -235,6 +235,28 @@ Contagens DB-backed pos-apply: Purphoros 5/5, Brago 4/4, Veyran 4/4 e Balan
 4/4 linhas aceitas totais por comandante, todas com unresolved/off-color 0,
 `commander_quantity=1`, `main_quantity=99` e singleton limpo. Pre-change para o
 Lote C era 0 linhas por comandante. Nenhum comandante do Lote C foi promovido.
+
+## Lote C public proof + decisao - 2026-05-14
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_PUBLIC_PROOF_2026-05-14.md`.
+
+Artifacts novos:
+`server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/public_proof/summary.json`
+e
+`server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/readiness_public/readiness_scorecard_summary.json`.
+
+| Commander | Public proof | Runtime gates | p50/p95 | Readiness publico | Promoted |
+| --- | --- | --- | --- | --- | --- |
+| `Purphoros, God of the Forge` | BLOCKED | HTTP 200, validation, commander e main 99 em 5/5; profile/stats/corpus 0/5; invalid=0, off_identity=0, timeout=0 | 794ms / 12590ms | score 25, `blocked`, blockers profile/card_stats/deterministic | false |
+| `Brago, King Eternal` | PASS | HTTP 200, validation, commander, main 99, profile/stats/corpus em 5/5; invalid=0, off_identity=0, timeout=0 | 864ms / 942ms | score 100, `ready_for_mini_batch` | true |
+| `Veyran, Voice of Duality` | BLOCKED | HTTP 200, validation, commander e main 99 em 5/5; profile/stats/corpus 0/5; invalid=0, off_identity=0, timeout=0 | 794ms / 11112ms | score 25, `blocked`, blockers profile/card_stats/deterministic | false |
+| `Balan, Wandering Knight` | BLOCKED | HTTP 200, validation, commander e main 99 em 5/5; profile/stats/corpus 0/5; invalid=0, off_identity=0, timeout=0 | 826ms / 15568ms | score 25, `blocked`, blockers profile/card_stats/deterministic | false |
+
+Decisao: apenas Brago foi promovido para mini-batch controlado. O Lote C como
+conjunto fica **BLOCKED** ate aplicar/corrigir Commander Reference Profile,
+Card Stats e fallback deterministico para Purphoros, Veyran e Balan e repetir a
+prova publica.
 
 ## Fechamento parcial Lote A - 2026-05-13
 

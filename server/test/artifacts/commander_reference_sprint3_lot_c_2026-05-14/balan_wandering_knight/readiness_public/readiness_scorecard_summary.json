@@ -1,0 +1,106 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "version": "commander_reference_readiness_v2_2026-05-13",
+  "mode": "read_only_scorecard",
+  "db_mutations": false,
+  "started_at": "2026-05-14T14:11:38.687705Z",
+  "finished_at": "2026-05-14T14:11:40.519682Z",
+  "artifact_dir": "test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/balan_wandering_knight/readiness_public",
+  "commander_count": 1,
+  "ready_count": 0,
+  "scorecards": [
+    {
+      "version": "commander_reference_readiness_v2_2026-05-13",
+      "commander_name": "Balan, Wandering Knight",
+      "score": 25,
+      "status": "blocked",
+      "expansion_ready": false,
+      "gates": {
+        "commander_card_resolved": false,
+        "profile_available": false,
+        "profile_confidence_usable": false,
+        "profile_has_sources": false,
+        "profile_has_themes": false,
+        "profile_has_expected_packages": false,
+        "card_stats_available": false,
+        "card_stats_unresolved_zero": true,
+        "card_stats_packages_available": false,
+        "corpus_available": true,
+        "corpus_minimum_accepted_decks": true,
+        "corpus_core_package_strong": true,
+        "deterministic_deck_valid": false,
+        "deterministic_main_quantity_ok": false,
+        "runtime_public_gate_passed": false
+      },
+      "blockers": [
+        "commander_card_not_resolved",
+        "profile_missing_or_below_confidence",
+        "card_stats_missing",
+        "deterministic_reference_deck_invalid",
+        "deterministic_main_quantity_not_99"
+      ],
+      "warnings": [
+        "public_runtime_gate_not_passed"
+      ],
+      "next_actions": [
+        "Aplicar commander_reference_card_stats resolvidos para o comandante.",
+        "Corrigir fallback deterministico commander-aware antes de liberar.",
+        "Criar/aplicar Commander Reference Profile com confidence >= medium.",
+        "Garantir fallback deterministic com 99 cartas no main.",
+        "Repetir proof ate fallback/off-color/commander gates passarem.",
+        "Resolver a carta do comandante em cards antes de habilitar runtime."
+      ],
+      "inputs": {
+        "commander_name": "Balan, Wandering Knight",
+        "commander_card_resolved": false,
+        "profile_available": false,
+        "profile_confidence": "not_proven",
+        "profile_source_count": 0,
+        "profile_theme_count": 0,
+        "profile_expected_package_count": 0,
+        "card_stats_count": 0,
+        "card_stats_unresolved_count": 0,
+        "card_stats_package_count": 0,
+        "corpus_available": true,
+        "corpus_accepted_deck_count": 4,
+        "corpus_core_package_count": 38,
+        "corpus_theme_package_count": 0,
+        "corpus_support_package_count": 0,
+        "deterministic_deck_valid": false,
+        "deterministic_main_quantity": 0,
+        "deterministic_warnings": [],
+        "runtime_proof": {
+          "available": true,
+          "status": "BLOCKED",
+          "backend_sha": "ca23fc5a16e0b5c194d7375a537e23cf5cd34d2f",
+          "with_commander": {
+            "backend_git_sha": "ca23fc5a16e0b5c194d7375a537e23cf5cd34d2f",
+            "commander_preserved": 5,
+            "corpus_used": 0,
+            "fallback_count": 0,
+            "http_200": 5,
+            "invalid_cards_total": 0,
+            "main_quantity_99": 5,
+            "off_identity_total": 0,
+            "p50_ms": 826,
+            "p95_ms": 15568,
+            "probe_count": 5,
+            "profile_used": 0,
+            "stats_used": 0,
+            "status": "BLOCKED",
+            "timeout_fallback_count": 0,
+            "validation_ok": 5
+          },
+          "gate_passed": false
+        }
+      },
+      "cache_key": "commander_reference_readiness:4ef39165a65005f8"
+    }
+  ],
+  "safety": {
+    "no_runtime_code_changes": true,
+    "no_decklists_recorded": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

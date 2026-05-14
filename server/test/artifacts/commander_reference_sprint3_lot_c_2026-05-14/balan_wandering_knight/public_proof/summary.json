@@ -1,0 +1,18 @@
+{
+  "backend_git_sha": "ca23fc5a16e0b5c194d7375a537e23cf5cd34d2f",
+  "commander_preserved": 5,
+  "corpus_used": 0,
+  "fallback_count": 0,
+  "http_200": 5,
+  "invalid_cards_total": 0,
+  "main_quantity_99": 5,
+  "off_identity_total": 0,
+  "p50_ms": 826,
+  "p95_ms": 15568,
+  "probe_count": 5,
+  "profile_used": 0,
+  "stats_used": 0,
+  "status": "BLOCKED",
+  "timeout_fallback_count": 0,
+  "validation_ok": 5
+}

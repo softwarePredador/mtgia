@@ -3,6 +3,54 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote C public proof
+
+### O Porquê
+- Depois do Lote C aplicado e idempotente, era necessario executar a prova
+  publica 5/5 de `POST /ai/generate` por comandante e decidir promocao via
+  scorecard com `--runtime-summary`.
+- O gate exigia `format=Commander`, `bracket=3`, `commander_name` exato,
+  comandante preservado, main deck 99, profile/stats/corpus usados,
+  invalid/off-identity 0, timeout fallback 0 e scorecard final 100.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com
+  `git_sha=ca23fc5a16e0b5c194d7375a537e23cf5cd34d2f`, igual ao HEAD local.
+- Foram lidos o relatorio Lote C apply/corpus prep, o API map e este manual. O
+  API map permaneceu inalterado porque nao houve mudanca de contrato, payload,
+  response shape, diagnostics app-facing, data source ou consumidor mobile.
+- Para cada comandante Lote C foi criado usuario QA descartavel em memoria e
+  executadas 5 probes publicas sanitizadas de `/ai/generate`; os artifacts
+  persistem apenas contadores, timings e flags, sem token, e-mail completo,
+  prompt completo, decklist, JWT, Sentry DSN, `DATABASE_URL` ou
+  `OPENAI_API_KEY`.
+- O scorecard foi executado por comandante com `--runtime-summary` apontando para
+  `public_proof/summary.json`, salvando `readiness_public/`.
+
+### Resultado
+- Resultado operacional: **BLOCKED** para promocao do Lote C completo.
+- Public proof:
+  - Purphoros: 5/5 HTTP 200, validation, comandante e main 99; invalid/off-id 0
+    e timeout 0, mas profile/stats/corpus 0/5; score 25, `blocked`.
+  - Brago: 5/5 HTTP 200, validation, comandante, main 99, profile/stats/corpus;
+    invalid/off-id 0, timeout 0, p50/p95 864ms/942ms; score 100,
+    `ready_for_mini_batch`.
+  - Veyran: 5/5 HTTP 200, validation, comandante e main 99; invalid/off-id 0 e
+    timeout 0, mas profile/stats/corpus 0/5; score 25, `blocked`.
+  - Balan: 5/5 HTTP 200, validation, comandante e main 99; invalid/off-id 0 e
+    timeout 0, mas profile/stats/corpus 0/5; score 25, `blocked`.
+- Apenas `Brago, King Eternal` foi promovido no tracker para mini-batch
+  controlado. Purphoros, Veyran e Balan seguem bloqueados por
+  `commander_card_not_resolved`, `profile_missing_or_below_confidence`,
+  `card_stats_missing`, `deterministic_reference_deck_invalid` e
+  `deterministic_main_quantity_not_99`.
+- Documentos/artifacts atualizados:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_PUBLIC_PROOF_2026-05-14.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md` e
+  `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/<safe_commander>/{public_proof,readiness_public}/`.
+- Scanner, camera, OCR e app runtime real permaneceram fora do escopo.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote C apply e readiness pos-corpus
 
 ### O Porquê
