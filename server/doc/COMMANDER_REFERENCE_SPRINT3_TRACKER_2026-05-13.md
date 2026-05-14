@@ -341,14 +341,15 @@ Artifacts:
 
 | Commander | Apply/idempotencia | Public proof | p50/p95 | Readiness publico | Promoted |
 | --- | --- | --- | --- | --- | --- |
-| `Feather, the Redeemed` | PASS 4/4, unresolved=0, off_color=0, singleton limpo | BLOCKED: HTTP 200, validation, commander, main 99 e profile/stats/corpus 5/5; invalid/off-id 0; `timeout_fallback_count=5` em duas rodadas | 847ms / 25045ms | score 98, `profile_ready_needs_proof`, warning `public_runtime_gate_not_passed` | false |
-| `Miirym, Sentinel Wyrm` | PASS 5/5, unresolved=0, off_color=0, singleton limpo | PASS: HTTP 200, validation, commander, main 99 e profile/stats/corpus 5/5; invalid/off-id 0; timeout 0 | 848ms / 956ms | score 100, `ready_for_mini_batch`, blockers/warnings vazios | true |
+| `Feather, the Redeemed` | PASS 4/4, unresolved=0, off_color=0, singleton limpo | BLOCKED: revalidacao atual HTTP 200, validation, commander, main 99 e profile/stats/corpus 5/5; `invalid_cards_total=5`, off-id 0, timeout 0; historico anterior com `timeout_fallback_count=5` | 855ms / 25659ms | scorecard atual 100, mas public proof gate falhou; nao promover | false |
+| `Miirym, Sentinel Wyrm` | PASS 5/5, unresolved=0, off_color=0, singleton limpo | PASS: HTTP 200, validation, commander, main 99 e profile/stats/corpus 5/5; invalid/off-id 0; timeout 0 | 849ms / 942ms | score 100, `ready_for_mini_batch`, blockers/warnings vazios | true |
 | `Ghave, Guru of Spores` | NOT_RUN | NOT_RUN | n/a | blocked por falta de profile/card_stats | false |
 | `Jodah, the Unifier` | NOT_RUN | NOT_RUN | n/a | blocked por profile legado `edhrec` e falta de card_stats | false |
 
 Resultado: **PASS_WITH_RISKS**. Promovido apenas `Miirym, Sentinel Wyrm`.
-`Feather, the Redeemed` nao deve ser tratado como promovido ate zerar timeout
-fallback em novo public proof e retornar score 100. Runtime app Android
+`Feather, the Redeemed` nao deve ser tratado como promovido ate zerar
+invalid/off-identity e timeout fallback no public proof, manter p95 aceitavel e
+retornar scorecard coerente com os gates. Runtime app Android
 `SM A135M` ficou preparado em
 `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`,
 mas nao foi executado nesta rodada.

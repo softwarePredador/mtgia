@@ -14,6 +14,7 @@ Scanner, camera e OCR permanecem fora do escopo.
 
 - Device: `SM A135M` (`R58T300SREH`)
 - Backend publico: `https://evolution-cartinhas.8ktevp.easypanel.host`
+- Backend `/health.git_sha` revalidado: `b472db78ef21a9d4e2c3bc3feaac4e3c7d06b20f`
 - Comandante promovido a cobrir: `Miirym, Sentinel Wyrm`
 - Comandantes nao promovidos nesta rodada: `Feather, the Redeemed`, `Ghave, Guru
   of Spores`, `Jodah, the Unifier`

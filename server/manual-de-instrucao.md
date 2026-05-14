@@ -15,7 +15,7 @@
 
 ### O Como
 - `master` foi sincronizada com `origin/master` e o `/health` publico respondeu
-  `git_sha=7b607404871168aa18d920ab71f7d70c63f325a5`, alinhado ao HEAD local.
+  `git_sha=b472db78ef21a9d4e2c3bc3feaac4e3c7d06b20f`, alinhado ao HEAD local.
 - Foram relidos plano Sprint 4, tracker Sprint 3/Sprint 4, API map e este
   manual antes de qualquer apply.
 - Track A confirmou `Feather, the Redeemed` e `Miirym, Sentinel Wyrm` como
@@ -25,7 +25,8 @@
   artifacts versionados contem apenas summaries sanitizados.
 - Para Feather e Miirym foram executados dry-run pre-apply, `--apply`,
   idempotencia e scorecard sem runtime. Depois, public proof 5/5 no backend
-  publico e scorecard com `--runtime-summary`.
+  publico e scorecard com `--runtime-summary`; a revalidacao do deploy atual foi
+  salva em `public_proof_current_sha/` e `readiness_public_current_sha/`.
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e permaneceu
   inalterado porque nao houve mudanca de contrato app-facing, payload, response
   shape, diagnostics app-facing, data source ou consumidor mobile.
@@ -34,11 +35,13 @@
 - Resultado operacional: **PASS_WITH_RISKS**.
 - Promovido: `Miirym, Sentinel Wyrm` com public proof PASS, HTTP 200 5/5,
   validation 5/5, comandante preservado 5/5, main 99 5/5, profile/stats/corpus
-  5/5, invalid/off-identity 0, timeout fallback 0, p50 848ms, p95 956ms e
+  5/5, invalid/off-identity 0, timeout fallback 0, p50 849ms, p95 942ms e
   scorecard 100 `ready_for_mini_batch`.
 - Bloqueado: `Feather, the Redeemed` com legalidade e profile/stats/corpus 5/5,
-  mas `timeout_fallback_count=5` em duas rodadas, p95 25045ms e scorecard 98
-  `profile_ready_needs_proof`.
+  mas public proof atual `status=BLOCKED` por `invalid_cards_total=5` e p95
+  25659ms; o historico anterior tambem registrou `timeout_fallback_count=5`.
+  Mesmo com scorecard atual 100, nao foi promovido porque falhou o gate publico
+  sanitizado.
 - Bloqueados sem apply: `Ghave, Guru of Spores` por falta de profile/card_stats
   e `Jodah, the Unifier` por profile legado `edhrec` e ausencia de card_stats.
 - Documentos/artifacts atualizados:

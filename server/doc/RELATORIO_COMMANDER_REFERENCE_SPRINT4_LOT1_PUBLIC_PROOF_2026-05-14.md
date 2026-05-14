@@ -5,9 +5,10 @@
 **PASS_WITH_RISKS.**
 
 O Lote 1 promove somente `Miirym, Sentinel Wyrm` para
-`ready_for_mini_batch`. `Feather, the Redeemed` passou nos gates de legalidade e
-uso de profile/card_stats/corpus, mas nao foi promovido porque duas rodadas de
-public proof ficaram com `timeout_fallback_count=5` e scorecard final 98.
+`ready_for_mini_batch`. `Feather, the Redeemed` passou nos gates de
+HTTP/validacao/comandante/main/profile/card_stats/corpus, mas nao foi promovido:
+na revalidacao do deploy atual o summary ficou `status=BLOCKED` por
+`invalid_cards_total=5` e p95 alto, apesar do scorecard atual retornar 100.
 
 Nao houve mudanca de contrato app-facing, scanner, camera ou OCR. Artifacts
 persistidos sao summaries sanitizados; corpora brutos temporarios ficaram fora do
@@ -18,7 +19,7 @@ repositorio e foram removidos ao final.
 - Repo: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia`
 - Branch alvo: `master`
 - Backend publico: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Backend `/health.git_sha`: `7b607404871168aa18d920ab71f7d70c63f325a5`
+- Backend `/health.git_sha`: `b472db78ef21a9d4e2c3bc3feaac4e3c7d06b20f`
 - API map consultado e mantido sem alteracao porque nao houve drift de rota,
   payload, response shape, diagnostics app-facing, data source ou consumidor
   mobile.
@@ -36,6 +37,8 @@ repositorio e foram removidos ao final.
 
 Artifacts:
 `server/test/artifacts/commander_reference_sprint4_lot1_2026-05-14/`.
+Os summaries do deploy atual ficam em `public_proof_current_sha/` e
+`readiness_public_current_sha/`; a rodada anterior em `7b6074...` foi preservada.
 
 | Commander | Dry-run pre-apply | Apply | Idempotencia | Readiness sem runtime |
 | --- | --- | --- | --- | --- |
@@ -50,19 +53,20 @@ prompt bruto ou decklist completa.
 
 | Commander | Public proof | Runtime gates | p50/p95 | Resultado |
 | --- | --- | --- | --- | --- |
-| `Feather, the Redeemed` | BLOCKED | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; invalid=0, off_identity=0; `timeout_fallback_count=5` em duas rodadas | 847ms / 25045ms na rodada final | Nao promover; score 98 `profile_ready_needs_proof` |
-| `Miirym, Sentinel Wyrm` | PASS | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; invalid=0, off_identity=0, timeout=0 | 848ms / 956ms | Promover; score 100 `ready_for_mini_batch` |
+| `Feather, the Redeemed` | BLOCKED | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; `invalid_cards_total=5`, off_identity=0, timeout=0 | 855ms / 25659ms na revalidacao atual | Nao promover; public proof gate falhou apesar de scorecard atual 100 |
+| `Miirym, Sentinel Wyrm` | PASS | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; invalid=0, off_identity=0, timeout=0 | 849ms / 942ms | Promover; score 100 `ready_for_mini_batch` |
 
-Observacao: Feather teve uma primeira tentativa preservada em
-`public_proof_timeout_attempt/` e uma repeticao controlada no path final
-`public_proof/`; ambas bloquearam pelo mesmo motivo objetivo:
-`timeout_fallback_count=5`.
+Observacao: Feather teve a rodada anterior preservada em
+`public_proof_timeout_attempt/` e `public_proof/`, ambas bloqueadas por
+`timeout_fallback_count=5`. Na revalidacao do deploy atual
+`public_proof_current_sha/`, o timeout zerou, mas o gate continuou bloqueado por
+`invalid_cards_total=5` e p95 25659ms.
 
 ## Track D - scorecard de promocao
 
 | Commander | Score | Status | Promoted |
 | --- | ---: | --- | --- |
-| `Feather, the Redeemed` | 98 | `profile_ready_needs_proof`, warning `public_runtime_gate_not_passed` | false |
+| `Feather, the Redeemed` | 100 | `ready_for_mini_batch` no scorecard atual, mas public proof `status=BLOCKED` por invalid_cards_total>0 | false |
 | `Miirym, Sentinel Wyrm` | 100 | `ready_for_mini_batch`, blockers/warnings vazios | true |
 
 ## Track E - runtime app Android SM A135M
@@ -91,7 +95,8 @@ adb -s R58T300SREH shell svc wifi enable
 ## Decisao final
 
 - **Promovido:** `Miirym, Sentinel Wyrm`.
-- **Bloqueados:** `Feather, the Redeemed` por timeout fallback publico;
+- **Bloqueados:** `Feather, the Redeemed` por public proof atual com
+  `invalid_cards_total=5` e p95 alto, alem de historico de timeout fallback;
   `Ghave, Guru of Spores` e `Jodah, the Unifier` por falta de
   profile/card_stats utilizaveis.
 - **Resultado operacional:** **PASS_WITH_RISKS**.

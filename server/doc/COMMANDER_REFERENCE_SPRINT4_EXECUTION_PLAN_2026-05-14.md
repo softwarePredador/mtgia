@@ -15,9 +15,11 @@ aplicadas.
 
 Atualizacao Lote 1: `Miirym, Sentinel Wyrm` foi promovido para
 `ready_for_mini_batch` apos apply/idempotencia, public proof 5/5 e scorecard
-100. `Feather, the Redeemed` nao foi promovido porque o public proof repetiu
-`timeout_fallback_count=5`. `Ghave, Guru of Spores` e `Jodah, the Unifier`
-permanecem bloqueados por profile/card_stats ausentes ou legados.
+100. `Feather, the Redeemed` nao foi promovido porque a revalidacao do deploy
+atual bloqueou o public proof por `invalid_cards_total=5` e p95 alto, alem do
+historico anterior de `timeout_fallback_count=5`. `Ghave, Guru of Spores` e
+`Jodah, the Unifier` permanecem bloqueados por profile/card_stats ausentes ou
+legados.
 
 ## Contexto operacional
 
@@ -155,7 +157,8 @@ dart run bin/commander_reference_readiness_scorecard.dart \
 ## Blockers
 
 - Lote 1 promove apenas `Miirym, Sentinel Wyrm`; `Feather, the Redeemed`
-  permanece bloqueado por timeout fallback publico.
+  permanece bloqueado por public proof atual com `invalid_cards_total=5`, p95
+  25659ms e historico de timeout fallback publico.
 - `Ghave` e `Jodah` precisam de profile/card_stats antes de qualquer apply.
 - iPhone 15 ainda depende de resolver ou contornar o blocker historico de
   `MLImage.framework`/scanner mantendo scanner/OCR fora do escopo.

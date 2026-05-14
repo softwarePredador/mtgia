@@ -1,0 +1,64 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "backend": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "backend_git_sha": "b472db78ef21a9d4e2c3bc3feaac4e3c7d06b20f",
+  "promoted": [
+    "Miirym, Sentinel Wyrm"
+  ],
+  "blocked": [
+    {
+      "commander": "Feather, the Redeemed",
+      "reason": "public_proof_current_sha_invalid_cards_total_5_p95_25659ms"
+    },
+    {
+      "commander": "Ghave, Guru of Spores",
+      "reason": "profile_card_stats_missing"
+    },
+    {
+      "commander": "Jodah, the Unifier",
+      "reason": "legacy_profile_and_card_stats_missing"
+    }
+  ],
+  "public_proof": {
+    "Feather, the Redeemed": {
+      "status": "BLOCKED",
+      "http_200": 5,
+      "validation_ok": 5,
+      "commander_preserved": 5,
+      "main_quantity_99": 5,
+      "profile_used": 5,
+      "stats_used": 5,
+      "corpus_used": 5,
+      "invalid_cards_total": 5,
+      "off_identity_total": 0,
+      "fallback_count": 0,
+      "timeout_fallback_count": 0,
+      "p50_ms": 855,
+      "p95_ms": 25659
+    },
+    "Miirym, Sentinel Wyrm": {
+      "status": "PASS",
+      "http_200": 5,
+      "validation_ok": 5,
+      "commander_preserved": 5,
+      "main_quantity_99": 5,
+      "profile_used": 5,
+      "stats_used": 5,
+      "corpus_used": 5,
+      "invalid_cards_total": 0,
+      "off_identity_total": 0,
+      "fallback_count": 5,
+      "timeout_fallback_count": 0,
+      "p50_ms": 849,
+      "p95_ms": 942
+    }
+  },
+  "scorecard_note": "Feather current scorecard returned 100, but promotion remains false because the stricter public proof gate requires invalid_cards_total=0.",
+  "safety": {
+    "token_recorded": false,
+    "email_recorded": false,
+    "decklists_recorded": false,
+    "prompts_recorded": false,
+    "scanner_camera_ocr_out_of_scope": true
+  }
+}
