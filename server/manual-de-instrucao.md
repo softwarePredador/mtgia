@@ -3,6 +3,47 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 consolidacao A+B e decisao Lote C
+
+### O Porquê
+- Depois dos Lotes A e B terem public proof e app runtime parcial registrados, era
+  necessario consolidar a decisao operacional em um relatorio unico, atualizar o
+  tracker Sprint 3 e decidir o proximo lote sem alterar runtime ou contratos.
+- A consolidacao precisava preservar seguranca documental: sem tokens, JWT,
+  Sentry DSN, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails QA completos, prompts,
+  decklists completas ou payload sensivel.
+
+### O Como
+- Foram relidos os relatorios finais/public proof dos Lotes A+B, handoffs app
+  runtime, tracker Sprint 3, APP audit, API contract map e este manual.
+- Foi criado
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_AB_CONSOLIDATION_2026-05-14.md`
+  com promovidos, provas backend/app, cores, arquetipos, p50/p95, riscos,
+  observacao de `429`/backoff, workaround Android Wi-Fi e recomendacao do Lote C.
+- `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md` foi atualizado
+  para apontar a consolidacao e substituir a fila C por quatro candidatos
+  adjacentes que evitam repetir diretamente os shells ja promovidos:
+  `Purphoros, God of the Forge`, `Brago, King Eternal`,
+  `Veyran, Voice of Duality` e `Balan, Wandering Knight`.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e nao foi alterado
+  porque nao houve drift de rota, payload, response shape, diagnostics
+  app-facing, async job, data source ou consumidor mobile.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Promovidos consolidados: Krenko, Light-Paws, Niv-Mizzet, Teysa, Meren,
+  Korvold, Sythis e Urza, todos com corpus/apply/idempotencia PASS, public proof
+  5/5, invalid/off-identity 0, timeout fallback 0/5 e readiness `score=100`.
+- App proof real cobre Krenko/Teysa/Urza/Meren no Android fisico `SM A135M`
+  contra backend publico, com register/login, Generate Commander, preview, save,
+  Deck Details e `/decks/:id/validate`.
+- Riscos remanescentes: runtime Android dependeu de rede celular por timeout
+  Wi-Fi, iPhone 15 Simulator segue bloqueado por `MLImage.framework`/scanner,
+  provas em lote precisam de backoff por risco de `429`, e o agregado
+  `commander_name` de `GET /decks/:id` nao deve virar fonte de verdade ate ser
+  auditado.
+- Scanner, camera, OCR e contratos app-facing ficaram fora do escopo.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote B app runtime
 
 ### O Porquê

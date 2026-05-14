@@ -16,6 +16,7 @@ camera ou OCR.
 - `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_PUBLIC_PROOF_2026-05-13.md`
 - `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_a_app_2026-05-13.md`
 - `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_A_FINAL_2026-05-13.md`
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_AB_CONSOLIDATION_2026-05-14.md`
 - `server/bin/commander_reference_deck_corpus.dart`
 
 ## Status por comandante
@@ -30,10 +31,10 @@ camera ou OCR.
 | 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
-| 9 | `Brago, King Eternal` | C | Azorius blink/ETB value/control | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 10 | `Feather, the Redeemed` | C | Boros spellslinger-Voltron/protection combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 11 | `Jodah, the Unifier` | C | Five-color legendary typal/value-combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 12 | `Ghave, Guru of Spores` | C | Abzan tokens/+1/+1 counters/aristocrats-combo | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
+| 9 | `Purphoros, God of the Forge` | C | Mono-red token payoff/burn sem repetir Goblin typal de Krenko | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
+| 10 | `Brago, King Eternal` | C | Azorius blink/ETB value/control sem stax duro como default | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
+| 11 | `Veyran, Voice of Duality` | C | Izzet magecraft/spell-copy/prowess sem repetir Niv draw-damage control | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
+| 12 | `Balan, Wandering Knight` | C | Mono-white Equipment Voltron sem repetir Light-Paws aura tutor | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 
 ## Lote A corpus prep - 2026-05-13
 
@@ -162,6 +163,32 @@ e
 Observacao operacional: o primeiro disparo continuo encontrou rate limit publico
 `429` apos dez chamadas; Sythis e Urza foram rerodados com backoff e os summaries
 rate-limited ficaram preservados em `public_proof_rate_limited_attempt/`.
+
+## Consolidacao Lotes A+B e decisao Lote C - 2026-05-14
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_AB_CONSOLIDATION_2026-05-14.md`.
+
+Resultado consolidado: **PASS_WITH_RISKS**.
+
+- Promovidos A+B: Krenko, Light-Paws, Niv-Mizzet, Teysa, Meren, Korvold, Sythis
+  e Urza, todos com corpus/apply/idempotencia PASS, public proof 5/5,
+  `score=100`, `ready_for_mini_batch`, invalid/off-identity 0 e timeout fallback
+  0/5.
+- App runtime real: PASS_WITH_RISKS no Android fisico `SM A135M` para Krenko,
+  Teysa, Urza e Meren, cobrindo register/login, Generate Commander com
+  `commander_name`, preview, save, Deck Details e `/decks/:id/validate`.
+- Riscos: workaround de rede celular no Android por timeout Wi-Fi, iPhone 15
+  Simulator ainda nao provado por `MLImage.framework`/scanner, `429` em prova
+  publica de lote exige backoff, e `GET /decks/:id.commander_name` agregado nao
+  foi fonte de verdade no Lote B.
+- API map: consultado e mantido sem alteracao porque nao houve drift de rota,
+  payload, response shape, diagnostics app-facing, async job, data source ou
+  consumidor mobile.
+- Lote C recomendado: `Purphoros, God of the Forge`, `Brago, King Eternal`,
+  `Veyran, Voice of Duality` e `Balan, Wandering Knight`, priorizando lacunas
+  red tokens sem Goblin typal, Azorius blink/control, Izzet magecraft e
+  mono-white Equipment sem repetir diretamente Krenko, Niv ou Light-Paws.
 
 ## Fechamento parcial Lote A - 2026-05-13
 
