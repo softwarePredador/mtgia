@@ -3,6 +3,49 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote B corpus prep
+
+### O Porquê
+- Depois do runtime app real do Lote A fechar como PASS_WITH_RISKS no Android
+  fisico, o proximo passo autorizado era preparar o Lote B somente em modo
+  backend/offline, sem aplicar no banco.
+- O lote precisava priorizar diversidade ainda faltante: graveyard BG,
+  sacrifice/treasure Jund, enchantress GW e mono-blue artifacts/control/combo,
+  mantendo cEDH/high-power separado de Commander casual.
+
+### O Como
+- `master` local foi confirmado sincronizado com `origin/master` antes da coleta,
+  e o `/health` publico retornou
+  `git_sha=f4ec0d3c056d811f033d061cfaf0afefa82d30fb`, igual ao HEAD local.
+- Foram lidos o relatorio final Lote A, o tracker Sprint 2, o plano/tracker
+  Sprint 3, os relatorios dos comandantes ja promovidos e este manual.
+- Foram selecionados `Meren of Clan Nel Toth`, `Korvold, Fae-Cursed King` retry,
+  `Sythis, Harvest's Hand` e `Urza, Lord High Artificer`.
+- As paginas publicas EDHREC Average Deck foram coletadas uma vez em baixo volume
+  e salvas como corpora offline em
+  `server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/corpus.json`.
+- Cada corpus foi validado com
+  `dart run bin/commander_reference_deck_corpus.dart --dry-run`, salvando
+  summaries em `dry_run/`. `--apply` nao foi executado.
+- Meren teve fontes `/graveyard`, `/sacrifice` e `/self-mill` sondadas, mas
+  excluidas do artifact final porque o DB local nao resolveu `Cauldron of
+  Essence` ou `Grave Researcher` no dry-run.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Dry-run PASS sem mutacao no banco:
+  - Meren: 3/3 decks aceitos, commander/main 1/99, unresolved 0, off_color 0.
+  - Korvold: 4/4 decks aceitos, commander/main 1/99, unresolved 0, off_color 0.
+  - Sythis: 5/5 decks aceitos, commander/main 1/99, unresolved 0, off_color 0.
+  - Urza: 5/5 decks aceitos, commander/main 1/99, unresolved 0, off_color 0.
+- Documentos criados:
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_LOT_B_PLAN_2026-05-14.md` e
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_CORPUS_PREP_2026-05-14.md`.
+- Tracker atualizado com `corpus_prepared=DONE`, `dry_run=DONE, PASS`,
+  `apply=APPLY_NOT_RUN` e demais gates `PENDING`.
+- Nenhum endpoint, contrato app-facing, provider, scanner/camera/OCR, token,
+  secret, prompt completo ou payload sensivel foi alterado/persistido.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote A app runtime rerun
 
 ### O Porquê

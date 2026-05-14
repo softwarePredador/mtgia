@@ -26,10 +26,10 @@ camera ou OCR.
 | 2 | `Light-Paws, Emperor's Voice` | A | Mono-white auras/Voltron/protection | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 3 | `Niv-Mizzet, Parun` | A | Izzet spellslinger/draw-damage/control-combo lanes | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
 | 4 | `Teysa Karlov` | A | Orzhov aristocrats/tokens/death triggers | DONE | DONE | DONE | DONE | PASS | PASS score 100 `ready_for_mini_batch` | true |
-| 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
-| 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
+| 5 | `Meren of Clan Nel Toth` | B | Golgari graveyard recursion/sacrifice value | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 6 | `Korvold, Fae-Cursed King` retry | B | Jund sacrifice/treasure/value-combo | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 7 | `Sythis, Harvest's Hand` | B | Selesnya enchantress value | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
+| 8 | `Urza, Lord High Artificer` | B | Mono-blue artifacts/control/combo with explicit power lane | DONE | DONE, PASS | APPLY_NOT_RUN | PENDING | PENDING | PENDING | false |
 | 9 | `Brago, King Eternal` | C | Azorius blink/ETB value/control | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 10 | `Feather, the Redeemed` | C | Boros spellslinger-Voltron/protection combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
 | 11 | `Jodah, the Unifier` | C | Five-color legendary typal/value-combat | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | false |
@@ -91,6 +91,29 @@ e
 | `Light-Paws, Emperor's Voice` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 873ms / 952ms | score 100, `ready_for_mini_batch` | true |
 | `Niv-Mizzet, Parun` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 857ms / 981ms | score 100, `ready_for_mini_batch` | true |
 | `Teysa Karlov` | PASS 5/5 | HTTP 200, validation, commander, main 99, profile/stats/corpus; invalid=0, off_identity=0, timeout=0 | 856ms / 908ms | score 100, `ready_for_mini_batch` | true |
+
+## Lote B corpus prep/dry-run - 2026-05-14
+
+Artifacts:
+`server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/corpus.json`
+e
+`server/test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/<safe_commander>/dry_run/`.
+
+Relatorios:
+`server/doc/COMMANDER_REFERENCE_SPRINT3_LOT_B_PLAN_2026-05-14.md` e
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_B_CORPUS_PREP_2026-05-14.md`.
+
+| Commander | Decks | Dry-run | DB mutations | Commander/main | unresolved | off_color | singleton |
+| --- | ---: | --- | --- | --- | ---: | ---: | --- |
+| `Meren of Clan Nel Toth` | 3 | PASS | false | 1/99 em 3/3 | 0 | 0 | `{}` em 3/3 |
+| `Korvold, Fae-Cursed King` | 4 | PASS | false | 1/99 em 4/4 | 0 | 0 | `{}` em 4/4 |
+| `Sythis, Harvest's Hand` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
+| `Urza, Lord High Artificer` | 5 | PASS | false | 1/99 em 5/5 | 0 | 0 | `{}` em 5/5 |
+
+`--apply` nao foi executado por escopo; Lote B permanece sem idempotencia,
+public proof, readiness final ou promocao. Resultado: **PASS_WITH_RISKS** por
+Meren ter fontes especificas excluidas por unresolved local, Korvold carregar
+historico de core package fraco e Urza exigir lane high-power/combo explicita.
 
 ## Fechamento parcial Lote A - 2026-05-13
 
