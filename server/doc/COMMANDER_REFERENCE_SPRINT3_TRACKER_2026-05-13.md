@@ -258,6 +258,26 @@ conjunto fica **BLOCKED** ate aplicar/corrigir Commander Reference Profile,
 Card Stats e fallback deterministico para Purphoros, Veyran e Balan e repetir a
 prova publica.
 
+## Lote C app runtime - 2026-05-14
+
+Handoff:
+`app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_c_app_2026-05-14.md`.
+
+Resultado app: **PASS_WITH_RISKS** no Android fisico `SM A135M`
+(`R58T300SREH`, Android 14/API 34) contra o backend publico
+`https://evolution-cartinhas.8ktevp.easypanel.host` em
+`git_sha=ef2df98abb9bb8cb2d4b03ca1d3c5d1123da3c86`.
+
+| Commander | App runtime | Promovido no backend | Observacao |
+| --- | --- | --- | --- |
+| `Brago, King Eternal` | PASS: register/login, Generate Commander, preview, save, Deck Details e `/decks/:id/validate`; 99 main, 1 comandante fora das 99, 100 total, off-identity 0 | true | Fecha a prova app do unico promovido Lote C. |
+| `Purphoros, God of the Forge` | PASS app-runtime adjunct com os mesmos gates de app/API | false | Nao conta como segundo promovido; segue bloqueado por profile/card_stats/corpus conforme public proof. |
+
+O objetivo literal de provar dois comandantes Lote C promovidos permanece
+**nao satisfazivel** ate que Purphoros, Veyran ou Balan passem no scorecard
+backend. O app nao mostrou erro cru, overflow, modal preso, scanner, camera ou
+OCR.
+
 ## Fechamento parcial Lote A - 2026-05-13
 
 Relatorio final:

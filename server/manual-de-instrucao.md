@@ -3,6 +3,55 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote C app runtime
+
+### O Porquê
+- Depois do public proof do Lote C promover apenas `Brago, King Eternal`, era
+  necessario provar o fluxo mobile real no Android solicitado e explicitar a
+  divergencia do objetivo "2 promovidos" com o estado backend atual.
+- O fluxo precisava cobrir register/login, Generate Commander com
+  `commander_name`, preview, save, Deck Details e `/decks/:id/validate`, sem
+  expor secrets, tokens, prompts/decklists completas, scanner, camera ou OCR.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com
+  `git_sha=ef2df98abb9bb8cb2d4b03ca1d3c5d1123da3c86`, igual ao HEAD local.
+- Foram consultados o relatorio publico do Lote C, APP audit, UI test surface
+  map, API contract map e este manual. O API map permaneceu inalterado porque
+  nao houve mudanca de rota, payload, response shape, diagnostics app-facing,
+  data source ou consumidor mobile.
+- Foi criado
+  `app/integration_test/commander_reference_sprint3_lot_c_app_runtime_test.dart`
+  reutilizando as keys estaveis de cadastro/login, Generate Commander,
+  preview/save, lista de decks e Deck Details.
+- A prova rodou no Android fisico `SM A135M` (`R58T300SREH`, Android 14/API 34)
+  contra `https://evolution-cartinhas.8ktevp.easypanel.host`; o Wi-Fi foi
+  desabilitado durante a rodada para usar o workaround de rede celular ja
+  documentado nos Lotes A/B e reabilitado ao final.
+- Logs foram sanitizados e screenshots extraidas em
+  `app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint3_lot_c_app/`.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- `Brago, King Eternal`: PASS app/API e `promoted_on_backend=true`; 99 cartas nas
+  99, 1 comandante fora das 99, 100 cartas totais, 0 off-identity e
+  `validation_ok=true`.
+- `Purphoros, God of the Forge`: PASS app/API como cobertura adjunta, mas
+  `promoted_on_backend=false`; nao deve ser tratado como segundo promovido ate
+  corrigir profile/card_stats/corpus e repetir public proof + scorecard.
+- O campo agregado `GET /decks/:id.commander_name` continuou nao batendo com o
+  comandante salvo, mas a lista `commander` e `/decks/:id/validate` foram fonte
+  de verdade e passaram.
+- Documentos atualizados:
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_c_app_2026-05-14.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md`,
+  `app/doc/UI_TEST_SURFACE_MAP.md` e
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`.
+- Scanner, camera, OCR, secrets, JWT, `SENTRY_DSN`, `DATABASE_URL`,
+  `OPENAI_API_KEY`, e-mails QA completos e decklists completas ficaram fora dos
+  artifacts.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote C public proof
 
 ### O Porquê

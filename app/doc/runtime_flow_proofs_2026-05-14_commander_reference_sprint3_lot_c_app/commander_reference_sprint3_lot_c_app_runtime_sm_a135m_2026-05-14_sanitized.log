@@ -1,0 +1,263 @@
+--- repo/device/backend precheck ---
+## master...origin/master
+?? app/integration_test/commander_reference_sprint3_lot_c_app_runtime_test.dart
+ef2df98abb9bb8cb2d4b03ca1d3c5d1123da3c86
+ef2df98abb9bb8cb2d4b03ca1d3c5d1123da3c86
+List of devices attached
+R58T300SREH            device usb:2-1 product:a13ub model:SM_A135M device:a13 transport_id:4
+
+--- android network before cellular workaround ---
+  NetworkAgentInfo{network{143}  handle{617586020365}  ni{WIFI CONNECTED extra: } created=2026-05-14T13:11:36.405Z Score(Policies : TRANSPORT_PRIMARY&EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0)  created 666194065 firstValidated 666194473 lastValidated 666194473  lp{{InterfaceName: wlan0 LinkAddresses: [ fe80::44d1:68ff:fe01:892b/64,192.168.2.41/24 ] DnsAddresses: [ /1.1.1.1,/8.8.8.8 ] UsePrivateDns: true ValidatedPrivateDnsAddresses: [1.1.1.1,8.8.8.8] Domains: Predador.Celulares MTU: 0 ServerAddress: /192.168.2.1 TcpBufferSizes: 524288,1048576,4194304,524288,1048576,4194304 Routes: [ fe80::/64 -> :: wlan0 mtu 0,192.168.2.0/24 -> 0.0.0.0 wlan0 mtu 0,0.0.0.0/0 -> 192.168.2.1 wlan0 mtu 0 ]}}  nc{[ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED LinkUpBandwidth>=28518Kbps LinkDnBandwidth>=43937Kbps Specifier: <WifiNetworkAgentSpecifier [WifiConfiguration=, SSID="Predador - Mobile", BSSID=a2:05:d6:53:d6:c4, band=2, mMatchLocalOnlySpecifiers=false]> TransportInfo: <SSID: "Predador - Mobile", BSSID: a2:05:d6:53:d6:c4, MAC: 46:d1:68:01:89:2b, IP: /192.168.2.41, Security type: 4, Supplicant state: COMPLETED, Wi-Fi standard: 5, RSSI: -47, Link speed: 200Mbps, Tx Link speed: 200Mbps, Max Supported Tx Link speed: 200Mbps, Rx Link speed: 6Mbps, Max Supported Rx Link speed: 200Mbps, Frequency: 5240MHz, Net ID: 3, Metered hint: false, score: 60, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: 1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none>"Predador - Mobile"wpa3-saeMLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>> SignalStrength: -47 OwnerUid: 1000 AdminUids: [1000] SSID: "Predador - Mobile" UnderlyingNetworks: Null]}  factorySerialNumber=8}
+  NetworkAgentInfo{network{144}  handle{621880987661}  ni{MOBILE[IWLAN] CONNECTED extra: ims} created=2026-05-14T13:50:08.225Z Score(Policies : YIELD_TO_BAD_WIFI&EVER_EVALUATED&IS_UNMETERED&EVER_VALIDATED&IS_VALIDATED ; KeepConnected : 0)  created 668505885 firstValidated 668507407 lastValidated 668507407  lp{{InterfaceName: rmnet1 LinkAddresses: [ 10.151.70.172/24 ] DnsAddresses: [ ] PcscfAddresses: [ /10.255.59.74,/10.255.63.74 ] Domains: null MTU: 1280 TcpBufferSizes: 2097152,4194304,8388608,512000,2097152,4194304 Routes: [ 0.0.0.0/0 -> 10.151.70.1 rmnet1 mtu 1280,10.151.70.0/24 -> 0.0.0.0 rmnet1 mtu 0 ]}}  nc{[ Transports: CELLULAR Capabilities: IMS&NOT_METERED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&MMTEL LinkUpBandwidth>=14Kbps LinkDnBandwidth>=14Kbps Specifier: <TelephonyNetworkSpecifier [mSubId = 1]> SubscriptionIds: {1} UnderlyingNetworks: Null]}  factorySerialNumber=3}
+--- public backend health from Mac ---
+{"status":"healthy","service":"mtgia-server","timestamp":"2026-05-14T14:21:27.059686","environment":"production","version":"1.0.0","git_sha":"ef2df98abb9bb8cb2d4b03ca1d3c5d1123da3c86","checks":{"process":{"status":"healthy"}}}--- disable wifi for cellular runtime workaround ---
+--- android ping over current route ---
+PING evolution-cartinhas.8ktevp.easypanel.host (143.198.230.247) 56(84) bytes of data.
+64 bytes from 143.198.230.247: icmp_seq=1 ttl=47 time=213 ms
+
+--- evolution-cartinhas.8ktevp.easypanel.host ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 213.557/213.557/213.557/0.000 ms
+--- flutter runtime ---
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/commander_reference_sprint3_lot_c_app_runtime_test.dart
+Running Gradle task 'assembleDebug'...                             22.5s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...           7.5s
+00:00 +0: SM A135M runtime: Sprint 3 Lote C Commander Reference Brago plus Purphoros adjunct
+COMMANDER_REFERENCE_LOT_C_APP_BASE_URL https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/health
+[🌐 ApiClient] GET /health → 200 (1385ms)
+COMMANDER_REFERENCE_LOT_C_APP_HEALTH status=200 git_sha=ef2df98abb9bb8cb2d4b03ca1d3c5d1123da3c86 latency_ms=1385
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedCredential exists: false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: login
+CAPTURE_START commander_reference_lot_c_01_login
+CAPTURE_CONVERT_BEGIN commander_reference_lot_c_01_login
+CAPTURE_CONVERT_DONE commander_reference_lot_c_01_login
+CAPTURE_TAKEN commander_reference_lot_c_01_login bytes=474513
+SCREENSHOT_BEGIN commander_reference_lot_c_01_login [png chunks stripped; saved as commander_reference_lot_c_01_login.png]
+SCREENSHOT_END commander_reference_lot_c_01_login
+[🧭 Router] redirect: location=/register | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: register
+[🧭 Router] redirect: location=/login | status=AuthStatus.loading
+[🧭 Router] → null (status=AuthStatus.loading, aguardando)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/auth/register
+[🌐 ApiClient] POST /auth/register → 201 (1021ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🧭 Router] redirect: location=/login | status=AuthStatus.authenticated
+[🧭 Router] → /home (já autenticado)
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/market/movers?limit=5&min_price=1.0
+CAPTURE_START commander_reference_lot_c_02_registered
+[🌐 ApiClient] GET /notifications/count → 200 (1942ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (2328ms)
+[⚠️ SLOW REQUEST] GET /conversations/unread-count demorou 2328ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /conversations/unread-count, status_code: 200, duration_ms: 2328, request_id: [redacted], response_request_id: [redacted]}
+[🌐 ApiClient] GET /decks → 200 (1461ms)
+CAPTURE_TAKEN commander_reference_lot_c_02_registered bytes=365350
+SCREENSHOT_BEGIN commander_reference_lot_c_02_registered [png chunks stripped; saved as commander_reference_lot_c_02_registered.png]
+SCREENSHOT_END commander_reference_lot_c_02_registered
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedCredential exists: false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🌐 ApiClient] GET /market/movers?limit=5&min_price=1.0 → 200 (5229ms)
+[⚠️ SLOW REQUEST] GET /market/movers?limit=5&min_price=1.0 demorou 5229ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /market/movers?limit=5&min_price=1.0, status_code: 200, duration_ms: 5229, request_id: [redacted], response_request_id: [redacted]}
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: login
+[📱 LoginScreen] _handleLogin() chamado
+[📱 LoginScreen] chamando authProvider.login()...
+[🔑 Auth] login() chamado email_domain=example.invalid
+[🧭 Router] redirect: location=/login | status=AuthStatus.loading
+[🧭 Router] → null (status=AuthStatus.loading, aguardando)
+[🔑 Auth] enviando POST /auth/login...
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/auth/login
+[🌐 ApiClient] POST /auth/login → 200 (764ms)
+[🔑 Auth] resposta recebida: statusCode=200
+[🔑 Auth] auth credential received: yes
+[🔑 Auth] user parsed: [qa-user-redacted]
+[🔑 Auth] credenciais salvas
+[🔑 Auth] status → authenticated ✅
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🧭 Router] redirect: location=/login | status=AuthStatus.authenticated
+[🧭 Router] → /home (já autenticado)
+[📱 LoginScreen] login retornou: success=true
+[📱 LoginScreen] ✅ login OK — aguardando redirect do GoRouter
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/market/movers?limit=5&min_price=1.0
+CAPTURE_START commander_reference_lot_c_03_logged_in
+[🌐 ApiClient] GET /notifications/count → 200 (771ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (776ms)
+[🌐 ApiClient] GET /decks → 200 (348ms)
+CAPTURE_TAKEN commander_reference_lot_c_03_logged_in bytes=365350
+SCREENSHOT_BEGIN commander_reference_lot_c_03_logged_in [png chunks stripped; saved as commander_reference_lot_c_03_logged_in.png]
+SCREENSHOT_END commander_reference_lot_c_03_logged_in
+COMMANDER_REFERENCE_LOT_C_APP_AUTH_SUMMARY register_ui=true login_ui=true
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /decks → 200 (870ms)
+[🧭 Router] redirect: location=/decks/generate | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: generate
+[🌐 ApiClient] GET /market/movers?limit=5&min_price=1.0 → 200 (4289ms)
+[⚠️ SLOW REQUEST] GET /market/movers?limit=5&min_price=1.0 demorou 4289ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /market/movers?limit=5&min_price=1.0, status_code: 200, duration_ms: 4289, request_id: [redacted], response_request_id: [redacted]}
+CAPTURE_START commander_reference_lot_c_brago_01_generate_screen
+CAPTURE_TAKEN commander_reference_lot_c_brago_01_generate_screen bytes=250669
+SCREENSHOT_BEGIN commander_reference_lot_c_brago_01_generate_screen [png chunks stripped; saved as commander_reference_lot_c_brago_01_generate_screen.png]
+SCREENSHOT_END commander_reference_lot_c_brago_01_generate_screen
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate
+[🌐 ApiClient] POST /ai/generate → 202 (562ms)
+ℹ️ [DeckGenerate] async accepted status=202 job_id=[redacted] accepted_ms=562
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_accepted data={status_code: 202, job_id=[redacted], accepted_ms: 562}
+ℹ️ [DeckGenerate] initial async feedback after 581ms
+COMMANDER_REFERENCE_LOT_C_APP_GENERATE_INITIAL_FEEDBACK commander="Brago, King Eternal" archetype=azorius_blink_etb promoted_on_backend=true elapsed_ms=891
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/[redacted]
+[🌐 ApiClient] GET /ai/generate/jobs/[redacted] → 200 (603ms)
+ℹ️ [DeckGenerate] async completed job_id=[redacted] result_status=200 elapsed_ms=5637
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_completed data={job_id=[redacted], result_status_code: 200, elapsed_ms: 5637}
+ℹ️ [DeckGenerate] reference diagnostics commander="Brago, King Eternal" reference_profile_used=true reference_card_stats_used=true on_theme_candidate_count=30 unresolved_reference_cards=0
+CAPTURE_START commander_reference_lot_c_brago_02_preview
+CAPTURE_TAKEN commander_reference_lot_c_brago_02_preview bytes=256186
+SCREENSHOT_BEGIN commander_reference_lot_c_brago_02_preview [png chunks stripped; saved as commander_reference_lot_c_brago_02_preview.png]
+SCREENSHOT_END commander_reference_lot_c_brago_02_preview
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/cards/resolve/batch
+[🌐 ApiClient] POST /cards/resolve/batch → 200 (797ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /decks → 200 (1155ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/users/me/activation-events
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] ← POP: generate (13589ms)
+[⚠️ SLOW SCREEN] generate demorou 13s
+[🌐 ApiClient] GET /decks → 200 (1230ms)
+[🌐 ApiClient] GET /decks → 200 (1210ms)
+[🧭 Router] redirect: location=/decks/848e3863-c6ca-4fa9-83b5-a64359cb9318 | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: :id
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/848e3863-c6ca-4fa9-83b5-a64359cb9318
+[🌐 ApiClient] POST /users/me/activation-events → 201 (3272ms)
+[⚠️ SLOW REQUEST] POST /users/me/activation-events demorou 3272ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: POST, endpoint: /users/me/activation-events, status_code: 201, duration_ms: 3272, request_id: [redacted], response_request_id: [redacted]}
+CAPTURE_START commander_reference_lot_c_brago_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] GET /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318 → 200 (1708ms)
+CAPTURE_TAKEN commander_reference_lot_c_brago_03_details bytes=79449
+SCREENSHOT_BEGIN commander_reference_lot_c_brago_03_details [png chunks stripped; saved as commander_reference_lot_c_brago_03_details.png]
+SCREENSHOT_END commander_reference_lot_c_brago_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/848e3863-c6ca-4fa9-83b5-a64359cb9318
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/pricing
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/validate
+[🌐 ApiClient] GET /conversations/unread-count → 200 (2322ms)
+[⚠️ SLOW REQUEST] GET /conversations/unread-count demorou 2322ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /conversations/unread-count, status_code: 200, duration_ms: 2322, request_id: [redacted], response_request_id: [redacted]}
+[🌐 ApiClient] GET /notifications/count → 200 (2333ms)
+[⚠️ SLOW REQUEST] GET /notifications/count demorou 2333ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /notifications/count, status_code: 200, duration_ms: 2333, request_id: [redacted], response_request_id: [redacted]}
+[🌐 ApiClient] GET /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318 → 200 (2067ms)
+[⚠️ SLOW REQUEST] GET /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318 demorou 2067ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318, status_code: 200, duration_ms: 2067, request_id: [redacted], response_request_id: [redacted]}
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/validate
+[🌐 ApiClient] POST /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/validate → 200 (662ms)
+COMMANDER_REFERENCE_LOT_C_APP_VALIDATE_SUMMARY {"deck_id":"848e3863-c6ca-4fa9-83b5-a64359cb9318","commander":"Brago, King Eternal","archetype":"azorius_blink_etb","promoted_on_backend":true,"app_runtime_valid":true,"deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Brago, King Eternal"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+COMMANDER_REFERENCE_LOT_C_APP_RUNTIME_SUMMARY {"deck_id":"848e3863-c6ca-4fa9-83b5-a64359cb9318","commander":"Brago, King Eternal","archetype":"azorius_blink_etb","promoted_on_backend":true,"app_runtime_valid":true,"deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Brago, King Eternal"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+[📱 Screen] ← POP: :id (5348ms)
+[⚠️ SLOW SCREEN] :id demorou 5s
+[🌐 ApiClient] POST /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/validate → 200 (1923ms)
+[🌐 ApiClient] POST /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/pricing → 200 (2075ms)
+[⚠️ SLOW REQUEST] POST /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/pricing demorou 2075ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: POST, endpoint: /decks/848e3863-c6ca-4fa9-83b5-a64359cb9318/pricing, status_code: 200, duration_ms: 2075, request_id: [redacted], response_request_id: [redacted]}
+[🧭 Router] redirect: location=/decks/generate | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: generate
+CAPTURE_START commander_reference_lot_c_purphoros_01_generate_screen
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] GET /notifications/count → 200 (299ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (304ms)
+CAPTURE_TAKEN commander_reference_lot_c_purphoros_01_generate_screen bytes=250669
+SCREENSHOT_BEGIN commander_reference_lot_c_purphoros_01_generate_screen [png chunks stripped; saved as commander_reference_lot_c_purphoros_01_generate_screen.png]
+SCREENSHOT_END commander_reference_lot_c_purphoros_01_generate_screen
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate
+COMMANDER_REFERENCE_LOT_C_APP_GENERATE_INITIAL_FEEDBACK commander="Purphoros, God of the Forge" archetype=mono_red_tokens_burn promoted_on_backend=false elapsed_ms=598
+[🌐 ApiClient] POST /ai/generate → 202 (991ms)
+ℹ️ [DeckGenerate] async accepted status=202 job_id=[redacted] accepted_ms=991
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_accepted data={status_code: 202, job_id=[redacted], accepted_ms: 991}
+ℹ️ [DeckGenerate] initial async feedback after 993ms
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/[redacted]
+[🌐 ApiClient] GET /ai/generate/jobs/[redacted] → 200 (327ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/[redacted]
+[🌐 ApiClient] GET /ai/generate/jobs/[redacted] → 200 (349ms)
+ℹ️ [DeckGenerate] async completed job_id=[redacted] result_status=200 elapsed_ms=15701
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_completed data={job_id=[redacted], result_status_code: 200, elapsed_ms: 15701}
+ℹ️ [DeckGenerate] reference diagnostics commander="Purphoros, God of the Forge" reference_profile_used=false reference_card_stats_used=false on_theme_candidate_count=null unresolved_reference_cards=0
+CAPTURE_START commander_reference_lot_c_purphoros_02_preview
+CAPTURE_TAKEN commander_reference_lot_c_purphoros_02_preview bytes=292413
+SCREENSHOT_BEGIN commander_reference_lot_c_purphoros_02_preview [png chunks stripped; saved as commander_reference_lot_c_purphoros_02_preview.png]
+SCREENSHOT_END commander_reference_lot_c_purphoros_02_preview
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/cards/resolve/batch
+[🌐 ApiClient] POST /cards/resolve/batch → 200 (539ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /decks → 200 (733ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/users/me/activation-events
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] ← POP: generate (22512ms)
+[⚠️ SLOW SCREEN] generate demorou 22s
+[🌐 ApiClient] GET /decks → 200 (404ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /notifications/count → 200 (294ms)
+[🌐 ApiClient] POST /users/me/activation-events → 201 (1063ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (827ms)
+[🌐 ApiClient] GET /decks → 200 (904ms)
+[🧭 Router] redirect: location=/decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: :id
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe/pricing
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe/validate
+CAPTURE_START commander_reference_lot_c_purphoros_03_details
+[🌐 ApiClient] POST /decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe/validate → 200 (876ms)
+[🌐 ApiClient] POST /decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe/pricing → 200 (975ms)
+[🌐 ApiClient] GET /decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe → 200 (1248ms)
+CAPTURE_TAKEN commander_reference_lot_c_purphoros_03_details bytes=79417
+SCREENSHOT_BEGIN commander_reference_lot_c_purphoros_03_details [png chunks stripped; saved as commander_reference_lot_c_purphoros_03_details.png]
+SCREENSHOT_END commander_reference_lot_c_purphoros_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe
+[🌐 ApiClient] GET /decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe → 200 (754ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe/validate
+[🌐 ApiClient] POST /decks/15fd7e1a-f71b-425e-a7ad-48569403d6fe/validate → 200 (341ms)
+COMMANDER_REFERENCE_LOT_C_APP_VALIDATE_SUMMARY {"deck_id":"15fd7e1a-f71b-425e-a7ad-48569403d6fe","commander":"Purphoros, God of the Forge","archetype":"mono_red_tokens_burn","promoted_on_backend":false,"app_runtime_valid":true,"deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Purphoros, God of the Forge"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+COMMANDER_REFERENCE_LOT_C_APP_RUNTIME_SUMMARY {"deck_id":"15fd7e1a-f71b-425e-a7ad-48569403d6fe","commander":"Purphoros, God of the Forge","archetype":"mono_red_tokens_burn","promoted_on_backend":false,"app_runtime_valid":true,"deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Purphoros, God of the Forge"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+[📱 Screen] ← POP: :id (3766ms)
+[⚠️ SLOW SCREEN] :id demorou 3s
+COMMANDER_REFERENCE_LOT_C_APP_ALL_SUMMARIES [{"deck_id":"848e3863-c6ca-4fa9-83b5-a64359cb9318","commander":"Brago, King Eternal","archetype":"azorius_blink_etb","promoted_on_backend":true,"app_runtime_valid":true,"deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Brago, King Eternal"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0},{"deck_id":"15fd7e1a-f71b-425e-a7ad-48569403d6fe","commander":"Purphoros, God of the Forge","archetype":"mono_red_tokens_burn","promoted_on_backend":false,"app_runtime_valid":true,"deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Purphoros, God of the Forge"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}]
+01:23 +1: (tearDownAll)
+01:25 +1: All tests passed!
