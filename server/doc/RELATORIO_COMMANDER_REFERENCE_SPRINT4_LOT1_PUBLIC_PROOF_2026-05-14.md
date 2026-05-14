@@ -27,7 +27,7 @@ do repositorio e foram removidos ao final.
   `5c316ab6ac0b4513a91653faceacec11039ecae8`
 - Backend `/health.git_sha` revalidado no runtime iPhone 15 Simulator:
   `34576f51e710e10c950f787ae2f91aa6f77e3cba`
-- Commit final do harness/documentacao em `master`:
+- Commit com a correcao do harness em `master`:
   `dd918fc5b9e95f0c1f551f48bd73752b817ab8b4`
 - API map consultado e mantido sem alteracao porque nao houve drift de rota,
   payload, response shape, diagnostics app-facing, data source ou consumidor

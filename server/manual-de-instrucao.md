@@ -21,7 +21,7 @@
 - `master` foi sincronizada com `origin/master`; o backend publico respondeu
   `/health` com `status=healthy`,
   `git_sha=34576f51e710e10c950f787ae2f91aa6f77e3cba` e `latency_ms=1148`.
-- O commit final do harness/documentacao em `master` ficou
+- O commit com a correcao do harness em `master` ficou
   `dd918fc5b9e95f0c1f551f48bd73752b817ab8b4`.
 - O harness
   `app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart`

@@ -20,7 +20,7 @@ mantem e-mail QA completo, decklist completa, secrets, tokens, JWT,
 - Branch alvo: `master`.
 - Base sincronizada antes da mudanca:
   `34576f51e710e10c950f787ae2f91aa6f77e3cba`.
-- Commit final do harness/documentacao em `master`:
+- Commit com a correcao do harness em `master`:
   `dd918fc5b9e95f0c1f551f48bd73752b817ab8b4`.
 - `git status` antes da mudanca e apos o push: limpo e alinhado a
   `origin/master`.
