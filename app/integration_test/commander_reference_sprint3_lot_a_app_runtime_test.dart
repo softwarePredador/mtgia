@@ -114,11 +114,11 @@ Future<_RuntimeCredentials> _registerByUi(
   IntegrationTestWidgetsFlutterBinding binding,
   WidgetTester tester,
 ) async {
-  await _waitUntilFound(
+  await pumpUntilFound(tester, find.text('Entrar'), attempts: 90);
+  await captureVisualProof(
+    binding,
     tester,
-    find.byKey(const Key('login-open-register-button')),
-    description: 'login register link',
-    attempts: 90,
+    'commander_reference_lot_a_01_login',
   );
 
   final registerLink = find.byKey(const Key('login-open-register-button'));
@@ -126,10 +126,9 @@ Future<_RuntimeCredentials> _registerByUi(
   await tester.tap(registerLink);
   await tester.pump();
 
-  await _waitUntilFound(
+  await pumpUntilFound(
     tester,
     find.byKey(const Key('register-submit-button')),
-    description: 'register submit button',
     attempts: 60,
   );
   final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
@@ -153,12 +152,7 @@ Future<_RuntimeCredentials> _registerByUi(
   await tester.tap(find.byKey(const Key('register-submit-button')));
   await tester.pump();
 
-  await _waitUntilFound(
-    tester,
-    find.text('Decks'),
-    description: 'Decks',
-    attempts: 120,
-  );
+  await pumpUntilFound(tester, find.text('Decks'), attempts: 120);
   await captureVisualProof(
     binding,
     tester,
@@ -184,10 +178,9 @@ Future<void> _loginByUi(
   await tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()));
   await tester.pump();
 
-  await _waitUntilFound(
+  await pumpUntilFound(
     tester,
     find.byKey(const Key('login-submit-button')),
-    description: 'login submit button',
     attempts: 90,
   );
   await tester.enterText(
@@ -201,12 +194,7 @@ Future<void> _loginByUi(
   await tester.tap(find.byKey(const Key('login-submit-button')));
   await tester.pump();
 
-  await _waitUntilFound(
-    tester,
-    find.text('Decks'),
-    description: 'Decks',
-    attempts: 120,
-  );
+  await pumpUntilFound(tester, find.text('Decks'), attempts: 120);
   await captureVisualProof(
     binding,
     tester,
@@ -222,12 +210,7 @@ Future<void> _loginByUi(
 Future<void> _openDeckList(WidgetTester tester) async {
   await tester.tap(find.text('Decks').first);
   await tester.pump();
-  await _waitUntilFound(
-    tester,
-    find.text('Meus Decks'),
-    description: 'Meus Decks',
-    attempts: 90,
-  );
+  await pumpUntilFound(tester, find.text('Meus Decks'), attempts: 90);
 }
 
 Future<Map<String, dynamic>> _generateSaveOpenAndValidate(
@@ -257,10 +240,9 @@ Future<Map<String, dynamic>> _generateSaveOpenAndValidate(
   await tester.tap(submit);
   await tester.pump();
 
-  await _waitUntilAnyFound(
+  await pumpUntilAnyFound(
     tester,
     [find.text('Pedido aceito'), find.text('Preview antes de salvar')],
-    description: 'initial generate feedback',
     attempts: 60,
     step: const Duration(milliseconds: 250),
   );
@@ -272,10 +254,9 @@ Future<Map<String, dynamic>> _generateSaveOpenAndValidate(
     'elapsed_ms=${feedbackStopwatch.elapsedMilliseconds}',
   );
 
-  await _waitUntilFound(
+  await pumpUntilFound(
     tester,
     find.text('Preview antes de salvar'),
-    description: 'generate preview',
     attempts: 180,
     step: const Duration(seconds: 1),
   );
@@ -301,17 +282,15 @@ Future<Map<String, dynamic>> _generateSaveOpenAndValidate(
   await tester.tap(find.byKey(const Key('deck-generate-save-button')));
   await tester.pump();
 
-  await _waitUntilAnyFound(
+  await pumpUntilAnyFound(
     tester,
     [find.text('Meus Decks'), find.text('Decks')],
-    description: 'deck list after save',
     attempts: 180,
     step: const Duration(seconds: 1),
   );
-  await _waitUntilFound(
+  await pumpUntilFound(
     tester,
     find.text(deckName),
-    description: 'created deck row text',
     attempts: 120,
     step: const Duration(milliseconds: 500),
   );
@@ -326,22 +305,12 @@ Future<Map<String, dynamic>> _generateSaveOpenAndValidate(
   expect(deckId, isNotNull);
 
   final deckRow = find.byKey(ValueKey('deck-list-row-$deckId'));
-  await _waitUntilFound(
-    tester,
-    deckRow,
-    description: 'created deck row',
-    attempts: 90,
-  );
+  await pumpUntilFound(tester, deckRow, attempts: 90);
   await tester.ensureVisible(deckRow);
   await tester.tap(deckRow);
   await tester.pump();
 
-  await _waitUntilFound(
-    tester,
-    find.text('Detalhes do Deck'),
-    description: 'Deck Details',
-    attempts: 120,
-  );
+  await pumpUntilFound(tester, find.text('Detalhes do Deck'), attempts: 120);
   await captureVisualProof(
     binding,
     tester,
@@ -362,12 +331,7 @@ Future<void> _openGenerateScreen(
   WidgetTester tester,
   _LotACommanderCase runtimeCase,
 ) async {
-  await _waitUntilFound(
-    tester,
-    find.text('Meus Decks'),
-    description: 'Meus Decks',
-    attempts: 90,
-  );
+  await pumpUntilFound(tester, find.text('Meus Decks'), attempts: 90);
 
   final emptyGenerate = find.byKey(
     const Key('deck-list-empty-generate-button'),
@@ -377,31 +341,16 @@ Future<void> _openGenerateScreen(
     await tester.tap(emptyGenerate);
   } else {
     final fabMenu = find.byKey(const Key('deck-list-fab-menu'));
-    await _waitUntilFound(
-      tester,
-      fabMenu,
-      description: 'deck FAB menu',
-      attempts: 90,
-    );
+    await pumpUntilFound(tester, fabMenu, attempts: 90);
     await tester.tap(fabMenu);
     await tester.pumpAndSettle(const Duration(milliseconds: 250));
     final menuGenerate = find.byKey(const Key('deck-list-menu-generate'));
-    await _waitUntilFound(
-      tester,
-      menuGenerate,
-      description: 'deck generate menu action',
-      attempts: 30,
-    );
+    await pumpUntilFound(tester, menuGenerate, attempts: 30);
     await tester.tap(menuGenerate);
   }
 
   await tester.pump();
-  await _waitUntilFound(
-    tester,
-    find.text('Gerar Deck'),
-    description: 'Generate Deck screen',
-    attempts: 90,
-  );
+  await pumpUntilFound(tester, find.text('Gerar Deck'), attempts: 90);
   await captureVisualProof(
     binding,
     tester,
@@ -415,52 +364,15 @@ Future<void> _returnToDeckList(WidgetTester tester) async {
     await tester.tap(backButton.first);
     await tester.pump();
   }
-  await _waitUntilAnyFound(
-    tester,
-    [find.text('Meus Decks'), find.text('Decks')],
-    description: 'back to deck shell',
-    attempts: 90,
-  );
+  await pumpUntilAnyFound(tester, [
+    find.text('Meus Decks'),
+    find.text('Decks'),
+  ], attempts: 90);
   if (find.text('Meus Decks').evaluate().isEmpty) {
     await tester.tap(find.text('Decks').first);
     await tester.pump();
   }
-  await _waitUntilFound(
-    tester,
-    find.text('Meus Decks'),
-    description: 'Meus Decks',
-    attempts: 90,
-  );
-}
-
-Future<void> _waitUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  required String description,
-  int attempts = 60,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump();
-    if (finder.evaluate().isNotEmpty) return;
-    await tester.runAsync(() => Future<void>.delayed(step));
-  }
-  fail('Timeout waiting for $description');
-}
-
-Future<void> _waitUntilAnyFound(
-  WidgetTester tester,
-  List<Finder> finders, {
-  required String description,
-  int attempts = 60,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump();
-    if (finders.any((finder) => finder.evaluate().isNotEmpty)) return;
-    await tester.runAsync(() => Future<void>.delayed(step));
-  }
-  fail('Timeout waiting for $description');
+  await pumpUntilFound(tester, find.text('Meus Decks'), attempts: 90);
 }
 
 Future<Map<String, dynamic>> _validateSavedDeck(

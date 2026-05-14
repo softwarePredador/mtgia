@@ -3,6 +3,62 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote A app runtime rerun
+
+### O Porquê
+- A rodada de 2026-05-13 deixou o Lote A como PASS_WITH_RISKS porque o backend e
+  o public proof passaram, mas o runtime app real ficou BLOCKED antes de provar
+  register/login -> Generate Commander -> save -> Deck Details -> validate para
+  comandantes promovidos.
+- Era necessario diagnosticar o blocker real, corrigir apenas o que fosse seguro
+  no app/harness e rerodar no device primario solicitado sem expor secrets,
+  tokens, e-mails QA completos, prompts/decklists completas ou dados sensiveis.
+
+### O Como
+- Foram relidos o relatorio final Lote A, handoffs/logs de 2026-05-13,
+  `APP_AUDIT_2026-04-29.md`, `API_CONTRACTS_AND_DATA_MAP.md`,
+  `UI_TEST_SURFACE_MAP.md` e este manual.
+- O backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host/health` respondeu
+  `status=healthy` e
+  `git_sha=40c71f905af6a3389f37bc4e1085e71dd26a414b`, igual ao HEAD local.
+- `flutter devices` encontrou o Android fisico `SM A135M` (`R58T300SREH`,
+  Android 14/API 34) e o iPhone 15 Simulator
+  `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- O blocker anterior foi reduzido a dois pontos:
+  - o harness especifico do Lote A duplicava helpers locais de espera em vez de
+    usar `app/integration_test/runtime_test_helpers.dart`, deixando o timeout
+    opaco apos o redirect para `/login`;
+  - o fallback iPhone 15 Simulator continuava bloqueado por `MLImage.framework`
+    do scanner linkado como iOS device, nao iOS Simulator.
+- Em 2026-05-14 apareceu tambem um blocker ambiental de rede: no Wi-Fi do
+  `SM A135M`, o app timeoutou em `/health` apos 15s, embora o Mac respondesse
+  em ~0.6s e o device conseguisse pingar o host. A prova final foi feita com a
+  rede celular temporariamente, e o Wi-Fi foi reabilitado ao final.
+- `app/integration_test/commander_reference_sprint3_lot_a_app_runtime_test.dart`
+  foi corrigido para reutilizar `pumpUntilFound/pumpUntilAnyFound` de
+  `runtime_test_helpers.dart` e manter os seletores estaveis existentes.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Runtime real no `SM A135M` passou para `Krenko, Mob Boss` e `Teysa Karlov`
+  contra o backend publico atual:
+  - register/login pela UI;
+  - Generate Commander com `commander_name`;
+  - preview antes de salvar;
+  - save;
+  - Deck Details;
+  - `/decks/:id/validate`;
+  - `validation_ok=true`, `main_qty=99`, `total_with_commander=100`,
+    `commander_count=1`, `commander_in_99_count=0` e `off_identity_count=0` para
+    ambos.
+- Evidencia sanitizada:
+  `app/doc/runtime_flow_handoffs/commander_reference_sprint3_lot_a_app_2026-05-14.md`
+  e
+  `app/doc/runtime_flow_proofs_2026-05-14_commander_reference_sprint3_lot_a_app/`.
+- Nenhum endpoint, payload, provider, contrato app-facing, scanner/camera/OCR ou
+  backend foi alterado.
+
 ## 2026-05-13 — Commander Reference Sprint 3 Lote A app runtime attempt
 
 ### O Porquê

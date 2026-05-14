@@ -1,0 +1,228 @@
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/commander_reference_sprint3_lot_a_app_runtime_test.dart
+Running Gradle task 'assembleDebug'...                             18.7s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...           7.1s
+00:00 +0: SM A135M runtime: Sprint 3 Lote A Commander Reference Krenko and Teysa
+COMMANDER_REFERENCE_LOT_A_APP_BASE_URL https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/health
+[🌐 ApiClient] GET /health → 200 (1458ms)
+COMMANDER_REFERENCE_LOT_A_APP_HEALTH status=200 git_sha=40c71f905af6a3389f37bc4e1085e71dd26a414b latency_ms=1458
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedToken exists: false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: login
+CAPTURE_START commander_reference_lot_a_01_login
+CAPTURE_CONVERT_BEGIN commander_reference_lot_a_01_login
+CAPTURE_CONVERT_DONE commander_reference_lot_a_01_login
+CAPTURE_TAKEN commander_reference_lot_a_01_login bytes=474513
+SCREENSHOT_BEGIN commander_reference_lot_a_01_login
+SCREENSHOT_END commander_reference_lot_a_01_login
+[🧭 Router] redirect: location=/register | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: register
+[🧭 Router] redirect: location=/login | status=AuthStatus.loading
+[🧭 Router] → null (status=AuthStatus.loading, aguardando)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/auth/register
+[🌐 ApiClient] POST /auth/register → 201 (1269ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🧭 Router] redirect: location=/login | status=AuthStatus.authenticated
+[🧭 Router] → /home (já autenticado)
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/market/movers?limit=5&min_price=1.0
+CAPTURE_START commander_reference_lot_a_02_registered
+[🌐 ApiClient] GET /notifications/count → 200 (1653ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (2058ms)
+[⚠️ SLOW REQUEST] GET /conversations/unread-count demorou 2058ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /conversations/unread-count, status_code: 200, duration_ms: 2058, request_id: mob-651c62c2d695f-42b27b5a, response_request_id: mob-651c62c2d695f-42b27b5a}
+[🌐 ApiClient] GET /decks → 200 (1429ms)
+CAPTURE_TAKEN commander_reference_lot_a_02_registered bytes=365350
+SCREENSHOT_BEGIN commander_reference_lot_a_02_registered
+SCREENSHOT_END commander_reference_lot_a_02_registered
+[🌐 ApiClient] baseUrl = https://evolution-cartinhas.8ktevp.easypanel.host
+[🌐 ApiClient] platform = TargetPlatform.android | kIsWeb=false | kDebugMode=true
+[🧭 Router] redirect: location=/ | status=AuthStatus.initial
+[🔑 Auth] initialize() → loading
+[🧭 Router] redirect: location=/ | status=AuthStatus.loading
+[🔑 Auth] savedToken exists: false, savedUser exists: false
+[🔑 Auth] initialize() concluído → AuthStatus.unauthenticated
+[🧭 Router] redirect: location=/ | status=AuthStatus.unauthenticated
+[🌐 ApiClient] GET /market/movers?limit=5&min_price=1.0 → 200 (5215ms)
+[⚠️ SLOW REQUEST] GET /market/movers?limit=5&min_price=1.0 demorou 5215ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /market/movers?limit=5&min_price=1.0, status_code: 200, duration_ms: 5215, request_id: mob-651c62c3e5116-fe885ee0, response_request_id: mob-651c62c3e5116-fe885ee0}
+[🧭 Router] redirect: location=/login | status=AuthStatus.unauthenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: login
+[📱 LoginScreen] _handleLogin() chamado
+[📱 LoginScreen] chamando authProvider.login()...
+[🔑 Auth] login() chamado email_domain=example.invalid
+[🧭 Router] redirect: location=/login | status=AuthStatus.loading
+[🧭 Router] → null (status=AuthStatus.loading, aguardando)
+[🔑 Auth] enviando POST /auth/login...
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/auth/login
+[🌐 ApiClient] POST /auth/login → 200 (484ms)
+[🔑 Auth] resposta recebida: statusCode=200
+[🔑 Auth] token recebido: sim
+[🔑 Auth] user parsed: qa_cmdref_lot_a_app_19e2671aa1e
+[🔑 Auth] credenciais salvas
+[🔑 Auth] status → authenticated ✅
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🧭 Router] redirect: location=/login | status=AuthStatus.authenticated
+[🧭 Router] → /home (já autenticado)
+[📱 LoginScreen] login retornou: success=true
+[📱 LoginScreen] ✅ login OK — aguardando redirect do GoRouter
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/market/movers?limit=5&min_price=1.0
+CAPTURE_START commander_reference_lot_a_03_logged_in
+[🌐 ApiClient] GET /notifications/count → 200 (789ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (795ms)
+[🌐 ApiClient] GET /decks → 200 (361ms)
+CAPTURE_TAKEN commander_reference_lot_a_03_logged_in bytes=365350
+SCREENSHOT_BEGIN commander_reference_lot_a_03_logged_in
+SCREENSHOT_END commander_reference_lot_a_03_logged_in
+COMMANDER_REFERENCE_LOT_A_APP_AUTH_SUMMARY register_ui=true login_ui=true
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: decks
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /decks → 200 (308ms)
+[🧭 Router] redirect: location=/decks/generate | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: generate
+[🌐 ApiClient] GET /market/movers?limit=5&min_price=1.0 → 200 (4334ms)
+[⚠️ SLOW REQUEST] GET /market/movers?limit=5&min_price=1.0 demorou 4334ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /market/movers?limit=5&min_price=1.0, status_code: 200, duration_ms: 4334, request_id: mob-651c62caad10f-d807e285, response_request_id: mob-651c62caad10f-d807e285}
+CAPTURE_START commander_reference_lot_a_krenko_01_generate_screen
+CAPTURE_TAKEN commander_reference_lot_a_krenko_01_generate_screen bytes=250669
+SCREENSHOT_BEGIN commander_reference_lot_a_krenko_01_generate_screen
+SCREENSHOT_END commander_reference_lot_a_krenko_01_generate_screen
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate
+[🌐 ApiClient] POST /ai/generate → 202 (553ms)
+ℹ️ [DeckGenerate] async accepted status=202 job_id=abaf2507a770bd887915c323ecabe9f7 accepted_ms=553
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_accepted data={status_code: 202, job_id: abaf2507a770bd887915c323ecabe9f7, accepted_ms: 553}
+ℹ️ [DeckGenerate] initial async feedback after 573ms
+COMMANDER_REFERENCE_LOT_A_APP_GENERATE_INITIAL_FEEDBACK commander="Krenko, Mob Boss" archetype=aggro_goblins elapsed_ms=877
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/abaf2507a770bd887915c323ecabe9f7
+[🌐 ApiClient] GET /ai/generate/jobs/abaf2507a770bd887915c323ecabe9f7 → 200 (538ms)
+ℹ️ [DeckGenerate] async completed job_id=abaf2507a770bd887915c323ecabe9f7 result_status=200 elapsed_ms=5587
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_completed data={job_id: abaf2507a770bd887915c323ecabe9f7, result_status_code: 200, elapsed_ms: 5588}
+ℹ️ [DeckGenerate] reference diagnostics commander="Krenko, Mob Boss" reference_profile_used=true reference_card_stats_used=true on_theme_candidate_count=32 unresolved_reference_cards=0
+CAPTURE_START commander_reference_lot_a_krenko_02_preview
+CAPTURE_TAKEN commander_reference_lot_a_krenko_02_preview bytes=258450
+SCREENSHOT_BEGIN commander_reference_lot_a_krenko_02_preview
+SCREENSHOT_END commander_reference_lot_a_krenko_02_preview
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/cards/resolve/batch
+[🌐 ApiClient] POST /cards/resolve/batch → 200 (901ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /decks → 200 (704ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/users/me/activation-events
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] ← POP: generate (13326ms)
+[⚠️ SLOW SCREEN] generate demorou 13s
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /decks → 200 (1269ms)
+[🌐 ApiClient] POST /users/me/activation-events → 201 (2539ms)
+[⚠️ SLOW REQUEST] POST /users/me/activation-events demorou 2539ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: POST, endpoint: /users/me/activation-events, status_code: 201, duration_ms: 2539, request_id: mob-651c62da8382a-99c37f23, response_request_id: mob-651c62da8382a-99c37f23}
+[🌐 ApiClient] GET /decks → 200 (1801ms)
+[🧭 Router] redirect: location=/decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: :id
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b
+CAPTURE_START commander_reference_lot_a_krenko_03_details
+[🌐 ApiClient] GET /decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b → 200 (879ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b/pricing
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b/validate
+CAPTURE_TAKEN commander_reference_lot_a_krenko_03_details bytes=79406
+SCREENSHOT_BEGIN commander_reference_lot_a_krenko_03_details
+SCREENSHOT_END commander_reference_lot_a_krenko_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b
+[🌐 ApiClient] GET /conversations/unread-count → 200 (1921ms)
+[🌐 ApiClient] GET /notifications/count → 200 (1995ms)
+[🌐 ApiClient] POST /decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b/pricing → 200 (687ms)
+[🌐 ApiClient] POST /decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b/validate → 200 (1418ms)
+[🌐 ApiClient] GET /decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b → 200 (1778ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b/validate
+[🌐 ApiClient] POST /decks/8d4fc071-c8b0-4492-aeb4-8f03e43c303b/validate → 200 (402ms)
+COMMANDER_REFERENCE_LOT_A_APP_VALIDATE_SUMMARY {"deck_id":"8d4fc071-c8b0-4492-aeb4-8f03e43c303b","commander":"Krenko, Mob Boss","archetype":"aggro_goblins","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Krenko, Mob Boss"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+COMMANDER_REFERENCE_LOT_A_APP_RUNTIME_SUMMARY {"deck_id":"8d4fc071-c8b0-4492-aeb4-8f03e43c303b","commander":"Krenko, Mob Boss","archetype":"aggro_goblins","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Krenko, Mob Boss"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+[📱 Screen] ← POP: :id (5272ms)
+[⚠️ SLOW SCREEN] :id demorou 5s
+[🧭 Router] redirect: location=/decks/generate | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: generate
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/notifications/count
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/conversations/unread-count
+[🌐 ApiClient] GET /notifications/count → 200 (291ms)
+[🌐 ApiClient] GET /conversations/unread-count → 200 (306ms)
+CAPTURE_START commander_reference_lot_a_teysa_01_generate_screen
+CAPTURE_TAKEN commander_reference_lot_a_teysa_01_generate_screen bytes=250669
+SCREENSHOT_BEGIN commander_reference_lot_a_teysa_01_generate_screen
+SCREENSHOT_END commander_reference_lot_a_teysa_01_generate_screen
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate
+[🌐 ApiClient] POST /ai/generate → 202 (371ms)
+ℹ️ [DeckGenerate] async accepted status=202 job_id=c3e60007b14f9a59bd9d343c66eedfa7 accepted_ms=371
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_accepted data={status_code: 202, job_id: c3e60007b14f9a59bd9d343c66eedfa7, accepted_ms: 371}
+ℹ️ [DeckGenerate] initial async feedback after 376ms
+COMMANDER_REFERENCE_LOT_A_APP_GENERATE_INITIAL_FEEDBACK commander="Teysa Karlov" archetype=aristocrats elapsed_ms=680
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate/jobs/c3e60007b14f9a59bd9d343c66eedfa7
+[🌐 ApiClient] GET /ai/generate/jobs/c3e60007b14f9a59bd9d343c66eedfa7 → 200 (525ms)
+ℹ️ [DeckGenerate] async completed job_id=c3e60007b14f9a59bd9d343c66eedfa7 result_status=200 elapsed_ms=5543
+[Observability] breadcrumb category=ai_generate message=ai_generate_async_completed data={job_id: c3e60007b14f9a59bd9d343c66eedfa7, result_status_code: 200, elapsed_ms: 5544}
+ℹ️ [DeckGenerate] reference diagnostics commander="Teysa Karlov" reference_profile_used=true reference_card_stats_used=true on_theme_candidate_count=32 unresolved_reference_cards=0
+CAPTURE_START commander_reference_lot_a_teysa_02_preview
+CAPTURE_TAKEN commander_reference_lot_a_teysa_02_preview bytes=260903
+SCREENSHOT_BEGIN commander_reference_lot_a_teysa_02_preview
+SCREENSHOT_END commander_reference_lot_a_teysa_02_preview
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/cards/resolve/batch
+[🌐 ApiClient] POST /cards/resolve/batch → 200 (536ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST /decks → 200 (605ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/users/me/activation-events
+[🧭 Router] redirect: location=/decks | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] ← POP: generate (12003ms)
+[⚠️ SLOW SCREEN] generate demorou 12s
+[🌐 ApiClient] GET /decks → 200 (509ms)
+[🌐 ApiClient] POST /users/me/activation-events → 201 (864ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks
+[🌐 ApiClient] GET /decks → 200 (309ms)
+[🧭 Router] redirect: location=/decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5 | status=AuthStatus.authenticated
+[🧭 Router] → null (sem redirect)
+[📱 Screen] → PUSH: :id
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5/pricing
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5/validate
+[🌐 ApiClient] POST /decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5/pricing → 200 (548ms)
+CAPTURE_START commander_reference_lot_a_teysa_03_details
+[🌐 ApiClient] POST /decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5/validate → 200 (912ms)
+[🌐 ApiClient] GET /decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5 → 200 (1003ms)
+CAPTURE_TAKEN commander_reference_lot_a_teysa_03_details bytes=79380
+SCREENSHOT_BEGIN commander_reference_lot_a_teysa_03_details
+SCREENSHOT_END commander_reference_lot_a_teysa_03_details
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5
+[🌐 ApiClient] GET /decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5 → 200 (791ms)
+[🌐 ApiClient] POST https://evolution-cartinhas.8ktevp.easypanel.host/decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5/validate
+[🌐 ApiClient] POST /decks/6a423b8f-6927-4de8-96cf-e6dc6a813fd5/validate → 200 (344ms)
+COMMANDER_REFERENCE_LOT_A_APP_VALIDATE_SUMMARY {"deck_id":"6a423b8f-6927-4de8-96cf-e6dc6a813fd5","commander":"Teysa Karlov","archetype":"aristocrats","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Teysa Karlov"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+COMMANDER_REFERENCE_LOT_A_APP_RUNTIME_SUMMARY {"deck_id":"6a423b8f-6927-4de8-96cf-e6dc6a813fd5","commander":"Teysa Karlov","archetype":"aristocrats","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Teysa Karlov"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}
+[📱 Screen] ← POP: :id (3692ms)
+[⚠️ SLOW SCREEN] :id demorou 3s
+COMMANDER_REFERENCE_LOT_A_APP_ALL_SUMMARIES [{"deck_id":"8d4fc071-c8b0-4492-aeb4-8f03e43c303b","commander":"Krenko, Mob Boss","archetype":"aggro_goblins","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Krenko, Mob Boss"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0},{"deck_id":"6a423b8f-6927-4de8-96cf-e6dc6a813fd5","commander":"Teysa Karlov","archetype":"aristocrats","deck_commander_name_matches":false,"raw_commander_entries":1,"raw_commander_names":["Teysa Karlov"],"validation_ok":true,"main_qty":99,"total_with_commander":100,"commander_count":1,"commander_in_99_count":0,"off_identity_count":0}]
+09:08 +1: (tearDownAll)
+09:10 +1: All tests passed!
