@@ -3,6 +3,53 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Sprint 3 Lote C final
+
+### O Porquê
+- Purphoros passou no app runtime do Lote C, mas continuou
+  `promoted=false` no scorecard/backend. Era necessario provar se isso era gate
+  correto, bug de parser/scorecard/tracker ou lacuna de dados.
+- A decisao precisava consolidar o Lote C sem expor secrets, tokens, JWT,
+  Sentry DSN, `DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo, prompts ou
+  decklists geradas.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com `git_sha=c182df4ac3a3fb3ad4c88bd61402502434692fa6`, alinhado ao
+  HEAD local.
+- Foram relidos o public proof Lote C, o handoff app runtime, o tracker Sprint 3,
+  este manual, `server/lib/ai/commander_reference_readiness_support.dart` e os
+  artifacts `public_proof`/`readiness_public` de Purphoros e Brago.
+- Purphoros foi comparado contra Brago em public proof, fallback,
+  timeout fallback, invalid/off-identity, p95, corpus/profile/stats usados,
+  scorecard gates, blockers, warnings e versao.
+- O scorecard de Purphoros foi rerodado em modo read-only com o summary publico
+  existente, salvando
+  `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/purphoros_god_of_the_forge/readiness_public_rerun_final/`.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` nao foi alterado porque nao houve
+  mudanca de rota, payload, response shape, diagnostics app-facing, data source
+  ou consumidor mobile.
+
+### Resultado
+- Resultado operacional: **PASS_WITH_RISKS**.
+- Nao houve bug seguro no parser/scorecard/tracker. Purphoros foi bloqueado por
+  gate correto: `profile_used=0`, `stats_used=0`, `corpus_used=0`,
+  `fallback_count=0`, `p95=12590ms`, score 25, `blocked`,
+  `profile_available=false`, `card_stats_count=0`,
+  `deterministic_deck_valid=false` e `runtime_public_gate_passed=false`.
+- Brago permanece o unico promovido final do Lote C: `profile/stats/corpus` 5/5,
+  `fallback_count=5`, timeout 0, invalid/off-identity 0, p95 942ms e score 100.
+- O app runtime de Purphoros continua valido como cobertura adjunta de app/API,
+  mas nao substitui o gate Commander Reference de promocao.
+- Decisao: **NO-GO** para Lote D como expansao baseada em dois promovidos Lote C;
+  **GO condicionado** apenas para preparar profile/card_stats/deterministic proof
+  de Purphoros, Veyran ou Balan e repetir public proof + scorecard.
+- Documentos/artifacts atualizados:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_FINAL_2026-05-14.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md` e
+  `server/test/artifacts/commander_reference_sprint3_lot_c_2026-05-14/purphoros_god_of_the_forge/readiness_public_rerun_final/`.
+- Scanner, camera e OCR permaneceram fora do escopo.
+
 ## 2026-05-14 — Commander Reference Sprint 3 Lote C app runtime
 
 ### O Porquê

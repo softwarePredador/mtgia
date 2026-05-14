@@ -278,6 +278,26 @@ O objetivo literal de provar dois comandantes Lote C promovidos permanece
 backend. O app nao mostrou erro cru, overflow, modal preso, scanner, camera ou
 OCR.
 
+## Lote C final - 2026-05-14
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_SPRINT3_LOT_C_FINAL_2026-05-14.md`.
+
+Resultado consolidado: **PASS_WITH_RISKS** para a auditoria e **NO-GO** para
+avancar ao Lote D como se o Lote C tivesse fechado com dois promovidos.
+
+- A comparacao Purphoros vs Brago confirmou que Purphoros passou no app runtime
+  por validade Commander/app API, mas nao promoveu por gate backend correto:
+  `profile_used=0`, `stats_used=0`, `corpus_used=0`, `fallback_count=0`,
+  `p95=12590ms` e scorecard `score=25`, `blocked`.
+- O scorecard de Purphoros foi rerodado em `master` atual com o summary publico
+  existente e permaneceu `blocked`, `ready_count=0`, sem mutacao de DB.
+- Nao houve bug seguro de parser, scorecard ou tracker; portanto Purphoros nao
+  foi promovido artificialmente.
+- `Brago, King Eternal` permanece o unico promovido final do Lote C. Purphoros e
+  os demais bloqueados precisam de profile/card_stats/deterministic reference
+  proof antes de novo public proof.
+
 ## Fechamento parcial Lote A - 2026-05-13
 
 Relatorio final:
