@@ -16433,3 +16433,29 @@ Validacao:
 - `cd app && flutter analyze lib/features/decks/providers/deck_provider.dart lib/features/decks/screens/deck_details_screen.dart lib/features/decks/screens/deck_list_screen.dart test/features/decks/providers/deck_provider_test.dart --no-version-check`: `PASS`;
 - `cd app && flutter test test/features/decks/providers/deck_provider_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/screens/deck_details_screen_smoke_test.dart --no-version-check`: `PASS`;
 - `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/import_to_deck_flow_test.dart --tags live --plain-name 'creates Commander draft and resolves commander field separately' -r expanded`: `PASS`.
+
+## 126. Post-mutation stale-state hardening - 2026-05-15
+
+Auditoria fleet apontou riscos similares ao bug de import/comandante em outras
+areas: contadores e listas podiam ficar stale apos mutacoes de leitura,
+mensagem, trade, importacao para deck ou edicao de Fichario.
+
+Patch aplicado:
+
+- `PUT /conversations/:id/read` agora retorna `conversation_id`,
+  `marked_read` e `unread`;
+- `PUT /notifications/read-all` agora retorna `marked_read` e `unread: 0`;
+- `POST /import/to-deck` agora retorna `deck_id` e `total_cards`;
+- app consome esses campos quando presentes e mantem fallback para backends
+  antigos;
+- envio de direct message recarrega a lista de conversas apos sucesso;
+- status/respond de Trades atualiza a linha da lista a partir do detalhe
+  recarregado;
+- update de Binder com `list_type` remove item da aba filtrada atual quando ele
+  migra para outra lista;
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi corrigido para refletir shapes
+  reais e campos aditivos.
+
+Validacao exigida para futuros agentes: ao alterar mutacoes app-facing, testar
+tambem a tela/lista/counter que fica atras do detalhe, nao apenas o endpoint ou
+dialog ativo.

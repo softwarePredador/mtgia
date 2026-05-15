@@ -87,6 +87,58 @@ class _RealtimeTradeApiClient extends ApiClient {
   }
 }
 
+class _TradeStatusMutationApiClient extends ApiClient {
+  final putEndpoints = <String>[];
+  String detailStatus = 'pending';
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    if (endpoint == '/trades?page=1&limit=20&role=all') {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'trade-1',
+            'status': 'pending',
+            'type': 'trade',
+            'sender': {'id': 'sender-1', 'username': 'sender'},
+            'receiver': {'id': 'receiver-1', 'username': 'receiver'},
+            'created_at': '2026-05-11T10:00:00Z',
+            'updated_at': '2026-05-11T10:00:00Z',
+          },
+        ],
+        'total': 1,
+        'page': 1,
+      });
+    }
+    if (endpoint == '/trades/trade-1') {
+      return ApiResponse(200, {
+        'id': 'trade-1',
+        'status': detailStatus,
+        'type': 'trade',
+        'sender': {'id': 'sender-1', 'username': 'sender'},
+        'receiver': {'id': 'receiver-1', 'username': 'receiver'},
+        'created_at': '2026-05-11T10:00:00Z',
+        'updated_at': '2026-05-11T10:05:00Z',
+        'my_items': [],
+        'their_items': [],
+        'messages': [],
+        'status_history': [],
+      });
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+
+  @override
+  Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    putEndpoints.add(endpoint);
+    if (endpoint == '/trades/trade-1/status') {
+      detailStatus = body['status'] as String? ?? 'pending';
+      return ApiResponse(200, {'ok': true});
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
+
 void main() {
   test(
     'createTrade maps item availability failure to friendly message',
@@ -155,6 +207,24 @@ void main() {
 
       expect(provider.trades, hasLength(1));
       expect(api.getEndpoints, contains('/trades?page=1&limit=20&role=all'));
+    },
+  );
+
+  test(
+    'updateTradeStatus patches matching list row after detail refresh',
+    () async {
+      final api = _TradeStatusMutationApiClient();
+      final provider = TradeProvider(apiClient: api);
+
+      await provider.fetchTrades();
+      expect(provider.trades.single.status, 'pending');
+
+      final updated = await provider.updateTradeStatus('trade-1', 'shipped');
+
+      expect(updated, isTrue);
+      expect(api.putEndpoints, contains('/trades/trade-1/status'));
+      expect(provider.selectedTrade?.status, 'shipped');
+      expect(provider.trades.single.status, 'shipped');
     },
   );
 }

@@ -343,6 +343,7 @@ class MessageProvider extends ChangeNotifier {
         final dm = DirectMessage.fromJson(resp.data as Map<String, dynamic>);
         _messages.insert(0, dm); // Mensagens em DESC, nova no topo
         _totalMessages += 1;
+        await fetchConversations();
         return true;
       }
     } catch (e) {
@@ -357,25 +358,39 @@ class MessageProvider extends ChangeNotifier {
   /// Marca mensagens da conversa como lidas
   Future<void> markAsRead(String conversationId) async {
     try {
-      await _api.put('/conversations/$conversationId/read', {});
+      final resp = await _api.put('/conversations/$conversationId/read', {});
+      if (resp.statusCode < 200 || resp.statusCode >= 300) {
+        return;
+      }
       // Atualizar o unread count local
       final idx = _conversations.indexWhere((c) => c.id == conversationId);
+      var changed = false;
       if (idx >= 0) {
         final old = _conversations[idx];
-        if (old.unreadCount == 0) {
-          return;
+        if (old.unreadCount != 0) {
+          _conversations[idx] = Conversation(
+            id: old.id,
+            otherUser: old.otherUser,
+            lastMessage: old.lastMessage,
+            lastMessageSenderId: old.lastMessageSenderId,
+            unreadCount: 0,
+            lastMessageAt: old.lastMessageAt,
+            createdAt: old.createdAt,
+          );
+          changed = true;
         }
-        _conversations[idx] = Conversation(
-          id: old.id,
-          otherUser: old.otherUser,
-          lastMessage: old.lastMessage,
-          lastMessageSenderId: old.lastMessageSenderId,
-          unreadCount: 0,
-          lastMessageAt: old.lastMessageAt,
-          createdAt: old.createdAt,
-        );
-        // Recalcular badge global
-        _unreadCount = _conversations.fold(0, (sum, c) => sum + c.unreadCount);
+      }
+
+      final data = resp.data is Map ? resp.data as Map : const {};
+      final backendUnread = data['unread'] as int?;
+      final nextUnread =
+          backendUnread ??
+          _conversations.fold<int>(0, (sum, c) => sum + c.unreadCount);
+      if (_unreadCount != nextUnread) {
+        _unreadCount = nextUnread;
+        changed = true;
+      }
+      if (changed) {
         notifyListeners();
       }
     } catch (e) {

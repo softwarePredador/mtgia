@@ -244,7 +244,9 @@ Future<Response> _importToDeck(RequestContext context) async {
 
     return Response.json(body: {
       'success': true,
+      'deck_id': deckId,
       'cards_imported': _sumQuantities(consolidatedCards),
+      'total_cards': _sumQuantities(consolidatedCards),
       'not_found_lines': notFoundCards,
       'warnings': warnings,
     });

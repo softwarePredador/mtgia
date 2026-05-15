@@ -1031,7 +1031,7 @@ class DeckProvider extends ChangeNotifier {
     );
 
     if (result['success'] == true) {
-      invalidateDeckCache(deckId);
+      await _refreshDeckDetailsAfterMutation(deckId);
     }
     return result;
   }

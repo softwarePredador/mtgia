@@ -117,4 +117,24 @@ void main() {
       expect(provider.items.single.language, 'ja');
     },
   );
+
+  test(
+    'updateItem removes item from active list when list_type changes',
+    () async {
+      final api = _FakeBinderApiClient();
+      final provider = BinderProvider(apiClient: api);
+
+      provider.applyFilters(listType: 'have');
+      await Future<void>.delayed(Duration.zero);
+      expect(provider.items, hasLength(1));
+
+      final updated = await provider.updateItem('binder-1', {
+        'list_type': 'want',
+      });
+
+      expect(updated, isTrue);
+      expect(api.lastPutBody?['list_type'], 'want');
+      expect(provider.items, isEmpty);
+    },
+  );
 }

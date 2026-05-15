@@ -763,6 +763,12 @@ class BinderProvider extends ChangeNotifier {
           if (updates.containsKey('language')) {
             item.language = updates['language'] as String? ?? 'en';
           }
+          if (updates.containsKey('list_type')) {
+            item.listType = updates['list_type'] as String? ?? 'have';
+            if (_currentListType != null && item.listType != _currentListType) {
+              _items.removeAt(idx);
+            }
+          }
           notifyListeners();
         }
         await fetchStats();

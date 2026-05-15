@@ -25,6 +25,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     return Response.json(body: {
       'marked_read': result.affectedRows,
+      'unread': 0,
     });
   } catch (e, st) {
     await captureRouteException(

@@ -16,7 +16,8 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
     // Verificar participação
     final convResult = await pool.execute(
-      Sql.named('SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
+      Sql.named(
+          'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -45,8 +46,23 @@ Future<Response> onRequest(RequestContext context, String id) async {
       parameters: {'convId': id, 'userId': userId},
     );
 
+    final unreadResult = await pool.execute(
+      Sql.named('''
+        SELECT COUNT(*)::int
+        FROM direct_messages dm
+        JOIN conversations c ON c.id = dm.conversation_id
+        WHERE dm.read_at IS NULL
+          AND dm.sender_id != @userId
+          AND (c.user_a_id = @userId OR c.user_b_id = @userId)
+      '''),
+      parameters: {'userId': userId},
+    );
+    final unread = (unreadResult.first[0] as int?) ?? 0;
+
     return Response.json(body: {
+      'conversation_id': id,
       'marked_read': result.affectedRows,
+      'unread': unread,
     });
   } catch (e, st) {
     await captureRouteException(

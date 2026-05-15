@@ -112,7 +112,9 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
     final data = asDynamicMap(response.data);
     return {
       'success': true,
+      'deck_id': data['deck_id'],
       'cards_imported': data['cards_imported'] ?? 0,
+      'total_cards': data['total_cards'],
       'not_found_lines': data['not_found_lines'] ?? const <String>[],
       'warnings': data['warnings'] ?? const <String>[],
     };

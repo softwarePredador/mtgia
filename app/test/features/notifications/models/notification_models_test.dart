@@ -38,7 +38,8 @@ class _FakeNotificationApiClient extends ApiClient {
     putEndpoints.add(endpoint);
     if (endpoint == '/notifications/read-all') {
       readAllCalled = true;
-      return ApiResponse(200, {'ok': true});
+      unread = 0;
+      return ApiResponse(200, {'marked_read': 2, 'unread': unread});
     }
     if (endpoint == '/notifications/notif-1/read') {
       return ApiResponse(200, {'ok': true});

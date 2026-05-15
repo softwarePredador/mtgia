@@ -1225,5 +1225,61 @@ void main() {
       expect(decksFetchCount, 1);
       expect(provider.decks.single.id, 'deck-copy');
     });
+
+    test(
+      'importListToDeck refreshes selected deck details on success',
+      () async {
+        var detailsFetchCount = 0;
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1': () {
+              detailsFetchCount += 1;
+              final cards =
+                  detailsFetchCount == 1
+                      ? {'spell-1': 1, 'land-1': 36}
+                      : {'spell-1': 1, 'imported-1': 2, 'land-1': 36};
+              return ApiResponse(200, _buildDeckDetailsJson(cards));
+            },
+            '/decks':
+                () => ApiResponse(200, [
+                  {
+                    'id': 'deck-1',
+                    'name': 'Smoke Deck',
+                    'format': 'commander',
+                    'is_public': false,
+                    'created_at': '2026-03-23T00:00:00.000Z',
+                    'card_count': 39,
+                  },
+                ]),
+          },
+          postHandlers: {
+            '/import/to-deck':
+                (_) => ApiResponse(200, {
+                  'success': true,
+                  'deck_id': 'deck-1',
+                  'cards_imported': 2,
+                  'total_cards': 39,
+                  'not_found_lines': [],
+                  'warnings': [],
+                }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        await provider.fetchDeckDetails('deck-1');
+        expect(provider.selectedDeck?.cardCount, 37);
+
+        final result = await provider.importListToDeck(
+          deckId: 'deck-1',
+          list: '2 Counterspell',
+        );
+
+        expect(result['success'], isTrue);
+        expect(result['deck_id'], 'deck-1');
+        expect(result['total_cards'], 39);
+        expect(provider.selectedDeck?.cardCount, 39);
+        expect(detailsFetchCount, 2);
+      },
+    );
   });
 }

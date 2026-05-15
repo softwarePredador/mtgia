@@ -304,6 +304,32 @@ class TradeOffer {
           [],
     );
   }
+
+  TradeOffer mergeDetailForList(TradeOffer detail) {
+    return TradeOffer(
+      id: id,
+      status: detail.status,
+      type: detail.type,
+      message: detail.message ?? message,
+      paymentAmount: detail.paymentAmount ?? paymentAmount,
+      paymentCurrency: detail.paymentCurrency ?? paymentCurrency,
+      paymentMethod: detail.paymentMethod ?? paymentMethod,
+      deliveryMethod: detail.deliveryMethod ?? deliveryMethod,
+      trackingCode: detail.trackingCode ?? trackingCode,
+      sender: detail.sender,
+      receiver: detail.receiver,
+      createdAt: detail.createdAt,
+      updatedAt: detail.updatedAt,
+      valueSummary: detail.valueSummary ?? valueSummary,
+      myItems: myItems,
+      theirItems: theirItems,
+      messages: messages,
+      statusHistory: statusHistory,
+      offeringCount: offeringCount,
+      requestingCount: requestingCount,
+      messageCount: messageCount,
+    );
+  }
 }
 
 class TradeValueSummary {
@@ -565,6 +591,17 @@ class TradeProvider extends ChangeNotifier {
     await refreshTradeDetail(tradeId, showLoading: true);
   }
 
+  void _patchTradeListFromSelectedDetail(String tradeId) {
+    final detail = _selectedTrade;
+    if (detail == null || detail.id != tradeId) return;
+
+    final idx = _trades.indexWhere((trade) => trade.id == tradeId);
+    if (idx < 0) return;
+
+    _trades[idx] = _trades[idx].mergeDetailForList(detail);
+    notifyListeners();
+  }
+
   Future<void> refreshTradeDetail(
     String tradeId, {
     bool showLoading = false,
@@ -678,6 +715,7 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 200) {
         // Recarregar detalhe
         await fetchTradeDetail(tradeId);
+        _patchTradeListFromSelectedDetail(tradeId);
         return true;
       } else {
         _errorMessage = FriendlyErrorMapper.fromApiResponse(
@@ -720,6 +758,7 @@ class TradeProvider extends ChangeNotifier {
 
       if (res.statusCode == 200) {
         await fetchTradeDetail(tradeId);
+        _patchTradeListFromSelectedDetail(tradeId);
         return true;
       } else {
         _errorMessage = FriendlyErrorMapper.fromApiResponse(

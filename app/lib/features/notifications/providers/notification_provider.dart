@@ -163,7 +163,10 @@ class NotificationProvider extends ChangeNotifier {
   /// Marca uma notificação como lida
   Future<void> markAsRead(String notificationId) async {
     try {
-      await _api.put('/notifications/$notificationId/read', {});
+      final resp = await _api.put('/notifications/$notificationId/read', {});
+      if (resp.statusCode < 200 || resp.statusCode >= 300) {
+        return;
+      }
       final idx = _notifications.indexWhere((n) => n.id == notificationId);
       if (idx >= 0) {
         final old = _notifications[idx];
@@ -201,7 +204,10 @@ class NotificationProvider extends ChangeNotifier {
         return;
       }
 
-      await _api.put('/notifications/read-all', {});
+      final resp = await _api.put('/notifications/read-all', {});
+      if (resp.statusCode < 200 || resp.statusCode >= 300) {
+        return;
+      }
       var changed = false;
       for (var i = 0; i < _notifications.length; i++) {
         final old = _notifications[i];
@@ -218,8 +224,10 @@ class NotificationProvider extends ChangeNotifier {
           changed = true;
         }
       }
-      if (_unreadCount != 0) {
-        _unreadCount = 0;
+      final data = resp.data is Map ? resp.data as Map : const {};
+      final nextUnread = data['unread'] as int? ?? 0;
+      if (_unreadCount != nextUnread) {
+        _unreadCount = nextUnread;
         changed = true;
       }
       if (changed) {

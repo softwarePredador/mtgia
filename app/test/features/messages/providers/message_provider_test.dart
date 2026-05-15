@@ -20,6 +20,7 @@ class _SlowMessagesApiClient extends ApiClient {
 
 class _RealtimeMessagesApiClient extends ApiClient {
   final getEndpoints = <String>[];
+  final postEndpoints = <String>[];
   final putEndpoints = <String>[];
   int unread = 1;
 
@@ -70,8 +71,31 @@ class _RealtimeMessagesApiClient extends ApiClient {
     putEndpoints.add(endpoint);
     if (endpoint == '/conversations/conversation-1/read') {
       unread = 0;
+      return ApiResponse(200, {
+        'conversation_id': 'conversation-1',
+        'marked_read': 1,
+        'unread': unread,
+      });
     }
     return ApiResponse(200, {'ok': true});
+  }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    postEndpoints.add(endpoint);
+    if (endpoint == '/conversations/conversation-1/messages') {
+      return ApiResponse(201, {
+        'id': 'message-sent',
+        'sender_id': 'user-1',
+        'message': body['message'],
+        'created_at': '2026-05-11T10:01:00Z',
+      });
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
   }
 }
 
@@ -135,6 +159,25 @@ void main() {
         ]),
       );
       expect(api.putEndpoints, contains('/conversations/conversation-1/read'));
+    },
+  );
+
+  test(
+    'sendMessage refreshes conversation list preview after success',
+    () async {
+      final api = _RealtimeMessagesApiClient();
+      final provider = MessageProvider(apiClient: api);
+
+      final sent = await provider.sendMessage('conversation-1', 'resposta');
+
+      expect(sent, isTrue);
+      expect(provider.messages.first.id, 'message-sent');
+      expect(provider.conversations, hasLength(1));
+      expect(
+        api.postEndpoints,
+        contains('/conversations/conversation-1/messages'),
+      );
+      expect(api.getEndpoints, contains('/conversations?page=1&limit=20'));
     },
   );
 }
