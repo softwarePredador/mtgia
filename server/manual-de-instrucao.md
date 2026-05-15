@@ -16459,3 +16459,22 @@ Patch aplicado:
 Validacao exigida para futuros agentes: ao alterar mutacoes app-facing, testar
 tambem a tela/lista/counter que fica atras do detalhe, nao apenas o endpoint ou
 dialog ativo.
+
+## 127. Deck diagnostic explainability - 2026-05-15
+
+Feedback de tester: a leitura rapida do deck mostrava contadores de Ramp,
+Compra, Interacao e Wipes, mas o usuario nao conseguia auditar quais cartas
+tinham entrado na conta.
+
+Patch aplicado:
+
+- `DeckDiagnosticPanel` ganhou a secao `O que entrou na conta`;
+- cada categoria mostra ate cinco cartas detectadas e o total contado;
+- texto da UI deixa claro que tutores nao contam como compra;
+- heuristica de Compra cobre draw direto, impulse draw/exile-play e efeitos que
+  colocam carta na mao, mantendo tutor fora do indicador.
+
+Validacao:
+
+- `cd app && flutter analyze lib/features/decks/widgets/deck_diagnostic_panel.dart test/features/decks/widgets/deck_diagnostic_panel_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter test test/features/decks/widgets/deck_diagnostic_panel_test.dart --no-version-check`: `PASS`.

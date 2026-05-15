@@ -142,6 +142,24 @@ class DeckDiagnosticPanel extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
+            'O que entrou na conta',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Cartas detectadas localmente em cada indicador. Tutores não entram como compra.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _DiagnosticEvidenceGrid(evidence: snapshot.evidence),
+          const SizedBox(height: 18),
+          Text(
             'Diagnóstico textual',
             style: theme.textTheme.titleSmall?.copyWith(
               color: AppTheme.textPrimary,
@@ -263,6 +281,104 @@ class _DiagnosticMetricCard extends StatelessWidget {
   }
 }
 
+class _DiagnosticEvidenceGrid extends StatelessWidget {
+  final List<_DiagnosticEvidence> evidence;
+
+  const _DiagnosticEvidenceGrid({required this.evidence});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth < 520 ? 1 : 2;
+        final spacing = 10.0;
+        final itemWidth =
+            (constraints.maxWidth - ((columns - 1) * spacing)) / columns;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children:
+              evidence
+                  .map(
+                    (item) => SizedBox(
+                      width: itemWidth,
+                      child: _DiagnosticEvidenceCard(evidence: item),
+                    ),
+                  )
+                  .toList(),
+        );
+      },
+    );
+  }
+}
+
+class _DiagnosticEvidenceCard extends StatelessWidget {
+  final _DiagnosticEvidence evidence;
+
+  const _DiagnosticEvidenceCard({required this.evidence});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final preview = evidence.cardLabels.take(5).toList();
+    final hiddenCount = evidence.cardLabels.length - preview.length;
+
+    return Container(
+      key: Key('deck-diagnostic-evidence-${evidence.label}'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.74),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(evidence.icon, size: 15, color: AppTheme.mythicGold),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '${evidence.label} (${evidence.count})',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (preview.isEmpty)
+            Text(
+              'Nenhuma carta detectada.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                fontStyle: FontStyle.italic,
+              ),
+            )
+          else
+            Text(
+              [
+                ...preview,
+                if (hiddenCount > 0) '+$hiddenCount outras',
+              ].join(' • '),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DiagnosticInsightRow extends StatelessWidget {
   final _DiagnosticInsight insight;
 
@@ -369,10 +485,12 @@ class _MetricToneBadge extends StatelessWidget {
 
 class _DeckDiagnosticSnapshot {
   final List<_DiagnosticMetric> metrics;
+  final List<_DiagnosticEvidence> evidence;
   final List<_DiagnosticInsight> insights;
 
   const _DeckDiagnosticSnapshot({
     required this.metrics,
+    required this.evidence,
     required this.insights,
   });
 
@@ -380,23 +498,28 @@ class _DeckDiagnosticSnapshot {
     final cards = deck.mainBoard.values.expand((list) => list).toList();
     final targets = _DeckDiagnosticTargets.fromDeck(deck);
 
-    final landCount = _sumWhere(cards, (card) => _isLand(card));
-    final rampCount = _sumWhere(
+    final landCards = _collectWhere(cards, (card) => _isLand(card));
+    final rampCards = _collectWhere(
       cards,
       (card) => !_isLand(card) && _isRamp(card),
     );
-    final drawCount = _sumWhere(
+    final drawCards = _collectWhere(
       cards,
       (card) => !_isLand(card) && _isDraw(card),
     );
-    final interactionCount = _sumWhere(
+    final interactionCards = _collectWhere(
       cards,
       (card) => !_isLand(card) && _isInteraction(card),
     );
-    final wipeCount = _sumWhere(
+    final wipeCards = _collectWhere(
       cards,
       (card) => !_isLand(card) && _isWipe(card),
     );
+    final landCount = _sumQuantities(landCards);
+    final rampCount = _sumQuantities(rampCards);
+    final drawCount = _sumQuantities(drawCards);
+    final interactionCount = _sumQuantities(interactionCards);
+    final wipeCount = _sumQuantities(wipeCards);
 
     var weightedCmc = 0;
     var nonLandCount = 0;
@@ -513,7 +636,38 @@ class _DeckDiagnosticSnapshot {
       targets: targets,
     );
 
-    return _DeckDiagnosticSnapshot(metrics: metrics, insights: insights);
+    final evidence = <_DiagnosticEvidence>[
+      _DiagnosticEvidence(
+        label: 'Ramp',
+        count: rampCount,
+        icon: Icons.bolt_rounded,
+        cardLabels: _formatEvidenceCards(rampCards),
+      ),
+      _DiagnosticEvidence(
+        label: 'Compra',
+        count: drawCount,
+        icon: Icons.auto_stories_rounded,
+        cardLabels: _formatEvidenceCards(drawCards),
+      ),
+      _DiagnosticEvidence(
+        label: 'Interação',
+        count: interactionCount,
+        icon: Icons.shield_outlined,
+        cardLabels: _formatEvidenceCards(interactionCards),
+      ),
+      _DiagnosticEvidence(
+        label: 'Wipes',
+        count: wipeCount,
+        icon: Icons.cleaning_services_outlined,
+        cardLabels: _formatEvidenceCards(wipeCards),
+      ),
+    ];
+
+    return _DeckDiagnosticSnapshot(
+      metrics: metrics,
+      evidence: evidence,
+      insights: insights,
+    );
   }
 
   static List<_DiagnosticInsight> _buildInsights({
@@ -667,14 +821,25 @@ class _DeckDiagnosticSnapshot {
     return insights.take(3).map((item) => item.insight).toList();
   }
 
-  static int _sumWhere(
+  static List<DeckCardItem> _collectWhere(
     List<DeckCardItem> cards,
     bool Function(DeckCardItem card) predicate,
   ) {
-    return cards.fold<int>(
-      0,
-      (sum, card) => predicate(card) ? sum + card.quantity : sum,
-    );
+    return cards.where(predicate).toList(growable: false);
+  }
+
+  static int _sumQuantities(List<DeckCardItem> cards) {
+    return cards.fold<int>(0, (sum, card) => sum + card.quantity);
+  }
+
+  static List<String> _formatEvidenceCards(List<DeckCardItem> cards) {
+    final sorted = [...cards]..sort((a, b) => a.name.compareTo(b.name));
+    return sorted
+        .map(
+          (card) =>
+              card.quantity > 1 ? '${card.name} x${card.quantity}' : card.name,
+        )
+        .toList(growable: false);
   }
 
   static bool _isLand(DeckCardItem card) =>
@@ -708,6 +873,21 @@ class _DeckDiagnosticSnapshot {
         text.contains('draw two cards') ||
         text.contains('draw three cards') ||
         text.contains('draw x cards') ||
+        text.contains('draw cards') ||
+        text.contains('draw that many') ||
+        text.contains('draw equal') ||
+        text.contains('draws a card') ||
+        text.contains('draw, then') ||
+        text.contains('draw and discard') ||
+        text.contains('you may draw') ||
+        text.contains('put that card into your hand') ||
+        text.contains('put one of them into your hand') ||
+        text.contains('put a card from among them into your hand') ||
+        text.contains('exile the top card') && text.contains('you may play') ||
+        text.contains('exile the top two cards') &&
+            text.contains('you may play') ||
+        text.contains('exile cards from the top') &&
+            text.contains('you may play') ||
         text.contains('investigate') ||
         text.contains('connive');
   }
@@ -916,6 +1096,20 @@ class _DiagnosticMetric {
     required this.target,
     required this.tone,
     required this.icon,
+  });
+}
+
+class _DiagnosticEvidence {
+  final String label;
+  final int count;
+  final IconData icon;
+  final List<String> cardLabels;
+
+  const _DiagnosticEvidence({
+    required this.label,
+    required this.count,
+    required this.icon,
+    required this.cardLabels,
   });
 }
 

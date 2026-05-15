@@ -169,6 +169,79 @@ void main() {
     );
   }
 
+  DeckDetails makeCardAdvantageCommanderDeck() {
+    return DeckDetails(
+      id: 'deck-card-advantage',
+      name: 'Boros Value',
+      format: 'commander',
+      commanderName: 'Lorehold, the Historian',
+      isPublic: false,
+      createdAt: DateTime(2026, 5, 15),
+      cardCount: 100,
+      stats: const {},
+      commander: [
+        card(
+          id: 'cmdr3',
+          name: 'Lorehold, the Historian',
+          typeLine: 'Legendary Creature — Human Cleric',
+          manaCost: '{R}{W}',
+          quantity: 1,
+          isCommander: true,
+        ),
+      ],
+      mainBoard: {
+        'Mainboard': [
+          card(
+            id: 'land3',
+            name: 'Mountain',
+            typeLine: 'Basic Land — Mountain',
+            quantity: 35,
+          ),
+          card(
+            id: 'draw-a-card',
+            name: 'Esper Sentinel',
+            typeLine: 'Artifact Creature — Human Soldier',
+            manaCost: '{W}',
+            oracleText:
+                'Whenever an opponent casts their first noncreature spell each turn, draw a card unless that player pays {X}.',
+          ),
+          card(
+            id: 'impulse',
+            name: 'Reckless Impulse',
+            typeLine: 'Sorcery',
+            manaCost: '{1}{R}',
+            oracleText:
+                'Exile the top two cards of your library. Until the end of your next turn, you may play those cards.',
+          ),
+          card(
+            id: 'look-hand',
+            name: 'Thrill of Possibility',
+            typeLine: 'Instant',
+            manaCost: '{1}{R}',
+            oracleText:
+                'As an additional cost to cast this spell, discard a card. Draw two cards.',
+          ),
+          card(
+            id: 'tutor',
+            name: 'Enlightened Tutor',
+            typeLine: 'Instant',
+            manaCost: '{W}',
+            oracleText:
+                'Search your library for an artifact or enchantment card, reveal it, then shuffle and put that card on top.',
+          ),
+          card(
+            id: 'filler3',
+            name: 'Boros Recruit',
+            typeLine: 'Creature — Goblin Soldier',
+            manaCost: '{R/W}',
+            oracleText: 'First strike.',
+            quantity: 60,
+          ),
+        ],
+      },
+    );
+  }
+
   Widget createSubject(DeckDetails deck, {double width = 400}) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
@@ -197,6 +270,9 @@ void main() {
       expect(find.text('Compra'), findsOneWidget);
       expect(find.text('Interação'), findsOneWidget);
       expect(find.text('CMC médio'), findsOneWidget);
+      expect(find.text('O que entrou na conta'), findsOneWidget);
+      expect(find.text('Compra (8)'), findsOneWidget);
+      expect(find.text('Chart a Course x8'), findsOneWidget);
       expect(
         find.text('Base de mana na faixa esperada para o formato.'),
         findsOneWidget,
@@ -232,5 +308,24 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets(
+      'explains card advantage count without treating tutors as draw',
+      (tester) async {
+        await tester.pumpWidget(
+          createSubject(makeCardAdvantageCommanderDeck()),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Compra (3)'), findsOneWidget);
+        expect(
+          find.text(
+            'Esper Sentinel • Reckless Impulse • Thrill of Possibility',
+          ),
+          findsOneWidget,
+        );
+        expect(find.textContaining('Enlightened Tutor'), findsNothing);
+      },
+    );
   });
 }
