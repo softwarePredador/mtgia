@@ -109,6 +109,13 @@ String _optimizeIntensityKeyForLabel(String label) {
   };
 }
 
+String _mainBoardImportListWithoutCommander() {
+  return _completeCommanderImportList
+      .split('\n')
+      .where((line) => !line.contains('[Commander]'))
+      .join('\n');
+}
+
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
   const chunkSize = 2000;
@@ -283,6 +290,61 @@ Future<String> _findDeckIdByName(String deckName) async {
   return createdDeckId!;
 }
 
+Future<void> _expectSingleCommander(String deckId, String commanderName) async {
+  final response = await ApiClient().get('/decks/$deckId');
+  expect(response.statusCode, 200);
+  final deck = (response.data as Map).cast<String, dynamic>();
+  final commanders = _commanderEntries(deck, commanderName).toList();
+  final matchingCommanderQuantity = commanders
+      .where((card) => _cardNameMatches(card, commanderName))
+      .fold<int>(0, (total, card) => total + _cardQuantity(card));
+  expect(
+    matchingCommanderQuantity,
+    1,
+    reason: 'Importing a list without commander must preserve one commander.',
+  );
+}
+
+Iterable<Map<String, dynamic>> _commanderEntries(
+  Map<String, dynamic> deck,
+  String commanderName,
+) sync* {
+  final commander = deck['commander'];
+  if (commander is List) {
+    for (final entry in commander.whereType<Map>()) {
+      yield entry.cast<String, dynamic>();
+    }
+    return;
+  }
+  if (commander is Map) {
+    yield commander.cast<String, dynamic>();
+    return;
+  }
+
+  final cards = deck['cards'];
+  if (cards is List) {
+    for (final entry in cards.whereType<Map>()) {
+      final card = entry.cast<String, dynamic>();
+      if (card['is_commander'] == true ||
+          _cardNameMatches(card, commanderName)) {
+        yield card;
+      }
+    }
+  }
+}
+
+bool _cardNameMatches(Map<String, dynamic> card, String expectedName) {
+  final name = card['name']?.toString() ?? card['card_name']?.toString() ?? '';
+  return name.trim().toLowerCase() == expectedName.trim().toLowerCase();
+}
+
+int _cardQuantity(Map<String, dynamic> card) {
+  final raw = card['quantity'];
+  if (raw is int) return raw;
+  if (raw is num) return raw.toInt();
+  return int.tryParse(raw?.toString() ?? '') ?? 1;
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -420,6 +482,47 @@ void main() {
         attempts: 120,
       );
       await _capture(binding, tester, '07_commander_imported');
+
+      await tester.tap(find.byKey(const Key('deck-details-menu')));
+      await tester.pump();
+      final noCommanderImportMenuEntry = find.byKey(
+        const Key('deck-details-menu-import-list'),
+      );
+      await pumpUntilFound(tester, noCommanderImportMenuEntry, attempts: 30);
+      await tester.tap(noCommanderImportMenuEntry);
+      await tester.pump();
+
+      await pumpUntilFound(tester, importDialogTitle, attempts: 30);
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-replace-switch')),
+      );
+      await tester.pump();
+      await tester.enterText(
+        find.byKey(const Key('deck-import-list-dialog-field')),
+        _mainBoardImportListWithoutCommander(),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+      await _capture(binding, tester, '07b_import_without_commander');
+
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
+      await tester.pump();
+
+      await pumpUntilAbsent(tester, importDialogTitle, attempts: 120);
+      await pumpUntilFound(
+        tester,
+        find.text('Talrand, Sky Summoner'),
+        attempts: 120,
+      );
+      final deckIdAfterNoCommanderImport = await _findDeckIdByName(
+        createdDeckName,
+      );
+      await _expectSingleCommander(
+        deckIdAfterNoCommanderImport,
+        'Talrand, Sky Summoner',
+      );
+      await _capture(binding, tester, '07c_commander_preserved');
 
       if (_runtimeOptimizeForceArchetype.trim().isNotEmpty) {
         final createdDeckId = await _findDeckIdByName(createdDeckName);

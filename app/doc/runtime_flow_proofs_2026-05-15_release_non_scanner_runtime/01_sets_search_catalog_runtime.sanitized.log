@@ -1,0 +1,108 @@
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/sets_search_catalog_runtime_test.dart
+The following target(s) do not support arm64 architecture, which is a requirement for Apple Silicon iOS 26+ simulators:
+  - camera_avfoundation (Flutter plugin)
+  - camera_avfoundation-camera_avfoundation_privacy
+  - Firebase (transitive dependency of Flutter plugin firebase_messaging)
+  - firebase_core (Flutter plugin)
+  - firebase_messaging (Flutter plugin)
+  - firebase_messaging-firebase_messaging_Privacy
+  - firebase_performance (Flutter plugin)
+  - FirebaseABTesting (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseABTesting-FirebaseABTesting_Privacy (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseCore (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseCore-FirebaseCore_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseCoreExtension (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseCoreExtension-FirebaseCoreExtension_Privacy (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseCoreInternal (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseCoreInternal-FirebaseCoreInternal_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseInstallations (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseInstallations-FirebaseInstallations_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseMessaging (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebaseMessaging-FirebaseMessaging_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - FirebasePerformance (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseRemoteConfig (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseRemoteConfig-FirebaseRemoteConfig_Privacy (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseRemoteConfigInterop (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseSessions (transitive dependency of Flutter plugin firebase_performance)
+  - FirebaseSharedSwift (transitive dependency of Flutter plugin firebase_performance)
+  - Flutter (transitive dependency of Flutter plugin camera_avfoundation)
+  - google_mlkit_commons (Flutter plugin)
+  - google_mlkit_text_recognition (Flutter plugin)
+  - GoogleDataTransport (transitive dependency of Flutter plugin firebase_messaging)
+  - GoogleDataTransport-GoogleDataTransport_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - GoogleMLKit (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - GoogleToolboxForMac (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - GoogleToolboxForMac-GoogleToolboxForMac_Logger_Privacy
+  - GoogleToolboxForMac-GoogleToolboxForMac_Privacy
+  - GoogleUtilities (transitive dependency of Flutter plugin firebase_messaging)
+  - GoogleUtilities-GoogleUtilities_Privacy
+  - GTMSessionFetcher (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - GTMSessionFetcher-GTMSessionFetcher_Core_Privacy
+  - integration_test (Flutter plugin)
+  - MLImage (transitive dependency of Flutter plugin google_mlkit_commons)
+  - MLKitCommon (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLKitTextRecognition (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLKitTextRecognition-LatinOCRResources (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLKitTextRecognitionCommon (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLKitVision (transitive dependency of Flutter plugin google_mlkit_commons)
+  - nanopb (transitive dependency of Flutter plugin firebase_messaging)
+  - nanopb-nanopb_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - objective_c (Flutter plugin)
+  - package_info_plus (Flutter plugin)
+  - package_info_plus-package_info_plus_privacy
+  - permission_handler_apple (Flutter plugin)
+  - permission_handler_apple-permission_handler_apple_privacy
+  - PromisesObjC (transitive dependency of Flutter plugin firebase_messaging)
+  - PromisesObjC-FBLPromises_Privacy (transitive dependency of Flutter plugin firebase_messaging)
+  - PromisesSwift (transitive dependency of Flutter plugin firebase_performance)
+  - PromisesSwift-Promises_Privacy (transitive dependency of Flutter plugin firebase_performance)
+  - Sentry (transitive dependency of Flutter plugin sentry_flutter)
+  - Sentry-Sentry
+  - sentry_flutter (Flutter plugin)
+  - share_plus (Flutter plugin)
+  - share_plus-share_plus_privacy
+  - shared_preferences_foundation (Flutter plugin)
+  - shared_preferences_foundation-shared_preferences_foundation_privacy
+  - sqflite_darwin (Flutter plugin)
+  - sqflite_darwin-sqflite_darwin_privacy
+  - webview_flutter_wkwebview (Flutter plugin)
+  - webview_flutter_wkwebview-webview_flutter_wkwebview_privacy
+  - camera_avfoundation (Flutter plugin)
+
+Please contact plugin maintainers to request arm64 support to continue to be able to use the plugin on a simulator.
+Running Xcode build...
+Xcode build done.                                           27.9s
+00:00 +0: search collections tab searches and opens set detail against live backend
+[⚠️ ApiClient] Firebase Performance indisponível; métricas HTTP desativadas nesta sessão. Detalhe: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/cards?name=Black+Lotus&limit=50&page=1
+CAPTURE_START sets_search_01_cards_results
+[🌐 ApiClient] GET /cards?name=Black+Lotus&limit=50&page=1 → 200 (1108ms)
+CAPTURE_CONVERT_BEGIN sets_search_01_cards_results
+CAPTURE_CONVERT_DONE sets_search_01_cards_results
+CAPTURE_TAKEN sets_search_01_cards_results bytes=134579
+SCREENSHOT_BEGIN sets_search_01_cards_results
+SCREENSHOT_SAVED 01_sets_search_catalog_runtime__sets_search_01_cards_results.png bytes=134579
+SCREENSHOT_END sets_search_01_cards_results
+CAPTURE_START sets_search_02_card_detail
+CAPTURE_TAKEN sets_search_02_card_detail bytes=5131739
+SCREENSHOT_BEGIN sets_search_02_card_detail
+SCREENSHOT_SAVED 01_sets_search_catalog_runtime__sets_search_02_card_detail.png bytes=5131739
+SCREENSHOT_END sets_search_02_card_detail
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/sets?limit=50&page=1
+[🌐 ApiClient] GET /sets?limit=50&page=1 → 200 (1253ms)
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/sets?limit=50&page=1&q=ECC
+[🌐 ApiClient] GET /sets?limit=50&page=1&q=ECC → 200 (246ms)
+CAPTURE_START sets_search_03_collections_results
+CAPTURE_TAKEN sets_search_03_collections_results bytes=454616
+SCREENSHOT_BEGIN sets_search_03_collections_results
+SCREENSHOT_SAVED 01_sets_search_catalog_runtime__sets_search_03_collections_results.png bytes=454616
+SCREENSHOT_END sets_search_03_collections_results
+[🌐 ApiClient] GET https://evolution-cartinhas.8ktevp.easypanel.host/cards?set=ECC&limit=100&page=1&dedupe=true
+[🌐 ApiClient] GET /cards?set=ECC&limit=100&page=1&dedupe=true → 200 (751ms)
+CAPTURE_START sets_search_04_set_detail
+CAPTURE_TAKEN sets_search_04_set_detail bytes=567666
+SCREENSHOT_BEGIN sets_search_04_set_detail
+SCREENSHOT_SAVED 01_sets_search_catalog_runtime__sets_search_04_set_detail.png bytes=567666
+SCREENSHOT_END sets_search_04_set_detail
+00:34 +1: (tearDownAll)
+00:35 +1: All tests passed!

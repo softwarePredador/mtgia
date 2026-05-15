@@ -3,6 +3,46 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Internal release runtime QA non-scanner PASS_WITH_RISKS
+
+### O Porquê
+- O release interno precisava de prova runtime no device/simulador contra o
+  backend publico depois de analyze/tests, sem scanner/camera/OCR/MLKit e sem
+  expor secrets, tokens, JWT, `DATABASE_URL`, `SENTRY_DSN`, `OPENAI_API_KEY`,
+  e-mail real ou payload sensivel.
+- O alvo Android preferencial `SM A135M/R58T300SREH` nao estava conectado; o
+  iPhone 15 Simulator bootado virou o alvo principal disponivel.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; `/health` publico respondeu
+  `healthy` com `git_sha=dc53d092ee9f1955a52d2e0fd45d22298ca91540`.
+- Foram executados harnesses de runtime no iPhone 15 Simulator
+  `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` contra
+  `https://evolution-cartinhas.8ktevp.easypanel.host`.
+- O harness `deck_runtime_m2006_test.dart` passou a cobrir importacao
+  `replace_all=true` sem comandante e confirmar por API que o comandante
+  existente permanece unico antes do optimize.
+- O harness `binder_marketplace_trade_runtime_test.dart` foi endurecido para
+  enviar trade chat via `TextInputAction.send`, usar router real em Messages e
+  evitar rate limit de login repetido ao trocar contas QA descartaveis.
+
+### Resultado
+- Status final: **PASS_WITH_RISKS**.
+- Provas PASS: Search/Cards/Sets/Card Detail, Home/Decks/Community/Collection/
+  Profile, Generate Commander async com `commander_name`, create/open/validate
+  deck, import com comandante, import sem comandante preservando comandante,
+  optimize focado com preview selecionavel/partial apply, Binder, Marketplace,
+  Trades, trade chat, Notifications, Direct Messages e troca de conta sem stale
+  state no harness.
+- Riscos aceitos: optimize agressivo mostrou falha amigavel/no apply nesta
+  rodada; backend publico exigiu retry `retry_after=60` em setup QA; warnings de
+  plugins nativos de scanner/Firebase persistem no build do simulador, mas
+  scanner/camera/OCR/MLKit seguem **DEFERRED / NOT PROVEN**.
+- Documentos/evidencias:
+  `server/doc/INTERNAL_RELEASE_RUNTIME_QA_2026-05-15.md`,
+  `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-05-15.md`
+  e `app/doc/runtime_flow_proofs_2026-05-15_release_non_scanner_runtime/`.
+
 ## 2026-05-15 — Track B app screen/field audit PASS_WITH_RISKS
 
 ### O Porquê

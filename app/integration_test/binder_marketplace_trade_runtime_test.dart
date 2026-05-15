@@ -13,6 +13,7 @@ import 'package:manaloom/features/binder/widgets/binder_item_editor.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/collection/screens/collection_screen.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
+import 'package:manaloom/features/messages/screens/chat_screen.dart';
 import 'package:manaloom/features/messages/screens/message_inbox_screen.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:manaloom/features/notifications/screens/notification_screen.dart';
@@ -59,13 +60,28 @@ class _RuntimeApi {
     String? token,
     Set<int> expected = const {200, 201},
   }) async {
-    final response = await _client
+    var response = await _client
         .post(
           Uri.parse('$baseUrl$endpoint'),
           headers: _headers(token),
           body: jsonEncode(body),
         )
         .timeout(const Duration(seconds: 20));
+    if (response.statusCode == 429) {
+      final retryAfter = _retryAfterSeconds(response.body);
+      // Public release QA can hit distributed auth limits across disposable
+      // users; retry once and keep the evidence explicit in the log.
+      // ignore: avoid_print
+      print('RUNTIME_RATE_LIMIT_RETRY endpoint=$endpoint seconds=$retryAfter');
+      await Future<void>.delayed(Duration(seconds: retryAfter));
+      response = await _client
+          .post(
+            Uri.parse('$baseUrl$endpoint'),
+            headers: _headers(token),
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 20));
+    }
     return _decode(response, expected: expected);
   }
 
@@ -267,6 +283,17 @@ class _RuntimeApi {
   }
 
   void close() => _client.close();
+}
+
+int _retryAfterSeconds(String body) {
+  try {
+    final data = jsonDecode(body);
+    final raw = data is Map ? data['retry_after'] : null;
+    final parsed = raw is int ? raw : int.tryParse(raw?.toString() ?? '');
+    return (parsed ?? 60).clamp(1, 65);
+  } catch (_) {
+    return 60;
+  }
 }
 
 void main() {
@@ -654,7 +681,7 @@ void main() {
         find.byKey(const Key('trade-message-field')),
         tradeChatMessage,
       );
-      await tester.tap(find.byKey(const Key('trade-message-send-button')));
+      await tester.testTextInput.receiveAction(TextInputAction.send);
       await tester.pump();
       await pumpUntilFound(tester, find.text(tradeChatMessage));
       await captureVisualProof(binding, tester, 'market_trade_08_trade_chat');
@@ -855,17 +882,15 @@ void main() {
       );
 
       final auth = AuthProvider();
-      final loggedIn = await auth.login(receiver.email, receiver.password);
-      expect(loggedIn, isTrue);
+      await _seedAuthAs(auth, receiver);
 
       await tester.pumpWidget(
-        _runtimeApp(
+        _runtimeMessagesRouterApp(
           auth: auth,
           binder: BinderProvider(),
           trade: TradeProvider(),
           messages: MessageProvider(),
           notifications: NotificationProvider(),
-          home: const MessageInboxScreen(),
         ),
       );
       await tester.pump();
@@ -959,6 +984,43 @@ Widget _runtimeRouterApp({
     ],
     child: MaterialApp.router(
       title: 'ManaLoom Notifications Runtime',
+      theme: AppTheme.darkTheme,
+      routerConfig: router,
+    ),
+  );
+}
+
+Widget _runtimeMessagesRouterApp({
+  required AuthProvider auth,
+  required BinderProvider binder,
+  required TradeProvider trade,
+  required MessageProvider messages,
+  required NotificationProvider notifications,
+}) {
+  final router = GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => const MessageInboxScreen()),
+      GoRoute(
+        path: '/messages/:id',
+        builder:
+            (_, state) =>
+                ChatScreen(conversationId: state.pathParameters['id']!),
+      ),
+    ],
+  );
+
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider<AuthProvider>.value(value: auth),
+      ChangeNotifierProvider<BinderProvider>.value(value: binder),
+      ChangeNotifierProvider<CardProvider>(create: (_) => CardProvider()),
+      ChangeNotifierProvider<TradeProvider>.value(value: trade),
+      ChangeNotifierProvider<MessageProvider>.value(value: messages),
+      ChangeNotifierProvider<NotificationProvider>.value(value: notifications),
+    ],
+    child: MaterialApp.router(
+      title: 'ManaLoom Messages Runtime',
       theme: AppTheme.darkTheme,
       routerConfig: router,
     ),
@@ -1063,8 +1125,24 @@ class _BinderEditorRuntimeHarness extends StatelessWidget {
 
 Future<void> _loginAs(AuthProvider auth, _RuntimeUser user) async {
   await auth.logout();
-  final ok = await auth.login(user.email, user.password);
-  expect(ok, isTrue, reason: 'login failed for ${user.username}');
+  await _seedAuthAs(auth, user);
+  expect(
+    auth.user?.id,
+    user.id,
+    reason: 'auth did not switch to ${user.username}',
+  );
+}
+
+Future<void> _seedAuthAs(AuthProvider auth, _RuntimeUser user) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('auth_token', user.token);
+  await prefs.setString(
+    'user_data',
+    jsonEncode({'id': user.id, 'username': user.username, 'email': user.email}),
+  );
+  ApiClient.setToken(user.token);
+  await auth.initialize();
+  expect(auth.isAuthenticated, isTrue);
 }
 
 Future<void> _tapVisible(WidgetTester tester, Finder finder) async {
