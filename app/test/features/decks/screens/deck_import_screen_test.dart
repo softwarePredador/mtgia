@@ -29,6 +29,32 @@ class _ImportFailureDeckProvider extends DeckProvider {
   }
 }
 
+class _PartialSuccessDeckProvider extends DeckProvider {
+  _PartialSuccessDeckProvider() : super(apiClient: _NoopApiClient());
+
+  @override
+  Future<Map<String, dynamic>> importDeckFromList({
+    required String name,
+    required String format,
+    required String list,
+    String? description,
+    String? commander,
+  }) async {
+    return {
+      'success': true,
+      'deck': {'id': 'deck-1'},
+      'cards_imported': 9,
+      'not_found_lines': const ['1 Dragao Pira Funesta'],
+      'warnings': const [
+        'Comandante informado ("Kaalia of the Vast") foi adicionado ao slot de comandante.',
+      ],
+      'is_partial': true,
+      'commander_detected': true,
+      'missing_commander': false,
+    };
+  }
+}
+
 Widget _buildSubject({DeckProvider? provider}) {
   return MaterialApp(
     theme: AppTheme.darkTheme,
@@ -94,5 +120,45 @@ void main() {
 
     expect(find.text('Não foi possível importar agora'), findsOneWidget);
     expect(find.text('Falha ao processar a lista informada.'), findsOneWidget);
+  });
+
+  testWidgets('shows partial import dialog when review is still needed', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildSubject(provider: _PartialSuccessDeckProvider()),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('deck-import-screen-name-field')),
+      'Kaalia import',
+    );
+    await tester.enterText(
+      find.byKey(const Key('deck-import-screen-commander-field')),
+      'Kaalia da Vastidão',
+    );
+    await tester.enterText(
+      find.byKey(const Key('deck-import-screen-list-field')),
+      '1 Sol Ring\n1 Dragao Pira Funesta',
+    );
+    await tester.pumpAndSettle();
+
+    final submitButton = find.byKey(
+      const Key('deck-import-screen-submit-button'),
+    );
+    await tester.ensureVisible(submitButton);
+    await tester.tap(submitButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Importação parcial'), findsOneWidget);
+    expect(
+      find.text(
+        'O deck foi criado, mas ainda precisa de revisão antes de análise ou otimização.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Abrir rascunho'), findsOneWidget);
+    expect(find.text('1 cartas não identificadas'), findsOneWidget);
   });
 }

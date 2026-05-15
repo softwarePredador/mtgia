@@ -3,6 +3,38 @@ import 'package:postgres/postgres.dart';
 String cleanImportLookupKey(String value) =>
     value.replaceAll(RegExp(r'\s+\d+$'), '');
 
+String foldImportLookupKey(String value) {
+  return value
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[áàâãä]'), 'a')
+      .replaceAll(RegExp(r'[éèêë]'), 'e')
+      .replaceAll(RegExp(r'[íìîï]'), 'i')
+      .replaceAll(RegExp(r'[óòôõö]'), 'o')
+      .replaceAll(RegExp(r'[úùûü]'), 'u')
+      .replaceAll('ç', 'c')
+      .replaceAll(RegExp(r'\s+'), ' ');
+}
+
+const _localizedImportAliases = <String, String>{
+  'kaalia da vastidao': 'Kaalia of the Vast',
+  'planicie': 'Plains',
+  'pantano': 'Swamp',
+  'montanha': 'Mountain',
+  'necrolpotencia': 'Necropotence',
+  'necropotencia': 'Necropotence',
+  'espadas em arados': 'Swords to Plowshares',
+  'capela isolada': 'Isolated Chapel',
+  'retiro da falesia': 'Clifftop Retreat',
+  'memorial de akroma': "Akroma's Memorial",
+};
+
+String canonicalizeImportLookupName(String value) {
+  final cleanKey = cleanImportLookupKey(value.trim().toLowerCase());
+  final folded = foldImportLookupKey(cleanKey);
+  return _localizedImportAliases[folded]?.toLowerCase() ?? cleanKey;
+}
+
 /// Resolve nomes de cartas para dados do banco em lote.
 ///
 /// Estratégia:
@@ -19,15 +51,27 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       normalizedPreferredFormat != null && normalizedPreferredFormat.isNotEmpty;
 
   final exactKeys = <String>{};
+  final aliasesByCanonicalKey = <String, Set<String>>{};
   for (final item in parsedItems) {
     final rawName = item['name']?.toString().trim();
     if (rawName == null || rawName.isEmpty) continue;
 
     final originalKey = rawName.toLowerCase();
     final cleanKey = cleanImportLookupKey(originalKey);
+    final canonicalOriginalKey = canonicalizeImportLookupName(originalKey);
+    final canonicalCleanKey = canonicalizeImportLookupName(cleanKey);
 
     exactKeys.add(originalKey);
     exactKeys.add(cleanKey);
+    exactKeys.add(canonicalOriginalKey);
+    exactKeys.add(canonicalCleanKey);
+
+    for (final canonicalKey in {canonicalOriginalKey, canonicalCleanKey}) {
+      aliasesByCanonicalKey.putIfAbsent(canonicalKey, () => <String>{}).addAll({
+        originalKey,
+        cleanKey,
+      });
+    }
   }
 
   if (exactKeys.isNotEmpty) {
@@ -75,7 +119,8 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       final colors = row[5];
       final oracleText = row[6] as String?;
       final manaCost = row[7] as String?;
-      foundCardsMap[name.toLowerCase()] = {
+      final key = name.toLowerCase();
+      final card = {
         'id': id,
         'name': name,
         'type_line': typeLine,
@@ -85,6 +130,10 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
         'oracle_text': oracleText,
         'mana_cost': manaCost,
       };
+      foundCardsMap[key] = card;
+      for (final alias in aliasesByCanonicalKey[key] ?? const <String>{}) {
+        foundCardsMap[alias] = card;
+      }
     }
   }
 
@@ -96,8 +145,12 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
 
     final originalKey = rawName.toLowerCase();
     final cleanKey = cleanImportLookupKey(originalKey);
-    final lookupKey =
-        foundCardsMap.containsKey(originalKey) ? originalKey : cleanKey;
+    final canonicalKey = canonicalizeImportLookupName(cleanKey);
+    final lookupKey = foundCardsMap.containsKey(originalKey)
+        ? originalKey
+        : foundCardsMap.containsKey(cleanKey)
+            ? cleanKey
+            : canonicalKey;
 
     if (!foundCardsMap.containsKey(lookupKey)) {
       splitPatternsToQuery.add('$lookupKey // %');

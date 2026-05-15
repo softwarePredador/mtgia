@@ -69,7 +69,11 @@ Future<Response> _importDeck(RequestContext context) async {
   final parsedItems = parseResult.parsedItems;
   notFoundCards.addAll(parseResult.invalidLines);
 
-  final foundCardsMap = await resolveImportCardNames(pool, parsedItems);
+  final foundCardsMap = await resolveImportCardNames(
+    pool,
+    parsedItems,
+    preferredFormat: normalizedFormat,
+  );
 
   // 6. Montagem final da lista de inserção
   for (final item in parsedItems) {
@@ -104,6 +108,48 @@ Future<Response> _importDeck(RequestContext context) async {
     }
   }
 
+  final warnings = <String>[];
+
+  final requiresCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+  final trimmedCommanderName = commanderName?.trim();
+
+  if (requiresCommander &&
+      trimmedCommanderName != null &&
+      trimmedCommanderName.isNotEmpty &&
+      !cardsToInsert.any((card) => card['is_commander'] == true)) {
+    final commanderLookup = await resolveImportCardNames(
+      pool,
+      [
+        {
+          'line': 'commander: $trimmedCommanderName',
+          'name': trimmedCommanderName,
+          'quantity': 1,
+          'isCommanderTag': true,
+        },
+      ],
+      preferredFormat: normalizedFormat,
+    );
+    final commanderKey = trimmedCommanderName.toLowerCase();
+    final cleanCommanderKey = cleanImportLookupKey(commanderKey);
+    final canonicalCommanderKey = canonicalizeImportLookupName(
+      cleanCommanderKey,
+    );
+    final commanderData = commanderLookup[commanderKey] ??
+        commanderLookup[cleanCommanderKey] ??
+        commanderLookup[canonicalCommanderKey];
+
+    if (commanderData != null) {
+      cardsToInsert.add({
+        'card_id': commanderData['id'],
+        'quantity': 1,
+        'is_commander': true,
+        'name': commanderData['name'],
+        'type_line': commanderData['type_line'],
+      });
+    }
+  }
+
   if (cardsToInsert.isEmpty) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
@@ -118,11 +164,6 @@ Future<Response> _importDeck(RequestContext context) async {
 
   final consolidatedCards = _consolidateCardsById(cardsToInsert);
 
-  final warnings = <String>[];
-
-  final requiresCommander =
-      normalizedFormat == 'commander' || normalizedFormat == 'brawl';
-
   if (requiresCommander) {
     final hasCommander =
         consolidatedCards.any((c) => c['is_commander'] == true);
@@ -132,14 +173,20 @@ Future<Response> _importDeck(RequestContext context) async {
       );
     }
 
-    if (commanderName != null && commanderName.trim().isNotEmpty) {
-      final normalizedCommander = commanderName.trim().toLowerCase();
+    if (trimmedCommanderName != null && trimmedCommanderName.isNotEmpty) {
+      final normalizedCommander = trimmedCommanderName.toLowerCase();
+      final canonicalCommander = canonicalizeImportLookupName(
+        normalizedCommander,
+      );
       final matched = consolidatedCards.any(
-        (c) => (c['name'] as String?)?.toLowerCase() == normalizedCommander,
+        (c) {
+          final name = (c['name'] as String?)?.toLowerCase();
+          return name == normalizedCommander || name == canonicalCommander;
+        },
       );
       if (!matched) {
         warnings.add(
-          'Comandante informado ("$commanderName") não foi encontrado na lista importada.',
+          'Comandante informado ("$trimmedCommanderName") não foi encontrado no banco. O deck foi salvo como rascunho sem comandante.',
         );
       }
     }
@@ -227,6 +274,11 @@ Future<Response> _importDeck(RequestContext context) async {
       'deck': newDeck,
       'cards_imported': _sumQuantities(consolidatedCards),
       'not_found_lines': notFoundCards,
+      'is_partial': notFoundCards.isNotEmpty || warnings.isNotEmpty,
+      'commander_detected':
+          consolidatedCards.any((c) => c['is_commander'] == true),
+      'missing_commander': requiresCommander &&
+          !consolidatedCards.any((c) => c['is_commander'] == true),
     };
 
     if (warnings.isNotEmpty) {

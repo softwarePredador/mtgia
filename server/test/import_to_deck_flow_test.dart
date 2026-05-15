@@ -139,6 +139,39 @@ void main() {
 
   group('Import to existing deck | /import/to-deck', () {
     test(
+      'creates Commander draft and resolves commander field separately',
+      () async {
+        final response = await http.post(
+          Uri.parse('$baseUrl/import'),
+          headers: authHeaders(withContentType: true),
+          body: jsonEncode({
+            'name':
+                'Import Commander Draft ${DateTime.now().millisecondsSinceEpoch}',
+            'format': 'commander',
+            'commander': 'Kaalia da Vastidão',
+            'list': '''
+1 Sol Ring
+1 Planície
+1 Pântano
+1 Montanha
+''',
+          }),
+        );
+
+        expect(response.statusCode, equals(200), reason: response.body);
+        final body = decodeJson(response);
+        final deck = body['deck'] as Map<String, dynamic>?;
+        expect(deck?['id'], isA<String>(), reason: response.body);
+        createdDeckIds.add(deck!['id'] as String);
+        expect(body['commander_detected'], isTrue, reason: response.body);
+        expect(body['missing_commander'], isFalse, reason: response.body);
+        expect(body['cards_imported'], greaterThanOrEqualTo(5));
+        expect(body['not_found_lines'], isEmpty, reason: response.body);
+      },
+      skip: skipIntegration,
+    );
+
+    test(
       'imports list into existing deck successfully',
       () async {
         final deckId = await createDeck();

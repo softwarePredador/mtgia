@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 
+import '../lib/import_card_lookup_service.dart';
 import '../lib/import_list_service.dart';
 
 void main() {
@@ -23,6 +24,26 @@ void main() {
       expect(
         result.parsedItems.map((item) => item['isCommanderTag']),
         equals([true, true, true]),
+      );
+    });
+  });
+
+  group('canonicalizeImportLookupName', () {
+    test('maps known Portuguese Commander names to local English card names',
+        () {
+      expect(
+        canonicalizeImportLookupName('Kaalia da Vastidão'),
+        equals('kaalia of the vast'),
+      );
+    });
+
+    test('maps common Portuguese deck import staples safely', () {
+      expect(canonicalizeImportLookupName('Planície'), equals('plains'));
+      expect(canonicalizeImportLookupName('Pântano'), equals('swamp'));
+      expect(canonicalizeImportLookupName('Montanha'), equals('mountain'));
+      expect(
+        canonicalizeImportLookupName('Espadas em Arados'),
+        equals('swords to plowshares'),
       );
     });
   });

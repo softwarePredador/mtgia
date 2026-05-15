@@ -125,9 +125,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
     if (result['success'] == true) {
       final deck = result['deck'];
+      final isPartial =
+          result['is_partial'] == true ||
+          _notFoundLines.isNotEmpty ||
+          _warnings.isNotEmpty;
 
-      // Se houve cartas não encontradas, mostra resultado com opção de editar
-      if (_notFoundLines.isNotEmpty) {
+      // Se houve avisos/cartas não encontradas, mostra revisão antes de abrir.
+      if (isPartial) {
         _showResultDialog(
           success: true,
           deckId: deck?['id'],
@@ -174,6 +178,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     String? error,
   }) {
     final theme = Theme.of(context);
+    final isPartial = success && (notFound.isNotEmpty || warnings.isNotEmpty);
 
     showDialog(
       context: context,
@@ -186,12 +191,22 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   success
                       ? Icons.check_circle_outline_rounded
                       : Icons.warning_amber_rounded,
-              title: success ? 'Importação concluída' : 'Revisão da importação',
+              title:
+                  success
+                      ? isPartial
+                          ? 'Importação parcial'
+                          : 'Importação concluída'
+                      : 'Revisão da importação',
               subtitle:
                   success
-                      ? 'A lista foi processada e o deck já pode ser aberto.'
+                      ? isPartial
+                          ? 'O deck foi salvo como rascunho. Revise avisos e cartas não identificadas antes de otimizar.'
+                          : 'A lista foi processada e o deck já pode ser aberto.'
                       : 'A lista foi lida, mas alguns pontos precisam de revisão.',
-              accent: success ? theme.colorScheme.primary : AppTheme.warning,
+              accent:
+                  success && !isPartial
+                      ? theme.colorScheme.primary
+                      : AppTheme.warning,
             ),
             content: SingleChildScrollView(
               child: Column(
@@ -215,7 +230,9 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'O deck já pode seguir para análise, otimização ou revisão manual.',
+                            isPartial
+                                ? 'O deck foi criado, mas ainda precisa de revisão antes de análise ou otimização.'
+                                : 'O deck já pode seguir para análise, otimização ou revisão manual.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: AppTheme.textSecondary,
                               height: 1.35,
@@ -339,7 +356,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                       Navigator.pop(context);
                       context.go('/decks/$deckId');
                     },
-                    child: const Text('Abrir Deck'),
+                    child: Text(isPartial ? 'Abrir rascunho' : 'Abrir Deck'),
                   ),
               ],
             ],
@@ -495,11 +512,12 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 key: const Key('deck-import-screen-commander-field'),
                 controller: _commanderController,
                 decoration: const InputDecoration(
-                  labelText: 'Comandante (opcional)',
-                  hintText: 'Ex: Urza, Lord High Artificer',
+                  labelText: 'Comandante (recomendado)',
+                  hintText: 'Ex: Kaalia da Vastidão ou Kaalia of the Vast',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.star),
-                  helperText: 'Ou marque na lista com [Commander]',
+                  helperText:
+                      'Ajuda a validar identidade de cor; também aceita [Commander] na lista.',
                 ),
               ),
               const SizedBox(height: 16),

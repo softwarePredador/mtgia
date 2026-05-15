@@ -1162,6 +1162,9 @@ void main() {
             expect(body['name'], 'Deck');
             return ApiResponse(200, {
               'deck': {'id': 'deck-1'},
+              'is_partial': true,
+              'commander_detected': true,
+              'missing_commander': false,
             });
           },
           '/import/validate': (body) {
@@ -1339,6 +1342,9 @@ void main() {
       expect(analysis.synergyScore, 77);
       expect(setQuantityResult.isSuccess, isTrue);
       expect(importResult['success'], isTrue);
+      expect(importResult['is_partial'], isTrue);
+      expect(importResult['commander_detected'], isTrue);
+      expect(importResult['missing_commander'], isFalse);
       expect(validateImportResult['success'], isTrue);
       expect(importToDeckResult['success'], isTrue);
       expect(toggled, isTrue);

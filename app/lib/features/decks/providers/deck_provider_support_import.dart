@@ -29,6 +29,9 @@ Map<String, dynamic> parseImportDeckResponse(ApiResponse response) {
       'cards_imported': data['cards_imported'] ?? 0,
       'not_found_lines': data['not_found_lines'] ?? const <String>[],
       'warnings': data['warnings'] ?? const <String>[],
+      'is_partial': data['is_partial'] == true,
+      'commander_detected': data['commander_detected'] == true,
+      'missing_commander': data['missing_commander'] == true,
     };
   }
 

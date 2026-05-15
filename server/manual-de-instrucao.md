@@ -16372,3 +16372,35 @@ Validacao:
 - `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_archetypes_flow_test.dart --tags live -r expanded`: `PASS`;
 - probe local de Lorehold retornou `source=commander_reference_profile`,
   profile `high` e titulos corretos, sem `Aggro`/`Artifact`.
+
+## 124. Commander import draft handling - 2026-05-15
+
+Problema observado por usuario: ao importar uma lista Commander com campo de
+comandante preenchido (`Kaalia da Vastidao`) e lista majoritariamente em
+portugues, o app salvava o deck como importacao concluida, mas avisava que
+nenhum comandante foi detectado e permitia seguir para otimizacao com um deck
+parcial.
+
+Patch aplicado:
+
+- `POST /import` agora resolve o campo `commander` separadamente da lista para
+  Commander/Brawl;
+- aliases PT-BR seguros foram adicionados ao lookup de importacao para o caso
+  reportado e staples comuns (`Kaalia da Vastidao`, terrenos basicos,
+  `Swords to Plowshares`, `Isolated Chapel`, `Clifftop Retreat`,
+  `Akroma's Memorial`, `Necropotence`);
+- a resposta adiciona campos opcionais backward-compatible:
+  `is_partial`, `commander_detected` e `missing_commander`;
+- o app passa a mostrar `Importacao parcial`/`Abrir rascunho` quando houver
+  warnings ou cartas nao identificadas, evitando comunicar que o deck ja esta
+  pronto para IA;
+- o campo visual de comandante virou `Comandante (recomendado)`, deixando claro
+  que ele e necessario para validar identidade de cor.
+
+Validacao:
+
+- `cd server && dart analyze lib/import_card_lookup_service.dart routes/import/index.dart test/import_list_service_test.dart test/import_to_deck_flow_test.dart`: `PASS`;
+- `cd server && dart test test/import_list_service_test.dart -r expanded`: `PASS`;
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/import_to_deck_flow_test.dart --tags live -r expanded`: `PASS`, incluindo o caso `Kaalia da Vastidao`;
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider_support_import.dart lib/features/decks/screens/deck_import_screen.dart test/features/decks/screens/deck_import_screen_test.dart test/features/decks/providers/deck_provider_support_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter test test/features/decks/screens/deck_import_screen_test.dart test/features/decks/providers/deck_provider_support_test.dart --no-version-check`: `PASS`.
