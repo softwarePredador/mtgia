@@ -3,6 +3,53 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Commander Reference Ghave/Jodah unlock PASS
+
+### O Porquê
+- `Ghave, Guru of Spores` e `Jodah, the Unifier` estavam parcialmente
+  desbloqueados: profile high, card_stats, corpus apply/idempotencia e
+  readiness pre-proof ja passavam, mas faltava prova publica runtime.
+- O criterio de promocao exigia public proof 5/5 e scorecard final 100 sem
+  expor secrets, tokens, JWT, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`,
+  e-mail QA completo, prompt bruto ou decklist completa.
+
+### O Como
+- O estado local foi preservado sem `git pull`, porque havia artifacts locais
+  relevantes em
+  `server/test/artifacts/commander_reference_ghave_jodah_unlock_2026-05-15/`.
+- O diagnostico pre-proof retornou score 98 para ambos, com unico warning
+  `public_runtime_proof_missing`; nao houve bug de deck nem necessidade de
+  relaxar gate.
+- A primeira tentativa confirmou que `/ai/generate` publico exige JWT; a prova
+  final usou usuario QA descartavel mantido somente em memoria e salvou apenas
+  summaries agregados sanitizados.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e ficou sem
+  alteracao porque nao houve mudanca de rota, payload, response shape,
+  diagnostics app-facing, data source ou consumidor mobile.
+- Scanner, camera e OCR permaneceram fora do escopo.
+
+### Resultado
+- Backend publico provado:
+  `git_sha=4570daf8a43fbf5b79301fde8e1d8f5c40004b8b`.
+- Public proof Ghave 5/5: HTTP 200, validation, commander, main 99,
+  profile/stats/corpus usados, `invalid_cards_total=0`,
+  `off_identity_total=0`, `timeout_fallback_count=0`, p50 `801ms`, p95
+  `1069ms`.
+- Public proof Jodah 5/5: HTTP 200, validation, commander, main 99,
+  profile/stats/corpus usados, `invalid_cards_total=0`,
+  `off_identity_total=0`, `timeout_fallback_count=0`, p50 `793ms`, p95
+  `915ms`.
+- Scorecards finais: ambos score 100, `ready_for_mini_batch`, sem blockers ou
+  warnings.
+- Validacao local: `dart analyze` focado em scorecard/readiness,
+  `dart test test/commander_reference_readiness_support_test.dart`, validacao JSON
+  dos summaries, `git diff --check` e scan simples de secrets nas linhas
+  adicionadas.
+- Documentos/artifacts principais:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_GHAVE_JODAH_UNLOCK_2026-05-15.md`,
+  `server/doc/COMMANDER_REFERENCE_SPRINT4_EXECUTION_PLAN_2026-05-14.md` e
+  `server/test/artifacts/commander_reference_ghave_jodah_unlock_2026-05-15/`.
+
 ## 2026-05-15 — Commander Reference Feather app runtime PASS
 
 ### O Porquê

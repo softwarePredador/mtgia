@@ -2,7 +2,17 @@
 
 ## Resultado
 
-**PASS_WITH_RISKS.**
+**PASS.**
+
+Atualizacao Ghave/Jodah unlock 2026-05-15: `Ghave, Guru of Spores` e
+`Jodah, the Unifier` foram promovidos em rodada dedicada contra o backend publico
+`git_sha=4570daf8a43fbf5b79301fde8e1d8f5c40004b8b`. Ambos passaram public proof
+5/5 com HTTP 200, validacao, comandante preservado, main 99,
+profile/stats/corpus usados, `invalid_cards_total=0`,
+`off_identity_total=0`, `timeout_fallback_count=0`; p95 Ghave `1069ms`, p95
+Jodah `915ms`. Scorecards finais: 100, `ready_for_mini_batch`, sem blockers ou
+warnings. Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_GHAVE_JODAH_UNLOCK_2026-05-15.md`.
 
 Atualizacao Feather timeout fix: `Feather, the Redeemed` foi promovida em
 rodada dedicada apos commit `73d9f886c4959ff0ab9f60ec075ba787ffbe5144`.
@@ -16,8 +26,8 @@ Sprint 4 comecou como expansao controlada e documental: os subagentes paralelos
 produziram cobertura, auditoria de pipeline, dry-run de corpus, data quality e
 plano runtime sem alterar contratos app-facing. No Lote 1 original, apenas
 candidatos sem blockers entraram em apply/public proof, e somente
-`Miirym, Sentinel Wyrm` foi promovido; a rodada dedicada posterior promoveu
-`Feather, the Redeemed`.
+`Miirym, Sentinel Wyrm` foi promovido; rodadas dedicadas posteriores promoveram
+`Feather, the Redeemed`, `Ghave, Guru of Spores` e `Jodah, the Unifier`.
 
 Na execucao inicial nao houve mudanca de codigo. No fix dedicado de Feather,
 houve ajuste interno no backend sem mudanca de contrato app-facing.
@@ -27,9 +37,9 @@ Atualizacao Lote 1 original: `Miirym, Sentinel Wyrm` foi promovido para
 100. `Feather, the Redeemed` nao foi promovido porque a revalidacao do deploy
 atual bloqueou o public proof por `invalid_cards_total=5` e p95 alto, alem do
 historico anterior de `timeout_fallback_count=5`; o fix dedicado posterior
-zerou invalid/off-identity/timeout e promoveu Feather. `Ghave, Guru of Spores`
-e `Jodah, the Unifier` permanecem bloqueados por profile/card_stats ausentes ou
-legados.
+zerou invalid/off-identity/timeout e promoveu Feather. A rodada dedicada de
+2026-05-15 aplicou o unlock ja preparado de `Ghave, Guru of Spores` e
+`Jodah, the Unifier`; ambos agora estao `ready_for_mini_batch`.
 
 ## Contexto operacional
 
@@ -60,8 +70,8 @@ legados.
 | ---: | --- | --- | --- |
 | 1 | `Feather, the Redeemed` | Profile/card_stats resolvidos; corpus dry-run PASS 4/4 | apply controlado + idempotencia + scorecard |
 | 2 | `Miirym, Sentinel Wyrm` | Profile/card_stats resolvidos; corpus dry-run PASS 5/5 | apply controlado + idempotencia + scorecard |
-| 3 | `Ghave, Guru of Spores` | Corpus dry-run PASS 5/5; sem profile/card_stats | criar profile/card_stats antes de apply |
-| 4 | `Jodah, the Unifier` | Corpus dry-run PASS 5/5; profile legado nao utilizavel | criar profile Commander Reference e stats antes de apply |
+| 3 | `Ghave, Guru of Spores` | Promovido em 2026-05-15; score 100, `ready_for_mini_batch` | monitorar mini-batch controlado |
+| 4 | `Jodah, the Unifier` | Promovido em 2026-05-15; score 100, `ready_for_mini_batch` | monitorar mini-batch controlado |
 
 ### Alternativa de cobertura
 
@@ -166,10 +176,9 @@ dart run bin/commander_reference_readiness_scorecard.dart \
 
 ## Blockers
 
-- Lote 1 promove apenas `Miirym, Sentinel Wyrm`; `Feather, the Redeemed`
-  permanece bloqueado por public proof atual com `invalid_cards_total=5`, p95
-  25659ms e historico de timeout fallback publico.
-- `Ghave` e `Jodah` precisam de profile/card_stats antes de qualquer apply.
+- `Miirym, Sentinel Wyrm`, `Feather, the Redeemed`, `Ghave, Guru of Spores` e
+  `Jodah, the Unifier` estao promovidos; nao ha blocker aberto para esses quatro
+  no gate backend/public proof.
 - iPhone 15 ainda depende de resolver ou contornar o blocker historico de
   `MLImage.framework`/scanner mantendo scanner/OCR fora do escopo.
 - Raw corpora completos devem ficar fora do commit; se forem necessarios para
@@ -177,6 +186,7 @@ dart run bin/commander_reference_readiness_scorecard.dart \
 
 ## Resultado final
 
-**PASS_WITH_RISKS.** A fila e os criterios de Sprint 4 estao definidos, os
-artifacts versionaveis foram sanitizados, e a unica promocao autorizada no Lote
-1 e `Miirym, Sentinel Wyrm`.
+**PASS.** A fila e os criterios de Sprint 4 estao definidos, os artifacts
+versionaveis foram sanitizados, e as promocoes autorizadas incluem
+`Miirym, Sentinel Wyrm`, `Feather, the Redeemed`, `Ghave, Guru of Spores` e
+`Jodah, the Unifier`.
