@@ -16478,3 +16478,28 @@ Validacao:
 
 - `cd app && flutter analyze lib/features/decks/widgets/deck_diagnostic_panel.dart test/features/decks/widgets/deck_diagnostic_panel_test.dart --no-version-check`: `PASS`;
 - `cd app && flutter test test/features/decks/widgets/deck_diagnostic_panel_test.dart --no-version-check`: `PASS`.
+
+## 128. Full flow state and documentation audit - 2026-05-15
+
+Foi feita uma varredura de documentacao ativa e de riscos de estado stale nos
+fluxos app-facing non-scanner.
+
+Patch aplicado:
+
+- `docs/README.md` deixou de apontar docs antigos como fonte ativa;
+- `app/doc/runtime_flow_handoffs/README.md` foi atualizado para handoffs
+  recentes e escopo scanner deferred;
+- novo relatorio: `server/doc/FULL_FLOW_STATE_AND_DOC_AUDIT_2026-05-15.md`;
+- `CommunityProvider` passou a usar token de geracao para ignorar resposta
+  atrasada apos reset/filtro;
+- `BinderProvider` passou a usar tokens equivalentes para Binder, Marketplace e
+  Public Binder;
+- `MessageProvider.fetchMessages` ignora resposta de conversa antiga quando o
+  usuario ja esta em outra conversa ativa.
+
+Validacao:
+
+- `cd app && flutter analyze lib/features/community/providers/community_provider.dart lib/features/binder/providers/binder_provider.dart lib/features/messages/providers/message_provider.dart test/features/community/providers/community_provider_test.dart test/features/binder/providers/binder_provider_test.dart test/features/messages/providers/message_provider_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter test test/features/community/providers/community_provider_test.dart test/features/binder/providers/binder_provider_test.dart test/features/messages/providers/message_provider_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter analyze lib test --no-version-check`: `PASS`;
+- `cd app && flutter test test --no-version-check`: `PASS`.

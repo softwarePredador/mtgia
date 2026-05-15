@@ -517,6 +517,7 @@ class BinderProvider extends ChangeNotifier {
   bool? _filterFoil;
   String _sortBy = 'name';
   String _sortOrder = 'asc';
+  int _binderFetchGeneration = 0;
 
   List<BinderItem> get items => _items;
   BinderStats? get stats => _stats;
@@ -530,6 +531,7 @@ class BinderProvider extends ChangeNotifier {
   String? _marketError;
   int _marketPage = 1;
   bool _hasMoreMarket = true;
+  int _marketFetchGeneration = 0;
 
   List<MarketplaceItem> get marketItems => _marketItems;
   bool get isLoadingMarket => _isLoadingMarket;
@@ -543,6 +545,7 @@ class BinderProvider extends ChangeNotifier {
   int _publicPage = 1;
   bool _hasMorePublic = true;
   Map<String, dynamic>? _publicOwner;
+  int _publicFetchGeneration = 0;
 
   List<BinderItem> get publicItems => _publicItems;
   bool get isLoadingPublic => _isLoadingPublic;
@@ -556,7 +559,7 @@ class BinderProvider extends ChangeNotifier {
 
   /// Fetch my binder items (paginado, incremental)
   Future<void> fetchMyBinder({bool reset = false}) async {
-    if (_isLoading) return;
+    if (_isLoading && !reset) return;
     if (!reset && !_hasMore) return;
 
     if (reset) {
@@ -565,28 +568,43 @@ class BinderProvider extends ChangeNotifier {
       _hasMore = true;
     }
 
+    final generation = ++_binderFetchGeneration;
+    final requestPage = _page;
+    final requestListType = _currentListType;
+    final requestFilter = _currentFilter;
+    final requestSearch = _currentSearch;
+    final requestForTrade = _filterForTrade;
+    final requestForSale = _filterForSale;
+    final requestSet = _currentSet;
+    final requestRarity = _currentRarity;
+    final requestLanguage = _currentLanguage;
+    final requestFoil = _filterFoil;
+    final requestSortBy = _sortBy;
+    final requestSortOrder = _sortOrder;
+
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      var endpoint = '/binder?page=$_page&limit=20';
-      if (_currentListType != null) endpoint += '&list_type=$_currentListType';
-      if (_currentFilter != null) endpoint += '&condition=$_currentFilter';
-      if (_currentSearch != null && _currentSearch!.isNotEmpty) {
-        endpoint += '&search=${Uri.encodeComponent(_currentSearch!)}';
+      var endpoint = '/binder?page=$requestPage&limit=20';
+      if (requestListType != null) endpoint += '&list_type=$requestListType';
+      if (requestFilter != null) endpoint += '&condition=$requestFilter';
+      if (requestSearch != null && requestSearch.isNotEmpty) {
+        endpoint += '&search=${Uri.encodeComponent(requestSearch)}';
       }
-      if (_filterForTrade == true) endpoint += '&for_trade=true';
-      if (_filterForSale == true) endpoint += '&for_sale=true';
-      if (_currentSet != null && _currentSet!.isNotEmpty) {
-        endpoint += '&set=${Uri.encodeComponent(_currentSet!)}';
+      if (requestForTrade == true) endpoint += '&for_trade=true';
+      if (requestForSale == true) endpoint += '&for_sale=true';
+      if (requestSet != null && requestSet.isNotEmpty) {
+        endpoint += '&set=${Uri.encodeComponent(requestSet)}';
       }
-      if (_currentRarity != null) endpoint += '&rarity=$_currentRarity';
-      if (_currentLanguage != null) endpoint += '&language=$_currentLanguage';
-      if (_filterFoil != null) endpoint += '&foil=$_filterFoil';
-      endpoint += '&sort=$_sortBy&order=$_sortOrder';
+      if (requestRarity != null) endpoint += '&rarity=$requestRarity';
+      if (requestLanguage != null) endpoint += '&language=$requestLanguage';
+      if (requestFoil != null) endpoint += '&foil=$requestFoil';
+      endpoint += '&sort=$requestSortBy&order=$requestSortOrder';
 
       final res = await _api.get(endpoint);
+      if (generation != _binderFetchGeneration) return;
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
         final list =
@@ -595,7 +613,7 @@ class BinderProvider extends ChangeNotifier {
                 .toList();
         _items.addAll(list);
         _hasMore = list.length >= 20;
-        _page++;
+        _page = requestPage + 1;
         _error = null;
       } else {
         _error = FriendlyErrorMapper.fromApiResponse(
@@ -610,8 +628,10 @@ class BinderProvider extends ChangeNotifier {
         context: FriendlyErrorContext.binder,
       );
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _binderFetchGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -910,7 +930,7 @@ class BinderProvider extends ChangeNotifier {
   // ---------------------------------------------------------------
 
   Future<void> fetchPublicBinder(String userId, {bool reset = false}) async {
-    if (_isLoadingPublic) return;
+    if (_isLoadingPublic && !reset) return;
     if (!reset && !_hasMorePublic) return;
 
     if (reset) {
@@ -920,14 +940,17 @@ class BinderProvider extends ChangeNotifier {
       _publicOwner = null;
     }
 
+    final generation = ++_publicFetchGeneration;
+    final requestPage = _publicPage;
     _isLoadingPublic = true;
     _publicError = null;
     notifyListeners();
 
     try {
       final res = await _api.get(
-        '/community/binders/$userId?page=$_publicPage&limit=20',
+        '/community/binders/$userId?page=$requestPage&limit=20',
       );
+      if (generation != _publicFetchGeneration) return;
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
         _publicOwner = data['owner'] as Map<String, dynamic>?;
@@ -937,7 +960,7 @@ class BinderProvider extends ChangeNotifier {
                 .toList();
         _publicItems.addAll(list);
         _hasMorePublic = list.length >= 20;
-        _publicPage++;
+        _publicPage = requestPage + 1;
       } else {
         _publicError = FriendlyErrorMapper.fromApiResponse(
           res,
@@ -951,8 +974,10 @@ class BinderProvider extends ChangeNotifier {
         context: FriendlyErrorContext.binder,
       );
     } finally {
-      _isLoadingPublic = false;
-      notifyListeners();
+      if (generation == _publicFetchGeneration) {
+        _isLoadingPublic = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -967,7 +992,7 @@ class BinderProvider extends ChangeNotifier {
     bool? forSale,
     bool reset = false,
   }) async {
-    if (_isLoadingMarket) return;
+    if (_isLoadingMarket && !reset) return;
     if (!reset && !_hasMoreMarket) return;
 
     if (reset) {
@@ -976,12 +1001,14 @@ class BinderProvider extends ChangeNotifier {
       _hasMoreMarket = true;
     }
 
+    final generation = ++_marketFetchGeneration;
+    final requestPage = _marketPage;
     _isLoadingMarket = true;
     _marketError = null;
     notifyListeners();
 
     try {
-      var endpoint = '/community/marketplace?page=$_marketPage&limit=20';
+      var endpoint = '/community/marketplace?page=$requestPage&limit=20';
       if (search != null && search.isNotEmpty) {
         endpoint += '&search=${Uri.encodeComponent(search)}';
       }
@@ -990,6 +1017,7 @@ class BinderProvider extends ChangeNotifier {
       if (forSale == true) endpoint += '&for_sale=true';
 
       final res = await _api.get(endpoint);
+      if (generation != _marketFetchGeneration) return;
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
         final list =
@@ -998,7 +1026,7 @@ class BinderProvider extends ChangeNotifier {
                 .toList();
         _marketItems.addAll(list);
         _hasMoreMarket = list.length >= 20;
-        _marketPage++;
+        _marketPage = requestPage + 1;
       } else {
         _marketError = FriendlyErrorMapper.fromApiResponse(
           res,
@@ -1012,13 +1040,18 @@ class BinderProvider extends ChangeNotifier {
         context: FriendlyErrorContext.marketplace,
       );
     } finally {
-      _isLoadingMarket = false;
-      notifyListeners();
+      if (generation == _marketFetchGeneration) {
+        _isLoadingMarket = false;
+        notifyListeners();
+      }
     }
   }
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
+    _binderFetchGeneration++;
+    _marketFetchGeneration++;
+    _publicFetchGeneration++;
     if (_items.isEmpty &&
         _stats == null &&
         !_isLoading &&

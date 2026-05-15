@@ -28,9 +28,13 @@ Use this runbook for the primary simulator proof:
 
 The iPhone 15 Simulator proof is not complete unless the handoff includes the simulator id from `flutter devices` or `xcrun simctl list devices available`, backend URL `http://127.0.0.1:8081`, backend health proof, exact Flutter command, and logs/artifacts.
 
-Latest iPhone 15 Simulator attempt:
+Latest iPhone 15 Simulator evidence:
 
-- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-28.md`
+- `app/doc/runtime_flow_handoffs/commander_reference_feather_app_2026-05-15.md`
+- `app/doc/runtime_flow_handoffs/commander_reference_sprint4_lot1_app_2026-05-14.md`
+
+Use older `deck_runtime_iphone15_simulator_YYYY-MM-DD.md` files only as
+historical comparison.
 
 ## Physical M2006 fallback runbook
 
@@ -73,6 +77,12 @@ The runner verifies `GET /health` and `POST /auth/login` before writes. If the U
 Each runtime handoff must be based on a fresh execution in the current session.
 
 Old screenshots and old logs are historical comparison only.
+
+## Scanner scope
+
+Scanner/camera/OCR/MLKit are explicitly deferred for the current internal
+non-scanner test round. Do not block non-scanner release validation on scanner
+handoffs unless the task explicitly reopens scanner scope.
 
 ## Suggested file naming
 

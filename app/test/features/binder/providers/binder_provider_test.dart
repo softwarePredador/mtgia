@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
@@ -68,6 +70,37 @@ class _FakeBinderApiClient extends ApiClient {
   }
 }
 
+class _DelayedBinderApiClient extends ApiClient {
+  final completers = <String, Completer<ApiResponse>>{};
+  final getCalls = <String>[];
+
+  @override
+  Future<ApiResponse> get(String endpoint) {
+    getCalls.add(endpoint);
+    final completer = Completer<ApiResponse>();
+    completers[endpoint] = completer;
+    return completer.future;
+  }
+}
+
+Map<String, dynamic> _binderItemJson({
+  required String id,
+  required String name,
+  required String listType,
+}) => {
+  'id': id,
+  'card_id': '$id-card',
+  'card_name': name,
+  'quantity': 1,
+  'condition': 'NM',
+  'is_foil': false,
+  'for_trade': false,
+  'for_sale': false,
+  'currency': 'BRL',
+  'language': 'pt',
+  'list_type': listType,
+};
+
 void main() {
   test(
     'removeItem treats backend 204 No Content as successful delete',
@@ -135,6 +168,58 @@ void main() {
       expect(updated, isTrue);
       expect(api.lastPutBody?['list_type'], 'want');
       expect(provider.items, isEmpty);
+    },
+  );
+
+  test(
+    'reset fetch ignores stale binder response from previous filter',
+    () async {
+      final api = _DelayedBinderApiClient();
+      final provider = BinderProvider(apiClient: api);
+
+      final oldFuture = provider.fetchMyBinder(reset: true);
+      await Future<void>.delayed(Duration.zero);
+      provider.applyFilters(listType: 'want');
+      await Future<void>.delayed(Duration.zero);
+
+      final oldEndpoint = api.getCalls.singleWhere(
+        (endpoint) => !endpoint.contains('list_type='),
+      );
+      final newEndpoint = api.getCalls.singleWhere(
+        (endpoint) => endpoint.contains('list_type=want'),
+      );
+
+      api.completers[newEndpoint]!.complete(
+        ApiResponse(200, {
+          'data': [
+            _binderItemJson(
+              id: 'want-1',
+              name: 'Wanted Card',
+              listType: 'want',
+            ),
+          ],
+          'page': 1,
+          'limit': 20,
+          'total': 1,
+        }),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      api.completers[oldEndpoint]!.complete(
+        ApiResponse(200, {
+          'data': [
+            _binderItemJson(id: 'have-1', name: 'Have Card', listType: 'have'),
+          ],
+          'page': 1,
+          'limit': 20,
+          'total': 1,
+        }),
+      );
+      await oldFuture;
+
+      expect(provider.items, hasLength(1));
+      expect(provider.items.single.id, 'want-1');
+      expect(provider.items.single.listType, 'want');
     },
   );
 }

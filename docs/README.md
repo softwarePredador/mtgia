@@ -1,93 +1,45 @@
-# Documentação Ativa
+# Documentacao ativa do ManaLoom
 
-Este diretório concentra a documentação que ainda orienta decisão e execução.
+Este diretorio agora serve como indice curto. Relatorios antigos continuam no
+repositorio como historico/prova, mas nao devem guiar implementacao sem checar
+as fontes canônicas abaixo.
 
-## Ordem de leitura
+## Fontes canônicas atuais
 
-1. [CONTEXTO_PRODUTO_ATUAL.md](CONTEXTO_PRODUTO_ATUAL.md)
-2. [MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
-3. [CONTRATO_OPTIMIZE_REBUILD_2026-03-23.md](CONTRATO_OPTIMIZE_REBUILD_2026-03-23.md)
-4. [AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md](AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md)
-5. [SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md](SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md)
-6. [SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md](SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md)
+1. `server/manual-de-instrucao.md`
+   - diario operacional e ultimas decisoes aplicadas.
+2. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+   - contratos app/backend, rotas, shapes e campos opcionais.
+3. `app/doc/APP_AUDIT_2026-04-29.md`
+   - status consolidado do app mobile, riscos e validacoes recentes.
+4. `app/doc/UI_TEST_SURFACE_MAP.md`
+   - keys e superficies que testes runtime devem usar.
+5. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+   - checklist para rodada interna non-scanner.
+6. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+   - status de distribuicao interna com riscos aceitos.
+7. `app/doc/runtime_flow_handoffs/README.md`
+   - indice de runtime/handoffs e regra de evidencia fresca.
 
-## O que cada documento faz
+## Relatorios recentes por tema
 
-### Fonte de verdade operacional
+- Commander Reference: `server/doc/COMMANDER_REFERENCE_SPRINT3_TRACKER_2026-05-13.md`
+- Commander Reference Sprint 4: `server/doc/COMMANDER_REFERENCE_SPRINT4_EXECUTION_PLAN_2026-05-14.md`
+- Push/FCM: `app/doc/runtime_flow_handoffs/push_delivery_android_sm_a135m_2026-05-11.md`
+- Card entry/import: `docs/qa/manaloom_card_entry_qa_2026-05-08.md`
+- Design Android: `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`
+- Icone do app: `docs/qa/manaloom_app_icon_contact_sheet_2026-05-15.png`
 
-- [CONTEXTO_PRODUTO_ATUAL.md](CONTEXTO_PRODUTO_ATUAL.md)
-  - prioridade atual
-  - regras de decisão
-  - escopo permitido e bloqueado
-  - próximos passos oficiais do core
+## Scanner
 
-### Validação e qualidade
+Scanner/camera/OCR seguem fora do escopo da rodada interna atual. Nao use
+documentos antigos de scanner como gate de release non-scanner.
 
-- [MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
-  - mapa da cobertura da otimização
-  - quais suites sustentam confiança real
-  - o que ainda falta endurecer
+## Como tratar documentos historicos
 
-- [CONTRATO_OPTIMIZE_REBUILD_2026-03-23.md](CONTRATO_OPTIMIZE_REBUILD_2026-03-23.md)
-  - contrato funcional do fluxo optimize -> rebuild -> validate
-  - payloads esperados de sucesso, warning e erro
-  - regras mínimas de compatibilidade entre backend e app
-
-- [AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md](AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md)
-  - leitura consolidada de produto
-  - riscos de UX, lógica e performance
-  - recomendações de priorização
-
-- [SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md](SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md)
-  - sprint formal de revisão de produto e direção visual
-  - checklist por tela
-  - critérios de aceite visual, de produto e técnico
-  - ordem oficial de execução por waves
-
-- [SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md](SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md)
-  - sprint formal de clone do benchmark do `life counter`
-  - matriz do que copiar 1:1 e do que adaptar ao MTG
-  - waves de reescrita da mesa, hub, overlays e estados especiais
-
-- [../server/doc/RESOLUTION_CORPUS_WORKFLOW.md](../server/doc/RESOLUTION_CORPUS_WORKFLOW.md)
-  - operacao do corpus estavel Commander
-  - gate recorrente de release do fluxo optimize -> rebuild -> validate
-
-- [../server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-23.md](../server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-23.md)
-  - auditoria da ingestao de `meta_decks`
-  - cobertura real por formato e identidade de cor
-  - leitura estrategica do que os decks meta ensinam ao produto
-
-- [../server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md](../server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md)
-  - fluxo controlado para pesquisa web multi-fonte de Commander/cEDH
-  - persistencia intermediaria antes de promover para `meta_decks`
-
-## Documentos complementares
-
-Esses documentos continuam úteis, mas não definem a prioridade principal sozinhos:
-
-- [../ROADMAP.md](../ROADMAP.md)
-- [../CHECKLIST_GO_LIVE_FINAL.md](../CHECKLIST_GO_LIVE_FINAL.md)
-- [../CHECKLIST_EXECUCAO.md](../CHECKLIST_EXECUCAO.md)
-- [PLANO_SPRINTS_EXECUCAO_MTGIA_2026-03-23.md](PLANO_SPRINTS_EXECUCAO_MTGIA_2026-03-23.md)
-- [SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md](SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md)
-- [SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md](SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md)
-- [SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md](SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md)
-- [PLANO_ABSORCAO_OPERACIONAL_REDIS_SENTRY_EASYPANEL_2026-03-23.md](PLANO_ABSORCAO_OPERACIONAL_REDIS_SENTRY_EASYPANEL_2026-03-23.md)
-- [SENTRY_SETUP_MTGIA_2026-03-24.md](SENTRY_SETUP_MTGIA_2026-03-24.md)
-- [EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md](EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md)
-- [../server/manual-de-instrucao.md](../server/manual-de-instrucao.md)
-- [../server/doc/RESOLUTION_CORPUS_WORKFLOW.md](../server/doc/RESOLUTION_CORPUS_WORKFLOW.md)
-- [../server/doc/OPTIMIZATION_RESOLUTION_HANDOFF_2026-03-18.md](../server/doc/OPTIMIZATION_RESOLUTION_HANDOFF_2026-03-18.md)
-- [../app/doc/COMMANDER_PRODUCT_ROADMAP_2026-03-18.md](../app/doc/COMMANDER_PRODUCT_ROADMAP_2026-03-18.md)
-- [../app/doc/COMMANDER_EXECUTION_TRACKER_2026-03-18.md](../app/doc/COMMANDER_EXECUTION_TRACKER_2026-03-18.md)
-- [../app/doc/DESIGN_COLOR_LAYOUT_AUDIT_2026-03-18.md](../app/doc/DESIGN_COLOR_LAYOUT_AUDIT_2026-03-18.md)
-- [../app/doc/THEME_SYSTEM_ABSORPTION_PLAN_2026-03-23.md](../app/doc/THEME_SYSTEM_ABSORPTION_PLAN_2026-03-23.md)
-
-## Documentos históricos
-
-Documentos arquivados ou superados ficam em:
-
-- `archive_docs/`
-
-Relatórios pontuais de rodada continuam no root para consulta, mas devem ser lidos como histórico de execução, não como prioridade atual.
+- Arquivos de marco/abril no root de `docs/` sao historicos, nao prioridade
+  atual.
+- Proof folders com logs/prints devem ser preservados quando sustentam uma
+  decisao ja tomada.
+- Ao criar nova decisao app-facing, atualize primeiro `server/manual-de-instrucao.md`
+  e `server/doc/API_CONTRACTS_AND_DATA_MAP.md` quando houver contrato envolvido.

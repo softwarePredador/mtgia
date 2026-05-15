@@ -99,6 +99,17 @@ class _RealtimeMessagesApiClient extends ApiClient {
   }
 }
 
+class _SwitchingMessagesApiClient extends ApiClient {
+  final completers = <String, Completer<ApiResponse>>{};
+
+  @override
+  Future<ApiResponse> get(String endpoint) {
+    final completer = Completer<ApiResponse>();
+    completers[endpoint] = completer;
+    return completer.future;
+  }
+}
+
 void main() {
   test(
     'fetchMessages ignores overlapping polling calls for same conversation',
@@ -180,4 +191,53 @@ void main() {
       expect(api.getEndpoints, contains('/conversations?page=1&limit=20'));
     },
   );
+
+  test('late message response cannot overwrite active conversation', () async {
+    final api = _SwitchingMessagesApiClient();
+    final provider = MessageProvider(apiClient: api);
+
+    provider.setActiveConversation('conversation-a');
+    final first = provider.fetchMessages('conversation-a');
+    await Future<void>.delayed(Duration.zero);
+
+    provider.setActiveConversation('conversation-b');
+    final second = provider.fetchMessages('conversation-b');
+    await Future<void>.delayed(Duration.zero);
+
+    api.completers['/conversations/conversation-b/messages?page=1&limit=50']!
+        .complete(
+          ApiResponse(200, {
+            'data': [
+              {
+                'id': 'message-b',
+                'sender_id': 'user-b',
+                'message': 'B ativa',
+                'created_at': '2026-05-15T14:00:00Z',
+              },
+            ],
+            'total': 1,
+          }),
+        );
+    await second;
+
+    api.completers['/conversations/conversation-a/messages?page=1&limit=50']!
+        .complete(
+          ApiResponse(200, {
+            'data': [
+              {
+                'id': 'message-a',
+                'sender_id': 'user-a',
+                'message': 'A atrasada',
+                'created_at': '2026-05-15T13:59:00Z',
+              },
+            ],
+            'total': 1,
+          }),
+        );
+    await first;
+
+    expect(provider.activeConversationId, 'conversation-b');
+    expect(provider.messages, hasLength(1));
+    expect(provider.messages.single.id, 'message-b');
+  });
 }

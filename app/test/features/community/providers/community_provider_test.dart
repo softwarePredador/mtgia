@@ -17,6 +17,28 @@ class _FakeCommunityApiClient extends ApiClient {
   }
 }
 
+class _DelayedCommunityApiClient extends ApiClient {
+  final completers = <String, Completer<ApiResponse>>{};
+  final getCalls = <String>[];
+
+  @override
+  Future<ApiResponse> get(String endpoint) {
+    getCalls.add(endpoint);
+    final completer = Completer<ApiResponse>();
+    completers[endpoint] = completer;
+    return completer.future;
+  }
+}
+
+Map<String, dynamic> _communityDeckJson(String id, String name) => {
+  'id': id,
+  'name': name,
+  'format': 'commander',
+  'description': null,
+  'card_count': 100,
+  'created_at': '2026-05-15T12:00:00Z',
+};
+
 void main() {
   test('fetchPublicDecks exposes loading and empty state', () async {
     final completer = Completer<ApiResponse>();
@@ -86,4 +108,54 @@ void main() {
 
     expect(api.getCalls.single, contains('search=Atraxa+deck'));
   });
+
+  test(
+    'reset fetch ignores stale response from previous community query',
+    () async {
+      final api = _DelayedCommunityApiClient();
+      final provider = CommunityProvider(apiClient: api);
+
+      final oldFuture = provider.fetchPublicDecks(
+        search: 'Atraxa',
+        reset: true,
+      );
+      await Future<void>.delayed(Duration.zero);
+      final newFuture = provider.fetchPublicDecks(
+        search: 'Krenko',
+        reset: true,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      final oldEndpoint = api.getCalls.singleWhere(
+        (endpoint) => endpoint.contains('Atraxa'),
+      );
+      final newEndpoint = api.getCalls.singleWhere(
+        (endpoint) => endpoint.contains('Krenko'),
+      );
+
+      api.completers[newEndpoint]!.complete(
+        ApiResponse(200, {
+          'data': [_communityDeckJson('new-deck', 'Krenko Tokens')],
+          'page': 1,
+          'limit': 20,
+          'total': 1,
+        }),
+      );
+      await newFuture;
+
+      api.completers[oldEndpoint]!.complete(
+        ApiResponse(200, {
+          'data': [_communityDeckJson('old-deck', 'Atraxa Superfriends')],
+          'page': 1,
+          'limit': 20,
+          'total': 1,
+        }),
+      );
+      await oldFuture;
+
+      expect(provider.decks, hasLength(1));
+      expect(provider.decks.single.id, 'new-deck');
+      expect(provider.searchQuery, 'Krenko');
+    },
+  );
 }

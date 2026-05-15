@@ -280,6 +280,10 @@ class MessageProvider extends ChangeNotifier {
               : '/conversations/$conversationId/messages?page=$page&limit=$limit';
 
       final resp = await _api.get(endpoint);
+      if (_activeConversationId != null &&
+          _activeConversationId != conversationId) {
+        return;
+      }
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];

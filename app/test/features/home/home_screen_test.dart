@@ -16,7 +16,7 @@ class _IdleDeckProvider extends DeckProvider {
   _IdleDeckProvider() : super(apiClient: _NoopApiClient());
 
   @override
-  Future<void> fetchDecks() async {}
+  Future<void> fetchDecks({bool silent = false}) async {}
 }
 
 class _IdleMarketProvider extends MarketProvider {

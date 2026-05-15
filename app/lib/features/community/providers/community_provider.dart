@@ -61,6 +61,7 @@ class CommunityProvider extends ChangeNotifier {
   bool _hasMore = true;
   String? _searchQuery;
   String? _formatFilter;
+  int _fetchGeneration = 0;
 
   List<CommunityDeck> get decks => _decks;
   bool get isLoading => _isLoading;
@@ -79,27 +80,36 @@ class CommunityProvider extends ChangeNotifier {
     String? format,
     bool reset = false,
   }) async {
+    if (_isLoading && !reset) return;
+
     if (reset) {
       _page = 1;
       _decks = [];
       _hasMore = true;
     }
 
-    if (!_hasMore || _isLoading) return;
+    if (!_hasMore) return;
 
+    final generation = ++_fetchGeneration;
     _isLoading = true;
     _errorMessage = null;
     _searchQuery = search ?? _searchQuery;
     _formatFilter = format ?? _formatFilter;
+    final requestPage = _page;
+    final requestSearch = _searchQuery;
+    final requestFormat = _formatFilter;
     notifyListeners();
 
     try {
-      final queryParams = <String, String>{'page': '$_page', 'limit': '20'};
-      if (_searchQuery != null && _searchQuery!.isNotEmpty) {
-        queryParams['search'] = _searchQuery!;
+      final queryParams = <String, String>{
+        'page': '$requestPage',
+        'limit': '20',
+      };
+      if (requestSearch != null && requestSearch.isNotEmpty) {
+        queryParams['search'] = requestSearch;
       }
-      if (_formatFilter != null && _formatFilter!.isNotEmpty) {
-        queryParams['format'] = _formatFilter!;
+      if (requestFormat != null && requestFormat.isNotEmpty) {
+        queryParams['format'] = requestFormat;
       }
 
       final queryString = queryParams.entries
@@ -110,6 +120,7 @@ class CommunityProvider extends ChangeNotifier {
           .join('&');
 
       final response = await _apiClient.get('/community/decks?$queryString');
+      if (generation != _fetchGeneration) return;
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
@@ -132,7 +143,7 @@ class CommunityProvider extends ChangeNotifier {
           _decks.addAll(newDecks);
           _total = data['total'] as int? ?? 0;
           _hasMore = _decks.length < _total;
-          _page++;
+          _page = requestPage + 1;
         }
       } else {
         _recordCommunityEvent(
@@ -158,8 +169,10 @@ class CommunityProvider extends ChangeNotifier {
       _errorMessage = 'Erro de conexão: $e';
     }
 
-    _isLoading = false;
-    notifyListeners();
+    if (generation == _fetchGeneration) {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   /// Limpa filtros e recarrega
@@ -201,6 +214,7 @@ class CommunityProvider extends ChangeNotifier {
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
+    _fetchGeneration++;
     if (_decks.isEmpty &&
         !_isLoading &&
         _errorMessage == null &&
