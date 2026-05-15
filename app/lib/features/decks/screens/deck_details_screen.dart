@@ -48,6 +48,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   bool _isValidating = false;
   Map<String, dynamic>? _validationResult;
   Set<String> _invalidCardNames = {};
+  String? _lastValidationDeckSignature;
 
   /// Extrai o nome da carta problemática do resultado da validação.
   /// Usa o campo estruturado 'card_name' quando disponível,
@@ -278,6 +279,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           if (deck == null) {
             return const Center(child: Text('Deck não encontrado'));
           }
+          _syncValidationStateWithDeck(deck);
           _pricing ??= _pricingFromDeck(deck);
 
           final format = deck.format.toLowerCase();
@@ -449,6 +451,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         },
       ),
     );
+  }
+
+  void _syncValidationStateWithDeck(DeckDetails deck) {
+    final signature = _deckValidationSignature(deck);
+    if (_lastValidationDeckSignature == signature) return;
+    _lastValidationDeckSignature = signature;
+    _validationAutoLoaded = false;
+    _validationResult = null;
+    _invalidCardNames = {};
   }
 
   Widget _buildCardSection(
@@ -1257,6 +1268,20 @@ int _totalCards(DeckDetails deck) {
     }
   }
   return total;
+}
+
+String _deckValidationSignature(DeckDetails deck) {
+  final parts = <String>[
+    deck.id,
+    deck.format,
+    for (final c in deck.commander)
+      'cmd:${c.id}:${c.quantity}:${c.isCommander}:${c.name}',
+    for (final entry in deck.mainBoard.entries)
+      for (final c in entry.value)
+        'main:${entry.key}:${c.id}:${c.quantity}:${c.isCommander}:${c.name}',
+  ];
+  parts.sort();
+  return parts.join('|');
 }
 
 String _bracketLabel(int bracket) {

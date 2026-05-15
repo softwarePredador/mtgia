@@ -255,10 +255,12 @@ class DeckProvider extends ChangeNotifier {
   }
 
   /// Busca todos os decks do usuário
-  Future<void> fetchDecks() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  Future<void> fetchDecks({bool silent = false}) async {
+    if (!silent) {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+    }
 
     try {
       final state = await fetchDeckListRequest(_apiClient);
@@ -272,21 +274,28 @@ class DeckProvider extends ChangeNotifier {
         // Busca color identity em background para decks que ainda não a possuem.
         fetchMissingColorIdentities(hydration.missingColorIdentityDecks);
       } else {
-        _errorMessage = state.errorMessage;
+        if (!silent) {
+          _errorMessage = state.errorMessage;
+        }
       }
     } catch (e, stackTrace) {
-      _errorMessage = FriendlyErrorMapper.fromException(
-        e,
-        context: FriendlyErrorContext.deckDetails,
-      );
+      if (!silent) {
+        _errorMessage = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.deckDetails,
+        );
+      }
       _captureProviderException(
         e,
         stackTrace: stackTrace,
         operation: 'fetchDecks',
+        extras: {'silent': silent},
       );
       // Não limpa _decks para permitir cache visual em caso de erro
     } finally {
-      _isLoading = false;
+      if (!silent) {
+        _isLoading = false;
+      }
       notifyListeners();
     }
   }
@@ -326,7 +335,7 @@ class DeckProvider extends ChangeNotifier {
         }
 
         // Recarrega em background para hidratar campos faltantes (ex.: card_count, description, etc).
-        unawaited(fetchDecks());
+        unawaited(fetchDecks(silent: true));
 
         unawaited(
           _trackActivationEvent(
@@ -972,7 +981,7 @@ class DeckProvider extends ChangeNotifier {
       );
 
       if (result['success'] == true) {
-        await fetchDecks();
+        await fetchDecks(silent: true);
       }
 
       _errorMessage = result['error']?.toString();
@@ -1037,7 +1046,17 @@ class DeckProvider extends ChangeNotifier {
 
   Future<void> _refreshDeckDetailsAfterMutation(String deckId) async {
     invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await fetchDeckDetails(deckId, forceRefresh: true);
+    unawaited(_refreshDeckListSilently());
+  }
+
+  Future<void> _refreshDeckListSilently() async {
+    try {
+      await fetchDecks(silent: true);
+    } catch (_) {
+      // fetchDecks already maps/captures errors; deck details must not fail
+      // because the list refresh is only cache reconciliation.
+    }
   }
 
   // ───── Social / Sharing ─────
@@ -1093,7 +1112,7 @@ class DeckProvider extends ChangeNotifier {
       () => copyPublicDeckRequest(_apiClient, deckId),
     );
     if (result['success'] == true) {
-      await fetchDecks();
+      await fetchDecks(silent: true);
     }
     return result;
   }

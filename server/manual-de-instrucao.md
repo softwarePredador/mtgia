@@ -16404,3 +16404,32 @@ Validacao:
 - `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/import_to_deck_flow_test.dart --tags live -r expanded`: `PASS`, incluindo o caso `Kaalia da Vastidao`;
 - `cd app && flutter analyze lib/features/decks/providers/deck_provider_support_import.dart lib/features/decks/screens/deck_import_screen.dart test/features/decks/screens/deck_import_screen_test.dart test/features/decks/providers/deck_provider_support_test.dart --no-version-check`: `PASS`;
 - `cd app && flutter test test/features/decks/screens/deck_import_screen_test.dart test/features/decks/providers/deck_provider_support_test.dart --no-version-check`: `PASS`.
+
+## 125. Deck refresh after commander/import mutations - 2026-05-15
+
+Relato de tester: apos importar/corrigir comandante, a tela ainda exibia erros
+antigos de comandante e, ao voltar para a lista de decks, o card aparecia
+temporariamente com contagem incorreta (`1 carta`). Sair para a Home e voltar
+forcava refresh e o deck aparecia correto.
+
+Causa provavel: lista `/decks` e validacao local de `DeckDetailsScreen` ficavam
+com estado anterior depois de mutacoes de cartas/comandante. O detalhe era
+recarregado, mas a lista era reconciliada apenas em alguns fluxos e a validacao
+local podia continuar exibindo resultado antigo ate nova validacao manual.
+
+Patch aplicado:
+
+- `DeckProvider.fetchDecks` aceita `silent=true` para reconciliar lista sem
+  spinner/erro visual global;
+- mutacoes de cartas/comandante passam a recarregar detalhes com
+  `forceRefresh=true` e disparar refresh silencioso da lista;
+- `DeckListScreen` agenda refresh quando a rota volta a ficar visivel,
+  reduzindo cache stale ao usar o botao voltar;
+- `DeckDetailsScreen` calcula assinatura do deck e limpa resultado de validacao
+  antigo quando comandante/mainboard mudam, permitindo revalidacao limpa.
+
+Validacao:
+
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider.dart lib/features/decks/screens/deck_details_screen.dart lib/features/decks/screens/deck_list_screen.dart test/features/decks/providers/deck_provider_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter test test/features/decks/providers/deck_provider_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/screens/deck_details_screen_smoke_test.dart --no-version-check`: `PASS`;
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/import_to_deck_flow_test.dart --tags live --plain-name 'creates Commander draft and resolves commander field separately' -r expanded`: `PASS`.

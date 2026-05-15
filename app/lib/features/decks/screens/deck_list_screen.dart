@@ -14,13 +14,31 @@ class DeckListScreen extends StatefulWidget {
 }
 
 class _DeckListScreenState extends State<DeckListScreen> {
+  DateTime? _lastVisibleRefreshAt;
+
   @override
   void initState() {
     super.initState();
     // Busca os decks ao abrir a tela
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DeckProvider>().fetchDecks();
+      _refreshDecksIfVisible(force: true);
     });
+  }
+
+  void _refreshDecksIfVisible({bool force = false}) {
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
+
+    final now = DateTime.now();
+    final shouldRefresh =
+        force ||
+        _lastVisibleRefreshAt == null ||
+        now.difference(_lastVisibleRefreshAt!) > const Duration(seconds: 3);
+    if (!shouldRefresh) return;
+
+    _lastVisibleRefreshAt = now;
+    context.read<DeckProvider>().fetchDecks(silent: !force);
   }
 
   Future<void> _showCreateDeckDialog(BuildContext context) async {
@@ -195,6 +213,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final deckCount = context.select<DeckProvider, int>((p) => p.decks.length);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshDecksIfVisible();
+    });
 
     return Scaffold(
       appBar: AppBar(
