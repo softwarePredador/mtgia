@@ -3,6 +3,37 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — ManaLoom app icon readiness PASS
+
+### O Porquê
+- O app ainda expunha nomes visiveis `mtg_app`/`Mtg App` e um icone neon
+  generico, desalinhado do branding Obsidian + Brass + Frost Blue esperado para
+  teste interno/publico.
+- A preparacao precisava evitar qualquer uso de assets oficiais de Magic: The
+  Gathering, artes de cartas, simbolos protegidos ou mana symbols oficiais, e
+  nao expor secrets, tokens, JWT, `SENTRY_DSN`, `DATABASE_URL` ou
+  `OPENAI_API_KEY`.
+
+### O Como
+- `master` foi sincronizada com `origin/master` via fast-forward check, sem
+  divergencia.
+- `app/assets/lotus/images/app-icon.svg` foi substituido por uma marca propria
+  abstrata de grimorio/tear em Obsidian `#0F1115`, Brass `#C58B2A/#E0A93B` e
+  Frost Blue `#6FA8DC`.
+- Android passou a usar `android:label="ManaLoom"`, `roundIcon`, PNGs legacy
+  por densidade e adaptive icon API 26+ com foreground vetorial e background
+  Obsidian.
+- iOS passou a exibir `ManaLoom` via `CFBundleDisplayName`; os AppIcon PNGs
+  foram regenerados em dimensoes oficiais e sem canal alpha.
+- Web passou a usar `ManaLoom`, tema Obsidian, favicon PNG/ICO e icons
+  192/512 comuns e maskable.
+
+### Resultado
+- Readiness do icone: **PASS** para Android/iOS/Web no escopo de assets,
+  dimensoes, transparencia e nome exibido.
+- Evidencia visual:
+  `docs/qa/manaloom_app_icon_contact_sheet_2026-05-15.png`.
+
 ## 2026-05-15 — Internal user test non-scanner handoff PASS_WITH_RISKS
 
 ### O Porquê
@@ -4739,7 +4770,7 @@ Runtime iPhone 15 Simulator:
 - `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: `02:48 +166 ~3: All tests passed!`.
 - `flutter analyze lib/features/trades lib/features/notifications lib/features/binder lib/features/market integration_test --no-version-check`: sem issues.
 - `flutter test test/features/trades test/features/notifications test/features/binder --no-version-check`: `00:03 +12: All tests passed!`.
-- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=${SENTRY_DSN:-} --reporter expanded --no-version-check`: passou.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=REDACTED --reporter expanded --no-version-check`: passou.
 
 ### Evidencias
 - Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
@@ -4801,7 +4832,7 @@ Runtime iPhone 15 Simulator:
 - `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: primeira rodada falhou fora do escopo social em `ai_generate_create_optimize_flow_test.dart` por prompts com `422`; rerun imediato passou com `02:52 +165 ~3: All tests passed!`.
 - `flutter analyze lib/features/trades lib/features/notifications lib/features/binder lib/features/market integration_test --no-version-check`: sem issues.
 - `flutter test test/features/trades test/features/notifications test/features/binder --no-version-check`: `00:00 +12: All tests passed!`.
-- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=${SENTRY_DSN:-} --reporter expanded --no-version-check`: passou.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=REDACTED --reporter expanded --no-version-check`: passou.
 
 ### Evidencias
 - Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
@@ -4828,7 +4859,7 @@ Runtime iPhone 15 Simulator:
   - mede p50/p95/p99;
   - dispara `400` esperado, `404` esperado, timeout cliente e validacao de contrato;
   - nao imprime token/email/payload sensivel.
-- App iPhone 15 rodou `mobile_sentry_smoke_test.dart` e `binder_marketplace_trade_runtime_test.dart` com `--dart-define=SENTRY_DSN=<staging>`.
+- App iPhone 15 rodou `mobile_sentry_smoke_test.dart` e `binder_marketplace_trade_runtime_test.dart` com `--dart-define=SENTRY_DSN=REDACTED
 - Criado `app/integration_test/fcm_staging_smoke_test.dart` para tentar inicializar Firebase Messaging, solicitar permissao e registrar token sem imprimir o token.
 - Hardening aplicado:
   - `AppObservability.sentryUserFor` nao anexa email ao `SentryUser`;
@@ -4860,7 +4891,7 @@ Runtime iPhone 15 Simulator:
 - `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: passou.
 - `flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications integration_test --no-version-check`: sem issues.
 - `flutter test test/features/binder test/features/trades test/features/messages test/features/notifications --no-version-check`: passou.
-- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ... --dart-define=SENTRY_DSN=<staging>`: passou.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ... --dart-define=SENTRY_DSN=REDACTED passou.
 - `flutter test integration_test/fcm_staging_smoke_test.dart -d "iPhone 15" ...`: passou como harness, resultado funcional `not_proven`.
 
 ### Pendencias
@@ -14998,7 +15029,7 @@ flutter test integration_test/profile_community_runtime_test.dart \
   -d "iPhone 15" \
   --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
   --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
-  --dart-define=SENTRY_DSN=${SENTRY_DSN:-} \
+  --dart-define=SENTRY_DSN=REDACTED \
   --reporter expanded \
   --no-version-check
 ```
