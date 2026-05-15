@@ -3,6 +3,48 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Internal user test non-scanner handoff PASS_WITH_RISKS
+
+### O Porquê
+- O foco operacional foi deslocado de expansao Commander Reference para preparar
+  ManaLoom para teste interno com usuarios reais no escopo non-scanner.
+- Era necessario consolidar status atual, riscos aceitos, checklist de QA e
+  instrucoes de handoff sem expor secrets, tokens, JWT, `SENTRY_DSN`,
+  `DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo ou decklists completas.
+- Scanner, camera e OCR deveriam permanecer explicitamente fora do escopo.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host` respondeu `/health` com
+  HTTP 200, `status=healthy`, `environment=production` e
+  `git_sha=fca11424b72b667c2a48ac0fa5b4b0fd127238c6`.
+- Foram relidos `server/manual-de-instrucao.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md`,
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`, os relatorios recentes de
+  Commander Reference Sprint 4 e handoffs runtime recentes.
+- Track A/D consolidaram Commander Reference como expansao pausada: 24
+  comandantes promovidos, Miirym/Feather com app runtime iPhone 15 Simulator,
+  Ghave/Jodah promovidos em backend public proof/scorecard, e
+  Purphoros/Veyran/Balan/backlog mantidos bloqueados ou deferred.
+- Track B/E viraram checklist e handoff para testers cobrindo auth,
+  search/cards, sets, decks, Generate IA, Optimize IA, validate, binder,
+  marketplace/trades, messages/notifications e Life Counter, sem scanner.
+- Track C executou somente probes publicas nao mutativas de health, cards, sets,
+  community decks e marketplace; fluxos com JWT ficaram reservados a contas QA
+  descartaveis.
+
+### Resultado
+- Resultado de release interno: **PASS_WITH_RISKS** para usuarios reais em
+  escopo non-scanner.
+- Documentos criados:
+  `server/doc/INTERNAL_USER_TEST_HANDOFF_NON_SCANNER_2026-05-15.md` e
+  `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`.
+- `app/doc/APP_AUDIT_2026-04-29.md` foi atualizado com o novo status.
+- Riscos aceitos: AI latency, optimize safe no-op/quality rejection,
+  Firebase/push por ambiente, variabilidade de rede Android, agregado
+  `GET /decks/:id.commander_name` instavel e scanner/camera/OCR
+  **DEFERRED / NOT PROVEN**.
+
 ## 2026-05-15 — Commander Reference Ghave/Jodah unlock PASS
 
 ### O Porquê
