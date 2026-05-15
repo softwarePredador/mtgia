@@ -82,7 +82,7 @@ print('deck_like_links', len(re.findall(r'href=\"([^\"]*event\\?e=\\d+&d=\\d+[^\
 PY
 python3 - <<'PY'
 import psycopg2, json
-conn=psycopg2.connect('postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder')
+conn=psycopg2.connect('<DATABASE_URL_REDACTED>')
 cur=conn.cursor()
 cur.execute(\"\"\"
 SELECT COUNT(*)::int,

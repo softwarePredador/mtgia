@@ -20,6 +20,9 @@ as fontes canônicas abaixo.
    - status de distribuicao interna com riscos aceitos.
 7. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
+8. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+   - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
+     DELETE_CANDIDATE para docs e artefatos versionados.
 
 ## Relatorios recentes por tema
 
@@ -29,6 +32,7 @@ as fontes canônicas abaixo.
 - Card entry/import: `docs/qa/manaloom_card_entry_qa_2026-05-08.md`
 - Design Android: `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`
 - Icone do app: `docs/qa/manaloom_app_icon_contact_sheet_2026-05-15.png`
+- Auditoria de docs/artefatos: `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
 
 ## Scanner
 
@@ -38,8 +42,14 @@ documentos antigos de scanner como gate de release non-scanner.
 ## Como tratar documentos historicos
 
 - Arquivos de marco/abril no root de `docs/` sao historicos, nao prioridade
-  atual.
+  atual; documentos sem referencia ativa foram movidos para
+  `docs/archive/2026-03/`.
 - Proof folders com logs/prints devem ser preservados quando sustentam uma
   decisao ja tomada.
+- Corpus, scorecards, summaries e readiness JSON de Commander Reference devem
+  permanecer versionados enquanto forem usados para readiness/promocao.
+- Artefatos com payload sensivel devem ser redigidos ou removidos; nao versionar
+  JWT, tokens, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails reais,
+  decklists completas ou headers de Authorization.
 - Ao criar nova decisao app-facing, atualize primeiro `server/manual-de-instrucao.md`
   e `server/doc/API_CONTRACTS_AND_DATA_MAP.md` quando houver contrato envolvido.

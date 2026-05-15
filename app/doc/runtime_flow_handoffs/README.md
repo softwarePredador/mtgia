@@ -78,6 +78,17 @@ Each runtime handoff must be based on a fresh execution in the current session.
 
 Old screenshots and old logs are historical comparison only.
 
+## Retention rule
+
+- Keep current handoffs, recent release/runtime reports, and proof folders cited
+  by handoffs, canonical docs, API map, release reports, or production audits.
+- Keep scanner/camera/OCR handoffs only as historical/deferred evidence for now;
+  they are not a gate for the non-scanner internal round.
+- Do not version raw auth payloads, JWTs, tokens, `SENTRY_DSN`, `DATABASE_URL`,
+  `OPENAI_API_KEY`, real e-mails, Authorization headers, or complete decklists.
+- See `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md` for the
+  repository-wide KEEP/HISTORICAL/ARCHIVE/DELETE_CANDIDATE matrix.
+
 ## Scanner scope
 
 Scanner/camera/OCR/MLKit are explicitly deferred for the current internal

@@ -135,7 +135,7 @@ cd server && dart run bin/commander_reference_profile.dart --profile-json=<profi
 cd server && dart analyze bin lib routes test
 cd server && dart test test/commander_reference_profile_support_test.dart test/commander_reference_card_stats_support_test.dart -r expanded
 git diff --check
-git grep -nE "(sk-[A-Za-z0-9_-]{20,}|DATABASE_URL=|SENTRY_DSN=|OPENAI_API_KEY=|Authorization: Bearer|eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)" -- <changed files>
+git grep -nE "(sk-[A-Za-z0-9_-]{20,}|DATABASE_URL=|SENTRY_DSN=<SENTRY_DSN_REDACTED> Bearer|eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)" -- <changed files>
 ```
 
 ## Pass/fail summary

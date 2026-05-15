@@ -33,7 +33,7 @@ Backend command: `cd server && PORT=8081 dart run .dart_frog/server.dart`
 
 ## Account Used
 
-Identifier: `runtime.e2e.20260423@example.com`
+Identifier: `<EMAIL_REDACTED>`
 
 How it was created: `POST /auth/register` during live backend validation.
 

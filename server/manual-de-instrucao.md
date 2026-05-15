@@ -3,6 +3,44 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Docs/artifacts retention audit PASS_WITH_RISKS
+
+### O Porquê
+- A base acumulou documentos e provas historicas de marco a maio, incluindo
+  runtime handoffs, scanner deferred, Commander Reference readiness e artefatos
+  de auditoria.
+- A limpeza precisava definir o que fica ativo, o que fica historico, o que vai
+  para archive e o que e candidato a exclusao sem apagar evidencias canonicas,
+  release reports, API map, auditorias de producao ou corpus/scorecards usados
+  por Commander Reference.
+- Tambem era necessario redigir valores/payloads sensiveis sem expor secrets,
+  JWT, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails reais ou
+  decklists completas.
+
+### O Como
+- `master` foi sincronizada com `origin/master` e a worktree inicial estava
+  limpa.
+- Foram relidos `docs/README.md`,
+  `server/doc/FULL_FLOW_STATE_AND_DOC_AUDIT_2026-05-15.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md`, este manual e
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- O inventario cobriu `docs/`, `app/doc/`, `server/doc/`,
+  `app/doc/runtime_flow_handoffs/`, `app/doc/runtime_flow_proofs_*` e
+  `server/test/artifacts/`.
+- Dois documentos de marco sem referencia ativa foram movidos para
+  `docs/archive/2026-03/`; provas e artefatos citados foram preservados.
+- Valores sensiveis em docs/artefatos antigos foram redigidos com placeholders,
+  mantendo o valor historico sem versionar payload sensivel.
+
+### Resultado
+- Documento criado:
+  `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`.
+- Indices atualizados:
+  `docs/README.md` e `app/doc/runtime_flow_handoffs/README.md`.
+- Status: **PASS_WITH_RISKS**. Riscos aceitos: muitos proof folders historicos
+  permanecem versionados porque sustentam decisoes/handoffs; scanner/camera/OCR
+  seguem fora do escopo funcional e mantidos apenas como evidencia deferred.
+
 ## 2026-05-15 — Internal test round ready non-scanner PASS_WITH_RISKS
 
 ### O Porquê

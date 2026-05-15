@@ -51,7 +51,7 @@ flutter test integration_test/binder_marketplace_trade_runtime_test.dart \
   -d "iPhone 15" \
   --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
   --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
-  --dart-define=SENTRY_DSN=${SENTRY_DSN:-} \
+  --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> \
   --reporter expanded \
   --no-version-check
 ```
@@ -117,7 +117,7 @@ flutter test integration_test/binder_marketplace_trade_runtime_test.dart \
   -d "iPhone 15" \
   --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
   --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
-  --dart-define=SENTRY_DSN=${SENTRY_DSN:-} \
+  --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> \
   --reporter expanded \
   --no-version-check
 ```
@@ -146,7 +146,7 @@ Resultado: `Approved for Sentry/log structured staging observability on simulato
 | Health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0","checks":{"process":{"status":"healthy"}}}` |
 | Sentry backend | PASS: `SENTRY_SMOKE_EVENT_ID=fa3497bfe71248f99d0217b3ba964816`, env `staging`, release `4edfbdf` |
 | Sentry mobile | PASS: `SENTRY_MOBILE_EVENT_ID=08cc80c92ae446b89e8179e842a368e3`, tag `mtgia-mobile-smoke-19dde342848` |
-| Runtime Social Trading | PASS: `02:12 +2: All tests passed!` com `--dart-define=SENTRY_DSN=<staging>` |
+| Runtime Social Trading | PASS: `02:12 +2: All tests passed!` com `--dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED>` |
 | FCM simulador | `not_proven`: `FCM_PERMISSION status=denied`, `FCM_APNS_TOKEN_PRESENT=false`, erro `firebase_messaging/apns-token-not-set` |
 | Evidencias locais | `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_social_observability/` |
 
@@ -162,9 +162,9 @@ OBS_SAMPLE_COUNT=5 TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/qa/socia
 
 ```bash
 cd app
-flutter test integration_test/mobile_sentry_smoke_test.dart -d "iPhone 15" --dart-define=SENTRY_DSN=<staging> --dart-define=SENTRY_ENVIRONMENT=staging --reporter expanded --no-version-check
+flutter test integration_test/mobile_sentry_smoke_test.dart -d "iPhone 15" --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> --dart-define=SENTRY_ENVIRONMENT=staging --reporter expanded --no-version-check
 flutter test integration_test/fcm_staging_smoke_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
-flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=<staging> --dart-define=SENTRY_ENVIRONMENT=staging --reporter expanded --no-version-check
+flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> --dart-define=SENTRY_ENVIRONMENT=staging --reporter expanded --no-version-check
 ```
 
 Metricas do probe backend real, 5 amostras por endpoint:

@@ -46,7 +46,7 @@ flutter test integration_test/profile_community_runtime_test.dart \
   -d "iPhone 15" \
   --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
   --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
-  --dart-define=SENTRY_DSN=${SENTRY_DSN:-} \
+  --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> \
   --reporter expanded \
   --no-version-check
 ```
@@ -165,7 +165,7 @@ cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expand
 ```bash
 cd app && flutter analyze lib/features/profile lib/features/community lib/features/auth integration_test --no-version-check
 cd app && flutter test test/features/profile test/features/community test/features/auth --no-version-check
-cd app && flutter test integration_test/profile_community_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=${SENTRY_DSN:-} --reporter expanded --no-version-check
+cd app && flutter test integration_test/profile_community_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> --reporter expanded --no-version-check
 ```
 
 ## Validation Notes

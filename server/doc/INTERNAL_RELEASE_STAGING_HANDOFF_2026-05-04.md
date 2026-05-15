@@ -288,7 +288,7 @@ flutter build ipa --release \
   --build-number=<internal-build-number> \
   --dart-define=API_BASE_URL=<staging-api-url> \
   --dart-define=PUBLIC_API_BASE_URL=<staging-api-url> \
-  --dart-define=SENTRY_DSN=<ci-secret-sentry-dsn> \
+  --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> \
   --dart-define=SENTRY_ENVIRONMENT=staging \
   --dart-define=SENTRY_RELEASE=manaloom@1.0.0+<internal-build-number>
 ```
@@ -302,7 +302,7 @@ flutter build appbundle --release \
   --build-number=<internal-build-number> \
   --dart-define=API_BASE_URL=<staging-api-url> \
   --dart-define=PUBLIC_API_BASE_URL=<staging-api-url> \
-  --dart-define=SENTRY_DSN=<ci-secret-sentry-dsn> \
+  --dart-define=SENTRY_DSN=<SENTRY_DSN_REDACTED> \
   --dart-define=SENTRY_ENVIRONMENT=staging \
   --dart-define=SENTRY_RELEASE=manaloom@1.0.0+<internal-build-number>
 ```

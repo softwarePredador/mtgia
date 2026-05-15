@@ -339,7 +339,7 @@ cd server && dart run bin/extract_meta_insights.dart --report-only
 cd server && dart run bin/meta_profile_report.dart
 python3 - <<'PY'
 import psycopg2
-conn=psycopg2.connect('postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder')
+conn=psycopg2.connect('<DATABASE_URL_REDACTED>')
 cur=conn.cursor()
 cur.execute("""
 SELECT CASE WHEN source_url ILIKE 'https://www.mtgtop8.com/%' THEN 'mtgtop8' ELSE 'external' END AS source,
