@@ -1,5 +1,29 @@
 # Commander Reference Feather Timeout Fix - 2026-05-14
 
+## App runtime publico - 2026-05-15
+
+**PASS.** `Feather, the Redeemed` foi provada no app runtime real no iPhone 15
+Simulator (`F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4) contra o backend
+publico `https://evolution-cartinhas.8ktevp.easypanel.host` em
+`git_sha=6e155224ea2306d944dc8aa20d93576aa29ff8ee`.
+
+O harness
+`app/integration_test/commander_reference_feather_app_runtime_test.dart`
+executou register/login QA descartavel, Generate Commander com
+`commander_name='Feather, the Redeemed'`, feedback async, preview, save, Deck
+Details e `/decks/:id/validate`. O summary sanitizado confirmou
+`validation_ok=true`, `main_quantity=99`, `total=100`, `commander_count=1`,
+`commander_in_99_count=0`, `off_identity=0`,
+`raw_commander_names=["Feather, the Redeemed"]` e
+`deck_commander_name_matches=true`.
+
+Nao houve mudanca de contrato app-facing. `API_CONTRACTS_AND_DATA_MAP.md` foi
+consultado e permaneceu sem alteracao. Scanner, camera e OCR ficaram fora do
+escopo. Artifacts sanitizados:
+`app/doc/runtime_flow_proofs_2026-05-15_commander_reference_feather_app/` e
+handoff
+`app/doc/runtime_flow_handoffs/commander_reference_feather_app_2026-05-15.md`.
+
 ## Resultado
 
 **PASS.** `Feather, the Redeemed` foi promovida para

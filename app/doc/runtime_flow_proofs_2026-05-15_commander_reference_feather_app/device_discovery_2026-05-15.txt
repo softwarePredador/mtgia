@@ -1,0 +1,29 @@
+# Device/backend discovery - 2026-05-15
+repo=/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+branch=master
+head=6e155224ea2306d944dc8aa20d93576aa29ff8ee
+git_status=## master...origin/master ?? app/integration_test/commander_reference_feather_app_runtime_test.dart
+
+## flutter devices
+Found 5 connected devices:
+  SM A135M (mobile)  • R58T300SREH                          • android-arm    • Android 14 (API 34)
+  M2006C3MG (mobile) • TGOJTKDUX4S4XWWK                     • android-arm    • Android 10 (API 29)
+  iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios            • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)
+  macOS (desktop)    • macos                                • darwin-arm64   • macOS 26.2 25C56 darwin-arm64
+  Chrome (web)       • chrome                               • web-javascript • Google Chrome 148.0.7778.168
+
+Checking for wireless devices...
+
+Found 1 wirelessly connected device:
+  <redacted-wireless-device>
+
+Nearby wireless device discovery errors redacted from artifact.
+
+## iPhone 15 simulators
+    iPhone 15 Pro (F3C5B123-673F-4ACC-84B2-489957CB81C8) (Shutdown)
+    iPhone 15 Pro Max (DABB9D79-2FDB-4585-94DB-E31F1288EE74) (Shutdown)
+    iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)
+    iPhone 15 Plus (6A3E5508-0190-48AC-B6D1-E4BA8A94FFD9) (Shutdown)
+
+## public health
+{"status":"healthy","service":"mtgia-server","timestamp":"2026-05-15T13:47:17.548607","environment":"production","version":"1.0.0","git_sha":"6e155224ea2306d944dc8aa20d93576aa29ff8ee","checks":{"process":{"status":"healthy"}}}

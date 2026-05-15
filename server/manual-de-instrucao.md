@@ -3,6 +3,51 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Commander Reference Feather app runtime PASS
+
+### O Porquê
+- `Feather, the Redeemed` ja tinha public proof backend 5/5 e scorecard
+  `ready_for_mini_batch`, mas ainda faltava provar o fluxo app real apos a
+  correcao de timeout/invalids.
+- A prova precisava cobrir o contrato mobile completo sem expor secrets, tokens,
+  JWT, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo,
+  prompt bruto ou decklist completa. Scanner, camera e OCR continuaram fora do
+  escopo.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com `status=healthy`,
+  `git_sha=6e155224ea2306d944dc8aa20d93576aa29ff8ee`.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e ficou sem
+  alteracao porque nao houve mudanca de rota, payload, response shape,
+  diagnostics app-facing, data source ou consumidor mobile.
+- Foi criado
+  `app/integration_test/commander_reference_feather_app_runtime_test.dart`,
+  preservando o harness Miirym, para register/login QA descartavel, Generate
+  Commander com `commander_name=Feather, the Redeemed`, feedback async, preview,
+  save, Deck Details e `/decks/:id/validate`.
+- O harness valida comandante unico fora das 99, `main_quantity=99`,
+  `total=100`, `validation_ok=true`, `off_identity=0`, sem erro cru, sem
+  excecao Flutter e sem dialog/modal preso.
+- Foram executados `dart format`, `flutter analyze` focado no harness Feather e
+  no harness Miirym, `flutter test test/features/decks/providers/deck_provider_test.dart`
+  e o runtime no iPhone 15 Simulator contra o backend publico.
+
+### Resultado
+- Resultado operacional app runtime: **PASS**.
+- Runtime iPhone 15 Simulator: `00:39 +1: All tests passed!`.
+- Summary sanitizado: `deck_id=<redacted-deck-id>`, `app_runtime_valid=true`,
+  `deck_commander_name_matches=true`,
+  `raw_commander_names=["Feather, the Redeemed"]`, `validation_ok=true`,
+  `main_quantity=99`, `total=100`, `commander_count=1`,
+  `commander_in_99_count=0` e `off_identity=0`.
+- Latencias relevantes: `/health latency_ms=1085`, feedback inicial de Generate
+  Commander `elapsed_ms=764`.
+- Documentos atualizados:
+  `app/doc/runtime_flow_handoffs/commander_reference_feather_app_2026-05-15.md`,
+  `app/doc/APP_AUDIT_2026-04-29.md` e
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_FEATHER_TIMEOUT_FIX_2026-05-14.md`.
+
 ## 2026-05-14 — Commander Reference Feather timeout fix PASS
 
 ### O Porquê
