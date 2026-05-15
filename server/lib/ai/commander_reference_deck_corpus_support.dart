@@ -507,7 +507,9 @@ bool shouldUseCompactCommanderReferenceCorpusPrompt(
 ) {
   if (guidance == null || !guidance.isUsable) return false;
   final packages = guidance.packages;
-  return guidance.acceptedDeckCount >= 3 && packages.corePackage.length >= 24;
+  return (guidance.acceptedDeckCount >= 3 &&
+          packages.corePackage.length >= 24) ||
+      (guidance.acceptedDeckCount >= 4 && packages.corePackage.length >= 20);
 }
 
 Set<String> commanderReferenceCorpusCoreCardNames(

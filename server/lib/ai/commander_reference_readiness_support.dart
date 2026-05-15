@@ -40,20 +40,32 @@ class CommanderReferenceReadinessRuntimeProof {
     final timeoutFallbackCount = mode.containsKey('timeout_fallback_count')
         ? _intValue(mode['timeout_fallback_count'])
         : _intValue(mode['timeout_fallback']);
+    final invalidCardsTotal = _intValue(mode['invalid_cards_total']);
+    final offIdentityTotal = _intValue(mode['off_identity_total']);
+    final p95Ms = _intValue(mode['p95_ms']);
+    final profileUsed = _intValue(mode['profile_used']);
+    final statsUsed = _intValue(mode['stats_used']);
+    final corpusUsed = _intValue(mode['corpus_used']);
+    final latencyOk = p95Ms == 0 || p95Ms <= 5000;
     final deterministicReferencePathOk = fallbackCount >= 5 &&
         timeoutFallbackCount == 0 &&
-        _intValue(mode['profile_used']) >= 5 &&
-        _intValue(mode['stats_used']) >= 5 &&
-        _intValue(mode['corpus_used']) >= 5 &&
-        _intValue(mode['invalid_cards_total']) == 0 &&
-        _intValue(mode['off_identity_total']) == 0 &&
-        (_intValue(mode['p95_ms']) == 0 || _intValue(mode['p95_ms']) <= 5000);
+        profileUsed >= 5 &&
+        statsUsed >= 5 &&
+        corpusUsed >= 5 &&
+        invalidCardsTotal == 0 &&
+        offIdentityTotal == 0 &&
+        latencyOk;
     return _intValue(mode['http_200']) >= 5 &&
         _intValue(mode['validation_ok']) >= 5 &&
         commanderPreserved >= 5 &&
         mainQuantityOk >= 5 &&
-        _intValue(mode['corpus_used']) >= 5 &&
+        profileUsed >= 5 &&
+        statsUsed >= 5 &&
+        corpusUsed >= 5 &&
         timeoutFallbackCount == 0 &&
+        invalidCardsTotal == 0 &&
+        offIdentityTotal == 0 &&
+        latencyOk &&
         (fallbackCount == 0 || deterministicReferencePathOk);
   }
 

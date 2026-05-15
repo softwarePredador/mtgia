@@ -7,12 +7,15 @@ class ReferenceGeneratedCardsIdentityFilterResult {
   const ReferenceGeneratedCardsIdentityFilterResult({
     required this.cards,
     required this.removedOffColorNames,
+    this.removedUnresolvedNames = const [],
   });
 
   final List<Map<String, dynamic>> cards;
   final List<String> removedOffColorNames;
+  final List<String> removedUnresolvedNames;
 
   int get removedOffColorCount => removedOffColorNames.length;
+  int get removedUnresolvedCount => removedUnresolvedNames.length;
 }
 
 ReferenceGeneratedCardsIdentityFilterResult
@@ -27,11 +30,13 @@ ReferenceGeneratedCardsIdentityFilterResult
     return ReferenceGeneratedCardsIdentityFilterResult(
       cards: cards.map(Map<String, dynamic>.from).toList(growable: false),
       removedOffColorNames: const [],
+      removedUnresolvedNames: const [],
     );
   }
 
   final filtered = <Map<String, dynamic>>[];
-  final removed = <String>{};
+  final removedOffColor = <String>{};
+  final removedUnresolved = <String>{};
   final normalizedCommander =
       normalizeCommanderReferenceCardName(commanderName);
 
@@ -44,7 +49,7 @@ ReferenceGeneratedCardsIdentityFilterResult
 
     final resolved = _findResolvedCard(name, resolvedCardsByName);
     if (resolved == null) {
-      filtered.add(Map<String, dynamic>.from(card));
+      removedUnresolved.add(name);
       continue;
     }
 
@@ -58,7 +63,7 @@ ReferenceGeneratedCardsIdentityFilterResult
       cardIdentity: identity,
       commanderIdentity: commanderIdentity,
     )) {
-      removed.add(name);
+      removedOffColor.add(name);
       continue;
     }
     filtered.add(Map<String, dynamic>.from(card));
@@ -66,7 +71,8 @@ ReferenceGeneratedCardsIdentityFilterResult
 
   return ReferenceGeneratedCardsIdentityFilterResult(
     cards: filtered,
-    removedOffColorNames: removed.toList()..sort(),
+    removedOffColorNames: removedOffColor.toList()..sort(),
+    removedUnresolvedNames: removedUnresolved.toList()..sort(),
   );
 }
 

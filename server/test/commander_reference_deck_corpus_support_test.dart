@@ -337,6 +337,28 @@ void main() {
       expect(prompt, isNot(contains('Core Test Card 25')));
     });
 
+    test('uses compact prompt for four-deck Feather-strength corpus', () {
+      final guidance = CommanderReferenceDeckCorpusGuidance(
+        commanderName: 'Feather, the Redeemed',
+        source: 'unit_test',
+        deckCount: 4,
+        acceptedDeckCount: 4,
+        averageRoleCounts: const {'lands': 34, 'protection': 9},
+        topCards: [
+          for (var i = 0; i < 20; i++)
+            {
+              'card_name': 'Feather Core Card $i',
+              'deck_count': 4,
+              'total_quantity': 4,
+              'role': i < 4 ? 'lands' : 'protection',
+            },
+        ],
+        themeCounts: const {'boros_targeted_spells': 4},
+      );
+
+      expect(shouldUseCompactCommanderReferenceCorpusPrompt(guidance), isTrue);
+    });
+
     test('evaluates generated deck coverage against corpus packages', () {
       const guidance = CommanderReferenceDeckCorpusGuidance(
         commanderName: 'Lorehold, the Historian',

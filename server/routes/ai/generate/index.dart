@@ -26,7 +26,7 @@ import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 
 const _aiGenerateReferencePromptPolicyVersion =
-    'ai_generate_reference_prompt_v5';
+    'ai_generate_reference_prompt_v6';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -173,17 +173,20 @@ Future<Response> onRequest(RequestContext context) async {
         cacheHit: false,
         timings: timings,
       );
-      writeAiGenerateCache(
-        cacheKey: cacheKey,
-        payload: responseBody,
-        ttl: const Duration(seconds: 120),
-      );
+      if (_aiGenerateBodyIsValidWithoutInvalidCards(mockBody)) {
+        writeAiGenerateCache(
+          cacheKey: cacheKey,
+          payload: responseBody,
+          ttl: const Duration(seconds: 120),
+        );
+      }
       return Response.json(body: responseBody);
     }
 
     if (_shouldUseReferenceGuidedDeterministicFastPath(
       format: format,
       referenceProfile: referenceProfile,
+      referenceCardStats: referenceCardStats,
       referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
     )) {
       final fastPathStopwatch = Stopwatch()..start();
@@ -209,9 +212,7 @@ Future<Response> onRequest(RequestContext context) async {
         cacheHit: false,
         timings: timings,
       );
-      final deterministicValidation =
-          deterministicBody['validation'] as Map<String, dynamic>?;
-      if (deterministicValidation?['is_valid'] == true) {
+      if (_aiGenerateBodyIsValidWithoutInvalidCards(deterministicBody)) {
         writeAiGenerateCache(
           cacheKey: cacheKey,
           payload: responseBody,
@@ -453,8 +454,6 @@ $metaContext
         warningMessage:
             'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
       );
-      final fallbackValidation =
-          fallbackBody['validation'] as Map<String, dynamic>?;
       timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
       final responseBody = withAiGenerateRuntimeMetadata(
         payload: {
@@ -466,7 +465,7 @@ $metaContext
         timings: timings,
       );
 
-      if (fallbackValidation?['is_valid'] == true) {
+      if (_aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
         writeAiGenerateCache(
           cacheKey: cacheKey,
           payload: responseBody,
@@ -514,11 +513,13 @@ $metaContext
           cacheHit: false,
           timings: timings,
         );
-        writeAiGenerateCache(
-          cacheKey: cacheKey,
-          payload: responseBody,
-          ttl: const Duration(seconds: 120),
-        );
+        if (_aiGenerateBodyIsValidWithoutInvalidCards(mockBody)) {
+          writeAiGenerateCache(
+            cacheKey: cacheKey,
+            payload: responseBody,
+            ttl: const Duration(seconds: 120),
+          );
+        }
         return Response.json(body: responseBody);
       }
 
@@ -686,12 +687,19 @@ $metaContext
       };
     }
 
-    if (!validation.isValid) {
+    if (!validation.isValid || validation.invalidCards.isNotEmpty) {
       Log.w(
-        'AI generate returned invalid deck; using deterministic fallback. '
-        'format=$format errors=${validation.errors.join(' | ')}',
+        'AI generate returned invalid or unresolved deck; using deterministic '
+        'fallback. format=$format errors=${validation.errors.join(' | ')} '
+        'invalid_cards=${validation.invalidCards.length}',
       );
 
+      final fallbackWarningCode = validation.isValid
+          ? 'ai_generate_invalid_card_fallback'
+          : 'ai_generate_validation_fallback';
+      final fallbackWarningMessage = validation.isValid
+          ? 'A geracao principal retornou cartas nao resolvidas. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.'
+          : 'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.';
       final fallbackBody = await _buildMockGenerateResponse(
         pool: pool,
         prompt: prompt,
@@ -704,16 +712,17 @@ $metaContext
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
-        warningCode: 'ai_generate_validation_fallback',
-        warningMessage:
-            'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
+        warningCode: fallbackWarningCode,
+        warningMessage: fallbackWarningMessage,
       );
 
-      final fallbackValidation =
-          fallbackBody['validation'] as Map<String, dynamic>?;
-      if (fallbackValidation?['is_valid'] == true) {
+      if (_aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
         fallbackBody['ai_generation_repaired_by_fallback'] = true;
         fallbackBody['original_validation_errors'] = validation.errors;
+        if (validation.invalidCards.isNotEmpty) {
+          fallbackBody['original_invalid_cards_count'] =
+              validation.invalidCards.length;
+        }
         timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
         final validFallbackBody = withAiGenerateRuntimeMetadata(
           payload: fallbackBody,
@@ -1046,14 +1055,50 @@ Uri _resolveInternalGenerateUrl(Request request) {
 bool _shouldUseReferenceGuidedDeterministicFastPath({
   required String format,
   required Map<String, dynamic>? referenceProfile,
+  required List<CommanderReferenceCardStat> referenceCardStats,
   required CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
 }) {
   final normalizedFormat = normalizeAiGenerateFormat(format);
   if (normalizedFormat != 'commander') return false;
   if (referenceProfile == null) return false;
-  return shouldUseCompactCommanderReferenceCorpusPrompt(
-    referenceDeckCorpusGuidance,
-  );
+  final resolvedReferenceStats =
+      referenceCardStats.where((stat) => !stat.unresolved).length;
+  return resolvedReferenceStats >= 20 &&
+      shouldUseCompactCommanderReferenceCorpusPrompt(
+        referenceDeckCorpusGuidance,
+      );
+}
+
+bool _aiGenerateBodyIsValidWithoutInvalidCards(Map<String, dynamic> body) {
+  final validation = body['validation'];
+  if (validation is! Map || validation['is_valid'] != true) return false;
+
+  final validationInvalidCards = validation['invalid_cards'];
+  if (validationInvalidCards is Iterable && validationInvalidCards.isNotEmpty) {
+    return false;
+  }
+
+  final stats = body['stats'];
+  if (stats is Map) {
+    final invalidCount = _aiGenerateIntValue(stats['invalid_cards']);
+    if (invalidCount > 0) return false;
+  }
+
+  final warnings = body['warnings'];
+  if (warnings is Map) {
+    final warningInvalidCards = warnings['invalid_cards'];
+    if (warningInvalidCards is Iterable && warningInvalidCards.isNotEmpty) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+int _aiGenerateIntValue(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.round();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
 }
 
 Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({

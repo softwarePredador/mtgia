@@ -33,6 +33,8 @@ void main() {
               'validation_ok': 5,
               'commander_preserved': 5,
               'main_quantity_99': 5,
+              'profile_used': 5,
+              'stats_used': 5,
               'corpus_used': 5,
               'fallback': 0,
               'timeout_fallback': 0,
@@ -95,9 +97,13 @@ void main() {
             'validation_ok': 5,
             'commander_preserved': 5,
             'main_quantity_99': 5,
+            'profile_used': 5,
+            'stats_used': 5,
             'corpus_used': 5,
             'fallback': 0,
             'timeout_fallback': 0,
+            'invalid_cards_total': 0,
+            'off_identity_total': 0,
           },
         },
       });
@@ -154,6 +160,50 @@ void main() {
       expect(proof, isNotNull);
       expect(proof!.available, isTrue);
       expect(proof.gatePassed, isFalse);
+    });
+
+    test('rejects non-fallback proof with invalid cards', () {
+      final proof = parseCommanderReferenceReadinessRuntimeProof({
+        'status': 'PASS_WITH_RISKS',
+        'backend_git_sha': 'def456',
+        'http_200': 5,
+        'validation_ok': 5,
+        'commander_preserved': 5,
+        'main_quantity_99': 5,
+        'profile_used': 5,
+        'stats_used': 5,
+        'corpus_used': 5,
+        'fallback_count': 0,
+        'timeout_fallback_count': 0,
+        'invalid_cards_total': 1,
+        'off_identity_total': 0,
+        'p95_ms': 1200,
+      });
+
+      expect(proof, isNotNull);
+      expect(proof!.gatePassed, isFalse);
+    });
+
+    test('rejects non-fallback proof with high p95 latency', () {
+      final proof = parseCommanderReferenceReadinessRuntimeProof({
+        'status': 'PASS_WITH_RISKS',
+        'backend_git_sha': 'def456',
+        'http_200': 5,
+        'validation_ok': 5,
+        'commander_preserved': 5,
+        'main_quantity_99': 5,
+        'profile_used': 5,
+        'stats_used': 5,
+        'corpus_used': 5,
+        'fallback_count': 0,
+        'timeout_fallback_count': 0,
+        'invalid_cards_total': 0,
+        'off_identity_total': 0,
+        'p95_ms': 23000,
+      });
+
+      expect(proof, isNotNull);
+      expect(proof!.gatePassed, isFalse);
     });
   });
 }

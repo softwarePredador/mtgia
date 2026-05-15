@@ -316,12 +316,17 @@ void main() {
 
       expect(result.removedOffColorNames, equals(['Temporal Mastery']));
       expect(
+          result.removedUnresolvedNames, equals(['Unknown Local Test Card']));
+      expect(
         result.cards.map((card) => card['name']),
         containsAll([
           "Sensei's Divining Top",
           'Swords to Plowshares',
-          'Unknown Local Test Card',
         ]),
+      );
+      expect(
+        result.cards.map((card) => card['name']),
+        isNot(contains('Unknown Local Test Card')),
       );
       expect(
         result.cards.map((card) => card['name']),
