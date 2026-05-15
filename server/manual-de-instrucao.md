@@ -16301,3 +16301,39 @@ Decisao operacional: **PASS_WITH_RISKS** para corpus prep/dry-run do Lote C e
 **APPLY_NOT_RUN** por escopo. Proxima etapa minima e revisar packages, corrigir
 a lacuna Veyran se possivel, rerodar dry-run pre-apply e so entao avaliar
 `--apply` controlado em tarefa futura.
+
+## 122. Android permissions and notification defaults - 2026-05-15
+
+Foi revisado o setup Android de permissoes e notificacoes do ManaLoom.
+
+Estado validado:
+
+- `app/android/app/src/main/AndroidManifest.xml` declara `INTERNET`,
+  `POST_NOTIFICATIONS` e `CAMERA`;
+- camera/autofocus estao como `required=false`, evitando bloqueio de instalacao
+  em devices sem camera;
+- `MainActivity.kt` cria o canal `manaloom_notifications` com
+  `IMPORTANCE_DEFAULT`;
+- `server/lib/push_notification_service.dart` envia FCM Android com
+  `channel_id=manaloom_notifications`, alinhado ao canal nativo;
+- o app registra FCM token em `/users/me/fcm-token` apos login e remove no
+  logout quando havia sessao autenticada.
+
+Hardening aplicado:
+
+- adicionado fallback Firebase no manifest para
+  `default_notification_channel_id=manaloom_notifications`;
+- adicionado `default_notification_icon=@drawable/ic_stat_manaloom_notification`;
+- adicionado `default_notification_color=@color/notification_accent`;
+- criado icone monocromatico `ic_stat_manaloom_notification.xml`, adequado para
+  status bar/notificacoes Android;
+- comentario Dart atualizado para Android 13+ (`POST_NOTIFICATIONS`), sem
+  assumir auto-grant.
+
+Validacao executada:
+
+- `cd app && flutter analyze lib/core/services/push_notification_service.dart --no-version-check`: `PASS`;
+- `cd app && flutter build apk --debug --no-version-check`: `PASS`.
+
+Risco restante: entrega push real em device/FCM permanece uma validacao runtime,
+fora deste patch de manifest/resources.

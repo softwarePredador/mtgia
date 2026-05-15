@@ -121,7 +121,7 @@ class PushNotificationService {
     }
 
     try {
-      // Solicita permissão (iOS requer, Android auto-concede)
+      // iOS always prompts; Android 13+ prompts via POST_NOTIFICATIONS.
       final settings = await _messaging!.requestPermission(
         alert: true,
         badge: true,
