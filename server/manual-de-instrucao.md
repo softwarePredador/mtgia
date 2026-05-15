@@ -3,6 +3,41 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Internal test round ready non-scanner PASS_WITH_RISKS
+
+### O Porquê
+- A rodada de teste interno precisava ser preparada com iPhone 15 Simulator como
+  runtime principal, backend publico em producao e escopo estritamente
+  non-scanner.
+- Scanner, camera, OCR, MLKit fisico, device fisico e push real deveriam ficar
+  **DEFERRED / NOT PROVEN**, sem bloquear a distribuicao controlada.
+- A consolidacao precisava evitar exposicao de secrets, tokens, JWT,
+  `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mail QA completo, senha,
+  prompt bruto ou decklist completa.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; o backend publico respondeu
+  `/health` com HTTP 200, `status=healthy`, `environment=production` e
+  `git_sha=5e7105cadb2016f4728096c6ce0ce08cfa1d0f82`.
+- Foram relidos o checklist/handoff non-scanner, o audit do app e este manual.
+- A readiness leve passou em `flutter analyze lib test integration_test` e
+  `flutter test test`.
+- Probes publicos sanitizados passaram para health, cards, sets, register QA
+  descartavel e `/ai/generate` async, registrando apenas status e contagens.
+- O runtime no iPhone 15 Simulator provou search/cards/sets, collection
+  entrypoints, generate async/save/detail/validate e Life Counter; optimize apply,
+  direct messages e parte de trades/notifications ficaram parciais ou NOT PROVEN.
+
+### Resultado
+- Status final para testers: **PASS_WITH_RISKS**, pronto para distribuicao
+  interna controlada no escopo non-scanner.
+- Documento criado:
+  `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`.
+- Riscos aceitos: persistencia de mensagem em trade, rate limit 429 em login de
+  segundo cenario de direct messages, optimize apply nao provado, latencia de IA,
+  dados QA descartaveis no backend publico e scanner/camera/OCR/push/device
+  fisico deferred.
+
 ## 2026-05-15 — ManaLoom app icon readiness PASS
 
 ### O Porquê
