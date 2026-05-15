@@ -376,6 +376,27 @@ void main() {
     expect(result['not_found_lines'], ['1 Unknown']);
   });
 
+  test('parseImportToDeckResponse maps commander status fields', () {
+    final result = parseImportToDeckResponse(
+      ApiResponse(200, {
+        'deck_id': 'deck-1',
+        'cards_imported': 1,
+        'total_cards': 2,
+        'commander_detected': true,
+        'missing_commander': false,
+        'commander_preserved': true,
+      }),
+    );
+
+    expect(result['success'], isTrue);
+    expect(result['deck_id'], 'deck-1');
+    expect(result['cards_imported'], 1);
+    expect(result['total_cards'], 2);
+    expect(result['commander_detected'], isTrue);
+    expect(result['missing_commander'], isFalse);
+    expect(result['commander_preserved'], isTrue);
+  });
+
   test('applyDeckVisibility helpers update selected deck and list', () {
     final selected = DeckDetails(
       id: 'deck-1',

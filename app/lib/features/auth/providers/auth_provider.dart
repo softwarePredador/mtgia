@@ -16,6 +16,7 @@ class AuthProvider extends ChangeNotifier {
   String? _token;
   AuthStatus _status = AuthStatus.initial;
   String? _errorMessage;
+  int _authGeneration = 0;
 
   User? get user => _user;
   String? get token => _token;
@@ -27,6 +28,7 @@ class AuthProvider extends ChangeNotifier {
 
   /// Inicializa o provider verificando se há token salvo
   Future<void> initialize() async {
+    final generation = ++_authGeneration;
     debugPrint('[🔑 Auth] initialize() → loading');
     _status = AuthStatus.loading;
     notifyListeners();
@@ -44,7 +46,8 @@ class AuthProvider extends ChangeNotifier {
         ApiClient.setToken(savedToken);
         _user = User.fromJson(jsonDecode(savedUserJson));
         debugPrint('[🔑 Auth] validando token com backend...');
-        final isValid = await _validateTokenWithBackend();
+        final isValid = await _validateTokenWithBackend(generation);
+        if (generation != _authGeneration) return;
         debugPrint('[🔑 Auth] token válido: $isValid');
         _status =
             isValid ? AuthStatus.authenticated : AuthStatus.unauthenticated;
@@ -59,6 +62,7 @@ class AuthProvider extends ChangeNotifier {
         _status = AuthStatus.unauthenticated;
       }
     } catch (e, stackTrace) {
+      if (generation != _authGeneration) return;
       debugPrint('[❌ Auth] initialize() erro: $e');
       unawaited(
         AppObservability.instance.captureProviderException(
@@ -71,12 +75,14 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.unauthenticated;
     }
 
+    if (generation != _authGeneration) return;
     debugPrint('[🔑 Auth] initialize() concluído → $_status');
     notifyListeners();
   }
 
   /// Login
   Future<bool> login(String email, String password) async {
+    final generation = ++_authGeneration;
     debugPrint(
       '[🔑 Auth] login() chamado email_domain=${_safeEmailDomain(email)}',
     );
@@ -95,17 +101,26 @@ class AuthProvider extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
+        if (generation != _authGeneration) return false;
         final data = response.data as Map<String, dynamic>;
-        _token = data['token'] as String?;
-        ApiClient.setToken(_token);
+        final nextToken = data['token'] as String?;
+        final nextUser = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint(
-          '[🔑 Auth] token recebido: ${_token != null ? "sim" : "NÃO"}',
+          '[🔑 Auth] token recebido: ${nextToken != null ? "sim" : "NÃO"}',
         );
-        _user = User.fromJson(data['user'] as Map<String, dynamic>);
-        debugPrint('[🔑 Auth] user parsed: ${_user?.username}');
+        debugPrint('[🔑 Auth] user parsed: ${nextUser.username}');
 
         // Salvar credenciais
-        await _saveCredentials();
+        if (!await _saveCredentials(
+          generation,
+          token: nextToken,
+          user: nextUser,
+        )) {
+          return false;
+        }
+        _token = nextToken;
+        _user = nextUser;
+        ApiClient.setToken(_token);
         debugPrint('[🔑 Auth] credenciais salvas');
 
         _status = AuthStatus.authenticated;
@@ -113,6 +128,7 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
+        if (generation != _authGeneration) return false;
         _errorMessage = FriendlyErrorMapper.fromApiResponse(
           response,
           context: FriendlyErrorContext.authLogin,
@@ -123,6 +139,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e, stackTrace) {
+      if (generation != _authGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.authLogin,
@@ -149,6 +166,7 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    final generation = ++_authGeneration;
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -161,17 +179,26 @@ class AuthProvider extends ChangeNotifier {
       });
 
       if (response.statusCode == 201) {
+        if (generation != _authGeneration) return false;
         final data = response.data as Map<String, dynamic>;
-        _token = data['token'] as String?;
-        _user = User.fromJson(data['user'] as Map<String, dynamic>);
+        final nextToken = data['token'] as String?;
+        final nextUser = User.fromJson(data['user'] as Map<String, dynamic>);
+        if (!await _saveCredentials(
+          generation,
+          token: nextToken,
+          user: nextUser,
+        )) {
+          return false;
+        }
+        _token = nextToken;
+        _user = nextUser;
         ApiClient.setToken(_token);
-
-        await _saveCredentials();
 
         _status = AuthStatus.authenticated;
         notifyListeners();
         return true;
       } else {
+        if (generation != _authGeneration) return false;
         _errorMessage = FriendlyErrorMapper.fromApiResponse(
           response,
           context: FriendlyErrorContext.authRegister,
@@ -181,6 +208,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e, stackTrace) {
+      if (generation != _authGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.authRegister,
@@ -202,9 +230,9 @@ class AuthProvider extends ChangeNotifier {
 
   /// Logout
   Future<void> logout() async {
+    _authGeneration++;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_data');
+    await _clearStoredCredentials(prefs);
 
     _token = null;
     _user = null;
@@ -214,11 +242,55 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Salva credenciais localmente
-  Future<void> _saveCredentials() async {
-    if (_token != null && _user != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('auth_token', _token!);
-      await prefs.setString('user_data', jsonEncode(_user!.toJson()));
+  Future<bool> _saveCredentials(
+    int generation, {
+    String? token,
+    User? user,
+  }) async {
+    final resolvedToken = token ?? _token;
+    final resolvedUser = user ?? _user;
+    if (resolvedToken == null ||
+        resolvedUser == null ||
+        generation != _authGeneration) {
+      return false;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    if (generation != _authGeneration) return false;
+
+    await prefs.setString('auth_token', resolvedToken);
+    if (generation != _authGeneration) {
+      if (prefs.getString('auth_token') == resolvedToken) {
+        await prefs.remove('auth_token');
+      }
+      return false;
+    }
+
+    final userJson = jsonEncode(resolvedUser.toJson());
+    await prefs.setString('user_data', userJson);
+    if (generation != _authGeneration) {
+      await _clearStoredCredentialsIfMatch(prefs, resolvedToken, userJson);
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _clearStoredCredentials(SharedPreferences prefs) async {
+    await prefs.remove('auth_token');
+    await prefs.remove('user_data');
+  }
+
+  Future<void> _clearStoredCredentialsIfMatch(
+    SharedPreferences prefs,
+    String token,
+    String userJson,
+  ) async {
+    if (prefs.getString('auth_token') == token) {
+      await prefs.remove('auth_token');
+    }
+    if (prefs.getString('user_data') == userJson) {
+      await prefs.remove('user_data');
     }
   }
 
@@ -227,15 +299,19 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> _validateTokenWithBackend() async {
+  Future<bool> _validateTokenWithBackend(int generation) async {
     try {
       final response = await _apiClient.get('/auth/me');
+      if (generation != _authGeneration) return false;
       if (response.statusCode != 200) return false;
       if (response.data is Map && (response.data as Map).containsKey('user')) {
         final userJson = (response.data as Map)['user'];
         if (userJson is Map<String, dynamic>) {
-          _user = User.fromJson(userJson);
-          await _saveCredentials();
+          final nextUser = User.fromJson(userJson);
+          if (!await _saveCredentials(generation, user: nextUser)) {
+            return false;
+          }
+          _user = nextUser;
         }
       }
       return true;
@@ -245,8 +321,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> refreshProfile() async {
+    final generation = _authGeneration;
     try {
       final response = await _apiClient.get('/users/me');
+      if (generation != _authGeneration) return false;
       if (response.statusCode != 200) {
         _recordProfileProviderEvent(
           'profile_refresh_http_error',
@@ -258,8 +336,9 @@ class AuthProvider extends ChangeNotifier {
       }
       final data = response.data;
       if (data is Map && data['user'] is Map<String, dynamic>) {
-        _user = User.fromJson((data['user'] as Map<String, dynamic>));
-        await _saveCredentials();
+        final nextUser = User.fromJson((data['user'] as Map<String, dynamic>));
+        if (!await _saveCredentials(generation, user: nextUser)) return false;
+        _user = nextUser;
         notifyListeners();
         return true;
       }
@@ -271,6 +350,7 @@ class AuthProvider extends ChangeNotifier {
       );
       return false;
     } catch (e, stackTrace) {
+      if (generation != _authGeneration) return false;
       unawaited(
         AppObservability.instance.captureProviderException(
           e,
@@ -290,6 +370,7 @@ class AuthProvider extends ChangeNotifier {
     String? locationCity,
     String? tradeNotes,
   }) async {
+    final generation = _authGeneration;
     _errorMessage = null;
     notifyListeners();
 
@@ -301,6 +382,7 @@ class AuthProvider extends ChangeNotifier {
         if (locationCity != null) 'location_city': locationCity,
         if (tradeNotes != null) 'trade_notes': tradeNotes,
       });
+      if (generation != _authGeneration) return false;
       if (response.statusCode != 200) {
         _recordProfileProviderEvent(
           'profile_update_http_error',
@@ -317,8 +399,9 @@ class AuthProvider extends ChangeNotifier {
       }
       final data = response.data;
       if (data is Map && data['user'] is Map<String, dynamic>) {
-        _user = User.fromJson((data['user'] as Map<String, dynamic>));
-        await _saveCredentials();
+        final nextUser = User.fromJson((data['user'] as Map<String, dynamic>));
+        if (!await _saveCredentials(generation, user: nextUser)) return false;
+        _user = nextUser;
         notifyListeners();
       } else {
         _recordProfileProviderEvent(
@@ -333,6 +416,7 @@ class AuthProvider extends ChangeNotifier {
       }
       return true;
     } catch (e, stackTrace) {
+      if (generation != _authGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.authProfile,

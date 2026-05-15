@@ -501,6 +501,51 @@ void main() {
   );
 
   test(
+    'POST /decks/:id/cards should reject adding the commander to the 99',
+    () async {
+      final token = await getAuthToken();
+      final commander = await findCardByNames(token, names: [
+        'Talrand, Sky Summoner',
+        'Krenko, Mob Boss',
+        'Lathril, Blade of the Elves',
+        'Niv-Mizzet, Parun',
+      ]);
+      if (commander == null || !isCommanderEligible(commander)) {
+        return;
+      }
+
+      final deckId = await createDeck(token, format: 'commander');
+      final commanderId = commander['id'] as String;
+      final addCommanderRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: commanderId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(addCommanderRes.statusCode, equals(200),
+          reason: addCommanderRes.body);
+
+      final addMainRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: commanderId,
+        quantity: 1,
+      );
+      expect(addMainRes.statusCode, equals(400), reason: addMainRes.body);
+
+      final deck = await fetchDeck(token, deckId);
+      final commanderCards =
+          ((deck['commander'] as List?) ?? const []).cast<Map>();
+      expect(commanderCards, hasLength(1));
+      expect(commanderCards.single['id'], commanderId);
+      expect(flattenMainBoard(deck).any((card) => card['id'] == commanderId),
+          isFalse);
+    },
+    skip: skipIntegration,
+  );
+
+  test(
     'Lorehold, the Historian picker options should all preserve commander slot',
     () async {
       final token = await getAuthToken();

@@ -225,6 +225,7 @@ class DeckRulesService {
 
     // Calcular identidade de cor combinada de todos os comandantes
     final commanderIdentitySet = <String>{};
+    final commanderNameSet = <String>{};
     for (final cmd in commanders) {
       final cmdId = cmd['card_id'] as String?;
       if (cmdId == null) continue;
@@ -238,6 +239,7 @@ class DeckRulesService {
         );
       }
 
+      commanderNameSet.add(info.name.trim().toLowerCase());
       commanderIdentitySet.addAll(_resolvedIdentity(info));
     }
 
@@ -246,6 +248,15 @@ class DeckRulesService {
       if (cardId == null) continue;
       final info = cardsData[cardId];
       if (info == null) continue;
+      final isCommander = item['is_commander'] as bool? ?? false;
+
+      if (!isCommander &&
+          commanderNameSet.contains(info.name.trim().toLowerCase())) {
+        throw DeckRulesException(
+          'Regra violada: "${info.name}" já está selecionada como comandante e não pode entrar no deck principal.',
+          cardName: info.name,
+        );
+      }
 
       for (final c in _resolvedIdentity(info)) {
         if (!commanderIdentitySet.contains(c.toUpperCase())) {
@@ -401,7 +412,7 @@ class DeckRulesService {
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -419,6 +430,7 @@ class DeckRulesService {
       final colorIdentity =
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
+      final manaCost = row[6] as String?;
 
       map[id] = _CardData(
         id: id,
@@ -427,6 +439,7 @@ class DeckRulesService {
         oracleText: oracleText,
         colors: colors,
         colorIdentity: colorIdentity,
+        manaCost: manaCost,
       );
     }
 
@@ -455,6 +468,7 @@ class DeckRulesService {
       colorIdentity: card.colorIdentity,
       colors: card.colors,
       oracleText: card.oracleText,
+      manaCost: card.manaCost,
     );
   }
 }
@@ -475,6 +489,7 @@ class _CardData {
     required this.oracleText,
     required this.colors,
     required this.colorIdentity,
+    required this.manaCost,
   });
 
   final String id;
@@ -483,4 +498,5 @@ class _CardData {
   final String? oracleText;
   final List<String> colors;
   final List<String> colorIdentity;
+  final String? manaCost;
 }

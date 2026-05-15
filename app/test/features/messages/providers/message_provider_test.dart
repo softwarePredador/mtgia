@@ -240,4 +240,69 @@ void main() {
     expect(provider.messages, hasLength(1));
     expect(provider.messages.single.id, 'message-b');
   });
+
+  test(
+    'late conversation response cannot repopulate state after clear',
+    () async {
+      final api = _SwitchingMessagesApiClient();
+      final provider = MessageProvider(apiClient: api);
+
+      final request = provider.fetchConversations();
+      await Future<void>.delayed(Duration.zero);
+
+      provider.clearAllState();
+      api.completers['/conversations?page=1&limit=20']!.complete(
+        ApiResponse(200, {
+          'data': [
+            {
+              'id': 'conversation-stale',
+              'other_user': {'id': 'user-stale', 'username': 'stale'},
+              'last_message': 'stale',
+              'unread_count': 4,
+              'created_at': '2026-05-15T14:00:00Z',
+            },
+          ],
+          'total': 1,
+        }),
+      );
+      await request;
+
+      expect(provider.conversations, isEmpty);
+      expect(provider.unreadCount, 0);
+      expect(provider.isLoading, isFalse);
+    },
+  );
+
+  test(
+    'late chat response is ignored after active conversation closes',
+    () async {
+      final api = _SwitchingMessagesApiClient();
+      final provider = MessageProvider(apiClient: api);
+
+      provider.setActiveConversation('conversation-a');
+      final request = provider.fetchMessages('conversation-a');
+      await Future<void>.delayed(Duration.zero);
+
+      provider.clearActiveConversation('conversation-a');
+      api.completers['/conversations/conversation-a/messages?page=1&limit=50']!
+          .complete(
+            ApiResponse(200, {
+              'data': [
+                {
+                  'id': 'message-stale',
+                  'sender_id': 'user-a',
+                  'message': 'stale',
+                  'created_at': '2026-05-15T14:00:00Z',
+                },
+              ],
+              'total': 1,
+            }),
+          );
+      await request;
+
+      expect(provider.activeConversationId, isNull);
+      expect(provider.messages, isEmpty);
+      expect(provider.isLoadingMessages, isFalse);
+    },
+  );
 }

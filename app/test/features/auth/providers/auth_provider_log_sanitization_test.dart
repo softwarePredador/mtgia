@@ -36,6 +36,33 @@ class _AuthTimeoutApiClient extends ApiClient {
   }
 }
 
+class _DelayedProfileApiClient extends ApiClient {
+  final profileCompleter = Completer<ApiResponse>();
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    expect(endpoint, '/auth/login');
+    return ApiResponse(200, {
+      'token': 'session-token',
+      'user': {
+        'id': 'user-1',
+        'username': 'qa_user',
+        'email': 'qa_user@example.com',
+      },
+    });
+  }
+
+  @override
+  Future<ApiResponse> get(String endpoint) {
+    expect(endpoint, '/users/me');
+    return profileCompleter.future;
+  }
+}
+
 void main() {
   test('login debug logs do not expose email, password or token', () async {
     SharedPreferences.setMockInitialValues({});
@@ -77,5 +104,36 @@ void main() {
     );
     expect(provider.errorMessage, isNot(contains('SocketException')));
     expect(provider.errorMessage, isNot(contains('RequestOptions')));
+  });
+
+  test('late profile refresh cannot repopulate user after logout', () async {
+    SharedPreferences.setMockInitialValues({});
+    final api = _DelayedProfileApiClient();
+    final provider = AuthProvider(apiClient: api);
+
+    final loggedIn = await provider.login(
+      'qa_user@example.com',
+      'Password123!',
+    );
+    expect(loggedIn, isTrue);
+
+    final refresh = provider.refreshProfile();
+    await Future<void>.delayed(Duration.zero);
+    await provider.logout();
+
+    api.profileCompleter.complete(
+      ApiResponse(200, {
+        'user': {
+          'id': 'user-stale',
+          'username': 'stale_user',
+          'email': 'stale@example.com',
+        },
+      }),
+    );
+    final refreshed = await refresh;
+
+    expect(refreshed, isFalse);
+    expect(provider.user, isNull);
+    expect(provider.status, AuthStatus.unauthenticated);
   });
 }

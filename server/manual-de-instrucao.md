@@ -3,6 +3,128 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-15 — Track B app screen/field audit PASS_WITH_RISKS
+
+### O Porquê
+- A rodada full-stack non-scanner precisava mapear tela por tela, campo por
+  campo, botões, cards, dialogs, keys, payloads consumidos/enviados, estados de
+  loading/erro/vazio/sucesso e expectativas de refresh sem reabrir scanner,
+  camera, OCR ou MLKit.
+- A auditoria precisava evitar secrets, tokens, JWT, `SENTRY_DSN`,
+  `DATABASE_URL`, `OPENAI_API_KEY`, e-mails reais, payloads sensíveis e
+  decklists completas.
+
+### O Como
+- Foram relidos os docs canônicos, o mapa de contratos e
+  `app/doc/UI_TEST_SURFACE_MAP.md`.
+- O inventário cobriu telas non-scanner em `app/lib/features`, incluindo Auth,
+  Profile, Decks, Import, Generate, Optimize, Cards/Sets, Binder, Marketplace,
+  Trades, Community, Messages, Notifications e Life Counter/Lotus.
+- O scanner apareceu apenas como árvore/caminho existente e ficou marcado como
+  **DEFERRED / NOT TOUCHED**.
+- Como correção acoplada à auditoria Commander/import, o parser app-side de
+  `/import/to-deck` passou a preservar os campos opcionais
+  `commander_detected`, `missing_commander` e `commander_preserved`.
+
+### Resultado
+- Documento criado:
+  `app/doc/FULL_APP_SCREEN_FIELD_AUDIT_2026-05-15.md`.
+- Status: **PASS_WITH_RISKS**.
+- Riscos restantes: estados de loading/erro/vazio ainda precisam de keys mais
+  consistentes em Messages, Notifications, Card Search, Binder, Marketplace e
+  Community para runtime tests não dependerem apenas de texto visível.
+
+## 2026-05-15 — Track D Commander/AI/deck rules audit PASS_WITH_RISKS
+
+### O Porquê
+- A rodada full-stack non-scanner precisava validar generate/optimize/validate,
+  import/create/edit de decks Commander, edições, quantidades, diagnostics,
+  scorecards, fallback e regras de legalidade/cor/bracket sem expor secrets,
+  tokens, JWT, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails reais,
+  payloads sensíveis, prompts ou decklists completas.
+- Scanner/camera/OCR/MLKit permaneceram **DEFERRED** e fora do escopo funcional.
+
+### O Como
+- Foram relidos os docs canônicos e auditados contratos/código de Decks, Import,
+  `/ai/generate`, `/ai/optimize`, validação MTG e Commander Reference.
+- Bugs claros corrigidos:
+  - `POST /decks/:id/cards` agora rejeita adicionar o comandante ao 99 por
+    mesmo `card_id` e por mesmo nome normalizado em outra impressão.
+  - `DeckRulesService` rejeita comandante duplicado no mainboard e usa
+    `mana_cost` como fallback de identidade de cor quando campos DB estão
+    incompletos.
+  - `POST /import/to-deck replace_all=true` preserva o comandante Commander/Brawl
+    existente quando a lista importada não traz comandante e retorna campos
+    opcionais de status de comandante.
+  - `total_cards` de `/import/to-deck` agora representa o total final persistido,
+    incluindo comandante preservado, enquanto `cards_imported` continua contando
+    apenas a lista submetida.
+
+### Resultado
+- Documento criado:
+  `server/doc/FULL_COMMANDER_AI_DECK_RULES_AUDIT_2026-05-15.md`.
+- Status: **PASS_WITH_RISKS**.
+- Riscos restantes: geração/otimização seguem experimentais, `bracket` de
+  geração ainda não é prova rígida de poder, alguns erros 500 ainda devem ser
+  sanitizados em hardening futuro e provas públicas/live devem ser repetidas no
+  backend deployado antes de declarar produção totalmente fechada.
+
+## 2026-05-15 — Track C state/realtime/cache audit PASS_WITH_RISKS
+
+### O Porquê
+- A rodada full-stack non-scanner precisava validar troca de conta, logout,
+  polling/realtime, cache e respostas atrasadas sem expor secrets, tokens, JWT,
+  `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails reais, payloads
+  sensíveis ou decklists completas.
+- Scanner/camera/OCR/MLKit permaneceram fora do escopo funcional e foram apenas
+  confirmados como **DEFERRED / NOT PROVEN**.
+
+### O Como
+- Foram auditados os providers de Auth/Profile, Decks, Binder/Marketplace,
+  Messages, Notifications, Trades, Community, Social, Cards/Sets e Market.
+- Bugs claros de stale response foram corrigidos com guards de geração nos
+  providers de Auth, Messages, Notifications e Trades, sem alterar contratos API.
+- Foram adicionados testes focados para logout/clear/active-chat/detail com
+  respostas atrasadas.
+
+### Resultado
+- Documento criado:
+  `server/doc/FULL_STATE_REALTIME_CACHE_AUDIT_2026-05-15.md`.
+- Status: **PASS_WITH_RISKS**.
+- Validação: focused `flutter test`, `dart analyze` dos arquivos alterados e
+  `./scripts/quality_gate.sh quick` passaram.
+
+## 2026-05-15 — Track A backend/data flow audit PASS_WITH_RISKS
+
+### O Porquê
+- A rodada full-stack non-scanner precisava comparar rotas reais, providers e
+  fontes de dados contra `server/doc/API_CONTRACTS_AND_DATA_MAP.md`, sem expor
+  secrets, tokens, JWT, `SENTRY_DSN`, `DATABASE_URL`, `OPENAI_API_KEY`, e-mails
+  reais, payloads sensíveis ou decklists completas.
+- Scanner/camera/OCR/MLKit permaneceram fora do escopo funcional e foram apenas
+  confirmados como **DEFERRED / NOT PROVEN**.
+
+### O Como
+- Foram relidos os docs canônicos de 2026-05-15, o mapa de contratos, o mapa de
+  superfícies UI e este manual.
+- O inventário cobriu `server/routes`, serviços relevantes em `server/lib`,
+  providers em `app/lib/features`, testes e handoffs disponíveis.
+- `rg` não estava disponível no shell; buscas equivalentes foram feitas com
+  `find`, `grep` e scripts `python3`.
+- Probes públicos sanitizados passaram para `/health`, `/health/ready`, `/sets`,
+  `/cards` e `/rules`.
+
+### Resultado
+- Documento criado:
+  `server/doc/FULL_BACKEND_DATA_FLOW_AUDIT_2026-05-15.md`.
+- Status: **PASS_WITH_RISKS**.
+- Drift principal: `/users/me/plan`, `/community/decks/following`, `/rules` e
+  parâmetros reais de `/sets` foram refletidos no mapa de contratos desta
+  rodada.
+- Bug candidate P1: `/community/decks/following` vive como caso especial em
+  `server/routes/community/decks/[id].dart`; recomendação é mover para rota
+  dedicada com teste e manter compatibilidade.
+
 ## 2026-05-15 — Docs/artifacts retention audit PASS_WITH_RISKS
 
 ### O Porquê

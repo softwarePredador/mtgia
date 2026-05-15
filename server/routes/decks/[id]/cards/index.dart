@@ -235,6 +235,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final existingIsCommander = existingResult.isNotEmpty
           ? (existingResult.first[1] as bool? ?? false)
           : false;
+      if (existingIsCommander && !isCommander) {
+        throw DeckRulesException(
+          'Regra violada: "$cardName" já está selecionada como comandante; edite o slot de comandante em vez de adicionar ao deck principal.',
+        );
+      }
 
       final nextQty = isCommander ? 1 : existingQty + quantity;
 
@@ -310,6 +315,33 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           }
         }
       }
+
+      final nextDeckRows = await session.execute(
+        Sql.named('''
+          SELECT card_id::text, quantity::int, is_commander
+          FROM deck_cards
+          WHERE deck_id = @deckId AND card_id <> @cardId
+        '''),
+        parameters: {'deckId': deckId, 'cardId': cardId},
+      );
+      final nextCards = <Map<String, dynamic>>[
+        for (final row in nextDeckRows)
+          {
+            'card_id': row[0] as String,
+            'quantity': row[1] as int,
+            'is_commander': row[2] as bool? ?? false,
+          },
+        {
+          'card_id': cardId,
+          'quantity': nextQty,
+          'is_commander': false,
+        },
+      ];
+      await DeckRulesService(session).validateAndThrow(
+        format: format,
+        cards: nextCards,
+        strict: false,
+      );
 
       // Upsert (deck_id, card_id) com a quantidade final, flag de comandante e condição
       await session.execute(

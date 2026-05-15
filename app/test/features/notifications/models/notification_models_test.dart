@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
@@ -45,6 +47,17 @@ class _FakeNotificationApiClient extends ApiClient {
       return ApiResponse(200, {'ok': true});
     }
     return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
+
+class _DelayedNotificationApiClient extends ApiClient {
+  final completers = <String, Completer<ApiResponse>>{};
+
+  @override
+  Future<ApiResponse> get(String endpoint) {
+    final completer = Completer<ApiResponse>();
+    completers[endpoint] = completer;
+    return completer.future;
   }
 }
 
@@ -202,5 +215,45 @@ void main() {
       expect(api.readAllCalled, isTrue);
       expect(provider.unreadCount, 0);
     });
+
+    test(
+      'late count and list responses are ignored after clearAllState',
+      () async {
+        final api = _DelayedNotificationApiClient();
+        final provider = NotificationProvider(apiClient: api);
+
+        final countRequest = provider.fetchUnreadCount();
+        await Future<void>.delayed(Duration.zero);
+        provider.clearAllState();
+        api.completers['/notifications/count']!.complete(
+          ApiResponse(200, {'unread': 7}),
+        );
+        await countRequest;
+
+        expect(provider.unreadCount, 0);
+
+        final listRequest = provider.fetchNotifications();
+        await Future<void>.delayed(Duration.zero);
+        provider.clearAllState();
+        api.completers['/notifications?page=1&limit=30']!.complete(
+          ApiResponse(200, {
+            'data': [
+              {
+                'id': 'notif-stale',
+                'type': 'direct_message',
+                'reference_id': 'conversation-stale',
+                'title': 'Stale',
+                'created_at': '2026-05-15T14:00:00Z',
+              },
+            ],
+            'total': 1,
+          }),
+        );
+        await listRequest;
+
+        expect(provider.notifications, isEmpty);
+        expect(provider.isLoading, isFalse);
+      },
+    );
   });
 }

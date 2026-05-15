@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/trades/providers/trade_provider.dart';
@@ -139,6 +141,17 @@ class _TradeStatusMutationApiClient extends ApiClient {
   }
 }
 
+class _DelayedTradeApiClient extends ApiClient {
+  final completers = <String, Completer<ApiResponse>>{};
+
+  @override
+  Future<ApiResponse> get(String endpoint) {
+    final completer = Completer<ApiResponse>();
+    completers[endpoint] = completer;
+    return completer.future;
+  }
+}
+
 void main() {
   test(
     'createTrade maps item availability failure to friendly message',
@@ -225,6 +238,66 @@ void main() {
       expect(api.putEndpoints, contains('/trades/trade-1/status'));
       expect(provider.selectedTrade?.status, 'shipped');
       expect(provider.trades.single.status, 'shipped');
+    },
+  );
+
+  test(
+    'late list and detail responses are ignored after clearAllState',
+    () async {
+      final api = _DelayedTradeApiClient();
+      final provider = TradeProvider(apiClient: api);
+
+      final listRequest = provider.fetchTrades();
+      await Future<void>.delayed(Duration.zero);
+      provider.clearAllState();
+      api.completers['/trades?page=1&limit=20&role=all']!.complete(
+        ApiResponse(200, {
+          'data': [
+            {
+              'id': 'trade-stale',
+              'status': 'pending',
+              'type': 'trade',
+              'sender': {'id': 'sender-stale', 'username': 'sender'},
+              'receiver': {'id': 'receiver-stale', 'username': 'receiver'},
+              'created_at': '2026-05-15T14:00:00Z',
+              'updated_at': '2026-05-15T14:00:00Z',
+            },
+          ],
+          'total': 1,
+          'page': 1,
+        }),
+      );
+      await listRequest;
+
+      expect(provider.trades, isEmpty);
+      expect(provider.totalTrades, 0);
+      expect(provider.isLoading, isFalse);
+
+      provider.setActiveTrade('trade-stale');
+      final detailRequest = provider.fetchTradeDetail('trade-stale');
+      await Future<void>.delayed(Duration.zero);
+      provider.clearAllState();
+      api.completers['/trades/trade-stale']!.complete(
+        ApiResponse(200, {
+          'id': 'trade-stale',
+          'status': 'accepted',
+          'type': 'trade',
+          'sender': {'id': 'sender-stale', 'username': 'sender'},
+          'receiver': {'id': 'receiver-stale', 'username': 'receiver'},
+          'created_at': '2026-05-15T14:00:00Z',
+          'updated_at': '2026-05-15T14:01:00Z',
+          'my_items': [],
+          'their_items': [],
+          'messages': [],
+          'status_history': [],
+        }),
+      );
+      await detailRequest;
+
+      expect(provider.selectedTrade, isNull);
+      expect(provider.chatMessages, isEmpty);
+      expect(provider.activeTradeId, isNull);
+      expect(provider.isLoading, isFalse);
     },
   );
 }

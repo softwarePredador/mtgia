@@ -476,6 +476,10 @@ class TradeProvider extends ChangeNotifier {
   // Chat messages (for polling / incremental fetch)
   List<TradeMessage> _chatMessages = [];
   int _chatTotal = 0;
+  int _stateGeneration = 0;
+  int _listFetchGeneration = 0;
+  int _detailFetchGeneration = 0;
+  int _messageFetchGeneration = 0;
 
   // ─── Getters ────────────────────────────────────────────────
   List<TradeOffer> get trades => _trades;
@@ -505,6 +509,8 @@ class TradeProvider extends ChangeNotifier {
     int page = 1,
     int limit = 20,
   }) async {
+    final generation = _stateGeneration;
+    final requestGeneration = ++_listFetchGeneration;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -516,6 +522,10 @@ class TradeProvider extends ChangeNotifier {
       }
       final query = queryParts.join('&');
       final res = await _api.get('/trades?$query');
+      if (generation != _stateGeneration ||
+          requestGeneration != _listFetchGeneration) {
+        return;
+      }
 
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
@@ -533,13 +543,20 @@ class TradeProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
+      if (generation != _stateGeneration ||
+          requestGeneration != _listFetchGeneration) {
+        return;
+      }
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.tradeList,
       );
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration &&
+          requestGeneration == _listFetchGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -550,6 +567,8 @@ class TradeProvider extends ChangeNotifier {
     int limit = 20,
   }) async {
     if (_isLoading) return;
+    final generation = _stateGeneration;
+    final requestGeneration = ++_listFetchGeneration;
     final nextPage = _currentPage + 1;
 
     _isLoading = true;
@@ -566,6 +585,10 @@ class TradeProvider extends ChangeNotifier {
       }
       final query = queryParts.join('&');
       final res = await _api.get('/trades?$query');
+      if (generation != _stateGeneration ||
+          requestGeneration != _listFetchGeneration) {
+        return;
+      }
 
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
@@ -579,10 +602,17 @@ class TradeProvider extends ChangeNotifier {
         _currentPage = data['page'] as int? ?? nextPage;
       }
     } catch (e) {
+      if (generation != _stateGeneration ||
+          requestGeneration != _listFetchGeneration) {
+        return;
+      }
       debugPrint('[TradeProvider] fetchMoreTrades error: $e');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration &&
+          requestGeneration == _listFetchGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -606,6 +636,9 @@ class TradeProvider extends ChangeNotifier {
     String tradeId, {
     bool showLoading = false,
   }) async {
+    final generation = _stateGeneration;
+    final requestGeneration = ++_detailFetchGeneration;
+    final requestActiveTradeId = _activeTradeId;
     if (showLoading) {
       _isLoading = true;
       _errorMessage = null;
@@ -616,6 +649,11 @@ class TradeProvider extends ChangeNotifier {
 
     try {
       final res = await _api.get('/trades/$tradeId');
+      if (generation != _stateGeneration ||
+          requestGeneration != _detailFetchGeneration ||
+          (requestActiveTradeId != null && _activeTradeId != tradeId)) {
+        return;
+      }
 
       if (res.statusCode == 200) {
         _selectedTrade = TradeOffer.fromDetailJson(
@@ -631,15 +669,24 @@ class TradeProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
+      if (generation != _stateGeneration ||
+          requestGeneration != _detailFetchGeneration) {
+        return;
+      }
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.tradeDetail,
       );
     } finally {
-      if (showLoading) {
+      if (generation == _stateGeneration &&
+          requestGeneration == _detailFetchGeneration &&
+          showLoading) {
         _isLoading = false;
       }
-      notifyListeners();
+      if (generation == _stateGeneration &&
+          requestGeneration == _detailFetchGeneration) {
+        notifyListeners();
+      }
     }
   }
 
@@ -661,6 +708,7 @@ class TradeProvider extends ChangeNotifier {
     double? paymentAmount,
     String? paymentMethod,
   }) async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -677,6 +725,7 @@ class TradeProvider extends ChangeNotifier {
       if (paymentMethod != null) body['payment_method'] = paymentMethod;
 
       final res = await _api.post('/trades', body);
+      if (generation != _stateGeneration) return false;
 
       if (res.statusCode == 201) {
         // Recarregar a lista
@@ -690,19 +739,23 @@ class TradeProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.tradeCreate,
       );
       return false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
   // ─── Respond (accept / decline) ─────────────────────────────
   Future<bool> respondToTrade(String tradeId, String action) async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -711,6 +764,7 @@ class TradeProvider extends ChangeNotifier {
       final res = await _api.put('/trades/$tradeId/respond', {
         'action': action,
       });
+      if (generation != _stateGeneration) return false;
 
       if (res.statusCode == 200) {
         // Recarregar detalhe
@@ -725,14 +779,17 @@ class TradeProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.tradeAction,
       );
       return false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -744,6 +801,7 @@ class TradeProvider extends ChangeNotifier {
     String? deliveryMethod,
     String? notes,
   }) async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -755,6 +813,7 @@ class TradeProvider extends ChangeNotifier {
       if (notes != null) body['notes'] = notes;
 
       final res = await _api.put('/trades/$tradeId/status', body);
+      if (generation != _stateGeneration) return false;
 
       if (res.statusCode == 200) {
         await fetchTradeDetail(tradeId);
@@ -768,14 +827,17 @@ class TradeProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.tradeAction,
       );
       return false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -785,10 +847,18 @@ class TradeProvider extends ChangeNotifier {
     int page = 1,
     int limit = 50,
   }) async {
+    final generation = _stateGeneration;
+    final requestGeneration = ++_messageFetchGeneration;
+    final requestActiveTradeId = _activeTradeId;
     try {
       final res = await _api.get(
         '/trades/$tradeId/messages?page=$page&limit=$limit',
       );
+      if (generation != _stateGeneration ||
+          requestGeneration != _messageFetchGeneration ||
+          (requestActiveTradeId != null && _activeTradeId != tradeId)) {
+        return;
+      }
 
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
@@ -814,6 +884,10 @@ class TradeProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
+      if (generation != _stateGeneration ||
+          requestGeneration != _messageFetchGeneration) {
+        return;
+      }
       debugPrint('[TradeProvider] fetchMessages error: $e');
     }
   }
@@ -825,12 +899,18 @@ class TradeProvider extends ChangeNotifier {
     String? attachmentUrl,
     String? attachmentType,
   }) async {
+    final generation = _stateGeneration;
+    final requestActiveTradeId = _activeTradeId;
     try {
       final body = <String, dynamic>{'message': message};
       if (attachmentUrl != null) body['attachment_url'] = attachmentUrl;
       if (attachmentType != null) body['attachment_type'] = attachmentType;
 
       final res = await _api.post('/trades/$tradeId/messages', body);
+      if (generation != _stateGeneration ||
+          (requestActiveTradeId != null && _activeTradeId != tradeId)) {
+        return false;
+      }
 
       if (res.statusCode == 201) {
         // Adicionar localmente para feedback imediato
@@ -848,6 +928,7 @@ class TradeProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.tradeMessage,
@@ -876,6 +957,10 @@ class TradeProvider extends ChangeNotifier {
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
+    _stateGeneration++;
+    _listFetchGeneration++;
+    _detailFetchGeneration++;
+    _messageFetchGeneration++;
     if (_trades.isEmpty &&
         _selectedTrade == null &&
         !_isLoading &&

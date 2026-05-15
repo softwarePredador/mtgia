@@ -33,6 +33,12 @@ as fontes canônicas abaixo.
 - Design Android: `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`
 - Icone do app: `docs/qa/manaloom_app_icon_contact_sheet_2026-05-15.png`
 - Auditoria de docs/artefatos: `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+- Auditoria full-stack non-scanner: `server/doc/FULL_BACKEND_DATA_FLOW_AUDIT_2026-05-15.md`,
+  `app/doc/FULL_APP_SCREEN_FIELD_AUDIT_2026-05-15.md`,
+  `server/doc/FULL_STATE_REALTIME_CACHE_AUDIT_2026-05-15.md`,
+  `server/doc/FULL_COMMANDER_AI_DECK_RULES_AUDIT_2026-05-15.md`,
+  `server/doc/FULL_PROJECT_VALIDATION_MATRIX_2026-05-15.md` e
+  `server/doc/FULL_PROJECT_AUDIT_MASTER_REPORT_2026-05-15.md`.
 
 ## Scanner
 

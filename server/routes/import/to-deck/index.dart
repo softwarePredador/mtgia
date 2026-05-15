@@ -155,6 +155,10 @@ Future<Response> _importToDeck(RequestContext context) async {
   }
 
   try {
+    var commanderPreserved = false;
+    var commanderDetected =
+        consolidatedCards.any((card) => card['is_commander'] == true);
+    var finalTotalCards = _sumQuantities(consolidatedCards);
     await pool.runTx((session) async {
       final finalCards = <Map<String, dynamic>>[];
 
@@ -177,6 +181,28 @@ Future<Response> _importToDeck(RequestContext context) async {
             'condition': row[3] as String? ?? 'NM',
           });
         }
+      } else if ((normalizedFormat == 'commander' ||
+              normalizedFormat == 'brawl') &&
+          !commanderDetected) {
+        final existingCommanderResult = await session.execute(
+          Sql.named('''
+            SELECT card_id::text, quantity::int, is_commander, condition
+            FROM deck_cards
+            WHERE deck_id = @deckId AND is_commander = TRUE
+          '''),
+          parameters: {'deckId': deckId},
+        );
+
+        for (final row in existingCommanderResult) {
+          finalCards.add({
+            'card_id': row[0] as String,
+            'quantity': row[1] as int,
+            'is_commander': row[2] as bool? ?? false,
+            'condition': row[3] as String? ?? 'NM',
+          });
+        }
+        commanderPreserved = existingCommanderResult.isNotEmpty;
+        commanderDetected = commanderPreserved;
       }
 
       final byId = <String, Map<String, dynamic>>{
@@ -205,6 +231,7 @@ Future<Response> _importToDeck(RequestContext context) async {
       }
 
       final validatedCards = byId.values.toList();
+      finalTotalCards = _sumQuantities(validatedCards);
       await DeckRulesService(session).validateAndThrow(
         format: normalizedFormat,
         cards: validatedCards,
@@ -246,9 +273,14 @@ Future<Response> _importToDeck(RequestContext context) async {
       'success': true,
       'deck_id': deckId,
       'cards_imported': _sumQuantities(consolidatedCards),
-      'total_cards': _sumQuantities(consolidatedCards),
+      'total_cards': finalTotalCards,
       'not_found_lines': notFoundCards,
       'warnings': warnings,
+      'commander_detected': commanderDetected,
+      'missing_commander':
+          (normalizedFormat == 'commander' || normalizedFormat == 'brawl') &&
+              !commanderDetected,
+      'commander_preserved': commanderPreserved,
     });
   } on DeckRulesException catch (e) {
     return badRequest(e.message);

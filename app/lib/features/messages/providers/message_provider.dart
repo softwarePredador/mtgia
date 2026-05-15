@@ -105,6 +105,9 @@ class MessageProvider extends ChangeNotifier {
   final Map<String, String> _lastMessageAtByConversation = {};
   final Set<String> _activeMessageFetches = {};
   String? _activeConversationId;
+  int _stateGeneration = 0;
+  int _conversationFetchGeneration = 0;
+  int _unreadFetchGeneration = 0;
 
   MessageProvider({ApiClient? apiClient}) : _api = apiClient ?? ApiClient();
 
@@ -176,8 +179,14 @@ class MessageProvider extends ChangeNotifier {
 
   /// Busca contagem de mensagens não-lidas (endpoint dedicado e leve)
   Future<void> fetchUnreadCount() async {
+    final generation = _stateGeneration;
+    final requestGeneration = ++_unreadFetchGeneration;
     try {
       final resp = await _api.get('/conversations/unread-count');
+      if (generation != _stateGeneration ||
+          requestGeneration != _unreadFetchGeneration) {
+        return;
+      }
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final count = data['unread'] as int? ?? 0;
@@ -193,12 +202,18 @@ class MessageProvider extends ChangeNotifier {
 
   /// Busca lista de conversas do usuário
   Future<void> fetchConversations({int page = 1, int limit = 20}) async {
+    final generation = _stateGeneration;
+    final requestGeneration = ++_conversationFetchGeneration;
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
       final resp = await _api.get('/conversations?page=$page&limit=$limit');
+      if (generation != _stateGeneration ||
+          requestGeneration != _conversationFetchGeneration) {
+        return;
+      }
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
@@ -211,11 +226,18 @@ class MessageProvider extends ChangeNotifier {
         _unreadCount = _conversations.fold(0, (sum, c) => sum + c.unreadCount);
       }
     } catch (e) {
+      if (generation != _stateGeneration ||
+          requestGeneration != _conversationFetchGeneration) {
+        return;
+      }
       _error = '$e';
       debugPrint('[MessageProvider] fetchConversations error: $e');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration &&
+          requestGeneration == _conversationFetchGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -263,6 +285,8 @@ class MessageProvider extends ChangeNotifier {
     if (_activeMessageFetches.contains(conversationId)) {
       return;
     }
+    final generation = _stateGeneration;
+    final requestActiveConversationId = _activeConversationId;
     _activeMessageFetches.add(conversationId);
 
     var didChange = false;
@@ -280,7 +304,10 @@ class MessageProvider extends ChangeNotifier {
               : '/conversations/$conversationId/messages?page=$page&limit=$limit';
 
       final resp = await _api.get(endpoint);
-      if (_activeConversationId != null &&
+      if (generation != _stateGeneration) {
+        return;
+      }
+      if (requestActiveConversationId != null &&
           _activeConversationId != conversationId) {
         return;
       }
@@ -317,11 +344,16 @@ class MessageProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
+      if (generation != _stateGeneration) {
+        return;
+      }
       _error = '$e';
       didChange = true;
       debugPrint('[MessageProvider] fetchMessages error: $e');
     } finally {
-      if (!incremental) {
+      if (generation != _stateGeneration) {
+        _activeMessageFetches.remove(conversationId);
+      } else if (!incremental) {
         _isLoadingMessages = false;
         _activeMessageFetches.remove(conversationId);
         notifyListeners();
@@ -336,6 +368,7 @@ class MessageProvider extends ChangeNotifier {
 
   /// Envia mensagem em uma conversa
   Future<bool> sendMessage(String conversationId, String message) async {
+    final generation = _stateGeneration;
     _isSending = true;
     notifyListeners();
 
@@ -343,6 +376,7 @@ class MessageProvider extends ChangeNotifier {
       final resp = await _api.post('/conversations/$conversationId/messages', {
         'message': message,
       });
+      if (generation != _stateGeneration) return false;
       if (resp.statusCode == 201 && resp.data is Map) {
         final dm = DirectMessage.fromJson(resp.data as Map<String, dynamic>);
         _messages.insert(0, dm); // Mensagens em DESC, nova no topo
@@ -353,16 +387,20 @@ class MessageProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('[MessageProvider] sendMessage error: $e');
     } finally {
-      _isSending = false;
-      notifyListeners();
+      if (generation == _stateGeneration) {
+        _isSending = false;
+        notifyListeners();
+      }
     }
     return false;
   }
 
   /// Marca mensagens da conversa como lidas
   Future<void> markAsRead(String conversationId) async {
+    final generation = _stateGeneration;
     try {
       final resp = await _api.put('/conversations/$conversationId/read', {});
+      if (generation != _stateGeneration) return;
       if (resp.statusCode < 200 || resp.statusCode >= 300) {
         return;
       }
@@ -408,6 +446,9 @@ class MessageProvider extends ChangeNotifier {
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
+    _stateGeneration++;
+    _conversationFetchGeneration++;
+    _unreadFetchGeneration++;
     if (_conversations.isEmpty &&
         _messages.isEmpty &&
         !_isLoading &&

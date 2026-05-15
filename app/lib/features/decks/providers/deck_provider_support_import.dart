@@ -117,6 +117,9 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
       'total_cards': data['total_cards'],
       'not_found_lines': data['not_found_lines'] ?? const <String>[],
       'warnings': data['warnings'] ?? const <String>[],
+      'commander_detected': data['commander_detected'] == true,
+      'missing_commander': data['missing_commander'] == true,
+      'commander_preserved': data['commander_preserved'] == true,
     };
   }
 

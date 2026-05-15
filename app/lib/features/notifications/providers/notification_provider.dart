@@ -58,6 +58,9 @@ class NotificationProvider extends ChangeNotifier {
   bool _hasLoadedNotifications = false;
 
   Timer? _pollTimer;
+  int _stateGeneration = 0;
+  int _unreadFetchGeneration = 0;
+  int _notificationFetchGeneration = 0;
 
   /// Inicia polling de contagem de não-lidas a cada 30s
   void startPolling() {
@@ -82,8 +85,14 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Busca contagem de não-lidas (badge)
   Future<void> fetchUnreadCount() async {
+    final generation = _stateGeneration;
+    final requestGeneration = ++_unreadFetchGeneration;
     try {
       final resp = await _api.get('/notifications/count');
+      if (generation != _stateGeneration ||
+          requestGeneration != _unreadFetchGeneration) {
+        return;
+      }
       if (resp.statusCode == 200 && resp.data is Map) {
         final newCount = (resp.data as Map)['unread'] as int? ?? 0;
         if (newCount != _unreadCount) {
@@ -111,6 +120,8 @@ class NotificationProvider extends ChangeNotifier {
   }) async {
     if (_isLoading) return;
 
+    final generation = _stateGeneration;
+    final requestGeneration = ++_notificationFetchGeneration;
     _isLoading = true;
     notifyListeners();
 
@@ -118,6 +129,10 @@ class NotificationProvider extends ChangeNotifier {
       final query =
           'page=$page&limit=$limit${unreadOnly ? '&unread_only=true' : ''}';
       final resp = await _api.get('/notifications?$query');
+      if (generation != _stateGeneration ||
+          requestGeneration != _notificationFetchGeneration) {
+        return;
+      }
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
@@ -128,6 +143,10 @@ class NotificationProvider extends ChangeNotifier {
         _hasLoadedNotifications = true;
       }
     } catch (e, stackTrace) {
+      if (generation != _stateGeneration ||
+          requestGeneration != _notificationFetchGeneration) {
+        return;
+      }
       debugPrint('[NotificationProvider] fetchNotifications error: $e');
       _captureProviderException(
         e,
@@ -136,8 +155,11 @@ class NotificationProvider extends ChangeNotifier {
         extras: {'page': page, 'limit': limit, 'unread_only': unreadOnly},
       );
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (generation == _stateGeneration &&
+          requestGeneration == _notificationFetchGeneration) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -162,8 +184,10 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Marca uma notificação como lida
   Future<void> markAsRead(String notificationId) async {
+    final generation = _stateGeneration;
     try {
       final resp = await _api.put('/notifications/$notificationId/read', {});
+      if (generation != _stateGeneration) return;
       if (resp.statusCode < 200 || resp.statusCode >= 300) {
         return;
       }
@@ -198,6 +222,7 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Marca todas como lidas
   Future<void> markAllAsRead() async {
+    final generation = _stateGeneration;
     try {
       final hasUnreadLocal = _notifications.any((n) => !n.isRead);
       if (!hasUnreadLocal && _unreadCount == 0) {
@@ -205,6 +230,7 @@ class NotificationProvider extends ChangeNotifier {
       }
 
       final resp = await _api.put('/notifications/read-all', {});
+      if (generation != _stateGeneration) return;
       if (resp.statusCode < 200 || resp.statusCode >= 300) {
         return;
       }
@@ -245,6 +271,9 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
+    _stateGeneration++;
+    _unreadFetchGeneration++;
+    _notificationFetchGeneration++;
     if (_notifications.isEmpty &&
         _unreadCount == 0 &&
         !_isLoading &&

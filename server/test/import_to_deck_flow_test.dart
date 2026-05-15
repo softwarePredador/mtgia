@@ -282,5 +282,51 @@ void main() {
       },
       skip: skipIntegration,
     );
+
+    test(
+      'replace_all preserves existing Commander when imported list has no commander',
+      () async {
+        final commander = await findCardByNames([
+          'Talrand, Sky Summoner',
+          'Krenko, Mob Boss',
+          'Lathril, Blade of the Elves',
+          'Niv-Mizzet, Parun',
+        ]);
+        if (commander == null || !isCommanderEligible(commander)) {
+          return;
+        }
+
+        final deckId = await createDeck(
+          format: 'commander',
+          cards: [
+            {
+              'card_id': commander['id'],
+              'quantity': 1,
+              'is_commander': true,
+            },
+          ],
+        );
+        createdDeckIds.add(deckId);
+
+        final response = await http.post(
+          Uri.parse('$baseUrl/import/to-deck'),
+          headers: authHeaders(withContentType: true),
+          body: jsonEncode({
+            'deck_id': deckId,
+            'list': '1 Sol Ring',
+            'replace_all': true,
+          }),
+        );
+
+        expect(response.statusCode, equals(200), reason: response.body);
+        final body = decodeJson(response);
+        expect(body['commander_detected'], isTrue, reason: response.body);
+        expect(body['missing_commander'], isFalse, reason: response.body);
+        expect(body['commander_preserved'], isTrue, reason: response.body);
+        expect(body['cards_imported'], equals(1), reason: response.body);
+        expect(body['total_cards'], equals(2), reason: response.body);
+      },
+      skip: skipIntegration,
+    );
   });
 }
