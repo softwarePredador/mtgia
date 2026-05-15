@@ -4,11 +4,19 @@
 
 **PASS_WITH_RISKS backend / PASS_WITH_MINOR_HARNESS_FIX app runtime.**
 
-O Lote 1 promove somente `Miirym, Sentinel Wyrm` para
+Atualizacao Feather timeout fix: `Feather, the Redeemed` foi reprocessada em
+commit `73d9f886c4959ff0ab9f60ec075ba787ffbe5144` e passou no public proof
+5/5 com `invalid_cards_total=0`, `off_identity_total=0`,
+`timeout_fallback_count=0`, p95 `1243ms` e scorecard 100
+`ready_for_mini_batch`. Relatorio dedicado:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_FEATHER_TIMEOUT_FIX_2026-05-14.md`.
+
+Na rodada original, o Lote 1 promoveu somente `Miirym, Sentinel Wyrm` para
 `ready_for_mini_batch`. `Feather, the Redeemed` passou nos gates de
-HTTP/validacao/comandante/main/profile/card_stats/corpus, mas nao foi promovido:
-na revalidacao do deploy atual o summary ficou `status=BLOCKED` por
-`invalid_cards_total=5` e p95 alto, apesar do scorecard atual retornar 100.
+HTTP/validacao/comandante/main/profile/card_stats/corpus, mas nao foi promovida
+naquele momento: a revalidacao do deploy retornou `status=BLOCKED` por
+`invalid_cards_total=5` e p95 alto. A atualizacao dedicada acima corrige essa
+pendencia e promove Feather.
 
 O harness app Sprint 4 Lote 1 foi corrigido e rerodado para
 `Miirym, Sentinel Wyrm`; o runtime real ficou
@@ -37,7 +45,7 @@ do repositorio e foram removidos ao final.
 
 | Commander | Decisao | Motivo |
 | --- | --- | --- |
-| `Feather, the Redeemed` | Elegivel para pipeline, nao promovido | Profile/card_stats resolvidos e corpus 4/4 limpo; bloqueado depois por timeout fallback publico. |
+| `Feather, the Redeemed` | Promovido no fix dedicado | Profile/card_stats resolvidos, corpus 4/4 limpo, public proof PASS 5/5 apos fix de timeout/invalid e scorecard 100. |
 | `Miirym, Sentinel Wyrm` | Promovido | Profile/card_stats resolvidos, corpus 5/5 limpo, public proof PASS e scorecard 100. |
 | `Ghave, Guru of Spores` | Bloqueado | Corpus dry-run 5/5, mas sem profile/card_stats. |
 | `Jodah, the Unifier` | Bloqueado | Corpus dry-run 5/5, mas apenas profile legado `edhrec` e sem card_stats. |
@@ -62,7 +70,7 @@ prompt bruto ou decklist completa.
 
 | Commander | Public proof | Runtime gates | p50/p95 | Resultado |
 | --- | --- | --- | --- | --- |
-| `Feather, the Redeemed` | BLOCKED | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; `invalid_cards_total=5`, off_identity=0, timeout=0 | 855ms / 25659ms na revalidacao atual | Nao promover; public proof gate falhou apesar de scorecard atual 100 |
+| `Feather, the Redeemed` | PASS apos fix dedicado | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; invalid=0, off_identity=0, timeout=0 | 828ms / 1243ms | Promover; score 100 `ready_for_mini_batch` |
 | `Miirym, Sentinel Wyrm` | PASS | HTTP 200, validation, commander, main 99, profile/stats/corpus 5/5; invalid=0, off_identity=0, timeout=0 | 849ms / 942ms | Promover; score 100 `ready_for_mini_batch` |
 
 Observacao: Feather teve a rodada anterior preservada em
@@ -75,7 +83,7 @@ Observacao: Feather teve a rodada anterior preservada em
 
 | Commander | Score | Status | Promoted |
 | --- | ---: | --- | --- |
-| `Feather, the Redeemed` | 100 | `ready_for_mini_batch` no scorecard atual, mas public proof `status=BLOCKED` por invalid_cards_total>0 | false |
+| `Feather, the Redeemed` | 100 | `ready_for_mini_batch` apos public proof fix dedicado | true |
 | `Miirym, Sentinel Wyrm` | 100 | `ready_for_mini_batch`, blockers/warnings vazios | true |
 
 ## Track E - runtime app iPhone 15 Simulator

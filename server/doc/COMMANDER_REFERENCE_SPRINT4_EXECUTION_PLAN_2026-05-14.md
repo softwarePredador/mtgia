@@ -4,21 +4,31 @@
 
 **PASS_WITH_RISKS.**
 
+Atualizacao Feather timeout fix: `Feather, the Redeemed` foi promovida em
+rodada dedicada apos commit `73d9f886c4959ff0ab9f60ec075ba787ffbe5144`.
+Public proof 5/5: HTTP 200, validacao, comandante, main 99,
+profile/stats/corpus usados, `invalid_cards_total=0`,
+`off_identity_total=0`, `timeout_fallback_count=0`, p95 `1243ms`. Scorecard:
+100, `ready_for_mini_batch`, sem blockers/warnings. Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_FEATHER_TIMEOUT_FIX_2026-05-14.md`.
+
 Sprint 4 comecou como expansao controlada e documental: os subagentes paralelos
 produziram cobertura, auditoria de pipeline, dry-run de corpus, data quality e
-plano runtime sem alterar contratos app-facing. No Lote 1, apenas candidatos
-sem blockers entraram em apply/public proof, e somente `Miirym, Sentinel Wyrm`
-foi promovido.
+plano runtime sem alterar contratos app-facing. No Lote 1 original, apenas
+candidatos sem blockers entraram em apply/public proof, e somente
+`Miirym, Sentinel Wyrm` foi promovido; a rodada dedicada posterior promoveu
+`Feather, the Redeemed`.
 
-Nao houve mudanca de codigo. Propostas de codigo foram documentadas e nao
-aplicadas.
+Na execucao inicial nao houve mudanca de codigo. No fix dedicado de Feather,
+houve ajuste interno no backend sem mudanca de contrato app-facing.
 
-Atualizacao Lote 1: `Miirym, Sentinel Wyrm` foi promovido para
+Atualizacao Lote 1 original: `Miirym, Sentinel Wyrm` foi promovido para
 `ready_for_mini_batch` apos apply/idempotencia, public proof 5/5 e scorecard
 100. `Feather, the Redeemed` nao foi promovido porque a revalidacao do deploy
 atual bloqueou o public proof por `invalid_cards_total=5` e p95 alto, alem do
-historico anterior de `timeout_fallback_count=5`. `Ghave, Guru of Spores` e
-`Jodah, the Unifier` permanecem bloqueados por profile/card_stats ausentes ou
+historico anterior de `timeout_fallback_count=5`; o fix dedicado posterior
+zerou invalid/off-identity/timeout e promoveu Feather. `Ghave, Guru of Spores`
+e `Jodah, the Unifier` permanecem bloqueados por profile/card_stats ausentes ou
 legados.
 
 ## Contexto operacional

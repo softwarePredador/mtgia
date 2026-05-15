@@ -3,6 +3,41 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-14 — Commander Reference Feather timeout fix PASS
+
+### O Porquê
+- `Feather, the Redeemed` tinha profile/card_stats/corpus prontos e score alto,
+  mas ficou bloqueada por historico de `timeout_fallback_count=5` e, depois, por
+  public proof com `invalid_cards_total=5` e p95 alto.
+- O scorecard tambem podia promover uma prova normal com invalids/p95 alto
+  quando `fallback_count=0`, criando divergencia entre public proof e readiness.
+
+### O Como
+- A readiness runtime proof passou a exigir, para qualquer modo, profile/stats/
+  corpus 5/5, `invalid_cards_total=0`, `off_identity_total=0`,
+  `timeout_fallback_count=0` e p95 <= 5000ms.
+- O `/ai/generate` reference-guided foi versionado para
+  `ai_generate_reference_prompt_v6`, usa fast path deterministico com corpus
+  4 decks/core 20 e >=20 card_stats resolvidos, remove cartas nao resolvidas
+  antes da validacao/refill e nao cacheia respostas com invalids.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi consultado e ficou sem
+  alteracao porque nao houve mudanca de rota, payload, response shape,
+  diagnostics app-facing, data source ou consumidor mobile.
+- Scanner, camera e OCR permaneceram fora do escopo. Artifacts persistidos
+  registram apenas summaries sanitizados.
+
+### Resultado
+- Commit de codigo provado no backend publico:
+  `73d9f886c4959ff0ab9f60ec075ba787ffbe5144`.
+- Public proof Feather 5/5: HTTP 200, validation, commander, main 99,
+  profile/stats/corpus usados, `invalid_cards_total=0`,
+  `off_identity_total=0`, `timeout_fallback_count=0`, p50 `828ms`, p95
+  `1243ms`.
+- Readiness: `score=100`, `status=ready_for_mini_batch`,
+  `expansion_ready=true`, blockers/warnings vazios.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_FEATHER_TIMEOUT_FIX_2026-05-14.md`.
+
 ## 2026-05-14 — Commander Reference Sprint 4 Lote 1 app runtime PASS_WITH_MINOR_HARNESS_FIX
 
 ### O Porquê
