@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/endpoint_cache.dart';
+import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
@@ -79,11 +80,29 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
+    Map<String, dynamic>? referenceProfile;
+    if (commanders.isNotEmpty) {
+      try {
+        referenceProfile = await loadUsableCommanderReferenceProfile(
+          pool: pool,
+          commanderName: commanders.first,
+        );
+      } catch (error) {
+        Log.w(
+          '[ARCHETYPES] commander_reference_profile unavailable '
+          'commander="${commanders.first}" error=$error',
+        );
+      }
+    }
+
     final cacheKey = _buildArchetypesCacheKey(
       deckId: deckId,
       deckName: deckName,
       deckFormat: deckFormat,
       cardFingerprintParts: cardFingerprintParts,
+      referenceProfileVersion: referenceProfile == null
+          ? null
+          : commanderReferenceProfileCacheVersion(referenceProfile),
     );
     final cachedPayload = EndpointCache.instance.get(cacheKey);
     if (cachedPayload != null) {
@@ -104,6 +123,36 @@ Future<Response> onRequest(RequestContext context) async {
         'total_ms=${totalStopwatch.elapsedMilliseconds} '
         'deck_lookup_ms=$deckLookupMs cards_lookup_ms=$cardsLookupMs '
         'openai_call_ms=0 response_parse_ms=0',
+      );
+      return Response.json(body: responseBody);
+    }
+
+    if (referenceProfile != null) {
+      final responseBody = _buildCommanderReferenceArchetypesPayload(
+        referenceProfile,
+      );
+      totalStopwatch.stop();
+      _annotateArchetypesPayload(
+        responseBody,
+        cacheKey: cacheKey,
+        cacheHit: false,
+        totalMs: totalStopwatch.elapsedMilliseconds,
+        deckLookupMs: deckLookupMs,
+        cardsLookupMs: cardsLookupMs,
+        openAiCallMs: 0,
+        responseParseMs: 0,
+      );
+      EndpointCache.instance.set(
+        cacheKey,
+        _cloneArchetypesPayload(responseBody),
+        ttl: const Duration(minutes: 10),
+      );
+      Log.i(
+        '[ARCHETYPES_TIMING] cache=miss key=$cacheKey '
+        'total_ms=${totalStopwatch.elapsedMilliseconds} '
+        'deck_lookup_ms=$deckLookupMs cards_lookup_ms=$cardsLookupMs '
+        'openai_call_ms=0 response_parse_ms=0 '
+        'source=commander_reference_profile',
       );
       return Response.json(body: responseBody);
     }
@@ -346,15 +395,119 @@ String _buildArchetypesCacheKey({
   required String deckName,
   required String deckFormat,
   required List<String> cardFingerprintParts,
+  String? referenceProfileVersion,
 }) {
   final normalizedParts = [...cardFingerprintParts]..sort();
   final base = [
     deckId.trim().toLowerCase(),
     deckName.trim().toLowerCase(),
     deckFormat.trim().toLowerCase(),
+    if (referenceProfileVersion != null &&
+        referenceProfileVersion.trim().isNotEmpty)
+      'profile:${referenceProfileVersion.trim().toLowerCase()}',
     ...normalizedParts,
   ].join('::');
   return 'archetypes:v1:${_stableHash(base)}';
+}
+
+Map<String, dynamic> _buildCommanderReferenceArchetypesPayload(
+  Map<String, dynamic> profile,
+) {
+  final commander = profile['commander']?.toString().trim() ?? '';
+  final themes = (profile['themes'] as List?)
+          ?.whereType<Map>()
+          .map((theme) => theme.cast<String, dynamic>())
+          .toList() ??
+      const <Map<String, dynamic>>[];
+
+  final options = _referenceOptionsForCommander(commander, themes);
+  return {
+    'options': options,
+    'source': 'commander_reference_profile',
+    'commander_reference': {
+      'commander': commander,
+      'profile_confidence': normalizeCommanderReferenceConfidence(
+        profile['confidence'],
+      ),
+      'profile_version': commanderReferenceProfileCacheVersion(profile),
+      'source_count': profile['source_count'] ?? 0,
+      'theme_count': themes.length,
+    },
+  };
+}
+
+List<Map<String, dynamic>> _referenceOptionsForCommander(
+  String commander,
+  List<Map<String, dynamic>> themes,
+) {
+  if (isLoreholdCommanderReferenceCandidate(commander)) {
+    return const [
+      {
+        'id': 'boros-miracle-big-spells',
+        'title': 'Miracle Big Spells',
+        'description':
+            'Maximiza o desconto de miracle do Lorehold com mágicas grandes, setup de topo e ramp Boros. O plano vence convertendo spells de alto impacto em bursts de dano, tokens e vantagem.',
+        'difficulty': 'Média',
+      },
+      {
+        'id': 'topdeck-discard-value',
+        'title': 'Topdeck / Discard Value',
+        'description':
+            'Prioriza controlar o topo, comprar no turno dos oponentes e transformar descarte em valor. É a linha mais fiel ao comandante quando o deck precisa de consistência antes de mais finalizadores.',
+        'difficulty': 'Média',
+      },
+      {
+        'id': 'spellslinger-burn-finishers',
+        'title': 'Spellslinger Burn Finishers',
+        'description':
+            'Usa cópias, payoffs de mágicas e finalizadores vermelhos/brancos para fechar a mesa sem virar aggro genérico. Mantém proteção, remoções e compra suficientes para não depender só do combate.',
+        'difficulty': 'Alta',
+      },
+    ];
+  }
+
+  final mapped = <Map<String, dynamic>>[];
+  for (final theme in themes.take(3)) {
+    final rawName = theme['name']?.toString().trim() ?? '';
+    if (rawName.isEmpty) continue;
+    final title = _humanizeReferenceTheme(rawName);
+    mapped.add({
+      'id': rawName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-'),
+      'title': title,
+      'description': theme['notes']?.toString().trim().isNotEmpty == true
+          ? theme['notes'].toString().trim()
+          : 'Linha sugerida pelo perfil de referência do comandante, mantendo identidade de cor e validação antes do preview.',
+      'difficulty': _difficultyForTheme(theme['confidence']),
+    });
+  }
+
+  if (mapped.isNotEmpty) return mapped;
+  return const [
+    {
+      'id': 'commander-reference',
+      'title': 'Plano do comandante',
+      'description':
+          'Otimiza preservando o plano principal do comandante e validando identidade de cor, bracket e segurança antes do preview.',
+      'difficulty': 'Média',
+    },
+  ];
+}
+
+String _humanizeReferenceTheme(String value) {
+  return value
+      .split(RegExp(r'[_\\-\\s]+'))
+      .where((part) => part.trim().isNotEmpty)
+      .map((part) {
+    final lower = part.toLowerCase();
+    return lower.substring(0, 1).toUpperCase() + lower.substring(1);
+  }).join(' ');
+}
+
+String _difficultyForTheme(Object? confidence) {
+  final rank = commanderReferenceConfidenceRank(confidence);
+  if (rank >= commanderReferenceConfidenceRank('high')) return 'Média';
+  if (rank >= commanderReferenceConfidenceRank('medium')) return 'Média';
+  return 'Alta';
 }
 
 String _stableHash(String value) {

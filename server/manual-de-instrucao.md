@@ -16340,3 +16340,35 @@ Validacao executada:
 
 Risco restante: entrega push real em device/FCM permanece uma validacao runtime,
 fora deste patch de manifest/resources.
+
+## 123. Commander Reference archetype options - 2026-05-15
+
+Problema observado em teste manual: ao otimizar um deck de
+`Lorehold, the Historian`, o sheet inicial de estrategias podia sugerir linhas
+genericas/divergentes como `Aggro` ou `Artifact`, embora a geracao final do deck
+seguisse corretamente o profile/corpus de Lorehold.
+
+Causa: `POST /ai/archetypes` analisava o deck via OpenAI/mock generico e nao
+consultava `commander_reference_profiles`. Assim, a primeira decisao visual do
+usuario podia divergir do guidance usado por `/ai/generate`.
+
+Patch aplicado:
+
+- `server/routes/ai/archetypes/index.dart` agora carrega
+  `loadUsableCommanderReferenceProfile(...)` quando o deck tem comandante;
+- se houver profile usavel, retorna opcoes deterministicas com
+  `source=commander_reference_profile` antes de chamar OpenAI;
+- para Lorehold, as opcoes passam a ser:
+  - `Miracle Big Spells`;
+  - `Topdeck / Discard Value`;
+  - `Spellslinger Burn Finishers`;
+- a chave de cache inclui a versao do reference profile;
+- resposta continua backward-compatible: `options[]` permanece o contrato
+  principal e `commander_reference` e opcional.
+
+Validacao:
+
+- `cd server && dart analyze routes/ai/archetypes/index.dart lib/ai/commander_reference_profile_support.dart`: `PASS`;
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_archetypes_flow_test.dart --tags live -r expanded`: `PASS`;
+- probe local de Lorehold retornou `source=commander_reference_profile`,
+  profile `high` e titulos corretos, sem `Aggro`/`Artifact`.

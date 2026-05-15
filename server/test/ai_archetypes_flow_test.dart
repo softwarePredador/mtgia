@@ -233,4 +233,51 @@ void main() {
     },
     skip: skipIntegration,
   );
+
+  test(
+    '/ai/archetypes uses commander reference options for Lorehold',
+    () async {
+      final lorehold = await findCardByName('Lorehold, the Historian');
+      final deckId = await createDeck(
+        format: 'commander',
+        cards: [
+          {
+            'card_id': lorehold['id'],
+            'quantity': 1,
+            'is_commander': true,
+          },
+        ],
+      );
+      createdDeckIds.add(deckId);
+
+      final response = await postJson('/ai/archetypes', {'deck_id': deckId});
+      expect(response.statusCode, equals(200), reason: response.body);
+
+      final body = decodeJson(response);
+      expect(body['source'], equals('commander_reference_profile'));
+      expect(body['commander_reference'], isA<Map>());
+      expect(
+        ((body['commander_reference'] as Map)['commander'] as String)
+            .toLowerCase(),
+        equals('lorehold, the historian'),
+      );
+
+      final options =
+          (body['options'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      expect(options, hasLength(greaterThanOrEqualTo(3)));
+
+      final titles = options
+          .map((option) => option['title']?.toString().toLowerCase() ?? '')
+          .toList();
+      expect(titles, contains('miracle big spells'));
+      expect(titles, contains('topdeck / discard value'));
+      expect(titles, contains('spellslinger burn finishers'));
+      expect(
+        titles.any((title) => title.contains('artifact') || title == 'aggro'),
+        isFalse,
+        reason: response.body,
+      );
+    },
+    skip: skipIntegration,
+  );
 }
