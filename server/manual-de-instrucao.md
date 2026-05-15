@@ -12855,6 +12855,9 @@ Nova estratégia de resolução do `baseUrl`:
   - Android emulator: `http://10.0.2.2:8080`
   - iOS simulator/macOS/web: `http://localhost:8080`
 3. Em release/profile, mantém domínio de produção.
+  - Fallback atual: `https://evolution-cartinhas.8ktevp.easypanel.host`
+  - `--dart-define=API_BASE_URL=...` continua tendo prioridade para staging,
+    testes locais ou troca emergencial de backend.
 
 ### 55.3 Benefício
 

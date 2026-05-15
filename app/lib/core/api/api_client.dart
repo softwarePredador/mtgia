@@ -42,7 +42,8 @@ class ApiClient {
   );
   static const String _debugAndroidEmulatorUrl = 'http://10.0.2.2:8080';
   static const String _debugLocalhostUrl = 'http://127.0.0.1:8080';
-  static const String _releaseFallbackUrl = '';
+  static const String _releaseFallbackUrl =
+      'https://evolution-cartinhas.8ktevp.easypanel.host';
 
   // ──────────────────────────────────────────
   // Cache do token em memória (evita SharedPreferences a cada request)
