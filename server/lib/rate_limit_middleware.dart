@@ -117,6 +117,40 @@ class RateLimiter {
   }
 }
 
+Map<String, dynamic> buildRateLimitResponseBody({
+  required String error,
+  required String message,
+  required int retryAfterSeconds,
+  required String bucket,
+  String? backend,
+}) {
+  return {
+    'error': error,
+    'message': message,
+    'retry_after': retryAfterSeconds,
+    'retry_after_seconds': retryAfterSeconds,
+    'retry_after_ms': retryAfterSeconds * 1000,
+    'rate_limit_bucket': bucket,
+    'rate_limit_scope': 'client',
+    if (backend != null) 'rate_limit_backend': backend,
+  };
+}
+
+Map<String, String> buildRateLimitHeaders({
+  required int maxRequests,
+  required int windowSeconds,
+  required int retryAfterSeconds,
+  int remaining = 0,
+}) {
+  return {
+    'Retry-After': retryAfterSeconds.toString(),
+    'X-RateLimit-Limit': maxRequests.toString(),
+    'X-RateLimit-Remaining': remaining.toString(),
+    'X-RateLimit-Window': windowSeconds.toString(),
+    'X-RateLimit-Reset': retryAfterSeconds.toString(),
+  };
+}
+
 /// Instâncias globais de rate limiters por tipo de endpoint
 final _authRateLimiter = RateLimiter(
   maxRequests: 5,
@@ -201,17 +235,18 @@ Middleware rateLimitMiddleware({
       if (!limiter.isAllowed(clientId)) {
         return Response.json(
           statusCode: HttpStatus.tooManyRequests, // 429
-          body: {
-            'error': 'Too Many Requests',
-            'message':
+          body: buildRateLimitResponseBody(
+            error: 'Too Many Requests',
+            message:
                 'Você excedeu o limite de $maxRequests requisições em $windowSeconds segundos.',
-            'retry_after': windowSeconds,
-          },
-          headers: {
-            'Retry-After': windowSeconds.toString(),
-            'X-RateLimit-Limit': maxRequests.toString(),
-            'X-RateLimit-Window': windowSeconds.toString(),
-          },
+            retryAfterSeconds: windowSeconds,
+            bucket: 'generic',
+          ),
+          headers: buildRateLimitHeaders(
+            maxRequests: maxRequests,
+            windowSeconds: windowSeconds,
+            retryAfterSeconds: windowSeconds,
+          ),
         );
       }
 
@@ -257,13 +292,18 @@ Middleware authRateLimit() {
       if (distributedAllowed == false) {
         return Response.json(
           statusCode: HttpStatus.tooManyRequests,
-          body: {
-            'error': 'Too Many Login Attempts',
-            'message': 'Você fez muitas tentativas de login. Aguarde 1 minuto.',
-            'retry_after': 60,
-            'rate_limit_backend': 'distributed',
-          },
-          headers: {'Retry-After': '60'},
+          body: buildRateLimitResponseBody(
+            error: 'Too Many Login Attempts',
+            message: 'Você fez muitas tentativas de login. Aguarde 1 minuto.',
+            retryAfterSeconds: 60,
+            bucket: 'auth',
+            backend: 'distributed',
+          ),
+          headers: buildRateLimitHeaders(
+            maxRequests: limiter.maxRequests,
+            windowSeconds: limiter.windowSeconds,
+            retryAfterSeconds: 60,
+          ),
         );
       }
 
@@ -274,13 +314,18 @@ Middleware authRateLimit() {
       if (!limiter.isAllowed(clientId)) {
         return Response.json(
           statusCode: HttpStatus.tooManyRequests,
-          body: {
-            'error': 'Too Many Login Attempts',
-            'message': 'Você fez muitas tentativas de login. Aguarde 1 minuto.',
-            'retry_after': 60,
-            'rate_limit_backend': 'in_memory_fallback',
-          },
-          headers: {'Retry-After': '60'},
+          body: buildRateLimitResponseBody(
+            error: 'Too Many Login Attempts',
+            message: 'Você fez muitas tentativas de login. Aguarde 1 minuto.',
+            retryAfterSeconds: 60,
+            bucket: 'auth',
+            backend: 'in_memory_fallback',
+          ),
+          headers: buildRateLimitHeaders(
+            maxRequests: limiter.maxRequests,
+            windowSeconds: limiter.windowSeconds,
+            retryAfterSeconds: 60,
+          ),
         );
       }
 
@@ -311,14 +356,19 @@ Middleware aiRateLimit() {
       if (distributedAllowed == false) {
         return Response.json(
           statusCode: HttpStatus.tooManyRequests,
-          body: {
-            'error': 'Too Many AI Requests',
-            'message':
+          body: buildRateLimitResponseBody(
+            error: 'Too Many AI Requests',
+            message:
                 'Você atingiu o limite de requisições de IA. Aguarde 1 minuto.',
-            'retry_after': 60,
-            'rate_limit_backend': 'distributed',
-          },
-          headers: {'Retry-After': '60'},
+            retryAfterSeconds: 60,
+            bucket: 'ai',
+            backend: 'distributed',
+          ),
+          headers: buildRateLimitHeaders(
+            maxRequests: limiter.maxRequests,
+            windowSeconds: limiter.windowSeconds,
+            retryAfterSeconds: 60,
+          ),
         );
       }
 
@@ -329,14 +379,19 @@ Middleware aiRateLimit() {
       if (!limiter.isAllowed(clientId)) {
         return Response.json(
           statusCode: HttpStatus.tooManyRequests,
-          body: {
-            'error': 'Too Many AI Requests',
-            'message':
+          body: buildRateLimitResponseBody(
+            error: 'Too Many AI Requests',
+            message:
                 'Você atingiu o limite de requisições de IA. Aguarde 1 minuto.',
-            'retry_after': 60,
-            'rate_limit_backend': 'in_memory_fallback',
-          },
-          headers: {'Retry-After': '60'},
+            retryAfterSeconds: 60,
+            bucket: 'ai',
+            backend: 'in_memory_fallback',
+          ),
+          headers: buildRateLimitHeaders(
+            maxRequests: limiter.maxRequests,
+            windowSeconds: limiter.windowSeconds,
+            retryAfterSeconds: 60,
+          ),
         );
       }
 

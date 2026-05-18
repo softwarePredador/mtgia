@@ -3278,6 +3278,85 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
   };
 }
 
+Map<String, dynamic> buildAggressiveOptimizeUtilitySignal({
+  required int requestedSwaps,
+  required int returnedSwaps,
+  required Map<String, int> rejectionBuckets,
+  required bool lowCandidateCoverage,
+}) {
+  final safeRequested = requestedSwaps <= 0 ? 1 : requestedSwaps;
+  final returnedRatio = returnedSwaps / safeRequested;
+
+  String status;
+  String userMessageKey;
+  if (returnedSwaps > 0) {
+    status = returnedRatio >= 0.5 ? 'actionable' : 'partial_actionable';
+    userMessageKey = 'aggressive_swaps_available';
+  } else if (lowCandidateCoverage) {
+    status = 'low_coverage';
+    userMessageKey = 'aggressive_low_candidate_coverage';
+  } else if (rejectionBuckets.isNotEmpty) {
+    status = 'quality_rejected';
+    userMessageKey = 'aggressive_quality_gate_blocked';
+  } else {
+    status = 'no_safe_swaps';
+    userMessageKey = 'aggressive_no_safe_swaps';
+  }
+
+  return {
+    'status': status,
+    'requested_swaps': safeRequested,
+    'returned_swaps': returnedSwaps,
+    'returned_ratio': double.parse(returnedRatio.toStringAsFixed(3)),
+    'has_actionable_swaps': returnedSwaps > 0,
+    'needs_product_explanation': returnedSwaps == 0,
+    'user_message_key': userMessageKey,
+  };
+}
+
+Map<String, dynamic> summarizeAggressiveOptimizeUtilitySamples({
+  required List<Map<String, dynamic>> samples,
+  int minApplicableRatePercent = 70,
+}) {
+  final eligible = samples
+      .where((sample) => sample['eligible'] != false)
+      .toList(growable: false);
+  final total = eligible.length;
+  final applicable = eligible.where((sample) {
+    final swaps = sample['returned_swaps'];
+    if (swaps is int) return swaps > 0;
+    final diagnostics = sample['aggressive_candidate_quality'];
+    if (diagnostics is Map) {
+      final returned = diagnostics['returned_swaps'];
+      return returned is int && returned > 0;
+    }
+    final rawSwaps = sample['swaps'];
+    return rawSwaps is List && rawSwaps.isNotEmpty;
+  }).length;
+  final noOp = total - applicable;
+  final rate = total == 0 ? 0 : ((applicable * 100) / total).round();
+
+  final latencies = eligible
+      .map((sample) => sample['latency_ms'])
+      .whereType<int>()
+      .toList()
+    ..sort();
+  final p95 = latencies.isEmpty
+      ? null
+      : latencies[((latencies.length * 0.95).ceil() - 1)
+          .clamp(0, latencies.length - 1)];
+
+  return {
+    'eligible_samples': total,
+    'applicable_samples': applicable,
+    'no_op_samples': noOp,
+    'applicable_rate_percent': rate,
+    'min_applicable_rate_percent': minApplicableRatePercent,
+    'passes_utility_gate': total > 0 && rate >= minApplicableRatePercent,
+    if (p95 != null) 'p95_ms': p95,
+  };
+}
+
 String resolveOptimizeArchetype({
   required String requestedArchetype,
   required String? detectedArchetype,

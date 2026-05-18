@@ -16703,3 +16703,24 @@ Validacao:
 - `cd app && flutter test test/features/community/providers/community_provider_test.dart test/features/binder/providers/binder_provider_test.dart test/features/messages/providers/message_provider_test.dart --no-version-check`: `PASS`;
 - `cd app && flutter analyze lib test --no-version-check`: `PASS`;
 - `cd app && flutter test test --no-version-check`: `PASS`.
+
+## 130. Optimize aggressive utility + rate limit tuning - 2026-05-18
+
+Patch aplicado para fechar riscos aceitos do release interno non-scanner:
+
+- `intensity=aggressive` em `/ai/optimize` agora expõe
+  `optimize_diagnostics.aggressive_candidate_quality.utility_signal` como campo
+  aditivo, distinguindo sugestões aplicáveis, partial actionable, quality gate
+  blocked, baixa cobertura e no-op seguro;
+- `server/lib/ai/optimize_runtime_support.dart` ganhou scorecard
+  `summarizeAggressiveOptimizeUtilitySamples`, com gate recomendado de `>=70%`
+  de amostras elegíveis retornando ao menos uma sugestão aplicável antes de
+  produção ampla;
+- respostas `429` passaram a carregar `retry_after_seconds`, `retry_after_ms`,
+  `rate_limit_bucket`, `rate_limit_scope`, `rate_limit_backend` quando houver e
+  headers `Retry-After`/`X-RateLimit-*` consistentes;
+- relatório: `server/doc/RELATORIO_OPTIMIZE_AGGRESSIVE_UTILITY_RATE_LIMIT_2026-05-18.md`.
+
+Regra para agentes: não tratar no-op agressivo como bug automaticamente. Usar
+`utility_signal.status` e scorecard por amostra para decidir entre ajustar pool,
+explicar quality gate ao usuário ou aceitar ausência de troca segura.

@@ -690,6 +690,9 @@ Future<Response> onRequest(RequestContext context) async {
                   as int?) ??
               intensity.targetMax;
       final returned = returnedSwaps ?? 0;
+      final lowCoverage =
+          aggressiveCandidateQualityDiagnostics['low_candidate_coverage'] ??
+              false;
       return {
         'requested_target_swaps': requested,
         'removal_candidates':
@@ -703,15 +706,19 @@ Future<Response> onRequest(RequestContext context) async {
         'returned_swaps': returned,
         'safety_reduced_scope':
             returned < requested || aggressiveRejectionReasonBuckets.isNotEmpty,
-        'low_candidate_coverage':
-            aggressiveCandidateQualityDiagnostics['low_candidate_coverage'] ??
-                false,
+        'low_candidate_coverage': lowCoverage,
         'ranked_before_quality_gate': aggressiveCandidateQualityDiagnostics[
                 'ranked_before_quality_gate'] ??
             false,
         'candidate_sources':
             aggressiveCandidateQualityDiagnostics['candidate_sources'] ??
                 const <String>[],
+        'utility_signal': optimize_support.buildAggressiveOptimizeUtilitySignal(
+          requestedSwaps: requested,
+          returnedSwaps: returned,
+          rejectionBuckets: aggressiveRejectionReasonBuckets,
+          lowCandidateCoverage: lowCoverage == true,
+        ),
       };
     }
 

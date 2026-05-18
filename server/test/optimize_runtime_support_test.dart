@@ -138,6 +138,53 @@ void main() {
     });
   });
 
+  group('aggressive optimize utility', () {
+    test('classifies actionable and quality rejected outcomes', () {
+      final actionable = buildAggressiveOptimizeUtilitySignal(
+        requestedSwaps: 10,
+        returnedSwaps: 6,
+        rejectionBuckets: const {},
+        lowCandidateCoverage: false,
+      );
+      final rejected = buildAggressiveOptimizeUtilitySignal(
+        requestedSwaps: 10,
+        returnedSwaps: 0,
+        rejectionBuckets: const {'color_identity': 4},
+        lowCandidateCoverage: false,
+      );
+
+      expect(actionable['status'], equals('actionable'));
+      expect(actionable['has_actionable_swaps'], isTrue);
+      expect(actionable['needs_product_explanation'], isFalse);
+      expect(rejected['status'], equals('quality_rejected'));
+      expect(rejected['has_actionable_swaps'], isFalse);
+      expect(rejected['needs_product_explanation'], isTrue);
+      expect(
+        rejected['user_message_key'],
+        equals('aggressive_quality_gate_blocked'),
+      );
+    });
+
+    test('summarizes fixture success rate for release utility gate', () {
+      final summary = summarizeAggressiveOptimizeUtilitySamples(
+        samples: const [
+          {'eligible': true, 'returned_swaps': 4, 'latency_ms': 900},
+          {'eligible': true, 'returned_swaps': 2, 'latency_ms': 1100},
+          {'eligible': true, 'returned_swaps': 0, 'latency_ms': 1200},
+          {'eligible': true, 'returned_swaps': 3, 'latency_ms': 1300},
+          {'eligible': false, 'returned_swaps': 0, 'latency_ms': 500},
+        ],
+        minApplicableRatePercent: 70,
+      );
+
+      expect(summary['eligible_samples'], equals(4));
+      expect(summary['applicable_samples'], equals(3));
+      expect(summary['applicable_rate_percent'], equals(75));
+      expect(summary['passes_utility_gate'], isTrue);
+      expect(summary['p95_ms'], equals(1300));
+    });
+  });
+
   group('landFixesCommanderColors', () {
     test('accepts five-color fixing lands', () {
       expect(

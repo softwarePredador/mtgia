@@ -70,5 +70,36 @@ void main() {
 
       expect(limiter.isAllowed('client-d'), isTrue);
     });
+
+    test('builds structured 429 body with retry metadata', () {
+      final body = buildRateLimitResponseBody(
+        error: 'Too Many AI Requests',
+        message: 'Aguarde 1 minuto.',
+        retryAfterSeconds: 60,
+        bucket: 'ai',
+        backend: 'in_memory_fallback',
+      );
+
+      expect(body['retry_after'], equals(60));
+      expect(body['retry_after_seconds'], equals(60));
+      expect(body['retry_after_ms'], equals(60000));
+      expect(body['rate_limit_bucket'], equals('ai'));
+      expect(body['rate_limit_scope'], equals('client'));
+      expect(body['rate_limit_backend'], equals('in_memory_fallback'));
+    });
+
+    test('builds 429 headers with remaining zero and reset', () {
+      final headers = buildRateLimitHeaders(
+        maxRequests: 10,
+        windowSeconds: 60,
+        retryAfterSeconds: 45,
+      );
+
+      expect(headers['Retry-After'], equals('45'));
+      expect(headers['X-RateLimit-Limit'], equals('10'));
+      expect(headers['X-RateLimit-Remaining'], equals('0'));
+      expect(headers['X-RateLimit-Window'], equals('60'));
+      expect(headers['X-RateLimit-Reset'], equals('45'));
+    });
   });
 }
