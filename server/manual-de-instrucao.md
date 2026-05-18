@@ -41,6 +41,10 @@
 - Sync `pt` aplicado nesta rodada com `38594` aliases sincronizados; demais
   idiomas devem ser aplicados em janelas separadas para respeitar rate limit da
   Scryfall.
+- Runtime no iPhone 15 Simulator contra backend publico no SHA `94e5ded`
+  confirmou `found_count=2`, `localized_matches_count=2`,
+  `commander_detected=true`, `missing_commander=false` e limpeza do deck
+  temporario.
 - Relatorio: `server/doc/RELATORIO_LOCALIZED_IMPORT_NAMES_2026-05-18.md`.
 
 ## 2026-05-15 — Internal release runtime QA non-scanner PASS_WITH_RISKS

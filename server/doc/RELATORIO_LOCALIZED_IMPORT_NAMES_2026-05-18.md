@@ -43,6 +43,34 @@ Resultado sanitizado:
 }
 ```
 
+## Prova runtime app
+
+iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` contra backend
+publico `https://evolution-cartinhas.8ktevp.easypanel.host` em
+`git_sha=94e5ded5990f9b57bf9810a30ec7975e8a1c6877`:
+
+```text
+flutter test integration_test/localized_import_runtime_test.dart \
+  -d F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true
+```
+
+Resultado sanitizado:
+
+```json
+{
+  "found_count": 2,
+  "localized_matches_count": 2,
+  "commander_detected": true,
+  "missing_commander": false
+}
+```
+
+O deck temporario criado pelo harness foi removido ao final.
+
 ## Sync aplicado
 
 Foi aplicado o sync de portugues:
