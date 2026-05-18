@@ -3,6 +3,7 @@ import '../color_identity.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import 'aggressive_candidate_meta_signal_support.dart';
+import 'functional_card_tags.dart';
 import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
 
@@ -3241,27 +3242,35 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
       .where((candidate) =>
           (candidate['remove']?.toString().trim().isNotEmpty ?? false) &&
           (candidate['add']?.toString().trim().isNotEmpty ?? false))
-      .map((candidate) => {
-            'out': candidate['remove'],
-            'in': candidate['add'],
-            if (candidate['reason'] != null) 'reason': candidate['reason'],
-            'role': candidate['remove_role'] ?? candidate['role'] ?? 'utility',
-            'function':
-                candidate['remove_role'] ?? candidate['role'] ?? 'utility',
-            'priority': intensity?.selected == 'light' ? 'Medium' : 'High',
-            'impact': intensity?.selected == 'aggressive'
-                ? 'maior escopo de melhoria preservando gates'
-                : 'melhoria segura de consistencia',
-            'risk': intensity?.selected == 'aggressive' ? 'medium' : 'low',
-            if (candidate['candidate_quality_score'] != null)
-              'candidate_quality_score': candidate['candidate_quality_score'],
-            if (candidate['candidate_quality_signal'] != null)
-              'candidate_quality_signal': candidate['candidate_quality_signal'],
-            if (candidate['candidate_quality_sources'] != null)
-              'candidate_quality_sources':
-                  candidate['candidate_quality_sources'],
-          })
-      .toList();
+      .map((candidate) {
+    final sources = candidate['candidate_quality_sources'] is List
+        ? (candidate['candidate_quality_sources'] as List)
+            .map((source) => source.toString())
+            .toSet()
+        : const <String>{};
+    final semanticNote = sources.contains(semanticLayerV2Source)
+        ? ' Sinal semântico v2 em shadow mode ajudou o ranking; gates legados continuam valendo.'
+        : '';
+    return {
+      'out': candidate['remove'],
+      'in': candidate['add'],
+      'reason':
+          '${candidate['reason'] ?? 'swap deterministico por funcao'}$semanticNote',
+      'role': candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+      'function': candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+      'priority': intensity?.selected == 'light' ? 'Medium' : 'High',
+      'impact': intensity?.selected == 'aggressive'
+          ? 'maior escopo de melhoria preservando gates'
+          : 'melhoria segura de consistencia',
+      'risk': intensity?.selected == 'aggressive' ? 'medium' : 'low',
+      if (candidate['candidate_quality_score'] != null)
+        'candidate_quality_score': candidate['candidate_quality_score'],
+      if (candidate['candidate_quality_signal'] != null)
+        'candidate_quality_signal': candidate['candidate_quality_signal'],
+      if (candidate['candidate_quality_sources'] != null)
+        'candidate_quality_sources': candidate['candidate_quality_sources'],
+    };
+  }).toList();
 
   return {
     'mode': 'optimize',

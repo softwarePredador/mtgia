@@ -1,6 +1,8 @@
 import 'optimization_functional_roles.dart';
 
 const functionalCardTagsSchemaVersion = 'functional_card_tags_v1_2026_05_18';
+const semanticLayerV2SchemaVersion = 'semantic_layer_v2_2026_05_18';
+const semanticLayerV2Source = 'deterministic_semantic_v2';
 
 const functionalCardTagsV1 = <String>{
   'land',
@@ -26,6 +28,11 @@ const functionalCardTagsV1 = <String>{
   'blink',
   'big_spell',
   'exile_value',
+  'combo_piece',
+  'wincon',
+  'engine',
+  'payoff',
+  'enabler',
 };
 
 const deckAnalysisMainFunctionalBuckets = <String>{
@@ -43,6 +50,10 @@ const deckAnalysisMainFunctionalBuckets = <String>{
   'lifegain',
   'drain',
   'spellslinger',
+  'wincon',
+  'engine',
+  'payoff',
+  'enabler',
 };
 
 class FunctionalCardTag {
@@ -67,6 +78,7 @@ class FunctionalDeckSummary {
   const FunctionalDeckSummary({
     required this.counts,
     required this.samples,
+    required this.sampleDetails,
     required this.cardRows,
     required this.cardCopies,
     required this.taggedRows,
@@ -81,6 +93,7 @@ class FunctionalDeckSummary {
 
   final Map<String, int> counts;
   final Map<String, List<String>> samples;
+  final Map<String, List<Map<String, dynamic>>> sampleDetails;
   final int cardRows;
   final int cardCopies;
   final int taggedRows;
@@ -96,8 +109,10 @@ class FunctionalDeckSummary {
 
   Map<String, dynamic> toJson() => {
         'schema_version': functionalCardTagsSchemaVersion,
+        'semantic_schema_version': semanticLayerV2SchemaVersion,
         'counts': counts,
         'samples': samples,
+        'sample_details': sampleDetails,
         'coverage': {
           'card_rows': cardRows,
           'card_copies': cardCopies,
@@ -113,6 +128,61 @@ class FunctionalDeckSummary {
           'heuristic_rows': heuristicRows,
           'heuristic_copies': heuristicCopies,
         },
+      };
+}
+
+class SemanticCardAnalysisV2 {
+  const SemanticCardAnalysisV2({
+    required this.tags,
+    required this.speed,
+    required this.manaEfficiency,
+    required this.cardAdvantageType,
+    required this.interactionScope,
+    required this.comboPiece,
+    required this.wincon,
+    required this.engine,
+    required this.payoff,
+    required this.enabler,
+    required this.protectionType,
+    required this.recursionType,
+    required this.roleConfidence,
+    required this.explanationReason,
+    this.source = semanticLayerV2Source,
+  });
+
+  final List<FunctionalCardTag> tags;
+  final String speed;
+  final String manaEfficiency;
+  final String cardAdvantageType;
+  final String interactionScope;
+  final bool comboPiece;
+  final bool wincon;
+  final bool engine;
+  final bool payoff;
+  final bool enabler;
+  final String protectionType;
+  final String recursionType;
+  final double roleConfidence;
+  final String explanationReason;
+  final String source;
+
+  Map<String, dynamic> toJson() => {
+        'schema_version': semanticLayerV2SchemaVersion,
+        'source': source,
+        'tags': tags.map((tag) => tag.toJson()).toList(growable: false),
+        'speed': speed,
+        'mana_efficiency': manaEfficiency,
+        'card_advantage_type': cardAdvantageType,
+        'interaction_scope': interactionScope,
+        'combo_piece': comboPiece,
+        'wincon': wincon,
+        'engine': engine,
+        'payoff': payoff,
+        'enabler': enabler,
+        'protection_type': protectionType,
+        'recursion_type': recursionType,
+        'role_confidence': double.parse(roleConfidence.toStringAsFixed(3)),
+        'explanation_reason': explanationReason,
       };
 }
 
@@ -246,6 +316,26 @@ List<FunctionalCardTag> inferFunctionalCardTags({
     add('exile_value', 0.84, 'exile_play_or_cast_value_text');
   }
 
+  if (_looksLikeWincon(oracle, normalizedName)) {
+    add('wincon', 0.78, 'explicit_win_or_finisher_text');
+  }
+
+  if (_looksLikeComboPiece(oracle, normalizedName)) {
+    add('combo_piece', 0.72, 'combo_pattern_text_or_known_name');
+  }
+
+  if (_looksLikeEngine(oracle)) {
+    add('engine', 0.7, 'repeatable_value_engine_text');
+  }
+
+  if (_looksLikePayoff(oracle, normalizedName)) {
+    add('payoff', 0.72, 'payoff_trigger_or_scaling_text');
+  }
+
+  if (_looksLikeEnabler(oracle, normalizedName)) {
+    add('enabler', 0.7, 'plan_enabler_or_setup_text');
+  }
+
   final ordered = tags.values.toList()
     ..sort((a, b) {
       final byConfidence = b.confidence.compareTo(a.confidence);
@@ -253,6 +343,58 @@ List<FunctionalCardTag> inferFunctionalCardTags({
       return a.tag.compareTo(b.tag);
     });
   return ordered;
+}
+
+SemanticCardAnalysisV2 inferSemanticCardAnalysisV2({
+  required String name,
+  required String typeLine,
+  required String oracleText,
+  String? manaCost,
+  Object? cmc,
+}) {
+  final normalizedName = normalizeFunctionalCardName(name);
+  final type = typeLine.toLowerCase();
+  final oracle = oracleText.toLowerCase();
+  final estimatedCmc = _safeDouble(cmc, _estimateManaValue(manaCost ?? ''));
+  final tags = inferFunctionalCardTags(
+    name: name,
+    typeLine: typeLine,
+    oracleText: oracleText,
+    manaCost: manaCost,
+    cmc: cmc,
+  );
+  final tagNames = tags.map((tag) => tag.tag).toSet();
+  final roleConfidence = tags.isEmpty
+      ? 0.0
+      : tags
+          .map((tag) => tag.confidence)
+          .reduce((value, element) => value > element ? value : element);
+
+  return SemanticCardAnalysisV2(
+    tags: tags,
+    speed: _inferSpeed(type, oracle),
+    manaEfficiency: _inferManaEfficiency(estimatedCmc),
+    cardAdvantageType: _inferCardAdvantageType(tagNames, oracle),
+    interactionScope: _inferInteractionScope(tagNames, oracle),
+    comboPiece: tagNames.contains('combo_piece'),
+    wincon: tagNames.contains('wincon'),
+    engine: tagNames.contains('engine'),
+    payoff: tagNames.contains('payoff') ||
+        tagNames.contains('aristocrat_payoff') ||
+        tagNames.contains('spellslinger'),
+    enabler: tagNames.contains('enabler') ||
+        tagNames.contains('ramp') ||
+        tagNames.contains('loot') ||
+        tagNames.contains('tutor'),
+    protectionType: _inferProtectionType(
+      oracle: oracle,
+      normalizedName: normalizedName,
+      tagNames: tagNames,
+    ),
+    recursionType: _inferRecursionType(oracle, tagNames),
+    roleConfidence: roleConfidence,
+    explanationReason: _buildSemanticExplanationReason(tagNames),
+  );
 }
 
 FunctionalDeckSummary summarizeFunctionalTagsForDeck(
@@ -266,6 +408,9 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
   };
   final samples = <String, List<String>>{
     for (final tag in countedTags) tag: <String>[],
+  };
+  final sampleDetails = <String, List<Map<String, dynamic>>>{
+    for (final tag in countedTags) tag: <Map<String, dynamic>>[],
   };
 
   var cardRows = 0;
@@ -289,20 +434,36 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
       countedTags: countedTags,
       minConfidence: minConfidence,
     );
-    final tags = persistedTags.isNotEmpty
+    final semanticV2 = _readPersistedSemanticV2(card['semantic_tags_v2']) ??
+        inferSemanticCardAnalysisV2(
+          name: name,
+          typeLine: (card['type_line'] as String?) ?? '',
+          oracleText: (card['oracle_text'] as String?) ?? '',
+          manaCost: card['mana_cost'] as String?,
+          cmc: card['cmc'],
+        );
+    final inferredTags = inferFunctionalCardTags(
+      name: name,
+      typeLine: (card['type_line'] as String?) ?? '',
+      oracleText: (card['oracle_text'] as String?) ?? '',
+      manaCost: card['mana_cost'] as String?,
+      cmc: card['cmc'],
+    )
+        .where((tag) =>
+            countedTags.contains(tag.tag) && tag.confidence >= minConfidence)
+        .toList(growable: false);
+    final tagObjects = persistedTags.isNotEmpty
         ? persistedTags
-        : inferFunctionalCardTags(
-            name: name,
-            typeLine: (card['type_line'] as String?) ?? '',
-            oracleText: (card['oracle_text'] as String?) ?? '',
-            manaCost: card['mana_cost'] as String?,
-            cmc: card['cmc'],
-          )
-            .where((tag) =>
-                countedTags.contains(tag.tag) &&
-                tag.confidence >= minConfidence)
-            .map((tag) => tag.tag)
-            .toSet();
+            .map((tag) => FunctionalCardTag(
+                  tag: tag,
+                  confidence: semanticV2.roleConfidence > 0
+                      ? semanticV2.roleConfidence
+                      : 0.75,
+                  evidence: semanticV2.explanationReason,
+                ))
+            .toList(growable: false)
+        : inferredTags;
+    final tags = tagObjects.map((tag) => tag.tag).toSet();
 
     if (persistedTags.isNotEmpty) {
       persistedRows++;
@@ -328,6 +489,23 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
           !tagSamples.contains(name)) {
         tagSamples.add(name);
         samples[tag] = tagSamples;
+        final details = sampleDetails[tag] ?? <Map<String, dynamic>>[];
+        if (details.length < sampleLimit) {
+          final tagObject = tagObjects.firstWhere(
+            (candidate) => candidate.tag == tag,
+            orElse: () => FunctionalCardTag(
+              tag: tag,
+              confidence: semanticV2.roleConfidence,
+              evidence: semanticV2.explanationReason,
+            ),
+          );
+          details.add(_buildFunctionalSampleDetail(
+            name: name,
+            tag: tagObject,
+            semantic: semanticV2,
+          ));
+          sampleDetails[tag] = details;
+        }
       }
     }
   }
@@ -335,6 +513,7 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
   return FunctionalDeckSummary(
     counts: counts,
     samples: samples,
+    sampleDetails: sampleDetails,
     cardRows: cardRows,
     cardCopies: cardCopies,
     taggedRows: taggedRows,
@@ -367,6 +546,90 @@ Set<String> _readPersistedFunctionalTags(
     if (confidence >= minConfidence) tags.add(tag);
   }
   return tags;
+}
+
+SemanticCardAnalysisV2? _readPersistedSemanticV2(Object? value) {
+  if (value is! Iterable) return null;
+  Map? selected;
+  for (final raw in value) {
+    if (raw is! Map) continue;
+    final confidence = _safeDouble(raw['role_confidence'], 0);
+    final currentConfidence =
+        selected == null ? -1.0 : _safeDouble(selected['role_confidence'], 0);
+    if (confidence > currentConfidence) selected = raw;
+  }
+  if (selected == null) return null;
+
+  final rawTags = selected['tags'];
+  final tags = <FunctionalCardTag>[];
+  if (rawTags is Iterable) {
+    for (final rawTag in rawTags) {
+      if (rawTag is String && functionalCardTagsV1.contains(rawTag)) {
+        tags.add(FunctionalCardTag(
+          tag: rawTag,
+          confidence: _safeDouble(selected['role_confidence'], 0.75),
+          evidence: selected['explanation_reason']?.toString() ??
+              'persisted_semantic_v2',
+        ));
+      } else if (rawTag is Map) {
+        final tag = rawTag['tag']?.toString().trim();
+        if (tag == null || !functionalCardTagsV1.contains(tag)) continue;
+        tags.add(FunctionalCardTag(
+          tag: tag,
+          confidence: _safeDouble(rawTag['confidence'],
+              _safeDouble(selected['role_confidence'], 0.75)),
+          evidence: rawTag['evidence']?.toString() ??
+              selected['explanation_reason']?.toString() ??
+              'persisted_semantic_v2',
+        ));
+      }
+    }
+  }
+
+  return SemanticCardAnalysisV2(
+    tags: tags,
+    speed: selected['speed']?.toString() ?? 'unknown',
+    manaEfficiency: selected['mana_efficiency']?.toString() ?? 'unknown',
+    cardAdvantageType: selected['card_advantage_type']?.toString() ?? 'none',
+    interactionScope: selected['interaction_scope']?.toString() ?? 'none',
+    comboPiece: selected['combo_piece'] == true,
+    wincon: selected['wincon'] == true,
+    engine: selected['engine'] == true,
+    payoff: selected['payoff'] == true,
+    enabler: selected['enabler'] == true,
+    protectionType: selected['protection_type']?.toString() ?? 'none',
+    recursionType: selected['recursion_type']?.toString() ?? 'none',
+    roleConfidence: _safeDouble(selected['role_confidence'], 0),
+    explanationReason:
+        selected['explanation_reason']?.toString() ?? 'persisted_semantic_v2',
+    source: selected['source']?.toString() ?? semanticLayerV2Source,
+  );
+}
+
+Map<String, dynamic> _buildFunctionalSampleDetail({
+  required String name,
+  required FunctionalCardTag tag,
+  required SemanticCardAnalysisV2 semantic,
+}) {
+  return {
+    'name': name,
+    'tag': tag.tag,
+    'role': tag.tag,
+    'reason': _friendlyFunctionalTagReason(tag.tag, semantic),
+    'evidence': tag.evidence,
+    'confidence': double.parse(tag.confidence.toStringAsFixed(3)),
+    'semantic_schema_version': semanticLayerV2SchemaVersion,
+    'speed': semantic.speed,
+    'mana_efficiency': semantic.manaEfficiency,
+    if (semantic.cardAdvantageType != 'none')
+      'card_advantage_type': semantic.cardAdvantageType,
+    if (semantic.interactionScope != 'none')
+      'interaction_scope': semantic.interactionScope,
+    if (semantic.protectionType != 'none')
+      'protection_type': semantic.protectionType,
+    if (semantic.recursionType != 'none')
+      'recursion_type': semantic.recursionType,
+  };
 }
 
 String normalizeFunctionalCardName(String value) {
@@ -590,6 +853,169 @@ bool _looksLikeRitual(String oracle, String normalizedName) {
               oracle.contains('for each') ||
               oracle.contains('for every') ||
               oracle.contains('your mana pool'));
+}
+
+bool _looksLikeWincon(String oracle, String normalizedName) {
+  return normalizedName.contains('thassa\'s oracle') ||
+      oracle.contains('you win the game') ||
+      oracle.contains('loses the game') ||
+      oracle.contains('each opponent loses') ||
+      oracle.contains('damage equal to') && oracle.contains('opponent') ||
+      oracle.contains('double your life total');
+}
+
+bool _looksLikeComboPiece(String oracle, String normalizedName) {
+  return normalizedName.contains('isochron scepter') ||
+      normalizedName.contains('dramatic reversal') ||
+      normalizedName.contains('thassa\'s oracle') ||
+      oracle.contains('copy target activated or triggered ability') ||
+      oracle.contains('untap') && oracle.contains('add ') ||
+      oracle.contains('infinite');
+}
+
+bool _looksLikeEngine(String oracle) {
+  return oracle.contains('whenever') &&
+          (oracle.contains('draw') ||
+              oracle.contains('create') && oracle.contains('token') ||
+              oracle.contains('add {') ||
+              oracle.contains('put a +1/+1 counter')) ||
+      oracle.contains('at the beginning of') &&
+          (oracle.contains('draw') || oracle.contains('create'));
+}
+
+bool _looksLikePayoff(String oracle, String normalizedName) {
+  return normalizedName == 'blood artist' ||
+      oracle.contains('for each') ||
+      oracle.contains('whenever') &&
+          (oracle.contains('creature dies') ||
+              oracle.contains('you cast') ||
+              oracle.contains('artifact enters') ||
+              oracle.contains('enchantment enters') ||
+              oracle.contains('you sacrifice'));
+}
+
+bool _looksLikeEnabler(String oracle, String normalizedName) {
+  return normalizedName.contains('greaves') ||
+      normalizedName.contains('boots') ||
+      oracle.contains('costs {') && oracle.contains('less to cast') ||
+      oracle.contains('you may play an additional land') ||
+      oracle.contains('haste') ||
+      oracle.contains('mill') ||
+      oracle.contains('sacrifice another') ||
+      oracle.contains('search your library');
+}
+
+String _inferSpeed(String typeLine, String oracle) {
+  if (typeLine.contains('instant') || oracle.contains('flash')) {
+    return 'instant_speed';
+  }
+  if (typeLine.contains('land')) return 'land_drop';
+  if (typeLine.contains('sorcery')) return 'sorcery_speed';
+  if (oracle.contains('whenever') || oracle.contains('at the beginning')) {
+    return 'triggered_engine';
+  }
+  return 'board_speed';
+}
+
+String _inferManaEfficiency(double cmc) {
+  if (cmc <= 0) return 'free_or_land';
+  if (cmc <= 1) return 'one_mana';
+  if (cmc <= 2) return 'cheap';
+  if (cmc <= 3) return 'efficient';
+  if (cmc <= 5) return 'fair';
+  return 'expensive';
+}
+
+String _inferCardAdvantageType(Set<String> tags, String oracle) {
+  if (tags.contains('draw')) return 'draw';
+  if (tags.contains('loot')) return 'selection';
+  if (tags.contains('tutor')) return 'tutor';
+  if (tags.contains('exile_value')) return 'impulse';
+  if (tags.contains('recursion')) return 'recursion';
+  if (tags.contains('token_maker')) return 'board_material';
+  if (oracle.contains('investigate') || oracle.contains('connive')) {
+    return 'selection';
+  }
+  return 'none';
+}
+
+String _inferInteractionScope(Set<String> tags, String oracle) {
+  if (tags.contains('board_wipe')) return 'mass';
+  if (oracle.contains('counter target')) return 'counterspell';
+  if (tags.contains('removal')) return 'targeted';
+  return 'none';
+}
+
+String _inferProtectionType({
+  required String oracle,
+  required String normalizedName,
+  required Set<String> tagNames,
+}) {
+  if (!tagNames.contains('protection')) return 'none';
+  if (oracle.contains('hexproof')) return 'hexproof';
+  if (oracle.contains('indestructible')) return 'indestructible';
+  if (oracle.contains('ward')) return 'ward';
+  if (oracle.contains('prevent all damage')) return 'damage_prevention';
+  if (oracle.contains('counter target')) return 'counterspell';
+  if (tagNames.contains('blink')) return 'blink';
+  if (normalizedName.contains('greaves') || normalizedName.contains('boots')) {
+    return 'equipment';
+  }
+  return 'generic';
+}
+
+String _inferRecursionType(String oracle, Set<String> tagNames) {
+  if (!tagNames.contains('recursion')) return 'none';
+  if (oracle.contains('onto the battlefield'))
+    return 'graveyard_to_battlefield';
+  if (oracle.contains('to your hand')) return 'graveyard_to_hand';
+  if (oracle.contains('cast')) return 'cast_from_graveyard';
+  return 'generic';
+}
+
+String _buildSemanticExplanationReason(Set<String> tags) {
+  if (tags.contains('ramp')) return 'mana_acceleration_or_land_search';
+  if (tags.contains('draw')) return 'adds_cards_or_refills_hand';
+  if (tags.contains('loot')) return 'filters_hand_quality';
+  if (tags.contains('tutor')) return 'searches_library_for_nonland_card';
+  if (tags.contains('removal')) return 'answers_targeted_threats';
+  if (tags.contains('board_wipe')) return 'answers_multiple_threats';
+  if (tags.contains('protection')) return 'protects_plan_or_permanents';
+  if (tags.contains('recursion')) return 'returns_resources_from_graveyard';
+  if (tags.contains('wincon')) return 'can_close_or_win_the_game';
+  if (tags.contains('combo_piece')) return 'matches_known_combo_pattern';
+  if (tags.contains('engine')) return 'creates_repeatable_value';
+  if (tags.contains('payoff')) return 'rewards_the_deck_plan';
+  if (tags.contains('enabler')) return 'sets_up_the_deck_plan';
+  return 'no_primary_function_detected';
+}
+
+String _friendlyFunctionalTagReason(
+  String tag,
+  SemanticCardAnalysisV2 semantic,
+) {
+  return switch (tag) {
+    'ramp' => 'Conta como ramp porque acelera mana ou busca terrenos.',
+    'draw' => 'Conta como compra porque repõe cartas ou gera vantagem de mão.',
+    'loot' => 'Conta como seleção porque compra e filtra/descarte cartas.',
+    'tutor' => 'Conta como tutor porque busca carta não-terreno no grimório.',
+    'removal' =>
+      'Conta como remoção porque interage com uma ameaça específica.',
+    'board_wipe' =>
+      'Conta como wipe porque afeta múltiplas criaturas ou permanentes.',
+    'protection' =>
+      'Conta como proteção (${semantic.protectionType}) porque protege o plano ou permanentes.',
+    'recursion' =>
+      'Conta como recursão (${semantic.recursionType}) porque recupera recursos do cemitério.',
+    'wincon' => 'Conta como condição de vitória porque pode fechar o jogo.',
+    'combo_piece' =>
+      'Conta como peça de combo por padrão conhecido ou texto de combo.',
+    'engine' => 'Conta como engine porque gera valor repetível.',
+    'payoff' => 'Conta como payoff porque recompensa o plano do deck.',
+    'enabler' => 'Conta como enabler porque ajuda a configurar o plano.',
+    _ =>
+      'Classificada por heurística semântica segura (${semantic.explanationReason}).',
+  };
 }
 
 double _estimateManaValue(String manaCost) {

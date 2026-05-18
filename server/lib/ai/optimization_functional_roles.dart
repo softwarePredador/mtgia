@@ -51,6 +51,10 @@ bool looksLikeOptimizationLandSearchText(String oracleText) {
 }
 
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
+  final semanticRole =
+      _classifySemanticV2FunctionalRole(card['semantic_tags_v2']);
+  if (semanticRole != null) return semanticRole;
+
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
 
@@ -100,4 +104,58 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   if (typeLine.contains('planeswalker')) return 'planeswalker';
 
   return 'utility';
+}
+
+String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
+  if (rawSemanticTags is! Iterable) return null;
+  Map? best;
+  for (final raw in rawSemanticTags) {
+    if (raw is! Map) continue;
+    final confidence = _safeSemanticConfidence(raw['role_confidence']);
+    final currentConfidence =
+        best == null ? -1.0 : _safeSemanticConfidence(best['role_confidence']);
+    if (confidence > currentConfidence) best = raw;
+  }
+  if (best == null || _safeSemanticConfidence(best['role_confidence']) < 0.65) {
+    return null;
+  }
+
+  final tags = <String>{};
+  final rawTags = best['tags'];
+  if (rawTags is Iterable) {
+    for (final item in rawTags) {
+      if (item is String) {
+        tags.add(item.trim().toLowerCase());
+      } else if (item is Map) {
+        final tag = item['tag']?.toString().trim().toLowerCase();
+        if (tag != null && tag.isNotEmpty) tags.add(tag);
+      }
+    }
+  }
+
+  if (tags.contains('board_wipe')) return 'wipe';
+  for (final role in const [
+    'draw',
+    'removal',
+    'ramp',
+    'tutor',
+    'protection',
+    'recursion',
+    'wincon',
+    'combo_piece',
+  ]) {
+    if (tags.contains(role)) return role;
+  }
+  if (best['wincon'] == true) return 'wincon';
+  if (best['combo_piece'] == true) return 'combo_piece';
+  if (best['engine'] == true) return 'engine';
+  if (best['payoff'] == true) return 'payoff';
+  if (best['enabler'] == true) return 'enabler';
+  return null;
+}
+
+double _safeSemanticConfidence(Object? value) {
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0;
+  return 0;
 }

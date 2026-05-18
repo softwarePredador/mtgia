@@ -3,6 +3,41 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-18 — Semantic Layer v2 para build/optimize/generate
+
+### O Porquê
+- A camada v1 estabilizou contagens funcionais, mas IA de build/optimize/generate
+  precisava de sinais mais granulares e explicáveis por carta.
+- Tags contextuais como engine, payoff, enabler, wincon e combo exigem rollout
+  cuidadoso para nao reduzir swaps seguros por falso positivo heuristico.
+
+### O Como
+- Criado schema aditivo `card_semantic_tags_v2` em
+  `candidate_quality_data_support.dart`, com campos de velocidade, eficiencia de
+  mana, tipo de vantagem, escopo de interacao, flags contextuais, confidence e
+  reason code.
+- `functional_tags.schema_version` foi mantido em v1; v2 entra por
+  `semantic_schema_version` e `sample_details`, preservando fallback legado.
+- `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` carregam v2 somente
+  quando a tabela existe; caso contrario retornam array vazio e usam heuristica.
+- `OptimizationValidator` recebeu adapter v2 -> roles legados, mas optimize segue
+  em shadow mode para v2.
+- `/ai/generate` retorna `semantic_layer_v2` opcional com cobertura agregada,
+  sem alterar Commander Reference.
+- Criado runner `server/bin/semantic_layer_v2_backfill.dart` com dry-run/apply e
+  artefato agregado sanitizado.
+
+### Resultado
+- Dry-run v2: 33.435 linhas, 24.172 tagged, 9.263 unknown, 3.643 ambiguous,
+  cobertura 72,295%, sem regressions agregadas.
+- Relatorios:
+  - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_TRACK_A_SCHEMA_DATA_2026-05-18.md`
+  - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_TRACK_B_BACKFILL_AUDIT_2026-05-18.md`
+  - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_TRACK_C_OPTIMIZE_GENERATE_2026-05-18.md`
+  - `app/doc/RELATORIO_SEMANTIC_LAYER_V2_TRACK_D_APP_UI_EXPLAINABILITY_2026-05-18.md`
+  - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_TRACK_E_VALIDATION_2026-05-18.md`
+  - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_FINAL_2026-05-18.md`
+
 ## 2026-05-18 — Mass audit de Functional Card Tags v1
 
 ### O Porquê
@@ -17072,3 +17107,42 @@ Risco restante:
 - prova em simulador iOS, nao build assinado em device fisico;
 - fixture pequena prova contrato runtime/origem persistida, nao corretude
   semantica exaustiva para todas as cartas.
+
+## 137. Semantic Layer v2 shadow mode - 2026-05-18
+
+Implementado em modo aditivo/shadow:
+
+- schema `card_semantic_tags_v2`;
+- runner `server/bin/semantic_layer_v2_backfill.dart`;
+- `functional_tags.sample_details` com explicabilidade por carta/tag;
+- Deck Analysis exibindo explicacao sem quebrar fallback legado;
+- sinais v2 disponiveis para optimize/generate em shadow mode, sem gate duro.
+
+Dry-run:
+
+- `card_rows=33435`;
+- `tagged_rows=24172`;
+- `unknown_rows=9263`;
+- `ambiguous_rows=3643`;
+- `coverage_pct=72.295`;
+- `regressions={}`.
+
+Apply controlado:
+
+- `db_mutations=true`;
+- `upserted_semantic_rows=24172`;
+- `upserted_function_tag_rows=52797`;
+- `false_positive_candidates.blink_like_removal=59`;
+- `false_positive_candidates.expensive_ramp_review=40`;
+- `regressions={}`.
+
+Artefatos:
+
+- `server/test/artifacts/semantic_layer_v2_backfill_2026-05-18_dry_run/summary_dry_run.json`;
+- `server/test/artifacts/semantic_layer_v2_backfill_2026-05-18_apply/summary_apply.json`;
+- `server/doc/RELATORIO_SEMANTIC_LAYER_V2_FINAL_2026-05-18.md`.
+
+Risco restante:
+
+- v2 permanece em shadow mode; nao deve bloquear optimize/generate ate haver
+  prova publica e taxa aceitavel de falsos positivos.

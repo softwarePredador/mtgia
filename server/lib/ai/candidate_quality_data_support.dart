@@ -37,6 +37,9 @@ const candidateQualityAllowedTags = <String>{
   'blink',
   'big_spell',
   'exile_value',
+  'engine',
+  'payoff',
+  'enabler',
 };
 
 const candidateQualitySchemaStatements = <String>[
@@ -105,6 +108,32 @@ CREATE TABLE IF NOT EXISTS optimize_rejection_penalties (
   )
 )
 ''',
+  '''
+CREATE TABLE IF NOT EXISTS card_semantic_tags_v2 (
+  card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+  card_name TEXT NOT NULL,
+  schema_version TEXT NOT NULL,
+  speed TEXT NOT NULL DEFAULT 'unknown',
+  mana_efficiency TEXT NOT NULL DEFAULT 'unknown',
+  card_advantage_type TEXT NOT NULL DEFAULT 'none',
+  interaction_scope TEXT NOT NULL DEFAULT 'none',
+  combo_piece BOOLEAN NOT NULL DEFAULT false,
+  wincon BOOLEAN NOT NULL DEFAULT false,
+  engine BOOLEAN NOT NULL DEFAULT false,
+  payoff BOOLEAN NOT NULL DEFAULT false,
+  enabler BOOLEAN NOT NULL DEFAULT false,
+  protection_type TEXT NOT NULL DEFAULT 'none',
+  recursion_type TEXT NOT NULL DEFAULT 'none',
+  role_confidence NUMERIC(4,3) NOT NULL CHECK (
+    role_confidence >= 0 AND role_confidence <= 1
+  ),
+  explanation_reason TEXT NOT NULL,
+  tags JSONB NOT NULL DEFAULT '[]'::jsonb,
+  source TEXT NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (card_id, source)
+)
+''',
 ];
 
 const candidateQualityIndexStatements = <String>[
@@ -142,6 +171,21 @@ ON optimize_rejection_penalties (
   penalty DESC
 )
 ''',
+  '''
+CREATE INDEX IF NOT EXISTS idx_card_semantic_tags_v2_flags
+ON card_semantic_tags_v2 (
+  wincon,
+  combo_piece,
+  engine,
+  payoff,
+  enabler,
+  role_confidence DESC
+)
+''',
+  '''
+CREATE INDEX IF NOT EXISTS idx_card_semantic_tags_v2_card_name
+ON card_semantic_tags_v2 (LOWER(card_name))
+''',
 ];
 
 const optimizeCandidateQualitySummaryViewStatement = '''
@@ -168,11 +212,33 @@ SELECT
   COALESCE(
     ARRAY_REMOVE(ARRAY_AGG(DISTINCT crs.role), NULL),
     ARRAY[]::TEXT[]
-  ) AS scored_roles
+  ) AS scored_roles,
+  COALESCE(
+    jsonb_agg(DISTINCT jsonb_build_object(
+      'schema_version', cstv2.schema_version,
+      'source', cstv2.source,
+      'speed', cstv2.speed,
+      'mana_efficiency', cstv2.mana_efficiency,
+      'card_advantage_type', cstv2.card_advantage_type,
+      'interaction_scope', cstv2.interaction_scope,
+      'combo_piece', cstv2.combo_piece,
+      'wincon', cstv2.wincon,
+      'engine', cstv2.engine,
+      'payoff', cstv2.payoff,
+      'enabler', cstv2.enabler,
+      'protection_type', cstv2.protection_type,
+      'recursion_type', cstv2.recursion_type,
+      'role_confidence', cstv2.role_confidence,
+      'explanation_reason', cstv2.explanation_reason,
+      'tags', cstv2.tags
+    )) FILTER (WHERE cstv2.card_id IS NOT NULL),
+    '[]'::jsonb
+  ) AS semantic_tags_v2
 FROM cards c
 LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
 LEFT JOIN card_function_tags cft ON cft.card_id = c.id
 LEFT JOIN card_role_scores crs ON crs.card_id = c.id
+LEFT JOIN card_semantic_tags_v2 cstv2 ON cstv2.card_id = c.id
 GROUP BY
   c.id,
   c.name,
@@ -236,6 +302,9 @@ String normalizeCandidateQualityRole(String tag) {
     'exile_value' => 'draw',
     'drain' => 'wincon',
     'lifegain' => 'protection',
+    'engine' => 'engine',
+    'payoff' => 'payoff',
+    'enabler' => 'enabler',
     _ => tag,
   };
 }

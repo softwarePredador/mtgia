@@ -20,14 +20,20 @@ void main() {
           'schema_version': 999,
           'counts': {'ramp': 10, 'draw': '12', 'board_wipe': 3},
           'samples': {
-            'ramp': [
-              'Sol Ring',
-              {'name': 'Arcane Signet', 'reason': 'mana_or_land_ramp_text'},
-              null,
-              42,
-            ],
+            'ramp': ['Sol Ring', 'Arcane Signet', null, 42],
             'draw': [
               {'card_name': 'Skullclamp', 'role': 'draw'},
+            ],
+          },
+          'sample_details': {
+            'ramp': [
+              {
+                'name': 'Arcane Signet',
+                'reason': 'Conta como ramp porque acelera mana.',
+                'confidence': 0.88,
+                'speed': 'board_speed',
+                'mana_efficiency': 'cheap',
+              },
             ],
           },
           'coverage': {
@@ -52,10 +58,10 @@ void main() {
         3,
       );
       expect(analysis.samplesFor('ramp').map((sample) => sample.name), [
-        'Sol Ring',
         'Arcane Signet',
       ]);
-      expect(analysis.samplesFor('ramp').last.reason, 'mana_or_land_ramp_text');
+      expect(analysis.samplesFor('ramp').first.reason, contains('ramp'));
+      expect(analysis.samplesFor('ramp').first.confidence, 0.88);
       expect(
         analysis.functionalTags?.coverage.summary,
         '61/100 cópias classificadas',

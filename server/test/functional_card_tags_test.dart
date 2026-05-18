@@ -44,6 +44,19 @@ void main() {
               'Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to its mana value.',
           expected: const {'recursion', 'graveyard_synergy'},
         ),
+        'Demonic Tutor': _card(
+          typeLine: 'Sorcery',
+          manaCost: '{1}{B}',
+          oracleText: 'Search your library for a card, put it into your hand.',
+          expected: const {'tutor', 'enabler'},
+        ),
+        'Thassa\'s Oracle': _card(
+          typeLine: 'Creature - Merfolk Wizard',
+          manaCost: '{U}{U}',
+          oracleText:
+              'When Thassa\'s Oracle enters, if your devotion to blue is greater than or equal to the number of cards in your library, you win the game.',
+          expected: const {'wincon', 'combo_piece'},
+        ),
         'Blood Artist': _card(
           typeLine: 'Creature - Vampire',
           manaCost: '{1}{B}',
@@ -212,8 +225,11 @@ void main() {
       expect(summary.count('removal'), equals(1));
       expect(summary.otherCopies, equals(3));
       expect(summary.samples['ramp'], equals(const ['Sol Ring']));
+      expect(summary.sampleDetails['ramp']?.first['reason'], contains('ramp'));
       expect(
           summary.toJson()['schema_version'], functionalCardTagsSchemaVersion);
+      expect(summary.toJson()['semantic_schema_version'],
+          equals(semanticLayerV2SchemaVersion));
     });
 
     test('prefers persisted tags and falls back to heuristic tags per row', () {

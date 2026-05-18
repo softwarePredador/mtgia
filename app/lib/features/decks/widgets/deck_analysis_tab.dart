@@ -633,6 +633,34 @@ const _functionalBuckets = <_FunctionalBucketSpec>[
     icon: Icons.shield_outlined,
     color: AppTheme.manaViolet,
   ),
+  _FunctionalBucketSpec(
+    key: 'tutor',
+    tagKey: 'tutor',
+    compositionKey: 'tutor',
+    label: 'Tutors',
+    description: 'Busca cartas específicas sem contar buscas de terrenos.',
+    icon: Icons.manage_search_rounded,
+    color: AppTheme.mythicGold,
+  ),
+  _FunctionalBucketSpec(
+    key: 'recursion',
+    tagKey: 'recursion',
+    compositionKey: 'recursion',
+    label: 'Recursão',
+    description:
+        'Recupera recursos do cemitério para mão, campo ou conjuração.',
+    icon: Icons.restore_rounded,
+    color: AppTheme.loomCyan,
+  ),
+  _FunctionalBucketSpec(
+    key: 'wincon',
+    tagKey: 'wincon',
+    compositionKey: 'wincon',
+    label: 'Wincons',
+    description: 'Cartas que ajudam a fechar ou vencer a partida.',
+    icon: Icons.emoji_events_outlined,
+    color: AppTheme.success,
+  ),
 ];
 
 class _FunctionalTagsOverview extends StatelessWidget {
@@ -1097,6 +1125,12 @@ class _FunctionalSampleRow extends StatelessWidget {
     final theme = Theme.of(context);
     final detail =
         sample.reason?.trim().isNotEmpty == true ? sample.reason : sample.role;
+    final metadata = [
+      if (sample.confidence != null)
+        'confiança ${(sample.confidence!.clamp(0, 1) * 100).round()}%',
+      if ((sample.speed ?? '').isNotEmpty) sample.speed!,
+      if ((sample.manaEfficiency ?? '').isNotEmpty) sample.manaEfficiency!,
+    ].join(' • ');
 
     return Container(
       width: double.infinity,
@@ -1132,6 +1166,18 @@ class _FunctionalSampleRow extends StatelessWidget {
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppTheme.textSecondary,
                       height: 1.25,
+                    ),
+                  ),
+                ],
+                if (metadata.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    metadata,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary.withValues(alpha: 0.82),
+                      height: 1.2,
                     ),
                   ),
                 ],

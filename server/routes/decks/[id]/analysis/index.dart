@@ -31,6 +31,39 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     }
 
     final format = deckResult.first[0] as String;
+    final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
+    final semanticV2Select = hasSemanticV2
+        ? '''
+          COALESCE(
+            (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'schema_version', cstv2.schema_version,
+                  'source', cstv2.source,
+                  'speed', cstv2.speed,
+                  'mana_efficiency', cstv2.mana_efficiency,
+                  'card_advantage_type', cstv2.card_advantage_type,
+                  'interaction_scope', cstv2.interaction_scope,
+                  'combo_piece', cstv2.combo_piece,
+                  'wincon', cstv2.wincon,
+                  'engine', cstv2.engine,
+                  'payoff', cstv2.payoff,
+                  'enabler', cstv2.enabler,
+                  'protection_type', cstv2.protection_type,
+                  'recursion_type', cstv2.recursion_type,
+                  'role_confidence', cstv2.role_confidence,
+                  'explanation_reason', cstv2.explanation_reason,
+                  'tags', cstv2.tags
+                )
+                ORDER BY cstv2.role_confidence DESC, cstv2.source
+              )
+              FROM card_semantic_tags_v2 cstv2
+              WHERE cstv2.card_id = c.id
+            ),
+            '[]'::jsonb
+          )
+        '''
+        : ''''[]'::jsonb''';
 
     // 2. Buscar cartas do deck
     final cardsResult = await pool.execute(
@@ -59,7 +92,8 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
               WHERE cft.card_id = c.id
             ),
             '[]'::jsonb
-          ) AS functional_tags
+          ) AS functional_tags,
+          $semanticV2Select AS semantic_tags_v2
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
         WHERE dc.deck_id = @deckId
@@ -475,4 +509,12 @@ ManaAnalysis _parseManaCost(String manaCost) {
   }
 
   return ManaAnalysis(cmc, colors);
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  final result = await pool.execute(
+    Sql.named("SELECT to_regclass(@table_name) IS NOT NULL"),
+    parameters: {'table_name': tableName},
+  );
+  return result.isNotEmpty && result.first[0] == true;
 }

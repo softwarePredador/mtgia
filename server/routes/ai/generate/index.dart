@@ -14,6 +14,7 @@ import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
+import '../../../lib/ai/functional_card_tags.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -655,6 +656,9 @@ $metaContext
         'invalid_cards': validation.invalidCards.length,
       },
       'validation': validation.validationSummary(),
+      'semantic_layer_v2': _buildSemanticLayerV2GenerateSummary(
+        validation.generatedDeck,
+      ),
       if (referenceProfile != null)
         'diagnostics': buildCommanderReferenceDiagnostics(
           referenceProfile,
@@ -1295,6 +1299,9 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'invalid_cards': validation.invalidCards.length,
       },
       'validation': validation.validationSummary(),
+      'semantic_layer_v2': _buildSemanticLayerV2GenerateSummary(
+        validation.generatedDeck,
+      ),
       if (referenceProfile != null)
         'diagnostics': buildCommanderReferenceDiagnostics(
           referenceProfile,
@@ -1357,6 +1364,60 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         },
     };
   }
+}
+
+Map<String, dynamic> _buildSemanticLayerV2GenerateSummary(
+  Map<String, dynamic> generatedDeck,
+) {
+  final cards = (generatedDeck['cards'] as List?)
+          ?.whereType<Map>()
+          .map((card) => card.cast<String, dynamic>())
+          .toList(growable: false) ??
+      const <Map<String, dynamic>>[];
+  if (cards.isEmpty) {
+    return {
+      'schema_version': semanticLayerV2SchemaVersion,
+      'mode': 'shadow',
+      'coverage': {
+        'card_rows': 0,
+        'tagged_rows': 0,
+        'unknown_rows': 0,
+      },
+      'role_counts': const <String, int>{},
+      'note':
+          'Semantic v2 is additive and does not replace Commander Reference validation.',
+    };
+  }
+
+  var taggedRows = 0;
+  final counts = <String, int>{};
+  for (final card in cards) {
+    final name = card['name']?.toString() ?? '';
+    final semantic = inferSemanticCardAnalysisV2(
+      name: name,
+      typeLine: card['type_line']?.toString() ?? '',
+      oracleText: card['oracle_text']?.toString() ?? '',
+      manaCost: card['mana_cost']?.toString(),
+      cmc: card['cmc'],
+    );
+    if (semantic.tags.isNotEmpty) taggedRows++;
+    for (final tag in semantic.tags) {
+      counts[tag.tag] = (counts[tag.tag] ?? 0) + 1;
+    }
+  }
+
+  return {
+    'schema_version': semanticLayerV2SchemaVersion,
+    'mode': 'shadow',
+    'coverage': {
+      'card_rows': cards.length,
+      'tagged_rows': taggedRows,
+      'unknown_rows': cards.length - taggedRows,
+    },
+    'role_counts': counts,
+    'note':
+        'Semantic v2 is additive and does not replace Commander Reference validation.',
+  };
 }
 
 Future<Map<String, dynamic>> _mockGeneratedDeck(

@@ -13,6 +13,9 @@ const aggressiveCandidateTrackedRoles = <String>{
   'recursion',
   'graveyard',
   'token',
+  'engine',
+  'payoff',
+  'enabler',
 };
 
 bool isCommanderCandidateLegalityAllowed(String? status) {

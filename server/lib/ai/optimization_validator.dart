@@ -308,7 +308,13 @@ class OptimizationValidator {
       'utility',
       'wipe',
       'tutor',
-      'protection'
+      'protection',
+      'recursion',
+      'wincon',
+      'combo_piece',
+      'engine',
+      'payoff',
+      'enabler'
     ]) {
       final lost = removedRoles.where((r) => r == role).length;
       final gained = addedRoles.where((r) => r == role).length;

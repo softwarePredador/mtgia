@@ -75,6 +75,7 @@ class DeckFunctionalTags {
 
   factory DeckFunctionalTags.fromJson(Map<String, dynamic> json) {
     final rawSamples = _asStringMap(json['samples']);
+    final rawSampleDetails = _asStringMap(json['sample_details']);
     final parsedSamples = <String, List<DeckFunctionalTagSample>>{};
     for (final entry in rawSamples.entries) {
       final rawList = entry.value;
@@ -83,6 +84,16 @@ class DeckFunctionalTags {
           .map(DeckFunctionalTagSample.fromDynamic)
           .whereType<DeckFunctionalTagSample>()
           .toList(growable: false);
+      parsedSamples[entry.key] = samples;
+    }
+    for (final entry in rawSampleDetails.entries) {
+      final rawList = entry.value;
+      if (rawList is! List) continue;
+      final samples = rawList
+          .map(DeckFunctionalTagSample.fromDynamic)
+          .whereType<DeckFunctionalTagSample>()
+          .toList(growable: false);
+      if (samples.isEmpty) continue;
       parsedSamples[entry.key] = samples;
     }
 
@@ -98,11 +109,21 @@ class DeckFunctionalTags {
 }
 
 class DeckFunctionalTagSample {
-  const DeckFunctionalTagSample({required this.name, this.reason, this.role});
+  const DeckFunctionalTagSample({
+    required this.name,
+    this.reason,
+    this.role,
+    this.confidence,
+    this.speed,
+    this.manaEfficiency,
+  });
 
   final String name;
   final String? reason;
   final String? role;
+  final double? confidence;
+  final String? speed;
+  final String? manaEfficiency;
 
   static DeckFunctionalTagSample? fromDynamic(dynamic value) {
     if (value is String) {
@@ -125,6 +146,9 @@ class DeckFunctionalTagSample {
         name: name,
         reason: _optionalTrimmedString(map['reason'] ?? map['evidence']),
         role: _optionalTrimmedString(map['role'] ?? map['function']),
+        confidence: _optionalDouble(map['confidence']),
+        speed: _optionalTrimmedString(map['speed']),
+        manaEfficiency: _optionalTrimmedString(map['mana_efficiency']),
       );
     }
 
@@ -203,4 +227,10 @@ String? _optionalTrimmedString(dynamic value) {
   final text = value?.toString().trim();
   if (text == null || text.isEmpty) return null;
   return text;
+}
+
+double? _optionalDouble(dynamic value) {
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
 }

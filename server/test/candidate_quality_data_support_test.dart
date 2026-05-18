@@ -138,6 +138,8 @@ void main() {
       ].join('\n').toLowerCase();
 
       expect(schema, contains('create table if not exists card_function_tags'));
+      expect(
+          schema, contains('create table if not exists card_semantic_tags_v2'));
       expect(schema, contains('create table if not exists card_role_scores'));
       expect(schema,
           contains('create table if not exists commander_card_synergy'));

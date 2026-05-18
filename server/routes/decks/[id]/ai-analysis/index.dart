@@ -71,6 +71,40 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       );
     }
 
+    final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
+    final semanticV2Select = hasSemanticV2
+        ? '''
+          COALESCE(
+            (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'schema_version', cstv2.schema_version,
+                  'source', cstv2.source,
+                  'speed', cstv2.speed,
+                  'mana_efficiency', cstv2.mana_efficiency,
+                  'card_advantage_type', cstv2.card_advantage_type,
+                  'interaction_scope', cstv2.interaction_scope,
+                  'combo_piece', cstv2.combo_piece,
+                  'wincon', cstv2.wincon,
+                  'engine', cstv2.engine,
+                  'payoff', cstv2.payoff,
+                  'enabler', cstv2.enabler,
+                  'protection_type', cstv2.protection_type,
+                  'recursion_type', cstv2.recursion_type,
+                  'role_confidence', cstv2.role_confidence,
+                  'explanation_reason', cstv2.explanation_reason,
+                  'tags', cstv2.tags
+                )
+                ORDER BY cstv2.role_confidence DESC, cstv2.source
+              )
+              FROM card_semantic_tags_v2 cstv2
+              WHERE cstv2.card_id = c.id
+            ),
+            '[]'::jsonb
+          )
+        '''
+        : ''''[]'::jsonb''';
+
     final cardsResult = await pool.execute(
       Sql.named('''
         SELECT
@@ -98,6 +132,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             ),
             '[]'::jsonb
           ) AS functional_tags,
+          $semanticV2Select AS semantic_tags_v2,
           COALESCE(
             (SELECT SUM(
               CASE
@@ -276,6 +311,7 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
       'quantity': qty,
       'cmc': cmc,
       'functional_tags': m['functional_tags'],
+      'semantic_tags_v2': m['semantic_tags_v2'],
     });
 
     if (isCommander) {
@@ -504,4 +540,12 @@ int _clampInt(dynamic value, {required int min, required int max}) {
   if (parsed < min) return min;
   if (parsed > max) return max;
   return parsed;
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  final result = await pool.execute(
+    Sql.named("SELECT to_regclass(@table_name) IS NOT NULL"),
+    parameters: {'table_name': tableName},
+  );
+  return result.isNotEmpty && result.first[0] == true;
 }
