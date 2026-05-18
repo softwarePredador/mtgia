@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../../lib/meta/meta_deck_format_support.dart';
 
@@ -14,16 +15,19 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
 Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
+  final userId = context.read<String>();
 
   try {
     // 1. Buscar informações do deck (formato)
     final deckResult = await pool.execute(
-      Sql.named('SELECT format FROM decks WHERE id = @deckId'),
-      parameters: {'deckId': deckId},
+      Sql.named(
+          'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId'),
+      parameters: {'deckId': deckId, 'userId': userId},
     );
 
     if (deckResult.isEmpty) {
-      return Response.json(statusCode: HttpStatus.notFound, body: {'error': 'Deck not found'});
+      return Response.json(
+          statusCode: HttpStatus.notFound, body: {'error': 'Deck not found'});
     }
 
     final format = deckResult.first[0] as String;
@@ -31,7 +35,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 2. Buscar cartas do deck
     final cardsResult = await pool.execute(
       Sql.named('''
-        SELECT c.id, c.name, c.mana_cost, c.type_line, c.oracle_text, c.price, dc.quantity
+        SELECT c.id, c.name, c.mana_cost, c.type_line, c.oracle_text, c.price, dc.quantity, c.cmc
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
         WHERE dc.deck_id = @deckId
@@ -43,7 +47,14 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
 
     // 3. Análise: Curva de Mana, Cores e Preço
     final manaCurve = <int, int>{};
-    final colorDistribution = <String, int>{'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'C': 0};
+    final colorDistribution = <String, int>{
+      'W': 0,
+      'U': 0,
+      'B': 0,
+      'R': 0,
+      'G': 0,
+      'C': 0
+    };
     var totalCards = 0;
     var totalLands = 0;
     double totalPrice = 0.0;
@@ -57,7 +68,6 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       totalPrice += price * quantity;
       totalCards += quantity;
 
-      totalCards += quantity;
       if (typeLine.toLowerCase().contains('land')) {
         totalLands += quantity;
         continue; // Terrenos geralmente não têm custo de mana (exceto alguns especiais)
@@ -65,7 +75,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
 
       // Calcular CMC e Cores
       final analysis = _parseManaCost(manaCost);
-      
+
       // Atualiza Curva de Mana
       final cmc = analysis.cmc;
       manaCurve[cmc] = (manaCurve[cmc] ?? 0) + quantity;
@@ -73,47 +83,61 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       // Atualiza Distribuição de Cores
       analysis.colors.forEach((color, count) {
         if (colorDistribution.containsKey(color)) {
-          colorDistribution[color] = (colorDistribution[color] ?? 0) + (count * quantity);
+          colorDistribution[color] =
+              (colorDistribution[color] ?? 0) + (count * quantity);
         }
       });
     }
 
     // 4. Análise: Legalidade (Otimizada)
     final issues = <Map<String, dynamic>>[];
-    
+
     // 4.1. Regras de Construção (Quantidade e Cópias)
     final isCommander = format.toLowerCase() == 'commander';
     final minCards = isCommander ? 100 : 60;
     final maxCopies = isCommander ? 1 : 4;
-    
+
     if (totalCards < minCards) {
       issues.add({
         'type': 'error',
         'message': 'Deck has $totalCards cards. Minimum required is $minCards.',
       });
     }
-    
+
     if (isCommander && totalCards > 100) {
-       issues.add({
+      issues.add({
         'type': 'error',
-        'message': 'Commander decks must have exactly 100 cards (currently $totalCards).',
+        'message':
+            'Commander decks must have exactly 100 cards (currently $totalCards).',
       });
     }
 
     // Checagem de cópias (exceto terrenos básicos e cartas que permitem múltiplas cópias ex: Relentless Rats)
     // Simplificação: assumimos que apenas terrenos básicos podem ter > maxCopies
-    final basicLands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest', 'Wastes', 'Snow-Covered Plains', 'Snow-Covered Island', 'Snow-Covered Swamp', 'Snow-Covered Mountain', 'Snow-Covered Forest'];
-    
+    final basicLands = [
+      'Plains',
+      'Island',
+      'Swamp',
+      'Mountain',
+      'Forest',
+      'Wastes',
+      'Snow-Covered Plains',
+      'Snow-Covered Island',
+      'Snow-Covered Swamp',
+      'Snow-Covered Mountain',
+      'Snow-Covered Forest'
+    ];
+
     for (final card in cards) {
       final name = card['name'] as String;
       final quantity = card['quantity'] as int;
-      
+
       // Verifica se é terreno básico (pode ter qualquer quantidade)
       // Uma verificação mais robusta seria checar o supertype "Basic" no banco, mas pelo nome resolve 99%
-      final isBasic = basicLands.any((b) => name.contains(b)); 
-      
+      final isBasic = basicLands.any((b) => name.contains(b));
+
       if (!isBasic && quantity > maxCopies) {
-         issues.add({
+        issues.add({
           'type': 'error',
           'message': 'Card "$name" has $quantity copies. Limit is $maxCopies.',
         });
@@ -122,7 +146,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
 
     // 4.2. Checagem de Banidas (Batch Query)
     final cardIds = cards.map((c) => c['id'] as String).toList();
-    
+
     if (cardIds.isNotEmpty) {
       // Busca o status de legalidade de todas as cartas do deck para o formato
       final legalityResult = await pool.execute(
@@ -143,7 +167,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       for (final card in cards) {
         final id = card['id'] as String;
         final name = card['name'] as String;
-        
+
         // Se não tiver registro na tabela de legalidade, assumimos que é legal (ou que falta dado)
         // Mas se tiver e for 'banned', reportamos.
         if (legalityMap.containsKey(id)) {
@@ -154,7 +178,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
               'message': '"$name" is BANNED in $format.',
             });
           } else if (status == 'restricted' && (card['quantity'] as int) > 1) {
-             issues.add({
+            issues.add({
               'type': 'error',
               'message': '"$name" is RESTRICTED in $format (max 1 copy).',
             });
@@ -165,100 +189,71 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
 
     // 4.3. Análise de Consistência (Land Count & Colors)
     // Baseado em heurísticas de Frank Karsten
-    
+
     // Calcular CMC Médio (apenas cartas não-terreno)
     var totalCmc = 0;
     var nonLandCards = totalCards - totalLands;
-    
+
     manaCurve.forEach((cmc, count) {
       totalCmc += cmc * count;
     });
-    
+
     final avgCmc = nonLandCards > 0 ? totalCmc / nonLandCards : 0.0;
-    
+
     // Recomendação de Terrenos
     // Fórmula simplificada: 31 + (AvgCMC * 2.5) para Commander (aprox)
     // Ex: Avg 2.0 -> 36 lands. Avg 3.0 -> 38.5 lands. Avg 4.0 -> 41 lands.
     if (isCommander) {
       final recommendedLands = (31 + (avgCmc * 2.5)).round();
       final diff = totalLands - recommendedLands;
-      
+
       if (diff.abs() > 3) {
         issues.add({
           'type': 'warning',
           'message': 'Land Count Warning: Your deck has an Average CMC of ${avgCmc.toStringAsFixed(2)}. '
-                     'We recommend around $recommendedLands lands, but you have $totalLands. '
-                     '${diff < 0 ? "Consider adding more lands to avoid missing drops." : "Consider removing lands to avoid flooding."}',
+              'We recommend around $recommendedLands lands, but you have $totalLands. '
+              '${diff < 0 ? "Consider adding more lands to avoid missing drops." : "Consider removing lands to avoid flooding."}',
         });
       }
     }
 
-    // 4.4. Análise de Composição (Vegetables: Ramp, Draw, Removal)
-    // Heurística baseada em palavras-chave no oracle_text
-    var rampCount = 0;
-    var drawCount = 0;
-    var removalCount = 0;
-    var boardWipeCount = 0;
-
-    for (final card in cards) {
-      final text = (card['oracle_text'] as String? ?? '').toLowerCase();
-      final type = (card['type_line'] as String? ?? '').toLowerCase();
-      final quantity = card['quantity'] as int;
-      
-      // Ignora terrenos básicos para contagem de ramp (mas conta fetch lands ou utility lands se tiverem texto)
-      if (type.contains('basic land')) continue;
-
-      // Ramp: "add {", "search your library for a land", "create a treasure"
-      // Cuidado com falsos positivos, mas para MVP serve.
-      if (text.contains('add {') || 
-          text.contains('search your library for a land') || 
-          text.contains('create a treasure') ||
-          text.contains('put a land card from your hand')) {
-        rampCount += quantity;
-      }
-
-      // Draw: "draw a card", "draw cards"
-      if (text.contains('draw a card') || text.contains('draw cards')) {
-        drawCount += quantity;
-      }
-
-      // Removal: "destroy target", "exile target", "deal damage to target" (simplificado)
-      if (text.contains('destroy target') || 
-          text.contains('exile target') || 
-          (text.contains('deal') && text.contains('damage to target'))) {
-        removalCount += quantity;
-      }
-
-      // Board Wipe: "destroy all", "exile all"
-      if (text.contains('destroy all') || text.contains('exile all')) {
-        boardWipeCount += quantity;
-      }
-    }
+    // 4.4. Análise de Composição (Ramp, Draw, Removal, Wipes)
+    final functionalSummary = summarizeFunctionalTagsForDeck(cards);
+    final rampCount = functionalSummary.count('ramp');
+    final drawCount = functionalSummary.count('draw');
+    final removalCount = functionalSummary.count('removal');
+    final boardWipeCount = functionalSummary.count('board_wipe');
+    final protectionCount = functionalSummary.count('protection');
 
     // Recomendações de Composição (Commander)
     if (isCommander) {
       if (rampCount < 10) {
         issues.add({
           'type': 'warning',
-          'message': 'Ramp Warning: You have $rampCount ramp sources. We recommend at least 10 to ensure you have mana.',
+          'message':
+              'Ramp Warning: You have $rampCount ramp sources. We recommend at least 10 to ensure you have mana.',
         });
       }
       if (drawCount < 10) {
         issues.add({
           'type': 'warning',
-          'message': 'Card Draw Warning: You have $drawCount card draw sources. We recommend at least 10 to keep your hand full.',
+          'message':
+              'Card Draw Warning: You have $drawCount card draw sources. We recommend at least 10 to keep your hand full.',
         });
       }
-      if (removalCount < 8) { // Um pouco menos exigente que 10
+      if (removalCount < 8) {
+        // Um pouco menos exigente que 10
         issues.add({
           'type': 'warning',
-          'message': 'Removal Warning: You have $removalCount single target removal spells. We recommend at least 8 to deal with threats.',
+          'message':
+              'Removal Warning: You have $removalCount single target removal spells. We recommend at least 8 to deal with threats.',
         });
       }
       if (boardWipeCount < 2) {
         issues.add({
           'type': 'warning',
-          'message': 'Board Wipe Warning: You have $boardWipeCount board wipes. We recommend at least 2-3 to reset the game when losing.',
+          'message':
+              'Board Wipe Warning: You have $boardWipeCount board wipes. We recommend at least 2-3 to reset the game when losing.',
         });
       }
     }
@@ -266,12 +261,11 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 4.5. Comparação com o Meta (Meta Insights)
     // Busca decks similares no banco de dados de Meta para sugerir melhorias
     Map<String, dynamic>? metaAnalysis;
-    
+
     try {
       final metaFormats = metaDeckFormatCodesForDeckFormat(format);
-      final metaScope = format.toLowerCase() == 'commander'
-          ? 'commander'
-          : null;
+      final metaScope =
+          format.toLowerCase() == 'commander' ? 'commander' : null;
       final metaDecksResult = metaFormats.isEmpty
           ? const <dynamic>[]
           : await pool.execute(
@@ -294,28 +288,30 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         String? bestMatchFormatCode;
         String? bestMatchSubformat;
         String? bestMatchFormatLabel;
-        
+
         // Cria um Set com os nomes das cartas do usuário para comparação rápida
-        final userCardNames = cards.map((c) => (c['name'] as String).toLowerCase()).toSet();
+        final userCardNames =
+            cards.map((c) => (c['name'] as String).toLowerCase()).toSet();
 
         for (final row in metaDecksResult) {
           final storedFormat = (row[0] as String?) ?? '';
           final archetype = row[1] as String;
           final cardListRaw = row[2] as String;
           final formatDescriptor = describeMetaDeckFormat(storedFormat);
-          
+
           final parsedDeck = parseMetaDeckCardList(
             cardList: cardListRaw,
             format: storedFormat,
           );
-          final metaCards =
-              parsedDeck.mainboard.keys.map((name) => name.toLowerCase()).toSet();
-          
+          final metaCards = parsedDeck.mainboard.keys
+              .map((name) => name.toLowerCase())
+              .toSet();
+
           // Calcula similaridade (Jaccard Index simplificado: Interseção / União)
           final intersection = userCardNames.intersection(metaCards).length;
           final union = userCardNames.union(metaCards).length;
           final score = union > 0 ? intersection / union : 0.0;
-          
+
           if (score > bestMatchScore) {
             bestMatchScore = score;
             bestMatchArchetype = archetype;
@@ -323,7 +319,10 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
             bestMatchSubformat = formatDescriptor.commanderSubformat;
             bestMatchFormatLabel = formatDescriptor.label;
             // Identifica cartas que o meta tem e o usuário não (Staples potenciais)
-            bestMatchMissingCards = metaCards.difference(userCardNames).take(5).toList(); // Sugere top 5
+            bestMatchMissingCards = metaCards
+                .difference(userCardNames)
+                .take(5)
+                .toList(); // Sugere top 5
           }
         }
 
@@ -331,7 +330,8 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         if (bestMatchScore > 0.10) {
           metaAnalysis = {
             'archetype': bestMatchArchetype,
-            'similarity': double.parse((bestMatchScore * 100).toStringAsFixed(1)),
+            'similarity':
+                double.parse((bestMatchScore * 100).toStringAsFixed(1)),
             'format_code': bestMatchFormatCode,
             'format_label': bestMatchFormatLabel,
             'subformat': bestMatchSubformat,
@@ -342,7 +342,8 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
                 'format_codes': metaFormats,
               },
             'suggested_adds': bestMatchMissingCards,
-            'message': 'Your deck is ${(bestMatchScore * 100).toStringAsFixed(0)}% similar to "$bestMatchArchetype". Consider adding these cards used in the meta.',
+            'message':
+                'Your deck is ${(bestMatchScore * 100).toStringAsFixed(0)}% similar to "$bestMatchArchetype". Consider adding these cards used in the meta.',
           };
         }
       }
@@ -365,17 +366,19 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           'draw': drawCount,
           'removal': removalCount,
           'board_wipes': boardWipeCount,
+          'protection': protectionCount,
         }
       },
+      'functional_tags': functionalSummary.toJson(),
       'meta_analysis': metaAnalysis,
-      'mana_curve': manaCurve.map((key, value) => MapEntry(key.toString(), value)),
+      'mana_curve':
+          manaCurve.map((key, value) => MapEntry(key.toString(), value)),
       'color_distribution': colorDistribution,
       'legality': {
         'is_valid': issues.where((i) => i['type'] == 'error').isEmpty,
         'issues': issues,
       }
     });
-
   } catch (e) {
     print('[ERROR] Failed to analyze deck: $e');
     return Response.json(
@@ -401,7 +404,7 @@ ManaAnalysis _parseManaCost(String manaCost) {
 
   for (final match in matches) {
     final symbol = match.group(1) ?? '';
-    
+
     // Se for número (ex: {2})
     final number = int.tryParse(symbol);
     if (number != null) {
@@ -412,7 +415,7 @@ ManaAnalysis _parseManaCost(String manaCost) {
     } else if (symbol.contains('/')) {
       // Símbolo híbrido: {2/W}, {B/G}, {W/P}, {B/P}, etc.
       final parts = symbol.split('/');
-      
+
       // Para híbridos com número (ex: {2/W}), o CMC é o maior valor
       // Para híbridos de cor (ex: {B/G}) ou Phyrexian (ex: {B/P}), o CMC é 1
       // P (Phyrexian) não é número, então não afeta o cálculo
@@ -426,7 +429,7 @@ ManaAnalysis _parseManaCost(String manaCost) {
         }
       }
       cmc += hybridCmc;
-      
+
       // Conta as cores (ignorando números e 'P' para Phyrexian)
       if (symbol.contains('W')) colors['W'] = (colors['W'] ?? 0) + 1;
       if (symbol.contains('U')) colors['U'] = (colors['U'] ?? 0) + 1;
@@ -437,7 +440,7 @@ ManaAnalysis _parseManaCost(String manaCost) {
     } else {
       // Símbolo de cor simples: {U}, {B}, {R}, {G}, {W}, {C}
       cmc += 1;
-      
+
       if (symbol.contains('W')) colors['W'] = (colors['W'] ?? 0) + 1;
       if (symbol.contains('U')) colors['U'] = (colors['U'] ?? 0) + 1;
       if (symbol.contains('B')) colors['B'] = (colors['B'] ?? 0) + 1;

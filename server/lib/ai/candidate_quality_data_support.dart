@@ -1,11 +1,15 @@
+import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimize_runtime_support.dart';
 
 const candidateQualitySchemaVersion = 'aggressive_candidate_quality_v2_stage1';
 
 const candidateQualityAllowedTags = <String>{
+  'land',
   'ramp',
+  'ritual',
   'draw',
+  'loot',
   'removal',
   'board_wipe',
   'protection',
@@ -14,12 +18,25 @@ const candidateQualityAllowedTags = <String>{
   'combo_piece',
   'mana_fixing',
   'graveyard',
+  'graveyard_synergy',
   'token',
+  'token_maker',
   'aristocrats',
+  'aristocrat_payoff',
   'counterspell',
   'stax',
   'sacrifice',
+  'sacrifice_outlet',
   'recursion',
+  'lifegain',
+  'drain',
+  'spellslinger',
+  'artifact_synergy',
+  'enchantment_synergy',
+  'etb',
+  'blink',
+  'big_spell',
+  'exile_value',
 };
 
 const candidateQualitySchemaStatements = <String>[
@@ -209,7 +226,16 @@ String normalizeCandidateQualityRole(String tag) {
     'board_wipe' => 'wipe',
     'counterspell' => 'removal',
     'mana_fixing' => 'ramp',
+    'ritual' => 'ramp',
     'combo_piece' => 'combo_piece',
+    'token_maker' => 'token',
+    'aristocrat_payoff' => 'aristocrats',
+    'sacrifice_outlet' => 'sacrifice',
+    'graveyard_synergy' => 'graveyard',
+    'blink' => 'protection',
+    'exile_value' => 'draw',
+    'drain' => 'wincon',
+    'lifegain' => 'protection',
     _ => tag,
   };
 }
@@ -234,6 +260,39 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
         confidence: confidence.clamp(0, 1).toDouble(),
         evidence: evidence,
       );
+    }
+  }
+
+  for (final inferred in inferFunctionalCardTags(
+    name: name,
+    typeLine: typeLine,
+    oracleText: oracleText,
+    manaCost: manaCost,
+  )) {
+    add(inferred.tag, inferred.confidence, inferred.evidence);
+    switch (inferred.tag) {
+      case 'token_maker':
+        add('token', inferred.confidence, '${inferred.evidence};alias=v1');
+        break;
+      case 'aristocrat_payoff':
+        add('aristocrats', inferred.confidence,
+            '${inferred.evidence};alias=v1');
+        break;
+      case 'graveyard_synergy':
+        add('graveyard', inferred.confidence, '${inferred.evidence};alias=v1');
+        break;
+      case 'sacrifice_outlet':
+        add('sacrifice', inferred.confidence, '${inferred.evidence};alias=v1');
+        break;
+      case 'ritual':
+        add('ramp', 0.72, '${inferred.evidence};alias=v1');
+        break;
+      case 'blink':
+        add('protection', 0.68, '${inferred.evidence};alias=v1');
+        break;
+      case 'exile_value':
+        add('draw', 0.64, '${inferred.evidence};alias=v1');
+        break;
     }
   }
 

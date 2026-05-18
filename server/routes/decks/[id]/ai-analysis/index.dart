@@ -5,6 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/openai_runtime_config.dart';
 
 /// POST /decks/:id/ai-analysis
@@ -188,6 +189,7 @@ class _DeckMetrics {
   final int removalCount;
   final int boardWipeCount;
   final int protectionCount;
+  final FunctionalDeckSummary functionalSummary;
 
   _DeckMetrics({
     required this.totalCards,
@@ -201,6 +203,7 @@ class _DeckMetrics {
     required this.removalCount,
     required this.boardWipeCount,
     required this.protectionCount,
+    required this.functionalSummary,
   });
 
   Map<String, dynamic> toJson() {
@@ -217,6 +220,7 @@ class _DeckMetrics {
       'removal_count': removalCount,
       'board_wipe_count': boardWipeCount,
       'protection_count': protectionCount,
+      'functional_tags': functionalSummary.toJson(),
     };
   }
 }
@@ -233,6 +237,7 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
   var removal = 0;
   var wipes = 0;
   var protection = 0;
+  final cardRows = <Map<String, dynamic>>[];
 
   double totalCmcNonLands = 0;
 
@@ -244,8 +249,17 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
     final typeLine = ((m['type_line'] as String?) ?? '').toLowerCase();
     final oracle = ((m['oracle_text'] as String?) ?? '').toLowerCase();
     final cmc = (m['cmc'] as num?)?.toDouble() ?? 0.0;
+    final manaCost = (m['mana_cost'] as String?) ?? '';
 
     total += qty;
+    cardRows.add({
+      'name': name,
+      'type_line': typeLine,
+      'oracle_text': oracle,
+      'mana_cost': manaCost,
+      'quantity': qty,
+      'cmc': cmc,
+    });
 
     if (isCommander) {
       commanderCount += qty;
@@ -259,41 +273,15 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
 
     nonLands += qty;
     totalCmcNonLands += cmc * qty;
-
-    // Ramp (heurística simples)
-    if (oracle.contains('add {') ||
-        (oracle.contains('search your library') && oracle.contains('land')) ||
-        oracle.contains('put a land card')) {
-      ramp += qty;
-    }
-
-    // Draw
-    if (oracle.contains('draw') && oracle.contains('card')) {
-      draw += qty;
-    }
-
-    // Removal
-    if (oracle.contains('destroy target') ||
-        oracle.contains('exile target') ||
-        (oracle.contains('deal') && oracle.contains('damage to target'))) {
-      removal += qty;
-    }
-
-    // Wipes
-    if (oracle.contains('destroy all') || oracle.contains('exile all')) {
-      wipes += qty;
-    }
-
-    // Protection
-    if (oracle.contains('hexproof') ||
-        oracle.contains('indestructible') ||
-        oracle.contains('protection from') ||
-        oracle.contains('shroud')) {
-      protection += qty;
-    }
   }
 
   final avgCmc = nonLands > 0 ? (totalCmcNonLands / nonLands) : 0.0;
+  final functionalSummary = summarizeFunctionalTagsForDeck(cardRows);
+  ramp = functionalSummary.count('ramp');
+  draw = functionalSummary.count('draw');
+  removal = functionalSummary.count('removal');
+  wipes = functionalSummary.count('board_wipe');
+  protection = functionalSummary.count('protection');
 
   return _DeckMetrics(
     totalCards: total,
@@ -307,6 +295,7 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
     removalCount: removal,
     boardWipeCount: wipes,
     protectionCount: protection,
+    functionalSummary: functionalSummary,
   );
 }
 

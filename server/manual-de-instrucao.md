@@ -3,6 +3,44 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-18 — Functional Card Tags v1 para Deck Analysis/Optimize
+
+### O Porquê
+- A análise de decks tinha heurísticas duplicadas para ramp/draw/removal/wipes/protection em
+  `/decks/:id/analysis`, `/decks/:id/ai-analysis` e no pipeline de candidate quality.
+- Cartas úteis ficavam fora das contagens quando o texto não continha exatamente os padrões
+  antigos, por exemplo `draw two cards`, blink/proteção que mirava permanente próprio,
+  aristocrats/drain, recursion e exile-value.
+- O endpoint `/decks/:id/analysis` também somava `totalCards` duas vezes por linha, afetando
+  total, CMC médio e avisos de legalidade/terrenos.
+
+### O Como
+- Criado `server/lib/ai/functional_card_tags.dart` com heurísticas determinísticas e testáveis,
+  sem IA e sem alterar a tabela `cards`.
+- Tags v1: `land`, `ramp`, `ritual`, `draw`, `loot`, `tutor`, `removal`, `board_wipe`,
+  `protection`, `recursion`, `token_maker`, `sacrifice_outlet`, `aristocrat_payoff`,
+  `lifegain`, `drain`, `spellslinger`, `artifact_synergy`, `enchantment_synergy`,
+  `graveyard_synergy`, `etb`, `blink`, `big_spell`, `exile_value`.
+- A camada retorna `FunctionalDeckSummary` com `counts`, `samples` limitados e `coverage`
+  (`tagged`/`other`), usado em:
+  - `GET /decks/:id/analysis` para composição e `functional_tags` opcional;
+  - `POST /decks/:id/ai-analysis` para `metrics.functional_tags` e contagens da análise;
+  - `candidate_quality_data_support.dart` como sinal auxiliar, mantendo aliases antigos
+    (`token`, `aristocrats`, `graveyard`, `sacrifice`) para não quebrar Optimize.
+- `GET /decks/:id/analysis` agora filtra pelo `user_id` autenticado antes de retornar
+  explicabilidade e corrige a contagem duplicada de cartas.
+
+### Resultado
+- Testes adicionados:
+  - `server/test/functional_card_tags_test.dart`;
+  - `server/test/functional_card_tags_commander_probe_test.dart`.
+- Os exemplos obrigatórios cobrem Sol Ring/Arcane Signet, Swords to Plowshares, Wrath of God,
+  Skullclamp, Reanimate, Blood Artist, Young Pyromancer, Ephemerate e Jeska's Will.
+- Provas sanitizadas de Lorehold, Dina e Feather mostram queda de `other` sem expor decklists
+  completas; falsos positivos conhecidos como Ephemerate removido como removal foram bloqueados.
+- Contrato atualizado em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; relatório:
+  `server/doc/RELATORIO_FUNCTIONAL_CARD_TAGS_V1_2026-05-18.md`.
+
 ## 2026-05-18 — Localized deck import names
 
 ### O Porquê
