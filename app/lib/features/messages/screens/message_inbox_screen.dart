@@ -53,12 +53,27 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
         builder: (context, provider, _) {
           if (provider.isLoading && provider.conversations.isEmpty) {
             return const Center(
+              key: Key('messages-inbox-loading'),
               child: CircularProgressIndicator(color: AppTheme.manaViolet),
+            );
+          }
+
+          if (provider.error != null && provider.conversations.isEmpty) {
+            return AppStatePanel(
+              key: const Key('messages-inbox-error'),
+              icon: Icons.error_outline_rounded,
+              title: 'Não foi possível carregar mensagens',
+              message:
+                  'Verifique sua conexão e tente novamente. Suas conversas não foram apagadas.',
+              accent: AppTheme.error,
+              actionLabel: 'Tentar novamente',
+              onAction: () => provider.fetchConversations(),
             );
           }
 
           if (provider.conversations.isEmpty) {
             return const AppStatePanel(
+              key: Key('messages-inbox-empty'),
               icon: Icons.chat_bubble_outline_rounded,
               title: 'Nenhuma conversa',
               message:

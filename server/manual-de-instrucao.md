@@ -16904,3 +16904,25 @@ Direcao de produto:
 - priorizar keyed error/empty states, re-prova de mensagens/trades e prova
   objetiva de optimize aggressive com apply;
 - manter scanner/camera/OCR fora do escopo ate sprint dedicado em device fisico.
+
+## 132. Messages/Notifications keyed error states - 2026-05-18
+
+Patch aplicado:
+
+- `MessageProvider.fetchConversations` e `fetchMessages` agora expõem erro
+  amigável também em respostas backend non-200, não apenas em exceção;
+- `NotificationProvider.fetchNotifications` ganhou `error` público, limpa erro
+  no novo fetch e em `clearAllState`;
+- `MessageInboxScreen` diferencia `messages-inbox-loading`,
+  `messages-inbox-error` e `messages-inbox-empty`;
+- `NotificationScreen` diferencia `notifications-loading`,
+  `notifications-error` e `notifications-empty`;
+- `app/doc/UI_TEST_SURFACE_MAP.md` foi atualizado com as novas keys.
+
+Validação:
+
+- `flutter analyze app/lib/features/messages/providers/message_provider.dart app/lib/features/messages/screens/message_inbox_screen.dart app/lib/features/notifications/providers/notification_provider.dart app/lib/features/notifications/screens/notification_screen.dart app/test/features/messages/providers/message_provider_test.dart app/test/features/messages/screens/message_inbox_screen_test.dart app/test/features/notifications/models/notification_models_test.dart app/test/features/notifications/screens/notification_screen_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter test test/features/messages/providers/message_provider_test.dart test/features/messages/screens/message_inbox_screen_test.dart test/features/notifications/models/notification_models_test.dart test/features/notifications/screens/notification_screen_test.dart --no-version-check --reporter expanded`: `PASS`.
+
+Risco fechado: falha inicial de `/conversations` ou `/notifications` nao deve
+mais ser confundida com estado vazio real nas telas.

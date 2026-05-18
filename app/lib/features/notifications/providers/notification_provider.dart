@@ -56,6 +56,8 @@ class NotificationProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   bool _hasLoadedNotifications = false;
+  String? _error;
+  String? get error => _error;
 
   Timer? _pollTimer;
   int _stateGeneration = 0;
@@ -123,6 +125,7 @@ class NotificationProvider extends ChangeNotifier {
     final generation = _stateGeneration;
     final requestGeneration = ++_notificationFetchGeneration;
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
@@ -141,12 +144,15 @@ class NotificationProvider extends ChangeNotifier {
                 .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
                 .toList();
         _hasLoadedNotifications = true;
+      } else {
+        _error = 'Não foi possível carregar as notificações.';
       }
     } catch (e, stackTrace) {
       if (generation != _stateGeneration ||
           requestGeneration != _notificationFetchGeneration) {
         return;
       }
+      _error = 'Não foi possível carregar as notificações.';
       debugPrint('[NotificationProvider] fetchNotifications error: $e');
       _captureProviderException(
         e,
@@ -277,6 +283,7 @@ class NotificationProvider extends ChangeNotifier {
     if (_notifications.isEmpty &&
         _unreadCount == 0 &&
         !_isLoading &&
+        _error == null &&
         !_hasLoadedNotifications) {
       stopPolling();
       return;
@@ -286,6 +293,7 @@ class NotificationProvider extends ChangeNotifier {
     _notifications = [];
     _unreadCount = 0;
     _isLoading = false;
+    _error = null;
     _hasLoadedNotifications = false;
     notifyListeners();
   }

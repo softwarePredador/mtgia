@@ -41,7 +41,7 @@ sensitive payloads, Authorization headers, or full decklists are included here.
 | Trades | `TradeInboxScreen`, `CreateTradeScreen`, `TradeDetailScreen` | Create type/items/payment/message/review, detail accept/decline/cancel/ship/deliver/complete/dispute, ship dialog, trade chat. | `/trades`, `/trades/:id`, respond/status/messages. | Tab change reloads; detail and chat refresh/polling exist. Inbox state keys remain a gap. | PASS_WITH_RISKS |
 | Community/social | `CommunityScreen`, `UserSearchScreen`, public profile | Community tabs, explore search/clear/filter/list/owner, following feed list, inline user search rows, public profile tabs/actions. | `/community/decks`, `/community/decks/following`, `/community/users`, follow endpoints. | Explore/users/following visible states exist; loading/error/empty keys should be added. | PASS_WITH_RISKS |
 | Messages | `MessageInboxScreen`, `ChatScreen` | Inbox list/tile, chat field/send. | `/conversations`, `/conversations/:id/messages`, read/unread count. | Polling and refresh exist; provider stale-response guard was added in Track C. Error state can still visually collapse into empty state. | PASS_WITH_RISKS |
-| Notifications | `NotificationScreen` | Notification list/tile/read-all. | `/notifications`, count, read, read-all. | Polling and refresh exist; provider stale-response guard was added in Track C. Error state can still visually collapse into empty state. | PASS_WITH_RISKS |
+| Notifications | `NotificationScreen` | Notification list/tile/read-all. | `/notifications`, count, read, read-all. | Polling and refresh exist; provider stale-response guard was added in Track C. Error/empty/loading states are now keyed. | PASS_WITH_RISKS |
 | Life Counter / Lotus | Non-scanner screens and sheets | Local gameplay counters and non-scanner card-search surfaces. | Mostly local state plus card search where used. | Runtime was not rerun by Track B. | PASS_WITH_RISKS |
 | Scanner | `app/lib/features/scanner` | Present in tree only. | Shared card routes exist for future scanner validation. | **DEFERRED / NOT TOUCHED**. | DEFERRED |
 
@@ -51,8 +51,8 @@ sensitive payloads, Authorization headers, or full decklists are included here.
 
 | Finding | File | Repro summary | Recommended patch |
 |---|---|---|---|
-| Messages inbox can show empty copy when `/conversations` fails before data exists. | `app/lib/features/messages/screens/message_inbox_screen.dart` | Force conversations fetch failure on an empty inbox. | Add `messages-inbox-error`, `messages-inbox-empty`, and retry state keys. |
-| Notifications can show empty copy when `/notifications` fails before data exists. | `app/lib/features/notifications/screens/notification_screen.dart` | Force notification list failure on an empty list. | Add `notifications-error`, `notifications-empty`, and retry state keys. |
+| Messages inbox previously could show empty copy when `/conversations` failed before data existed. | `app/lib/features/messages/screens/message_inbox_screen.dart` | Force conversations fetch failure on an empty inbox. | **Closed 2026-05-18:** added `messages-inbox-loading`, `messages-inbox-error`, `messages-inbox-empty` and retry coverage. |
+| Notifications previously could show empty copy when `/notifications` failed before data existed. | `app/lib/features/notifications/screens/notification_screen.dart` | Force notification list failure on an empty list. | **Closed 2026-05-18:** added `notifications-loading`, `notifications-error`, `notifications-empty` and retry coverage. |
 | Chat message load failure has no dedicated keyed error panel. | `app/lib/features/messages/screens/chat_screen.dart` | Force `/conversations/:id/messages` failure. | Expose provider fetch error through `chat-messages-error` with retry. |
 
 ### P2 - UI test surface gaps

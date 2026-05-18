@@ -224,6 +224,8 @@ class MessageProvider extends ChangeNotifier {
         _totalConversations = data['total'] as int? ?? list.length;
         // Sincronizar badge de unread
         _unreadCount = _conversations.fold(0, (sum, c) => sum + c.unreadCount);
+      } else {
+        _error = 'Não foi possível carregar suas conversas.';
       }
     } catch (e) {
       if (generation != _stateGeneration ||
@@ -342,6 +344,9 @@ class MessageProvider extends ChangeNotifier {
             didChange = true;
           }
         }
+      } else if (!incremental) {
+        _error = 'Não foi possível carregar as mensagens.';
+        didChange = true;
       }
     } catch (e) {
       if (generation != _stateGeneration) {

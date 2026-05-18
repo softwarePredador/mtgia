@@ -145,9 +145,15 @@ de animação.
 | Enviar chat direto | `ChatScreen` | `chat-message-send-button` | Persiste mensagem em `/conversations/:id/messages`. | Tap por key + API. |
 | Lista de conversas | `MessageInboxScreen` | `messages-inbox-list` | Renderiza `/conversations` e atualiza por foreground/polling leve. | `find.byKey` + contagem por API. |
 | Conversa individual | `MessageInboxScreen` | `message-conversation-tile-<conversationId>` | Abre `/messages/:conversationId` com contexto estável para tap de FCM. | Tap por key ou deep link por rota. |
+| Loading inbox | `MessageInboxScreen` | `messages-inbox-loading` | Diferencia carregamento inicial de lista vazia. | `find.byKey`; nao depender de spinner anonimo. |
+| Erro inbox | `MessageInboxScreen` | `messages-inbox-error` | Falha de `/conversations` nao deve aparecer como inbox vazio. | `find.byKey` + retry por texto/key de acao. |
+| Inbox vazio | `MessageInboxScreen` | `messages-inbox-empty` | Estado realmente sem conversas. | `find.byKey`; validar ausencia de erro. |
 | Lista de notificações | `NotificationScreen` | `notifications-list` | Renderiza notificações. | `find.byKey`. |
 | Notificação individual | `NotificationScreen` | `notification-tile-<notificationId>` | Abre contexto e marca como lida quando aplicável. | Tap por key. |
 | Ler todas | `NotificationScreen` | `notifications-read-all-button` | Marca todas como lidas. | Tap por key + API. |
+| Loading notificações | `NotificationScreen` | `notifications-loading` | Diferencia carregamento inicial de lista vazia. | `find.byKey`; nao depender de spinner anonimo. |
+| Erro notificações | `NotificationScreen` | `notifications-error` | Falha de `/notifications` nao deve aparecer como lista vazia. | `find.byKey` + retry por texto/key de acao. |
+| Notificações vazias | `NotificationScreen` | `notifications-empty` | Estado realmente sem notificações. | `find.byKey`; validar ausencia de erro. |
 
 ## Optimize
 

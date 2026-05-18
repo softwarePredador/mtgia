@@ -74,12 +74,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
         builder: (context, provider, _) {
           if (provider.isLoading && provider.notifications.isEmpty) {
             return const Center(
+              key: Key('notifications-loading'),
               child: CircularProgressIndicator(color: AppTheme.manaViolet),
+            );
+          }
+
+          if (provider.error != null && provider.notifications.isEmpty) {
+            return AppStatePanel(
+              key: const Key('notifications-error'),
+              icon: Icons.error_outline_rounded,
+              title: 'Não foi possível carregar notificações',
+              message:
+                  'Verifique sua conexão e tente novamente. Seus avisos não foram apagados.',
+              accent: AppTheme.error,
+              actionLabel: 'Tentar novamente',
+              onAction: () => provider.fetchNotifications(),
             );
           }
 
           if (provider.notifications.isEmpty) {
             return const AppStatePanel(
+              key: Key('notifications-empty'),
               icon: Icons.notifications_none_rounded,
               title: 'Nenhuma notificação',
               message:

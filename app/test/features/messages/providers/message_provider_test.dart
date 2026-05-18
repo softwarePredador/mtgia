@@ -110,6 +110,16 @@ class _SwitchingMessagesApiClient extends ApiClient {
   }
 }
 
+class _FailingConversationsApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    if (endpoint.startsWith('/conversations?')) {
+      return ApiResponse(500, {'error': 'server_error'});
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
+
 void main() {
   test(
     'fetchMessages ignores overlapping polling calls for same conversation',
@@ -172,6 +182,18 @@ void main() {
       expect(api.putEndpoints, contains('/conversations/conversation-1/read'));
     },
   );
+
+  test('fetchConversations exposes error on backend failure', () async {
+    final provider = MessageProvider(
+      apiClient: _FailingConversationsApiClient(),
+    );
+
+    await provider.fetchConversations();
+
+    expect(provider.conversations, isEmpty);
+    expect(provider.isLoading, isFalse);
+    expect(provider.error, isNotNull);
+  });
 
   test(
     'sendMessage refreshes conversation list preview after success',

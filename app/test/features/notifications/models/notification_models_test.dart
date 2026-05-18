@@ -61,6 +61,16 @@ class _DelayedNotificationApiClient extends ApiClient {
   }
 }
 
+class _FailingNotificationApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    if (endpoint.startsWith('/notifications?')) {
+      return ApiResponse(500, {'error': 'server_error'});
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
+
 void main() {
   group('AppNotification Model', () {
     test('fromJson deve parsear corretamente com todos os campos', () {
@@ -214,6 +224,18 @@ void main() {
       await provider.markAllAsRead();
       expect(api.readAllCalled, isTrue);
       expect(provider.unreadCount, 0);
+    });
+
+    test('fetchNotifications exposes error on backend failure', () async {
+      final provider = NotificationProvider(
+        apiClient: _FailingNotificationApiClient(),
+      );
+
+      await provider.fetchNotifications();
+
+      expect(provider.notifications, isEmpty);
+      expect(provider.isLoading, isFalse);
+      expect(provider.error, isNotNull);
     });
 
     test(
