@@ -61,13 +61,32 @@ Resumo sanitizado:
 - Servidor local `PORT=8082` com backend real: `GET /health`: PASS.
 - `dart test test/deck_analysis_contract_test.dart -r expanded`: PASS, `3/3`.
 
+## Prova publica app/runtime
+
+Artifact:
+
+- `app/doc/runtime_flow_proofs_2026-05-18_deck_functional_tags_persisted_source/summary.json`
+
+Resumo sanitizado no backend publico `04ec676f42f452acbbca3f96a2ee1852015d7974`:
+
+- iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`: PASS.
+- `GET /decks/:id/analysis`: `200`.
+- `functional_tags.schema_version=functional_card_tags_v1_2026_05_18`.
+- `functional_tags.source.priority=persisted_then_heuristic`.
+- `persisted_rows=5`, `persisted_copies=5`.
+- `heuristic_rows=2`, `heuristic_copies=2`.
+- Contagens principais: `ramp=2`, `draw=1`, `removal=2`.
+- Cobertura da fixture: `card_rows=7`, `tagged_rows=6`.
+- UI renderizou a secao de funcoes e exibiu amostra de ramp.
+
 ## Riscos restantes
 
 - A classificacao continua deterministica/heuristica; a persistencia melhora
   estabilidade e auditabilidade, mas nao substitui revisao humana para casos
   ambiguos.
-- A prova de rota foi local contra o banco atual; o deploy publico precisa
-  atualizar para o commit que contem a leitura persistida.
+- O deploy publico foi provado para leitura persistida na rota de analysis e
+  na UI de Deck Analysis, mas a prova e uma fixture pequena e nao substitui
+  auditoria semantica massiva.
 - Previews brutos do runner foram descartados do versionamento; ficam
   versionados apenas summaries e `tag_counts.csv` para evitar excesso de
   nomes/listas em artefatos.

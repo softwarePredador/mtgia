@@ -17035,3 +17035,40 @@ Risco restante:
 - classificacao continua heuristica/deterministica; persistencia melhora
   estabilidade e auditabilidade, mas falsos positivos/negativos ainda devem ser
   tratados por reports de usuarios e fixtures novas.
+
+## 136. Deck functional tags persisted source runtime - 2026-05-18
+
+Prova publica concluida no app:
+
+- iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`;
+- backend publico `https://evolution-cartinhas.8ktevp.easypanel.host`;
+- backend SHA `04ec676f42f452acbbca3f96a2ee1852015d7974`;
+- harness `app/integration_test/deck_functional_tags_runtime_test.dart`;
+- resultado `00:09 +1: All tests passed!`.
+
+Resumo sanitizado:
+
+- `analysis_http_status=200`;
+- `functional_tags_schema_version=functional_card_tags_v1_2026_05_18`;
+- `source_priority=persisted_then_heuristic`;
+- `persisted_rows=5`;
+- `persisted_copies=5`;
+- `heuristic_rows=2`;
+- `heuristic_copies=2`;
+- `counts.ramp=2`;
+- `counts.draw=1`;
+- `counts.removal=2`;
+- `coverage.card_rows=7`;
+- `coverage.tagged_rows=6`;
+- UI de Deck Analysis renderizou a secao de funcoes e exibiu amostra de ramp.
+
+Artefatos:
+
+- `app/doc/runtime_flow_handoffs/deck_functional_tags_persisted_source_iphone15_simulator_2026-05-18.md`;
+- `app/doc/runtime_flow_proofs_2026-05-18_deck_functional_tags_persisted_source/summary.json`.
+
+Risco restante:
+
+- prova em simulador iOS, nao build assinado em device fisico;
+- fixture pequena prova contrato runtime/origem persistida, nao corretude
+  semantica exaustiva para todas as cartas.

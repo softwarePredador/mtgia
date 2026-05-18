@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -60,6 +62,23 @@ Future<String> _createSmallFunctionalDeck(ApiClient api) async {
   return deckId!;
 }
 
+Map<String, dynamic> _asMap(Object? value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return value.cast<String, dynamic>();
+  return const <String, dynamic>{};
+}
+
+int _asInt(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+Map<String, int> _pickFunctionalCounts(Map<String, dynamic> counts) {
+  const tracked = ['ramp', 'draw', 'removal', 'board_wipe', 'protection'];
+  return {for (final tag in tracked) tag: _asInt(counts[tag])};
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -73,12 +92,35 @@ void main() {
     final api = ApiClient();
     final health = await api.get('/health');
     expect(health.statusCode, 200);
+    final healthData = _asMap(health.data);
 
     await seedAuthenticatedSession(
       api,
       usernamePrefix: 'functional_tags_runtime',
     );
     final deckId = await _createSmallFunctionalDeck(api);
+
+    final analysisResponse = await api.get('/decks/$deckId/analysis');
+    expect(analysisResponse.statusCode, 200);
+    final analysisPayload = _asMap(analysisResponse.data);
+    final functionalTags = _asMap(analysisPayload['functional_tags']);
+    final source = _asMap(functionalTags['source']);
+    final counts = _asMap(functionalTags['counts']);
+    final coverage = _asMap(functionalTags['coverage']);
+    final samples = _asMap(functionalTags['samples']);
+
+    final persistedRows = _asInt(source['persisted_rows']);
+    final persistedCopies = _asInt(source['persisted_copies']);
+    final heuristicRows = _asInt(source['heuristic_rows']);
+    final heuristicCopies = _asInt(source['heuristic_copies']);
+    final trackedCounts = _pickFunctionalCounts(counts);
+    final rampSamples = (samples['ramp'] as List?) ?? const [];
+
+    expect(persistedRows, greaterThan(0));
+    expect(persistedCopies, greaterThan(0));
+    expect(trackedCounts['ramp'], greaterThanOrEqualTo(2));
+    expect(_asInt(coverage['tagged_rows']), greaterThan(0));
+    expect(_asInt(coverage['tagged_copies']), greaterThan(0));
 
     final provider = DeckProvider(apiClient: api);
     await provider.fetchDeckDetails(deckId);
@@ -123,6 +165,27 @@ void main() {
     );
     expect(find.textContaining('Sol Ring'), findsWidgets);
     expectNoRawTechnicalErrorText(tester);
+
+    // Sanitized runtime proof: no auth token, e-mail, raw payload or decklist.
+    // Card-name booleans are limited to the tiny fixture used by this test.
+    // ignore: avoid_print
+    print(
+      'DECK_FUNCTIONAL_TAGS_RUNTIME_SUMMARY ${jsonEncode({
+        'backend_git_sha': healthData['git_sha']?.toString(),
+        'analysis_http_status': analysisResponse.statusCode,
+        'functional_tags_schema_version': functionalTags['schema_version']?.toString(),
+        'source_priority': source['priority']?.toString(),
+        'persisted_rows': persistedRows,
+        'persisted_copies': persistedCopies,
+        'heuristic_rows': heuristicRows,
+        'heuristic_copies': heuristicCopies,
+        'counts': trackedCounts,
+        'coverage': {'card_rows': _asInt(coverage['card_rows']), 'card_copies': _asInt(coverage['card_copies']), 'tagged_rows': _asInt(coverage['tagged_rows']), 'tagged_copies': _asInt(coverage['tagged_copies']), 'other_rows': _asInt(coverage['other_rows']), 'other_copies': _asInt(coverage['other_copies'])},
+        'ramp_sample_count': rampSamples.length,
+        'ui_rendered': true,
+        'sol_ring_visible': true,
+      })}',
+    );
 
     // Keep binding referenced so visual capture setup stays available if enabled.
     expect(binding, isA<IntegrationTestWidgetsFlutterBinding>());
