@@ -16872,3 +16872,35 @@ Patch aplicado para fechar riscos aceitos do release interno non-scanner:
 Regra para agentes: não tratar no-op agressivo como bug automaticamente. Usar
 `utility_signal.status` e scorecard por amostra para decidir entre ajustar pool,
 explicar quality gate ao usuário ou aceitar ausência de troca segura.
+
+## 131. Global product rigor audit - 2026-05-18
+
+Foi consolidada uma auditoria global de produto apos os fixes de import
+localizado, Functional Card Tags, UI de funcoes do deck e auditoria massiva das
+heuristicas.
+
+Relatorio canonico:
+
+- `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+
+Veredito:
+
+- `PASS_WITH_RISKS` para teste interno controlado;
+- `NO-GO` para release publico amplo ate fechar optimize aggressive apply,
+  trade/direct-message persistence, prova de build interno assinado e decisao
+  explicita de scanner/camera/OCR.
+
+Baseline confirmado:
+
+- backend publico saudavel em
+  `20837c42d84ea4345ed6c156a12777276b28491b`;
+- 167 arquivos de teste versionados, sendo 97 app e 70 server;
+- runtime publico recente passou para import localizado e deck analysis com
+  functional tags no iPhone 15 Simulator.
+
+Direcao de produto:
+
+- pausar expansao de Commander Reference ate feedback interno real;
+- priorizar keyed error/empty states, re-prova de mensagens/trades e prova
+  objetiva de optimize aggressive com apply;
+- manter scanner/camera/OCR fora do escopo ate sprint dedicado em device fisico.

@@ -18,9 +18,11 @@ as fontes canônicas abaixo.
    - checklist para rodada interna non-scanner.
 6. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-7. `app/doc/runtime_flow_handoffs/README.md`
+7. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+   - veredito global atual de produto, gates restantes e ordem de execucao.
+8. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-8. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+9. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 
@@ -39,6 +41,10 @@ as fontes canônicas abaixo.
   `server/doc/FULL_COMMANDER_AI_DECK_RULES_AUDIT_2026-05-15.md`,
   `server/doc/FULL_PROJECT_VALIDATION_MATRIX_2026-05-15.md` e
   `server/doc/FULL_PROJECT_AUDIT_MASTER_REPORT_2026-05-15.md`.
+- Auditoria global de produto atual: `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`.
+- Import localizado: `server/doc/RELATORIO_LOCALIZED_IMPORT_NAMES_2026-05-18.md`.
+- Tags funcionais/deck analysis: `server/doc/RELATORIO_FUNCTIONAL_CARD_TAGS_V1_2026-05-18.md` e
+  `server/doc/RELATORIO_FUNCTIONAL_CARD_TAGS_MASS_AUDIT_2026-05-18.md`.
 
 ## Scanner
 
