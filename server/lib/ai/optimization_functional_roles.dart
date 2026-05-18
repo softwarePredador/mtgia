@@ -1,13 +1,21 @@
 bool looksLikeOptimizationBoardWipeText(String oracleText) {
   final oracle = oracleText.toLowerCase();
+  final ownBoardOnly = oracle.contains('all creatures you control') ||
+      oracle.contains('each creature you control');
+  final combatDamageAssignment = oracle.contains('assigns combat damage');
+
+  if (ownBoardOnly || combatDamageAssignment) return false;
 
   return oracle.contains('destroy all') ||
       oracle.contains('exile all') ||
-      oracle.contains('all creatures get') ||
+      oracle.contains('all creatures get -') ||
       oracle.contains('all colored permanents') ||
       oracle.contains('each player sacrifices all') ||
       oracle.contains('each opponent sacrifices all') ||
-      (oracle.contains('each creature') && oracle.contains('damage'));
+      oracle.contains('damage to each creature') ||
+      oracle.contains('deals') &&
+          oracle.contains('damage') &&
+          oracle.contains('to each creature');
 }
 
 bool looksLikeOptimizationRampText(String oracleText) {
@@ -18,13 +26,7 @@ bool looksLikeOptimizationRampText(String oracleText) {
   }
 
   if (oracle.contains('search your library') &&
-      (oracle.contains('land card') ||
-          oracle.contains('basic land') ||
-          oracle.contains('forest card') ||
-          oracle.contains('plains card') ||
-          oracle.contains('island card') ||
-          oracle.contains('swamp card') ||
-          oracle.contains('mountain card'))) {
+      looksLikeOptimizationLandSearchText(oracle)) {
     return true;
   }
 
@@ -35,6 +37,17 @@ bool looksLikeOptimizationRampText(String oracleText) {
       oracle.contains('create a treasure token') ||
       oracle.contains('create two treasure tokens') ||
       oracle.contains('create three treasure tokens');
+}
+
+bool looksLikeOptimizationLandSearchText(String oracleText) {
+  final oracle = oracleText.toLowerCase();
+  return oracle.contains('land card') ||
+      oracle.contains('basic land') ||
+      oracle.contains('forest card') ||
+      oracle.contains('plains card') ||
+      oracle.contains('island card') ||
+      oracle.contains('swamp card') ||
+      oracle.contains('mountain card');
 }
 
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {

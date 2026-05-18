@@ -110,6 +110,77 @@ void main() {
       ).map((tag) => tag.tag).toSet();
 
       expect(hushwingTags, isNot(contains('etb')));
+
+      final natureLoreTags = inferFunctionalCardTags(
+        name: 'Nature\'s Lore',
+        typeLine: 'Sorcery',
+        oracleText:
+            'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
+        manaCost: '{1}{G}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(natureLoreTags, contains('ramp'));
+      expect(natureLoreTags, isNot(contains('tutor')));
+
+      final erebosTags = inferFunctionalCardTags(
+        name: 'Erebos, God of the Dead',
+        typeLine: 'Legendary Enchantment Creature - God',
+        oracleText:
+            'Indestructible. Your opponents can\'t gain life. Pay 2 life: Draw a card.',
+        manaCost: '{3}{B}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(erebosTags, isNot(contains('lifegain')));
+
+      final arcadesTags = inferFunctionalCardTags(
+        name: 'Arcades, the Strategist',
+        typeLine: 'Legendary Creature - Elder Dragon',
+        oracleText:
+            'Each creature you control with defender assigns combat damage equal to its toughness rather than its power.',
+        manaCost: '{1}{G}{W}{U}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(arcadesTags, isNot(contains('board_wipe')));
+
+      final anthemTags = inferFunctionalCardTags(
+        name: 'Glorious Anthem',
+        typeLine: 'Enchantment',
+        oracleText: 'Creatures you control get +1/+1.',
+        manaCost: '{1}{W}{W}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(anthemTags, isNot(contains('board_wipe')));
+    });
+
+    test('keeps protection and wipe positives after mass-audit refinements',
+        () {
+      final wardTags = inferFunctionalCardTags(
+        name: 'Coppercoat Vanguard',
+        typeLine: 'Creature - Human Soldier',
+        oracleText: 'Each other Human you control has ward {1}.',
+        manaCost: '{1}{W}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(wardTags, contains('protection'));
+
+      final blasphemousActTags = inferFunctionalCardTags(
+        name: 'Blasphemous Act',
+        typeLine: 'Sorcery',
+        oracleText:
+            'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
+        manaCost: '{8}{R}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(blasphemousActTags, contains('board_wipe'));
+
+      final drownTags = inferFunctionalCardTags(
+        name: 'Drown in Sorrow',
+        typeLine: 'Sorcery',
+        oracleText: 'All creatures get -2/-2 until end of turn. Scry 1.',
+        manaCost: '{1}{B}{B}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(drownTags, contains('board_wipe'));
     });
 
     test('summarizes counts and bounded samples using quantities', () {

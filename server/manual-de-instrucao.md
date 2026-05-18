@@ -3,6 +3,38 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-18 — Mass audit de Functional Card Tags v1
+
+### O Porquê
+- A primeira entrega de `functional_card_tags_v1` provou slices de comandantes,
+  mas ainda faltava aplicar as heurísticas contra o banco real completo de cartas
+  para medir cobertura, exemplos por tag e suspeitas de falsos positivos/negativos.
+- O audit precisava ser seguro: sem persistir `oracle_text`, ids internos,
+  secrets, JWT, DSN, DATABASE_URL, e-mails QA ou decklists.
+
+### O Como
+- Criado `server/bin/audit_functional_card_tags_mass.dart`, runner somente leitura
+  que conecta sem imprimir detalhes do banco, processa `cards` em chunks e gera
+  `server/test/artifacts/functional_card_tags_mass_audit_2026-05-18/summary.json`.
+- O artefato guarda apenas contagens agregadas, exemplos limitados por nome
+  público de carta, `type_line`, `mana_cost`, `cmc`, confidence/evidence em
+  allow-list e reason codes de suspeita.
+- A auditoria encontrou e corrigiu bugs pequenos:
+  - buscas de tipo basico (`Forest card`, etc.) nao entram mais como `tutor`;
+  - hate de lifegain nao entra mais como `lifegain`;
+  - `ward`, anti-target, prevencao de dano e regeneracao entram em `protection`;
+  - board wipe evita efeitos de dano de combate atribuido e efeitos so em
+    criaturas do controlador;
+  - candidate quality nao reintroduz land-search como tutor pelo bloco legado.
+
+### Resultado
+- Banco real auditado: 33.435 linhas com `type_line` e `oracle_text`.
+- Cobertura final: 22.272 linhas com tag, 11.163 sem tag, 66,613% por linha.
+- Testes focados atualizados:
+  - `server/test/functional_card_tags_test.dart`;
+  - `server/test/candidate_quality_data_support_test.dart`.
+- Relatorio: `server/doc/RELATORIO_FUNCTIONAL_CARD_TAGS_MASS_AUDIT_2026-05-18.md`.
+
 ## 2026-05-18 — App Deck Analysis consumindo functional_tags
 
 ### O Porquê

@@ -344,7 +344,8 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
     add('board_wipe', 0.9, 'mass_removal_text');
   }
 
-  if (oracle.contains('search your library') && !oracle.contains('land card')) {
+  if (oracle.contains('search your library') &&
+      !looksLikeOptimizationLandSearchText(oracle)) {
     add('tutor', 0.86, 'non_land_library_search');
   }
 

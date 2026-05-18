@@ -346,8 +346,7 @@ bool _looksLikeLoot(String oracle) {
 
 bool _looksLikeTutor(String oracle) {
   return oracle.contains('search your library') &&
-      !oracle.contains('basic land') &&
-      !oracle.contains('land card') &&
+      !looksLikeOptimizationLandSearchText(oracle) &&
       (oracle.contains('put') ||
           oracle.contains('reveal') ||
           oracle.contains('card'));
@@ -379,8 +378,15 @@ bool _looksLikeProtection(String oracle, String normalizedName) {
       oracle.contains('indestructible') ||
       oracle.contains('protection from') ||
       oracle.contains('shroud') ||
+      oracle.contains('ward') ||
       oracle.contains('phase out') ||
       oracle.contains('gain protection') ||
+      oracle.contains("can't be the target") ||
+      oracle.contains('cannot be the target') ||
+      oracle.contains('prevent all damage') ||
+      oracle.contains('regenerate target') ||
+      oracle.contains('gains hexproof') ||
+      oracle.contains('gains indestructible') ||
       normalizedName.contains('teferi\'s protection') ||
       normalizedName.contains('heroic intervention') ||
       normalizedName.contains('swiftfoot boots') ||
@@ -435,6 +441,12 @@ bool _looksLikeAristocratPayoff(String oracle, String normalizedName) {
 }
 
 bool _looksLikeLifegain(String oracle) {
+  if (oracle.contains("can't gain life") ||
+      oracle.contains('cannot gain life') ||
+      oracle.contains('players can\'t gain life') ||
+      oracle.contains('opponents can\'t gain life')) {
+    return false;
+  }
   return oracle.contains('you gain') && oracle.contains('life') ||
       oracle.contains('gain life') ||
       oracle.contains('gains you') && oracle.contains('life');

@@ -86,6 +86,19 @@ void main() {
       }
     });
 
+    test('does not duplicate land ramp searches as generic tutors', () {
+      final tags = inferCandidateFunctionTags(
+        name: 'Nature\'s Lore',
+        typeLine: 'Sorcery',
+        oracleText:
+            'Search your library for a Forest card, put that card onto the battlefield, then shuffle.',
+        manaCost: '{1}{G}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(tags, contains('ramp'));
+      expect(tags, isNot(contains('tutor')));
+    });
+
     test('role scores carry budget and bracket suitability metadata', () {
       final scores = buildCandidateRoleScores(
         name: 'Mana Crypt',
