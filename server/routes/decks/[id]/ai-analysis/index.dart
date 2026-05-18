@@ -83,6 +83,22 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           c.colors,
           c.color_identity,
           COALESCE(
+            (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'tag', cft.tag,
+                  'confidence', cft.confidence,
+                  'evidence', cft.evidence,
+                  'source', cft.source
+                )
+                ORDER BY cft.confidence DESC, cft.tag
+              )
+              FROM card_function_tags cft
+              WHERE cft.card_id = c.id
+            ),
+            '[]'::jsonb
+          ) AS functional_tags,
+          COALESCE(
             (SELECT SUM(
               CASE
                 WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
@@ -259,6 +275,7 @@ _DeckMetrics _computeMetrics(Result cardsResult, {required String format}) {
       'mana_cost': manaCost,
       'quantity': qty,
       'cmc': cmc,
+      'functional_tags': m['functional_tags'],
     });
 
     if (isCommander) {

@@ -16986,3 +16986,52 @@ Risco restante:
 
 - prova em simulador, nao build assinado fisico;
 - APNs/FCM real nao foi reprovado aqui.
+
+## 135. Semantic layer operationalization - 2026-05-18
+
+Patch aplicado:
+
+- `summarizeFunctionalTagsForDeck` passou a priorizar tags persistidas por
+  carta em `card_function_tags`;
+- quando nao houver tag persistida confiavel, o fluxo preserva fallback
+  heuristico por carta;
+- `functional_tags.source` agora expoe contagem de linhas/copias vindas de
+  persistencia versus heuristica;
+- `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` carregam
+  `card_function_tags` via `card_id`;
+- foundation runner aplicado para materializar a camada semantica.
+
+Foundation aplicado:
+
+- `cards_scanned=33324`;
+- `cards_with_function_tags=23434`;
+- `function_tag_rows_planned=59712`;
+- `role_score_rows_planned=45425`;
+- `commander_synergy_rows_planned=5000`;
+- `rejection_penalty_rows_planned=371`;
+- `upserted_function_tags=59712`;
+- `upserted_role_scores=45425`;
+- `upserted_commander_synergies=5000`;
+- `upserted_rejection_penalties=371`;
+- `pruned_stale_function_tags=294`;
+- `pruned_stale_role_scores=1134`;
+- `function_tag_coverage_pct=70.322`.
+
+Artefatos:
+
+- `server/doc/RELATORIO_SEMANTIC_LAYER_OPERATIONALIZATION_2026-05-18.md`;
+- `server/test/artifacts/semantic_layer_operational_foundation_2026-05-18_dry_run/summary_dry_run.json`;
+- `server/test/artifacts/semantic_layer_operational_foundation_2026-05-18_apply/summary_apply.json`.
+
+Validacao:
+
+- analyze focado de `functional_card_tags`, rotas de analysis/ai-analysis e
+  testes relacionados: PASS;
+- `dart test test/functional_card_tags_test.dart test/candidate_quality_data_support_test.dart -r expanded`: PASS;
+- servidor local `PORT=8082` + `dart test test/deck_analysis_contract_test.dart -r expanded`: PASS.
+
+Risco restante:
+
+- classificacao continua heuristica/deterministica; persistencia melhora
+  estabilidade e auditabilidade, mas falsos positivos/negativos ainda devem ser
+  tratados por reports de usuarios e fixtures novas.

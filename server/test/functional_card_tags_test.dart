@@ -215,6 +215,50 @@ void main() {
       expect(
           summary.toJson()['schema_version'], functionalCardTagsSchemaVersion);
     });
+
+    test('prefers persisted tags and falls back to heuristic tags per row', () {
+      final summary = summarizeFunctionalTagsForDeck([
+        {
+          'name': 'Semantic Cache Hit',
+          'type_line': 'Creature',
+          'oracle_text': '',
+          'quantity': 2,
+          'functional_tags': [
+            {'tag': 'draw', 'confidence': 0.9, 'source': 'test'},
+          ],
+        },
+        {
+          'name': 'Sol Ring',
+          'type_line': 'Artifact',
+          'oracle_text': '{T}: Add {C}{C}.',
+          'mana_cost': '{1}',
+          'quantity': 1,
+          'functional_tags': const [],
+        },
+        {
+          'name': 'Low Confidence Persisted',
+          'type_line': 'Creature',
+          'oracle_text': '',
+          'quantity': 3,
+          'functional_tags': [
+            {'tag': 'removal', 'confidence': 0.2, 'source': 'test'},
+          ],
+        },
+      ]);
+
+      expect(summary.count('draw'), equals(2));
+      expect(summary.count('ramp'), equals(1));
+      expect(summary.count('removal'), equals(0));
+      expect(summary.persistedRows, equals(1));
+      expect(summary.persistedCopies, equals(2));
+      expect(summary.heuristicRows, equals(2));
+      expect(summary.heuristicCopies, equals(4));
+      expect(summary.otherCopies, equals(3));
+
+      final source = summary.toJson()['source'] as Map<String, dynamic>;
+      expect(source['priority'], equals('persisted_then_heuristic'));
+      expect(source['persisted_rows'], equals(1));
+    });
   });
 }
 

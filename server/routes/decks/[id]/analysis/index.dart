@@ -35,7 +35,31 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 2. Buscar cartas do deck
     final cardsResult = await pool.execute(
       Sql.named('''
-        SELECT c.id, c.name, c.mana_cost, c.type_line, c.oracle_text, c.price, dc.quantity, c.cmc
+        SELECT
+          c.id,
+          c.name,
+          c.mana_cost,
+          c.type_line,
+          c.oracle_text,
+          c.price,
+          dc.quantity,
+          c.cmc,
+          COALESCE(
+            (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'tag', cft.tag,
+                  'confidence', cft.confidence,
+                  'evidence', cft.evidence,
+                  'source', cft.source
+                )
+                ORDER BY cft.confidence DESC, cft.tag
+              )
+              FROM card_function_tags cft
+              WHERE cft.card_id = c.id
+            ),
+            '[]'::jsonb
+          ) AS functional_tags
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
         WHERE dc.deck_id = @deckId

@@ -114,9 +114,20 @@ grep -RInE "<secret-value-patterns>" <changed-files>
   O runtime preserva aliases para compatibilidade. Uma future backfill job pode recalcular tudo
   com `source=deterministic_functional_tags_v1`.
 
+## Addendum operacional - 2026-05-18
+
+O backfill idempotente foi executado depois deste relatorio inicial.
+
+- Relatorio operacional: `server/doc/RELATORIO_SEMANTIC_LAYER_OPERATIONALIZATION_2026-05-18.md`.
+- `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` agora priorizam
+  `card_function_tags` persistido e mantem fallback heuristico por carta.
+- Foundation apply: `59712` function tags, `45425` role scores,
+  `5000` synergy rows e `371` rejection penalties upsertados.
+- A cobertura planejada/persistida da camada foundation ficou em `70.322%`
+  das cartas escaneadas.
+
 ## Menores proximos fixes
 
-1. Criar backfill idempotente para popular `card_function_tags` com `functional_card_tags_v1`.
-2. Ampliar fixtures negativas para Howling Mine, Torpor Orb/Hushwing-like, sacrifice-as-cost e
+1. Ampliar fixtures negativas para Howling Mine, Torpor Orb/Hushwing-like, sacrifice-as-cost e
    cards simetricos de draw.
-3. Rodar prova live em decks reais sanitizados quando houver janela segura de backend publico.
+2. Rodar prova live em decks reais sanitizados quando houver janela segura de backend publico.

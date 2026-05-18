@@ -73,6 +73,10 @@ class FunctionalDeckSummary {
     required this.taggedCopies,
     required this.otherRows,
     required this.otherCopies,
+    this.persistedRows = 0,
+    this.persistedCopies = 0,
+    this.heuristicRows = 0,
+    this.heuristicCopies = 0,
   });
 
   final Map<String, int> counts;
@@ -83,6 +87,10 @@ class FunctionalDeckSummary {
   final int taggedCopies;
   final int otherRows;
   final int otherCopies;
+  final int persistedRows;
+  final int persistedCopies;
+  final int heuristicRows;
+  final int heuristicCopies;
 
   int count(String tag) => counts[tag] ?? 0;
 
@@ -97,6 +105,13 @@ class FunctionalDeckSummary {
           'tagged_copies': taggedCopies,
           'other_rows': otherRows,
           'other_copies': otherCopies,
+        },
+        'source': {
+          'priority': 'persisted_then_heuristic',
+          'persisted_rows': persistedRows,
+          'persisted_copies': persistedCopies,
+          'heuristic_rows': heuristicRows,
+          'heuristic_copies': heuristicCopies,
         },
       };
 }
@@ -259,23 +274,43 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
   var taggedCopies = 0;
   var otherRows = 0;
   var otherCopies = 0;
+  var persistedRows = 0;
+  var persistedCopies = 0;
+  var heuristicRows = 0;
+  var heuristicCopies = 0;
 
   for (final card in cards) {
     cardRows++;
     final name = ((card['name'] as String?) ?? '').trim();
     final qty = ((card['quantity'] as int?) ?? 1).clamp(0, 999).toInt();
     cardCopies += qty;
-    final tags = inferFunctionalCardTags(
-      name: name,
-      typeLine: (card['type_line'] as String?) ?? '',
-      oracleText: (card['oracle_text'] as String?) ?? '',
-      manaCost: card['mana_cost'] as String?,
-      cmc: card['cmc'],
-    )
-        .where((tag) =>
-            countedTags.contains(tag.tag) && tag.confidence >= minConfidence)
-        .map((tag) => tag.tag)
-        .toSet();
+    final persistedTags = _readPersistedFunctionalTags(
+      card['functional_tags'],
+      countedTags: countedTags,
+      minConfidence: minConfidence,
+    );
+    final tags = persistedTags.isNotEmpty
+        ? persistedTags
+        : inferFunctionalCardTags(
+            name: name,
+            typeLine: (card['type_line'] as String?) ?? '',
+            oracleText: (card['oracle_text'] as String?) ?? '',
+            manaCost: card['mana_cost'] as String?,
+            cmc: card['cmc'],
+          )
+            .where((tag) =>
+                countedTags.contains(tag.tag) &&
+                tag.confidence >= minConfidence)
+            .map((tag) => tag.tag)
+            .toSet();
+
+    if (persistedTags.isNotEmpty) {
+      persistedRows++;
+      persistedCopies += qty;
+    } else {
+      heuristicRows++;
+      heuristicCopies += qty;
+    }
 
     if (tags.isEmpty) {
       otherRows++;
@@ -306,7 +341,32 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
     taggedCopies: taggedCopies,
     otherRows: otherRows,
     otherCopies: otherCopies,
+    persistedRows: persistedRows,
+    persistedCopies: persistedCopies,
+    heuristicRows: heuristicRows,
+    heuristicCopies: heuristicCopies,
   );
+}
+
+Set<String> _readPersistedFunctionalTags(
+  Object? value, {
+  required Set<String> countedTags,
+  required double minConfidence,
+}) {
+  if (value is! Iterable) return const <String>{};
+  final tags = <String>{};
+  for (final raw in value) {
+    if (raw is String) {
+      if (countedTags.contains(raw)) tags.add(raw);
+      continue;
+    }
+    if (raw is! Map) continue;
+    final tag = (raw['tag'] as String?)?.trim();
+    if (tag == null || !countedTags.contains(tag)) continue;
+    final confidence = _safeDouble(raw['confidence'], 1);
+    if (confidence >= minConfidence) tags.add(tag);
+  }
+  return tags;
 }
 
 String normalizeFunctionalCardName(String value) {
