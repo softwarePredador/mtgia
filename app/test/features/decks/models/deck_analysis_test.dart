@@ -1,0 +1,95 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/decks/models/deck_analysis.dart';
+
+void main() {
+  group('DeckAnalysisData', () {
+    test('parses functional_tags counts samples and coverage tolerantly', () {
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': 'deck-1',
+        'format': 'commander',
+        'stats': {
+          'composition': {
+            'ramp': '9',
+            'draw': 11,
+            'removal': 8.2,
+            'board_wipes': 2,
+            'protection': null,
+          },
+        },
+        'functional_tags': {
+          'schema_version': 999,
+          'counts': {'ramp': 10, 'draw': '12', 'board_wipe': 3},
+          'samples': {
+            'ramp': [
+              'Sol Ring',
+              {'name': 'Arcane Signet', 'reason': 'mana_or_land_ramp_text'},
+              null,
+              42,
+            ],
+            'draw': [
+              {'card_name': 'Skullclamp', 'role': 'draw'},
+            ],
+          },
+          'coverage': {
+            'card_rows': 80,
+            'card_copies': 100,
+            'tagged_rows': 45,
+            'tagged_copies': 61,
+            'other_rows': 35,
+            'other_copies': 39,
+          },
+        },
+      });
+
+      expect(analysis.deckId, 'deck-1');
+      expect(analysis.countFor(tagKey: 'ramp', compositionKey: 'ramp'), 10);
+      expect(
+        analysis.countFor(tagKey: 'removal', compositionKey: 'removal'),
+        8,
+      );
+      expect(
+        analysis.countFor(tagKey: 'board_wipe', compositionKey: 'board_wipes'),
+        3,
+      );
+      expect(analysis.samplesFor('ramp').map((sample) => sample.name), [
+        'Sol Ring',
+        'Arcane Signet',
+      ]);
+      expect(analysis.samplesFor('ramp').last.reason, 'mana_or_land_ramp_text');
+      expect(
+        analysis.functionalTags?.coverage.summary,
+        '61/100 cópias classificadas',
+      );
+      expect(analysis.sourceLabel, contains('999'));
+    });
+
+    test(
+      'falls back to legacy stats.composition when functional_tags is absent',
+      () {
+        final analysis = DeckAnalysisData.fromJson({
+          'deck_id': 'deck-legacy',
+          'stats': {
+            'composition': {
+              'ramp': 7,
+              'draw': 9,
+              'removal': 5,
+              'board_wipes': 1,
+              'protection': 2,
+            },
+          },
+        });
+
+        expect(analysis.hasFunctionalTags, isFalse);
+        expect(analysis.sourceLabel, 'stats.composition legado');
+        expect(analysis.samplesFor('ramp'), isEmpty);
+        expect(
+          analysis.countFor(
+            tagKey: 'board_wipe',
+            compositionKey: 'board_wipes',
+          ),
+          1,
+        );
+      },
+    );
+  });
+}

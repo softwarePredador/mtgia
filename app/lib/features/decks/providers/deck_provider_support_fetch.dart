@@ -1,6 +1,7 @@
 import '../../../core/api/api_client.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
+import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
 import 'deck_provider_support_common.dart';
 
@@ -113,6 +114,30 @@ Future<DeckDetailsFetchState> fetchDeckDetailsRequest(
 ) async {
   final response = await apiClient.get('/decks/$deckId');
   return parseDeckDetailsResponse(response);
+}
+
+DeckAnalysisData parseDeckAnalysisResponse(ApiResponse response) {
+  if (response.statusCode == 200 && response.data is Map) {
+    return DeckAnalysisData.fromJson(
+      (response.data as Map).cast<String, dynamic>(),
+    );
+  }
+
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckDetails,
+      fallback: 'Não foi possível carregar as funções do deck.',
+    ),
+  );
+}
+
+Future<DeckAnalysisData> fetchDeckAnalysisRequest(
+  ApiClient apiClient,
+  String deckId,
+) async {
+  final response = await apiClient.get('/decks/$deckId/analysis');
+  return parseDeckAnalysisResponse(response);
 }
 
 DeckListFetchState parseDeckListResponse(ApiResponse response) {

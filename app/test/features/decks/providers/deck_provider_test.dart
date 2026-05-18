@@ -1191,6 +1191,83 @@ void main() {
       expect(provider.decks.single.synergyScore, 87);
     });
 
+    test(
+      'fetchDeckAnalysis caches payload and card mutations invalidate it',
+      () async {
+        final currentCards = <String, int>{'spell-1': 1, 'land-1': 36};
+        var analysisFetchCount = 0;
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks':
+                () => ApiResponse(200, [
+                  {
+                    'id': 'deck-1',
+                    'name': 'Smoke Deck',
+                    'format': 'commander',
+                    'is_public': false,
+                    'created_at': '2026-03-23T00:00:00.000Z',
+                    'card_count': 37,
+                  },
+                ]),
+            '/decks/deck-1':
+                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/decks/deck-1/analysis': () {
+              analysisFetchCount += 1;
+              return ApiResponse(200, {
+                'deck_id': 'deck-1',
+                'format': 'commander',
+                'stats': {
+                  'composition': {
+                    'ramp': 1,
+                    'draw': 1,
+                    'removal': 0,
+                    'board_wipes': 0,
+                    'protection': 0,
+                  },
+                },
+                'functional_tags': {
+                  'schema_version': 'functional_card_tags_v1_2026_05_18',
+                  'counts': {'ramp': 1, 'draw': 1},
+                  'samples': {
+                    'ramp': ['Mind Stone'],
+                  },
+                  'coverage': {
+                    'card_rows': 2,
+                    'card_copies': 37,
+                    'tagged_rows': 2,
+                    'tagged_copies': 2,
+                    'other_rows': 0,
+                    'other_copies': 35,
+                  },
+                },
+              });
+            },
+          },
+          postHandlers: {
+            '/decks/deck-1/cards': (_) => ApiResponse(200, {'ok': true}),
+          },
+        );
+
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDeckDetails('deck-1');
+
+        final first = await provider.fetchDeckAnalysis('deck-1');
+        final second = await provider.fetchDeckAnalysis('deck-1');
+        expect(first, same(second));
+        expect(analysisFetchCount, 1);
+        expect(provider.deckAnalysisFor('deck-1'), isNotNull);
+
+        final added = await provider.addCardToDeck(
+          'deck-1',
+          provider.selectedDeck!.mainBoard['Instants']!.first,
+          1,
+        );
+
+        expect(added, isTrue);
+        expect(provider.deckAnalysisFor('deck-1'), isNull);
+      },
+    );
+
     test('copyPublicDeck refreshes deck list on success', () async {
       var decksFetchCount = 0;
       final apiClient = _FakeApiClient(

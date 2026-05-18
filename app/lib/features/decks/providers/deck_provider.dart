@@ -8,6 +8,7 @@ import '../../../core/services/activation_funnel_service.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
 import '../models/deck.dart';
+import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
 import '../models/deck_card_item.dart';
 import 'deck_provider_support.dart';
@@ -46,6 +47,10 @@ class DeckProvider extends ChangeNotifier {
   // Cache de detalhes do deck (evita recarregar se já temos os dados)
   final Map<String, DeckDetails> _deckDetailsCache = {};
   final Map<String, DateTime> _deckDetailsCacheTime = {};
+  final Map<String, DeckAnalysisData> _deckAnalysisCache = {};
+  final Map<String, bool> _deckAnalysisLoading = {};
+  final Map<String, String> _deckAnalysisErrors = {};
+  final Map<String, Future<DeckAnalysisData?>> _deckAnalysisInFlight = {};
   static const _cacheDuration = Duration(minutes: 5);
 
   List<Deck> get decks => List.unmodifiable(_decks);
@@ -55,6 +60,11 @@ class DeckProvider extends ChangeNotifier {
   String? get detailsErrorMessage => _detailsErrorMessage;
   int? get detailsStatusCode => _detailsStatusCode;
   bool get hasError => _errorMessage != null;
+  DeckAnalysisData? deckAnalysisFor(String deckId) =>
+      _deckAnalysisCache[deckId];
+  bool isDeckAnalysisLoading(String deckId) =>
+      _deckAnalysisLoading[deckId] == true;
+  String? deckAnalysisErrorFor(String deckId) => _deckAnalysisErrors[deckId];
 
   DeckProvider({
     ApiClient? apiClient,
@@ -210,6 +220,53 @@ class DeckProvider extends ChangeNotifier {
       );
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<DeckAnalysisData?> fetchDeckAnalysis(
+    String deckId, {
+    bool forceRefresh = false,
+  }) {
+    if (!forceRefresh && _deckAnalysisCache.containsKey(deckId)) {
+      return Future.value(_deckAnalysisCache[deckId]);
+    }
+
+    final inflight = _deckAnalysisInFlight[deckId];
+    if (!forceRefresh && inflight != null) {
+      return inflight;
+    }
+
+    final future = _fetchDeckAnalysisInternal(deckId);
+    _deckAnalysisInFlight[deckId] = future;
+    return future;
+  }
+
+  Future<DeckAnalysisData?> _fetchDeckAnalysisInternal(String deckId) async {
+    _deckAnalysisLoading[deckId] = true;
+    _deckAnalysisErrors.remove(deckId);
+    notifyListeners();
+
+    try {
+      final analysis = await fetchDeckAnalysisRequest(_apiClient, deckId);
+      _deckAnalysisCache[deckId] = analysis;
+      return analysis;
+    } catch (e, stackTrace) {
+      _deckAnalysisErrors[deckId] = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
+        fallback: 'Não foi possível carregar as funções do deck.',
+      );
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'fetchDeckAnalysis',
+        extras: {'deck_id': deckId},
+      );
+      return null;
+    } finally {
+      _deckAnalysisLoading[deckId] = false;
+      _deckAnalysisInFlight.remove(deckId);
       notifyListeners();
     }
   }
@@ -686,7 +743,12 @@ class DeckProvider extends ChangeNotifier {
     _selectedDeck = nextSelectedDeck;
     _decks = nextDecks;
 
-    if (didUpdate) {
+    final hadAnalysisState =
+        _deckAnalysisCache.containsKey(deckId) ||
+        _deckAnalysisErrors.containsKey(deckId) ||
+        _deckAnalysisLoading.containsKey(deckId);
+    invalidateDeckAnalysisCache(deckId);
+    if (didUpdate || hadAnalysisState) {
       notifyListeners();
     }
 
@@ -943,12 +1005,23 @@ class DeckProvider extends ChangeNotifier {
   void invalidateDeckCache(String deckId) {
     _deckDetailsCache.remove(deckId);
     _deckDetailsCacheTime.remove(deckId);
+    invalidateDeckAnalysisCache(deckId);
+  }
+
+  void invalidateDeckAnalysisCache(String deckId) {
+    _deckAnalysisCache.remove(deckId);
+    _deckAnalysisErrors.remove(deckId);
+    _deckAnalysisLoading.remove(deckId);
   }
 
   /// Limpa todo o cache de detalhes
   void clearAllCache() {
     _deckDetailsCache.clear();
     _deckDetailsCacheTime.clear();
+    _deckAnalysisCache.clear();
+    _deckAnalysisErrors.clear();
+    _deckAnalysisLoading.clear();
+    _deckAnalysisInFlight.clear();
   }
 
   /// Importa um deck a partir de uma lista de texto (ex: "1 Sol Ring")
@@ -1127,6 +1200,10 @@ class DeckProvider extends ChangeNotifier {
     _detailsStatusCode = null;
     _deckDetailsCache.clear();
     _deckDetailsCacheTime.clear();
+    _deckAnalysisCache.clear();
+    _deckAnalysisErrors.clear();
+    _deckAnalysisLoading.clear();
+    _deckAnalysisInFlight.clear();
     notifyListeners();
   }
 

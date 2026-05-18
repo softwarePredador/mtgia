@@ -111,6 +111,44 @@ void main() {
     expect(direct.single['id'], 'card-2');
   });
 
+  test('parseDeckAnalysisResponse supports functional tags payload', () {
+    final analysis = parseDeckAnalysisResponse(
+      ApiResponse(200, {
+        'deck_id': 'deck-1',
+        'format': 'commander',
+        'stats': {
+          'composition': {
+            'ramp': 9,
+            'draw': 10,
+            'removal': 8,
+            'board_wipes': 2,
+            'protection': 3,
+          },
+        },
+        'functional_tags': {
+          'schema_version': 'functional_card_tags_v1_2026_05_18',
+          'counts': {'ramp': 11, 'board_wipe': 2},
+          'samples': {
+            'ramp': ['Sol Ring', 'Arcane Signet'],
+          },
+          'coverage': {
+            'card_rows': 80,
+            'card_copies': 100,
+            'tagged_rows': 44,
+            'tagged_copies': 59,
+            'other_rows': 36,
+            'other_copies': 41,
+          },
+        },
+      }),
+    );
+
+    expect(analysis.deckId, 'deck-1');
+    expect(analysis.countFor(tagKey: 'ramp', compositionKey: 'ramp'), 11);
+    expect(analysis.samplesFor('ramp').first.name, 'Sol Ring');
+    expect(analysis.functionalTags?.coverage.taggedCopies, 59);
+  });
+
   test('applyRemovalCountsToCurrentCards decrements and removes entries', () {
     final currentCards = <String, Map<String, dynamic>>{
       'card-1': {'card_id': 'card-1', 'quantity': 2, 'is_commander': false},

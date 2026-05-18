@@ -3,6 +3,38 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-18 — App Deck Analysis consumindo functional_tags
+
+### O Porquê
+- O backend passou a retornar `functional_tags` em `/decks/:id/analysis`, mas a
+  aba Analise do app ainda nao explicava quais cartas eram contadas como ramp,
+  draw, removal, wipes ou protection.
+- Sem essa explicabilidade, o usuario via apenas numeros agregados e nao
+  conseguia auditar a origem das contagens funcionais.
+
+### O Como
+- Criado `DeckAnalysisData` com parsing tolerante de
+  `functional_tags.{schema_version,counts,samples,coverage}` e fallback para
+  `stats.composition` legado.
+- `DeckProvider` ganhou `fetchDeckAnalysis`, cache por deck, deduplicacao de
+  requisicoes em voo, estados loading/erro e invalidacao junto com mutacoes do
+  deck.
+- `DeckAnalysisTab` agora renderiza a secao "Funcoes do deck" com buckets
+  expansíveis para ramp, compra, remocao, wipes e protecao, exibindo origem da
+  contagem, cobertura geral e amostras limitadas quando disponiveis.
+- `app/doc/UI_TEST_SURFACE_MAP.md` foi atualizado com keys estaveis por deck,
+  bucket, contagem, samples e estados.
+
+### Resultado
+- Testes adicionados/atualizados:
+  - `app/test/features/decks/models/deck_analysis_test.dart`;
+  - `app/test/features/decks/providers/deck_provider_support_test.dart`;
+  - `app/test/features/decks/providers/deck_provider_test.dart`;
+  - `app/test/features/decks/widgets/deck_analysis_tab_test.dart`.
+- Harness runtime adicionado:
+  `app/integration_test/deck_functional_tags_runtime_test.dart`.
+- Scanner, camera e OCR continuam fora do escopo desta validacao.
+
 ## 2026-05-18 — Functional Card Tags v1 para Deck Analysis/Optimize
 
 ### O Porquê

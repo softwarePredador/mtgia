@@ -1,0 +1,38 @@
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/deck_functional_tags_runtime_test.dart
+Running Xcode build...
+Xcode build done.                                           31.6s
+00:00 +0: Deck Analysis shows backend functional tag samples
+[🌐 ApiClient] GET http://127.0.0.1:8081/health
+[🌐 ApiClient] GET /health → 200 (365ms)
+[🌐 ApiClient] POST http://127.0.0.1:8081/auth/register
+[🌐 ApiClient] POST /auth/register → 201 (2637ms)
+[⚠️ SLOW REQUEST] POST /auth/register demorou 2637ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: POST, endpoint: /auth/register, status_code: 201, duration_ms: 2637, request_id: mob-65218fb832c06-93d2aa52, response_request_id: mob-65218fb832c06-93d2aa52}
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Talrand%2C+Sky+Summoner&limit=1
+[🌐 ApiClient] GET /cards?name=Talrand%2C+Sky+Summoner&limit=1 → 200 (1275ms)
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Sol+Ring&limit=1
+[🌐 ApiClient] GET /cards?name=Sol+Ring&limit=1 → 200 (1203ms)
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Arcane+Signet&limit=1
+[🌐 ApiClient] GET /cards?name=Arcane+Signet&limit=1 → 200 (1213ms)
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Brainstorm&limit=1
+[🌐 ApiClient] GET /cards?name=Brainstorm&limit=1 → 200 (1207ms)
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Pongify&limit=1
+[🌐 ApiClient] GET /cards?name=Pongify&limit=1 → 200 (1203ms)
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Counterspell&limit=1
+[🌐 ApiClient] GET /cards?name=Counterspell&limit=1 → 200 (1204ms)
+[🌐 ApiClient] GET http://127.0.0.1:8081/cards?name=Whelming+Wave&limit=1
+[🌐 ApiClient] GET /cards?name=Whelming+Wave&limit=1 → 200 (1204ms)
+[🌐 ApiClient] POST http://127.0.0.1:8081/decks
+[🌐 ApiClient] POST /decks → 200 (9033ms)
+[⚠️ SLOW REQUEST] POST /decks demorou 9033ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: POST, endpoint: /decks, status_code: 200, duration_ms: 9033, request_id: mob-65218fc2e93e0-81255036, response_request_id: mob-65218fc2e93e0-81255036}
+[🌐 ApiClient] GET http://127.0.0.1:8081/decks/<deck_id_redacted>
+[🌐 ApiClient] GET /decks/<deck_id_redacted> → 200 (2402ms)
+[⚠️ SLOW REQUEST] GET /decks/<deck_id_redacted> demorou 2402ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /decks/<deck_id_redacted>, status_code: 200, duration_ms: 2402, request_id: mob-65218fcb88c64-8e9cbce2, response_request_id: mob-65218fcb88c64-8e9cbce2}
+[🌐 ApiClient] GET http://127.0.0.1:8081/decks/<deck_id_redacted>/analysis
+[🌐 ApiClient] GET /decks/<deck_id_redacted>/analysis → 200 (2978ms)
+[⚠️ SLOW REQUEST] GET /decks/<deck_id_redacted>/analysis demorou 2978ms
+[Observability] breadcrumb category=api message=api_slow_request data={method: GET, endpoint: /decks/<deck_id_redacted>/analysis, status_code: 200, duration_ms: 2978, request_id: mob-65218fcf698ac-f43878c2, response_request_id: mob-65218fcf698ac-f43878c2}
+00:29 +1: (tearDownAll)
+00:30 +1: All tests passed!

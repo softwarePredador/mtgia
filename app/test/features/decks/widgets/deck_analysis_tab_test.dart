@@ -8,6 +8,20 @@ import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/widgets/deck_analysis_tab.dart';
 import 'package:provider/provider.dart';
 
+class _FakeApiClient extends ApiClient {
+  _FakeApiClient(this.analysisPayload);
+
+  final Map<String, dynamic> analysisPayload;
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    if (endpoint.endsWith('/analysis')) {
+      return ApiResponse(200, analysisPayload);
+    }
+    throw UnimplementedError('No GET handler for $endpoint');
+  }
+}
+
 DeckDetails _makeDeck({
   required String id,
   required String name,
@@ -87,11 +101,28 @@ DeckDetails _makeDeck({
   );
 }
 
-Widget _subject(DeckDetails deck) {
+Widget _subject(DeckDetails deck, {Map<String, dynamic>? analysisPayload}) {
   return MaterialApp(
     theme: AppTheme.darkTheme,
     home: ChangeNotifierProvider(
-      create: (_) => DeckProvider(apiClient: ApiClient()),
+      create:
+          (_) => DeckProvider(
+            apiClient: _FakeApiClient(
+              analysisPayload ??
+                  {
+                    'deck_id': deck.id,
+                    'stats': {
+                      'composition': {
+                        'ramp': 0,
+                        'draw': 0,
+                        'removal': 0,
+                        'board_wipes': 0,
+                        'protection': 0,
+                      },
+                    },
+                  },
+            ),
+          ),
       child: Scaffold(
         body: SingleChildScrollView(child: DeckAnalysisTab(deck: deck)),
       ),
@@ -122,6 +153,10 @@ void main() {
     expect(find.text('Leitura de sinergia'), findsOneWidget);
     expect(find.text('Pontos fortes'), findsOneWidget);
     expect(find.text('Pontos fracos'), findsOneWidget);
+    expect(
+      find.byKey(Key('deck-analysis-functional-section-${deck.id}')),
+      findsOneWidget,
+    );
     expect(find.text('Curva de mana'), findsOneWidget);
     expect(find.text('Distribuição de cores'), findsOneWidget);
   });
@@ -141,5 +176,137 @@ void main() {
     expect(find.text('Leitura pendente'), findsOneWidget);
     expect(find.text('Gerar análise'), findsOneWidget);
     expect(find.text('Sinergia ainda não gerada'), findsOneWidget);
+  });
+
+  testWidgets('renders functional tag counts and expandable samples', (
+    tester,
+  ) async {
+    final deck = _makeDeck(
+      id: 'deck-functional',
+      name: 'Talrand Tags',
+      synergyScore: 82,
+    );
+
+    await tester.pumpWidget(
+      _subject(
+        deck,
+        analysisPayload: {
+          'deck_id': deck.id,
+          'format': 'commander',
+          'stats': {
+            'composition': {
+              'ramp': 9,
+              'draw': 12,
+              'removal': 8,
+              'board_wipes': 2,
+              'protection': 4,
+            },
+          },
+          'functional_tags': {
+            'schema_version': 'functional_card_tags_v1_2026_05_18',
+            'counts': {
+              'ramp': 10,
+              'draw': 12,
+              'removal': 8,
+              'board_wipe': 2,
+              'protection': 4,
+            },
+            'samples': {
+              'ramp': ['Sol Ring', 'Arcane Signet'],
+              'draw': [
+                {'name': 'Skullclamp', 'reason': 'card_draw_text'},
+              ],
+              'removal': ['Swords to Plowshares'],
+              'board_wipe': ['Wrath of God'],
+              'protection': ['Ephemerate'],
+            },
+            'coverage': {
+              'card_rows': 80,
+              'card_copies': 100,
+              'tagged_rows': 46,
+              'tagged_copies': 63,
+              'other_rows': 34,
+              'other_copies': 37,
+            },
+          },
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Funções do deck'), findsOneWidget);
+    expect(
+      find.byKey(
+        const Key('deck-analysis-functional-bucket-deck-functional-ramp'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(
+        const Key('deck-analysis-functional-count-deck-functional-ramp'),
+      ),
+      findsOneWidget,
+    );
+
+    final rampBucket = find.byKey(
+      const Key('deck-analysis-functional-bucket-deck-functional-ramp'),
+    );
+    await tester.ensureVisible(rampBucket);
+    await tester.tap(rampBucket);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sol Ring'), findsOneWidget);
+    expect(find.text('Arcane Signet'), findsOneWidget);
+    expect(
+      find.textContaining('Origem da contagem: functional_tags'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('63/100 cópias classificadas'), findsWidgets);
+  });
+
+  testWidgets('renders legacy composition counts without samples', (
+    tester,
+  ) async {
+    final deck = _makeDeck(
+      id: 'deck-legacy',
+      name: 'Legacy Analysis',
+      synergyScore: 82,
+    );
+
+    await tester.pumpWidget(
+      _subject(
+        deck,
+        analysisPayload: {
+          'deck_id': deck.id,
+          'format': 'commander',
+          'stats': {
+            'composition': {
+              'ramp': 7,
+              'draw': 9,
+              'removal': 5,
+              'board_wipes': 1,
+              'protection': 2,
+            },
+          },
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Resposta legada: contagens visíveis, mas sem amostras de cartas.',
+      ),
+      findsOneWidget,
+    );
+    final rampBucket = find.byKey(
+      const Key('deck-analysis-functional-bucket-deck-legacy-ramp'),
+    );
+    await tester.ensureVisible(rampBucket);
+    await tester.tap(rampBucket);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('stats.composition legado'), findsWidgets);
+    expect(find.textContaining('não enviou amostras'), findsOneWidget);
   });
 }

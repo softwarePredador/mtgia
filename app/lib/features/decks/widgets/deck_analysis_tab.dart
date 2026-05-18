@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../../core/utils/mana_helper.dart';
 import '../providers/deck_provider.dart';
+import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
 
 class DeckAnalysisTab extends StatefulWidget {
@@ -18,6 +19,7 @@ class DeckAnalysisTab extends StatefulWidget {
 class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
   bool _isRefreshingAi = false;
   bool _autoAnalysisTriggered = false;
+  final Set<String> _autoFetchedFunctionalDeckIds = <String>{};
 
   // Cached analysis data — recalculated only when deck changes
   String? _cachedDeckId;
@@ -89,6 +91,15 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     }
   }
 
+  void _scheduleFunctionalAnalysisFetch(String deckId) {
+    if (_autoFetchedFunctionalDeckIds.contains(deckId)) return;
+    _autoFetchedFunctionalDeckIds.add(deckId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<DeckProvider>().fetchDeckAnalysis(deckId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -122,6 +133,16 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         (effectiveDeck.synergyScore ?? 0) > 0 ||
         ((effectiveDeck.strengths ?? '').trim().isNotEmpty) ||
         ((effectiveDeck.weaknesses ?? '').trim().isNotEmpty);
+    _scheduleFunctionalAnalysisFetch(effectiveDeck.id);
+    final functionalAnalysis = context.select<DeckProvider, DeckAnalysisData?>(
+      (p) => p.deckAnalysisFor(effectiveDeck.id),
+    );
+    final functionalAnalysisLoading = context.select<DeckProvider, bool>(
+      (p) => p.isDeckAnalysisLoading(effectiveDeck.id),
+    );
+    final functionalAnalysisError = context.select<DeckProvider, String?>(
+      (p) => p.deckAnalysisErrorFor(effectiveDeck.id),
+    );
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -209,6 +230,24 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
               ),
             ),
           ],
+          const SizedBox(height: 20),
+          _SectionCard(
+            key: Key('deck-analysis-functional-section-${effectiveDeck.id}'),
+            title: 'Funções do deck',
+            subtitle:
+                'Entenda quais cartas entraram nas contagens de ramp, compra, remoção, wipes e proteção.',
+            child: _FunctionalTagsOverview(
+              deckId: effectiveDeck.id,
+              analysis: functionalAnalysis,
+              isLoading: functionalAnalysisLoading,
+              errorMessage: functionalAnalysisError,
+              onRefresh:
+                  () => context.read<DeckProvider>().fetchDeckAnalysis(
+                    effectiveDeck.id,
+                    forceRefresh: true,
+                  ),
+            ),
+          ),
           const SizedBox(height: 20),
           _SectionCard(
             title: 'Base de mana',
@@ -449,7 +488,9 @@ class _AnalysisActionBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                hasAnalysis ? Icons.check_circle_outline : Icons.pending_outlined,
+                hasAnalysis
+                    ? Icons.check_circle_outline
+                    : Icons.pending_outlined,
                 size: 16,
                 color: accent,
               ),
@@ -480,6 +521,7 @@ class _SectionCard extends StatelessWidget {
   final Widget child;
 
   const _SectionCard({
+    super.key,
     required this.title,
     required this.subtitle,
     required this.child,
@@ -519,6 +561,583 @@ class _SectionCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class _FunctionalBucketSpec {
+  const _FunctionalBucketSpec({
+    required this.key,
+    required this.tagKey,
+    required this.compositionKey,
+    required this.label,
+    required this.description,
+    required this.icon,
+    required this.color,
+  });
+
+  final String key;
+  final String tagKey;
+  final String compositionKey;
+  final String label;
+  final String description;
+  final IconData icon;
+  final Color color;
+}
+
+const _functionalBuckets = <_FunctionalBucketSpec>[
+  _FunctionalBucketSpec(
+    key: 'ramp',
+    tagKey: 'ramp',
+    compositionKey: 'ramp',
+    label: 'Ramp',
+    description: 'Aceleração de mana e busca/geração de recursos.',
+    icon: Icons.bolt_rounded,
+    color: AppTheme.success,
+  ),
+  _FunctionalBucketSpec(
+    key: 'draw',
+    tagKey: 'draw',
+    compositionKey: 'draw',
+    label: 'Compra',
+    description: 'Cartas que repõem mão ou geram seleção de cartas.',
+    icon: Icons.style_rounded,
+    color: AppTheme.loomCyan,
+  ),
+  _FunctionalBucketSpec(
+    key: 'removal',
+    tagKey: 'removal',
+    compositionKey: 'removal',
+    label: 'Remoção',
+    description: 'Interações pontuais contra ameaças da mesa.',
+    icon: Icons.gps_fixed_rounded,
+    color: AppTheme.warning,
+  ),
+  _FunctionalBucketSpec(
+    key: 'wipes',
+    tagKey: 'board_wipe',
+    compositionKey: 'board_wipes',
+    label: 'Wipes',
+    description: 'Efeitos globais para resetar criaturas ou permanentes.',
+    icon: Icons.cleaning_services_rounded,
+    color: AppTheme.error,
+  ),
+  _FunctionalBucketSpec(
+    key: 'protection',
+    tagKey: 'protection',
+    compositionKey: 'protection',
+    label: 'Proteção',
+    description: 'Respostas que protegem comandante, plano ou permanentes.',
+    icon: Icons.shield_outlined,
+    color: AppTheme.manaViolet,
+  ),
+];
+
+class _FunctionalTagsOverview extends StatelessWidget {
+  const _FunctionalTagsOverview({
+    required this.deckId,
+    required this.analysis,
+    required this.isLoading,
+    required this.errorMessage,
+    required this.onRefresh,
+  });
+
+  final String deckId;
+  final DeckAnalysisData? analysis;
+  final bool isLoading;
+  final String? errorMessage;
+  final Future<DeckAnalysisData?> Function() onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (isLoading && analysis == null) {
+      return const _FunctionalAnalysisStatus(
+        key: Key('deck-analysis-functional-loading'),
+        icon: Icons.hourglass_top_rounded,
+        message: 'Carregando contagens funcionais do backend...',
+        child: Padding(
+          padding: EdgeInsets.only(top: 12),
+          child: LinearProgressIndicator(),
+        ),
+      );
+    }
+
+    if (errorMessage != null && analysis == null) {
+      return _FunctionalAnalysisStatus(
+        key: const Key('deck-analysis-functional-error'),
+        icon: Icons.info_outline_rounded,
+        message: errorMessage!,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: OutlinedButton.icon(
+            key: const Key('deck-analysis-functional-retry-button'),
+            onPressed: () => onRefresh(),
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Tentar novamente'),
+          ),
+        ),
+      );
+    }
+
+    final data = analysis;
+    if (data == null || !data.hasAnyCounts) {
+      return _FunctionalAnalysisStatus(
+        key: const Key('deck-analysis-functional-empty'),
+        icon: Icons.category_outlined,
+        message:
+            'As funções ainda não estão disponíveis para este deck. Atualize para buscar a leitura do backend.',
+        child: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: FilledButton.tonalIcon(
+            key: const Key('deck-analysis-functional-refresh-button'),
+            onPressed: isLoading ? null : () => onRefresh(),
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Atualizar funções'),
+          ),
+        ),
+      );
+    }
+
+    final coverage = data.functionalTags?.coverage;
+    final coverageRatio = coverage?.taggedCopyRatio;
+    final coverageText = coverage?.summary ?? 'Amostras não informadas';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          key: Key('deck-analysis-functional-origin-$deckId'),
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceSlate.withValues(alpha: 0.42),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.outlineMuted.withValues(alpha: 0.35),
+              width: 0.7,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _FunctionalInfoChip(
+                    icon: Icons.source_outlined,
+                    label: data.sourceLabel,
+                  ),
+                  _FunctionalInfoChip(
+                    icon: Icons.analytics_outlined,
+                    label: coverageText,
+                  ),
+                ],
+              ),
+              if (coverageRatio != null) ...[
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                  child: LinearProgressIndicator(
+                    value: coverageRatio.clamp(0, 1).toDouble(),
+                    minHeight: 5,
+                    color: AppTheme.loomCyan,
+                    backgroundColor: AppTheme.outlineMuted.withValues(
+                      alpha: 0.35,
+                    ),
+                  ),
+                ),
+              ],
+              if (!data.hasFunctionalTags) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Resposta legada: contagens visíveis, mas sem amostras de cartas.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        ..._functionalBuckets.map(
+          (bucket) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _FunctionalBucketTile(
+              deckId: deckId,
+              bucket: bucket,
+              analysis: data,
+            ),
+          ),
+        ),
+        if (isLoading) ...[
+          const SizedBox(height: 2),
+          Text(
+            'Atualizando funções...',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _FunctionalAnalysisStatus extends StatelessWidget {
+  const _FunctionalAnalysisStatus({
+    super.key,
+    required this.icon,
+    required this.message,
+    this.child,
+  });
+
+  final IconData icon;
+  final String message;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.36),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.35),
+          width: 0.7,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: AppTheme.textSecondary, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textPrimary.withValues(alpha: 0.88),
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (child != null) child!,
+        ],
+      ),
+    );
+  }
+}
+
+class _FunctionalInfoChip extends StatelessWidget {
+  const _FunctionalInfoChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.38),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppTheme.loomCyan),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 220),
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textPrimary.withValues(alpha: 0.9),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FunctionalBucketTile extends StatelessWidget {
+  const _FunctionalBucketTile({
+    required this.deckId,
+    required this.bucket,
+    required this.analysis,
+  });
+
+  final String deckId;
+  final _FunctionalBucketSpec bucket;
+  final DeckAnalysisData analysis;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final count = analysis.countFor(
+      tagKey: bucket.tagKey,
+      compositionKey: bucket.compositionKey,
+    );
+    final samples = analysis.samplesFor(bucket.tagKey);
+    final samplePreview =
+        samples.isEmpty
+            ? 'Sem amostras nesta resposta.'
+            : samples.take(2).map((sample) => sample.name).join(', ');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate2.withValues(alpha: 0.68),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: bucket.color.withValues(alpha: 0.2),
+          width: 0.7,
+        ),
+      ),
+      child: ExpansionTile(
+        key: Key('deck-analysis-functional-bucket-$deckId-${bucket.key}'),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        iconColor: bucket.color,
+        collapsedIconColor: AppTheme.textSecondary,
+        leading: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: bucket.color.withValues(alpha: 0.13),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(bucket.icon, color: bucket.color, size: 19),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                bucket.label,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              key: Key('deck-analysis-functional-count-$deckId-${bucket.key}'),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: bucket.color.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              ),
+              child: Text(
+                '$count',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: bucket.color,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+        subtitle: Text(
+          samplePreview,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: AppTheme.textSecondary,
+          ),
+        ),
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              bucket.description,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          _FunctionalBucketSamples(
+            deckId: deckId,
+            bucket: bucket,
+            samples: samples,
+            sourceLabel: analysis.sourceLabel,
+            coverageSummary:
+                analysis.functionalTags?.coverage.summary ??
+                'Cobertura não informada',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FunctionalBucketSamples extends StatelessWidget {
+  const _FunctionalBucketSamples({
+    required this.deckId,
+    required this.bucket,
+    required this.samples,
+    required this.sourceLabel,
+    required this.coverageSummary,
+  });
+
+  final String deckId;
+  final _FunctionalBucketSpec bucket;
+  final List<DeckFunctionalTagSample> samples;
+  final String sourceLabel;
+  final String coverageSummary;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final visibleSamples = samples.take(5).toList(growable: false);
+
+    return Column(
+      key: Key('deck-analysis-functional-samples-$deckId-${bucket.key}'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _FunctionalMetaLine(
+          icon: Icons.source_outlined,
+          text: 'Origem da contagem: $sourceLabel',
+        ),
+        const SizedBox(height: 6),
+        _FunctionalMetaLine(
+          icon: Icons.analytics_outlined,
+          text: 'Cobertura geral: $coverageSummary',
+        ),
+        const SizedBox(height: 10),
+        if (visibleSamples.isEmpty)
+          Text(
+            'Este backend retornou a contagem, mas não enviou amostras de cartas para este indicador.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.35,
+            ),
+          )
+        else
+          ...List.generate(visibleSamples.length, (index) {
+            final sample = visibleSamples[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: _FunctionalSampleRow(
+                key: Key(
+                  'deck-analysis-functional-sample-$deckId-${bucket.key}-$index',
+                ),
+                sample: sample,
+                accent: bucket.color,
+              ),
+            );
+          }),
+      ],
+    );
+  }
+}
+
+class _FunctionalMetaLine extends StatelessWidget {
+  const _FunctionalMetaLine({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 14, color: AppTheme.textSecondary),
+        const SizedBox(width: 7),
+        Expanded(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FunctionalSampleRow extends StatelessWidget {
+  const _FunctionalSampleRow({
+    super.key,
+    required this.sample,
+    required this.accent,
+  });
+
+  final DeckFunctionalTagSample sample;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final detail =
+        sample.reason?.trim().isNotEmpty == true ? sample.reason : sample.role;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check_circle_outline, size: 15, color: accent),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sample.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textPrimary.withValues(alpha: 0.92),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (detail != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    detail,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: 1.25,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
