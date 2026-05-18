@@ -34,12 +34,12 @@ sensitive payloads, Authorization headers, or full decklists are included here.
 | Deck import | `DeckImportScreen`, import-to-deck dialog | Full-screen import fields, commander field, list field, example/count/error/submit keys, dialog field/replace switch/error/not-found keys. | `/import`, `/import/validate`, `/import/to-deck`. | Dialog refreshes deck details after success; backend now returns commander status fields for clearer Commander/Brawl UX. | PASS |
 | Generate | `DeckGenerateScreen` | Format, commander, prompt, submit, generated deck name, save. | `/ai/generate`, job polling, deck create. | Progress and validation feedback are visible; some panels still need stable state keys. | PASS_WITH_RISKS |
 | Optimize | Optimize config/preview/outcome widgets | Preview dialog, intensity, keep-theme, current-strategy, add/remove suggestions, apply, outcome, guided rebuild, error snackbar. | `/ai/optimize`, optimize jobs, rebuild/archetypes/validate. | Strong alignment with `UI_TEST_SURFACE_MAP.md`. | PASS |
-| Cards/search | `CardSearchScreen`, `CardDetailScreen` | Search field, tabs, result list/rows/images/add dialog/confirm. | `/cards`, `/cards/printings`, `/ai/explain`, deck/binder callbacks. | Loading/error/empty states are friendly but not consistently keyed. | PASS_WITH_RISKS |
+| Cards/search | `CardSearchScreen`, `CardDetailScreen` | Search field, tabs, result list/rows/images/add dialog/confirm. | `/cards`, `/cards/printings`, `/ai/explain`, deck/binder callbacks. | Loading/error/empty states are now keyed for card search. | PASS_WITH_RISKS |
 | Sets/collections | `CollectionScreen`, `SetsCatalogScreen`, `SetCardsScreen` | Hub tabs, open catalog/latest, sets search/list/tile, set card list/empty/card. | `/sets`, `/cards?set=...`. | Refresh/retry exists; `setCardsEmptyState` is keyed, other states less consistently keyed. | PASS_WITH_RISKS |
-| Binder | `BinderTabContent`, binder editor | Stats, search, have/want lists, item card, add action, foil/trade/sale/price/notes/language/condition/quantity/save/remove. | `/binder`, `/binder/stats`, binder CRUD. | Pull refresh and filters exist; loading/error/empty states need more stable keys. Scanner add action is deferred. | PASS_WITH_RISKS |
-| Marketplace | `MarketplaceTabContent` | Search, list, item card, owner, propose trade. | `/community/marketplace`. | Infinite scroll and filters exist; loading/error/empty states are not fully keyed. | PASS_WITH_RISKS |
+| Binder | `BinderTabContent`, binder editor | Stats, search, have/want lists, item card, add action, foil/trade/sale/price/notes/language/condition/quantity/save/remove. | `/binder`, `/binder/stats`, binder CRUD. | Pull refresh and filters exist; loading/error/empty states are keyed per `have/want`. Scanner add action is deferred. | PASS_WITH_RISKS |
+| Marketplace | `MarketplaceTabContent` | Search, list, item card, owner, propose trade. | `/community/marketplace`. | Infinite scroll, filters and loading/error/empty keys exist. | PASS_WITH_RISKS |
 | Trades | `TradeInboxScreen`, `CreateTradeScreen`, `TradeDetailScreen` | Create type/items/payment/message/review, detail accept/decline/cancel/ship/deliver/complete/dispute, ship dialog, trade chat. | `/trades`, `/trades/:id`, respond/status/messages. | Tab change reloads; detail and chat refresh/polling exist. Inbox state keys remain a gap. | PASS_WITH_RISKS |
-| Community/social | `CommunityScreen`, `UserSearchScreen`, public profile | Community tabs, explore search/clear/filter/list/owner, following feed list, inline user search rows, public profile tabs/actions. | `/community/decks`, `/community/decks/following`, `/community/users`, follow endpoints. | Explore/users/following visible states exist; loading/error/empty keys should be added. | PASS_WITH_RISKS |
+| Community/social | `CommunityScreen`, `UserSearchScreen`, public profile | Community tabs, explore search/clear/filter/list/owner, following feed list, inline user search rows, public profile tabs/actions. | `/community/decks`, `/community/decks/following`, `/community/users`, follow endpoints. | Explore/users/following loading/error/empty keys exist. | PASS_WITH_RISKS |
 | Messages | `MessageInboxScreen`, `ChatScreen` | Inbox list/tile, chat field/send. | `/conversations`, `/conversations/:id/messages`, read/unread count. | Polling and refresh exist; provider stale-response guard was added in Track C. Error state can still visually collapse into empty state. | PASS_WITH_RISKS |
 | Notifications | `NotificationScreen` | Notification list/tile/read-all. | `/notifications`, count, read, read-all. | Polling and refresh exist; provider stale-response guard was added in Track C. Error/empty/loading states are now keyed. | PASS_WITH_RISKS |
 | Life Counter / Lotus | Non-scanner screens and sheets | Local gameplay counters and non-scanner card-search surfaces. | Mostly local state plus card search where used. | Runtime was not rerun by Track B. | PASS_WITH_RISKS |
@@ -60,18 +60,6 @@ sensitive payloads, Authorization headers, or full decklists are included here.
 Recommended stable state keys for future patches:
 
 - `deck-list-loading`, `deck-list-error`
-- `card-search-loading`, `card-search-error`, `card-search-empty-state`
-- `binder-list-loading-<have|want>`, `binder-list-error-<have|want>`,
-  `binder-list-empty-<have|want>`
-- `marketplace-list-loading`, `marketplace-list-error`,
-  `marketplace-list-empty`
-- `community-explore-loading`, `community-explore-error`,
-  `community-explore-empty`
-- `community-following-loading`, `community-following-error`,
-  `community-following-empty`
-- `community-users-loading`, `community-users-error`, `community-users-empty`
-- `messages-inbox-loading`, `messages-inbox-error`, `messages-inbox-empty`
-- `notifications-loading`, `notifications-error`, `notifications-empty`
 - `deck-generate-progress-panel`, `deck-generate-validation-errors`,
   `deck-generate-warnings`
 

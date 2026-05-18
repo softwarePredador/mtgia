@@ -10,9 +10,10 @@ import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:provider/provider.dart';
 
 class _FixedCardProvider extends CardProvider {
-  _FixedCardProvider(this._results);
+  _FixedCardProvider(this._results, {this.errorMessageOverride});
 
   final List<DeckCardItem> _results;
+  final String? errorMessageOverride;
 
   @override
   List<DeckCardItem> get searchResults => _results;
@@ -25,6 +26,9 @@ class _FixedCardProvider extends CardProvider {
 
   @override
   bool get hasMore => false;
+
+  @override
+  String? get errorMessage => errorMessageOverride;
 }
 
 class _FakeSetsApiClient extends ApiClient {
@@ -207,5 +211,49 @@ void main() {
       apiClient.requests.any((r) => r.startsWith('/cards?set=SOC')),
       isTrue,
     );
+  });
+
+  testWidgets('card search exposes keyed empty and error states', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create: (_) => _FixedCardProvider(const []),
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const CardSearchScreen(deckId: 'binder-1', mode: 'binder'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('card-search-empty-state')), findsOneWidget);
+    expect(find.byKey(const Key('card-search-error')), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<CardProvider>(
+        create:
+            (_) => _FixedCardProvider(
+              const [],
+              errorMessageOverride: 'Falha controlada',
+            ),
+        child: MaterialApp(
+          key: UniqueKey(),
+          theme: AppTheme.darkTheme,
+          home: CardSearchScreen(
+            key: UniqueKey(),
+            deckId: 'binder-1',
+            mode: 'binder',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('card-search-error')), findsOneWidget);
+    expect(find.byKey(const Key('card-search-empty-state')), findsNothing);
   });
 }

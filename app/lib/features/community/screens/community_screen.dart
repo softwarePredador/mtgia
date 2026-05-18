@@ -222,12 +222,14 @@ class _ExploreTabState extends State<_ExploreTab>
             builder: (context, provider, _) {
               if (provider.isLoading && provider.decks.isEmpty) {
                 return const Center(
+                  key: Key('community-explore-loading'),
                   child: CircularProgressIndicator(color: AppTheme.manaViolet),
                 );
               }
 
               if (provider.errorMessage != null && provider.decks.isEmpty) {
                 return Center(
+                  key: const Key('community-explore-error'),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -243,6 +245,7 @@ class _ExploreTabState extends State<_ExploreTab>
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
+                        key: const Key('community-explore-retry'),
                         onPressed: () => provider.fetchPublicDecks(reset: true),
                         child: const Text('Tentar novamente'),
                       ),
@@ -253,6 +256,7 @@ class _ExploreTabState extends State<_ExploreTab>
 
               if (provider.decks.isEmpty) {
                 return Center(
+                  key: const Key('community-explore-empty'),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -408,12 +412,14 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
       builder: (context, provider, _) {
         if (provider.isLoadingFeed && provider.followingFeed.isEmpty) {
           return const Center(
+            key: Key('community-following-loading'),
             child: CircularProgressIndicator(color: AppTheme.manaViolet),
           );
         }
 
         if (provider.feedError != null && provider.followingFeed.isEmpty) {
           return Center(
+            key: const Key('community-following-error'),
             child: Padding(
               padding: const EdgeInsets.all(32),
               child: Column(
@@ -432,6 +438,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
+                    key: const Key('community-following-retry'),
                     onPressed: () => provider.fetchFollowingFeed(reset: true),
                     child: const Text('Tentar novamente'),
                   ),
@@ -443,6 +450,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
 
         if (provider.followingFeed.isEmpty) {
           return Center(
+            key: const Key('community-following-empty'),
             child: Padding(
               padding: const EdgeInsets.all(32),
               child: Column(
@@ -607,12 +615,14 @@ class _UserSearchTabState extends State<_UserSearchTab>
             builder: (context, provider, _) {
               if (provider.isSearching) {
                 return const Center(
+                  key: Key('community-users-loading'),
                   child: CircularProgressIndicator(color: AppTheme.manaViolet),
                 );
               }
 
               if (provider.searchError != null) {
                 return Center(
+                  key: const Key('community-users-error'),
                   child: Text(
                     provider.searchError!,
                     style: const TextStyle(color: AppTheme.textSecondary),
@@ -622,6 +632,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
 
               if (_searchController.text.trim().isEmpty) {
                 return Center(
+                  key: const Key('community-users-empty-query'),
                   child: Padding(
                     padding: const EdgeInsets.all(32),
                     child: Column(
@@ -660,6 +671,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
 
               if (provider.searchResults.isEmpty) {
                 return Center(
+                  key: const Key('community-users-empty'),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

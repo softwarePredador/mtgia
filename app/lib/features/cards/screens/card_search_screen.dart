@@ -328,12 +328,14 @@ class _CardSearchScreenState extends State<CardSearchScreen>
 
         if (provider.isLoading) {
           return const Center(
+            key: Key('card-search-loading'),
             child: CircularProgressIndicator(color: AppTheme.frost400),
           );
         }
 
         if (provider.errorMessage != null) {
           return AppStatePanel(
+            key: const Key('card-search-error'),
             icon: Icons.error_outline_rounded,
             title: 'Falha ao buscar cartas',
             message: provider.errorMessage!,
@@ -345,6 +347,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
 
         if (provider.searchResults.isEmpty) {
           return AppStatePanel(
+            key: const Key('card-search-empty-state'),
             icon:
                 query.length >= 3
                     ? Icons.search_off_rounded

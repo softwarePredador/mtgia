@@ -5,18 +5,24 @@ import 'package:manaloom/features/binder/screens/marketplace_screen.dart';
 import 'package:provider/provider.dart';
 
 class _FakeBinderProvider extends BinderProvider {
-  _FakeBinderProvider(this._items);
+  _FakeBinderProvider(
+    this._items, {
+    this.loading = false,
+    this.marketErrorOverride,
+  });
 
   final List<MarketplaceItem> _items;
+  final bool loading;
+  final String? marketErrorOverride;
 
   @override
   List<MarketplaceItem> get marketItems => _items;
 
   @override
-  bool get isLoadingMarket => false;
+  bool get isLoadingMarket => loading;
 
   @override
-  String? get marketError => null;
+  String? get marketError => marketErrorOverride;
 
   @override
   bool get hasMoreMarket => false;
@@ -77,6 +83,36 @@ void main() {
 
       expect(find.text('Kenrith, the Returned King'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'MarketplaceTabContent exposes keyed loading, error and empty states',
+    (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(390, _FakeBinderProvider(const [], loading: true)),
+      );
+      await tester.pump();
+      expect(find.byKey(const Key('marketplace-list-loading')), findsOneWidget);
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          390,
+          _FakeBinderProvider(
+            const [],
+            marketErrorOverride: 'Falha controlada',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('marketplace-list-error')), findsOneWidget);
+      expect(find.byKey(const Key('marketplace-list-empty')), findsNothing);
+
+      await tester.pumpWidget(
+        buildTestWidget(390, _FakeBinderProvider(const [])),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('marketplace-list-empty')), findsOneWidget);
     },
   );
 }

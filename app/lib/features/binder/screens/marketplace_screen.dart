@@ -182,12 +182,14 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
   Widget _buildMarketList(BinderProvider provider) {
     if (provider.isLoadingMarket && provider.marketItems.isEmpty) {
       return const Center(
+        key: Key('marketplace-list-loading'),
         child: CircularProgressIndicator(color: AppTheme.frost400),
       );
     }
 
     if (provider.marketError != null && provider.marketItems.isEmpty) {
       return Center(
+        key: const Key('marketplace-list-error'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -203,6 +205,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
             ),
             const SizedBox(height: 12),
             ElevatedButton(
+              key: const Key('marketplace-list-retry'),
               onPressed: _doSearch,
               child: const Text('Tentar novamente'),
             ),
@@ -213,6 +216,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
 
     if (provider.marketItems.isEmpty) {
       return Center(
+        key: const Key('marketplace-list-empty'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

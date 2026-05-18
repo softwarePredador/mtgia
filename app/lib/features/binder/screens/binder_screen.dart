@@ -413,13 +413,15 @@ class _BinderListViewState extends State<_BinderListView>
 
   Widget _buildList(bool isHave) {
     if (_isLoading && _items.isEmpty) {
-      return const Center(
+      return Center(
+        key: Key('binder-list-loading-${widget.listType}'),
         child: CircularProgressIndicator(color: AppTheme.frost400),
       );
     }
 
     if (_error != null && _items.isEmpty) {
       return Center(
+        key: Key('binder-list-error-${widget.listType}'),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -435,6 +437,7 @@ class _BinderListViewState extends State<_BinderListView>
             ),
             const SizedBox(height: 12),
             ElevatedButton(
+              key: Key('binder-list-retry-${widget.listType}'),
               onPressed: () => _fetchItems(reset: true),
               child: const Text('Tentar novamente'),
             ),
@@ -445,6 +448,7 @@ class _BinderListViewState extends State<_BinderListView>
 
     if (_items.isEmpty) {
       return Center(
+        key: Key('binder-list-empty-${widget.listType}'),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
             24,

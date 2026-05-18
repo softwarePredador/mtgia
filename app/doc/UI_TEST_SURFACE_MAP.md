@@ -71,6 +71,9 @@ de animação.
 | Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
 |---|---|---|---|---|
 | Campo de busca de cartas | `CardSearchScreen` | `card-search-field` | Digita nome/código para buscar cartas. | `enterText` por key. |
+| Loading busca cartas | `CardSearchScreen` | `card-search-loading` | Diferencia carregamento inicial de resultado vazio. | `find.byKey`. |
+| Erro busca cartas | `CardSearchScreen` | `card-search-error` | Falha de `/cards` nao deve aparecer como lista vazia. | `find.byKey` + retry quando query existir. |
+| Vazio busca cartas | `CardSearchScreen` | `card-search-empty-state` | Estado inicial ou nenhum resultado. | `find.byKey`; validar ausencia de erro. |
 | Tabs de busca | `CardSearchScreen` | `cardSearchTabs` | Alterna `Cartas` e `Coleções`. | Tap por texto visível ou índice apenas após localizar key. |
 | Lista de resultados | `CardSearchScreen` | `card-search-results-list` | Renderiza resultados de `/cards`. | Screenshot + contagem mínima. |
 | Resultado de carta | `CardSearchScreen` | `card-search-result-<cardId>` | Linha com nome, edição e restrições Commander. | `find.byKey` + texto como evidência. |
@@ -96,6 +99,9 @@ de animação.
 | Cards totais/únicas/duplicadas | `BinderTabContent` | `binder-stat-total`, `binder-stat-unique`, `binder-stat-duplicates` | Métricas principais visíveis. | Texto como evidência visual. |
 | Busca do fichário | `BinderTabContent` | `binder-search-field` | Filtra binder. | `enterText` por key. |
 | Lista do fichário | `BinderTabContent` | `binder-list-<have|want>` | Renderiza itens do binder. | `find.byKey`. |
+| Loading fichário | `BinderTabContent` | `binder-list-loading-<have|want>` | Diferencia carregamento inicial de lista vazia. | `find.byKey`. |
+| Erro fichário | `BinderTabContent` | `binder-list-error-<have|want>` | Falha de `/binder` nao deve aparecer como lista vazia. | `find.byKey` + retry `binder-list-retry-<have|want>`. |
+| Vazio fichário | `BinderTabContent` | `binder-list-empty-<have|want>` | Estado real sem itens no filtro/lista. | `find.byKey`; validar ausencia de erro. |
 | Card do fichário | `BinderTabContent` | `binder-item-card-<binderItemId>` | Abre editor do item. | Tap por key + API. |
 | Ação adicionar no fichário | `BinderTabContent` | `binder-add-card-action` | Abre busca para adicionar. | Tap por key. |
 | Ação scanner no fichário | `BinderTabContent` | `binder-scan-card-action` | Scanner, fora de escopo quando explicitamente ignorado. | Não usar em non-scanner QA. |
@@ -108,6 +114,9 @@ de animação.
 | Salvar/remover item | `BinderItemEditor` | `binder-editor-save-button`, `binder-editor-remove-button` | Persiste ou remove item. | Tap por key + API. |
 | Busca marketplace | `MarketplaceTabContent` | `marketplace-search-field` | Filtra marketplace. | `enterText` por key. |
 | Lista marketplace | `MarketplaceTabContent` | `marketplace-list` | Renderiza `/community/marketplace`. | Screenshot + latência. |
+| Loading marketplace | `MarketplaceTabContent` | `marketplace-list-loading` | Diferencia carregamento inicial de marketplace vazio. | `find.byKey`. |
+| Erro marketplace | `MarketplaceTabContent` | `marketplace-list-error` | Falha de marketplace nao deve aparecer como lista vazia. | `find.byKey` + retry `marketplace-list-retry`. |
+| Vazio marketplace | `MarketplaceTabContent` | `marketplace-list-empty` | Estado real sem cards para filtros atuais. | `find.byKey`; validar ausencia de erro. |
 | Card marketplace | `MarketplaceTabContent` | `marketplace-item-card-<marketItemId>` | Mostra item, preço, trust e ações. | `find.byKey`. |
 | Dono do item | `MarketplaceTabContent` | `marketplace-owner-<ownerId>` | Abre perfil público. | Tap por key quando seguro. |
 | Propor trade/compra | `MarketplaceTabContent` | `marketplace-propose-trade-<marketItemId>` | Abre criação de trade. | Tap por key + confirmar review. |
@@ -134,8 +143,11 @@ de animação.
 | Busca Explorar | `_ExploreTab` | `community-explore-search-field`, `community-explore-search-clear-button` | Busca decks públicos. | `enterText` por key + submit. |
 | Filtros Explorar | `_ExploreTab` | `community-explore-format-chip-<format|all>` | Filtra decks por formato. | Tap por key. |
 | Lista Explorar | `_ExploreTab` | `community-explore-deck-list`, `community-explore-deck-row-<deckId>`, `community-explore-deck-owner-<ownerId>` | Abre deck público ou perfil do dono. | Usar IDs vindos do setup/API em runtime. |
+| Estados Explorar | `_ExploreTab` | `community-explore-loading`, `community-explore-error`, `community-explore-retry`, `community-explore-empty` | Diferencia loading/erro/vazio no feed público. | Validar erro por key antes de copy. |
 | Lista Seguindo | `_FollowingFeedTab` | `community-following-deck-list`, `community-following-deck-row-<deckId>` | Abre decks dos seguidos. | `find.byKey` + screenshot. |
+| Estados Seguindo | `_FollowingFeedTab` | `community-following-loading`, `community-following-error`, `community-following-retry`, `community-following-empty` | Diferencia loading/erro/vazio do feed seguido. | Validar erro por key antes de copy. |
 | Busca Usuários inline | `_UserSearchTab` | `community-users-search-field`, `community-users-search-clear-button`, `community-users-list`, `community-users-row-<userId>` | Busca perfis na aba Comunidade. | `enterText` e tap por key baseada em `user.id`. |
+| Estados Usuários | `_UserSearchTab` | `community-users-loading`, `community-users-error`, `community-users-empty-query`, `community-users-empty` | Diferencia busca inicial, falha e zero resultados. | `find.byKey`; texto como evidência visual. |
 
 ## Messages / Notifications
 

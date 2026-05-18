@@ -16926,3 +16926,26 @@ Validação:
 
 Risco fechado: falha inicial de `/conversations` ou `/notifications` nao deve
 mais ser confundida com estado vazio real nas telas.
+
+## 133. Binder/Marketplace/Community/Card Search keyed states - 2026-05-18
+
+Patch aplicado:
+
+- `CardSearchScreen` ganhou `card-search-loading`, `card-search-error` e
+  `card-search-empty-state`;
+- `BinderTabContent` ganhou `binder-list-loading-<have|want>`,
+  `binder-list-error-<have|want>`, `binder-list-retry-<have|want>` e
+  `binder-list-empty-<have|want>`;
+- `MarketplaceTabContent` ganhou `marketplace-list-loading`,
+  `marketplace-list-error`, `marketplace-list-retry` e
+  `marketplace-list-empty`;
+- `CommunityScreen` ganhou keys para loading/error/empty/retry em Explore,
+  Seguindo e Usuarios;
+- `app/doc/UI_TEST_SURFACE_MAP.md` e auditorias de produto foram atualizadas.
+
+Validação desta etapa deve incluir:
+
+- analyze dos arquivos de Cards, Binder, Marketplace e Community;
+- testes de `card_search_screen_test.dart`, `marketplace_screen_overflow_test.dart`
+  e providers de Community/Binder quando alterados;
+- `git diff --check` e scan simples de segredos no diff.

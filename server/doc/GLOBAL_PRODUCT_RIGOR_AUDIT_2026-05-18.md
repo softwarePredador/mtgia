@@ -52,7 +52,7 @@ included in this report.
 | Deck analysis functional roles | PASS_WITH_RISKS | UI/backend runtime-proven against public backend. Counts are explainable but heuristic, not oracle-perfect. |
 | Optimize focused | PASS_WITH_RISKS | Preview/apply paths have tests and prior runtime coverage; quality still depends on candidate availability. |
 | Optimize aggressive | PARTIAL | UX-safe no-op/friendly failure was validated; broad apply-quality proof remains incomplete. |
-| Binder/collection | PASS_WITH_RISKS | CRUD and runtime coverage exist; filter/list error/empty keys should improve. |
+| Binder/collection | PASS_WITH_RISKS | CRUD and runtime coverage exist; Binder/Marketplace list loading/error/empty keys are now explicit. |
 | Marketplace/trades | PASS_WITH_RISKS | Lifecycle has runtime coverage, but trade-chat persistence and list/detail stale UX remain areas to re-prove under lower rate-limit pressure. |
 | Messages/notifications | PASS_WITH_RISKS | Realtime/polling refresh exists, stale-state guards were added, and initial loading/error/empty states are now keyed. Trade/direct-message persistence still needs runtime re-proof. |
 | Life Counter/Lotus | PASS | Large runtime harness inventory and prior proofs exist; not the current risk center. |
@@ -63,7 +63,7 @@ included in this report.
 
 1. **Optimize aggressive apply proof**: run a real non-empty deck through aggressive optimize where suggestions are returned, previewed, partially applied, saved, and validated. Current proof is safe UX, not quality/apply confidence.
 2. **Trade/message persistence re-proof**: rerun trade chat and direct messages with pacing/backoff to avoid `429`, then confirm list preview, unread counts, detail refresh and persisted messages.
-3. **Error/empty state UI hardening**: Messages and Notifications are now keyed; Binder, Marketplace, Community and Card Search still need stable loading/error/empty states so tests can distinguish backend failure from genuinely empty data.
+3. **Error/empty state UI hardening**: Messages, Notifications, Binder, Marketplace, Community and Card Search are now keyed for their main loading/error/empty states. Remaining work is to extend this to lower-priority secondary surfaces such as Deck List and profile/social detail panels.
 4. **Localized import language policy**: decide whether product copy says “Portuguese supported” or “multi-language supported”. Only PT is synced/proven today; ES/FR/DE/IT/JA/KO/RU/ZHS/ZHT need operational sync and proof.
 5. **Scanner decision**: either keep scanner explicitly out of release scope or run a physical-device scanner/OCR validation sprint. Do not leave this ambiguous for testers.
 6. **Release build proof**: before TestFlight/Play internal distribution, rerun a signed/internal build smoke with the exact `API_BASE_URL` and public backend, plus secret-scan and store-label/icon verification.
@@ -82,8 +82,8 @@ included in this report.
 1. Close documentation for this product audit and keep it as the current global status source.
 2. Run the current public runtime smoke set on iPhone 15 Simulator: localized import, functional deck analysis, generate/save/validate, focused optimize, binder/trade/message/notification.
 3. Run one physical-device Android or iPhone internal build smoke only if the next milestone is actual tester distribution, not just engineering validation.
-4. Patch keyed error/empty states for Binder/Marketplace/Community/Card Search.
-5. Re-run trade/direct-message persistence proof with pacing after the Messages/Notifications UI-state patch.
+4. Patch keyed error/empty states for remaining secondary surfaces such as Deck List and profile/social detail panels.
+5. Re-run trade/direct-message persistence proof with pacing after the UI-state hardening.
 6. Decide whether to pause Commander expansion until after internal tester feedback. Current recommendation: **pause expansion** and spend the next pass on product UX correctness.
 
 ## Final product classification
