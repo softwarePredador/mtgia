@@ -4,6 +4,21 @@ import 'package:manaloom/core/api/api_client.dart';
 
 import 'runtime_test_helpers.dart';
 
+const _localizedPortugueseDeckList = '''
+1 Kaalia da Vastidão
+1 Dragão Pira Funesta
+1 Sol Ring
+1 Arcane Signet
+1 Planície
+1 Pântano
+1 Montanha
+1 Necropotência
+1 Espadas em Arados
+1 Capela Isolada
+1 Retiro da Falésia
+1 Memorial de Akroma
+''';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -20,7 +35,7 @@ void main() {
     try {
       final validateResponse = await api.post('/import/validate', {
         'format': 'commander',
-        'list': '1 Dragão Pira Funesta\n1 Kaalia da Vastidão',
+        'list': _localizedPortugueseDeckList,
       });
 
       expect(validateResponse.statusCode, 200);
@@ -32,14 +47,23 @@ void main() {
 
       expect(foundNames, contains('Balefire Dragon'));
       expect(foundNames, contains('Kaalia of the Vast'));
+      expect(foundNames, contains('Plains'));
+      expect(foundNames, contains('Swamp'));
+      expect(foundNames, contains('Mountain'));
+      expect(foundNames, contains('Necropotence'));
+      expect(foundNames, contains('Swords to Plowshares'));
+      expect(foundNames, contains('Isolated Chapel'));
+      expect(foundNames, contains('Clifftop Retreat'));
+      expect(foundNames, contains("Akroma's Memorial"));
       expect(validateBody['not_found_lines'], isEmpty);
-      expect(validateBody['localized_matches_count'], greaterThanOrEqualTo(2));
+      expect(foundNames.length, greaterThanOrEqualTo(12));
+      expect(validateBody['localized_matches_count'], greaterThanOrEqualTo(10));
 
       final importResponse = await api.post('/import', {
         'name': 'Localized Import Runtime',
         'format': 'commander',
         'commander': 'Kaalia da Vastidão',
-        'list': '1 Dragão Pira Funesta\n1 Kaalia da Vastidão',
+        'list': _localizedPortugueseDeckList,
       });
 
       expect(importResponse.statusCode, 200);
@@ -47,7 +71,8 @@ void main() {
       deckId = (importBody['deck'] as Map?)?['id']?.toString();
       expect(deckId, isNotNull);
       expect(importBody['not_found_lines'], isEmpty);
-      expect(importBody['localized_matches_count'], greaterThanOrEqualTo(2));
+      expect(importBody['cards_imported'], greaterThanOrEqualTo(12));
+      expect(importBody['localized_matches_count'], greaterThanOrEqualTo(10));
       expect(importBody['commander_detected'], isTrue);
       expect(importBody['missing_commander'], isFalse);
 

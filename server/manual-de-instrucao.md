@@ -42,7 +42,9 @@
   idiomas devem ser aplicados em janelas separadas para respeitar rate limit da
   Scryfall.
 - Runtime no iPhone 15 Simulator contra backend publico no SHA `94e5ded`
-  confirmou `found_count=2`, `localized_matches_count=2`,
+  confirmou primeiro `found_count=2`, `localized_matches_count=2` e depois,
+  no harness ampliado com 12 linhas PT, `found_count=12`,
+  `localized_matches_count=10`,
   `commander_detected=true`, `missing_commander=false` e limpeza do deck
   temporario.
 - Relatorio: `server/doc/RELATORIO_LOCALIZED_IMPORT_NAMES_2026-05-18.md`.

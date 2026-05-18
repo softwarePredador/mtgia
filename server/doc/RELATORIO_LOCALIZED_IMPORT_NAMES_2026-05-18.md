@@ -58,7 +58,7 @@ flutter test integration_test/localized_import_runtime_test.dart \
   --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true
 ```
 
-Resultado sanitizado:
+Resultado sanitizado da primeira prova:
 
 ```json
 {
@@ -69,7 +69,18 @@ Resultado sanitizado:
 }
 ```
 
-O deck temporario criado pelo harness foi removido ao final.
+Prova ampliada posterior com lista PT de 12 linhas:
+
+```json
+{
+  "found_count": 12,
+  "localized_matches_count": 10,
+  "commander_detected": true,
+  "missing_commander": false
+}
+```
+
+Os decks temporarios criados pelo harness foram removidos ao final.
 
 ## Sync aplicado
 
