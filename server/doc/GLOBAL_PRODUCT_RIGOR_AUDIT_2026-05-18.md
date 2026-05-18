@@ -53,8 +53,8 @@ included in this report.
 | Optimize focused | PASS_WITH_RISKS | Preview/apply paths have tests and prior runtime coverage; quality still depends on candidate availability. |
 | Optimize aggressive | PARTIAL | UX-safe no-op/friendly failure was validated; broad apply-quality proof remains incomplete. |
 | Binder/collection | PASS_WITH_RISKS | CRUD and runtime coverage exist; Binder/Marketplace list loading/error/empty keys are now explicit. |
-| Marketplace/trades | PASS_WITH_RISKS | Lifecycle has runtime coverage, but trade-chat persistence and list/detail stale UX remain areas to re-prove under lower rate-limit pressure. |
-| Messages/notifications | PASS_WITH_RISKS | Realtime/polling refresh exists, stale-state guards were added, and initial loading/error/empty states are now keyed. Trade/direct-message persistence still needs runtime re-proof. |
+| Marketplace/trades | PASS_WITH_RISKS | Lifecycle, trade chat persistence, notification tap-through and read-all were re-proven on iPhone 15 Simulator against the public backend with no rate-limit retries. Physical signed-build proof remains separate. |
+| Messages/notifications | PASS_WITH_RISKS | Direct Message inbox, conversation open, read receipt, reply persistence and unread count were re-proven on iPhone 15 Simulator. Real APNs/FCM delivery remains outside this proof. |
 | Life Counter/Lotus | PASS | Large runtime harness inventory and prior proofs exist; not the current risk center. |
 | Push delivery | PASS_WITH_RISKS | Android FCM real delivery was proven previously, but current internal-test cycle treats real push/APNs as deferred unless rerun for the build. |
 | Scanner/camera/OCR/MLKit | DEFERRED | Must not be claimed as ready until a dedicated physical-device scanner sprint passes. |
@@ -62,11 +62,10 @@ included in this report.
 ## Current non-negotiable gates before broader public release
 
 1. **Optimize aggressive apply proof**: run a real non-empty deck through aggressive optimize where suggestions are returned, previewed, partially applied, saved, and validated. Current proof is safe UX, not quality/apply confidence.
-2. **Trade/message persistence re-proof**: rerun trade chat and direct messages with pacing/backoff to avoid `429`, then confirm list preview, unread counts, detail refresh and persisted messages.
-3. **Error/empty state UI hardening**: Messages, Notifications, Binder, Marketplace, Community and Card Search are now keyed for their main loading/error/empty states. Remaining work is to extend this to lower-priority secondary surfaces such as Deck List and profile/social detail panels.
-4. **Localized import language policy**: decide whether product copy says “Portuguese supported” or “multi-language supported”. Only PT is synced/proven today; ES/FR/DE/IT/JA/KO/RU/ZHS/ZHT need operational sync and proof.
-5. **Scanner decision**: either keep scanner explicitly out of release scope or run a physical-device scanner/OCR validation sprint. Do not leave this ambiguous for testers.
-6. **Release build proof**: before TestFlight/Play internal distribution, rerun a signed/internal build smoke with the exact `API_BASE_URL` and public backend, plus secret-scan and store-label/icon verification.
+2. **Error/empty state UI hardening**: Messages, Notifications, Binder, Marketplace, Community and Card Search are now keyed for their main loading/error/empty states. Remaining work is to extend this to lower-priority secondary surfaces such as Deck List and profile/social detail panels.
+3. **Localized import language policy**: decide whether product copy says “Portuguese supported” or “multi-language supported”. Only PT is synced/proven today; ES/FR/DE/IT/JA/KO/RU/ZHS/ZHT need operational sync and proof.
+4. **Scanner decision**: either keep scanner explicitly out of release scope or run a physical-device scanner/OCR validation sprint. Do not leave this ambiguous for testers.
+5. **Release build proof**: before TestFlight/Play internal distribution, rerun a signed/internal build smoke with the exact `API_BASE_URL` and public backend, plus secret-scan and store-label/icon verification.
 
 ## Product risks to communicate to testers
 
@@ -74,7 +73,7 @@ included in this report.
 - Localized import currently has proven Portuguese support. Other languages should be treated as pending until synced and tested.
 - AI generation is strongest when the user sets a commander and the commander has a reference profile/stats/corpus or archetype reuse. Without commander input, validation still protects legality, but theme quality is less guaranteed.
 - Aggressive optimize may return no actionable changes or a friendly failure when the backend cannot find safe upgrades. That is acceptable UX, but not proof of optimization quality.
-- Rate limit can affect repeated QA auth/message flows on the public backend. Testers should avoid rapid account churn and report timestamps when `429` appears.
+- Rate limit can affect repeated QA auth/message flows on the public backend. The latest trade/direct-message proof observed `0` harness retries, but testers should still avoid rapid account churn and report timestamps when `429` appears.
 - Scanner/camera/OCR findings are out of scope unless a scanner-specific build/test is requested.
 
 ## Recommended next execution order
@@ -83,13 +82,12 @@ included in this report.
 2. Run the current public runtime smoke set on iPhone 15 Simulator: localized import, functional deck analysis, generate/save/validate, focused optimize, binder/trade/message/notification.
 3. Run one physical-device Android or iPhone internal build smoke only if the next milestone is actual tester distribution, not just engineering validation.
 4. Patch keyed error/empty states for remaining secondary surfaces such as Deck List and profile/social detail panels.
-5. Re-run trade/direct-message persistence proof with pacing after the UI-state hardening.
-6. Decide whether to pause Commander expansion until after internal tester feedback. Current recommendation: **pause expansion** and spend the next pass on product UX correctness.
+5. Decide whether to pause Commander expansion until after internal tester feedback. Current recommendation: **pause expansion** and spend the next pass on product UX correctness.
 
 ## Final product classification
 
 **Internal testing:** GO with documented risks.
 
-**External/public release:** NO-GO until optimize aggressive apply, trade/message persistence, release-build smoke and scanner scope decision are closed.
+**External/public release:** NO-GO until optimize aggressive apply, release-build smoke and scanner scope decision are closed.
 
 **Engineering direction:** prioritize product feedback loops and UI correctness over adding more Commander profiles right now.

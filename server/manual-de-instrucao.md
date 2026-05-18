@@ -16949,3 +16949,40 @@ Validação desta etapa deve incluir:
 - testes de `card_search_screen_test.dart`, `marketplace_screen_overflow_test.dart`
   e providers de Community/Binder quando alterados;
 - `git diff --check` e scan simples de segredos no diff.
+
+## 134. Trade/Direct Messages runtime re-proof - 2026-05-18
+
+Prova executada:
+
+- `app/integration_test/binder_marketplace_trade_runtime_test.dart` no iPhone
+  15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`;
+- backend publico `https://evolution-cartinhas.8ktevp.easypanel.host`;
+- backend SHA `5156f9b644f2cff0b6fc6572df1c5569ad313890`;
+- resultado `00:01:18 +2: All tests passed!`.
+
+Cobertura provada:
+
+- Binder item create/update/delete;
+- Marketplace listing discovery;
+- Trade create/accept/ship/confirm delivery/complete;
+- mensagem de trade persistida e notificacao `trade_message` presente;
+- notificacao `trade_completed` presente para vendedor;
+- tap-through de notificacao para Trade Detail;
+- read-all zerando unread de notificacoes;
+- Direct Messages inbox/conversa/read receipt/reply;
+- Direct Messages com `direct_messages_total=2` e unread do recebedor `0`.
+
+Harden do harness:
+
+- `_RuntimeApi` agora aplica retry sanitizado para `429` em GET/POST/PUT/DELETE;
+- o runtime imprime summaries finais sem tokens/e-mails/payloads sensiveis.
+
+Artefatos:
+
+- `app/doc/runtime_flow_handoffs/trade_direct_messages_iphone15_simulator_2026-05-18.md`;
+- `app/doc/runtime_flow_proofs_2026-05-18_trade_direct_messages_iphone15_simulator/summary.json`.
+
+Risco restante:
+
+- prova em simulador, nao build assinado fisico;
+- APNs/FCM real nao foi reprovado aqui.

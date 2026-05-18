@@ -46,11 +46,16 @@ class _RuntimeApi {
 
   final String baseUrl;
   final _client = http.Client();
+  int rateLimitRetries = 0;
 
   Future<Map<String, dynamic>> getJson(String endpoint, {String? token}) async {
-    final response = await _client
-        .get(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
-        .timeout(const Duration(seconds: 20));
+    final response = await _sendWithRateLimitRetry(
+      endpoint: endpoint,
+      request:
+          () => _client
+              .get(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
+              .timeout(const Duration(seconds: 20)),
+    );
     return _decode(response, expected: {200});
   }
 
@@ -60,28 +65,17 @@ class _RuntimeApi {
     String? token,
     Set<int> expected = const {200, 201},
   }) async {
-    var response = await _client
-        .post(
-          Uri.parse('$baseUrl$endpoint'),
-          headers: _headers(token),
-          body: jsonEncode(body),
-        )
-        .timeout(const Duration(seconds: 20));
-    if (response.statusCode == 429) {
-      final retryAfter = _retryAfterSeconds(response.body);
-      // Public release QA can hit distributed auth limits across disposable
-      // users; retry once and keep the evidence explicit in the log.
-      // ignore: avoid_print
-      print('RUNTIME_RATE_LIMIT_RETRY endpoint=$endpoint seconds=$retryAfter');
-      await Future<void>.delayed(Duration(seconds: retryAfter));
-      response = await _client
-          .post(
-            Uri.parse('$baseUrl$endpoint'),
-            headers: _headers(token),
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 20));
-    }
+    final response = await _sendWithRateLimitRetry(
+      endpoint: endpoint,
+      request:
+          () => _client
+              .post(
+                Uri.parse('$baseUrl$endpoint'),
+                headers: _headers(token),
+                body: jsonEncode(body),
+              )
+              .timeout(const Duration(seconds: 20)),
+    );
     return _decode(response, expected: expected);
   }
 
@@ -90,23 +84,55 @@ class _RuntimeApi {
     Map<String, dynamic> body, {
     required String token,
   }) async {
-    final response = await _client
-        .put(
-          Uri.parse('$baseUrl$endpoint'),
-          headers: _headers(token),
-          body: jsonEncode(body),
-        )
-        .timeout(const Duration(seconds: 20));
+    final response = await _sendWithRateLimitRetry(
+      endpoint: endpoint,
+      request:
+          () => _client
+              .put(
+                Uri.parse('$baseUrl$endpoint'),
+                headers: _headers(token),
+                body: jsonEncode(body),
+              )
+              .timeout(const Duration(seconds: 20)),
+    );
     return _decode(response, expected: {200});
   }
 
   Future<void> delete(String endpoint, {required String token}) async {
-    final response = await _client
-        .delete(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
-        .timeout(const Duration(seconds: 20));
+    final response = await _sendWithRateLimitRetry(
+      endpoint: endpoint,
+      request:
+          () => _client
+              .delete(Uri.parse('$baseUrl$endpoint'), headers: _headers(token))
+              .timeout(const Duration(seconds: 20)),
+    );
     if (response.statusCode != 200 && response.statusCode != 204) {
       fail('DELETE $endpoint -> ${response.statusCode}: ${response.body}');
     }
+  }
+
+  Future<http.Response> _sendWithRateLimitRetry({
+    required String endpoint,
+    required Future<http.Response> Function() request,
+  }) async {
+    var response = await request();
+    for (
+      var attempt = 1;
+      response.statusCode == 429 && attempt <= 2;
+      attempt++
+    ) {
+      final retryAfter = _retryAfterSeconds(response.body);
+      rateLimitRetries += 1;
+      // Public QA can hit distributed limits; keep only endpoint and wait.
+      // ignore: avoid_print
+      print(
+        'RUNTIME_RATE_LIMIT_RETRY endpoint=$endpoint '
+        'attempt=$attempt seconds=$retryAfter',
+      );
+      await Future<void>.delayed(Duration(seconds: retryAfter));
+      response = await request();
+    }
+    return response;
   }
 
   Future<_RuntimeUser> registerUser(String prefix) async {
@@ -843,6 +869,27 @@ void main() {
         description: 'notifications read-all reflected in backend',
       );
 
+      final tradeSummary = {
+        'trade_id': tradeId,
+        'status': await api.tradeStatus(buyer.token, tradeId),
+        'trade_messages_total': await api.tradeMessageCount(
+          buyer.token,
+          tradeId,
+        ),
+        'seller_trade_completed_notification': await api.hasNotificationType(
+          seller.token,
+          'trade_completed',
+        ),
+        'buyer_unread_notifications': await api.notificationUnreadCount(
+          buyer.token,
+        ),
+        'rate_limit_retries': api.rateLimitRetries,
+      };
+      // ignore: avoid_print
+      print(
+        'BINDER_MARKETPLACE_TRADE_RUNTIME_SUMMARY ${jsonEncode(tradeSummary)}',
+      );
+
       expect(tester.takeException(), isNull);
     },
   );
@@ -922,6 +969,20 @@ void main() {
             await api.directMessageCount(receiver.token, conversationId) >= 2,
         description: 'direct message reply persisted',
       );
+
+      final directSummary = {
+        'conversation_id': conversationId,
+        'direct_messages_total': await api.directMessageCount(
+          receiver.token,
+          conversationId,
+        ),
+        'receiver_unread_direct_messages': await api.directUnreadCount(
+          receiver.token,
+        ),
+        'rate_limit_retries': api.rateLimitRetries,
+      };
+      // ignore: avoid_print
+      print('DIRECT_MESSAGES_RUNTIME_SUMMARY ${jsonEncode(directSummary)}');
 
       expect(tester.takeException(), isNull);
     },
