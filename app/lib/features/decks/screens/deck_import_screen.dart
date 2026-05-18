@@ -25,6 +25,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   List<String> _notFoundLines = [];
   List<String> _warnings = [];
   int _cardsImported = 0;
+  int _localizedMatchesCount = 0;
   String? _error;
 
   @override
@@ -97,6 +98,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       _error = null;
       _notFoundLines = [];
       _warnings = [];
+      _localizedMatchesCount = 0;
     });
 
     final provider = context.read<DeckProvider>();
@@ -121,6 +123,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       _notFoundLines = List<String>.from(result['not_found_lines'] ?? []);
       _warnings = List<String>.from(result['warnings'] ?? []);
       _cardsImported = result['cards_imported'] ?? 0;
+      _localizedMatchesCount = result['localized_matches_count'] as int? ?? 0;
     });
 
     if (result['success'] == true) {
@@ -138,6 +141,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           cardsImported: _cardsImported,
           notFound: _notFoundLines,
           warnings: _warnings,
+          localizedMatchesCount: _localizedMatchesCount,
         );
       } else {
         // Tudo ok, vai direto pro deck
@@ -164,6 +168,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           success: false,
           notFound: _notFoundLines,
           error: _error,
+          localizedMatchesCount: _localizedMatchesCount,
         );
       }
     }
@@ -175,6 +180,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     int cardsImported = 0,
     List<String> notFound = const [],
     List<String> warnings = const [],
+    int localizedMatchesCount = 0,
     String? error,
   }) {
     final theme = Theme.of(context);
@@ -238,6 +244,16 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                               height: 1.35,
                             ),
                           ),
+                          if (localizedMatchesCount > 0) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              '$localizedMatchesCount nomes localizados convertidos automaticamente.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppTheme.success,
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -322,7 +338,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tente usar o nome em inglês ou revisar a ortografia das linhas listadas.',
+                            'Tente usar o nome em inglês ou revisar a ortografia. Nomes em outros idiomas são reconhecidos quando a base localizada está sincronizada.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: AppTheme.textSecondary,
                               fontStyle: FontStyle.italic,

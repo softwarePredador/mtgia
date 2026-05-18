@@ -1,11 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
-import '../../../lib/import_card_lookup_service.dart';
 import '../../../lib/import_list_service.dart';
-
-String _cleanLookupKey(String value) =>
-    value.replaceAll(RegExp(r'\s+\d+$'), '');
+import '../../../lib/import_card_lookup_service.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method == HttpMethod.post) {
@@ -45,6 +42,8 @@ Future<Response> _validateList(RequestContext context) async {
   final foundCards = <Map<String, dynamic>>[];
   final notFoundLines = <String>[];
   final warnings = <String>[];
+  final localizedMatches = <Map<String, dynamic>>[];
+  final localizedMatchKeys = <String>{};
 
   final parseResult = parseImportLines(lines);
   final parsedItems = parseResult.parsedItems;
@@ -57,13 +56,17 @@ Future<Response> _validateList(RequestContext context) async {
   for (final item in parsedItems) {
     if (notFoundLines.contains(item['line'])) continue;
 
-    final originalKey = (item['name'] as String).toLowerCase();
-    final cleanedKey = _cleanLookupKey(originalKey);
-    final nameKey =
-        foundCardsMap.containsKey(originalKey) ? originalKey : cleanedKey;
+    final cardData = findResolvedImportCard(
+      foundCardsMap,
+      item['name'] as String,
+    );
 
-    if (foundCardsMap.containsKey(nameKey)) {
-      final cardData = foundCardsMap[nameKey]!;
+    if (cardData != null) {
+      final localizedMatch = localizedImportMatchForCard(cardData, item);
+      if (localizedMatch != null &&
+          localizedMatchKeys.add('${localizedMatch['line']}')) {
+        localizedMatches.add(localizedMatch);
+      }
 
       foundCards.add({
         'card_id': cardData['id'],
@@ -208,6 +211,8 @@ Future<Response> _validateList(RequestContext context) async {
   return Response.json(body: {
     'found_cards': foundCards,
     'not_found_lines': notFoundLines,
+    'localized_matches': localizedMatches,
+    'localized_matches_count': localizedMatches.length,
     'warnings': warnings,
     'total_cards': totalCards,
     'total_unique': consolidated.length,

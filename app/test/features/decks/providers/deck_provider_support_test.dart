@@ -353,6 +353,7 @@ void main() {
         'deck': {'id': 'deck-1'},
         'cards_imported': 99,
         'not_found_lines': ['1 Missing Card'],
+        'localized_matches_count': 4,
         'warnings': ['warning'],
       }),
     );
@@ -360,6 +361,7 @@ void main() {
     expect(result['success'], isTrue);
     expect(result['cards_imported'], 99);
     expect(result['not_found_lines'], ['1 Missing Card']);
+    expect(result['localized_matches_count'], 4);
     expect(result['warnings'], ['warning']);
   });
 
@@ -382,6 +384,7 @@ void main() {
         'deck_id': 'deck-1',
         'cards_imported': 1,
         'total_cards': 2,
+        'localized_matches_count': 1,
         'commander_detected': true,
         'missing_commander': false,
         'commander_preserved': true,
@@ -392,6 +395,7 @@ void main() {
     expect(result['deck_id'], 'deck-1');
     expect(result['cards_imported'], 1);
     expect(result['total_cards'], 2);
+    expect(result['localized_matches_count'], 1);
     expect(result['commander_detected'], isTrue);
     expect(result['missing_commander'], isFalse);
     expect(result['commander_preserved'], isTrue);

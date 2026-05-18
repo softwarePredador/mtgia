@@ -29,11 +29,111 @@ const _localizedImportAliases = <String, String>{
   'memorial de akroma': "Akroma's Memorial",
 };
 
+const createCardLocalizedNamesTableSql = '''
+CREATE TABLE IF NOT EXISTS card_localized_names (
+  scryfall_id UUID NOT NULL,
+  oracle_id UUID,
+  card_id UUID REFERENCES cards(id) ON DELETE CASCADE,
+  lang TEXT NOT NULL,
+  printed_name TEXT NOT NULL,
+  normalized_printed_name TEXT NOT NULL,
+  canonical_name TEXT NOT NULL,
+  set_code TEXT,
+  collector_number TEXT,
+  source TEXT NOT NULL DEFAULT 'scryfall',
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (scryfall_id, lang, normalized_printed_name)
+)
+''';
+
+const createCardLocalizedNamesIndexesSql = [
+  '''
+  CREATE INDEX IF NOT EXISTS idx_card_localized_names_lookup
+  ON card_localized_names (normalized_printed_name, lang)
+  ''',
+  '''
+  CREATE INDEX IF NOT EXISTS idx_card_localized_names_card_id
+  ON card_localized_names (card_id)
+  ''',
+  '''
+  CREATE INDEX IF NOT EXISTS idx_card_localized_names_oracle_id
+  ON card_localized_names (oracle_id)
+  ''',
+];
+
 String canonicalizeImportLookupName(String value) {
   final cleanKey = cleanImportLookupKey(value.trim().toLowerCase());
   final folded = foldImportLookupKey(cleanKey);
   return _localizedImportAliases[folded]?.toLowerCase() ?? cleanKey;
 }
+
+String normalizeLocalizedImportName(String value) =>
+    foldImportLookupKey(cleanImportLookupKey(value.trim()))
+        .replaceAll(RegExp(r'[’`´]'), "'")
+        .replaceAll(RegExp(r'[“”]'), '"')
+        .trim();
+
+String? staticLocalizedImportAliasTarget(String value) {
+  final folded = normalizeLocalizedImportName(value);
+  return _localizedImportAliases[folded]?.toLowerCase();
+}
+
+Future<void> ensureCardLocalizedNamesTable(Session session) async {
+  await session.execute(Sql.named(createCardLocalizedNamesTableSql));
+  for (final sql in createCardLocalizedNamesIndexesSql) {
+    await session.execute(Sql.named(sql));
+  }
+}
+
+Future<bool> hasCardLocalizedNamesTable(Pool pool) async {
+  final result = await pool.execute(
+    Sql.named("SELECT to_regclass('public.card_localized_names') IS NOT NULL"),
+  );
+  return result.isNotEmpty && result.first[0] == true;
+}
+
+Map<String, dynamic>? findResolvedImportCard(
+  Map<String, Map<String, dynamic>> foundCardsMap,
+  String rawName,
+) {
+  final originalKey = rawName.toLowerCase();
+  final cleanedKey = cleanImportLookupKey(originalKey);
+  final canonicalKey = canonicalizeImportLookupName(cleanedKey);
+  final localizedKey = normalizeLocalizedImportName(cleanedKey);
+  return foundCardsMap[originalKey] ??
+      foundCardsMap[cleanedKey] ??
+      foundCardsMap[canonicalKey] ??
+      foundCardsMap[localizedKey];
+}
+
+Map<String, dynamic>? localizedImportMatchForCard(
+  Map<String, dynamic> cardData,
+  Map<String, dynamic> item,
+) {
+  if (cardData['_localized_match'] != true) return null;
+  return {
+    'line': item['line'],
+    'input_name': item['name'],
+    'matched_name': cardData['name'],
+    'printed_name': cardData['_localized_printed_name'] ?? item['name'],
+    'lang': cardData['_localized_lang'],
+    'source': cardData['_localized_source'],
+  };
+}
+
+Map<String, dynamic> _withLocalizedMetadata(
+  Map<String, dynamic> card, {
+  required String printedName,
+  required String lang,
+  required String source,
+}) =>
+    {
+      ...card,
+      '_localized_match': true,
+      '_localized_printed_name': printedName,
+      '_localized_lang': lang,
+      '_localized_source': source,
+    };
 
 /// Resolve nomes de cartas para dados do banco em lote.
 ///
@@ -52,6 +152,8 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
 
   final exactKeys = <String>{};
   final aliasesByCanonicalKey = <String, Set<String>>{};
+  final staticLocalizedInputsByCanonicalKey = <String, Set<String>>{};
+  final localizedAliasesByNormalizedKey = <String, Set<String>>{};
   for (final item in parsedItems) {
     final rawName = item['name']?.toString().trim();
     if (rawName == null || rawName.isEmpty) continue;
@@ -60,6 +162,8 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
     final cleanKey = cleanImportLookupKey(originalKey);
     final canonicalOriginalKey = canonicalizeImportLookupName(originalKey);
     final canonicalCleanKey = canonicalizeImportLookupName(cleanKey);
+    final localizedOriginalKey = normalizeLocalizedImportName(originalKey);
+    final localizedCleanKey = normalizeLocalizedImportName(cleanKey);
 
     exactKeys.add(originalKey);
     exactKeys.add(cleanKey);
@@ -71,6 +175,22 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
         originalKey,
         cleanKey,
       });
+    }
+
+    for (final candidate in {originalKey, cleanKey}) {
+      final staticTarget = staticLocalizedImportAliasTarget(candidate);
+      if (staticTarget != null) {
+        staticLocalizedInputsByCanonicalKey
+            .putIfAbsent(staticTarget, () => <String>{})
+            .add(candidate);
+      }
+    }
+
+    for (final localizedKey in {localizedOriginalKey, localizedCleanKey}) {
+      if (localizedKey.isEmpty) continue;
+      localizedAliasesByNormalizedKey
+          .putIfAbsent(localizedKey, () => <String>{})
+          .addAll({originalKey, cleanKey});
     }
   }
 
@@ -134,6 +254,117 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       for (final alias in aliasesByCanonicalKey[key] ?? const <String>{}) {
         foundCardsMap[alias] = card;
       }
+      for (final alias
+          in staticLocalizedInputsByCanonicalKey[key] ?? const <String>{}) {
+        foundCardsMap[alias] = _withLocalizedMetadata(
+          card,
+          printedName: alias,
+          lang: 'manual',
+          source: 'static_alias',
+        );
+      }
+    }
+  }
+
+  if (localizedAliasesByNormalizedKey.isNotEmpty &&
+      await hasCardLocalizedNamesTable(pool)) {
+    final localizedSql = hasPreferredFormat
+        ? '''
+        SELECT DISTINCT ON (l.normalized_printed_name)
+          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
+          c.oracle_text, c.mana_cost, l.normalized_printed_name,
+          l.printed_name, l.lang
+        FROM card_localized_names l
+        JOIN cards c
+          ON c.id = l.card_id
+          OR c.scryfall_id = l.scryfall_id
+          OR c.scryfall_id = l.oracle_id
+          OR lower(c.name) = lower(l.canonical_name)
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id
+         AND cl.format = @preferredFormat
+        WHERE l.normalized_printed_name = ANY(@names)
+        ORDER BY l.normalized_printed_name,
+          CASE
+            WHEN c.id = l.card_id THEN 0
+            WHEN c.scryfall_id = l.scryfall_id THEN 1
+            WHEN c.scryfall_id = l.oracle_id THEN 2
+            ELSE 3
+          END,
+          CASE
+            WHEN cl.status = 'legal' THEN 0
+            WHEN cl.status = 'restricted' THEN 1
+            WHEN cl.status IS NULL THEN 2
+            ELSE 3
+          END,
+          c.id::text
+      '''
+        : '''
+        SELECT DISTINCT ON (l.normalized_printed_name)
+          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
+          c.oracle_text, c.mana_cost, l.normalized_printed_name,
+          l.printed_name, l.lang
+        FROM card_localized_names l
+        JOIN cards c
+          ON c.id = l.card_id
+          OR c.scryfall_id = l.scryfall_id
+          OR c.scryfall_id = l.oracle_id
+          OR lower(c.name) = lower(l.canonical_name)
+        WHERE l.normalized_printed_name = ANY(@names)
+        ORDER BY l.normalized_printed_name,
+          CASE
+            WHEN c.id = l.card_id THEN 0
+            WHEN c.scryfall_id = l.scryfall_id THEN 1
+            WHEN c.scryfall_id = l.oracle_id THEN 2
+            ELSE 3
+          END,
+          c.id::text
+      ''';
+    final localizedResult = await pool.execute(
+      Sql.named(localizedSql),
+      parameters: {
+        'names': TypedValue(
+          Type.textArray,
+          localizedAliasesByNormalizedKey.keys.toList(),
+        ),
+        if (hasPreferredFormat) 'preferredFormat': normalizedPreferredFormat,
+      },
+    );
+
+    for (final row in localizedResult) {
+      final id = row[0] as String;
+      final name = row[1] as String;
+      final typeLine = row[2] as String;
+      final imageUrl = row[3] as String?;
+      final colorIdentity = row[4];
+      final colors = row[5];
+      final oracleText = row[6] as String?;
+      final manaCost = row[7] as String?;
+      final normalizedPrintedName = row[8] as String;
+      final printedName = row[9] as String;
+      final lang = row[10] as String;
+      final card = _withLocalizedMetadata(
+        {
+          'id': id,
+          'name': name,
+          'type_line': typeLine,
+          'image_url': imageUrl,
+          'color_identity': colorIdentity,
+          'colors': colors,
+          'oracle_text': oracleText,
+          'mana_cost': manaCost,
+        },
+        printedName: printedName,
+        lang: lang,
+        source: 'card_localized_names',
+      );
+
+      for (final alias
+          in localizedAliasesByNormalizedKey[normalizedPrintedName] ??
+              const <String>{}) {
+        foundCardsMap[alias] = card;
+      }
+      foundCardsMap[normalizedPrintedName] = card;
     }
   }
 
@@ -143,17 +374,10 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
     final rawName = item['name']?.toString().trim();
     if (rawName == null || rawName.isEmpty) continue;
 
-    final originalKey = rawName.toLowerCase();
-    final cleanKey = cleanImportLookupKey(originalKey);
-    final canonicalKey = canonicalizeImportLookupName(cleanKey);
-    final lookupKey = foundCardsMap.containsKey(originalKey)
-        ? originalKey
-        : foundCardsMap.containsKey(cleanKey)
-            ? cleanKey
-            : canonicalKey;
-
-    if (!foundCardsMap.containsKey(lookupKey)) {
-      splitPatternsToQuery.add('$lookupKey // %');
+    if (findResolvedImportCard(foundCardsMap, rawName) == null) {
+      splitPatternsToQuery.add(
+        '${canonicalizeImportLookupName(cleanImportLookupKey(rawName.toLowerCase()))} // %',
+      );
     }
   }
 

@@ -64,6 +64,8 @@ Future<Response> _importDeck(RequestContext context) async {
 
   final cardsToInsert = <Map<String, dynamic>>[];
   final notFoundCards = <String>[];
+  final localizedMatches = <Map<String, dynamic>>[];
+  final localizedMatchKeys = <String>{};
 
   final parseResult = parseImportLines(lines);
   final parsedItems = parseResult.parsedItems;
@@ -80,18 +82,36 @@ Future<Response> _importDeck(RequestContext context) async {
     // Verifica se já foi marcado como não encontrado (ex: erro de regex)
     if (notFoundCards.contains(item['line'])) continue;
 
-    final originalKey = (item['name'] as String).toLowerCase();
-    final cleanedKey = cleanImportLookupKey(originalKey);
-    final nameKey =
-        foundCardsMap.containsKey(originalKey) ? originalKey : cleanedKey;
+    final cardData = findResolvedImportCard(
+      foundCardsMap,
+      item['name'] as String,
+    );
 
-    if (foundCardsMap.containsKey(nameKey)) {
-      final cardData = foundCardsMap[nameKey]!;
+    if (cardData != null) {
+      final localizedMatch = localizedImportMatchForCard(cardData, item);
+      if (localizedMatch != null &&
+          localizedMatchKeys.add('${localizedMatch['line']}')) {
+        localizedMatches.add(localizedMatch);
+      }
       final dbName = cardData['name'] as String;
+      final normalizedCommanderName = commanderName?.trim().toLowerCase();
+      final canonicalCommanderName = normalizedCommanderName == null
+          ? null
+          : canonicalizeImportLookupName(normalizedCommanderName);
+      final localizedCommanderName = normalizedCommanderName == null
+          ? null
+          : normalizeLocalizedImportName(normalizedCommanderName);
 
       final isCommander = item['isCommanderTag'] ||
           (commanderName != null &&
-              dbName.toLowerCase() == commanderName.toLowerCase());
+              (dbName.toLowerCase() == normalizedCommanderName ||
+                  dbName.toLowerCase() == canonicalCommanderName ||
+                  (cardData['_localized_match'] == true &&
+                      normalizeLocalizedImportName(
+                            cardData['_localized_printed_name']?.toString() ??
+                                '',
+                          ) ==
+                          localizedCommanderName)));
 
       cardsToInsert.add({
         'card_id': cardData['id'],
@@ -156,8 +176,10 @@ Future<Response> _importDeck(RequestContext context) async {
       body: {
         'error': 'No valid cards found in the list.',
         'not_found': notFoundCards,
+        'localized_matches': localizedMatches,
+        'localized_matches_count': localizedMatches.length,
         'hint':
-            'Confira formato das linhas (ex: "1 Sol Ring") e nomes das cartas.',
+            'Confira formato das linhas (ex: "1 Sol Ring"). Nomes localizados dependem da tabela card_localized_names sincronizada.',
       },
     );
   }
@@ -274,6 +296,8 @@ Future<Response> _importDeck(RequestContext context) async {
       'deck': newDeck,
       'cards_imported': _sumQuantities(consolidatedCards),
       'not_found_lines': notFoundCards,
+      'localized_matches': localizedMatches,
+      'localized_matches_count': localizedMatches.length,
       'is_partial': notFoundCards.isNotEmpty || warnings.isNotEmpty,
       'commander_detected':
           consolidatedCards.any((c) => c['is_commander'] == true),
@@ -293,6 +317,8 @@ Future<Response> _importDeck(RequestContext context) async {
         'error': e.message,
         'not_found': notFoundCards,
         'not_found_lines': notFoundCards,
+        'localized_matches': localizedMatches,
+        'localized_matches_count': localizedMatches.length,
         if (warnings.isNotEmpty) 'warnings': warnings,
       },
     );

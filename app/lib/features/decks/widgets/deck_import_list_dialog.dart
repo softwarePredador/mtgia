@@ -25,6 +25,7 @@ Future<void> showDeckImportListDialog({
   bool isImporting = false;
   bool replaceAll = false;
   List<String> notFoundLines = [];
+  int localizedMatchesCount = 0;
   String? error;
 
   await showDialog(
@@ -261,6 +262,17 @@ Future<void> showDeckImportListDialog({
                               ),
                             ),
                           ],
+                          if (localizedMatchesCount > 0) ...[
+                            const SizedBox(height: 12),
+                            Text(
+                              '$localizedMatchesCount nomes localizados convertidos automaticamente.',
+                              style: TextStyle(
+                                color: AppTheme.success,
+                                fontSize: AppTheme.fontSm,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -288,6 +300,7 @@ Future<void> showDeckImportListDialog({
                                   isImporting = true;
                                   error = null;
                                   notFoundLines = [];
+                                  localizedMatchesCount = 0;
                                 });
 
                                 final result = await importListToDeck(
@@ -303,6 +316,10 @@ Future<void> showDeckImportListDialog({
                                   notFoundLines = List<String>.from(
                                     result['not_found_lines'] ?? const [],
                                   );
+                                  localizedMatchesCount =
+                                      result['localized_matches_count']
+                                          as int? ??
+                                      0;
                                 });
 
                                 if (result['success'] == true) {
@@ -313,7 +330,9 @@ Future<void> showDeckImportListDialog({
                                   showSnackBar(
                                     message:
                                         notFoundLines.isEmpty
-                                            ? '$imported cartas importadas!'
+                                            ? localizedMatchesCount > 0
+                                                ? '$imported cartas importadas ($localizedMatchesCount traduzidas)'
+                                                : '$imported cartas importadas!'
                                             : '$imported cartas importadas (${notFoundLines.length} não encontradas)',
                                     backgroundColor:
                                         notFoundLines.isEmpty

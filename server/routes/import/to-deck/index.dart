@@ -53,6 +53,8 @@ Future<Response> _importToDeck(RequestContext context) async {
   final cardsToInsert = <Map<String, dynamic>>[];
   final notFoundCards = <String>[];
   final warnings = <String>[];
+  final localizedMatches = <Map<String, dynamic>>[];
+  final localizedMatchKeys = <String>{};
 
   final parseResult = parseImportLines(lines);
   final parsedItems = parseResult.parsedItems;
@@ -65,13 +67,17 @@ Future<Response> _importToDeck(RequestContext context) async {
   for (final item in parsedItems) {
     if (notFoundCards.contains(item['line'])) continue;
 
-    final originalKey = (item['name'] as String).toLowerCase();
-    final cleanedKey = cleanImportLookupKey(originalKey);
-    final nameKey =
-        foundCardsMap.containsKey(originalKey) ? originalKey : cleanedKey;
+    final cardData = findResolvedImportCard(
+      foundCardsMap,
+      item['name'] as String,
+    );
 
-    if (foundCardsMap.containsKey(nameKey)) {
-      final cardData = foundCardsMap[nameKey]!;
+    if (cardData != null) {
+      final localizedMatch = localizedImportMatchForCard(cardData, item);
+      if (localizedMatch != null &&
+          localizedMatchKeys.add('${localizedMatch['line']}')) {
+        localizedMatches.add(localizedMatch);
+      }
 
       cardsToInsert.add({
         'card_id': cardData['id'],
@@ -90,8 +96,10 @@ Future<Response> _importToDeck(RequestContext context) async {
   if (cardsToInsert.isEmpty) {
     return badRequest('No valid cards found in the list.', details: {
       'not_found_lines': notFoundCards,
+      'localized_matches': localizedMatches,
+      'localized_matches_count': localizedMatches.length,
       'hint':
-          'Confira formato das linhas (ex: "1 Sol Ring") e nomes das cartas.',
+          'Confira formato das linhas (ex: "1 Sol Ring"). Nomes localizados dependem da tabela card_localized_names sincronizada.',
     });
   }
 
@@ -275,6 +283,8 @@ Future<Response> _importToDeck(RequestContext context) async {
       'cards_imported': _sumQuantities(consolidatedCards),
       'total_cards': finalTotalCards,
       'not_found_lines': notFoundCards,
+      'localized_matches': localizedMatches,
+      'localized_matches_count': localizedMatches.length,
       'warnings': warnings,
       'commander_detected': commanderDetected,
       'missing_commander':

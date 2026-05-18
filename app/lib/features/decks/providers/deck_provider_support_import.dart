@@ -28,6 +28,8 @@ Map<String, dynamic> parseImportDeckResponse(ApiResponse response) {
       'deck': data['deck'],
       'cards_imported': data['cards_imported'] ?? 0,
       'not_found_lines': data['not_found_lines'] ?? const <String>[],
+      'localized_matches': data['localized_matches'] ?? const <dynamic>[],
+      'localized_matches_count': data['localized_matches_count'] ?? 0,
       'warnings': data['warnings'] ?? const <String>[],
       'is_partial': data['is_partial'] == true,
       'commander_detected': data['commander_detected'] == true,
@@ -45,6 +47,8 @@ Map<String, dynamic> parseImportDeckResponse(ApiResponse response) {
         (data['not_found'] is List)
             ? List<String>.from(data['not_found'])
             : const <String>[],
+    'localized_matches': data['localized_matches'] ?? const <dynamic>[],
+    'localized_matches_count': data['localized_matches_count'] ?? 0,
   };
 }
 
@@ -76,6 +80,8 @@ Map<String, dynamic> parseValidateImportListResponse(ApiResponse response) {
       'success': true,
       'found_cards': data['found_cards'] ?? const <dynamic>[],
       'not_found_lines': data['not_found_lines'] ?? const <String>[],
+      'localized_matches': data['localized_matches'] ?? const <dynamic>[],
+      'localized_matches_count': data['localized_matches_count'] ?? 0,
       'warnings': data['warnings'] ?? const <String>[],
     };
   }
@@ -116,6 +122,8 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
       'cards_imported': data['cards_imported'] ?? 0,
       'total_cards': data['total_cards'],
       'not_found_lines': data['not_found_lines'] ?? const <String>[],
+      'localized_matches': data['localized_matches'] ?? const <dynamic>[],
+      'localized_matches_count': data['localized_matches_count'] ?? 0,
       'warnings': data['warnings'] ?? const <String>[],
       'commander_detected': data['commander_detected'] == true,
       'missing_commander': data['missing_commander'] == true,
@@ -132,6 +140,8 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
         (data['not_found_lines'] is List)
             ? List<String>.from(data['not_found_lines'])
             : const <String>[],
+    'localized_matches': data['localized_matches'] ?? const <dynamic>[],
+    'localized_matches_count': data['localized_matches_count'] ?? 0,
   };
 }
 

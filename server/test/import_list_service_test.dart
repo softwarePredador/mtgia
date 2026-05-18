@@ -46,5 +46,16 @@ void main() {
         equals('swords to plowshares'),
       );
     });
+
+    test('normalizes localized lookup names accent-insensitively', () {
+      expect(
+        normalizeLocalizedImportName(' Dragão Pira Funesta 123 '),
+        equals('dragao pira funesta'),
+      );
+      expect(
+        staticLocalizedImportAliasTarget('Kaalia da Vastidão'),
+        equals('kaalia of the vast'),
+      );
+    });
   });
 }

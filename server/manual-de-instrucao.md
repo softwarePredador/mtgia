@@ -3,6 +3,46 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-18 — Localized deck import names
+
+### O Porquê
+- Tester reportou falha ao importar lista com nomes de cartas em portugues. O
+  comportamento anterior era limitado: alguns aliases PT-BR manuais eram
+  aceitos, mas listas completas em outros idiomas caiam em `not_found_lines` e
+  a UI orientava usar nomes em ingles.
+- Chamar API externa carta por carta durante import criaria latencia, rate limit
+  e comportamento nao deterministico. O caminho correto e resolver nomes
+  localizados por tabela local sincronizada.
+
+### O Como
+- Criada a tabela operacional `card_localized_names` via helper em
+  `server/lib/import_card_lookup_service.dart`, com lookup por
+  `normalized_printed_name`, `lang`, `scryfall_id`, `oracle_id` e `card_id`.
+- Criado `server/bin/sync_localized_card_names.dart` para popular aliases a
+  partir da busca paginada da Scryfall por idioma (`lang:<idioma>`). Uso:
+  - `cd server && dart run bin/sync_localized_card_names.dart --dry-run`
+  - `cd server && dart run bin/sync_localized_card_names.dart --apply`
+  - `cd server && dart run bin/sync_localized_card_names.dart --apply --langs=pt,es,fr,de,it,ja,ko,ru,zhs,zht`
+- `POST /import`, `POST /import/validate` e `POST /import/to-deck` agora tentam
+  resolver `cards.name` em ingles, aliases manuais existentes e, quando a tabela
+  estiver criada/sincronizada, `card_localized_names.normalized_printed_name`.
+- As respostas app-facing ganharam campos aditivos `localized_matches` e
+  `localized_matches_count`; o app preserva esses campos e informa quando nomes
+  localizados foram convertidos automaticamente.
+
+### Resultado
+- Suporte fica deterministico e multi-idioma apos sync da tabela local; sem sync,
+  o sistema continua backward-compatible e usa apenas nomes em ingles + aliases
+  manuais.
+- Testes adicionados/atualizados:
+  - `server/test/sync_localized_card_names_test.dart`;
+  - `server/test/import_list_service_test.dart`;
+  - `app/test/features/decks/providers/deck_provider_support_test.dart`.
+- Sync `pt` aplicado nesta rodada com `38594` aliases sincronizados; demais
+  idiomas devem ser aplicados em janelas separadas para respeitar rate limit da
+  Scryfall.
+- Relatorio: `server/doc/RELATORIO_LOCALIZED_IMPORT_NAMES_2026-05-18.md`.
+
 ## 2026-05-15 — Internal release runtime QA non-scanner PASS_WITH_RISKS
 
 ### O Porquê
