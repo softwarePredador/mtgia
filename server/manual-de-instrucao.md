@@ -17362,3 +17362,19 @@ Artifacts:
 
 - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_OPTIMIZE_SCORECARD_2026-05-19.md`;
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary.json`.
+
+Reprova pos-deploy em `6076dc1554c4575ee5a049ade079c78dfdf0e98f`:
+
+- `--limit 6`: `cases_attempted=6`, `jobs_attempted=10`,
+  `current_gate_approved_jobs=4`, `false_positive_candidates=0`,
+  `semantic_shadow_would_block_approved_jobs=0`, `review_candidates=2`;
+- `--limit 10`: `cases_attempted=6`, `jobs_attempted=8`,
+  `current_gate_approved_jobs=4`, `false_positive_candidates=0`,
+  `semantic_shadow_would_block_approved_jobs=0`, `review_candidates=2`.
+
+Conclusao operacional:
+
+- regra refinada de `protection` segue **PASS WITH RISKS**;
+- feature flag pode ser preparada desligada por padrao;
+- enforcement real continua bloqueado ate haver pelo menos 10 corpora elegiveis
+  efetivos sem blocker em `draw`, `removal`, `ramp` ou `wipe`.

@@ -137,3 +137,14 @@ sem bloquear swaps aprovados pelo quality gate atual. Hard blockers continuam
 restritos a perdas de `draw`, `removal`, `ramp` e `wipe`. A feature flag ainda
 fica desligada até ampliar o corpus e confirmar que não há blocker semântico em
 jobs aprovados.
+
+Reprova pos-deploy em `6076dc1554c4575ee5a049ade079c78dfdf0e98f`:
+
+- `--limit 6`: `false_positive_candidates=0`,
+  `semantic_shadow_would_block_approved_jobs=0`, `review_candidates=2`;
+- `--limit 10`: `cases_attempted=6`, `false_positive_candidates=0`,
+  `semantic_shadow_would_block_approved_jobs=0`, `review_candidates=2`.
+
+O resultado autoriza preparar feature flag limitada desligada por padrão, mas
+nao autoriza enforcement real ainda: antes disso, o conjunto precisa ter pelo
+menos 10 corpora elegiveis efetivos.
