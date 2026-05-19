@@ -1,0 +1,89 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "date": "2026-05-19",
+  "scope": "semantic_layer_v2_optimize_multi_corpus_diagnostics",
+  "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "backend_git_sha": "a5bfdc9029653bdc0d77f2721dcb9164a6652091",
+  "implementation": {
+    "optimize_diagnostics_semantic_layer_v2": true,
+    "post_analysis_validation_functional_analysis_semantic_layer_v2": true,
+    "semantic_tags_loaded_for_current_deck_cards": true,
+    "semantic_tags_loaded_for_addition_cards": true,
+    "enforcement": "disabled"
+  },
+  "corpus": {
+    "cases_attempted": 3,
+    "sources": [
+      "versioned_commander_reference_corpus"
+    ],
+    "decklists_saved": false,
+    "card_names_saved": false,
+    "commanders": [
+      "brago_king_eternal",
+      "krenko_mob_boss",
+      "edgar_markov"
+    ]
+  },
+  "results": {
+    "created_decks": 3,
+    "validated_decks": 3,
+    "unresolved_total": 0,
+    "off_identity_total": 0,
+    "async_jobs": 6,
+    "completed_jobs": 3,
+    "valid_swap_jobs": 3,
+    "quality_failed_jobs": 3,
+    "semantic_signal_jobs": 3,
+    "semantic_enforcement_disabled_jobs": 3
+  },
+  "completed_jobs": [
+    {
+      "commander_slug": "brago_king_eternal",
+      "intensity": "aggressive",
+      "mode": "optimize",
+      "suggestion_count": 20,
+      "semantic_pair_count": 20,
+      "semantic_pairs_with_signal": 18,
+      "semantic_removed_role_count": 12,
+      "semantic_added_role_count": 16,
+      "quality_error": false,
+      "elapsed_ms": 7368
+    },
+    {
+      "commander_slug": "krenko_mob_boss",
+      "intensity": "focused",
+      "mode": "optimize",
+      "suggestion_count": 9,
+      "semantic_pair_count": 9,
+      "semantic_pairs_with_signal": 9,
+      "semantic_removed_role_count": 7,
+      "semantic_added_role_count": 8,
+      "quality_error": false,
+      "elapsed_ms": 72517
+    },
+    {
+      "commander_slug": "edgar_markov",
+      "intensity": "focused",
+      "mode": "optimize",
+      "suggestion_count": 10,
+      "semantic_pair_count": 10,
+      "semantic_pairs_with_signal": 10,
+      "semantic_removed_role_count": 5,
+      "semantic_added_role_count": 9,
+      "quality_error": false,
+      "elapsed_ms": 69834
+    }
+  ],
+  "gate": {
+    "decision": "keep_shadow_mode",
+    "reason": "Semantic v2 diagnostics are now observable with real role signals in completed optimize jobs. Enforcement remains disabled until false-positive review and broader corpus acceptance criteria are defined."
+  },
+  "redactions": {
+    "auth_token": "not_saved",
+    "qa_email": "not_saved",
+    "deck_ids": "redacted",
+    "decklists": "not_saved",
+    "card_names": "not_saved",
+    "raw_payloads": "not_saved"
+  }
+}

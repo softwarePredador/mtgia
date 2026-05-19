@@ -70,21 +70,50 @@ publica de corpus real produzindo swaps. A promocao de v2 para gate duro ainda
 fica bloqueada porque esse job com swaps nao expôs sinal semantico v2 nos
 diagnostics do optimize (`semantic_signal_jobs=0`).
 
+## Optimize com diagnostics semanticos v2
+
+Implementacao publicada em:
+
+- `754d08d3eb33091438f2c1345dd8b844c109cc95`: expõe
+  `optimize_diagnostics.semantic_layer_v2` e
+  `post_analysis.validation.functional_analysis.semantic_layer_v2`;
+- `a5bfdc9029653bdc0d77f2721dcb9164a6652091`: carrega
+  `card_semantic_tags_v2` para cartas atuais do deck e para cartas adicionadas.
+
+Medição pública multi-corpus em `a5bfdc9029653bdc0d77f2721dcb9164a6652091`:
+
+- corpora reais versionados: Brago, Krenko e Edgar;
+- decks temporarios criados: `3/3`;
+- decks validos antes do optimize: `3/3`;
+- unresolved total: `0`;
+- off-identity total: `0`;
+- jobs async: `6`;
+- jobs completos com swaps: `3`;
+- jobs com quality gate/falha segura: `3`;
+- jobs completos com diagnostics semanticos v2: `3`.
+
+Resumo dos jobs completos:
+
+- Brago agressivo: `20` sugestões, `18/20` pares com sinal semântico;
+- Krenko focado: `9` sugestões, `9/9` pares com sinal semântico;
+- Edgar focado: `10` sugestões, `10/10` pares com sinal semântico.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_multi_corpus_semantic_diagnostics_summary.json`.
+
 ## Decisao
 
 - Manter `semantic_layer_v2` em shadow mode.
 - Liberar uso como explicabilidade e sinal auxiliar.
 - Nao usar como bloqueio/gate duro em optimize/generate ainda.
-- Proximo gate deve medir diagnostics semanticos explicitamente no optimize e
-  ampliar a amostra de corpus com swaps antes de enforcement.
+- Diagnostics semanticos v2 já estão observáveis no optimize; o próximo gate é
+  revisão de falsos positivos e critérios de aceitação para enforcement parcial.
 
 ## Proximos passos objetivos
 
-1. Expor/registrar diagnostics semanticos v2 no optimize quando os dados
-   semanticos participarem da analise funcional.
-2. Ampliar corpus pequeno de decks completos que produzam swaps validos, nao
-   apenas `rebuild_guided`.
-3. Medir `suggestion_count`, qualidade final, off-color, roles perdidos e
-   presenca de `deterministic_semantic_v2` nos diagnostics.
-4. So promover v2 para gate parcial quando optimize tiver jobs completos validos
-   com taxa aceitavel de falsos positivos e diagnostics semanticos observaveis.
+1. Definir scorecard de falsos positivos para `role_delta` semântico.
+2. Ampliar corpus para mais arquétipos e cores com swaps completos.
+3. Comparar decisão atual do quality gate vs. decisão sugerida por v2 em shadow.
+4. Promover v2 apenas para enforcement parcial quando a divergência for
+   aceitável e reversível por feature flag.

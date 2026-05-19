@@ -17284,3 +17284,42 @@ Próximas validações necessárias antes de gate duro:
   off-color, commander preservado e falsos positivos;
 - só promover v2 para enforcement parcial se jobs completos com swaps mantiverem
   qualidade e diagnostics observáveis.
+
+## 142. Semantic Layer v2 optimize diagnostics + multi-corpus - 2026-05-19
+
+Implementado:
+
+- `OptimizationValidator` passa a serializar
+  `functional_analysis.semantic_layer_v2`;
+- `/ai/optimize` passa a expor `optimize_diagnostics.semantic_layer_v2`;
+- o contexto de optimize carrega `card_semantic_tags_v2` para cartas atuais do
+  deck e cartas adicionadas;
+- enforcement segue `disabled`, sem alterar quality gate.
+
+Validação local:
+
+- `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart lib/ai/optimize_request_support.dart routes/ai/optimize/index.dart test/optimization_validator_test.dart`: PASS;
+- `dart test test/optimization_validator_test.dart test/optimization_quality_gate_test.dart test/optimize_runtime_support_test.dart -r expanded`: PASS.
+
+Prova pública em `a5bfdc9029653bdc0d77f2721dcb9164a6652091`:
+
+- corpora reais: Brago, Krenko e Edgar;
+- decks criados e validados: `3/3`;
+- unresolved: `0`;
+- off-identity: `0`;
+- jobs async: `6`;
+- jobs completos com swaps: `3`;
+- jobs com quality gate/falha segura: `3`;
+- jobs completos com diagnostics semânticos v2: `3`;
+- maior amostra: Brago agressivo com `20` sugestões e `18/20` pares com sinal
+  semântico.
+
+Decisão:
+
+- `semantic_layer_v2` permanece em shadow mode;
+- já existe instrumentation suficiente para medir optimize;
+- próximo passo é scorecard de falsos positivos antes de qualquer enforcement.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_multi_corpus_semantic_diagnostics_summary.json`.
