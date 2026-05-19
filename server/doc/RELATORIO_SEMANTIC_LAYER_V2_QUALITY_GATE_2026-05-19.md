@@ -126,11 +126,14 @@ Rodada adicional publicada no relatório:
 
 Resultado:
 
-- `false_positive_candidates=2`;
+- `false_positive_candidates=0`;
 - `false_negative_candidates=0`;
-- `semantic_shadow_would_block_approved_jobs=2`;
-- decisão: `NO-GO` para enforcement parcial agora.
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_shadow_review_approved_jobs=2`;
+- decisão: `eligible_for_limited_flagged_enforcement_review`.
 
-Motivo: a v2 bloquearia perda de `protection` em jobs que o quality gate atual
-aprovou. Antes de enforcement, a regra precisa considerar alvo mínimo,
-redundância e compensação por outras funções.
+Motivo: perda de `protection` foi rebaixada para revisão manual na fase inicial,
+sem bloquear swaps aprovados pelo quality gate atual. Hard blockers continuam
+restritos a perdas de `draw`, `removal`, `ramp` e `wipe`. A feature flag ainda
+fica desligada até ampliar o corpus e confirmar que não há blocker semântico em
+jobs aprovados.

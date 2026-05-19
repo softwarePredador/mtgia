@@ -1,5 +1,5 @@
 {
-  "backend_git_sha": "b8d62ffeacf93d27f6e52fad1556d1b6ada0b378",
+  "backend_git_sha": "4a94b6592460ce382fa1b97ac5cb33b1228814ce",
   "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
   "cases": [
     {
@@ -13,9 +13,9 @@
       "optimize": [
         {
           "accepted_async": true,
-          "accepted_ms": 644,
+          "accepted_ms": 607,
           "current_gate_approved": false,
-          "elapsed_ms": 71763,
+          "elapsed_ms": 72267,
           "has_semantic_signal": false,
           "intensity": "focused",
           "mode": null,
@@ -28,6 +28,8 @@
           "semantic_removed_role_count": null,
           "semantic_shadow_coverage_ratio": 0.0,
           "semantic_shadow_critical_loss_roles": [],
+          "semantic_shadow_protection_rule": "not_evaluated",
+          "semantic_shadow_review_loss_roles": [],
           "semantic_shadow_would_block_partial": false,
           "submit_status": 202,
           "suggestion_count": 0,
@@ -35,9 +37,9 @@
         },
         {
           "accepted_async": true,
-          "accepted_ms": 604,
+          "accepted_ms": 615,
           "current_gate_approved": true,
-          "elapsed_ms": 70104,
+          "elapsed_ms": 7288,
           "has_semantic_signal": true,
           "intensity": "aggressive",
           "mode": "optimize",
@@ -49,10 +51,12 @@
           "semantic_pairs_with_signal": 18,
           "semantic_removed_role_count": 12,
           "semantic_shadow_coverage_ratio": 0.9,
-          "semantic_shadow_critical_loss_roles": [
+          "semantic_shadow_critical_loss_roles": [],
+          "semantic_shadow_protection_rule": "protection_loss_is_review_only",
+          "semantic_shadow_review_loss_roles": [
             "protection"
           ],
-          "semantic_shadow_would_block_partial": true,
+          "semantic_shadow_would_block_partial": false,
           "submit_status": 202,
           "suggestion_count": 20,
           "terminal": "completed"
@@ -76,9 +80,9 @@
       "optimize": [
         {
           "accepted_async": true,
-          "accepted_ms": 609,
+          "accepted_ms": 61191,
           "current_gate_approved": true,
-          "elapsed_ms": 69950,
+          "elapsed_ms": 7168,
           "has_semantic_signal": true,
           "intensity": "focused",
           "mode": "optimize",
@@ -90,19 +94,21 @@
           "semantic_pairs_with_signal": 9,
           "semantic_removed_role_count": 7,
           "semantic_shadow_coverage_ratio": 1.0,
-          "semantic_shadow_critical_loss_roles": [
+          "semantic_shadow_critical_loss_roles": [],
+          "semantic_shadow_protection_rule": "protection_loss_is_review_only",
+          "semantic_shadow_review_loss_roles": [
             "protection"
           ],
-          "semantic_shadow_would_block_partial": true,
+          "semantic_shadow_would_block_partial": false,
           "submit_status": 202,
           "suggestion_count": 9,
           "terminal": "completed"
         },
         {
           "accepted_async": true,
-          "accepted_ms": 610,
+          "accepted_ms": 574,
           "current_gate_approved": false,
-          "elapsed_ms": 69643,
+          "elapsed_ms": 61216,
           "has_semantic_signal": false,
           "intensity": "aggressive",
           "mode": null,
@@ -115,6 +121,8 @@
           "semantic_removed_role_count": null,
           "semantic_shadow_coverage_ratio": 0.0,
           "semantic_shadow_critical_loss_roles": [],
+          "semantic_shadow_protection_rule": "not_evaluated",
+          "semantic_shadow_review_loss_roles": [],
           "semantic_shadow_would_block_partial": false,
           "submit_status": 202,
           "suggestion_count": 0,
@@ -139,31 +147,33 @@
       "optimize": [
         {
           "accepted_async": true,
-          "accepted_ms": 630,
-          "current_gate_approved": true,
-          "elapsed_ms": 69788,
-          "has_semantic_signal": true,
+          "accepted_ms": 621,
+          "current_gate_approved": false,
+          "elapsed_ms": 69618,
+          "has_semantic_signal": false,
           "intensity": "focused",
-          "mode": "optimize",
-          "outcome_code": "optimized",
-          "quality_error": false,
-          "semantic_added_role_count": 9,
-          "semantic_enforcement": "disabled",
-          "semantic_pair_count": 10,
-          "semantic_pairs_with_signal": 10,
-          "semantic_removed_role_count": 5,
-          "semantic_shadow_coverage_ratio": 1.0,
+          "mode": null,
+          "outcome_code": null,
+          "quality_error": true,
+          "semantic_added_role_count": null,
+          "semantic_enforcement": null,
+          "semantic_pair_count": null,
+          "semantic_pairs_with_signal": null,
+          "semantic_removed_role_count": null,
+          "semantic_shadow_coverage_ratio": 0.0,
           "semantic_shadow_critical_loss_roles": [],
+          "semantic_shadow_protection_rule": "not_evaluated",
+          "semantic_shadow_review_loss_roles": [],
           "semantic_shadow_would_block_partial": false,
           "submit_status": 202,
-          "suggestion_count": 10,
-          "terminal": "completed"
+          "suggestion_count": 0,
+          "terminal": "failed"
         },
         {
           "accepted_async": true,
-          "accepted_ms": 613,
+          "accepted_ms": 574,
           "current_gate_approved": false,
-          "elapsed_ms": 69617,
+          "elapsed_ms": 69597,
           "has_semantic_signal": false,
           "intensity": "aggressive",
           "mode": null,
@@ -176,6 +186,8 @@
           "semantic_removed_role_count": null,
           "semantic_shadow_coverage_ratio": 0.0,
           "semantic_shadow_critical_loss_roles": [],
+          "semantic_shadow_protection_rule": "not_evaluated",
+          "semantic_shadow_review_loss_roles": [],
           "semantic_shadow_would_block_partial": false,
           "submit_status": 202,
           "suggestion_count": 0,
@@ -202,16 +214,18 @@
   "scope": "semantic_layer_v2_optimize_shadow_scorecard",
   "scorecard": {
     "cases_attempted": 3,
-    "completed_jobs": 3,
-    "current_gate_approved_jobs": 3,
-    "decision": "keep_shadow_mode",
+    "completed_jobs": 2,
+    "current_gate_approved_jobs": 2,
+    "decision": "eligible_for_limited_flagged_enforcement_review",
     "false_negative_candidates": 0,
-    "false_positive_candidates": 2,
+    "false_positive_candidates": 0,
     "jobs_attempted": 6,
-    "quality_failed_jobs": 3,
-    "reason": "Keep shadow mode while reviewing semantic losses on currently approved swaps.",
-    "semantic_shadow_would_block_approved_jobs": 2,
-    "semantic_signal_jobs": 3
+    "quality_failed_jobs": 4,
+    "reason": "No semantic shadow blockers among currently approved jobs in this sample; review-only losses still require broader corpus before enforcement.",
+    "review_candidates": 2,
+    "semantic_shadow_review_approved_jobs": 2,
+    "semantic_shadow_would_block_approved_jobs": 0,
+    "semantic_signal_jobs": 2
   },
   "status": "PASS_WITH_RISKS"
 }

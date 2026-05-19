@@ -156,13 +156,30 @@ def validate_deck(base_url: str, token: str, deck_id: str) -> dict[str, Any]:
 
 def semantic_shadow_decision(semantic: dict[str, Any]) -> dict[str, Any]:
     role_delta = semantic.get("role_delta") if isinstance(semantic.get("role_delta"), dict) else {}
-    critical_losses = {role: value for role, value in role_delta.items() if role in {"draw", "removal", "ramp", "wipe", "protection"} and isinstance(value, int) and value < 0}
     pair_count = int(semantic.get("pair_count") or 0)
     signaled = int(semantic.get("pairs_with_any_semantic_signal") or 0)
+    coverage_ratio = (signaled / pair_count) if pair_count else 0
+    critical_losses: dict[str, int] = {}
+    review_losses: dict[str, int] = {}
+
+    for role, value in role_delta.items():
+        if role not in {"draw", "removal", "ramp", "wipe", "protection"}:
+            continue
+        if not isinstance(value, int) or value >= 0:
+            continue
+
+        if role == "protection":
+            review_losses[role] = value
+            continue
+
+        critical_losses[role] = value
+
     return {
         "would_block_partial": bool(critical_losses),
         "critical_losses": critical_losses,
-        "coverage_ratio": (signaled / pair_count) if pair_count else 0,
+        "review_losses": review_losses,
+        "coverage_ratio": coverage_ratio,
+        "protection_rule": "protection_loss_is_review_only",
     }
 
 
@@ -181,7 +198,13 @@ def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity:
         elapsed_ms = polled["elapsed_ms"]
     diagnostics = result.get("optimize_diagnostics") if isinstance(result.get("optimize_diagnostics"), dict) else {}
     semantic = diagnostics.get("semantic_layer_v2") if isinstance(diagnostics.get("semantic_layer_v2"), dict) else {}
-    shadow = semantic_shadow_decision(semantic) if semantic else {"would_block_partial": False, "critical_losses": {}, "coverage_ratio": 0}
+    shadow = semantic_shadow_decision(semantic) if semantic else {
+        "would_block_partial": False,
+        "critical_losses": {},
+        "review_losses": {},
+        "coverage_ratio": 0,
+        "protection_rule": "not_evaluated",
+    }
     suggestion_count = max(
         len(result.get("additions") or []) if isinstance(result.get("additions"), list) else 0,
         len(result.get("removals") or []) if isinstance(result.get("removals"), list) else 0,
@@ -208,7 +231,9 @@ def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity:
         "semantic_enforcement": semantic.get("enforcement"),
         "semantic_shadow_would_block_partial": shadow["would_block_partial"],
         "semantic_shadow_critical_loss_roles": sorted(shadow["critical_losses"].keys()),
+        "semantic_shadow_review_loss_roles": sorted(shadow["review_losses"].keys()),
         "semantic_shadow_coverage_ratio": round(float(shadow["coverage_ratio"]), 4),
+        "semantic_shadow_protection_rule": shadow["protection_rule"],
     }
 
 
@@ -265,6 +290,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     approved = [job for job in jobs if job.get("current_gate_approved")]
     semantic = [job for job in jobs if job.get("has_semantic_signal")]
     semantic_would_block = [job for job in approved if job.get("semantic_shadow_would_block_partial")]
+    semantic_review = [job for job in approved if job.get("semantic_shadow_review_loss_roles")]
     quality_fail = [job for job in jobs if job.get("terminal") == "failed" or job.get("quality_error")]
     summary["scorecard"] = {
         "cases_attempted": len(summary["cases"]),
@@ -274,10 +300,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "quality_failed_jobs": len(quality_fail),
         "semantic_signal_jobs": len(semantic),
         "semantic_shadow_would_block_approved_jobs": len(semantic_would_block),
+        "semantic_shadow_review_approved_jobs": len(semantic_review),
         "false_positive_candidates": len(semantic_would_block),
+        "review_candidates": len(semantic_review),
         "false_negative_candidates": 0,
         "decision": "keep_shadow_mode" if semantic_would_block else "eligible_for_limited_flagged_enforcement_review",
-        "reason": "Keep shadow mode while reviewing semantic losses on currently approved swaps." if semantic_would_block else "No semantic shadow blockers among currently approved jobs in this sample; still require broader corpus before enforcement.",
+        "reason": "Keep shadow mode while reviewing semantic losses on currently approved swaps." if semantic_would_block else "No semantic shadow blockers among currently approved jobs in this sample; review-only losses still require broader corpus before enforcement.",
     }
     return summary
 

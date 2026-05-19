@@ -17337,22 +17337,26 @@ Objetivo:
 - salvar apenas dados agregados, sem token, e-mail QA, deck id, decklist, nomes
   de cartas ou payload bruto.
 
-Prova pública em `b8d62ffeacf93d27f6e52fad1556d1b6ada0b378`:
+Prova pública em `4a94b6592460ce382fa1b97ac5cb33b1228814ce`:
 
 - corpora: Brago, Krenko e Edgar;
 - jobs async: `6`;
-- jobs aprovados pelo gate atual: `3`;
-- jobs com signal v2: `3`;
-- `false_positive_candidates=2`;
+- jobs aprovados pelo gate atual: `2`;
+- jobs com signal v2: `2`;
+- `false_positive_candidates=0`;
 - `false_negative_candidates=0`;
-- `semantic_shadow_would_block_approved_jobs=2`.
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_shadow_review_approved_jobs=2`;
+- `review_candidates=2`.
 
 Decisão:
 
-- `NO-GO` para enforcement parcial agora;
+- `PASS_WITH_RISKS` para a regra refinada de `protection`;
+- `NO-GO` para ligar feature flag ainda, ate ampliar corpus;
 - manter v2 em shadow mode;
-- refinar regra de perda de `protection` para considerar alvo mínimo,
-  redundância e compensação por outras funções.
+- perda de `protection` e review-only nesta fase;
+- hard blockers iniciais ficam restritos a perdas de `draw`, `removal`, `ramp`
+  e `wipe`.
 
 Artifacts:
 
