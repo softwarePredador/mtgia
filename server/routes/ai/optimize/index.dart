@@ -2036,6 +2036,7 @@ Future<Response> onRequest(RequestContext context) async {
             final v = validByNameLower[n.toLowerCase()];
             return (v?['name'] as String?) ?? n;
           }).toList();
+          final semanticV2Select = await _semanticV2SelectSql(pool);
           final additionsDataResult = await pool.execute(
             Sql.named('''
               SELECT DISTINCT ON (LOWER(name))
@@ -2051,7 +2052,8 @@ Future<Response> onRequest(RequestContext context) async {
                        ) FROM regexp_matches(mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                        0
                      ) as cmc,
-                     oracle_text
+                     oracle_text,
+                     $semanticV2Select
               FROM cards 
               WHERE LOWER(name) = ANY(@names)
               ORDER BY LOWER(name), name
@@ -2070,6 +2072,7 @@ Future<Response> onRequest(RequestContext context) async {
                     'colors': (row[3] as List?)?.cast<String>() ?? [],
                     'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
                     'oracle_text': (row[5] as String?) ?? '',
+                    'semantic_tags_v2': row.length > 6 ? row[6] : null,
                   })
               .toList();
 
@@ -3098,6 +3101,37 @@ Uri _resolveInternalOptimizeUrl(Request request) {
     configuredBaseUrl: Platform.environment['AI_OPTIMIZE_INTERNAL_BASE_URL'],
     fallbackPort: Platform.environment['PORT']?.trim(),
   );
+}
+
+Future<String> _semanticV2SelectSql(Pool pool) async {
+  final exists = await _hasOptimizeTable(pool, 'card_semantic_tags_v2');
+  if (!exists) return 'NULL::jsonb AS semantic_tags_v2';
+  return '''
+                     (
+                       SELECT jsonb_agg(jsonb_build_object(
+                         'tags', cstv2.tags,
+                         'role_confidence', cstv2.role_confidence,
+                         'engine', cstv2.engine,
+                         'payoff', cstv2.payoff,
+                         'enabler', cstv2.enabler,
+                         'wincon', cstv2.wincon,
+                         'combo_piece', cstv2.combo_piece
+                       ))
+                       FROM card_semantic_tags_v2 cstv2
+                       WHERE cstv2.card_id = cards.id
+                     ) AS semantic_tags_v2''';
+}
+
+Future<bool> _hasOptimizeTable(Pool pool, String tableName) async {
+  try {
+    final result = await pool.execute(
+      Sql.named("SELECT to_regclass(@name) IS NOT NULL"),
+      parameters: {'name': tableName},
+    );
+    return result.isNotEmpty && result.first[0] == true;
+  } catch (_) {
+    return false;
+  }
 }
 
 Future<void> _recordOptimizeAnalysisOutcome({

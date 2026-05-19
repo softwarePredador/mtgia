@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 bool looksLikeOptimizationBoardWipeText(String oracleText) {
   final oracle = oracleText.toLowerCase();
   final ownBoardOnly = oracle.contains('all creatures you control') ||
@@ -107,9 +109,17 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
 }
 
 String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
-  if (rawSemanticTags is! Iterable) return null;
+  var semanticTags = rawSemanticTags;
+  if (semanticTags is String && semanticTags.trim().isNotEmpty) {
+    try {
+      semanticTags = jsonDecode(semanticTags);
+    } catch (_) {
+      return null;
+    }
+  }
+  if (semanticTags is! Iterable) return null;
   Map? best;
-  for (final raw in rawSemanticTags) {
+  for (final raw in semanticTags) {
     if (raw is! Map) continue;
     final confidence = _safeSemanticConfidence(raw['role_confidence']);
     final currentConfidence =

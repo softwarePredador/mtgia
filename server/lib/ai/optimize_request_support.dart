@@ -83,6 +83,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     throw const OptimizeDeckContextException('DECK_FORMAT_MISSING');
   }
 
+  final semanticV2Select = await _semanticV2SelectSql(pool);
   final cardsResult = await (telemetry?.trackAsync(
         'deck_context.cards_query',
         () => pool.execute(
@@ -101,7 +102,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              ) as cmc,
              c.oracle_text,
              c.color_identity,
-             c.id::text
+             c.id::text,
+             $semanticV2Select
       FROM deck_cards dc 
       JOIN cards c ON c.id = dc.card_id 
       WHERE dc.deck_id = @id
@@ -125,7 +127,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              ) as cmc,
              c.oracle_text,
              c.color_identity,
-             c.id::text
+             c.id::text,
+             $semanticV2Select
       FROM deck_cards dc 
       JOIN cards c ON c.id = dc.card_id 
       WHERE dc.deck_id = @id
@@ -174,6 +177,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     final oracleText = (row[7] as String?) ?? '';
     final colorIdentity = (row[8] as List?)?.cast<String>() ?? const <String>[];
     final cardId = row[9] as String;
+    final semanticTagsV2 = row.length > 10 ? row[10] : null;
 
     currentTotalCards += quantity;
     originalCountsById[cardId] = (originalCountsById[cardId] ?? 0) + quantity;
@@ -190,6 +194,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       'oracle_text': oracleText,
       'quantity': quantity,
       'card_id': cardId,
+      'semantic_tags_v2': semanticTagsV2,
     };
     allCardData.add(cardData);
 
@@ -313,6 +318,37 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     deckState: deckState,
     effectiveOptimizeArchetype: effectiveOptimizeArchetype,
   );
+}
+
+Future<String> _semanticV2SelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_semantic_tags_v2');
+  if (!exists) return 'NULL::jsonb AS semantic_tags_v2';
+  return '''
+             (
+               SELECT jsonb_agg(jsonb_build_object(
+                 'tags', cstv2.tags,
+                 'role_confidence', cstv2.role_confidence,
+                 'engine', cstv2.engine,
+                 'payoff', cstv2.payoff,
+                 'enabler', cstv2.enabler,
+                 'wincon', cstv2.wincon,
+                 'combo_piece', cstv2.combo_piece
+               ))
+               FROM card_semantic_tags_v2 cstv2
+               WHERE cstv2.card_id = c.id
+             ) AS semantic_tags_v2''';
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  try {
+    final result = await pool.execute(
+      Sql.named("SELECT to_regclass(@name) IS NOT NULL"),
+      parameters: {'name': tableName},
+    );
+    return result.isNotEmpty && result.first[0] == true;
+  } catch (_) {
+    return false;
+  }
 }
 
 class OptimizeDeckContextException implements Exception {
