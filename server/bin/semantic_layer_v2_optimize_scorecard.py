@@ -29,6 +29,10 @@ DEFAULT_CORPORA = [
     ("teysa_karlov", "test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/teysa_karlov/corpus.json", "orzhov_aristocrats_tokens"),
     ("niv_mizzet_parun", "test/artifacts/commander_reference_sprint3_lot_a_2026-05-13/niv_mizzet_parun/corpus.json", "izzet_spellslinger"),
     ("prosper_tome_bound", "test/artifacts/commander_reference_deck_corpus_prosper_2026-05-13/prosper_edhrec_average_corpus.json", "rakdos_exile_treasure"),
+    ("aesi_tyrant_of_gyre_strait", "test/artifacts/commander_reference_deck_corpus_aesi_2026-05-13/aesi_edhrec_average_corpus.json", "simic_lands_ramp_draw"),
+    ("winota_joiner_of_forces", "test/artifacts/commander_reference_sprint2_2026-05-13/winota_joiner_of_forces/corpus.json", "boros_winota_nonhuman_attack"),
+    ("urza_lord_high_artificer", "test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/urza_lord_high_artificer/corpus.json", "mono_blue_artifact_combo_control"),
+    ("sythis_harvest_s_hand", "test/artifacts/commander_reference_sprint3_lot_b_2026-05-14/sythis_harvest_s_hand/corpus.json", "selesnya_enchantress_value"),
 ]
 
 
@@ -292,8 +296,20 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     semantic_would_block = [job for job in approved if job.get("semantic_shadow_would_block_partial")]
     semantic_review = [job for job in approved if job.get("semantic_shadow_review_loss_roles")]
     quality_fail = [job for job in jobs if job.get("terminal") == "failed" or job.get("quality_error")]
+    eligible_cases = [
+        case for case in summary["cases"]
+        if case.get("create_status") != "skipped"
+        and case.get("validation_ok")
+        and int(case.get("unresolved_count") or 0) == 0
+        and int(case.get("off_identity") or 0) == 0
+        and int(case.get("commander_qty") or 0) == 1
+        and int(case.get("main_qty") or 0) == 99
+    ]
+    blocked = bool(semantic_would_block) or len(eligible_cases) < len(summary["cases"])
     summary["scorecard"] = {
         "cases_attempted": len(summary["cases"]),
+        "eligible_cases": len(eligible_cases),
+        "skipped_or_invalid_cases": len(summary["cases"]) - len(eligible_cases),
         "jobs_attempted": len(jobs),
         "completed_jobs": len(completed),
         "current_gate_approved_jobs": len(approved),
@@ -304,9 +320,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "false_positive_candidates": len(semantic_would_block),
         "review_candidates": len(semantic_review),
         "false_negative_candidates": 0,
-        "decision": "keep_shadow_mode" if semantic_would_block else "eligible_for_limited_flagged_enforcement_review",
-        "reason": "Keep shadow mode while reviewing semantic losses on currently approved swaps." if semantic_would_block else "No semantic shadow blockers among currently approved jobs in this sample; review-only losses still require broader corpus before enforcement.",
+        "decision": "keep_shadow_mode" if blocked else "eligible_for_limited_flagged_enforcement_review",
+        "reason": "Keep shadow mode while reviewing semantic losses or invalid corpus coverage." if blocked else "No semantic shadow blockers among currently approved jobs in this sample; review-only losses still require broader corpus before enforcement.",
     }
+    summary["status"] = "BLOCKED" if blocked else "PASS_WITH_RISKS"
     return summary
 
 

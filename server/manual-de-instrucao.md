@@ -17378,3 +17378,50 @@ Conclusao operacional:
 - feature flag pode ser preparada desligada por padrao;
 - enforcement real continua bloqueado ate haver pelo menos 10 corpora elegiveis
   efetivos sem blocker em `draw`, `removal`, `ramp` ou `wipe`.
+
+## 144. Semantic Layer v2 optimize scorecard expandido - 2026-05-19
+
+### O Porquê
+
+- A rodada anterior com `--limit 10` tentou apenas 6 corpora porque o runner
+  selecionava `DEFAULT_CORPORA[:limit]` e a lista default tinha somente 6
+  entradas.
+- Antes de qualquer enforcement ou feature flag ligada, a prova precisava chegar
+  a pelo menos 10 corpora Commander Reference reais, versionados e sanitizados.
+
+### O Como
+
+- `server/bin/semantic_layer_v2_optimize_scorecard.py` passou a incluir mais 4
+  corpora versionados ja existentes:
+  - Aesi, Tyrant of Gyre Strait (`simic_lands_ramp_draw`);
+  - Winota, Joiner of Forces (`boros_winota_nonhuman_attack`);
+  - Urza, Lord High Artificer (`mono_blue_artifact_combo_control`);
+  - Sythis, Harvest's Hand (`selesnya_enchantress_value`).
+- Nenhum artifact bruto de decklist foi criado; os corpora ja tinham
+  corpus/profile/stats suficientes.
+- O scorecard agora registra `eligible_cases` e `skipped_or_invalid_cases`, para
+  evitar declarar sucesso quando algum corpus for pulado por unresolved,
+  off-color, comandante ausente ou validacao falha.
+- O enforcement de producao e a feature flag nao foram alterados.
+
+### Resultado
+
+- Backend publico medido: `740a4e96b059568a329bc2b528679dc9118b1ce9`.
+- Artifact:
+  `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit10_expanded.json`.
+- `cases_attempted=10`, `eligible_cases=10`, `skipped_or_invalid_cases=0`.
+- `jobs_attempted=20`, `completed_jobs=10`,
+  `current_gate_approved_jobs=10`, `semantic_signal_jobs=10`.
+- Todos os casos ficaram com `unresolved_count=0`, `off_identity=0`,
+  `commander_qty=1` e `main_qty=99`.
+- `false_positive_candidates=0`,
+  `semantic_shadow_would_block_approved_jobs=0` e `review_candidates=4`.
+
+### Decisao
+
+`PASS_WITH_RISKS`.
+
+Manter `semantic_layer_v2` em shadow mode. A feature flag pode continuar sendo
+preparada desligada por padrao, mas nao deve ser ligada ainda. Se uma rodada
+futura encontrar blockers shadow em `draw`, `removal`, `ramp` ou `wipe` em jobs
+aprovados pelo quality gate atual, o status volta para `BLOCKED`.

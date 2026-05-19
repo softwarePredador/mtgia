@@ -104,3 +104,74 @@ Ampliar a prova antes de qualquer flag:
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary.json`.
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit6.json`.
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit10.json`.
+
+## Expansao para 10 corpora elegiveis
+
+Backend publico:
+
+- `740a4e96b059568a329bc2b528679dc9118b1ce9`.
+
+Motivo da rodada anterior com `--limit 10` ter atingido apenas 6 corpora:
+
+- o runner usa `DEFAULT_CORPORA[:limit]`;
+- `DEFAULT_CORPORA` tinha somente 6 entradas versionadas;
+- portanto o limite 10 nao podia selecionar mais casos, mesmo existindo outros
+  corpora Commander Reference no repositorio.
+
+Corpora ja elegiveis pelo runner antes da expansao:
+
+- Brago, King Eternal — Azorius blink/ETB value;
+- Krenko, Mob Boss — mono-red goblin tokens aggro;
+- Edgar Markov — Mardu vampire tokens/aristocrats;
+- Teysa Karlov — Orzhov aristocrats/tokens;
+- Niv-Mizzet, Parun — Izzet spellslinger/draw-damage control;
+- Prosper, Tome-Bound — Rakdos exile/treasure.
+
+Corpora adicionados ao runner, todos ja versionados com corpus/profile/stats e
+sem necessidade de gerar novos artifacts de corpus/dry-run/apply:
+
+- Aesi, Tyrant of Gyre Strait — Simic lands/ramp/draw;
+- Winota, Joiner of Forces — Boros combat trigger/humans;
+- Urza, Lord High Artificer — mono-blue artifact combo/control;
+- Sythis, Harvest's Hand — Selesnya enchantress value.
+
+Resultado do scorecard publico `--limit 10`:
+
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `skipped_or_invalid_cases=0`;
+- `jobs_attempted=20`;
+- `completed_jobs=10`;
+- `current_gate_approved_jobs=10`;
+- `quality_failed_jobs=10`;
+- `semantic_signal_jobs=10`;
+- `false_positive_candidates=0`;
+- `false_negative_candidates=0`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_shadow_review_approved_jobs=4`;
+- `review_candidates=4`;
+- decisao do artifact: `eligible_for_limited_flagged_enforcement_review`.
+
+Sanidade dos corpora criados temporariamente:
+
+- `unresolved_count=0` em todos os 10 casos;
+- `off_identity=0` em todos os 10 casos;
+- `commander_qty=1` e `main_qty=99` em todos os 10 casos;
+- decks temporarios removidos ao fim de cada caso;
+- artifact segue sanitizado: sem token, e-mail QA completo, deck id, decklist,
+  nomes de cartas ou payload bruto.
+
+## Decisao expandida
+
+`PASS_WITH_RISKS`.
+
+Nao houve blocker shadow em perdas criticas de `draw`, `removal`, `ramp` ou
+`wipe` entre jobs aprovados pelo quality gate atual. As perdas de `protection`
+continuam review-only nesta fase.
+
+Manter `semantic_layer_v2` em shadow mode e recomendar qualquer feature flag
+desligada por padrao. Nao alterar enforcement de producao nesta rodada.
+
+Artifact expandido:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit10_expanded.json`.

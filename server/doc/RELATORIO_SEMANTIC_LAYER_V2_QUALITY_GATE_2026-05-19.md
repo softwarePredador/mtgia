@@ -148,3 +148,37 @@ Reprova pos-deploy em `6076dc1554c4575ee5a049ade079c78dfdf0e98f`:
 O resultado autoriza preparar feature flag limitada desligada por padrão, mas
 nao autoriza enforcement real ainda: antes disso, o conjunto precisa ter pelo
 menos 10 corpora elegiveis efetivos.
+
+## Scorecard expandido para 10 corpora elegiveis
+
+Rodada publica no backend `740a4e96b059568a329bc2b528679dc9118b1ce9`:
+
+- o runner foi expandido de 6 para 10 corpora Commander Reference versionados;
+- `--limit 10` agora executa 10 casos efetivos, nao apenas 6;
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `skipped_or_invalid_cases=0`;
+- `jobs_attempted=20`;
+- `completed_jobs=10`;
+- `current_gate_approved_jobs=10`;
+- `semantic_signal_jobs=10`;
+- `false_positive_candidates=0`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `review_candidates=4`;
+- `unresolved_count=0`, `off_identity=0`, `commander_qty=1` e `main_qty=99`
+  para todos os corpora.
+
+Corpora adicionados ao scorecard: Aesi, Winota, Urza e Sythis, cobrindo
+Simic lands/ramp/draw, Boros combat triggers, mono-blue artifacts e Selesnya
+enchantress.
+
+Decisao: `PASS_WITH_RISKS`.
+
+Semantic Layer v2 permanece em shadow mode. Como nao houve blocker shadow em
+`draw`, `removal`, `ramp` ou `wipe`, o resultado permite continuar preparando
+feature flag limitada desligada por padrao, mas sem ligar enforcement em
+producao nesta rodada.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit10_expanded.json`.
