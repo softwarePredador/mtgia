@@ -43,7 +43,23 @@ Resumo:
 
 ## Proximos passos objetivos
 
-1. Medir delivery de jobs completos de optimize/generate antes/depois em corpus
-   representativo.
-2. Curar falsos positivos `blink_like_removal` e `expensive_ramp_review`.
-3. Promover v2 de shadow para gate somente apos taxa de falsos positivos aceitavel.
+1. Corrigir/investigar o executor async de optimize: a prova de qualidade em
+   2026-05-19 retornou `Optimize async recebeu resposta invalida do executor interno`.
+2. Criar corpus pequeno de decks completos que produzam swaps validos, nao
+   apenas `rebuild_guided`.
+3. Curar falsos positivos `blink_like_removal` e `expensive_ramp_review`.
+4. Promover v2 de shadow para gate somente apos taxa de falsos positivos aceitavel.
+
+## Quality gate 2026-05-19
+
+Relatorio:
+
+- `server/doc/RELATORIO_SEMANTIC_LAYER_V2_QUALITY_GATE_2026-05-19.md`
+
+Resumo:
+
+- `generate`: `2/2` jobs async completos, `2/2` validos,
+  `semantic_layer_v2=true`.
+- `optimize`: `2/2` jobs async chegaram em `failed`; sync forcado respondeu
+  com `rebuild_guided` seguro, mas sem swaps.
+- Decisao: manter v2 em `shadow mode`; ainda nao promover para gate duro.

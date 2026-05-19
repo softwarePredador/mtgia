@@ -1,0 +1,48 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "date": "2026-05-19",
+  "scope": "semantic_layer_v2_generate_complete_jobs",
+  "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "backend_git_sha": "13d5d23e4bc2cd1325711dbe740f24bc856e6f46",
+  "generated": [
+    {
+      "commander": "Talrand, Sky Summoner",
+      "submit_status": 202,
+      "accepted_async": true,
+      "terminal": "completed",
+      "accepted_ms": 1054,
+      "elapsed_ms": 72109,
+      "validation_ok": true,
+      "has_semantic_layer_v2": true,
+      "semantic_schema_version": "semantic_layer_v2_2026_05_18",
+      "fallback": true
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "submit_status": 202,
+      "accepted_async": true,
+      "terminal": "completed",
+      "accepted_ms": 639,
+      "elapsed_ms": 772,
+      "validation_ok": true,
+      "has_semantic_layer_v2": true,
+      "semantic_schema_version": "semantic_layer_v2_2026_05_18",
+      "reference_profile_used": true,
+      "fallback": false
+    }
+  ],
+  "gate": {
+    "generate_completed": 2,
+    "generate_valid": 2,
+    "semantic_v2_in_generate_results": 2,
+    "decision": "generate_v2_shadow_pass",
+    "reason": "Generate jobs completed and returned valid decks with semantic_layer_v2 present, but sample size is still too small for hard gate promotion."
+  },
+  "redactions": {
+    "auth_token": "not_saved",
+    "qa_email": "not_saved",
+    "deck_ids": "redacted",
+    "decklists": "not_saved",
+    "raw_payloads": "not_saved"
+  }
+}

@@ -17192,3 +17192,39 @@ Risco restante:
 - optimize/generate foram provados como aceite async/smoke, nao qualidade final
   de jobs completos;
 - prova de app em simulador iOS, nao em build assinado em device fisico.
+
+## 139. Semantic Layer v2 quality gate - 2026-05-19
+
+Medição pública de qualidade executada contra backend
+`13d5d23e4bc2cd1325711dbe740f24bc856e6f46`.
+
+Generate:
+
+- `Talrand, Sky Summoner`: job async completo, `validation_ok=true`,
+  `semantic_layer_v2=true`, `fallback=true`, `elapsed_ms=72109`;
+- `Lorehold, the Historian`: job async completo, `validation_ok=true`,
+  `semantic_layer_v2=true`, `reference_profile_used=true`, `fallback=false`,
+  `elapsed_ms=772`.
+
+Optimize:
+
+- job async `focused`: terminal `failed`, erro sanitizado
+  `Optimize async recebeu resposta invalida do executor interno.`;
+- job async `aggressive`: terminal `failed`;
+- sync forcado `focused`: `422`, `mode=rebuild_guided`,
+  `quality_error_code=OPTIMIZE_NEEDS_REPAIR`;
+- sync forcado `aggressive`: `422`, `mode=rebuild_guided`,
+  `quality_error_code=OPTIMIZE_NEEDS_REPAIR`.
+
+Decisão:
+
+- `semantic_layer_v2` permanece em shadow mode;
+- pode ser usado como explicabilidade e sinal auxiliar;
+- nao deve virar gate duro em optimize/generate ate corrigir optimize async e
+  medir jobs completos com swaps validos.
+
+Artefatos:
+
+- `server/doc/RELATORIO_SEMANTIC_LAYER_V2_QUALITY_GATE_2026-05-19.md`;
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/generate_quality_summary.json`;
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_quality_summary.json`.
