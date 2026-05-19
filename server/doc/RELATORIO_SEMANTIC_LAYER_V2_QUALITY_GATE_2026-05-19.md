@@ -117,3 +117,20 @@ Artifact:
 3. Comparar decisão atual do quality gate vs. decisão sugerida por v2 em shadow.
 4. Promover v2 apenas para enforcement parcial quando a divergência for
    aceitável e reversível por feature flag.
+
+## Scorecard shadow de falsos positivos
+
+Rodada adicional publicada no relatório:
+
+- `server/doc/RELATORIO_SEMANTIC_LAYER_V2_OPTIMIZE_SCORECARD_2026-05-19.md`.
+
+Resultado:
+
+- `false_positive_candidates=2`;
+- `false_negative_candidates=0`;
+- `semantic_shadow_would_block_approved_jobs=2`;
+- decisão: `NO-GO` para enforcement parcial agora.
+
+Motivo: a v2 bloquearia perda de `protection` em jobs que o quality gate atual
+aprovou. Antes de enforcement, a regra precisa considerar alvo mínimo,
+redundância e compensação por outras funções.

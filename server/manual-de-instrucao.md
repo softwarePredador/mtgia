@@ -17323,3 +17323,38 @@ Decisão:
 Artifact:
 
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_multi_corpus_semantic_diagnostics_summary.json`.
+
+## 143. Semantic Layer v2 optimize shadow scorecard - 2026-05-19
+
+Criado runner:
+
+- `server/bin/semantic_layer_v2_optimize_scorecard.py`.
+
+Objetivo:
+
+- comparar quality gate atual vs. decisão shadow da Semantic Layer v2;
+- identificar falsos positivos antes de qualquer enforcement;
+- salvar apenas dados agregados, sem token, e-mail QA, deck id, decklist, nomes
+  de cartas ou payload bruto.
+
+Prova pública em `b8d62ffeacf93d27f6e52fad1556d1b6ada0b378`:
+
+- corpora: Brago, Krenko e Edgar;
+- jobs async: `6`;
+- jobs aprovados pelo gate atual: `3`;
+- jobs com signal v2: `3`;
+- `false_positive_candidates=2`;
+- `false_negative_candidates=0`;
+- `semantic_shadow_would_block_approved_jobs=2`.
+
+Decisão:
+
+- `NO-GO` para enforcement parcial agora;
+- manter v2 em shadow mode;
+- refinar regra de perda de `protection` para considerar alvo mínimo,
+  redundância e compensação por outras funções.
+
+Artifacts:
+
+- `server/doc/RELATORIO_SEMANTIC_LAYER_V2_OPTIMIZE_SCORECARD_2026-05-19.md`;
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary.json`.
