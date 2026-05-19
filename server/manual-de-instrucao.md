@@ -17252,7 +17252,35 @@ Relatório:
 
 Próximo gate:
 
-- aguardar deploy público do commit da correção;
-- repetir probe público de optimize async completo;
-- se jobs completarem com swaps válidos, medir novamente Semantic Layer v2 para
-  decidir promoção parcial.
+- deploy público confirmado em
+  `981a02f6b4f00b688903714d60138b596a244195`;
+- probe público confirmou que o erro antigo de executor interno inválido não
+  reapareceu;
+- corpus real Brago produziu optimize async completo com `suggestion_count=10`,
+  `quality_error=false`, `commander=1`, `main=99`, `unresolved=0`,
+  `off_identity=0`;
+- manter Semantic Layer v2 em shadow mode porque o job com swaps não expôs sinal
+  semântico v2 nos diagnostics.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_async_executor_fix_summary.json`.
+
+## 141. Semantic Layer v2 optimize gate follow-up - 2026-05-19
+
+Estado após a correção do executor:
+
+- `executor_async=pass`;
+- `real_corpus_valid_swap_jobs=1`;
+- `semantic_signal_jobs=0`;
+- decisão: `keep_semantic_layer_v2_shadow_mode`.
+
+Próximas validações necessárias antes de gate duro:
+
+- expor diagnostics semânticos v2 no optimize quando `semantic_tags_v2`
+  participar da classificação funcional;
+- medir corpus pequeno com múltiplos comandantes e swaps completos;
+- validar deltas de função (`ramp`, `draw`, `removal`, `wipe`, `protection`),
+  off-color, commander preservado e falsos positivos;
+- só promover v2 para enforcement parcial se jobs completos com swaps mantiverem
+  qualidade e diagnostics observáveis.

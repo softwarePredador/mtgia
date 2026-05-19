@@ -1,0 +1,71 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "date": "2026-05-19",
+  "scope": "optimize_async_executor_fix_and_real_corpus_swap_measurement",
+  "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "backend_git_sha": "981a02f6b4f00b688903714d60138b596a244195",
+  "executor_fix": {
+    "public_deploy_verified": true,
+    "old_invalid_executor_response_observed_after_fix": false,
+    "async_jobs_accepted": true,
+    "internal_url_resolution": "uses forwarded HTTPS/proxy-aware resolver for /ai/optimize"
+  },
+  "structural_probe": {
+    "fixture": "sanitized_full_talrand_spell_corpus",
+    "resolved_nonland_rows": 64,
+    "missing_name_count": 0,
+    "main_quantity": 99,
+    "focused": {
+      "accepted_async": true,
+      "terminal": "failed",
+      "quality_error": true,
+      "suggestion_count": 0
+    },
+    "aggressive": {
+      "accepted_async": true,
+      "terminal": "failed",
+      "quality_error": true,
+      "suggestion_count": 0,
+      "has_semantic_diagnostic": true
+    },
+    "decision": "not_usable_for_swap_quality_gate"
+  },
+  "real_corpus_probe": {
+    "source": "versioned_commander_reference_corpus",
+    "commander_slug": "brago_king_eternal",
+    "theme": "blink_etb_value",
+    "card_entry_count": 82,
+    "quantity_total": 100,
+    "commander_quantity": 1,
+    "main_quantity": 99,
+    "unresolved_count": 0,
+    "off_identity": 0,
+    "validation_ok": true,
+    "focused": {
+      "accepted_async": true,
+      "terminal": "completed",
+      "mode": "optimize",
+      "quality_error": false,
+      "outcome_code": "optimized",
+      "suggestion_count": 10,
+      "elapsed_ms": 5130,
+      "has_diagnostics": true,
+      "has_semantic_signal": false
+    }
+  },
+  "gate": {
+    "executor_async": "pass",
+    "real_corpus_valid_swap_jobs": 1,
+    "semantic_signal_jobs": 0,
+    "decision": "keep_semantic_layer_v2_shadow_mode",
+    "reason": "Optimize async is fixed and real corpus produced valid swaps, but semantic v2 was not observable in optimize diagnostics in this sample. Do not promote v2 to hard gate until semantic diagnostics and broader corpus pass."
+  },
+  "redactions": {
+    "auth_token": "not_saved",
+    "qa_email": "not_saved",
+    "deck_ids": "redacted",
+    "decklists": "not_saved",
+    "card_names": "not_saved",
+    "raw_payloads": "not_saved"
+  }
+}
