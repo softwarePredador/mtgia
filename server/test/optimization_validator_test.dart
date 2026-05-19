@@ -84,6 +84,64 @@ void main() {
       print('Swap: ${swap.removed} → ${swap.added} = ${swap.verdict}');
     });
 
+    test('functional analysis exposes semantic v2 shadow diagnostics',
+        () async {
+      final originalDeck = [
+        {
+          'name': 'Old Ramp Rock',
+          'type_line': 'Artifact',
+          'mana_cost': '{3}',
+          'oracle_text': '{T}: Add {C}.',
+          'cmc': 3,
+          'quantity': 1,
+          'semantic_tags_v2': [
+            {
+              'tags': ['ramp'],
+              'role_confidence': 0.9,
+            }
+          ],
+        },
+        ..._makeLands(36),
+        ..._makeSpells(63, avgCmc: 3),
+      ];
+
+      final optimizedDeck = [
+        {
+          'name': 'Efficient Draw Spell',
+          'type_line': 'Instant',
+          'mana_cost': '{1}{U}',
+          'oracle_text': 'Draw two cards.',
+          'cmc': 2,
+          'quantity': 1,
+          'semantic_tags_v2': [
+            {
+              'tags': ['draw'],
+              'role_confidence': 0.95,
+            }
+          ],
+        },
+        ..._makeLands(36),
+        ..._makeSpells(63, avgCmc: 3),
+      ];
+
+      final report = await validator.validate(
+        originalDeck: originalDeck,
+        optimizedDeck: optimizedDeck,
+        removals: ['Old Ramp Rock'],
+        additions: ['Efficient Draw Spell'],
+        commanders: ['Test Commander'],
+        archetype: 'control',
+      );
+
+      final semantic = report.functional.toJson()['semantic_layer_v2'] as Map;
+      expect(semantic['source'], equals('deterministic_semantic_v2'));
+      expect(semantic['mode'], equals('shadow'));
+      expect(semantic['enforcement'], equals('disabled'));
+      expect(semantic['pairs_with_both_semantic_signals'], equals(1));
+      expect(semantic['role_delta'], containsPair('ramp', -1));
+      expect(semantic['role_delta'], containsPair('draw', 1));
+    });
+
     test('mulligan report produces reasonable rates', () async {
       final deck = [
         ..._makeLands(36),

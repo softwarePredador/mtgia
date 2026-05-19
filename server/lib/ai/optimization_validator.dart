@@ -321,6 +321,13 @@ class OptimizationValidator {
       roleDelta[role] = gained - lost;
     }
 
+    final semanticLayerV2 = buildOptimizationSemanticV2Diagnostics(
+      originalDeck: originalDeck,
+      optimizedDeck: optimizedDeck,
+      removals: removals,
+      additions: additions,
+    );
+
     return FunctionalReport(
       swaps: swapAnalysis,
       upgrades: upgrades,
@@ -328,6 +335,7 @@ class OptimizationValidator {
       tradeoffs: tradeoffs,
       questionable: questionable,
       roleDelta: roleDelta,
+      semanticLayerV2: semanticLayerV2,
     );
   }
 
@@ -785,6 +793,7 @@ class FunctionalReport {
   final int tradeoffs;
   final int questionable;
   final Map<String, int> roleDelta;
+  final Map<String, dynamic> semanticLayerV2;
 
   FunctionalReport({
     required this.swaps,
@@ -793,6 +802,7 @@ class FunctionalReport {
     required this.tradeoffs,
     required this.questionable,
     required this.roleDelta,
+    this.semanticLayerV2 = const <String, dynamic>{},
   });
 
   Map<String, dynamic> toJson() => {
@@ -804,6 +814,7 @@ class FunctionalReport {
           'questionable': questionable,
         },
         'role_delta': roleDelta,
+        if (semanticLayerV2.isNotEmpty) 'semantic_layer_v2': semanticLayerV2,
       };
 }
 

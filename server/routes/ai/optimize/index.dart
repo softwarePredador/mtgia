@@ -2836,6 +2836,18 @@ Future<Response> onRequest(RequestContext context) async {
         returnedSwaps: responseSwapCount(responseBody),
         qualityGateDropped: qualityGateDroppedCount,
       );
+      if (optimizationValidationReport?.functional.semanticLayerV2.isNotEmpty ==
+          true) {
+        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
+            ? (responseBody['optimize_diagnostics'] as Map)
+                .cast<String, dynamic>()
+            : <String, dynamic>{};
+        responseBody['optimize_diagnostics'] = {
+          ...existingDiagnostics,
+          'semantic_layer_v2':
+              optimizationValidationReport!.functional.semanticLayerV2,
+        };
+      }
       if (intensity.selected == 'aggressive') {
         final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
             ? (responseBody['optimize_diagnostics'] as Map)

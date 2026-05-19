@@ -159,3 +159,78 @@ double _safeSemanticConfidence(Object? value) {
   if (value is String) return double.tryParse(value) ?? 0;
   return 0;
 }
+
+Map<String, dynamic> buildOptimizationSemanticV2Diagnostics({
+  required List<Map<String, dynamic>> originalDeck,
+  required List<Map<String, dynamic>> optimizedDeck,
+  required List<String> removals,
+  required List<String> additions,
+}) {
+  final originalByName = _cardsByNormalizedName(originalDeck);
+  final optimizedByName = _cardsByNormalizedName(optimizedDeck);
+  final roleDelta = <String, int>{};
+  var removedSemanticRoleCount = 0;
+  var addedSemanticRoleCount = 0;
+  var pairsWithAnySemanticSignal = 0;
+  var pairsWithBothSemanticSignals = 0;
+
+  for (var i = 0; i < removals.length && i < additions.length; i++) {
+    final removed = originalByName[_normalizeRoleCardName(removals[i])];
+    final added = optimizedByName[_normalizeRoleCardName(additions[i])];
+    final removedRole = _classifySemanticV2FunctionalRole(
+      removed?['semantic_tags_v2'],
+    );
+    final addedRole = _classifySemanticV2FunctionalRole(
+      added?['semantic_tags_v2'],
+    );
+
+    if (removedRole != null) {
+      removedSemanticRoleCount++;
+      roleDelta[removedRole] = (roleDelta[removedRole] ?? 0) - 1;
+    }
+    if (addedRole != null) {
+      addedSemanticRoleCount++;
+      roleDelta[addedRole] = (roleDelta[addedRole] ?? 0) + 1;
+    }
+    if (removedRole != null || addedRole != null) {
+      pairsWithAnySemanticSignal++;
+    }
+    if (removedRole != null && addedRole != null) {
+      pairsWithBothSemanticSignals++;
+    }
+  }
+
+  final normalizedRoleDelta = Map.fromEntries(
+    roleDelta.entries.where((entry) => entry.value != 0).toList()
+      ..sort((a, b) => a.key.compareTo(b.key)),
+  );
+
+  return {
+    'schema_version': 'semantic_layer_v2_2026_05_18',
+    'source': 'deterministic_semantic_v2',
+    'mode': 'shadow',
+    'pair_count':
+        removals.length < additions.length ? removals.length : additions.length,
+    'removed_semantic_role_count': removedSemanticRoleCount,
+    'added_semantic_role_count': addedSemanticRoleCount,
+    'pairs_with_any_semantic_signal': pairsWithAnySemanticSignal,
+    'pairs_with_both_semantic_signals': pairsWithBothSemanticSignals,
+    'role_delta': normalizedRoleDelta,
+    'enforcement': 'disabled',
+  };
+}
+
+Map<String, Map<String, dynamic>> _cardsByNormalizedName(
+  List<Map<String, dynamic>> cards,
+) {
+  final byName = <String, Map<String, dynamic>>{};
+  for (final card in cards) {
+    final key = _normalizeRoleCardName(card['name']?.toString() ?? '');
+    if (key.isNotEmpty) byName[key] = card;
+  }
+  return byName;
+}
+
+String _normalizeRoleCardName(String value) {
+  return value.trim().toLowerCase();
+}
