@@ -32,6 +32,24 @@ void main() {
       );
     });
 
+    test('resolves arbitrary AI route with forwarded https protocol', () {
+      final uri = resolveInternalAiRouteUrl(
+        headers: const {
+          'host': 'evolution-cartinhas.8ktevp.easypanel.host',
+          'x-forwarded-proto': 'https',
+        },
+        requestUri: Uri.parse(
+          'http://evolution-cartinhas.8ktevp.easypanel.host/ai/optimize',
+        ),
+        routePath: '/ai/optimize',
+      );
+
+      expect(
+        uri.toString(),
+        'https://evolution-cartinhas.8ktevp.easypanel.host/ai/optimize',
+      );
+    });
+
     test('keeps local http for direct development requests', () {
       final uri = resolveAiGenerateInternalUrl(
         headers: const {'host': '127.0.0.1:8082'},

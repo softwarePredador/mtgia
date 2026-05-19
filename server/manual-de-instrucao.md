@@ -17228,3 +17228,31 @@ Artefatos:
 - `server/doc/RELATORIO_SEMANTIC_LAYER_V2_QUALITY_GATE_2026-05-19.md`;
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/generate_quality_summary.json`;
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_quality_summary.json`.
+
+## 140. Optimize async internal URL fix - 2026-05-19
+
+Correção aplicada:
+
+- `/ai/optimize` async agora usa o mesmo resolvedor de URL interna usado por
+  `/ai/generate`, respeitando `x-forwarded-proto`, scheme do request, fallback
+  local e `AI_OPTIMIZE_INTERNAL_BASE_URL`;
+- isso corrige a causa provável do erro público
+  `Optimize async recebeu resposta invalida do executor interno.`;
+- o resolvedor generico fica em `server/lib/ai_generate_internal_url_support.dart`.
+
+Validação local:
+
+- `dart analyze lib/ai_generate_internal_url_support.dart routes/ai/optimize/index.dart test/ai_generate_internal_url_support_test.dart`: PASS;
+- `dart test test/ai_generate_internal_url_support_test.dart test/optimize_runtime_support_test.dart -r expanded`: PASS;
+- servidor local `PORT=8082` + `dart test test/ai_optimize_flow_test.dart -r expanded`: PASS.
+
+Relatório:
+
+- `server/doc/RELATORIO_OPTIMIZE_ASYNC_EXECUTOR_FIX_2026-05-19.md`.
+
+Próximo gate:
+
+- aguardar deploy público do commit da correção;
+- repetir probe público de optimize async completo;
+- se jobs completarem com swaps válidos, medir novamente Semantic Layer v2 para
+  decidir promoção parcial.

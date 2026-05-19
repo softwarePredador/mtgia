@@ -1,13 +1,14 @@
-Uri resolveAiGenerateInternalUrl({
+Uri resolveInternalAiRouteUrl({
   required Map<String, String> headers,
   required Uri requestUri,
+  required String routePath,
   String? configuredBaseUrl,
   String? fallbackPort,
 }) {
   final configured = configuredBaseUrl?.trim();
   if (configured != null && configured.isNotEmpty) {
     final base = configured.replaceFirst(RegExp(r'/$'), '');
-    return Uri.parse('$base/ai/generate');
+    return Uri.parse('$base$routePath');
   }
 
   final host = headers['host']?.trim();
@@ -25,5 +26,20 @@ Uri resolveAiGenerateInternalUrl({
           ? requestScheme
           : 'http';
 
-  return Uri.parse('$scheme://$resolvedHost/ai/generate');
+  return Uri.parse('$scheme://$resolvedHost$routePath');
+}
+
+Uri resolveAiGenerateInternalUrl({
+  required Map<String, String> headers,
+  required Uri requestUri,
+  String? configuredBaseUrl,
+  String? fallbackPort,
+}) {
+  return resolveInternalAiRouteUrl(
+    headers: headers,
+    requestUri: requestUri,
+    routePath: '/ai/generate',
+    configuredBaseUrl: configuredBaseUrl,
+    fallbackPort: fallbackPort,
+  );
 }

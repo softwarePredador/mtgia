@@ -20,6 +20,7 @@ import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
+import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/logger.dart';
@@ -3078,18 +3079,13 @@ Future<void> _processOptimizeModeAsync({
 }
 
 Uri _resolveInternalOptimizeUrl(Request request) {
-  final configured = Platform.environment['AI_OPTIMIZE_INTERNAL_BASE_URL'];
-  if (configured != null && configured.trim().isNotEmpty) {
-    final base = configured.trim().replaceFirst(RegExp(r'/$'), '');
-    return Uri.parse('$base/ai/optimize');
-  }
-
-  final host = request.headers['host']?.trim();
-  final fallbackPort = Platform.environment['PORT']?.trim();
-  final resolvedHost = host != null && host.isNotEmpty
-      ? host
-      : '127.0.0.1:${fallbackPort?.isNotEmpty == true ? fallbackPort : '8080'}';
-  return Uri.parse('http://$resolvedHost/ai/optimize');
+  return resolveInternalAiRouteUrl(
+    headers: request.headers,
+    requestUri: request.uri,
+    routePath: '/ai/optimize',
+    configuredBaseUrl: Platform.environment['AI_OPTIMIZE_INTERNAL_BASE_URL'],
+    fallbackPort: Platform.environment['PORT']?.trim(),
+  );
 }
 
 Future<void> _recordOptimizeAnalysisOutcome({
