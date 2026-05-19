@@ -17146,3 +17146,49 @@ Risco restante:
 
 - v2 permanece em shadow mode; nao deve bloquear optimize/generate ate haver
   prova publica e taxa aceitavel de falsos positivos.
+
+## 138. Semantic Layer v2 public runtime proof - 2026-05-19
+
+Prova publica concluida:
+
+- backend publico `https://evolution-cartinhas.8ktevp.easypanel.host`;
+- backend SHA `36a356eeba9e787f8eeb9648f93c718bea40af95`;
+- route smoke: PASS;
+- iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`: PASS;
+- harness `app/integration_test/deck_functional_tags_runtime_test.dart`;
+- resultado runtime `00:09 +1: All tests passed!`.
+
+Route smoke:
+
+- `/health=200`;
+- `/cards` resolveu 7/7 cartas da fixture;
+- `/decks=200`;
+- `/decks/:id/analysis=200`;
+- `/decks/:id/ai-analysis=200`;
+- `/ai/optimize=202`;
+- `/ai/generate=202`.
+
+Contrato semantico provado:
+
+- `functional_tags_schema_version=functional_card_tags_v1_2026_05_18`;
+- `semantic_schema_version=semantic_layer_v2_2026_05_18`;
+- `source_priority=persisted_then_heuristic`;
+- `persisted_rows=6`;
+- `heuristic_rows=1`;
+- `ramp_sample_detail_count=2`;
+- `has_explainability_reason=true`;
+- UI exibiu amostra `Sol Ring`;
+- UI exibiu texto amigavel `Conta como ramp`.
+
+Artefatos:
+
+- `server/test/artifacts/semantic_layer_v2_public_runtime_2026-05-19/route_smoke_summary.json`;
+- `app/doc/runtime_flow_handoffs/semantic_layer_v2_iphone15_simulator_2026-05-19.md`;
+- `app/doc/runtime_flow_proofs_2026-05-19_semantic_layer_v2/summary.json`.
+
+Risco restante:
+
+- v2 segue em shadow mode;
+- optimize/generate foram provados como aceite async/smoke, nao qualidade final
+  de jobs completos;
+- prova de app em simulador iOS, nao em build assinado em device fisico.

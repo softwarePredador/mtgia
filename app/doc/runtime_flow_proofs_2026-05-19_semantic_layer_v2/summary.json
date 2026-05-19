@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "date": "2026-05-19",
+  "scope": "semantic_layer_v2_deck_analysis_runtime",
+  "device": "iPhone 15 Simulator",
+  "device_id": "F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF",
+  "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "backend_git_sha": "36a356eeba9e787f8eeb9648f93c718bea40af95",
+  "test_file": "app/integration_test/deck_functional_tags_runtime_test.dart",
+  "result": "00:09 +1: All tests passed!",
+  "analysis_http_status": 200,
+  "functional_tags_schema_version": "functional_card_tags_v1_2026_05_18",
+  "semantic_schema_version": "semantic_layer_v2_2026_05_18",
+  "source_priority": "persisted_then_heuristic",
+  "persisted_rows": 6,
+  "persisted_copies": 6,
+  "heuristic_rows": 1,
+  "heuristic_copies": 1,
+  "counts": {
+    "ramp": 2,
+    "draw": 1,
+    "removal": 2,
+    "board_wipe": 0,
+    "protection": 0
+  },
+  "coverage": {
+    "card_rows": 7,
+    "card_copies": 7,
+    "tagged_rows": 6,
+    "tagged_copies": 6,
+    "other_rows": 1,
+    "other_copies": 1
+  },
+  "ramp_sample_count": 2,
+  "ramp_sample_detail_count": 2,
+  "has_explainability_reason": true,
+  "ui_rendered": true,
+  "sol_ring_visible": true,
+  "explainability_visible": true,
+  "redactions": {
+    "deck_id": "redacted",
+    "auth_token": "not_saved",
+    "qa_email": "not_saved",
+    "raw_decklist": "not_saved"
+  },
+  "risks": [
+    "Runtime proved on iPhone 15 Simulator, not a signed physical-device build.",
+    "Known iOS simulator arm64 plugin warnings were emitted but did not block execution.",
+    "Optimize and generate were smoked as async acceptance only; full job completion quality is a separate measurement gate."
+  ]
+}

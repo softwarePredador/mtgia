@@ -1,0 +1,45 @@
+{
+  "status": "PASS",
+  "date": "2026-05-19",
+  "scope": "semantic_layer_v2_public_route_smoke",
+  "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "backend_git_sha": "36a356eeba9e787f8eeb9648f93c718bea40af95",
+  "route_statuses": {
+    "health": 200,
+    "auth_register": 201,
+    "cards_resolved": 7,
+    "deck_create": 200,
+    "deck_analysis": 200,
+    "deck_ai_analysis": 200,
+    "ai_optimize": 202,
+    "ai_generate_async_submit": 202
+  },
+  "semantic_contract": {
+    "functional_schema_version": "functional_card_tags_v1_2026_05_18",
+    "semantic_schema_version": "semantic_layer_v2_2026_05_18",
+    "source_priority": "persisted_then_heuristic",
+    "persisted_rows": 6,
+    "heuristic_rows": 1,
+    "ramp_sample_detail_count": 2,
+    "has_explainability_reason": true,
+    "ai_analysis_has_functional_tags": true
+  },
+  "optimize_safe_response": {
+    "status": 202,
+    "has_mode": false,
+    "has_quality_error": false,
+    "has_diagnostics": false
+  },
+  "generate_safe_response": {
+    "status": 202,
+    "accepted_async": true,
+    "has_validation": false,
+    "has_semantic_layer_v2": false
+  },
+  "redactions": {
+    "auth_token": "not_saved",
+    "qa_email": "not_saved",
+    "deck_id": "redacted",
+    "raw_decklist": "not_saved"
+  }
+}
