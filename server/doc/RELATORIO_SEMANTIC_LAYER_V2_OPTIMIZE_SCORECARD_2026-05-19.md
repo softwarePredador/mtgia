@@ -175,3 +175,41 @@ desligada por padrao. Nao alterar enforcement de producao nesta rodada.
 Artifact expandido:
 
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit10_expanded.json`.
+
+## Feature flag segura de enforcement parcial - 2026-05-20
+
+Implementado preparo controlado para enforcement no `/ai/optimize`:
+
+- flag de ambiente `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT`;
+- valores aceitos: `disabled` e `partial`;
+- default seguro: `disabled` para valor ausente, vazio ou desconhecido;
+- em `disabled`, a Semantic Layer v2 permanece shadow/diagnostic e nao bloqueia
+  respostas;
+- em `partial`, o bloqueio so ocorre depois que o fluxo atual aprovar a
+  otimizacao e apenas para perda semantica critica em `draw`, `removal`,
+  `ramp` ou `wipe`;
+- perda de `protection` continua review-only em `review_loss_roles`;
+- requests com `partial` bypassam read/write de `ai_optimize_cache` para evitar
+  reaproveitar decisoes geradas com enforcement desligado.
+
+Diagnostics opcionais adicionados em
+`optimize_diagnostics.semantic_layer_v2`:
+
+- `enforcement_mode`;
+- `critical_loss_roles`;
+- `review_loss_roles`;
+- `blocked_by_semantic_v2`;
+- `enforcement_signal=role_delta_negative`.
+
+Quando `partial` bloqueia, a resposta usa `422` com
+`quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED` e
+`rejection_source=semantic_layer_v2`, preservando o contrato app-facing
+aditivo.
+
+Validacao local:
+
+- `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart routes/ai/optimize/index.dart test/optimization_validator_test.dart`: PASS;
+- `dart test test/optimization_validator_test.dart -r expanded`: PASS.
+
+Resultado: `PASS_WITH_RISKS`. A flag continua recomendada desligada por padrao
+em producao; `partial` deve ser usado primeiro em ambiente controlado.

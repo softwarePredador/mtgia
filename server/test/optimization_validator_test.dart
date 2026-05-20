@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import '../lib/ai/optimization_functional_roles.dart';
 import '../lib/ai/optimization_validator.dart';
 
 void main() {
@@ -140,6 +141,98 @@ void main() {
       expect(semantic['pairs_with_both_semantic_signals'], equals(1));
       expect(semantic['role_delta'], containsPair('ramp', -1));
       expect(semantic['role_delta'], containsPair('draw', 1));
+    });
+
+    test('semantic v2 enforcement defaults to disabled and is non-blocking',
+        () {
+      final mode = resolveSemanticV2OptimizeEnforcementMode(null);
+      final semantic = buildOptimizationSemanticV2Diagnostics(
+        originalDeck: [
+          _semanticCard('Old Draw', ['draw']),
+        ],
+        optimizedDeck: [
+          _semanticCard('New Utility', ['utility']),
+        ],
+        removals: const ['Old Draw'],
+        additions: const ['New Utility'],
+      );
+
+      final diagnostics = withOptimizationSemanticV2EnforcementDiagnostics(
+        semanticLayerV2: semantic,
+        mode: mode,
+      );
+
+      expect(mode, equals(SemanticV2OptimizeEnforcementMode.disabled));
+      expect(resolveSemanticV2OptimizeEnforcementMode(''), equals(mode));
+      expect(resolveSemanticV2OptimizeEnforcementMode('full'), equals(mode));
+      expect(resolveSemanticV2OptimizeEnforcementMode('PARTIAL'),
+          equals(SemanticV2OptimizeEnforcementMode.partial));
+      expect(diagnostics['mode'], equals('shadow'));
+      expect(diagnostics['enforcement'], equals('disabled'));
+      expect(diagnostics['enforcement_mode'], equals('disabled'));
+      expect(diagnostics['critical_loss_roles'], equals(const ['draw']));
+      expect(diagnostics['blocked_by_semantic_v2'], isFalse);
+    });
+
+    test('semantic v2 partial blocks only critical role losses', () {
+      for (final role in const ['draw', 'removal', 'ramp', 'wipe']) {
+        final decision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+        );
+
+        expect(decision.criticalLossRoles, equals([role]));
+        expect(decision.reviewLossRoles, isEmpty);
+        expect(decision.blockedBySemanticV2, isTrue);
+      }
+    });
+
+    test('semantic v2 partial keeps protection review-only', () {
+      final diagnostics = withOptimizationSemanticV2EnforcementDiagnostics(
+        semanticLayerV2: const {
+          'role_delta': {'protection': -1},
+        },
+        mode: SemanticV2OptimizeEnforcementMode.partial,
+      );
+
+      expect(diagnostics['critical_loss_roles'], isEmpty);
+      expect(diagnostics['review_loss_roles'], equals(const ['protection']));
+      expect(diagnostics['blocked_by_semantic_v2'], isFalse);
+    });
+
+    test('semantic v2 partial does not block missing semantic signal', () {
+      final decision = evaluateOptimizationSemanticV2Enforcement(
+        semanticLayerV2: const <String, dynamic>{},
+        mode: SemanticV2OptimizeEnforcementMode.partial,
+      );
+
+      expect(decision.criticalLossRoles, isEmpty);
+      expect(decision.reviewLossRoles, isEmpty);
+      expect(decision.blockedBySemanticV2, isFalse);
+    });
+
+    test('semantic v2 shadow builder keeps backward-compatible core fields',
+        () {
+      final semantic = buildOptimizationSemanticV2Diagnostics(
+        originalDeck: [
+          _semanticCard('Old Protection', ['protection']),
+        ],
+        optimizedDeck: [
+          _semanticCard('New Draw', ['draw']),
+        ],
+        removals: const ['Old Protection'],
+        additions: const ['New Draw'],
+      );
+
+      expect(
+          semantic['schema_version'], equals('semantic_layer_v2_2026_05_18'));
+      expect(semantic['source'], equals('deterministic_semantic_v2'));
+      expect(semantic['mode'], equals('shadow'));
+      expect(semantic['enforcement'], equals('disabled'));
+      expect(semantic.containsKey('enforcement_mode'), isFalse);
+      expect(semantic['role_delta'], containsPair('protection', -1));
     });
 
     test('mulligan report produces reasonable rates', () async {
@@ -407,6 +500,21 @@ void main() {
     });
   });
 }
+
+Map<String, dynamic> _semanticCard(String name, List<String> tags) => {
+      'name': name,
+      'type_line': 'Instant',
+      'mana_cost': '{1}',
+      'oracle_text': 'Test semantic card.',
+      'cmc': 1,
+      'quantity': 1,
+      'semantic_tags_v2': [
+        {
+          'tags': tags,
+          'role_confidence': 0.9,
+        }
+      ],
+    };
 
 /// Helper: cria N terrenos básicos
 List<Map<String, dynamic>> _makeLands(int count) {

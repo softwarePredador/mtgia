@@ -14,6 +14,7 @@ import '../../../lib/ai/optimize_request_support.dart' as optimize_request;
 import '../../../lib/ai/optimize_state_support.dart' as optimize_state;
 import '../../../lib/ai/optimize_stage_telemetry.dart';
 import '../../../lib/ai/otimizacao.dart';
+import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
@@ -363,6 +364,7 @@ String deriveOptimizeOutcomeCode({
           ? 'needs_repair'
           : 'no_safe_upgrade_found';
     case 'OPTIMIZE_QUALITY_REJECTED':
+    case 'OPTIMIZE_SEMANTIC_V2_REJECTED':
       if (deckState.status == 'needs_repair' ||
           (healthScore != null && healthScore < 45)) {
         return 'needs_repair';
@@ -430,6 +432,11 @@ Future<Response> onRequest(RequestContext context) async {
     );
     final hasBracketOverride = body.containsKey('bracket');
     final hasKeepThemeOverride = body.containsKey('keep_theme');
+    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final semanticV2OptimizeEnforcementMode =
+        resolveSemanticV2OptimizeEnforcementMode(
+      env['SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT'],
+    );
 
     _optimizeRequestCount++;
 
@@ -576,13 +583,16 @@ Future<Response> onRequest(RequestContext context) async {
       return removalsCount < additionsCount ? removalsCount : additionsCount;
     }
 
-    final cachedResponse = await telemetry.trackAsync(
-      'request.cache_lookup',
-      () => loadOptimizeCache(
-        pool: pool,
-        cacheKey: cacheKey,
-      ),
-    );
+    final cachedResponse = semanticV2OptimizeEnforcementMode ==
+            SemanticV2OptimizeEnforcementMode.disabled
+        ? await telemetry.trackAsync(
+            'request.cache_lookup',
+            () => loadOptimizeCache(
+              pool: pool,
+              cacheKey: cacheKey,
+            ),
+          )
+        : null;
     if (cachedResponse != null) {
       cachedResponse['cache'] = {
         'hit': true,
@@ -754,6 +764,19 @@ Future<Response> onRequest(RequestContext context) async {
           ),
         };
       }
+      if (validationReport?.functional.semanticLayerV2.isNotEmpty == true) {
+        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
+            ? (responseBody['optimize_diagnostics'] as Map)
+                .cast<String, dynamic>()
+            : <String, dynamic>{};
+        responseBody['optimize_diagnostics'] = {
+          ...existingDiagnostics,
+          'semantic_layer_v2': withOptimizationSemanticV2EnforcementDiagnostics(
+            semanticLayerV2: validationReport!.functional.semanticLayerV2,
+            mode: semanticV2OptimizeEnforcementMode,
+          ),
+        };
+      }
       responseBody['outcome_code'] ??= deriveOptimizeOutcomeCode(
         statusCode: statusCode,
         body: responseBody,
@@ -833,7 +856,6 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // 2. Otimização via DeckOptimizerService (IA + RAG)
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final apiKey = env['OPENAI_API_KEY'];
     final disableCompleteAi = env['OPTIMIZE_COMPLETE_DISABLE_OPENAI'] == '1';
 
@@ -2484,6 +2506,67 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
+      if (!isComplete && optimizationValidationReport != null) {
+        final semanticV2 =
+            optimizationValidationReport.functional.semanticLayerV2;
+        if (semanticV2.isNotEmpty) {
+          final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
+            semanticLayerV2: semanticV2,
+            mode: semanticV2OptimizeEnforcementMode,
+          );
+
+          if (semanticV2Decision.blockedBySemanticV2) {
+            final semanticDiagnostics =
+                withOptimizationSemanticV2EnforcementDiagnostics(
+              semanticLayerV2: semanticV2,
+              mode: semanticV2OptimizeEnforcementMode,
+            );
+            final semanticReasons = semanticV2Decision.criticalLossRoles
+                .map(
+                  (role) =>
+                      'Semantic Layer v2 detectou perda crítica em "$role".',
+                )
+                .toList();
+
+            return respondWithOptimizeTelemetry(
+              statusCode: HttpStatus.unprocessableEntity,
+              body: {
+                'error':
+                    'A otimizacao sugerida foi bloqueada pela validacao semantica v2.',
+                'quality_error': {
+                  'code': 'OPTIMIZE_SEMANTIC_V2_REJECTED',
+                  'message':
+                      'As trocas passaram no gate atual, mas a Semantic Layer v2 em modo partial detectou perda critica.',
+                  'rejection_source': 'semantic_layer_v2',
+                  'reasons': semanticReasons,
+                  'critical_loss_roles': semanticV2Decision.criticalLossRoles,
+                  'review_loss_roles': semanticV2Decision.reviewLossRoles,
+                  'blocked_by_semantic_v2': true,
+                  'semantic_layer_v2': semanticDiagnostics,
+                  'validation': optimizationValidationReport.toJson(),
+                },
+                'mode': 'optimize',
+                'removals': validRemovals,
+                'additions': validAdditions,
+                'deck_analysis': deckAnalysis,
+                'post_analysis': postAnalysis,
+                'validation_warnings': validationWarnings,
+                'optimize_diagnostics': {
+                  'semantic_layer_v2': semanticDiagnostics,
+                },
+              },
+              postAnalysisOverride: postAnalysis,
+              validationReport: optimizationValidationReport,
+              removalsOverride: validRemovals,
+              additionsOverride: validAdditions,
+              validationWarningsOverride: validationWarnings,
+              blockedByColorIdentityOverride: filteredByColorIdentity,
+              blockedByBracketOverride: blockedByBracket,
+            );
+          }
+        }
+      }
+
       // Preparar resposta com avisos sobre cartas inválidas
       final invalidCards = validation['invalid'] as List<String>;
       final suggestions =
@@ -2847,8 +2930,11 @@ Future<Response> onRequest(RequestContext context) async {
             : <String, dynamic>{};
         responseBody['optimize_diagnostics'] = {
           ...existingDiagnostics,
-          'semantic_layer_v2':
-              optimizationValidationReport!.functional.semanticLayerV2,
+          'semantic_layer_v2': withOptimizationSemanticV2EnforcementDiagnostics(
+            semanticLayerV2:
+                optimizationValidationReport!.functional.semanticLayerV2,
+            mode: semanticV2OptimizeEnforcementMode,
+          ),
         };
       }
       if (intensity.selected == 'aggressive') {
@@ -2928,14 +3014,17 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       try {
-        await saveOptimizeCache(
-          pool: pool,
-          cacheKey: cacheKey,
-          userId: userId,
-          deckId: deckId,
-          deckSignature: deckSignature,
-          payload: responseBody,
-        );
+        if (semanticV2OptimizeEnforcementMode ==
+            SemanticV2OptimizeEnforcementMode.disabled) {
+          await saveOptimizeCache(
+            pool: pool,
+            cacheKey: cacheKey,
+            userId: userId,
+            deckId: deckId,
+            deckSignature: deckSignature,
+            payload: responseBody,
+          );
+        }
         await saveUserAiPreferences(
           pool: pool,
           userId: userId,

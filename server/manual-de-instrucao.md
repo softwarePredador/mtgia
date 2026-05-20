@@ -17425,3 +17425,51 @@ Manter `semantic_layer_v2` em shadow mode. A feature flag pode continuar sendo
 preparada desligada por padrao, mas nao deve ser ligada ainda. Se uma rodada
 futura encontrar blockers shadow em `draw`, `removal`, `ramp` ou `wipe` em jobs
 aprovados pelo quality gate atual, o status volta para `BLOCKED`.
+
+## 145. Semantic Layer v2 optimize feature flag parcial - 2026-05-20
+
+### O Porquê
+
+- O scorecard expandido chegou a `PASS_WITH_RISKS` sem blockers shadow em
+  `draw`, `removal`, `ramp` ou `wipe`, mas a recomendacao operacional continua
+  sendo nao ligar enforcement em producao por padrao.
+- A implementacao precisava permitir experimento controlado e reversivel sem
+  alterar o comportamento atual quando a flag estiver desligada.
+
+### O Como
+
+- Criada a flag `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT` com parser seguro:
+  `disabled` ou `partial`; qualquer valor ausente, vazio ou desconhecido resolve
+  para `disabled`.
+- `/ai/optimize` agora anexa diagnostics opcionais em
+  `optimize_diagnostics.semantic_layer_v2`:
+  `enforcement_mode`, `critical_loss_roles`, `review_loss_roles`,
+  `blocked_by_semantic_v2` e `enforcement_signal`.
+- Em `disabled`, a Semantic Layer v2 continua shadow/diagnostic e nao altera
+  bloqueios.
+- Em `partial`, a decisao semantica roda somente apos o fluxo atual aprovar a
+  otimizacao. O bloqueio fica restrito a deltas negativos de `draw`, `removal`,
+  `ramp` ou `wipe`.
+- `protection` permanece review-only: aparece em `review_loss_roles`, mas nao
+  bloqueia.
+- Requests com `partial` bypassam leitura e escrita do cache persistente de
+  optimize para nao misturar respostas geradas com enforcement desligado.
+- Rejeicoes semanticas usam `quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED`
+  e `rejection_source=semantic_layer_v2`, mantendo campos app-facing
+  obrigatorios inalterados.
+
+### Validação
+
+- `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart routes/ai/optimize/index.dart test/optimization_validator_test.dart`: PASS.
+- `dart test test/optimization_validator_test.dart -r expanded`: PASS.
+
+### Decisão
+
+`PASS_WITH_RISKS`.
+
+A flag deve permanecer `disabled` em producao. Para scorecard publico controlado,
+rodar primeiro sem a variavel definida ou com
+`SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=disabled`; depois repetir em ambiente
+controlado com `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` e comparar
+`OPTIMIZE_SEMANTIC_V2_REJECTED`, `critical_loss_roles` e
+`review_loss_roles`.

@@ -164,6 +164,109 @@ String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
   return null;
 }
 
+enum SemanticV2OptimizeEnforcementMode {
+  disabled,
+  partial,
+}
+
+extension SemanticV2OptimizeEnforcementModeWire
+    on SemanticV2OptimizeEnforcementMode {
+  String get wireValue => switch (this) {
+        SemanticV2OptimizeEnforcementMode.disabled => 'disabled',
+        SemanticV2OptimizeEnforcementMode.partial => 'partial',
+      };
+}
+
+SemanticV2OptimizeEnforcementMode resolveSemanticV2OptimizeEnforcementMode(
+  String? rawValue,
+) {
+  final normalized = rawValue?.trim().toLowerCase();
+  return switch (normalized) {
+    'partial' => SemanticV2OptimizeEnforcementMode.partial,
+    _ => SemanticV2OptimizeEnforcementMode.disabled,
+  };
+}
+
+class OptimizationSemanticV2EnforcementDecision {
+  final SemanticV2OptimizeEnforcementMode mode;
+  final List<String> criticalLossRoles;
+  final List<String> reviewLossRoles;
+
+  const OptimizationSemanticV2EnforcementDecision({
+    required this.mode,
+    required this.criticalLossRoles,
+    required this.reviewLossRoles,
+  });
+
+  bool get blockedBySemanticV2 =>
+      mode == SemanticV2OptimizeEnforcementMode.partial &&
+      criticalLossRoles.isNotEmpty;
+
+  Map<String, dynamic> toDiagnostics() => {
+        'enforcement_mode': mode.wireValue,
+        'critical_loss_roles': criticalLossRoles,
+        'review_loss_roles': reviewLossRoles,
+        'blocked_by_semantic_v2': blockedBySemanticV2,
+        'enforcement_signal': 'role_delta_negative',
+      };
+}
+
+OptimizationSemanticV2EnforcementDecision
+    evaluateOptimizationSemanticV2Enforcement({
+  required Map<String, dynamic> semanticLayerV2,
+  required SemanticV2OptimizeEnforcementMode mode,
+}) {
+  final roleDelta = _readSemanticRoleDelta(semanticLayerV2['role_delta']);
+  final criticalLossRoles = <String>[
+    for (final role in const ['draw', 'removal', 'ramp', 'wipe'])
+      if ((roleDelta[role] ?? 0) < 0) role,
+  ];
+  final reviewLossRoles = <String>[
+    for (final role in const ['protection'])
+      if ((roleDelta[role] ?? 0) < 0) role,
+  ];
+
+  return OptimizationSemanticV2EnforcementDecision(
+    mode: mode,
+    criticalLossRoles: criticalLossRoles,
+    reviewLossRoles: reviewLossRoles,
+  );
+}
+
+Map<String, dynamic> withOptimizationSemanticV2EnforcementDiagnostics({
+  required Map<String, dynamic> semanticLayerV2,
+  required SemanticV2OptimizeEnforcementMode mode,
+}) {
+  final decision = evaluateOptimizationSemanticV2Enforcement(
+    semanticLayerV2: semanticLayerV2,
+    mode: mode,
+  );
+  return {
+    ...semanticLayerV2,
+    ...decision.toDiagnostics(),
+    'enforcement': mode.wireValue,
+  };
+}
+
+Map<String, int> _readSemanticRoleDelta(Object? rawRoleDelta) {
+  if (rawRoleDelta is! Map) return const <String, int>{};
+  final parsed = <String, int>{};
+  for (final entry in rawRoleDelta.entries) {
+    final key = entry.key?.toString().trim().toLowerCase() ?? '';
+    if (key.isEmpty) continue;
+    final value = entry.value;
+    if (value is int) {
+      parsed[key] = value;
+    } else if (value is num) {
+      parsed[key] = value.toInt();
+    } else if (value is String) {
+      final parsedValue = int.tryParse(value);
+      if (parsedValue != null) parsed[key] = parsedValue;
+    }
+  }
+  return parsed;
+}
+
 double _safeSemanticConfidence(Object? value) {
   if (value is num) return value.toDouble();
   if (value is String) return double.tryParse(value) ?? 0;
