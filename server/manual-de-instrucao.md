@@ -17457,11 +17457,16 @@ aprovados pelo quality gate atual, o status volta para `BLOCKED`.
 - Rejeicoes semanticas usam `quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED`
   e `rejection_source=semantic_layer_v2`, mantendo campos app-facing
   obrigatorios inalterados.
+- O scorecard `server/bin/semantic_layer_v2_optimize_scorecard.py` tambem passa
+  a ler diagnostics em `quality_error.optimize_diagnostics` para jobs async
+  bloqueados por `partial` e registra `semantic_v2_actual_blocked_jobs` de forma
+  agregada/sanitizada.
 
 ### Validação
 
 - `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart routes/ai/optimize/index.dart test/optimization_validator_test.dart`: PASS.
 - `dart test test/optimization_validator_test.dart -r expanded`: PASS.
+- `python3 -m py_compile bin/semantic_layer_v2_optimize_scorecard.py`: PASS.
 
 ### Decisão
 

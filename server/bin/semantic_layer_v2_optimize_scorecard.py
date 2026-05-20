@@ -200,7 +200,10 @@ def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity:
         terminal = polled["terminal"]
         result = polled.get("payload") or {}
         elapsed_ms = polled["elapsed_ms"]
+    quality_error = result.get("quality_error") if isinstance(result.get("quality_error"), dict) else {}
     diagnostics = result.get("optimize_diagnostics") if isinstance(result.get("optimize_diagnostics"), dict) else {}
+    if not diagnostics and isinstance(quality_error.get("optimize_diagnostics"), dict):
+        diagnostics = quality_error.get("optimize_diagnostics") or {}
     semantic = diagnostics.get("semantic_layer_v2") if isinstance(diagnostics.get("semantic_layer_v2"), dict) else {}
     shadow = semantic_shadow_decision(semantic) if semantic else {
         "would_block_partial": False,
@@ -215,6 +218,10 @@ def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity:
         len(result.get("swaps") or []) if isinstance(result.get("swaps"), list) else 0,
     )
     current_gate_approved = terminal == "completed" and suggestion_count > 0 and not bool(result.get("quality_error"))
+    semantic_v2_actual_blocked = (
+        quality_error.get("code") == "OPTIMIZE_SEMANTIC_V2_REJECTED"
+        or semantic.get("blocked_by_semantic_v2") is True
+    )
     return {
         "intensity": intensity,
         "submit_status": status,
@@ -226,6 +233,8 @@ def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity:
         "outcome_code": result.get("outcome_code") or result.get("quality_error_code"),
         "quality_error": bool(result.get("quality_error")) or terminal == "failed",
         "suggestion_count": suggestion_count,
+        "semantic_v2_actual_blocked": semantic_v2_actual_blocked,
+        "semantic_v2_enforcement_mode": semantic.get("enforcement_mode"),
         "current_gate_approved": current_gate_approved,
         "has_semantic_signal": bool(semantic),
         "semantic_pair_count": semantic.get("pair_count"),
@@ -295,6 +304,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     semantic = [job for job in jobs if job.get("has_semantic_signal")]
     semantic_would_block = [job for job in approved if job.get("semantic_shadow_would_block_partial")]
     semantic_review = [job for job in approved if job.get("semantic_shadow_review_loss_roles")]
+    semantic_actual_blocked = [job for job in jobs if job.get("semantic_v2_actual_blocked")]
     quality_fail = [job for job in jobs if job.get("terminal") == "failed" or job.get("quality_error")]
     eligible_cases = [
         case for case in summary["cases"]
@@ -317,6 +327,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "semantic_signal_jobs": len(semantic),
         "semantic_shadow_would_block_approved_jobs": len(semantic_would_block),
         "semantic_shadow_review_approved_jobs": len(semantic_review),
+        "semantic_v2_actual_blocked_jobs": len(semantic_actual_blocked),
         "false_positive_candidates": len(semantic_would_block),
         "review_candidates": len(semantic_review),
         "false_negative_candidates": 0,

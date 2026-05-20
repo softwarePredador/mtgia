@@ -191,6 +191,9 @@ Implementado preparo controlado para enforcement no `/ai/optimize`:
 - perda de `protection` continua review-only em `review_loss_roles`;
 - requests com `partial` bypassam read/write de `ai_optimize_cache` para evitar
   reaproveitar decisoes geradas com enforcement desligado.
+- o runner `server/bin/semantic_layer_v2_optimize_scorecard.py` tambem reconhece
+  diagnostics em `quality_error.optimize_diagnostics` quando `partial` bloqueia
+  um job async e registra `semantic_v2_actual_blocked_jobs` no resumo agregado.
 
 Diagnostics opcionais adicionados em
 `optimize_diagnostics.semantic_layer_v2`:
