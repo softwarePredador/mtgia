@@ -182,3 +182,32 @@ producao nesta rodada.
 Artifact:
 
 - `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-19/optimize_shadow_scorecard_summary_limit10_expanded.json`.
+
+## Validacao pos-feature-flag
+
+Rodada publica com default `disabled` no backend
+`73f298a53868d2b61390765cc43e3300e64e18a6`:
+
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `current_gate_approved_jobs=7`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=4`.
+
+Rodada local controlada com
+`SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial`:
+
+- `cases_attempted=1`;
+- `eligible_cases=1`;
+- `current_gate_approved_jobs=1`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=1`.
+
+Decisao: `PASS_WITH_RISKS`. A flag esta implementada com default seguro e o
+modo `partial` foi provado em amostra controlada mínima, mas deve continuar
+restrito a ambiente controlado ate existir scorecard maior com worker async
+estavel.

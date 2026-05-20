@@ -17478,3 +17478,59 @@ rodar primeiro sem a variavel definida ou com
 controlado com `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` e comparar
 `OPTIMIZE_SEMANTIC_V2_REJECTED`, `critical_loss_roles` e
 `review_loss_roles`.
+
+## 146. Semantic Layer v2 feature flag validation - 2026-05-20
+
+### O Que
+
+Validação da flag `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT` após deploy do commit
+`73f298a53868d2b61390765cc43e3300e64e18a6`.
+
+### O Porquê
+
+A feature flag foi implementada desligada por padrão. Antes de qualquer uso de
+`partial`, era necessário provar dois estados:
+
+- produção/default `disabled` não altera comportamento nem bloqueia jobs;
+- ambiente controlado `partial` executa a decisão semântica sem tratar
+  `protection` como blocker.
+
+### O Como
+
+Prova pública `disabled`:
+
+- backend: `https://evolution-cartinhas.8ktevp.easypanel.host`;
+- SHA: `73f298a53868d2b61390765cc43e3300e64e18a6`;
+- artifact:
+  `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-20/optimize_scorecard_disabled_public.json`;
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `current_gate_approved_jobs=7`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=4`.
+
+Prova local controlada `partial`:
+
+- backend local: `http://127.0.0.1:8083`;
+- env: `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial`;
+- artifact:
+  `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-20/optimize_scorecard_partial_local_limit1.json`;
+- `cases_attempted=1`;
+- `eligible_cases=1`;
+- `current_gate_approved_jobs=1`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=1`.
+
+### Decisão
+
+`PASS_WITH_RISKS`.
+
+- Produção deve continuar `disabled`.
+- `partial` pode ser usado apenas em ambiente controlado/staging.
+- O scorecard local `limit=10` foi interrompido por custo operacional do
+  pipeline real de optimize local; antes de rollout público, repetir amostra
+  maior em staging com worker async estável.

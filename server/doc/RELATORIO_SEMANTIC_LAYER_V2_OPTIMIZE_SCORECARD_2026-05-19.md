@@ -216,3 +216,75 @@ Validacao local:
 
 Resultado: `PASS_WITH_RISKS`. A flag continua recomendada desligada por padrao
 em producao; `partial` deve ser usado primeiro em ambiente controlado.
+
+## Validacao pos-flag - 2026-05-20
+
+### Publico com default `disabled`
+
+Backend publico:
+
+- `73f298a53868d2b61390765cc43e3300e64e18a6`.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-20/optimize_scorecard_disabled_public.json`.
+
+Resultado:
+
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `jobs_attempted=20`;
+- `completed_jobs=7`;
+- `current_gate_approved_jobs=7`;
+- `quality_failed_jobs=13`;
+- `semantic_signal_jobs=16`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=4`;
+- decisao: `eligible_for_limited_flagged_enforcement_review`.
+
+Conclusao: com a flag desligada, producao manteve comportamento atual e nao
+houve bloqueio real por Semantic v2.
+
+### Local controlado com `partial`
+
+Ambiente:
+
+- `http://127.0.0.1:8083`;
+- `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial`;
+- `/health.git_sha=null`, por ser servidor local.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-20/optimize_scorecard_partial_local_limit1.json`.
+
+Resultado:
+
+- `cases_attempted=1`;
+- `eligible_cases=1`;
+- `jobs_attempted=2`;
+- `completed_jobs=1`;
+- `current_gate_approved_jobs=1`;
+- `quality_failed_jobs=1`;
+- `semantic_signal_jobs=2`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=1`;
+- decisao: `eligible_for_limited_flagged_enforcement_review`.
+
+Conclusao: `partial` executou em ambiente controlado sem bloquear perda de
+`protection` e sem gerar falso positivo na amostra mínima. A tentativa local
+`limit=10` foi interrompida por custo operacional do pipeline real de optimize
+local, nao por falha semantica; a cobertura ampla continua sendo a prova publica
+com `disabled`.
+
+### Decisao pos-flag
+
+`PASS_WITH_RISKS`.
+
+- Manter `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=disabled` em producao.
+- Permitir `partial` apenas em ambiente controlado/staging.
+- Antes de qualquer rollout publico com `partial`, repetir scorecard em ambiente
+  controlado com amostra maior ou criar staging com worker async estavel.
