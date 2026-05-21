@@ -211,3 +211,17 @@ Decisao: `PASS_WITH_RISKS`. A flag esta implementada com default seguro e o
 modo `partial` foi provado em amostra controlada mínima, mas deve continuar
 restrito a ambiente controlado ate existir scorecard maior com worker async
 estavel.
+
+Revalidacao publica do deploy `64beabff5a80ccd293c8da119d04c52784e8ba7d`
+com default `disabled`:
+
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `current_gate_approved_jobs=6`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=3`.
+
+Conclusao: producao segue segura com `disabled`; `partial` permanece restrito a
+staging/controlado.

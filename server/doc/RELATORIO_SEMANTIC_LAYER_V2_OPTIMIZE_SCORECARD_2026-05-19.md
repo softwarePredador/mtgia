@@ -288,3 +288,32 @@ com `disabled`.
 - Permitir `partial` apenas em ambiente controlado/staging.
 - Antes de qualquer rollout publico com `partial`, repetir scorecard em ambiente
   controlado com amostra maior ou criar staging com worker async estavel.
+
+### Revalidacao publica do deploy `64beabf`
+
+Backend publico:
+
+- `64beabff5a80ccd293c8da119d04c52784e8ba7d`.
+
+Artifact:
+
+- `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-20/optimize_scorecard_disabled_public_64beabf.json`.
+
+Resultado:
+
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `jobs_attempted=20`;
+- `completed_jobs=6`;
+- `current_gate_approved_jobs=6`;
+- `quality_failed_jobs=14`;
+- `semantic_signal_jobs=17`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=3`;
+- decisao: `eligible_for_limited_flagged_enforcement_review`.
+
+Conclusao: o deploy posterior manteve producao segura com a flag desligada e
+sem bloqueio real por Semantic v2. O proximo gate continua sendo staging com
+`partial`, nao producao.

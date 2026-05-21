@@ -17534,3 +17534,21 @@ Prova local controlada `partial`:
 - O scorecard local `limit=10` foi interrompido por custo operacional do
   pipeline real de optimize local; antes de rollout público, repetir amostra
   maior em staging com worker async estável.
+
+### Revalidação pública pós-deploy `64beabf`
+
+- backend: `https://evolution-cartinhas.8ktevp.easypanel.host`;
+- SHA: `64beabff5a80ccd293c8da119d04c52784e8ba7d`;
+- artifact:
+  `server/test/artifacts/semantic_layer_v2_quality_gate_2026-05-20/optimize_scorecard_disabled_public_64beabf.json`;
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `current_gate_approved_jobs=6`;
+- `semantic_shadow_would_block_approved_jobs=0`;
+- `semantic_v2_actual_blocked_jobs=0`;
+- `false_positive_candidates=0`;
+- `review_candidates=3`.
+
+Decisão: produção continua **PASS WITH RISKS** com flag default `disabled`.
+`partial` permanece bloqueado para produção e liberado apenas para staging ou
+ambiente controlado.
