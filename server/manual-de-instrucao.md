@@ -17588,3 +17588,53 @@ semânticos; faltava expor isso de forma clara no app.
 Handoff:
 
 - `app/doc/runtime_flow_handoffs/deck_analysis_explainability_iphone15_simulator_2026-05-21.md`.
+
+## 148. Deck Analysis functional scorecard publico - 2026-05-21
+
+### O Que
+
+Adicionado o runner sanitizado
+`server/bin/deck_analysis_functional_scorecard.py` para medir
+`GET /decks/:id/analysis` em decks Commander completos a partir dos corpora
+Commander Reference versionados.
+
+### O Porquê
+
+A UI de explicabilidade já mostrava quais cartas entraram em funções do deck,
+mas a prova anterior era uma fixture pequena. Antes de mudar heurísticas ou
+expor mais informação ao usuário, era necessário provar em decks reais que
+`stats.composition`, `functional_tags.counts`, amostras, `sample_details`,
+`coverage` e `source` continuam coerentes.
+
+### Resultado
+
+- backend público:
+  `5b7153d4db5e4e1df465050d65ea399fa8ad6f3b`;
+- artifact sanitizado:
+  `server/test/artifacts/deck_analysis_functional_scorecard_2026-05-21/public_summary.json`;
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `analysis_http_200_cases=10`;
+- `analysis_shape_ok_cases=10`;
+- `blocker_count=0`;
+- `warning_count=0`;
+- decisão:
+  `analysis_payload_ready_for_real_deck_qa`.
+
+O artifact não salva token, e-mail QA, deck id, card id, decklist, nome de
+carta ou payload bruto. O relatório detalhado está em
+`server/doc/RELATORIO_DECK_ANALYSIS_FUNCTIONAL_SCORECARD_2026-05-21.md`.
+
+### Runtime
+
+O harness `app/integration_test/deck_functional_tags_runtime_test.dart` passou
+no iPhone 15 Pro Max Simulator
+`DABB9D79-2FDB-4585-94DB-E31F1288EE74` contra o mesmo backend público:
+`00:09 +1: All tests passed!`.
+
+### Decisão
+
+Deck Analysis segue **PASS_WITH_RISKS** para QA real. Não houve bug objetivo
+de shape/coerência que justificasse alterar backend nesta rodada; qualquer
+falso positivo/negativo reportado por carta deve virar fixture focada antes de
+ampliar heurística global.
