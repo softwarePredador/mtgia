@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck_card_item.dart';
 import 'deck_details_aux_widgets.dart';
@@ -25,7 +26,7 @@ Future<String?> showDeckDescriptionEditorDialog({
             icon: Icons.edit_note_rounded,
             title: 'Descrição do deck',
             subtitle: 'Registre o plano, tema ou objetivo principal da lista.',
-            accent: AppTheme.primarySoft,
+            accent: AppTheme.frost400,
           ),
           content: TextField(
             key: const Key('deck-description-editor-field'),
@@ -67,8 +68,27 @@ Future<bool?> showDeckRemoveCardConfirmationDialog({
     context: context,
     builder:
         (ctx) => AlertDialog(
-          title: const Text('Remover carta'),
-          content: Text('Remover "${card.name}" do deck?'),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+          title: const DialogTitleBlock(
+            icon: Icons.remove_circle_outline_rounded,
+            title: 'Remover carta',
+            subtitle:
+                'Confirme antes de alterar a composição estratégica do deck.',
+            accent: AppTheme.error,
+          ),
+          content: DialogSectionCard(
+            title: card.name,
+            accent: AppTheme.error,
+            icon: Icons.style_outlined,
+            child: Text(
+              'A carta será removida desta lista. Você poderá adicioná-la novamente pela busca.',
+              style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -76,6 +96,10 @@ Future<bool?> showDeckRemoveCardConfirmationDialog({
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.error,
+                foregroundColor: AppTheme.textPrimary,
+              ),
               child: const Text('Remover'),
             ),
           ],
@@ -97,7 +121,7 @@ Future<void> showDeckAiExplanationFlow({
             title: 'Analisando a carta...',
             subtitle:
                 'Relacionando a carta com o plano do deck e o papel dela na lista.',
-            accent: AppTheme.manaViolet,
+            accent: AppTheme.frost400,
             icon: Icons.auto_awesome_rounded,
             tips: [
               'A análise tenta explicar função, sinergia e valor da carta no deck.',
@@ -127,12 +151,12 @@ Future<void> showDeckAiExplanationFlow({
               icon: Icons.auto_awesome_rounded,
               title: 'Análise: ${card.name}',
               subtitle: 'Leitura contextual da carta dentro do seu deck.',
-              accent: AppTheme.manaViolet,
+              accent: AppTheme.frost400,
             ),
             content: SingleChildScrollView(
               child: DialogSectionCard(
                 title: 'O que essa carta faz aqui',
-                accent: AppTheme.manaViolet,
+                accent: AppTheme.frost400,
                 icon: Icons.psychology_alt_outlined,
                 child: Text(
                   explanation ?? 'Não foi possível gerar uma explicação.',
@@ -154,9 +178,15 @@ Future<void> showDeckAiExplanationFlow({
   } catch (e) {
     if (context.mounted) {
       Navigator.pop(context);
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
+        fallback:
+            'Não foi possível explicar esta carta agora. Tente novamente em instantes.',
+      );
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao explicar carta: $e')));
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }
@@ -210,11 +240,27 @@ Future<void> showDeckEditionPicker({
                     );
                   }
                   if (snapshot.hasError) {
+                    final message = FriendlyErrorMapper.fromException(
+                      snapshot.error,
+                      context: FriendlyErrorContext.deckDetails,
+                      fallback:
+                          'Não foi possível carregar as edições agora. Tente novamente.',
+                    );
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Text(
-                        'Erro ao buscar edições: ${snapshot.error}',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      child: DialogSectionCard(
+                        title: 'Edições indisponíveis',
+                        accent: AppTheme.error,
+                        icon: Icons.error_outline_rounded,
+                        child: Text(
+                          message,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
                       ),
                     );
                   }
@@ -321,8 +367,12 @@ Future<void> showDeckCardDetailsDialog({
     builder:
         (dialogContext) => Dialog(
           key: Key('deck-card-details-dialog-${card.id}'),
+          backgroundColor: AppTheme.surfaceElevated,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            side: BorderSide(
+              color: AppTheme.outlineMuted.withValues(alpha: 0.72),
+            ),
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -387,41 +437,50 @@ Future<void> showDeckCardDetailsDialog({
                         const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: TextButton.icon(
+                          child: ActionChip(
                             key: Key('deck-card-change-edition-${card.id}'),
+                            avatar: const Icon(
+                              Icons.collections_bookmark,
+                              size: 16,
+                              color: AppTheme.frost400,
+                            ),
+                            label: const Text('Trocar edição'),
+                            labelStyle: const TextStyle(
+                              color: AppTheme.frost400,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            backgroundColor: AppTheme.frost400.withValues(
+                              alpha: 0.12,
+                            ),
+                            side: BorderSide(
+                              color: AppTheme.frost400.withValues(alpha: 0.28),
+                            ),
                             onPressed: () {
                               Navigator.pop(dialogContext);
                               onShowEditionPicker();
                             },
-                            icon: const Icon(Icons.collections_bookmark),
-                            label: const Text('Trocar edição'),
                           ),
                         ),
                       ],
                       const SizedBox(height: 8),
-                      InkWell(
-                        onTap: onShowAiExplanation,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.auto_awesome,
-                              size: 14,
-                              color:
-                                  Theme.of(dialogContext).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Explicar',
-                              style: TextStyle(
-                                color:
-                                    Theme.of(dialogContext).colorScheme.primary,
-                                decoration: TextDecoration.underline,
-                                fontSize: AppTheme.fontSm,
-                              ),
-                            ),
-                          ],
+                      ActionChip(
+                        avatar: const Icon(
+                          Icons.auto_awesome_rounded,
+                          size: 16,
+                          color: AppTheme.frost400,
                         ),
+                        label: const Text('Explicar com IA'),
+                        labelStyle: const TextStyle(
+                          color: AppTheme.frost400,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        backgroundColor: AppTheme.frost400.withValues(
+                          alpha: 0.12,
+                        ),
+                        side: BorderSide(
+                          color: AppTheme.frost400.withValues(alpha: 0.28),
+                        ),
+                        onPressed: onShowAiExplanation,
                       ),
                       if (card.oracleText != null) ...[
                         const SizedBox(height: 16),

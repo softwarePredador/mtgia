@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck.dart';
 import '../providers/deck_provider.dart';
@@ -379,58 +380,27 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
           // Loading (apenas se a lista estiver vazia)
           if (deckIsLoading && decks.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: theme.colorScheme.primary),
-                  const SizedBox(height: 16),
-                  Text('Carregando decks...', style: theme.textTheme.bodyLarge),
-                ],
-              ),
+            return const AppStatePanel(
+              key: Key('deck-list-loading-state'),
+              icon: Icons.auto_stories_rounded,
+              title: 'Carregando decks',
+              message:
+                  'Organizando suas listas, comandantes e progresso de coleção.',
+              accent: AppTheme.frost400,
             );
           }
 
           // Error
           if (hasError && decks.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.wifi_off_rounded,
-                      size: 56,
-                      color: AppTheme.textHint.withValues(alpha: 0.6),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      errorMessage ?? 'Erro desconhecido',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.textPrimary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Verifique sua conexão e tente novamente.',
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontMd,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    OutlinedButton.icon(
-                      onPressed:
-                          () => context.read<DeckProvider>().fetchDecks(),
-                      icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('Tentar Novamente'),
-                    ),
-                  ],
-                ),
-              ),
+            return AppStatePanel(
+              key: const Key('deck-list-error-state'),
+              icon: Icons.wifi_off_rounded,
+              title: 'Não foi possível carregar seus decks',
+              message:
+                  errorMessage ?? 'Verifique sua conexão e tente novamente.',
+              accent: AppTheme.error,
+              actionLabel: 'Tentar novamente',
+              onAction: () => context.read<DeckProvider>().fetchDecks(),
             );
           }
 
@@ -602,17 +572,15 @@ class _DeckListScreenState extends State<DeckListScreen> {
               if (visibleDecks.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: Text(
-                        'Nenhum deck combina com esse filtro.',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                  child: AppStatePanel(
+                    key: const Key('deck-list-filter-empty-state'),
+                    icon: Icons.filter_alt_off_rounded,
+                    title: 'Nenhum deck combina',
+                    message:
+                        hasQuery
+                            ? 'Tente outro nome, comandante ou formato para refinar a busca.'
+                            : 'Ajuste os filtros para voltar a ver suas listas.',
+                    accent: AppTheme.frost400,
                   ),
                 )
               else
@@ -748,33 +716,107 @@ class _DeckListScreenState extends State<DeckListScreen> {
     );
   }
 
-  Future<bool?> _showDeleteDialog(BuildContext context, String deckName) {
+  Future<bool?> _showDeleteDialog(BuildContext context, Deck deck) {
     return showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('Deletar Deck'),
-            content: Text('Tem certeza que deseja deletar "$deckName"?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancelar'),
+          (context) => Dialog(
+            backgroundColor: AppTheme.surfaceElevated,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              side: BorderSide(color: AppTheme.error.withValues(alpha: 0.28)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: AppTheme.error.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.delete_forever_rounded,
+                          color: AppTheme.error,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Excluir deck?',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    deck.name,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_formatDeckLabel(deck.format)} · ${_deckCountLabel(deck)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Essa ação remove a lista da sua coleção de decks e não pode ser desfeita.',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Cancelar'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.error,
+                            foregroundColor: AppTheme.textPrimary,
+                          ),
+                          child: const Text('Excluir deck'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                child: const Text('Deletar'),
-              ),
-            ],
+            ),
           ),
     );
   }
 
   Future<void> _deleteDeck(BuildContext context, Deck deck) async {
     final deckProvider = context.read<DeckProvider>();
-    final confirmed = await _showDeleteDialog(context, deck.name);
+    final confirmed = await _showDeleteDialog(context, deck);
     if (confirmed == true) {
       await deckProvider.deleteDeck(deck.id);
     }

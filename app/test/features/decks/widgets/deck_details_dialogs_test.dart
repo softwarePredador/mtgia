@@ -222,10 +222,10 @@ void main() {
       find.byKey(const Key('deck-card-change-edition-card-1')),
       findsOneWidget,
     );
-    expect(find.text('Explicar'), findsOneWidget);
+    expect(find.text('Explicar com IA'), findsOneWidget);
     expect(find.text('Ver Detalhes'), findsOneWidget);
 
-    await tester.tap(find.text('Explicar'));
+    await tester.tap(find.text('Explicar com IA'));
     await tester.pumpAndSettle();
     expect(explanationCalls, 1);
 
@@ -278,13 +278,64 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Remover carta'), findsOneWidget);
-    expect(find.text('Remover "Arcane Signet" do deck?'), findsOneWidget);
+    expect(find.text('Arcane Signet'), findsOneWidget);
+    expect(
+      find.textContaining('Você poderá adicioná-la novamente pela busca.'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Remover'));
     await tester.pumpAndSettle();
 
     expect(confirmed, isTrue);
   });
+
+  testWidgets(
+    'showDeckAiExplanationFlow maps technical errors to friendly copy',
+    (tester) async {
+      final card = _buildCard();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await showDeckAiExplanationFlow(
+                        context: context,
+                        card: card,
+                        explainCard:
+                            (_) async =>
+                                throw Exception(
+                                  'SocketException: failed host lookup',
+                                ),
+                      );
+                    },
+                    child: const Text('abrir'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('abrir'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Exception'), findsNothing);
+      expect(find.textContaining('SocketException'), findsNothing);
+      expect(
+        find.text(
+          'Sem conexão com o servidor. Confira sua internet e tente novamente.',
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('showDeckPricingDetailsSheet renders pricing breakdown', (
     tester,

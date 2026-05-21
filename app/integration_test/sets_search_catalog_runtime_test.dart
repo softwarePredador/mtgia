@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
@@ -39,11 +38,15 @@ void main() {
       await captureVisualProof(binding, tester, 'sets_search_01_cards_results');
       expect(find.byType(CardDetailScreen), findsNothing);
 
-      await tester.tap(find.text('Black Lotus').first);
-      await tester.pumpAndSettle();
-      expect(find.byType(CardDetailScreen), findsNothing);
-
-      await tester.tap(find.byType(CachedCardImage).first);
+      final resultTile = find.byWidgetPredicate(
+        (widget) =>
+            widget.key is ValueKey<String> &&
+            (widget.key as ValueKey<String>).value.startsWith(
+              'card-search-result-',
+            ),
+      );
+      await pumpUntilFound(tester, resultTile);
+      await tester.tap(resultTile.first);
       await tester.pumpAndSettle();
       await pumpUntilFound(tester, find.byType(CardDetailScreen));
       expect(find.text('Detalhes'), findsWidgets);

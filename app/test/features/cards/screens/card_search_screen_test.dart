@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
-import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
@@ -163,7 +162,7 @@ Map<String, dynamic> _deckDetailsJson() {
 
 void main() {
   testWidgets(
-    'search result opens details only from image and adds only from plus button',
+    'search result opens details from the full tile and adds from plus button',
     (tester) async {
       Map<String, dynamic>? selectedCard;
       final card = _sampleCard();
@@ -188,11 +187,7 @@ void main() {
       expect(find.textContaining('Non-foil'), findsNothing);
       expect(find.byType(CardDetailScreen), findsNothing);
 
-      await tester.tap(find.text(card.name));
-      await tester.pumpAndSettle();
-      expect(find.byType(CardDetailScreen), findsNothing);
-
-      await tester.tap(find.byType(CachedCardImage).first);
+      await tester.tap(find.byKey(Key('card-search-result-${card.id}')));
       await tester.pumpAndSettle();
       expect(find.byType(CardDetailScreen), findsOneWidget);
       expect(find.text('Código'), findsOneWidget);

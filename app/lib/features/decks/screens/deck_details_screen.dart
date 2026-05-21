@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_card_item.dart';
@@ -236,50 +237,54 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           );
 
           if (isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const AppStatePanel(
+              key: Key('deck-details-loading-state'),
+              icon: Icons.auto_awesome_rounded,
+              title: 'Carregando grimório',
+              message:
+                  'Buscando cartas, comandante e sinais de análise do deck.',
+              accent: AppTheme.frost400,
+            );
           }
 
           if (detailsError != null) {
             final isUnauthorized = detailsStatusCode == 401;
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: theme.colorScheme.error,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(detailsError),
-                    const SizedBox(height: 16),
-                    if (isUnauthorized)
-                      ElevatedButton(
-                        onPressed: () async {
-                          await context.read<AuthProvider>().logout();
-                          if (!context.mounted) return;
-                          context.go('/login');
-                        },
-                        child: const Text('Fazer login novamente'),
-                      )
-                    else
-                      ElevatedButton(
-                        onPressed:
-                            () => context.read<DeckProvider>().fetchDeckDetails(
-                              widget.deckId,
-                            ),
-                        child: const Text('Tentar Novamente'),
+            return AppStatePanel(
+              key: const Key('deck-details-error-state'),
+              icon:
+                  isUnauthorized
+                      ? Icons.lock_clock_rounded
+                      : Icons.error_outline_rounded,
+              title:
+                  isUnauthorized
+                      ? 'Sessão expirada'
+                      : 'Não foi possível abrir este deck',
+              message: detailsError,
+              accent: isUnauthorized ? AppTheme.warning : AppTheme.error,
+              actionLabel:
+                  isUnauthorized ? 'Fazer login novamente' : 'Tentar novamente',
+              onAction:
+                  isUnauthorized
+                      ? () async {
+                        await context.read<AuthProvider>().logout();
+                        if (!context.mounted) return;
+                        context.go('/login');
+                      }
+                      : () => context.read<DeckProvider>().fetchDeckDetails(
+                        widget.deckId,
                       ),
-                  ],
-                ),
-              ),
             );
           }
 
           if (deck == null) {
-            return const Center(child: Text('Deck não encontrado'));
+            return const AppStatePanel(
+              key: Key('deck-details-not-found-state'),
+              icon: Icons.style_outlined,
+              title: 'Deck não encontrado',
+              message:
+                  'A lista pode ter sido removida ou não está disponível nesta sessão.',
+              accent: AppTheme.frost400,
+            );
           }
           _syncValidationStateWithDeck(deck);
           _pricing ??= _pricingFromDeck(deck);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/binder_provider.dart';
 import '../widgets/binder_item_editor.dart';
@@ -413,40 +414,29 @@ class _BinderListViewState extends State<_BinderListView>
 
   Widget _buildList(bool isHave) {
     if (_isLoading && _items.isEmpty) {
-      return Center(
+      return AppStatePanel(
         key: Key('binder-list-loading-${widget.listType}'),
-        child: CircularProgressIndicator(color: AppTheme.frost400),
+        icon: isHave ? Icons.inventory_2_rounded : Icons.favorite_rounded,
+        title: isHave ? 'Carregando fichário' : 'Carregando wishlist',
+        message: 'Organizando cartas, condições e sinais de coleção.',
+        accent: isHave ? AppTheme.frost400 : AppTheme.brass400,
       );
     }
 
     if (_error != null && _items.isEmpty) {
-      return Center(
+      return AppStatePanel(
         key: Key('binder-list-error-${widget.listType}'),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppTheme.textSecondary,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _error!,
-              style: const TextStyle(color: AppTheme.textSecondary),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              key: Key('binder-list-retry-${widget.listType}'),
-              onPressed: () => _fetchItems(reset: true),
-              child: const Text('Tentar novamente'),
-            ),
-          ],
-        ),
+        icon: Icons.error_outline_rounded,
+        title: 'Não foi possível carregar esta lista',
+        message: _error!,
+        accent: AppTheme.error,
+        actionLabel: 'Tentar novamente',
+        onAction: () => _fetchItems(reset: true),
       );
     }
 
     if (_items.isEmpty) {
+      final accent = isHave ? AppTheme.frost400 : AppTheme.brass400;
       return Center(
         key: Key('binder-list-empty-${widget.listType}'),
         child: SingleChildScrollView(
@@ -456,60 +446,79 @@ class _BinderListViewState extends State<_BinderListView>
             24,
             24 + MediaQuery.of(context).padding.bottom + 88,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                isHave ? Icons.inventory_2 : Icons.favorite_border,
-                size: 64,
-                color: AppTheme.textSecondary.withValues(alpha: 0.4),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                isHave
-                    ? 'Nenhuma carta em "Tenho"'
-                    : 'Nenhuma carta em "Quero"',
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: AppTheme.fontXl,
-                  fontWeight: FontWeight.w600,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceElevated,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              border: Border.all(color: accent.withValues(alpha: 0.22)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  ),
+                  child: Icon(
+                    isHave ? Icons.inventory_2_rounded : Icons.favorite_border,
+                    size: 28,
+                    color: accent,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                isHave
-                    ? 'Adicione cartas que você possui!'
-                    : 'Adicione cartas que você procura!',
-                style: const TextStyle(color: AppTheme.textSecondary),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _openAddCard,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Buscar carta'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isHave ? AppTheme.brass500 : AppTheme.brass400,
-                      foregroundColor: AppTheme.backgroundAbyss,
-                    ),
+                const SizedBox(height: 14),
+                Text(
+                  isHave
+                      ? 'Nenhuma carta em "Tenho"'
+                      : 'Nenhuma carta em "Quero"',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _openScanCard,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Escanear'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.frost400,
-                      foregroundColor: AppTheme.backgroundAbyss,
-                    ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isHave
+                      ? 'Adicione cartas que você possui para acompanhar valor, condição e disponibilidade.'
+                      : 'Monte sua wishlist para encontrar oportunidades no marketplace.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.4,
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 18),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _openAddCard,
+                      icon: const Icon(Icons.add),
+                      label: const Text('Buscar carta'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.brass500,
+                        foregroundColor: AppTheme.backgroundAbyss,
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: _openScanCard,
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('Escanear'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.frost400,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );

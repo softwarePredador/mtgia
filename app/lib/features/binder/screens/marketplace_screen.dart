@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../trades/screens/create_trade_screen.dart';
 import '../providers/binder_provider.dart';
@@ -181,65 +182,35 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
 
   Widget _buildMarketList(BinderProvider provider) {
     if (provider.isLoadingMarket && provider.marketItems.isEmpty) {
-      return const Center(
+      return const AppStatePanel(
         key: Key('marketplace-list-loading'),
-        child: CircularProgressIndicator(color: AppTheme.frost400),
+        icon: Icons.storefront_rounded,
+        title: 'Carregando marketplace',
+        message: 'Buscando cartas disponíveis, confiança e sinais de troca.',
+        accent: AppTheme.frost400,
       );
     }
 
     if (provider.marketError != null && provider.marketItems.isEmpty) {
-      return Center(
+      return AppStatePanel(
         key: const Key('marketplace-list-error'),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppTheme.textSecondary,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              provider.marketError!,
-              style: const TextStyle(color: AppTheme.textSecondary),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              key: const Key('marketplace-list-retry'),
-              onPressed: _doSearch,
-              child: const Text('Tentar novamente'),
-            ),
-          ],
-        ),
+        icon: Icons.error_outline_rounded,
+        title: 'Marketplace indisponível',
+        message:
+            'Não conseguimos carregar as ofertas agora. Ajuste os filtros ou tente novamente.',
+        accent: AppTheme.error,
+        actionLabel: 'Tentar novamente',
+        onAction: _doSearch,
       );
     }
 
     if (provider.marketItems.isEmpty) {
-      return Center(
-        key: const Key('marketplace-list-empty'),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.storefront,
-              size: 64,
-              color: AppTheme.textSecondary.withValues(alpha: 0.4),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Nenhuma carta encontrada',
-              style: TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: AppTheme.fontLg,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Tente outro nome, condição ou tipo de negociação.',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ],
-        ),
+      return const AppStatePanel(
+        key: Key('marketplace-list-empty'),
+        icon: Icons.storefront_rounded,
+        title: 'Nenhuma carta encontrada',
+        message: 'Tente outro nome, condição ou tipo de negociação.',
+        accent: AppTheme.brass400,
       );
     }
 

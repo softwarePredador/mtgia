@@ -61,7 +61,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 child: const Text(
                   'Ler todas',
                   style: TextStyle(
-                    color: AppTheme.manaViolet,
+                    color: AppTheme.brass400,
                     fontSize: AppTheme.fontSm,
                   ),
                 ),
@@ -75,7 +75,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           if (provider.isLoading && provider.notifications.isEmpty) {
             return const Center(
               key: Key('notifications-loading'),
-              child: CircularProgressIndicator(color: AppTheme.manaViolet),
+              child: CircularProgressIndicator(color: AppTheme.frost400),
             );
           }
 
@@ -99,12 +99,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
               title: 'Nenhuma notificação',
               message:
                   'Quando algo importante acontecer no app, os avisos aparecem aqui.',
-              accent: AppTheme.primarySoft,
+              accent: AppTheme.frost400,
             );
           }
 
           return RefreshIndicator(
-            color: AppTheme.manaViolet,
+            color: AppTheme.frost400,
             onRefresh: () => provider.fetchNotifications(),
             child: ListView.separated(
               key: const Key('notifications-list'),
@@ -181,13 +181,13 @@ class _NotificationTile extends StatelessWidget {
             color:
                 isRead
                     ? AppTheme.surfaceSlate
-                    : AppTheme.manaViolet.withValues(alpha: 0.08),
+                    : AppTheme.brass500.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
               color:
                   isRead
                       ? AppTheme.outlineMuted
-                      : AppTheme.manaViolet.withValues(alpha: 0.22),
+                      : AppTheme.brass400.withValues(alpha: 0.28),
               width: 0.8,
             ),
           ),
@@ -195,6 +195,17 @@ class _NotificationTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (!isRead) ...[
+                Container(
+                  width: 4,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: AppTheme.brass400,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
               CircleAvatar(
                 radius: 20,
                 backgroundColor: _typeColor(
@@ -278,9 +289,9 @@ class _NotificationTile extends StatelessWidget {
   Color _typeColor(String type) {
     switch (type) {
       case 'new_follower':
-        return AppTheme.primarySoft;
+        return AppTheme.frost400;
       case 'trade_offer_received':
-        return AppTheme.mythicGold;
+        return AppTheme.brass400;
       case 'trade_accepted':
         return AppTheme.success;
       case 'trade_declined':
@@ -288,13 +299,13 @@ class _NotificationTile extends StatelessWidget {
       case 'trade_shipped':
         return AppTheme.warning;
       case 'trade_delivered':
-        return AppTheme.primarySoft;
+        return AppTheme.frost400;
       case 'trade_completed':
         return AppTheme.success;
       case 'trade_message':
-        return AppTheme.manaViolet;
+        return AppTheme.frost400;
       case 'direct_message':
-        return AppTheme.manaViolet;
+        return AppTheme.frost400;
       default:
         return AppTheme.textSecondary;
     }

@@ -54,7 +54,7 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
           if (provider.isLoading && provider.conversations.isEmpty) {
             return const Center(
               key: Key('messages-inbox-loading'),
-              child: CircularProgressIndicator(color: AppTheme.manaViolet),
+              child: CircularProgressIndicator(color: AppTheme.frost400),
             );
           }
 
@@ -78,12 +78,12 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
               title: 'Nenhuma conversa',
               message:
                   'Quando você começar uma conversa a partir do perfil de outro jogador, ela aparece aqui.',
-              accent: AppTheme.primarySoft,
+              accent: AppTheme.frost400,
             );
           }
 
           return RefreshIndicator(
-            color: AppTheme.manaViolet,
+            color: AppTheme.frost400,
             onRefresh: () => provider.fetchConversations(),
             child: ListView.separated(
               key: const Key('messages-inbox-list'),
@@ -128,80 +128,92 @@ class _ConversationTile extends StatelessWidget {
     final user = conversation.otherUser;
     final hasUnread = conversation.unreadCount > 0;
 
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: CircleAvatar(
-        radius: 24,
-        backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
-        backgroundImage:
-            user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                ? NetworkImage(user.avatarUrl!)
-                : null,
-        child:
-            user.avatarUrl == null || user.avatarUrl!.isEmpty
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: hasUnread ? AppTheme.brass400 : AppTheme.transparent,
+            width: 3,
+          ),
+        ),
+      ),
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        leading: CircleAvatar(
+          radius: 24,
+          backgroundColor: AppTheme.frost400.withValues(alpha: 0.18),
+          backgroundImage:
+              user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                  ? NetworkImage(user.avatarUrl!)
+                  : null,
+          child:
+              user.avatarUrl == null || user.avatarUrl!.isEmpty
+                  ? Text(
+                    user.label.isNotEmpty ? user.label[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      color: AppTheme.frost400,
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppTheme.fontLg,
+                    ),
+                  )
+                  : null,
+        ),
+        title: Text(
+          user.label,
+          style: TextStyle(
+            color: AppTheme.textPrimary,
+            fontWeight: hasUnread ? FontWeight.bold : FontWeight.w500,
+            fontSize: AppTheme.fontMd,
+          ),
+        ),
+        subtitle:
+            conversation.lastMessage != null
                 ? Text(
-                  user.label.isNotEmpty ? user.label[0].toUpperCase() : '?',
-                  style: const TextStyle(
-                    color: AppTheme.manaViolet,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppTheme.fontLg,
+                  conversation.lastMessage!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color:
+                        hasUnread
+                            ? AppTheme.textPrimary
+                            : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
                   ),
                 )
                 : null,
-      ),
-      title: Text(
-        user.label,
-        style: TextStyle(
-          color: AppTheme.textPrimary,
-          fontWeight: hasUnread ? FontWeight.bold : FontWeight.w500,
-          fontSize: AppTheme.fontMd,
-        ),
-      ),
-      subtitle:
-          conversation.lastMessage != null
-              ? Text(
-                conversation.lastMessage!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (conversation.lastMessageAt != null)
+              Text(
+                _formatTime(conversation.lastMessageAt!),
                 style: TextStyle(
-                  color:
-                      hasUnread ? AppTheme.textPrimary : AppTheme.textSecondary,
-                  fontSize: AppTheme.fontSm,
-                ),
-              )
-              : null,
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (conversation.lastMessageAt != null)
-            Text(
-              _formatTime(conversation.lastMessageAt!),
-              style: TextStyle(
-                color: hasUnread ? AppTheme.manaViolet : AppTheme.textSecondary,
-                fontSize: AppTheme.fontXs,
-              ),
-            ),
-          if (hasUnread) ...[
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppTheme.manaViolet,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '${conversation.unreadCount}',
-                style: const TextStyle(
-                  color: Colors.white,
+                  color: hasUnread ? AppTheme.brass400 : AppTheme.textSecondary,
                   fontSize: AppTheme.fontXs,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
+            if (hasUnread) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppTheme.brass400,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${conversation.unreadCount}',
+                  style: const TextStyle(
+                    color: AppTheme.backgroundAbyss,
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

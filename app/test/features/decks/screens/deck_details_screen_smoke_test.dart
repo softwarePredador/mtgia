@@ -217,7 +217,8 @@ void main() {
     final apiClient = _FakeApiClient();
     final provider = _LoadingDeckProvider(apiClient: apiClient);
     await _pumpScreen(tester, apiClient: apiClient, provider: provider);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byKey(const Key('deck-details-loading-state')), findsOneWidget);
+    expect(find.text('Carregando grimório'), findsOneWidget);
   });
 
   testWidgets(
@@ -271,9 +272,9 @@ void main() {
       await _pumpScreen(tester, apiClient: apiClient, provider: provider);
       await tester.pumpAndSettle();
 
-      expect(find.text('Tentar Novamente'), findsOneWidget);
+      expect(find.text('Tentar novamente'), findsOneWidget);
 
-      await tester.tap(find.text('Tentar Novamente'));
+      await tester.tap(find.text('Tentar novamente'));
       await tester.pumpAndSettle();
 
       expect(find.text('Recovered Deck'), findsOneWidget);
@@ -290,6 +291,10 @@ void main() {
     await _pumpScreen(tester, apiClient: apiClient, provider: provider);
     await tester.pumpAndSettle();
 
+    expect(
+      find.byKey(const Key('deck-details-not-found-state')),
+      findsOneWidget,
+    );
     expect(find.text('Deck não encontrado'), findsOneWidget);
   });
 

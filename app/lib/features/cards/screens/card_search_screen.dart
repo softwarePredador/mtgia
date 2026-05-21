@@ -609,36 +609,34 @@ class _CardSearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Material(
         color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          onTap: onOpen,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Container(
-            constraints: const BoxConstraints(minHeight: 62),
-            padding: const EdgeInsets.fromLTRB(8, 6, 6, 6),
+            constraints: const BoxConstraints(minHeight: 76),
+            padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
-                color: AppTheme.outlineMuted.withValues(alpha: 0.35),
+                color: AppTheme.outlineMuted.withValues(alpha: 0.5),
               ),
             ),
             child: Row(
               children: [
-                GestureDetector(
+                ClipRRect(
                   key: Key('card-search-image-${card.id}'),
-                  onTap: onOpen,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                    child: CachedCardImage(
-                      imageUrl: card.imageUrl,
-                      width: 38,
-                      height: 52,
-                    ),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                  child: CachedCardImage(
+                    imageUrl: card.imageUrl,
+                    width: 48,
+                    height: 66,
                   ),
                 ),
-                const SizedBox(width: 9),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,6 +677,8 @@ class _CardSearchResultTile extends StatelessWidget {
                                 collectorNumber: card.collectorNumber,
                               ),
                             ),
+                          if (card.colorIdentity.isNotEmpty)
+                            _SearchIdentityPips(identity: card.colorIdentity),
                           if ((card.manaCost ?? '').trim().isNotEmpty)
                             ManaCostRow(cost: card.manaCost),
                           if ((warning ?? '').isNotEmpty)
@@ -696,21 +696,36 @@ class _CardSearchResultTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 4),
-                SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: IconButton(
-                    key: Key('card-search-add-${card.id}'),
-                    tooltip: canAdd ? 'Adicionar' : 'Indisponível',
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.zero,
-                    icon: Icon(
-                      Icons.add_circle_outline,
-                      size: 20,
-                      color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
+                const SizedBox(width: 8),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color:
+                        canAdd
+                            ? AppTheme.brass500.withValues(alpha: 0.18)
+                            : AppTheme.surfaceElevated,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color:
+                          canAdd
+                              ? AppTheme.brass400.withValues(alpha: 0.62)
+                              : AppTheme.outlineMuted,
                     ),
-                    onPressed: onAdd,
+                  ),
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: IconButton(
+                      key: Key('card-search-add-${card.id}'),
+                      tooltip: canAdd ? 'Adicionar' : 'Indisponível',
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        Icons.add_circle_outline,
+                        size: 20,
+                        color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
+                      ),
+                      onPressed: onAdd,
+                    ),
                   ),
                 ),
               ],
@@ -718,6 +733,55 @@ class _CardSearchResultTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SearchIdentityPips extends StatelessWidget {
+  const _SearchIdentityPips({required this.identity});
+
+  final List<String> identity;
+
+  @override
+  Widget build(BuildContext context) {
+    final values =
+        identity
+            .map((symbol) => symbol.trim().toUpperCase())
+            .where((symbol) => symbol.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+    if (values.isEmpty) return const SizedBox.shrink();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children:
+          values
+              .map(
+                (symbol) => Container(
+                  width: 15,
+                  height: 15,
+                  margin: const EdgeInsets.only(right: 3),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppTheme.manaPipBackground(symbol),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.backgroundAbyss.withValues(alpha: 0.5),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Text(
+                    symbol,
+                    style: TextStyle(
+                      color: AppTheme.manaPipForeground(symbol),
+                      fontSize: 8,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/message_provider.dart';
 
@@ -106,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
+              backgroundColor: AppTheme.frost400.withValues(alpha: 0.18),
               backgroundImage:
                   avatarUrl != null && avatarUrl.isNotEmpty
                       ? NetworkImage(avatarUrl)
@@ -116,7 +117,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? Text(
                         label.isNotEmpty ? label[0].toUpperCase() : '?',
                         style: const TextStyle(
-                          color: AppTheme.manaViolet,
+                          color: AppTheme.frost400,
                           fontWeight: FontWeight.bold,
                           fontSize: AppTheme.fontSm,
                         ),
@@ -145,22 +146,18 @@ class _ChatScreenState extends State<ChatScreen> {
               builder: (context, provider, _) {
                 if (provider.isLoadingMessages && provider.messages.isEmpty) {
                   return const Center(
-                    child: CircularProgressIndicator(
-                      color: AppTheme.manaViolet,
-                    ),
+                    child: CircularProgressIndicator(color: AppTheme.frost400),
                   );
                 }
 
                 if (provider.messages.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'Nenhuma mensagem ainda.\nDigite algo para iniciar a conversa!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontMd,
-                      ),
-                    ),
+                  return const AppStatePanel(
+                    key: Key('chat-empty-state'),
+                    icon: Icons.forum_outlined,
+                    title: 'Conversa pronta',
+                    message:
+                        'Envie uma mensagem curta para combinar trocas, dúvidas ou disponibilidade.',
+                    accent: AppTheme.frost400,
                   );
                 }
 
@@ -236,12 +233,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppTheme.manaViolet,
+                                  color: AppTheme.brass400,
                                 ),
                               )
                               : const Icon(
                                 Icons.send_rounded,
-                                color: AppTheme.manaViolet,
+                                color: AppTheme.brass400,
                               ),
                     );
                   },
@@ -277,8 +274,14 @@ class _MessageBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               isMe
-                  ? AppTheme.manaViolet.withValues(alpha: 0.85)
+                  ? AppTheme.brass500.withValues(alpha: 0.22)
                   : AppTheme.surfaceSlate,
+          border: Border.all(
+            color:
+                isMe
+                    ? AppTheme.brass400.withValues(alpha: 0.34)
+                    : AppTheme.outlineMuted.withValues(alpha: 0.55),
+          ),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
