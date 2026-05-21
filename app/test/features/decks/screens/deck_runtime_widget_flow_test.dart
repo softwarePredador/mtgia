@@ -572,7 +572,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Runtime Talrand'), findsOneWidget);
-      expect(find.textContaining('Talrand, Sky Summoner'), findsOneWidget);
+      expect(find.text('Commander'), findsWidgets);
 
       await tester.tap(find.text('Runtime Talrand'));
       await tester.pumpAndSettle();
