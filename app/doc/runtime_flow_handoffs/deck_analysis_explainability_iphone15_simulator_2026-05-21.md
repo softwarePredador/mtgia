@@ -18,7 +18,8 @@ Scanner/camera/OCR fora do escopo.
   `https://evolution-cartinhas.8ktevp.easypanel.host`;
 - device: iPhone 15 Pro Max Simulator
   `DABB9D79-2FDB-4585-94DB-E31F1288EE74`;
-- backend git SHA: `b80700c49958a8bf806a346d34c7c127e3f862b6`.
+- backend git SHA pós-deploy:
+  `a02fe90673334ed2fa3a7b7b2a61066760486581`.
 
 ## Fluxo validado
 
@@ -40,7 +41,7 @@ Scanner/camera/OCR fora do escopo.
 Runtime:
 
 ```text
-00:10 +1: All tests passed!
+00:16 +1: All tests passed!
 ```
 
 Resumo sanitizado:
@@ -77,3 +78,4 @@ Resumo sanitizado:
 - A UI agora diferencia contagem total da função e amostras visíveis.
 - Produção continua com `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=disabled`; esta
   mudança é apenas explicabilidade da análise.
+- A reprova foi rodada após `/health` confirmar o deploy do commit da UI.

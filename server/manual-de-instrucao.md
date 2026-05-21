@@ -17581,8 +17581,9 @@ semânticos; faltava expor isso de forma clara no app.
 - `flutter analyze` focado em model/widget/runtime: PASS;
 - `flutter test test/features/decks/models/deck_analysis_test.dart test/features/decks/widgets/deck_analysis_tab_test.dart`: PASS;
 - runtime no iPhone 15 Pro Max Simulator contra backend público: PASS,
-  `00:10 +1: All tests passed!`;
-- backend público usado no runtime: `b80700c49958a8bf806a346d34c7c127e3f862b6`.
+  `00:16 +1: All tests passed!`;
+- backend público usado no runtime pós-deploy:
+  `a02fe90673334ed2fa3a7b7b2a61066760486581`.
 
 Handoff:
 
