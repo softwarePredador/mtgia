@@ -647,8 +647,9 @@ bool _looksLikeDraw(String oracle) {
     return false;
   }
   return oracle.contains('draw a card') ||
-      oracle.contains('draw two cards') ||
-      oracle.contains('draw three cards') ||
+      RegExp(
+        r'\bdraw (?:one|two|three|four|five|six|seven|eight|nine|ten|\d+) cards\b',
+      ).hasMatch(oracle) ||
       oracle.contains('draw cards') ||
       oracle.contains('draw x cards') ||
       oracle.contains('draw that many cards') ||

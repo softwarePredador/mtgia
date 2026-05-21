@@ -37,6 +37,20 @@ void main() {
               'Equipped creature gets +1/-1. Whenever equipped creature dies, draw two cards.',
           expected: const {'draw'},
         ),
+        'Kozilek, Butcher of Truth': _card(
+          typeLine: 'Legendary Creature - Eldrazi',
+          manaCost: '{10}',
+          oracleText:
+              'When you cast this spell, draw four cards. Annihilator 4.',
+          expected: const {'draw'},
+        ),
+        'Midnight Clock': _card(
+          typeLine: 'Artifact',
+          manaCost: '{2}{U}',
+          oracleText:
+              'When the twelfth hour counter is put on Midnight Clock, shuffle your hand and graveyard into your library, then draw seven cards.',
+          expected: const {'draw'},
+        ),
         'Reanimate': _card(
           typeLine: 'Sorcery',
           manaCost: '{B}',

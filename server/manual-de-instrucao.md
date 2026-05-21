@@ -17638,3 +17638,42 @@ Deck Analysis segue **PASS_WITH_RISKS** para QA real. Não houve bug objetivo
 de shape/coerência que justificasse alterar backend nesta rodada; qualquer
 falso positivo/negativo reportado por carta deve virar fixture focada antes de
 ampliar heurística global.
+
+## 149. Semantic Layer v2 draw refinement - 2026-05-21
+
+### O Que
+
+Refinada a tag `draw` para reconhecer compra explícita com cardinal ou número,
+por exemplo `draw four cards` e `draw seven cards`.
+
+### O Porquê
+
+O scorecard de Deck Analysis provou shape/coerência, mas não corretude total da
+classificação. No mass audit atual havia um falso negativo seguro: a regra de
+`draw` cobria `a/two/three/x`, mas não comprava explicitamente quatro ou sete
+cartas.
+
+### Resultado
+
+- fixtures focadas adicionadas para `Kozilek, Butcher of Truth` e
+  `Midnight Clock`;
+- mass audit atual subiu de `draw.card_rows=4516` para `4570`;
+- cobertura agregada subiu de `72.295%` para `72.322%`;
+- dry-run e apply do backfill Semantic v2 concluídos com
+  `regressions={}`;
+- apply atualizou `24181` semantic rows e `52851` function-tag rows.
+
+Artifacts:
+
+- `server/test/artifacts/semantic_layer_v2_draw_refinement_2026-05-21/dry_run/summary_dry_run.json`;
+- `server/test/artifacts/semantic_layer_v2_draw_refinement_2026-05-21/apply/summary_apply.json`.
+
+Relatório:
+
+- `server/doc/RELATORIO_SEMANTIC_LAYER_V2_DRAW_REFINEMENT_2026-05-21.md`.
+
+### Limite
+
+`target player draws`, `investigate` e `connive` seguem fora deste patch por
+ambiguidade de contagem. A prova pública de Deck Analysis e o runtime iPhone
+Simulator devem ser repetidos após deploy deste commit.

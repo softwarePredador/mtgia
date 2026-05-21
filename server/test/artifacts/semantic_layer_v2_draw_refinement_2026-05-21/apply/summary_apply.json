@@ -1,0 +1,89 @@
+{
+  "schema_version": "semantic_layer_v2_2026_05_18",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-21T14:24:35.934360Z",
+  "finished_at": "2026-05-21T14:26:06.369232Z",
+  "duration_ms": 90434,
+  "artifact_safety": {
+    "raw_rules_text_saved": false,
+    "card_ids_saved": false,
+    "full_deck_lists_saved": false,
+    "secrets_saved": false,
+    "free_text_evidence_saved": false
+  },
+  "coverage": {
+    "card_rows": 33435,
+    "tagged_rows": 24181,
+    "unknown_rows": 9254,
+    "ambiguous_rows": 3654,
+    "coverage_pct": 72.322
+  },
+  "role_counts": {
+    "graveyard_synergy": 4781,
+    "removal": 4583,
+    "draw": 4570,
+    "engine": 4018,
+    "token_maker": 3959,
+    "big_spell": 3847,
+    "enabler": 3785,
+    "payoff": 3571,
+    "ramp": 3247,
+    "protection": 2379,
+    "recursion": 1960,
+    "lifegain": 1825,
+    "artifact_synergy": 1412,
+    "sacrifice_outlet": 1381,
+    "exile_value": 1316,
+    "land": 1186,
+    "enchantment_synergy": 732,
+    "board_wipe": 688,
+    "loot": 672,
+    "spellslinger": 590,
+    "wincon": 498,
+    "tutor": 488,
+    "drain": 481,
+    "ritual": 298,
+    "etb": 165,
+    "aristocrat_payoff": 159,
+    "combo_piece": 150,
+    "blink": 110
+  },
+  "speed_counts": {
+    "board_speed": 14546,
+    "triggered_engine": 9704,
+    "instant_speed": 4640,
+    "sorcery_speed": 3362,
+    "land_drop": 1183
+  },
+  "mana_efficiency_counts": {
+    "fair": 9971,
+    "efficient": 7810,
+    "cheap": 6908,
+    "expensive": 3301,
+    "one_mana": 3293,
+    "free_or_land": 2152
+  },
+  "card_advantage_type_counts": {
+    "none": 22808,
+    "draw": 4570,
+    "board_material": 3124,
+    "recursion": 1413,
+    "impulse": 1196,
+    "tutor": 241,
+    "selection": 83
+  },
+  "interaction_scope_counts": {
+    "none": 28208,
+    "targeted": 4070,
+    "mass": 688,
+    "counterspell": 469
+  },
+  "false_positive_candidates": {
+    "blink_like_removal": 59,
+    "expensive_ramp_review": 40
+  },
+  "regressions": {},
+  "upserted_semantic_rows": 24181,
+  "upserted_function_tag_rows": 52851
+}
