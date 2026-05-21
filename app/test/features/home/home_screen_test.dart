@@ -50,28 +50,27 @@ Widget _buildSubject() {
 }
 
 void main() {
-  testWidgets('shows calmer home CTA stack and neutral empty state', (
+  testWidgets('shows premium home dashboard and empty deck state', (
     tester,
   ) async {
     await tester.pumpWidget(_buildSubject());
     await tester.pumpAndSettle();
 
-    expect(find.text('Escolha sua intenção'), findsOneWidget);
-    expect(find.text('Jogar agora'), findsOneWidget);
+    expect(find.text('ManaLoom'), findsOneWidget);
+    expect(find.text('Olá,\nPlaneswalker'), findsOneWidget);
+    expect(find.text('Acesso rápido'), findsOneWidget);
+    expect(find.text('Jogar agora'), findsWidgets);
     expect(find.text('Construir deck'), findsOneWidget);
-    expect(find.text('IA de decks'), findsOneWidget);
-    expect(find.text('Minha coleção'), findsOneWidget);
-    expect(find.text('Trocas e mercado'), findsOneWidget);
-    expect(find.text('Importar lista'), findsOneWidget);
 
-    expect(find.text('Nenhum deck criado ainda'), findsOneWidget);
+    expect(find.text('Decks recentes'), findsOneWidget);
+    expect(find.text('Você ainda não tem decks'), findsOneWidget);
     expect(
-      find.text(
-        'Comece criando um deck manualmente ou importando uma lista que você já usa.',
-      ),
+      find.text('Crie seu primeiro deck e comece sua jornada em Magic.'),
       findsOneWidget,
     );
-    expect(find.text('Abrir decks'), findsOneWidget);
+    expect(find.text('Criar novo deck'), findsOneWidget);
+    expect(find.text('Gerar com IA'), findsOneWidget);
+    expect(find.text('Atividade recente'), findsOneWidget);
     expect(find.text('Iniciar fluxo guiado'), findsNothing);
     expect(
       find.text('Crie seu primeiro deck ou gere um com IA!'),
@@ -91,9 +90,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Construir deck'), findsOneWidget);
-    expect(find.text('IA de decks'), findsOneWidget);
-    expect(find.text('Minha coleção'), findsOneWidget);
-    expect(find.text('Trocas e mercado'), findsOneWidget);
+    expect(find.text('Meus Decks'), findsOneWidget);
+    await tester.drag(find.byType(ListView).first, const Offset(-280, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('Coleção'), findsOneWidget);
+    expect(find.text('Trocas'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
