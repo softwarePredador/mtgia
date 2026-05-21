@@ -91,8 +91,6 @@ void main() {
 
     expect(find.text('Construir deck'), findsOneWidget);
     expect(find.text('Meus Decks'), findsOneWidget);
-    await tester.drag(find.byType(ListView).first, const Offset(-280, 0));
-    await tester.pumpAndSettle();
     expect(find.text('Coleção'), findsOneWidget);
     expect(find.text('Trocas'), findsOneWidget);
     expect(tester.takeException(), isNull);

@@ -133,7 +133,12 @@ class _HomeScreenState extends State<HomeScreen>
 String _firstName(String? raw) {
   final value = raw?.trim();
   if (value == null || value.isEmpty) return 'Planeswalker';
-  return value.split(RegExp(r'\s+')).first;
+  final first = value.split(RegExp(r'\s+')).first;
+  if (RegExp(r'^qa[0-9a-f]{6,}$', caseSensitive: false).hasMatch(first)) {
+    return 'Planeswalker';
+  }
+  if (first.length > 13) return 'Planeswalker';
+  return first;
 }
 
 class _HomeHeader extends StatelessWidget {
@@ -214,9 +219,9 @@ class _HomeHero extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/branding/splash_art.png',
+              'assets/branding/home_hero.png',
               fit: BoxFit.cover,
-              alignment: const Alignment(0.44, -0.12),
+              alignment: const Alignment(0.58, -0.08),
             ),
           ),
           Positioned.fill(
@@ -239,7 +244,7 @@ class _HomeHero extends StatelessWidget {
             left: 22,
             top: 34,
             bottom: 28,
-            width: 190,
+            width: 236,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -250,6 +255,7 @@ class _HomeHero extends StatelessWidget {
                   style: theme.textTheme.headlineMedium?.copyWith(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w900,
+                    fontSize: 28,
                     height: 1.02,
                     letterSpacing: -0.2,
                   ),
@@ -265,21 +271,35 @@ class _HomeHero extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.brass400,
-                    foregroundColor: const Color(0xFF120D05),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 22,
-                      vertical: 13,
+                SizedBox(
+                  width: 150,
+                  height: 48,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.brass400,
+                      foregroundColor: const Color(0xFF120D05),
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      textStyle: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15,
+                      ),
                     ),
-                    textStyle: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w900,
+                    onPressed: () => openLifeCounterRoute(context),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text('Jogar agora'),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(Icons.arrow_forward_rounded, size: 18),
+                      ],
                     ),
                   ),
-                  onPressed: () => openLifeCounterRoute(context),
-                  icon: const Icon(Icons.favorite_rounded, size: 18),
-                  label: const Text('Jogar agora'),
                 ),
               ],
             ),
@@ -337,48 +357,49 @@ class _QuickActions extends StatelessWidget {
       _QuickActionData(
         icon: Icons.favorite_rounded,
         title: 'Jogar agora',
-        subtitle: 'Abrir contador de vida',
+        subtitle: 'Contador de vida',
         accent: AppTheme.brass400,
         onTap: () => openLifeCounterRoute(context),
       ),
       _QuickActionData(
         icon: Icons.construction_rounded,
         title: 'Construir deck',
-        subtitle: 'Criar, importar ou ajustar',
+        subtitle: 'Criar ou importar',
         accent: AppTheme.brass500,
         onTap: () => context.go('/onboarding/core-flow'),
       ),
       _QuickActionData(
         icon: Icons.collections_bookmark_rounded,
         title: 'Meus Decks',
-        subtitle: 'Ver e gerenciar seus decks',
+        subtitle: 'Gerenciar decks',
         accent: AppTheme.frost400,
         onTap: () => context.go('/decks'),
       ),
       _QuickActionData(
         icon: Icons.public_rounded,
         title: 'Coleção',
-        subtitle: 'Suas cartas e coleções',
+        subtitle: 'Cartas e coleções',
         accent: AppTheme.frost400,
         onTap: () => context.go('/collection'),
       ),
       _QuickActionData(
         icon: Icons.storefront_rounded,
         title: 'Trocas',
-        subtitle: 'Marketplace e propostas',
+        subtitle: 'Propostas',
         accent: AppTheme.brass500,
         onTap: () => context.go('/collection?tab=1'),
       ),
     ];
 
     return SizedBox(
-      height: 148,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        itemCount: actions.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, index) => _QuickActionCard(data: actions[index]),
+      height: 112,
+      child: Row(
+        children: [
+          for (var index = 0; index < actions.length; index++) ...[
+            if (index > 0) const SizedBox(width: 8),
+            Expanded(child: _QuickActionCard(data: actions[index])),
+          ],
+        ],
       ),
     );
   }
@@ -408,71 +429,76 @@ class _QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SizedBox(
-      width: 142,
-      child: Material(
-        color: AppTheme.transparent,
-        child: InkWell(
-          onTap: data.onTap,
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          splashColor: data.accent.withValues(alpha: 0.08),
-          highlightColor: data.accent.withValues(alpha: 0.04),
-          child: Ink(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(
-                color: AppTheme.outlineMuted.withValues(alpha: 0.9),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.16),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+    return Material(
+      color: AppTheme.transparent,
+      child: InkWell(
+        onTap: data.onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        splashColor: data.accent.withValues(alpha: 0.08),
+        highlightColor: data.accent.withValues(alpha: 0.04),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.outlineMuted.withValues(alpha: 0.9),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: data.accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    border: Border.all(
-                      color: data.accent.withValues(alpha: 0.18),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.14),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: data.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: data.accent.withValues(alpha: 0.18),
+                  ),
+                ),
+                child: Icon(data.icon, color: data.accent, size: 19),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                height: 13,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    data.title,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 10.8,
+                      height: 1.0,
                     ),
                   ),
-                  child: Icon(data.icon, color: data.accent, size: 25),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  data.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w900,
-                    height: 1.05,
-                  ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                data.subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  fontSize: 8.4,
+                  height: 1.08,
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  data.subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                    height: 1.22,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
