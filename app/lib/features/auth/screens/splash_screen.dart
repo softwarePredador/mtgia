@@ -65,68 +65,55 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppTheme.surfaceElevated.withValues(alpha: 0.9),
-                      border: Border.all(
-                        color: AppTheme.outlineMuted.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.auto_awesome,
-                      size: 64,
-                      color: AppTheme.primarySoft,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  Text(
-                    'ManaLoom',
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    'Teça sua estratégia perfeita',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppTheme.primarySoft,
-                      ),
-                    ),
-                  ),
+      backgroundColor: AppTheme.backgroundAbyss,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/branding/splash_art.png',
+            fit: BoxFit.cover,
+            semanticLabel: 'ManaLoom splash art',
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x22000000),
+                  Color(0x00000000),
+                  Color(0x99070A0F),
                 ],
+                stops: [0, 0.46, 1],
               ),
             ),
           ),
-        ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 56),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: const SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppTheme.primarySoft,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

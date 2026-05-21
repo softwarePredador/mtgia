@@ -92,6 +92,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/fonts/
+    - assets/branding/
     - assets/symbols/
     - assets/lotus/
     - assets/lotus/cordova-js-src/

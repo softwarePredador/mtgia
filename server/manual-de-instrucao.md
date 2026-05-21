@@ -473,6 +473,29 @@
 - Evidencia visual:
   `docs/qa/manaloom_app_icon_contact_sheet_2026-05-21.png`.
 
+## 2026-05-21 — ManaLoom splash art slasharat PASS
+
+### O Porquê
+- A splash oficial do app passou a usar a arte vertical fornecida em
+  `slasharat.png`, garantindo consistencia entre a splash nativa e a primeira
+  tela Flutter.
+
+### O Como
+- O source foi preservado em
+  `docs/qa/manaloom_splash_art_source_2026-05-21.png`.
+- Android recebeu `launch_image.png` em `drawable-nodpi` e
+  `launch_background.xml` passou a renderizar a arte em tela cheia.
+- iOS recebeu `LaunchImage` 1x/2x/3x e `LaunchScreen.storyboard` passou a usar
+  `scaleAspectFill` em tela cheia.
+- Flutter recebeu `assets/branding/splash_art.png` e a `SplashScreen` inicial
+  passou a usar a mesma arte com overlay discreto e indicador de carregamento.
+
+### Resultado
+- Readiness da splash art: **PASS** para dimensoes, transparencia e builds
+  Android/iOS Simulator.
+- Evidencia visual:
+  `docs/qa/manaloom_splash_art_preview_2026-05-21.png`.
+
 ## 2026-05-15 — Internal user test non-scanner handoff PASS_WITH_RISKS
 
 ### O Porquê
