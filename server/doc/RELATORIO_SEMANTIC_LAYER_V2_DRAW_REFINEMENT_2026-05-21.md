@@ -91,12 +91,59 @@ cd server && dart run bin/semantic_layer_v2_backfill.dart \
   --artifact-dir=test/artifacts/semantic_layer_v2_draw_refinement_2026-05-21/apply
 ```
 
+## Prova pública pós-deploy
+
+Backend público:
+
+- SHA:
+  `db04b5a105f2fc87cc42aa68ccd8e57dd41954b4`;
+- Deck Analysis scorecard:
+  `server/test/artifacts/semantic_layer_v2_draw_refinement_2026-05-21/public_analysis_scorecard_summary.json`.
+
+Scorecard público:
+
+| Métrica | Valor |
+|---|---:|
+| `cases_attempted` | 10 |
+| `eligible_cases` | 10 |
+| `analysis_http_200_cases` | 10 |
+| `analysis_shape_ok_cases` | 10 |
+| `blocker_count` | 0 |
+| `warning_count` | 0 |
+| `decision` | `analysis_payload_ready_for_real_deck_qa` |
+
+Runtime app:
+
+- harness: `app/integration_test/deck_functional_tags_runtime_test.dart`;
+- device: iPhone 15 Pro Max Simulator
+  `DABB9D79-2FDB-4585-94DB-E31F1288EE74`;
+- resultado: `00:10 +1: All tests passed!`;
+- runtime confirmou o mesmo backend SHA e a UI de funções do deck com
+  explicabilidade visível.
+
+Comandos:
+
+```bash
+python3 server/bin/deck_analysis_functional_scorecard.py \
+  --expected-sha db04b5a105f2fc87cc42aa68ccd8e57dd41954b4 \
+  --limit 10 \
+  --output server/test/artifacts/semantic_layer_v2_draw_refinement_2026-05-21/public_analysis_scorecard_summary.json
+cd app && flutter test integration_test/deck_functional_tags_runtime_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
 ## Riscos restantes
 
 - O ganho cobre compra explícita direta; o bucket `draw` ainda não tenta
   resolver toda forma de card advantage contextual.
 - Deck Analysis prioriza tags persistidas quando existem; por isso o backfill
   foi necessário nesta rodada.
-- O scorecard público de Deck Analysis e o runtime iPhone Simulator devem ser
-  repetidos no backend com este commit implantado antes de fechar a prova
-  pública.
+- O scorecard prova coerência nos corpora completos e o runtime prova a UI, mas
+  feedback de carta/tag específica ainda precisa de fixture focada antes de
+  ampliar heurística.

@@ -17675,5 +17675,23 @@ Relatório:
 ### Limite
 
 `target player draws`, `investigate` e `connive` seguem fora deste patch por
-ambiguidade de contagem. A prova pública de Deck Analysis e o runtime iPhone
-Simulator devem ser repetidos após deploy deste commit.
+ambiguidade de contagem.
+
+### Prova pública pós-deploy
+
+- backend SHA:
+  `db04b5a105f2fc87cc42aa68ccd8e57dd41954b4`;
+- scorecard público:
+  `server/test/artifacts/semantic_layer_v2_draw_refinement_2026-05-21/public_analysis_scorecard_summary.json`;
+- `cases_attempted=10`;
+- `eligible_cases=10`;
+- `analysis_http_200_cases=10`;
+- `analysis_shape_ok_cases=10`;
+- `blocker_count=0`;
+- `warning_count=0`;
+- decisão:
+  `analysis_payload_ready_for_real_deck_qa`;
+- iPhone 15 Pro Max Simulator
+  `DABB9D79-2FDB-4585-94DB-E31F1288EE74`:
+  `app/integration_test/deck_functional_tags_runtime_test.dart` PASS,
+  `00:10 +1: All tests passed!`.
