@@ -17552,3 +17552,38 @@ Prova local controlada `partial`:
 Decisão: produção continua **PASS WITH RISKS** com flag default `disabled`.
 `partial` permanece bloqueado para produção e liberado apenas para staging ou
 ambiente controlado.
+
+## 147. Deck Analysis explainability UI - 2026-05-21
+
+### O Que
+
+Refinada a UI de `Funções do deck` para mostrar quais cartas foram consideradas
+em cada função e por que entraram na contagem.
+
+### O Porquê
+
+Feedback de usuário indicou dúvida entre contagens exibidas e cartas percebidas
+como compra/ramp/proteção. O backend já retornava `functional_tags` e metadados
+semânticos; faltava expor isso de forma clara no app.
+
+### O Como
+
+- `DeckAnalysisData` agora preserva `semantic_schema_version`, origem
+  persistida/heurística e metadados por amostra;
+- cada bucket expandido mostra `Como é contado` e `Cartas consideradas:
+  mostrando X de Y`;
+- amostras exibem razão, confiança, evidência traduzida e chips semânticos
+  legíveis;
+- fallback legado continua suportado quando o backend não envia amostras.
+
+### Validação
+
+- `flutter analyze` focado em model/widget/runtime: PASS;
+- `flutter test test/features/decks/models/deck_analysis_test.dart test/features/decks/widgets/deck_analysis_tab_test.dart`: PASS;
+- runtime no iPhone 15 Pro Max Simulator contra backend público: PASS,
+  `00:10 +1: All tests passed!`;
+- backend público usado no runtime: `b80700c49958a8bf806a346d34c7c127e3f862b6`.
+
+Handoff:
+
+- `app/doc/runtime_flow_handoffs/deck_analysis_explainability_iphone15_simulator_2026-05-21.md`.

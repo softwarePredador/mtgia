@@ -18,6 +18,14 @@ void main() {
         },
         'functional_tags': {
           'schema_version': 999,
+          'semantic_schema_version': 'semantic_layer_v2_2026_05_18',
+          'source': {
+            'priority': 'persisted_then_heuristic',
+            'persisted_rows': 20,
+            'persisted_copies': 24,
+            'heuristic_rows': 8,
+            'heuristic_copies': 10,
+          },
           'counts': {'ramp': 10, 'draw': '12', 'board_wipe': 3},
           'samples': {
             'ramp': ['Sol Ring', 'Arcane Signet', null, 42],
@@ -30,9 +38,13 @@ void main() {
               {
                 'name': 'Arcane Signet',
                 'reason': 'Conta como ramp porque acelera mana.',
+                'evidence': 'persisted_semantic_v2',
+                'tag': 'ramp',
                 'confidence': 0.88,
+                'semantic_schema_version': 'semantic_layer_v2_2026_05_18',
                 'speed': 'board_speed',
                 'mana_efficiency': 'cheap',
+                'interaction_scope': 'none',
               },
             ],
           },
@@ -61,7 +73,18 @@ void main() {
         'Arcane Signet',
       ]);
       expect(analysis.samplesFor('ramp').first.reason, contains('ramp'));
+      expect(
+        analysis.samplesFor('ramp').first.evidence,
+        'persisted_semantic_v2',
+      );
+      expect(analysis.samplesFor('ramp').first.tag, 'ramp');
+      expect(analysis.samplesFor('ramp').first.manaEfficiency, 'cheap');
       expect(analysis.samplesFor('ramp').first.confidence, 0.88);
+      expect(analysis.functionalTags?.semanticSchemaVersion, contains('v2'));
+      expect(
+        analysis.functionalTags?.source?.summary,
+        contains('24 persistidas'),
+      );
       expect(
         analysis.functionalTags?.coverage.summary,
         '61/100 cópias classificadas',

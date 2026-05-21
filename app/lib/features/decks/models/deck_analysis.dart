@@ -63,12 +63,16 @@ class DeckAnalysisData {
 class DeckFunctionalTags {
   const DeckFunctionalTags({
     required this.schemaVersion,
+    this.semanticSchemaVersion,
+    this.source,
     required this.counts,
     required this.samples,
     required this.coverage,
   });
 
   final String schemaVersion;
+  final String? semanticSchemaVersion;
+  final DeckFunctionalTagsSource? source;
   final Map<String, int> counts;
   final Map<String, List<DeckFunctionalTagSample>> samples;
   final DeckFunctionalTagsCoverage coverage;
@@ -99,6 +103,10 @@ class DeckFunctionalTags {
 
     return DeckFunctionalTags(
       schemaVersion: json['schema_version']?.toString() ?? '',
+      semanticSchemaVersion: _optionalTrimmedString(
+        json['semantic_schema_version'],
+      ),
+      source: DeckFunctionalTagsSource.fromJson(_asStringMap(json['source'])),
       counts: _parseIntMap(_asStringMap(json['counts'])),
       samples: Map.unmodifiable(parsedSamples),
       coverage: DeckFunctionalTagsCoverage.fromJson(
@@ -108,22 +116,85 @@ class DeckFunctionalTags {
   }
 }
 
+class DeckFunctionalTagsSource {
+  const DeckFunctionalTagsSource({
+    required this.priority,
+    required this.persistedRows,
+    required this.persistedCopies,
+    required this.heuristicRows,
+    required this.heuristicCopies,
+  });
+
+  final String? priority;
+  final int persistedRows;
+  final int persistedCopies;
+  final int heuristicRows;
+  final int heuristicCopies;
+
+  factory DeckFunctionalTagsSource.fromJson(Map<String, dynamic> json) {
+    return DeckFunctionalTagsSource(
+      priority: _optionalTrimmedString(json['priority']),
+      persistedRows: _parseInt(json['persisted_rows']),
+      persistedCopies: _parseInt(json['persisted_copies']),
+      heuristicRows: _parseInt(json['heuristic_rows']),
+      heuristicCopies: _parseInt(json['heuristic_copies']),
+    );
+  }
+
+  bool get hasAnySignal =>
+      persistedRows > 0 ||
+      persistedCopies > 0 ||
+      heuristicRows > 0 ||
+      heuristicCopies > 0 ||
+      (priority ?? '').isNotEmpty;
+
+  String get summary {
+    if (!hasAnySignal) return 'Origem não informada';
+    final parts = <String>[
+      if ((priority ?? '').isNotEmpty) 'prioridade $priority',
+      if (persistedCopies > 0) '$persistedCopies persistidas',
+      if (heuristicCopies > 0) '$heuristicCopies heurísticas',
+    ];
+    if (parts.isEmpty && persistedRows > 0) {
+      parts.add('$persistedRows linhas persistidas');
+    }
+    if (parts.isEmpty && heuristicRows > 0) {
+      parts.add('$heuristicRows linhas heurísticas');
+    }
+    return parts.join(' • ');
+  }
+}
+
 class DeckFunctionalTagSample {
   const DeckFunctionalTagSample({
     required this.name,
+    this.tag,
     this.reason,
+    this.evidence,
     this.role,
     this.confidence,
+    this.semanticSchemaVersion,
     this.speed,
     this.manaEfficiency,
+    this.cardAdvantageType,
+    this.interactionScope,
+    this.protectionType,
+    this.recursionType,
   });
 
   final String name;
+  final String? tag;
   final String? reason;
+  final String? evidence;
   final String? role;
   final double? confidence;
+  final String? semanticSchemaVersion;
   final String? speed;
   final String? manaEfficiency;
+  final String? cardAdvantageType;
+  final String? interactionScope;
+  final String? protectionType;
+  final String? recursionType;
 
   static DeckFunctionalTagSample? fromDynamic(dynamic value) {
     if (value is String) {
@@ -144,11 +215,20 @@ class DeckFunctionalTagSample {
       if (name == null || name.isEmpty) return null;
       return DeckFunctionalTagSample(
         name: name,
+        tag: _optionalTrimmedString(map['tag']),
         reason: _optionalTrimmedString(map['reason'] ?? map['evidence']),
+        evidence: _optionalTrimmedString(map['evidence']),
         role: _optionalTrimmedString(map['role'] ?? map['function']),
         confidence: _optionalDouble(map['confidence']),
+        semanticSchemaVersion: _optionalTrimmedString(
+          map['semantic_schema_version'],
+        ),
         speed: _optionalTrimmedString(map['speed']),
         manaEfficiency: _optionalTrimmedString(map['mana_efficiency']),
+        cardAdvantageType: _optionalTrimmedString(map['card_advantage_type']),
+        interactionScope: _optionalTrimmedString(map['interaction_scope']),
+        protectionType: _optionalTrimmedString(map['protection_type']),
+        recursionType: _optionalTrimmedString(map['recursion_type']),
       );
     }
 

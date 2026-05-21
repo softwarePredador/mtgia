@@ -204,6 +204,14 @@ void main() {
           },
           'functional_tags': {
             'schema_version': 'functional_card_tags_v1_2026_05_18',
+            'semantic_schema_version': 'semantic_layer_v2_2026_05_18',
+            'source': {
+              'priority': 'persisted_then_heuristic',
+              'persisted_rows': 30,
+              'persisted_copies': 41,
+              'heuristic_rows': 5,
+              'heuristic_copies': 7,
+            },
             'counts': {
               'ramp': 10,
               'draw': 12,
@@ -214,7 +222,14 @@ void main() {
             'samples': {
               'ramp': ['Sol Ring', 'Arcane Signet'],
               'draw': [
-                {'name': 'Skullclamp', 'reason': 'card_draw_text'},
+                {
+                  'name': 'Skullclamp',
+                  'reason': 'Conta como compra porque repõe cartas.',
+                  'evidence': 'card_draw_text',
+                  'confidence': 0.91,
+                  'card_advantage_type': 'card_draw',
+                  'mana_efficiency': 'cheap',
+                },
               ],
               'removal': ['Swords to Plowshares'],
               'board_wipe': ['Wrath of God'],
@@ -258,10 +273,30 @@ void main() {
     expect(find.text('Sol Ring'), findsOneWidget);
     expect(find.text('Arcane Signet'), findsOneWidget);
     expect(
+      find.textContaining('Cartas consideradas: mostrando 2 de 10'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Como é contado:'), findsOneWidget);
+    expect(
       find.textContaining('Origem da contagem: functional_tags'),
       findsOneWidget,
     );
     expect(find.textContaining('63/100 cópias classificadas'), findsWidgets);
+    expect(find.textContaining('41 persistidas'), findsOneWidget);
+
+    final drawBucket = find.byKey(
+      const Key('deck-analysis-functional-bucket-deck-functional-draw'),
+    );
+    await tester.ensureVisible(drawBucket);
+    await tester.tap(drawBucket);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Skullclamp'), findsWidgets);
+    expect(find.textContaining('Conta como compra'), findsOneWidget);
+    expect(find.textContaining('confiança 91%'), findsOneWidget);
+    expect(find.text('compra carta'), findsOneWidget);
+    expect(find.textContaining('baixo custo'), findsOneWidget);
+    expect(find.textContaining('Evidência: texto da carta'), findsOneWidget);
   });
 
   testWidgets('renders legacy composition counts without samples', (

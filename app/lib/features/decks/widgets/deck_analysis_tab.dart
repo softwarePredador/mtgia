@@ -765,6 +765,11 @@ class _FunctionalTagsOverview extends StatelessWidget {
                     icon: Icons.analytics_outlined,
                     label: coverageText,
                   ),
+                  if (data.functionalTags?.source?.hasAnySignal == true)
+                    _FunctionalInfoChip(
+                      icon: Icons.account_tree_outlined,
+                      label: data.functionalTags!.source!.summary,
+                    ),
                 ],
               ),
               if (coverageRatio != null) ...[
@@ -1010,6 +1015,7 @@ class _FunctionalBucketTile extends StatelessWidget {
             deckId: deckId,
             bucket: bucket,
             samples: samples,
+            totalCount: count,
             sourceLabel: analysis.sourceLabel,
             coverageSummary:
                 analysis.functionalTags?.coverage.summary ??
@@ -1026,6 +1032,7 @@ class _FunctionalBucketSamples extends StatelessWidget {
     required this.deckId,
     required this.bucket,
     required this.samples,
+    required this.totalCount,
     required this.sourceLabel,
     required this.coverageSummary,
   });
@@ -1033,6 +1040,7 @@ class _FunctionalBucketSamples extends StatelessWidget {
   final String deckId;
   final _FunctionalBucketSpec bucket;
   final List<DeckFunctionalTagSample> samples;
+  final int totalCount;
   final String sourceLabel;
   final String coverageSummary;
 
@@ -1054,6 +1062,12 @@ class _FunctionalBucketSamples extends StatelessWidget {
           icon: Icons.analytics_outlined,
           text: 'Cobertura geral: $coverageSummary',
         ),
+        const SizedBox(height: 6),
+        _FunctionalMetaLine(
+          icon: Icons.rule_rounded,
+          text:
+              'Como é contado: ${bucket.description} A contagem inclui cartas marcadas com a função "${bucket.label}" no backend.',
+        ),
         const SizedBox(height: 10),
         if (visibleSamples.isEmpty)
           Text(
@@ -1063,7 +1077,19 @@ class _FunctionalBucketSamples extends StatelessWidget {
               height: 1.35,
             ),
           )
-        else
+        else ...[
+          Text(
+            'Cartas consideradas: mostrando ${visibleSamples.length} de $totalCount.',
+            key: Key(
+              'deck-analysis-functional-considered-$deckId-${bucket.key}',
+            ),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textPrimary.withValues(alpha: 0.84),
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 8),
           ...List.generate(visibleSamples.length, (index) {
             final sample = visibleSamples[index];
             return Padding(
@@ -1077,6 +1103,7 @@ class _FunctionalBucketSamples extends StatelessWidget {
               ),
             );
           }),
+        ],
       ],
     );
   }
@@ -1128,9 +1155,22 @@ class _FunctionalSampleRow extends StatelessWidget {
     final metadata = [
       if (sample.confidence != null)
         'confiança ${(sample.confidence!.clamp(0, 1) * 100).round()}%',
-      if ((sample.speed ?? '').isNotEmpty) sample.speed!,
-      if ((sample.manaEfficiency ?? '').isNotEmpty) sample.manaEfficiency!,
-    ].join(' • ');
+      if (_friendlyFunctionalCode(sample.speed).isNotEmpty)
+        _friendlyFunctionalCode(sample.speed),
+      if (_friendlyFunctionalCode(sample.manaEfficiency).isNotEmpty)
+        _friendlyFunctionalCode(sample.manaEfficiency),
+    ];
+    final semanticDetails = [
+      if (_friendlyFunctionalCode(sample.cardAdvantageType).isNotEmpty)
+        _friendlyFunctionalCode(sample.cardAdvantageType),
+      if (_friendlyFunctionalCode(sample.interactionScope).isNotEmpty)
+        _friendlyFunctionalCode(sample.interactionScope),
+      if (_friendlyFunctionalCode(sample.protectionType).isNotEmpty)
+        _friendlyFunctionalCode(sample.protectionType),
+      if (_friendlyFunctionalCode(sample.recursionType).isNotEmpty)
+        _friendlyFunctionalCode(sample.recursionType),
+    ];
+    final evidence = _friendlyFunctionalEvidence(sample.evidence);
 
     return Container(
       width: double.infinity,
@@ -1161,6 +1201,9 @@ class _FunctionalSampleRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     detail,
+                    key: Key(
+                      'deck-analysis-functional-sample-reason-${sample.name}',
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -1172,11 +1215,34 @@ class _FunctionalSampleRow extends StatelessWidget {
                 if (metadata.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
-                    metadata,
+                    metadata.join(' • '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppTheme.textSecondary.withValues(alpha: 0.82),
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+                if (semanticDetails.isNotEmpty) ...[
+                  const SizedBox(height: 5),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (final item in semanticDetails)
+                        _FunctionalDetailPill(label: item, accent: accent),
+                    ],
+                  ),
+                ],
+                if (evidence.isNotEmpty) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    'Evidência: $evidence',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary.withValues(alpha: 0.72),
                       height: 1.2,
                     ),
                   ),
@@ -1188,6 +1254,78 @@ class _FunctionalSampleRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _FunctionalDetailPill extends StatelessWidget {
+  const _FunctionalDetailPill({required this.label, required this.accent});
+
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.11),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        border: Border.all(color: accent.withValues(alpha: 0.18), width: 0.6),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: AppTheme.textPrimary.withValues(alpha: 0.82),
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+String _friendlyFunctionalCode(String? raw) {
+  final value = raw?.trim();
+  if (value == null || value.isEmpty || value == 'none' || value == 'unknown') {
+    return '';
+  }
+  return switch (value) {
+    'fast' => 'rápida',
+    'medium' => 'média',
+    'slow' => 'lenta',
+    'cheap' => 'baixo custo',
+    'fair' => 'custo justo',
+    'expensive' => 'custo alto',
+    'card_draw' => 'compra carta',
+    'selection' => 'seleção',
+    'loot' => 'filtra mão',
+    'spot' => 'pontual',
+    'single_target' => 'alvo único',
+    'mass' => 'global',
+    'board' => 'mesa',
+    'hexproof' => 'hexproof',
+    'indestructible' => 'indestrutível',
+    'phase_out' => 'phase out',
+    'blink' => 'blink/proteção',
+    'counterspell' => 'anula mágicas',
+    'graveyard_to_hand' => 'cemitério para mão',
+    'graveyard_to_battlefield' => 'reanima',
+    _ => value.replaceAll('_', ' '),
+  };
+}
+
+String _friendlyFunctionalEvidence(String? raw) {
+  final value = raw?.trim();
+  if (value == null || value.isEmpty) return '';
+  return switch (value) {
+    'persisted_semantic_v2' => 'tag semântica persistida',
+    'heuristic_functional_tags_v1' => 'heurística funcional v1',
+    'card_draw_text' => 'texto da carta indica compra/vantagem',
+    'mana_ramp_text' => 'texto da carta acelera mana',
+    'removal_text' => 'texto da carta remove/interage',
+    'board_wipe_text' => 'texto da carta afeta várias permanentes',
+    'protection_text' => 'texto da carta protege permanente ou plano',
+    _ => value.replaceAll('_', ' '),
+  };
 }
 
 class _InsightBlock extends StatelessWidget {

@@ -179,6 +179,8 @@ void main() {
     );
     expect(find.textContaining('Sol Ring'), findsWidgets);
     expect(find.textContaining('Conta como ramp'), findsWidgets);
+    expect(find.textContaining('Cartas consideradas:'), findsWidgets);
+    expect(find.textContaining('Como é contado:'), findsWidgets);
     expectNoRawTechnicalErrorText(tester);
 
     // Sanitized runtime proof: no auth token, e-mail, raw payload or decklist.
@@ -203,6 +205,7 @@ void main() {
         'ui_rendered': true,
         'sol_ring_visible': true,
         'explainability_visible': true,
+        'considered_cards_copy_visible': true,
       })}',
     );
 
