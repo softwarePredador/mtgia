@@ -202,7 +202,8 @@ class _CardSearchScreenState extends State<CardSearchScreen>
             card: card,
             deckFormat: format,
             hasCommanderSelected: (deck?.commander.isNotEmpty ?? false),
-            forceCommander: mustPickCommanderFirst || isCommanderMode,
+            preferCommander: mustPickCommanderFirst || isCommanderMode,
+            requireCommander: isCommanderMode,
             canAddByCommanderIdentity: canOpenAddDialog,
             onConfirm: (quantity, isCommander) async {
               Navigator.pop(dialogContext);
@@ -752,7 +753,8 @@ class _AddCardDialog extends StatefulWidget {
   final DeckCardItem card;
   final String? deckFormat;
   final bool hasCommanderSelected;
-  final bool forceCommander;
+  final bool preferCommander;
+  final bool requireCommander;
   final bool canAddByCommanderIdentity;
   final Function(int quantity, bool isCommander) onConfirm;
 
@@ -760,7 +762,8 @@ class _AddCardDialog extends StatefulWidget {
     required this.card,
     required this.deckFormat,
     required this.hasCommanderSelected,
-    required this.forceCommander,
+    required this.preferCommander,
+    required this.requireCommander,
     required this.canAddByCommanderIdentity,
     required this.onConfirm,
   });
@@ -777,7 +780,7 @@ class _AddCardDialogState extends State<_AddCardDialog> {
   @override
   void initState() {
     super.initState();
-    if (widget.forceCommander) {
+    if (widget.preferCommander) {
       _isCommander = true;
       _quantity = 1;
     }
@@ -792,19 +795,23 @@ class _AddCardDialogState extends State<_AddCardDialog> {
     );
     final canIncreaseQuantity = !isCommanderFormat || isBasicLand;
     final isCommanderEligible = _isCommanderEligible(widget.card);
+    final showCommanderChoice =
+        isCommanderFormat &&
+        isCommanderEligible &&
+        (!widget.hasCommanderSelected || widget.requireCommander);
 
     return Dialog(
       key: Key('card-search-add-dialog-${widget.card.id}'),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
       backgroundColor: AppTheme.surfaceElevated,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
         side: BorderSide(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -855,11 +862,11 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     child: CachedCardImage(
                       imageUrl: widget.card.imageUrl,
-                      width: 72,
-                      height: 100,
+                      width: 82,
+                      height: 114,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -871,6 +878,7 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                           ).textTheme.titleMedium?.copyWith(
                             color: AppTheme.textPrimary,
                             fontWeight: FontWeight.w800,
+                            height: 1.05,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -878,7 +886,7 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                           card: widget.card,
                           showTypeLine: true,
                           warning:
-                              widget.forceCommander
+                              _isCommander
                                   ? 'Será definido como comandante'
                                   : null,
                         ),
@@ -898,41 +906,21 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed:
-                            _isSubmitting
-                                ? null
-                                : _quantity > 1
-                                ? () => setState(() => _quantity--)
-                                : null,
-                      ),
-                      Text(
-                        '$_quantity',
-                        style: const TextStyle(fontSize: AppTheme.fontXl),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed:
-                            _isSubmitting
-                                ? null
-                                : canIncreaseQuantity
-                                ? () => setState(() => _quantity++)
-                                : null,
-                      ),
-                    ],
+                  _QuantityStepper(
+                    quantity: _quantity,
+                    canDecrease: !_isSubmitting && _quantity > 1,
+                    canIncrease:
+                        !_isSubmitting && canIncreaseQuantity && !_isCommander,
+                    onDecrease: () => setState(() => _quantity--),
+                    onIncrease: () => setState(() => _quantity++),
                   ),
                 ],
               ),
               const SizedBox(height: 14),
-              if (isCommanderFormat &&
-                  isCommanderEligible &&
-                  !widget.hasCommanderSelected &&
-                  !widget.forceCommander)
+              if (showCommanderChoice)
                 _CommanderChoiceCard(
                   isCommander: _isCommander,
+                  requireCommander: widget.requireCommander,
                   onChanged:
                       _isSubmitting
                           ? null
@@ -941,21 +929,28 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                             if (_isCommander) _quantity = 1;
                           }),
                 ),
-              if (widget.forceCommander)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.brass500.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    border: Border.all(
-                      color: AppTheme.brass400.withValues(alpha: 0.28),
-                    ),
+              if (isCommanderFormat && !isCommanderEligible)
+                const _CommanderGuidanceCard(
+                  message:
+                      'Esta carta não pode ser comandante. Ela pode entrar apenas como carta comum se respeitar a identidade de cor.',
+                )
+              else if (widget.requireCommander)
+                const _CommanderGuidanceCard(
+                  message:
+                      'Você está escolhendo o comandante do deck. Esta carta será definida como comandante.',
+                )
+              else if (widget.preferCommander && showCommanderChoice)
+                const Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: _CommanderGuidanceCard(
+                    message:
+                        'Este deck precisa de um comandante. Você pode definir esta carta agora ou adicioná-la como carta comum.',
                   ),
-                  child: const Text(
-                    'Este deck precisa de um comandante. Esta carta será definida como comandante.',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
+                )
+              else if (widget.preferCommander)
+                const _CommanderGuidanceCard(
+                  message:
+                      'Este deck precisa de um comandante. Esta carta será definida como comandante.',
                 ),
               if (_isSubmitting) ...[
                 const SizedBox(height: 12),
@@ -967,13 +962,24 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                   ),
                 ),
               ],
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed:
                           _isSubmitting ? null : () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(
+                          color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
+                        ),
+                      ),
                       child: const Text('Cancelar'),
                     ),
                   ),
@@ -986,14 +992,19 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                               ? null
                               : () async {
                                 setState(() => _isSubmitting = true);
-                                await widget.onConfirm(
-                                  _quantity,
-                                  widget.forceCommander ? true : _isCommander,
-                                );
+                                await widget.onConfirm(_quantity, _isCommander);
                                 if (mounted) {
                                   setState(() => _isSubmitting = false);
                                 }
                               },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
+                        ),
+                      ),
                       child: const Text('Adicionar'),
                     ),
                   ),
@@ -1007,19 +1018,140 @@ class _AddCardDialogState extends State<_AddCardDialog> {
   }
 }
 
+class _QuantityStepper extends StatelessWidget {
+  const _QuantityStepper({
+    required this.quantity,
+    required this.canDecrease,
+    required this.canIncrease,
+    required this.onDecrease,
+    required this.onIncrease,
+  });
+
+  final int quantity;
+  final bool canDecrease;
+  final bool canIncrease;
+  final VoidCallback onDecrease;
+  final VoidCallback onIncrease;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('card-search-add-quantity-stepper'),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.38),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.44),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _StepperButton(
+            icon: Icons.remove_rounded,
+            enabled: canDecrease,
+            onTap: onDecrease,
+          ),
+          SizedBox(
+            width: 36,
+            child: Text(
+              '$quantity',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontLg,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          _StepperButton(
+            icon: Icons.add_rounded,
+            enabled: canIncrease,
+            onTap: onIncrease,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  const _StepperButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+      onTap: enabled ? onTap : null,
+      child: Container(
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color:
+              enabled
+                  ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
+                  : AppTheme.surfaceSlate.withValues(alpha: 0.35),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        ),
+        child: Icon(
+          icon,
+          size: 18,
+          color: enabled ? AppTheme.textPrimary : AppTheme.textHint,
+        ),
+      ),
+    );
+  }
+}
+
+class _CommanderGuidanceCard extends StatelessWidget {
+  const _CommanderGuidanceCard({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.brass500.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.28)),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(color: AppTheme.textSecondary, height: 1.3),
+      ),
+    );
+  }
+}
+
 class _CommanderChoiceCard extends StatelessWidget {
   const _CommanderChoiceCard({
     required this.isCommander,
+    required this.requireCommander,
     required this.onChanged,
   });
 
   final bool isCommander;
+  final bool requireCommander;
   final ValueChanged<bool>? onChanged;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      key: const Key('card-search-commander-choice-card'),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1033,12 +1165,15 @@ class _CommanderChoiceCard extends StatelessWidget {
             subtitle: 'Esta carta será o comandante do deck.',
             onTap: onChanged == null ? null : () => onChanged!(true),
           ),
-          const Divider(height: 18, color: AppTheme.outlineMuted),
+          const SizedBox(height: 8),
           _CommanderChoiceRow(
             selected: !isCommander,
             title: 'Adicionar como carta comum',
             subtitle: 'Adicionar ao deck sem definir como comandante.',
-            onTap: onChanged == null ? null : () => onChanged!(false),
+            onTap:
+                onChanged == null || requireCommander
+                    ? null
+                    : () => onChanged!(false),
           ),
         ],
       ),
@@ -1064,8 +1199,32 @@ class _CommanderChoiceRow extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color:
+              selected
+                  ? AppTheme.frost400.withValues(alpha: 0.08)
+                  : AppTheme.transparent,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(
+            color:
+                selected
+                    ? AppTheme.brass400.withValues(alpha: 0.48)
+                    : AppTheme.outlineMuted.withValues(alpha: 0.18),
+          ),
+          boxShadow:
+              selected
+                  ? [
+                    BoxShadow(
+                      color: AppTheme.brass400.withValues(alpha: 0.1),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ]
+                  : null,
+        ),
         child: Row(
           children: [
             Icon(
@@ -1073,6 +1232,7 @@ class _CommanderChoiceRow extends StatelessWidget {
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_unchecked_rounded,
               color: selected ? AppTheme.brass400 : AppTheme.textHint,
+              size: 22,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -1083,14 +1243,15 @@ class _CommanderChoiceRow extends StatelessWidget {
                     title,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppTheme.textSecondary,
+                      height: 1.25,
                     ),
                   ),
                 ],

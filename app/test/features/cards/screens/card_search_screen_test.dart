@@ -7,6 +7,7 @@ import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
 import 'package:manaloom/features/cards/screens/card_search_screen.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
+import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:provider/provider.dart';
 
 class _FixedCardProvider extends CardProvider {
@@ -102,6 +103,31 @@ class _FakeSetsApiClient extends ApiClient {
   }
 }
 
+class _FakeDeckApiClient extends ApiClient {
+  final List<Map<String, dynamic>> postBodies = [];
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    if (endpoint == '/decks/deck-1') {
+      return ApiResponse(200, _deckDetailsJson());
+    }
+    return ApiResponse(404, {'error': 'not found'});
+  }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    if (endpoint == '/decks/deck-1/cards') {
+      postBodies.add(body);
+      return ApiResponse(200, {'ok': true});
+    }
+    return ApiResponse(404, {'error': 'not found'});
+  }
+}
+
 DeckCardItem _sampleCard() {
   return DeckCardItem(
     id: 'card-1',
@@ -118,6 +144,21 @@ DeckCardItem _sampleCard() {
     quantity: 1,
     isCommander: false,
   );
+}
+
+Map<String, dynamic> _deckDetailsJson() {
+  return {
+    'id': 'deck-1',
+    'name': 'Lorehold Draft',
+    'format': 'commander',
+    'description': null,
+    'is_public': false,
+    'created_at': '2026-05-21T10:00:00.000Z',
+    'color_identity': <String>[],
+    'stats': {'total_cards': 0},
+    'commander': <Map<String, dynamic>>[],
+    'main_board': <String, List<Map<String, dynamic>>>{},
+  };
 }
 
 void main() {
@@ -256,4 +297,64 @@ void main() {
     expect(find.byKey(const Key('card-search-error')), findsOneWidget);
     expect(find.byKey(const Key('card-search-empty-state')), findsNothing);
   });
+
+  testWidgets(
+    'commander deck without commander shows guided commander choice',
+    (tester) async {
+      final card = _sampleCard();
+      final apiClient = _FakeDeckApiClient();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<CardProvider>(
+              create: (_) => _FixedCardProvider([card]),
+            ),
+            ChangeNotifierProvider<DeckProvider>(
+              create: (_) => DeckProvider(apiClient: apiClient),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: const CardSearchScreen(deckId: 'deck-1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Adicionar'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Adicionar carta ao deck'), findsOneWidget);
+      expect(
+        find.byKey(const Key('card-search-add-quantity-stepper')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('card-search-commander-choice-card')),
+        findsOneWidget,
+      );
+      expect(find.text('Definir como comandante'), findsOneWidget);
+      expect(find.text('Adicionar como carta comum'), findsOneWidget);
+      expect(
+        find.textContaining('Você pode definir esta carta agora'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Adicionar como carta comum'));
+      await tester.pumpAndSettle();
+      final confirmButton = find.byKey(
+        Key('card-search-add-confirm-${card.id}'),
+      );
+      await tester.ensureVisible(confirmButton);
+      await tester.pumpAndSettle();
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+
+      expect(apiClient.postBodies, isNotEmpty);
+      expect(apiClient.postBodies.single['card_id'], card.id);
+      expect(apiClient.postBodies.single['quantity'], 1);
+      expect(apiClient.postBodies.single['is_commander'], isFalse);
+    },
+  );
 }
