@@ -129,6 +129,31 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     _recalculateIfNeeded(effectiveDeck);
     final manaCurve = _cachedManaCurve;
     final colorCounts = _cachedColorCounts;
+    final allCards = [
+      ...effectiveDeck.commander,
+      ...effectiveDeck.mainBoard.values.expand((l) => l),
+    ];
+    final landCount = allCards
+        .where((card) => card.typeLine.toLowerCase().contains('land'))
+        .fold<int>(0, (sum, card) => sum + card.quantity);
+    final spellCards =
+        allCards
+            .where((card) => !card.typeLine.toLowerCase().contains('land'))
+            .toList();
+    final spellQuantity = spellCards.fold<int>(
+      0,
+      (sum, card) => sum + card.quantity,
+    );
+    final averageCmc =
+        spellQuantity == 0
+            ? 0.0
+            : spellCards.fold<double>(
+                  0,
+                  (sum, card) =>
+                      sum +
+                      (ManaHelper.calculateCMC(card.manaCost) * card.quantity),
+                ) /
+                spellQuantity;
     final hasAiSummary =
         (effectiveDeck.synergyScore ?? 0) > 0 ||
         ((effectiveDeck.strengths ?? '').trim().isNotEmpty) ||
@@ -162,6 +187,16 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
             ),
+          ),
+          const SizedBox(height: 16),
+          _AnalysisSummaryStrip(
+            legalityScore: _legalityScore(effectiveDeck),
+            priceLabel:
+                effectiveDeck.pricingTotal == null
+                    ? 'N/D'
+                    : 'R\$ ${effectiveDeck.pricingTotal!.toStringAsFixed(0)}',
+            averageCmc: averageCmc,
+            landCount: landCount,
           ),
           const SizedBox(height: 16),
           _AnalysisActionBar(
@@ -385,6 +420,17 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     );
   }
 
+  int _legalityScore(DeckDetails deck) {
+    final format = deck.format.toLowerCase();
+    final target = format == 'commander' ? 100 : (format == 'brawl' ? 60 : 60);
+    final hasCommander =
+        (format == 'commander' || format == 'brawl')
+            ? deck.commander.isNotEmpty
+            : true;
+    final countScore = ((deck.cardCount / target).clamp(0.0, 1.0) * 85).round();
+    return (countScore + (hasCommander ? 15 : 0)).clamp(0, 100);
+  }
+
   List<PieChartSectionData> _buildPieSections(Map<String, int> counts) {
     final total = counts.values.fold(0, (sum, item) => sum + item);
     if (total == 0) return [];
@@ -454,6 +500,114 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         ),
       );
     }).toList();
+  }
+}
+
+class _AnalysisSummaryStrip extends StatelessWidget {
+  const _AnalysisSummaryStrip({
+    required this.legalityScore,
+    required this.priceLabel,
+    required this.averageCmc,
+    required this.landCount,
+  });
+
+  final int legalityScore;
+  final String priceLabel;
+  final double averageCmc;
+  final int landCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 4,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 0.74,
+      children: [
+        _SummaryMetricRing(
+          label: 'Legalidade',
+          value: '$legalityScore/100',
+          accent: AppTheme.success,
+        ),
+        _SummaryMetricRing(
+          label: 'Preço total',
+          value: priceLabel,
+          accent: AppTheme.brass400,
+        ),
+        _SummaryMetricRing(
+          label: 'Curva média',
+          value: averageCmc.toStringAsFixed(1),
+          accent: AppTheme.frost400,
+        ),
+        _SummaryMetricRing(
+          label: 'Terrenos',
+          value: '$landCount',
+          accent: AppTheme.frost600,
+        ),
+      ],
+    );
+  }
+}
+
+class _SummaryMetricRing extends StatelessWidget {
+  const _SummaryMetricRing({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated.withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: accent.withValues(alpha: 0.42)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: accent, width: 2),
+              color: accent.withValues(alpha: 0.08),
+            ),
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

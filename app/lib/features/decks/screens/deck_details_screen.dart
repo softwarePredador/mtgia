@@ -43,6 +43,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   Map<String, dynamic>? _pricing;
   bool _isPricingLoading = false;
   final Set<String> _hiddenCardIds = <String>{};
+  final TextEditingController _cardSearchController = TextEditingController();
   bool _pricingAutoLoaded = false;
   bool _validationAutoLoaded = false;
   bool _isValidating = false;
@@ -112,6 +113,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _cardSearchController.dispose();
     super.dispose();
   }
 
@@ -292,6 +294,18 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             format: deck.format,
             totalCards: totalCards,
           );
+          final cardQuery = _cardSearchController.text.trim().toLowerCase();
+          List<DeckCardItem> filterCards(List<DeckCardItem> cards) {
+            if (cardQuery.isEmpty) return cards;
+            return cards
+                .where(
+                  (card) =>
+                      card.name.toLowerCase().contains(cardQuery) ||
+                      card.typeLine.toLowerCase().contains(cardQuery) ||
+                      card.setCode.toLowerCase().contains(cardQuery),
+                )
+                .toList();
+          }
 
           // Auto-load pricing when deck is ready
           if (hasMeaningfulDeckState &&
@@ -372,6 +386,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  _DeckCardsSearchHeader(
+                    controller: _cardSearchController,
+                    totalCards: totalCards,
+                    onChanged: () => setState(() {}),
+                  ),
+                  const SizedBox(height: 12),
                   if (maxCards != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
@@ -423,17 +443,32 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     _buildCardSection(
                       context,
                       title: 'Comandante',
-                      cards: deck.commander,
+                      cards: filterCards(deck.commander),
                       deckFormat: deck.format,
                     ),
                   ...deck.mainBoard.entries.map(
                     (entry) => _buildCardSection(
                       context,
                       title: entry.key,
-                      cards: entry.value,
+                      cards: filterCards(entry.value),
                       deckFormat: deck.format,
                     ),
                   ),
+                  if (cardQuery.isNotEmpty &&
+                      filterCards(deck.commander).isEmpty &&
+                      deck.mainBoard.values
+                          .expand((cards) => filterCards(cards))
+                          .isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 28),
+                      child: Text(
+                        'Nenhuma carta encontrada nesse deck.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                 ],
               ),
 
@@ -1249,6 +1284,81 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     final pricing = _pricing;
     if (pricing == null) return;
     await showDeckPricingDetailsSheet(context: context, pricing: pricing);
+  }
+}
+
+class _DeckCardsSearchHeader extends StatelessWidget {
+  const _DeckCardsSearchHeader({
+    required this.controller,
+    required this.totalCards,
+    required this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final int totalCards;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '$totalCards cartas',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.backgroundAbyss.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                ),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  color: AppTheme.brass400,
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: controller,
+            onChanged: (_) => onChanged(),
+            decoration: InputDecoration(
+              hintText: 'Buscar cartas',
+              prefixIcon: const Icon(Icons.search_rounded),
+              suffixIcon:
+                  controller.text.isEmpty
+                      ? null
+                      : IconButton(
+                        tooltip: 'Limpar busca',
+                        onPressed: () {
+                          controller.clear();
+                          onChanged();
+                        },
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

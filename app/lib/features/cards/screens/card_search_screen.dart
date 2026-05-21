@@ -367,14 +367,30 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         }
 
         final totalItems =
-            provider.searchResults.length + (provider.hasMore ? 1 : 0);
+            provider.searchResults.length + (provider.hasMore ? 1 : 0) + 1;
 
         return ListView.builder(
           key: const Key('card-search-results-list'),
           controller: _scrollController,
           itemCount: totalItems,
           itemBuilder: (context, index) {
-            if (index >= provider.searchResults.length) {
+            if (index == 0) {
+              return _SearchResultsHeader(
+                query: query,
+                count: provider.searchResults.length,
+                onFilterTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Filtros rápidos por coleção estão na aba Coleções.',
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            final resultIndex = index - 1;
+            if (resultIndex >= provider.searchResults.length) {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
@@ -382,7 +398,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                 ),
               );
             }
-            final card = provider.searchResults[index];
+            final card = provider.searchResults[resultIndex];
             final isCommanderEligible = _isCommanderEligible(card);
             final allowedByIdentity =
                 !isCommanderFormat ||
@@ -396,69 +412,204 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                     : (mustPickCommanderFirst
                         ? isCommanderEligible
                         : allowedByIdentity);
-            return ListTile(
+            return _CardSearchResultTile(
               key: Key('card-search-result-${card.id}'),
-              leading: GestureDetector(
-                key: Key('card-search-image-${card.id}'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CardDetailScreen(card: card),
-                    ),
-                  );
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  child: CachedCardImage(
-                    imageUrl: card.imageUrl,
-                    width: 40,
-                    height: 56,
+              card: card,
+              showTypeLine: !widget.isBinderMode,
+              warning:
+                  mustPickCommanderFirst && !isCommanderEligible
+                      ? 'Selecione um comandante primeiro'
+                      : !mustPickCommanderFirst &&
+                          isCommanderFormat &&
+                          commanderIdentity != null &&
+                          !allowedByIdentity
+                      ? 'Fora da identidade do comandante'
+                      : null,
+              canAdd: canAdd,
+              onOpen: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CardDetailScreen(card: card),
                   ),
-                ),
-              ),
-              title: Text(card.name),
-              subtitle: _CardSearchEditionSubtitle(
-                card: card,
-                showTypeLine: !widget.isBinderMode,
-                warning:
-                    mustPickCommanderFirst && !isCommanderEligible
-                        ? 'Selecione um comandante primeiro'
-                        : !mustPickCommanderFirst &&
-                            isCommanderFormat &&
-                            commanderIdentity != null &&
-                            !allowedByIdentity
-                        ? 'Fora da identidade do comandante'
-                        : null,
-              ),
-              trailing: IconButton(
-                key: Key('card-search-add-${card.id}'),
-                tooltip: 'Adicionar',
-                icon: const Icon(Icons.add_circle_outline),
-                onPressed:
-                    canAdd
-                        ? () {
-                          if (widget.isBinderMode) {
-                            final cardData = {
-                              'id': card.id,
-                              'name': card.name,
-                              'image_url': card.imageUrl,
-                              'set_code': card.setCode,
-                              'mana_cost': card.manaCost,
-                              'rarity': card.rarity,
-                            };
-                            Navigator.pop(context);
-                            widget.onCardSelectedForBinder?.call(cardData);
-                          } else {
-                            _addCardToDeck(card);
-                          }
+                );
+              },
+              onAdd:
+                  canAdd
+                      ? () {
+                        if (widget.isBinderMode) {
+                          final cardData = {
+                            'id': card.id,
+                            'name': card.name,
+                            'image_url': card.imageUrl,
+                            'set_code': card.setCode,
+                            'mana_cost': card.manaCost,
+                            'rarity': card.rarity,
+                          };
+                          Navigator.pop(context);
+                          widget.onCardSelectedForBinder?.call(cardData);
+                        } else {
+                          _addCardToDeck(card);
                         }
-                        : null,
-              ),
+                      }
+                      : null,
             );
           },
         );
       },
+    );
+  }
+}
+
+class _SearchResultsHeader extends StatelessWidget {
+  const _SearchResultsHeader({
+    required this.query,
+    required this.count,
+    required this.onFilterTap,
+  });
+
+  final String query;
+  final int count;
+  final VoidCallback onFilterTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Resultados para "$query"',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '$count cartas encontradas',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          FilledButton.tonalIcon(
+            onPressed: onFilterTap,
+            icon: const Icon(Icons.tune_rounded, size: 16),
+            label: const Text('Filtrar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardSearchResultTile extends StatelessWidget {
+  const _CardSearchResultTile({
+    super.key,
+    required this.card,
+    required this.showTypeLine,
+    required this.warning,
+    required this.canAdd,
+    required this.onOpen,
+    required this.onAdd,
+  });
+
+  final DeckCardItem card;
+  final bool showTypeLine;
+  final String? warning;
+  final bool canAdd;
+  final VoidCallback onOpen;
+  final VoidCallback? onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      child: Material(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              border: Border.all(
+                color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+              ),
+            ),
+            child: Row(
+              children: [
+                GestureDetector(
+                  key: Key('card-search-image-${card.id}'),
+                  onTap: onOpen,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    child: CachedCardImage(
+                      imageUrl: card.imageUrl,
+                      width: 44,
+                      height: 62,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        card.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      _CardSearchEditionSubtitle(
+                        card: card,
+                        showTypeLine: showTypeLine,
+                        warning: warning,
+                      ),
+                      if ((card.manaCost ?? '').trim().isNotEmpty) ...[
+                        const SizedBox(height: 5),
+                        Text(
+                          card.manaCost!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.mythicGold,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  key: Key('card-search-add-${card.id}'),
+                  tooltip: canAdd ? 'Adicionar' : 'Indisponível',
+                  icon: Icon(
+                    Icons.add_circle_outline,
+                    color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
+                  ),
+                  onPressed: onAdd,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -508,117 +659,312 @@ class _AddCardDialogState extends State<_AddCardDialog> {
     final canIncreaseQuantity = !isCommanderFormat || isBasicLand;
     final isCommanderEligible = _isCommanderEligible(widget.card);
 
-    return AlertDialog(
+    return Dialog(
       key: Key('card-search-add-dialog-${widget.card.id}'),
-      title: Text('Adicionar ${widget.card.name}'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!widget.canAddByCommanderIdentity)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  'Essa carta está fora da identidade de cor do comandante.',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      backgroundColor: AppTheme.surfaceElevated,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        side: BorderSide(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Adicionar carta ao deck',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        fontFamily: AppTheme.displayFontFamily,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed:
+                        _isSubmitting ? null : () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
+                    color: AppTheme.textSecondary,
+                    tooltip: 'Fechar',
+                  ),
+                ],
               ),
-            _CardSearchEditionSubtitle(
-              card: widget.card,
-              showTypeLine: true,
-              warning:
-                  widget.forceCommander
-                      ? 'Será definido como comandante'
-                      : null,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Quantidade:'),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed:
-                          _isSubmitting
-                              ? null
-                              : _quantity > 1
-                              ? () => setState(() => _quantity--)
-                              : null,
+              const SizedBox(height: 16),
+              if (!widget.canAddByCommanderIdentity)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.error.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
+                      color: AppTheme.error.withValues(alpha: 0.32),
                     ),
-                    Text(
-                      '$_quantity',
-                      style: const TextStyle(fontSize: AppTheme.fontXl),
+                  ),
+                  child: const Text(
+                    'Essa carta está fora da identidade de cor do comandante.',
+                    style: TextStyle(color: AppTheme.textPrimary),
+                  ),
+                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    child: CachedCardImage(
+                      imageUrl: widget.card.imageUrl,
+                      width: 72,
+                      height: 100,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed:
-                          _isSubmitting
-                              ? null
-                              : canIncreaseQuantity
-                              ? () => setState(() => _quantity++)
-                              : null,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.card.name,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        _CardSearchEditionSubtitle(
+                          card: widget.card,
+                          showTypeLine: true,
+                          warning:
+                              widget.forceCommander
+                                  ? 'Será definido como comandante'
+                                  : null,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Quantidade',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove),
+                        onPressed:
+                            _isSubmitting
+                                ? null
+                                : _quantity > 1
+                                ? () => setState(() => _quantity--)
+                                : null,
+                      ),
+                      Text(
+                        '$_quantity',
+                        style: const TextStyle(fontSize: AppTheme.fontXl),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed:
+                            _isSubmitting
+                                ? null
+                                : canIncreaseQuantity
+                                ? () => setState(() => _quantity++)
+                                : null,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              if (isCommanderFormat &&
+                  isCommanderEligible &&
+                  !widget.hasCommanderSelected &&
+                  !widget.forceCommander)
+                _CommanderChoiceCard(
+                  isCommander: _isCommander,
+                  onChanged:
+                      _isSubmitting
+                          ? null
+                          : (val) => setState(() {
+                            _isCommander = val;
+                            if (_isCommander) _quantity = 1;
+                          }),
+                ),
+              if (widget.forceCommander)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.brass500.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
+                      color: AppTheme.brass400.withValues(alpha: 0.28),
+                    ),
+                  ),
+                  child: const Text(
+                    'Este deck precisa de um comandante. Esta carta será definida como comandante.',
+                    style: TextStyle(color: AppTheme.textSecondary),
+                  ),
+                ),
+              if (_isSubmitting) ...[
+                const SizedBox(height: 12),
+                const Center(
+                  child: SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
               ],
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed:
+                          _isSubmitting ? null : () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      key: Key('card-search-add-confirm-${widget.card.id}'),
+                      onPressed:
+                          _isSubmitting || !widget.canAddByCommanderIdentity
+                              ? null
+                              : () async {
+                                setState(() => _isSubmitting = true);
+                                await widget.onConfirm(
+                                  _quantity,
+                                  widget.forceCommander ? true : _isCommander,
+                                );
+                                if (mounted) {
+                                  setState(() => _isSubmitting = false);
+                                }
+                              },
+                      child: const Text('Adicionar'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CommanderChoiceCard extends StatelessWidget {
+  const _CommanderChoiceCard({
+    required this.isCommander,
+    required this.onChanged,
+  });
+
+  final bool isCommander;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
+      ),
+      child: Column(
+        children: [
+          _CommanderChoiceRow(
+            selected: isCommander,
+            title: 'Definir como comandante',
+            subtitle: 'Esta carta será o comandante do deck.',
+            onTap: onChanged == null ? null : () => onChanged!(true),
+          ),
+          const Divider(height: 18, color: AppTheme.outlineMuted),
+          _CommanderChoiceRow(
+            selected: !isCommander,
+            title: 'Adicionar como carta comum',
+            subtitle: 'Adicionar ao deck sem definir como comandante.',
+            onTap: onChanged == null ? null : () => onChanged!(false),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommanderChoiceRow extends StatelessWidget {
+  const _CommanderChoiceRow({
+    required this.selected,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final bool selected;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: selected ? AppTheme.brass400 : AppTheme.textHint,
             ),
-            if (isCommanderFormat &&
-                isCommanderEligible &&
-                !widget.hasCommanderSelected &&
-                !widget.forceCommander)
-              CheckboxListTile(
-                title: const Text('É Comandante?'),
-                value: _isCommander,
-                onChanged:
-                    _isSubmitting
-                        ? null
-                        : (val) => setState(() {
-                          _isCommander = val ?? false;
-                          if (_isCommander) _quantity = 1;
-                        }),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
               ),
-            if (widget.forceCommander)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text(
-                  'Esse deck precisa de um comandante. Esta carta será definida como comandante.',
-                ),
-              ),
-            if (_isSubmitting)
-              const Padding(
-                padding: EdgeInsets.only(top: 12),
-                child: SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton(
-          key: Key('card-search-add-confirm-${widget.card.id}'),
-          onPressed:
-              _isSubmitting || !widget.canAddByCommanderIdentity
-                  ? null
-                  : () async {
-                    setState(() => _isSubmitting = true);
-                    await widget.onConfirm(
-                      _quantity,
-                      widget.forceCommander ? true : _isCommander,
-                    );
-                    if (mounted) setState(() => _isSubmitting = false);
-                  },
-          child: const Text('Adicionar'),
-        ),
-      ],
     );
   }
 }
