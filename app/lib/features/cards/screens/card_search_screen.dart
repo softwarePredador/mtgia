@@ -8,6 +8,7 @@ import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/models/deck_details.dart';
+import '../../decks/widgets/deck_details_aux_widgets.dart';
 import '../../collection/screens/sets_catalog_screen.dart';
 import '../widgets/card_edition_metadata.dart';
 import 'card_detail_screen.dart';
@@ -251,54 +252,113 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         !widget.isBinderMode &&
         (widget.mode ?? '').toLowerCase() == 'commander';
 
-    final isSetsTab = _tabController.index == 1;
-
     return Scaffold(
+      backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
-        titleSpacing: isSetsTab ? null : 0,
-        title:
-            isSetsTab
-                ? const Text('Coleções')
-                : Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: TextField(
-                    key: const Key('card-search-field'),
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    autofocus: true,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      hintText:
-                          widget.isBinderMode
-                              ? 'Buscar carta para o fichário...'
-                              : isCommanderMode
-                              ? 'Buscar comandante...'
-                              : 'Buscar cartas...',
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                      hintStyle: const TextStyle(
+        toolbarHeight: 54,
+        titleSpacing: 0,
+        backgroundColor: AppTheme.backgroundAbyss,
+        surfaceTintColor: AppTheme.transparent,
+        title: Container(
+          height: 34,
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceSlate,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+            ),
+          ),
+          child: TextField(
+            key: const Key('card-search-field'),
+            controller: _searchController,
+            onChanged: _onSearchChanged,
+            autofocus: true,
+            textAlignVertical: TextAlignVertical.center,
+            decoration: InputDecoration(
+              hintText:
+                  widget.isBinderMode
+                      ? 'Buscar carta'
+                      : isCommanderMode
+                      ? 'Buscar comandante'
+                      : 'Buscar cartas',
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              suffixIcon:
+                  _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                        icon: const Icon(Icons.close_rounded, size: 16),
                         color: AppTheme.textSecondary,
-                        fontSize: 16,
+                        onPressed: () {
+                          _searchController.clear();
+                          context.read<CardProvider>().clearSearch();
+                          setState(() {});
+                        },
                       ),
+              hintStyle: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+            style: const TextStyle(color: AppTheme.textPrimary, fontSize: 12),
+            cursorColor: AppTheme.textPrimary,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 10),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Filtros rápidos por coleção estão na aba Coleções.',
                     ),
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontSize: 16,
-                    ),
-                    cursorColor: AppTheme.textPrimary,
+                  ),
+                );
+              },
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceSlate,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.outlineMuted.withValues(alpha: 0.75),
                   ),
                 ),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  size: 17,
+                  color: AppTheme.brass400,
+                ),
+              ),
+            ),
+          ),
+        ],
         bottom: TabBar(
           key: const Key('cardSearchTabs'),
           controller: _tabController,
-          indicatorColor: AppTheme.frost400,
-          labelColor: AppTheme.frost400,
+          indicatorColor: AppTheme.brass400,
+          labelColor: AppTheme.brass400,
           unselectedLabelColor: AppTheme.textSecondary,
-          tabs: const [
-            Tab(icon: Icon(Icons.style_outlined), text: 'Cartas'),
-            Tab(icon: Icon(Icons.grid_view_rounded), text: 'Coleções'),
-          ],
+          indicatorSize: TabBarIndicatorSize.label,
+          labelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+          tabs: const [Tab(text: 'Cartas'), Tab(text: 'Coleções')],
         ),
       ),
       body: TabBarView(
@@ -476,7 +536,7 @@ class _SearchResultsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -486,25 +546,39 @@ class _SearchResultsHeader extends StatelessWidget {
               children: [
                 Text(
                   'Resultados para "$query"',
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
                   '$count cartas encontradas',
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: AppTheme.textSecondary,
+                    fontSize: 10,
                   ),
                 ),
               ],
             ),
           ),
-          FilledButton.tonalIcon(
-            onPressed: onFilterTap,
-            icon: const Icon(Icons.tune_rounded, size: 16),
-            label: const Text('Filtrar'),
+          SizedBox(
+            height: 30,
+            child: FilledButton.tonalIcon(
+              onPressed: onFilterTap,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                backgroundColor: AppTheme.surfaceElevated,
+                foregroundColor: AppTheme.frost400,
+                textStyle: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              icon: const Icon(Icons.tune_rounded, size: 13),
+              label: const Text('Filtrar'),
+            ),
           ),
         ],
       ),
@@ -534,18 +608,19 @@ class _CardSearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
       child: Material(
         color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
           child: Container(
-            padding: const EdgeInsets.all(10),
+            constraints: const BoxConstraints(minHeight: 62),
+            padding: const EdgeInsets.fromLTRB(8, 6, 6, 6),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               border: Border.all(
-                color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+                color: AppTheme.outlineMuted.withValues(alpha: 0.35),
               ),
             ),
             child: Row(
@@ -554,60 +629,119 @@ class _CardSearchResultTile extends StatelessWidget {
                   key: Key('card-search-image-${card.id}'),
                   onTap: onOpen,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                     child: CachedCardImage(
                       imageUrl: card.imageUrl,
-                      width: 44,
-                      height: 62,
+                      width: 38,
+                      height: 52,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 9),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         card.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
+                        style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w800,
+                          fontSize: 12,
                         ),
                       ),
-                      const SizedBox(height: 3),
-                      _CardSearchEditionSubtitle(
-                        card: card,
-                        showTypeLine: showTypeLine,
-                        warning: warning,
-                      ),
-                      if ((card.manaCost ?? '').trim().isNotEmpty) ...[
-                        const SizedBox(height: 5),
+                      const SizedBox(height: 1),
+                      if (showTypeLine && card.typeLine.trim().isNotEmpty)
                         Text(
-                          card.manaCost!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppTheme.mythicGold,
-                            fontWeight: FontWeight.w700,
+                          card.typeLine,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                            fontSize: 10,
+                            height: 1.1,
                           ),
                         ),
-                      ],
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 5,
+                        runSpacing: 3,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (card.setCode.trim().isNotEmpty)
+                            _SearchSetPill(
+                              label: cardEditionCodeLabel(
+                                setCode: card.setCode,
+                                collectorNumber: card.collectorNumber,
+                              ),
+                            ),
+                          if ((card.manaCost ?? '').trim().isNotEmpty)
+                            ManaCostRow(cost: card.manaCost),
+                          if ((warning ?? '').isNotEmpty)
+                            Text(
+                              warning!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppTheme.warning,
+                                fontSize: 10,
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  key: Key('card-search-add-${card.id}'),
-                  tooltip: canAdd ? 'Adicionar' : 'Indisponível',
-                  icon: Icon(
-                    Icons.add_circle_outline,
-                    color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
+                const SizedBox(width: 4),
+                SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: IconButton(
+                    key: Key('card-search-add-${card.id}'),
+                    tooltip: canAdd ? 'Adicionar' : 'Indisponível',
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.add_circle_outline,
+                      size: 20,
+                      color: canAdd ? AppTheme.brass400 : AppTheme.textHint,
+                    ),
+                    onPressed: onAdd,
                   ),
-                  onPressed: onAdd,
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchSetPill extends StatelessWidget {
+  const _SearchSetPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppTheme.frost400.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: AppTheme.frost400,
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
         ),
       ),
     );

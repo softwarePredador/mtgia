@@ -144,7 +144,7 @@ void main() {
 
       expect(find.text(card.name), findsOneWidget);
       expect(find.textContaining('C16 #28'), findsOneWidget);
-      expect(find.textContaining('Non-foil'), findsOneWidget);
+      expect(find.textContaining('Non-foil'), findsNothing);
       expect(find.byType(CardDetailScreen), findsNothing);
 
       await tester.tap(find.text(card.name));
