@@ -452,6 +452,27 @@
 - Evidencia visual:
   `docs/qa/manaloom_app_icon_contact_sheet_2026-05-15.png`.
 
+## 2026-05-21 — ManaLoom app icon nrelogo PASS
+
+### O Porquê
+- O icone oficial do app passou a ser o arquivo fornecido em `nrelogo.png`,
+  substituindo a marca anterior sem alterar nome exibido, bundle id ou contrato
+  app-facing.
+
+### O Como
+- O source foi preservado em
+  `docs/qa/manaloom_app_icon_source_2026-05-21.png`.
+- Android recebeu mipmaps legacy, round icon e adaptive foreground PNG
+  regenerados a partir do novo source.
+- iOS/macOS receberam AppIcon PNGs oficiais regenerados sem canal alpha.
+- Web recebeu favicon PNG/ICO e icons 192/512 comuns e maskable atualizados.
+
+### Resultado
+- Readiness do novo icone: **PASS** para dimensoes, transparencia e build
+  Android/iOS Simulator.
+- Evidencia visual:
+  `docs/qa/manaloom_app_icon_contact_sheet_2026-05-21.png`.
+
 ## 2026-05-15 — Internal user test non-scanner handoff PASS_WITH_RISKS
 
 ### O Porquê
