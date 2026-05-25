@@ -1,77 +1,66 @@
 # Hermes Analysis: Project Memory
 
-> Memoria operacional inicial para o agente residente do projeto ManaLoom.
+> Memoria operacional do agente residente para o projeto ManaLoom.
+> Versionada neste diretorio — atualizar sempre que houver mudanca estrutural.
 
-## Identidade do projeto
+## Identidade
 
-- Nome: ManaLoom
-- Repositorio: `softwarePredador/mtgia`
-- Produto: app e backend para Magic: The Gathering com foco em Commander
-- Stack principal: Flutter no `app/` e Dart Frog no `server/`
-- Estado inicial analisado pelo agente: branch `master`, commit `97195723`
+- Nome: **ManaLoom** (tambem referido como mtgia)
+- Repositorio: `softwarePredador/mtgia` (GitHub)
+- Produto: Plataforma Commander-first para Magic: The Gathering
+- Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
+- Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
+- Estado em 2026-05-25: **PASS_WITH_RISKS** para release interno non-scanner
 
-## Regra principal
+## Branch de analise
 
-`docs/CONTEXTO_PRODUTO_ATUAL.md` e a fonte de verdade operacional. Se houver conflito entre roadmaps antigos, relatorios historicos e esse arquivo, o contexto atual vence.
+A memoria versionada do agente vive em `codex/hermes-analysis-docs`.
+Nunca commitar diretamente na `master`. Fluxo:
 
-## Objetivo do produto
+1. `git fetch --all --prune`
+2. `git checkout codex/hermes-analysis-docs`
+3. `git pull --ff-only origin codex/hermes-analysis-docs`
+4. Editar `docs/hermes-analysis/*`
+5. `git add docs/hermes-analysis && git commit -m "Update Hermes project analysis docs"`
+6. `git push origin codex/hermes-analysis-docs`
 
-Construir um fluxo confiavel para criar/importar decks, validar regras e identidade, analisar plano e problemas, otimizar ou reconstruir com IA, aplicar mudancas com controle e validar o resultado final.
+## Fontes canonicas (ordem de precedencia)
 
-## Arquitetura resumida
+1. `docs/CONTEXTO_PRODUTO_ATUAL.md` — fonte de verdade operacional
+2. `server/manual-de-instrucao.md` — diario tecnico com ultimas decisoes
+3. `docs/README.md` — indice documental
+4. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` — contratos app/backend
+5. `app/doc/APP_AUDIT_2026-04-29.md` — status consolidado do app
+6. `app/doc/UI_TEST_SURFACE_MAP.md` — keys de teste para runtime
+7. `docs/hermes-analysis/*` — analise do agente (este diretorio)
+8. `git log --oneline --decorate -40` — estado atual dos commits
 
-```text
-app/ Flutter
-  - Provider para estado
-  - GoRouter para navegacao
-  - Firebase/Sentry/MLKit/camera como dependencias nativas
-  - core de decks em app/lib/features/decks
+## Regra de escopo
 
-server/ Dart Frog
-  - rotas REST por dominio
-  - PostgreSQL
-  - auth JWT/bcrypt
-  - Sentry
-  - integracoes de dados MTG e IA
-  - core de IA em server/routes/ai e server/lib/ai
-```
+- `CONTEXTO_PRODUTO_ATUAL.md` prevalece sobre roadmaps antigos e handoffs congelados antes de 2026-03-23.
+- Nenhuma melhoria visual ou operacional fora do core de decks deve furar a fila da Sprint 1/2.
+- Toda tela do fluxo core precisa preservar: `formato`, `deckId`, feedback de erro e estado de carregamento.
+- Toda melhoria de UX precisa de validacao tecnica repetivel.
 
-## Fontes canonicas para abrir qualquer analise
+## Estado do agente neste servidor
 
-1. `docs/CONTEXTO_PRODUTO_ATUAL.md`
-2. `docs/README.md`
-3. `server/manual-de-instrucao.md`
-4. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
-5. `app/doc/APP_AUDIT_2026-04-29.md`
-6. `app/doc/UI_TEST_SURFACE_MAP.md`
-7. `CHECKLIST_GO_LIVE_FINAL.md`
-8. `git log --oneline --decorate -80`
+Hermes consegue ler, auditar e analisar o repositorio. O container NAO possui Dart ou Flutter SDK — `dart test`, `flutter analyze` e `flutter test` nao podem ser executados aqui. Recomendacoes de codigo sem validacao local devem ser marcadas explicitamente.
 
-## Comandos de referencia
+## Politica de resposta
 
-```bash
-./scripts/quality_gate.sh quick
-./scripts/quality_gate.sh full
-./scripts/quality_gate.sh resolution
-
-cd server && dart test
-cd app && flutter analyze --no-fatal-infos
-cd app && flutter test
-```
-
-## Estado do agente no servidor
-
-O Hermes atualmente consegue clonar, ler, resumir e auditar o repositorio. O ambiente do container nao possui Dart/Flutter, portanto a validacao automatica completa depende de toolchain externa ou instalacao futura.
-
-## Politica de resposta do agente
-
-Quando o usuario perguntar sobre o projeto, o agente deve consultar esta memoria, checar `docs/CONTEXTO_PRODUTO_ATUAL.md` para prioridade/escopo, checar commits recentes para estado atual, separar fato observado de inferencia e apontar riscos por arquivo ou area afetada.
+Ao responder sobre o ManaLoom:
+1. Consultar esta memoria
+2. Checar `docs/CONTEXTO_PRODUTO_ATUAL.md` para prioridade/escopo
+3. Checar commits recentes para estado atual
+4. Separar fato observado de inferencia
+5. Se envolver contrato app/backend, consultar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+6. Se envolver UI runtime, consultar `app/doc/UI_TEST_SURFACE_MAP.md`
 
 ## Areas criticas
 
-- `app/lib/features/decks/**`
-- `server/routes/ai/**`
-- `server/lib/ai/**`
-- `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
-- `scripts/quality_gate.sh`
-- `CHECKLIST_GO_LIVE_FINAL.md`
+- `app/lib/features/decks/**` (core do produto)
+- `server/routes/ai/**` (IA: generate, optimize, rebuild)
+- `server/lib/ai/**` (logica de IA, ~30 arquivos)
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` (contratos)
+- `scripts/quality_gate.sh` (validacao automatizada)
+- `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)

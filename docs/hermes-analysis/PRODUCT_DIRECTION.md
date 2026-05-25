@@ -1,53 +1,79 @@
 # Hermes Analysis: Product Direction
 
-> Leitura operacional do objetivo do ManaLoom para orientar o agente residente.
+> Direcao de produto do ManaLoom. Atualizado em 2026-05-25.
 
-## Produto
+## O Produto
 
-ManaLoom e uma plataforma Commander-first para Magic: The Gathering. A promessa central e ajudar o usuario a criar, importar, analisar, otimizar, aplicar mudancas e validar decks com confiabilidade real.
+ManaLoom e uma plataforma **Commander-first** para Magic: The Gathering.
+A promessa central: criar, importar, analisar, otimizar e validar decks com confiabilidade real.
 
 ## Fluxo carro-chefe
 
-```text
-criar/importar -> analisar -> otimizar -> aplicar -> validar
+```
+criar/importar → analisar → otimizar → aplicar → validar
 ```
 
-Esse fluxo deve prevalecer sobre frentes adjacentes enquanto o produto estiver em endurecimento do core.
+O usuario deve conseguir sair do onboarding e chegar ao primeiro deck otimizado sem perder contexto.
 
-## Intencao de produto
+## Jornada completa
 
-O app quer ser mais que um deck builder cosmetico. A direcao indicada pela documentacao e construir confianca operacional:
+1. **Onboarding** — escolhe formato (Commander, Brawl, etc.)
+2. **Home** — ve seus decks, cria novo (IA por prompt) ou importa lista
+3. **Abrir deck** — 3 abas: Visao Geral, Cartas, Analise
+4. **Analisar** — IA analisa forcas/fraquezas + functional tags (ramp, draw, removal, wipes, protection)
+5. **Otimizar** — IA sugere swaps, preview, apply parcial ou total
+6. **Rebuild guiado** — se IA indica `needs_repair`, gera draft alternativo
+7. **Validar** — legalidade, identidade de cor, bracket, regras Commander
+8. **Compartilhar / Exportar** — para jogar ou trocar
 
-- importar listas sem quebrar;
-- entender comandante, identidade de cor e regras de Commander;
-- analisar plano, curva, sinergia e buracos do deck;
-- sugerir upgrades seguros;
-- aplicar mudancas com preview e controle;
-- validar o resultado final;
-- reduzir ruido visual e deixar o fluxo principal claro.
+## Funcionalidades complementares (bloqueadas ate core blindado)
 
-## Prioridade atual
+- **Community** — decks publicos, seguir usuarios
+- **Binder** — colecao pessoal com trade/sale
+- **Marketplace** — compra/venda entre usuarios
+- **Trades** — ofertas, status, chat, trust metrics
+- **Messages** — mensagens diretas
+- **Notifications** — badge, FCM real (Android PASS em 2026-05-11)
+- **Life Counter** — mesa Commander (2p-6p) com poison, commander tax, high roll, D20
+- **Scanner / OCR** — DEFERRED, fora do escopo atual
 
-Enquanto `docs/CONTEXTO_PRODUTO_ATUAL.md` nao mudar, a prioridade e blindar o core de decks.
+## Decisoes de produto recentes
 
-Ordem de atencao:
+| Decisao | Data | Status |
+|---------|------|--------|
+| Splash art oficial (slasharat) | 2026-05-21 | PASS |
+| App icon oficial (nrelogo) | 2026-05-21 | PASS |
+| UX/UI global premium non-scanner | 2026-05-21 | PASS_WITH_RISKS |
+| Semantic Layer v2 (build/optimize/generate) | 2026-05-18 | Shadow mode ativo |
+| Functional Card Tags mass audit | 2026-05-18 | 66.6% cobertura |
+| Deck Analysis consumindo functional_tags | 2026-05-18 | PASS |
+| Localized import names (38.594 aliases PT) | 2026-05-18 | PASS |
+| Internal release non-scanner QA | 2026-05-15 | PASS_WITH_RISKS |
+| Commander Reference 24+ profiles | 2026-05-14 | PASS_WITH_RISKS |
+| Realtime notifications + FCM Android | 2026-05-11 | PASS |
+| Sentry backend validado | 2026-03-24 | PASS |
+| Sentry mobile + x-request-id correlacao | 2026-03-24 | PENDENTE |
+| Sprint 1 (blindar core de decks) | 2026-03-23 | ~95% fechada |
 
-1. confiabilidade do fluxo de decks;
-2. contratos app/backend;
-3. observabilidade e request tracing;
-4. cobertura de testes do core;
-5. carga/thresholds basicos;
-6. frentes secundarias.
+## Norte de qualidade (para declarar release confiavel)
 
-## Frentes secundarias
+1. Usuario sai do onboarding e chega ao primeiro deck otimizado sem perda de contexto
+2. Backend responde com contratos previsiveis e suites verdes
+3. Telas do fluxo core tem estados claros de loading, erro, vazio e sucesso
+4. Resultados de IA sao explicaveis, aplicaveis e validaveis
+5. Qualquer regressao no core e detectada por teste ou checklist
 
-Social, binder, trade, scanner/OCR, community e cosmetica sem impacto no fluxo principal nao devem disputar prioridade com o core.
+## Horizonte estrategico
 
-## Perguntas que o agente deve responder sempre
+- **H1 (atual):** Confiabilidade do core — contracts estaveis, quality gates, corpus de referencia
+- **H2:** Clareza de produto — UX mais explicavel, feedback de IA, analise legivel
+- **H3:** Ecossistema — ligacao deck-colecao-trade, life counter forte, instrumentacao de uso
 
-- isso melhora o fluxo carro-chefe?
-- isso reduz risco ou aumenta escopo?
-- isso respeita a fonte de verdade atual?
-- isso precisa atualizar contrato ou documentacao?
-- existe teste/documento que protege esse comportamento?
-- qual e o proximo passo mais util para release?
+## Fila oficial de execucao
+
+1. Fechar residual de orquestracao em `deck_provider.dart`
+2. Validar ingestao real do Sentry mobile
+3. Correlacao x-request-id ponta a ponta
+4. Revisar CHECKLIST_GO_LIVE_FINAL.md com entregas reais
+5. Sobre depois: carga basica/thresholds do fluxo core
+6. So depois: frentes secundarias (community, binder, trades, scanner)
