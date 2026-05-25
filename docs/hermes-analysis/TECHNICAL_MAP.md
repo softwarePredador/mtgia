@@ -131,3 +131,32 @@ mtgia/
 - Sentry mobile: PENDENTE (SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1)
 - x-request-id: Backend gera e propaga, correlacao mobile pendente
 - Sentry DSN e config em server/.env.example e app/
+
+## Navegacao e Layout (auditado 2026-05-25)
+
+### GoRouter
+- ShellRoute com MainScaffold (5 tabs bottom nav) envolvendo 10+ rotas
+- Telas sem bottom nav: Splash, Login, Register, LifeCounter, Onboarding
+- `/messages/:id` e `/notifications` ficam dentro do shell (sem tab propria)
+
+### Bottom Navigation (5 tabs)
+| Indice | Rotulo | Rotas cobertas |
+|--------|--------|----------------|
+| 0 | Inicio | /home |
+| 1 | Decks | /decks, /decks/generate, /decks/import, /decks/:id + search/scan |
+| 2 | Colecao | /collection (4 tabs internas), /market, /trades |
+| 3 | Comunidade | /community, search-users, user/:userId |
+| 4 | Perfil | /profile |
+
+### TabBars aninhados
+- CollectionScreen: 4 tabs (Fichario, Market, Trades, Colecoes)
+- TradeInboxTabContent: 3 sub-tabs (Recebidas, Enviadas, Finalizadas)
+- BinderTabContent: 2 sub-tabs (Tenho, Quero)
+- CommunityScreen: 4 tabs (Explorar, Seguindo, Usuarios, Cotacoes) + sub-tabs
+- DeckDetailsScreen: 3 tabs (Visao Geral, Cartas, Analise)
+
+### Consistencia do tema
+- Zero `Color(0x...)` hardcoded nas telas do fluxo core (excecao: life_counter_screen com 12)
+- AppBar segue tema Onda 6 exceto community_screen (override w800 vs w700 do tema)
+- TabBars usam brass400 como indicador — deck_details_screen usa o tema direto; collection/binder/trade_inbox/community fazem override redundante com valores identicos ao tema
+- MainScaffold NavigationBar usa NavigationBarThemeData com indicatorColor brass500 alpha 0.15

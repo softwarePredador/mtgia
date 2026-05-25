@@ -24,9 +24,29 @@ Tentativas em macOS, Android emulator e iOS wireless falharam por toolchain, nao
 O smoke encerra classificavelmente, mas sem event_id confirmado.
 
 ### Cobertura de testes do app abaixo do ideal
-25 telas mapeadas no fluxo core. Poucas tem teste de widget/smoke dedicado.
-A maior protecao esta em widgets especificos e no backend.
+25 telas mapeadas no fluxo core. Auditoria de codigo confirmou:
+- `community_screen.dart` (1725 linhas, 40 classes) — sem teste de widget
+- `trade_detail_screen.dart` (1479 linhas) — sem teste de widget
+- `binder_screen.dart` (1628 linhas) — sem teste de widget
+- `marketplace_screen.dart` (851 linhas) — sem teste de widget
+- `binder_item_editor.dart` (1025 linhas) — sem teste de widget
+- `profile_screen.dart` (588 linhas) — refatorado, sem golden test
 Sem cobertura ampla, regressao visual ou logica pode passar despercebida.
+
+### Telas criticas do fluxo core ainda grandes
+Auditoria confirmou tamanhos reais no codigo:
+- `deck_details_screen.dart` (1705 linhas) — ainda concentra AppBar + 3 abas + acoes
+- `community_screen.dart` (1725 linhas, 40 classes) — 4 tabs + sub-tab aninhada
+- `trade_detail_screen.dart` (1479 linhas) — timeline, chat, status, itens, trust
+- `binder_screen.dart` (1628 linhas) — listas, editor, filtros
+- `deck_optimize_sheet_widgets.dart` (1215 linhas) — sheet de otimizacao
+- `deck_analysis_tab.dart` (1632 linhas) — functional tags + graficos
+
+### AppBar community_screen com fontWeight 800 foge do tema Onda 6
+`community_screen.dart` define `titleTextStyle` com `w800` manualmente, enquanto o AppBarTheme define `w700`. Diferenca visual intencional ou residuo de refatoracao.
+
+### life_counter_screen.dart com 12 cores hardcoded
+Auditoria confirmou: 12 `Color(0x...)` e 21 `Colors.` references que fogem do contrato de 24 tokens do AppTheme.
 
 ### x-request-id sem correlacao ponta a ponta
 Backend ja gera e propaga. Script de validacao existe (`validate_request_id_ready.sh`).
