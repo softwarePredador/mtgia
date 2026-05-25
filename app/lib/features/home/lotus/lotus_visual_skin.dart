@@ -638,6 +638,429 @@ ${LotusDomSelectors.optionCard} h3 {
   display: none !important;
 }
 
+.settings-overlay,
+.life-history-overlay,
+.card-search-overlay {
+  font-family: var(--manaloom-ui-font) !important;
+  color: var(--manaloom-shell-text) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(216, 154, 47, 0.12), transparent 32%),
+    radial-gradient(circle at 90% 12%, rgba(120, 168, 255, 0.08), transparent 30%),
+    linear-gradient(180deg, rgb(5, 10, 22), rgb(2, 6, 16)) !important;
+  text-transform: none !important;
+}
+
+.settings-overlay *,
+.life-history-overlay *,
+.card-search-overlay * {
+  font-family: var(--manaloom-ui-font) !important;
+  text-transform: none !important;
+}
+
+.settings-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 0 !important;
+  max-width: 100vw !important;
+  transform: none !important;
+  display: block !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 24px) 22px
+    calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
+  box-sizing: border-box !important;
+  overflow: auto !important;
+}
+
+.settings-overlay::before,
+.card-search-overlay::before {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  font-family: var(--manaloom-display-font) !important;
+  font-size: 30px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: rgb(247, 241, 226) !important;
+  text-align: left !important;
+}
+
+.settings-overlay::before {
+  content: "Configurações" !important;
+}
+
+.card-search-overlay::before {
+  content: "Buscar carta" !important;
+  position: absolute !important;
+  left: 22px !important;
+  top: calc(env(safe-area-inset-top, 0px) + 24px) !important;
+  z-index: 2 !important;
+}
+
+.settings-overlay .settings-headline,
+.settings-overlay h1,
+.settings-overlay h2,
+.settings-overlay h3,
+.life-history-overlay .game-name,
+.life-history-overlay .timeline-label,
+.life-history-overlay .meta-label,
+.card-search-overlay .results-wrapper .card-name {
+  font-family: var(--manaloom-display-font) !important;
+  color: rgb(247, 241, 226) !important;
+  letter-spacing: -0.01em !important;
+}
+
+.settings-overlay .settings-headline {
+  position: relative !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  font-size: 0 !important;
+}
+
+.settings-overlay .settings-headline::after {
+  content: "Preferências da mesa" !important;
+  display: block !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 15px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  color: var(--manaloom-shell-text-muted) !important;
+  text-align: left !important;
+}
+
+.settings-overlay .settings-overlay-list {
+  position: relative !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: calc(100vw - 44px) !important;
+  margin: 0 !important;
+  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 88px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.settings-overlay .settings-list-item {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background:
+    linear-gradient(180deg, rgba(13, 22, 42, 0.8), rgba(6, 11, 24, 0.72)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 26px rgba(1, 8, 22, 0.18) !important;
+}
+
+.settings-overlay .settings-label,
+.settings-overlay .in-list-label {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: var(--manaloom-display-font) !important;
+  font-size: 20px !important;
+  line-height: 1.05 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  text-align: left !important;
+  color: rgb(247, 241, 226) !important;
+}
+
+.settings-overlay .settings-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 46px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 11px 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  border-radius: 15px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background:
+    linear-gradient(180deg, rgba(15, 25, 47, 0.76), rgba(8, 13, 27, 0.72)) !important;
+  color: rgba(247, 241, 226, 0.94) !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 15px !important;
+  line-height: 1.15 !important;
+  font-weight: 750 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+.settings-overlay .settings-select.subentry {
+  width: calc(100% - 18px) !important;
+  margin-left: 18px !important;
+  opacity: 0.92 !important;
+}
+
+.settings-overlay .settings-select.subsubentry {
+  width: calc(100% - 36px) !important;
+  margin-left: 36px !important;
+  opacity: 0.86 !important;
+}
+
+.settings-overlay .settings-select > div {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.settings-overlay .settings-select span {
+  display: block !important;
+  max-width: 100% !important;
+  color: var(--manaloom-shell-text-muted) !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.settings-overlay .settings-select::before,
+.settings-overlay .settings-select::after {
+  flex: 0 0 auto !important;
+}
+
+.settings-overlay .close-settings-overlay-btn,
+.life-history-overlay .close-life-history-overlay-btn,
+.card-search-overlay .close-card-search-overlay {
+  position: absolute !important;
+  top: calc(env(safe-area-inset-top, 0px) + 18px) !important;
+  right: 18px !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 15px !important;
+  background:
+    linear-gradient(180deg, rgba(16, 24, 44, 0.96), rgba(7, 12, 25, 0.94)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 22px rgba(1, 8, 22, 0.24) !important;
+  color: rgba(247, 241, 226, 0.92) !important;
+}
+
+.settings-overlay .close-settings-overlay-btn::before,
+.settings-overlay .close-settings-overlay-btn::after,
+.life-history-overlay .close-life-history-overlay-btn::before,
+.life-history-overlay .close-life-history-overlay-btn::after,
+.card-search-overlay .close-card-search-overlay::before,
+.card-search-overlay .close-card-search-overlay::after {
+  background: rgba(247, 241, 226, 0.92) !important;
+}
+
+.settings-overlay input,
+.settings-overlay textarea,
+.settings-overlay select,
+.settings-overlay .input,
+.life-history-overlay input,
+.card-search-overlay input.search-input {
+  min-height: 44px !important;
+  box-sizing: border-box !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background:
+    linear-gradient(180deg, rgba(13, 22, 42, 0.92), rgba(6, 11, 24, 0.9)) !important;
+  color: rgba(247, 241, 226, 0.96) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.settings-overlay input::placeholder,
+.settings-overlay textarea::placeholder,
+.card-search-overlay input.search-input::placeholder {
+  color: rgba(207, 215, 233, 0.5) !important;
+}
+
+.settings-overlay .btn,
+.settings-overlay button,
+.settings-overlay .set-value-btn,
+.life-history-overlay .all-games-btn,
+.life-history-overlay .set-value-btn,
+.card-search-overlay label,
+.card-search-overlay .view-all-prints-btn {
+  min-height: 38px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--manaloom-shell-border-warm) !important;
+  background:
+    linear-gradient(180deg, rgba(216, 154, 47, 0.96), rgba(186, 126, 28, 0.96)) !important;
+  color: #170f04 !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 12px 22px rgba(216, 154, 47, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.settings-overlay .restart-btn {
+  background:
+    linear-gradient(180deg, rgba(161, 61, 74, 0.96), rgba(104, 28, 42, 0.96)) !important;
+  color: rgba(247, 241, 226, 0.96) !important;
+  box-shadow:
+    0 12px 22px rgba(104, 28, 42, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+.settings-overlay .restart-btn.inactive,
+.settings-overlay .btn.inactive {
+  background:
+    linear-gradient(180deg, rgba(18, 27, 47, 0.82), rgba(8, 13, 27, 0.82)) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(207, 215, 233, 0.5) !important;
+  box-shadow: none !important;
+}
+
+.settings-overlay .toggle,
+.settings-overlay .checkbox,
+.settings-overlay .radio,
+.settings-overlay [class*="toggle"],
+.settings-overlay [class*="checkbox"],
+.settings-overlay [class*="radio"] {
+  border-color: rgba(120, 168, 255, 0.4) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(7, 13, 26, 0.18) !important;
+}
+
+.settings-overlay .active,
+.settings-overlay .selected,
+.life-history-overlay .active,
+.card-search-overlay label.active {
+  color: rgb(247, 241, 226) !important;
+}
+
+.life-history-overlay {
+  overflow: auto !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
+}
+
+.life-history-overlay .life-history-header,
+.life-history-overlay .history-meta-header,
+.life-history-overlay .life-history-timeline,
+.life-history-overlay .life-history-row,
+.life-history-overlay .empty-timeline-overlay {
+  background:
+    linear-gradient(180deg, rgba(13, 22, 42, 0.78), rgba(6, 11, 24, 0.7)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 26px rgba(1, 8, 22, 0.2) !important;
+}
+
+.life-history-overlay .life-history-header,
+.life-history-overlay .history-meta-header {
+  border-radius: 22px !important;
+  margin: 10px 12px 14px !important;
+}
+
+.life-history-overlay .life-history-row,
+.life-history-overlay .empty-timeline-overlay {
+  border-radius: 16px !important;
+  margin-inline: 12px !important;
+}
+
+.life-history-overlay .life-history-cell,
+.life-history-overlay .meta-value,
+.life-history-overlay .player-name,
+.life-history-overlay .stat-value,
+.card-search-overlay .card-meta,
+.card-search-overlay .artist-label {
+  color: var(--manaloom-shell-text-muted) !important;
+}
+
+.life-history-overlay .change-cell.active.positive {
+  color: rgba(78, 214, 145, 0.96) !important;
+}
+
+.life-history-overlay .change-cell.active.negative {
+  color: rgba(255, 104, 130, 0.96) !important;
+}
+
+.card-search-overlay {
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 72px) 18px
+    calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+  box-sizing: border-box !important;
+}
+
+.card-search-overlay:after {
+  background:
+    linear-gradient(180deg, rgba(4, 8, 18, 0.96), rgba(2, 6, 16, 0.98)) !important;
+}
+
+.card-search-overlay .giphy-switch {
+  top: calc(env(safe-area-inset-top, 0px) + 20px) !important;
+  left: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(16, 24, 44, 0.96), rgba(7, 12, 25, 0.94)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(247, 241, 226, 0.9) !important;
+}
+
+.card-search-overlay .results-wrapper {
+  width: 100% !important;
+  height: auto !important;
+  max-height: calc(100vh - 210px) !important;
+  padding: 0 0 18px !important;
+  gap: 14px !important;
+  z-index: 2 !important;
+}
+
+.card-search-overlay .results-wrapper .card-image,
+.card-search-overlay.menu-card-search .card-image-wrapper {
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 14px 24px rgba(1, 8, 22, 0.32) !important;
+}
+
+.card-search-overlay input.search-input {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 0 18px !important;
+  font-size: 16px !important;
+  text-align: left !important;
+}
+
 .first-time-user-overlay {
   position: fixed !important;
   inset: 0 !important;

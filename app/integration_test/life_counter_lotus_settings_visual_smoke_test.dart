@@ -7,6 +7,23 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
+void _emitScreenshot(String name, List<int> pngBytes) {
+  final encoded = base64Encode(pngBytes);
+  const chunkSize = 12000;
+  // ignore: avoid_print
+  print('SCREENSHOT_BEGIN $name');
+  for (var offset = 0; offset < encoded.length; offset += chunkSize) {
+    final end =
+        (offset + chunkSize < encoded.length)
+            ? offset + chunkSize
+            : encoded.length;
+    // ignore: avoid_print
+    print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
+  }
+  // ignore: avoid_print
+  print('SCREENSHOT_END $name');
+}
+
 Future<void> _pumpUntilUiSnapshotAvailable(
   WidgetTester tester,
   LotusUiSnapshotStore uiSnapshotStore,
@@ -130,7 +147,7 @@ Future<void> _pumpUntilSettingsOpen(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('opens Lotus settings overlay from the radial menu', (
     tester,
@@ -168,5 +185,9 @@ void main() {
     );
     expect(settingsState['settings_overlay_open'], isTrue);
     expect(settingsState['native_settings_present'], isFalse);
+
+    await binding.convertFlutterSurfaceToImage();
+    final screenshot = await binding.takeScreenshot('lotus_settings_overlay');
+    _emitScreenshot('lotus_settings_overlay', screenshot);
   });
 }
