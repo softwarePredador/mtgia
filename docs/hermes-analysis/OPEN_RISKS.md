@@ -76,6 +76,18 @@ Recomendacao: separar o risco em duas trilhas:
 - Flutter nativo: extrair tokens locais/semanticos ou documentar excecao de cores
   de jogo.
 
+### Life Counter Lotus: 8 pendencias abertas da task de perfeicao
+Task formal `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` define 8 gaps.
+Auditoria confirmou que todos seguem abertos:
+1. Geometria fina 2p/3p/4p nao travada
+2. Centragem otica dos numerais por assento
+3. Hub central ainda polido demais
+4. DICE overlay precisa endurecer
+5. PLAYERS overlay precisa perder acabamento
+6. Commander damage overlay com linguagem residual
+7. Motion final (takeovers, SET LIFE, KO'D!)
+8. Side-by-side final com benchmark + freeze
+
 ### Arquivos criticos cresceram alem do ultimo mapa
 Validacao local em 2026-05-25 indicou tamanhos maiores que os registrados no
 mapa anterior:

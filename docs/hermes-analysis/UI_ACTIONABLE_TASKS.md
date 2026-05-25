@@ -3,6 +3,74 @@
 > Tasks validadas no codigo (origin/master) em 2026-05-25.
 > Nenhuma task foi criada por suposicao. Cada uma tem evidencia concreta.
 
+## Life Counter / Lotus — Pendencias Ativas
+
+Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codigo.
+
+### LC.1 — Geometria fina 2p/3p/4p nao travada
+- **Arquivo:** `app/lib/features/home/life_counter_screen.dart` / `lotus_visual_skin.dart`
+- **Evidencia:** Task doc seccao 1: "travar proporcoes finais de 2p, 3p e 4p", "revisar gutters, bordas, raios e massa dos quadrantes". Sem commit especifico de travamento de geometria desde a task (2026-03-26).
+- **Por que importa:** Base geometrica errada = todo refinamento visual fica em cima de proporcao errada. Afeta a primeira impressao da mesa.
+- **Ajuste recomendado:** Revisar largura/altura dos quadrantes em 3p. Verificar se compact ainda comprime mais que o benchmark. Revisar massa visual dos cantos arredondados. Verificar se o centro da mesa respira como no benchmark.
+- **Criterio de pronto:** Screenshot lado a lado passa como mesma familia visual. Nenhum quadrante parece "card". A mesa pode ser lida como poster antes de qualquer detalhe.
+- **Teste:** Prova visual com screenshot + comparacao com benchmark.
+
+### LC.2 — Centragem otica dos numerais por assento
+- **Arquivo:** `app/lib/features/home/life_counter_screen.dart`
+- **Evidencia:** Task doc seccao 2: "sair de matematicamente centralizado para oticamente correto". Validar quarterTurns atuais por assento. Revisar massa visual de numeros como 7, 10, 23, 41.
+- **Por que importa:** Numeros podem parecer centrados no codigo mas tortos a olho. Impacta leitura em todos os assentos.
+- **Ajuste recomendado:** Aplicar vieses pequenos por assento e por estado (normal, SET LIFE, takeover, special). Validar em 2p/3p/4p/5p/6p.
+- **Criterio de pronto:** Numeros parecem centrados, nao apenas calculados. Nenhuma orientacao parece torta. Leitura obvia em todos os assentos.
+- **Teste:** Prova visual em device/simulador.
+
+### LC.3 — Hub central ainda polido demais
+- **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart`
+- **Evidencia:** Task doc seccao 3: "reduzir o que ainda parece premium product UI". Revisar escala do hexagono central vs petalas. Revisar espessura do contorno e glow. Revisar peso do bloco de ultimo evento.
+- **Por que importa:** O hub deve parecer ferramenta de mesa, nao menu bonito. Contrasta com a tese de mesa brutal/fisica.
+- **Ajuste recomendado:** Reduzir brilho premium do centro. Aproximar anatomia do benchmark. Legenda de ultimo evento mais seca.
+- **Criterio de pronto:** Hub parece ferramenta de mesa. Leitura de PLAYERS, SETTINGS, HIGH ROLL, RESTART e HELP e imediata. Centro nao compete com quadrantes.
+- **Teste:** Prova visual + comparacao com benchmark.
+
+### LC.4 — DICE overlay precisa endurecer
+- **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart`
+- **Evidencia:** Task doc seccao 4: "endurecer mais DICE". O CSS do DICE nao foi priorizado nos commits recentes (ca0c8d52 focou Settings/History/Card Search). HIGH ROLL deve ser acao primaria dominante do overlay.
+- **Por que importa:** Overlay de dado ainda pode parecer "utilitario de app" em vez de ferramenta de mesa.
+- **Ajuste recomendado:** HIGH ROLL como acao primaria dominante. D20/COIN/ROLL 1ST como utilitarios secos. Ultimo evento como texto cru.
+- **Criterio de pronto:** DICE overlay parece da mesma familia do benchmark. Nenhum elemento parece "card ornamental".
+- **Teste:** Prova visual.
+
+### LC.5 — PLAYERS overlay precisa perder acabamento
+- **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart`
+- **Evidencia:** Task doc seccao 4: "PLAYERS ainda precisa perder acabamento". Deve parecer ferramenta de mesa, nao modal de app.
+- **Por que importa:** Overlay de configuracao de jogadores nao deve quebrar a ilusao de mesa fisica.
+- **Ajuste recomendado:** Deixar overlay mais seco, menos polido. Remover linguagem residual de "sheet generica".
+- **Criterio de pronto:** Overlay parece camada da mesa, nao modal generico.
+- **Teste:** Prova visual.
+
+### LC.6 — Commander damage overlay com linguagem residual de adaptacao
+- **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart` / `life_counter_native_commander_damage_sheet.dart`
+- **Evidencia:** Task doc seccao 7: "reduzir linguagem residual de feature adaptada". Overlay rapido de commander damage existe mas pode ter cheiro de "counter row" ornamental.
+- **Por que importa:** Contadores MTG precisam soar nativos da shell clone, nao como "adaptacao em cima".
+- **Ajuste recomendado:** Revisar como poison e tax aparecem no painel sem sujar o clone. Overlay rapido de commander damage com linhas por fonte mais cruas.
+- **Criterio de pronto:** Contadores extras convivem com a mesa clone sem quebrar o benchmark. Rapidos. Nao reintroduzem UI de card/painel auxiliar.
+- **Teste:** Prova visual + fluxo funcional.
+
+### LC.7 — Motion final: takeover, SET LIFE, KO'D!
+- **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart` / `life_counter_screen.dart`
+- **Evidencia:** Task doc seccao 8: Motion compartilhado (fade + scale + slide) existe nos overlays (Wave 9). Mas duracoes/easing do takeover de High Roll, transicao de SET LIFE e presenca de KO'D! ainda precisam ser revisados contra o benchmark.
+- **Por que importa:** Sem motion final, a tela pode estar viva mas nao no nivel de impacto do benchmark.
+- **Ajuste recomendado:** Revisar duracao/easing do takeover de High Roll. Revisar entrada/saida dos overlays. Revisar transicao de SET LIFE. Revisar presenca de KO'D! e lethal states.
+- **Criterio de pronto:** Motion melhora leitura. Visivel em gravacao curta. Nao parece ornamental.
+- **Teste:** Prova visual gravada + comparacao com benchmark.
+
+### LC.8 — Side-by-side final com benchmark + freeze
+- **Arquivo:** `app/doc/runtime_flow_handoffs/` / novo documento
+- **Evidencia:** Task doc seccao Fase E: "side-by-side final com benchmark". A pasta `dddddd/` contem 10 capturas do benchmark. Nao ha documento de comparacao visual publicado desde 2026-03-26.
+- **Por que importa:** Sem comparacao direta, nao e possivel provar que o clone esta no nivel aceitavel.
+- **Ajuste recomendado:** Gerar screenshots do estado atual, comparar com as 10 capturas do benchmark em `dddddd/`. Documentar discrepancias. Congelar aceite.
+- **Criterio de pronto:** Documento de side-by-side publicado. Todos os 8 gaps acima fechados ou aceitos como "risco aceito". Life counter marcado como DONE.
+- **Teste:** Screenshots + documento comparativo.
+
 ## P1 — Precisa antes de release/core polish
 
 ### P1.1 deck_details_screen.dart ainda grande demais
