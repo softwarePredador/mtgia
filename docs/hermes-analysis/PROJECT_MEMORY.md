@@ -64,3 +64,13 @@ Ao responder sobre o ManaLoom:
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` (contratos)
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
+
+## Conta QA para validacao
+
+- Email: `rafa@rafarafa.com`
+- Senha: `12341234`
+- Username: `dsadasdsa`
+- User ID: `840e108c-b2fc-4d10-b13e-83f52184f3d4`
+- Plano: Free (120 requests IA/mes)
+- Decks: `teste` (0 cartas), `lorehold` (2 cartas)
+- Obs: JWT expira rapido (~30s) — fazer login fresco antes de usar
