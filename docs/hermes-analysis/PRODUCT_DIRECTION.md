@@ -41,6 +41,8 @@ O usuario deve conseguir sair do onboarding e chegar ao primeiro deck otimizado 
 
 | Decisao | Data | Status |
 |---------|------|--------|
+| Premium Visual System (tema global, golden tests, agente UX) | 2026-05-25 | **PASS** — 63 arquivos, commit massivo |
+| Lotus life counter skin premium por jogador | 2026-05-25 | PASS |
 | Splash art oficial (slasharat) | 2026-05-21 | PASS |
 | App icon oficial (nrelogo) | 2026-05-21 | PASS |
 | UX/UI global premium non-scanner | 2026-05-21 | PASS_WITH_RISKS |

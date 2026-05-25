@@ -54,6 +54,17 @@ Implementado como branch magico em `server/routes/community/decks/[id].dart`
 (trata `id == 'following'` como feed de seguidores).
 Risco de manutencao: recomendacao documentada e criar rota dedicada.
 
+### Golden tests requerem baseline versionada
+O novo golden test do hero da home (`home_hero_sma135m.png`) adiciona risco de falha
+em CI se o viewport, DPR ou fontes mudarem. A baseline precisa ser atualizada
+manualmente com `--update-goldens` e revisao visual do PNG gerado.
+
+### Premium Visual System pode mascarar bugs funcionais
+Os commits recentes (3eebd0f6, 63 arquivos) focam quase exclusivamente em
+refinamento visual. O risco e que problemas funcionais no core de decks passem
+despercebidos enquanto o time foca em aparencia premium. Monitorar se `flutter analyze`
+e `flutter test` continuam verdes apos mudancas visuais.
+
 ### Payloads grandes podem afetar performance mobile
 Deck details, optimize response e public deck detail incluem 100 cartas + analise.
 Performance em device de baixo custo (SM A135M) precisa ser monitorada.
