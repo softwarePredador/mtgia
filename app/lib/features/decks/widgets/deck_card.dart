@@ -505,7 +505,7 @@ class _FallbackPip extends StatelessWidget {
       child: Text(
         letter,
         style: TextStyle(
-          fontSize: 9,
+          fontSize: AppTheme.fontTiny,
           fontWeight: FontWeight.bold,
           color: AppTheme.manaPipForeground(letter),
         ),

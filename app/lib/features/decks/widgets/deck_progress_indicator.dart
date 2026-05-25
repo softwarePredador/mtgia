@@ -203,7 +203,7 @@ class DeckProgressIndicator extends StatelessWidget {
                     child: const Text(
                       'Pronto',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppTheme.textPrimary,
                         fontSize: AppTheme.fontSm,
                         fontWeight: FontWeight.bold,
                       ),

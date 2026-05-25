@@ -158,7 +158,10 @@ class FallbackManaSymbol extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         symbol,
-        style: const TextStyle(fontSize: 8, color: AppTheme.backgroundAbyss),
+        style: const TextStyle(
+          fontSize: AppTheme.fontMicro,
+          color: AppTheme.backgroundAbyss,
+        ),
       ),
     );
   }
@@ -265,7 +268,7 @@ class FallbackColorPip extends StatelessWidget {
       child: Text(
         letter,
         style: TextStyle(
-          fontSize: 10,
+          fontSize: AppTheme.fontXs,
           fontWeight: FontWeight.bold,
           color: AppTheme.manaPipForeground(letter),
         ),

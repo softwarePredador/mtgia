@@ -362,7 +362,10 @@ void main() {
       await _seedFourPlayerSession();
 
       await tester.pumpWidget(
-        const MaterialApp(home: LotusLifeCounterScreen()),
+        const MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: LotusLifeCounterScreen(),
+        ),
       );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
@@ -449,7 +452,10 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 2));
       await tester.pumpWidget(
-        const MaterialApp(home: LotusLifeCounterScreen()),
+        const MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: LotusLifeCounterScreen(),
+        ),
       );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));

@@ -52,34 +52,24 @@ class _BinderTabContentState extends State<BinderTabContent>
       children: [
         // Sub-tabs: Tenho / Quero
         Container(
-          color: AppTheme.surfaceElevated,
+          color: AppTheme.backgroundAbyss,
           child: TabBar(
             controller: _subTabController,
-            dividerColor: Colors.transparent,
-            indicatorColor:
-                _subTabController.index == 0
-                    ? AppTheme.frost400
-                    : AppTheme.brass400,
-            labelColor:
-                _subTabController.index == 0
-                    ? AppTheme.frost400
-                    : AppTheme.brass400,
+            dividerColor: AppTheme.transparent,
+            indicatorColor: AppTheme.brass400,
+            labelColor: AppTheme.brass400,
             unselectedLabelColor: AppTheme.textSecondary,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: AppTheme.fontMd,
+              fontSize: AppTheme.fontSm,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: AppTheme.fontSm,
             ),
             tabs: const [
-              Tab(
-                icon: Icon(Icons.inventory_2, size: 18),
-                text: 'Tenho',
-                height: 52,
-              ),
-              Tab(
-                icon: Icon(Icons.favorite_border, size: 18),
-                text: 'Quero',
-                height: 52,
-              ),
+              Tab(text: 'Tenho', height: 34),
+              Tab(text: 'Quero', height: 34),
             ],
           ),
         ),
@@ -338,7 +328,14 @@ class _BinderListViewState extends State<_BinderListView>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final showStats = stats != null && constraints.maxHeight > 300;
+        final hasStatsData =
+            stats != null &&
+            (stats.totalItems > 0 ||
+                stats.uniqueCards > 0 ||
+                stats.wishlistCount > 0 ||
+                stats.forTradeCount > 0 ||
+                stats.forSaleCount > 0);
+        final showStats = hasStatsData && constraints.maxHeight > 300;
 
         return Column(
           children: [
@@ -448,7 +445,7 @@ class _BinderListViewState extends State<_BinderListView>
           ),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 420),
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppTheme.surfaceElevated,
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -458,19 +455,19 @@ class _BinderListViewState extends State<_BinderListView>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: accent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                   ),
                   child: Icon(
                     isHave ? Icons.inventory_2_rounded : Icons.favorite_border,
-                    size: 28,
+                    size: 24,
                     color: accent,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Text(
                   isHave
                       ? 'Nenhuma carta em "Tenho"'
@@ -479,9 +476,10 @@ class _BinderListViewState extends State<_BinderListView>
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w700,
+                    fontSize: AppTheme.fontMd,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   isHave
                       ? 'Adicione cartas que você possui para acompanhar valor, condição e disponibilidade.'
@@ -489,10 +487,11 @@ class _BinderListViewState extends State<_BinderListView>
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppTheme.textSecondary,
-                    height: 1.4,
+                    fontSize: AppTheme.fontSm,
+                    height: 1.28,
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
                 Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 12,
@@ -512,7 +511,8 @@ class _BinderListViewState extends State<_BinderListView>
                       icon: const Icon(Icons.camera_alt),
                       label: const Text('Escanear'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.frost400,
+                        foregroundColor: AppTheme.brass400,
+                        side: const BorderSide(color: AppTheme.outlineMuted),
                       ),
                     ),
                   ],
@@ -1212,19 +1212,30 @@ class _SearchFilterBar extends StatelessWidget {
                   label: Text(sortOrder == 'asc' ? 'A-Z' : 'Z-A'),
                   selected: sortOrder == 'desc',
                   onSelected: (_) => onSortOrderToggle(),
-                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
                   backgroundColor: AppTheme.surfaceSlate,
-                  labelStyle: const TextStyle(
-                    color: AppTheme.textSecondary,
+                  labelStyle: TextStyle(
+                    color:
+                        sortOrder == 'desc'
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
-                  side: const BorderSide(color: AppTheme.outlineMuted),
+                  side: BorderSide(
+                    color:
+                        sortOrder == 'desc'
+                            ? AppTheme.brass400
+                            : AppTheme.outlineMuted,
+                  ),
                   avatar: Icon(
                     sortOrder == 'asc'
                         ? Icons.arrow_upward
                         : Icons.arrow_downward,
                     size: 14,
-                    color: AppTheme.textSecondary,
+                    color:
+                        sortOrder == 'desc'
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1265,19 +1276,19 @@ class _SearchFilterBar extends StatelessWidget {
                   onSelected: (_) {
                     onFoilChanged(foilFilter == false ? null : false);
                   },
-                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
                         foilFilter == false
-                            ? AppTheme.frost400
+                            ? AppTheme.brass400
                             : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
                         foilFilter == false
-                            ? AppTheme.frost400
+                            ? AppTheme.brass400
                             : AppTheme.outlineMuted,
                   ),
                 ),
@@ -1286,19 +1297,19 @@ class _SearchFilterBar extends StatelessWidget {
                   label: const Text('Troca'),
                   selected: tradeFilter == true,
                   onSelected: (_) => onTradeToggle(),
-                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
                         tradeFilter == true
-                            ? AppTheme.frost400
+                            ? AppTheme.brass400
                             : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
                         tradeFilter == true
-                            ? AppTheme.frost400
+                            ? AppTheme.brass400
                             : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
@@ -1306,7 +1317,7 @@ class _SearchFilterBar extends StatelessWidget {
                     size: 14,
                     color:
                         tradeFilter == true
-                            ? AppTheme.frost400
+                            ? AppTheme.brass400
                             : AppTheme.textSecondary,
                   ),
                 ),
@@ -1390,7 +1401,7 @@ class _SetCodeFilterField extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-            borderSide: const BorderSide(color: AppTheme.frost400),
+            borderSide: const BorderSide(color: AppTheme.brass400),
           ),
         ),
       ),

@@ -22,9 +22,9 @@ class ShellAppBarActions extends StatelessWidget {
                 isLabelVisible: unreadCount > 0,
                 label: Text(
                   unreadCount > 99 ? '99+' : '$unreadCount',
-                  style: const TextStyle(fontSize: 9),
+                  style: const TextStyle(fontSize: AppTheme.fontTiny),
                 ),
-                backgroundColor: AppTheme.primarySoft,
+                backgroundColor: AppTheme.brass400,
                 child: const Icon(
                   Icons.chat_bubble_outline,
                   color: AppTheme.textSecondary,
@@ -46,9 +46,9 @@ class ShellAppBarActions extends StatelessWidget {
                 isLabelVisible: unreadCount > 0,
                 label: Text(
                   unreadCount > 99 ? '99+' : '$unreadCount',
-                  style: const TextStyle(fontSize: 9),
+                  style: const TextStyle(fontSize: AppTheme.fontTiny),
                 ),
-                backgroundColor: AppTheme.error,
+                backgroundColor: AppTheme.brass400,
                 child: const Icon(
                   Icons.notifications_outlined,
                   color: AppTheme.textSecondary,

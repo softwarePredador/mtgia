@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
@@ -49,7 +50,20 @@ Widget _buildSubject() {
   );
 }
 
+Future<void> _loadGoldenFonts() async {
+  await Future.wait([
+    (FontLoader(AppTheme.uiFontFamily)
+      ..addFont(rootBundle.load('assets/lotus/fonts/Manrope.ttf'))).load(),
+    (FontLoader(AppTheme.displayFontFamily)
+      ..addFont(rootBundle.load('assets/lotus/fonts/Fraunces.ttf'))).load(),
+    (FontLoader('MaterialIcons')
+      ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load(),
+  ]);
+}
+
 void main() {
+  setUpAll(_loadGoldenFonts);
+
   testWidgets('shows premium home dashboard and empty deck state', (
     tester,
   ) async {
@@ -60,7 +74,12 @@ void main() {
     expect(find.text('Olá,\nPlaneswalker'), findsOneWidget);
     expect(find.text('Acesso rápido'), findsOneWidget);
     expect(find.text('Jogar agora'), findsWidgets);
+    expect(find.text('Abrir contador de vida'), findsOneWidget);
     expect(find.text('Construir deck'), findsOneWidget);
+    expect(find.text('Criar, importar ou ajustar'), findsOneWidget);
+    expect(find.text('Ver e gerenciar seus decks'), findsOneWidget);
+    expect(find.text('Suas cartas e coleções'), findsOneWidget);
+    expect(find.text('Marketplace e propostas'), findsOneWidget);
 
     expect(find.text('Decks recentes'), findsOneWidget);
     expect(find.text('Você ainda não tem decks'), findsOneWidget);
@@ -94,5 +113,24 @@ void main() {
     expect(find.text('Coleção'), findsOneWidget);
     expect(find.text('Trocas'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('matches the SM A135M hero visual baseline', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_buildSubject());
+    await precacheImage(
+      const AssetImage('assets/branding/home_hero_banner.png'),
+      tester.element(find.byType(HomeScreen)),
+    );
+    await tester.pumpAndSettle();
+
+    await expectLater(
+      find.byKey(const Key('home-hero-frame')),
+      matchesGoldenFile('goldens/home_hero_sma135m.png'),
+    );
   });
 }

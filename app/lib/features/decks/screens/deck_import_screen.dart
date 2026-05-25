@@ -713,7 +713,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 onPressed: _isImporting ? null : _importDeck,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppTheme.backgroundAbyss,
                 ),
                 child:
                     _isImporting
@@ -725,7 +725,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppTheme.backgroundAbyss,
                               ),
                             ),
                             const SizedBox(width: 12),

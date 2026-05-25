@@ -144,6 +144,23 @@ Nota operacional de 2026-04-29:
 - Diffs acima desses limites continuam falhando e gerando artefatos em `test/features/home/failures`.
 - Use `--update-goldens` somente depois de revisar visualmente os PNGs afetados e confirmar mudanca legitima de baseline.
 
+### Prova visual do hero da Home
+
+```bash
+flutter test test/features/home/home_screen_test.dart --no-version-check
+```
+
+O teste `matches the SM A135M hero visual baseline` compara o frame vivo do hero
+com `test/features/home/goldens/home_hero_sma135m.png` em viewport de telefone.
+Ele complementa o runtime no simulador: smoke/runtime provam o fluxo; o golden
+falha se arte, background, tipografia ou espacamento do hero mudarem sem revisao.
+
+Atualize a baseline somente depois de comparar o PNG gerado com a referencia:
+
+```bash
+flutter test test/features/home/home_screen_test.dart --update-goldens --no-version-check
+```
+
 ## Life counter vivo
 
 O caminho oficial do contador hoje nao e mais `LifeCounterScreen`.

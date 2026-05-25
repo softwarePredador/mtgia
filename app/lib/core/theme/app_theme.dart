@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 ///   Qualquer cor fora deste arquivo é violação.
 ///
 /// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
-/// FONT SCALE:   fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
+/// FONT SCALE:   fontMicro(8) / fontTiny(9) / fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
   static const String uiFontFamily = 'Manrope';
   static const String displayFontFamily = 'Fraunces';
@@ -48,7 +48,9 @@ class AppTheme {
   // Text
   static const Color textPrimary = Color(0xFFF3EFE3); // ivory-100
   static const Color textSecondary = Color(0xFFB8C0CC); // mist-300
-  static const Color textHint = Color(0xFF8A93A3); // mist-500 (hints/placeholders)
+  static const Color textHint = Color(
+    0xFF8A93A3,
+  ); // mist-500 (hints/placeholders)
   static const Color outlineMuted = Color(0xFF2B3142); // slate-700
 
   // ── Deprecated aliases (backward compat) ────────────────────
@@ -105,7 +107,9 @@ class AppTheme {
   static const double radiusLg = 16; // large containers, scanner
   static const double radiusXl = 20; // pills, bottom sheets
 
-  // ── Font Size Scale (7 tokens) ────────────────────────────
+  // ── Font Size Scale (9 tokens) ────────────────────────────
+  static const double fontMicro = 8; // dense metadata, compact helper text
+  static const double fontTiny = 9; // compact deck/card metadata
   static const double fontXs = 10; // badges, chips, mini-labels
   static const double fontSm = 12; // captions, labels, metadata
   static const double fontMd = 14; // body text, list items
@@ -272,14 +276,22 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: backgroundAbyss,
     textTheme: _buildTextTheme(),
-    appBarTheme: AppBarTheme(
-      backgroundColor: surfaceSlate,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: backgroundAbyss,
       foregroundColor: textPrimary,
       elevation: 0,
       centerTitle: true,
       shadowColor: transparent,
       surfaceTintColor: transparent,
-      shape: const Border(bottom: BorderSide(color: outlineMuted, width: 0.5)),
+      iconTheme: IconThemeData(color: textSecondary, size: 22),
+      actionsIconTheme: IconThemeData(color: textSecondary, size: 22),
+      titleTextStyle: TextStyle(
+        color: textPrimary,
+        fontFamily: displayFontFamily,
+        fontSize: fontLg + 1,
+        fontWeight: FontWeight.w700,
+      ),
+      shape: Border(bottom: BorderSide(color: outlineMuted, width: 0.5)),
     ),
     cardTheme: CardThemeData(
       color: surfaceSlate,
@@ -302,14 +314,50 @@ class AppTheme {
         shadowColor: transparent,
       ),
     ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: brass500,
+        foregroundColor: backgroundAbyss,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+        ),
+      ),
+    ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: frost400,
+        foregroundColor: brass400,
         side: const BorderSide(color: outlineMuted, width: 1),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: brass400,
+        textStyle: const TextStyle(
+          fontSize: fontMd,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: textSecondary,
+        disabledForegroundColor: textHint,
+      ),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: brass500,
+      foregroundColor: backgroundAbyss,
+      elevation: 0,
+      focusElevation: 0,
+      hoverElevation: 0,
+      highlightElevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radiusMd)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -325,7 +373,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        borderSide: const BorderSide(color: frost400, width: 1.5),
+        borderSide: const BorderSide(color: brass400, width: 1.5),
       ),
     ),
     dialogTheme: DialogThemeData(
@@ -366,6 +414,21 @@ class AppTheme {
       thickness: 0.5,
       space: 1,
     ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: surfaceSlate,
+      selectedItemColor: brass500,
+      unselectedItemColor: textSecondary,
+      selectedLabelStyle: TextStyle(
+        fontSize: fontXs,
+        fontWeight: FontWeight.w700,
+      ),
+      unselectedLabelStyle: TextStyle(
+        fontSize: fontXs,
+        fontWeight: FontWeight.w500,
+      ),
+      elevation: 0,
+      type: BottomNavigationBarType.fixed,
+    ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: surfaceSlate,
       indicatorColor: brass500.withValues(alpha: 0.15),
@@ -389,13 +452,157 @@ class AppTheme {
         return const IconThemeData(color: textSecondary, size: 22);
       }),
     ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: surfaceElevated,
+      surfaceTintColor: transparent,
+      elevation: 0,
+      textStyle: const TextStyle(color: textPrimary, fontSize: fontMd),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusMd),
+        side: const BorderSide(color: outlineMuted, width: 0.5),
+      ),
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      textStyle: const TextStyle(color: textPrimary, fontSize: fontMd),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceSlate,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: outlineMuted, width: 0.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: outlineMuted, width: 0.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: brass400, width: 1.2),
+        ),
+      ),
+      menuStyle: MenuStyle(
+        backgroundColor: const WidgetStatePropertyAll(surfaceElevated),
+        surfaceTintColor: const WidgetStatePropertyAll(transparent),
+        elevation: const WidgetStatePropertyAll(0),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMd),
+            side: const BorderSide(color: outlineMuted, width: 0.5),
+          ),
+        ),
+      ),
+    ),
+    menuTheme: MenuThemeData(
+      style: MenuStyle(
+        backgroundColor: const WidgetStatePropertyAll(surfaceElevated),
+        surfaceTintColor: const WidgetStatePropertyAll(transparent),
+        elevation: const WidgetStatePropertyAll(0),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMd),
+            side: const BorderSide(color: outlineMuted, width: 0.5),
+          ),
+        ),
+      ),
+    ),
+    listTileTheme: const ListTileThemeData(
+      iconColor: textSecondary,
+      textColor: textPrimary,
+      selectedColor: brass400,
+      selectedTileColor: surfaceSlate,
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      titleTextStyle: TextStyle(
+        color: textPrimary,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+      ),
+      subtitleTextStyle: TextStyle(color: textSecondary, fontSize: fontSm),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return brass400;
+        if (states.contains(WidgetState.disabled)) return textHint;
+        return textSecondary;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return brass500.withValues(alpha: 0.26);
+        }
+        return outlineMuted;
+      }),
+      trackOutlineColor: const WidgetStatePropertyAll(outlineMuted),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      checkColor: const WidgetStatePropertyAll(backgroundAbyss),
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return brass500;
+        return transparent;
+      }),
+      side: const BorderSide(color: outlineMuted, width: 1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusXs),
+      ),
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return brass400;
+        return textHint;
+      }),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return brass400.withValues(alpha: 0.16);
+          }
+          return transparent;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return brass400;
+          return textSecondary;
+        }),
+        side: const WidgetStatePropertyAll(
+          BorderSide(color: outlineMuted, width: 0.5),
+        ),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(fontSize: fontSm, fontWeight: FontWeight.w700),
+        ),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusSm)),
+        ),
+      ),
+    ),
     chipTheme: ChipThemeData(
       backgroundColor: surfaceSlate,
-      selectedColor: frost400.withValues(alpha: 0.18),
+      selectedColor: brass400.withValues(alpha: 0.16),
       labelStyle: const TextStyle(fontSize: fontSm, color: textPrimary),
       side: const BorderSide(color: outlineMuted, width: 0.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusXs),
+      ),
+    ),
+    tooltipTheme: TooltipThemeData(
+      decoration: BoxDecoration(
+        color: surfaceElevated,
+        borderRadius: BorderRadius.circular(radiusSm),
+        border: Border.all(color: outlineMuted, width: 0.5),
+      ),
+      textStyle: const TextStyle(color: textPrimary, fontSize: fontSm),
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: brass400,
+      selectionColor: brass400.withValues(alpha: 0.28),
+      selectionHandleColor: brass400,
+    ),
+    tabBarTheme: const TabBarThemeData(
+      dividerColor: transparent,
+      indicatorColor: brass400,
+      labelColor: brass400,
+      unselectedLabelColor: textSecondary,
+      labelStyle: TextStyle(fontSize: fontMd, fontWeight: FontWeight.w700),
+      unselectedLabelStyle: TextStyle(
+        fontSize: fontMd,
+        fontWeight: FontWeight.w600,
       ),
     ),
   );

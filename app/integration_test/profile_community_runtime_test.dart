@@ -23,6 +23,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'runtime_test_helpers.dart';
+import 'visual_capture_helpers.dart';
 
 class _RuntimeUser {
   const _RuntimeUser({
@@ -211,6 +212,7 @@ void main() {
       await tester.pump();
       await pumpUntilFound(tester, find.text('Perfil'));
       await pumpUntilFound(tester, find.text(viewer.username));
+      await captureVisualProof(binding, tester, 'profile_community_01_profile');
 
       final editedDisplayName = 'Runtime Profile $marker';
       final editedCity = 'Sao Paulo';
@@ -267,6 +269,11 @@ void main() {
       await pumpUntilFound(tester, find.text('Seguidores'));
       await pumpUntilFound(tester, find.text('Seguindo'));
       await pumpUntilFound(tester, find.text(deckName));
+      await captureVisualProof(
+        binding,
+        tester,
+        'profile_community_02_user_profile',
+      );
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Seguir'));
       await tester.pump();
@@ -316,6 +323,11 @@ void main() {
                 .isNotEmpty,
         description: 'user search result for ${creator.username}',
       );
+      await captureVisualProof(
+        binding,
+        tester,
+        'profile_community_03_user_search',
+      );
       await tester.tap(find.byKey(Key('user-search-row-${creator.id}')));
       await tester.pump();
       await pumpUntilFound(tester, find.textContaining('Decks'));
@@ -344,6 +356,11 @@ void main() {
         tester,
         find.byKey(Key('community-explore-deck-row-$deckId')),
       );
+      await captureVisualProof(
+        binding,
+        tester,
+        'profile_community_04_community_explore',
+      );
       await tester.tap(find.byKey(Key('community-explore-deck-row-$deckId')));
       await tester.pump();
       await pumpUntil(
@@ -365,6 +382,11 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       expect(find.textContaining('Sol Ring'), findsWidgets);
+      await captureVisualProof(
+        binding,
+        tester,
+        'profile_community_05_community_deck_detail',
+      );
       await tester.pageBack();
       await tester.pump();
       await pumpUntilFound(tester, find.text('Comunidade'));
@@ -372,6 +394,11 @@ void main() {
       await tester.tap(find.widgetWithText(Tab, 'Seguindo'));
       await tester.pump();
       await pumpUntilFound(tester, find.text(deckName));
+      await captureVisualProof(
+        binding,
+        tester,
+        'profile_community_06_community_following',
+      );
 
       await tester.tap(find.widgetWithText(Tab, 'Usuários'));
       await tester.pump();
@@ -397,6 +424,11 @@ void main() {
                 .evaluate()
                 .isNotEmpty,
         description: 'community user tab result for ${creator.username}',
+      );
+      await captureVisualProof(
+        binding,
+        tester,
+        'profile_community_07_community_users',
       );
       await tester.tap(find.byKey(Key('community-users-row-${creator.id}')));
       await tester.pump();

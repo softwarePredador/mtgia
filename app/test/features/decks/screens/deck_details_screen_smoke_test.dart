@@ -325,7 +325,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Novo Deck'), findsOneWidget);
-      expect(find.text('Deck pronto para começar'), findsOneWidget);
+      expect(find.text('Escolha o comandante primeiro'), findsOneWidget);
       expect(find.text('Selecionar comandante'), findsOneWidget);
       expect(find.text('Buscar cartas'), findsOneWidget);
       expect(find.text('Colar lista'), findsOneWidget);

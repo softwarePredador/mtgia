@@ -107,13 +107,13 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         title: const Text('Perfil'),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
       ),
       body: Consumer<SocialProvider>(
         builder: (context, provider, _) {
           if (provider.isLoadingProfile) {
             return const Center(
-              child: CircularProgressIndicator(color: AppTheme.manaViolet),
+              child: CircularProgressIndicator(color: AppTheme.brass500),
             );
           }
 
@@ -156,8 +156,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     // Avatar
                     CircleAvatar(
                       radius: 40,
-                      backgroundColor: AppTheme.manaViolet.withValues(
-                        alpha: 0.3,
+                      backgroundColor: AppTheme.brass400.withValues(
+                        alpha: 0.16,
                       ),
                       backgroundImage:
                           user.avatarUrl != null
@@ -168,7 +168,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                               ? Text(
                                 user.username[0].toUpperCase(),
                                 style: const TextStyle(
-                                  color: AppTheme.manaViolet,
+                                  color: AppTheme.brass400,
                                   fontSize: AppTheme.fontDisplay,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -243,8 +243,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                 backgroundColor:
                                     provider.isFollowingVisited
                                         ? AppTheme.surfaceSlate
-                                        : AppTheme.manaViolet,
-                                foregroundColor: AppTheme.textPrimary,
+                                        : AppTheme.brass500,
+                                foregroundColor:
+                                    provider.isFollowingVisited
+                                        ? AppTheme.brass400
+                                        : AppTheme.backgroundAbyss,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                     AppTheme.radiusXl,
@@ -289,7 +292,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                             child: OutlinedButton.icon(
                               onPressed: () => _openChat(widget.userId),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppTheme.textPrimary,
+                                foregroundColor: AppTheme.brass400,
                                 side: const BorderSide(
                                   color: AppTheme.outlineMuted,
                                 ),
@@ -316,11 +319,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               ),
               // === Tabs ===
               Container(
-                color: AppTheme.surfaceElevated,
+                color: AppTheme.backgroundAbyss,
                 child: TabBar(
                   controller: _tabController,
-                  indicatorColor: AppTheme.manaViolet,
-                  labelColor: AppTheme.textPrimary,
+                  indicatorColor: AppTheme.brass400,
+                  labelColor: AppTheme.brass400,
                   unselectedLabelColor: AppTheme.textSecondary,
                   tabs: [
                     Tab(text: 'Decks (${provider.visitedUserDecks.length})'),
@@ -794,14 +797,8 @@ class _PublicBinderTabHaveWantState extends State<_PublicBinderTabHaveWant>
           color: AppTheme.backgroundAbyss,
           child: TabBar(
             controller: _subTabController,
-            indicatorColor:
-                _subTabController.index == 0
-                    ? AppTheme.primarySoft
-                    : AppTheme.mythicGold,
-            labelColor:
-                _subTabController.index == 0
-                    ? AppTheme.primarySoft
-                    : AppTheme.mythicGold,
+            indicatorColor: AppTheme.brass400,
+            labelColor: AppTheme.brass400,
             unselectedLabelColor: AppTheme.textSecondary,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w700,

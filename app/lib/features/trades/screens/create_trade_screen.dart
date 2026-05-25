@@ -565,7 +565,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         title: const Text('Nova Proposta'),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -658,7 +658,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   borderSide: const BorderSide(
-                    color: AppTheme.frost400,
+                    color: AppTheme.brass400,
                     width: 1,
                   ),
                 ),

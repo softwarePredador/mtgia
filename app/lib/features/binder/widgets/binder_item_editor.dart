@@ -520,10 +520,10 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                       style: TextStyle(
                                         color:
                                             isSelected
-                                                ? Colors.white
+                                                ? AppTheme.backgroundAbyss
                                                 : AppTheme.textPrimary,
                                         fontWeight: FontWeight.w800,
-                                        fontSize: 11,
+                                        fontSize: AppTheme.fontSm - 1,
                                         letterSpacing: 0.5,
                                       ),
                                     ),
@@ -534,7 +534,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                       year,
                                       style: const TextStyle(
                                         color: AppTheme.textSecondary,
-                                        fontSize: 11,
+                                        fontSize: AppTheme.fontSm - 1,
                                       ),
                                     ),
                                   ],
@@ -544,7 +544,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                       '\$${price.toStringAsFixed(2)}',
                                       style: const TextStyle(
                                         color: AppTheme.mythicGold,
-                                        fontSize: 11,
+                                        fontSize: AppTheme.fontSm - 1,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -561,7 +561,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                   ].join(' • '),
                                   style: const TextStyle(
                                     color: AppTheme.textSecondary,
-                                    fontSize: 10,
+                                    fontSize: AppTheme.fontXs,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -575,7 +575,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                       isSelected
                                           ? AppTheme.textPrimary
                                           : AppTheme.textSecondary,
-                                  fontSize: 10,
+                                  fontSize: AppTheme.fontXs,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -769,16 +769,20 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                       label: Text(c),
                       selected: selected,
                       onSelected: (_) => setState(() => _condition = c),
-                      selectedColor: AppTheme.manaViolet,
-                      backgroundColor: AppTheme.surfaceElevated,
+                      selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
+                      backgroundColor: AppTheme.surfaceSlate,
                       labelStyle: TextStyle(
-                        color: selected ? Colors.white : AppTheme.textSecondary,
+                        color:
+                            selected
+                                ? AppTheme.brass400
+                                : AppTheme.textSecondary,
                         fontSize: AppTheme.fontSm,
+                        fontWeight: FontWeight.w600,
                       ),
                       side: BorderSide(
                         color:
                             selected
-                                ? AppTheme.manaViolet
+                                ? AppTheme.brass400
                                 : AppTheme.outlineMuted,
                       ),
                       tooltip: conditionLabels[c],
@@ -808,17 +812,20 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                       ),
                       selected: selected,
                       onSelected: (_) => setState(() => _language = language),
-                      selectedColor: AppTheme.primarySoft,
-                      backgroundColor: AppTheme.surfaceElevated,
+                      selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
+                      backgroundColor: AppTheme.surfaceSlate,
                       labelStyle: TextStyle(
-                        color: selected ? Colors.white : AppTheme.textSecondary,
+                        color:
+                            selected
+                                ? AppTheme.brass400
+                                : AppTheme.textSecondary,
                         fontSize: AppTheme.fontSm,
                         fontWeight: FontWeight.w600,
                       ),
                       side: BorderSide(
                         color:
                             selected
-                                ? AppTheme.primarySoft
+                                ? AppTheme.brass400
                                 : AppTheme.outlineMuted,
                       ),
                     );
@@ -898,7 +905,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    borderSide: const BorderSide(color: AppTheme.manaViolet),
+                    borderSide: const BorderSide(color: AppTheme.brass400),
                   ),
                 ),
               ),
@@ -920,7 +927,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide: const BorderSide(color: AppTheme.manaViolet),
+                  borderSide: const BorderSide(color: AppTheme.brass400),
                 ),
               ),
             ),
@@ -954,8 +961,8 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     key: const Key('binder-editor-save-button'),
                     onPressed: _saving ? null : _save,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.manaViolet,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.brass500,
+                      foregroundColor: AppTheme.backgroundAbyss,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -968,7 +975,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppTheme.backgroundAbyss,
                               ),
                             )
                             : Text(isEditing ? 'Salvar' : 'Adicionar'),
@@ -1003,14 +1010,14 @@ class _QuantityButton extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           border: Border.all(
-            color: onTap != null ? AppTheme.manaViolet : AppTheme.outlineMuted,
+            color: onTap != null ? AppTheme.brass400 : AppTheme.outlineMuted,
           ),
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: onTap != null ? AppTheme.manaViolet : AppTheme.outlineMuted,
+          color: onTap != null ? AppTheme.brass400 : AppTheme.outlineMuted,
         ),
       ),
     );

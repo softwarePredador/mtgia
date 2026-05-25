@@ -1048,18 +1048,30 @@ class _ValidationIssueRow extends StatelessWidget {
             ],
           );
 
+          final isPrimaryCommanderAction =
+              issue.actionLabel == 'Selecionar comandante';
+          final action =
+              isPrimaryCommanderAction
+                  ? FilledButton.icon(
+                    onPressed: issue.onAction,
+                    icon: const Icon(
+                      Icons.workspace_premium_outlined,
+                      size: 16,
+                    ),
+                    label: Text(issue.actionLabel),
+                  )
+                  : TextButton(
+                    onPressed: issue.onAction,
+                    child: Text(issue.actionLabel),
+                  );
+
           if (constraints.maxWidth < 280) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 textBlock,
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: issue.onAction,
-                    child: Text(issue.actionLabel),
-                  ),
-                ),
+                const SizedBox(height: 8),
+                Align(alignment: Alignment.centerRight, child: action),
               ],
             );
           }
@@ -1069,10 +1081,7 @@ class _ValidationIssueRow extends StatelessWidget {
             children: [
               Expanded(child: textBlock),
               const SizedBox(width: 8),
-              TextButton(
-                onPressed: issue.onAction,
-                child: Text(issue.actionLabel),
-              ),
+              action,
             ],
           );
         },
@@ -1242,17 +1251,18 @@ class _OverviewQuickActions extends StatelessWidget {
         onPressed: onOptimize,
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          backgroundColor: AppTheme.frost400.withValues(alpha: 0.12),
-          side: BorderSide(color: AppTheme.frost400.withValues(alpha: 0.28)),
+          backgroundColor: AppTheme.brass400.withValues(alpha: 0.10),
+          foregroundColor: AppTheme.brass400,
+          side: BorderSide(color: AppTheme.brass400.withValues(alpha: 0.30)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
         ),
-        icon: const Icon(Icons.auto_fix_high, color: AppTheme.frost400),
+        icon: const Icon(Icons.auto_fix_high, color: AppTheme.brass400),
         label: Text(
           'Otimizar com IA',
           style: theme.textTheme.titleSmall?.copyWith(
-            color: AppTheme.frost400,
+            color: AppTheme.brass400,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -1483,7 +1493,9 @@ class _DeckEmptyState extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Deck pronto para começar',
+                      isCommanderFormat
+                          ? 'Escolha o comandante primeiro'
+                          : 'Deck pronto para começar',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: AppTheme.textPrimary,
                         fontWeight: FontWeight.w700,
@@ -1491,7 +1503,9 @@ class _DeckEmptyState extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Adicione as primeiras cartas para liberar análise, validação e recomendações.',
+                      isCommanderFormat
+                          ? 'Commander precisa de um comandante antes das 99 cartas para validar identidade de cor e recomendações.'
+                          : 'Adicione as primeiras cartas para liberar análise, validação e recomendações.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: AppTheme.textSecondary,
                       ),
@@ -1502,16 +1516,21 @@ class _DeckEmptyState extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
+          if (isCommanderFormat) ...[
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onSelectCommander,
+                icon: const Icon(Icons.workspace_premium_outlined),
+                label: const Text('Selecionar comandante'),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
           Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [
-              if (isCommanderFormat)
-                FilledButton.icon(
-                  onPressed: onSelectCommander,
-                  icon: const Icon(Icons.workspace_premium_outlined),
-                  label: const Text('Selecionar comandante'),
-                ),
               OutlinedButton.icon(
                 onPressed: onOpenCards,
                 icon: const Icon(Icons.search),

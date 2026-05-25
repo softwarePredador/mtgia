@@ -42,12 +42,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceElevated,
-        title: const Text(
-          'Notificações',
-          style: TextStyle(color: AppTheme.textPrimary),
-        ),
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        backgroundColor: AppTheme.backgroundAbyss,
+        title: const Text('Notificações'),
         actions: [
           Consumer<NotificationProvider>(
             builder: (context, provider, _) {
@@ -75,7 +71,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           if (provider.isLoading && provider.notifications.isEmpty) {
             return const Center(
               key: Key('notifications-loading'),
-              child: CircularProgressIndicator(color: AppTheme.frost400),
+              child: CircularProgressIndicator(color: AppTheme.brass400),
             );
           }
 
@@ -99,12 +95,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
               title: 'Nenhuma notificação',
               message:
                   'Quando algo importante acontecer no app, os avisos aparecem aqui.',
-              accent: AppTheme.frost400,
+              accent: AppTheme.brass400,
             );
           }
 
           return RefreshIndicator(
-            color: AppTheme.frost400,
+            color: AppTheme.brass400,
             onRefresh: () => provider.fetchNotifications(),
             child: ListView.separated(
               key: const Key('notifications-list'),
@@ -172,7 +168,7 @@ class _NotificationTile extends StatelessWidget {
     final isRead = notification.isRead;
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),

@@ -48,16 +48,23 @@ Future<void> _showVisualOverlay(
   final script = '''
 (() => {
   document.querySelectorAll('[data-manaloom-visual-proof="true"]').forEach((node) => node.remove());
+  document.body.classList.add('manaloom-visual-proof-active');
+
+  const backdrop = document.createElement('div');
+  backdrop.setAttribute('data-manaloom-visual-proof', 'true');
+  backdrop.setAttribute('data-manaloom-visual-proof-backdrop', 'true');
 
   const overlay = document.createElement('div');
   overlay.className = '$overlayClass';
   overlay.setAttribute('data-manaloom-visual-proof', 'true');
   overlay.innerHTML = `
-    <div class="font">$title</div>
-    <div class="text">$text</div>
-    <div class="btn-wrapper">$buttonsHtml</div>
+    <div class="manaloom-proof-step">Etapa 1</div>
+    <div class="manaloom-proof-title">$title</div>
+    <div class="manaloom-proof-body">$text</div>
+    <div class="manaloom-proof-actions">$buttonsHtml</div>
   `;
 
+  document.body.appendChild(backdrop);
   document.body.appendChild(overlay);
 })();
 ''';
@@ -73,7 +80,12 @@ void main() {
   ) async {
     final uiSnapshotStore = LotusUiSnapshotStore();
 
-    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+    await tester.pumpWidget(
+      const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: LotusLifeCounterScreen(),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(seconds: 8));
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
@@ -102,7 +114,12 @@ void main() {
   ) async {
     final uiSnapshotStore = LotusUiSnapshotStore();
 
-    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+    await tester.pumpWidget(
+      const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: LotusLifeCounterScreen(),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(seconds: 8));
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
@@ -114,7 +131,7 @@ void main() {
     await binding.convertFlutterSurfaceToImage();
     await _showVisualOverlay(
       screenState,
-      overlayClass: 'turn-tracker-hint-overlay',
+      overlayClass: 'manaloom-turn-tracker-proof',
       title: 'TURN TRACKER',
       text: 'TAP NEXT OR PREVIOUS TO FOLLOW THE ACTIVE TURN',
       buttons: const ['GOT IT!'],

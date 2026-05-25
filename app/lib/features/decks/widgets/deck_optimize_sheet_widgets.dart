@@ -831,6 +831,12 @@ class OutcomeInfoDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       key: const Key('optimize-outcome-info-dialog'),
+      backgroundColor: AppTheme.surfaceElevated,
+      surfaceTintColor: AppTheme.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        side: BorderSide(color: AppTheme.brass400.withValues(alpha: 0.18)),
+      ),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       title: DialogTitleBlock(
@@ -1178,7 +1184,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
-                            fontSize: 12,
+                            fontSize: AppTheme.fontSm,
                             height: 1.35,
                           ),
                         ),
@@ -1192,7 +1198,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
-                            fontSize: 12,
+                            fontSize: AppTheme.fontSm,
                             height: 1.35,
                           ),
                         ),

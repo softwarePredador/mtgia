@@ -351,7 +351,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
         titleTextStyle: theme.textTheme.titleMedium?.copyWith(
           color: AppTheme.textPrimary,
           fontFamily: AppTheme.displayFontFamily,
-          fontSize: 17,
+          fontSize: AppTheme.fontLg + 1,
           fontWeight: FontWeight.w700,
         ),
         actions: [
@@ -472,12 +472,12 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                   ),
                                   hintStyle: const TextStyle(
                                     color: AppTheme.textHint,
-                                    fontSize: 12,
+                                    fontSize: AppTheme.fontSm,
                                   ),
                                 ),
                                 style: const TextStyle(
                                   color: AppTheme.textPrimary,
-                                  fontSize: 12,
+                                  fontSize: AppTheme.fontSm,
                                 ),
                                 cursorColor: AppTheme.textPrimary,
                               ),
@@ -560,7 +560,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           '$incompleteCount ${incompleteCount == 1 ? 'incompleto' : 'incompletos'}',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: AppTheme.textHint,
-                            fontSize: 10,
+                            fontSize: AppTheme.fontXs,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -910,7 +910,7 @@ class _SparseDeckActions extends StatelessWidget {
             style: TextStyle(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w800,
-              fontSize: 12,
+              fontSize: AppTheme.fontSm,
             ),
           ),
           const SizedBox(height: 10),
@@ -975,7 +975,7 @@ class _QuickDeckAction extends StatelessWidget {
               label,
               style: const TextStyle(
                 color: AppTheme.textSecondary,
-                fontSize: 11,
+                fontSize: AppTheme.fontSm - 1,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1106,7 +1106,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: AppTheme.textPrimary,
                         fontFamily: AppTheme.displayFontFamily,
-                        fontSize: 16,
+                        fontSize: AppTheme.fontLg,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
                       ),
@@ -1120,7 +1120,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: AppTheme.textSecondary,
-                        fontSize: 10,
+                        fontSize: AppTheme.fontXs,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1152,7 +1152,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                           _timeAgo(deck.createdAt),
                           style: const TextStyle(
                             color: AppTheme.textHint,
-                            fontSize: 10,
+                            fontSize: AppTheme.fontXs,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1167,7 +1167,7 @@ class _DeckSpotlightCard extends StatelessWidget {
                             deck.pricingTotal!.toStringAsFixed(0),
                             style: const TextStyle(
                               color: AppTheme.brass400,
-                              fontSize: 10,
+                              fontSize: AppTheme.fontXs,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -1244,7 +1244,7 @@ class _DeckInfoBadge extends StatelessWidget {
         label,
         style: TextStyle(
           color: accent,
-          fontSize: 10,
+          fontSize: AppTheme.fontXs,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -1376,7 +1376,7 @@ class _DeckFilterChip extends StatelessWidget {
                     style: TextStyle(
                       color: color,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                      fontSize: 11,
+                      fontSize: AppTheme.fontSm - 1,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -1384,7 +1384,7 @@ class _DeckFilterChip extends StatelessWidget {
                     '$count',
                     style: TextStyle(
                       color: color.withValues(alpha: selected ? 0.9 : 0.65),
-                      fontSize: 10,
+                      fontSize: AppTheme.fontXs,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -1540,7 +1540,7 @@ class _DeckGalleryCard extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: AppTheme.textPrimary,
                         fontFamily: AppTheme.displayFontFamily,
-                        fontSize: 13,
+                        fontSize: AppTheme.fontSm + 1,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
                       ),
@@ -1554,7 +1554,7 @@ class _DeckGalleryCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: AppTheme.textSecondary,
-                        fontSize: 10,
+                        fontSize: AppTheme.fontXs,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -1649,7 +1649,7 @@ class _DeckFallbackArt extends StatelessWidget {
           style: TextStyle(
             color: AppTheme.textPrimary.withValues(alpha: 0.42),
             fontFamily: AppTheme.displayFontFamily,
-            fontSize: 52,
+            fontSize: AppTheme.fontDisplay + AppTheme.fontXxl,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -1682,7 +1682,7 @@ class _DeckEmptyState extends StatelessWidget {
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w800,
-                  fontSize: 14,
+                  fontSize: AppTheme.fontMd,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -1691,7 +1691,7 @@ class _DeckEmptyState extends StatelessWidget {
                 'Crie seu primeiro deck e comece\nsua jornada em Magic.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
-                  fontSize: 12,
+                  fontSize: AppTheme.fontSm,
                   height: 1.35,
                 ),
                 textAlign: TextAlign.center,

@@ -85,7 +85,7 @@ class AppStatePanel extends StatelessWidget {
                         ElevatedButton(
                           onPressed: onAction,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: accent,
+                            backgroundColor: AppTheme.brass500,
                             foregroundColor: AppTheme.backgroundAbyss,
                           ),
                           child: Text(actionLabel!),

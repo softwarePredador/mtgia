@@ -104,6 +104,7 @@ void main() {
 
     await tester.pumpWidget(const app.ManaLoomApp());
     await tester.pump();
+    await _capture(binding, tester, '00_splash');
     await tester.pump(const Duration(seconds: 2));
 
     // Login screen.
@@ -153,6 +154,16 @@ void main() {
     await pumpUntilFound(tester, find.text('Decks'), attempts: 90);
     await tester.pump(const Duration(seconds: 1));
     await _capture(binding, tester, '03_home');
+
+    await tester.tap(find.text('Construir deck'));
+    await tester.pump();
+    await pumpUntilFound(
+      tester,
+      find.text('Criar e Otimizar Deck'),
+      attempts: 60,
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await _capture(binding, tester, '03a_onboarding_core_flow');
 
     // Decks tab.
     await tester.tap(find.text('Decks'));
@@ -224,6 +235,23 @@ void main() {
     // to background during automated runs.
     final fabMenu = find.byKey(const Key('deck-list-fab-menu'));
     if (fabMenu.evaluate().isNotEmpty) {
+      await tester.tap(fabMenu);
+      await tester.pump(const Duration(seconds: 1));
+
+      final importEntry = find.byKey(const Key('deck-list-menu-import'));
+      expect(importEntry, findsOneWidget);
+      await tester.tap(importEntry);
+      await tester.pump();
+      await pumpUntilFound(tester, find.text('Importar Lista'), attempts: 60);
+      await tester.pump(const Duration(seconds: 1));
+      await _capture(binding, tester, '04c_deck_import');
+
+      final importBack = find.byIcon(Icons.arrow_back);
+      expect(importBack, findsOneWidget);
+      await tester.tap(importBack);
+      await tester.pump();
+      await pumpUntilFound(tester, find.text('Meus Decks'), attempts: 60);
+
       await tester.tap(fabMenu);
       await tester.pump(const Duration(seconds: 1));
 

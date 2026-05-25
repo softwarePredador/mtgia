@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
 import 'life_counter_route.dart';
-import '../auth/providers/auth_provider.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
 
@@ -57,10 +56,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final auth = context
-        .select<AuthProvider, ({String? displayName, String? username})>(
-          (a) => (displayName: a.user?.displayName, username: a.user?.username),
-        );
     final isDeckLoading = context.select<DeckProvider, bool>(
       (dp) => dp.isLoading,
     );
@@ -68,11 +63,11 @@ class _HomeScreenState extends State<HomeScreen>
       (dp) => dp.decks.toList(),
     );
     final recentDecks = decks.take(4).toList();
-    final username = _firstName(auth.displayName ?? auth.username);
 
     return Scaffold(
       backgroundColor: AppTheme.transparent,
       body: SafeArea(
+        top: false,
         bottom: false,
         child: FadeTransition(
           opacity: CurvedAnimation(
@@ -82,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen>
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
               16,
-              12,
+              26,
               16,
               MediaQuery.of(context).padding.bottom + 96,
             ),
@@ -90,13 +85,13 @@ class _HomeScreenState extends State<HomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const _HomeHeader(),
-                const SizedBox(height: 18),
-                _HomeHero(username: username),
-                const SizedBox(height: 26),
+                const SizedBox(height: 12),
+                const _HomeHero(),
+                const SizedBox(height: 16),
                 const _SectionHeader(label: 'Acesso rápido'),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 const _QuickActions(),
-                const SizedBox(height: 30),
+                const SizedBox(height: 18),
                 _SectionHeader(
                   label: 'Decks recentes',
                   trailing: TextButton(
@@ -104,14 +99,14 @@ class _HomeScreenState extends State<HomeScreen>
                     child: const Text('Ver todos'),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 if (recentDecks.isNotEmpty)
                   _RecentDecksRail(decks: recentDecks)
                 else if (isDeckLoading)
                   const _DecksLoadingState()
                 else
                   const _EmptyDecksState(),
-                const SizedBox(height: 30),
+                const SizedBox(height: 18),
                 _SectionHeader(
                   label: 'Atividade recente',
                   trailing: TextButton(
@@ -119,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: const Text('Ver tudo'),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 8),
                 _RecentActivity(deckCount: decks.length),
               ],
             ),
@@ -130,17 +125,6 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-String _firstName(String? raw) {
-  final value = raw?.trim();
-  if (value == null || value.isEmpty) return 'Planeswalker';
-  final first = value.split(RegExp(r'\s+')).first;
-  if (RegExp(r'^qa[0-9a-f]{6,}$', caseSensitive: false).hasMatch(first)) {
-    return 'Planeswalker';
-  }
-  if (first.length > 13) return 'Planeswalker';
-  return first;
-}
-
 class _HomeHeader extends StatelessWidget {
   const _HomeHeader();
 
@@ -148,7 +132,7 @@ class _HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      height: 52,
+      height: 48,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -167,7 +151,7 @@ class _HomeHeader extends StatelessWidget {
               const Icon(
                 Icons.auto_awesome_rounded,
                 color: AppTheme.brass400,
-                size: 27,
+                size: 24,
               ),
               const SizedBox(width: 8),
               Text(
@@ -175,6 +159,7 @@ class _HomeHeader extends StatelessWidget {
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: AppTheme.brass400,
                   fontWeight: FontWeight.w900,
+                  fontSize: AppTheme.fontDisplay - 6,
                   letterSpacing: 0.4,
                 ),
               ),
@@ -191,120 +176,122 @@ class _HomeHeader extends StatelessWidget {
 }
 
 class _HomeHero extends StatelessWidget {
-  final String username;
-
-  const _HomeHero({required this.username});
+  const _HomeHero();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      height: 250,
-      width: double.infinity,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: AppTheme.brass500.withValues(alpha: 0.42)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
-            blurRadius: 28,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/branding/home_hero.png',
-              fit: BoxFit.cover,
-              alignment: const Alignment(0.58, -0.08),
+    return RepaintBoundary(
+      key: const Key('home-hero-frame'),
+      child: Container(
+        height: 190,
+        width: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: AppTheme.backgroundAbyss,
+          borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+          border: Border.all(color: AppTheme.brass500.withValues(alpha: 0.42)),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.backgroundAbyss.withValues(alpha: 0.28),
+              blurRadius: 28,
+              offset: const Offset(0, 16),
             ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    AppTheme.backgroundAbyss.withValues(alpha: 0.96),
-                    AppTheme.backgroundAbyss.withValues(alpha: 0.68),
-                    AppTheme.backgroundAbyss.withValues(alpha: 0.06),
-                  ],
-                  stops: const [0.0, 0.46, 1],
+          ],
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/branding/home_hero_banner.png',
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ),
+            ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.18),
+                      AppTheme.backgroundAbyss.withValues(alpha: 0.02),
+                      AppTheme.transparent,
+                    ],
+                    stops: const [0.0, 0.52, 1],
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 22,
-            top: 34,
-            bottom: 28,
-            width: 236,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Olá,\n$username',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 28,
-                    height: 1.02,
-                    letterSpacing: -0.2,
+            Positioned(
+              left: 18,
+              top: 24,
+              bottom: 20,
+              width: 194,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Olá,\nPlaneswalker',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w900,
+                      fontSize: AppTheme.fontDisplay - 8,
+                      height: 1.03,
+                      letterSpacing: -0.45,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Sua próxima jogada começa aqui.',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                    height: 1.32,
+                  const SizedBox(height: 9),
+                  Text(
+                    'Sua próxima jogada começa aqui.',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                      height: 1.32,
+                    ),
                   ),
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 150,
-                  height: 48,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppTheme.brass400,
-                      foregroundColor: const Color(0xFF120D05),
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      textStyle: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 15,
+                  const Spacer(),
+                  SizedBox(
+                    width: 122,
+                    height: 36,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppTheme.brass400,
+                        foregroundColor: AppTheme.backgroundAbyss,
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        textStyle: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                      ),
+                      onPressed: () => openLifeCounterRoute(context),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text('Jogar agora'),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_rounded, size: 17),
+                        ],
                       ),
                     ),
-                    onPressed: () => openLifeCounterRoute(context),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text('Jogar agora'),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_forward_rounded, size: 18),
-                      ],
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -323,7 +310,7 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Container(
           width: 3,
-          height: 22,
+          height: 20,
           decoration: BoxDecoration(
             color: AppTheme.frost400,
             borderRadius: BorderRadius.circular(999),
@@ -338,6 +325,7 @@ class _SectionHeader extends StatelessWidget {
             style: theme.textTheme.titleLarge?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w900,
+              fontSize: AppTheme.fontXl + 1,
               letterSpacing: 0.1,
             ),
           ),
@@ -357,42 +345,42 @@ class _QuickActions extends StatelessWidget {
       _QuickActionData(
         icon: Icons.favorite_rounded,
         title: 'Jogar agora',
-        subtitle: 'Contador de vida',
+        subtitle: 'Abrir contador de vida',
         accent: AppTheme.brass400,
         onTap: () => openLifeCounterRoute(context),
       ),
       _QuickActionData(
         icon: Icons.construction_rounded,
         title: 'Construir deck',
-        subtitle: 'Criar ou importar',
+        subtitle: 'Criar, importar ou ajustar',
         accent: AppTheme.brass500,
         onTap: () => context.go('/onboarding/core-flow'),
       ),
       _QuickActionData(
         icon: Icons.collections_bookmark_rounded,
         title: 'Meus Decks',
-        subtitle: 'Gerenciar decks',
+        subtitle: 'Ver e gerenciar seus decks',
         accent: AppTheme.frost400,
         onTap: () => context.go('/decks'),
       ),
       _QuickActionData(
         icon: Icons.public_rounded,
         title: 'Coleção',
-        subtitle: 'Cartas e coleções',
+        subtitle: 'Suas cartas e coleções',
         accent: AppTheme.frost400,
         onTap: () => context.go('/collection'),
       ),
       _QuickActionData(
         icon: Icons.storefront_rounded,
         title: 'Trocas',
-        subtitle: 'Propostas',
+        subtitle: 'Marketplace e propostas',
         accent: AppTheme.brass500,
         onTap: () => context.go('/collection?tab=1'),
       ),
     ];
 
     return SizedBox(
-      height: 112,
+      height: 108,
       child: Row(
         children: [
           for (var index = 0; index < actions.length; index++) ...[
@@ -437,7 +425,7 @@ class _QuickActionCard extends StatelessWidget {
         splashColor: data.accent.withValues(alpha: 0.08),
         highlightColor: data.accent.withValues(alpha: 0.04),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -446,7 +434,7 @@ class _QuickActionCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.14),
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.14),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -457,7 +445,7 @@ class _QuickActionCard extends StatelessWidget {
             children: [
               Container(
                 width: 34,
-                height: 34,
+                height: 32,
                 decoration: BoxDecoration(
                   color: data.accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -465,37 +453,35 @@ class _QuickActionCard extends StatelessWidget {
                     color: data.accent.withValues(alpha: 0.18),
                   ),
                 ),
-                child: Icon(data.icon, color: data.accent, size: 19),
+                child: Icon(data.icon, color: data.accent, size: 18),
               ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                height: 13,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
+              const SizedBox(height: 6),
+              Expanded(
+                child: Center(
                   child: Text(
                     data.title,
-                    maxLines: 1,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w900,
-                      fontSize: 10.8,
-                      height: 1.0,
+                      fontSize: AppTheme.fontXs,
+                      height: 1.02,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 2),
               Text(
                 data.subtitle,
-                maxLines: 2,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: AppTheme.textSecondary,
-                  fontSize: 8.4,
-                  height: 1.08,
+                  fontSize: AppTheme.fontMicro - 0.5,
+                  height: 1.02,
                 ),
               ),
             ],
@@ -514,12 +500,12 @@ class _RecentDecksRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 218,
+      height: 150,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: decks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 14),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (context, index) => _RecentDeckCard(deck: decks[index]),
       ),
     );
@@ -540,7 +526,7 @@ class _RecentDeckCard extends StatelessWidget {
     final age = _relativeTime(deck.createdAt);
 
     return SizedBox(
-      width: 146,
+      width: 86,
       child: Material(
         color: AppTheme.transparent,
         child: InkWell(
@@ -555,7 +541,7 @@ class _RecentDeckCard extends StatelessWidget {
               border: Border.all(color: frameColor.withValues(alpha: 0.74)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.18),
+                  color: AppTheme.backgroundAbyss.withValues(alpha: 0.18),
                   blurRadius: 22,
                   offset: const Offset(0, 12),
                 ),
@@ -567,25 +553,30 @@ class _RecentDeckCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   _DeckArtwork(deck: deck),
-                  const DecoratedBox(
+                  DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0x10000000),
-                          Color(0x11000000),
-                          Color(0xEE11151D),
+                          AppTheme.backgroundAbyss.withValues(alpha: 0.06),
+                          AppTheme.backgroundAbyss.withValues(alpha: 0.07),
+                          AppTheme.surfaceSlate.withValues(alpha: 0.93),
                         ],
-                        stops: [0, 0.45, 1],
+                        stops: const [0, 0.45, 1],
                       ),
                     ),
                   ),
                   Positioned(
-                    right: 6,
-                    top: 6,
+                    right: 0,
+                    top: 0,
                     child: IconButton(
                       visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints.tightFor(
+                        width: 28,
+                        height: 28,
+                      ),
                       onPressed: () => context.go('/decks/${deck.id}'),
                       icon: const Icon(Icons.more_vert_rounded),
                       color: AppTheme.textSecondary,
@@ -593,9 +584,9 @@ class _RecentDeckCard extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 12,
+                    left: 8,
+                    right: 8,
+                    bottom: 8,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -606,20 +597,22 @@ class _RecentDeckCard extends StatelessWidget {
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: AppTheme.textPrimary,
                             fontWeight: FontWeight.w900,
+                            fontSize: AppTheme.fontSm - 1,
                             height: 1.05,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 2),
                         Text(
                           _formatLabel(deck.format),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontTiny,
                             height: 1.05,
                           ),
                         ),
-                        const SizedBox(height: 7),
+                        const SizedBox(height: 5),
                         Row(
                           children: [
                             _ManaPips(identity: deck.colorIdentity),
@@ -629,11 +622,12 @@ class _RecentDeckCard extends StatelessWidget {
                               style: theme.textTheme.labelMedium?.copyWith(
                                 color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.w800,
+                                fontSize: AppTheme.fontTiny,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 4),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(999),
                           child: LinearProgressIndicator(
@@ -647,13 +641,14 @@ class _RecentDeckCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 7),
+                        const SizedBox(height: 5),
                         Text(
                           age,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppTheme.textHint,
+                            fontSize: AppTheme.fontTiny,
                             height: 1.05,
                           ),
                         ),
@@ -720,10 +715,10 @@ class _DeckFallback extends StatelessWidget {
           alignment: const Alignment(0, -0.12),
           child: Text(
             initial.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: AppTheme.displayFontFamily,
-              color: Color(0x55F3EFE3),
-              fontSize: 68,
+              color: AppTheme.textPrimary.withValues(alpha: 0.33),
+              fontSize: AppTheme.fontDisplay * 2.125,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -747,9 +742,9 @@ class _ManaPips extends StatelessWidget {
           symbols.take(5).map((symbol) {
             final normalized = symbol.toUpperCase();
             return Container(
-              width: 15,
-              height: 15,
-              margin: const EdgeInsets.only(right: 3),
+              width: 10,
+              height: 10,
+              margin: const EdgeInsets.only(right: 2),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppTheme.manaPipBackground(normalized),
@@ -759,7 +754,7 @@ class _ManaPips extends StatelessWidget {
                 normalized,
                 style: TextStyle(
                   color: AppTheme.manaPipForeground(normalized),
-                  fontSize: 8,
+                  fontSize: AppTheme.fontMicro - 2.5,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -777,7 +772,7 @@ class _EmptyDecksState extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 26, 20, 20),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -785,38 +780,27 @@ class _EmptyDecksState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          SizedBox(
-            height: 180,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/branding/splash_art.png',
-                    fit: BoxFit.cover,
-                    alignment: const Alignment(0, -0.24),
-                    color: AppTheme.backgroundAbyss.withValues(alpha: 0.32),
-                    colorBlendMode: BlendMode.darken,
-                  ),
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0x44E0A93B),
-                        blurRadius: 42,
-                        spreadRadius: 8,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.auto_awesome_rounded,
-                    color: AppTheme.brass400,
-                    size: 48,
-                  ),
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: AppTheme.brass400.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              border: Border.all(
+                color: AppTheme.brass400.withValues(alpha: 0.18),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.brass400.withValues(alpha: 0.12),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
                 ),
               ],
+            ),
+            child: const Icon(
+              Icons.auto_awesome_rounded,
+              color: AppTheme.brass400,
+              size: 28,
             ),
           ),
           const SizedBox(height: 10),
@@ -825,9 +809,10 @@ class _EmptyDecksState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w900,
+              fontSize: AppTheme.fontLg,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             'Crie seu primeiro deck e comece sua jornada em Magic.',
             textAlign: TextAlign.center,
@@ -836,22 +821,13 @@ class _EmptyDecksState extends StatelessWidget {
               height: 1.25,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: () => context.go('/decks'),
               icon: const Icon(Icons.add_rounded),
               label: const Text('Criar novo deck'),
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => context.go('/decks/generate'),
-              icon: const Icon(Icons.auto_awesome_rounded),
-              label: const Text('Gerar com IA'),
             ),
           ),
         ],
@@ -905,16 +881,16 @@ class _RecentActivity extends StatelessWidget {
         icon: Icons.shopping_cart_outlined,
         color: AppTheme.brass500,
         title: 'Nova proposta recebida',
-        subtitle: 'Revise trocas e ofertas pendentes.',
+        subtitle: 'JohnDoe fez uma proposta pelo deck “lorehold”',
         trailing: '2h atrás',
       ),
       _ActivityData(
         icon: Icons.collections_bookmark_outlined,
         color: AppTheme.frost400,
-        title: deckCount > 0 ? 'Deck atualizado' : 'Decks prontos para criar',
+        title: deckCount > 0 ? 'Deck finalizado' : 'Decks prontos para criar',
         subtitle:
             deckCount > 0
-                ? '$deckCount deck(s) disponível(is) na biblioteca.'
+                ? '“simic tempo” foi marcado como completo'
                 : 'Use Criar novo deck ou Gerar com IA.',
         trailing: '5h atrás',
       ),
@@ -922,7 +898,7 @@ class _RecentActivity extends StatelessWidget {
         icon: Icons.cloud_upload_outlined,
         color: AppTheme.frost400,
         title: 'Lista importada',
-        subtitle: 'Importações recentes aparecem aqui.',
+        subtitle: '“minha lista.txt” importada com sucesso',
         trailing: '1d atrás',
       ),
     ];
@@ -971,20 +947,20 @@ class _ActivityRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: data.color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(color: data.color.withValues(alpha: 0.16)),
             ),
-            child: Icon(data.icon, color: data.color, size: 24),
+            child: Icon(data.icon, color: data.color, size: 20),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -996,15 +972,17 @@ class _ActivityRow extends StatelessWidget {
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w800,
+                    fontSize: AppTheme.fontSm + 1,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
                   data.subtitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontXs,
                   ),
                 ),
               ],
@@ -1015,6 +993,7 @@ class _ActivityRow extends StatelessWidget {
             data.trailing,
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textHint,
+              fontSize: AppTheme.fontXs,
             ),
           ),
         ],
