@@ -42,7 +42,7 @@ O usuario deve conseguir sair do onboarding e chegar ao primeiro deck otimizado 
 | Decisao | Data | Status |
 |---------|------|--------|
 | Premium Visual System (tema global, golden tests, agente UX) | 2026-05-25 | **PASS** — 63 arquivos, commit massivo |
-| Lotus life counter skin premium por jogador | 2026-05-25 | PASS |
+| Lotus life counter skin premium por jogador | 2026-05-25 | PASS_WITH_RISKS — main table em `master`; overlays/settings/card search exigem prova viva antes de baseline canonica |
 | Splash art oficial (slasharat) | 2026-05-21 | PASS |
 | App icon oficial (nrelogo) | 2026-05-21 | PASS |
 | UX/UI global premium non-scanner | 2026-05-21 | PASS_WITH_RISKS |
@@ -74,8 +74,10 @@ O usuario deve conseguir sair do onboarding e chegar ao primeiro deck otimizado 
 ## Fila oficial de execucao
 
 1. Fechar residual de orquestracao em `deck_provider.dart`
-2. Validar ingestao real do Sentry mobile
-3. Correlacao x-request-id ponta a ponta
-4. Revisar CHECKLIST_GO_LIVE_FINAL.md com entregas reais
-5. Sobre depois: carga basica/thresholds do fluxo core
-6. So depois: frentes secundarias (community, binder, trades, scanner)
+2. Atualizar/validar a prova viva do Lotus life counter quando overlays/settings
+   forem alterados
+3. Validar ingestao real do Sentry mobile
+4. Correlacao x-request-id ponta a ponta
+5. Revisar CHECKLIST_GO_LIVE_FINAL.md com entregas reais
+6. Sobre depois: carga basica/thresholds do fluxo core
+7. So depois: frentes secundarias (community, binder, trades, scanner)

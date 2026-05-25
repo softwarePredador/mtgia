@@ -1,7 +1,7 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-25 (segunda rodada).
+> Atualizado em 2026-05-25 (segunda rodada + validacao de consistencia).
 
 ## Estado atual
 
@@ -10,7 +10,7 @@
 - HEAD atual: **`9a2bb38b`** (Improve Lotus life counter controls)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHAs publicados: `97195723` (HEAD), `97195723` ainda rodando em producao (health confirmado)
+- SHA publicado confirmado em producao: **`9a2bb38b3bfc52e68041f75fea329e98347d304c`** (`/health`, 2026-05-25)
 
 ## Novos commits nesta rodada
 
@@ -94,6 +94,9 @@ Dois commits desde a ultima analise:
 - Player cards com gradientes radiais + box-shadows + blend modes
 - Saturação reduzida (0.62 vs 0.84) para aparencia mais cinematica e premium
 - Cada player card tem glow, accent-soft e accent-faint como variaveis CSS
+- Validacao adicional local em 2026-05-25 confirmou tela principal, radial menu,
+  history, settings e card search em iPhone Simulator; ajustes de harness/skin
+  posteriores a este HEAD ainda devem ser commitados antes de virarem baseline canonica.
 
 ## Impacto na direcao do projeto
 
@@ -138,7 +141,7 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 4. **Observabilidade** — Sentry, x-request-id
 5. **Produto global** — icon, splash, onboarding
 
-## O que esta fora dos commits recentes
+## O que esta fora dos commits recentes / nao consolidado neste digest
 
 - Scanner/OCR — DEFERRED
 - Community expansion — manutencao apenas
@@ -146,6 +149,8 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 - Carga/thresholds — nao iniciado
 - Sentry mobile — pendente
 - CHECKLIST_GO_LIVE — desatualizado
+- Ajustes locais nao commitados no workspace principal nao contam como `master`
+  ate virarem commit/push; este digest observa o `origin/master`.
 
 ## Como atualizar este digest
 

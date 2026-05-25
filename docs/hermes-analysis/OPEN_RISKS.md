@@ -5,10 +5,27 @@
 
 ## P0 — Bloqueante
 
-### Ambiente de validacao do agente
-Hermes consegue ler e auditar o repositorio, mas o container NAO possui Dart ou Flutter SDK.
-Impacto: `dart test`, `flutter analyze` e `flutter test` nao podem ser executados aqui.
-Recomendacoes de codigo sem validacao local devem ser marcadas explicitamente.
+### Ambiente de validacao do agente Hermes
+Hermes consegue ler e auditar o repositorio, mas o container usado para esta
+memoria NAO possui Dart ou Flutter SDK.
+
+Impacto: `dart test`, `flutter analyze` e `flutter test` nao podem ser executados
+no container Hermes. Recomendacoes de codigo sem validacao local devem ser
+marcadas explicitamente.
+
+Observacao: esta limitacao nao se aplica automaticamente ao workspace local
+Codex/desenvolvedor, onde Flutter/Dart podem estar disponiveis e devem ser usados
+para prova viva quando possivel.
+
+### Credenciais QA nao podem ficar versionadas
+Historicamente a memoria continha email/senha/user ID de QA. Mesmo sendo uma
+conta de teste, isso nao deve ficar em branch publica.
+
+Impacto: risco operacional e habito ruim de documentar segredo/identificador
+sensivel em Markdown.
+
+Recomendacao: manter apenas referencias sanitizadas e mover credenciais para
+cofre/local env/handoff privado.
 
 ## P1 — Alto
 
@@ -45,8 +62,31 @@ Auditoria confirmou tamanhos reais no codigo:
 ### AppBar community_screen com fontWeight 800 foge do tema Onda 6
 `community_screen.dart` define `titleTextStyle` com `w800` manualmente, enquanto o AppBarTheme define `w700`. Diferenca visual intencional ou residuo de refatoracao.
 
-### life_counter_screen.dart com 12 cores hardcoded
-Auditoria confirmou: 12 `Color(0x...)` e 21 `Colors.` references que fogem do contrato de 24 tokens do AppTheme.
+### life_counter_screen.dart ainda tem cores hardcoded no Flutter nativo
+Auditoria confirmou muitas referencias `Color(0x...)` e `Colors.` no
+`life_counter_screen.dart`. O Lotus WebView recebeu skin premium por jogador em
+`lotus_visual_skin.dart`, mas o arquivo Flutter nativo segue fora do contrato
+estrito de tokens.
+
+Impacto: risco de deriva visual se a tela nativa for usada/alterada sem passar
+pelo skin Lotus.
+
+Recomendacao: separar o risco em duas trilhas:
+- Lotus skin: validar por prova viva de overlays, settings, card search e mesa.
+- Flutter nativo: extrair tokens locais/semanticos ou documentar excecao de cores
+  de jogo.
+
+### Arquivos criticos cresceram alem do ultimo mapa
+Validacao local em 2026-05-25 indicou tamanhos maiores que os registrados no
+mapa anterior:
+- `server/routes/ai/optimize/index.dart`: 3495 linhas
+- `server/lib/ai/optimize_runtime_support.dart`: 4197 linhas
+- `app/lib/features/decks/providers/deck_provider.dart`: 1226 linhas
+
+Impacto: gargalos de manutencao maiores do que o digest inicial sugeria.
+
+Recomendacao: atualizar o Technical Map e tratar a quebra modular como P1 quando
+voltar ao core de IA/decks.
 
 ### x-request-id sem correlacao ponta a ponta
 Backend ja gera e propaga. Script de validacao existe (`validate_request_id_ready.sh`).

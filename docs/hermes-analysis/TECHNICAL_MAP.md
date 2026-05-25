@@ -108,10 +108,15 @@ mtgia/
 
 | Arquivo | Linhas | Risco |
 |---------|--------|-------|
-| server/routes/ai/optimize/index.dart | ~2745 | P1 — gargalo de manutencao |
-| server/lib/ai/optimize_runtime_support.dart | ~2842 | P1 — logica densa |
-| app/lib/features/decks/screens/deck_details_screen.dart | ~1445 | P1 — caindo, mas ainda grande |
-| app/lib/features/decks/providers/deck_provider.dart | ~899 | P2 — residual, quase orquestracao pura |
+| server/routes/ai/optimize/index.dart | 3495 | P1 — gargalo de manutencao maior que o digest anterior |
+| server/lib/ai/optimize_runtime_support.dart | 4197 | P1 — logica densa, precisa de quebra modular |
+| app/lib/features/home/life_counter_screen.dart | 6400 | P1 — tela/engine nativa grande; Lotus WebView tem skin separado |
+| app/lib/features/decks/screens/deck_details_screen.dart | 1705 | P1 — caindo, mas ainda grande |
+| app/lib/features/community/screens/community_screen.dart | 1725 | P1 — 4 tabs + sub-tabs |
+| app/lib/features/binder/screens/binder_screen.dart | 1628 | P1 — listas, editor, filtros |
+| app/lib/features/decks/widgets/deck_analysis_tab.dart | 1632 | P1 — functional tags + graficos |
+| app/lib/features/trades/screens/trade_detail_screen.dart | 1479 | P1 — timeline, chat, status, itens, trust |
+| app/lib/features/decks/providers/deck_provider.dart | 1226 | P1/P2 — voltou a crescer; residual/orquestracao |
 | server/manual-de-instrucao.md | ~17741 | N/A — documentacao |
 | app/doc/APP_AUDIT_2026-04-29.md | ~2195 | N/A — auditoria |
 | server/doc/API_CONTRACTS_AND_DATA_MAP.md | ~369 linhas / 100KB | N/A — contratos |
@@ -156,7 +161,10 @@ mtgia/
 - DeckDetailsScreen: 3 tabs (Visao Geral, Cartas, Analise)
 
 ### Consistencia do tema
-- Zero `Color(0x...)` hardcoded nas telas do fluxo core (excecao: life_counter_screen com 12)
+- Zero `Color(0x...)` hardcoded nas telas do fluxo core permanece como objetivo,
+  mas `life_counter_screen.dart` ainda tem varias cores hardcoded no Flutter nativo.
+- O Lotus WebView usa `lotus_visual_skin.dart` como camada visual propria, fora do
+  tema Flutter, e precisa de prova viva de overlays para ser considerado PASS.
 - AppBar segue tema Onda 6 exceto community_screen (override w800 vs w700 do tema)
 - TabBars usam brass400 como indicador — deck_details_screen usa o tema direto; collection/binder/trade_inbox/community fazem override redundante com valores identicos ao tema
 - MainScaffold NavigationBar usa NavigationBarThemeData com indicatorColor brass500 alpha 0.15

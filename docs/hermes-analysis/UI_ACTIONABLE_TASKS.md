@@ -55,13 +55,22 @@
 - **Criterio de pronto:** TabBars visualmente identicos, mas sem os overrides redundantes. `flutter analyze` verde.
 - **Teste:** Verificacao visual (snapshot ou runtime).
 
-### P2.2 life_counter_screen.dart com 12 cores hardcoded
+### P2.2 life_counter_screen.dart com cores hardcoded no Flutter nativo
 - **Arquivo:** `app/lib/features/home/life_counter_screen.dart`
-- **Evidencia:** 12 `Color(0x...)` hardcoded e 21 `Colors.` references (4x Colors.black, 12x Colors.white, 5x Colors.transparent). Isso foge da regra do tema de "24 tokens, qualquer cor fora e violacao".
-- **Por que importa:** Violacao documentada do design system. Se o tema escuro mudar, as cores do life counter podem ficar desalinhadas.
-- **Ajuste recomendado:** Mover as cores usadas no life counter (poison red, commander damage colors, accent colors) para tokens semanticos no AppTheme, ou pelo menos definir constantes locais no comeco do arquivo que referenciem as cores do tema.
-- **Criterio de pronto:** Zero `Color(0x...)` no life_counter_screen.dart. Cores importadas do AppTheme.
-- **Teste:** Verificacao estatica + visual.
+- **Evidencia:** validacao local em 2026-05-25 encontrou muitas referencias
+  `Color(0x...)` e `Colors.` no arquivo. O Lotus WebView ja recebeu
+  `lotus_visual_skin.dart`, mas a tela/engine Flutter nativa continua com tokens
+  locais/hardcoded.
+- **Por que importa:** Se a experiencia nativa for usada ou alterada sem passar
+  pelo Lotus skin, pode divergir do Premium Visual System.
+- **Ajuste recomendado:** Nao converter mecanicamente todas as cores para
+  `AppTheme`, porque parte delas representa cor de jogador/efeito de jogo.
+  Separar em constantes semanticas locais ou tokens especificos de Life Counter:
+  player accent, poison, commander damage, overlay scrim, glass border.
+- **Criterio de pronto:** cores intencionais nomeadas e centralizadas; nenhum
+  `Color(0x...)` disperso em widgets; prova viva de mesa, menus, overlays,
+  settings e busca.
+- **Teste:** verificacao estatica + prova viva no iPhone Simulator.
 
 ### P2.3 Navegacao tab 2 agrupa 3 modulos sob mesmo rotulo
 - **Arquivo:** `app/lib/core/widgets/main_scaffold.dart`, `app/lib/features/collection/screens/collection_screen.dart`
@@ -120,6 +129,6 @@
 | CommunityScreen 4 tabs | `community_screen.dart` linhas 85-88 | Nao ha (e dificil ter) teste de widget para tabs aninhadas. Precisa de runtime manual no simulador |
 | TradeDetailScreen chat + timeline | `trade_detail_screen.dart` | Tela de 1479 linhas com chat, timeline, status, itens, trust. Teste automatizado complexo — validacao manual recomendada |
 | BinderItemEditor | `binder_item_editor.dart` (1025 linhas) | Editor com foil, trade/sale, price, condition, quantity, notes. Sem teste de widget. Validacao manual. |
-| LifeCounter cores hardcoded vs theme | `life_counter_screen.dart` | 12 cores hardcoded. Decisao de design: extrair para tema ou manter como estao (cores de jogo sao intencionalmente vibrantes)? |
+| LifeCounter cores hardcoded vs theme | `life_counter_screen.dart`, `lotus_visual_skin.dart` | Separar risco nativo Flutter do Lotus WebView. Lotus precisa de prova viva; nativo precisa de tokens semanticos ou excecao documentada. |
 | NavigationBar backgroundColor sem Container | `main_scaffold.dart` | O Container ao redor do NavigationBar adiciona borda superior mas nao cor de fundo. O NavigationBar usa o tema como fundo. Verificar se a cor do Container interfere |
 | Community inner sub-tab (Cotacoes) | `community_screen.dart` linha 1350 | Sub-TabBar dentro de Cotacoes com Valorizando/Desvalorizando. Navegacao aninhada pode ser confusa. Validacao UX manual |

@@ -44,7 +44,13 @@ Nunca commitar diretamente na `master`. Fluxo:
 
 ## Estado do agente neste servidor
 
-Hermes consegue ler, auditar e analisar o repositorio. O container NAO possui Dart ou Flutter SDK — `dart test`, `flutter analyze` e `flutter test` nao podem ser executados aqui. Recomendacoes de codigo sem validacao local devem ser marcadas explicitamente.
+Hermes consegue ler, auditar e analisar o repositorio. O container Hermes usado para
+esta memoria NAO possui Dart ou Flutter SDK — `dart test`, `flutter analyze` e
+`flutter test` nao podem ser executados nele.
+
+Esta limitacao e do ambiente Hermes, nao necessariamente do workspace local do
+desenvolvedor/Codex. Quando uma validacao for feita fora do container Hermes,
+registrar explicitamente onde ela rodou.
 
 ## Politica de resposta
 
@@ -67,10 +73,12 @@ Ao responder sobre o ManaLoom:
 
 ## Conta QA para validacao
 
-- Email: `rafa@rafarafa.com`
-- Senha: `12341234`
-- Username: `dsadasdsa`
-- User ID: `840e108c-b2fc-4d10-b13e-83f52184f3d4`
-- Plano: Free (120 requests IA/mes)
-- Decks: `teste` (0 cartas), `lorehold` (2 cartas)
-- Obs: JWT expira rapido (~30s) — fazer login fresco antes de usar
+Credenciais, user IDs, tokens, emails reais e senhas de QA nao devem ficar
+versionados neste diretorio. Usar cofre/local env/handoff privado quando uma
+rodada de validacao precisar de conta real.
+
+Informacoes operacionais permitidas neste arquivo:
+
+- Plano QA: Free (120 requests IA/mes), se aplicavel
+- Decks de smoke podem ser citados por nome sanitizado, sem user ID
+- Obs: JWT pode expirar rapido; fazer login fresco antes de usar
