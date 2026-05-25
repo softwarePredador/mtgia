@@ -76,17 +76,19 @@ Recomendacao: separar o risco em duas trilhas:
 - Flutter nativo: extrair tokens locais/semanticos ou documentar excecao de cores
   de jogo.
 
-### Life Counter Lotus: 8 pendencias abertas da task de perfeicao
+### Life Counter Lotus: pendencias da task de perfeicao
 Task formal `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` define 8 gaps.
-Auditoria confirmou que todos seguem abertos:
-1. Geometria fina 2p/3p/4p nao travada
-2. Centragem otica dos numerais por assento
-3. Hub central ainda polido demais
-4. DICE overlay precisa endurecer
-5. PLAYERS overlay precisa perder acabamento
-6. Commander damage overlay com linguagem residual
-7. Motion final (takeovers, SET LIFE, KO'D!)
-8. Side-by-side final com benchmark + freeze
+Auditoria em `master` confirmou que a task ainda nao esta fechada, mas o status
+nao e mais "todos abertos": o commit `ca0c8d5` adicionou prova viva parcial para
+mesa 4p, history, settings e card search.
+
+Status granular:
+- **OPEN:** geometria fina 2p/3p/4p, centragem otica, hub central, DICE overlay,
+  PLAYERS overlay, commander damage, motion final e side-by-side final.
+- **PARTIAL_PROVEN:** mesa 4p com controles visiveis, cores por jogador,
+  history overlay, settings overlay e card search overlay com resultado real.
+- **NEEDS_BENCHMARK_COMPARISON:** todos os itens ainda precisam de comparacao
+  lado a lado com `dddddd/` antes de marcar a task como DONE.
 
 ### Arquivos criticos cresceram alem do ultimo mapa
 Validacao local em 2026-05-25 indicou tamanhos maiores que os registrados no
