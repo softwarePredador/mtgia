@@ -41,7 +41,9 @@ String get lotusInjectedVisualSkinScript {
   --manaloom-shell-text-muted: rgba(207, 215, 233, 0.76);
   --manaloom-shell-accent: #78a8ff;
   --manaloom-shell-accent-strong: #9ac2ff;
-  --manaloom-shell-accent-warm: #f3c46b;
+  --manaloom-shell-accent-warm: #d89a2f;
+  --manaloom-shell-accent-warm-strong: #f2bc49;
+  --manaloom-shell-border-warm: rgba(216, 154, 47, 0.42);
   --manaloom-shell-radius: 22px;
   --manaloom-shell-pill-radius: 999px;
   --manaloom-shell-backdrop: saturate(1.12) blur(16px);
@@ -61,15 +63,128 @@ body {
 }
 
 ${LotusDomSelectors.playerCard} {
-  filter: saturate(0.84) brightness(0.96) contrast(0.99);
+  --manaloom-player-accent: rgba(216, 154, 47, 0.78);
+  --manaloom-player-accent-soft: rgba(216, 154, 47, 0.26);
+  --manaloom-player-accent-faint: rgba(216, 154, 47, 0.1);
+  --manaloom-player-glow: rgba(216, 154, 47, 0.2);
+  filter: saturate(0.62) brightness(0.88) contrast(1.03);
+  border-radius: calc(var(--borderRadius) * 1.15);
+  box-shadow:
+    inset 0 0 0 1px var(--manaloom-player-accent-soft),
+    inset 0 0 34px var(--manaloom-player-accent-faint),
+    0 18px 34px rgba(0, 0, 0, 0.26);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n + 1) {
+  --manaloom-player-accent: rgba(242, 188, 73, 0.82);
+  --manaloom-player-accent-soft: rgba(242, 188, 73, 0.34);
+  --manaloom-player-accent-faint: rgba(242, 188, 73, 0.14);
+  --manaloom-player-glow: rgba(242, 188, 73, 0.24);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n + 2) {
+  --manaloom-player-accent: rgba(120, 168, 255, 0.82);
+  --manaloom-player-accent-soft: rgba(120, 168, 255, 0.34);
+  --manaloom-player-accent-faint: rgba(120, 168, 255, 0.14);
+  --manaloom-player-glow: rgba(120, 168, 255, 0.24);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n + 3) {
+  --manaloom-player-accent: rgba(154, 124, 255, 0.82);
+  --manaloom-player-accent-soft: rgba(154, 124, 255, 0.34);
+  --manaloom-player-accent-faint: rgba(154, 124, 255, 0.14);
+  --manaloom-player-glow: rgba(154, 124, 255, 0.24);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n) {
+  --manaloom-player-accent: rgba(78, 214, 145, 0.82);
+  --manaloom-player-accent-soft: rgba(78, 214, 145, 0.34);
+  --manaloom-player-accent-faint: rgba(78, 214, 145, 0.14);
+  --manaloom-player-glow: rgba(78, 214, 145, 0.24);
 }
 
 ${LotusDomSelectors.playerCard} .player-card-inner:not(.option-card):not(.color-card) {
   border-radius: calc(var(--borderRadius) * 1.15);
+  background:
+    radial-gradient(circle at 78% 18%, var(--manaloom-player-glow), transparent 35%),
+    radial-gradient(circle at 42% 52%, var(--bg, rgba(21, 29, 45, 0.94)), transparent 50%),
+    radial-gradient(circle at 20% 82%, var(--manaloom-player-accent-faint), transparent 40%),
+    linear-gradient(145deg, rgba(4, 8, 18, 0.9), rgba(8, 14, 30, 0.96)) !important;
+  background-blend-mode: screen, soft-light, screen, normal;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -20px 28px rgba(1, 6, 16, 0.18),
-    0 12px 24px rgba(1, 8, 22, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px var(--manaloom-player-accent-soft),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.025),
+    inset 0 -28px 42px rgba(1, 6, 16, 0.36),
+    inset 0 0 42px var(--manaloom-player-accent-faint),
+    0 12px 24px rgba(1, 8, 22, 0.22);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life {
+  position: absolute !important;
+  background:
+    radial-gradient(circle at center, var(--manaloom-player-accent-faint), transparent 48%),
+    rgba(5, 9, 20, 0.08) !important;
+  box-shadow:
+    inset 0 0 90px rgba(2, 6, 16, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:after,
+${LotusDomSelectors.playerCard} .decrease-button.life:after {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: var(--manaloom-ui-font);
+  font-size: clamp(32px, 13vw, 68px);
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(247, 241, 226, 0.52);
+  text-shadow:
+    0 0 14px var(--manaloom-player-accent-soft),
+    0 4px 14px rgba(1, 7, 18, 0.48);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:after {
+  content: "+";
+}
+
+${LotusDomSelectors.playerCard} .decrease-button.life:after {
+  content: "−";
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:before,
+${LotusDomSelectors.playerCard} .decrease-button.life:before {
+  color: rgba(247, 241, 226, 0.68) !important;
+  text-shadow:
+    0 0 10px var(--manaloom-player-accent-soft),
+    0 4px 12px rgba(1, 7, 18, 0.36) !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life,
+${LotusDomSelectors.playerCard} .increase-button.life .font,
+${LotusDomSelectors.playerCard} .decrease-button.life .font,
+${LotusDomSelectors.playerCard} .increase-button.life .char-plus,
+${LotusDomSelectors.playerCard} .decrease-button.life .char-minus {
+  --fontColor: rgba(247, 241, 226, 0.68) !important;
+  color: rgba(247, 241, 226, 0.68) !important;
+  fill: rgba(247, 241, 226, 0.68) !important;
+  stroke: rgba(247, 241, 226, 0.68) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.68) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 8px var(--manaloom-player-accent-soft)) !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:active,
+${LotusDomSelectors.playerCard} .decrease-button.life:active {
+  background:
+    radial-gradient(circle at center, var(--manaloom-player-accent-soft), transparent 54%),
+    rgba(5, 9, 20, 0.16) !important;
 }
 
 ${LotusDomSelectors.playerCard} .player-name,
@@ -90,12 +205,17 @@ ${LotusDomSelectors.playerCard} .player-name-input {
 
 ${LotusDomSelectors.playerCard} .player-life-count {
   filter: drop-shadow(0 14px 22px rgba(2, 7, 19, 0.28));
+  color: rgba(247, 241, 226, 0.94) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.94) !important;
 }
 
 ${LotusDomSelectors.playerCard} .player-life-count .font {
+  --fontColor: var(--fontWhite) !important;
+  color: rgba(247, 241, 226, 0.94) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.94) !important;
   text-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.08),
-    0 10px 18px rgba(1, 7, 18, 0.22);
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 20px rgba(1, 7, 18, 0.5);
 }
 
 ${LotusDomSelectors.playerCard} .counters-on-card .counter {
@@ -689,12 +809,20 @@ ${LotusDomSelectors.optionCard} h3 {
   min-height: 50px !important;
   padding: 12px 24px !important;
   border-radius: 999px !important;
-  background: linear-gradient(180deg, #ff2f86, #f31269) !important;
+  background:
+    linear-gradient(
+      180deg,
+      var(--manaloom-shell-accent-warm-strong),
+      var(--manaloom-shell-accent-warm)
+    ) !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: 16px !important;
   font-weight: 800 !important;
   letter-spacing: 0.01em !important;
-  color: #fff !important;
+  color: #170f04 !important;
+  box-shadow:
+    0 14px 24px rgba(216, 154, 47, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 .first-time-user-overlay .commander-card.hide {
@@ -737,6 +865,7 @@ ${LotusDomSelectors.optionCard} h3 {
   box-shadow: var(--manaloom-shell-shadow);
   backdrop-filter: var(--manaloom-shell-backdrop);
   background:
+    radial-gradient(circle at 82% 0%, rgba(216, 154, 47, 0.12), transparent 34%),
     linear-gradient(180deg, rgba(12, 21, 40, 0.97), rgba(6, 11, 24, 0.94));
 }
 
@@ -806,6 +935,8 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .manaloom-proof-title {
+  position: relative !important;
+  z-index: 2 !important;
   width: 100% !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: clamp(16px, 4.8vw, 22px) !important;
@@ -816,7 +947,30 @@ ${LotusDomSelectors.optionCard} h3 {
   color: var(--manaloom-shell-text) !important;
 }
 
+.manaloom-proof-step {
+  position: relative !important;
+  z-index: 2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 28px !important;
+  padding: 7px 12px !important;
+  border: 1px solid var(--manaloom-shell-border-warm) !important;
+  border-radius: 999px !important;
+  background: rgba(216, 154, 47, 0.12) !important;
+  color: var(--manaloom-shell-accent-warm-strong) !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
 .manaloom-proof-body {
+  position: relative !important;
+  z-index: 2 !important;
   width: 100% !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: clamp(13px, 4vw, 18px) !important;
@@ -829,6 +983,8 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .manaloom-proof-actions {
+  position: relative !important;
+  z-index: 2 !important;
   width: 100% !important;
   display: flex !important;
   align-items: stretch !important;
@@ -855,8 +1011,42 @@ ${LotusDomSelectors.optionCard} h3 {
   gap: 14px !important;
   overflow: hidden !important;
   backdrop-filter: none !important;
+  isolation: isolate !important;
+  opacity: 1 !important;
   background:
+    radial-gradient(circle at 78% 0%, rgba(216, 154, 47, 0.13), transparent 30%),
     linear-gradient(180deg, rgb(10, 16, 30), rgb(5, 9, 20)) !important;
+}
+
+[data-manaloom-visual-proof="true"].commander-damage-overlay .font,
+[data-manaloom-visual-proof="true"].own-commander-damage-hint-overlay .font,
+[data-manaloom-visual-proof="true"].turn-tracker-hint-overlay .font,
+[data-manaloom-visual-proof="true"].manaloom-turn-tracker-proof .font,
+[data-manaloom-visual-proof="true"].show-counters-hint-overlay .font,
+[data-manaloom-visual-proof="true"].manaloom-show-counters-proof .font {
+  display: none !important;
+}
+
+[data-manaloom-visual-proof-backdrop="true"] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483646 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(216, 154, 47, 0.08), transparent 34%),
+    linear-gradient(180deg, rgb(6, 11, 23), rgb(3, 7, 17)) !important;
+}
+
+[data-manaloom-visual-proof="true"].commander-damage-overlay,
+[data-manaloom-visual-proof="true"].own-commander-damage-hint-overlay,
+[data-manaloom-visual-proof="true"].turn-tracker-hint-overlay,
+[data-manaloom-visual-proof="true"].manaloom-turn-tracker-proof,
+[data-manaloom-visual-proof="true"].show-counters-hint-overlay,
+[data-manaloom-visual-proof="true"].manaloom-show-counters-proof {
+  z-index: 2147483647 !important;
 }
 
 .commander-damage-overlay .btn-wrapper,
@@ -884,8 +1074,16 @@ ${LotusDomSelectors.optionCard} h3 {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: linear-gradient(180deg, #ff2f86, #f31269) !important;
-  color: #fff !important;
+  background:
+    linear-gradient(
+      180deg,
+      var(--manaloom-shell-accent-warm-strong),
+      var(--manaloom-shell-accent-warm)
+    ) !important;
+  color: #170f04 !important;
+  box-shadow:
+    0 12px 22px rgba(216, 154, 47, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
 }
 
 .own-commander-damage-hint-overlay .font,
@@ -1161,11 +1359,42 @@ String get _visualProofChromeCleanupScript => '''
 ''';
 
 String get _visualProofIsolatedCanvasScript => '''
-  Array.from(document.body.children).forEach((node) => {
+  document.body.classList.add('manaloom-visual-proof-active');
+  document.getElementById('manaloom-visual-proof-isolation-style')?.remove();
+  const isolationStyle = document.createElement('style');
+  isolationStyle.id = 'manaloom-visual-proof-isolation-style';
+  isolationStyle.textContent = `
+    body.manaloom-visual-proof-active {
+      background: linear-gradient(180deg, rgb(6, 11, 23), rgb(3, 7, 17)) !important;
+    }
+    body.manaloom-visual-proof-active .player-card,
+    body.manaloom-visual-proof-active .menu-button,
+    body.manaloom-visual-proof-active .turn-time-tracker,
+    body.manaloom-visual-proof-active .game-timer,
+    body.manaloom-visual-proof-active .current-time-clock,
+    body.manaloom-visual-proof-active .close-controls-backdrop {
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    body.manaloom-visual-proof-active [data-manaloom-visual-proof="true"],
+    body.manaloom-visual-proof-active [data-manaloom-visual-proof="true"] * {
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  `;
+  document.head.appendChild(isolationStyle);
+
+  Array.from(document.body.querySelectorAll('*')).forEach((node) => {
     if (!(node instanceof HTMLElement)) {
       return;
     }
+    if (node.closest('[data-manaloom-visual-proof="true"]')) {
+      return;
+    }
     node.style.setProperty('visibility', 'hidden', 'important');
+    node.style.setProperty('opacity', '0', 'important');
     node.style.setProperty('pointer-events', 'none', 'important');
   });
   document.body.style.setProperty(
@@ -1196,14 +1425,20 @@ String _buildSimpleVisualProofScript({
 $_visualProofIsolatedCanvasScript
 
   const overlay = document.createElement('div');
+  const backdrop = document.createElement('div');
+  backdrop.setAttribute('data-manaloom-visual-proof', 'true');
+  backdrop.setAttribute('data-manaloom-visual-proof-backdrop', 'true');
+
   overlay.className = $overlayClassJson;
   overlay.setAttribute('data-manaloom-visual-proof', 'true');
   overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
   overlay.innerHTML =
+    '<div class="manaloom-proof-step">Etapa 1</div>' +
     '<div class="manaloom-proof-title">' + $titleJson + '</div>' +
     '<div class="manaloom-proof-body">' + $textJson + '</div>' +
     '<div class="manaloom-proof-actions">' + $buttonsHtmlJson + '</div>';
 
+  document.body.appendChild(backdrop);
   document.body.appendChild(overlay);
 })();
 ''';

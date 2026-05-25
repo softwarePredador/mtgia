@@ -72,8 +72,29 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('--manaloom-shell-panel'));
       expect(
         lotusInjectedVisualSkinScript,
-        contains('clamp(13px, 4vw, 19px)'),
+        contains('--manaloom-player-accent'),
       );
+      expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n + 1)'));
+      expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n + 2)'));
+      expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n + 3)'));
+      expect(lotusInjectedVisualSkinScript, contains(':nth-of-type(4n)'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.increase-button.life .font'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.decrease-button.life .font'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('.char-plus'));
+      expect(lotusInjectedVisualSkinScript, contains('.char-minus'));
+      expect(lotusInjectedVisualSkinScript, contains('content: \\"+\\"'));
+      expect(lotusInjectedVisualSkinScript, contains('content: \\"−\\"'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('rgba(247, 241, 226, 0.68)'),
+      );
+      expect(lotusInjectedVisualSkinScript, contains('clamp(13px, 4vw, 19px)'));
       expect(lotusInjectedVisualSkinScript, contains('white-space: normal'));
       expect(lotusInjectedVisualSkinScript, contains('word-break: break-word'));
     });
