@@ -6,12 +6,13 @@
 ## P0 — Bloqueante
 
 ### Ambiente de validacao do agente Hermes
-Hermes consegue ler e auditar o repositorio, mas o container usado para esta
-memoria NAO possui Dart ou Flutter SDK.
+Hermes consegue ler e auditar o repositorio. O container Hermes agora possui
+Dart/Flutter para checks Linux (`dart test`, `flutter analyze`), mas continua
+sem iPhone Simulator, Android emulator, camera/scanner/OCR e prova visual real.
 
-Impacto: `dart test`, `flutter analyze` e `flutter test` nao podem ser executados
-no container Hermes. Recomendacoes de codigo sem validacao local devem ser
-marcadas explicitamente.
+Impacto: validacoes Linux sao possiveis, mas qualquer evidencia de layout/runtime
+mobile precisa continuar sendo provada no Mac local com iPhone Simulator ou
+dispositivo fisico, conforme o caso.
 
 Observacao: esta limitacao nao se aplica automaticamente ao workspace local
 Codex/desenvolvedor, onde Flutter/Dart podem estar disponiveis e devem ser usados

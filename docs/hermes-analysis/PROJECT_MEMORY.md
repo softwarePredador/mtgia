@@ -82,3 +82,19 @@ Informacoes operacionais permitidas neste arquivo:
 - Plano QA: Free (120 requests IA/mes), se aplicavel
 - Decks de smoke podem ser citados por nome sanitizado, sem user ID
 - Obs: JWT pode expirar rapido; fazer login fresco antes de usar
+
+## Rotina obrigatoria pos-push Codex -> Hermes
+
+A partir de 2026-05-26, depois de todo push relevante feito no fluxo local/Codex, o Hermes deve ser chamado antes de continuar a proxima frente:
+
+- Mudanca comum: `/opt/data/scripts/manaloom-post-push-audit.sh normal <sha>`
+- Mudanca grande de app/backend/layout/runtime: `/opt/data/scripts/manaloom-post-push-audit.sh deep <sha>`
+- Smoke rapido de infraestrutura: `/opt/data/scripts/manaloom-post-push-audit.sh smoke`
+
+A rotina esperada e:
+
+1. Codex local implementa, valida e faz push.
+2. Se houver backend publico, confirmar `/health.git_sha`.
+3. Hermes audita a branch/commit e atualiza somente `docs/hermes-analysis/**` se houver achado real.
+4. Codex local le o retorno do Hermes, valida os achados e corrige P0/P1 antes de seguir.
+5. Hermes nao substitui prova viva local em iPhone Simulator, scanner/camera, push real ou validacao visual.
