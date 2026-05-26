@@ -110,3 +110,4 @@ Atualizado em 2026-05-26:
 - Todo relatorio termina com `HERMES_AUDIT_STATUS: PASS|FINDINGS|BLOCKED|TIMEOUT|PASS_UNCLASSIFIED`.
 - O ultimo relatorio fica apontado por `/opt/data/.hermes/data/manaloom/reports/post_push_latest.md`.
 - Se o LLM travar, o script deve retornar `TIMEOUT` em vez de deixar processo pendurado.
+- O script faz `git fetch --all --prune` antes de calcular `origin/master`, para o smoke nao reportar SHA antigo.

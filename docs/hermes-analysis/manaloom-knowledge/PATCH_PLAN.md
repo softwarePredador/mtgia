@@ -9,6 +9,50 @@
 
 ---
 
+## Status de aplicacao no produto
+
+**APLICADO em `master`: `f57bb8d3` — `Fix semantic role classification fallbacks`**
+
+O patch foi implementado de forma conservadora no codigo de produto:
+
+- `server/lib/ai/optimization_functional_roles.dart`
+  - adiciona listas curadas pequenas para `wincon`, `engine`, `combo_piece` e `protection`;
+  - avalia essas listas antes dos fallbacks de `draw`, `removal` e `ramp`;
+  - corrige os casos reproduzidos: `Walking Ballista`, `The One Ring`, `Basalt Monolith`, `Fierce Guardianship`, `Endurance`.
+- `server/lib/edh_bracket_policy.dart`
+  - detecta `without paying` como `freeInteraction`;
+  - cobre cartas como `Fierce Guardianship`, `Deflecting Swat` e `Deadly Rollick` quando o oracle usa free-cast em vez de `rather than pay`.
+- Testes adicionados:
+  - `server/test/optimization_quality_gate_test.dart`
+  - `server/test/optimize_runtime_support_test.dart`
+
+Validacoes locais executadas antes do push:
+
+```bash
+cd server
+dart analyze lib/ai/optimization_functional_roles.dart lib/edh_bracket_policy.dart test/optimization_quality_gate_test.dart test/optimize_runtime_support_test.dart
+dart test test/optimization_quality_gate_test.dart test/optimization_validator_test.dart test/optimize_runtime_support_test.dart -r expanded
+dart analyze bin lib routes test
+dart test
+```
+
+Resultado:
+
+- `dart analyze`: PASS
+- testes focados: PASS
+- `dart test` completo backend: PASS, `601` testes
+- `git diff --check`: PASS
+- scan simples de secrets nas linhas alteradas: PASS
+
+Observacoes:
+
+- A correcao nao substitui `semantic_tags_v2`; ela melhora o fallback quando a carta nao tem tag persistida ou a confianca semantica e baixa.
+- `Fierce Guardianship` foi tratado por lista curada, nao por regra global para todos os counters. Isso evita reclassificar `Counterspell`/`Swan Song`, que continuam preservando o papel `removal` nos testes existentes.
+- As listas curadas sao intencionalmente pequenas. Novas cartas devem entrar com evidencia concreta e teste.
+- Ainda nao houve novo scorecard publico de optimize apos `f57bb8d3`.
+
+---
+
 ## Patch 1: Walking Ballista classificado como removal em vez de wincon
 
 ### Arquivo: `server/lib/ai/optimization_functional_roles.dart`
