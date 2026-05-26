@@ -185,14 +185,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
+        toolbarHeight: 54,
         title: const Text('Perfil'),
+        centerTitle: true,
         backgroundColor: AppTheme.backgroundAbyss,
         surfaceTintColor: AppTheme.transparent,
         titleTextStyle: theme.textTheme.titleMedium?.copyWith(
           color: AppTheme.textPrimary,
           fontFamily: AppTheme.displayFontFamily,
-          fontWeight: FontWeight.w800,
           fontSize: AppTheme.fontLg + 1,
+          fontWeight: FontWeight.w700,
         ),
         actions: [
           IconButton(

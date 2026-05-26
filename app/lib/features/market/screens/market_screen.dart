@@ -40,39 +40,19 @@ class _MarketScreenState extends State<MarketScreen>
         return Scaffold(
           backgroundColor: AppTheme.backgroundAbyss,
           appBar: AppBar(
-            title: Row(
-              children: [
-                const Icon(
-                  Icons.trending_up,
-                  color: AppTheme.brass400,
-                  size: 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Market',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+            toolbarHeight: 54,
+            title: const Text('Market'),
+            centerTitle: true,
             backgroundColor: AppTheme.backgroundAbyss,
+            surfaceTintColor: AppTheme.transparent,
             elevation: 0,
+            titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontFamily: AppTheme.displayFontFamily,
+              fontSize: AppTheme.fontLg + 1,
+              fontWeight: FontWeight.w700,
+            ),
             actions: [
-              if (provider.moversData != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Center(
-                    child: Text(
-                      '${provider.moversData!.totalTracked} cartas',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontSm,
-                      ),
-                    ),
-                  ),
-                ),
               IconButton(
                 icon: const Icon(Icons.refresh, color: AppTheme.textSecondary),
                 onPressed: provider.isLoading ? null : () => provider.refresh(),

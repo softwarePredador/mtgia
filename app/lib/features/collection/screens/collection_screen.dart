@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../binder/screens/binder_screen.dart' show BinderTabContent;
@@ -42,23 +41,23 @@ class _CollectionScreenState extends State<CollectionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
-        toolbarHeight: 52,
+        toolbarHeight: 54,
         title: const Text('Coleção'),
+        centerTitle: true,
         backgroundColor: AppTheme.backgroundAbyss,
-        actions: [
-          IconButton(
-            key: const Key('collection-open-sets-catalog'),
-            tooltip: 'Catálogo de coleções',
-            onPressed: () => context.push('/collection/sets'),
-            icon: const Icon(Icons.grid_view_rounded, size: 21),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints.tightFor(width: 38, height: 38),
-          ),
-          const ShellAppBarActions(),
-        ],
+        surfaceTintColor: AppTheme.transparent,
+        titleTextStyle: theme.textTheme.titleMedium?.copyWith(
+          color: AppTheme.textPrimary,
+          fontFamily: AppTheme.displayFontFamily,
+          fontSize: AppTheme.fontLg + 1,
+          fontWeight: FontWeight.w700,
+        ),
+        actions: const [ShellAppBarActions()],
         bottom: TabBar(
           key: const Key('collection-hub-tabs'),
           controller: _tabController,
@@ -77,10 +76,14 @@ class _CollectionScreenState extends State<CollectionScreen>
             fontWeight: FontWeight.w700,
           ),
           tabs: const [
-            Tab(text: 'Fichário', height: 34),
-            Tab(text: 'Market', height: 34),
-            Tab(text: 'Trades', height: 34),
-            Tab(text: 'Coleções', height: 34),
+            Tab(
+              key: Key('collection-tab-binder'),
+              text: 'Fichário',
+              height: 34,
+            ),
+            Tab(key: Key('collection-tab-market'), text: 'Market', height: 34),
+            Tab(key: Key('collection-tab-trades'), text: 'Trades', height: 34),
+            Tab(key: Key('collection-tab-sets'), text: 'Coleções', height: 34),
           ],
         ),
       ),

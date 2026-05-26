@@ -45,27 +45,36 @@ void main() {
     await captureVisualProof(binding, tester, 'collection_01_binder');
 
     await tester.tap(
-      find.widgetWithText(Tab, 'Marketplace'),
+      find.byKey(const Key('collection-tab-market')),
       warnIfMissed: false,
     );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.text('Buscar carta no marketplace...'));
     await captureVisualProof(binding, tester, 'collection_02_marketplace');
 
-    await tester.tap(find.widgetWithText(Tab, 'Trades'), warnIfMissed: false);
+    await tester.tap(
+      find.byKey(const Key('collection-tab-trades')),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Recebidas'));
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Enviadas'));
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Finalizadas'));
     await captureVisualProof(binding, tester, 'collection_03_trade_inbox');
 
-    await tester.tap(find.widgetWithText(Tab, 'Coleções'), warnIfMissed: false);
+    await tester.tap(
+      find.byKey(const Key('collection-tab-sets')),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.text('Catálogo de Coleções'));
     await pumpUntilFound(tester, find.byKey(const Key('setsCatalogList')));
     await captureVisualProof(binding, tester, 'collection_04_sets_catalog');
 
-    await tester.tap(find.widgetWithText(Tab, 'Fichário'), warnIfMissed: false);
+    await tester.tap(
+      find.byKey(const Key('collection-tab-binder')),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
   });

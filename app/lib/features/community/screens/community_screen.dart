@@ -55,17 +55,21 @@ class _CommunityScreenState extends State<CommunityScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
+        toolbarHeight: 54,
         title: const Text('Comunidade'),
+        centerTitle: true,
         backgroundColor: AppTheme.backgroundAbyss,
         surfaceTintColor: AppTheme.transparent,
-        titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+        titleTextStyle: theme.textTheme.titleMedium?.copyWith(
           color: AppTheme.textPrimary,
           fontFamily: AppTheme.displayFontFamily,
-          fontWeight: FontWeight.w800,
           fontSize: AppTheme.fontLg + 1,
+          fontWeight: FontWeight.w700,
         ),
         actions: const [ShellAppBarActions()],
         bottom: TabBar(
