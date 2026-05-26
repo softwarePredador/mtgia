@@ -1,2 +1,18 @@
+# Database files (regenerated locally)
 *.db
+*.db-shm
+*.db-wal
+
+# Temp seed files
 seed_temp.json
+
+# Temp analysis scripts (single-use cron generated research)
+analyze_*.py
+read_*.py
+parse_*.py
+seed_*.py
+check_*.py
+explore_*.py
+generate_*.py
+query_*.py
+apply_*.sh
