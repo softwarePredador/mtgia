@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 3 | 2026-05-26 |
-| Decks analisados | 3 | 2026-05-26 |
-| Cartas revisadas | ~154 (selecao) | 2026-05-26 |
-| Insights documentados | 14 | 2026-05-26 |
-| Discrepancias com ManaLoom | 18 (5 novas) | 2026-05-26 |
+| Comandantes analisados | 4 | 2026-05-26 |
+| Decks analisados | 4 | 2026-05-26 |
+| Cartas revisadas | ~200 (selecao) | 2026-05-26 |
+| Insights documentados | 20 | 2026-05-26 |
+| Discrepancias com ManaLoom | 23 (5 novas) | 2026-05-26 |
 
 ## Comandantes Analisados
 
@@ -21,6 +21,7 @@
 | Kinnan, Bonder Prodigy | 1 | 2026-05-26 | 4 | Pendente |
 | Atraxa, Praetors' Voice | 1 | 2026-05-26 | 4 | Pendente |
 | Yuriko, the Tiger's Shadow | 1 | 2026-05-26 | 6 | Pendente |
+| Korvold, Fae-Cursed King | 1 | 2026-05-26 | 5 | Pendente |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -50,6 +51,19 @@
    a funcao primaria de algumas cartas (Temporal Trespass, Shadow of Mortality)
    e ser revelada, nao conjurada. O sistema de tags precisa capturar esta
    dualidade de proposito.
+8. **Korvold e o "engine deck" de Jund** — O deck parece combo (Pitiless
+   Plunderer + sac outlet), mas a metrica mais importante e a quantidade de
+   "fodder" (coisas para sacrificar). Cada sacrifice fodder = 1 carta (Korvold)
+   + 1 dano (Mayhem Devil) + 1 treasure (Pitiless). A qualidade de cada peca
+   individual e menos importante que a densidade do triangulo aristocratas.
+9. **Bracket 3 midrange super-estima ramp e subestima interacao** — O EDHREC
+   avg de Korvold tem 24 cartas que aceleram mana (14 ramp puro + 8 combo) mas
+   apenas 1 board wipe e 0 counterspells. Jogadores de bracket 3 confiam que
+   seu motor gerara mais valor do que os oponentes podem remover.
+10. **Sacrifice permanentes, nao so criaturas** — Diferente de aristocrats
+    tradicionais que so sacrificam criaturas, Korvold sacrifica treasures,
+    clues, foods, encantamentos (Awakening Zone), e ate terrenos. Isso torna
+    o deck mais robusto contra remocao focada em criaturas.
 
 ### Por Arquetipo
 - **Combo (cEDH):** 24+ ramp, 15+ interaction, 0-2 board wipes,
@@ -62,6 +76,10 @@
   10-12 enablers de evasao 1-mana, 12-17 ninjas, 35-37 terrenos (full build),
   CMC medio ~2.8 (mas ~1.8 se excluir flips), ~4 wincons de alto CMC (7-11),
   3-4 topdeck manipulation, 4 tutores
+- **Sacrifice/Midrange (Korvold, bracket 3):** 14 ramp puro (+8 condicional),
+  7 draw, 12 removal (incluindo payoffs como Blood Artist), 1 board wipe,
+  5 tutores, 5 sac outlets, 37 terrenos (full build), CMC medio ~3.2,
+  12 wincons (incrementais + combo), 6 Game Changers
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -78,6 +96,15 @@
   conjura) em troca de explosao de dano. Valoriza consistencia de enablers
   acima de qualidade individual das cartas. E um dos poucos jogadores que
   otimiza o topo do library mais que a mao.
+- **Jogador de Korvold sacrifice/midrange:** Conservador-incremental com
+  explosao de combo. Prefere "win-more" a "comeback" — cartas como Old Gnawbone
+  e Bootleggers' Stash multiplicam uma posicao ja boa. Subestima interacao
+  (zero counterspells, 1 board wipe). Confia que o motor de valor (Korvold +
+  Pitiless + 5 sac outlets) gera mais vantagem que os oponentes podem remover.
+  Pensamento chave: "Toda peca do deck serve a pelo menos 2 funcoes" — Pitiless
+  e ramp + combo piece, Blood Artist e payoff + removal, Mayhem Devil e payoff
+  + removal. O deck e construido para ter 0 cartas mortas, mas aceita que
+  nenhuma funcao individual e maximizada.
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -107,6 +134,19 @@
   evasao de 1-2 manas. Sem eles, Yuriko nao ativa e o deck nao funciona. A IA
   precisa medir "conexao funcional" (ratio enabler:deck_size) em vez de so
   contagens tradicionais.
+- **Korvold + fetch lands = valor psuedo-gratis:** Cada fetch land ativa
+  Korvold (compra 1 carta) e Tireless Provisioner (1 treasure). O jogador
+  escolheu 13+ fetch lands nao so por correcao de mana, mas por gerar valor
+  adicional de sacrificio "gratuito" — a fetch morre de qualquer jeito.
+- **O triangulo aristocratas de Korvold:** Sac outlet + Fodder + Payoff = win.
+  A densidade e tao alta (5 outlets, 13 payoffs, 10+ fodder) que o deck quase
+  sempre tem o triangulo completo em campo. A IA precisa entender que
+  redundancia de pecas e mais importante que qualidade individual.
+- **Ramp inflado por combo pieces no sistema de tags:** Pitiless Plunderer e
+  Phyrexian Altar sao classificados como "ramp" pelo ManaLoom, mas no contexto
+  de Korvold sao primariamente combo pieces. A discrepancia entre tag e funcao
+  real (como confirmado na auditoria de 2026-05-26) faz com que a IA
+  superestime ramp e subestime wincons no deck.
 
 ## Sinergias Documentadas
 
@@ -133,6 +173,16 @@
 | Yuriko | Tetsuko Umezawa | Torna todos os enablers 1/1 unblockable | Alta (Yuriko) |
 | Yuriko | Ingenious Infiltrator | Compra 2 ao ninjutsu + flip de 4 | Alta (Yuriko) |
 | Changeling Outcast | Cover of Darkness | Changeling = ninja -> ganha fear | Alta (Yuriko) |
+| Korvold | Pitiless Plunderer | Cada sacrificio = 1 treasure + 1 draw + 1 +1/+1 | Essencial (Korvold) |
+| Korvold | Viscera Seer | Sac outlet de 1 mana que scry. Ativa motor inteiro | Essencial (Korvold) |
+| Korvold | Tireless Provisioner | Fetch lands viram treasures que viram cartas | Alta (Korvold) |
+| Pitiless Plunderer | Chatterfang, Squirrel General | Squirrels + treasures infinitos | Essencial (Korvold) |
+| Pitiless Plunderer | Blood Artist | Combo infinita = drena 3 oponentes | Essencial (Korvold) |
+| Pitiless Plunderer | Reassembling Skeleton | Loop infinito (sac, volta, sac) | Alta (Korvold) |
+| Underworld Breach | Lotus Petal | Loop de mana recursivo | Alta (Korvold) |
+| Ashnod's Altar | Pitiless Plunderer | 2 treasures + 2 mana por criatura sacrificada | Alta (Korvold) |
+| Old Gnawbone | Korvold | Ataque gera treasures que viram cartas | Media (Korvold) |
+| Academy Manufactor | Pitiless Plunderer | Cada morte de criatura = 1 treasure + 1 clue + 1 food | Alta (Korvold) |
 
 ## Discrepancias Acumuladas com ManaLoom
 
@@ -156,6 +206,11 @@
 | Dark Ritual (Yuriko) | ramp | ritual | No Yuriko funciona como ramp porque o deck inteiro custa 1-2 CMC | Medio |
 | Mystic Remora (Yuriko) | stax_light | draw | Tambem impede oponentes de jogar spells de baixo CMC cedo | Medio |
 | Commandeer (Yuriko) | protection | removal | Funciona como protecao contra board wipes | Baixo |
+| Pitiless Plunderer (Korvold) | ramp + combo_piece | ramp | Tag unica perde funcao primaria de wincon | Medio |
+| Blood Artist (Korvold) | payoff | removal | Tag removal ignora que e o payoff principal do deck | Alto |
+| Mayhem Devil (Korvold) | payoff + removal | removal | Dual function nao capturada | Medio |
+| Underworld Breach (Korvold) | recursion + wincon | recursion | Missing wincon tag | Alto |
+| Korvold, Fae-Cursed King (Korvold) | engine | draw | Sistema nao tem tag engine | Alto |
 
 ## Funcional Tags: Precisao Acumulada
 
@@ -186,6 +241,11 @@
 | Dead draw premium (Yuriko) | Cartas valiosas no topo do library para Yuriko flipar mas inuteis na mao por serem caras demais para conjurar |
 | Conexao funcional | Ratio entre numero de enablers e tamanho do deck - metrica essencial para Yuriko |
 | Dual purpose card (Yuriko) | Carta que serve tanto para efeito quanto como flip de dano para Yuriko |
+| Aristocrat Triangle (Korvold) | Sac outlet + Fodder + Payoff = o triangulo basico de qualquer deck aristocrats |
+| Treasure Storm (Korvold) | Geracao massiva de treasures em um turno (Pitiless + sac outlet + Reassembling Skeleton) |
+| Combo Density (Korvold) | Numero de pecas de combo no deck. Korvold tem alta densidade porque muitas pecas servem a 2 funcoes |
+| Incremental Engine (Korvold) | Motor que gera valor a cada acao (Korvold compra a cada sacrificio, nao de uma vez) |
+| Dual Function Card (geral) | Carta que serve a 2 funcoes primarias (ex: Pitiless = ramp + combo_piece). O sistema de tags do ManaLoom nao captura dual function |
 
 ## Principios de Deckbuilding (extraidos das analises)
 
@@ -199,6 +259,10 @@
 8. **"A carta que voce NAO joga pode ser mais valiosa do que a que voce joga."** (Yuriko — Temporal Trespass nunca e conjurada, mas e o motor de dano principal)
 9. **"Enabler density > Card quality. Ter 12 enablers de evasao de 1 mana e mais importante que ter cartas individuais mais fortes."** (Yuriko)
 10. **"Consistencia de conexao > Potencia individual. Cada ataque que conecta vale 3+ recursos."** (Yuriko)
+11. **"Todo slot tem custo de oportunidade — cada carta que nao acelera ou nao interage e um risco calculado."** (Korvold)
+12. **"O triangulo aristocratas: Sac outlet + Fodder + Payoff = win. A densidade de cada peca e mais importante que a qualidade individual."** (Korvold)
+13. **"Bracket 3 confia em motor > interacao. Prefere ter 14 ramp e 0 counters a 10 ramp e 4 counters."** (Korvold)
+14. **"Dual function > Single function. Uma carta que serve a 2 propositos (Pitiless = ramp + combo) vale mais que duas cartas que fazem cada um separadamente."** (Korvold)
 
 ## Ultimas Execucoes
 
@@ -207,3 +271,4 @@
 | 2026-05-26 | Jokers Are Wild Monthly 1k | Kinnan (2nd) | Analise concluida |
 | 2026-05-26 | EDHREC Average Deck (41.130 decks) | Atraxa, Praetors' Voice (Default/Goodstuff) | Analise concluida |
 | 2026-05-26 | EDHREC Average Deck (30.921 decks) | Yuriko, the Tiger's Shadow (Dimir Ninja Topdeck Tempo) | Analise concluida |
+| 2026-05-26 | EDHREC Average Deck (19.646 decks) | Korvold, Fae-Cursed King (Jund Sacrifice Midrange) | Analise concluida |
