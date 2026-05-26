@@ -68,3 +68,19 @@ Seedborn Muse, e todos os stax pieces.
 
 Os crons vao pesquisar cada carta individualmente (1 por execucao),
 documentando o why_game_changer e notes no SQLite.
+
+## Progresso (2026-05-26)
+
+| Status | Count |
+|:-------|:-----:|
+| Total GCs | 53 |
+| With full analysis | 1/53 |
+| Remaining | 52 |
+| Detected by ManaLoom | 24/53 |
+
+### Ultima analise: Cyclonic Rift
+- **Impact:** 10/10 (board_wipe unilateral)
+- **Why GC:** One-sided, instant-speed board wipe that resets opponents while keeping caster's board intact. Bypasses hexproof/shroud via overload. EDHREC rank #51, $41.
+- **ManaLoom tag:** `removal` (only sees targeted bounce mode)
+- **ManaLoom bracket:** NOT detected
+- **Discrepancy:** System misses overload mode entirely. Needs board_wipe or game_changer bracket category.
