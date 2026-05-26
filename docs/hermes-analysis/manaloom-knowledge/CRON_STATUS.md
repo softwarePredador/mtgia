@@ -57,11 +57,50 @@
 
 **Total:** 6 ações de recuperação — 4 resumes, 2 triggers.
 
-## Notas
+|## Notas
+|
+|- **commander-knowledge-deep** e **missing-gc-filler** terminaram com status=error. Após resume, seus `next_run_at` estavam como None — scheduler recalculou, crons re-agendados via trigger manual.
+|- **master-watchdog** (script-based) está funcional mas tem delay no scheduler.
+|- Nenhum cron com token/secret exposto. Branch: codex/hermes-analysis-docs ✅. knowledge.db writable (hermes:hermes).
 
-- **commander-knowledge-deep** e **missing-gc-filler** terminaram com status=error. Após resume, seus `next_run_at` estão como None — o scheduler deve recalcular na próxima verificação.
-- **master-watchdog** (script-based) está funcional mas tem 1h53min desde última execução (próximo: 21:07) — dentro da janela de 30min mas pode estar atrasado.
-- Nenhum cron com token/secret exposto. Nenhuma branch errada detectada.
+## Análise de Causa Raiz (2026-05-26 22:25)
+
+### manaloom-commander-knowledge-deep — erro 21:00
+
+**Causa primária: Troca de branch.** O workdir do cron estava em uma branch
+que não `codex/hermes-analysis-docs`. Ao executar, todos os arquivos
+necessários (INDEX.md, knowledge.db, scripts/, analises markdown) estavam
+ausentes ou em caminhos diferentes. O cron não conseguiu encontrar o que
+precisava e falhou.
+
+**Causas secundárias (script):** Mesmo na branch correta, `explore_artifacts.py`
+tem problemas estruturais:
+1. `SyntaxError: unterminated string literal` — escaping Python via terminal
+2. `'list' object has no attribute 'get'` — corpus.json pode ser list OU dict
+3. `KeyError` em slicing de dados não-list (EDHTop16 expansion files com `NO_CARDS`)
+4. Commit final ficou como "pending" — a análise nunca foi finalizada
+
+### manaloom-missing-gc-filler — erro 20:36
+
+**Causa primária: Troca de branch** (mesmo padrão). Como era a PRIMEIRA
+execução do cron (nunca rodou antes), ele foi criado e agendado, mas quando
+o scheduler tentou executar, o workdir estava em outra branch.
+
+**Causa secundária: Inicialização incompleta.** O cron foi criado na
+sessão das 20:00 mas nunca completou uma execução. O skills `manaloom-commander-knowledge`
+e `manaloom-mtg-domain` precisam carregar, consultar SQLite, achar o próximo
+GC a preencher — qualquer erro de arquivo ou permissão interrompe o fluxo.
+
+### Estado Atual da Correção
+
+| Fator | Status | Evidência |
+|:------|:------:|:----------|
+| Branch correta | ✅ | codex/hermes-analysis-docs |
+| knowledge.db acessível | ✅ | hermes:hermes 644, 237KB |
+| Scripts no diretório | ✅ | 20+ scripts presentes |
+| Cron re-agendados | ✅ | next_run_at ~22:22 (trigger manual) |
+| knowledge.db root-owned | ✅ NÃO | Não é necessário workaround de mv+cp |
+| Manager watchdog ativo | ✅ | Próxima exec ~22:23 |
 
 ## Scorecard de Otimização
 
