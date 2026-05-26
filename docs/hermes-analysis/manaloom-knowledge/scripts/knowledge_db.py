@@ -193,6 +193,34 @@ CREATE TABLE IF NOT EXISTS game_changers (
     notes TEXT
 );
 
+CREATE TABLE IF NOT EXISTS deck_themes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    theme_name TEXT UNIQUE NOT NULL,
+    category TEXT,
+    description TEXT,
+    bracket_min INTEGER DEFAULT 1,
+    bracket_max INTEGER DEFAULT 4,
+    difficulty TEXT DEFAULT 'medium',
+    core_cards_json TEXT,
+    enabler_count_min INTEGER,
+    payoff_count_min INTEGER,
+    role_targets_json TEXT,
+    compatible_themes_json TEXT,
+    conflicting_themes_json TEXT,
+    signature_commanders_json TEXT,
+    notes TEXT
+);
+
+CREATE TABLE IF NOT EXISTS theme_detection_rules (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    theme_id INTEGER REFERENCES deck_themes(id),
+    rule_type TEXT DEFAULT 'oracle',
+    pattern TEXT NOT NULL,
+    weight REAL DEFAULT 1.0,
+    card_name TEXT,
+    notes TEXT
+);
+
 CREATE TABLE IF NOT EXISTS run_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     run_date TEXT NOT NULL,
