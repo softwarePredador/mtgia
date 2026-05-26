@@ -114,10 +114,13 @@ BracketTagResult tagCardForBracket({
 
   // Free interaction / custo alternativo (heurística)
   final hasRather = o.contains('rather than pay');
-  final hasExile = o.contains('exile a') || o.contains('exile two') || o.contains('exile one');
+  final hasExile = o.contains('exile a') ||
+      o.contains('exile two') ||
+      o.contains('exile one');
   final hasPayLife = o.contains('pay') && o.contains('life') && hasRather;
   final hasPitch = hasRather && (hasExile || hasPayLife);
-  if (hasPitch) {
+  final hasFreeCast = o.contains('without paying');
+  if (hasPitch || hasFreeCast) {
     categories.add(BracketCategory.freeInteraction);
   }
 
@@ -148,7 +151,11 @@ Map<BracketCategory, int> countBracketCategories(
     if (name.isEmpty) continue;
 
     final qty = (c['quantity'] as int?) ?? 1;
-    final tags = tagCardForBracket(name: name, typeLine: typeLine, oracleText: oracle);
+    final tags = tagCardForBracket(
+      name: name,
+      typeLine: typeLine,
+      oracleText: oracle,
+    );
     for (final cat in tags.categories) {
       counts[cat] = (counts[cat] ?? 0) + qty;
     }
@@ -183,7 +190,8 @@ BracketFilterDecision applyBracketPolicyToAdditions({
 
   final remaining = <BracketCategory, int>{};
   for (final entry in policy.maxCounts.entries) {
-    remaining[entry.key] = (entry.value - (counts[entry.key] ?? 0)).clamp(0, 999);
+    remaining[entry.key] =
+        (entry.value - (counts[entry.key] ?? 0)).clamp(0, 999);
   }
 
   final allowed = <String>[];
@@ -195,7 +203,11 @@ BracketFilterDecision applyBracketPolicyToAdditions({
     final oracle = (c['oracle_text'] as String?) ?? '';
     if (name.isEmpty) continue;
 
-    final tags = tagCardForBracket(name: name, typeLine: typeLine, oracleText: oracle);
+    final tags = tagCardForBracket(
+      name: name,
+      typeLine: typeLine,
+      oracleText: oracle,
+    );
     final categories = tags.categories.toList();
 
     var canAdd = true;
@@ -259,4 +271,3 @@ const _knownInfiniteComboPieces = <String>{
   'demonic consultation',
   'tainted pact',
 };
-

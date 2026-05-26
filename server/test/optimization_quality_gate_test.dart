@@ -368,6 +368,48 @@ void main() {
       expect(role, equals('ramp'));
     });
 
+    test('classifies curated semantic staples before oracle fallback roles',
+        () {
+      final samples = {
+        'Walking Ballista': [
+          'Artifact Creature — Construct',
+          '{4}: Put a +1/+1 counter on Walking Ballista. Remove a +1/+1 counter from Walking Ballista: It deals 1 damage to any target.',
+          'wincon',
+        ],
+        'The One Ring': [
+          'Legendary Artifact',
+          'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
+          'engine',
+        ],
+        'Basalt Monolith': [
+          'Artifact',
+          'Basalt Monolith does not untap during your untap step. {T}: Add {C}{C}{C}. {3}: Untap Basalt Monolith.',
+          'combo_piece',
+        ],
+        'Fierce Guardianship': [
+          'Instant',
+          'If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell.',
+          'protection',
+        ],
+        'Endurance': [
+          'Creature — Elemental Incarnation',
+          'Flash. Reach. When Endurance enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.',
+          'protection',
+        ],
+      };
+
+      for (final entry in samples.entries) {
+        final values = entry.value;
+        final role = classifyOptimizationFunctionalRole({
+          'name': entry.key,
+          'type_line': values[0],
+          'oracle_text': values[1],
+        });
+
+        expect(role, equals(values[2]), reason: entry.key);
+      }
+    });
+
     test('treats all is dust as wipe and blocks wipe to creature downgrade',
         () {
       final originalDeck = [

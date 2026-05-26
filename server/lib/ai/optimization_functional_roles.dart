@@ -59,8 +59,25 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
 
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
+  final name = ((card['name'] as String?) ?? '').toLowerCase().trim();
 
   if (typeLine.contains('land')) return 'land';
+
+  if (_knownWinconNames.contains(name) || oracle.contains('you win the game')) {
+    return 'wincon';
+  }
+
+  if (_knownComboPieceNames.contains(name)) {
+    return 'combo_piece';
+  }
+
+  if (_knownEngineNames.contains(name)) {
+    return 'engine';
+  }
+
+  if (_knownProtectionNames.contains(name)) {
+    return 'protection';
+  }
 
   if (oracle.contains('draw') ||
       oracle.contains('look at the top') ||
@@ -107,6 +124,61 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
 
   return 'utility';
 }
+
+const _knownWinconNames = <String>{
+  'walking ballista',
+  'laboratory maniac',
+  "thassa's oracle",
+  'jace, wielder of mysteries',
+  'approach of the second sun',
+  'craterhoof behemoth',
+  'torment of hailfire',
+  'exsanguinate',
+  'aetherflux reservoir',
+  'finale of devastation',
+  'triskaidekaphile',
+};
+
+const _knownEngineNames = <String>{
+  'the one ring',
+  'thrasios, triton hero',
+  'kinnan, bonder prodigy',
+  'seedborn muse',
+  'consecrated sphinx',
+  'necropotence',
+  "bolas's citadel",
+  'mystic forge',
+  'future sight',
+  'magus of the future',
+  "sensei's divining top",
+  'rhystic study',
+  'mystic remora',
+  'esper sentinel',
+};
+
+const _knownComboPieceNames = <String>{
+  'basalt monolith',
+  'grim monolith',
+  'freed from the real',
+  "pemmin's aura",
+  'dramatic reversal',
+  'isochron scepter',
+  'underworld breach',
+  "lion's eye diamond",
+  'demonic consultation',
+  'tainted pact',
+  'hermit druid',
+};
+
+const _knownProtectionNames = <String>{
+  'fierce guardianship',
+  'deflecting swat',
+  'deadly rollick',
+  'endurance',
+  "teferi's protection",
+  'heroic intervention',
+  'flawless maneuver',
+};
 
 String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
   var semanticTags = rawSemanticTags;

@@ -272,6 +272,17 @@ void main() {
   });
 
   group('bracket safety', () {
+    test('detects commander free-cast interaction as free interaction', () {
+      final tags = tagCardForBracket(
+        name: 'Fierce Guardianship',
+        typeLine: 'Instant',
+        oracleText:
+            'If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell.',
+      );
+
+      expect(tags.categories, contains(BracketCategory.freeInteraction));
+    });
+
     test('blocks power additions above low bracket budgets', () {
       final decision = applyBracketPolicyToAdditions(
         bracket: 1,
