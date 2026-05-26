@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-26T22:04Z**
+> Última atualização: **2026-05-26T23:12Z**
 
 ## Resumo
 
@@ -15,22 +15,22 @@
 | Mana Base | 1 | 1 | a cada 60min |
 | Gerencial | 1 | 1 | a cada 30min |
 
-**Estado geral:** 12/12 habilitados ✅ — 2 com last_status=error (recuperados via resume, aguardando scheduler).
+**Estado geral:** 12/12 habilitados ✅ — 1 com last_status=error (commander-knowledge-deep, recuperado via resume, aguardando próximo ciclo).
 
 ## Crons de Conhecimento (20min)
 
 | Cron | Última exec | Status | Observação |
 |:-----|:-----------:|:------:|:----------|
-| manaloom-commander-knowledge-deep | 21:00 | 🔴 error | Resumido nesta rodada — estava disabled+error |
-| manaloom-gamechanger-research | 21:12 | 🟢 ok | Resumido — desabilitado por troca de branch |
-| manaloom-themes-research | 21:32 | 🟢 ok | Resumido — desabilitado por troca de branch |
+| manaloom-commander-knowledge-deep | 22:35 | 🔴 error | Resumido — estava disabled+error por troca de branch |
+| manaloom-gamechanger-research | 22:47 | 🟢 ok | Resumido — desabilitado por troca de branch |
+| manaloom-themes-research | 23:01 | 🟢 ok | Resumido — desabilitado por troca de branch |
 
 ## Crons de Auditoria
 
 | Cron | Schedule | Status | Observação |
 |:-----|:--------:|:------|:----------|
-| manaloom-master-watchdog | 30min | 🟢 OK | Script-based (no agent) |
-| manaloom-hermes-normal-audit | 16h,21h | 🟢 trigger manual | 21:00 foi perdido; trigger enviado |
+| manaloom-master-watchdog | 30min | 🟢 OK | Script-based — trigger manual enviado (3h20min sem exec) |
+| manaloom-hermes-normal-audit | 16h,21h | 🟢 OK | Última exec 21:59Z; próximo 16h amanhã |
 | manaloom-hermes-daily-deep-audit | 11:30 | 🟡 Pendente | Próximo: 2026-05-27 11:30 |
 | manaloom-hermes-weekly-memory-cleanup | Dom 12h | 🟡 Pendente | Próximo: 2026-05-31 |
 | manaloom-hermes-weekly-parallel-audit | Dom 12:30 | 🟡 Pendente | Próximo: 2026-05-31 |
@@ -39,29 +39,29 @@
 
 | Cron | Schedule | Função | Status |
 |:-----|:--------:|:-------|:------|
-| manaloom-missing-gc-filler | 20min | Preenche análise dos 32 GCs faltantes | 🟢 Resumido (estava error) |
-| manaloom-manager-watchdog | 30min | Monitora e recupera crons | 🟢 Primeira execução |
+| manaloom-missing-gc-filler | 20min | Preenche análise dos 32 GCs faltantes | 🟢 Resumido — último ciclo 23:10Z |
+| manaloom-manager-watchdog | 30min | Monitora e recupera crons | 🟢 2ª execução |
 | manaloom-tag-accuracy-reporter | 6h | Relatório de precisão das tags | 🟡 Aguardando 01:55 |
-| manaloom-mana-base-validator | 60min | Valida base de mana vs EDHREC | 🟢 Trigger manual enviado |
+| manaloom-mana-base-validator | 60min | Valida base de mana vs EDHREC | 🟢 Último ciclo 22:08Z |
 
-## Ações da Rodada Atual (2026-05-26T21:40Z)
+## Ações da Rodada Atual (2026-05-26T23:12Z)
 
 | # | Cron | Ação | Resultado |
 |:-:|:-----|:----|:----------|
-| 1 | manaloom-commander-knowledge-deep | resume (disabled+error) | ✅ Ativado |
-| 2 | manaloom-gamechanger-research | resume (branch switch) | ✅ Ativado |
-| 3 | manaloom-themes-research | resume (branch switch) | ✅ Ativado |
-| 4 | manaloom-missing-gc-filler | resume (disabled+error) | ✅ Ativado |
-| 5 | manaloom-hermes-normal-audit | trigger (janela 21:00 perdida) | ✅ Disparado |
-| 6 | manaloom-mana-base-validator | trigger (nunca rodou, atrasado) | ✅ Completo — 3 críticos, 3 moderados |
+| 1 | manaloom-commander-knowledge-deep | resume (disabled+error) | ✅ Reativado — aguardando próximo ciclo |
+| 2 | manaloom-gamechanger-research | resume (branch switch) | ✅ Reativado |
+| 3 | manaloom-themes-research | resume (branch switch) | ✅ Reativado |
+| 4 | manaloom-missing-gc-filler | resume (branch switch) | ✅ Reativado |
+| 5 | manaloom-master-watchdog | trigger (3h20min sem execução) | ✅ Disparado — next 23:12Z |
 
-**Total:** 6 ações de recuperação — 4 resumes, 2 triggers.
+**Total:** 5 ações de recuperação — 4 resumes, 1 trigger.
 
 |## Notas
 |
-|- **commander-knowledge-deep** e **missing-gc-filler** terminaram com status=error. Após resume, seus `next_run_at` estavam como None — scheduler recalculou, crons re-agendados via trigger manual.
-|- **master-watchdog** (script-based) está funcional mas tem delay no scheduler.
-|- Nenhum cron com token/secret exposto. Branch: codex/hermes-analysis-docs ✅. knowledge.db writable (hermes:hermes).
+|- **commander-knowledge-deep** manteve last_status=error mas já foi reativado — o próximo ciclo deve resetar o status.
+|- **master-watchdog** ficou 3h20min sem executar (19:49→23:12Z). Trigger manual enviado. Possível causa: scheduler perdeu o ciclo durante janela de troca de branch das 20:00.
+|- **gamechanger-research**, **themes-research** e **missing-gc-filler** rodaram com sucesso mesmo desabilitados — troca de branch os desabilitou mas os ciclos individuais terminaram OK.
+|- Nenhum cron com token/secret exposto. Branch: codex/hermes-analysis-docs ✅.
 
 ## Análise de Causa Raiz (2026-05-26 22:25)
 
