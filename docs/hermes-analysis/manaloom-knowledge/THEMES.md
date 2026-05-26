@@ -23,7 +23,7 @@ Cada tema tem:
 | Tema | Enablers Min | Payoffs Min | Bracket | Dificuldade | Comandantes Assinatura |
 |:-----|:-----------:|:----------:|:------:|:----------:|:----------------------|
 | **Elfball** | 25 elfos | 8 payoffs | 2-4 | Media | Lathril, Ezuri, Marwyn |
-| **Goblins** | 20 goblins | 6 payoffs | 2-4 | Media | Krenko, Muxus |
+| **Goblins** | 25-38 goblins | 5-10 payoffs | 2-4 | Media | Krenko, Muxus |
 | **Zombies** | 20 zumbis | 6 payoffs | 2-4 | Facil | Wilhelt, Varina, Sidisi |
 | **Vampires** | 20 vampiros | 6 payoffs | 2-4 | Facil | Edgar Markov, Strefan |
 | **Dragons** | 15 dragoes | 5 payoffs | 3-4 | Dificil | Miirym, Ur-Dragon |
@@ -85,7 +85,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 | Tema | Ramp Ideal | Tipo de Ramp | Notas |
 |:-----|:---------:|:------------|:------|
 | Elfball | 20-30 | Dorks de mana | Cada elfo e ramp |
-| Goblins | 12-18 | Dorks + Rocks | Goblin tribal tem ramp integrada |
+| Goblins | 8-11 | Rocks + rituals (Skirk Prospector) | Mono-red sem dorks verdes. Ramp e integrado a criaturas/rituals |
 | Dragons | 15-20 | Rocks + Ramp spells | CMC medio alto (4-5) |
 | Spellslinger | 8-12 | Rocks + mana reducao | Paga pouco por spell |
 | Voltron | 8-10 | Equipment cost reducers | Precisa de mana para equipar |
@@ -104,6 +104,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 | Enchantress | 10-14 | Enchantress effects | Cada encantamento compra |
 | Aristocrats | 8-12 | Sacrifice draw | Grim Haruspex, Midnight Reaper |
 | Tribal | 6-10 | Tribal draw | Beast Whisperer (elfos) |
+| Goblins | 8-11 | Sacrifice draw (Skullclamp) + rummage | Draw baixo no EDHREC avg (~3), mas profile conta Skullclamp |
 | Voltron | 6-8 | Equipment draw | Kor Spiritdancer, Puresteel |
 | cEDH | 4-6 | Efficient draw | Rhystic Study, Mystic Remora |
 
@@ -124,7 +125,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 Dado um decklist, a deteccao do tema usa estas heuristicas:
 
 ### Passo 1: Contar tribos
-- Se 20+ cartas compartilham um tipo de criatura -> TRIBAL
+- Se 20+ cartas compartilham um tipo de criatura -> TRIBAL (exceto Goblins: 25+ por Krenko profile)
 - Qual tipo tem mais cartas? Esse e o tema tribal
 
 ### Passo 2: Contar mecanicas
@@ -137,6 +138,7 @@ Dado um decklist, a deteccao do tema usa estas heuristicas:
 - 10+ GY interactions -> GRAVEYARD
 - 8+ reanimation spells + targets -> REANIMATOR
 - 15+ landfall triggers + 10 land ramp -> LANDFALL
+- 25+ goblin type-line + 5+ haste/untap enablers + 4+ sacrifice finishers -> GOBLINS
 
 ### Passo 3: Score de Confianca
 - 3+ sinais fortes para o mesmo tema = CONFIRMADO
@@ -184,3 +186,79 @@ Dado um decklist, a deteccao do tema usa estas heuristicas:
 O banco `knowledge.db` tem duas novas tabelas:
 - `deck_themes` — definicao de cada tema com metricas
 - `theme_detection_rules` — regras para detectar temas em decklists
+
+## Validacao de Temas (FONTES REAIS)
+
+### Status Atual (2026-05-26)
+
+| Tema | Status | Fontes | Confianca | Validade |
+|:-----|:------|:-------|:---------:|:--------:|
+| **Enchantress** | VALIDADO | EDHREC (Sythis) + Draftsim primer + TCGPlayer guide + Profile curator | ALTA | 2026-05-26 |
+| **Landfall** | VALIDADO | EDHREC (Aesi 41k+ decks) + Moxfield | ALTA | 2026-05-26 |
+| **Elfball** | VALIDADO | EDHREC (Lathril) + Moxfield | ALTA | 2026-05-26 |
+| **Aristocrats** | VALIDADO | EDHREC (Teysa Karlov) + MTGGoldfish | ALTA | 2026-05-26 |
+| **Artifacts** | VALIDADO | EDHREC (Urza casual + cEDH) + Moxfield | ALTA | 2026-05-26 |
+| **Goblins** | VALIDADO | Krenko profile (4 fontes: EDHREC, Moxfield, Archidekt) + EDHREC avg deck corpus (sprint3_lot_a) | ALTA | 2026-05-26 |
+| **Dragons** | NAO VALIDADO | — | — | — |
+| **Vampires** | NAO VALIDADO | — | — | — |
+| **Spellslinger** | NAO VALIDADO | — | — | — |
+| **Graveyard** | NAO VALIDADO | — | — | — |
+| **Tokens** | NAO VALIDADO | — | — | — |
+| **+1/+1 Counters** | NAO VALIDADO | — | — | — |
+| **Voltron** | NAO VALIDADO | — | — | — |
+| **Blink/Flicker** | NAO VALIDADO | — | — | — |
+| **Wheels** | NAO VALIDADO | — | — | — |
+| **Reanimator** | NAO VALIDADO | — | — | — |
+| **Mill** | NAO VALIDADO | — | — | — |
+| **Zombies** | NAO VALIDADO | — | — | — |
+| **Knights** | NAO VALIDADO | — | — | — |
+| **Merfolk** | NAO VALIDADO | — | — | — |
+| **Humans** | NAO VALIDADO | — | — | — |
+| **Stax/Prison** | NAO VALIDADO | — | — | — |
+| **Combo (Proactive)** | NAO VALIDADO | — | — | — |
+| **Group Slug** | NAO VALIDADO | — | — | — |
+| **Superfriends** | NAO VALIDADO | — | — | — |
+| **Cascade** | NAO VALIDADO | — | — | — |
+
+### Discrepancias Encontradas: Goblins
+
+Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC + perfil Krenko):
+
+| Metrica | THEMES.md (antigo) | Dado REAL | Diferenca | Impacto |
+|:--------|:------------------:|:---------:|:---------:|:--------|
+| Enablers (goblins) | 20 Min | 25-38 (profile) | SUBESTIMADO 25-90% | Alto |
+| Payoffs | 6 Min | 5-10 (profile) | Validado (range maior) | Baixo |
+| Ramp | 12-18 | 8-11 (profile) / ~6 (EDHREC avg) | SUPERESTIMADO 50-100% | **CRITICO** |
+| Draw | — | 8-11 (profile) / ~3 (EDHREC avg) | Ausente | Medio |
+| Removal | 6-8 | 4-7 (profile) | Ligeiramente superestimado | Baixo |
+| Haste/Untap | — | 6-10 (profile) | **AUSENTE** — critico | **CRITICO** |
+| Lands | — | 33-35 (profile) | Ausente | Medio |
+| Protecao | — | 3-5 (profile) | Ausente | Medio |
+| Board Wipes | — | 1-2 (profile) | Ausente | Baixo |
+| Core Commanders | Krenko, Muxus | Igual | Validado | — |
+
+### Principios Aprendidos
+
+1. **Cada tribal tem metrica de ramp diferente:** Goblins (8-11) != Elfos (20-30) != Dragoes (15-20).
+   Nao existe "tribal ramp generico". O ramp depende da identidade de cor do tribal.
+2. **Cada tribal tem metrica de densidade diferente:** Elfos (25), Goblins (25-38), Dragoes (18-24).
+   A densidade depende de quantos enablers a tribo precisa para funcionar.
+3. **Haste e critica para Krenko**: sem haste/untap, Krenko precisa sobreviver um turno inteiro
+   antes de ativar, o que raramente acontece. 6-10 haste/untap enablers sao o SEGUNDO fator
+   mais importante depois da densidade de goblins.
+4. **Ramp de goblins e integrado a criaturas**: Skirk Prospector e ao mesmo tempo um goblin
+   (conta para densidade) e uma fonte de mana (ramp). THEMES.md original contava como ramp
+   separado, mas ele e dual-purpose.
+
+### Proximos Temas a Validar (por prioridade)
+
+1. **Dragons** (Miirym profile disponivel em batch_b, 4 fontes) — distinto de Elfball/Goblins
+2. **Spellslinger** (Prosper profile disponivel em batch_a, Niv-Mizzet em batch_c)
+3. **Vampires** (Edgar Markov profile disponivel em batch_b)
+4. **Graveyard** (Muldrotha profile disponivel em batch_a, Meren em batch_c)
+5. **Blink/Flicker** (Brago profile disponivel em batch_c)
+6. **Tokens** (Chatterfang ou Ghired — verificar se ha perfil disponivel)
+7. **+1/+1 Counters** (Atraxa profile disponivel em batch_a)
+8. **Voltron** (Light-Paws profile disponivel em batch_c, Feather em batch_c)
+9. **Mill** (Bruvac — verificar se ha dados de EDHREC)
+10. **Reanimator** (Meren profile disponivel em batch_c)
