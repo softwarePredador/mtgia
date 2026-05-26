@@ -26,7 +26,7 @@ Cada tema tem:
 | **Goblins** | 25-38 goblins | 5-10 payoffs | 2-4 | Media | Krenko, Muxus |
 | **Zombies** | 20 zumbis | 6 payoffs | 2-4 | Facil | Wilhelt, Varina, Sidisi |
 | **Vampires** | 20 vampiros | 6 payoffs | 2-4 | Facil | Edgar Markov, Strefan |
-| **Dragons** | 15 dragoes | 5 payoffs | 3-4 | Dificil | Miirym, Ur-Dragon |
+|| **Dragons** | 18-24 dragoes | 10-17 payoffs | 3-4 | Dificil | Miirym, Ur-Dragon |
 | **Knights** | 18 cavaleiros | 5 payoffs | 2-3 | Media | Syr Gwyn, Sidar Jabari |
 | **Merfolk** | 20 tritões | 5 payoffs | 2-3 | Facil | Kumena, Hakban |
 | **Soldiers** | 20 soldados | 5 payoffs | 2-3 | Facil | Darien, Odric |
@@ -86,7 +86,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 |:-----|:---------:|:------------|:------|
 | Elfball | 20-30 | Dorks de mana | Cada elfo e ramp |
 | Goblins | 8-11 | Rocks + rituals (Skirk Prospector) | Mono-red sem dorks verdes. Ramp e integrado a criaturas/rituals |
-| Dragons | 15-20 | Rocks + Ramp spells | CMC medio alto (4-5) |
+|| Dragons | 12-16 | Rocks + cost reducers + Orbs | CMC medio alto (~4.09). Ramp inclui Dragon's Hoard (63% EDHREC) |
 | Spellslinger | 8-12 | Rocks + mana reducao | Paga pouco por spell |
 | Voltron | 8-10 | Equipment cost reducers | Precisa de mana para equipar |
 | Aristocrats | 8-12 | Rocks | Nao precisa de mana extrema |
@@ -199,7 +199,7 @@ O banco `knowledge.db` tem duas novas tabelas:
 | **Aristocrats** | VALIDADO | EDHREC (Teysa Karlov) + MTGGoldfish | ALTA | 2026-05-26 |
 | **Artifacts** | VALIDADO | EDHREC (Urza casual + cEDH) + Moxfield | ALTA | 2026-05-26 |
 | **Goblins** | VALIDADO | Krenko profile (4 fontes: EDHREC, Moxfield, Archidekt) + EDHREC avg deck corpus (sprint3_lot_a) | ALTA | 2026-05-26 |
-| **Dragons** | NAO VALIDADO | — | — | — |
+| **Dragons** | VALIDADO | EDHREC (Miirym 27k+ decks) + Miirym profile (4 fontes: Draftsim, Moxfield, Archidekt) + Draftsim primer | ALTA | 2026-05-26 |
 | **Vampires** | NAO VALIDADO | — | — | — |
 | **Spellslinger** | NAO VALIDADO | — | — | — |
 | **Graveyard** | NAO VALIDADO | — | — | — |
@@ -237,9 +237,28 @@ Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC + perfil
 | Board Wipes | — | 1-2 (profile) | Ausente | Baixo |
 | Core Commanders | Krenko, Muxus | Igual | Validado | — |
 
+### Discrepancias Encontradas: Dragons
+
+Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC 27k+ decks + Miirym profile 4 fontes):
+
+| Metrica | THEMES.md (antigo) | Dado REAL | Diferenca | Impacto |
+|:--------|:------------------:|:---------:|:---------:|:--------|
+| Enablers (dragoes) | 15 Min | 18-24 (profile) | SUBESTIMADO 20-60% | Alto |
+| Payoffs | 5 | 10-17 (5-9 copy + 5-8 ETB) | SUBESTIMADO 100-240% | **CRITICO** |
+| Ramp | 15-20 | 12-16 (profile) | SUPERESTIMADO 25% (max) | Medio |
+| CMC Medio | — | ~4.09 (EDHREC mana curve) | Ausente | Medio |
+| Lands | — | 36-38 (profile) / 36 (EDHREC avg) | Ausente | Medio |
+| Draw | — | 9-12 (profile) | Ausente | Alto |
+| Interaction | — | 7-10 (profile) | Ausente | Medio |
+| Counter Protection | — | 4-7 (profile) | Ausente | Alto |
+| Board Wipes | — | 1-3 (profile) | Ausente | Baixo |
+| Copy Enablers | — | 5-9 (profile) | **AUSENTE** — essencial para Miirym | **CRITICO** |
+| ETB Damage Payoffs | — | 5-8 (profile) | **AUSENTE** — wincon primaria | **CRITICO** |
+| Core Commanders | Miirym, Ur-Dragon | Igual | Validado | — |
+
 ### Principios Aprendidos
 
-1. **Cada tribal tem metrica de ramp diferente:** Goblins (8-11) != Elfos (20-30) != Dragoes (15-20).
+1. **Cada tribal tem metrica de ramp diferente:** Goblins (8-11) != Elfos (20-30) != Dragoes (12-16).
    Nao existe "tribal ramp generico". O ramp depende da identidade de cor do tribal.
 2. **Cada tribal tem metrica de densidade diferente:** Elfos (25), Goblins (25-38), Dragoes (18-24).
    A densidade depende de quantos enablers a tribo precisa para funcionar.
@@ -249,16 +268,24 @@ Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC + perfil
 4. **Ramp de goblins e integrado a criaturas**: Skirk Prospector e ao mesmo tempo um goblin
    (conta para densidade) e uma fonte de mana (ramp). THEMES.md original contava como ramp
    separado, mas ele e dual-purpose.
+5. **Dragons tem payoff em duas camadas**: copy enablers (Sakashima, Molten Echoes) e ETB
+   damage (Terror of the Peaks, Scourge of Valkas). Payoffs nao sao um grupo unico — sao
+   DUAS categorias distintas que precisam de densidade separada.
+6. **CMC medio de ~4.09 significa que ramp nao e so acelerar — e poder CASTAR**
+   Enquanto Elfball casta 1-3 e Goblins 2-4, Dragoes custam 4-7 em media.
+   Cada dois pontos de ramp extra permitem castar um dragao a mais por turno.
+7. **EDHREC avg deck (86 cards) vs full build (100 cards):** A diferenca de ~14 cartas
+   sao principalmente terrenos (total real ~40-42). Decks de dragao precisam de mais
+   terrenos que a media porque o CMC e alto.
 
 ### Proximos Temas a Validar (por prioridade)
 
-1. **Dragons** (Miirym profile disponivel em batch_b, 4 fontes) — distinto de Elfball/Goblins
-2. **Spellslinger** (Prosper profile disponivel em batch_a, Niv-Mizzet em batch_c)
-3. **Vampires** (Edgar Markov profile disponivel em batch_b)
-4. **Graveyard** (Muldrotha profile disponivel em batch_a, Meren em batch_c)
-5. **Blink/Flicker** (Brago profile disponivel em batch_c)
-6. **Tokens** (Chatterfang ou Ghired — verificar se ha perfil disponivel)
-7. **+1/+1 Counters** (Atraxa profile disponivel em batch_a)
-8. **Voltron** (Light-Paws profile disponivel em batch_c, Feather em batch_c)
-9. **Mill** (Bruvac — verificar se ha dados de EDHREC)
-10. **Reanimator** (Meren profile disponivel em batch_c)
+1. **Spellslinger** (Prosper profile disponivel em batch_a, Niv-Mizzet em batch_c)
+2. **Vampires** (Edgar Markov profile disponivel em batch_b)
+3. **Graveyard** (Muldrotha profile disponivel em batch_a, Meren em batch_c)
+4. **Blink/Flicker** (Brago profile disponivel em batch_c)
+5. **Tokens** (Chatterfang ou Ghired — verificar se ha perfil disponivel)
+6. **+1/+1 Counters** (Atraxa profile disponivel em batch_a)
+7. **Voltron** (Light-Paws profile disponivel em batch_c, Feather em batch_c)
+8. **Mill** (Bruvac — verificar se ha dados de EDHREC)
+9. **Reanimator** (Meren profile disponivel em batch_c)
