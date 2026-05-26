@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 5 | 2026-05-26 |
-| Decks analisados | 5 | 2026-05-26 |
-| Cartas revisadas | ~280 (selecao) | 2026-05-26 |
-| Insights documentados | 26 | 2026-05-26 |
-| Discrepancias com ManaLoom | 30 (7 novas) | 2026-05-26 |
+| Comandantes analisados | 6 | 2026-05-26 |
+| Decks analisados | 7 | 2026-05-26 |
+| Cartas revisadas | ~578 (selecao) | 2026-05-26 |
+| Insights documentados | 34 | 2026-05-26 |
+| Discrepancias com ManaLoom | 33 | 2026-05-26 |
 
 ## Comandantes Analisados
 
@@ -23,6 +23,8 @@
 | Yuriko, the Tiger's Shadow | 1 | 2026-05-26 | 6 | Pendente |
 | Korvold, Fae-Cursed King | 1 | 2026-05-26 | 5 | Pendente |
 | Teysa Karlov | 1 | 2026-05-26 | 6 | Pendente |
+| Aesi, Tyrant of Gyre Strait | 1 | 2026-05-26 | 4 | Pendente |
+| **Lorehold, the Historian** | **1** | **2026-05-26** | **4** | **Pendente** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -75,6 +77,15 @@
 13. **O triangulo aristocrats e universal** — Fodder + Outlet + Payoff aparece
     em todos os 4 decks do corpus Teysa (default, aristocrats, tokens, sacrifice).
     A densidade varia, mas o triangulo sempre esta presente.
+14. **Aesi como engine: draw + ramp simultaneo** — Aesi e o unico comandante que
+    da extra land drop E card draw pelo mesmo trigger. O sistema (tag "draw") perde
+    metade da funcao. Aesi precisa de 40+ terrenos e 14-18 ramp (perfil confirma).
+15. **EDHREC average deck pode ter mais ramp que o perfil** — O Aesi default tem
+    23 ramp fontes vs perfil max de 18. O deck mais popular prioriza "mais ramp
+    e mais terrenos" ao custo de protecao e interacao.
+16. **Comandantes engine requerem metricas diferentes** — CMC medio (2.61) e
+    aceitavel, mas a metrica chave para Aesi e # de extra-land-drop effects e
+    # de landfall payoffs, nao ramp/draw tradicionais.
 
 ### Por Arquetipo
 - **Combo (cEDH):** 24+ ramp, 15+ interaction, 0-2 board wipes,
@@ -96,6 +107,10 @@
   0 protecao (redundancia > protecao), 9 sacrifice outlets (7 + 2 terrenos),
   11 fodder/tokens, 8 death payoffs, 4 recursion, 35 terrenos, ~2.9 CMC medio,
   2 Game Changers (Smothering Tithe, Bolas's Citadel)
+- **Lands-Matter/Value Engine (Aesi, bracket 3):** 23 ramp (14-18 perfil),
+  7 draw (Aesi complementa), 9 removal/removal, 2 board wipes, 2 protecao,
+  1 tutor, 11 landfall payoffs, 3 recursion, 40 terrenos, 2.61 CMC medio,
+  2 Game Changers (Cyclonic Rift, Crop Rotation)
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -132,6 +147,15 @@
   prefere ter mais pecas do que o oponente pode remover. A inclusao de Bolas's
   Citadel revela ambicao de late game para quando o plano A (drenagem incremental)
   e lento demais.
+- **Jogador de Aesi lands-matter/value engine:** Conservador-value. Quer vencer
+  por acumulo inevitavel, nao por combo. Prefere consistencia (40 terrenos, 23
+  ramp) a protecao (2 cards). Confia que o motor Aesi gera mais valor que os
+  oponentes podem remover. Pensamento chave: "Cada terreno e 2 recursos — mana
+  e draw trigger. Mais terrenos = mais triggers = mais cartas = mais terrenos."
+  Tolerancia a risco media-baixa: nao inclui combos infinitos (UG!), prefere
+  Avenger tokens a Deadeye+Palinchron. Aceita que Aesi sera removida e recastada
+  em vez de proteger ela. O deck e construido para ser resiliente por redundancia
+  de payoffs, nao por protecao de pecas.
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -189,6 +213,15 @@
   criaturas morrendo (Grim Haruspex, Midnight Reaper, Skullclamp). A confianca
   de que "sempre vai ter algo para sacrificar" e alta — mas pode ser punida por
   oponentes que fogem do jogo de criaturas.
+- **Aesi como engine — o sistema ManaLoom perde metade da funcao.** Tag "draw"
+  ignora o extra land drop. A discrepancia e confirmada: o perfil do projeto
+  classifica Aesi como "lands_ramp_draw" theme, nao so draw.
+- **EDHREC average Aesi tem 23 ramp vs perfil 14-18.** O deck default mais popular
+  prioriza ramp excessivo sobre protecao. Isso pode ser um sinal de que jogadores
+  de bracket 3 preferem "mais gas" a "mais seguranca."
+- **Aesi e o deck lands-matter com CMC medio mais baixo (2.61).** Comparado com
+  Korvold (3.2) e Teysa (2.9), Aesi tem CMC mais baixo porque metade do deck
+  e ramp de baixo custo + terrenos.
 
 ## Sinergias Documentadas
 
@@ -234,6 +267,10 @@
 | Bolas's Citadel | Blood Artist | Life gain de Blood Artist alimenta Citadel | Alta (Teysa) |
 | Smothering Tithe | Mirkwood Bats | Treasures como fodder que drenam | Media (Teysa) |
 | Smothering Tithe | Marionette Apprentice | Cada treasure que morre = 3 de dano (com Teysa) | Media (Teysa) |
+| Aesi | Extra Land Drops (Azusa, Dryad, Exploration) | Cada drop extra = 1 draw + 1 payoff trigger | Essencial (Aesi) |
+| Aesi | Landfall Payoffs (Avenger, Scute Swarm) | Converte land drops em board presence | Essencial (Aesi) |
+| Aesi | Bounce Lands (Simic Growth Chamber) | Re-trigga Aesi + landfalls + guarda carta na mao | Alta (Aesi) |
+| Aesi | Tireless Provisioner | Cada fetch land vira treasure + draw | Alta (Aesi) |
 
 ## Discrepancias Acumuladas com ManaLoom
 
@@ -269,6 +306,9 @@
 | Ashnod's Altar (Teysa) | sacrifice_outlet | ramp | Primariamente outlet que gera mana, nao ramp puro | Alto |
 | Teysa, Orzhov Scion | sac_outlet_token_maker | removal | Dual function: outlet + token gen | Medio |
 | Syr Konrad, the Grim | death_payoff_drain | removal | Drenagem passiva vs spot removal | Alto |
+| Aesi, Tyrant of Gyre Strait | engine | draw | Sistema perde metade da funcao (extra land drop + draw) | Medio |
+| Cyclonic Rift | board_wipe | removal | Sistema ve só modo alvo; overload mode é board wipe unilateral | Medio |
+| Tatyova, Benthic Druid | engine | draw | Mesmo problema — draw + lifegain por landfall | Baixo |
 
 ## Funcional Tags: Precisao Acumulada
 
