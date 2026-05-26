@@ -49,14 +49,25 @@ Mas o autor executou antes do push:
 **NAO.** O patch atua exclusivamente no fallback deterministico (`classifyOptimizationFunctionalRole`). Nao mexe em `_classifySemanticV2FunctionalRole`, nem em `OptimizationSemanticV2EnforcementDecision`, nem nas configuracoes de enforcement que permanecem `disabled`.
 
 ### 7. O backend publico esta no SHA do patch?
-**NAO.** O backend publico reporta `git_sha: 7329fbbd` — que e um commit posterior (adicionou o documento de validacao). O patch `f57bb8d3` ainda nao foi deployado para producao.
+**SIM, por ancestralidade Git.** O backend publico reporta `git_sha: 7329fbbd`, que e um commit posterior a `f57bb8d3` em `master`. Foi validado que `f57bb8d3` e ancestral de `7329fbbd`, portanto o backend publico contem o patch de fallback semantico.
 ```
 Local master: f57bb8d3 (patch)
-Public backend: 7329fbbd (documentation only, pre-patch)
+Public backend: 7329fbbd (commit posterior que inclui f57bb8d3)
+Check: git merge-base --is-ancestor f57bb8d3 7329fbbd => yes
 ```
 
 ### 8. Scorecard foi executado?
-**NAO.** O scorecard nao foi executado porque o backend publico nao esta no SHA do patch (`f57bb8d3`). A condicao no documento de request exige que o SHA publico corresponda antes de rodar.
+**TENTADO, mas inconclusivo nesta janela operacional.** Depois de confirmar que `7329fbbd` contem `f57bb8d3`, o scorecard publico foi iniciado com:
+
+```bash
+SEMANTIC_SCORECARD_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+SEMANTIC_SCORECARD_LIMIT=10 \
+python3 bin/semantic_layer_v2_optimize_scorecard.py \
+  --expected-sha 7329fbbdd0d5ea3e88de50d3c8235e76852380f4 \
+  --output test/artifacts/semantic_layer_v2_quality_gate_2026-05-26/optimize_scorecard_after_7329fbbd.json
+```
+
+Tambem foi tentado `--limit 3`. Ambas as execucoes ficaram sem artifact/saida dentro da janela local e foram encerradas manualmente. Isso nao indica regressao semantica; indica que o runner publico ainda precisa de timeout/progresso por caso ou execucao em janela maior para gerar evidencia completa.
 
 ### 9. Os docs do Hermes sao consistentes com o patch?
 **SIM.** Validado em `codex/hermes-analysis-docs`:
@@ -66,8 +77,8 @@ Public backend: 7329fbbd (documentation only, pre-patch)
 
 ### 10. O que falta antes de ativar SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial?
 
-1. **Deployar f57bb8d3 em producao** — backend publico ainda esta em 7329fbbd
-2. **Rodar scorecard pos-deploy** — `semantic_layer_v2_optimize_scorecard.py` com `--expected-sha f57bb8d3...`
+1. **Rodar scorecard pos-deploy com SHA publico correto** — usar `--expected-sha 7329fbbdd0d5ea3e88de50d3c8235e76852380f4`, pois esse commit contem `f57bb8d3`.
+2. **Melhorar runner se necessario** — adicionar log/progresso por corpus e timeout global para evitar execucoes silenciosas sem artifact.
 3. **Verificar metricas no scorecard:**
    - `semantic_shadow_would_block_approved_jobs == 0`
    - `false_positive_candidates == 0`
@@ -89,21 +100,22 @@ Public backend: 7329fbbd (documentation only, pre-patch)
 | Fierce = freeInteraction (bracket) | PASS | Teste explicito no runtime support |
 | Sem regra global counterspell | PASS | Apenas lista curada, nao mexeu em Counterspell |
 | Sem mecher em enforcement | PASS | Nenhuma linha em semantic_v2_enforcement |
-| Backend publico no SHA | **NAO** | Em 7329fbbd, precisa deploy |
+| Backend publico contem patch | PASS | 7329fbbd contem f57bb8d3 por ancestralidade Git |
+| Scorecard publico pos-patch | INCONCLUSIVO | Tentado com expected-sha 7329fbbd; sem artifact/saida na janela local |
 | Docs Hermes consistentes | PASS | PATCH_PLAN.md, VALIDATION_AUDIT.md, validate_patches.py |
 
 ## Risco / Limites
 
-- **Unico risco:** public backend nao esta no patch SHA. Qualquer teste contra o backend publico ainda vera o comportamento ANTIGO.
+- **Risco restante:** scorecard publico pos-patch ainda nao produziu artifact nesta janela. Nao promover enforcement alem de shadow/controlled testing sem esse resultado.
 - **Listas curadas sao intencionalmente pequenas.** Novas adicoes exigem evidencia concreta + teste.
-- **Scorecard nao rodado** — impossivel afirmar que nao ha falsos positivos ate rodar contra dados reais.
+- **Runner silencioso:** `semantic_layer_v2_optimize_scorecard.py` nao emite progresso antes de concluir; em API publica isso dificulta distinguir demora real de espera em requests/jobs.
 
 ## Proximo Passo Recomendado
 
 ```
-1. git push origin master (se f57bb8d3 nao estiver em remote)
-2. Aguardar deploy no Easypanel
-3. Verificar health endpoint: git_sha = f57bb8d3...
-4. Rodar scorecard
-5. Se PASS, ativar enforcement=partial em staging
+1. Manter Semantic Layer v2 em shadow/default disabled.
+2. Ajustar ou executar o scorecard com timeout/progresso controlado.
+3. Usar expected-sha publico 7329fbbdd0d5ea3e88de50d3c8235e76852380f4 enquanto production estiver nesse commit.
+4. Se o scorecard publico PASSAR, testar enforcement=partial apenas em staging/controlado.
+5. So considerar producao partial depois de scorecard e monitoramento sem falsos positivos.
 ```

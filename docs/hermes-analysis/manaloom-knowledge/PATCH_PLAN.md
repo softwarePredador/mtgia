@@ -49,7 +49,8 @@ Observacoes:
 - A correcao nao substitui `semantic_tags_v2`; ela melhora o fallback quando a carta nao tem tag persistida ou a confianca semantica e baixa.
 - `Fierce Guardianship` foi tratado por lista curada, nao por regra global para todos os counters. Isso evita reclassificar `Counterspell`/`Swan Song`, que continuam preservando o papel `removal` nos testes existentes.
 - As listas curadas sao intencionalmente pequenas. Novas cartas devem entrar com evidencia concreta e teste.
-- Ainda nao houve novo scorecard publico de optimize apos `f57bb8d3`.
+- Backend publico em `7329fbbd` contem `f57bb8d3` por ancestralidade Git (`git merge-base --is-ancestor f57bb8d3 7329fbbd => yes`).
+- Scorecard publico pos-patch foi tentado em 2026-05-26 com `--expected-sha 7329fbbdd0d5ea3e88de50d3c8235e76852380f4`, mas ficou inconclusivo sem artifact/saida dentro da janela local. Antes de qualquer enforcement alem de shadow/controlado, rerodar com timeout/progresso por caso ou janela maior.
 
 ---
 
