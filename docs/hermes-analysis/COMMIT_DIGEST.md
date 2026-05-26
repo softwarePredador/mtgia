@@ -1,26 +1,37 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-26 (quarta rodada — commit 91885194).
+> Atualizado em 2026-05-26 (quinta rodada — commit 7329fbbd).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `ca0c8d52` (Polish Lotus life counter overlays)
-- HEAD atual: **`91885194`** (Polish secondary shell headers)
+- HEAD anterior: `91885194` (Polish secondary shell headers)
+- HEAD atual: **`7329fbbd`** (docs: add Hermes semantic validation request)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`918851942d59fd78e55d002924a6f0c71a31b209`** (`/health`, 2026-05-26)
+- SHA publicado confirmado em producao: **`7329fbbdd0d5ea3e88de50d3c8235e76852380f4`** (`/health`, 2026-05-26)
 
 ## Novos commits nesta rodada
 
-Um commit desde a ultima analise:
+Dois commits desde a ultima analise:
 
-### `91885194` — Polish secondary shell headers (NOVO)
+### `f57bb8d3` — Fix semantic role classification fallbacks (NOVO)
+- **4 arquivos**, **+142/-6 linhas** (codigo)
+- Co-authored-by: Copilot
+- Data: 2026-05-26 14:27 BRT
+- **Tipo: CODE** — corrige classificacao de cartas no fallback deterministico
+
+### `7329fbbd` — docs: add Hermes semantic validation request (NOVO)
+- **1 arquivo**, **+170 linhas** (documentacao)
+- Autor: softwarePredador
+- Data: 2026-05-26 14:46 BRT
+- **Tipo: DOC** — adiciona pedido de validacao semantica para o Hermes
+
+### `91885194` — Polish secondary shell headers (rodada anterior)
 - **5 arquivos**, **+52/-54 linhas**
 - Co-authored-by: Copilot
 - Data: 2026-05-26 10:08 BRT
-- Deployed SHA confirmado via `/health`: `918851942d59fd78e55d002924a6f0c71a31b209`
 
 ### `ca0c8d52` — Polish Lotus life counter overlays (rodada anterior)
 - **4 arquivos**, **+531/-2 linhas**
@@ -182,7 +193,65 @@ as seguintes propriedades em todas elas:
 
 **Nao alterado**: backend (0 arquivos), contratos API, core de decks, IA, rotas.
 
-## Impacto na direcao do projeto
+## Analise do commit f57bb8d3 — Fix semantic role classification fallbacks
+
+Este commit aplica o patch de fallbacks deterministicos para classificacao de roles
+funcionais que foi planejado, validado e simulado em `PATCH_PLAN.md`.
+
+### Mudancas em `optimization_functional_roles.dart`
+
+- **Novas listas curadas**:
+  - `_knownWinconNames` (11 cartas: Walking Ballista, Laboratory Maniac, Thassa's Oracle, etc.)
+  - `_knownEngineNames` (14 cartas: The One Ring, Rhystic Study, Seedborn Muse, etc.)
+  - `_knownComboPieceNames` (11 cartas: Basalt Monolith, Dramatic Reversal, Underworld Breach, etc.)
+  - `_knownProtectionNames` (7 cartas: Fierce Guardianship, Deflecting Swat, Heroic Intervention, etc.)
+- **Ordem de avaliacao**: listas curadas sao avaliadas ANTES dos fallbacks de oracle text
+  (`draw`, `removal`, `ramp`), corrigindo:
+  - Walking Ballista: `removal` → `wincon`
+  - The One Ring: `draw` → `engine`
+  - Basalt Monolith: `ramp` → `combo_piece`
+  - Fierce Guardianship: `protection` (agora detectado por nome, nao por regra global de counters)
+  - Endurance: `other` → `protection`
+- **Nao altera**: `semantic_tags_v2` continue em shadow mode; nenhum enforcement novo
+
+### Mudancas em `edh_bracket_policy.dart`
+
+- Adiciona `hasFreeCast` (oracle contem `without paying`) ao lado da heuristica `hasPitch`
+- Fierce Guardianship, Deflecting Swat e Deadly Rollick agora sao detectados como
+  `freeInteraction` — antes so `rather than pay` era detectado
+- Sem mudanca na logica de contagem de bracket ou categorias existentes
+
+### Testes novos
+
+- `test/optimization_quality_gate_test.dart`: teste parametrizado para os 5 exemplos curados
+  (Walking Ballista→wincon, The One Ring→engine, Basalt Monolith→combo_piece,
+  Fierce Guardianship→protection, Endurance→protection)
+- `test/optimize_runtime_support_test.dart`: teste especifico para Fierce Guardianship
+  como `freeInteraction` no bracket system
+
+### Diferenca entre PATCH_PLAN.md e implementacao real
+
+- A lista `_knownWinconNames` no plano inclui `'test of talents'` (12 cartas);
+  a implementacao real tem 11 cartas (sem test of talents). A versao real e a
+  conservadora e correta — test of talents nao e wincon consistente.
+- O plano sugeria uma exclusao de `remove a +1/+1 counter` no bloco de removal;
+  a versao real e mais simples: so adiciona verificacao por nome antes do bloco
+  de oracle text, sem modificar o bloco de removal. Isso e mais seguro.
+
+### Validacoes Linux (Hermes container)
+
+- **dart test**: 599/599 passed (mantido)
+- **flutter analyze**: No issues found
+- **dart analyze** dos 4 arquivos alterados: PASS
+- **Backend publicado**: `7329fbbd` contem `f57bb8d3` por ancestralidade Git
+
+**Nao alterado**: contratos API, core de decks (app), rotas, visual system, deploy.
+
+## Analise do commit 7329fbbd — docs: add Hermes semantic validation request
+
+- Adiciona `docs/qa/HERMES_VALIDATION_REQUEST_SEMANTIC_FALLBACKS_2026-05-26.md`
+- Documento formalizando 10 perguntas que o Hermes deve responder sobre o patch
+- Nao altera codigo, rotas, contratos ou UI
 
 ### Projeto entrou oficialmente na Onda 6: Premium Visual System
 O commit `3eebd0f6` estabelece um **design system premium completo**:
@@ -201,17 +270,19 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 6. **Agente UX auditor elevado para gpt-5.5** — ambicao de qualidade visual de produto premium
 
 ### O que NAO mudou
-- Backend: nenhuma alteracao
-- IA/Rotas: nenhuma alteracao
+- Backend: **alterado** — `optimization_functional_roles.dart` e `edh_bracket_policy.dart` receberam o patch
+- IA/Rotas: rota de optimize nao foi alterada; a classificacao de roles foi endurecida internamente
 - Contratos app/backend: inalterados
 - Core de decks: inalterado (nenhuma tela de decks foi tocada)
 - Scrum/prioridades Sprint 1/2: mesmas pendencias abertas
+- Visual system: inalterado (apenas UM commit de doc, um de IA classificacao)
 
 ## Ondas de commit atualizadas (HEAD~80)
 
 | Onda | Periodo | Commits | Tema |
 |------|---------|---------|------|
 | 6 | 2026-05-25/26 | 4 | **Premium Visual System** — tema global, AuthVisualShell, golden tests, Lotus skin + overlays premium, secondary shell headers unificados, agente UX auditor |
+| **7** | **2026-05-26** | **2** | **AI Classification Hardening** — fallbacks deterministicos para roles funcionais (wincon, engine, combo_piece, protection), bracket free-cast detection, doc de validacao semantica |
 | 1 | 2026-05-21/25 | 12 | UX Polishing — home, splash, icon, premium UX, card/deck screens |
 | 2 | Abril-Maio | ~30 | Semantic Layer v2 |
 | 3 | Maio | ~15 | Functional Tags + Localized Import |
@@ -220,11 +291,12 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 
 ## Direcao do projeto
 
-1. **Premium Visual System (ATIVO)** — design system, golden tests, componentes compartilhados, audiencia UX
-2. **Convergencia para o core** — decks, otimizacao, geracao, analise
-3. **Qualidade de IA** — semantic tags, functional tags, Commander Reference
-4. **Observabilidade** — Sentry, x-request-id
-5. **Produto global** — icon, splash, onboarding
+1. **Premium Visual System** — design system, golden tests, componentes compartilhados, audiencia UX
+2. **AI Classification Hardening (ATIVO nesta rodada)** — fallbacks deterministicos para accurate role classification; proximo passo e reavaliar enforcement do Semantic Layer v2
+3. **Convergencia para o core** — decks, otimizacao, geracao, analise
+4. **Qualidade de IA** — semantic tags, functional tags, Commander Reference
+5. **Observabilidade** — Sentry, x-request-id
+6. **Produto global** — icon, splash, onboarding
 
 ## O que esta fora dos commits recentes / nao consolidado neste digest
 

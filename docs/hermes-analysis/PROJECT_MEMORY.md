@@ -11,7 +11,8 @@
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - Estado em 2026-05-26: **PASS_WITH_RISKS** para release interno non-scanner
-- Backend tests: 599 (2026-05-26), up from 589
+- Backend tests: 599 (2026-05-26), mantido
+- Master HEAD: 7329fbbd (2026-05-26, Onda 7 — AI Classification Hardening)
 
 ## Branch de analise
 
