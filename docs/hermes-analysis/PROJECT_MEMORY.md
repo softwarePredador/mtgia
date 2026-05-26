@@ -11,6 +11,7 @@
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - Estado em 2026-05-26: **PASS_WITH_RISKS** para release interno non-scanner
+- Backend tests: 599 (2026-05-26), up from 589
 
 ## Branch de analise
 
@@ -45,12 +46,10 @@ Nunca commitar diretamente na `master`. Fluxo:
 ## Estado do agente neste servidor
 
 Hermes consegue ler, auditar e analisar o repositorio. O container Hermes usado para
-esta memoria NAO possui Dart ou Flutter SDK — `dart test`, `flutter analyze` e
-`flutter test` nao podem ser executados nele.
+esta memoria possui **Dart 3.12.0** e **Flutter 3.44.0** instalados em `/opt/data/tools/flutter/bin/`.
 
-Esta limitacao e do ambiente Hermes, nao necessariamente do workspace local do
-desenvolvedor/Codex. Quando uma validacao for feita fora do container Hermes,
-registrar explicitamente onde ela rodou.
+- `dart test`: 599 passed (backend)
+- `flutter analyze --no-pub --no-fatal-infos`: No issues found
 
 ## Politica de resposta
 

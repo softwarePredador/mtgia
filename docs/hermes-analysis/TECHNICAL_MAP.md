@@ -125,7 +125,7 @@ mtgia/
 ## Qualidade e validacao
 
 - `flutter analyze --no-fatal-infos`: VERDE
-- `flutter test`: VERDE (589 tests em 2026-05-21)
+- `flutter test`: VERDE (599 tests em 2026-05-26)
 - `dart test`: VERDE (backend unitario)
 - Corpus estavel de resolucao Commander: 19/19 passed
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
@@ -166,6 +166,6 @@ mtgia/
   mas `life_counter_screen.dart` ainda tem varias cores hardcoded no Flutter nativo.
 - O Lotus WebView usa `lotus_visual_skin.dart` como camada visual propria, fora do
   tema Flutter, e precisa de prova viva de overlays para ser considerado PASS.
-- AppBar segue tema Onda 6 exceto community_screen (override w800 vs w700 do tema)
+- AppBar segue tema Onda 6 — community_screen w800 corrigido para w700 (commit 91885194)
 - TabBars usam brass400 como indicador — deck_details_screen usa o tema direto; collection/binder/trade_inbox/community fazem override redundante com valores identicos ao tema
 - MainScaffold NavigationBar usa NavigationBarThemeData com indicatorColor brass500 alpha 0.15

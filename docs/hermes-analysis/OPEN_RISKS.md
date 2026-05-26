@@ -61,7 +61,9 @@ Auditoria confirmou tamanhos reais no codigo:
 - `deck_analysis_tab.dart` (1632 linhas) — functional tags + graficos
 
 ### AppBar community_screen com fontWeight 800 foge do tema Onda 6
-`community_screen.dart` define `titleTextStyle` com `w800` manualmente, enquanto o AppBarTheme define `w700`. Diferenca visual intencional ou residuo de refatoracao.
+**RESOLVIDO** pelo commit `91885194` (Polish secondary shell headers).
+O titleTextStyle foi alterado de w800 para w700, alinhando com AppBarTheme.
+Movido para riscos resolvidos na tabela abaixo.
 
 ### life_counter_screen.dart ainda tem cores hardcoded no Flutter nativo
 Auditoria confirmou muitas referencias `Color(0x...)` e `Colors.` no
@@ -171,6 +173,7 @@ Price history pode ser vazio para cartas sem dados. A UI precisa tolerar estados
 | Home sugeria "nenhum deck" antes do fetch | HomeScreen agora busca ao abrir | 2026-03-23 |
 | Score do OptimizationValidator oscilava | Seed estavel implementada | 2026-03-23 |
 | `server/dart test` falhava sem servidor | RUN_INTEGRATION_TESTS opt-in | 2026-03-23 |
+| AppBar community_screen com fontWeight 800 foge do tema Onda 6 | Commit 91885194 corrigiu w800 para w700 | 2026-05-26 |
 
 ## Regras de monitoramento
 
