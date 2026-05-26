@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 2 | 2026-05-26 |
-| Decks analisados | 2 | 2026-05-26 |
-| Cartas revisadas | ~70 (selecao) | 2026-05-26 |
-| Insights documentados | 8 | 2026-05-26 |
-| Discrepancias com ManaLoom | 13 (8 novas) | 2026-05-26 |
+| Comandantes analisados | 3 | 2026-05-26 |
+| Decks analisados | 3 | 2026-05-26 |
+| Cartas revisadas | ~154 (selecao) | 2026-05-26 |
+| Insights documentados | 14 | 2026-05-26 |
+| Discrepancias com ManaLoom | 18 (5 novas) | 2026-05-26 |
 
 ## Comandantes Analisados
 
@@ -20,6 +20,7 @@
 |:-----------|:-----:|:--------------:|:--------:|:-----------:|
 | Kinnan, Bonder Prodigy | 1 | 2026-05-26 | 4 | Pendente |
 | Atraxa, Praetors' Voice | 1 | 2026-05-26 | 4 | Pendente |
+| Yuriko, the Tiger's Shadow | 1 | 2026-05-26 | 6 | Pendente |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -37,6 +38,18 @@
    (veneno rapido), mas e um engine que acelera gradualmente. Cada proliferacao
    e um "tick" de motor, nao uma explosao. A IA precisa distinguir entre
    wincons de acumulo e wincons de combo.
+5. **Yuriko inverte a regra de CMC** — cartas de CMC alto nao sao "custosas",
+   sao o motor de dano do deck. Temporal Trespass (CMC 11) e a melhor carta do
+   deck, mas nunca e conjurada. A IA precisa entender que CMC alto pode ser
+   vantagem, nao desvantagem.
+6. **Enabler density > Card quality** — No Yuriko, ter 12 enablers de evasao
+   de 1 mana e mais importante que ter cartas individuais mais fortes. A
+   metrica mais importante do deck nao e CMC medio ou ramp — e quantas
+   criaturas evasivas de baixo custo o deck tem.
+7. **Nem toda carta precisa ser jogavel** — Yuriko e o unico deck popular onde
+   a funcao primaria de algumas cartas (Temporal Trespass, Shadow of Mortality)
+   e ser revelada, nao conjurada. O sistema de tags precisa capturar esta
+   dualidade de proposito.
 
 ### Por Arquetipo
 - **Combo (cEDH):** 24+ ramp, 15+ interaction, 0-2 board wipes,
@@ -45,6 +58,10 @@
   35-40 terrenos, CMC medio 2.5-3.5
 - **Proliferate/Midrange (bracket 3):** 12 ramp, 6-8 removal, 1 board wipe,
   35-37 terrenos, CMC medio ~3.0, ~14 infect/poison sources, ~12 proliferate engines
+- **Tempo/Ninja (Yuriko, bracket 3):** 6 ramp (baixo, mas aceitavel), 8-10 draw,
+  10-12 enablers de evasao 1-mana, 12-17 ninjas, 35-37 terrenos (full build),
+  CMC medio ~2.8 (mas ~1.8 se excluir flips), ~4 wincons de alto CMC (7-11),
+  3-4 topdeck manipulation, 4 tutores
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -55,6 +72,12 @@
   possivel. Prefere combos compactos (2 slots) sobre redundancia (4-6 slots).
   Tolerante a risco (Mox Diamond + 29 lands). Nao se importa em perder se o
   combo falha — prefere "win fast or lose fast."
+- **Jogador de Yuriko tempo:** Calculista-oportunista. Pensa em termos de
+  "conexoes", nao de "cartas" — cada ataque que conecta vale 3+ recursos (dano,
+  Yuriko flip, ETB do ninja). Aceita dead draws (cartas de CMC 11 que nao
+  conjura) em troca de explosao de dano. Valoriza consistencia de enablers
+  acima de qualidade individual das cartas. E um dos poucos jogadores que
+  otimiza o topo do library mais que a mao.
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -74,6 +97,16 @@
   o contador de veneno dos 3 oponentes por {B}. Sem o primeiro counter,
   proliferacao nao faz nada — entao esta carta e essencial no arquétipo, mas
   parece fraca para uma IA que so ve "sorcery: each opponent gets 1 poison."
+- **Yuriko inverte o valor de CMC:** Temporal Trespass (CMC 11) e a melhor carta
+  do deck, mas a IA classificaria como "big_spell" (negativo). No Yuriko, CMC
+  alto e positivo. O sistema precisa de logica condicional por comandante.
+- **Dead draw premium e exclusivo do Yuriko:** Cartas de CMC 7-11 que sao
+  valiosas no topo mas inuteis na mao. Nenhum outro comandante cria este
+  fenomeno. O sistema de tags nao captura "carta valiosa por nao ser jogavel."
+- **Enabler density e metrica critica:** Yuriko precisa de 10+ enablers de
+  evasao de 1-2 manas. Sem eles, Yuriko nao ativa e o deck nao funciona. A IA
+  precisa medir "conexao funcional" (ratio enabler:deck_size) em vez de so
+  contagens tradicionais.
 
 ## Sinergias Documentadas
 
@@ -92,6 +125,14 @@
 | Doubling Season | Deepglow Skate | Exponencial de counters | Massiva |
 | Vorinclex | Doubling Season | Quadruplica counters (teorico) | Massiva |
 | Venerated Rotpriest | Remocao oponente | Punishe oponente por remover | Media |
+| Yuriko | Sensei's Divining Top | Controle de topo para flip otimizado | Essencial (Yuriko) |
+| Yuriko | Scroll Rack | Troca mao pelo topo para maximo CMC | Essencial (Yuriko) |
+| Yuriko | Silver-Fur Master | Reduz ninjutsu {1} para todos os ninjas | Essencial (Yuriko) |
+| Yuriko | Temporal Trespass | Flip de 11 de dano + extra turn potencial | Essencial (Yuriko) |
+| Yuriko | Changeling Outcast | Melhor enabler (unblockable + changeling = ninja) | Essencial (Yuriko) |
+| Yuriko | Tetsuko Umezawa | Torna todos os enablers 1/1 unblockable | Alta (Yuriko) |
+| Yuriko | Ingenious Infiltrator | Compra 2 ao ninjutsu + flip de 4 | Alta (Yuriko) |
+| Changeling Outcast | Cover of Darkness | Changeling = ninja -> ganha fear | Alta (Yuriko) |
 
 ## Discrepancias Acumuladas com ManaLoom
 
@@ -110,6 +151,11 @@
 | Ixhel, Scion of Atraxa | engine | creature | Tag engine faltando | IA subestima redundancia |
 | Brokers Ascendancy | engine | enchantment | Tag engine faltando | Nao detecta como motor de counters |
 | Smothering Tithe | ramp | enchantment | Tag ramp correta, mas perde contexto | Pode ser tratada como ramp comum |
+| Temporal Trespass (Yuriko) | wincon | big_spell | Tag big_spell sugere fardo, mas no Yuriko e o motor de dano principal | Alto |
+| Shadow of Mortality (Yuriko) | wincon | creature | Nunca e jogada como criatura — existe para ser revelada por Yuriko | Alto |
+| Dark Ritual (Yuriko) | ramp | ritual | No Yuriko funciona como ramp porque o deck inteiro custa 1-2 CMC | Medio |
+| Mystic Remora (Yuriko) | stax_light | draw | Tambem impede oponentes de jogar spells de baixo CMC cedo | Medio |
+| Commandeer (Yuriko) | protection | removal | Funciona como protecao contra board wipes | Baixo |
 
 ## Funcional Tags: Precisao Acumulada
 
@@ -122,6 +168,7 @@
 | wincon | 90% (est.) | 2 | 0 | Ballista como wincon depende de deteccao |
 | *Precisoes sao estimativas. Validacao real depende de rodar o sistema contra estes decks.* |
 | engine | 60% (est.) | 6 | 0 | 4 falsos - (Ixhel, Brokers Ascendancy, Deepglow Skate, Contagion Engine nao detectados como engine) |
+| big_spell | 50% (est.) | 2 | 2 (Temporal Trespass, Shadow of Mortality como wincon) | 0 |
 
 ## Vocabulario do Dominio
 
@@ -134,6 +181,11 @@
 | EDHREC Average Deck | Lista dos cards mais estatisticamente comuns para um comandante (nao e deck completo de 100) |
 | Value per turn | Mentalidade de avaliacao de cartas por quanto valor geram a cada turno em jogo |
 | Engine deck | Deck que vence por acumulo de valor incremental, nao por combo ou explosao |
+| Enabler density | Proporcao de cartas que permitem ativar a mecanica principal do deck (ex: 12 enablers de evasao no Yuriko) |
+| Flip economy (Yuriko) | Ciclo de revelar cartas com Yuriko, causar dano = CMC, e gerar card advantage com triggers |
+| Dead draw premium (Yuriko) | Cartas valiosas no topo do library para Yuriko flipar mas inuteis na mao por serem caras demais para conjurar |
+| Conexao funcional | Ratio entre numero de enablers e tamanho do deck - metrica essencial para Yuriko |
+| Dual purpose card (Yuriko) | Carta que serve tanto para efeito quanto como flip de dano para Yuriko |
 
 ## Principios de Deckbuilding (extraidos das analises)
 
@@ -144,6 +196,9 @@
 5. "Staples sao staples por um motivo. Uma carta generica forte vence uma carta tematica fraca." (Rhystic, Smothering em Atraxa)
 6. "O melhor combo e o que voce consegue proteger, nao o mais forte." (Kinnan — optou por nao incluir Isochron+Dramatic)
 7. "Valor por turno: avalie cartas por quanto elas produzem a cada turno em jogo, nao apenas pelo impacto inicial." (Atraxa)
+8. **"A carta que voce NAO joga pode ser mais valiosa do que a que voce joga."** (Yuriko — Temporal Trespass nunca e conjurada, mas e o motor de dano principal)
+9. **"Enabler density > Card quality. Ter 12 enablers de evasao de 1 mana e mais importante que ter cartas individuais mais fortes."** (Yuriko)
+10. **"Consistencia de conexao > Potencia individual. Cada ataque que conecta vale 3+ recursos."** (Yuriko)
 
 ## Ultimas Execucoes
 
@@ -151,3 +206,4 @@
 |:----|:--------|:-----:|:------:|
 | 2026-05-26 | Jokers Are Wild Monthly 1k | Kinnan (2nd) | Analise concluida |
 | 2026-05-26 | EDHREC Average Deck (41.130 decks) | Atraxa, Praetors' Voice (Default/Goodstuff) | Analise concluida |
+| 2026-05-26 | EDHREC Average Deck (30.921 decks) | Yuriko, the Tiger's Shadow (Dimir Ninja Topdeck Tempo) | Analise concluida |
