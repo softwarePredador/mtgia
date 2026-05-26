@@ -1,30 +1,29 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-25 (segunda rodada + validacao de consistencia).
+> Atualizado em 2026-05-26 (terceira rodada).
 
 ## Estado atual
 
 - Branch observada: `master`
 - HEAD anterior: `97195723` (Use new ManaLoom home hero art)
-- HEAD atual: **`9a2bb38b`** (Improve Lotus life counter controls)
+- HEAD atual: **`ca0c8d52`** (Polish Lotus life counter overlays)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`9a2bb38b3bfc52e68041f75fea329e98347d304c`** (`/health`, 2026-05-25)
+- SHA publicado confirmado em producao: **`9a2bb38b3bfc52e68041f75fea329e98347d304c`** (`/health`, 2026-05-25) — nao atualizado nesta rodada
 
 ## Novos commits nesta rodada
 
-Dois commits desde a ultima analise:
+Um commit desde a ultima analise:
 
-### `3eebd0f6` — Refresh ManaLoom visual system
+### `ca0c8d52` — Polish Lotus life counter overlays
+- **4 arquivos**, **+531/-2 linhas**
+- Co-authored-by: Copilot (mesmo autor de softwarePredador)
+- Data: 2026-05-25 16:39 BRT
+
+### `3eebd0f6` — Refresh ManaLoom visual system (rodada anterior)
 - **63 arquivos**, **+3839/-2093 linhas** — commit massivo
 - Co-authored-by: Copilot
-- Data: 2026-05-25 14:54 BRT
-
-### `9a2bb38b` — Improve Lotus life counter controls (HEAD)
-- **2 arquivos**, **+269/-13 linhas**
-- Co-authored-by: Copilot
-- Data: 2026-05-25 14:55 BRT
 
 ## Analise detalhada do commit 3eebd0f6
 
@@ -98,6 +97,32 @@ Dois commits desde a ultima analise:
   history, settings e card search em iPhone Simulator; ajustes de harness/skin
   posteriores a este HEAD ainda devem ser commitados antes de virarem baseline canonica.
 
+## Analise do commit ca0c8d52 — Lotus Overlays Polish
+
+Este commit expande `lotus_visual_skin.dart` (+423 linhas para 1333 total) com
+CSS premium para tres overlays do Lotus WebView:
+
+- **Settings overlay** (`Configurações`): posicionamento fixed full-viewport,
+  safe-area-aware, fundo gradiente radial + linear, lista de itens com cards
+  arredondados (20px), glassmorphism com `linear-gradient(180deg, rgba(13,22,42,0.8), rgba(6,11,24,0.72))`, bordoas sutis e sombra profunda.
+- **Life history overlay**: timeline com tipografia `manaloom-display-font`,
+  identidade visual consistente.
+- **Card search overlay**: titulo `Buscar carta` posicionado, resultados com
+  `card-name` estilizado, estrutura de pesquisa integrada ao tema premium.
+
+Tres arquivos de smoke test foram atualizados/criados:
+- `life_counter_lotus_card_search_visual_smoke_test.dart` (+59 linhas)
+- `life_counter_lotus_settings_visual_smoke_test.dart` (+23 linhas)
+- `life_counter_lotus_visual_overlays_smoke_test.dart` (+28 linhas, novo)
+
+**Nao alterado**: backend, contratos API, core de decks, IA, ou outras
+superficies do app. O arquivo `lotus_visual_skin.dart` continua sendo CSS
+injetado no WebView, fora do sistema de tema Flutter.
+
+**Status dos overlays**: settings, history e card search agora tem skin
+premium, mas ainda precisam de prova viva lado a lado com `dddddd/` (baseline
+pre-skin) para cada overlay antes de considerar a task de perfeicao fechada.
+
 ## Impacto na direcao do projeto
 
 ### Projeto entrou oficialmente na Onda 6: Premium Visual System
@@ -112,7 +137,7 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 1. **Design system agora tem testes dedicados** — 3 novos arquivos de teste de tokens
 2. **Home hero tem golden test** — baseline visual protegida contra regressao
 3. **Auth screens refatoradas** — +225 linhas de componente compartilhado, ~900 linhas removidas das telas
-4. **Life counter Lotus atingiu acabamento premium** — CSS skin com identidade por jogador
+4. **Life counter Lotus atingiu acabamento premium** — CSS skin com identidade por jogador + overlays settings/history/card search premium
 5. **Projeto esta usando Copilot como co-author** — commits assinados por Copilot
 6. **Agente UX auditor elevado para gpt-5.5** — ambicao de qualidade visual de produto premium
 
@@ -126,7 +151,7 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 
 | Onda | Periodo | Commits | Tema |
 |------|---------|---------|------|
-| 6 | 2026-05-25 | 2 | **Premium Visual System** — tema global, AuthVisualShell, golden tests, Lotus skin, agente UX auditor |
+| 6 | 2026-05-25/26 | 3 | **Premium Visual System** — tema global, AuthVisualShell, golden tests, Lotus skin + overlays premium, agente UX auditor |
 | 1 | 2026-05-21/25 | 12 | UX Polishing — home, splash, icon, premium UX, card/deck screens |
 | 2 | Abril-Maio | ~30 | Semantic Layer v2 |
 | 3 | Maio | ~15 | Functional Tags + Localized Import |

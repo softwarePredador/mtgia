@@ -1,6 +1,6 @@
 # Hermes Analysis: Open Risks
 
-> Riscos abertos do ManaLoom. Atualizado em 2026-05-25.
+> Riscos abertos do ManaLoom. Atualizado em 2026-05-26.
 > Este arquivo nao substitui os documentos canonicos; resume a leitura operacional atual.
 
 ## P0 — Bloqueante
@@ -79,14 +79,15 @@ Recomendacao: separar o risco em duas trilhas:
 ### Life Counter Lotus: pendencias da task de perfeicao
 Task formal `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` define 8 gaps.
 Auditoria em `master` confirmou que a task ainda nao esta fechada, mas o status
-nao e mais "todos abertos": o commit `ca0c8d5` adicionou prova viva parcial para
-mesa 4p, history, settings e card search.
+nao e mais "todos abertos": os commits `9a2bb38b` e `ca0c8d52` adicionaram
+prova viva para mesa 4p com cores por jogador, history, settings e card search.
 
 Status granular:
 - **OPEN:** geometria fina 2p/3p/4p, centragem otica, hub central, DICE overlay,
   PLAYERS overlay, commander damage, motion final e side-by-side final.
 - **PARTIAL_PROVEN:** mesa 4p com controles visiveis, cores por jogador,
-  history overlay, settings overlay e card search overlay com resultado real.
+  history overlay, settings overlay e card search overlay com CSS premium
+  e smoke tests dedicados.
 - **NEEDS_BENCHMARK_COMPARISON:** todos os itens ainda precisam de comparacao
   lado a lado com `dddddd/` antes de marcar a task como DONE.
 

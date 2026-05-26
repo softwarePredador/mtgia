@@ -1,6 +1,6 @@
 # Hermes Analysis: Product Direction
 
-> Direcao de produto do ManaLoom. Atualizado em 2026-05-25.
+> Direcao de produto do ManaLoom. Atualizado em 2026-05-26.
 
 ## O Produto
 

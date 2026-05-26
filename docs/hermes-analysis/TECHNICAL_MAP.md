@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-25.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-26.
 
 ## Estrutura do repositorio
 
@@ -111,6 +111,7 @@ mtgia/
 | server/routes/ai/optimize/index.dart | 3495 | P1 — gargalo de manutencao maior que o digest anterior |
 | server/lib/ai/optimize_runtime_support.dart | 4197 | P1 — logica densa, precisa de quebra modular |
 | app/lib/features/home/life_counter_screen.dart | 6400 | P1 — tela/engine nativa grande; Lotus WebView tem skin separado |
+| app/lib/features/home/lotus/lotus_visual_skin.dart | 1333 | P1 — CSS injetado no WebView, cresceu +423 linhas com overlays premium |
 | app/lib/features/decks/screens/deck_details_screen.dart | 1705 | P1 — caindo, mas ainda grande |
 | app/lib/features/community/screens/community_screen.dart | 1725 | P1 — 4 tabs + sub-tabs |
 | app/lib/features/binder/screens/binder_screen.dart | 1628 | P1 — listas, editor, filtros |
