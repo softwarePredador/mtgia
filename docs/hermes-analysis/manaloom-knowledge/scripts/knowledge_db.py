@@ -176,6 +176,23 @@ CREATE TABLE IF NOT EXISTS vocabulary (
     source TEXT
 );
 
+CREATE TABLE IF NOT EXISTS game_changers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    card_name TEXT UNIQUE NOT NULL,
+    cmc REAL,
+    type_line TEXT,
+    mana_cost TEXT,
+    oracle_text TEXT,
+    price_usd REAL,
+    impact_level INTEGER DEFAULT 5,
+    impact_category TEXT,
+    why_game_changer TEXT,
+    manaloom_bracket_category TEXT,
+    manaloom_detected INTEGER DEFAULT 0,
+    restricted_bracket INTEGER DEFAULT 3,
+    notes TEXT
+);
+
 CREATE TABLE IF NOT EXISTS run_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     run_date TEXT NOT NULL,
