@@ -89,6 +89,7 @@ A partir de 2026-05-26, depois de todo push relevante feito no fluxo local/Codex
 - Mudanca comum: `/opt/data/scripts/manaloom-post-push-audit.sh normal <sha>`
 - Mudanca grande de app/backend/layout/runtime: `/opt/data/scripts/manaloom-post-push-audit.sh deep <sha>`
 - Smoke rapido de infraestrutura: `/opt/data/scripts/manaloom-post-push-audit.sh smoke`
+- Status/ultimo relatorio: `/opt/data/scripts/manaloom-hermes-status.sh`
 
 A rotina esperada e:
 
@@ -97,3 +98,15 @@ A rotina esperada e:
 3. Hermes audita a branch/commit e atualiza somente `docs/hermes-analysis/**` se houver achado real.
 4. Codex local le o retorno do Hermes, valida os achados e corrige P0/P1 antes de seguir.
 5. Hermes nao substitui prova viva local em iPhone Simulator, scanner/camera, push real ou validacao visual.
+
+### Guardrails do script pos-push
+
+Atualizado em 2026-05-26:
+
+- `smoke` e deterministico, sem chamada LLM, para validar workspace/HEAD/status rapidamente.
+- `normal` usa timeout padrao de 360s.
+- `deep` usa timeout padrao de 1200s.
+- O timeout pode ser sobrescrito com `HERMES_AUDIT_TIMEOUT_SECONDS=<segundos>`.
+- Todo relatorio termina com `HERMES_AUDIT_STATUS: PASS|FINDINGS|BLOCKED|TIMEOUT|PASS_UNCLASSIFIED`.
+- O ultimo relatorio fica apontado por `/opt/data/.hermes/data/manaloom/reports/post_push_latest.md`.
+- Se o LLM travar, o script deve retornar `TIMEOUT` em vez de deixar processo pendurado.
