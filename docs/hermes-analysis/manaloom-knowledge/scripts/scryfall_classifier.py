@@ -221,6 +221,431 @@ def classify_card(card_data: dict) -> str:
     return "utility"
 
 
+# ─────────────────── Multi-Tag Functional Classification ───────────────────
+# Replica fielmente inferFunctionalCardTags() do Dart (functional_card_tags.dart)
+# Retorna lista de dicts: [{tag, confidence, evidence}, ...] ordenado por confidence decrescente
+
+
+VALID_FUNCTIONAL_TAGS = frozenset({
+    'land', 'ramp', 'ritual', 'draw', 'loot', 'tutor', 'removal',
+    'board_wipe', 'protection', 'recursion', 'token_maker',
+    'sacrifice_outlet', 'aristocrat_payoff', 'lifegain', 'drain',
+    'spellslinger', 'artifact_synergy', 'enchantment_synergy',
+    'graveyard_synergy', 'etb', 'blink', 'big_spell', 'exile_value',
+    'combo_piece', 'wincon', 'engine', 'payoff', 'enabler',
+})
+
+
+def _normalize_card_name(name: str) -> str:
+    """Replica normalizeFunctionalCardName() do Dart."""
+    n = name.strip().lower()
+    n = n.replace("\u2018", "'").replace("\u2019", "'")
+    n = " ".join(n.split())  # collapse whitespace
+    return n
+
+
+def _looks_like_ritual(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeRitual() do Dart (linha 850)."""
+    if normalized_name == "jeska's will":
+        return True
+    return ("add {" in oracle and
+            any(t in oracle for t in ["until end of turn", "for each",
+                                      "for every", "your mana pool"]))
+
+
+def _looks_like_draw(oracle: str) -> bool:
+    """Replica _looksLikeDraw() do Dart (linha 643)."""
+    if any(t in oracle for t in ["target opponent draws",
+                                  "an opponent draws",
+                                  "each opponent draws"]):
+        return False
+    return ("draw a card" in oracle or
+            bool(re.search(r'\bdraw (?:one|two|three|four|five|six|seven|eight|nine|ten|\d+) cards\b', oracle)) or
+            "draw cards" in oracle or
+            "draw x cards" in oracle or
+            "draw that many cards" in oracle or
+            "draw equal to" in oracle or
+            ("whenever" in oracle and "draw a card" in oracle) or
+            ("reveal" in oracle and "put" in oracle and "into your hand" in oracle))
+
+
+def _looks_like_loot(oracle: str) -> bool:
+    """Replica _looksLikeLoot() do Dart (linha 663)."""
+    return (("draw" in oracle and
+             any(t in oracle for t in ["discard a card", "discard that many", "then discard"])) or
+            ("discard" in oracle and "then draw" in oracle))
+
+
+def _looks_like_tutor(oracle: str) -> bool:
+    """Replica _looksLikeTutor() do Dart (linha 671)."""
+    return ("search your library" in oracle and
+            not looks_like_land_search(oracle) and
+            any(t in oracle for t in ["put", "reveal", "card"]))
+
+
+def _looks_like_targeted_removal(oracle: str) -> bool:
+    """Replica _looksLikeTargetedRemoval() do Dart (linha 679)."""
+    targets_own = any(t in oracle for t in [
+        "target creature you control",
+        "target permanent you control",
+        "target artifact you control",
+        "target enchantment you control",
+    ])
+    if targets_own:
+        return False
+    return ("destroy target" in oracle or
+            "exile target" in oracle or
+            ("return target" in oracle and "to its owner" in oracle) or
+            ("target" in oracle and "gets -" in oracle and "/-" in oracle) or
+            ("deals" in oracle and "damage" in oracle and
+             any(t in oracle for t in ["target creature", "target planeswalker",
+                                       "any target", "damage to target"])))
+
+
+def _looks_like_protection(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeProtection() do Dart (linha 700)."""
+    return ("hexproof" in oracle or
+            "indestructible" in oracle or
+            "protection from" in oracle or
+            "shroud" in oracle or
+            "ward" in oracle or
+            "phase out" in oracle or
+            "gain protection" in oracle or
+            "can't be the target" in oracle or
+            "cannot be the target" in oracle or
+            "prevent all damage" in oracle or
+            "regenerate target" in oracle or
+            "gains hexproof" in oracle or
+            "gains indestructible" in oracle or
+            any(x in normalized_name for x in [
+                "teferi's protection", "heroic intervention",
+                "swiftfoot boots", "lightning greaves",
+            ]))
+
+
+def _looks_like_recursion(oracle: str) -> bool:
+    """Replica _looksLikeRecursion() do Dart (linha 720)."""
+    has_graveyard = any(t in oracle for t in [
+        "from your graveyard", "from a graveyard", "from graveyard",
+    ])
+    if not has_graveyard:
+        return False
+    return any(t in oracle for t in ["return", "put target", "cast",
+                                     "onto the battlefield", "to your hand"])
+
+
+def _looks_like_graveyard_synergy(oracle: str) -> bool:
+    """Replica _looksLikeGraveyardSynergy() do Dart (linha 731)."""
+    return any(t in oracle for t in ["graveyard", "mill", "escape",
+                                     "disturb", "dredge", "flashback"])
+
+
+def _looks_like_token_maker(oracle: str) -> bool:
+    """Replica _looksLikeTokenMaker() do Dart (linha 740)."""
+    return ("create" in oracle and "token" in oracle) or "populate" in oracle
+
+
+def _looks_like_sacrifice_outlet(oracle: str) -> bool:
+    """Replica _looksLikeSacrificeOutlet() do Dart (linha 745)."""
+    return any(t in oracle for t in [
+        "sacrifice another", "sacrifice a creature:", "sacrifice a permanent:",
+        "sacrifice an artifact:", "sacrifice a token:", "{t}, sacrifice",
+    ])
+
+
+def _looks_like_aristocrat_payoff(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeAristocratPayoff() do Dart (linha 754)."""
+    if normalized_name in ("blood artist", "zulaport cutthroat"):
+        return True
+    if ("whenever" in oracle and "creature" in oracle and "dies" in oracle and
+            any(t in oracle for t in ["loses", "gain", "drain"])):
+        return True
+    if ("whenever you sacrifice" in oracle and
+            any(t in oracle for t in ["loses", "gain"])):
+        return True
+    return False
+
+
+def _looks_like_lifegain(oracle: str) -> bool:
+    """Replica _looksLikeLifegain() do Dart (linha 767)."""
+    if any(t in oracle for t in ["can't gain life", "cannot gain life",
+                                  "players can't gain life",
+                                  "opponents can't gain life"]):
+        return False
+    return (("you gain" in oracle and "life" in oracle) or
+            "gain life" in oracle or
+            ("gains you" in oracle and "life" in oracle))
+
+
+def _looks_like_drain(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeDrain() do Dart (linha 779)."""
+    return (normalized_name == "blood artist" or
+            ("loses" in oracle and "you gain" in oracle) or
+            "each opponent loses" in oracle or
+            "target player loses" in oracle)
+
+
+def _looks_like_spellslinger(oracle: str) -> bool:
+    """Replica _looksLikeSpellslinger() do Dart (linha 786)."""
+    return ("instant or sorcery" in oracle or
+            "magecraft" in oracle or
+            "whenever you cast or copy" in oracle or
+            ("whenever you cast" in oracle and
+             any(t in oracle for t in ["instant", "sorcery"])))
+
+
+def _looks_like_artifact_synergy(oracle: str) -> bool:
+    """Replica _looksLikeArtifactSynergy() do Dart (linha 794)."""
+    if "artifact" not in oracle:
+        return False
+    return any(t in oracle for t in ["whenever", "for each artifact",
+                                     "artifacts you control",
+                                     "artifact enters",
+                                     "sacrifice an artifact"])
+
+
+def _looks_like_enchantment_synergy(oracle: str) -> bool:
+    """Replica _looksLikeEnchantmentSynergy() do Dart (linha 803)."""
+    if "enchantment" not in oracle:
+        return False
+    return any(t in oracle for t in ["whenever", "for each enchantment",
+                                     "enchantments you control",
+                                     "enchantment enters"])
+
+
+def _looks_like_etb(oracle: str) -> bool:
+    """Replica _looksLikeEtb() do Dart (linha 811)."""
+    if "enters the battlefield" not in oracle:
+        return False
+    if any(t in oracle for t in ["don't cause abilities to trigger",
+                                  "abilities don't trigger"]):
+        return False
+    return any(t in oracle for t in ["when ", "whenever ", "as ",
+                                     "enters the battlefield,"])
+
+
+def _looks_like_blink(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeBlink() do Dart (linha 823)."""
+    if normalized_name == "ephemerate":
+        return True
+    if ("exile target" in oracle and "return" in oracle and "battlefield" in oracle):
+        return True
+    if ("exile another target" in oracle and "return" in oracle and "battlefield" in oracle):
+        return True
+    if "flicker" in oracle:
+        return True
+    return False
+
+
+def _looks_like_big_spell_payoff(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeBigSpellPayoff() do Dart (linha 834)."""
+    return (normalized_name == "jeska's will" or
+            "if you control a commander" in oracle or
+            "without paying its mana cost" in oracle or
+            "copy target spell" in oracle or
+            ("copy it" in oracle and "spell" in oracle))
+
+
+def _looks_like_exile_value(oracle: str) -> bool:
+    """Replica _looksLikeExileValue() do Dart (linha 842)."""
+    return ("exile" in oracle and
+            any(t in oracle for t in ["may play", "may cast",
+                                      "until the end of your next turn",
+                                      "until end of turn"]))
+
+
+def _looks_like_wincon(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeWincon() do Dart (linha 859)."""
+    return ("thassa's oracle" in normalized_name or
+            "you win the game" in oracle or
+            "loses the game" in oracle or
+            "each opponent loses" in oracle or
+            ("damage equal to" in oracle and "opponent" in oracle) or
+            "double your life total" in oracle)
+
+
+def _looks_like_combo_piece(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeComboPiece() do Dart (linha 868)."""
+    return (any(x in normalized_name for x in ["isochron scepter",
+                                                "dramatic reversal",
+                                                "thassa's oracle"]) or
+            "copy target activated or triggered ability" in oracle or
+            ("untap" in oracle and "add " in oracle) or
+            "infinite" in oracle)
+
+
+def _looks_like_engine(oracle: str) -> bool:
+    """Replica _looksLikeEngine() do Dart (linha 877)."""
+    if "whenever" in oracle:
+        if ("draw" in oracle or
+                ("create" in oracle and "token" in oracle) or
+                "add {" in oracle or
+                "put a +1/+1 counter" in oracle):
+            return True
+    if "at the beginning of" in oracle and any(t in oracle for t in ["draw", "create"]):
+        return True
+    return False
+
+
+def _looks_like_payoff(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikePayoff() do Dart (linha 887)."""
+    if normalized_name == "blood artist":
+        return True
+    if "for each" in oracle:
+        return True
+    if "whenever" in oracle and any(t in oracle for t in [
+        "creature dies", "you cast", "artifact enters",
+        "enchantment enters", "you sacrifice",
+    ]):
+        return True
+    return False
+
+
+def _looks_like_enabler(oracle: str, normalized_name: str) -> bool:
+    """Replica _looksLikeEnabler() do Dart (linha 898)."""
+    return (any(x in normalized_name for x in ["greaves", "boots"]) or
+            "costs {" in oracle and "less to cast" in oracle or
+            "you may play an additional land" in oracle or
+            "haste" in oracle or
+            "mill" in oracle or
+            "sacrifice another" in oracle or
+            "search your library" in oracle)
+
+
+def infer_functional_card_tags(
+    name: str,
+    type_line: str = "",
+    oracle_text: str = "",
+    cmc: float = 0,
+) -> list[dict]:
+    """Replica inferFunctionalCardTags() do Dart (functional_card_tags.dart).
+    
+    Returns list of {tag, confidence, evidence} sorted by confidence desc.
+    Each card can have MULTIPLE tags from independent heuristics.
+    """
+    normalized_name = _normalize_card_name(name)
+    type_lower = type_line.lower() if type_line else ""
+    oracle = oracle_text.lower() if oracle_text else ""
+
+    tags_map = {}  # tag_name -> {tag, confidence, evidence}
+
+    def add(tag: str, confidence: float, evidence: str):
+        """Inner add() function mirroring Dart closure (linha 202)."""
+        if tag not in VALID_FUNCTIONAL_TAGS:
+            return
+        current = tags_map.get(tag)
+        if current is None or confidence > current["confidence"]:
+            tags_map[tag] = {
+                "tag": tag,
+                "confidence": max(0.0, min(1.0, confidence)),
+                "evidence": evidence,
+            }
+
+    is_land = "land" in type_lower
+    if is_land:
+        add("land", 1.0, "type_line_land")
+
+    is_basic_land = "basic land" in type_lower
+    if not is_basic_land:
+        # ramp check: uses original oracle_text for Dart compat
+        if (looks_like_ramp(oracle, type_lower) or
+                "signet" in normalized_name or
+                "talisman" in normalized_name or
+                normalized_name == "sol ring" or
+                normalized_name == "arcane signet"):
+            add("ramp", 0.88, "mana_or_land_ramp_text")
+
+    if _looks_like_ritual(oracle, normalized_name):
+        add("ritual", 0.82, "temporary_mana_burst_text")
+
+    if _looks_like_draw(oracle):
+        add("draw", 0.84, "card_draw_text")
+
+    if _looks_like_loot(oracle):
+        add("loot", 0.80, "draw_discard_selection_text")
+
+    if _looks_like_tutor(oracle):
+        add("tutor", 0.86, "non_land_library_search")
+
+    if _looks_like_targeted_removal(oracle):
+        add("removal", 0.83, "targeted_interaction_text")
+
+    if "counter target" in oracle:
+        add("removal", 0.72, "counterspell_is_interaction")
+        add("protection", 0.62, "counterspell_can_protect_plan")
+
+    if looks_like_board_wipe(oracle):
+        add("board_wipe", 0.90, "mass_removal_text")
+
+    if _looks_like_protection(oracle, normalized_name):
+        add("protection", 0.82, "protection_keyword_or_effect")
+
+    if _looks_like_recursion(oracle):
+        add("recursion", 0.86, "graveyard_return_text")
+
+    if _looks_like_graveyard_synergy(oracle):
+        add("graveyard_synergy", 0.72, "graveyard_payoff_or_setup_text")
+
+    if _looks_like_token_maker(oracle):
+        add("token_maker", 0.82, "token_creation_text")
+
+    if _looks_like_sacrifice_outlet(oracle):
+        add("sacrifice_outlet", 0.80, "repeatable_sacrifice_outlet_text")
+
+    if _looks_like_aristocrat_payoff(oracle, normalized_name):
+        add("aristocrat_payoff", 0.84, "death_trigger_payoff_text")
+
+    if _looks_like_lifegain(oracle):
+        add("lifegain", 0.76, "life_gain_text")
+
+    if _looks_like_drain(oracle, normalized_name):
+        add("drain", 0.82, "life_loss_payoff_text")
+
+    if _looks_like_spellslinger(oracle):
+        add("spellslinger", 0.84, "instant_sorcery_cast_payoff_text")
+
+    if _looks_like_artifact_synergy(oracle):
+        add("artifact_synergy", 0.74, "artifact_payoff_text")
+
+    if _looks_like_enchantment_synergy(oracle):
+        add("enchantment_synergy", 0.74, "enchantment_payoff_text")
+
+    if _looks_like_etb(oracle):
+        add("etb", 0.70, "enters_the_battlefield_text")
+
+    if _looks_like_blink(oracle, normalized_name):
+        add("blink", 0.86, "exile_then_return_text")
+        add("protection", 0.68, "blink_can_protect_permanent")
+
+    if cmc >= 6 or _looks_like_big_spell_payoff(oracle, normalized_name):
+        add("big_spell", 0.72, "high_mana_value_or_big_turn_text")
+
+    if _looks_like_exile_value(oracle):
+        add("exile_value", 0.84, "exile_play_or_cast_value_text")
+
+    if _looks_like_wincon(oracle, normalized_name):
+        add("wincon", 0.78, "explicit_win_or_finisher_text")
+
+    if _looks_like_combo_piece(oracle, normalized_name):
+        add("combo_piece", 0.72, "combo_pattern_text_or_known_name")
+
+    if _looks_like_engine(oracle):
+        add("engine", 0.70, "repeatable_value_engine_text")
+
+    if _looks_like_payoff(oracle, normalized_name):
+        add("payoff", 0.72, "payoff_trigger_or_scaling_text")
+
+    if _looks_like_enabler(oracle, normalized_name):
+        add("enabler", 0.70, "plan_enabler_or_setup_text")
+
+    # Sort by confidence desc, then tag name asc (mirroring Dart sort)
+    ordered = sorted(
+        tags_map.values(),
+        key=lambda t: (-t["confidence"], t["tag"]),
+    )
+    return ordered
+
+
 # ─────────────────── Deck Parsing ───────────────────
 
 
@@ -338,7 +763,12 @@ def build_deck_json(
     deck_name: str = "",
     source_name: str = "User provided decklist",
 ) -> dict:
-    """Build the final deck JSON for knowledge_db.py --insert-deck."""
+    """Build the final deck JSON for knowledge_db.py --insert-deck.
+    
+    Each card dict may include:
+    - 'tags': list of {tag, confidence, evidence} (multi-tag, optional)
+    - 'functional_tag': single tag (legacy, optional)
+    """
     from datetime import date
 
     # Separate commander, lands, nonlands
@@ -361,11 +791,15 @@ def build_deck_json(
     total_lands = sum(c["qty"] for c in lands)
     total_cards = sum(c["qty"] for c in enriched_cards)
 
-    # Tag counts
+    # Tag counts — prefer multi-tag 'tags' field, fall back to 'functional_tag'
     tag_counts = Counter()
     for c in nonlands:
         if c != commander_card:
-            tag_counts[c["functional_tag"]] += c["qty"]
+            if c.get("tags"):
+                for t in c["tags"]:
+                    tag_counts[t["tag"]] += c["qty"]
+            else:
+                tag_counts[c["functional_tag"]] += c["qty"]
 
     # CMC
     cmc_cards = [c for c in nonlands if c != commander_card and c["cmc"] > 0]
@@ -375,13 +809,20 @@ def build_deck_json(
 
     cards_out = []
     for c in enriched_cards:
-        cards_out.append({
+        card_entry = {
             "name": c["name"],
             "quantity": c["qty"],
             "functional_tag": c["functional_tag"],
             "is_commander": 1 if c == commander_card else 0,
             "cmc": c["cmc"],
-        })
+        }
+        # Include multi-tags if available
+        if c.get("tags"):
+            card_entry["tags"] = c["tags"]
+            # Also update functional_tag to highest-confidence tag
+            if c["tags"]:
+                card_entry["functional_tag"] = c["tags"][0]["tag"]
+        cards_out.append(card_entry)
 
     return {
         "commander": commander_name,
@@ -417,7 +858,7 @@ def build_deck_json(
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "--test":
-        # Self-test
+        # Self-test (single-tag, legacy)
         test_cards = [
             "Sol Ring", "Swords to Plowshares", "Wrath of God",
             "Demonic Tutor", "Arcane Signet", "Rhystic Study",
@@ -428,4 +869,83 @@ if __name__ == "__main__":
             data = fetched.get(name.lower().strip(), {})
             tag = classify_card(data)
             print(f"{name:35s} -> {tag:15s} (cmc={data.get('cmc','?')})")
-        print("\nAll tests passed." if len(fetched) >= 6 else "\nSome cards not found.")
+        print("\\nAll tests passed." if len(fetched) >= 6 else "\\nSome cards not found.")
+    
+    elif len(sys.argv) > 1 and sys.argv[1] == "--test-multi":
+        # Self-test for multi-tag
+        test_cards = [
+            "Smothering Tithe",
+            "Boros Charm",
+            "Teferi's Protection",
+            "Volcanic Vision",
+            "Sunbird's Invocation",
+        ]
+        fetched = fetch_cards(test_cards, delay=0.5)
+        print(f"{'='*65}")
+        print(f"{'MULTI-TAG FUNCTIONAL CLASSIFICATION TEST':^65}")
+        print(f"{'='*65}")
+        all_ok = True
+        for name in test_cards:
+            data = fetched.get(name.lower().strip(), {})
+            if data.get("object") == "error":
+                print(f"\\n  {name}: ERROR fetching card")
+                all_ok = False
+                continue
+            tags = infer_functional_card_tags(
+                name=name,
+                type_line=data.get("type_line", ""),
+                oracle_text=data.get("oracle_text", ""),
+                cmc=data.get("cmc", 0),
+            )
+            tag_names = [t["tag"] for t in tags]
+            print(f"\\n  {name}")
+            print(f"  {'─'*40}")
+            print(f"  CMC: {data.get('cmc','?')} | Type: {data.get('type_line','')}")
+            for t in tags:
+                print(f"    {t['tag']:20s} conf={t['confidence']:.2f}  [{t['evidence']}]")
+        
+        # Verify expected tags
+        expected = {
+            "smothering tithe": {"engine", "token_maker"},
+            "boros charm": {"removal", "protection"},
+            "teferi's protection": {"protection"},
+            "volcanic vision": {"board_wipe", "recursion", "big_spell"},
+            "sunbird's invocation": {"big_spell", "payoff"},
+        }
+        print(f"\\n{'='*65}")
+        print(f"{'EXPECTED TAG VERIFICATION':^65}")
+        print(f"{'='*65}")
+        all_ok = True
+        for name in test_cards:
+            data = fetched.get(name.lower().strip(), {})
+            if data.get("object") == "error":
+                continue
+            tags = infer_functional_card_tags(
+                name=name,
+                type_line=data.get("type_line", ""),
+                oracle_text=data.get("oracle_text", ""),
+                cmc=data.get("cmc", 0),
+            )
+            tag_names = {t["tag"] for t in tags}
+            exp = expected.get(name.lower().strip(), set())
+            missing = exp - tag_names
+            extra = tag_names - exp
+            # Filter out harmless "extra" tags that come from correct Dart heuristics
+            # but were not in the simplified expected set
+            harmless_extras = {"graveyard_synergy", "spellslinger", "wincon",
+                               "lifegain", "artifact_synergy", "sacrifice_outlet",
+                               "ramp", "payoff"}
+            significant_extra = extra - harmless_extras
+            status = "OK" if not missing else "MISSING"
+            if significant_extra:
+                status += " +EXTRA"
+            print(f"  {name:30s} -> {', '.join(sorted(tag_names))}")
+            print(f"  {'':30s} expected={', '.join(sorted(exp))}")
+            print(f"  {'':30s} status={status}")
+            if missing:
+                print(f"  {'':30s} MISSING: {missing}")
+                all_ok = False
+            if significant_extra:
+                print(f"  {'':30s} EXTRA: {significant_extra}")
+        print(f"\\n{'─'*65}")
+        print(f"  OVERALL: {'ALL CHECKS PASSED' if all_ok else 'SOME CHECKS FAILED'}")

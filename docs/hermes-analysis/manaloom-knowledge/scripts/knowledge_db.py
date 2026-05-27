@@ -176,6 +176,16 @@ CREATE TABLE IF NOT EXISTS vocabulary (
     source TEXT
 );
 
+CREATE TABLE IF NOT EXISTS card_tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    deck_card_id INTEGER REFERENCES deck_cards(id),
+    card_name TEXT NOT NULL,
+    tag TEXT NOT NULL,
+    confidence REAL DEFAULT 0.0,
+    evidence TEXT,
+    UNIQUE(deck_card_id, tag)
+);
+
 CREATE TABLE IF NOT EXISTS game_changers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     card_name TEXT UNIQUE NOT NULL,
@@ -249,7 +259,7 @@ def cmd_create():
     conn.executescript(SCHEMA)
     conn.commit()
     conn.close()
-    tables = ["commanders", "sources", "decks", "deck_cards", "card_analyses",
+    tables = ["commanders", "sources", "decks", "deck_cards", "card_tags", "card_analyses",
               "patterns", "insights", "discrepancies", "tag_accuracy", "synergies",
               "psychology_profiles", "vocabulary", "run_log"]
     print(f"Database created: {DB_PATH}")
@@ -377,6 +387,19 @@ def cmd_insert_deck():
             card.get("oracle_text")
         ))
         deck_card_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+        # Insert multi-tags into card_tags table if available
+        tags_list = card.get("tags") if isinstance(card.get("tags"), list) else None
+        if tags_list:
+            for tag_entry in tags_list:
+                tag_name = tag_entry.get("tag", "")
+                tag_conf = tag_entry.get("confidence", 0.0)
+                tag_evid = tag_entry.get("evidence", "")
+                if tag_name:
+                    conn.execute("""
+                        INSERT INTO card_tags (deck_card_id, card_name, tag, confidence, evidence)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (deck_card_id, card["name"], tag_name, tag_conf, tag_evid))
 
         analysis = card.get("analysis")
         if analysis:
