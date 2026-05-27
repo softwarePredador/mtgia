@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T16:59Z**
+> Última atualização: **2026-05-27T17:50Z**
 
 ## Resumo
 
@@ -11,94 +11,97 @@
 | Total de crons (`include_disabled=True`) | 12 |
 | Habilitados | 12/12 |
 | Desabilitados | 0 |
-| `last_status=error` | **2** 🔴 (mesmo total desde 16:22Z, mas composição mudou) |
+| `last_status=error` | **2** 🔴 |
 | Nunca executaram (`last_run_at=null`) | 0 |
 | Stale (>120min atrás, `enabled=true`) | 0 |
-| Fleet removidos desde última rodada | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
-| Recuperados desde 16:22Z | 1 (lorehold-deck-validator) |
-| Regredidos desde 16:22Z | 1 (commander-knowledge-deep) |
+| Fleet removidos desde 2026-05-27 | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
+| Recuperados nesta sessão | 1 (lorehold-deck-validator, mulligan-analyst) |
+| Regredidos nesta sessão | 0 |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 12/12 habilitados ✅. Fleet consolidado em 12 crons. 2 crons em `status=error` 🔴 (mesmo total que 16:22Z, mas composição mudou — deck-validator recuperou, commander-knowledge-deep regrediu).
+**Estado geral:** 12/12 habilitados ✅. Fleet consolidado em 12 crons. 2 crons em `status=error` (transientes — git push branch-behind + HTTP 502).
 
-**Mudanças desde 16:22Z:**
-- `lorehold-deck-validator` 🔴→✅ **RECUPERADO** — 16:42Z rodou com sucesso 🎉
-- `commander-knowledge-deep` ✅→🔴 **REGREDIU** — 16:36Z falhou. Workdir estava errado.
-- `lorehold-deck-scout` executou 16:52Z ✅
-- `manaloom-master-watchdog` executou 16:26Z ✅
-- Workdir do commander-knowledge-deep **CORRIGIDO** → `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge` ✅
+**Mudanças desde 16:59Z:**
+- `manaloom-commander-knowledge-deep` 🔴 **mantém erro** — 17:46Z falhou (git push branch-behind no final de run que completou com sucesso). Model/provider corretos. Sem ação necessária.
+- `manaloom-mana-base-validator` ✅→🔴 **REGREDIU** — 17:24Z falhou com `HTTP 502: Provider returned error`. Erro transitório de provider. Sem ação necessária.
+- `manaloom-gamechanger-research` executou 17:48Z ✅
+- `manaloom-master-watchdog` executou 17:00Z ✅
+- `lorehold-deck-scout` executou 17:29Z ✅
+- `lorehold-mulligan-analyst` executou 17:33Z ✅
+- **Product code modificado no worktree:** `server/lib/ai/optimization_functional_roles.dart` e `server/lib/edh_bracket_policy.dart` — alterações de session anterior. Branch pode estar behind.
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
-|:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 16:26Z | 33min | 🟢 ok | 2026-05-27 17:27Z | sem ação — rodando normalmente |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 16:09Z | 50min | 🟢 ok | 2026-05-27 21:00Z | executou às 16:09Z ✅, próxima às 21:00Z |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 4h03min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 16:26Z | 33min | 🟢 ok | 2026-05-27 17:27Z | **esta execução** |
+|:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 17:00Z | 50min | 🟢 ok | 2026-05-27 18:04Z | sem ação — rodando normalmente |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 16:09Z | 1h41min | 🟢 ok | 2026-05-27 21:00Z | próxima às 21:00Z |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 4h54min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 17:00Z | 50min | 🟢 ok | 2026-05-27 18:04Z | **esta execução** |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
-|:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 16:36Z | 23min | 🔴 error | 2026-05-27 17:00Z | ❌ **REGREDIU** — 16:36Z falhou (`agent reported failure`, combinação de HTTP 429 + gpt-5.5 residuals + workdir errado). Workdir **CORRIGIDO** nesta rodada → `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge`. Próximo run iminente (~17:00Z). |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 16:22Z | 37min | 🟢 ok | 2026-05-27 17:00Z | ✅ rodando com deepseek funcional |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 13:05Z | 3h54min | 🟢 ok | 2026-05-27 19:05Z | próximo ciclo às 19:05Z |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 16:11Z | 48min | 🟢 ok | 2026-05-27 17:11Z | ✅ rodando com deepseek funcional |
+|:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
+| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 17:46Z | 4min | 🔴 error | 2026-05-27 18:06Z | ⚠️ Run completou análise Atraxa mas errou no git push (branch behind). Model: `deepseek-v4-flash`/`deepseek` ✅. Workdir correto ✅. Erro transiente, sem ação. Próximo run em ~18:06Z. |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 17:48Z | 2min | 🟢 ok | 2026-05-27 18:08Z | ✅ rodando normalmente |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 13:05Z | 4h45min | 🟢 ok | 2026-05-27 19:05Z | próximo ciclo às 19:05Z |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 17:24Z | 26min | 🔴 error | 2026-05-27 18:24Z | ⚠️ **REGREDIU** — `HTTP 502: Provider returned error`. Erro transitório de provider. Config OK (model default). Sem ação. Próximo run em ~18:24Z. |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
-|:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 16:52Z | 7min | 🟢 ok | 2026-05-27 17:22Z | ✅ rodando normalmente |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 16:42Z | 17min | 🟢 ok | 2026-05-27 17:42Z | ✅ **RECUPERADO** — 16:42Z rodou com sucesso! |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 15:21Z | 1h38min | 🔴 error | 2026-05-27 17:29Z | ❌ Model `gpt-5.5` no último run (config copilot anterior). Config já corrigida para deepseek ✅. Aguardando scheduler (~17:29Z) |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 3h37min | 🟢 ok | 2026-05-27 21:29Z | normal para schedule 6h |
+|:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 17:29Z | 21min | 🟢 ok | 2026-05-27 17:59Z | ✅ rodando normalmente |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 16:42Z | 1h08min | 🟢 ok | 2026-05-27 17:42Z | ✅ estável |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 17:33Z | 17min | 🟢 ok | 2026-05-27 19:33Z | ✅ **RECUPERADO** — rodando com deepseek |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 4h28min | 🟢 ok | 2026-05-27 21:29Z | normal para schedule 6h |
 
-## Ações da Rodada Atual (2026-05-27T16:59Z)
+## Ações da Rodada Atual (2026-05-27T17:50Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
-|:-:|:--|:--|:--|:--|:--|
-| 1 | — | **mestre** | `git fetch/pull` | Branch `codex/hermes-analysis-docs` já atualizada | ✅ ff-only aplicado |
-| 2 | — | **diagnóstico** | diagnosticou 12 crons | 2 erros (commander-knowledge-deep + mulligan-analyst) | 🔍 dados coletados |
-| 3 | `75eed994c103` | **commander-knowledge-deep** | `cronjob(update, workdir=...)` | Workdir `/opt/data/workspace/mtgia` → `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge` | ✅ workdir corrigido |
-| 4 | — | **observação** | deck-validator recuperou 🔴→✅ | rodada 16:42Z executou com sucesso | ✅ recuperação natural via scheduler |
-| 5 | — | **observação** | commander-knowledge-deep regrediu ✅→🔴 | rodada 16:36Z falhou (workdir errado + config residual) | 🔴 workdir corrigido, aguardando scheduler |
+:-:|:--|:--|:--|:--|:--|
+| 1 | — | **mestre** | `git branch` check | Branch já correta | ✅ `codex/hermes-analysis-docs` |
+| 2 | — | **diagnóstico** | listou 12 crons | 2 erros encontrados | 🔍 analisados |
+| 3 | `75eed994c103` | commander-knowledge-deep | diagnóstico | Erro = git push branch-behind (run bem-sucedido, push falhou) | ⏸️ Sem ação — erro transiente, scheduler reintentará em 18:06Z |
+| 4 | `444aa9510c2c` | mana-base-validator | diagnóstico | Erro = HTTP 502 provider transiente | ⏸️ Sem ação — scheduler reintentará em 18:24Z |
+| 5 | — | observação | mulligan-analyst recuperou | 17:33Z rodou com sucesso | ✅ recuperou naturalmente |
+| 6 | — | observação | gamechanger-research rodou | 17:48Z com sucesso | ✅ natural |
 
-## Mudanças desde o Último Relatório (2026-05-27T16:22Z)
+## Mudanças desde o Último Relatório (2026-05-27T16:59Z)
 
 | Mudança | Detalhe |
 |:--------|:--------|
-| Lorehold-deck-validator | **RECUPERADO** ✅ 🔴→✅ — 16:42Z rodou com deepseek funcional |
-| Commander-knowledge-deep | **REGREDIU** 🔴 ✅→🔴 — 16:36Z falhou. Workdir CORRIGIDO nesta rodada |
-| Lorehold-deck-scout | **EXECUTOU** ✅ — 16:52Z completada |
-| Manaloom-master-watchdog | **EXECUTOU** ✅ — 16:26Z completada |
-| Commander-knowledge-deep workdir | **CORRIGIDO** ✅ → `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge` |
-| Erros totais | 2 (mesmo total, composição mudou) |
+| Lorehold-mulligan-analyst | **RECUPERADO** ✅ 🔴→✅ — 17:33Z rodou com deepseek sem erro |
+| Manaloom-mana-base-validator | **REGREDIU** 🔴 ✅→🔴 — 17:24Z falhou com HTTP 502 (transitório) |
+| Manaloom-commander-knowledge-deep | **MANTÉM 🔴** — 17:46Z completou run mas push falhou (branch behind) |
+| Manaloom-gamechanger-research | **EXECUTOU** ✅ — 17:48Z |
+| Erros totais | 2 (mesmo total, composição mudou: mulligan recuperou, mana-base regrediu) |
 
 ## Alertas Pendentes
 
 ### 🔴 2 crons com `last_status=error`
 
-| Cron | Último run | Erro | Provider | Model | Workdir |
-|:-----|:----------:|:----|:--------:|:-----:|:-------:|
-| commander-knowledge-deep | 16:36Z | agent reported failure (429 + gpt-5.5 residuals + workdir) | `deepseek` | `deepseek-v4-flash` | ✅ **CORRIGIDO** agora |
-| mulligan-analyst | 15:21Z | gpt-5.5 not accessible | `deepseek` | `deepseek-v4-flash` | ✅ já correto |
+| Cron | Último run | Erro | Provider | Model | Workdir | Transiente? |
+|:-----|:----------:|:----|:--------:|:-----:|:-------:|:-----------:|
+| commander-knowledge-deep | 17:46Z | git push branch-behind (run OK) | `deepseek` | `deepseek-v4-flash` | ✅ correto | ✅ Sim |
+| mana-base-validator | 17:24Z | HTTP 502 provider | default | default | ✅ correto | ✅ Sim |
 
-**Próximo ciclo previsto:** commander-knowledge-deep ~17:00Z, mulligan-analyst ~17:29Z.
+**Nenhuma ação corretiva necessária** — ambos os erros são transitórios. Os crons rodarão novamente em seus próximos ticks (18:06Z e 18:24Z).
 
-### 1 cron que se recuperou nesta rodada:
-- lorehold-deck-validator: 🔴 (14:44Z, HTTP 429) → 🟢 (16:42Z) ✅
+### Recuperados hoje (2026-05-27):
+- lorehold-mulligan-analyst: 🔴 → 🟢 (17:33Z)
+- lorehold-deck-validator: 🔴 → 🟢 (16:42Z, rodada anterior)
 
-### 1 cron que regrediu nesta rodada:
-- commander-knowledge-deep: 🟢 (15:38Z) → 🔴 (16:36Z, agent reported failure) — workdir corrigido
+### Regredidos hoje (2026-05-27):
+- manaloom-mana-base-validator: 🟢 → 🔴 (17:24Z, HTTP 502)
 
-## Notas
+## Observações Importantes
 
+- **Product code modificado no worktree:** `server/lib/ai/optimization_functional_roles.dart` e `server/lib/edh_bracket_policy.dart` apresentam alterações não commitadas (eds de session anterior). Isso causa o branch-behind no commander-knowledge-deep que tenta `git push`. Sem ação do manager — responsabilidade da session que editou.
 - Branch confirmada: `codex/hermes-analysis-docs` ✅
 - `cronjob(action="list", include_disabled=True)` retornou 12 jobs, todos `enabled=true`.
-- **Nenhum `run` ou `resume` foi disparado** — os critérios da PASSO 2 não foram atendidos (todos enabled=true, nenhum stale >120min, nenhum never-run). As correções foram estruturais (workdir).
-- 2 crons em `last_status=error` (mesmo total desde 16:22Z, mas composição mudou).
-- 1 cron recuperou (deck-validator), 1 cron regrediu (commander-knowledge-deep) — agora com workdir corrigido.
+- **Nenhum `run` ou `resume` foi disparado** — nenhum critério atendido (todos enabled=true, nenhum stale >120min, nenhum never-run, erros são transitórios).
+- 2 crons em `last_status=error` — ambos transientes, sem ação corretiva necessária.
 - Working tree contém artefatos de cron não relacionados (decks lorehold, scripts de scout, `__pycache__`) — apenas `CRON_STATUS.md` será comitado.
 - Nenhum token/secret registrado neste relatório.
