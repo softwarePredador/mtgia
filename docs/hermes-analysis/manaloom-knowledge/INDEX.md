@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 9 | 2026-05-27 |
-| Decks analisados | 9 | 2026-05-27 |
-| Cartas revisadas | ~1.130 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100) | 2026-05-27 |
-| Insights documentados | 45 | 2026-05-27 |
-| Discrepancias com ManaLoom | 52 | 2026-05-27 |
+| Comandantes analisados | 11 | 2026-05-27 |
+| Decks analisados | 11 | 2026-05-27 |
+| Cartas revisadas | ~1.230 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100) | 2026-05-27 |
+| Insights documentados | 54 | 2026-05-27 |
+| Discrepancias com ManaLoom | 58 | 2026-05-27 |
 
 ## Comandantes Analisados
 
@@ -28,6 +28,7 @@
 | **Winota, Joiner of Forces** | **1** | **2026-05-27** | **4** | **Parcial: 85 linhas / 100 qty** |
 | **Muldrotha, the Gravetide** | **1** | **2026-05-27** | **3** | **Nova: 87/87 EDHREC avg** |
 | **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
+| **Krenko, Mob Boss** | **1** | **2026-05-27** | **7** | **Nova: 100/100 EDHREC avg goblin typal** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -210,6 +211,17 @@
   Sanguine Bond) mesmo sem proteção adequada — acredita que ninguém vai remover
   as peças. Tolerancia a risco média: aceita terrenos virados e ramp baixo,
   mas evita cartas de bracket 4 (sem Mana Crypt, sem Mox Diamond).
+- **Jogador de Krenko, Mob Boss (goblin typal tokens aggro):** Agressivo-instintivo —
+  quer fazer o maior número possível de fichas de goblin e atacar. Pensa em
+  termos de "dobrar" — cada ativação de Krenko dobra o board, então o pensamento
+  é linear: "mais goblins = mais dano." Aceita proteção zero como custo do
+  arquétipo mono-red, confiando que Krenko será re-jogado se morrer. Não otimiza
+  interações sutis (Raid Bombardment vs lords) porque está focado no plano A:
+  Krenko ativar 2-3 vezes e ganhar. Tolerância a risco alta: troca draw
+  consistente por explosão de tokens, aceita mãos sem terrenos e sem ação.
+  Viés tribal forte — inclui cartas medianas (Gempalm Incinerator, Goblin
+  Chirurgeon) porque são goblins, não por eficiência objetiva. Pensamento chave:
+  "Goblin bom é goblin que faz mais goblins."
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -468,6 +480,7 @@
 | 2026-05-27 | **EDHREC Live (7.597 decks)** | **Lorehold, the Historian (Spellslinger/Big Spells)** | **Scout concluido — 265 cartas mapeadas, 8 cartas faltando urgentes identificadas** |
 | 2026-05-27 | **EDHREC Average Deck (23.212 decks)** | **Muldrotha, the Gravetide (Graveyard Permanent Recursion Value)** | **Analise concluida — 87 cartas EDHREC avg, 3 Game Changers** |
 | 2026-05-27 | **EDHREC Average Deck** | **Edgar Markov (Vampire Tribal Aggro/Tokens/Aristocrats)** | **Analise concluida — 100/100 EDHREC avg, 8 discrepancias de classificacao, 3 novos padroes** |
+| 2026-05-27 | **EDHREC Average Deck** | **Krenko, Mob Boss (Goblin Typal Tokens Aggro)** | **Analise concluida — 100/100 EDHREC avg, 7 insights, 3 discrepancias** |
 
 ### Novos Insights desta Analise
 - **Muldrotha cria uma nova categoria de avaliacao:** "permanent-based efficiency." O deck prioriza permanentes mesmo se o efeito for mais fraco. Instants e sorceries sao "descartaveis" porque Muldrotha nao pode rejoga-los.
@@ -479,6 +492,12 @@
 - **O hibrido aggro+aristocrats e a norma no EDHREC avg, nao a excecao.** Apesar do perfil recomendar focar em um, a media dos jogadores tenta os dois.
 - **8/63 cartas (12.7%) classificadas incorretamente pelo ManaLoom.** Olivia's Wrath (board wipe como utility), Sorin (engine como removal), Viscera Seer (sac outlet como draw) - erros que distorcem contagens de funcao.
 
+### Novos Insights (Krenko, Mob Boss — Goblin Typal Tokens Aggro)
+- **Multiplicacao exponencial vs combo escondido:** Krenko parece aggro linear mas tem combo (Snoop + Recruiter + Kiki-Jiki) e Staff of Domination como outlet de mana infinita. O deckbuilder medio nao otimiza para combo, mas ele esta presente.
+- **Protecao zero como filosofia:** Mono-red aceita que Krenko morre. Nao ha counters, fog, ou indestrutivel. A resposta e re-jogar Krenko, nao proteger o primeiro.
+- **Raid Bombardment + lords = antissinergia nao reconhecida:** EDHREC inclui ambos porque sao "boas cartas de goblin", mas lords desqualificam goblins do Raid Bombardment ao aumentar poder para >2.
+- **Draw baixo (5 fontes) compensado por Skullclamp + Ringleader:** 5 draws e pouco para Commander, mas Skullclamp (equipa token 1/1 → draw 2) e Goblin Ringleader (revela 4, pega goblins) sustentam o plano aggro.
+
 ### Novos Padroes (Muldrotha — Graveyard Value)
 14. **"Strategy over power"** — Preferir cartas que se encaixam no plano do comandante a cartas objetivamente mais fortes. Spore Frog > Essence Warden.
 15. **"The graveyard is a resource, not a cost"** — Self-mill nao e "perder cartas", e "preparar o motor."
@@ -489,8 +508,11 @@
 
 ### Novos Padroes (Edgar Markov — Vampire Tribal Aggro)
 20. **"Eminencia compensa ramp baixo"** — Edgar funciona com 7 ramp porque cada vampiro de 1 mana gera 2 corpos. A metrica central e densidade vampiresca (24-34), nao ramp.
-21. **"Hibrido aggro+aristocrats e a norma, nao a excecao"** — O jogador medio prefere ter opcoes (aggro e aristocrats) a ser eficiente em um plano so.
-22. **"O combo sem protecao e um risco aceito"** — Exquisite Blood + Sanguine Bond estao no deck, mas com apenas 2 protecoes. O jogador aposta que ningue remove as pecas.
+22. **"O hibrido aggro+aristocrats e a norma, nao a excecao"** — O jogador medio prefere ter opcoes (aggro e aristocrats) a ser eficiente em um plano so.
+23. **"Combo sem protecao e um risco aceito"** — Exquisite Blood + Sanguine Bond estao no deck, mas com apenas 2 protecoes. O jogador aposta que ningue remove as pecas.
+24. **"Krenko e aggro com motor de combo escondido"** — O deck parece aggro linear, mas Conspicuous Snoop + Goblin Recruiter + Kiki-Jiki forma um combo de linha infinita. O deckbuilder medio não otimiza para o combo, mas ele está lá.
+25. **"Mono-red aceita protecao zero"** — Krenko não tem counterspells, fog, ou indestrutível. A filosofia é: se Krenko morrer, jogue outro. Isso é diferente de decks multicolor que podem incluir proteção.
+26. **"Raid Bombardment e lords tem antissinergia nao reconhecida"** — Lords aumentam poder dos goblins para >2, desqualificando-os do Raid Bombardment. EDHREC inclui ambos porque sao "boas cartas de goblin", nao por interacao otimizada.
 
 ### Novas Discrepancias com ManaLoom (Muldrotha)
 | Carta | Tag ManaLoom | Tag Esperada | Impacto |
@@ -500,6 +522,21 @@
 | Pernicious Deed | enchantment (no tag) | board_wipe | Medio - IA ve como enchantment generico |
 | Accursed Marauder | creature (no tag) | removal/edict | Medio - IA ve como criatura mediana |
 | Mesmeric Orb | artifact (no tag) | self-mill/engine | Medio - IA ve como artifact generico |
+
+### Correcoes a Analise Anterior (Lorehold — 2026-05-26-user-decklist.md)
+
+A analise anterior do deck Lorehold continha erros significativos nas metricas, corrigidos nesta execucao:
+
+| Metrica Antiga | Valor Correto | Diferenca | Fonte da Correcao |
+|:--------------|:-------------:|:---------:|:-----------------|
+| Lands = 34 | **35** | +1 | DB `total_lands` |
+| Ramp = 16 | **15** | -1 | DB `ramp_count` |
+| Draw = 4 | **3** (single-tag) / **8** (multi-tag) | -1/+4 | Classificador dual |
+| Gy Recursion = 0 | **4-5** | +4-5 | Mizzix's, Surge, Restoration, Goblin Engineer, Volcanic Vision |
+| Wincons = 10 | **2** (dedicated) / **5** (practical) | -8/-5 | Classificacao real |
+| Topdeck Setup = 12 | **7** | -5 | Contagem real de cartas |
+
+**Licao:** A analise anterior foi feita sem rodar o classificador real do DB. Os numeros foram estimados visualmente. Sempre cruzar com `deck_cards` + `card_tags` do knowledge.db.
 
 ### Novas Discrepancias com ManaLoom (Edgar Markov)
 | Carta | Tag ManaLoom | Tag Esperada | Impacto |
@@ -511,4 +548,14 @@
 | Blade of the Bloodchief | artifact | payoff | Medio - +1/+1 counters em morte |
 | Bloodthirsty Conqueror | creature | drain/combo_piece | Medio - segundo Exquisite Blood |
 | Exquisite Blood | enchantment | combo_piece | Medio - metade do combo EB+SB |
-| Blood Artist | creature (no tag) | aristocrat_payoff | Medio - sem tag funcional relevante |
+|| Blood Artist | creature (no tag) | aristocrat_payoff | Medio - sem tag funcional relevante |
+
+## Ultimas Execucoes
+
+### 2026-05-27 — Lorehold Purpose Analyzer (Agent 2)
+- **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
+- **Foco:** Analise profunda de cada carta do deck Lorehold
+- **Arquivos gerados:** VALIDATOR_LOG.md, VALIDATOR_SUMMARY.md
+- **Correcoes a analise anterior:** Lands 34→35, Draw 4→3, Recursion 0→4-5, Wincons 10→2/5, Topdeck Setup 12→7
+- **Insights:** 1 novo (deck tem plano de recursion+treasures, nao topdeck+miracle como media)
+- **Discrepancia:** 1 nova (10 cartas sem tag funcional primaria no classificador single-tag)
