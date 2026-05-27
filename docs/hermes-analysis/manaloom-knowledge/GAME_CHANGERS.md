@@ -75,8 +75,8 @@ documentando o why_game_changer e notes no SQLite.
 | Status | Count |
 |:-------|:-----:|
 | Total GCs | 53 |
-| With full analysis | 2/53 |
-| Remaining | 51 |
+| With full analysis | 3/53 |
+| Remaining | 50 |
 | Detected by ManaLoom | 24/53 |
 
 ### Analise anterior: Ad Nauseam (2026-05-27)
@@ -88,7 +88,16 @@ documentando o why_game_changer e notes no SQLite.
 - **ManaLoom bracket:** `tagCardForBracket()` em `server/lib/edh_bracket_policy.dart` com o oracle text do Scryfall retornou `NO_CATEGORIES`. Resultado registrado no SQLite: `manaloom_detected=0`, `manaloom_bracket_category=card_advantage_gap`.
 - **Discrepancy:** a politica atual cobre `fastMana`, `tutor`, `freeInteraction`, `extraTurns` e `infiniteCombo`, mas nao tem categoria para card-advantage explosivo / draw burst Game Changer como Ad Nauseam.
 
-### Ultima analise SQLite: Cyclonic Rift
+### Ultima analise SQLite: Rhystic Study (2026-05-27)
+- **Impact:** 10/10 (`card_advantage`)
+- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Rhystic%20Study` retornou `game_changer=true`, `type_line=Enchantment`, `mana_cost={2}{U}`, `cmc=3.0`, Commander `legal`, `edhrec_rank=41`, `price_usd=69.44`, `rarity=rare`, `oracle_text="Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."`
+- **Fonte EDHREC:** `https://edhrec.com/cards/rhystic-study` — aparece em 1.010.475 decks (~23% do formato EDHREC). Inclusao por comandante: 91% em spellslinger, 88% em draw synergy (Niv-Mizzet), 67-71% em control/midrange, 47-58% em genericos, 21-37% em decks onde azul e secundario. Preco: $70.20 USD.
+- **Fonte ManaLoom:** `tagCardForBracket()` em `server/lib/edh_bracket_policy.dart` com oracle text retornou `NO_CATEGORIES`. Rhystic Study nao se encaixa nas 5 categorias atuais (fastMana, tutor, freeInteraction, extraTurns, infiniteCombo). `manaloom_detected=0`, `manaloom_bracket_category=card_advantage`.
+- **Bracket oficial:** Scryfall `is:gamechanger !"Rhystic Study"` confirmou GC. URL brackets mtgcommander.net retornou Page not found. Texto oficial = **NAO VERIFICADO**.
+- **Restricao oficial:** PROIBIDO bracket 1-2, max 3 em bracket 3, sem limites bracket 4 (cEDH).
+- **Discrepancy:** mesmo sendo o king do draw passivo em Commander (23% do formato), o sistema de brackets do ManaLoom nao o detecta por falta de categoria `card_advantage`. Necessario adicionar sexta categoria.
+
+### Analise anterior: Cyclonic Rift (2026-05-27)
 - **Impact:** 10/10 (`board_wipe`)
 - **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Cyclonic%20Rift` retornou `game_changer=true`, `security_stamp=oval`, `type_line=Instant`, `mana_cost={1}{U}`, `cmc=2.0`, Commander `legal`, `price_usd=41.26`, `rarity=mythic`, e oracle text: "Return target nonland permanent you don't control to its owner's hand. Overload {6}{U} (You may cast this spell for its overload cost. If you do, change 'target' in its text to 'each.'")".
 - **Fonte Edhrec (artefatos do projeto):** Cyclonic Rift aparece em 69 artefatos JSON do projeto MTGIA. Confirmado como interação esperada nos perfis EDHREC de Yuriko (pacote `interaction`), Kinnan (pacote `tutors_interaction`), Niv-Mizzet (4 temas de corpus EDHREC), e mais (Aesi, Miirym, Atraxa, Urza). Perfis de `commander_reference_profile_anchor30_batch_a_2026-05-12` e `batch_b_2026-05-12`.
