@@ -1,6 +1,6 @@
 # Hermes Analysis: Open Risks
 
-> Riscos abertos do ManaLoom. Atualizado em 2026-05-26.
+> Riscos abertos do ManaLoom. Atualizado em 2026-05-27.
 > Este arquivo nao substitui os documentos canonicos; resume a leitura operacional atual.
 
 ## P0 — Bloqueante
@@ -42,19 +42,19 @@ Tentativas em macOS, Android emulator e iOS wireless falharam por toolchain, nao
 O smoke encerra classificavelmente, mas sem event_id confirmado.
 
 ### Cobertura de testes do app abaixo do ideal
-25 telas mapeadas no fluxo core. Auditoria de codigo confirmou:
-- `community_screen.dart` (1725 linhas, 40 classes) — sem teste de widget
-- `trade_detail_screen.dart` (1479 linhas) — sem teste de widget
-- `binder_screen.dart` (1628 linhas) — sem teste de widget
-- `marketplace_screen.dart` (851 linhas) — sem teste de widget
+25 telas mapeadas no fluxo core. Auditoria de codigo em `origin/master` 7329fbbd confirmou que a cobertura melhorou em alguns pontos, mas ainda nao e ampla:
+- `community_screen.dart` (1729 linhas) — sem teste de widget unitario; ha runtime em `profile_community_runtime_test.dart`
+- `trade_detail_screen.dart` (1479 linhas) — cobertura de widget parcial em `trade_confirmation_flow_test.dart`, sem baseline amplo de layout/status/chat
+- `binder_screen.dart` (1628 linhas) — sem teste de widget dedicado para `BinderTabContent`
+- `marketplace_screen.dart` (566 linhas) — ja tem `marketplace_screen_overflow_test.dart` cobrindo overflow e estados loading/error/empty
 - `binder_item_editor.dart` (1025 linhas) — sem teste de widget
-- `profile_screen.dart` (588 linhas) — refatorado, sem golden test
+- `profile_screen.dart` (590 linhas) — teste funcional existe, mas segue sem golden/baseline visual
 Sem cobertura ampla, regressao visual ou logica pode passar despercebida.
 
 ### Telas criticas do fluxo core ainda grandes
 Auditoria confirmou tamanhos reais no codigo:
 - `deck_details_screen.dart` (1705 linhas) — ainda concentra AppBar + 3 abas + acoes
-- `community_screen.dart` (1725 linhas, 40 classes) — 4 tabs + sub-tab aninhada
+- `community_screen.dart` (1729 linhas) — 4 tabs + sub-tab aninhada
 - `trade_detail_screen.dart` (1479 linhas) — timeline, chat, status, itens, trust
 - `binder_screen.dart` (1628 linhas) — listas, editor, filtros
 - `deck_optimize_sheet_widgets.dart` (1215 linhas) — sheet de otimizacao
@@ -94,17 +94,20 @@ Status granular:
 - **NEEDS_BENCHMARK_COMPARISON:** todos os itens ainda precisam de comparacao
   lado a lado com `dddddd/` antes de marcar a task como DONE.
 
-### Arquivos criticos cresceram alem do ultimo mapa
-Validacao local em 2026-05-25 indicou tamanhos maiores que os registrados no
-mapa anterior:
+### Arquivos criticos continuam grandes
+Validacao em `origin/master` 7329fbbd (2026-05-27) confirmou os maiores gargalos
+registrados no Technical Map:
 - `server/routes/ai/optimize/index.dart`: 3495 linhas
 - `server/lib/ai/optimize_runtime_support.dart`: 4197 linhas
+- `app/lib/features/home/life_counter_screen.dart`: 6400 linhas
+- `app/lib/features/home/lotus/lotus_visual_skin.dart`: 1991 linhas
 - `app/lib/features/decks/providers/deck_provider.dart`: 1226 linhas
 
-Impacto: gargalos de manutencao maiores do que o digest inicial sugeria.
+Impacto: gargalos de manutencao permanecem relevantes; Lotus visual skin cresceu
+alem do mapa anterior e deve ser tratado como superficie visual propria.
 
-Recomendacao: atualizar o Technical Map e tratar a quebra modular como P1 quando
-voltar ao core de IA/decks.
+Recomendacao: manter Technical Map sincronizado e tratar quebra modular como P1
+quando voltar ao core de IA/decks/Lotus.
 
 ### x-request-id sem correlacao ponta a ponta
 Backend ja gera e propaga. Script de validacao existe (`validate_request_id_ready.sh`).

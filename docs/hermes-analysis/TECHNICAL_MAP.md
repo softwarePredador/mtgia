@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-26.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-27.
 
 ## Estrutura do repositorio
 
@@ -111,22 +111,22 @@ mtgia/
 | server/routes/ai/optimize/index.dart | 3495 | P1 — gargalo de manutencao maior que o digest anterior |
 | server/lib/ai/optimize_runtime_support.dart | 4197 | P1 — logica densa, precisa de quebra modular |
 | app/lib/features/home/life_counter_screen.dart | 6400 | P1 — tela/engine nativa grande; Lotus WebView tem skin separado |
-| app/lib/features/home/lotus/lotus_visual_skin.dart | 1333 | P1 — CSS injetado no WebView, cresceu +423 linhas com overlays premium |
+| app/lib/features/home/lotus/lotus_visual_skin.dart | 1991 | P1 — CSS injetado no WebView; superficie visual propria Lotus com overlays/provas |
 | app/lib/features/decks/screens/deck_details_screen.dart | 1705 | P1 — caindo, mas ainda grande |
-| app/lib/features/community/screens/community_screen.dart | 1725 | P1 — 4 tabs + sub-tabs |
+| app/lib/features/community/screens/community_screen.dart | 1729 | P1 — 4 tabs + sub-tabs |
 | app/lib/features/binder/screens/binder_screen.dart | 1628 | P1 — listas, editor, filtros |
 | app/lib/features/decks/widgets/deck_analysis_tab.dart | 1632 | P1 — functional tags + graficos |
 | app/lib/features/trades/screens/trade_detail_screen.dart | 1479 | P1 — timeline, chat, status, itens, trust |
 | app/lib/features/decks/providers/deck_provider.dart | 1226 | P1/P2 — voltou a crescer; residual/orquestracao |
-| server/manual-de-instrucao.md | ~17741 | N/A — documentacao |
-| app/doc/APP_AUDIT_2026-04-29.md | ~2195 | N/A — auditoria |
-| server/doc/API_CONTRACTS_AND_DATA_MAP.md | ~369 linhas / 100KB | N/A — contratos |
+| server/manual-de-instrucao.md | 17741 | N/A — documentacao |
+| app/doc/APP_AUDIT_2026-04-29.md | 2222 | N/A — auditoria |
+| server/doc/API_CONTRACTS_AND_DATA_MAP.md | 369 | N/A — contratos |
 
 ## Qualidade e validacao
 
-- `flutter analyze --no-fatal-infos`: VERDE
-- `flutter test`: VERDE (599 tests em 2026-05-26)
-- `dart test`: VERDE (backend unitario)
+- `flutter analyze --no-pub --no-fatal-infos`: VERDE (2026-05-27)
+- `dart test`: VERDE, 599 tests (backend, 2026-05-27)
+- `flutter test`: VERDE historico; nao reexecutado integralmente nesta higiene semanal
 - Corpus estavel de resolucao Commander: 19/19 passed
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`

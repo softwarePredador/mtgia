@@ -1,7 +1,7 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-26 (quinta rodada — commit 7329fbbd).
+> Atualizado em 2026-05-27 (higiene semanal — master ainda em 7329fbbd).
 
 ## Estado atual
 
@@ -10,19 +10,19 @@
 - HEAD atual: **`7329fbbd`** (docs: add Hermes semantic validation request)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`7329fbbdd0d5ea3e88de50d3c8235e76852380f4`** (`/health`, 2026-05-26)
+- SHA publicado confirmado em producao: **`7329fbbdd0d5ea3e88de50d3c8235e76852380f4`** (`/health`, 2026-05-27)
 
 ## Novos commits nesta rodada
 
-Dois commits desde a ultima analise:
+Higiene semanal de 2026-05-27: **nenhum commit novo** desde a ultima analise (`7329fbbd..origin/master` vazio). Mantem-se, para referencia, os dois commits novos da rodada anterior:
 
-### `f57bb8d3` — Fix semantic role classification fallbacks (NOVO)
+### `f57bb8d3` — Fix semantic role classification fallbacks (rodada anterior)
 - **4 arquivos**, **+142/-6 linhas** (codigo)
 - Co-authored-by: Copilot
 - Data: 2026-05-26 14:27 BRT
 - **Tipo: CODE** — corrige classificacao de cartas no fallback deterministico
 
-### `7329fbbd` — docs: add Hermes semantic validation request (NOVO)
+### `7329fbbd` — docs: add Hermes semantic validation request (rodada anterior)
 - **1 arquivo**, **+170 linhas** (documentacao)
 - Autor: softwarePredador
 - Data: 2026-05-26 14:46 BRT
@@ -116,8 +116,10 @@ Dois commits desde a ultima analise:
 
 ## Analise do commit ca0c8d52 — Lotus Overlays Polish
 
-Este commit expande `lotus_visual_skin.dart` (+423 linhas para 1333 total) com
-CSS premium para tres overlays do Lotus WebView:
+Este commit expandiu `lotus_visual_skin.dart` em +423 linhas na epoca do commit,
+com CSS premium para tres overlays do Lotus WebView. Na higiene semanal de
+2026-05-27, o arquivo completo em `origin/master` soma 1991 linhas por incluir
+tambem commits anteriores da skin Lotus:
 
 - **Settings overlay** (`Configurações`): posicionamento fixed full-viewport,
   safe-area-aware, fundo gradiente radial + linear, lista de itens com cards
@@ -240,9 +242,9 @@ funcionais que foi planejado, validado e simulado em `PATCH_PLAN.md`.
 
 ### Validacoes Linux (Hermes container)
 
-- **dart test**: 599/599 passed (mantido)
-- **flutter analyze**: No issues found
-- **dart analyze** dos 4 arquivos alterados: PASS
+- **dart test**: 599/599 passed (revalidado em 2026-05-27)
+- **flutter analyze --no-pub --no-fatal-infos**: No issues found (revalidado em 2026-05-27)
+- **dart analyze** dos 4 arquivos alterados: PASS historico
 - **Backend publicado**: `7329fbbd` contem `f57bb8d3` por ancestralidade Git
 
 **Nao alterado**: contratos API, core de decks (app), rotas, visual system, deploy.
@@ -308,6 +310,14 @@ O commit `3eebd0f6` estabelece um **design system premium completo**:
 - CHECKLIST_GO_LIVE — desatualizado
 - Ajustes locais nao commitados no workspace principal nao contam como `master`
   ate virarem commit/push; este digest observa o `origin/master`.
+
+## Higiene semanal 2026-05-27
+
+- `origin/master` permanece em `7329fbbd`; `git log 7329fbbd..origin/master` vazio.
+- `/health.git_sha` confirmou `7329fbbdd0d5ea3e88de50d3c8235e76852380f4`.
+- `dart test` no backend: 599/599 passed.
+- `flutter analyze --no-pub --no-fatal-infos` no app: No issues found.
+- Reconciliacao documental feita sem criar novos riscos de produto: alguns itens de UI foram ajustados para refletir cobertura existente (Profile/Trade/Marketplace) e tamanhos reais (`lotus_visual_skin.dart` agora 1991 linhas em `origin/master`).
 
 ## Como atualizar este digest
 

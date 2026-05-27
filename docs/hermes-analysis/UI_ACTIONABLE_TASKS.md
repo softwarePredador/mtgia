@@ -1,13 +1,13 @@
 # Hermes Analysis: UI Actionable Tasks
 
-> Tasks validadas no codigo (origin/master) em 2026-05-25.
+> Tasks validadas no codigo (origin/master) em 2026-05-27.
 > Nenhuma task foi criada por suposicao. Cada uma tem evidencia concreta.
 
 ## Life Counter / Lotus — Pendencias Ativas
 
 Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codigo.
 
-### Status atual apos `ca0c8d5`
+### Status atual apos `7329fbbd`
 
 - **PARTIAL_PROVEN:** mesa 4p, cores por jogador, controles `+/-` visiveis em
   todos os jogadores, radial menu, history overlay, settings overlay e card
@@ -21,7 +21,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.1 — Geometria fina 2p/3p/4p nao travada
 - **Arquivo:** `app/lib/features/home/life_counter_screen.dart` / `lotus_visual_skin.dart`
 - **Status:** OPEN
-- **Evidencia:** Task doc seccao 1: "travar proporcoes finais de 2p, 3p e 4p", "revisar gutters, bordas, raios e massa dos quadrantes". Sem commit especifico de travamento de geometria desde a task (2026-03-26).
+- **Evidencia:** Task doc seccao 1: "travar proporcoes finais de 2p, 3p e 4p", "revisar gutters, bordas, raios e massa dos quadrantes". Sem commit especifico de travamento de geometria desde a task (2026-03-26); `origin/master` 7329fbbd mantem `life_counter_screen.dart` com 6400 linhas e `lotus_visual_skin.dart` com 1991 linhas.
 - **Por que importa:** Base geometrica errada = todo refinamento visual fica em cima de proporcao errada. Afeta a primeira impressao da mesa.
 - **Ajuste recomendado:** Revisar largura/altura dos quadrantes em 3p. Verificar se compact ainda comprime mais que o benchmark. Revisar massa visual dos cantos arredondados. Verificar se o centro da mesa respira como no benchmark.
 - **Criterio de pronto:** Screenshot lado a lado passa como mesma familia visual. Nenhum quadrante parece "card". A mesa pode ser lida como poster antes de qualquer detalhe.
@@ -39,7 +39,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.3 — Hub central ainda polido demais
 - **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart`
 - **Status:** OPEN
-- **Evidencia:** Task doc seccao 3: "reduzir o que ainda parece premium product UI". Revisar escala do hexagono central vs petalas. Revisar espessura do contorno e glow. Revisar peso do bloco de ultimo evento.
+- **Evidencia:** Task doc seccao 3: "reduzir o que ainda parece premium product UI". Revisar escala do hexagono central vs petalas. Revisar espessura do contorno e glow. Revisar peso do bloco de ultimo evento. `origin/master` 7329fbbd contem skin Lotus extensa (1991 linhas), mas nao ha side-by-side/freeze que feche este aceite.
 - **Por que importa:** O hub deve parecer ferramenta de mesa, nao menu bonito. Contrasta com a tese de mesa brutal/fisica.
 - **Ajuste recomendado:** Reduzir brilho premium do centro. Aproximar anatomia do benchmark. Legenda de ultimo evento mais seca.
 - **Criterio de pronto:** Hub parece ferramenta de mesa. Leitura de PLAYERS, SETTINGS, HIGH ROLL, RESTART e HELP e imediata. Centro nao compete com quadrantes.
@@ -48,7 +48,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.4 — DICE overlay precisa endurecer
 - **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart`
 - **Status:** OPEN
-- **Evidencia:** Task doc seccao 4: "endurecer mais DICE". O CSS do DICE nao foi priorizado nos commits recentes (`ca0c8d5` focou Settings/History/Card Search). HIGH ROLL deve ser acao primaria dominante do overlay.
+- **Evidencia:** Task doc seccao 4: "endurecer mais DICE". `lotus_visual_skin.dart` em `origin/master` 7329fbbd contem markup/estilos de dice/high roll, mas os commits recentes priorizaram Settings/History/Card Search e nao ha prova de aceite benchmark para DICE. HIGH ROLL deve ser acao primaria dominante do overlay.
 - **Por que importa:** Overlay de dado ainda pode parecer "utilitario de app" em vez de ferramenta de mesa.
 - **Ajuste recomendado:** HIGH ROLL como acao primaria dominante. D20/COIN/ROLL 1ST como utilitarios secos. Ultimo evento como texto cru.
 - **Criterio de pronto:** DICE overlay parece da mesma familia do benchmark. Nenhum elemento parece "card ornamental".
@@ -57,7 +57,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.5 — PLAYERS overlay precisa perder acabamento
 - **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart`
 - **Status:** OPEN
-- **Evidencia:** Task doc seccao 4: "PLAYERS ainda precisa perder acabamento". Deve parecer ferramenta de mesa, nao modal de app.
+- **Evidencia:** Task doc seccao 4: "PLAYERS ainda precisa perder acabamento". `lotus_visual_skin.dart` em `origin/master` 7329fbbd contem estilos de players, mas nao ha prova de aceite benchmark/freeze. Deve parecer ferramenta de mesa, nao modal de app.
 - **Por que importa:** Overlay de configuracao de jogadores nao deve quebrar a ilusao de mesa fisica.
 - **Ajuste recomendado:** Deixar overlay mais seco, menos polido. Remover linguagem residual de "sheet generica".
 - **Criterio de pronto:** Overlay parece camada da mesa, nao modal generico.
@@ -66,7 +66,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.6 — Commander damage overlay com linguagem residual de adaptacao
 - **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart` / `life_counter_native_commander_damage_sheet.dart`
 - **Status:** OPEN / PARTIAL_VISUAL_PROOF
-- **Evidencia:** Task doc seccao 7: "reduzir linguagem residual de feature adaptada". Overlay rapido de commander damage existe mas pode ter cheiro de "counter row" ornamental.
+- **Evidencia:** Task doc seccao 7: "reduzir linguagem residual de feature adaptada". `origin/master` 7329fbbd contem CSS/markup de commander damage no Lotus skin, mas sem aceite side-by-side; overlay rapido pode manter cheiro de "counter row" ornamental.
 - **Nota:** existe prova viva do overlay, mas ela ainda nao equivale a aceite
   contra benchmark nem revisao de linguagem.
 - **Por que importa:** Contadores MTG precisam soar nativos da shell clone, nao como "adaptacao em cima".
@@ -77,7 +77,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.7 — Motion final: takeover, SET LIFE, KO'D!
 - **Arquivo:** `app/lib/features/home/lotus/lotus_visual_skin.dart` / `life_counter_screen.dart`
 - **Status:** OPEN
-- **Evidencia:** Task doc seccao 8: Motion compartilhado (fade + scale + slide) existe nos overlays (Wave 9). Mas duracoes/easing do takeover de High Roll, transicao de SET LIFE e presenca de KO'D! ainda precisam ser revisados contra o benchmark.
+- **Evidencia:** Task doc seccao 8: Motion compartilhado (fade + scale + slide) existe nos overlays. Mas, em `origin/master` 7329fbbd, nao ha documento/prova final revisando duracoes/easing do takeover de High Roll, transicao de SET LIFE e presenca de KO'D! contra o benchmark.
 - **Por que importa:** Sem motion final, a tela pode estar viva mas nao no nivel de impacto do benchmark.
 - **Ajuste recomendado:** Revisar duracao/easing do takeover de High Roll. Revisar entrada/saida dos overlays. Revisar transicao de SET LIFE. Revisar presenca de KO'D! e lethal states.
 - **Criterio de pronto:** Motion melhora leitura. Visivel em gravacao curta. Nao parece ornamental.
@@ -104,35 +104,39 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 
 ### P1.2 community_screen.dart com complexidade alta
 - **Arquivo:** `app/lib/features/community/screens/community_screen.dart`
-- **Evidencia:** 1725 linhas, 40 classes/methods. 4 tabs principais (Explorar, Seguindo, Usuarios, Cotacoes) + sub-tabs dentro de Cotacoes. Mistura feed de decks, feed de seguidores, busca de usuarios e cotacoes de mercado em um unico arquivo. Foi refatorado (+504/-367) mas continua muito denso.
-- **Por que importa:** Telas com 40 classes internas sao dificeis de testar, dar manutencao e evolucionar sem risco de regressao.
+- **Evidencia:** validacao em `origin/master` 7329fbbd confirmou
+  `app/lib/features/community/screens/community_screen.dart` com 1729 linhas,
+  14 classes, 9 `Widget build`, 4 tabs principais (Explorar, Seguindo,
+  Usuarios, Cotacoes) + sub-tabs dentro de Cotacoes. Mistura feed de decks,
+  feed de seguidores, busca de usuarios e cotacoes de mercado em um unico
+  arquivo. Nao ha teste de widget unitario para `CommunityScreen`; ha cobertura
+  runtime em `app/integration_test/profile_community_runtime_test.dart`.
+- **Por que importa:** Tela de 1729 linhas com tabs aninhadas e multiplos dominios e dificil de testar, dar manutencao e evolucionar sem risco de regressao.
 - **Ajuste recomendado:** Quebrar em widgets de tab dedicados em arquivos separados: `_ExploreTab`, `_FollowingFeedTab`, `_UserSearchTab`, `_MarketMoversTab` para `community_tabs/` ou similar.
 - **Criterio de pronto:** Tela abaixo de 600 linhas, tabs em arquivos separados. Navegacao entre tabs intacta.
 - **Teste:** Teste de widget para pelo menos a tab principal (Explorar).
 
 ### P1.3 ProfileScreen sem baseline visual apos refatoracao
 - **Arquivo:** `app/lib/features/profile/profile_screen.dart`
-- **Evidencia:** Foi refatorado na Onda 6 (+388/-214, 588 linhas atuais). Nao ha golden test e o teste existente (`profile_screen_test.dart`) nao cobre layout visual.
+- **Evidencia:** validacao em `origin/master` 7329fbbd confirmou `app/lib/features/profile/profile_screen.dart` com 590 linhas. Existe teste funcional (`app/test/features/profile/profile_screen_test.dart`) cobrindo edicao/refresh de dados, mas nao ha golden/baseline visual da refatoracao Onda 6.
 - **Por que importa:** Tela de alta visibilidade (tab 4 do bottom nav). Qualquer regressao visual na apresentacao do perfil e estado do usuario impacta percepcao de produto premium.
-- **Ajuste recomendado:** Adicionar teste de widget que verifique a presenca dos elementos principais (avatar, display name, stats, botoes de atalho). Verificar se cores/espacamentos seguem os tokens do AppTheme (nao tem hardcoded colors, mas nao custa confirmar).
-- **Criterio de pronto:** Teste de widget para ProfileScreen criado e verde.
-- **Teste:** `profile_screen_test.dart` ampliado com asserts de layout.
+- **Ajuste recomendado:** Manter o teste funcional existente e adicionar golden/baseline visual ou snapshot focado que verifique avatar, display name, stats, botoes de atalho e aderencia aos tokens do AppTheme.
+- **Criterio de pronto:** Baseline visual/golden de ProfileScreen criado, revisado e verde.
+- **Teste:** `profile_screen_test.dart` mantido verde + novo golden/snapshot revisado.
 
-### P1.4 binder_screen + marketplace_screen sem AppBar proprio
-- **Arquivos:** `app/lib/features/binder/screens/binder_screen.dart` (1628 linhas), `app/lib/features/binder/screens/marketplace_screen.dart` (851 linhas)
-- **Evidencia:** Ambos sao "tab content" widgets embutidos no `CollectionScreen`. Nao tem Scaffold nem AppBar proprios. Isso e intencional (documentado em comentario), mas significa que qualquer rota direta para essas telas ficaria sem AppBar. O `binder_screen` tem seu proprio `TabBar` interno (2 sub-tabs), e `marketplace_screen` tem filtros e busca.
-- **Por que importa:** Se no futuro alguem quiser navegar diretamente para `/binder` ou `/market`, nao tera AppBar. O `binder_screen` com 1628 linhas e TabBar interno merece seu proprio teste de widget.
-- **Ajuste recomendado:** Nao mexer na estrutura (e intencional). Adicionar teste de widget para `BinderTabContent` e `MarketplaceTabContent` que verifique a renderizacao basica com dados mockados.
-- **Criterio de pronto:** Testes de widget para ambos existem e passam.
-- **Teste:** Novo teste para binder tab + marketplace tab.
+### P1.4 binder_screen grande e cobertura de widget ainda parcial
+- **Arquivos:** `app/lib/features/binder/screens/binder_screen.dart` (1628 linhas), `app/lib/features/binder/screens/marketplace_screen.dart` (566 linhas)
+- **Evidencia:** ambos sao "tab content" widgets embutidos no `CollectionScreen` e nao tem Scaffold/AppBar proprios; isso e intencional no hub atual. Validacao em `origin/master` 7329fbbd confirmou `binder_screen.dart` com 1628 linhas e TabBar interno (2 sub-tabs). `marketplace_screen.dart` caiu para 566 linhas e ja possui teste de widget em `app/test/features/binder/screens/marketplace_screen_overflow_test.dart` cobrindo overflow e estados loading/error/empty.
+- **Por que importa:** O maior risco restante e `binder_screen.dart`: 1628 linhas, sub-tabs e editor/listas ainda podem regredir sem teste de widget dedicado. A ausencia de AppBar propria e decisao de arquitetura do hub, nao bug isolado.
+- **Ajuste recomendado:** Nao mexer na estrutura do hub sem decisao de produto. Adicionar teste de widget para `BinderTabContent` com dados mockados; manter/expandir o teste existente de `MarketplaceTabContent` conforme novos estados surgirem.
+- **Criterio de pronto:** Teste de widget para `BinderTabContent` existe e passa; cobertura de Marketplace permanece verde.
+- **Teste:** novo teste de binder tab + `marketplace_screen_overflow_test.dart` verde.
 
-### P1.5 community_screen AppBar fontWeight 800 foge do padrao
+### P1.5 community_screen AppBar fontWeight 800 foge do padrao — RESOLVIDO
 - **Arquivo:** `app/lib/features/community/screens/community_screen.dart`
-- **Evidencia:** O AppBar da community_screen define `titleTextStyle` com `fontWeight: FontWeight.w800`, enquanto o tema define `w700` no AppBarTheme. O tema Onda 6 define AppBar com Fraunces w700. O w800 e um desvio.
-- **Por que importa:** Inconsistencia visual entre telas. O titulo da Community aparece mais pesado que o resto do app.
-- **Ajuste recomendado:** Remover o `titleTextStyle` override do AppBar e deixar o tema resolver. Se o Fraunces w700 do tema nao ficar bom, ajustar o tema (nao o override local).
-- **Criterio de pronto:** AppBar usa o tema, w800 removido. Visualmente consistente com DeckList, Profile, etc.
-- **Teste:** Verificacao visual ou snapshot.
+- **Status:** RESOLVIDO pelo commit `91885194`.
+- **Evidencia:** validacao em `origin/master` 7329fbbd confirmou `AppBar.titleTextStyle` com `fontWeight: FontWeight.w700` nas linhas 68-72. O unico `FontWeight.w800` remanescente no arquivo fica em badge interno (`_UserCard`/label), nao no AppBar.
+- **Fechamento:** manter apenas historico; nao gerar task ativa.
 
 ## P2 — Importante, mas nao bloqueia
 
@@ -146,10 +150,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 
 ### P2.2 life_counter_screen.dart com cores hardcoded no Flutter nativo
 - **Arquivo:** `app/lib/features/home/life_counter_screen.dart`
-- **Evidencia:** validacao local em 2026-05-25 encontrou muitas referencias
-  `Color(0x...)` e `Colors.` no arquivo. O Lotus WebView ja recebeu
-  `lotus_visual_skin.dart`, mas a tela/engine Flutter nativa continua com tokens
-  locais/hardcoded.
+- **Evidencia:** validacao em `origin/master` 7329fbbd encontrou 68 ocorrencias de `Color(0x...)` e 134 de `Colors.` em `life_counter_screen.dart` (ex.: linhas 108-113 com acentos de jogador; linhas 550/884/893/912 com scrims/fundos). O Lotus WebView ja recebeu `lotus_visual_skin.dart`, mas a tela/engine Flutter nativa continua com tokens locais/hardcoded.
 - **Por que importa:** Se a experiencia nativa for usada ou alterada sem passar
   pelo Lotus skin, pode divergir do Premium Visual System.
 - **Ajuste recomendado:** Nao converter mecanicamente todas as cores para
@@ -169,13 +170,13 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 - **Criterio de pronto:** Decisao documentada. Navegacao funcional e previsivel.
 - **Teste:** Teste de integracao de navegacao.
 
-### P2.4 TradeDetailScreen (1479 linhas) sem teste de widget
+### P2.4 TradeDetailScreen grande, mas com cobertura de widget parcial
 - **Arquivo:** `app/lib/features/trades/screens/trade_detail_screen.dart`
-- **Evidencia:** 1479 linhas, 142 references a AppTheme (usa bem o tema), mas nao ha teste de widget dedicado. So existem testes de provider e fluxo de confirmacao.
-- **Por que importa:** Tela de troca e uma das mais complexas do app (status, timeline, chat, trust, itens). Sem teste, regressao pode passar.
-- **Ajuste recomendado:** Adicionar teste de widget basico que renderize a tela com dados mockados e verifique a presenca dos elementos principais (status, itens, chat).
-- **Criterio de pronto:** Teste de widget para TradeDetailScreen criado e verde.
-- **Teste:** `trade_detail_screen_test.dart` com mock de provider.
+- **Evidencia:** validacao em `origin/master` 7329fbbd confirmou 1479 linhas. Existe cobertura de widget em `app/test/features/trades/screens/trade_confirmation_flow_test.dart`, que renderiza `TradeDetailScreen` com provider fake e cobre confirmacao de aceite/entrega; tambem ha runtime em `binder_marketplace_trade_runtime_test.dart`. Ainda nao ha teste basico cobrindo layout completo de status, itens, timeline/chat/trust.
+- **Por que importa:** Tela de troca e uma das mais complexas do app. A cobertura atual protege fluxos de acao, mas nao baseline amplo de apresentacao.
+- **Ajuste recomendado:** Adicionar teste de widget basico que renderize a tela com dados mockados e verifique presenca dos elementos principais (status, itens, chat/timeline/trust), sem substituir os testes de confirmacao existentes.
+- **Criterio de pronto:** Teste de layout/estado para TradeDetailScreen criado e verde.
+- **Teste:** novo `trade_detail_screen_test.dart` ou expansao segura de `trade_confirmation_flow_test.dart`.
 
 ## P3 — Melhoria futura
 
@@ -185,9 +186,9 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 - **Ajuste:** Adicionar `backgroundColor: AppTheme.surfaceSlate` explicito no NavigationBar, igualando ao valor do tema.
 - **Criterio de pronto:** NavigationBar com backgroundColor explicito.
 
-### P3.2 ProfileScreen (588 linhas) nao tem golden test
+### P3.2 ProfileScreen (590 linhas) nao tem golden test
 - **Arquivo:** `app/lib/features/profile/profile_screen.dart`
-- **Evidencia:** Refatorado na Onda 6, sem golden test. HomeScreen tem golden, ProfileScreen nao.
+- **Evidencia:** Refatorado na Onda 6; validacao em `origin/master` 7329fbbd confirmou 590 linhas e ausencia de golden test. HomeScreen tem golden, ProfileScreen nao.
 - **Ajuste:** Adicionar golden test para ProfileScreen similar ao da Home.
 - **Criterio de pronto:** Golden test passando com baseline revisada.
 

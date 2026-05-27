@@ -10,8 +10,8 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Estado em 2026-05-26: **PASS_WITH_RISKS** para release interno non-scanner
-- Backend tests: 599 (2026-05-26), mantido
+- Estado em 2026-05-27: **PASS_WITH_RISKS** para release interno non-scanner; master sem novos commits desde 7329fbbd
+- Backend tests: 599 (2026-05-27), mantido
 - Master HEAD: 7329fbbd (2026-05-26, Onda 7 — AI Classification Hardening)
 
 ## Branch de analise
@@ -23,7 +23,7 @@ Nunca commitar diretamente na `master`. Fluxo:
 2. `git checkout codex/hermes-analysis-docs`
 3. `git pull --ff-only origin codex/hermes-analysis-docs`
 4. Editar `docs/hermes-analysis/*`
-5. `git add docs/hermes-analysis && git commit -m "Update Hermes project analysis docs"`
+5. Stage apenas arquivos intencionais em `docs/hermes-analysis/**` (evitar artefatos de crons como `knowledge.db`, decks gerados e `__pycache__`) e commitar com `Update Hermes project analysis docs`
 6. `git push origin codex/hermes-analysis-docs`
 
 ## Fontes canonicas (ordem de precedencia)
@@ -49,8 +49,8 @@ Nunca commitar diretamente na `master`. Fluxo:
 Hermes consegue ler, auditar e analisar o repositorio. O container Hermes usado para
 esta memoria possui **Dart 3.12.0** e **Flutter 3.44.0** instalados em `/opt/data/tools/flutter/bin/`.
 
-- `dart test`: 599 passed (backend)
-- `flutter analyze --no-pub --no-fatal-infos`: No issues found
+- `dart test`: 599 passed (backend, 2026-05-27)
+- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-05-27)
 
 ## Politica de resposta
 
