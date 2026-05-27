@@ -1,0 +1,683 @@
+# ManaLoom Code Structure Audit
+> Data: 2026-05-27 20:17 UTC
+
+## Arquivos Mapeados
+- `server/lib/`: 81 arquivos
+- `server/routes/`: 86 arquivos
+- **Total**: 167 arquivos
+
+## Classes por Arquivo
+- `AggressiveCandidateQualitySignal` → `server/lib/ai/optimize_runtime_support.dart`
+- `AiGenerateJob` → `server/lib/ai_generate_job.dart`
+- `AiGenerateJobStore` → `server/lib/ai_generate_job.dart`
+- `AiGenerateOpenAiTimeoutSelection` → `server/lib/ai_generate_performance_support.dart`
+- `AiLogService` → `server/lib/ai_log_service.dart`
+- `ArchetypeCountersService` → `server/lib/archetype_counters_service.dart`
+- `ArchetypePattern` → `server/lib/ml_knowledge_service.dart`
+- `AuthService` → `server/lib/auth_service.dart`
+- `BattleResult` → `server/lib/ai/battle_simulator.dart`
+- `BattleSimulator` → `server/lib/ai/battle_simulator.dart`
+- `BracketFilterDecision` → `server/lib/edh_bracket_policy.dart`
+- `BracketPolicy` → `server/lib/edh_bracket_policy.dart`
+- `BracketTagResult` → `server/lib/edh_bracket_policy.dart`
+- `CandidateFunctionTag` → `server/lib/ai/candidate_quality_data_support.dart`
+- `CandidateRoleScore` → `server/lib/ai/candidate_quality_data_support.dart`
+- `CardInsight` → `server/lib/ml_knowledge_service.dart`
+- `CardRecommendation` → `server/lib/ml_knowledge_service.dart`
+- `CardResolutionDecision` → `server/lib/card_resolution_support.dart`
+- `CardValidationService` → `server/lib/card_validation_service.dart`
+- `ColorIdentityBackfillDecision` → `server/lib/mtg_data_integrity_support.dart`
+- `CommanderReferenceArchetypeStatsLoadResult` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCardStat` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCardStatsLoadResult` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCardStatsResolution` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCommanderCardResolution` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCorpusPackages` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceCorpusSummary` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckAnalysis` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckCardInput` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckCorpusGuidance` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckInput` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceReadinessInputs` → `server/lib/ai/commander_reference_readiness_support.dart`
+- `CommanderReferenceReadinessRuntimeProof` → `server/lib/ai/commander_reference_readiness_support.dart`
+- `CommanderReferenceReadinessScorecard` → `server/lib/ai/commander_reference_readiness_support.dart`
+- `CommanderShellMetadata` → `server/lib/meta/meta_deck_commander_shell_support.dart`
+- `CompleteBuildAccumulator` → `server/lib/ai/optimize_complete_support.dart`
+- `Database` → `server/lib/database.dart`
+- `DeckArchetypeAnalyzer` → `server/routes/ai/optimize/index.dart`
+- `DeckArchetypeAnalyzerCore` → `server/lib/ai/optimize_state_support.dart`
+- `DeckOptimizationState` → `server/routes/ai/optimize/index.dart`
+- `DeckOptimizationStateResult` → `server/lib/ai/optimize_state_support.dart`
+- `DeckOptimizerService` → `server/lib/ai/otimizacao.dart`
+- `DeckRulesException` → `server/lib/deck_rules_service.dart`
+- `DeckRulesService` → `server/lib/deck_rules_service.dart`
+- `DeckThemeProfile` → `server/routes/ai/optimize/index.dart`
+- `DeckThemeProfileResult` → `server/lib/ai/optimize_state_support.dart`
+- `DistributedRateLimiter` → `server/lib/distributed_rate_limiter.dart`
+- `EdhTop16TournamentEntry` → `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `EdhrecAverageDeckCard` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecAverageDeckData` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecCard` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecCommanderData` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecService` → `server/lib/ai/edhrec_service.dart`
+- `EndpointCache` → `server/lib/endpoint_cache.dart`
+- `EndpointMetricSnapshot` → `server/lib/request_metrics_service.dart`
+- `ExpandedDeckCard` → `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `ExpandedTopDeckDeck` → `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `ExternalCommanderMetaCandidate` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateIllegalCard` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateLegalityEvidence` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateLegalityRepository` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateUnresolvedCard` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateValidationResult` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaControlledSourcePolicy` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaEligibilityBatch` → `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+- `ExternalCommanderMetaEligibilityDecision` → `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+- `ExternalCommanderMetaImportConfig` → `server/lib/meta/external_commander_meta_import_support.dart`
+- `ExternalCommanderMetaOperationalConfig` → `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+- `ExternalCommanderMetaPersistencePlan` → `server/lib/meta/external_commander_meta_import_support.dart`
+- `ExternalCommanderMetaPromotionConfig` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionInsertPlan` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionIssue` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionPlan` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionResult` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionSnapshot` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaStagingConfig` → `server/lib/meta/external_commander_meta_staging_support.dart`
+- `ExternalCommanderMetaStagingPlan` → `server/lib/meta/external_commander_meta_staging_support.dart`
+- `ExternalCommanderMetaValidationIssue` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `FormatStaplesService` → `server/lib/ai/format_staples_service.dart`
+- `FunctionalCardTag` → `server/lib/ai/functional_card_tags.dart`
+- `FunctionalDeckSummary` → `server/lib/ai/functional_card_tags.dart`
+- `FunctionalReport` → `server/lib/ai/optimization_validator.dart`
+- `GameAction` → `server/lib/ai/battle_simulator.dart`
+- `GameCard` → `server/lib/ai/battle_simulator.dart`
+- `GeneratedDeckRepository` → `server/lib/generated_deck_validation_service.dart`
+- `GeneratedDeckValidationResult` → `server/lib/generated_deck_validation_service.dart`
+- `GeneratedDeckValidationService` → `server/lib/generated_deck_validation_service.dart`
+- `GoldfishResult` → `server/lib/ai/goldfish_simulator.dart`
+- `GoldfishSimulator` → `server/lib/ai/goldfish_simulator.dart`
+- `HateCardsService` → `server/lib/ai/hate_cards_service.dart`
+- `ImportListParseResult` → `server/lib/import_list_service.dart`
+- `InternalAiRequestToken` → `server/lib/internal_ai_request_token.dart`
+- `Log` → `server/lib/logger.dart`
+- `MLContext` → `server/lib/ml_knowledge_service.dart`
+- `MLKnowledgeService` → `server/lib/ml_knowledge_service.dart`
+- `Magic` → `server/routes/ai/generate/index.dart`
+- `ManaAnalysis` → `server/routes/decks/[id]/analysis/index.dart`
+- `MarketMoversCache` → `server/lib/market_movers.dart`
+- `MatchupAnalyzer` → `server/lib/ai/goldfish_simulator.dart`
+- `MatchupResult` → `server/lib/ai/goldfish_simulator.dart`
+- `MetaDeckAnalyticsContext` → `server/lib/meta/meta_deck_analytics_support.dart`
+- `MetaDeckFormatDescriptor` → `server/lib/meta/meta_deck_format_support.dart`
+- `MetaDeckReferenceCandidate` → `server/lib/meta/meta_deck_reference_support.dart`
+- `MetaDeckReferenceQueryParts` → `server/lib/meta/meta_deck_reference_support.dart`
+- `MetaDeckReferenceSelectionResult` → `server/lib/meta/meta_deck_reference_support.dart`
+- `MonteCarloComparison` → `server/lib/ai/optimization_validator.dart`
+- `MtgTop8EventDeckRow` → `server/lib/meta/mtgtop8_meta_support.dart`
+- `MulliganReport` → `server/lib/ai/optimization_validator.dart`
+- `NotificationService` → `server/lib/notification_service.dart`
+- `OpenAiRuntimeConfig` → `server/lib/openai_runtime_config.dart`
+- `OptimizationSemanticV2EnforcementDecision` → `server/lib/ai/optimization_functional_roles.dart`
+- `OptimizationSwapGateResult` → `server/lib/ai/optimization_quality_gate.dart`
+- `OptimizationValidator` → `server/lib/ai/optimization_validator.dart`
+- `OptimizeDeckContextData` → `server/lib/ai/optimize_request_support.dart`
+- `OptimizeDeckContextException` → `server/lib/ai/optimize_request_support.dart`
+- `OptimizeIntensityConfig` → `server/lib/ai/optimize_runtime_support.dart`
+- `OptimizeJob` → `server/lib/ai/optimize_job.dart`
+- `OptimizeJobStore` → `server/lib/ai/optimize_job.dart`
+- `OptimizeStageTelemetry` → `server/lib/ai/optimize_stage_telemetry.dart`
+- `ParsedMetaDeckCardEntry` → `server/lib/meta/meta_deck_card_list_support.dart`
+- `ParsedMetaDeckCardList` → `server/lib/meta/meta_deck_card_list_support.dart`
+- `PlanService` → `server/lib/plan_service.dart`
+- `PlayerState` → `server/lib/ai/battle_simulator.dart`
+- `PostgresExternalCommanderMetaCandidateLegalityRepository` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `PostgresGeneratedDeckRepository` → `server/lib/generated_deck_validation_service.dart`
+- `PushNotificationService` → `server/lib/push_notification_service.dart`
+- `RateLimiter` → `server/lib/rate_limit_middleware.dart`
+- `RebuildException` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildGuidedService` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildResult` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildScopeDecision` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildTargetProfile` → `server/lib/ai/rebuild_guided_service.dart`
+- `ReferenceGeneratedCardsIdentityFilterResult` → `server/lib/ai/commander_reference_generate_fallback_support.dart`
+- `ReferenceGeneratedDeckEvaluation` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `RequestMetricsService` → `server/lib/request_metrics_service.dart`
+- `RequestTrace` → `server/lib/request_trace.dart`
+- `SemanticCardAnalysisV2` → `server/lib/ai/functional_card_tags.dart`
+- `SwapFunctionalAnalysis` → `server/lib/ai/optimization_validator.dart`
+- `SynergyEngine` → `server/lib/ai/sinergia.dart`
+- `SynergyPackage` → `server/lib/ml_knowledge_service.dart`
+- `ThemeCheck` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `ThemeContextualRule` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `ThemeContextualRulesService` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `ThemeValidationResult` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `UserPlanSnapshot` → `server/lib/plan_service.dart`
+- `ValidationReport` → `server/lib/ai/optimization_validator.dart`
+- `_CacheItem` → `server/lib/endpoint_cache.dart`
+- `_CachedAverageDeckResult` → `server/lib/ai/edhrec_service.dart`
+- `_CachedResult` → `server/lib/ai/edhrec_service.dart`
+- `_CardData` → `server/lib/deck_rules_service.dart`
+- `_DeckMetrics` → `server/routes/decks/[id]/ai-analysis/index.dart`
+- `_DeckStats` → `server/lib/ai/goldfish_simulator.dart`
+- `_EndpointMetricBucket` → `server/lib/request_metrics_service.dart`
+- `_ExternalCommanderMetaParsedCardEntry` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `_InfluencedCardInsight` → `server/lib/meta/meta_deck_reference_support.dart`
+- `_LandTrimContext` → `server/lib/ai/optimization_quality_gate.dart`
+- `_MarketMoversCacheEntry` → `server/lib/market_movers.dart`
+- `_ParsedTradeItems` → `server/routes/trades/index.dart`
+- `_PasswordPreparation` → `server/lib/auth_service.dart`
+- `_PlayDecision` → `server/lib/ai/battle_simulator.dart`
+- `_PromotionDeckProfile` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `_QueryBuilder` → `server/routes/cards/index.dart`
+- `_RankedMetaDeckReference` → `server/lib/meta/meta_deck_reference_support.dart`
+- `_ResolvedExternalCommanderMetaCardEntry` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `_SimCard` → `server/routes/decks/[id]/simulate/index.dart`
+- `_TelemetryQuery` → `server/routes/ai/optimize/telemetry/index.dart`
+- `_WeightedCard` → `server/lib/ai/rebuild_guided_service.dart`
+
+## Imports Potencialmente Quebrados
+- `server/routes/ai/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/ai/_middleware.dart` importa `../../lib/plan_middleware.dart` (não encontrado)
+- `server/routes/ai/_middleware.dart` importa `../../lib/rate_limit_middleware.dart` (não encontrado)
+- `server/routes/ai/archetypes/index.dart` importa `../../../lib/endpoint_cache.dart` (não encontrado)
+- `server/routes/ai/archetypes/index.dart` importa `../../../lib/ai/commander_reference_profile_support.dart` (não encontrado)
+- `server/routes/ai/archetypes/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/archetypes/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/ai/archetypes/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/ai/archetypes/index.dart` importa `../../../lib/openai_runtime_config.dart` (não encontrado)
+- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/ai/edhrec_service.dart` (não encontrado)
+- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/meta/meta_deck_card_list_support.dart` (não encontrado)
+- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/meta/meta_deck_format_support.dart` (não encontrado)
+- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/meta/mtgtop8_meta_support.dart` (não encontrado)
+- `server/routes/ai/explain/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/explain/index.dart` importa `../../../lib/openai_runtime_config.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai_generate_job.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai_generate_internal_url_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai_generate_performance_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_card_stats_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_deck_corpus_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_generate_fallback_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_profile_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/functional_card_tags.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/color_identity.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/generated_deck_validation_service.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/import_card_lookup_service.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/internal_ai_request_token.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/meta/meta_deck_format_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/meta/meta_deck_reference_support.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/ai/generate/index.dart` importa `../../../lib/openai_runtime_config.dart` (não encontrado)
+- `server/routes/ai/ml-status/index.dart` importa `../../../lib/database.dart` (não encontrado)
+- `server/routes/ai/ml-status/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/color_identity.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/card_validation_service.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_analysis_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_complete_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_deck_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_request_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_state_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_stage_telemetry.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/otimizacao.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimization_functional_roles.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimization_quality_gate.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_runtime_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_runtime_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimization_validator.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/edhrec_service.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_job.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/theme_contextual_rules_service.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai_generate_internal_url_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/internal_ai_request_token.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/edh_bracket_policy.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/meta/meta_deck_reference_support.dart` (não encontrado)
+- `server/routes/ai/optimize/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/ai/rebuild/index.dart` importa `../../../lib/ai/rebuild_guided_service.dart` (não encontrado)
+- `server/routes/ai/rebuild/index.dart` importa `../../../lib/ai/deck_state_analysis.dart` (não encontrado)
+- `server/routes/ai/rebuild/index.dart` importa `../../../lib/deck_rules_service.dart` (não encontrado)
+- `server/routes/ai/rebuild/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/simulate/index.dart` importa `../../../lib/ai/battle_simulator.dart` (não encontrado)
+- `server/routes/ai/simulate/index.dart` importa `../../../lib/ai/goldfish_simulator.dart` (não encontrado)
+- `server/routes/ai/simulate/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/simulate/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/ai/simulate-matchup/index.dart` importa `../../../lib/archetype_counters_service.dart` (não encontrado)
+- `server/routes/ai/simulate-matchup/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/ai/simulate-matchup/index.dart` importa `../../../lib/meta/meta_deck_card_list_support.dart` (não encontrado)
+- `server/routes/ai/weakness-analysis/index.dart` importa `../../../lib/archetype_counters_service.dart` (não encontrado)
+- `server/routes/ai/weakness-analysis/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/auth/_middleware.dart` importa `../../lib/rate_limit_middleware.dart` (não encontrado)
+- `server/routes/auth/login.dart` importa `../../lib/auth_service.dart` (não encontrado)
+- `server/routes/auth/login.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/auth/me.dart` importa `../../lib/auth_service.dart` (não encontrado)
+- `server/routes/auth/register.dart` importa `../../lib/auth_service.dart` (não encontrado)
+- `server/routes/auth/register.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/binder/[id]/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/binder/[id]/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/binder/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/binder/index.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/binder/index.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/cards/index.dart` importa `../../lib/card_query_contract.dart` (não encontrado)
+- `server/routes/cards/index.dart` importa `../../lib/endpoint_cache.dart` (não encontrado)
+- `server/routes/cards/index.dart` importa `../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/cards/printings/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/cards/resolve/index.dart` importa `../../../lib/card_resolution_support.dart` (não encontrado)
+- `server/routes/cards/resolve/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/community/decks/[id].dart` importa `../../../lib/auth_service.dart` (não encontrado)
+- `server/routes/community/decks/[id].dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/community/decks/[id].dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/community/decks/[id].dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/community/decks/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/community/decks/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/community/decks/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/community/marketplace/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/community/marketplace/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/community/users/[id].dart` importa `../../../lib/auth_service.dart` (não encontrado)
+- `server/routes/community/users/[id].dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/community/users/[id].dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/community/users/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/community/users/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/notification_service.dart` (não encontrado)
+- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/request_trace.dart` (não encontrado)
+- `server/routes/conversations/[id]/read.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/conversations/[id]/read.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/conversations/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/conversations/index.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/conversations/index.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/conversations/unread-count.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/conversations/unread-count.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/decks/[id]/index.dart` importa `../../../lib/deck_rules_service.dart` (não encontrado)
+- `server/routes/decks/[id]/index.dart` importa `../../../lib/deck_schema_support.dart` (não encontrado)
+- `server/routes/decks/[id]/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/decks/[id]/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/decks/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/decks/index.dart` importa `../../lib/deck_schema_support.dart` (não encontrado)
+- `server/routes/decks/index.dart` importa `../../lib/deck_rules_service.dart` (não encontrado)
+- `server/routes/decks/index.dart` importa `../../lib/http_responses.dart` (não encontrado)
+- `server/routes/decks/index.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/decks/index.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/decks/index.dart` importa `../../lib/scryfall_image_url.dart` (não encontrado)
+- `server/routes/health/dashboard/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/health/dashboard/index.dart` importa `../../../lib/request_metrics_service.dart` (não encontrado)
+- `server/routes/health/index.dart` importa `../../lib/http_responses.dart` (não encontrado)
+- `server/routes/health/metrics/index.dart` importa `../../../lib/request_metrics_service.dart` (não encontrado)
+- `server/routes/health/metrics/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/health/ready/index.dart` importa `../../../lib/health_readiness_support.dart` (não encontrado)
+- `server/routes/health/ready/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/import/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/import/index.dart` importa `../../lib/deck_rules_service.dart` (não encontrado)
+- `server/routes/import/index.dart` importa `../../lib/http_responses.dart` (não encontrado)
+- `server/routes/import/index.dart` importa `../../lib/import_card_lookup_service.dart` (não encontrado)
+- `server/routes/import/index.dart` importa `../../lib/import_list_service.dart` (não encontrado)
+- `server/routes/import/to-deck/index.dart` importa `../../../lib/deck_rules_service.dart` (não encontrado)
+- `server/routes/import/to-deck/index.dart` importa `../../../lib/import_card_lookup_service.dart` (não encontrado)
+- `server/routes/import/to-deck/index.dart` importa `../../../lib/import_list_service.dart` (não encontrado)
+- `server/routes/import/to-deck/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
+- `server/routes/import/validate/index.dart` importa `../../../lib/import_list_service.dart` (não encontrado)
+- `server/routes/import/validate/index.dart` importa `../../../lib/import_card_lookup_service.dart` (não encontrado)
+- `server/routes/notifications/[id]/read.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/notifications/[id]/read.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/notifications/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/notifications/count.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/notifications/count.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/notifications/index.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/notifications/index.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/notifications/read-all.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/notifications/read-all.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/sets/index.dart` importa `../../lib/endpoint_cache.dart` (não encontrado)
+- `server/routes/sets/index.dart` importa `../../lib/sets_catalog_contract.dart` (não encontrado)
+- `server/routes/trades/[id]/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/trades/[id]/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/trades/[id]/messages.dart` importa `../../../lib/notification_service.dart` (não encontrado)
+- `server/routes/trades/[id]/messages.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/trades/[id]/messages.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/trades/[id]/messages.dart` importa `../../../lib/request_trace.dart` (não encontrado)
+- `server/routes/trades/[id]/respond.dart` importa `../../../lib/notification_service.dart` (não encontrado)
+- `server/routes/trades/[id]/respond.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/trades/[id]/respond.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/trades/[id]/respond.dart` importa `../../../lib/request_trace.dart` (não encontrado)
+- `server/routes/trades/[id]/status.dart` importa `../../../lib/notification_service.dart` (não encontrado)
+- `server/routes/trades/[id]/status.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/trades/[id]/status.dart` importa `../../../lib/observability.dart` (não encontrado)
+- `server/routes/trades/[id]/status.dart` importa `../../../lib/request_trace.dart` (não encontrado)
+- `server/routes/trades/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/trades/index.dart` importa `../../lib/notification_service.dart` (não encontrado)
+- `server/routes/trades/index.dart` importa `../../lib/logger.dart` (não encontrado)
+- `server/routes/trades/index.dart` importa `../../lib/observability.dart` (não encontrado)
+- `server/routes/trades/index.dart` importa `../../lib/request_trace.dart` (não encontrado)
+- `server/routes/users/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/users/me/index.dart` importa `../../../lib/auth_middleware.dart` (não encontrado)
+- `server/routes/users/me/index.dart` importa `../../../lib/logger.dart` (não encontrado)
+- `server/routes/users/me/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+
+## Funções Públicas (primeiros 5 por arquivo)
+- `server/lib/ai/aggressive_candidate_meta_signal_support.dart` (194 linhas): isCommanderCandidateLegalityAllowed, isExternalCommanderCandidateTrusted, confidenceLabel, scoreAggressiveMetaSignal, bracketScopeForMetaSignal
+- `server/lib/ai/battle_simulator.dart` (880 linhas): resetForNewTurn, toString, drawCard, shuffle
+- `server/lib/ai/candidate_quality_data_support.dart` (693 linhas): normalizeCandidateQualityKey, normalizeCandidateQualityRole, add, inferCandidateBudgetTier, inferCandidateBracketScope
+- `server/lib/ai/commander_reference_card_stats_support.dart` (1368 linhas): normalizeCommanderReferenceCardName, buildCommanderReferenceCardStatsPrompt, buildCommanderReferenceArchetypeStatsPrompt
+- `server/lib/ai/commander_reference_deck_corpus_support.dart` (1490 linhas): normalizeCommanderReferenceDeckText, buildReferenceDeckKey, buildCommanderReferenceDeckCorpusPrompt, shouldUseCompactCommanderReferenceCorpusPrompt, classifyCommanderReferenceDeckCardRole
+- `server/lib/ai/commander_reference_generate_fallback_support.dart` (370 linhas): addCard
+- `server/lib/ai/commander_reference_profile_support.dart` (543 linhas): normalizeCommanderReferenceName, normalizeCommanderReferenceConfidence, isLoreholdCommanderReferenceCandidate, isReferenceProfileConfidenceUsable, commanderReferenceConfidenceRank
+- `server/lib/ai/commander_reference_readiness_support.dart` (495 linhas): block
+- `server/lib/ai/deck_state_analysis.dart` (586 linhas): detectArchetype, addReason, resolveOptimizeArchetype
+- `server/lib/ai/edhrec_service.dart` (466 linhas): cleanupCache, isHighSynergy, toString
+- `server/lib/ai/functional_card_tags.dart` (1053 linhas): count, add, normalizeFunctionalCardName
+- `server/lib/ai/hate_cards_service.dart` (160 linhas): generatePromptContext
+- `server/lib/ai/optimization_functional_roles.dart` (399 linhas): looksLikeOptimizationBoardWipeText, looksLikeOptimizationRampText, looksLikeOptimizationLandSearchText, classifyOptimizationFunctionalRole
+- `server/lib/ai/optimize_complete_support.dart` (1560 linhas): calculateCompleteMaxBasicAdditions, addUnique, rebalanceCompleteDeckForLandDeficit, mergeUniqueSpells
+- `server/lib/ai/optimize_deck_support.dart` (180 linhas): commanderSignalsSpellslinger, commanderSignalsArtifacts, commanderSignalsEnchantments
+- `server/lib/ai/optimize_runtime_support.dart` (4198 linhas): normalizeOptimizeReasoning, resolveOptimizeMode, clampRequestedSwapCount, shouldUseAsyncOptimizeExecutor, isBasicLandName
+- `server/lib/ai/optimize_stage_telemetry.dart` (85 linhas): start, stop, logSummary
+- `server/lib/ai/optimize_state_support.dart` (982 linhas): detectArchetype, assessManaBase, assessManaCurve, calculateConfidence, addReason
+- `server/lib/ai/otimizacao.dart` (1046 linhas): addAll
+- `server/lib/ai/rebuild_guided_service.dart` (1748 linhas): addWeight, toString
+- `server/lib/ai/theme_contextual_rules_service.dart` (109 linhas): archetypeToTheme
+- `server/lib/ai_generate_performance_support.dart` (197 linhas): normalizeAiGeneratePrompt, normalizeAiGenerateFormat, normalizeAiGenerateBracket, normalizeAiGenerateCommanderName, buildAiGenerateCacheKey
+- `server/lib/ai_log_service.dart` (236 linhas): Function
+- `server/lib/auth_middleware.dart` (85 linhas): getUserId
+- `server/lib/auth_service.dart` (297 linhas): hashPassword, verifyPassword, normalizeEmail, normalizeUsername, generateToken
+- `server/lib/card_validation_service.dart` (248 linhas): sanitizeCardName
+- `server/lib/color_identity.dart` (61 linhas): isWithinCommanderIdentity
+- `server/lib/deck_rules_service.dart` (503 linhas): toString
+- `server/lib/endpoint_cache.dart` (37 linhas): set, clearExpired
+- `server/lib/generated_deck_validation_service.dart` (819 linhas): addLookupName
+- `server/lib/health_readiness_support.dart` (21 linhas): readinessStatusCode
+- `server/lib/import_card_lookup_service.dart` (451 linhas): cleanImportLookupKey, foldImportLookupKey, canonicalizeImportLookupName, normalizeLocalizedImportName
+- `server/lib/internal_ai_request_token.dart` (22 linhas): matches
+- `server/lib/log_sanitizer.dart` (59 linhas): sanitizeLogMessage
+- `server/lib/logger.dart` (40 linhas): d, print, i, print, w
+- `server/lib/market_movers.dart` (240 linhas): normalizeMarketMoversLimit, toInt, set
+- `server/lib/meta/external_commander_deck_expansion_support.dart` (638 linhas): edhTop16TournamentIdFromUrl
+- `server/lib/meta/external_commander_meta_candidate_support.dart` (1333 linhas): addName, normalizeCommanderMetaFormat, normalizeExternalCommanderMetaValidationStatus, canonicalizeExternalCommanderMetaSourceName
+- `server/lib/meta/external_commander_meta_promotion_support.dart` (748 linhas): buildMetaDeckCardListFingerprint
+- `server/lib/meta/meta_deck_analytics_support.dart` (85 linhas): classifyMetaDeckSource
+- `server/lib/meta/meta_deck_card_list_support.dart` (93 linhas): parseMetaDeckCardList, isCommanderMetaFormat, normalizeMetaDeckCardName
+- `server/lib/meta/meta_deck_commander_shell_support.dart` (356 linhas): metaDeckNeedsCommanderShellRefresh, inferCommanderStrategyArchetypeFromCardNames
+- `server/lib/meta/meta_deck_format_support.dart` (181 linhas): normalizeCommanderMetaScope, commanderMetaScopeLabel, metaDeckAnalyticsFormatKey
+- `server/lib/meta/meta_deck_reference_support.dart` (938 linhas): buildMetaDeckEvidenceText
+- `server/lib/meta/mtgtop8_meta_support.dart` (166 linhas): extractMtgTop8Placement, resolveMtgTop8Url
+- `server/lib/ml_knowledge_service.dart` (502 linhas): generatePromptContext
+- `server/lib/notification_service.dart` (140 linhas): createFromActorDeferred, Function
+- `server/lib/observability.dart` (249 linhas): isSentryEnabled
+- `server/lib/openai_runtime_config.dart` (150 linhas): shouldUseFallbackForInvalidApiKey, modelFor, intFor
+- `server/lib/rate_limit_middleware.dart` (402 linhas): Function, Function, buildClientIdentifierFromHeaders, isAllowed, cleanup
+- `server/lib/request_metrics_service.dart` (107 linhas): add, record
+- `server/lib/request_trace.dart` (58 linhas): generateRequestId, resolveRequestId
+- `server/lib/sets_catalog_contract.dart` (61 linhas): safeSetCatalogLimit, safeSetCatalogPage, resolveSetStatus
+- `server/routes/ai/optimize/index.dart` (3498 linhas): resolveOptimizeArchetype, shouldRetryOptimizeWithAiFallback, matchesFunctionalNeed, scoreOptimizeReplacementCandidate, isOptimizeStructuralRecoveryScenario
+- `server/routes/community/decks/[id].dart` (428 linhas): getMainType, calculateCmc
+- `server/routes/decks/[id]/index.dart` (538 linhas): getMainType, calculateCmc
+
+## Tabelas PostgreSQL Referenciadas no Código
+- `LATERAL`: 9 referências
+- `activation_funnel_events`: 1 referências
+- `ai_generate_jobs`: 1 referências
+- `ai_logs`: 3 referências
+- `ai_optimize_cache`: 1 referências
+- `ai_optimize_fallback_telemetry`: 3 referências
+- `ai_optimize_jobs`: 1 referências
+- `ai_user_preferences`: 1 referências
+- `archetype_counters`: 2 referências
+- `archetype_patterns`: 2 referências
+- `canonical_sets`: 2 referências
+- `card_function_tags`: 4 referências
+- `card_legalities`: 12 referências
+- `card_localized_names`: 1 referências
+- `card_meta_insights`: 6 referências
+- `card_role_scores`: 2 referências
+- `card_semantic_tags_v2`: 5 referências
+- `cards`: 45 referências
+- `checks`: 1 referências
+- `commander_card_synergy`: 2 referências
+- `commander_reference_card_stats`: 1 referências
+- `commander_reference_deck_analysis`: 1 referências
+- `commander_reference_deck_cards`: 1 referências
+- `commander_reference_decks`: 1 referências
+- `commander_reference_profiles`: 5 referências
+- `conversations`: 4 referências
+- `current_trade`: 2 referências
+- `deck_cards`: 25 referências
+- `deck_usage`: 1 referências
+- `decks`: 24 referências
+- `direct_messages`: 4 referências
+- `external_commander_meta_candidates`: 1 referências
+- `filtered_sets`: 1 referências
+- `follower_counts`: 2 referências
+- `following_counts`: 2 referências
+- `format_staples`: 1 referências
+- `have`: 1 referências
+- `history`: 2 referências
+- `information_schema`: 6 referências
+- `input_names`: 1 referências
+- `inserted`: 1 referências
+- `jsonb_to_recordset`: 1 referências
+- `latest`: 1 referências
+- `meta_decks`: 6 referências
+- `ml_learning_state`: 1 referências
+- `ml_prompt_feedback`: 1 referências
+- `movers`: 1 referências
+- `notifications`: 2 referências
+- `offer`: 1 referências
+- `offering_items`: 1 referências
+- `optimization_analysis_logs`: 2 referências
+- `optimize_candidate_quality_summary`: 1 referências
+- `optimize_rejection_penalties`: 2 referências
+- `owned`: 1 referências
+- `paged_users`: 1 referências
+- `penalty_rows`: 1 referências
+- `previous_prices`: 1 referências
+- `price_history`: 3 referências
+- `public_deck_counts`: 2 referências
+- `rate_limit_events`: 1 referências
+- `regexp_matches`: 9 referências
+- `requested`: 1 referências
+- `requesting_items`: 1 referências
+- `role_rows`: 1 referências
+- `rules`: 1 referências
+- `sets`: 6 referências
+- `sync_state`: 1 referências
+- `synergy_packages`: 2 referências
+- `synergy_rows`: 1 referências
+- `tag_rows`: 1 referências
+- `theme_contextual_rules`: 1 referências
+- `today_prices`: 1 referências
+- `totals`: 1 referências
+- `trade_items`: 2 referências
+- `trade_messages`: 3 referências
+- `trade_offers`: 6 referências
+- `trade_status_history`: 3 referências
+- `unnest`: 2 referências
+- `updated`: 2 referências
+- `user_binder_items`: 6 referências
+- `user_follows`: 6 referências
+- `user_plans`: 1 referências
+- `users`: 19 referências
+- `validation`: 2 referências
+- `want`: 1 referências
+
+## Problemas Estruturais Identificados
+- `server/lib/ai/candidate_quality_data_support.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- `server/lib/ai/functional_card_tags.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- `server/lib/ai/optimization_functional_roles.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- `server/lib/ai/optimize_request_support.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- `server/routes/ai/optimize/index.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- `server/routes/decks/[id]/analysis/index.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- Classe `AggressiveCandidateQualitySignal` é definida mas potencialmente não é usada em outros arquivos
+- Classe `AiGenerateOpenAiTimeoutSelection` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ArchetypePattern` é definida mas potencialmente não é usada em outros arquivos
+- Classe `BattleResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `BracketFilterDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `BracketTagResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CandidateFunctionTag` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CandidateRoleScore` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CardRecommendation` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ColorIdentityBackfillDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceArchetypeStatsLoadResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCardStatsLoadResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCardStatsResolution` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCommanderCardResolution` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCorpusPackages` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCorpusSummary` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceDeckAnalysis` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceDeckCardInput` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceDeckInput` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceReadinessInputs` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceReadinessRuntimeProof` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceReadinessScorecard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EdhTop16TournamentEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EdhrecAverageDeckCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EdhrecCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EndpointMetricSnapshot` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExpandedDeckCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExpandedTopDeckDeck` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateIllegalCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateLegalityEvidence` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateLegalityRepository` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateUnresolvedCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaEligibilityBatch` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaEligibilityDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaImportConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaOperationalConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPersistencePlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionInsertPlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionIssue` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionPlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionSnapshot` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaStagingConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaStagingPlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaValidationIssue` é definida mas potencialmente não é usada em outros arquivos
+- Classe `FunctionalReport` é definida mas potencialmente não é usada em outros arquivos
+- Classe `GameAction` é definida mas potencialmente não é usada em outros arquivos
+- Classe `GameCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `GeneratedDeckValidationResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ImportListParseResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MLContext` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ManaAnalysis` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MatchupResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MetaDeckAnalyticsContext` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MetaDeckReferenceQueryParts` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MonteCarloComparison` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MulliganReport` é definida mas potencialmente não é usada em outros arquivos
+- Classe `OptimizationSemanticV2EnforcementDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `OptimizationSwapGateResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ParsedMetaDeckCardEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `PlayerState` é definida mas potencialmente não é usada em outros arquivos
+- Classe `PostgresExternalCommanderMetaCandidateLegalityRepository` é definida mas potencialmente não é usada em outros arquivos
+- Classe `RebuildResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `RebuildScopeDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `RebuildTargetProfile` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ReferenceGeneratedCardsIdentityFilterResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ReferenceGeneratedDeckEvaluation` é definida mas potencialmente não é usada em outros arquivos
+- Classe `SwapFunctionalAnalysis` é definida mas potencialmente não é usada em outros arquivos
+- Classe `SynergyPackage` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ThemeCheck` é definida mas potencialmente não é usada em outros arquivos
+- Classe `UserPlanSnapshot` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CacheItem` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CachedAverageDeckResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CachedResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CardData` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_DeckMetrics` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_DeckStats` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_EndpointMetricBucket` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_ExternalCommanderMetaParsedCardEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_InfluencedCardInsight` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_LandTrimContext` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_MarketMoversCacheEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_ParsedTradeItems` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_PasswordPreparation` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_PlayDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_PromotionDeckProfile` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_QueryBuilder` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_RankedMetaDeckReference` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_ResolvedExternalCommanderMetaCardEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_SimCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_TelemetryQuery` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_WeightedCard` é definida mas potencialmente não é usada em outros arquivos
+- Arquivos grandes (>500 linhas):
+  - `server/lib/ai/optimize_runtime_support.dart`: 4198 linhas
+  - `server/routes/ai/optimize/index.dart`: 3498 linhas
+  - `server/lib/ai/rebuild_guided_service.dart`: 1748 linhas
+  - `server/routes/ai/generate/index.dart`: 1656 linhas
+  - `server/lib/ai/optimize_complete_support.dart`: 1560 linhas
+  - `server/lib/ai/commander_reference_deck_corpus_support.dart`: 1490 linhas
+  - `server/lib/ai/commander_reference_card_stats_support.dart`: 1368 linhas
+  - `server/lib/meta/external_commander_meta_candidate_support.dart`: 1333 linhas
+  - `server/lib/ai/functional_card_tags.dart`: 1053 linhas
+  - `server/lib/ai/otimizacao.dart`: 1046 linhas
+  - `server/lib/ai/optimize_state_support.dart`: 982 linhas
+  - `server/lib/meta/meta_deck_reference_support.dart`: 938 linhas
+  - `server/lib/ai/optimization_validator.dart`: 891 linhas
+  - `server/lib/ai/battle_simulator.dart`: 880 linhas
+  - `server/lib/generated_deck_validation_service.dart`: 819 linhas
+  - `server/lib/meta/external_commander_meta_promotion_support.dart`: 748 linhas
+  - `server/lib/ai/candidate_quality_data_support.dart`: 693 linhas
+  - `server/routes/cards/resolve/index.dart`: 691 linhas
+  - `server/routes/trades/index.dart`: 649 linhas
+  - `server/routes/ai/commander-reference/index.dart`: 641 linhas
+  - `server/lib/meta/external_commander_deck_expansion_support.dart`: 638 linhas
+  - `server/lib/ai/goldfish_simulator.dart`: 606 linhas
+  - `server/lib/ai/deck_state_analysis.dart`: 586 linhas
+  - `server/routes/ai/archetypes/index.dart`: 564 linhas
+  - `server/routes/decks/[id]/recommendations/index.dart`: 560 linhas
+  - `server/routes/decks/[id]/ai-analysis/index.dart`: 552 linhas
+  - `server/lib/ai/commander_reference_profile_support.dart`: 543 linhas
+  - `server/routes/decks/[id]/index.dart`: 538 linhas
+  - `server/routes/decks/[id]/analysis/index.dart`: 521 linhas
+  - `server/lib/deck_rules_service.dart`: 503 linhas
+  - `server/lib/ml_knowledge_service.dart`: 502 linhas
+  - `server/lib/ai/optimization_quality_gate.dart`: 501 linhas
+- Funções com nomes duplicados:
+  - `Function` em: server/lib/ai_log_service.dart, server/lib/notification_service.dart, server/lib/rate_limit_middleware.dart, server/lib/rate_limit_middleware.dart, server/lib/rate_limit_middleware.dart
+  - `_generateId` em: server/lib/ai/optimize_job.dart, server/lib/ai_generate_job.dart
+  - `_getCmc` em: server/lib/ai/goldfish_simulator.dart, server/lib/ai/goldfish_simulator.dart, server/lib/ai/optimization_quality_gate.dart, server/lib/ai/optimization_validator.dart
+  - `_hasResearchPayloadValue` em: server/lib/meta/external_commander_meta_candidate_support.dart, server/lib/meta/external_commander_meta_staging_support.dart
+  - `_intValue` em: server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_readiness_support.dart
+  - `_isBasicLandName` em: server/lib/ai/optimize_runtime_support.dart, server/lib/generated_deck_validation_service.dart, server/lib/meta/meta_deck_reference_support.dart, server/routes/ai/commander-reference/index.dart
+  - `_isLand` em: server/lib/ai/goldfish_simulator.dart, server/lib/ai/optimization_validator.dart
+  - `_logInvalidPayload` em: server/routes/conversations/[id]/messages.dart, server/routes/trades/[id]/messages.dart, server/routes/trades/[id]/respond.dart, server/routes/trades/[id]/status.dart, server/routes/trades/index.dart
+  - `_looksLikeComboPiece` em: server/lib/ai/functional_card_tags.dart, server/lib/ai/optimization_functional_roles.dart
+  - `_looksLikeEnabler` em: server/lib/ai/functional_card_tags.dart, server/lib/ai/optimization_functional_roles.dart
+  - `_looksLikeEngine` em: server/lib/ai/functional_card_tags.dart, server/lib/ai/optimization_functional_roles.dart
+  - `_looksLikePayoff` em: server/lib/ai/functional_card_tags.dart, server/lib/ai/optimization_functional_roles.dart
+  - `_looksLikeWincon` em: server/lib/ai/functional_card_tags.dart, server/lib/ai/optimization_functional_roles.dart
+  - `_readInt` em: server/lib/meta/external_commander_meta_operational_runner_support.dart, server/lib/meta/external_commander_meta_staging_support.dart
+  - `_readListLength` em: server/lib/meta/external_commander_meta_operational_runner_support.dart, server/lib/meta/external_commander_meta_staging_support.dart
+  - `_requestId` em: server/routes/conversations/[id]/messages.dart, server/routes/trades/[id]/messages.dart, server/routes/trades/[id]/respond.dart, server/routes/trades/[id]/status.dart, server/routes/trades/index.dart, server/routes/users/[id]/follow/index.dart
+  - `_responseTimeSql` em: server/routes/trades/[id]/index.dart, server/routes/trades/index.dart
+  - `_shippingTimeSql` em: server/routes/trades/[id]/index.dart, server/routes/trades/index.dart
+  - `_sourceCount` em: server/lib/ai/commander_reference_card_stats_support.dart, server/lib/ai/commander_reference_profile_support.dart
+  - `_stableDeckSeed` em: server/lib/ai/goldfish_simulator.dart, server/lib/ai/optimization_validator.dart
+  - `_stableHash` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/archetypes/index.dart
+  - `_sumQuantities` em: server/lib/meta/meta_deck_card_list_support.dart, server/routes/import/index.dart, server/routes/import/to-deck/index.dart
+  - `_toInt` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/optimize/telemetry/index.dart, server/routes/binder/[id]/index.dart, server/routes/community/marketplace/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/index.dart
+  - `_trustStatsSql` em: server/routes/trades/[id]/index.dart, server/routes/trades/index.dart
+  - `_validateCondition` em: server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/set/index.dart
+  - `add` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/functional_card_tags.dart, server/lib/request_metrics_service.dart
+  - `addReason` em: server/lib/ai/deck_state_analysis.dart, server/lib/ai/optimize_state_support.dart
+  - `addUnique` em: server/lib/ai/optimize_complete_support.dart, server/lib/ai/optimize_runtime_support.dart
+  - `calculateCmc` em: server/routes/community/decks/[id].dart, server/routes/decks/[id]/index.dart
+  - `computeOptimizeStructuralRecoverySwapTarget` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/optimize/index.dart
+  - `detectArchetype` em: server/lib/ai/deck_state_analysis.dart, server/lib/ai/optimize_state_support.dart
+  - `generatePromptContext` em: server/lib/ai/hate_cards_service.dart, server/lib/ml_knowledge_service.dart
+  - `getMainType` em: server/routes/community/decks/[id].dart, server/routes/decks/[id]/index.dart
+  - `isOptimizeStructuralRecoveryScenario` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/optimize/index.dart
+  - `matchesFunctionalNeed` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/optimize/index.dart
+  - `print` em: server/lib/logger.dart, server/lib/logger.dart, server/lib/logger.dart, server/lib/logger.dart
+  - `resolveOptimizeArchetype` em: server/lib/ai/deck_state_analysis.dart, server/lib/ai/optimize_runtime_support.dart, server/routes/ai/optimize/index.dart
+  - `scoreOptimizeReplacementCandidate` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/optimize/index.dart
+  - `set` em: server/lib/endpoint_cache.dart, server/lib/market_movers.dart
+  - `shouldRetryOptimizeWithAiFallback` em: server/lib/ai/optimize_runtime_support.dart, server/routes/ai/optimize/index.dart
+  - `toString` em: server/lib/ai/battle_simulator.dart, server/lib/ai/edhrec_service.dart, server/lib/ai/rebuild_guided_service.dart, server/lib/deck_rules_service.dart
+
+## Gaps Conhecidos (manual)
+- `card_function_tags`: 112K multi-tag records, mas otimizador usa `classifyOptimizationFunctionalRole()` (single-tag)
+- `card_deck_profiles`: 670 perfis, mas `filterUnsafeOptimizeSwapsByCardData` não consulta
+- `semantic_layer_v2`: Shadow mode (diagnóstico sem poder de veto)
+- `archetype_patterns`: 69 registros, não validado contra código
