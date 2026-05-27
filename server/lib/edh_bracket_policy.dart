@@ -10,6 +10,7 @@ enum BracketCategory {
   freeInteraction,
   extraTurns,
   infiniteCombo,
+  gameChanger,
 }
 
 class BracketPolicy {
@@ -33,6 +34,7 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 0,
             BracketCategory.extraTurns: 0,
             BracketCategory.infiniteCombo: 0,
+            BracketCategory.gameChanger: 0,
           },
         );
       case 2:
@@ -44,6 +46,7 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 2,
             BracketCategory.extraTurns: 1,
             BracketCategory.infiniteCombo: 0,
+            BracketCategory.gameChanger: 0,
           },
         );
       case 3:
@@ -55,6 +58,7 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 6,
             BracketCategory.extraTurns: 2,
             BracketCategory.infiniteCombo: 2,
+            BracketCategory.gameChanger: 3,
           },
         );
       case 4:
@@ -68,6 +72,7 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 99,
             BracketCategory.extraTurns: 99,
             BracketCategory.infiniteCombo: 99,
+            BracketCategory.gameChanger: 99,
           },
         );
     }
@@ -121,10 +126,20 @@ BracketTagResult tagCardForBracket({
     categories.add(BracketCategory.freeInteraction);
   }
 
+  // Free interaction: 'without paying' (covers Fierce Guardianship, Deflecting Swat)
+  if (o.contains('without paying')) {
+    categories.add(BracketCategory.freeInteraction);
+  }
+
   // Infinite combos: não dá pra inferir bem só do oracle text.
   // Começa com lista curada (pode evoluir depois).
   if (_knownInfiniteComboPieces.contains(n)) {
     categories.add(BracketCategory.infiniteCombo);
+  }
+
+  // Game Changer: lista curada das 53 cartas oficiais
+  if (_gameChangerNames.contains(n)) {
+    categories.add(BracketCategory.gameChanger);
   }
 
   return BracketTagResult(categories);
@@ -260,3 +275,60 @@ const _knownInfiniteComboPieces = <String>{
   'tainted pact',
 };
 
+
+
+const _gameChangerNames = <String>{
+  'ad nauseam',
+  'ancient tomb',
+  'aura shards',
+  'biorhythm',
+  'bolas\'s citadel',
+  'braids, cabal minion',
+  'chrome mox',
+  'coalition victory',
+  'consecrated sphinx',
+  'crop rotation',
+  'cyclonic rift',
+  'demonic tutor',
+  'drannith magistrate',
+  'enlightened tutor',
+  'farewell',
+  'field of the dead',
+  'fierce guardianship',
+  'force of will',
+  'gaea\'s cradle',
+  'gamble',
+  'gifts ungiven',
+  'glacial chasm',
+  'grand arbiter augustin iv',
+  'grim monolith',
+  'humility',
+  'imperial seal',
+  'intuition',
+  'jeska\'s will',
+  'lion\'s eye diamond',
+  'mana vault',
+  'mishra\'s workshop',
+  'mox diamond',
+  'mystical tutor',
+  'narset, parter of veils',
+  'natural order',
+  'necropotence',
+  'notion thief',
+  'opposition agent',
+  'orcish bowmasters',
+  'panoptic mirror',
+  'rhystic study',
+  'seedborn muse',
+  'serra\'s sanctum',
+  'smothering tithe',
+  'survival of the fittest',
+  'teferi\'s protection',
+  'tergrid, god of fright',
+  'thassa\'s oracle',
+  'the one ring',
+  'the tabernacle at pendrell vale',
+  'underworld breach',
+  'vampiric tutor',
+  'worldly tutor',
+};

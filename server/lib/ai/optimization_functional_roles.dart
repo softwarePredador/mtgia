@@ -62,12 +62,22 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
 
   if (typeLine.contains('land')) return 'land';
 
-  if (oracle.contains('draw') ||
-      oracle.contains('look at the top') ||
-      (oracle.contains('scry') && oracle.contains('draw'))) {
-    return 'draw';
+  // Board wipe first (most specific)
+  if (looksLikeOptimizationBoardWipeText(oracle)) {
+    return 'wipe';
   }
 
+  // Protection before removal (Boros Charm = protection, not removal)
+  if (oracle.contains('hexproof') ||
+      oracle.contains('indestructible') ||
+      oracle.contains('shroud') ||
+      oracle.contains('ward') ||
+      oracle.contains('phase out') ||
+      oracle.contains('protection from')) {
+    return 'protection';
+  }
+
+  // Spot removal
   if (oracle.contains('destroy target') ||
       oracle.contains('exile target') ||
       oracle.contains('counter target') ||
@@ -80,27 +90,33 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
     return 'removal';
   }
 
-  if (looksLikeOptimizationBoardWipeText(oracle)) {
-    return 'wipe';
-  }
-
+  // Ramp before draw (Smothering Tithe's Treasure is primary)
   if (looksLikeOptimizationRampText(oracle) ||
       (typeLine.contains('artifact') && oracle.contains('add'))) {
     return 'ramp';
   }
 
+  // Draw
+  if (oracle.contains('draw') ||
+      oracle.contains('look at the top') ||
+      (oracle.contains('scry') && oracle.contains('draw'))) {
+    return 'draw';
+  }
+
+  // Tutor
   if (oracle.contains('search your library') && !oracle.contains('land')) {
     return 'tutor';
   }
 
-  if (oracle.contains('hexproof') ||
-      oracle.contains('indestructible') ||
-      oracle.contains('shroud') ||
-      oracle.contains('ward')) {
-    return 'protection';
-  }
+    // High-level semantic tags (wincon, engine, combo_piece, payoff, enabler)
+  // These are checked before type-based fallback to catch combo pieces
+  if (_looksLikeWincon(oracle)) return 'wincon';
+  if (_looksLikeEngine(oracle)) return 'engine';
+  if (_looksLikeComboPiece(oracle)) return 'combo_piece';
+  if (_looksLikePayoff(oracle)) return 'payoff';
+  if (_looksLikeEnabler(oracle)) return 'enabler';
 
-  if (typeLine.contains('creature')) return 'creature';
+if (typeLine.contains('creature')) return 'creature';
   if (typeLine.contains('artifact')) return 'artifact';
   if (typeLine.contains('enchantment')) return 'enchantment';
   if (typeLine.contains('planeswalker')) return 'planeswalker';
@@ -346,4 +362,37 @@ Map<String, Map<String, dynamic>> _cardsByNormalizedName(
 
 String _normalizeRoleCardName(String value) {
   return value.trim().toLowerCase();
+}
+
+
+
+
+bool _looksLikeWincon(String oracle) {
+  return oracle.contains('you win the game') ||
+      oracle.contains('opponent loses the game') ||
+      oracle.contains('opponents lose the game');
+}
+
+bool _looksLikeEngine(String oracle) {
+  return (oracle.contains('at the beginning of your upkeep') && oracle.contains('you may')) ||
+      (oracle.contains('whenever') && oracle.contains('you may') &&
+       (oracle.contains('draw') || oracle.contains('create') || oracle.contains('add'))) ||
+      (oracle.contains('your end step') && oracle.contains('you may'));
+}
+
+bool _looksLikeComboPiece(String oracle) {
+  return (oracle.contains('remove') && oracle.contains('counter') && oracle.contains('from among')) ||
+      (oracle.contains('search your library') && oracle.contains('may cast') && oracle.contains('without paying'));
+}
+
+bool _looksLikePayoff(String oracle) {
+  return (oracle.contains('whenever') && oracle.contains('create') && oracle.contains('token')) ||
+      (oracle.contains('whenever you cast') && oracle.contains('copy')) ||
+      (oracle.contains('whenever you cast') && oracle.contains('scry'));
+}
+
+bool _looksLikeEnabler(String oracle) {
+  return oracle.contains('instant and sorcery spells you cast cost') ||
+      oracle.contains('cost less to cast') ||
+      (oracle.contains('spells you cast') && oracle.contains('cost') && oracle.contains('less'));
 }
