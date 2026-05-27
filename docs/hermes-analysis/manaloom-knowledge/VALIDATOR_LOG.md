@@ -1,326 +1,227 @@
-# VALIDATOR_LOG.md — Análise do Deck Lorehold
-
-## Execução: 2026-05-27 (Lorehold Purpose Analyzer)
-
-> **Deck:** Lorehold Spellslinger (bracket 3)
-> **Comandante:** Lorehold, the Historian
-> **Fonte:** Lista do usuário + DB knowledge.db (deck_id=6)
-> **Total: 100 cartas** (99 main + 1 commander)
-
----
+# Validacao do Deck Lorehold — 27 de maio de 2026
 
 ## Seção 1: Visão Geral
 
-### Comparação vs Perfil EDHREC (4 fontes, confidence=high)
+### Status vs Perfil EDHREC (Reference Profile Lorehold)
 
-O perfil oficial (`commander_reference_profile_lorehold_2026-05-11`) estabelece estes ranges. O deck está:
+| Metrica | Profile EDHREC | Seu Deck | Verdict |
+|:--------|:--------------:|:--------:|:-------:|
+| Lands | 36-38 | 35 (inclui 2 MDFCs) | 🟡 Levemente abaixo (1 abaixo do minimo) |
+| Ramp (mana rocks + treasure) | 10-13 | 15 | 🟡 Acima do range (mas ok em Boros sem verde) |
+| Draw / Rummage / Op-turn draw | 8-12 | 8 | 🟢 No range (na borda inferior) |
+| Topdeck / Miracle Setup | 6-9 | 3-4 | 🔴 Criticamente abaixo |
+| Miracle Haymakers (7+ CMC) | 10-16 | 9 (CMC 7+) | 🟡 Abaixo (mas outras cartas de 5-6 CMC compensam) |
+| Spot Interaction | 4-6 | 4 | 🟢 No range |
+| Board Wipes / Resets | 3-5 | 4 | 🟢 No range |
+| Spell Payoffs / Copy Engines | 5-8 | 5 | 🟢 No range (borda) |
+| Graveyard Recursion | 2-5 | 4 | 🟢 No range |
+| Dedicated Win Conditions | 4-7 | 2 | 🔴 Muito abaixo |
 
-| Métrica | Seu Deck | EDHREC Ideal | Status | O Que Significa |
-|:--------|:--------:|:------------:|:------:|:----------------|
-| Lands | 35 | 36-38 | 🔴 1 abaixo | Levemente abaixo — gerenciável com 15 ramp |
-| Mana Rocks / Treasure Ramp | 15 | 10-13 | 🟡 2 acima | Maior que a média, mas em Boros ramp extra é raro e bem-vindo |
-| Draw (single-tag) | 3 | 8-12 | 🔴🔴 crítico | O problema mais grave do deck |
-| Topdeck / Miracle Setup | 7 | 6-9 | ✅ | Scroll Rack, Top, Penance, Land Tax = bom pacote |
-| Miracle Haymakers (Big Spells) | 13 | 10-16 | ✅ | CMC 6+: Sunbird's, Volcanic Vision, Insurrection, Storm Herd, etc. |
-| Spot Interaction | 4 | 4-6 | ✅ | Swords, Path, Boros Charm, Deflecting Palm |
-| Board Wipes / Resets | 4 | 3-5 | ✅ | Austere, Volcanic Vision, Call Forth, Fated Clash |
-| Spell Payoffs / Copy Engines | 5 | 5-8 | ✅ | Double Vision, Galvanoth, Rite of the Dragoncaller, Mizzix's Mastery, Sunbird's |
-| Protection | 5 | 3-5 | ✅ | Teferi's, Perch, Mother of Runes, Lightning Greaves, Hexing Squelcher |
-| **Graveyard Recursion** | **4** | **2-5** | ✅ | **Correção da análise anterior:** deck TEM recursão (Mizzix's Mastery, Surge to Victory, Restoration Seminar, Volcanic Vision, Goblin Engineer) |
-| Win Conditions (dedicadas) | 2 | 4-7 | 🔴 2 abaixo | Apenas Approach + Hellkite Tyrant têm tag wincon — mas na prática deck ganha de outras formas (ver abaixo) |
-| **CMC médio (não-terrenos)** | 3.69 | 2.5-3.5 | 🟡 levemente acima | Aceitável para Lorehold que casta big spells |
+**CMC medio: 3.96** — preocupante para um deck que quer castar multiplas spells por turno.
 
-### Pontos-Chave que a análise anterior errou
+**Distribuicao de CMC (main deck, 62 cartas nao-terreno):**
+| CMC | Contagem | % |
+|:---:|:--------:|:-:|
+| 1 | 11 | 18% |
+| 2 | 14 | 23% |
+| 3 | 9 | 15% |
+| 4 | 5 | 8% |
+| 5 | 7 | 11% |
+| 6 | 7 | 11% |
+| 7+ | 9 | 15% |
 
-1. **Draw não é 4 — é 3 (single-tag) ou 8+ (multi-tag).** O problema real é que as únicas fontes de draw consistentes são Artist's Talent, Esper Sentinel e Sensei's Divining Top. Monument to Endurance é bom mas não puxa cartas sozinho. O deck depende de topdeck manipulation como pseudo-draw.
-
-2. **Recursão existe.** A análise anterior disse "0 recursion" mas o deck tem Mizzix's Mastery + Surge to Victory + Restoration Seminar + Goblin Engineer + Volcanic Vision. São 5 cartas de recursão no total.
-
-3. **Terrenos são 35, não 34.** A diferença é pequena mas relevante — 35 com 15 ramp é OK para bracket 3.
-
-4. **Wincons reais.** O classificador vê só 2 wincons (Approach + Hellkite), mas na prática o deck ganha por: Insurrection (rouba criaturas), Storm Herd (token massivo), Hellkite Tyrant (rouba artefatos), Approach (win condition literal), Volcanic Vision loop (recursão infinita de wipes).
+**23 cartas (37%) custam 5+ mana.** Com apenas 35 lands e 15 ramp — e muitas das ramp sao rituais (uso unico) — o deck vai ter maos presas frequentes.
 
 ---
 
 ## Seção 2: Cartas Que Brilham no Lorehold
 
-### Top 5 — Sinergia Máxima com o Comandante
+Estas sao as **5 cartas com maior sinergia** com Lorehold, the Historian. Sao suas melhores amigas.
 
-#### 1. **Mizzix's Mastery** ⭐⭐⭐⭐⭐ — A Carta Mais Importante do Deck
+### ⭐ 1. Sunbird's Invocation (CMC 6)
+**Por que brilha:** Lorehold copia uma instant/sorcery do seu graveyard quando voce ataca com ela. Sunbird's Invocation copia uma spell do seu topo de library quando voce casta ela. **Juntas:** voce casta uma spell do graveyard (Lorehold), Sunbird's Invocation ve voce castando uma spell e copia do topo. E um loop de valor massivo.
 
-Lorehold copia instants/sorceries do graveyard. Mizzix's Mastery exila TODAS as instants/sorceries do graveyard e copia cada uma. Com Lorehold no campo, você paga {4}{R} e ganha **o efeito de cada instant/sorcery no seu cemitério**, dobrado pelo Lorehold. É um Sunbird's Invocation que não precisa de topdeck — só precisa de um cemitério cheio.
+**Na Reference Deck 1:** nao aparece. O Ref Deck 1 prefere **Arcane Bombardment** (que esta na sua colecao!). Arcane Bombardment e geralmente melhor porque exila a spell e casta copias a cada upkeep — nao depende de ataque.
 
-**Sinergia:** Lorehold reduz o custo de Mizzix's Mastery (qualquer instant/sorcery do gy custa {1} a menos). Mizzix's Mastery copia TUDO de uma vez. Lorehold COPIA a copia. O resultado é: cada spell no cemitério é conjurada duas vezes.
+### ⭐ 2. Mizzix's Mastery (CMC 4)
+**Por que brilha:** Overload (5R) = casta **cada** instant/sorcery no seu graveyard de graca, uma de cada. Com Lorehold enchendo o graveyard de spells (via loot, descarte de cartas caras), Mizzix's Mastery vira um "ganhe o jogo" button. E basicamente um Rise of the Eldrazi + Volcanic Vision + Insurrection no mesmo turno.
 
-**Melhor cenário:** Tempo 6. Cemitério com Volcanic Vision, Reforge the Soul, Season of the Bold, Surge to Victory. Casta Mizzix's Mastery → copia 4 spells (8 com Lorehold) → limpa a mesa, compra 7 cartas, faz treasures, devolve mais spells.
+**Na Reference Deck 1:** Presente. Confirmado como staple Lorehold.
 
----
+### ⭐ 3. Volcanic Vision (CMC 7)
+**Por que brilha:** Board wipe que **volta uma instant/sorcery do graveyard pra sua mao**. Lorehold da desconto + copia. Custo efetivo depois da volta: 3-5 mana. E board wipe + recurse uma spell = card advantage massivo.
 
-#### 2. **Volcanic Vision** ⭐⭐⭐⭐⭐ — Loop de Board Wipe + Recursão
+**Na Reference Deck 1:** Presente. Confirmado.
 
-Lorehold gosta de spells caras no graveyard. Volcanic Vision custa 7, volta UMA instant/sorcery do gy pra mão, e limpa a mesa. Com Lorehold, ela é copiada — você pode voltar duas spells.
+### ⭐ 4. Rite of the Dragoncaller (CMC 6)
+**Por que brilha:** Cada instant/sorcery que voce casta faz uma ficha de dragon 4/4 com flying e haste. Com Lorehold copiando spells (incluindo do graveyard), voce faz 2 dragoes por spell castada. Storm Herd (10 mana, 10 pegasus) e bom, mas Rite faz dragoes **continuamente** e custa 6.
 
-**A verdadeira mágica:** Volcanic Vision volta Mizzix's Mastery → Mizzix's Mastery exila o gy de novo → volta Volcanic Vision → loop. É um reset completo a cada turno.
+**Na Reference Deck 1:** nao aparece. E uma escolha pessoal sua — e **boa**, mas obscura.
 
-**Função real:** board_wipe + recursion + engine. Não só um board wipe.
+### ⭐ 5. Double Vision (CMC 5)
+**Por que brilha:** Copia sua primeira instant/sorcery em cada turno. Com Lorehold copiando do graveyard, voce pode copiar 2 spells por turno. E o unico enabler que stacka com Lorehold.
 
----
+**Na Reference Deck 1:** Presente. Confirmado como staple.
 
-#### 3. **Sunbird's Invocation** ⭐⭐⭐⭐ — Double Your Pleasure
-
-A ironia é que o classificador chama isso de "big_spell", mas Sunbird's Invocation é o *segundo motor de cópia* do deck. Quando você casta uma spell de CMC 5+, Sunbird's Invocation procura outra spell de CMC ≤ a primeira e casta de graça. Lorehold então COPIA essa também.
-
-**Na prática:** Casta Insurrection (CMC 8) → Sunbird's procura CMC 8 → encontra Storm Herd → casta de graça → Lorehold copia Insurrection + copia Storm Herd → 2x Insurrection + 2x Storm Herd no mesmo turno.
-
-**Custo de oportunidade zero:** Sunbird's é um payoff que não ocupa slot de "big spell" — é um motor que transforma cada big spell em TWO big spells.
-
----
-
-#### 4. **Double Vision** ⭐⭐⭐⭐ — O Comeback Engine
-
-Copia o primeiro instant/sorcery de cada turno. Em um deck de spellslinger como Lorehold, isso significa: seu primeiro removal vira dois, seu primeiro draw vira dois, sua primeira recursão vira duas.
-
-**Por que não é #1:** Double Vision copia só UMA spell por turno (no early). Mizzix's Mastery escala com o tamanho do cemitério. Double Vision é melhor em jogos longos; Mizzix's é melhor quando o cemitério está cheio.
+### Mencoes Honrosas
+- **Galvanoth** — casta o top card de graca se for instant/sorcery. Sinergia direta com topdeck manipulation (Top, Scroll Rack, Penance).
+- **Hit the Mother Lode** — 7 mana, 7 treasure tokens = ramp massiva. Combina com Lorehold pra castar ainda mais spells.
+- **Surge to Victory** — exile top 6, attack trigger copia. Lorehold adora isso.
+- **Artist's Talent** — class level com spellslinging payoff + mana discount.
 
 ---
 
-#### 5. **Jeska's Will** ⭐⭐⭐⭐ — Ramp + Gas + Sinergia
+## Seção 3: Cartas Questionaveis
 
-{3} mana → exila top 3 → pode jogar este turno → ou {R} pra cada oponente. Com Lorehold {1} de desconto em instant/sorcery, Jeska's Will fica ainda mais eficiente. E as cartas exiladas viram gas imediato.
+### 🔴 Rise of the Eldrazi (CMC 12)
+**Funcao atual:** removal (destroi 1 creature)
+**% uso externo:** presente no Ref Deck 1, mas como 1-of em 90 cartas.
 
-**O que torna especial:** É ramp E card advantage E sinergia com Lorehold (spell do exílio, Lorehold desconta). Três funções em uma carta.
+**Por que talvez nao seja ideal:** CMC 12 para matar 1 criatura e absurdamente caro. Sim, ela pode ser castada do graveyard com Lorehold, mas ainda assim — 12 mana. Em 35 lands, voce vai ter Rise na mao e nao conseguir castar ela por 5-7 turnos. E uma dead card por muito tempo, e no late game um Swords to Plowshares (1 mana) faz o mesmo com 1/12 do custo.
 
----
+**O que ela FAZ de bom:** ela da annihilator 2 e indestructible ate prox turno. Se castar ela, e um removal + beater. Mas isso so acontece a cada 15 jogos.
 
-### Menções Honrosas
+**Da sua colecao:** Chaos Warp (R, 3 mana), Generous Gift (U, 3 mana). Ambos resolvem qualquer permanente por uma fracao do custo.
 
-| Carta | Por que brilha |
-|:------|:---------------|
-| **Galvanoth** | Revela topo, casta instant/sorcery CMC≤4 de graça. Lorehold copia. Custa {5} mas paga 1 spell + 1 cópia de graça a cada upkeep. |
-| **Rite of the Dragoncaller** | Cada spell cria um 5/5 Dragon token. Lorehold copiando = dois tokens por spell. |
-| **Season of the Bold** | Exila top 2, casta se pagar. Lorehold copia = 4 cartas exiladas. E faz treasures. |
-| **Unexpected Windfall** | Desconta carta, compra 2, faz 2 treasures. Lorehold copia = compra 4, faz 4 treasures. |
+### 🟡 Storm Herd (CMC 10)
+**Funcao atual:** token_maker (cria X pegasus X = seu life total)
+**% uso externo:** presente em Ref Deck 1 e Ref Deck 2.
 
----
+**Por que talvez nao seja ideal:** 10 mana. Voce precisa de life total alto (tipicamente 30+) para Storm Herd ser bom. O deck nao tem lifegain consistente (so Perch Protection e Teferi's Protection). Sem lifegain, Storm Herd vira 10 mana para 10-15 tokens. Bom, mas 10 mana.
 
-## Seção 3: Cartas Questionáveis
+**Alternativa melhor na sua colecao:** Nao ha substituto direto, mas **Worldfire + Beacon of Immortality** e uma wincon de 2 cartas que e muito mais forte. Worldfire limpa o board e deixa so os jogadores com 1 de vida. Beacon of Immortality dobra seu life total. Voce ganha no upkeep.
 
-### 1. **Rise of the Eldrazi** (CMC 12, removal)
-**Função atual:** Removal (target creature/planeswalker)
-**% de uso externo:** Extremamente raro em Lorehold. Nenhum EDHREC average deck inclui isso.
+### 🟡 Taunt from the Rampart (CMC 5)
+**Funcao atual:** goad todas as criaturas que nao sejam da cor branca.
+**Tag: NAO CLASSIFICADA**
 
-**Por que talvez não seja ideal:**
-- CMC 12 é caro demais até para Lorehold. Castar isso consome o turno inteiro.
-- Ele não é copy-friendly. Lorehold copia como "target" — você ganha um segundo "destroy target" que só funciona se a criatura/planeswalker original tiver aniquilador.
-- Aniquilador é irrelevante em Commander (poucos jogadores bloqueiam com 4+ criaturas).
-- O deck já tem Austere Command, Volcanic Vision, Fated Clash, Call Forth como wipes.
+**Por que talvez nao seja ideal:** Goad e um efeito politico. Em Lorehold, voce quer **board wipes** e **copy spells**, nao goad. Taunt e uma carta de "vai pra la, bate neles" — Lorehold e um commander de value, nao de politics. Presente em Ref Deck 1 e Ref Deck 2, mas em quantidades baixas.
 
-**Alternativa da sua coleção:**
-- **Blasphemous Act** (CMC 9, mas custa {1} na prática com N criaturas) — muito mais jogável.
-- **Catastrophe** (CMC 6, board wipe + Armageddon opcional) — mais barato e com opção de land wipe.
-- **Obliterate** (CMC 8, board wipe que não pode ser respondido) — melhor que Rise em qualquer cenário.
+**Alternativa da sua colecao:** **Disrupt Decorum** (R, 4 mana) — goad TODAS as criaturas exceto as suas. Melhor em todo cenario.
 
----
+### 🟡 Longshot, Rebel Bowman (CMC 4)
+**Funcao atual:** payoff (da reach, pinge quando outro rebelde entra)
+**Tag: NAO CLASSIFICADA** — mas marcada como 'payoff' no classifier.
 
-### 2. **Deflecting Palm** (CMC 2, uncertain — é removal condicional)
-**Função atual:** Prevenir dano + redirecionar
-**% de uso externo:** Muito raro. Só aparece em meta com um único oponente focando você.
+**Por que talvez nao seja ideal:** Longshot e uma criatura 2/4 que da reach. Num deck de spellslinging, uma criatura que so faz sentido se voce tiver outros rebeldes... e voce nao tem. A unica sinergia e que ele e uma criatura com reach que pings de 1 em 1. Em Lorehold, isso e filler.
 
-**Por que talvez não seja ideal:**
-- É um "fog" condicional que precisa de um oponente te atacando com dano relevante.
-- Em Commander de 4 jogadores, você raramente sabe quem vai te atacar.
-- Deflecting Swat (presente no deck) faz trabalho similar e melhor (redireciona qualquer spell/ability).
+**Alternativa da sua colecao:** **Monastery Mentor** (M, 3 mana) — toda spell nao-criatura faz um monk token. Isso e sinergia pura com Lorehold. **Guttersnipe** (U, 3 mana) — pings cada oponente por cada spell. Maior impacto que Longshot.
 
-**Alternativa da sua coleção:**
-- **Chaos Warp** — removal versátil que acerta qualquer permanente. Bota na biblioteca e o oponente revela.
-- **Generous Gift** — transforma qualquer permanente em 3/3 Elephant. Cria um blocker mas não deixa o oponente pescar topdeck.
-- **Bolt Bend** — redireciona se sua criatura tiver poder 4+. Lorehold é poder 5 em mana 5. Funciona bem.
+### 🟡 Victory Chimes (CMC 3)
+**Funcao atual:** ramp (mana rock, so pode usar em turnos dos oponentes)
+**Tag: NAO CLASSIFICADA**
 
----
+**Por que talvez nao seja ideal:** CMC 3 para um rock que so funciona em upkeep dos oponentes e muito lento. Felwar Stone (CMC 2) e melhor. Arcane Signet (CMC 2) e melhor. Boros Signet (na sua colecao, CMC 2) e melhor.
 
-### 3. **Pearl Medallion** (CMC 2, uncertain)
-**Função atual:** Cost reduction para white spells
-**% de uso externo:** Baixo em Lorehold (EDHREC mostra ~5% de inclusão)
+**Alternativa da sua colecao:** **Boros Signet** (C, CMC 2). **Fellwar Stone** (U, CMC 2). **Ornithopter of Paradise** (C, CMC 2).
 
-**Por que talvez não seja ideal:**
-- O deck tem apenas ~12 white spells. Pearl Medallion reduz {1} em cada.
-- Lorehold já dá desconto de {1} em instant/sorcery. O medallion se sobrepõe parcialmente.
-- Um turno 2 Pearl Medallion gasta um slot de rampa/rocks que poderia ser um Arcane Signet (que acelera mais).
+### 🟢 Fated Clash (CMC 5)
+**Funcao atual:** board_wipe (cada criatura luta contra outra)
+**Tag: board_wipe(0.90)** — confirmado.
 
-**Alternativa da sua coleção:**
-- **Fellwar Stone** (CMC 2, ramp) — mana de qualquer cor que oponentes tenham. Mais ramp que cost reduction.
-- **Storm-Kiln Artist** (CMC 4, ramp + spellslinger payoff) — faz treasure cada vez que casta instant/sorcery. Sinergia direta com Lorehold.
-- **Tablet of Discovery** (CMC 3, ramp) — procura uma land básica para o topo.
+**Por que pode ficar:** E um board wipe criativo que nao toca suas criaturas com protection. Mas tem um problema: **suas criaturas tambem lutam**. Se voce tiver Goldspan Dragon, Ancient Copper Dragon, Mother of Runes — elas sao afetadas. Melhor usar Austere Command, Call Forth the Tempest, ou Volcanic Vision.
+
+**Alternativa da sua colecao:** **Farewell** (R, 6 mana) — limpa exato o que voce quer. **Blasphemous Act** (R, CMC 9 mas custa 1-3 tipicamente). **Chain Reaction** (R, 4 mana).
+
+### 🟢 Hexing Squelcher (CMC 2)
+**Funcao atual:** protection (previne ativar habilidades de criaturas)
+**% uso externo:** Presente em Ref Deck 0 e Ref Deck 1.
+
+Pode ficar. E uma protecao boa contra elfball, Yuriko, Winota, Kinnan. Num meta com decks ativados, ela faz trabalho. Mas em bracket 3 casual, pode ser situacional demais.
 
 ---
 
-### 4. **Ruby Medallion** (CMC 2, uncertain)
-Mesma lógica do Pearl, mas para red. O deck tem mais red spells (~25-30), então Ruby é marginalmente melhor. Ainda assim:
+## Seção 4: Cartas Nao Classificadas pelo Sistema
 
-**Custo de oportunidade:** Poderia ser um ramp que realmente acelera em vez de reduzir custo. Em Lorehold, você quer chegar em 5+ mana rápido — um Sol Ring (já incluso) ou Talisman (já incluso) fazem mais.
+O multi-tag classifier perdeu **10 cartas**. Isso afeta as metricas de qualidade:
 
----
+| Carta | Funcao Real | Tag Esperada |
+|:-----|:-----------|:------------:|
+| Pearl Medallion | Ramp (reducao de custo) | ramp |
+| Ruby Medallion | Ramp (reducao de custo) | ramp |
+| Scroll Rack | Draw / Topdeck Setup | draw, enabler |
+| Victory Chimes | Ramp | ramp |
+| Grand Abolisher | Protection (stax) | protection |
+| Orim's Chant | Protection / Stax | protection |
+| Deflecting Palm | Protection / Removal | protection, removal |
+| Galadriel's Dismissal | Protection (flicker) | protection |
+| Penance | Topdeck Setup / Graveyard Synergy | enabler, graveyard_synergy |
+| Taunt from the Rampart | Goad / Politics | removal |
 
-### 5. **Taunt from the Rampart** (CMC 5, uncertain)
-**Função atual:** Goad + can't block
-**% de uso externo:** Muito raro. Não aparece em EDHREC Lorehold.
-
-**Por que talvez não seja ideal:**
-- CMC 5 é caro para um efeito que não avança seu plano de jogo.
-- Goar criaturas não te ajuda a vencer. Apenas adia a derrota por um turno.
-- Lorehold spellslinger quer CASTAR big spells com cópias, não controlar o combate.
-
-**Alternativa da sua coleção:**
-- **Disrupt Decorum** (CMC 4) — goad todas as criaturas. Mesmo efeito, {1} mais barato, e é instantaneo. Na prática, Disrupt Decorum faz a mesma coisa melhor.
-- **Pacifism** (CMC 2) — remove blocker de forma permanente.
-
----
-
-### 6. **Victory Chimes** (CMC 3, uncertain)
-**Função atual:** Mana para outros jogadores
-**% de uso externo:** Praticamente zero em Lorehold EDHREC.
-
-**Por que talvez não seja ideal:**
-- Dá mana para QUALQUER jogador. O deckbuilder que inclui Victory Chimes está desesperado por ramp em Boros.
-- O deck já tem 15 ramp sources (2 acima da média). Não precisa mais.
-- Dar mana para um oponente em bracket 3 é presente perigoso.
-
-**Alternativa da sua coleção:**
-- **Simian Spirit Guide** (CMC 3, mas funciona como instantâneo) — mana imediato sem dar vantagem ao oponente.
-- **Manamorphose** (ou qualquer spell de 2 mana) — melhor usar slot como spell que o Lorehold possa copiar.
+**Impacto nas metricas:** se reclassificadas, ramp passaria de 15 para 17-18 (mais longe do profile), draw passaria para 9-10, protection de 5 para 9.
 
 ---
 
-### 7. **Penance** (CMC 3, uncertain)
-**Função atual:** Topdeck manipulation + damage prevention condicional
-**% de uso externo:** Extremamente raro. Carta obscura.
+## Seção 5: O Que Outros Decks de Lorehold Fazem Diferente
 
-**Por que talvez não seja ideal:**
-- Colocar carta da mão no topo é útil para Lorehold (que casta do topo com desconto), mas só durante a sua main phase.
-- O "damage prevention" é contra black/red sources — muito situacional.
-- A carta poderia ser um draw spell real.
+### Reference Deck 0 — Stax / Combo (bracket 4)
+- Blood Moon, Armageddon, Cataclysm, Archon of Emeria, Drannith Magistrate
+- Karn + Lattice lock, Grinding Station + Urza's Saga
+- **Abordagem:** controlar o board com stax, ganhar com combo compacto
+- **Seu deck:** nao e stax. E big spells. Nao comparavel.
 
-**Apesar disso:** Penance tem **sinergia real** com Lorehold se você colocar uma big spell no topo e castar do topo com desconto de {1}. Não descarte completamente — é uma escolha pessoal criativa.
+### Reference Deck 1 — Big Spells / Topdeck (bracket 3)
+- Penance, Top, Scroll Rack + Approach of the Second Sun, Worldfire, Beacon of Immortality
+- Arcane Bombardment + big spells (Apex of Power, Dance with Calamity)
+- **Abordagem:** manipular topo do library, castar big spells de graca ou com desconto
+- **Seu deck:** e o mais similar! Faltam: Arcane Bombardment, Apex of Power, Dance with Calamity, Beacon of Immortality, Worldfire, Primal Amulet, Mana Geyser
 
-**Alternativa da sua coleção:**
-- **Faithless Looting** (CMC 1, loot 2) — coloca big spell no graveyard, compra e descarta. Sinergia com Lorehold via graveyard, não via topdeck.
-- **Dragon's Rage Channeler** (CMC 1, surveil + payoff) — mise no topo e enche o gy.
-- **Valakut Awakening** (já incluso no deck como MDFC — boa!)
+### Reference Deck 2 — Chaos / Casual (bracket 2)
+- Prisoner's Dilemma, Goblin Game, Chaotic Transformation, Restore Balance
+- **Abordagem:** caos e efeitos imprevisiveis, politico
+- **Seu deck:** mais focado que este, e bom que nao esta em chaos
 
----
+### Diferenca Estrategica Principal
 
-### 8. **Library of Leng** (CMC 1, graveyard_synergy)
-**Função atual:** No maximum hand size + discard to top
-**% de uso externo:** Muito baixo em Lorehold.
+**Seu deck:** Foca em castar big spells com rampa (descontos e rocks) e copiar com Lorehold + Double Vision + Sunbird's. O plano e rampar ate 7-8 mana, castar algo grande, e copiar.
 
-**Por que talvez não seja ideal:**
-- "No maximum hand size" é quase irrelevante em Commander (a não ser que você compre 15+ cartas por turno).
-- Colocar discard no topo em vez do gy é ANTI-sinergia com Lorehold (que quer instants/sorceries no gy para copiar com Mizzix's, Volcanic Vision, etc.).
-- Exceto se você quiser colocar big spells no topo para castar com Lorehold — mas Penance + Scroll Rack + Sensei's Top já fazem isso.
+**Ref Deck 1 (EDHREC tipico):** Foca em manipular topo de library (Top, Scroll Rack, Penance) para **miracle** as big spells (Terminus, Reforge the Soul) e castar do topo (Galvanoth, Dance with Calamity). O desconto do Lorehold e um bonus, nao o plano principal.
 
-**IMPORTANTE:** Library of Leng PODE ser boa se usada para colocar big spells no topo em vez de descartá-las. Mas o deck tem 3+ ferramentas de topdeck manipulation — a Library é redundante e ocupa um slot precioso.
+**Por que isso importa:** Miracle e topdeck manipulation sao mais eficientes que ramp + big spells em Boros (que nao tem verde). Com 35 lands e rituais, voce vai ter maos inconsistentes. Com Top + Scroll Rack + Penance, voce garante que toda draw seja um spell relevante.
 
-**Alternativa da sua coleção:**
-- **Dragon's Rage Channeler** — surveil + delimitação. Sinergia com graveyard de Lorehold.
-- **Faithless Looting** — enche o gy de spells. Lorehold copia spells do gy.
+### Upgrade Sugerido (da sua colecao, custo zero)
 
----
+**Swaps recomendados (3):**
 
-## Seção 4: O Que Outros Decks de Lorehold Fazem Diferente
+| Remover | Adicionar | Motivo |
+|:--------|:----------|:-------|
+| Hexing Squelcher | **Monastery Mentor** | Mentor sinergiza com spellslinging, Hexing e situacional |
+| Victory Chimes | **Fellwar Stone** | CMC 3 -> CMC 2, mesma funcao, mais rapido |
+| Taunt from the Rampart | **Arcane Bombardment** | Bomba > Goad. Bombardment faz o que Lorehold quer: copiar spells repetidamente |
 
-### Análise do EDHREC Average Lorehold (corpus v2, 5+ fontes)
+**Upgrades de longo prazo (precisa da colecao completa):**
+- Sunbird's Invocation -> Arcane Bombardment (ja na colecao!) — Bombardment paga todo upkeep, Sunbird so no cast. E diretamente melhor.
+- Rise of the Eldrazi -> Chaos Warp (ja na colecao) — 12 mana -> 3 mana, mesma funcao pratica.
+- Goldspan Dragon -> Manaform Hellkite (ja na colecao!) — Hellkite copia spells ao atacar. Lorehold copia spells do graveyard ao atacar. Dois juntos = 2 copias por ataque.
 
-O EDHREC average deck de Lorehold foca em **topdeck manipulation + miracle** como mecanismo central, enquanto seu deck foca em **treasures + recursion via graveyard**. As diferenças:
+### Wincon Gap
 
-#### Seu deck faz MAIS que a média:
-- **Ramp via treasures:** Smothering Tithe, Goldspan Dragon, Ancient Copper Dragon, Brass's Bounty. O EDHREC average não investe tanto em treasure ramp.
-- **Recursão:** Mizzix's Mastery + Surge to Victory + Restoration Seminar. Média Lorehold usa Sun Titan + Sevinne's Reclamation.
-- **Proteção de combo:** Grand Abolisher + Orim's Chant + Galadriel's Dismissal + Teferi's Protection. Média Lorehold prioriza Deflecting Swat + Flawless Maneuver.
+O maior gap do deck: **apenas 2 wincons dedicadas** (Hellkite Tyrant, Approach). O profile EDHREC espera 4-7.
 
-#### A média faz MAIS que seu deck:
-- **Draw consistente:** EDHREC Lorehold usa Trouble in Pairs, Esper Sentinel, Archivist of Oghma, Mystic Remora, Land Tax + Scroll Rack. O deck tem Artist's Talent + Esper Sentinel + Top — é insuficiente.
-- **Miracle payoff direto:** Terminus, Entreat the Dead, Temporal Trespass, etc. Seu deck não tem miracles (exceto o próprio Lorehold).
-- **Topdeck manipulation reutilizável:** Scroll Rack + Sensei's Top + Land Tax são o padrão. O deck já tem esses 3, mas faltam mais manipuladores (Sylvan Library não cabe em RW; Crystal Ball, Tower of Fortunes, God-Eternal Oketra pour opções).
-
-#### Por que seu deck é diferente:
-Seu deck parece ter sido construído com uma **premissa diferente** da média. Em vez de "topdeck + miracle", sua tese é "acumule treasures, encha o graveyard, e exploda com Mizzix's Mastery / Volcanic Vision." É uma abordagem mais explosiva mas menos consistente.
-
-**Isso é um problema?** Depende. Em bracket 3, decks que explodem no turno 8-10 são perfeitamente viáveis. O risco é que sem draw consistente, você pode chegar no turno 10 com 0 gas. O EDHREC average troca explosão por consistência.
-
-### Cartas que você DEVERIA considerar da média Lorehold
-
-#### Prioridade Alta — Tapar o buraco de draw:
-1. **Trouble in Pairs** (Rare, 1W) — draw massivo quando oponentes fazem coisas (que é sempre). Na sua coleção! Considere substituir uma carta questionável.
-2. **Archivist of Oghma** (Rare, 2W) — draw cada vez que oponente busca library. Sua coleção tem!
-3. **Dawn's Truce** — proteção + draw. Na sua coleção!
-4. **Mystic Remora** — draw barato (se pagar {4} por upkeep). Barato em $$$, excelente.
-
-#### Prioridade Média — Melhorar pacotes existentes:
-5. **Flawless Maneuver** (Rare) — proteção GRÁTIS se tiver commander no campo. Lorehold está sempre no campo.
-6. **Akroma's Will** (Rare, 5W) — proteção + ataque massivo (double strike + flying + lifelink). Na sua coleção!
-7. **Farewell** (Rare, 6W) — o melhor board wipe do formato. Exila tudo que você quer exilar. Na sua coleção!
-8. **Blasphemous Act** (Rare, R) — {9} mas custa {1} na prática. Na sua coleção!
+**Colecao tem as pecas:**
+1. **Worldfire + Beacon of Immortality** — Worldfire limpa tudo, Beacon deixa voce com 2x life. Com Lorehold, da pra castar Worldfire do graveyard. Combinacao mortal.
+2. **The One Ring** (na colecao!) — draw engine + protection. 4 mana, paga em brackets 2-3.
+3. **Akroma's Will** (na colecao!) — finisher com double strike + lifelink. Transforma qualquer ataque em lethal.
 
 ---
 
-## Seção 5: Recomendações Baseadas na Coleção do Usuário
+## Seção 6: Dados de Qualidade
 
-### Swap Priority #1 — +Draw (Crítico)
+| Metrica | Valor | Status |
+|:--------|:-----:|:------:|
+| Cartas com functional_tag ausente | 10/86 (12%) | 🟡 |
+| Card_tags (multi-tag) populados | 66/86 (77%) | 🟡 |
+| CMC nulo/negativo | 0 | ✅ |
+| Duplicatas nao-basicas | 0 | ✅ |
+| Commander accounted | 1 | ✅ |
+| Total cards (SUM qty) | 100 | ✅ |
+| Total cards (declarado) | 100 | ✅ |
 
-| 🔄 Remover | ➕ Adicionar | Por quê |
-|:-----------|:------------|:--------|
-| Taunt from the Rampart | Trouble in Pairs | Draw consistente em bracket 3 |
-| Victory Chimes | Archivist of Oghma | Draw por oponentes buscarem |
-| Deflecting Palm | Dawn's Truce | Proteção + draw |
-
-### Swap Priority #2 — Melhorar Board Wipes
-
-| 🔄 Remover | ➕ Adicionar | Por quê |
-|:-----------|:------------|:--------|
-| Rise of the Eldrazi | Farewell | Melhor board wipe do formato |
-| Call Forth the Tempest | Blasphemous Act | Mais barato, mais consistente |
-
-### Swap Priority #3 — Sinergia + Proteção
-
-| 🔄 Remover | ➕ Adicionar | Por quê |
-|:-----------|:------------|:--------|
-| Pearl Medallion | Flawless Maneuver | Proteção grátis |
-| Library of Leng | Dragon's Rage Channeler | Surveil + delimitação + sinergia gy |
+**Nota sobre classificacao:** as 10 cartas sem functional_tag tem `card_tags` populado para algumas (Esper Sentinel, Gamble tem card_tags mas sem functional_tag primaria). Isso indica que o `infer_functional_card_tags()` correu mas o `classify_card()` (single-tag) nao resolveu.
 
 ---
 
-## Seção 6: Cartas Que Não Foram Classificadas
-
-10 cartas do deck não têm tag funcional primária. O classificador (single-tag) não conseguiu categorizá-las, o que significa que:
-
-1. **O classificador não sabe o que elas fazem** — impacto na precisão das métricas de draw count, protection count, etc.
-2. **O ManaLoom pode sugerir removê-las** sem entender o valor.
-
-| Carta | Função Real | Tag Que Deveria Ser | Risco de Swap Indevido |
-|:------|:------------|:-------------------:|:----------------------:|
-| Grand Abolisher | Proteção — trava oponentes no seu turno | protection | 🟡 Alto — sistema pode tentar trocar por "removal" |
-| Orim's Chant | Proteção / Tempo — trava um jogador | protection | 🟡 Alto — sistema vê como "other" |
-| Galadriel's Dismissal | Proteção — phasing out de emergência | protection | 🟡 Médio — sistema vê como "other" |
-| Scroll Rack | Topdeck manipulation — core do plano | enabler/setup | 🔴 Alto — sem tag, sistema pode sugerir swap. **NÃO REMOVA** |
-| Penance | Topdeck manipulation + dano condicional | enabler/topdeck | 🔴 Médio — semi-dispensável, mas tem sinergia |
-| Pearl Medallion | Cost reduction white | ramp (indireto) | 🟢 Baixo — já substituível |
-| Ruby Medallion | Cost reduction red | ramp (indireto) | 🟢 Baixo — já substituível |
-| Victory Chimes | Mana assistida | ramp (ruim) | 🟢 Baixo — já substituível |
-| Taunt from the Rampart | Goad temporário | tempo | 🟢 Baixo — já substituível |
-| Deflecting Palm | Removal condicional redirecionado | removal | 🟡 Médio — cartas melhores existem |
-
----
-
-## Resumo para o Jogador
-
-> **Força:** Seu deck tem um plano claro — acumule treasures, encha o graveyard, exploda com Mizzix's Mastery + Volcanic Vision loop. Ramp está acima da média, board wipes estão no range ideal, recursão existe e é boa.
-
-> **Fraqueza crítica:** Draw é insuficiente. Você tem 3 fontes de draw confiáveis (Artist's Talent, Esper Sentinel, Sensei's Top) em vez de 8-12. Você compensa com topdeck manipulation, mas em jogos longos (controle, stax) você vai ficar sem gas enquanto seus oponentes compram 3 cartas por turno.
-
-> **Swap mais urgente:** Substitua Taunt from the Rampart por Trouble in Pairs (está na sua coleção!). A diferença de CMC é 5→4, e você ganha draw massivo.
-
-> **Swap mais criativo:** Substitua Library of Leng por Dragon's Rage Channeler. Você troca "mão sem limite" por surveil 1 por turno + delimitação (que vira 3/3 com 7+ no gy). Dragon's Rage Channeler enche o graveyard que Lorehold precisa.
-
-> **Swap mais seguro:** Substitua Rise of the Eldrazi por Farewell (está na sua coleção!). CMC 12 → 6. Board wipe que exila escolhido. Diferença de dia e noite.
-
-> **Observação final:** Seu deck é um Lorehold "explosivo" diferente da média EDHREC "topdeck + miracle". Isso não é errado — é seu estilo. Mas para tornar esse estilo viável em bracket 3, você precisa de DRAW. 3 fontes não sustentam um plano de recursion-heavy. Adicione 3 fontes de draw, corte as cartas questionáveis, e seu deck vira de "divertido mas inconsistente" para "ameaça real na mesa."
+**Data da analise:** 2026-05-27
+**Fontes consultadas:** EDHREC reference profile Lorehold (4 fontes, 3 decks de referencia), conhecimento do deck via knowledge.db
+**Braket:** 3
+**Comandante:** Lorehold, the Historian
