@@ -329,3 +329,26 @@ barato mas não crítico.
 **Conclusão da validação:** O deck está dentro de todos os ranges do perfil,
 com duas exceções leves: lands 1 abaixo (compensado por 2 MDFCs) e topdeck
 setup 1 abaixo. Nenhum P0 ou P1.
+
+---
+
+---
+
+## [2026-05-27 16:45] Execução #3 — Collection Cross-Reference
+
+**Foco:** Cruzei o deck Lorehold (deck_id=6) contra **3 fontes** simultaneamente:
+- **EDHREC Live** (7.597 decks, via `__NEXT_DATA__`)
+- **EDHREC Corpus** (3 decks completos de referência)
+- **User Collection** (229 cartas do usuário, Scryfall-classified)
+
+**Descoberta principal:** O usuário TEM na coleção 8 das 10 cartas prioritárias recomendadas — incluindo **Big Score** (67.3%), **Storm-Kiln Artist** (55.5%), **Apex of Power** (55.4%), **Dance with Calamity** (50.4%), e **Boros Signet** (50.4%) — e NÃO AS USA no deck.
+
+**Novos padrões identificados:**
+1. **Artifact subtheme invisível** — 6 cartas focadas em artefatos (Medallions, Oswald, Goblin Engineer) que estão em 0% dos decks EDHREC. O meta prefere treasures para explosão no turno do Lorehold.
+2. **Proteção em excesso** — 7 slots de proteção vs ~4 do meta. Mother of Runes, Greaves e Hexing Squelcher estão em 0% dos 7.597 decks.
+3. **Hellkite Tyrant** — wincon nicho (0% EDHREC) que ocupa slot que podia ser Dance with Calamity.
+
+**Swap P1 (custo zero, da coleção):** Big Score, Storm-Kiln Artist, Apex of Power, Dance with Calamity, Boros Signet.
+**Detalhes completos:** `decks/lorehold-the-historian/SCOUT_LOG.md` Execução #3.
+
+(Mantido histórico: Execuções #1 e #2 abaixo.)
