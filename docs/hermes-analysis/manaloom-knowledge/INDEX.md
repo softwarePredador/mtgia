@@ -8,19 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-<<<<<<< HEAD
-| Comandantes analisados | 11 | 2026-05-27 |
-| Decks analisados | 11 | 2026-05-27 |
-| Cartas revisadas | ~1.230 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100) | 2026-05-27 |
-| Insights documentados | 54 | 2026-05-27 |
-| Discrepancias com ManaLoom | 58 | 2026-05-27 |
-=======
-| Comandantes analisados | 11 | 2026-05-28 |
-| Decks analisados | 12 | 2026-05-28 |
-| Cartas revisadas | ~1.330 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100 + VALIDATOR 86) | 2026-05-28 |
-| Insights documentados | 64 | 2026-05-28 |
-| Discrepancias com ManaLoom | 62 | 2026-05-28 |
->>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
+|| Comandantes analisados | 11 | 2026-05-28 |
+|| Decks analisados | 12 | 2026-05-28 |
+|| Cartas revisadas | ~1.330 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100 + VALIDATOR 86) | 2026-05-28 |
+|| Insights documentados | 64 | 2026-05-28 |
+|| Discrepancias com ManaLoom | 62 | 2026-05-28 |
 
 ## Comandantes Analisados
 
@@ -32,11 +24,7 @@
 | Korvold, Fae-Cursed King | 1 | 2026-05-26 | 5 | Pendente |
 | Teysa Karlov | 1 | 2026-05-26 | 6 | Pendente |
 | Aesi, Tyrant of Gyre Strait | 1 | 2026-05-26 | 4 | Pendente |
-<<<<<<< HEAD
-| **Lorehold, the Historian** | **1** | **2026-05-26** | **4** | **Pendente** |
-=======
 | **Lorehold, the Historian** | **1** | **2026-05-28** | **4 + 10 novos** | **Completa: 86 cartas, 206 multi-tags, c/ VALIDATOR_LOG.md** |
->>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
 | **Winota, Joiner of Forces** | **1** | **2026-05-27** | **4** | **Parcial: 85 linhas / 100 qty** |
 | **Muldrotha, the Gravetide** | **1** | **2026-05-27** | **3** | **Nova: 87/87 EDHREC avg** |
 | **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
@@ -106,33 +94,30 @@
 17. **Graveyard como extensao da mao** — Self-mill nao e "perder cartas", e
     "preparar o motor". O deck Muldrotha tem 11+ cartas de self-mill, e cada
     carta no cemiterio esta disponivel para ser conjurada no turno seguinte.
-    Metricas tradicionais de "card advantage" nao capturam cemiterio como mao.**
+    Metricas tradicionais de "card advantage" nao capturam cemiterio como mao.
 18. **Interacao reusavel > Interacao forte** — Muldrotha prefere Seal of
     Primordium (remocao de artifact/enchantment reusavel todo turno) a Beast
     Within ou Abrupt Decay (uso unico). Isto e contra-intuitivo para o sistema
     de otimizacao, que prioriza eficiencia de mana sobre reusabilidade.
-16. **Comandantes engine requerem metricas diferentes** — CMC medio (2.61) e
+19. **Comandantes engine requerem metricas diferentes** — CMC medio (2.61) e
     aceitavel, mas a metrica chave para Aesi e # de extra-land-drop effects e
     # de landfall payoffs, nao ramp/draw tradicionais.
-19. **Edgar Markov quebra a regra de ramp baixo.** — 7 ramp contra 9-12 do perfil,
+20. **Edgar Markov quebra a regra de ramp baixo.** — 7 ramp contra 9-12 do perfil,
     mas o deck funciona porque a eminencia gera tokens de graça. A "ramp" de
     Edgar e indireta: cada vampiro conjurado produz 2 corpos (criatura + token),
     efetivamente dobrando o investimento de mana. A metrica central para Edgar
     e densidade vampiresca (24-34 recomendado), nao ramp.
-20. **O hibrido aggro+aristocrats e a norma no EDHREC, nao a excecao.** — O perfil
+21. **O hibrido aggro+aristocrats e a norma no EDHREC, nao a excecao.** — O perfil
     recomenda focar em aggro OU aristocrats, mas o jogador medio tenta os dois.
     Isso dilui ambos os planos, mas o jogador prefere "ter opcoes" a "ser eficiente."
-21. **8/63 cartas (12.7%) classificadas incorretamente pelo ManaLoom.** — Discrepancias
+22. **8/63 cartas (12.7%) classificadas incorretamente pelo ManaLoom.** — Discrepancias
     incluem: Olivia's Wrath (board wipe detectado como utility), Sorin Imperious Bloodlord
     (engine detectado como removal), Viscera Seer (sac outlet detectado como draw),
     Sanguine Bond (combo piece detectado como enchantment generico).
-<<<<<<< HEAD
-=======
-22. **Lorehold tem 3 arquétipos distintos em EDHREC.** — Stax/Combo (Drannith, Archon, Underworld Breach + Grinding Station), Big Spells Value (Arcane Bombardment, Double Vision, Worldfire), Chaos/Haymakers (Goblin Game, Master Warcraft). O deck analysis DEVE identificar qual arquétipo o deck segue antes de validar as métricas.
-23. **Lorehold Big Spells não precisa de stax.** — Confirmado contra EDHREC refs: o arquétipo Big Spells (Deck 2) tem zero stax pieces. Stax não é obrigatório para Lorehold em bracket 3.
-24. **Gy recursion é o gap mais comum em decks de big spells.** — Decks focados em copy/value engines (Lorehold, Arcane Bombardment, Sunbird's Invocation) frequentemente negligenciam recursão. O perfil EDHREC recomenda 2-5 fontes; decks que não têm isso perdem 30-50% do valor de longo prazo.
-25. **Topdeck setup tem rendimentos decrescentes.** — 12 cartas de topdeck/miracle setup vs 6-9 do ideal. Cada carta além do ponto ótimo entra em conflito com draw/ramp/interação. O ponto de saturação para Lorehold é 8-9 cartas — após isso, draw puro é melhor.
->>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
+23. **Lorehold tem 3 arquétipos distintos em EDHREC.** — Stax/Combo (Drannith, Archon, Underworld Breach + Grinding Station), Big Spells Value (Arcane Bombardment, Double Vision, Worldfire), Chaos/Haymakers (Goblin Game, Master Warcraft). O deck analysis DEVE identificar qual arquétipo o deck segue antes de validar as métricas.
+24. **Lorehold Big Spells não precisa de stax.** — Confirmado contra EDHREC refs: o arquétipo Big Spells (Deck 2) tem zero stax pieces. Stax não é obrigatório para Lorehold em bracket 3.
+25. **Gy recursion é o gap mais comum em decks de big spells.** — Decks focados em copy/value engines (Lorehold, Arcane Bombardment, Sunbird's Invocation) frequentemente negligenciam recursão. O perfil EDHREC recomenda 2-5 fontes; decks que não têm isso perdem 30-50% do valor de longo prazo.
+26. **Topdeck setup tem rendimentos decrescentes.** — 12 cartas de topdeck/miracle setup vs 6-9 do ideal. Cada carta além do ponto ótimo entra em conflito com draw/ramp/interação. O ponto de saturação para Lorehold é 8-9 cartas — após isso, draw puro é melhor.
 
 ### Por Arquetipo
 - **Combo (cEDH):** 24+ ramp, 15+ interaction, 0-2 board wipes,
@@ -569,17 +554,6 @@ A analise anterior do deck Lorehold continha erros significativos nas metricas, 
 | Exquisite Blood | enchantment | combo_piece | Medio - metade do combo EB+SB |
 || Blood Artist | creature (no tag) | aristocrat_payoff | Medio - sem tag funcional relevante |
 
-## Ultimas Execucoes
-
-<<<<<<< HEAD
-### 2026-05-27 — Lorehold Purpose Analyzer (Agent 2)
-- **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
-- **Foco:** Analise profunda de cada carta do deck Lorehold
-- **Arquivos gerados:** VALIDATOR_LOG.md, VALIDATOR_SUMMARY.md
-- **Correcoes a analise anterior:** Lands 34→35, Draw 4→3, Recursion 0→4-5, Wincons 10→2/5, Topdeck Setup 12→7
-- **Insights:** 1 novo (deck tem plano de recursion+treasures, nao topdeck+miracle como media)
-- **Discrepancia:** 1 nova (10 cartas sem tag funcional primaria no classificador single-tag)
-=======
 ### 2026-05-28 — Lorehold Purpose Analyzer (Agent 2) — Deep Dissection
 - **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
 - **Foco:** Validacao profunda de cada carta em 5 niveis de importancia + cross-ref com EDHREC (3 corpus decks) + user collection (229 cards)
@@ -591,4 +565,3 @@ A analise anterior do deck Lorehold continha erros significativos nas metricas, 
   - 5 cartas da colecao recomendadas para inclusao — destaque Arcane Bombardment, Faithless Looting, Dualcaster Mage + Twinflame combo
 - **Gap crítico:** 0 graveyard recursion vs 2-5 do perfil EDHREC
 - **Insights:** 7 novos (arquétipos Lorehold, stax validation, overlap analysis com 3 EDHREC refs)
->>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
