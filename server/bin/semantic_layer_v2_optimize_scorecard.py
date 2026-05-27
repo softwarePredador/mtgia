@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import pathlib
+import socket
 import ssl
 import sys
 import time
@@ -69,6 +70,11 @@ def request(base_url: str, method: str, path: str, payload: Any | None = None, t
                 time.sleep(int(retry_after) if retry_after and retry_after.isdigit() else 5 + attempt * 2)
                 continue
             return exc.code, parsed, dict(exc.headers)
+        except (TimeoutError, socket.timeout, urllib.error.URLError, OSError) as exc:
+            if attempt < retries:
+                time.sleep(3 + attempt * 2)
+                continue
+            return 598, {"error": type(exc).__name__}, {}
     return 599, {"error": "request_exhausted"}, {}
 
 
@@ -191,6 +197,13 @@ def semantic_shadow_decision(semantic: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def sanitized_error(exc: BaseException) -> dict[str, Any]:
+    return {
+        "error_kind": type(exc).__name__,
+        "error_recorded": True,
+    }
+
+
 def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity: str) -> dict[str, Any]:
     payload = {"deck_id": deck_id, "archetype": archetype, "bracket": 2, "keep_theme": True, "intensity": intensity, "async": True}
     started = time.time()
@@ -305,19 +318,20 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "quantity_total": sum(int(card.get("quantity") or 1) for card in cards),
             "optimize": [],
         }
-        log_progress("create_temp_deck_start", commander_slug=slug, card_entry_count=len(cards))
-        deck_id, create_meta = create_temp_deck(base_url, token, cards, cache)
-        case.update(create_meta)
-        log_progress(
-            "create_temp_deck_done",
-            commander_slug=slug,
-            create_status=create_meta.get("create_status"),
-            unresolved_count=create_meta.get("unresolved_count"),
-            commander_qty=create_meta.get("commander_qty"),
-            main_qty=create_meta.get("main_qty"),
-        )
-        if deck_id:
-            try:
+        deck_id = None
+        try:
+            log_progress("create_temp_deck_start", commander_slug=slug, card_entry_count=len(cards))
+            deck_id, create_meta = create_temp_deck(base_url, token, cards, cache)
+            case.update(create_meta)
+            log_progress(
+                "create_temp_deck_done",
+                commander_slug=slug,
+                create_status=create_meta.get("create_status"),
+                unresolved_count=create_meta.get("unresolved_count"),
+                commander_qty=create_meta.get("commander_qty"),
+                main_qty=create_meta.get("main_qty"),
+            )
+            if deck_id:
                 case.update(validate_deck(base_url, token, deck_id))
                 log_progress(
                     "validate_deck_done",
@@ -341,7 +355,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                             current_gate_approved=case["optimize"][-1].get("current_gate_approved"),
                             semantic_shadow_would_block_partial=case["optimize"][-1].get("semantic_shadow_would_block_partial"),
                         )
-            finally:
+        except Exception as exc:
+            case["case_error"] = sanitized_error(exc)
+            log_progress("case_error", commander_slug=slug, error_kind=type(exc).__name__)
+        finally:
+            if deck_id:
                 request(base_url, "DELETE", "/decks/" + deck_id, token=token, timeout=45, retries=0)
                 log_progress("delete_temp_deck_done", commander_slug=slug)
         summary["cases"].append(case)
