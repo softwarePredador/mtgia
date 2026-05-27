@@ -2,118 +2,106 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T15:02Z**
+> Última atualização: **2026-05-27T15:41Z**
 
 ## Resumo
 
 | Métrica | Valor |
 |:--|:--:|
-| Total de crons (`include_disabled=True`) | 16 |
-| Habilitados | 16/16 |
+| Total de crons (`include_disabled=True`) | 12 |
+| Habilitados | 12/12 |
 | Desabilitados | 0 |
-| `last_status=error` | **9** ⚠️ (↑ de 4 desde 13:34Z) |
+| `last_status=error` | **4** 🔴 (↓ de 9 desde 15:02Z) |
 | Nunca executaram (`last_run_at=null`) | 0 |
-| Stale (>120min atras, `enabled=true`) | 2 |
-| Triggers aceitos nesta rodada | 2 (stale crons) |
-| Resumes nesta rodada | 0 (nenhum desabilitado) |
+| Stale (>120min atrás, `enabled=true`) | 0 |
+| Fleet removidos desde última rodada | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
+| Recuperados desde última rodada | 2 (commander-knowledge-deep, lorehold-deck-scout) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 | HEAD da branch de análise | `9a1ee1410858` |
 
-**Estado geral:** 16/16 habilitados ✅, mas **9 crons em status=error** 🔴 — aumento significativo em relação às 4 da última rodada (13:34Z). Os triggers de `master-watchdog` e `lorehold-deck-scout` foram enviados. 2 triggers `run` aceitos para crons stale.
+**Estado geral:** 12/12 habilitados ✅. Fleet reduzido de 16 para 12 (consolidação 2026-05-27). 4 crons em `status=error` 🔴 (↓ de 9). 2 crons se recuperaram desde o último relatório. Nenhum cron stale ou desabilitado.
 
-> ⚠️ **Alerta:** Desde o último relatório, 5 crons que estavam mostrando `last_status=ok` (mas com last_run_at do dia anterior) executaram e agora mostram `error`. Isso indica que os crons ESTÃO rodando novamente (as `next_run_at` estão avançando), mas TODOS consistentemente falham. O problema parece sistêmico, não de branch ou scheduler.
+**Padrão:** Os 4 erros são todos de provider/model (3× GitHub 429, 1× gpt-5.5 model not found). Crons que funcionam usam `provider=deepseek` com `model=deepseek-v4-flash` e conseguiram executar. Os que falham parecem estar com provider chain caindo em copilot mesmo com deepseek configurado — ou tiveram a configuração alterada recentemente e os erros são de execuções anteriores.
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 12:10Z | 2h52min | 🟢 ok | 2026-05-27 15:03Z | ⚠️ stale (172min) → trigger `run` aceito |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 12:19Z | 2h43min | 🟢 ok | 2026-05-27 16:00Z | agendado para 16:00 — normal |
-| `07346720b753` | manaloom-hermes-daily-deep-audit | `30 11 * * *` | ✅ | 2026-05-27 11:42Z | 3h20min | 🔴 error | 2026-05-28 11:30Z | erro anterior; próximo ciclo amanhã |
-| `3542b818f8b3` | manaloom-hermes-weekly-memory-cleanup | `0 12 * * 0` | ✅ | 2026-05-27 12:31Z | 2h31min | 🔴 error | 2026-05-31 12:00Z | erro anterior; próximo domingo |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 2h06min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 13:35Z | 1h27min | 🟢 ok | 2026-05-27 15:32Z | **esta execução** |
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 15:05Z | 36min | 🟢 ok | 2026-05-27 15:35Z | sem ação |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 12:19Z | 3h22min | 🟢 ok | 2026-05-27 16:00Z | agendado para 16:00 — normal |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 2h45min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 15:05Z | 36min | 🟢 ok | 2026-05-27 15:35Z | **esta execução** |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 14:56Z | 6min | 🔴 error | 2026-05-27 15:22Z | ⚠️ error recente; o trigger da rodada 13:34Z funcionou (last_run avançou de 22:35→14:56Z) mas job erro |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 15:01Z | 1min | 🔴 error | 2026-05-27 15:23Z | 🔴 NOVO erro (era ok na rodada 13:34Z) |
-| `5fe699ed7ff2` | manaloom-themes-research | `every 20m` | ✅ | 2026-05-27 14:49Z | 13min | 🔴 error | 2026-05-27 15:09Z | 🔴 NOVO erro (era ok na rodada 13:34Z) |
-| `4430f8384ce4` | manaloom-missing-gc-filler | `every 20m` | ✅ | 2026-05-27 14:51Z | 11min | 🔴 error | 2026-05-27 15:11Z | 🔴 NOVO erro (era ok na rodada 13:34Z) |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 13:05Z | 1h57min | 🟢 ok | 2026-05-27 19:05Z | próximo ciclo às 19:05Z |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 14:40Z | 22min | 🔴 error | 2026-05-27 15:40Z | 🔴 NOVO erro (era ok na rodada 13:34Z) |
+| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 15:38Z | 3min | 🟢 ok | 2026-05-27 15:58Z | ✅ **RECUPERADO** desde 15:02Z (estava error) — deepseek funcionou |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 15:01Z | 40min | 🔴 error | 2026-05-27 15:40Z | ❌ HTTP 429 (GitHub rate limit) — provider aparenta cair em copilot |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 13:05Z | 2h36min | 🟢 ok | 2026-05-27 19:05Z | próximo ciclo às 19:05Z |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 14:40Z | 1h01min | 🔴 error | 2026-05-27 16:04Z | ❌ HTTP 429 (GitHub rate limit) — sem provider explícito, usa default chain (copilot?) |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 11:56Z | 3h06min | 🔴 error | 2026-05-27 15:03Z | ⚠️ stale (186min) → trigger `run` aceito |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 14:44Z | 18min | 🔴 error | 2026-05-27 15:44Z | 🔴 NOVO erro (era ok na rodada 13:34Z) |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 13:15Z | 1h47min | 🟢 ok | 2026-05-27 15:15Z | sem ação |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 1h40min | 🟢 ok | 2026-05-27 19:22Z | sem ação |
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 15:16Z | 25min | 🟢 ok | 2026-05-27 15:46Z | ✅ **RECUPERADO** — trigger da rodada 15:02Z funcionou |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 14:44Z | 57min | 🔴 error | 2026-05-27 16:29Z | ❌ HTTP 429 (GitHub rate limit) |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 15:21Z | 20min | 🔴 error | 2026-05-27 17:29Z | ❌ Model `gpt-5.5` não acessível (config residual de copilot) |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 2h19min | 🟢 ok | 2026-05-27 19:22Z | normal para schedule 6h |
 
-## Ações da Rodada Atual (2026-05-27T15:02Z)
+## Ações da Rodada Atual (2026-05-27T15:41Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
 |:-:|:--|:--|:--|:--|:--|
-| 1 | `757eefb8738b` | manaloom-master-watchdog | `run` | stale: last_run_at 172min atrás (>120min), every 30m | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T15:03:47Z |
-| 2 | `f20ac299992b` | lorehold-deck-scout | `run` | stale: last_run_at 186min atrás (>120min), every 30m | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T15:03:47Z |
+| 1 | — | **mestre** | `git pull` | Branch `codex/hermes-analysis-docs` já atualizada | ✅ ff-only aplicado |
+| 2 | — | **diagnóstico** | diagnosticou 4 erros | 3× HTTP 429, 1× gpt-5.5 model error | 🔍 dados coletados dos arquivos de output |
 
-**Total:** 2 ações — 0 `resume`, 2 `run`.
+**Observação:** Nenhum cron estava desabilitado ou stale (>120min). Nenhum `resume` ou `run` foi necessário. Os 4 erros são sistêmicos (provider/model chain) e os crons afetados continuam habilitados e agendados.
+
+## Mudanças desde o Último Relatório (2026-05-27T15:02Z)
+
+| Mudança | Detalhe |
+|:--------|:--------|
+| Fleet reduzido | 16→12 crons (4 removidos na consolidação 2026-05-27: daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
+| Commander-knowledge-deep | **RECUPERADO** ✅ — erro → ok (agora com deepseek funcional) |
+| Lorehold-deck-scout | **RECUPERADO** ✅ — stale/error → ok (trigger funcionou) |
+| Lorehold-mulligan-analyst | **NOVO ERRO** 🔴 — era ok→error (gpt-5.5 model not found) |
+| Erros totais | 9→4 (↓ devido à remoção de crons + recuperações) |
+| Stale crons | 2→0 (triggers funcionaram) |
 
 ## Alertas Pendentes
 
-### 🔴 9 crons com `last_status=error` — padrão sistêmico suspeito
+### 🔴 4 crons com `last_status=error` — padrão de provider
 
-A contagem de erros subiu de **4 → 9** desde o último relatório (13:34Z). 5 crons que estavam mostrando `last_status=ok` (com last_run_at do dia anterior) executaram e agora mostram `error`:
+Todos os 4 erros compartilham a mesma causa raiz: problemas de provider/model chain que fazem o Hermes cair em copilot em vez de usar deepseek.
 
-| Cron | Último run | Era ok em | Causa provável |
-|:-----|:----------:|:----------|:---------------|
-| manaloom-commander-knowledge-deep | 14:56Z | — | já estava error desde o início |
-| manaloom-gamechanger-research | 15:01Z | 13:34Z | erro de execução nos últimos 90min |
-| manaloom-themes-research | 14:49Z | 13:34Z | erro de execução |
-| manaloom-missing-gc-filler | 14:51Z | 13:34Z | erro de execução |
-| manaloom-mana-base-validator | 14:40Z | 13:34Z | erro de execução |
-| lorehold-deck-scout | 11:56Z | — | já estava stale desde 11:56 |
-| lorehold-deck-validator | 14:44Z | 13:34Z | erro de execução |
-| manaloom-hermes-daily-deep-audit | 11:42Z | — | erro anterior; próximo ciclo amanhã |
-| manaloom-hermes-weekly-memory-cleanup | 12:31Z | — | erro anterior; próximo domingo |
+| Cron | Último run | Erro | Provider configurado | Model configurado |
+|:-----|:----------:|:----|:--------------------:|:-----------------:|
+| manaloom-gamechanger-research | 15:01Z | HTTP 429 (GitHub) | `deepseek` | `deepseek-v4-flash` |
+| manaloom-mana-base-validator | 14:40Z | HTTP 429 (GitHub) | `None` (default) | `None` (default) |
+| lorehold-deck-validator | 14:44Z | HTTP 429 (GitHub) | `deepseek` | `deepseek-v4-flash` |
+| lorehold-mulligan-analyst | 15:21Z | gpt-5.5 not accessible | `deepseek` | `deepseek-v4-flash` |
 
-**Hipótese:** O scheduler está funcionando (next_run_at avança, last_run_at se atualiza), mas os jobs estão falhando consistentemente. Possíveis causas:
-- Model/provider desatualizado ou não disponível (alguns usam `gpt-5.5`/`copilot` que pode ter mudado)
-- Dependências de API que mudaram (Scryfall, EDHREC)
-- Problema de permissão no .git/objects que afeta commits dos jobs de conhecimento
-- Runtime error de script Python que não foi corrigido
+**Hipótese principal:** A configuração `provider=deepseek, model=deepseek-v4-flash` está sendo salva no cron config, mas o Hermes provider chain pode ter um fallback que cai em copilot quando deepseek está indisponível ou quando o modelo específico não pode ser usado. Isto explicaria por que:
+- Alguns crons com deepseek funcionam (commander-knowledge-deep, deck-scout)
+- Outros com deepseek idêntico falham com 429 do GitHub (gamechanger, deck-validator)
 
-### ⚠️ 2 crons stale com trigger enviado (aguardando scheduler)
+**3 crons com HTTP 429 (GitHub rate limit):** Estes provavelmente estão caindo no provider copilot via fallback chain. O mana-base-validator não tem provider/model explícito — usa o default, que inclui copilot.
 
-| Cron | ID | Status antes | Trigger enviado às |
-|:-----|:---|:------------:|:-----------------:|
-| manaloom-master-watchdog | `757eefb8738b` | ok (mas 172min sem exec) | 15:02Z |
-| lorehold-deck-scout | `f20ac299992b` | error (186min sem exec) | 15:02Z |
+**1 cron com modelo gpt-5.5:** Herança de configuração residual de copilot. O scheduler pode estar usando a configuração antiga em vez da atual.
 
-Ambos tiveram `next_run_at` reprogramado. Verificar na próxima rodada se `last_run_at` avançou.
+**Nenhum action trigger enviado:** Todos os 4 crons estão `enabled=true` com `state=scheduled` e `next_run_at` avançando. A scheduler tentará executá-los novamente nos próximos ciclos. Como o padrão é sistêmico e não de scheduler, triggers `run` adicionais não resolveriam — os jobs continuariam falhando no mesmo ponto.
+
+**Recomendação:** Para resolver, cada cron afetado precisaria de:
+1. Confirmação de que `provider=deepseek, model=deepseek-v4-flash` é respeitado (não cai em copilot)
+2. Se o mana-base-validator não tiver provider/model, definir explicitamente
+3. Se o fallback chain do sistema for inevitável, aumentar a frequência dos crons menos frequentes ou aceitar que alguns minutos são perdidos para 429
 
 ## Notas
 
 - Branch confirmada: `codex/hermes-analysis-docs` ✅ (HEAD `9a1ee1410858`)
-- `cronjob(action="list", include_disabled=True)` retornou 16 jobs sem `enabled=false`.
-- Working tree contém artefatos não relacionados (decks lorehold, scripts de scout, `__pycache__`) — apenas `CRON_STATUS.md` será comitado.
+- `cronjob(action="list", include_disabled=True)` retornou 12 jobs sem `enabled=false`.
+- Working tree contém artefatos não relacionados (decks lorehold, scripts de scout, `__pycache__`, `scripts/knowledge.db` vazio em `/opt/data/workspace/mtgia/scripts/`) — apenas `CRON_STATUS.md` será comitado.
 - Nenhum token/secret registrado neste relatório.
-- O `master-watchdog` (script-based, `no_agent=true`) é susceptível ao Pattern B (ciclos pulados silenciosamente). O trigger enviado deve resetar o scheduler.
-
-## Recomendação
-
-**Prioridade P1:** Investigar por que 7/7 crons de conhecimento Commander executaram e todos falharam nas últimas 2h. Sugiro:
-
-1. Capturar o output de erro de um cron específico (ex: `manaloom-commander-knowledge-deep` que roda a cada 20min) — verificar logs de erro na interface de crons ou no diretório `/opt/data/cron/output/75eed994c103/`
-2. Verificar se `copilot` provider ainda está funcional para os crons que usam `gpt-5.5` + `copilot` (themes-research, lorehold scout/validator/analyst/oracle)
-3. Verificar se `deepseek/deepseek-v4-flash` ainda é um provider/model válido
-
-Se os erros forem de provedor/modelo, o fix é simples: atualizar o model/provider nos crons afetados.
-
----
-
-<!-- commit nonce: 1 -->
+- 2 crons recuperaram desde o último relatório (commander-knowledge-deep, deck-scout), indicando que o scheduler e deepseek provider estão funcionais para alguns jobs.
