@@ -25,7 +25,7 @@ Cada tema tem:
 | **Elfball** | 25 elfos | 8 payoffs | 2-4 | Media | Lathril, Ezuri, Marwyn |
 | **Goblins** | 25-38 goblins | 5-10 payoffs | 2-4 | Media | Krenko, Muxus |
 | **Zombies** | 20 zumbis | 6 payoffs | 2-4 | Facil | Wilhelt, Varina, Sidisi |
-| **Vampires** | 20 vampiros | 6 payoffs | 2-4 | Facil | Edgar Markov, Strefan |
+| **Vampires** | 24-34 vampiros | 7-11 lord/drain payoffs | 2-4 | Facil | Edgar Markov, Strefan |
 || **Dragons** | 18-24 dragoes | 10-17 payoffs | 3-4 | Dificil | Miirym, Ur-Dragon |
 | **Knights** | 18 cavaleiros | 5 payoffs | 2-3 | Media | Syr Gwyn, Sidar Jabari |
 | **Merfolk** | 20 tritões | 5 payoffs | 2-3 | Facil | Kumena, Hakban |
@@ -86,6 +86,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 |:-----|:---------:|:------------|:------|
 | Elfball | 20-30 | Dorks de mana | Cada elfo e ramp |
 | Goblins | 8-11 | Rocks + rituals (Skirk Prospector) | Mono-red sem dorks verdes. Ramp e integrado a criaturas/rituals |
+| Vampires | 9-12 | Rocks + color fixing | Profile Edgar Markov; EDHREC live avg CMC 2.94 e Mardu exige fixing consistente |
 || Dragons | 12-16 | Rocks + cost reducers + Orbs | CMC medio alto (~4.09). Ramp inclui Dragon's Hoard (63% EDHREC) |
 | Spellslinger | 8-12 | Rocks + mana reducao | Paga pouco por spell |
 | Voltron | 8-10 | Equipment cost reducers | Precisa de mana para equipar |
@@ -104,6 +105,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 | Enchantress | 10-14 | Enchantress effects | Cada encantamento compra |
 | Aristocrats | 8-12 | Sacrifice draw | Grim Haruspex, Midnight Reaper |
 | Tribal | 6-10 | Tribal draw | Beast Whisperer (elfos) |
+| Vampires | 10-13 | Tribal/value draw | Profile Edgar Markov conta draw_value; EDHREC top inclui Skullclamp e Welcoming Vampire |
 | Goblins | 8-11 | Sacrifice draw (Skullclamp) + rummage | Draw baixo no EDHREC avg (~3), mas profile conta Skullclamp |
 | Voltron | 6-8 | Equipment draw | Kor Spiritdancer, Puresteel |
 | cEDH | 4-6 | Efficient draw | Rhystic Study, Mystic Remora |
@@ -116,6 +118,7 @@ precisa de menos ramp que um deck de Dragons (CMC medio alto).
 | Spellslinger | 8-12 | Instants | Spellslingers querem magicas |
 | Aristocrats | 4-6 | Sacrifice outlets | Sacrificar criatura = remover |
 | Aggro | 6-8 | Creature combat | Confia em criaturas |
+| Vampires | 8-11 | Mardu spot removal + sacrifice effects | Profile Edgar Markov: interaction 8-11; Flipside primer cita 8 spot removals + 5 sacrifice effects |
 | cEDH | 12-20 | Free interaction | Pact, Force, Fierce |
 | Voltron | 8-10 | Protection | Mais protecao que remocao |
 | Tribal | 6-8 | Tribal removal | Goblins = Goblin Grenade |
@@ -200,7 +203,7 @@ O banco `knowledge.db` tem duas novas tabelas:
 | **Artifacts** | VALIDADO | EDHREC (Urza casual + cEDH) + Moxfield | ALTA | 2026-05-26 |
 | **Goblins** | VALIDADO | Krenko profile (4 fontes: EDHREC, Moxfield, Archidekt) + EDHREC avg deck corpus (sprint3_lot_a) | ALTA | 2026-05-26 |
 | **Dragons** | VALIDADO | EDHREC (Miirym 27k+ decks) + Miirym profile (4 fontes: Draftsim, Moxfield, Archidekt) + Draftsim primer | ALTA | 2026-05-26 |
-| **Vampires** | NAO VALIDADO | — | — | — |
+| **Vampires** | VALIDADO | EDHREC Edgar Markov live (46.541 decks) + profile Edgar Markov (5 fontes: EDHREC, Moxfield, Archidekt) + Moxfield primer + Flipside primer | ALTA | 2026-05-27 |
 | **Spellslinger** | NAO VALIDADO | — | — | — |
 | **Graveyard** | NAO VALIDADO | — | — | — |
 | **Tokens** | NAO VALIDADO | — | — | — |
@@ -236,6 +239,31 @@ Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC + perfil
 | Protecao | — | 3-5 (profile) | Ausente | Medio |
 | Board Wipes | — | 1-2 (profile) | Ausente | Baixo |
 | Core Commanders | Krenko, Muxus | Igual | Validado | — |
+
+### Discrepancias Encontradas: Vampires
+
+Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC Edgar Markov live 46.541 decks + profile Edgar Markov 5 fontes + Moxfield primer + Flipside primer):
+
+| Metrica | THEMES.md (antigo) | Dado REAL | Diferenca | Impacto |
+|:--------|:------------------:|:---------:|:---------:|:--------|
+| Enablers (vampiros) | 20 Min | 24-34 (profile) / 35 (Moxfield primer) / 38 (Flipside primer) | SUBESTIMADO 20-90% | Alto |
+| Payoffs | 6 Min | 7-11 lord/drain payoffs (profile) | SUBESTIMADO 17-83% | Alto |
+| Ramp | — | 9-12 (profile); Flipside nomeia 6 ramp/fixing sources em build especifica | Ausente | Medio |
+| Draw | Tribal generico 6-10 | 10-13 draw_value (profile) | SUBESTIMADO 30-67% | Alto |
+| Interaction | Tribal generico 6-8 | 8-11 (profile); Flipside cita 8 spot removals + 5 sacrifice effects | SUBESTIMADO/INCOMPLETO | Medio |
+| Lands | — | 34-36 (profile) / 36 (EDHREC live avg) / 33 (Moxfield primer) | Ausente | Medio |
+| Board Wipes | — | 2-3 (profile); Flipside usa 4 wraths em build especifica | Ausente | Baixo |
+| Protecao | — | 3-5 (profile) | Ausente | Medio |
+| CMC Medio | — | 2.94 (EDHREC live mana_curve) / 2.77 nonland (Moxfield primer) | Ausente | Medio |
+| Core Commanders | Edgar Markov, Strefan | Edgar Markov validado; Strefan NAO VERIFICADO nesta rodada | Parcial | Baixo |
+
+#### Fontes reais usadas — Vampires
+
+- EDHREC live: `https://edhrec.com/commanders/edgar-markov` — 46.541 decks; avg deck com 36 lands, 33 creatures, 9 artifacts, 8 instants, 6 sorceries, 6 enchantments, 1 planeswalker; CMC medio 2.94 pela mana_curve; top cards incluem Captivating Vampire 82,6%, Cordial Vampire 82,1%, Blood Artist 82,5%, Stromkirk Captain 75,2%.
+- Profile local curado: `server/test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/profiles/edgar_markov.json` — source_count=5, confidence=high, fontes EDHREC/Moxfield/Archidekt; role_targets: lands 34-36, ramp 9-12, draw_value 10-13, interaction 8-11, board_wipes 2-3, protection 3-5, vampire_density 24-34, sacrifice_enablers 5-8, lord_drain_payoffs 7-11.
+- EDHREC average corpus local: `server/test/artifacts/commander_reference_deck_corpus_edgar_2026-05-13/edgar_edhrec_average_corpus.json` — 4 decks average (default, optimized, vampires, budget), todos com qty 100.
+- Moxfield primer-tagged deck: `https://moxfield.com/decks/c-0ehLFtnUiVKOV3sa5a-A` — 99 main + 1 commander, 35 Vampires, 33 lands, 47 creatures, 8 artifacts, 8 enchantments, 5 instants, 4 sorceries, avg CMC nonland 2.77, hub `Primer`, atualizado 2026-05-18.
+- Flipside primer: `https://flipsidegaming.com/blogs/magic-blog/commander-deck-tech-edgar-markov` — autor relata cortar 60 Vampires para 38, descreve deck aggro, nomeia 6 ramp/fixing sources, 8 spot removal spells, 5 sacrifice effects e 4 wraths.
 
 ### Discrepancias Encontradas: Dragons
 
@@ -281,11 +309,11 @@ Comparacao entre THEMES.md (conhecimento interno) e dados reais (EDHREC 27k+ dec
 ### Proximos Temas a Validar (por prioridade)
 
 1. **Spellslinger** (Prosper profile disponivel em batch_a, Niv-Mizzet em batch_c)
-2. **Vampires** (Edgar Markov profile disponivel em batch_b)
-3. **Graveyard** (Muldrotha profile disponivel em batch_a, Meren em batch_c)
-4. **Blink/Flicker** (Brago profile disponivel em batch_c)
-5. **Tokens** (Chatterfang ou Ghired — verificar se ha perfil disponivel)
-6. **+1/+1 Counters** (Atraxa profile disponivel em batch_a)
-7. **Voltron** (Light-Paws profile disponivel em batch_c, Feather em batch_c)
-8. **Mill** (Bruvac — verificar se ha dados de EDHREC)
-9. **Reanimator** (Meren profile disponivel em batch_c)
+2. **Graveyard** (Muldrotha profile disponivel em batch_a, Meren em batch_c)
+3. **Blink/Flicker** (Brago profile disponivel em batch_c)
+4. **Tokens** (Chatterfang ou Ghired — verificar se ha perfil disponivel)
+5. **+1/+1 Counters** (Atraxa profile disponivel em batch_a)
+6. **Voltron** (Light-Paws profile disponivel em batch_c, Feather em batch_c)
+7. **Mill** (Bruvac — verificar se ha dados de EDHREC)
+8. **Reanimator** (Meren profile disponivel em batch_c)
+9. **Zombies** (Wilhelt/Varina — buscar profile/corpus antes de validar)
