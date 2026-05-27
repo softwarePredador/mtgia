@@ -75,8 +75,8 @@ documentando o why_game_changer e notes no SQLite.
 | Status | Count |
 |:-------|:-----:|
 | Total GCs | 53 |
-| With full analysis | 1/53 |
-| Remaining | 52 |
+| With full analysis | 2/53 |
+| Remaining | 51 |
 | Detected by ManaLoom | 24/53 |
 
 ### Ultima analise SQLite: Ad Nauseam
@@ -86,4 +86,12 @@ documentando o why_game_changer e notes no SQLite.
 - **Fonte cEDH:** `https://cedh-decklist-database.com/` continha entrada **Rograkh Silas Turbo Naus** com texto "Turbo Ad Nauseam Rograkh Silas Storm Combo". Links Moxfield derivados da DDB confirmaram Ad Nauseam em listas publicas `[Primer] cEDH Rog Grixis Turbo` (`https://moxfield.com/decks/yRsS18tYsE-jVgqmK7_Z0w`, autoBracket 4, 135,239 views) e `[cEDH] Rograkh Silas Storm Combo` (`https://moxfield.com/decks/79hYZQUBdUaA9xD8zLX4vQ`, autoBracket 4, 177,057 views).
 - **Bracket oficial:** Scryfall search `is:gamechanger !"Ad Nauseam"` mostrou a carta na Commander Game Changer list; a URL solicitada `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
 - **ManaLoom bracket:** `tagCardForBracket()` em `server/lib/edh_bracket_policy.dart` com o oracle text do Scryfall retornou `NO_CATEGORIES`. Resultado registrado no SQLite: `manaloom_detected=0`, `manaloom_bracket_category=card_advantage_gap`.
-- **Discrepancy:** a politica atual cobre `fastMana`, `tutor`, `freeInteraction`, `extraTurns` e `infiniteCombo`, mas nao tem categoria para card-advantage explosivo / draw burst Game Changer como Ad Nauseam.
+|- **Discrepancy:** a politica atual cobre `fastMana`, `tutor`, `freeInteraction`, `extraTurns` e `infiniteCombo`, mas nao tem categoria para card-advantage explosivo / draw burst Game Changer como Ad Nauseam.
+
+### Ultima analise SQLite: Cyclonic Rift
+- **Impact:** 10/10 (`board_wipe`)
+- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Cyclonic%20Rift` retornou `game_changer=true`, `security_stamp=oval`, `type_line=Instant`, `mana_cost={1}{U}`, `cmc=2.0`, Commander `legal`, `edhrec_rank=51`, `price_usd=41.26`, e oracle text: "Return target nonland permanent you don't control to its owner's hand. Overload {6}{U} (You may cast this spell for its overload cost. If you do, change 'target' in its text to 'each.')"
+- **Fonte EDHREC:** `https://edhrec.com/cards/cyclonic-rift` reportou salt score **2.36/10**, inclusao de **~30%** (13.991 em 47.396 decks), e rank geral #51. E a carta de removal mais popular do formato, presente em praticamente todo deck azul otimizado.
+- **Fonte Bracket oficial:** Scryfall search `is:gamechanger !"Cyclonic Rift"` mostrou a carta na Commander Game Changer list (game_changer=True). A URL `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
+- **ManaLoom bracket:** `tagCardForBracket()` com oracle text real retorna `NO_CATEGORIES` — Rift nao e fastMana, tutor, freeInteraction (paga overload normalmente), extraTurns nem infiniteCombo. Resultado: `manaloom_detected=0`, `manaloom_bracket_category=board_wipe_gap`.
+- **Discrepancy:** Cyclonic Rift e a carta mais impactante da lista (P10) e nao e detectada por nenhuma categoria atual. Precisa da categoria `gameChanger` com lista curada para ser corretamente classificada. E o unico mass bounce unilateral do jogo, e sua assimetria (so devolve o dos oponentes) e o que a torna game-changer — nenhuma wipe tradicional faz isso.
