@@ -196,23 +196,47 @@ GC a preencher — qualquer erro de arquivo ou permissão interrompe o fluxo.
 - Melhoria: +22pp atribuída à inclusão de tags de alta confiança (ramp, draw, removal)
 - Piora aparente: "ninja" e multi-tags puxam a média para baixo
 
-## Mana Base Validation (2026-05-26 22:04)
+## Mana Base Validation (2026-05-27T13:11Z)
 
-**Fonte:** EDHREC Profiles (commander_reference_profile) + DB `knowledge.db`
+**Fonte:** SQLite `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` + perfis/corpus EDHREC locais quando disponíveis.
 
-| Deck | Commander | Lands | CMC | Ramp | Bracket | Data Quality | Alertas |
-|:-----|:----------|:-----:|:---:|:----:|:-------:|:-------------|:--------|
-| Kinnan, Bonder Prodigy | Kinnan | 29 | 1.8 | 24 | 4 | BAIXA (13/100) | ❌ INSERT incompleto; INFO: cEDH ok |
-| Dimir Ninja Topdeck Tempo | Yuriko | 33 | 2.8 | 6 | 3 | PARCIAL (99/100) | ✅ Nenhum |
-| EDHREC Average Default | Korvold | 25 | 3.2 | 14 | 3 | BAIXA (11/91) | ❌ CRÍTICO: lands=25 < 30 + dados corrompidos |
-| EDHREC Average Default | Teysa | 35 | 2.9 | 8 | 3 | PARCIAL (80/99) | ⚠️ Ramp=8 < EDHREC min 9 |
+**Regras aplicadas nesta rodada:** `lands < 32` => ALERTA; `CMC > 3.5` => ALERTA; `lands < 30 AND CMC > 3.0` => CRÍTICO. Perfis EDHREC locais foram usados como contexto adicional para evitar falsos positivos/negativos.
+
+| Deck | Commander | Fonte | Lands | CMC | Ramp | Bracket | Data Quality | Alertas |
+|:-----|:----------|:------|:-----:|:---:|:----:|:-------:|:-------------|:--------|
+| Lorehold Spellslinger | Lorehold, the Historian | User provided decklist (Scryfall classified) | 34 | 3.98 | 17 | 3 | COMPLETA (qty=100; declared=100) | 🟡 ALERTA: CMC=3.98 > 3.5<br>ℹ️ Lorehold corpus avg lands=32.00 (3 decks EDHREC) |
+| Aesi EDHREC Average Default | Aesi, Tyrant of Gyre Strait | EDHREC | 40 | 2.61 | 28 | 3 | COMPLETA (qty=100; declared=79) | ✅ lands dentro do profile (39-43) |
+| EDHREC Average Default | Teysa Karlov | EDHREC | 35 | 2.9 | 15 | 3 | PARCIAL/EDHREC (qty=80; declared=80) | ✅ lands dentro do profile (35-37)<br>🟡 ramp=15 > profile ramp max=11 |
+| EDHREC Average Default | Korvold, Fae-Cursed King | EDHREC | 25 | 3.2 | 3 | 3 | BAIXA (qty=11; declared=11) | 🔴 CRÍTICO: lands=25 < 30 e CMC=3.20 > 3.0<br>🟡 EDHREC profile lands min=34<br>🟡 ramp=3 < profile ramp_treasure min=10 |
+| EDHREC Average Deck - Dimir Ninja Topdeck Tempo | Yuriko, the Tiger's Shadow | EDHREC | 33 | 2.8 | 8 | 3 | COMPLETA (qty=99; declared=84) | ✅ lands dentro do profile (30-34) |
+| Kinnan, Bonder Prodigy | Kinnan, Bonder Prodigy | EDHTop16 | 29 | 1.8 | 4 | 4 | BAIXA (qty=13; declared=13) | 🟡 ALERTA: lands=29 < 32<br>✅ lands dentro do profile (29-34)<br>🟡 ramp=4 < profile nonland_mana_sources min=18 |
+
+### Resumo da rodada
+- Decks avaliados: **6**
+- P0 críticos: **1**
+- Alertas P1: **3**
+- Sem alerta de mana base: **2**
 
 ### Alertas Críticos (P0)
-1. **Korvold:** Apenas 11/91 cartas no DB — dados de mana base inválidos. Inserção corrompida.
-2. **Kinnan:** Apenas 13/100 cartas no DB — INSERT incompleto.
+- **EDHREC Average Default / Korvold, Fae-Cursed King:** 🔴 CRÍTICO: lands=25 < 30 e CMC=3.20 > 3.0
 
-### Ações Recomendadas
-- **P0:** Re-inserir Korvold e Kinnan com INSERT completo
-- **P2:** Verificar ramp=8 da Teysa (pode ser real, diferença pequena)
-- **P2:** Investigar tagging de ninjas no deck Yuriko (0 tagged como 'ninja')
-<!-- commit nonce: 1 -->
+### Alertas Moderados / Observações
+- **Lorehold Spellslinger / Lorehold, the Historian:** 🟡 ALERTA: CMC=3.98 > 3.5; ℹ️ Lorehold corpus avg lands=32.00 (3 decks EDHREC)
+- **EDHREC Average Default / Teysa Karlov:** ✅ lands dentro do profile (35-37); 🟡 ramp=15 > profile ramp max=11
+- **Kinnan, Bonder Prodigy / Kinnan, Bonder Prodigy:** 🟡 ALERTA: lands=29 < 32; ✅ lands dentro do profile (29-34); 🟡 ramp=4 < profile nonland_mana_sources min=18
+
+### Ações recomendadas
+- **P0/P1 revisar classificação:** Korvold, Fae-Cursed King disparou crítico genérico, mas é artefato EDHREC parcial (`total_cards=11`); validar contra corpus/profile antes de reinserir.
+- **P1:** Lorehold tem CMC 3.98 > 3.5; validar se a curva alta é intencional do plano topdeck/miracle ou se precisa reduzir bombas caras.
+- **P2:** revisar métricas de Teysa Karlov contra profile/corpus específico antes de alterar decklist.
+- **P2:** Kinnan tem 29 lands e bracket 4; profile EDHREC aceita 29-34, então o alerta genérico de lands baixas não deve virar bug sem evidência adicional.
+
+### Evidência de profiles/corpus usados
+- `commander_reference_deck_corpus_lorehold_2026-05-12/dry_run_after_backfill/lorehold_the_historian_dry_run_summary.json` — Lorehold corpus: lands avg=32.0, ramp avg=14.67, accepted_decks=3
+- `commander_reference_profile_anchor30_batch_b_2026-05-12/profiles/aesi_tyrant_of_gyre_strait.json` — commander Aesi, Tyrant of Gyre Strait; keys=lands, ramp_extra_lands, supplemental_draw, interaction_counter, board_wipes_bounce, protection, landfall_payoffs, land_recursion_bounce, finishers
+- `commander_reference_profile_anchor30_batch_b_2026-05-12/profiles/teysa_karlov.json` — commander Teysa Karlov; keys=lands, ramp, draw_value, interaction, board_wipes, protection, sacrifice_outlets, fodder_tokens, death_payoffs, recursion
+- `commander_reference_profile_anchor30_batch_a_2026-05-12/profiles/korvold_fae_cursed_king.json` — commander Korvold, Fae-Cursed King; keys=lands, ramp_treasure, sacrifice_fodder, sacrifice_outlets, aristocrat_payoffs, draw_value, interaction, combo_finishers
+- `commander_reference_profile_anchor30_batch_a_2026-05-12/profiles/yuriko_the_tigers_shadow.json` — commander Yuriko, the Tiger's Shadow; keys=lands, evasive_enablers, ninjas, topdeck_manipulation, high_mv_reveals, interaction, combo_finishers
+- `commander_reference_profile_anchor30_batch_a_2026-05-12/profiles/kinnan_bonder_prodigy.json` — commander Kinnan, Bonder Prodigy; keys=lands, nonland_mana_sources, mana_dorks, artifact_mana, infinite_mana_pieces, payoffs_outlets, interaction_protection
+
+<!-- mana-base-validator: end -->
