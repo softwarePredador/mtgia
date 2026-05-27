@@ -1,0 +1,2674 @@
+{
+  "commander": "Edgar Markov",
+  "archetype": "vampire_typal_aggro_tokens",
+  "color_identity": "WBR",
+  "bracket": 3,
+  "source_name": "EDHREC",
+  "source_url": "https://edhrec.com/average-decks/edgar-markov",
+  "source_type": "edhrec_average",
+  "deck_name": "Edgar Markov EDHREC Default Average",
+  "player_name": "",
+  "placement": "",
+  "tournament_date": "",
+  "total_lands": 36,
+  "avg_cmc": 2.86,
+  "ramp_count": 7,
+  "draw_count": 9,
+  "removal_count": 6,
+  "tutor_count": 3,
+  "board_wipe_count": 1,
+  "protection_count": 4,
+  "wincon_count": 0,
+  "analysis_md_path": "decks/edgar-markov/2026-05-27-edhrec-default.md",
+  "cards": [
+    {
+      "name": "Edgar Markov",
+      "quantity": 1,
+      "functional_tag": "commander",
+      "is_commander": 1,
+      "cmc": 6,
+      "tags": [
+        {
+          "tag": "commander",
+          "confidence": 1.0,
+          "evidence": "Commander slot"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "commander",
+        "expected_tag": "commander",
+        "tag_match": 1,
+        "psychology_why": "Unico comandante com eminencia que gera tokens vampires. Nao ha substituto para vampire tribal Mardu.",
+        "psychology_fear": "Sem Edgar, não ha geracao de tokens automatica, e o deck tribalo perde o principal motor.",
+        "psychology_opportunity": "Com Edgar na zona de comando, cada Vampiro conjurado gera um token 1/1 com voar de graca.",
+        "psychology_tradeoff": "Edgar nao compra cartas nem remove. O valor e puramente em board presence.",
+        "staple_or_personal": 1,
+        "synergy": "Eminencia ativa com cada Vampiro. Lords (Legion Lieutenant) buffam tokens.",
+        "alternatives": "Nenhuma — Edgar e unico para o arquétipo.",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Anguished Unmaking",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "targeted_interaction_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Anointed Procession",
+      "quantity": 1,
+      "functional_tag": "enchantment",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "token_creation_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "enchantment",
+        "expected_tag": "enchantment",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Arcane Signet",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Blade of the Bloodchief",
+      "quantity": 1,
+      "functional_tag": "artifact",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "artifact",
+        "expected_tag": "artifact",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Blood Artist",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "aristocrat_payoff",
+          "confidence": 0.84,
+          "evidence": "death_trigger_payoff_text"
+        },
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Blood Crypt",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Bloodletter of Aclazotz",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Bloodline Keeper",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Bloodstained Mire",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Bloodthirsty Conqueror",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Bojuka Bog",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Boros Charm",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "targeted_interaction_text"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "protection_keyword_or_effect"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Captivating Vampire",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Cavern of Souls",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Caves of Koilos",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Champion of Dusk",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Charismatic Conqueror",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "token_creation_text"
+        },
+        {
+          "tag": "artifact_synergy",
+          "confidence": 0.74,
+          "evidence": "artifact_payoff_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Clavileño, First of the Blessed",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "aristocrat_payoff",
+          "confidence": 0.84,
+          "evidence": "death_trigger_payoff_text"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "token_creation_text"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Command Tower",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Cordial Vampire",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Cruel Celebrant",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "aristocrat_payoff",
+          "confidence": 0.84,
+          "evidence": "death_trigger_payoff_text"
+        },
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "wincon",
+          "confidence": 0.78,
+          "evidence": "explicit_win_or_finisher_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Damn",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "targeted_interaction_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Dark Ritual",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Demonic Tutor",
+      "quantity": 1,
+      "functional_tag": "tutor",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "tutor",
+          "confidence": 0.86,
+          "evidence": "non_land_library_search"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "plan_enabler_or_setup_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "tutor",
+        "expected_tag": "tutor",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Dragonskull Summit",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Drana, Liberator of Malakir",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Edgar, Charmed Groom",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Elenda, the Dusk Rose",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "token_creation_text"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Exotic Orchard",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Exquisite Blood",
+      "quantity": 1,
+      "functional_tag": "enchantment",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "enchantment",
+        "expected_tag": "enchantment",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Forerunner of the Legion",
+      "quantity": 1,
+      "functional_tag": "tutor",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "tutor",
+          "confidence": 0.86,
+          "evidence": "non_land_library_search"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "plan_enabler_or_setup_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "tutor",
+        "expected_tag": "tutor",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Godless Shrine",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Herald's Horn",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "artifact_synergy",
+          "confidence": 0.74,
+          "evidence": "artifact_payoff_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Indulgent Aristocrat",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "repeatable_sacrifice_outlet_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Isolated Chapel",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Legion Lieutenant",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Luxury Suite",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Malakir Bloodwitch",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "protection_keyword_or_effect"
+        },
+        {
+          "tag": "wincon",
+          "confidence": 0.78,
+          "evidence": "explicit_win_or_finisher_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Markov Baron",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard_payoff_or_setup_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Marsh Flats",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Master of Dark Rites",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "repeatable_sacrifice_outlet_text"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "plan_enabler_or_setup_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Mavren Fein, Dusk Apostle",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "token_creation_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Mountain",
+      "quantity": 3,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "New Blood",
+      "quantity": 1,
+      "functional_tag": "utility",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "utility",
+        "expected_tag": "utility",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Nomad Outpost",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Olivia's Wrath",
+      "quantity": 1,
+      "functional_tag": "utility",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "utility",
+        "expected_tag": "utility",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Orzhov Signet",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Pact of the Serpent",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Path of Ancestry",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Path to Exile",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "targeted_interaction_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Patron of the Vein",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 6.0,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "targeted_interaction_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Phyrexian Arena",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Plains",
+      "quantity": 5,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Rakdos Signet",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Rakish Heir",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Ruinous Ultimatum",
+      "quantity": 1,
+      "functional_tag": "wipe",
+      "is_commander": 0,
+      "cmc": 7.0,
+      "tags": [
+        {
+          "tag": "board_wipe",
+          "confidence": 0.9,
+          "evidence": "mass_removal_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "wipe",
+        "expected_tag": "wipe",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Sacred Foundry",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Sanctum Seeker",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "wincon",
+          "confidence": 0.78,
+          "evidence": "explicit_win_or_finisher_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Sanguine Bond",
+      "quantity": 1,
+      "functional_tag": "enchantment",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "enchantment",
+        "expected_tag": "enchantment",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Savai Triome",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Secluded Courtyard",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Shared Animosity",
+      "quantity": 1,
+      "functional_tag": "enchantment",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "enchantment",
+        "expected_tag": "enchantment",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Skullclamp",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Sol Ring",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Sorin, Imperious Bloodlord",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Stensia Masquerade",
+      "quantity": 1,
+      "functional_tag": "enchantment",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard_payoff_or_setup_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "enchantment",
+        "expected_tag": "enchantment",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Stromkirk Captain",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Swamp",
+      "quantity": 7,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Swords to Plowshares",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "targeted_interaction_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "removal",
+        "expected_tag": "removal",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Talisman of Hierarchy",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "mana_or_land_ramp_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "ramp",
+        "expected_tag": "ramp",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Teferi's Protection",
+      "quantity": 1,
+      "functional_tag": "utility",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "protection_keyword_or_effect"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "utility",
+        "expected_tag": "utility",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Twilight Prophet",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 4.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "wincon",
+          "confidence": 0.78,
+          "evidence": "explicit_win_or_finisher_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Unclaimed Territory",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Vampire Nighthawk",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Vampire Socialite",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Vampire of the Dire Moon",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Vampiric Tutor",
+      "quantity": 1,
+      "functional_tag": "tutor",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "tutor",
+          "confidence": 0.86,
+          "evidence": "non_land_library_search"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "plan_enabler_or_setup_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "tutor",
+        "expected_tag": "tutor",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Vanquisher's Banner",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "artifact_synergy",
+          "confidence": 0.74,
+          "evidence": "artifact_payoff_text"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff_trigger_or_scaling_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Vault of Champions",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Vault of the Archangel",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Vengeful Bloodwitch",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 2.0,
+      "tags": [
+        {
+          "tag": "aristocrat_payoff",
+          "confidence": 0.84,
+          "evidence": "death_trigger_payoff_text"
+        },
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Village Rites",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Viscera Seer",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 1.0,
+      "tags": [
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "repeatable_sacrifice_outlet_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Vito, Thorn of the Dusk Rose",
+      "quantity": 1,
+      "functional_tag": "creature",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "drain",
+          "confidence": 0.82,
+          "evidence": "life_loss_payoff_text"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "life_gain_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "creature",
+        "expected_tag": "creature",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Voldaren Estate",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "Land card"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "land",
+        "expected_tag": "land",
+        "tag_match": 1,
+        "psychology_why": "Base de mana para suportar 3 cores (WBR) com 36 terrenos.",
+        "psychology_fear": "Sem mana consistente, as cartas caras (5+ mana) ficam presas na mao.",
+        "psychology_opportunity": "Base de mana com fetch + shock + triome +5 terrenos rainbow garante cores.",
+        "psychology_tradeoff": "10+ terrenos entram virados — aceita lentidao por orcamento.",
+        "staple_or_personal": 1,
+        "synergy": "Cavern of Souls nomeia Vampiro.",
+        "alternatives": "Fetch lands + shock lands sao o padrao Commander.",
+        "game_timing": "early"
+      }
+    },
+    {
+      "name": "Welcoming Vampire",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "card_draw_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "draw",
+        "expected_tag": "draw",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    },
+    {
+      "name": "Yahenni, Undying Partisan",
+      "quantity": 1,
+      "functional_tag": "protection",
+      "is_commander": 0,
+      "cmc": 3.0,
+      "tags": [
+        {
+          "tag": "aristocrat_payoff",
+          "confidence": 0.84,
+          "evidence": "death_trigger_payoff_text"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "protection_keyword_or_effect"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "repeatable_sacrifice_outlet_text"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "plan_enabler_or_setup_text"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "repeatable_value_engine_text"
+        }
+      ],
+      "analysis": {
+        "mana_loom_tag": "protection",
+        "expected_tag": "protection",
+        "tag_match": 1,
+        "psychology_why": "",
+        "psychology_fear": "",
+        "psychology_opportunity": "",
+        "psychology_tradeoff": "",
+        "staple_or_personal": 0,
+        "synergy": "",
+        "alternatives": "",
+        "game_timing": "any"
+      }
+    }
+  ],
+  "insights": [
+    {
+      "text": "Edgar EDHREC default vs profile: gap of 1 in ramp (8 vs 9-12), 1 in draw (9 vs 10-13), 2 in interaction (6 vs 8-11). Confirms pattern: average players underinvest in engine cards.",
+      "category": "gap_analysis",
+      "impact": "high"
+    },
+    {
+      "text": "Hybrid aggro+aristocrats is the EDHREC norm, despite profiles recommending focus. 33 vampires for aggro + aristocrat payoffs dilute both plans.",
+      "category": "deckbuilding_pattern",
+      "impact": "medium"
+    },
+    {
+      "text": "Bloodthirsty Conqueror (2024) is already in EDHREC avg — functions as second Exquisite Blood without needing Sanguine Bond.",
+      "category": "meta_update",
+      "impact": "medium"
+    },
+    {
+      "text": "8 card classification discrepancies identified (12.5% error rate). Olivia's Wrath not detected as board_wipe, Sorin as removal not engine.",
+      "category": "classifier_gap",
+      "impact": "high"
+    },
+    {
+      "text": "Game Changers present: Demonic Tutor, Vampiric Tutor, Teferi's Protection, Exquisite Blood, Sanguine Bond. Deck is firmly bracket 3.",
+      "category": "bracket_analysis",
+      "impact": "medium"
+    }
+  ],
+  "discrepancies": [
+    {
+      "card": "Sorin, Imperious Bloodlord",
+      "mana_loom_tag": "removal",
+      "expected_tag": "engine",
+      "description": "Sorin e principalmente um engine (coloca Vampiro em campo, da lifelink, ultimate), nao removio. O sistema ve 'deals damage' e classifica como removio.",
+      "impact": "high"
+    },
+    {
+      "card": "Olivia's Wrath",
+      "mana_loom_tag": "utility",
+      "expected_tag": "board_wipe",
+      "description": "Destroi todas as criaturas nao-Vampire. E um board wipe condicional. O sistema nao tem heuristica para wipes condicionais.",
+      "impact": "high"
+    },
+    {
+      "card": "Viscera Seer",
+      "mana_loom_tag": "draw",
+      "expected_tag": "sacrifice_outlet",
+      "description": "Viscera Seer e um sacrifice outlet (sacular criatura, scry 1). Scry nao e draw. O sistema classifica como draw por 'look at' no oracle text.",
+      "impact": "high"
+    },
+    {
+      "card": "Sanguine Bond",
+      "mana_loom_tag": "enchantment",
+      "expected_tag": "wincon",
+      "description": "Parte do combo Exquisite Blood + Sanguine Bond. O sistema ve como encantamento generico, nao como wincon.",
+      "impact": "medium"
+    },
+    {
+      "card": "Blade of the Bloodchief",
+      "mana_loom_tag": "artifact",
+      "expected_tag": "payoff_engine",
+      "description": "Da +1/+1 counters quando uma criatura morre. E um payoff/engine, nao so um artifact generico.",
+      "impact": "medium"
+    },
+    {
+      "card": "Sorin, Imperious Bloodlord",
+      "mana_loom_tag": "removal",
+      "expected_tag": "engine_resurrection",
+      "description": "Segunda entrada para destacar duplicata - Sorin ressuscita Vampire do cemiterio. Custo de 2 de vida nao e removio.",
+      "impact": "medium"
+    },
+    {
+      "card": "Exquisite Blood",
+      "mana_loom_tag": "enchantment",
+      "expected_tag": "combo_piece",
+      "description": "Metade do combo EB+SB. O sistema nao detecta wincon/combo generico.",
+      "impact": "medium"
+    },
+    {
+      "card": "Bloodthirsty Conqueror",
+      "mana_loom_tag": "creature",
+      "expected_tag": "combo_piece_drain",
+      "description": "Funciona como Exquisite Blood alternativo. O sistema ve como criatura generica.",
+      "impact": "low"
+    }
+  ]
+}

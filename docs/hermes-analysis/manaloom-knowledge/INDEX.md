@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 8 | 2026-05-27 |
-| Decks analisados | 8 | 2026-05-27 |
-| Cartas revisadas | ~1.030 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87) | 2026-05-27 |
-| Insights documentados | 40 | 2026-05-27 |
-| Discrepancias com ManaLoom | 44 | 2026-05-27 |
+| Comandantes analisados | 9 | 2026-05-27 |
+| Decks analisados | 9 | 2026-05-27 |
+| Cartas revisadas | ~1.130 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100) | 2026-05-27 |
+| Insights documentados | 45 | 2026-05-27 |
+| Discrepancias com ManaLoom | 52 | 2026-05-27 |
 
 ## Comandantes Analisados
 
@@ -27,6 +27,7 @@
 | **Lorehold, the Historian** | **1** | **2026-05-26** | **4** | **Pendente** |
 | **Winota, Joiner of Forces** | **1** | **2026-05-27** | **4** | **Parcial: 85 linhas / 100 qty** |
 | **Muldrotha, the Gravetide** | **1** | **2026-05-27** | **3** | **Nova: 87/87 EDHREC avg** |
+| **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -100,6 +101,18 @@
 16. **Comandantes engine requerem metricas diferentes** — CMC medio (2.61) e
     aceitavel, mas a metrica chave para Aesi e # de extra-land-drop effects e
     # de landfall payoffs, nao ramp/draw tradicionais.
+19. **Edgar Markov quebra a regra de ramp baixo.** — 7 ramp contra 9-12 do perfil,
+    mas o deck funciona porque a eminencia gera tokens de graça. A "ramp" de
+    Edgar e indireta: cada vampiro conjurado produz 2 corpos (criatura + token),
+    efetivamente dobrando o investimento de mana. A metrica central para Edgar
+    e densidade vampiresca (24-34 recomendado), nao ramp.
+20. **O hibrido aggro+aristocrats e a norma no EDHREC, nao a excecao.** — O perfil
+    recomenda focar em aggro OU aristocrats, mas o jogador medio tenta os dois.
+    Isso dilui ambos os planos, mas o jogador prefere "ter opcoes" a "ser eficiente."
+21. **8/63 cartas (12.7%) classificadas incorretamente pelo ManaLoom.** — Discrepancias
+    incluem: Olivia's Wrath (board wipe detectado como utility), Sorin Imperious Bloodlord
+    (engine detectado como removal), Viscera Seer (sac outlet detectado como draw),
+    Sanguine Bond (combo piece detectado como enchantment generico).
 
 ### Por Arquetipo
 - **Combo (cEDH):** 24+ ramp, 15+ interaction, 0-2 board wipes,
@@ -129,6 +142,14 @@
   (profile 31-35), 10 ramp, 3 draw, 8 removal, 10 protection multi-tag,
   22 nao-Human creatures, 25 Human creatures, CMC medio 2.35. Metrica central:
   densidade non-Human enabler vs Human hit, nao draw bruto.
+- **Vampire Tribal/Tokens/Aristocrats (Edgar Markov, bracket 3):** 36 lands
+  (profile 34-36), 7 ramp (profile 9-12 - abaixo), 9 draw (profile 10-13 - abaixo),
+  6 removal (profile 8-11 - abaixo), 2 board wipes (profile 2-3), 4 protection (profile 3-5),
+  3 tutors, 33 vampire density (profile 24-34), 3 sac outlets (profile 5-8 - abaixo),
+  ~13 lord/drain payoffs (profile 7-11 - acima). CMC medio 2.86.
+  5 Game Changers (Demonic/Vampiric Tutor, Teferi's Protection, Exquisite Blood, Sanguine Bond).
+  Metroca central: densidade vampiresca, nao ramp ou draw. O deck funciona com 7 ramp
+  porque cada vampiro de 1 mana gera um token — o payoff da eminencia compensa ramp baixo.
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -180,6 +201,15 @@
   Walker) porque elas sao excelentes estruturalmente. Tolerancia a risco alta:
   troca draw tradicional por uma janela curta de ataque protegida por stax e
   protecao.
+- **Jogador de Edgar Markov vampire tribal:** Estrategista tribal eficiente.
+  Pensa em termos de densidade — "cada vampiro de 1 mana gera 2 corpos."
+  Prefere lords e anthems a card advantage individual. Aceita ramp baixo (7 vs
+  9-12 do perfil) porque a eminencia de Edgar gera "mana virtual" na forma de
+  tokens. Híbrido por natureza: tenta aggro e aristocrats simultaneamente,
+  preferindo "ter opções" a "ser eficiente." Inclui combo (Exquisite Blood +
+  Sanguine Bond) mesmo sem proteção adequada — acredita que ninguém vai remover
+  as peças. Tolerancia a risco média: aceita terrenos virados e ramp baixo,
+  mas evita cartas de bracket 4 (sem Mana Crypt, sem Mox Diamond).
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -437,11 +467,17 @@
 | 2026-05-27 | EDHREC live (12.840 decks) + corpus local | Winota, Joiner of Forces (Aggro-Stax Combat Triggers) | Analise concluida |
 | 2026-05-27 | **EDHREC Live (7.597 decks)** | **Lorehold, the Historian (Spellslinger/Big Spells)** | **Scout concluido — 265 cartas mapeadas, 8 cartas faltando urgentes identificadas** |
 | 2026-05-27 | **EDHREC Average Deck (23.212 decks)** | **Muldrotha, the Gravetide (Graveyard Permanent Recursion Value)** | **Analise concluida — 87 cartas EDHREC avg, 3 Game Changers** |
+| 2026-05-27 | **EDHREC Average Deck** | **Edgar Markov (Vampire Tribal Aggro/Tokens/Aristocrats)** | **Analise concluida — 100/100 EDHREC avg, 8 discrepancias de classificacao, 3 novos padroes** |
 
 ### Novos Insights desta Analise
 - **Muldrotha cria uma nova categoria de avaliacao:** "permanent-based efficiency." O deck prioriza permanentes mesmo se o efeito for mais fraco. Instants e sorceries sao "descartaveis" porque Muldrotha nao pode rejoga-los.
 - **Spore Frog e a carta mais subestimada do Commander:** Em 99% dos decks e lixo; em Muldrotha e o melhor fog do formato. O sistema de tags perde completamente esta funcao.
-- **Lotus Petal = ramp infinito em Muldrotha:** Toda carta que vai pro cemiterio e "recursavel" ganha valor adicional. O classificador nao captura este valor contextual.
+- **Lotus Petal = ramp infinito em Muldrotha:** Toda carta que vai pro cemiterio e recursavel ganha valor adicional. O classificador nao captura este valor contextual.
+
+### Novos Insights (Edgar Markov - Vampire Tribal)
+- **Edgar EDHREC default vs profile: gap de ramp, draw e interacao confirmado.** 7 ramp (perfil: 9-12), 9 draw (10-13), 6 interacao (8-11). Mesmo padrao visto em Atraxa, Korvold, Aesi.
+- **O hibrido aggro+aristocrats e a norma no EDHREC avg, nao a excecao.** Apesar do perfil recomendar focar em um, a media dos jogadores tenta os dois.
+- **8/63 cartas (12.7%) classificadas incorretamente pelo ManaLoom.** Olivia's Wrath (board wipe como utility), Sorin (engine como removal), Viscera Seer (sac outlet como draw) - erros que distorcem contagens de funcao.
 
 ### Novos Padroes (Muldrotha — Graveyard Value)
 14. **"Strategy over power"** — Preferir cartas que se encaixam no plano do comandante a cartas objetivamente mais fortes. Spore Frog > Essence Warden.
@@ -451,11 +487,28 @@
 18. **"The commander is the engine, not the finisher"** — Muldrotha nao ganha o jogo sozinha; ela permite que outras cartas ganhem.
 19. **"Synergy-weighted card evaluation"** — O valor de uma carta depende 50% do texto e 50% do contexto do deck.
 
+### Novos Padroes (Edgar Markov — Vampire Tribal Aggro)
+20. **"Eminencia compensa ramp baixo"** — Edgar funciona com 7 ramp porque cada vampiro de 1 mana gera 2 corpos. A metrica central e densidade vampiresca (24-34), nao ramp.
+21. **"Hibrido aggro+aristocrats e a norma, nao a excecao"** — O jogador medio prefere ter opcoes (aggro e aristocrats) a ser eficiente em um plano so.
+22. **"O combo sem protecao e um risco aceito"** — Exquisite Blood + Sanguine Bond estao no deck, mas com apenas 2 protecoes. O jogador aposta que ningue remove as pecas.
+
 ### Novas Discrepancias com ManaLoom (Muldrotha)
 | Carta | Tag ManaLoom | Tag Esperada | Impacto |
 |:------|:------------:|:------------:|:-------:|
-| Spore Frog | creature (no tag) | protection/fog | Alto — IA ve como criatura inutil |
-| Kaya's Ghostform | enchantment (no tag) | protection/recursion | Alto — IA pode sugerir cortar |
-| Pernicious Deed | enchantment (no tag) | board_wipe | Medio — IA ve como "enchantment generico" |
-| Accursed Marauder | creature (no tag) | removal/edict | Medio — IA ve como criatura mediana |
-| Mesmeric Orb | artifact (no tag) | self-mill/engine | Medio — IA ve como artifact generico |
+| Spore Frog | creature (no tag) | protection/fog | Alto - IA ve como criatura inutil |
+| Kaya's Ghostform | enchantment (no tag) | protection/recursion | Alto - IA pode sugerir cortar |
+| Pernicious Deed | enchantment (no tag) | board_wipe | Medio - IA ve como enchantment generico |
+| Accursed Marauder | creature (no tag) | removal/edict | Medio - IA ve como criatura mediana |
+| Mesmeric Orb | artifact (no tag) | self-mill/engine | Medio - IA ve como artifact generico |
+
+### Novas Discrepancias com ManaLoom (Edgar Markov)
+| Carta | Tag ManaLoom | Tag Esperada | Impacto |
+|:------|:------------:|:------------:|:-------:|
+| Olivia's Wrath | utility | board_wipe | Alto - IA nao detecta wipe condicional |
+| Sorin, Imperious Bloodlord | removal | engine | Alto - IA ve como remocao, nao engine |
+| Viscera Seer | draw | sacrifice_outlet | Alto - scry nao e draw |
+| Sanguine Bond | enchantment | wincon | Medio - metade do combo EB+SB |
+| Blade of the Bloodchief | artifact | payoff | Medio - +1/+1 counters em morte |
+| Bloodthirsty Conqueror | creature | drain/combo_piece | Medio - segundo Exquisite Blood |
+| Exquisite Blood | enchantment | combo_piece | Medio - metade do combo EB+SB |
+| Blood Artist | creature (no tag) | aristocrat_payoff | Medio - sem tag funcional relevante |
