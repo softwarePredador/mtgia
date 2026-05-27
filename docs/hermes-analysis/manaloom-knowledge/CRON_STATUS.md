@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T12:01Z**
+> Última atualização: **2026-05-27T12:58Z**
 
 ## Resumo
 
@@ -12,92 +12,90 @@
 | Habilitados | 16/16 |
 | Desabilitados | 0 |
 | `last_status=error` | 6 |
-| Nunca executaram (`last_run_at=null`) | 2 |
-| Triggers aceitos nesta rodada | 11 |
+| Nunca executaram (`last_run_at=null`) | 0 |
+| Triggers aceitos nesta rodada | 8 |
+| Resumes nesta rodada | 0 |
 | Branch do workdir | `codex/hermes-analysis-docs` |
-| HEAD da branch de análise | `06e992f9b401` |
+| HEAD da branch de análise | `9190520f06b6` |
 
-**Estado geral:** 16/16 habilitados ✅. Nenhum cron precisou de `resume`. Foram emitidos triggers manuais para crons com `last_run_at` antigo (>120min) e para crons habilitados que nunca tinham rodado, conforme a rotina gerencial.
+**Estado geral:** 16/16 habilitados ✅. Nenhum cron precisou de `resume`. Foram enviados 8 `cronjob(action="run")` para jobs habilitados com `last_run_at` acima de 120min, conforme a rotina gerencial.
 
-**Observação operacional:** `cronjob(action="run")` aceitou os disparos e ajustou `next_run_at` para o horário da rodada. O campo `last_run_at/last_status` só muda quando o scheduler efetivamente conclui a execução; por isso alguns jobs ainda exibem status antigo imediatamente após o trigger.
+**Observação operacional:** `cronjob(action="run")` é trigger de scheduler, não prova de execução concluída. Nesta rodada os triggers foram aceitos e `next_run_at` foi reprogramado; `last_run_at/last_status` só mudam quando o scheduler realmente inicia e conclui cada job.
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 11:20Z | 41min | 🟢 ok | 2026-05-27 12:27Z | sem ação |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-26 21:59Z | 841min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
-| `07346720b753` | manaloom-hermes-daily-deep-audit | `30 11 * * *` | ✅ | 2026-05-27 11:42Z | 18min | 🔴 error | 2026-05-28 11:30Z | erro anterior; não atende critério de run nesta rodada |
-| `3542b818f8b3` | manaloom-hermes-weekly-memory-cleanup | `0 12 * * 0` | ✅ | — | — | 🟡 never-run | 2026-05-27 11:59Z | trigger de inicialização enviado |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | — | — | 🟡 never-run | 2026-05-27 11:59Z | trigger de inicialização enviado |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-26 23:17Z | 763min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 12:10Z | 47min | 🟢 ok | 2026-05-27 12:40Z | next_run_at já venceu; aguardando tick do scheduler |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 12:19Z | 39min | 🟢 ok | 2026-05-27 16:00Z | sem ação |
+| `07346720b753` | manaloom-hermes-daily-deep-audit | `30 11 * * *` | ✅ | 2026-05-27 11:42Z | 76min | 🔴 error | 2026-05-28 11:30Z | erro anterior; aguardando próximo ciclo/diagnóstico específico |
+| `3542b818f8b3` | manaloom-hermes-weekly-memory-cleanup | `0 12 * * 0` | ✅ | 2026-05-27 12:31Z | 27min | 🔴 error | 2026-05-31 12:00Z | erro anterior; aguardando próximo ciclo/diagnóstico específico |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 2min | 🟢 ok | 2026-05-31 12:30Z | sem ação |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 12:03Z | 55min | 🟢 ok | 2026-05-27 12:41Z | next_run_at já venceu; aguardando tick do scheduler |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-26 22:35Z | 805min | 🔴 error | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-26 22:47Z | 794min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
-| `5fe699ed7ff2` | manaloom-themes-research | `every 20m` | ✅ | 2026-05-26 23:01Z | 780min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
-| `4430f8384ce4` | manaloom-missing-gc-filler | `every 20m` | ✅ | 2026-05-26 23:10Z | 771min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 01:59Z | 602min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-26 22:08Z | 833min | 🟢 ok | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
+| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-26 22:35Z | 863min | 🔴 error | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-26 22:47Z | 851min | 🟢 ok | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
+| `5fe699ed7ff2` | manaloom-themes-research | `every 20m` | ✅ | 2026-05-26 23:01Z | 837min | 🟢 ok | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
+| `4430f8384ce4` | manaloom-missing-gc-filler | `every 20m` | ✅ | 2026-05-26 23:10Z | 828min | 🟢 ok | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 01:59Z | 659min | 🟢 ok | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-26 22:08Z | 890min | 🟢 ok | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 11:56Z | 4min | 🔴 error | 2026-05-27 12:26Z | erro anterior; não atende critério de run nesta rodada |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 10:45Z | 76min | 🔴 error | 2026-05-27 12:57Z | erro anterior; não atende critério de run nesta rodada |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 10:45Z | 76min | 🔴 error | 2026-05-27 12:45Z | erro anterior; não atende critério de run nesta rodada |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 08:46Z | 195min | 🔴 error | 2026-05-27 11:59Z | trigger manual enviado nesta rodada |
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 11:56Z | 62min | 🔴 error | 2026-05-27 12:26Z | erro anterior; aguardando próximo ciclo/diagnóstico específico |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 12:10Z | 48min | 🟢 ok | 2026-05-27 13:10Z | sem ação |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 10:45Z | 133min | 🔴 error | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 08:46Z | 252min | 🔴 error | 2026-05-27 12:57Z | trigger aceito nesta rodada; aguardando scheduler atualizar last_run_at/last_status |
 
-## Ações da Rodada Atual (2026-05-27T12:01Z)
+## Ações da Rodada Atual (2026-05-27T12:58Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
 |:-:|:--|:--|:--|:--|:--|
-| 1 | `660397bb97e1` | manaloom-hermes-normal-audit | `run` | last_run_at 840min atrás (>120min) | ✅ trigger manual aceito; next_run_at ajustado para 2026-05-27T11:59:17Z |
-| 2 | `3542b818f8b3` | manaloom-hermes-weekly-memory-cleanup | `run` | last_run_at=null | ✅ inicialização manual aceita; next_run_at ajustado para 2026-05-27T11:59:17Z |
-| 3 | `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `run` | last_run_at=null | ✅ inicialização manual aceita; next_run_at ajustado para 2026-05-27T11:59:17Z |
-| 4 | `75eed994c103` | manaloom-commander-knowledge-deep | `run` | last_run_at 804min atrás (>120min) | ✅ trigger manual aceito; cron segue enabled=true |
-| 5 | `7915cc2377a0` | manaloom-gamechanger-research | `run` | last_run_at 792min atrás (>120min) | ✅ trigger manual aceito |
-| 6 | `5fe699ed7ff2` | manaloom-themes-research | `run` | last_run_at 778min atrás (>120min) | ✅ trigger manual aceito |
-| 7 | `4430f8384ce4` | manaloom-missing-gc-filler | `run` | last_run_at 769min atrás (>120min) | ✅ trigger manual aceito |
-| 8 | `2d436c71bbf7` | manaloom-manager-watchdog | `run` | last_run_at 762min atrás (>120min) | ✅ trigger manual aceito |
-| 9 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | `run` | last_run_at 600min atrás (>120min) | ✅ trigger manual aceito |
-| 10 | `444aa9510c2c` | manaloom-mana-base-validator | `run` | last_run_at 831min atrás (>120min) | ✅ trigger manual aceito |
-| 11 | `a50bef4c2a59` | lorehold-evolution-oracle | `run` | last_run_at 193min atrás (>120min) | ✅ trigger manual aceito; cron segue enabled=true com last_status=error anterior |
+| 1 | `75eed994c103` | manaloom-commander-knowledge-deep | `run` | last_run_at 862min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z; last_status=error anterior ainda pendente |
+| 2 | `7915cc2377a0` | manaloom-gamechanger-research | `run` | last_run_at 851min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z |
+| 3 | `5fe699ed7ff2` | manaloom-themes-research | `run` | last_run_at 836min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z |
+| 4 | `4430f8384ce4` | manaloom-missing-gc-filler | `run` | last_run_at 828min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z |
+| 5 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | `run` | last_run_at 659min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z |
+| 6 | `444aa9510c2c` | manaloom-mana-base-validator | `run` | last_run_at 889min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z |
+| 7 | `08468451a06a` | lorehold-mulligan-analyst | `run` | last_run_at 132min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z; last_status=error anterior ainda pendente |
+| 8 | `a50bef4c2a59` | lorehold-evolution-oracle | `run` | last_run_at 252min atrás (>120min) | ✅ trigger aceito; next_run_at ajustado para 2026-05-27T12:57:44Z; last_status=error anterior ainda pendente |
 
-**Total:** 11 ações — 0 `resume`, 11 `run`.
+**Total:** 8 ações — 0 `resume`, 8 `run`.
 
 ## Alertas Pendentes
 
 Crons habilitados com `last_status=error` no snapshot pós-recuperação:
 
-- `manaloom-hermes-daily-deep-audit` `07346720b753` — último run 2026-05-27 11:42Z; next 2026-05-28 11:30Z (aguardando próximo ciclo; não estava >120min ou já rodou recentemente).
-- `manaloom-commander-knowledge-deep` `75eed994c103` — último run 2026-05-26 22:35Z; next 2026-05-27 11:59Z (trigger enviado nesta rodada).
-- `lorehold-deck-scout` `f20ac299992b` — último run 2026-05-27 11:56Z; next 2026-05-27 12:26Z (aguardando próximo ciclo; não estava >120min ou já rodou recentemente).
-- `lorehold-deck-validator` `712579b15767` — último run 2026-05-27 10:45Z; next 2026-05-27 12:57Z (aguardando próximo ciclo; não estava >120min ou já rodou recentemente).
-- `lorehold-mulligan-analyst` `08468451a06a` — último run 2026-05-27 10:45Z; next 2026-05-27 12:45Z (aguardando próximo ciclo; não estava >120min ou já rodou recentemente).
-- `lorehold-evolution-oracle` `a50bef4c2a59` — último run 2026-05-27 08:46Z; next 2026-05-27 11:59Z (trigger enviado nesta rodada).
+- `manaloom-hermes-daily-deep-audit` `07346720b753` — último run 2026-05-27 11:42Z; next 2026-05-28 11:30Z; status antigo permanece até nova execução concluída.
+- `manaloom-hermes-weekly-memory-cleanup` `3542b818f8b3` — último run 2026-05-27 12:31Z; next 2026-05-31 12:00Z; status antigo permanece até nova execução concluída.
+- `manaloom-commander-knowledge-deep` `75eed994c103` — último run 2026-05-26 22:35Z; next 2026-05-27 12:57Z; trigger enviado nesta rodada; status antigo permanece até nova execução concluída.
+- `lorehold-deck-scout` `f20ac299992b` — último run 2026-05-27 11:56Z; next 2026-05-27 12:26Z; status antigo permanece até nova execução concluída.
+- `lorehold-mulligan-analyst` `08468451a06a` — último run 2026-05-27 10:45Z; next 2026-05-27 12:57Z; trigger enviado nesta rodada; status antigo permanece até nova execução concluída.
+- `lorehold-evolution-oracle` `a50bef4c2a59` — último run 2026-05-27 08:46Z; next 2026-05-27 12:57Z; trigger enviado nesta rodada; status antigo permanece até nova execução concluída.
 
 Crons com `next_run_at` <= horário do relatório (provavelmente aguardando tick do scheduler):
-- `manaloom-hermes-normal-audit` `660397bb97e1` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-hermes-weekly-memory-cleanup` `3542b818f8b3` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-hermes-weekly-parallel-audit` `aeaeb666d377` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-commander-knowledge-deep` `75eed994c103` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-gamechanger-research` `7915cc2377a0` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-themes-research` `5fe699ed7ff2` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-missing-gc-filler` `4430f8384ce4` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-manager-watchdog` `2d436c71bbf7` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-tag-accuracy-reporter` `b340374bc4e7` — next_run_at 2026-05-27 11:59Z.
-- `manaloom-mana-base-validator` `444aa9510c2c` — next_run_at 2026-05-27 11:59Z.
-- `lorehold-evolution-oracle` `a50bef4c2a59` — next_run_at 2026-05-27 11:59Z.
+- `manaloom-master-watchdog` `757eefb8738b` — next_run_at 2026-05-27 12:40Z.
+- `manaloom-commander-knowledge-deep` `75eed994c103` — next_run_at 2026-05-27 12:57Z.
+- `manaloom-gamechanger-research` `7915cc2377a0` — next_run_at 2026-05-27 12:57Z.
+- `manaloom-themes-research` `5fe699ed7ff2` — next_run_at 2026-05-27 12:57Z.
+- `manaloom-missing-gc-filler` `4430f8384ce4` — next_run_at 2026-05-27 12:57Z.
+- `manaloom-manager-watchdog` `2d436c71bbf7` — next_run_at 2026-05-27 12:41Z.
+- `manaloom-tag-accuracy-reporter` `b340374bc4e7` — next_run_at 2026-05-27 12:57Z.
+- `manaloom-mana-base-validator` `444aa9510c2c` — next_run_at 2026-05-27 12:57Z.
+- `lorehold-deck-scout` `f20ac299992b` — next_run_at 2026-05-27 12:26Z.
+- `lorehold-mulligan-analyst` `08468451a06a` — next_run_at 2026-05-27 12:57Z.
+- `lorehold-evolution-oracle` `a50bef4c2a59` — next_run_at 2026-05-27 12:57Z.
 
 ## Notas
 
 - Branch conferida: `codex/hermes-analysis-docs` ✅; nenhum checkout para `master` foi feito.
-- `cronjob(action="list", include_disabled=True)` retornou 16 jobs; chamada sem `include_disabled` também retornou 16, indicando ausência de jobs ocultos/desabilitados neste snapshot.
+- `cronjob(action="list", include_disabled=True)` retornou 16 jobs; chamada sem `include_disabled` retornou 16.
 - Working tree já continha artefatos não relacionados de crons de conhecimento/deck antes desta rodada; esta atualização deve commitar apenas `CRON_STATUS.md`.
 - Nenhum token/secret foi registrado neste relatório.
 
@@ -217,3 +215,4 @@ GC a preencher — qualquer erro de arquivo ou permissão interrompe o fluxo.
 - **P0:** Re-inserir Korvold e Kinnan com INSERT completo
 - **P2:** Verificar ramp=8 da Teysa (pode ser real, diferença pequena)
 - **P2:** Investigar tagging de ninjas no deck Yuriko (0 tagged como 'ninja')
+<!-- commit nonce: 1 -->
