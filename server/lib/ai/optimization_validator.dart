@@ -582,7 +582,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     // Adicionar warnings de validação temática
     if (themeValidation != null) {
       for (final check in themeValidation.checks) {
-        if (check.isViolation && (check.priority == 'essential' || check.priority == 'high')) {
+        if (check.status != "ok" && (check.priority == 'essential' || check.priority == 'high')) {
           if (check.status == 'below_min') {
             warnings.add('Tema ${themeValidation.theme}: ${check.function} abaixo do mínimo '
                 '(${check.current}/${check.min}). ${check.description}');
