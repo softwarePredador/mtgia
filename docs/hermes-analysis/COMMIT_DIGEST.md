@@ -1,32 +1,45 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-27 (higiene semanal — master ainda em 7329fbbd).
+> Atualizado em 2026-05-27T18:25Z (manager-watchdog — novo commit c98153d6).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `91885194` (Polish secondary shell headers)
-- HEAD atual: **`7329fbbd`** (docs: add Hermes semantic validation request)
+- HEAD anterior: `7329fbbd` (docs: add Hermes semantic validation request)
+- HEAD atual: **`c98153d6`** (Improve optimize gate multi-tag handling)
+- SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`7329fbbdd0d5ea3e88de50d3c8235e76852380f4`** (`/health`, 2026-05-27)
+- SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 
 ## Novos commits nesta rodada
 
-Higiene semanal de 2026-05-27: **nenhum commit novo** desde a ultima analise (`7329fbbd..origin/master` vazio). Mantem-se, para referencia, os commits relevantes das rodadas anteriores:
+### `c98153d6` — Improve optimize gate multi-tag handling (2026-05-27T18:08Z, nova)
+- **5 arquivos**, **+362/-5 linhas** (código + script + testes)
+- Autor: softwarePredador (Co-authored-by: Copilot)
+- Data: 2026-05-27 15:08 BRT
+- **Tipo: CODE** — Melhora o gate de qualidade de otimização para cartas com múltiplas tags funcionais
+  - `optimization_quality_gate.dart`: Adiciona `_functionalRolesForGate()` que resolve múltiplas funções por carta via `inferFunctionalCardTags()` + `_gateRoleForFunctionalTag()`. Troca comparação single-role por interseção de sets de roles (`removedRoles.intersection(addedRoles).isNotEmpty`). Mensagens de droppedReasons agora mostram funções completas (`draw+ramp` vs `utility`).
+  - `semantic_layer_v2_optimize_scorecard.py`: Adiciona `log_progress()` para debug de timeout global, deadline-based early exit, structured progress events no stderr, elapsed_ms no summary.
+  - `optimization_quality_gate_test.dart`: +2 testes novos (preserves critical ramp on multi-tag cards, blocks loss of secondary protection on multi-function swaps).
+  - `RELATORIO_OPTIMIZE_MULTITAG_GATE_2026-05-27.md`: Relatório de implementação.
+  - `optimize_scorecard_progress_smoke_timeout30.json`: Smoke test fixture.
+- **Validação:** `dart test optimization_quality_gate_test.dart` = 13/13 PASS. `dart test` completo = 585 pass / 18 fail (18 pre-existing em auth_service_test.dart, não relacionado).
 
-### `f57bb8d3` — Fix semantic role classification fallbacks (rodada anterior)
-- **4 arquivos**, **+142/-6 linhas** (codigo)
-- Co-authored-by: Copilot
-- Data: 2026-05-26 14:27 BRT
-- **Tipo: CODE** — corrige classificacao de cartas no fallback deterministico
+Commits anteriores mantidos como referência:
 
-### `7329fbbd` — docs: add Hermes semantic validation request (rodada anterior)
+### `7329fbbd` — docs: add Hermes semantic validation request
 - **1 arquivo**, **+170 linhas** (documentacao)
 - Autor: softwarePredador
 - Data: 2026-05-26 14:46 BRT
-- **Tipo: DOC** — adiciona pedido de validacao semantica para o Hermes
+- **Tipo: DOC**
+
+### `f57bb8d3` — Fix semantic role classification fallbacks
+- **4 arquivos**, **+142/-6 linhas** (codigo)
+- Co-authored-by: Copilot
+- Data: 2026-05-26 14:27 BRT
+- **Tipo: CODE**
 
 ### `91885194` — Polish secondary shell headers (rodada anterior)
 - **5 arquivos**, **+52/-54 linhas**
