@@ -6,6 +6,7 @@ import '../logger.dart';
 import '../openai_runtime_config.dart';
 import 'goldfish_simulator.dart';
 import 'optimization_functional_roles.dart';
+import 'theme_contextual_rules_service.dart';
 
 /// Motor de Validação Pós-Otimização
 ///
@@ -19,8 +20,9 @@ import 'optimization_functional_roles.dart';
 /// 3. Critic IA — Segunda chamada à IA que CRITICA as trocas (auto-revisão)
 class OptimizationValidator {
   final String? openAiKey;
+  final ThemeContextualRulesService? themeService;
 
-  OptimizationValidator({this.openAiKey});
+  OptimizationValidator({this.openAiKey, this.themeService});
 
   /// Executa TODAS as camadas de validação e retorna um veredito unificado
   Future<ValidationReport> validate({
@@ -44,6 +46,22 @@ class OptimizationValidator {
       additions: additions,
       optimizedDeck: optimizedDeck,
     );
+
+    // 2.5 VALIDAÇÃO TEMÁTICA (theme_contextual_rules do PostgreSQL)
+    ThemeValidationResult? themeValidation;
+    if (themeService != null) {
+      try {
+        themeValidation = await themeService!.validateDeck(
+          archetype: archetype,
+          cards: originalDeck,
+        );
+        Log.i('ThemeValidation: ${themeValidation.theme}, '
+              '${themeValidation.checks.length} checks, '
+              'critical=${themeValidation.hasCriticalViolation}');
+      } catch (e) {
+        Log.w('ThemeValidation error: $e');
+      }
+    }
 
     // 3. SEGUNDA OPINIÃO (CRITIC IA)
     Map<String, dynamic>? criticReport;
@@ -456,6 +474,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     required FunctionalReport functional,
     required String archetype,
     Map<String, dynamic>? critic,
+    ThemeValidationResult? themeValidation,
   }) {
     final healthScore = _computeDeckHealthScore(
       monteCarlo: monteCarlo,
@@ -481,6 +500,10 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     var score = (healthScore * 0.6) + (improvementScore * 0.4);
     if (hasCriticalRoleLoss) {
       score -= 6;
+    }
+    // Penalidade por violação temática crítica
+    if (themeValidation != null && themeValidation.hasCriticalViolation) {
+      score -= 8;
     }
     final cleanUpgradeBonus = healthScore >= 70 &&
         improvementScore >= 55 &&
@@ -554,6 +577,21 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     if (improvementScore < 50) {
       warnings.add(
           'A melhoria incremental foi pequena (${improvementScore.round()}/100).');
+    }
+
+    // Adicionar warnings de validação temática
+    if (themeValidation != null) {
+      for (final check in themeValidation.checks) {
+        if (check.isViolation && (check.priority == 'essential' || check.priority == 'high')) {
+          if (check.status == 'below_min') {
+            warnings.add('Tema ${themeValidation.theme}: ${check.function} abaixo do mínimo '
+                '(${check.current}/${check.min}). ${check.description}');
+          } else if (check.status == 'above_max') {
+            warnings.add('Tema ${themeValidation.theme}: ${check.function} acima do máximo '
+                '(${check.current}/${check.max}). ${check.description}');
+          }
+        }
+      }
     }
 
     return ValidationReport(
