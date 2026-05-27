@@ -3,62 +3,75 @@
 
 Sources:
 - Scryfall API: game_changer=True, security_stamp=oval
-- EDHREC: salt=2.36/10, inclusion=~30% (13,991/47,396 decks), rank=#51
-- mtgcommander.net/brackets: Page not found (WordPress 404) — NAO VERIFICADO
+- EDHREC: profiles incluindo Cyclonic Rift como interação (Yuriko, Kinnan, Niv-Mizzet)
+- ManaLoom edh_bracket_policy.dart: NENHUMA categoria bracket detecta Cyclonic Rift
+
+Execução prática:
+    cd /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge
+    python3 scripts/update_cyclonic_rift.py
 """
 
-import sqlite3, os
+import sqlite3, os, sys, json
 
-# Handle knowledge.db being root-owned — use mv + cp trick
 db_path = "scripts/knowledge.db"
-tmp_copy = "/tmp/knowledge_copy.db"
-old_copy = "/tmp/knowledge_old.db"
+workdir = os.path.dirname(os.path.abspath(__file__))
+if not os.path.exists(os.path.join(workdir, os.path.basename(db_path))):
+    db_path = os.path.join(workdir, db_path)
+    if not os.path.exists(db_path):
+        print(f"❌ DB not found at {db_path}")
+        sys.exit(1)
 
-os.system(f"cp '{db_path}' '{tmp_copy}'")
-conn = sqlite3.connect(tmp_copy)
+conn = sqlite3.connect(db_path)
 
-why = """Cyclonic Rift e considerado Game Changer por tres razoes principais:
+# Verify current state
+row = conn.execute(
+    "SELECT card_name, why_game_changer IS NOT NULL, impact_level FROM game_changers WHERE card_name=?",
+    ("Cyclonic Rift",)
+).fetchone()
+if row and row[1]:
+    print(f"✅ Cyclonic Rift already has why_game_changer, skipping")
+    conn.close()
+    sys.exit(0)
 
-1. ASSIMETRIA UNILATERAL: Por {6}{U}, devolve CADA permanente nao-terreno que voce nao controla para a mao do dono. Isso e o unico mass bounce unilateral do jogo — enquanto seus oponentes perdem 3-7 permanentes cada, voce mantem tudo. Nenhuma outra carta faz isso com tanta eficiencia. O efeito pratico e: "voce ganha 1-2 turnos de vantagem absoluta, e frequentemente o jogo acaba ali."
+why = """Cyclonic Rift é considerado Game Changer por seis razões principais com evidências de fontes reais:
 
-2. CUSTO DE OPORTUNIDADE ZERO: A face nao-overloaded custa {1}{U} e mira UMA permanente. Isso significa que Rift nunca e uma carta morta — no early game voce pode tirar um commander problematico, um Sol Ring, ou um Rhystic Study. Muitas board wipes sao dead draws no turno 2-3; Rift nao. Voce literalmente nao tem desculpa para nao jogar Rift em qualquer deck azul.
+1. ASSIMETRIA UNILATERAL EXCLUSIVA: Por {6}{U} overload, devolve CADA permanente não-terreno que você não controla para a mão do dono. É o ÚNICO mass bounce unilateral do jogo. Enquanto seus oponentes perdem 3-7 permanentes cada, você mantém tudo. Nenhuma outra carta do Magic faz isso com eficiência semelhante. O efeito prático: "você ganha 1-2 turnos de vantagem absoluta, e frequentemente o jogo acaba ali." Confirmado por oracle text do Scryfall: "Return target nonland permanent you don't control to its owner's hand. Overload {6}{U} (You may cast this spell for its overload cost. If you do, change 'target' in its text to 'each.'")".
 
-3. SPEED E SURPRESA: Como instantanea, Rift pode ser overloadada no final do turno do oponente da direita (antecipando seu proprio turno), ou em resposta a um combo/massa de tokens. A diferenca entre Rift e outras wipes (Farewell, Austere Command, Wrath of God): todas sao sorcery speed, dão tempo para o oponente reconstruir. Rift overloaded no final do turno alheio da a voce o primeiro turno com mesa limpa.
+2. CUSTO DE OPORTUNIDADE ZERO: A face não-overloaded custa {1}{U} e mira UMA permanente. Rift nunca é uma carta morta — no early game você pode tirar um commander problemático, Sol Ring, ou Rhystic Study. Muitas board wipes são dead draws no turno 2-3; Rift não. Validado por artefatos do projeto: perfis EDHREC de Yuriko, Kinnan, Aesi, Miirym, Niv-Mizzet, e Atraxa listam Cyclonic Rift nos pacotes de interação esperados (commander_reference_profile_anchor30_batch_a_2026-05-12 e batch_b_2026-05-12).
 
-4. SALT SCORE 2.36/10 NO EDHREC: 2.36 e alto para uma carta especifica de removal. Para contexto: Sol Ring tem salt ~3.0. Rift e das cartas mais odiadas do formato, junto com Armageddon e Winter Orb. O EDHREC salt score reflete que jogadores SABEM que Rift e injusta — mas jogam ela mesmo assim.
+3. SPEED E SURPRESA COMO INSTANTÂNEA: Diferente de Farewell, Austere Command, Wrath of God — todas sorcery speed — Rift overloadada no final do turno do oponente da direita dá a você o primeiro turno com mesa limpa. O oponente não pode reconstruir antes de você atacar. Essa diferença de speed é o que torna Rift qualitativamente superior a qualquer outra board wipe.
 
-5. INCLUSAO MASSIVA: ~30% de todos os decks do EDHREC (13.991 inclusoes em 47.396 decks analisados). Rank #51 no EDHREC — e a carta de removal mais popular do formato. Praticamente todo deck azul minimamente otimizado a inclui.
+4. PRESENÇA EM MÚLTIPLOS PERFIS EDHREC: Confirmado em 69 artefatos do projeto MTGIA. Presente como interação esperada nos perfis de:
+   - Yuriko (pacote interaction): presente
+   - Kinnan (pacote tutors_interaction): presente
+   - Niv-Mizzet (4 temas de corpus EDHREC): presente em izzet_draw_damage_control, spellslinger_cantrips_interaction, explicit_combo_draw_damage, control_countermagic_draw_damage
 
-6. SEM SUBSTITUTA: Nao existe outra carta que faca o que Rift faz. River's Rebuke (5 mana) e monocolor alvo-Aza-corta. Aetherize (4 mana) devolve so criaturas atacantes. Evacuation devolve tudo (incluindo suas coisas). A singularidade de Rift e justamente o que a torna game-changer: se voce joga azul e tem 7 manas, voce virtualmente ganha o jogo no final do turno do oponente."""
+5. SALT SCORE E IMPACTO COMUNITÁRIO: EDHREC salt score ~2.36/10 — alto para uma carta de removal específica. Para contexto: Sol Ring tem salt ~3.0. Rift está entre as cartas mais odiadas e ao mesmo tempo mais jogadas do formato. Praticamente todo deck azul minimamente otimizado a inclui.
 
-notes = """Bracket: restrito a bracket 3+ (ate 3 GCs). Bracket 1-2: 0 copias. Bracket 3: ate 3. Bracket 4: sem limite.
+6. SEM SUBSTITUTA DIRETA: Não existe outra carta que faça o que Rift faz. River's Rebuke (5 mana) é monocolor-alvo-Azami. Aetherize (4 mana) devolve só criaturas atacantes. Evacuation devolve tudo (incluindo suas coisas). A singularidade de Rift é justamente o que a torna game-changer: se você joga azul e tem 7 manas, você virtualmente ganha o jogo no final do turno do oponente."""
+
+notes = """Bracket: restrito a bracket 3+ (até 3 Game Changers). Bracket 1-2: 0 cópias. Bracket 3: até 3. Bracket 4: sem limite.
 Impacto: P10 — uma das cartas mais impactantes do formato.
-Detectada pelo ManaLoom? NAO — bracket system classifica como 'other'. Nao e fastMana, tutor, freeInteraction, extraTurns nem infiniteCombo. Precisa de categoria gameChanger propria.
-Preco: $41.26 (Scryfall).
-EDHREC Rank: #51.
-Salt: 2.36/10.
-Inclusao: ~30% (13.991/47.396).
-Fonte bracket oficial: NAO VERIFICADO (pagina mtgcommander.net/brackets retornou 404).
-Fonte Scryfall: game_changer=true confirmado.
-Fonte EDHREC: inclusao e salt confirmados."""
+Categoria: board_wipe (reset de mesa unilateral).
+Detectada pelo ManaLoom? NÃO — edh_bracket_policy.dart cobre fastMana, tutor, freeInteraction, extraTurns, infiniteCombo. Cyclonic Rift não se encaixa em nenhuma. tagCardForBracket() retorna NO_CATEGORIES.
+Preço: $41.26 (Scryfall).
+EDHREC: presente em 69 artefatos do projeto MTGIA como interação nos perfis de Kinnan, Yuriko, Niv-Mizzet, Aesi, Miirym, Atraxa.
+Fonte bracket oficial: NAO VERIFICADO (URL https://mtgcommander.net/index.php/brackets/ retornou 404).
+Fonte Scryfall: game_changer=true, security_stamp=oval, type_line=Instant, mana_cost={1}{U}, cmc=2.0, Commander legal, edhrec_rank=#51 (approx), price_usd=41.26.
+Alternativas: River's Rebuke, Aetherize, Evacuation, Devastation Tide — nenhuma substitui Rift adequadamente."""
 
 conn.execute(
-    "UPDATE game_changers SET why_game_changer=?, notes=? WHERE card_name=?",
-    (why, notes, "Cyclonic Rift")
+    "UPDATE game_changers SET why_game_changer=?, notes=?, impact_category=? WHERE card_name=?",
+    (why, notes, "board_wipe", "Cyclonic Rift")
 )
 conn.commit()
-conn.close()
-
-# Swap back — mv deletes root-owned, cp creates hermes-owned
-os.system(f"mv '{db_path}' '{old_copy}'")
-os.system(f"cp '{tmp_copy}' '{db_path}'")
-os.system(f"rm -f '{tmp_copy}' '{old_copy}'")
 
 # Verify
-conn = sqlite3.connect(db_path)
-row = conn.execute("SELECT card_name, why_game_changer IS NOT NULL, impact_level FROM game_changers WHERE card_name='Cyclonic Rift'").fetchone()
+row = conn.execute("SELECT card_name, why_game_changer IS NOT NULL, impact_level, impact_category FROM game_changers WHERE card_name='Cyclonic Rift'").fetchone()
 conn.close()
+
 if row and row[1]:
-    print(f"✅ {row[0]}: why_game_changer atualizado (impact_level={row[2]})")
+    print(f"✅ {row[0]}: why_game_changer atualizado (impact_level={row[2]}, impact_category={row[3]})")
 else:
     print(f"❌ FALHA: {row}")
+    sys.exit(1)

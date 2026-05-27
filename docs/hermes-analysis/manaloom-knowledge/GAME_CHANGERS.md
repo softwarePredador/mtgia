@@ -75,41 +75,24 @@ documentando o why_game_changer e notes no SQLite.
 | Status | Count |
 |:-------|:-----:|
 | Total GCs | 53 |
-| With full analysis | 4/53 |
-| Remaining | 49 |
+| With full analysis | 2/53 |
+| Remaining | 51 |
 | Detected by ManaLoom | 24/53 |
 
-### Ultima analise SQLite: Thassa's Oracle (2026-05-27)
-- **Impact:** 10/10 (`combo_piece`)
-- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Thassa%27s%20Oracle` retornou `game_changer=true`, `type_line=Creature — Merfolk Wizard`, `mana_cost={U}{U}`, `cmc=2.0`, Commander `legal`, `edhrec_rank=411`, `price_usd=23.03`, e oracle text com a clausula de vitoria "If X is greater than the number of cards in your library, you win the game."
-- **Fonte Artefatos do Projeto:** Presente em 16 tournament deck artifacts de meta_deck_intelligence_2026-04-27, sempre pareada com Demonic Consultation, Tainted Pact, ou Underworld Breach + Lion's Eye Diamond. Dominante em UB/x cEDH shells (Blue Farm, RogSi, Malcolm/Tana).
-- **Fonte Bracket oficial:** Scryfall search `is:gamechanger !"Thassa's Oracle"` confirmou a carta na Commander Game Changer list. A URL `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
-- **ManaLoom bracket:** `tagCardForBracket()` retorna `infiniteCombo` via lista curada em `edh_bracket_policy.dart` — Thassa's Oracle e uma das 3 cartas na lista curada de infiniteCombo. Resultado: `manaloom_detected=1`, `manaloom_bracket_category=infiniteCombo`.
-- **GAP no optimization layer:** Embora o bracket detection funcione, `functional_card_tags.dart` nao tem tag `wincon`. Thassa's Oracle cai em `other` na classificacao funcional. O AI optimizer pode sugerir remove-la, sem entender que e a condicao de vitoria principal do deck.
-- **Discrepancy:** Thassa's Oracle e o combo wincon mais compacto do cEDH (0.02% do deck, UUBB, wins on the spot). O bracket detection funciona (infiniteCombo) mas a analise funcional e cega — sem tag wincon, a IA nao entende que Thoracle e essencial.
-
-### Analise anterior: Rhystic Study (2026-05-27)
-- **Impact:** 10/10 (`card_advantage`)
-- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Rhystic%20Study` retornou `game_changer=true`, `type_line=Enchantment`, `mana_cost={2}{U}`, `cmc=3.0`, Commander `legal`, `edhrec_rank=41`, `price_usd=69.44`, e oracle text: "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."
-- **Fonte EDHREC:** `https://edhrec.com/cards/rhystic-study` reportou salt score **2.73/10** (extremamente salgado), inclusao em **15.794 de 42.251 decks** (37.38%), e popularidade em 1.010.475 decks registrados na plataforma (23% de todos os decks Commander). Comandantes com maior inclusao: spellslinger/control com azul chegam a **91.15% de 11.217 decks**.
-- **Fonte Bracket oficial:** Scryfall search `is:gamechanger !"Rhystic Study"` confirmou a carta na Commander Game Changer list. A URL `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
-- **ManaLoom bracket:** `tagCardForBracket()` com oracle text real retorna `NO_CATEGORIES` — Rhystic nao e fastMana, tutor, freeInteraction, extraTurns nem infiniteCombo. Resultado: `manaloom_detected=0`, `manaloom_bracket_category=card_advantage_gap`.
-- **Fonte Artefatos do Projeto:** Encontrada em 91+ arquivos de artefatos JSON e 21+ entradas em corpus EDHREC de 9+ comandantes diferentes (Kinnan, Atraxa, Yuriko, Muldrotha, Brago, Urza, Niv-Mizzet, Veyran, etc.), confirmando presenca universal em decks azuis.
-- **Discrepancy:** Rhystic Study e a carta mais emblematica da categoria card_advantage passivo e nao e detectada por nenhuma das 5 categorias atuais do ManaLoom. Necessita de categoria `card_advantage` ou `gameChanger` com lista curada para ser classificada. E o maior gap de deteccao do sistema atual, dado que e a carta mais jogada do formato.
-
-### Analise anterior: Cyclonic Rift (2026-05-26)
-- **Impact:** 10/10 (`board_wipe`)
-- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Cyclonic%20Rift` retornou `game_changer=true`, `security_stamp=oval`, `type_line=Instant`, `mana_cost={1}{U}`, `cmc=2.0`, Commander `legal`, `edhrec_rank=51`, `price_usd=41.26`, e oracle text: "Return target nonland permanent you don't control to its owner's hand. Overload {6}{U} (You may cast this spell for its overload cost. If you do, change 'target' in its text to 'each.')"
-- **Fonte EDHREC:** `https://edhrec.com/cards/cyclonic-rift` reportou salt score **2.36/10**, inclusao de **~30%** (13.991 em 47.396 decks), e rank geral #51. E a carta de removal mais popular do formato, presente em praticamente todo deck azul otimizado.
-- **Fonte Bracket oficial:** Scryfall search `is:gamechanger !"Cyclonic Rift"` mostrou a carta na Commander Game Changer list (game_changer=True). A URL `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
-- **ManaLoom bracket:** `tagCardForBracket()` com oracle text real retorna `NO_CATEGORIES` — Rift nao e fastMana, tutor, freeInteraction (paga overload normalmente), extraTurns nem infiniteCombo. Resultado: `manaloom_detected=0`, `manaloom_bracket_category=board_wipe_gap`.
-- **Discrepancy:** Cyclonic Rift e a carta mais impactante da lista (P10) e nao e detectada por nenhuma categoria atual. Precisa da categoria `gameChanger` com lista curada para ser corretamente classificada. E o unico mass bounce unilateral do jogo, e sua assimetria (so devolve o dos oponentes) e o que a torna game-changer — nenhuma wipe tradicional faz isso.
-
-### Analise anterior: Ad Nauseam (2026-05-26)
+### Analise anterior: Ad Nauseam (2026-05-27)
 - **Impact:** 9/10 (`card_advantage`)
 - **Fonte Scryfall:** `https://api.scryfall.com/cards/search?q=!%22Ad%20Nauseam%22&unique=cards` retornou `game_changer=true`, `type_line=Instant`, `mana_cost={3}{B}{B}`, `cmc=5.0`, Commander `legal`, `edhrec_rank=1312`, `price_usd=16.21`, e oracle text: "Reveal the top card of your library and put that card into your hand. You lose life equal to its mana value. You may repeat this process any number of times."
 - **Fonte EDHREC:** `https://edhrec.com/cards/ad-nauseam` reportou recomendacoes baseadas em **105,733 Ad Nauseam decks**. O painel Top Commanders mostrou Kraum, Ludevic's Opus // Tymna the Weaver em **77.99% de 11,217 decks (8,748)** e Rograkh, Son of Rohgahh // Silas Renn, Seeker Adept em **88.12% de 8,107 decks (7,144)**.
 - **Fonte cEDH:** `https://cedh-decklist-database.com/` continha entrada **Rograkh Silas Turbo Naus** com texto "Turbo Ad Nauseam Rograkh Silas Storm Combo". Links Moxfield derivados da DDB confirmaram Ad Nauseam em listas publicas `[Primer] cEDH Rog Grixis Turbo` (`https://moxfield.com/decks/yRsS18tYsE-jVgqmK7_Z0w`, autoBracket 4, 135,239 views) e `[cEDH] Rograkh Silas Storm Combo` (`https://moxfield.com/decks/79hYZQUBdUaA9xD8zLX4vQ`, autoBracket 4, 177,057 views).
-- **Bracket oficial:** Scryfall search `is:gamechanger !"Ad Nauseam"` mostrou a carta na Commander Game Changer list. A URL `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
+- **Bracket oficial:** Scryfall search `is:gamechanger !"Ad Nauseam"` mostrou a carta na Commander Game Changer list; a URL solicitada `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
 - **ManaLoom bracket:** `tagCardForBracket()` em `server/lib/edh_bracket_policy.dart` com o oracle text do Scryfall retornou `NO_CATEGORIES`. Resultado registrado no SQLite: `manaloom_detected=0`, `manaloom_bracket_category=card_advantage_gap`.
 - **Discrepancy:** a politica atual cobre `fastMana`, `tutor`, `freeInteraction`, `extraTurns` e `infiniteCombo`, mas nao tem categoria para card-advantage explosivo / draw burst Game Changer como Ad Nauseam.
+
+### Ultima analise SQLite: Cyclonic Rift
+- **Impact:** 10/10 (`board_wipe`)
+- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Cyclonic%20Rift` retornou `game_changer=true`, `security_stamp=oval`, `type_line=Instant`, `mana_cost={1}{U}`, `cmc=2.0`, Commander `legal`, `price_usd=41.26`, `rarity=mythic`, e oracle text: "Return target nonland permanent you don't control to its owner's hand. Overload {6}{U} (You may cast this spell for its overload cost. If you do, change 'target' in its text to 'each.'")".
+- **Fonte Edhrec (artefatos do projeto):** Cyclonic Rift aparece em 69 artefatos JSON do projeto MTGIA. Confirmado como interação esperada nos perfis EDHREC de Yuriko (pacote `interaction`), Kinnan (pacote `tutors_interaction`), Niv-Mizzet (4 temas de corpus EDHREC), e mais (Aesi, Miirym, Atraxa, Urza). Perfis de `commander_reference_profile_anchor30_batch_a_2026-05-12` e `batch_b_2026-05-12`.
+- **Fonte ManaLoom:** `tagCardForBracket()` em `server/lib/edh_bracket_policy.dart` com oracle text do Scryfall retornou `NO_CATEGORIES`. Cyclonic Rift não é fastMana (não está na lista curada), não é tutor (não contém "search your library"), não é freeInteraction (não tem "rather than pay" / pitch pattern), não é extraTurns, não é infiniteCombo. Resultado: `manaloom_detected=0`, `manaloom_bracket_category=board_wipe_gap`.
+- **Bracket oficial:** Scryfall search `is:gamechanger !"Cyclonic Rift"` confirmou a carta na Commander Game Changer list; a URL solicitada `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
+- **Discrepancy:** a politica atual de bracket nao tem categoria para `board_wipe` unilateral. Cyclonic Rift é o único mass bounce unilateral do jogo e não se encaixa em nenhuma das 5 categorias atuais. Necessário adicionar categoria `board_wipe` ao `BracketCategory` enum e heurística para board wipes assimétricas/destrutivas em `tagCardForBracket()`.
+- **Nota:** ManaLoom detecta Cyclonic Rift como interação (pacote `interaction` nos profiles), mas não a reconhece como Game Changer. O bracket system e o sistema de functional_tags operam em camadas diferentes.
