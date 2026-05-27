@@ -105,3 +105,69 @@ Todos os 4 erros compartilham a mesma causa raiz: problemas de provider/model ch
 - Working tree contém artefatos não relacionados (decks lorehold, scripts de scout, `__pycache__`, `scripts/knowledge.db` vazio em `/opt/data/workspace/mtgia/scripts/`) — apenas `CRON_STATUS.md` será comitado.
 - Nenhum token/secret registrado neste relatório.
 - 2 crons recuperaram desde o último relatório (commander-knowledge-deep, deck-scout), indicando que o scheduler e deepseek provider estão funcionais para alguns jobs.
+
+======================================================================
+
+## Validacao de Mana Base (contra Perfis EDHREC)
+
+Deck                           Commander                 Brkt Lands  CMC    Ramp  Draw  Qual       Alertas
+------------------------------------------------------------------------------------------------------------------------
+
+Edgar Markov EDHREC Default Av Edgar Markov              3    36     2.9    7     9     COMPLETO(100/100) 🟡ALERT ramp=7<9
+Muldrotha EDHREC Average       Muldrotha, the Gravetide  3    36     2.7    12    14    COMPLETO(87/100) ✅
+EDHREC Average Default — Boros Winota, Joiner of Forces  4    34     2.4    10    3     COMPLETO(100/100) ✅
+Lorehold Spellslinger          Lorehold, the Historian   3    35     4.0    15    8     COMPLETO(100/100) 🟡 CMC=4.0>3.5
+Aesi EDHREC Average Default    Aesi, Tyrant of Gyre Stra 3    40     2.6    28    12    EDHREC_P(100/79) 🔵 EDHREC avg parcial (79 cards, sem terrenos completos)
+EDHREC Average Default         Teysa Karlov              3    35     2.9    15    11    EDHREC_P(80/80) ✅
+EDHREC Average Default         Korvold, Fae-Cursed King  3    25     3.2    3     1     PARCIAL(11/11) 🔴CRIT lands=25(ok 34-37) | 🔴CRIT ramp=3<10 | 🟡ALERT draw=1<6
+EDHREC Average Deck - Dimir Ni Yuriko, the Tiger's Shado 3    33     2.8    8     14    EDHREC_P(99/84) 🔵 Yuriko: CMC alto = BOM
+Kinnan, Bonder Prodigy         Kinnan, Bonder Prodigy    4    29     1.8    4     3     PARCIAL(13/13) 🔴CRIT ramp=4<18
+
+---
+
+### Perfis EDHREC Usados na Validacao
+- **Kinnan, Bonder Prodigy**: lands=29-34, ramp=18-26, draw=?-? | keys=['lands', 'nonland_mana_sources', 'mana_dorks', 'artifact_mana', 'infinite_mana_pieces', 'payoffs_outlets', 'interaction_protection']
+- **Yuriko, the Tiger's Shadow**: lands=30-34, ramp=?-?, draw=?-? | keys=['lands', 'evasive_enablers', 'ninjas', 'topdeck_manipulation', 'high_mv_reveals', 'interaction', 'combo_finishers']
+- **Korvold, Fae-Cursed King**: lands=34-37, ramp=?-?, draw=6-10 | keys=['lands', 'ramp_treasure', 'sacrifice_fodder', 'sacrifice_outlets', 'aristocrat_payoffs', 'draw_value', 'interaction', 'combo_finishers']
+- **Teysa Karlov**: lands=35-37, ramp=9-11, draw=10-14 | keys=['lands', 'ramp', 'draw_value', 'interaction', 'board_wipes', 'protection', 'sacrifice_outlets', 'fodder_tokens', 'death_payoffs', 'recursion']
+- **Aesi, Tyrant of Gyre Strait**: lands=39-43, ramp=?-?, draw=?-? | keys=['lands', 'ramp_extra_lands', 'supplemental_draw', 'interaction_counter', 'board_wipes_bounce', 'protection', 'landfall_payoffs', 'land_recursion_bounce', 'finishers']
+- **Winota, Joiner of Forces**: lands=31-35, ramp=?-?, draw=?-? | keys=['lands', 'nonhuman_enablers', 'human_hits', 'stax_disruption', 'protection', 'combat_payoffs', 'interaction']
+- **Muldrotha, the Gravetide**: lands=36-39, ramp=9-12, draw=?-? | keys=['lands', 'ramp', 'self_mill', 'recursion_value', 'replayable_interaction', 'graveyard_protection', 'finishers']
+- **Edgar Markov**: lands=34-36, ramp=9-12, draw=10-13 | keys=['lands', 'ramp', 'draw_value', 'interaction', 'board_wipes', 'protection', 'vampire_density', 'sacrifice_enablers', 'lord_drain_payoffs']
+- **Lorehold, the History Scholar**: sem profile EDHREC (Strixhaven) - thresholds genericos usados
+
+---
+
+### Alertas e Recomendacoes
+
+#### Edgar Markov (COMPLETO(100/100))
+- 🟡ALERT ramp=7<9
+
+#### Lorehold, the Historian (COMPLETO(100/100))
+- 🟡 CMC=4.0>3.5
+
+#### Aesi, Tyrant of Gyre Strait (EDHREC_P(100/79))
+- 🔵 EDHREC avg parcial (79 cards, sem terrenos completos)
+
+#### Korvold, Fae-Cursed King (PARCIAL(11/11))
+- 🔴CRIT lands=25(ok 34-37)
+- 🔴CRIT ramp=3<10
+- 🟡ALERT draw=1<6
+
+#### Yuriko, the Tiger's Shadow (EDHREC_P(99/84))
+- 🔵 Yuriko: CMC alto = BOM
+
+#### Kinnan, Bonder Prodigy (PARCIAL(13/13))
+- 🔴CRIT ramp=4<18
+
+### 🔴 Alertas Criticos (P0)
+- Korvold, Fae-Cursed King: ['🔴CRIT lands=25(ok 34-37)', '🔴CRIT ramp=3<10']
+- Kinnan, Bonder Prodigy: ['🔴CRIT ramp=4<18']
+
+### 🟡 Alertas Moderados (P1)
+- Edgar Markov: ['🟡ALERT ramp=7<9']
+- Lorehold, the Historian: ['🟡 CMC=4.0>3.5']
+
+---
+
+*Relatorio gerado em 2026-05-27 pelo cron de validacao de mana base.*
