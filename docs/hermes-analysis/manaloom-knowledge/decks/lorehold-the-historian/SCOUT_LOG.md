@@ -582,3 +582,29 @@ Hellkite Tyrant é um wincon que literalmente **nunca** aparece em Lorehold. Por
 2. Validar com `python3 scripts/knowledge_db.py --stats`
 3. Se aplicado, registrar nova análise markdown em `decks/lorehold-the-historian/`
 4. Nova rodada de scout em 20min para verificar mudanças no meta
+
+---
+
+## [2026-05-27 19:43] Execução #4 — EDHREC Live (7.651 decks)
+
+**Descoberta principal:** Você tem 19/26 cartas prioritárias na COLEÇÃO e não usa.
+
+**Custo de upgrade para os top 15 swaps: ZERO.** Todas da sua coleção.
+
+**Cartas na coleção mas não no deck:**
+Big Score (67.2%), Storm-Kiln Artist (55.4%), Apex of Power (55.3%),
+Dance with Calamity (50.4%), Boros Signet (50.4%), Arcane Bombardment (42.6%),
+Chaos Warp (38.9%), Blasphemous Act (40.5%), Faithless Looting (29.6%),
+Dragon's Rage Channeler (39.6%), Mana Geyser (26.3%), Fellwar Stone (34.3%),
+Reliquary Tower (34.2%), Soulfire Eruption (42.7%), Invoke Calamity (34.0%),
+Giver of Runes (19.6%), Creative Technique (26.4%), Pinnacle Monk (41.6%).
+
+**Top 4 swaps P1 (custo zero):**
+1. Big Score → Deflecting Palm
+2. Storm-Kiln Artist → Ancient Copper Dragon
+3. Dance with Calamity → Hellkite Tyrant
+4. Boros Signet → Oswald Fiddlebender
+
+**Detalhes completos:** `docs/hermes-analysis/manaloom-knowledge/SCOUT_LOG.md`
+
+**Dados brutos:** `scripts/_edhrec_snapshot_20260527_1943.json`

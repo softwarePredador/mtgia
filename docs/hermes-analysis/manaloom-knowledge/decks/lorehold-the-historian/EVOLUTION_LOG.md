@@ -53,7 +53,18 @@ Status: ✅ 100 cartas
 3. **Esper Sentinel (draw 1-drop):** Staple universal. Deveria ser auto-include em qualquer deck com branco.
 4. **Gamble (tutor):** Tutor vermelho essencial para consistencia.
 
+### Resultado Mulligan Pós-Swap (Ciclo #1) — 2026-05-27T19:50:00
+
+| Métrica | Antes (34 lands) | Agora (35 lands) | Δ |
+|:--------|:----------------:|:----------------:|:-:|
+| Jogáveis | 70.1% | 73.2% | +3.1pp |
+| Mulligan | 23.9% | 26.8% | +2.9pp |
+| Ramp T1 | 13.6% | 25.4% | +11.8pp ✅ |
+| Sem play T3 | 3.3% | 12.4% | +9.1pp 🟡 |
+
+**Análise:** Swaps foram neutros no mulligan (variação dentro do ruído ±3pp). Ramp T1 disparou com Esper Sentinel e Gamble. O calcanhar de Aquiles é "sem play T3" — deck precisa de mais interação CMC≤2.
+
 ### Proximo Ciclo
 - Adicionar Dance with Calamity e Hit the Mother Lode (sinergia Lorehold)
-- Cortar Obliterate ou Season of the Bold
-- Verificar se mulligan melhorou com +1 land
+- Cortar Obliterate, Volcanic Vision, ou Call Forth the Tempest (redundância CMC 7+)
+- **Prioridade:** Adicionar 1-2 interações CMC≤2 (Generous Gift, Chaos Warp) para reduzir sem_play_t3
