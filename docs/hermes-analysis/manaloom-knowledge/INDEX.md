@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 7 | 2026-05-27 |
-| Decks analisados | 7 | 2026-05-27 |
-| Cartas revisadas | ~943 (selecao + Winota 100 + Lorehold 265 EDHREC) | 2026-05-27 |
-| Insights documentados | 37 | 2026-05-27 |
-| Discrepancias com ManaLoom | 36 | 2026-05-27 |
+| Comandantes analisados | 8 | 2026-05-27 |
+| Decks analisados | 8 | 2026-05-27 |
+| Cartas revisadas | ~1.030 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87) | 2026-05-27 |
+| Insights documentados | 40 | 2026-05-27 |
+| Discrepancias com ManaLoom | 44 | 2026-05-27 |
 
 ## Comandantes Analisados
 
@@ -26,6 +26,7 @@
 | Aesi, Tyrant of Gyre Strait | 1 | 2026-05-26 | 4 | Pendente |
 | **Lorehold, the Historian** | **1** | **2026-05-26** | **4** | **Pendente** |
 | **Winota, Joiner of Forces** | **1** | **2026-05-27** | **4** | **Parcial: 85 linhas / 100 qty** |
+| **Muldrotha, the Gravetide** | **1** | **2026-05-27** | **3** | **Nova: 87/87 EDHREC avg** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -84,6 +85,18 @@
 15. **EDHREC average deck pode ter mais ramp que o perfil** — O Aesi default tem
     23 ramp fontes vs perfil max de 18. O deck mais popular prioriza "mais ramp
     e mais terrenos" ao custo de protecao e interacao.
+16. **Muldrotha reescreve a avaliacao de cartas** — Em Muldrotha, ser permanente
+    e mais importante que o efeito. Cartas "ruins" em qualquer outro deck (Spore
+    Frog, Seal of Primordium, Kaya's Ghostform) sao All-Stars. O sistema de tags
+    precisa de "permanent-reusability score" para capturar isso.
+17. **Graveyard como extensao da mao** — Self-mill nao e "perder cartas", e
+    "preparar o motor". O deck Muldrotha tem 11+ cartas de self-mill, e cada
+    carta no cemiterio esta disponivel para ser conjurada no turno seguinte.
+    Metricas tradicionais de "card advantage" nao capturam cemiterio como mao.**
+18. **Interacao reusavel > Interacao forte** — Muldrotha prefere Seal of
+    Primordium (remocao de artifact/enchantment reusavel todo turno) a Beast
+    Within ou Abrupt Decay (uso unico). Isto e contra-intuitivo para o sistema
+    de otimizacao, que prioriza eficiencia de mana sobre reusabilidade.
 16. **Comandantes engine requerem metricas diferentes** — CMC medio (2.61) e
     aceitavel, mas a metrica chave para Aesi e # de extra-land-drop effects e
     # de landfall payoffs, nao ramp/draw tradicionais.
@@ -405,6 +418,11 @@
 21. **"Big spells precisam de ramp que pague por si mesmas."** (Lorehold — CMC médio EDHREC 4.10, 21% das não-lands são CMC 7+. Big Score 67.3% e Apex of Power 55.4% são preferidos porque pagam por si ao serem lançados.)
 22. **"Topdeck manipulation substitui draw quando o comandante recompensa o topo."** (Lorehold — Library of Leng 78%, Sensei's Top 67%, Scroll Rack 60% vs draw spells mínimos. EDHREC confirma: topdeck > draw neste arquétipo.)
 23. **"Nem toda staple de Commander é staple para um comandante específico."** (Lorehold — Smothering Tithe só 29%, Teferi's Protection 21%, Ancient Tomb 14%. O que é bom no genérico pode não ser bom para Lorehold.)
+24. **"Strategy over power — prefira cartas que se encaixam no plano do comandante a cartas objetivamente mais fortes."** (Muldrotha — Spore Frog > Essence Warden)
+25. **"The graveyard is a resource, not a cost — self-mill nao e 'perder cartas', e 'preparar o motor'."** (Muldrotha — 11 cartas de self-mill, cada uma alimenta o motor)
+26. **"Reusable interaction beats one-shot interaction — quando o comandante permite recursao, Seals valem mais que instants."** (Muldrotha — Seal of Primordium > Beast Within)
+27. **"Anti-hate is mandatory — se o deck depende do cemiterio, respostas para Rest in Peace e Bojuka Bog sao obrigatorias."** (Muldrotha — Kaya's Ghostform, Perpetual Timepiece)
+28. **"Synergy-weighted card evaluation — o valor de uma carta depende 50% do texto e 50% do contexto do deck."** (Muldrotha — cartas medíocres são All-Stars no contexto certo)
 
 ## Ultimas Execucoes
 
@@ -418,3 +436,26 @@
 | 2026-05-26 | EDHREC Average Deck / corpus local | Aesi, Tyrant of Gyre Strait (Lands-Matter Value Engine) | Analise concluida |
 | 2026-05-27 | EDHREC live (12.840 decks) + corpus local | Winota, Joiner of Forces (Aggro-Stax Combat Triggers) | Analise concluida |
 | 2026-05-27 | **EDHREC Live (7.597 decks)** | **Lorehold, the Historian (Spellslinger/Big Spells)** | **Scout concluido — 265 cartas mapeadas, 8 cartas faltando urgentes identificadas** |
+| 2026-05-27 | **EDHREC Average Deck (23.212 decks)** | **Muldrotha, the Gravetide (Graveyard Permanent Recursion Value)** | **Analise concluida — 87 cartas EDHREC avg, 3 Game Changers** |
+
+### Novos Insights desta Analise
+- **Muldrotha cria uma nova categoria de avaliacao:** "permanent-based efficiency." O deck prioriza permanentes mesmo se o efeito for mais fraco. Instants e sorceries sao "descartaveis" porque Muldrotha nao pode rejoga-los.
+- **Spore Frog e a carta mais subestimada do Commander:** Em 99% dos decks e lixo; em Muldrotha e o melhor fog do formato. O sistema de tags perde completamente esta funcao.
+- **Lotus Petal = ramp infinito em Muldrotha:** Toda carta que vai pro cemiterio e "recursavel" ganha valor adicional. O classificador nao captura este valor contextual.
+
+### Novos Padroes (Muldrotha — Graveyard Value)
+14. **"Strategy over power"** — Preferir cartas que se encaixam no plano do comandante a cartas objetivamente mais fortes. Spore Frog > Essence Warden.
+15. **"The graveyard is a resource, not a cost"** — Self-mill nao e "perder cartas", e "preparar o motor."
+16. **"Reusable interaction beats one-shot interaction"** — Em decks com recursao, cartas que podem ser reusadas (Seal of Primordium) valem mais que efeitos instantaneos (Beast Within).
+17. **"Anti-hate is mandatory"** — Se o deck depende do cemiterio, respostas para Rest in Peace e Bojuka Bog sao obrigatorias.
+18. **"The commander is the engine, not the finisher"** — Muldrotha nao ganha o jogo sozinha; ela permite que outras cartas ganhem.
+19. **"Synergy-weighted card evaluation"** — O valor de uma carta depende 50% do texto e 50% do contexto do deck.
+
+### Novas Discrepancias com ManaLoom (Muldrotha)
+| Carta | Tag ManaLoom | Tag Esperada | Impacto |
+|:------|:------------:|:------------:|:-------:|
+| Spore Frog | creature (no tag) | protection/fog | Alto — IA ve como criatura inutil |
+| Kaya's Ghostform | enchantment (no tag) | protection/recursion | Alto — IA pode sugerir cortar |
+| Pernicious Deed | enchantment (no tag) | board_wipe | Medio — IA ve como "enchantment generico" |
+| Accursed Marauder | creature (no tag) | removal/edict | Medio — IA ve como criatura mediana |
+| Mesmeric Orb | artifact (no tag) | self-mill/engine | Medio — IA ve como artifact generico |

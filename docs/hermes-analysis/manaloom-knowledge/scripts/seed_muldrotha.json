@@ -1,0 +1,1574 @@
+{
+  "commander": "Muldrotha, the Gravetide",
+  "archetype": "graveyard_value_midrange",
+  "color_identity": "BGU",
+  "bracket": 3,
+  "source_name": "EDHREC",
+  "source_url": "https://edhrec.com/average-decks/muldrotha-the-gravetide",
+  "source_type": "edhrec_average",
+  "deck_name": "Muldrotha EDHREC Average",
+  "player_name": null,
+  "placement": null,
+  "tournament_date": null,
+  "total_lands": 36,
+  "avg_cmc": 2.66,
+  "ramp_count": 12,
+  "draw_count": 14,
+  "removal_count": 11,
+  "tutor_count": 3,
+  "board_wipe_count": 1,
+  "protection_count": 3,
+  "wincon_count": 2,
+  "engine_count": 8,
+  "analysis_md_path": "docs/hermes-analysis/manaloom-knowledge/decks/muldrotha-the-gravetide/2026-05-27-edhrec-avg.md",
+  "cards": [
+    {
+      "name": "Muldrotha, the Gravetide",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 1,
+      "cmc": 6,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "graveyard recursion"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Spore Frog",
+      "quantity": 1,
+      "functional_tag": "protection",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": []
+    },
+    {
+      "name": "Sakura-Tribe Elder",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "sacrifice: search basic land"
+        }
+      ]
+    },
+    {
+      "name": "Satyr Wayfinder",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws cards"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard fill"
+        }
+      ]
+    },
+    {
+      "name": "Stitcher's Supplier",
+      "quantity": 1,
+      "functional_tag": "mill",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "enables graveyard"
+        }
+      ]
+    },
+    {
+      "name": "Birds of Paradise",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Hermit Druid",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Eternal Witness",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "returns card from graveyard"
+        }
+      ]
+    },
+    {
+      "name": "Skull Prophet",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        }
+      ]
+    },
+    {
+      "name": "Baleful Strix",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws card"
+        }
+      ]
+    },
+    {
+      "name": "Aftermath Analyst",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "returns from graveyard"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Accursed Marauder",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": []
+    },
+    {
+      "name": "Plaguecrafter",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": []
+    },
+    {
+      "name": "Siren Stormtamer",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.72,
+          "evidence": "counters"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.62,
+          "evidence": "protection"
+        }
+      ]
+    },
+    {
+      "name": "Doc Aurlock, Grizzled Genius",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "graveyard recursion"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Haywire Mite",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "destroys artifact/enchantment"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "lifegain"
+        }
+      ]
+    },
+    {
+      "name": "Kheru Goldkeeper",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "treasure tokens"
+        },
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "creates tokens"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "sacrifice"
+        }
+      ]
+    },
+    {
+      "name": "River Kelpie",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "recursion"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard payoff"
+        }
+      ]
+    },
+    {
+      "name": "Sidisi, Brood Tyrant",
+      "quantity": 1,
+      "functional_tag": "token_maker",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "creates tokens"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        }
+      ]
+    },
+    {
+      "name": "Six",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "graveyard recursion"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Solemn Simulacrum",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "searches land"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws card"
+        }
+      ]
+    },
+    {
+      "name": "Syr Konrad, the Grim",
+      "quantity": 1,
+      "functional_tag": "wincon",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard payoff"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff"
+        }
+      ]
+    },
+    {
+      "name": "Tatyova, Benthic Druid",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "lifegain",
+          "confidence": 0.76,
+          "evidence": "lifegain"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "engine"
+        }
+      ]
+    },
+    {
+      "name": "Teval, the Balanced Scale",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "recursion"
+        },
+        {
+          "tag": "token_maker",
+          "confidence": 0.82,
+          "evidence": "creates tokens"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "The Gitrog Monster",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "extra land"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Underrealm Lich",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "protection"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "World Shaper",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "recursion"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard payoff"
+        }
+      ]
+    },
+    {
+      "name": "Gravebreaker Lamia",
+      "quantity": 1,
+      "functional_tag": "tutor",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "recursion"
+        },
+        {
+          "tag": "tutor",
+          "confidence": 0.86,
+          "evidence": "tutor"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Glen Elendra Archmage",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.72,
+          "evidence": "counters"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.62,
+          "evidence": "protection"
+        }
+      ]
+    },
+    {
+      "name": "Mulldrifter",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 5,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws cards"
+        }
+      ]
+    },
+    {
+      "name": "Hedron Shredder",
+      "quantity": 1,
+      "functional_tag": "mill",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "artifact_synergy",
+          "confidence": 0.74,
+          "evidence": "artifact"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "mill"
+        }
+      ]
+    },
+    {
+      "name": "Arcane Signet",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Sol Ring",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds 2 colorless"
+        }
+      ]
+    },
+    {
+      "name": "Lotus Petal",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "sacrifice"
+        }
+      ]
+    },
+    {
+      "name": "Altar of Dementia",
+      "quantity": 1,
+      "functional_tag": "sacrifice_outlet",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "sacrifice"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        }
+      ]
+    },
+    {
+      "name": "Lightning Greaves",
+      "quantity": 1,
+      "functional_tag": "protection",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "shroud"
+        }
+      ]
+    },
+    {
+      "name": "Swiftfoot Boots",
+      "quantity": 1,
+      "functional_tag": "protection",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "protection",
+          "confidence": 0.82,
+          "evidence": "hexproof"
+        }
+      ]
+    },
+    {
+      "name": "Mesmeric Orb",
+      "quantity": 1,
+      "functional_tag": "mill",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "enables graveyard"
+        }
+      ]
+    },
+    {
+      "name": "Perpetual Timepiece",
+      "quantity": 1,
+      "functional_tag": "mill",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "graveyard enabler"
+        }
+      ]
+    },
+    {
+      "name": "Kaya's Ghostform",
+      "quantity": 1,
+      "functional_tag": "protection",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": []
+    },
+    {
+      "name": "Animate Dead",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "reanimate"
+        }
+      ]
+    },
+    {
+      "name": "Pernicious Deed",
+      "quantity": 1,
+      "functional_tag": "board_wipe",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": []
+    },
+    {
+      "name": "Ripples of Undeath",
+      "quantity": 1,
+      "functional_tag": "mill",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "self-mill"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "graveyard enabler"
+        }
+      ]
+    },
+    {
+      "name": "Secrets of the Dead",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "recursion payoff"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        }
+      ]
+    },
+    {
+      "name": "Seal of Primordium",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "destroys artifact/enchantment"
+        }
+      ]
+    },
+    {
+      "name": "Seal of Removal",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "bounces creature"
+        }
+      ]
+    },
+    {
+      "name": "Rhystic Study",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws cards"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "engine"
+        }
+      ]
+    },
+    {
+      "name": "Mystic Remora",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "payoff",
+          "confidence": 0.72,
+          "evidence": "payoff"
+        },
+        {
+          "tag": "engine",
+          "confidence": 0.7,
+          "evidence": "engine"
+        }
+      ]
+    },
+    {
+      "name": "Jace, Wielder of Mysteries",
+      "quantity": 1,
+      "functional_tag": "wincon",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        },
+        {
+          "tag": "wincon",
+          "confidence": 0.78,
+          "evidence": "win condition"
+        }
+      ]
+    },
+    {
+      "name": "Ashiok, Dream Render",
+      "quantity": 1,
+      "functional_tag": "mill",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        },
+        {
+          "tag": "enabler",
+          "confidence": 0.7,
+          "evidence": "enabler"
+        }
+      ]
+    },
+    {
+      "name": "Counterspell",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.72,
+          "evidence": "counters"
+        },
+        {
+          "tag": "protection",
+          "confidence": 0.62,
+          "evidence": "protection"
+        }
+      ]
+    },
+    {
+      "name": "Cyclonic Rift",
+      "quantity": 1,
+      "functional_tag": "board_wipe",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "bounces"
+        }
+      ]
+    },
+    {
+      "name": "Assassin's Trophy",
+      "quantity": 1,
+      "functional_tag": "removal",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "removal",
+          "confidence": 0.83,
+          "evidence": "destroys permanent"
+        }
+      ]
+    },
+    {
+      "name": "Crop Rotation",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "searches land"
+        }
+      ]
+    },
+    {
+      "name": "Buried Alive",
+      "quantity": 1,
+      "functional_tag": "tutor",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "tutor",
+          "confidence": 0.86,
+          "evidence": "tutors to graveyard"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard enabler"
+        }
+      ]
+    },
+    {
+      "name": "Entomb",
+      "quantity": 1,
+      "functional_tag": "tutor",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "tutor",
+          "confidence": 0.86,
+          "evidence": "tutors to graveyard"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard enabler"
+        }
+      ]
+    },
+    {
+      "name": "Reanimate",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 1,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "reanimates"
+        }
+      ]
+    },
+    {
+      "name": "Victimize",
+      "quantity": 1,
+      "functional_tag": "recursion",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "reanimates"
+        }
+      ]
+    },
+    {
+      "name": "Life from the Loam",
+      "quantity": 1,
+      "functional_tag": "draw",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "recursion",
+          "confidence": 0.86,
+          "evidence": "recursion"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        }
+      ]
+    },
+    {
+      "name": "Cultivate",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "searches lands"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "draws"
+        }
+      ]
+    },
+    {
+      "name": "Farseek",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 2,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "searches land"
+        }
+      ]
+    },
+    {
+      "name": "Harrow",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 3,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "searches lands"
+        }
+      ]
+    },
+    {
+      "name": "Icetill Explorer",
+      "quantity": 1,
+      "functional_tag": "ramp",
+      "is_commander": 0,
+      "cmc": 4,
+      "tags": [
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "graveyard_synergy",
+          "confidence": 0.72,
+          "evidence": "graveyard synergy"
+        }
+      ]
+    },
+    {
+      "name": "Bojuka Bog",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Breeding Pool",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Command Beacon",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Command Tower",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Drowned Catacomb",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Evolving Wilds",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "sacrifice"
+        }
+      ]
+    },
+    {
+      "name": "Exotic Orchard",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Fabled Passage",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "sacrifice"
+        }
+      ]
+    },
+    {
+      "name": "Forest",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "basic land"
+        }
+      ]
+    },
+    {
+      "name": "Hinterland Harbor",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Island",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "basic land"
+        }
+      ]
+    },
+    {
+      "name": "Misty Rainforest",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Opulent Palace",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Overgrown Tomb",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Polluted Delta",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Rejuvenating Springs",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Sunken Hollow",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Swamp",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "basic land"
+        }
+      ]
+    },
+    {
+      "name": "Terramorphic Expanse",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "sacrifice_outlet",
+          "confidence": 0.8,
+          "evidence": "sacrifice"
+        }
+      ]
+    },
+    {
+      "name": "Undergrowth Stadium",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Verdant Catacombs",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Watery Grave",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Woodland Cemetery",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        }
+      ]
+    },
+    {
+      "name": "Zagoth Triome",
+      "quantity": 1,
+      "functional_tag": "land",
+      "is_commander": 0,
+      "cmc": 0,
+      "tags": [
+        {
+          "tag": "land",
+          "confidence": 1.0,
+          "evidence": "land"
+        },
+        {
+          "tag": "ramp",
+          "confidence": 0.88,
+          "evidence": "adds mana"
+        },
+        {
+          "tag": "draw",
+          "confidence": 0.84,
+          "evidence": "cycling"
+        }
+      ]
+    }
+  ]
+}
