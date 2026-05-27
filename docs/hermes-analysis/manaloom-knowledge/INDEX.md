@@ -8,11 +8,19 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
+<<<<<<< HEAD
 | Comandantes analisados | 11 | 2026-05-27 |
 | Decks analisados | 11 | 2026-05-27 |
 | Cartas revisadas | ~1.230 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100) | 2026-05-27 |
 | Insights documentados | 54 | 2026-05-27 |
 | Discrepancias com ManaLoom | 58 | 2026-05-27 |
+=======
+| Comandantes analisados | 11 | 2026-05-28 |
+| Decks analisados | 12 | 2026-05-28 |
+| Cartas revisadas | ~1.330 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100 + VALIDATOR 86) | 2026-05-28 |
+| Insights documentados | 64 | 2026-05-28 |
+| Discrepancias com ManaLoom | 62 | 2026-05-28 |
+>>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
 
 ## Comandantes Analisados
 
@@ -24,7 +32,11 @@
 | Korvold, Fae-Cursed King | 1 | 2026-05-26 | 5 | Pendente |
 | Teysa Karlov | 1 | 2026-05-26 | 6 | Pendente |
 | Aesi, Tyrant of Gyre Strait | 1 | 2026-05-26 | 4 | Pendente |
+<<<<<<< HEAD
 | **Lorehold, the Historian** | **1** | **2026-05-26** | **4** | **Pendente** |
+=======
+| **Lorehold, the Historian** | **1** | **2026-05-28** | **4 + 10 novos** | **Completa: 86 cartas, 206 multi-tags, c/ VALIDATOR_LOG.md** |
+>>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
 | **Winota, Joiner of Forces** | **1** | **2026-05-27** | **4** | **Parcial: 85 linhas / 100 qty** |
 | **Muldrotha, the Gravetide** | **1** | **2026-05-27** | **3** | **Nova: 87/87 EDHREC avg** |
 | **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
@@ -114,6 +126,13 @@
     incluem: Olivia's Wrath (board wipe detectado como utility), Sorin Imperious Bloodlord
     (engine detectado como removal), Viscera Seer (sac outlet detectado como draw),
     Sanguine Bond (combo piece detectado como enchantment generico).
+<<<<<<< HEAD
+=======
+22. **Lorehold tem 3 arquétipos distintos em EDHREC.** — Stax/Combo (Drannith, Archon, Underworld Breach + Grinding Station), Big Spells Value (Arcane Bombardment, Double Vision, Worldfire), Chaos/Haymakers (Goblin Game, Master Warcraft). O deck analysis DEVE identificar qual arquétipo o deck segue antes de validar as métricas.
+23. **Lorehold Big Spells não precisa de stax.** — Confirmado contra EDHREC refs: o arquétipo Big Spells (Deck 2) tem zero stax pieces. Stax não é obrigatório para Lorehold em bracket 3.
+24. **Gy recursion é o gap mais comum em decks de big spells.** — Decks focados em copy/value engines (Lorehold, Arcane Bombardment, Sunbird's Invocation) frequentemente negligenciam recursão. O perfil EDHREC recomenda 2-5 fontes; decks que não têm isso perdem 30-50% do valor de longo prazo.
+25. **Topdeck setup tem rendimentos decrescentes.** — 12 cartas de topdeck/miracle setup vs 6-9 do ideal. Cada carta além do ponto ótimo entra em conflito com draw/ramp/interação. O ponto de saturação para Lorehold é 8-9 cartas — após isso, draw puro é melhor.
+>>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
 
 ### Por Arquetipo
 - **Combo (cEDH):** 24+ ramp, 15+ interaction, 0-2 board wipes,
@@ -552,6 +571,7 @@ A analise anterior do deck Lorehold continha erros significativos nas metricas, 
 
 ## Ultimas Execucoes
 
+<<<<<<< HEAD
 ### 2026-05-27 — Lorehold Purpose Analyzer (Agent 2)
 - **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
 - **Foco:** Analise profunda de cada carta do deck Lorehold
@@ -559,3 +579,16 @@ A analise anterior do deck Lorehold continha erros significativos nas metricas, 
 - **Correcoes a analise anterior:** Lands 34→35, Draw 4→3, Recursion 0→4-5, Wincons 10→2/5, Topdeck Setup 12→7
 - **Insights:** 1 novo (deck tem plano de recursion+treasures, nao topdeck+miracle como media)
 - **Discrepancia:** 1 nova (10 cartas sem tag funcional primaria no classificador single-tag)
+=======
+### 2026-05-28 — Lorehold Purpose Analyzer (Agent 2) — Deep Dissection
+- **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
+- **Foco:** Validacao profunda de cada carta em 5 niveis de importancia + cross-ref com EDHREC (3 corpus decks) + user collection (229 cards)
+- **Arquivos gerados:** VALIDATOR_LOG.md (7 secoes, ~16KB)
+- **Descobertas:**
+  - 3 arquétipos de Lorehold identificados: Stax/Combo, Big Spells Value, Chaos/Haymakers
+  - Seu deck e Big Spells Value + elementos de Chaos — viável em bracket 3
+  - 4 cartas recomendadas para corte prioritario (Bender's Waterskin, Deflecting Palm, Longshot, Galadriel's Dismissal)
+  - 5 cartas da colecao recomendadas para inclusao — destaque Arcane Bombardment, Faithless Looting, Dualcaster Mage + Twinflame combo
+- **Gap crítico:** 0 graveyard recursion vs 2-5 do perfil EDHREC
+- **Insights:** 7 novos (arquétipos Lorehold, stax validation, overlap analysis com 3 EDHREC refs)
+>>>>>>> 83684733 (feat: Lorehold Purpose Analyzer - deep dissection 2026-05-28)
