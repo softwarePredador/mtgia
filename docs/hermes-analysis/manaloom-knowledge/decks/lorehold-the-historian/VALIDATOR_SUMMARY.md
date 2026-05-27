@@ -1,27 +1,42 @@
-# Lorehold Purpose Analyzer — Resumo 2026-05-27
+# Lorehold Purpose Analyzer — Resumo 2026-05-27 (v3, Play Pattern Focus)
 
-## O que seu deck É
+## Estado Atual (Pós-3 Swaps do EVOLUTION_LOG)
 
-**Big Spells Value com Topdeck Manipulation.** Você quer ter Scroll Rack + Top + Penance no campo, controlar o que está no topo do grimório, e castar uma spell grande por turno — copiada por Lorehold, às vezes também por Double Vision ou Sunbird's Invocation. É um plano lento, consistente, e fofo quando funciona.
+Lands: 35 | Ramp: 15 | Draw (single-tag): 4 | Proteção: 7 | Wincons: 2 | CMC médio: 3.96
 
-## O que seu deck PRECISA
+Swaps aplicados: Furygale Flocking → Esper Sentinel ✅, Jokulhaups → Gamble ✅, Karoo → Plains ✅
 
-**Draw.** Em Boros, você tem 4 fontes de draw (single-tag). Isso é fatal em jogos longos. Você TEM as soluções na coleção: Big Score, The One Ring, Trouble in Pairs, Faithless Looting. Por que não estão no deck?
+## O Problema Central: 4 Draw Sources em Boros
 
-## O que seu deck TEM DEMAIS
+O DB declara draw_count=8 por causa de falsos positivos no multi-tag (Land Tax, Weathered Wayfarer, Unexpected Windfall). **Draw real: 4.** Em 7.651 decks Lorehold, a média é 6-8.
 
-**Proteção.** 7 slots. Meta usa 4. Você tem Greaves + Mother of Runes + Hexing Squelcher = 3 slots que poderiam ser draw.
+## O Problema Estrutural: 12 Criaturas em Deck Spellslinger
 
-## Três Swaps Mais Urgentes (Custo $0)
+6 das 12 não sinergizam: Mother of Runes, Weathered Wayfarer, Goblin Engineer, Oswald Fiddlebender, Longshot Rebel Bowman, Hellkite Tyrant.
 
-1. Deflecting Palm → **Big Score** (67.3% EDHREC) — draw + ramp
-2. Hellkite Tyrant → **Dance with Calamity** (50.4% EDHREC) — a carta que melhor sinergiza com Lorehold
-3. Mother of Runes → **The One Ring** — draw engine que resolve Boros
+## O Problema de CMC: 16 Cartas de Custo 6+
 
-## O Deckbuilder, Segundo o Deck
+Insurrection (8), Storm Herd (10), Rise of the Eldrazi (12). Sem draw, o deck encontra cartas caras demais cedo demais e não consegue jogá-las.
 
-- Experiente, com tendência a grinder/stax
-- Gosta de valor lento em vez de explosivo
-- Superprotege o comandante (ansiedade de removals?)
-- Tem cartas "ajeitadinhas" que não merecem o slot
-- Tem a SOLUÇÃO na coleção mas não usa — **você tem 8 staples do meta EDHREC paradas na coleção**
+## Cinco Swaps Prioritários da Sua Coleção ($0)
+
+| # | Sai | Entra | Impacto |
+|:-:|:----|:------|:--------|
+| 1 | Deflecting Palm (0% EDHREC) | **Big Score** (67.3%) | Draw +1, Ramp +1 |
+| 2 | Hellkite Tyrant (0% EDHREC) | **Dance with Calamity** (50.4%) | Sinergia máxima Lorehold |
+| 3 | Mother of Runes (0% EDHREC) | **The One Ring** | Draw engine resolve Boros |
+| 4 | Victory Chimes (54.3%) | **Boros Signet** (50.4%) | Ramp fixo e seguro |
+| 5 | Lightning Greaves (0% EDHREC) | **Trouble in Pairs** | Draw passivo em multiplayer |
+
+## O Deckbuilder, Segundo o Deck (Atualizado)
+
+- Ama engines graduais (Scroll Rack + Penance + Top) — acertou, é o coração
+- Superprotege o comandante — ainda com Mother + Greaves + Hexing (6 proteções)
+- Subestima draw em Boros — mesmo com Esper Sentinel adicionada
+- Tem **10 cartas do meta Lorehold na coleção** não usadas
+
+## Próximo Ciclo
+
+- Purpose Analyzer v3 completo em VALIDATOR_LOG.md
+- Recomendar: aplicar os 5 swaps, re-simular mulligan com 35 lands
+- Avaliar se o deck precisa de +2 lands (37) para CMC 3.96
