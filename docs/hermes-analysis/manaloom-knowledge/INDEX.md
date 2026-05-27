@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-| Comandantes analisados | 6 | 2026-05-26 |
-| Decks analisados | 7 | 2026-05-26 |
-| Cartas revisadas | ~578 (selecao) | 2026-05-26 |
-| Insights documentados | 34 | 2026-05-26 |
-| Discrepancias com ManaLoom | 33 | 2026-05-26 |
+| Comandantes analisados | 7 | 2026-05-27 |
+| Decks analisados | 7 | 2026-05-27 |
+| Cartas revisadas | ~678 (selecao + Winota 100 cartas) | 2026-05-27 |
+| Insights documentados | 37 | 2026-05-27 |
+| Discrepancias com ManaLoom | 36 | 2026-05-27 |
 
 ## Comandantes Analisados
 
@@ -25,6 +25,7 @@
 | Teysa Karlov | 1 | 2026-05-26 | 6 | Pendente |
 | Aesi, Tyrant of Gyre Strait | 1 | 2026-05-26 | 4 | Pendente |
 | **Lorehold, the Historian** | **1** | **2026-05-26** | **4** | **Pendente** |
+| **Winota, Joiner of Forces** | **1** | **2026-05-27** | **4** | **Parcial: 85 linhas / 100 qty** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -111,6 +112,10 @@
   7 draw (Aesi complementa), 9 removal/removal, 2 board wipes, 2 protecao,
   1 tutor, 11 landfall payoffs, 3 recursion, 40 terrenos, 2.61 CMC medio,
   2 Game Changers (Cyclonic Rift, Crop Rotation)
+- **Aggro-Stax/Combat Triggers (Winota, bracket 4/high-power):** 34 lands
+  (profile 31-35), 10 ramp, 3 draw, 8 removal, 10 protection multi-tag,
+  22 nao-Human creatures, 25 Human creatures, CMC medio 2.35. Metrica central:
+  densidade non-Human enabler vs Human hit, nao draw bruto.
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -156,6 +161,12 @@
   Avenger tokens a Deadeye+Palinchron. Aceita que Aesi sera removida e recastada
   em vez de proteger ela. O deck e construido para ser resiliente por redundancia
   de payoffs, nao por protecao de pecas.
+- **Jogador de Winota aggro-stax:** Agressivo-controlador. Pensa em duas
+  pilhas: enablers nao-Humanos que disparam Winota e Humans que valem ser
+  trapaceados. Aceita cartas individualmente fracas (Ornithopter, Phyrexian
+  Walker) porque elas sao excelentes estruturalmente. Tolerancia a risco alta:
+  troca draw tradicional por uma janela curta de ataque protegida por stax e
+  protecao.
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -222,6 +233,13 @@
 - **Aesi e o deck lands-matter com CMC medio mais baixo (2.61).** Comparado com
   Korvold (3.2) e Teysa (2.9), Aesi tem CMC mais baixo porque metade do deck
   e ramp de baixo custo + terrenos.
+- **Winota: Human/Non-Human split e mais importante que tipo total.** EDHREC
+  live lista 46 creatures e 32 lands, mas a analise Scryfall do corpus default
+  mostra 25 Humans e 22 nao-Humans; isso explica por que a IA precisa separar
+  hits de enablers.
+- **Winota draw baixo nao e necessariamente problema.** O deck tem 3 draw
+  multi-tag, mas o plano real e gerar vantagem de campo via trigger de Winota
+  e proteger a janela com stax/protecao.
 
 ## Sinergias Documentadas
 
@@ -271,6 +289,10 @@
 | Aesi | Landfall Payoffs (Avenger, Scute Swarm) | Converte land drops em board presence | Essencial (Aesi) |
 | Aesi | Bounce Lands (Simic Growth Chamber) | Re-trigga Aesi + landfalls + guarda carta na mao | Alta (Aesi) |
 | Aesi | Tireless Provisioner | Cada fetch land vira treasure + draw | Alta (Aesi) |
+| Winota | Ornithopter/Rograkh/Gingerbrute | Nao-Human enablers baratos geram triggers | Essencial (Winota) |
+| Winota | Blade Historian/Angrath's Marauders | Humans hit que convertem trigger em dano explosivo | Essencial (Winota) |
+| Winota | Drannith Magistrate/Thalia/Archon | Humans/stax que reduzem janela de resposta | Alta (Winota) |
+| Winota | Grand Abolisher/Silence/Deflecting Swat | Protege o turno critico de ataque | Alta (Winota) |
 
 ## Discrepancias Acumuladas com ManaLoom
 
@@ -309,6 +331,9 @@
 | Aesi, Tyrant of Gyre Strait | engine | draw | Sistema perde metade da funcao (extra land drop + draw) | Medio |
 | Cyclonic Rift | board_wipe | removal | Sistema ve só modo alvo; overload mode é board wipe unilateral | Medio |
 | Tatyova, Benthic Druid | engine | draw | Mesmo problema — draw + lifegain por landfall | Baixo |
+| Winota, Joiner of Forces | engine/mana_cheat | creature/draw-like | Sistema nao captura command-zone engine de attack triggers | Alto |
+| Drannith Magistrate (Winota) | stax_disruption + Human hit | creature | Single-tag perde papel contextual de hatebear/hit | Alto |
+| Blade Historian (Winota) | combat_payoff | creature | Nao detecta payoff de dano em combat trigger deck | Medio |
 
 ## Funcional Tags: Precisao Acumulada
 
@@ -351,6 +376,9 @@
 | Fodder (Teysa) | Criaturas ou fichas descartaveis que podem ser sacrificadas. Quanto mais baratas e recorrentes, melhor. |
 | Drain (Teysa) | Perda de vida de oponentes combinada com ganho de vida proprio. Efeito Blood Artist. |
 | Sac outlet (Teysa) | Sacrifice outlet - permanente que pode sacrificar criaturas a custo zero ou baixo. |
+| Trigger density (Winota) | Quantidade de corpos/efeitos que realmente disparam Winota; principalmente nao-Human attackers. |
+| Human hit (Winota) | Criatura Human que vale revelar com Winota porque entra atacando e gera stax, protecao ou dano. |
+| Aggro-stax window | Janela curta em que stax impede respostas e combate resolve antes da mesa estabilizar. |
 
 ## Principios de Deckbuilding (extraidos das analises)
 
@@ -372,6 +400,8 @@
 16. **"Draw condicional e aceitavel se voce controla a condicao."** (Teysa — sempre pode criar uma ficha e sacrifica-la)
 17. **"Board wipe proprio e autodano aceitavel."** (Teysa — criaturas geram valor na morte, entao Toxic Deluge e um buff disfarcado)
 18. **"Tutor com custo de sacrificio e vantagem, nao custo."** (Teysa — Diabolic Intent e melhor que Demonic Tutor quando sacrificio e valor, nao perda)
+19. **"Cartas ruins podem ser corretas quando cumprem o papel estrutural."** (Winota — Ornithopter/Phyrexian Walker sao triggers gratuitos, nao ameaças individuais)
+20. **"Separe enablers de payoffs antes de avaliar qualidade."** (Winota — non-Human attackers e Human hits precisam de contagens distintas)
 
 ## Ultimas Execucoes
 
@@ -382,3 +412,5 @@
 | 2026-05-26 | EDHREC Average Deck (30.921 decks) | Yuriko, the Tiger's Shadow (Dimir Ninja Topdeck Tempo) | Analise concluida |
 | 2026-05-26 | EDHREC Average Deck (19.646 decks) | Korvold, Fae-Cursed King (Jund Sacrifice Midrange) | Analise concluida |
 | 2026-05-26 | EDHREC Average Deck (20.216 decks) | Teysa Karlov (Orzhov Aristocrats Death Triggers) | Analise concluida |
+| 2026-05-26 | EDHREC Average Deck / corpus local | Aesi, Tyrant of Gyre Strait (Lands-Matter Value Engine) | Analise concluida |
+| 2026-05-27 | EDHREC live (12.840 decks) + corpus local | Winota, Joiner of Forces (Aggro-Stax Combat Triggers) | Analise concluida |
