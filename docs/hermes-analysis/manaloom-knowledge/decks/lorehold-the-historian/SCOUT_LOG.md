@@ -25,7 +25,7 @@
 | Win Condition    | 1      | 7      | 1      | **3.0**    | —          | —       |
 | Creature         | 12     | 3      | 2      | **5.7**    | —          | —       |
 | Protection       | —      | 2      | 5      | **2.3**    | —          | —       |
-| Other            | 30     | 19     | 32     | **27.0**   | —          | —       |
+| Other            | 30     | 19     | 32     | **27.0**    | —          | —       |
 
 **Observações**: Nosso deck tem mais lands, ramp, draw e board wipes que a média externa. Isso sugere um perfil mais "midrange/controle" do que os decks de referência, que variam entre posturas mais agressivas (Deck 1 com 12 criaturas) e mais spell-slinging puras (Decks 2-3 com 2-3 criaturas).
 
@@ -794,6 +794,225 @@ Flooded Strand (9.7%), Scalding Tarn (9.8%) e Windswept Heath (10.3%) são fetch
 
 ---
 
+## [2026-05-27 22:00] Execução #6 — PÓS-CICLO #2: Verificação de Mudanças e Prioridades Revisadas
+
+### Fonte
+- **EDHREC Live** (__NEXT_DATA__): 7.651 decks reais de Lorehold
+- **Nosso deck**: deck_id=6, "Lorehold Spellslinger", **100 cartas, pós-Ciclo #2**
+- **Coleção**: 229 cartas no `user_collection`
+- **Pipeline**: Scout → Validator → Mulligan → Evolution (Ciclo #2 aplicado)
+
+---
+
+### ✅ CICLO #2 CONFIRMADO: 3 Swaps Aplicados
+
+Os swaps recomendados pela Execução #3 foram aplicados pelo Evolution Oracle:
+
+| Swap | Antes | Depois | % EDHREC | Status |
+|:----:|:------|:-------|:--------:|:------:|
+| 1 | Deflecting Palm (20.1%) | **Big Score** (67.2%) | ✅ | Ramp + draw no lugar de fog nicho |
+| 2 | Hellkite Tyrant (0%) | **Dance with Calamity** (50.4%) | ✅ | Lorehold's best friend |
+| 3 | Mother of Runes (34.5%) | **The One Ring** (8.4%) | ⚠️ | Draw engine em B3 (Game Changer) |
+
+**Resultado das mudanças no deck:**
+- Lands: 35 (inalterado)
+- Ramp: 15 → 16 (+1 Big Score)
+- Draw: várias fontes → + The One Ring (+1)
+- Proteção: 7 → 4 (-3, Mother of Runes saiu)
+- Sinergia Lorehold: agora Dance with Calamity presente
+
+---
+
+### 🔍 PÓS-CICLO #2: O que ainda precisa mudar?
+
+Com 3 swaps feitos, o deck melhorou mas ainda tem **14 cartas problemáticas** (abaixo de 15% EDHREC ou não trackeadas no meta):
+
+| Carta | % EDHREC | Tag | Problema |
+|:------|:--------:|:---:|:---------|
+| **Desperate Ritual** | 0% | ramp | Ritual puro sem value. CMC 2 para +{R}{R}{R} |
+| **Oswald Fiddlebender** | 0% | tutor | Tutor de artifact que ninguém usa em Lorehold |
+| **Goblin Engineer** | 0% | recursion | Recursão de artifact nicho |
+| **Ancient Copper Dragon** | 0% | token_maker | CMC 6 caro, payoff incerto |
+| **Galadriel's Dismissal** | 0% (não trackeado) | NULL | Phase out situacional, sem sinergia |
+| **Orim's Chant** | 0% (não trackeado) | NULL | Stax piece que não avança big spells |
+| **Weathered Wayfarer** | 0% (não trackeado) | ramp | Tutor de land frágil, morre fácil |
+| **Dormant Volcano** | 0% (não trackeado) | land | Bounce land — risco de stone rain |
+| **Kor Haven** | 0% (não trackeado) | land | Land de combate nicho, não aporta cor |
+| **Cavern of Souls** | 0% (não trackeado) | land | Não joga tribal, não precisa |
+| **Season of the Bold** | 9.9% | exile_value | CMC 5 para conditional exile draw |
+| **Fated Clash** | 15.6% | board_wipe | Board wipe condicional frágil |
+| **Sunbird's Invocation** | 13.7% | big_spell | CMC 6 slow, Double Vision + Arcane Bombardment são melhores |
+| **The One Ring** | 8.4% | draw | Game Changer, baixa inclusão em Lorehold B3 |
+
+**Total de slots problemáticos: 14 de 99 não-commander (14.1%).**
+
+---
+
+### 🆕 PRIORIDADES REVISADAS PÓS-CICLO #2
+
+A hierarquia de necessidades mudou. Agora que Big Score, Dance e The One Ring estão no deck, as maiores fraquezas são:
+
+#### Prioridade #1: Draw Consistency (🔴 CRÍTICO)
+O draw real do deck (excluindo falsos positivos) é baixo. The One Ring (8.4%) ajuda mas não resolve sozinho.
+
+**Swap:** Orim's Chant (0%) → **Trouble in Pairs** (10.5%, 📦 coleção)
+- Por quê: Trouble in Pairs dá draw passivo toda vez que oponentes fazem coisas — que é sempre em multiplayer. Em Boros, draw passivo vale ouro. E está na coleção.
+
+#### Prioridade #2: Treasure Payoff (🟡 ALTA)
+O deck agora tem Big Score, Brass's Bounty, Dance — mas não tem quem capitalize nos treasures.
+
+**Swap:** Ancient Copper Dragon (0%) → **Storm-Kiln Artist** (55.4%, 📦 coleção)
+- Por quê: A melhor criatura payoff de Lorehold. Cada spell conjurada = 1 treasure. 55% do meta usa.
+
+#### Prioridade #3: Removal Versátil (🟡 ALTA)
+O deck tem Path + Swords mas falta removal versátil.
+
+**Swap:** Galadriel's Dismissal (0%) → **Chaos Warp** (38.9%, 📦 coleção)
+- Por quê: Chaos Warp é o removal mais versátil de Boros. Tira qualquer permanente. 38.9% do meta.
+
+#### Prioridade #4: Ramp Consistente (🟡 MÉDIA)
+O deck tem muitas fontes de ramp situacional mas falta a base.
+
+**Swap:** Desperate Ritual (0%) → **Boros Signet** (50.4%, 📦 coleção)
+- Por quê: 2-cmc ramp que o meta joga em metade dos decks. Ramp consistente > ritual.
+
+#### Prioridade #5: Big Spell Upgrade (🟡 MÉDIA)
+Sunbird's Invocation é lento e imprevisível.
+
+**Swap:** Sunbird's Invocation (13.7%) → **Improvisation Capstone** (61.2%, 📦 coleção)
+- Por quê: Capstone é 4.5x mais popular. Exila 7, conjura instant/sorcery grátis. Sinergia direta com Lorehold.
+
+#### Prioridade #6: Board Wipe Upgrade (🟢 OPCIONAL)
+Fated Clash é condicional e frágil.
+
+**Swap:** Fated Clash (15.6%) → **Blasphemous Act** (40.5%, 📦 coleção)
+- Por quê: Blasphemous Act custa {1} no late game. O board wipe mais eficiente de Boros.
+
+---
+
+### 🎯 PROJEÇÃO: Como o Deck Fica Após os 6 Swaps
+
+| Métrica | Ciclo #2 | Pós-6 | Δ | Perfil (min-max) |
+|:--------|:-------:|:-----:|:-:|:----------------:|
+| Lands | 35 | 35 | — | 36-38 🟡 |
+| Ramp | 16 | 17 | +1 | 10-13 ✅ |
+| Draw | 5 (single) | **7-8** | +2-3 | 8-12 🟡 (melhorando) |
+| Spot removal | 4 | **5** | +1 | 4-6 ✅ |
+| Board wipes | 4 | 4 | — | 3-5 ✅ |
+| Treasure payoffs | 2 | **4** | +2 | N/A |
+| Big spells (CMC5+) | 24 | 24 | — | 10-16 miracle + 5-8 payoffs ✅ |
+| Proteção | 4 | 4 | — | support ✅ |
+| Avg CMC | ~3.85 | **~3.75** | -0.1 | ~4.1 🟢 (mais rápido) |
+| Sinergia Lorehold | Alta | **Muito Alta** | + | Storm-Kiln + Capstone + Dance |
+
+**Draw deve subir de ~5 para ~7-8 fontes reais** (The One Ring + Trouble in Pairs + draw passivo).
+
+---
+
+### 🗺️ MAPA COMPLETO: Onde Cada Carta do Deck Está vs Meta
+
+#### 🟢 STAPLES META (50%+ EDHREC) — 29 cartas
+Hit the Mother Lode (79.4%), Library of Leng (77.7%), Clifftop Retreat (75.6%), Storm Herd (75.2%), Monument to Endurance (72.9%), Bender's Waterskin (71.2%), Swords to Plowshares (68.9%), Brass's Bounty (67.2%), Big Score (67.2%), Sacred Foundry (67.1%), Sensei's Divining Top (67.0%), Call Forth the Tempest (65.6%), Talisman of Conviction (64.9%), Volcanic Vision (63.9%), Approach of the Second Sun (63.9%), Sundown Pass (60.3%), Scroll Rack (59.8%), Mizzix's Mastery (57.7%), Path to Exile (57.2%), Unexpected Windfall (56.8%), Rise of the Eldrazi (55.0%), Victory Chimes (53.9%), Olórin's Searing Light (53.3%), Dance with Calamity (50.4%)
+
+**+ Lands:** Mountain (98.4%), Plains (97.9%), Sol Ring (90.5%), Command Tower (88.2%), Arcane Signet (88.1%)
+
+#### 🟡 ACEITÁVEL (20-49%) — 26 cartas
+Longshot, Rebel Bowman (48.0%), Restoration Seminar (48.0%), Double Vision (46.8%), Arid Mesa (45.4%), Boros Charm (45.5%), Insurrection (45.5%), Lightning Greaves (45.2%), Ruby Medallion (42.4%), Penance (41.8%), Hexing Squelcher (41.0%), Reforge the Soul (37.9%), Deflecting Swat (36.9%), Taunt from the Rampart (35.3%), Perch Protection (34.7%), Austere Command (33.3%), Esper Sentinel (32.3%), Land Tax (31.3%), Exotic Orchard (31.1%), Jeska's Will (30.5%), Smothering Tithe (29.4%), Urza's Saga (26.9%), Galvanoth (26.6%), Pearl Medallion (25.2%), Rite of the Dragoncaller (23.3%), Teferi's Protection (21.2%), Artist's Talent (20.9%)
+
+#### 🟠 ABAIXO DO META (10-19%) — 12 cartas
+Enlightened Tutor (18.3%), Goldspan Dragon (17.9%), Archaeomancer's Map (17.2%), Seething Song (16.1%), Surge to Victory (19.7%), Fated Clash (15.6%), Sunbird's Invocation (13.7%), Ancient Tomb (13.9%), Boseiju (13.3%), Gamble (12.1%), Grand Abolisher (11.8%), The One Ring (8.4%)
+
+#### 🔴 ZERO NO META — 10 cartas
+Desperate Ritual, Oswald Fiddlebender, Goblin Engineer, Ancient Copper Dragon, Galadriel's Dismissal, Orim's Chant, Weathered Wayfarer, Dormant Volcano, Kor Haven, Cavern of Souls
+
+#### ? SEM DADOS — 2 cartas
+Season of the Bold (9.9% — baixíssimo), Valakut Awakening (26.9% — aceitável, corrigido)
+
+---
+
+### 🧠 PADRÃO EMERGENTE PÓS-CICLO #2: O deck agora tem um "núcleo explosivo"
+
+Com Big Score + Dance with Calamity + Brass's Bounty + Hit the Mother Lode, o deck tem 4 cartas que geram treasures em massa. Mas falta quem capitalize neles:
+
+**Missing piece:** Storm-Kiln Artist (55.4%) — que transforma cada spell copiada pelo Lorehold em um treasure adicional. O deck agora tem o setup, mas não o payoff.
+
+**Comparação com meta:** Storm-Kiln Artist está em 55.4% dos decks. Nosso deck NÃO tem. A carta mais óbvia que o deck precisa é Storm-Kiln Artist.
+
+**Swap imediato:** Ancient Copper Dragon (0%) → Storm-Kiln Artist (55.4%). Ambos CMC 6, ambos criaturas, mas Storm-Kiln dá treasure a CADA spell — não a cada ataque.
+
+---
+
+### 🧠 PADRÃO #2: O meta está rejeitando The One Ring (8.4%) em Lorehold
+
+The One Ring a 8.4% merece discussão. É uma carta objetivamente poderosa, mas o meta de Lorehold prefere:
+- **Monument to Endurance** (72.9%) — draw condicional mas não é Game Changer
+- **Library of Leng** (77.7%) — topdeck enabler, não draw puro
+- **Sensei's Divining Top** (67.0%) — topdeck manipulation
+
+**Por que TOR é baixo:** Lorehold é bracket 3. The One Ring consome um slot de Game Changer e não contribui para o plano de big spells. Os 8.4% que jogam TOR são provavelmente bracket 4.
+
+**Trade-off:** The One Ring resolve o maior problema do deck (draw em Boros), mas ocupa um slot de Game Changer. Se você quiser jogar bracket 3 puro, considere substituir por **Trouble in Pairs** (10.5%, 📦 coleção) — não é Game Changer, draw passivo similar, e está na coleção.
+
+---
+
+### 🧠 PADRÃO #3: A felicidade do deckbuilder de Lorehold é medida em treasures
+
+Olhando o perfil psicológico do deckbuilder médio de Lorehold:
+
+**Arquetípico:** O jogador de Lorehold quer uma mágica grande que gere treasures e depois outra mágica grande. Ele não quer proteção, não quer criaturas, não quer wincons específicos. Ele quer:
+1. Ramp (Hit the Mother Lode → treasures)
+2. Draw (Big Score → treasures + cards)
+3. Payoff (Dance with Calamity → free spells)
+4. Repeat (Lorehold trigger → copy big spell)
+
+**O que o nosso deck faz diferente:** Nosso deck ainda carrega 10 cartas que não geram treasures nem big spells (Desperate Ritual, Orim's Chant, Galadriel's Dismissal, Weathered Wayfarer, etc.). Cada uma delas trava a "engine" de Lorehold.
+
+---
+
+### 💡 PRIORIDADE DE CORTE (Ranking de Urgência)
+
+| # | Corte | Razão | Alternativa (da coleção) |
+|:-:|:------|:------|:-------------------------|
+| 1 | **Desperate Ritual** (0%) | 0% EDHREC, ritual sem value | Boros Signet (50.4%) |
+| 2 | **Ancient Copper Dragon** (0%) | 0% EDHREC, CMC 6 sem payoff | Storm-Kiln Artist (55.4%) |
+| 3 | **Sunbird's Invocation** (13.7%) | Slow, 13.7%, Capstone 61.2% | Improvisation Capstone (61.2%) |
+| 4 | **Orim's Chant** (0%) | Stax que não alinha | Trouble in Pairs (10.5%) |
+| 5 | **Fated Clash** (15.6%) | Board wipe condicional | Blasphemous Act (40.5%) |
+| 6 | **Galadriel's Dismissal** (0%) | Situacional, sem draw | Chaos Warp (38.9%) |
+| 7 | **Goblin Engineer** (0%) | 0% EDHREC, artifact subtheme | Apex of Power (55.3%) |
+| 8 | **Oswald Fiddlebender** (0%) | 0% EDHREC, artifact subtheme | Soulfire Eruption (42.7%) ou Mana Geyser (26.3%) |
+
+---
+
+### 💰 CUSTO TOTAL DOS 8 SWAPS: ZERO
+
+Todas as 8 alternativas estão na coleção. O custo total das melhorias é zero.
+
+---
+
+### LIÇÕES DESTA EXECUÇÃO
+
+1. **Ciclo #2 confirmado:** Os 3 swaps foram aplicados corretamente. Big Score, Dance with Calamity e The One Ring estão no deck.
+
+2. **O núcleo está formando:** O deck agora tem o setup (treasure ramp) mas ainda falta o payoff (Storm-Kiln Artist). Esse é o swap mais urgente do Ciclo #3.
+
+3. **14 cartas ainda problemáticas:** Mesmo após Ciclo #2, 14% do deck ainda está abaixo de 15% de inclusão no meta ou é zero no meta.
+
+4. **The One Ring (8.4%) é swap questionável:** Resolve draw mas é Game Changer. Se bracket 3 for prioridade, considerar Trouble in Pairs (10.5%) como alternativa — não é Game Changer e está na coleção.
+
+5. **O meta é estável:** 7.651 decks, mesmas inclusões da última análise. Nenhuma carta nova ou tendência surpreendente.
+
+6. **Andamento do pipeline:** Scout → Validator → Mulligan → Evolution está funcionando. Ciclo #1 removeu 3 cartas (Furygale Flocking, Jokulhaups, Karoo). Ciclo #2 removeu 3 cartas (Deflecting Palm, Hellkite Tyrant, Mother of Runes). O deck precisa de mais **2-3 ciclos para chegar a 90% de alinhamento com o meta.**
+
+---
+
+### PRÓXIMOS PASSOS PARA O PIPELINE
+
+1. **Evolution Oracle (Ciclo #3):** Aplicar swaps P1-P4 (Storm-Kiln, Boros Signet, Chaos Warp, Capstone)
+2. **Mulligan Analyst:** Re-simular com o deck atualizado
+3. **Validator:** Re-avaliar métricas vs perfil EDHREC
+4. **Próximo Scout:** Verificar se Storm-Kiln foi inserida e re-calcular draw real
+
+---
+
 **Dados brutos:** `scripts/_edhrec_raw_lorehold.json` (fresco desta execução)
-**Análise detalhada:** `scripts/_edhrec_card_data.json` (285 cartas com %)
-**Scripts usados:** `scripts/verify_matches.py`, `scripts/cross_ref.py`, `scripts/deep_analysis.py`
