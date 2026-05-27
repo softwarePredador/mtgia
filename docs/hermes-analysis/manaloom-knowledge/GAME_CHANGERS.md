@@ -75,8 +75,8 @@ documentando o why_game_changer e notes no SQLite.
 | Status | Count |
 |:-------|:-----:|
 | Total GCs | 53 |
-| With full analysis | 3/53 |
-| Remaining | 50 |
+| With full analysis | 4/53 |
+| Remaining | 49 |
 | Detected by ManaLoom | 24/53 |
 
 ### Analise anterior: Ad Nauseam (2026-05-27)
