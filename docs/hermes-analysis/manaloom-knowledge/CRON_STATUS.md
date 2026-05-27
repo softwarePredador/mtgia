@@ -2,122 +2,122 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T19:29Z**
+> Última atualização: **2026-05-27T21:08Z**
 
 ## Resumo
 
-| Métrica | Valor |
+|| Métrica | Valor |
 |:--|:--:|
-| Total de crons (`include_disabled=True`) | 13 |
-| Habilitados | 13/13 |
+| Total de crons (`include_disabled=True`) | 15 |
+| Habilitados | 15/15 |
 | Desabilitados | 0 |
-| `last_status=error` | **4** 🔴 |
+| `last_status=error` | **1** 🔴 |
 | Nunca executaram (`last_run_at=null`) | 0 |
 | Stale (>120min atrás, `enabled=true`) | 0 |
 | Fleet removidos desde 2026-05-27 | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
-| Recuperados nesta sessão | 0 |
-| Regredidos nesta sessão | 3 |
+| Recuperados nesta sessão | 2 |
+| Regredidos nesta sessão | 0 |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 13/13 habilitados ✅. **4 crons em `last_status=error`** — 3 por provider/tool-call issues, 1 por provider error (esta execução). Nenhum cron desabilitado ou stale. Nenhuma ação corretiva necessária (erros são transientes; scheduler reintentará nos próximos ticks).
+**Estado geral:** 15/15 habilitados ✅. **1 cron em `last_status=error`** — tag-accuracy-reporter (provider error transitório). 2 crons recuperados nesta rodada (resume + run trigger). Fleet cresceu de 13 → 15 com 2 estrutura-auditor distintos.
 
-**Mudanças desde 18:25Z:**
-- `manaloom-commander-knowledge-deep` 🔴 mantém erro — 19:11Z rodou (Prosper analysis completo) mas encerrou com RuntimeError (tool-call exhaustion no commit). Sem ação.
-- `manaloom-tag-accuracy-reporter` 🟡 **REGREDIU** — 19:26Z falhou com "Provider returned error" (output pequeno 4.8KB). Estava ok desde 13:05Z.
-- `lorehold-deck-validator` 🟡 **REGREDIU** — 19:03Z falhou com "agent reported failure" (tool-call exhaustion, output 98KB).
-- `manaloom-manager-watchdog` 🟡 **REGREDIU** (auto) — 19:20Z falhou com "Provider returned error".
-- `manaloom-master-watchdog` ✅ executou 19:26Z.
-- `manaloom-knowledge-import` — **NOVO CRON detectado** (job_id=b2f5c21ce2d7, every 30m, last_run=19:58Z ok).
-- **Novo commit em master:** `771c9318` — "Harden semantic scorecard runner" (3 arquivos, +359/-17 linhas).
-- `lorehold-mulligan-analyst` executou 19:51Z ✅
-- `manaloom-mana-base-validator` executou 19:43Z ✅
-- `lorehold-deck-scout` executou 19:47Z ✅
+**Mudanças desde 19:29Z:**
+- `manaloom-commander-knowledge-deep` 🟢 **recuperou** — 20:53Z executou ok (deepseek-v4-flash ✅).
+- `lorehold-deck-validator` 🟢 **recuperou** — 20:35Z executou ok (deepseek-v4-flash ✅).
+- `manaloom-manager-watchdog` 🟢 **recuperou** (auto) — 20:26Z ok (esta execução).
+- `manaloom-tag-accuracy-reporter` 🔴 **mantém erro** — 19:26Z "Provider returned error". Próximo tick: 01:26Z. Sem ação (transiente, 1/15 = não sistêmico).
+- `manaloom-code-structure-auditor` (577a0a669714, weekly Sunday) — estava **DISABLED**, foi **RESUMED** ✅. Agendado para 2026-05-31 06:00Z.
+- `manaloom-code-structure-auditor` (bb03201b8911, every 4h) — **NUNCA RODOU**, trigger aceito. next_run_at: ~21:05Z.
+- `manaloom-knowledge-import` ✅ 20:40Z ok.
+- `lorehold-deck-scout` ✅ 20:32Z ok.
+- `manaloom-mana-base-validator` ✅ 20:52Z ok.
+- `lorehold-mulligan-analyst` ✅ 19:51Z ok.
+- `lorehold-evolution-oracle` ✅ 13:22Z ok (próximo: 21:29Z).
+- `manaloom-hermes-normal-audit` ✅ 21:01Z ok.
+- `manaloom-hermes-weekly-parallel-audit` ✅ 12:56Z ok.
+- `manaloom-master-watchdog` ✅ 20:26Z ok.
+- `manaloom-gamechanger-research` ✅ 20:59Z ok.
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 19:26Z | 3min | 🟢 ok | 2026-05-27 20:29Z | sem ação — rodando normalmente |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 16:09Z | 3h20min | 🟢 ok | 2026-05-27 21:00Z | próxima às 21:00Z |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 6h33min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 19:20Z | 9min | 🔴 error | 2026-05-27 20:29Z | ⚠️ "Provider returned error" — esta execução. Próximo tick deve recuperar. |
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 20:26Z | 42min | 🟢 ok | 2026-05-27 21:30Z | sem ação — rodando normalmente |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 21:01Z | 7min | 🟢 ok | 2026-05-28 16:00Z | próxima às 16:00Z |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 8h12min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 20:26Z | 42min | 🟢 ok | 2026-05-27 21:30Z | ✅ recuperou — esta execução |
+| `577a0a669714` | manaloom-code-structure-auditor | `0 6 * * 0` | ✅ | NUNCA | — | ⚪ never-run | 2026-05-31 06:00Z | 🆕 **RESUMIDO** nesta rodada. Weekly Sunday. |
+| `bb03201b8911` | manaloom-code-structure-auditor | `0 20,0,4,8,12,16 * * *` | ✅ | NUNCA | — | ⚪ never-run | 2026-05-27 21:05Z | 🆕 **TRIGGER ACEITO**. next_run_at ajustado para ~21:05Z. |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 19:11Z | 18min | 🔴 error | 2026-05-27 20:08Z | ⚠️ Tool-call exhaustion (run OK, commit falhou). Model: `deepseek-v4-flash`/`deepseek` ✅. Workdir correto ✅. Transiente. |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 19:13Z | 16min | 🟢 ok | 2026-05-27 20:08Z | ✅ rodando normalmente |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 19:26Z | 3min | 🔴 error | 2026-05-28 01:26Z | ⚠️ "Provider returned error" (output 4.8KB = falha precoce). Estava ok desde 13:05Z. **REGREDIU.** |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 19:43Z | 0min | 🟢 ok | 2026-05-27 20:43Z | ✅ rodando normalmente |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | `every 30m` | ✅ | 2026-05-27 19:58Z | 0min | 🟢 ok | 2026-05-27 20:28Z | 🆕 Novo cron detectado nesta rodada. |
+| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 20:53Z | 15min | 🟢 ok | 2026-05-27 21:13Z | ✅ recuperou — deepseek-v4-flash ✅ |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 20:59Z | 9min | 🟢 ok | 2026-05-27 21:19Z | ✅ rodando normalmente |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 19:26Z | 1h42min | 🔴 error | 2026-05-28 01:26Z | ⚠️ "Provider returned error" (default provider). Não sistêmico (1/15). Aguardando próximo tick. |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 20:52Z | 16min | 🟢 ok | 2026-05-27 21:52Z | ✅ rodando normalmente |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | `every 30m` | ✅ | 2026-05-27 20:40Z | 28min | 🟢 ok | 2026-05-27 21:10Z | ✅ rodando normalmente |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 19:47Z | 0min | 🟢 ok | 2026-05-27 20:17Z | ✅ rodando normalmente |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 19:03Z | 26min | 🔴 error | 2026-05-27 20:03Z | ⚠️ Tool-call exhaustion (output 98KB, "agent reported failure"). **REGREDIU.** |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 19:51Z | 0min | 🟢 ok | 2026-05-27 21:51Z | ✅ rodando normalmente |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 6h07min | 🟢 ok | 2026-05-27 21:29Z | normal para schedule 6h |
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 20:32Z | 36min | 🟢 ok | 2026-05-27 21:02Z | ✅ rodando normalmente |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 20:35Z | 33min | 🟢 ok | 2026-05-27 21:35Z | ✅ recuperou — deepseek-v4-flash ✅ |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 19:51Z | 1h17min | 🟢 ok | 2026-05-27 21:51Z | ✅ rodando normalmente |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 7h46min | 🟢 ok | 2026-05-27 21:29Z | normal para schedule 6h |
 
-## Ações da Rodada Atual (2026-05-27T19:29Z)
+## Ações da Rodada Atual (2026-05-27T21:08Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
-:-:|:--|:--|:--|:--|:--|
-| 1 | — | **mestre** | `git branch` check | Verificação de branch | ✅ `codex/hermes-analysis-docs` |
-| 2 | — | **diagnóstico** | listou 13 crons | 4 erros encontrados | 🔍 analisados |
-| 3 | `75eed994c103` | commander-knowledge-deep | diagnóstico | Tool-call exhaustion (run OK, commit falhou) | ⏸️ Sem ação — erro transiente, scheduler reintentará em ~20:08Z |
-| 4 | `b340374bc4e7` | tag-accuracy-reporter | diagnóstico | "Provider returned error" — falha precoce | ⏸️ Sem ação — aguardando próximo ciclo (~01:26Z) |
-| 5 | `712579b15767` | lorehold-deck-validator | diagnóstico | Tool-call exhaustion (98KB output) | ⏸️ Sem ação — scheduler reintentará em ~20:03Z |
-| 6 | `2d436c71bbf7` | manager-watchdog | auto-diagnóstico | "Provider returned error" nesta execução | ⏸️ Auto — próximo tick em ~20:29Z |
-| 7 | `b2f5c21ce2d7` | manaloom-knowledge-import | registro | Novo cron detectado | 📝 Adicionado ao relatório |
+:-:|:--|:--|:--|:--|:--
+| 1 | `577a0a669714` | manaloom-code-structure-auditor (weekly) | `cronjob(action='resume')` | estava `enabled=false`, nunca rodou | ✅ Resumido. Habilitado, agendado para 2026-05-31 06:00Z |
+| 2 | `bb03201b8911` | manaloom-code-structure-auditor (4h) | `cronjob(action='run')` | `last_run_at=null`, nunca executou | ✅ Trigger aceito. next_run_at → ~21:05Z. Aguardando scheduler. |
+| 3 | — | **branch check** | `git branch --show-current` | Verificação de branch | ✅ `codex/hermes-analysis-docs` — sem ação |
+| 4 | — | **diagnóstico** | listou 15 crons | 1 erro encontrado | 🔍 Apenas tag-accuracy-reporter |
+| 5 | `75eed994c103` | commander-knowledge-deep | observação | Recuperou sozinho (20:53Z ok) | ✅ Sem intervenção necessária |
+| 6 | `712579b15767` | lorehold-deck-validator | observação | Recuperou sozinho (20:35Z ok) | ✅ Sem intervenção necessária |
+| 7 | `b340374bc4e7` | tag-accuracy-reporter | diagnóstico | "Provider returned error" — falha precoce | ⏸️ Sem ação — aguardando próximo ciclo (~01:26Z). Não sistêmico (1/15). |
 
-## Mudanças desde o Último Relatório (2026-05-27T18:25Z)
+## Mudanças desde o Último Relatório (2026-05-27T19:29Z)
 
 | Mudança | Detalhe |
 |:--------|:--------|
-| Total de crons | 12 → 13 (novo: `manaloom-knowledge-import`) |
-| Erros totais | 1 → 4 (3 regredidos) |
-| Master avançou | `771c9318` — Harden semantic scorecard runner (3 files, +359/-17) |
-| Regredidos | tag-accuracy-reporter, lorehold-deck-validator, manager-watchdog (self) |
-| Recuperados | 0 (nenhum resume/run necessário — todos enabled=true, nenhum stale) |
+| Total de crons | 13 → 15 (2 estrutura-auditor distintos: weekly + 4h) |
+| Erros totais | 4 → 1 (3 crons recuperaram sozinhos) |
+| Regredidos | 3 → 0 |
+| Recuperados nesta rodada | 2 (resume + run trigger) |
+| Fleet total | 15 crons, 15 habilitados, 0 desabilitados |
 
 ## Alertas Pendentes
 
-### 🔴 4 crons com `last_status=error`
+### 🔴 1 cron com `last_status=error`
 
 | Cron | Último run | Erro | Provider | Model | Workdir | Tipo |
 |:-----|:----------:|:----|:--------:|:-----:|:-------:|:----:|
-| commander-knowledge-deep | 19:11Z | RuntimeError (tool-call exhaustion) | `deepseek` | `deepseek-v4-flash` | ✅ correto | Transitório |
-| manager-watchdog (self) | 19:20Z | Provider returned error | — | — | — | Transitório |
-| tag-accuracy-reporter | 19:26Z | Provider returned error | — | — | — | Provider issue |
-| lorehold-deck-validator | 19:03Z | agent reported failure (tool-call exhaustion) | `deepseek` | `deepseek-v4-flash` | ✅ correto | Transitório |
+| tag-accuracy-reporter | 19:26Z | Provider returned error | default | — | /opt/data/workspace/mtgia | Transitório |
 
 **Nenhuma ação corretiva estrutural necessária:**
 - 0 crons desabilitados → nenhum resume
 - 0 crons stale (>120min) → nenhum run
-- Todos os erros são transitórios (provider/tool-call)
-- Todos os crons habilitados com model/provider corretos
-- Scheduler reintentará nos próximos ticks
+- 1/15 erro = não sistêmico
+- Único erro é transitório (provider issue)
+- Scheduler reintentará em ~01:26Z
 
 ### Recuperados hoje (2026-05-27):
-- lorehold-mulligan-analyst: 🔴 → 🟢 (17:33Z)
-- lorehold-deck-validator: 🔴 → 🟢 (16:42Z) → 🔴 novamente (19:03Z)
-- manaloom-mana-base-validator: 🔴 → 🟢 (18:22Z)
-
-### Regredidos hoje (2026-05-27):
-- manager-watchdog: 🟢 → 🔴 (19:20Z, esta execução)
-- tag-accuracy-reporter: 🟢 → 🔴 (19:26Z)
-- lorehold-deck-validator: 🟢 → 🔴 (19:03Z, novamente)
+- manaloom-manager-watchdog: 🔴 → 🟢 (20:26Z, esta execução)
+- manaloom-code-structure-auditor (577a0a669714): DISABLED → ENABLED (21:08Z)
+- commander-knowledge-deep: 🔴 → 🟢 (20:53Z)
+- lorehold-deck-validator: 🔴 → 🟢 (20:35Z)
 
 ## Observações Importantes
 
-- **Produção atualizada:** `/health` retorna `c98153d655b3660cb69e0ae6d019df6f07dc7967` (conforme último registro — novo commit `771c9318` ainda não confirmado em produção)
-- **Novo commit detectado:** `771c9318` — Harden semantic scorecard runner (server/bin/semantic_layer_v2_optimize_scorecard.py, RELATORIO, json fixture). O dirty worktree mostra `otimizacao.dart` e `theme_contextual_rules_service.dart` modificados — produto do commit anterior `c98153d6` que limpa imports não utilizados.
-- Branch confirmada: `codex/hermes-analysis-docs` ✅
-- `cronjob(action="list", include_disabled=True)` retornou 13 jobs, todos `enabled=true`.
-- **Nenhum `run` ou `resume` foi disparado** — nenhum critério atendido (todos enabled=true, nenhum stale >120min, nenhum never-run, erros são transientes).
+- **Fleet cresceu:** 13 → 15 crons. Dois `manaloom-code-structure-auditor` distintos: weekly Sunday (577a0a669714) + every 4h (bb03201b8911).
+- **Branch confirmada:** `codex/hermes-analysis-docs` ✅
+- **`cronjob(action="list", include_disabled=True)`** retornou 15 jobs, todos `enabled=true` após resume.
+- **Ações corretivas aplicadas:** 1 resume (weekly auditor) + 1 run trigger (4h auditor).
+- **Tag-accuracy-reporter** usa provider default (sem model/provider explícito). Erro "Provider returned error" é transitório — próximo tick em ~01:26Z.
 - Working tree contém artefatos de cron não relacionados (decks lorehold, scripts de scout, `__pycache__`) — apenas `CRON_STATUS.md` será comitado.
 - Nenhum token/secret registrado neste relatório.
 
