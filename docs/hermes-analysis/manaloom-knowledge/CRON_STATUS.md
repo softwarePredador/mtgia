@@ -128,7 +128,7 @@
 > Validação de mana base dos decks armazenados contra perfis EDHREC (commander_reference_profile_anchor30_batch_*).
 > Executado automaticamente pelo cron `manaloom-mana-base-validator`.
 
-**Última execução:** 2026-05-27 19:28 UTC
+**Última execução:** 2026-05-27 20:44 UTC
 **Perfis consultados:** commander_reference_profile_anchor30_batch_a/b/c_2026-05-12 (EDHREC + Moxfield + primers)
 **Decks validados:** 8
 
@@ -182,5 +182,6 @@
 |:-----|:-----:|:--------------:|:----------|
 | 2026-05-27 18:18 UTC | 8 | 0 | 4 críticos são artefatos de INSERT parcial |
 | 2026-05-27 19:28 UTC | 8 | 0 | Re-validação: sem mudanças. Yuriko qty corrigido 99→84. |
+| 2026-05-27 20:44 UTC | 8 | 0 | Re-validação: sem mudanças nos decks. DB atualizada às 20:35 (knowledge import). |
 
 *Relatório gerado por manaloom-mana-base-validator*
