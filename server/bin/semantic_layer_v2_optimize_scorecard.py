@@ -36,6 +36,10 @@ DEFAULT_CORPORA = [
 ]
 
 
+def log_progress(event: str, **fields: Any) -> None:
+    print("SEMANTIC_SCORECARD_PROGRESS " + json.dumps({"event": event, **fields}, sort_keys=True), file=sys.stderr, flush=True)
+
+
 def request(base_url: str, method: str, path: str, payload: Any | None = None, token: str | None = None, timeout: int = 90, retries: int = 3) -> tuple[int, Any, dict[str, str]]:
     data = None if payload is None else json.dumps(payload).encode()
     headers = {"Accept": "application/json"}
@@ -251,12 +255,16 @@ def optimize(base_url: str, token: str, deck_id: str, archetype: str, intensity:
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
+    started_at = time.time()
+    deadline = started_at + args.global_timeout_s if args.global_timeout_s > 0 else None
     base_url = args.base_url.rstrip("/")
+    log_progress("health_check", base_url=base_url)
     status, health, _ = request(base_url, "GET", "/health", timeout=30)
     if status != 200:
         raise RuntimeError(("health", status, health))
     if args.expected_sha and health.get("git_sha") != args.expected_sha:
         raise RuntimeError(("unexpected_sha", health.get("git_sha"), args.expected_sha))
+    log_progress("auth_start", backend_git_sha=health.get("git_sha"))
     token = auth(base_url)
     cache: dict[str, str | None] = {}
     server_root = pathlib.Path(args.server_root).resolve()
@@ -268,6 +276,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "backend_url": base_url,
         "backend_git_sha": health.get("git_sha"),
         "cases": [],
+        "run": {
+            "limit": args.limit,
+            "global_timeout_s": args.global_timeout_s,
+            "timed_out": False,
+        },
         "redactions": {
             "auth_token": "not_saved",
             "qa_email": "not_saved",
@@ -277,7 +290,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "raw_payloads": "not_saved",
         },
     }
-    for slug, rel_path, archetype in corpora:
+    for index, (slug, rel_path, archetype) in enumerate(corpora, start=1):
+        if deadline is not None and time.time() >= deadline:
+            log_progress("global_timeout_before_case", case_index=index, cases_total=len(corpora))
+            summary["run"]["timed_out"] = True
+            break
+        log_progress("case_start", case_index=index, cases_total=len(corpora), commander_slug=slug)
         deck_meta, cards = load_corpus(server_root, rel_path)
         case: dict[str, Any] = {
             "commander_slug": slug,
@@ -287,16 +305,45 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "quantity_total": sum(int(card.get("quantity") or 1) for card in cards),
             "optimize": [],
         }
+        log_progress("create_temp_deck_start", commander_slug=slug, card_entry_count=len(cards))
         deck_id, create_meta = create_temp_deck(base_url, token, cards, cache)
         case.update(create_meta)
+        log_progress(
+            "create_temp_deck_done",
+            commander_slug=slug,
+            create_status=create_meta.get("create_status"),
+            unresolved_count=create_meta.get("unresolved_count"),
+            commander_qty=create_meta.get("commander_qty"),
+            main_qty=create_meta.get("main_qty"),
+        )
         if deck_id:
             try:
                 case.update(validate_deck(base_url, token, deck_id))
+                log_progress(
+                    "validate_deck_done",
+                    commander_slug=slug,
+                    validation_ok=case.get("validation_ok"),
+                    off_identity=case.get("off_identity"),
+                )
                 if case.get("validation_ok"):
                     for intensity in ("focused", "aggressive"):
+                        if deadline is not None and time.time() >= deadline:
+                            log_progress("global_timeout_before_job", commander_slug=slug, intensity=intensity)
+                            summary["run"]["timed_out"] = True
+                            break
+                        log_progress("optimize_start", commander_slug=slug, intensity=intensity)
                         case["optimize"].append(optimize(base_url, token, deck_id, archetype, intensity))
+                        log_progress(
+                            "optimize_done",
+                            commander_slug=slug,
+                            intensity=intensity,
+                            terminal=case["optimize"][-1].get("terminal"),
+                            current_gate_approved=case["optimize"][-1].get("current_gate_approved"),
+                            semantic_shadow_would_block_partial=case["optimize"][-1].get("semantic_shadow_would_block_partial"),
+                        )
             finally:
                 request(base_url, "DELETE", "/decks/" + deck_id, token=token, timeout=45, retries=0)
+                log_progress("delete_temp_deck_done", commander_slug=slug)
         summary["cases"].append(case)
     jobs = [job for case in summary["cases"] for job in case.get("optimize", [])]
     completed = [job for job in jobs if job.get("terminal") == "completed"]
@@ -334,7 +381,13 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "decision": "keep_shadow_mode" if blocked else "eligible_for_limited_flagged_enforcement_review",
         "reason": "Keep shadow mode while reviewing semantic losses or invalid corpus coverage." if blocked else "No semantic shadow blockers among currently approved jobs in this sample; review-only losses still require broader corpus before enforcement.",
     }
-    summary["status"] = "BLOCKED" if blocked else "PASS_WITH_RISKS"
+    summary["run"]["elapsed_ms"] = int((time.time() - started_at) * 1000)
+    if summary["run"]["timed_out"]:
+        summary["scorecard"]["decision"] = "inconclusive_timeout"
+        summary["scorecard"]["reason"] = "Global timeout reached before all requested corpora/jobs completed; use the partial sanitized summary only as operational evidence."
+        summary["status"] = "BLOCKED"
+    else:
+        summary["status"] = "BLOCKED" if blocked else "PASS_WITH_RISKS"
     return summary
 
 
@@ -344,6 +397,7 @@ def main() -> int:
     parser.add_argument("--expected-sha", default=os.environ.get("SEMANTIC_SCORECARD_EXPECTED_SHA"))
     parser.add_argument("--server-root", default=str(pathlib.Path(__file__).resolve().parents[1]))
     parser.add_argument("--limit", type=int, default=int(os.environ.get("SEMANTIC_SCORECARD_LIMIT", "6")))
+    parser.add_argument("--global-timeout-s", type=int, default=int(os.environ.get("SEMANTIC_SCORECARD_GLOBAL_TIMEOUT_S", "900")))
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     summary = run(args)

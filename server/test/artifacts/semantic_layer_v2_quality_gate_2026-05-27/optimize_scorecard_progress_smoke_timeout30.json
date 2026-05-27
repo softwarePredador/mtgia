@@ -1,0 +1,57 @@
+{
+  "backend_git_sha": "7329fbbdd0d5ea3e88de50d3c8235e76852380f4",
+  "backend_url": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "cases": [
+    {
+      "card_entry_count": 82,
+      "commander_qty": 1,
+      "commander_slug": "brago_king_eternal",
+      "create_status": 200,
+      "entry_count": 82,
+      "main_qty": 99,
+      "off_identity": 0,
+      "optimize": [],
+      "quantity_total": 100,
+      "source": "versioned_commander_reference_corpus",
+      "theme": "blink_etb_value",
+      "unresolved_count": 0,
+      "validate_status": 200,
+      "validation_ok": true
+    }
+  ],
+  "date": "2026-05-27",
+  "redactions": {
+    "auth_token": "not_saved",
+    "card_names": "not_saved",
+    "deck_ids": "redacted",
+    "decklists": "not_saved",
+    "qa_email": "not_saved",
+    "raw_payloads": "not_saved"
+  },
+  "run": {
+    "elapsed_ms": 58122,
+    "global_timeout_s": 30,
+    "limit": 1,
+    "timed_out": true
+  },
+  "scope": "semantic_layer_v2_optimize_shadow_scorecard",
+  "scorecard": {
+    "cases_attempted": 1,
+    "completed_jobs": 0,
+    "current_gate_approved_jobs": 0,
+    "decision": "inconclusive_timeout",
+    "eligible_cases": 1,
+    "false_negative_candidates": 0,
+    "false_positive_candidates": 0,
+    "jobs_attempted": 0,
+    "quality_failed_jobs": 0,
+    "reason": "Global timeout reached before all requested corpora/jobs completed; use the partial sanitized summary only as operational evidence.",
+    "review_candidates": 0,
+    "semantic_shadow_review_approved_jobs": 0,
+    "semantic_shadow_would_block_approved_jobs": 0,
+    "semantic_signal_jobs": 0,
+    "semantic_v2_actual_blocked_jobs": 0,
+    "skipped_or_invalid_cases": 0
+  },
+  "status": "BLOCKED"
+}

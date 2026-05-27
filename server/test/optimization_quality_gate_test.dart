@@ -498,6 +498,76 @@ void main() {
       expect(result.additions, isEmpty);
       expect(result.droppedReasons, hasLength(2));
     });
+
+    test('preserves critical ramp when a card has multiple functional tags',
+        () {
+      final originalDeck = [
+        _card(
+          name: 'Smothering Tithe',
+          typeLine: 'Enchantment',
+          manaCost: '{3}{W}',
+          cmc: 4,
+          oracleText:
+              'Whenever an opponent draws a card, that player may pay {2}. If the player doesn\'t, you create a Treasure token.',
+        ),
+      ];
+      final additions = [
+        _card(
+          name: 'Arcane Signet',
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Smothering Tithe'],
+        additions: const ['Arcane Signet'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, equals(const ['Smothering Tithe']));
+      expect(result.additions, equals(const ['Arcane Signet']));
+      expect(result.droppedReasons, isEmpty);
+    });
+
+    test('blocks loss of secondary protection on multi-function swaps', () {
+      final originalDeck = [
+        _card(
+          name: 'Boros Charm',
+          typeLine: 'Instant',
+          manaCost: '{R}{W}',
+          cmc: 2,
+          oracleText:
+              'Choose one — Boros Charm deals 4 damage to any target; permanents you control gain indestructible until end of turn; or target creature gains double strike until end of turn.',
+        ),
+      ];
+      final additions = [
+        _card(
+          name: 'Lightning Bolt',
+          typeLine: 'Instant',
+          manaCost: '{R}',
+          cmc: 1,
+          oracleText: 'Lightning Bolt deals 3 damage to any target.',
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Boros Charm'],
+        additions: const ['Lightning Bolt'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'aggro',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons.single, contains('protection'));
+    });
   });
 }
 
