@@ -32,7 +32,7 @@ mtgia/
 │   │   ├── decks/*               # CRUD, cards, validate, pricing, export
 │   │   ├── ai/
 │   │   │   ├── generate/         # Geracao de decks por IA
-│   │   │   ├── optimize/         # Otimizacao de decks (LARGO ~2745 linhas)
+│   │   │   ├── optimize/         # Otimizacao de decks (LARGO ~3495 linhas)
 │   │   │   ├── rebuild/          # Reconstrucao guiada
 │   │   │   ├── explain/          # Explicacao de cartas
 │   │   │   ├── archetypes/       # Opcoes de arquétipo
@@ -49,7 +49,7 @@ mtgia/
 │   │   ├── conversations/*       # Mensagens diretas
 │   │   ├── notifications/*       # Lista, count, read
 │   │   ├── health/*              # Health, ready, live, metrics
-│   │   └── ready/                # (deprecado em favor de /health/ready)
+│   │   └── ready/                # alias operacional de /health/ready
 │   ├── lib/ai/                   # ~30 arquivos de logica de IA
 │   │   ├── optimize_*.dart       # Modulos do otimizador (9 arquivos)
 │   │   ├── candidate_quality_data_support.dart

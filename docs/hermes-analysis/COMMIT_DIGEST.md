@@ -14,7 +14,7 @@
 
 ## Novos commits nesta rodada
 
-Higiene semanal de 2026-05-27: **nenhum commit novo** desde a ultima analise (`7329fbbd..origin/master` vazio). Mantem-se, para referencia, os dois commits novos da rodada anterior:
+Higiene semanal de 2026-05-27: **nenhum commit novo** desde a ultima analise (`7329fbbd..origin/master` vazio). Mantem-se, para referencia, os commits relevantes das rodadas anteriores:
 
 ### `f57bb8d3` — Fix semantic role classification fallbacks (rodada anterior)
 - **4 arquivos**, **+142/-6 linhas** (codigo)

@@ -31,10 +31,13 @@ cofre/local env/handoff privado.
 ## P1 — Alto
 
 ### Gargalos de manutencao
-- `server/routes/ai/optimize/index.dart` (~2745 linhas) — rota gigante
-- `server/lib/ai/optimize_runtime_support.dart` (~2842 linhas) — logica densa
-- `deck_details_screen.dart` (~1445 linhas) — caindo, mas ainda grande
-- `deck_provider.dart` (~899 linhas) — residual, quase orquestracao pura
+Validacao em `origin/master` 7329fbbd (2026-05-27) confirmou tamanhos atuais:
+- `server/routes/ai/optimize/index.dart` (3495 linhas) — rota gigante
+- `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) — logica densa
+- `app/lib/features/home/life_counter_screen.dart` (6400 linhas) — tela/engine nativa grande
+- `app/lib/features/home/lotus/lotus_visual_skin.dart` (1991 linhas) — CSS Lotus/WebView proprio
+- `app/lib/features/decks/screens/deck_details_screen.dart` (1705 linhas) — caindo, mas ainda grande
+- `app/lib/features/decks/providers/deck_provider.dart` (1226 linhas) — residual/orquestracao voltou a crescer
 
 ### Sentry mobile nao verificado
 `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1` — compilacao nativa falha timeout (120s+).
@@ -49,6 +52,8 @@ O smoke encerra classificavelmente, mas sem event_id confirmado.
 - `marketplace_screen.dart` (566 linhas) — ja tem `marketplace_screen_overflow_test.dart` cobrindo overflow e estados loading/error/empty
 - `binder_item_editor.dart` (1025 linhas) — sem teste de widget
 - `profile_screen.dart` (590 linhas) — teste funcional existe, mas segue sem golden/baseline visual
+- `chat_screen.dart` — sem teste widget dedicado; falha de carregamento pode cair no empty state e falha de envio limpa o rascunho antes de sucesso
+- `market_screen.dart` / `MarketProvider` — estados loading/erro/empty/needs-data/cache/refresh sem cobertura deterministica dedicada
 Sem cobertura ampla, regressao visual ou logica pode passar despercebida.
 
 ### Telas criticas do fluxo core ainda grandes
@@ -112,6 +117,41 @@ quando voltar ao core de IA/decks/Lotus.
 ### x-request-id sem correlacao ponta a ponta
 Backend ja gera e propaga. Script de validacao existe (`validate_request_id_ready.sh`).
 A correlacao mobile → backend em device real NAO foi confirmada.
+
+### POST /ai/optimize sem escopo de ownership no carregamento do deck
+Auditoria em `origin/master` 7329fbbd confirmou que `server/routes/ai/optimize/index.dart`
+le `userId`, mas chama `loadOptimizeDeckContext` sem passa-lo; em
+`server/lib/ai/optimize_request_support.dart`, a query de deck usa apenas
+`WHERE id = @id` e as cartas usam apenas `WHERE dc.deck_id = @id`. Rotas de
+mutacao de deck usam o padrao mais seguro `WHERE id = @deckId AND user_id = @userId`.
+
+Impacto: usuario autenticado pode potencialmente disparar otimizacao/analise de
+um deck que nao possui se obtiver o UUID, expondo composicao privada e gastando
+trabalho de IA.
+
+Recomendacao: passar `userId` para o loader, escopar a query por dono ou regra
+publica explicita, rejeitar antes de criar job async e adicionar testes owner vs
+non-owner.
+
+### Jobs async de optimize aceitam leitura de job com `user_id = NULL`
+`server/routes/ai/optimize/jobs/[id].dart` so bloqueia quando `job.userId != null &&
+job.userId != userId`; jobs nulos ficam legiveis para qualquer usuario com o ID.
+Como a criacao async recebe `userId` nullable, o contrato deve exigir owner nao
+nulo para jobs user-facing ou retornar 404 para jobs sem dono salvo excecao interna.
+
+### Semantic Layer v2 partial tem helper testado, mas nao rota `POST /ai/optimize`
+A rota le `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT` e tem branch 422
+`OPTIMIZE_SEMANTIC_V2_REJECTED`, mas a cobertura atual exercita helpers em
+`optimization_validator_test.dart`; nao ha teste de rota/response shape para
+`blocked_by_semantic_v2` em modo partial. Antes de habilitar partial fora de
+staging/controlado, adicionar teste de integracao de rota.
+
+### Filler de optimize/complete aplica bracket com `currentDeckCards: const []`
+Alguns loaders em `optimize_runtime_support.dart` filtram candidatos por bracket
+sem considerar o deck atual e `loadGuaranteedNonBasicFillers` faz fallback com
+`bracket: null` quando falta preencher. Isso pode reduzir determinismo de budget
+de bracket em complete/rebuild/top-up. Threadar estado atual/virtual para todos
+os loaders e registrar fallback sem bracket quando intencional.
 
 ### Fonte de verdade e deriva documental
 `docs/CONTEXTO_PRODUTO_ATUAL.md` foi atualizado pela ultima vez em 2026-03-25.

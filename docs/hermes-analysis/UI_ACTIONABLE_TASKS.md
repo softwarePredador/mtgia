@@ -132,11 +132,21 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 - **Criterio de pronto:** Teste de widget para `BinderTabContent` existe e passa; cobertura de Marketplace permanece verde.
 - **Teste:** novo teste de binder tab + `marketplace_screen_overflow_test.dart` verde.
 
-### P1.5 community_screen AppBar fontWeight 800 foge do padrao — RESOLVIDO
-- **Arquivo:** `app/lib/features/community/screens/community_screen.dart`
-- **Status:** RESOLVIDO pelo commit `91885194`.
-- **Evidencia:** validacao em `origin/master` 7329fbbd confirmou `AppBar.titleTextStyle` com `fontWeight: FontWeight.w700` nas linhas 68-72. O unico `FontWeight.w800` remanescente no arquivo fica em badge interno (`_UserCard`/label), nao no AppBar.
-- **Fechamento:** manter apenas historico; nao gerar task ativa.
+### P1.5 ChatScreen mascara falha de carregamento como conversa vazia
+- **Arquivo:** `app/lib/features/messages/screens/chat_screen.dart`; `app/lib/features/messages/providers/message_provider.dart`
+- **Evidencia:** `MessageProvider.fetchMessages` grava `_error = 'Não foi possível carregar as mensagens.'` em falha HTTP e `_error = '$e'` em exception (`message_provider.dart` linhas 347-357). `ChatScreen` trata apenas loading e `provider.messages.isEmpty`; quando ha erro com lista vazia, renderiza `AppStatePanel` com key `chat-empty-state` e titulo `Conversa pronta` (`chat_screen.dart` linhas 147-161). Busca em `app/test` por `ChatScreen|chat-empty-state|chat-message-field` retornou 0 ocorrencias.
+- **Por que importa:** Falhas de API/rede em uma conversa podem aparecer para o usuario como chat vazio/pronto, escondendo outage e contexto perdido de trades/mensagens.
+- **Ajuste recomendado:** Adicionar branch de erro antes do empty state quando `provider.error != null && provider.messages.isEmpty`, com copy amigavel, retry e key estavel `chat-error-state`.
+- **Criterio de pronto:** Falha de carregamento mostra erro, nao empty state; retry refaz `fetchMessages`.
+- **Teste:** Widget test com provider/API fake falhando valida `chat-error-state`, ausencia de `chat-empty-state` e retry.
+
+### P1.6 ChatScreen limpa o rascunho antes de confirmar envio
+- **Arquivo:** `app/lib/features/messages/screens/chat_screen.dart`; `app/lib/features/messages/providers/message_provider.dart`
+- **Evidencia:** `_sendMessage` le o texto e limpa `_messageController` antes de aguardar `sendMessage` (`chat_screen.dart` linhas 69-80). `MessageProvider.sendMessage` retorna `false` para status nao-201 ou exception, sem expor feedback de erro para UI (`message_provider.dart` linhas 375-400). O campo e o botao ja tem keys `chat-message-field` e `chat-message-send-button` (`chat_screen.dart` linhas 200-228), mas nao ha teste de falha de envio.
+- **Por que importa:** Em falha de rede/API, o usuario perde o texto digitado sem feedback visivel, especialmente sensivel em negociacoes de troca.
+- **Ajuste recomendado:** Limpar o campo apenas apos `sendMessage == true`, ou restaurar o rascunho em falha; mostrar SnackBar/erro inline e considerar `sendError` amigavel no provider.
+- **Criterio de pronto:** Falha preserva/restaura texto e mostra feedback; sucesso limpa o campo e insere/superficie a mensagem.
+- **Teste:** Widget test com `sendMessage` fake falhando e passando.
 
 ## P2 — Importante, mas nao bloqueia
 
@@ -178,6 +188,14 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 - **Criterio de pronto:** Teste de layout/estado para TradeDetailScreen criado e verde.
 - **Teste:** novo `trade_detail_screen_test.dart` ou expansao segura de `trade_confirmation_flow_test.dart`.
 
+### P2.5 Market screen/provider sem cobertura deterministica de estados e cache
+- **Arquivo:** `app/lib/features/market/screens/market_screen.dart`; `app/lib/features/market/providers/market_provider.dart`
+- **Evidencia:** `MarketScreen` dispara `fetchMovers()` no primeiro frame (`market_screen.dart` linhas 21-27) e possui branches de loading, erro, empty, `needsMoreData`, abas gainers/losers e refresh (`market_screen.dart` linhas 86-128, 197-317). `MarketProvider` tem cache TTL de 5 minutos, erro HTTP/exception, refresh e clear state (`market_provider.dart` linhas 21-78). Busca em `app/test` encontrou apenas testes de modelo `CardMover` e uso indireto de `MarketProvider` em `home_screen_test.dart`; nao ha `MarketScreen`/`MarketProvider` unit-widget dedicado.
+- **Por que importa:** Regressao em loading/retry/empty/needs-data/tab switching/cache/refresh pode passar sem rede deterministica; smoke live pode falhar por ambiente ou passar sem cobrir branches.
+- **Ajuste recomendado:** Adicionar unit tests de `MarketProvider` com `ApiClient` fake e widget tests de `MarketScreen` para loading, erro+retry, empty, needs-data, gainers/losers, refresh; adicionar keys como `market-loading`, `market-error`, `market-empty`, `market-needs-data`, `market-gainers-list`, `market-losers-list`, `market-mover-card-<cardId>`.
+- **Criterio de pronto:** Estados principais cobertos sem rede live; runtime smoke continua apenas como prova complementar.
+- **Teste:** Novos testes unit/widget + `flutter analyze`.
+
 ## P3 — Melhoria futura
 
 ### P3.1 MainScaffold NavigationBar sem backgroundColor explicito
@@ -204,7 +222,7 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 | **DeckAnalysisTab** | 74 refs AppTheme, functional tags integradas, teste existe. |
 | **DeckOptimizeSheetWidgets / DeckOptimizeFlowSupport** | Widgets extraidos da tela principal. Estrutura OK. |
 | **CollectionScreen** | 98 linhas, hub simples com 4 tabs. Navegacao funciona. |
-| **MessageInboxScreen / ChatScreen** | AppTheme OK (28-26 refs), teste de tela existe para inbox. |
+| **MessageInboxScreen / ChatScreen** | Inbox tem teste de erro/lista; ChatScreen agora tem tasks P1 para erro de carregamento e falha de envio. |
 | **NotificationScreen** | AppTheme OK (32 refs), teste de tela existe. |
 | **MainScaffold** | 91 linhas, simples. NavigationBar theme configurado no AppTheme. |
 | **AppTheme** | 609 linhas, tema completo (AppBar, TabBar, NavigationBar, FilledButton, font scale). |
