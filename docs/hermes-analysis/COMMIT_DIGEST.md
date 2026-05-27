@@ -1,13 +1,13 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-27T18:25Z (manager-watchdog — novo commit c98153d6).
+> Atualizado em 2026-05-27T19:29Z (manager-watchdog — novo commit 771c9318).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `7329fbbd` (docs: add Hermes semantic validation request)
-- HEAD atual: **`c98153d6`** (Improve optimize gate multi-tag handling)
+- HEAD anterior: `c98153d6` (Improve optimize gate multi-tag handling)
+- HEAD atual: **`771c9318`** (Harden semantic scorecard runner)
 - SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
@@ -15,7 +15,17 @@
 
 ## Novos commits nesta rodada
 
-### `c98153d6` — Improve optimize gate multi-tag handling (2026-05-27T18:08Z, nova)
+### `771c9318` — Harden semantic scorecard runner (2026-05-27T18:40Z, nova)
+- **3 arquivos**, **+359/-17 linhas** (script Python + relatório + fixture JSON)
+- Autor: softwarePredador (Co-authored-by: Copilot)
+- Data: 2026-05-27 15:40 BRT
+- **Tipo: CODE/INFRA** — Robustecimento do runner de scorecard semântico
+  - `semantic_layer_v2_optimize_scorecard.py`: Adiciona tratamento de `TimeoutError`, `socket.timeout`, `URLError`, `OSError` na função `request()` (retry com sleep 3+attempt*2, retorna 598 em vez de 599). Adiciona `sanitized_error()` helper. Refatora `run()` com try/except ao redor de todo o fluxo do caso (create → validate → optimize), capturando exceções não-tratadas em `case["case_error"]`. Estrutura de controle mais resiliente: deck_id=None init, bloco try englobando todas as operações.
+  - `RELATORIO_OPTIMIZE_MULTITAG_GATE_2026-05-27.md`: Atualização do relatório com seção de hardening (+57 linhas).
+  - `optimize_scorecard_after_multitag_gate_limit5_resilient.json`: Nova fixture JSON (273 linhas) para teste resiliente com limit=5.
+- **Nota:** Detectado via git diff — o dirty worktree mostra `otimizacao.dart` e `theme_contextual_rules_service.dart` modificados (do commit anterior `c98153d6` que remove imports não utilizados).
+
+### `c98153d6` — Improve optimize gate multi-tag handling (2026-05-27T18:08Z, anterior)
 - **5 arquivos**, **+362/-5 linhas** (código + script + testes)
 - Autor: softwarePredador (Co-authored-by: Copilot)
 - Data: 2026-05-27 15:08 BRT
