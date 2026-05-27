@@ -1,8 +1,9 @@
 # Game Changers — Referencia Completa
 
 > Analise completa dos 53 Game Changers oficiais do formato Commander.
-> Fonte: Scryfall `is:gamechanger` + Commander Rules Committee bracket system.
-> Ultima atualizacao: 2026-05-26
+> Fonte primaria da lista: Scryfall `is:gamechanger` / campo API `game_changer`.
+> Brackets oficiais: URL solicitada `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao; texto especifico da pagina = NAO VERIFICADO.
+> Ultima atualizacao: 2026-05-27
 
 ## O que e um Game Changer?
 
@@ -69,7 +70,7 @@ Seedborn Muse, e todos os stax pieces.
 Os crons vao pesquisar cada carta individualmente (1 por execucao),
 documentando o why_game_changer e notes no SQLite.
 
-## Progresso (2026-05-26)
+## Progresso (2026-05-27)
 
 | Status | Count |
 |:-------|:-----:|
@@ -78,9 +79,11 @@ documentando o why_game_changer e notes no SQLite.
 | Remaining | 52 |
 | Detected by ManaLoom | 24/53 |
 
-### Ultima analise: Cyclonic Rift
-- **Impact:** 10/10 (board_wipe unilateral)
-- **Why GC:** One-sided, instant-speed board wipe that resets opponents while keeping caster's board intact. Bypasses hexproof/shroud via overload. EDHREC rank #51, $41.
-- **ManaLoom tag:** `removal` (only sees targeted bounce mode)
-- **ManaLoom bracket:** NOT detected
-- **Discrepancy:** System misses overload mode entirely. Needs board_wipe or game_changer bracket category.
+### Ultima analise SQLite: Ad Nauseam
+- **Impact:** 9/10 (`card_advantage`)
+- **Fonte Scryfall:** `https://api.scryfall.com/cards/search?q=!%22Ad%20Nauseam%22&unique=cards` retornou `game_changer=true`, `type_line=Instant`, `mana_cost={3}{B}{B}`, `cmc=5.0`, Commander `legal`, `edhrec_rank=1312`, `price_usd=16.21`, e oracle text: "Reveal the top card of your library and put that card into your hand. You lose life equal to its mana value. You may repeat this process any number of times."
+- **Fonte EDHREC:** `https://edhrec.com/cards/ad-nauseam` reportou recomendacoes baseadas em **105,733 Ad Nauseam decks**. O painel Top Commanders mostrou Kraum, Ludevic's Opus // Tymna the Weaver em **77.99% de 11,217 decks (8,748)** e Rograkh, Son of Rohgahh // Silas Renn, Seeker Adept em **88.12% de 8,107 decks (7,144)**.
+- **Fonte cEDH:** `https://cedh-decklist-database.com/` continha entrada **Rograkh Silas Turbo Naus** com texto "Turbo Ad Nauseam Rograkh Silas Storm Combo". Links Moxfield derivados da DDB confirmaram Ad Nauseam em listas publicas `[Primer] cEDH Rog Grixis Turbo` (`https://moxfield.com/decks/yRsS18tYsE-jVgqmK7_Z0w`, autoBracket 4, 135,239 views) e `[cEDH] Rograkh Silas Storm Combo` (`https://moxfield.com/decks/79hYZQUBdUaA9xD8zLX4vQ`, autoBracket 4, 177,057 views).
+- **Bracket oficial:** Scryfall search `is:gamechanger !"Ad Nauseam"` mostrou a carta na Commander Game Changer list; a URL solicitada `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
+- **ManaLoom bracket:** `tagCardForBracket()` em `server/lib/edh_bracket_policy.dart` com o oracle text do Scryfall retornou `NO_CATEGORIES`. Resultado registrado no SQLite: `manaloom_detected=0`, `manaloom_bracket_category=card_advantage_gap`.
+- **Discrepancy:** a politica atual cobre `fastMana`, `tutor`, `freeInteraction`, `extraTurns` e `infiniteCombo`, mas nao tem categoria para card-advantage explosivo / draw burst Game Changer como Ad Nauseam.
