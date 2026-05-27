@@ -244,14 +244,12 @@ def _normalize_card_name(name: str) -> str:
     return n
 
 
-def _looks_like_ritual(oracle: str, normalized_name: str) -> bool:
-    """Replica _looksLikeRitual() do Dart (linha 850)."""
-    if normalized_name == "jeska's will":
-        return True
-    return ("add {" in oracle and
-            any(t in oracle for t in ["until end of turn", "for each",
-                                      "for every", "your mana pool"]))
-
+def _looks_like_ritual(oracle: str) -> bool:
+    """Replica _looksLikeRitual() do Dart (linha 649)."""
+    return ("add {" in oracle and "until end of turn" in oracle) or \
+           ("add {" in oracle and "for each" in oracle) or \
+           ("add {" in oracle and "for every" in oracle) or \
+           ("add {" in oracle and "your mana pool" in oracle)
 
 def _looks_like_draw(oracle: str) -> bool:
     """Replica _looksLikeDraw() do Dart (linha 643)."""
@@ -302,7 +300,7 @@ def _looks_like_targeted_removal(oracle: str) -> bool:
                                        "any target", "damage to target"])))
 
 
-def _looks_like_protection(oracle: str, normalized_name: str) -> bool:
+def _looks_like_protection(oracle: str) -> bool:
     """Replica _looksLikeProtection() do Dart (linha 700)."""
     return ("hexproof" in oracle or
             "indestructible" in oracle or
@@ -316,11 +314,7 @@ def _looks_like_protection(oracle: str, normalized_name: str) -> bool:
             "prevent all damage" in oracle or
             "regenerate target" in oracle or
             "gains hexproof" in oracle or
-            "gains indestructible" in oracle or
-            any(x in normalized_name for x in [
-                "teferi's protection", "heroic intervention",
-                "swiftfoot boots", "lightning greaves",
-            ]))
+            "gains indestructible" in oracle)
 
 
 def _looks_like_recursion(oracle: str) -> bool:
@@ -353,10 +347,8 @@ def _looks_like_sacrifice_outlet(oracle: str) -> bool:
     ])
 
 
-def _looks_like_aristocrat_payoff(oracle: str, normalized_name: str) -> bool:
+def _looks_like_aristocrat_payoff(oracle: str) -> bool:
     """Replica _looksLikeAristocratPayoff() do Dart (linha 754)."""
-    if normalized_name in ("blood artist", "zulaport cutthroat"):
-        return True
     if ("whenever" in oracle and "creature" in oracle and "dies" in oracle and
             any(t in oracle for t in ["loses", "gain", "drain"])):
         return True
@@ -377,10 +369,9 @@ def _looks_like_lifegain(oracle: str) -> bool:
             ("gains you" in oracle and "life" in oracle))
 
 
-def _looks_like_drain(oracle: str, normalized_name: str) -> bool:
+def _looks_like_drain(oracle: str) -> bool:
     """Replica _looksLikeDrain() do Dart (linha 779)."""
-    return (normalized_name == "blood artist" or
-            ("loses" in oracle and "you gain" in oracle) or
+    return (("loses" in oracle and "you gain" in oracle) or
             "each opponent loses" in oracle or
             "target player loses" in oracle)
 
@@ -424,10 +415,8 @@ def _looks_like_etb(oracle: str) -> bool:
                                      "enters the battlefield,"])
 
 
-def _looks_like_blink(oracle: str, normalized_name: str) -> bool:
+def _looks_like_blink(oracle: str) -> bool:
     """Replica _looksLikeBlink() do Dart (linha 823)."""
-    if normalized_name == "ephemerate":
-        return True
     if ("exile target" in oracle and "return" in oracle and "battlefield" in oracle):
         return True
     if ("exile another target" in oracle and "return" in oracle and "battlefield" in oracle):
@@ -437,10 +426,9 @@ def _looks_like_blink(oracle: str, normalized_name: str) -> bool:
     return False
 
 
-def _looks_like_big_spell_payoff(oracle: str, normalized_name: str) -> bool:
+def _looks_like_big_spell_payoff(oracle: str) -> bool:
     """Replica _looksLikeBigSpellPayoff() do Dart (linha 834)."""
-    return (normalized_name == "jeska's will" or
-            "if you control a commander" in oracle or
+    return ("if you control a commander" in oracle or
             "without paying its mana cost" in oracle or
             "copy target spell" in oracle or
             ("copy it" in oracle and "spell" in oracle))
@@ -454,22 +442,18 @@ def _looks_like_exile_value(oracle: str) -> bool:
                                       "until end of turn"]))
 
 
-def _looks_like_wincon(oracle: str, normalized_name: str) -> bool:
+def _looks_like_wincon(oracle: str) -> bool:
     """Replica _looksLikeWincon() do Dart (linha 859)."""
-    return ("thassa's oracle" in normalized_name or
-            "you win the game" in oracle or
+    return ("you win the game" in oracle or
             "loses the game" in oracle or
             "each opponent loses" in oracle or
             ("damage equal to" in oracle and "opponent" in oracle) or
             "double your life total" in oracle)
 
 
-def _looks_like_combo_piece(oracle: str, normalized_name: str) -> bool:
+def _looks_like_combo_piece(oracle: str) -> bool:
     """Replica _looksLikeComboPiece() do Dart (linha 868)."""
-    return (any(x in normalized_name for x in ["isochron scepter",
-                                                "dramatic reversal",
-                                                "thassa's oracle"]) or
-            "copy target activated or triggered ability" in oracle or
+    return ("copy target activated or triggered ability" in oracle or
             ("untap" in oracle and "add " in oracle) or
             "infinite" in oracle)
 
@@ -487,10 +471,8 @@ def _looks_like_engine(oracle: str) -> bool:
     return False
 
 
-def _looks_like_payoff(oracle: str, normalized_name: str) -> bool:
+def _looks_like_payoff(oracle: str) -> bool:
     """Replica _looksLikePayoff() do Dart (linha 887)."""
-    if normalized_name == "blood artist":
-        return True
     if "for each" in oracle:
         return True
     if "whenever" in oracle and any(t in oracle for t in [
@@ -501,10 +483,9 @@ def _looks_like_payoff(oracle: str, normalized_name: str) -> bool:
     return False
 
 
-def _looks_like_enabler(oracle: str, normalized_name: str) -> bool:
+def _looks_like_enabler(oracle: str) -> bool:
     """Replica _looksLikeEnabler() do Dart (linha 898)."""
-    return (any(x in normalized_name for x in ["greaves", "boots"]) or
-            "costs {" in oracle and "less to cast" in oracle or
+    return ("costs {" in oracle and "less to cast" in oracle or
             "you may play an additional land" in oracle or
             "haste" in oracle or
             "mill" in oracle or
@@ -548,14 +529,10 @@ def infer_functional_card_tags(
     is_basic_land = "basic land" in type_lower
     if not is_basic_land:
         # ramp check: uses original oracle_text for Dart compat
-        if (looks_like_ramp(oracle, type_lower) or
-                "signet" in normalized_name or
-                "talisman" in normalized_name or
-                normalized_name == "sol ring" or
-                normalized_name == "arcane signet"):
+        if (looks_like_ramp(oracle, type_lower)):
             add("ramp", 0.88, "mana_or_land_ramp_text")
 
-    if _looks_like_ritual(oracle, normalized_name):
+    if _looks_like_ritual(oracle):
         add("ritual", 0.82, "temporary_mana_burst_text")
 
     if _looks_like_draw(oracle):
@@ -577,7 +554,7 @@ def infer_functional_card_tags(
     if looks_like_board_wipe(oracle):
         add("board_wipe", 0.90, "mass_removal_text")
 
-    if _looks_like_protection(oracle, normalized_name):
+    if _looks_like_protection(oracle):
         add("protection", 0.82, "protection_keyword_or_effect")
 
     if _looks_like_recursion(oracle):
@@ -592,13 +569,13 @@ def infer_functional_card_tags(
     if _looks_like_sacrifice_outlet(oracle):
         add("sacrifice_outlet", 0.80, "repeatable_sacrifice_outlet_text")
 
-    if _looks_like_aristocrat_payoff(oracle, normalized_name):
+    if _looks_like_aristocrat_payoff(oracle):
         add("aristocrat_payoff", 0.84, "death_trigger_payoff_text")
 
     if _looks_like_lifegain(oracle):
         add("lifegain", 0.76, "life_gain_text")
 
-    if _looks_like_drain(oracle, normalized_name):
+    if _looks_like_drain(oracle):
         add("drain", 0.82, "life_loss_payoff_text")
 
     if _looks_like_spellslinger(oracle):
@@ -613,29 +590,29 @@ def infer_functional_card_tags(
     if _looks_like_etb(oracle):
         add("etb", 0.70, "enters_the_battlefield_text")
 
-    if _looks_like_blink(oracle, normalized_name):
+    if _looks_like_blink(oracle):
         add("blink", 0.86, "exile_then_return_text")
         add("protection", 0.68, "blink_can_protect_permanent")
 
-    if cmc >= 6 or _looks_like_big_spell_payoff(oracle, normalized_name):
+    if cmc >= 6 or _looks_like_big_spell_payoff(oracle):
         add("big_spell", 0.72, "high_mana_value_or_big_turn_text")
 
     if _looks_like_exile_value(oracle):
         add("exile_value", 0.84, "exile_play_or_cast_value_text")
 
-    if _looks_like_wincon(oracle, normalized_name):
+    if _looks_like_wincon(oracle):
         add("wincon", 0.78, "explicit_win_or_finisher_text")
 
-    if _looks_like_combo_piece(oracle, normalized_name):
+    if _looks_like_combo_piece(oracle):
         add("combo_piece", 0.72, "combo_pattern_text_or_known_name")
 
     if _looks_like_engine(oracle):
         add("engine", 0.70, "repeatable_value_engine_text")
 
-    if _looks_like_payoff(oracle, normalized_name):
+    if _looks_like_payoff(oracle):
         add("payoff", 0.72, "payoff_trigger_or_scaling_text")
 
-    if _looks_like_enabler(oracle, normalized_name):
+    if _looks_like_enabler(oracle):
         add("enabler", 0.70, "plan_enabler_or_setup_text")
 
     # Sort by confidence desc, then tag name asc (mirroring Dart sort)
