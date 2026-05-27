@@ -75,11 +75,20 @@ documentando o why_game_changer e notes no SQLite.
 | Status | Count |
 |:-------|:-----:|
 | Total GCs | 53 |
-| With full analysis | 3/53 |
-| Remaining | 50 |
+| With full analysis | 4/53 |
+| Remaining | 49 |
 | Detected by ManaLoom | 24/53 |
 
-### Ultima analise SQLite: Rhystic Study
+### Ultima analise SQLite: Thassa's Oracle (2026-05-27)
+- **Impact:** 10/10 (`combo_piece`)
+- **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Thassa%27s%20Oracle` retornou `game_changer=true`, `type_line=Creature — Merfolk Wizard`, `mana_cost={U}{U}`, `cmc=2.0`, Commander `legal`, `edhrec_rank=411`, `price_usd=23.03`, e oracle text com a clausula de vitoria "If X is greater than the number of cards in your library, you win the game."
+- **Fonte Artefatos do Projeto:** Presente em 16 tournament deck artifacts de meta_deck_intelligence_2026-04-27, sempre pareada com Demonic Consultation, Tainted Pact, ou Underworld Breach + Lion's Eye Diamond. Dominante em UB/x cEDH shells (Blue Farm, RogSi, Malcolm/Tana).
+- **Fonte Bracket oficial:** Scryfall search `is:gamechanger !"Thassa's Oracle"` confirmou a carta na Commander Game Changer list. A URL `https://mtgcommander.net/index.php/brackets/` retornou Page not found nesta execucao, entao o texto especifico da pagina oficial de brackets fica **NAO VERIFICADO**.
+- **ManaLoom bracket:** `tagCardForBracket()` retorna `infiniteCombo` via lista curada em `edh_bracket_policy.dart` — Thassa's Oracle e uma das 3 cartas na lista curada de infiniteCombo. Resultado: `manaloom_detected=1`, `manaloom_bracket_category=infiniteCombo`.
+- **GAP no optimization layer:** Embora o bracket detection funcione, `functional_card_tags.dart` nao tem tag `wincon`. Thassa's Oracle cai em `other` na classificacao funcional. O AI optimizer pode sugerir remove-la, sem entender que e a condicao de vitoria principal do deck.
+- **Discrepancy:** Thassa's Oracle e o combo wincon mais compacto do cEDH (0.02% do deck, UUBB, wins on the spot). O bracket detection funciona (infiniteCombo) mas a analise funcional e cega — sem tag wincon, a IA nao entende que Thoracle e essencial.
+
+### Analise anterior: Rhystic Study (2026-05-27)
 - **Impact:** 10/10 (`card_advantage`)
 - **Fonte Scryfall:** `https://api.scryfall.com/cards/named?exact=Rhystic%20Study` retornou `game_changer=true`, `type_line=Enchantment`, `mana_cost={2}{U}`, `cmc=3.0`, Commander `legal`, `edhrec_rank=41`, `price_usd=69.44`, e oracle text: "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."
 - **Fonte EDHREC:** `https://edhrec.com/cards/rhystic-study` reportou salt score **2.73/10** (extremamente salgado), inclusao em **15.794 de 42.251 decks** (37.38%), e popularidade em 1.010.475 decks registrados na plataforma (23% de todos os decks Commander). Comandantes com maior inclusao: spellslinger/control com azul chegam a **91.15% de 11.217 decks**.
