@@ -8,11 +8,11 @@
 
 | Metrica | Valor | Data |
 |:--------|:-----:|:-----|
-|| Comandantes analisados | 11 | 2026-05-28 |
-|| Decks analisados | 12 | 2026-05-28 |
-|| Cartas revisadas | ~1.330 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100 + VALIDATOR 86) | 2026-05-28 |
-|| Insights documentados | 64 | 2026-05-28 |
-|| Discrepancias com ManaLoom | 62 | 2026-05-28 |
+|| Comandantes analisados | 12 | 2026-05-27 |
+|| Decks analisados | 16 | 2026-05-27 |
+|| Cartas revisadas | ~1.530 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100 + VALIDATOR 86 + Prosper 347 corpus) | 2026-05-27 |
+|| Insights documentados | 74 | 2026-05-27 |
+|| Discrepancias com ManaLoom | 72 | 2026-05-27 |
 
 ## Comandantes Analisados
 
@@ -29,6 +29,7 @@
 | **Muldrotha, the Gravetide** | **1** | **2026-05-27** | **3** | **Nova: 87/87 EDHREC avg** |
 | **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
 | **Krenko, Mob Boss** | **1** | **2026-05-27** | **7** | **Nova: 100/100 EDHREC avg goblin typal** |
+| **Prosper, Tome-Bound** | **4** | **2026-05-27** | **10 novos** | **Nova: 4 corpus EDHREC (optimized, control, cEDH, artifacts) + profile 6 fontes** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -155,6 +156,12 @@
   5 Game Changers (Demonic/Vampiric Tutor, Teferi's Protection, Exquisite Blood, Sanguine Bond).
   Metroca central: densidade vampiresca, nao ramp ou draw. O deck funciona com 7 ramp
   porque cada vampiro de 1 mana gera um token — o payoff da eminencia compensa ramp baixo.
+- **Exile Value Treasure Engine (Prosper, Tome-Bound, bracket 3-4):** 31.75 lands media (profile 33-36),
+  10.75 ramp (rituals compensam), 8.25 exile value sources, 7.75 interaction (profile 8-12),
+  1.5 protection (gap critico), 8-13 treasure generation, 5-9 treasure payoffs, 0-6 storm combo,
+  4.5 tutors, 0.75 board wipes, 4.25 topdeck setup, ~4 wincons (drenagem payoffs).
+  CMC medio ~3.2 (estimado). Metrica central: densidade de exile casting + treasure payoffs.
+  3 arquetipos: Optimized Combo (storm+payoffs), Control (valor incremental), cEDH (28 lands, 9 tutors, Breach storm).
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -226,6 +233,14 @@
   Viés tribal forte — inclui cartas medianas (Gempalm Incinerator, Goblin
   Chirurgeon) porque são goblins, não por eficiência objetiva. Pensamento chave:
   "Goblin bom é goblin que faz mais goblins."
+- **Jogador de Prosper exile value treasure:** Estrategista value-engine. Pensa em termos de
+  "mana gerada por treasure" e "valor por carta de exile." Prefere payoffs incrementais a combos
+  deterministicos. Aceita riscos de mana (rituals > rocks) pela velocidade extra. No arquetipo
+  control, e conservador-valor: usa interaction para sobreviver ate o midgame, quando Prosper +
+  Bolas's Citadel geram vantagem imparavel. No arquetipo cEDH, e agressivo-combo: pensa em
+  "storm count" e "mana positiva," com LED + Breach + Grinding Station como wincon principal
+  e Prosper como plano B. Pensamento chave: "Cada carta de impulse draw e um motor pequeno que
+  gera 1-3 treasures. O deck funciona com 8-10 desses motores rodando simultaneamente."
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -352,6 +367,14 @@
 | Winota | Blade Historian/Angrath's Marauders | Humans hit que convertem trigger em dano explosivo | Essencial (Winota) |
 | Winota | Drannith Magistrate/Thalia/Archon | Humans/stax que reduzem janela de resposta | Alta (Winota) |
 | Winota | Grand Abolisher/Silence/Deflecting Swat | Protege o turno critico de ataque | Alta (Winota) |
+| Prosper | Reckless Impulse/Light Up the Stage | Exile draw → Treasure | Essencial (Prosper) |
+| Prosper | Bolas's Citadel | Topdeck cast → Treasure infinito | Essencial (Prosper) |
+| Prosper | Sensei's Divining Top | Controle de topo → Treasure por turno | Alta (Prosper) |
+| Prosper | Xorn | Cada treasure gerado = 2 treasures | Essencial (Prosper) |
+| Prosper | Marionette Master | Treasures viram dreno direto | Alta (Prosper) |
+| Prosper | Mayhem Devil | Treasures viram ping direto | Alta (Prosper) |
+| Prosper | Underworld Breach + LED + Grinding Station | Storm combo infinito | Essencial (cEDH Prosper) |
+| Prosper | Birgi (Harnfel flip) | Exile draw que gera treasures | Alta (Prosper) |
 
 ## Discrepancias Acumuladas com ManaLoom
 
@@ -438,6 +461,9 @@
 | Trigger density (Winota) | Quantidade de corpos/efeitos que realmente disparam Winota; principalmente nao-Human attackers. |
 | Human hit (Winota) | Criatura Human que vale revelar com Winota porque entra atacando e gera stax, protecao ou dano. |
 | Aggro-stax window | Janela curta em que stax impede respostas e combate resolve antes da mesa estabilizar. |
+| Exile value engine (Prosper) | Comandante que gera valor passivo por conjurar cartas do exile (Prosper gera treasures). Diferente de engine que requer sacrificio (Korvold) ou combat (Winota). |
+| Impulse draw (Prosper) | Efeito que exila cartas do topo do library e permite conjura-las por tempo limitado. Nao e card draw tradicional — perde as cartas nao conjuradas. Prosper recompensa impulse draw com treasures. |
+| Treasure payoff (Prosper) | Carta que converte treasures em dano/cartas/mana (Marionette Master, Mayhem Devil, Xorn, Academy Manufactor). E a wincon principal do deck. |
 
 ## Principios de Deckbuilding (extraidos das analises)
 
@@ -469,6 +495,11 @@
 26. **"Reusable interaction beats one-shot interaction — quando o comandante permite recursao, Seals valem mais que instants."** (Muldrotha — Seal of Primordium > Beast Within)
 27. **"Anti-hate is mandatory — se o deck depende do cemiterio, respostas para Rest in Peace e Bojuka Bog sao obrigatorias."** (Muldrotha — Kaya's Ghostform, Perpetual Timepiece)
 28. **"Synergy-weighted card evaluation — o valor de uma carta depende 50% do texto e 50% do contexto do deck."** (Muldrotha — cartas medíocres são All-Stars no contexto certo)
+29. **"Impulse draw > card draw quando o comandante recompensa exile."** (Prosper — Reckless Impulse e melhor que preencher a mao com cartas que nao geram treasures.)
+30. **"Treasure payoffs sao wincons, nao apenas ramp."** (Prosper — Marionette Master, Mayhem Devil, Nadier's Nightblade convertem treasures em dano. O deck nao precisa de combos se tiver payoffs suficientes.)
+31. **"Rituals substituem ramp verde em Rakdos."** (Prosper — Dark Ritual, Rite of Flame, Jeska's Will compensam a falta de dorks de mana. Cada ritual que leva Prosper ao campo no turno 2-3 gera valor exponencial.)
+32. **"Topdeck manipulation e o segundo motor do deck."** (Prosper — Sensei's Top + Bolas's Citadel dao controle absoluto do topo. Citadel no campo faz cada draw ser um treasure em potencial.)
+33. **"Protecao do comandante e critica em engine decks."** (Prosper — com media de 1.5 protecoes, Prosper morre e o deck para. Diferente de Krenko (re-joga), Prosper custa 4 mana e depende de acumulo.)
 
 ## Ultimas Execucoes
 
@@ -484,7 +515,8 @@
 | 2026-05-27 | **EDHREC Live (7.597 decks)** | **Lorehold, the Historian (Spellslinger/Big Spells)** | **Scout concluido — 265 cartas mapeadas, 8 cartas faltando urgentes identificadas** |
 | 2026-05-27 | **EDHREC Average Deck (23.212 decks)** | **Muldrotha, the Gravetide (Graveyard Permanent Recursion Value)** | **Analise concluida — 87 cartas EDHREC avg, 3 Game Changers** |
 | 2026-05-27 | **EDHREC Average Deck** | **Edgar Markov (Vampire Tribal Aggro/Tokens/Aristocrats)** | **Analise concluida — 100/100 EDHREC avg, 8 discrepancias de classificacao, 3 novos padroes** |
-| 2026-05-27 | **EDHREC Average Deck** | **Krenko, Mob Boss (Goblin Typal Tokens Aggro)** | **Analise concluida — 100/100 EDHREC avg, 7 insights, 3 discrepancias** |
+|| 2026-05-27 | **EDHREC Average Deck** | **Krenko, Mob Boss (Goblin Typal Tokens Aggro)** | **Analise concluida — 100/100 EDHREC avg, 7 insights, 3 discrepancias** |
+|| 2026-05-27 | **Corpus EDHREC (4 arquétipos: optimized, control, cEDH, artifacts)** | **Prosper, Tome-Bound (Exile Value Treasure Engine)** | **Analise concluida — 4 decks x ~88 cartas, profile 6 fontes, 10 insights, 9 discrepancias** |
 
 ### Novos Insights desta Analise
 - **Muldrotha cria uma nova categoria de avaliacao:** "permanent-based efficiency." O deck prioriza permanentes mesmo se o efeito for mais fraco. Instants e sorceries sao "descartaveis" porque Muldrotha nao pode rejoga-los.
@@ -501,6 +533,18 @@
 - **Protecao zero como filosofia:** Mono-red aceita que Krenko morre. Nao ha counters, fog, ou indestrutivel. A resposta e re-jogar Krenko, nao proteger o primeiro.
 - **Raid Bombardment + lords = antissinergia nao reconhecida:** EDHREC inclui ambos porque sao "boas cartas de goblin", mas lords desqualificam goblins do Raid Bombardment ao aumentar poder para >2.
 - **Draw baixo (5 fontes) compensado por Skullclamp + Ringleader:** 5 draws e pouco para Commander, mas Skullclamp (equipa token 1/1 → draw 2) e Goblin Ringleader (revela 4, pega goblins) sustentam o plano aggro.
+
+### Novos Insights (Prosper, Tome-Bound — Exile Value Treasure Engine)
+- **Prosper e o unico comandante que gera treasures por conjurar do exile** — Nao ha outro comandante que faca isto. Cada carta de impulse draw e efetivamente "R: exile top card, conjure ate o fim do turno. Se conjurar, crie um treasure."
+- **Bolas's Citadel e a melhor carta do deck** — Presente em 4/4 decks do corpus. Citadel permite conjurar do topo do library, que ativa Prosper (treasure) e ignora timing de impulse draw.
+- **Topdeck manipulation substitui draw tradicional** — Sensei's Top + Bolas's Citadel + Scroll Rack dao controle absoluto do topo, similar a Lorehold. O deck tem ~4 cartas de topdeck setup.
+- **Treasure payoffs sao wincons integrados** — Marionette Master, Mirkwood Bats, Mayhem Devil, Nadier's Nightblade convertem treasures em dano direto. O deck nao precisa de combos para vencer.
+- **Storm e opcional, nao obrigatorio** — Apenas 2/4 arquétipos incluem Underworld Breach storm. O deck funciona sem storm em bracket 3 apenas com treasure payoffs.
+- **Rakdos sofre contra enchantments** — Feed the Swarm e a unica remocao de enchantment consistente. O deck depende de remover oponentes antes que eles estabelecam prison enchantments.
+- **Protection baixa e o gap mais comum** — Media de 1.5 protecoes. Prosper custa 4 mana e e o unico motor do deck. Sem protecao, oponentes matam Prosper e o deck para completamente.
+- **Lands abaixo do profile (31.75 vs 33-36)** — O deck funciona com menos lands por causa dos rituals, mas 31 lands e arriscado para bracket 3.
+- **Dauthi Voidwalker e hatebear + synergy** — Nao apenas impede oponentes de usar GY, mas permite castar cartas do exile deles, gerando treasures de Prosper.
+- **3 arquétipos principais identificados no corpus** — Optimized Combo/Artifacts Treasure (foco em storm + payoffs), Control Exile Treasure (foco em interacao + valor incremental), cEDH Storm Treasure (28 lands, 9 tutors, Breach storm).
 
 ### Novos Padroes (Muldrotha — Graveyard Value)
 14. **"Strategy over power"** — Preferir cartas que se encaixam no plano do comandante a cartas objetivamente mais fortes. Spore Frog > Essence Warden.
@@ -553,6 +597,19 @@ A analise anterior do deck Lorehold continha erros significativos nas metricas, 
 | Bloodthirsty Conqueror | creature | drain/combo_piece | Medio - segundo Exquisite Blood |
 | Exquisite Blood | enchantment | combo_piece | Medio - metade do combo EB+SB |
 || Blood Artist | creature (no tag) | aristocrat_payoff | Medio - sem tag funcional relevante |
+
+### Novas Discrepancias (Prosper, Tome-Bound — Exile Value Treasure)
+| Carta | Tag ManaLoom | Tag Esperada | Impacto |
+|:------|:------------:|:------------:|:-------:|
+| Prosper, Tome-Bound | engine | draw/engine | Alto - Sistema precisa de tag "engine" para comandantes que geram valor passivo |
+| Bolas's Citadel | miracle_topdeck | engine + wincon | Alto - E o motor principal do deck, nao apenas topdeck setup |
+| Xorn | ramp | treasure_payoff | Medio - Xorn duplica treasures, mas so funciona se voce ja tem treasure gen |
+| Crime Novelist | ramp | treasure_payoff | Medio - E payoff condicional, nao ramp puro |
+| Mayhem Devil | interaction | payoff + removal | Alto - E o principal payoff do deck, nao so remocao |
+| Birgi, God of Storytelling | ramp | engine + ramp | Alto - O flip (Harnfel) e engine de exile |
+| Storm-Kiln Artist | spellslinger | ramp + payoff | Medio - Cada spell gera treasure. E ramp condicional |
+| Professional Face-Breaker | ritual_treasure | engine + ramp | Alto - Atacar gera treasure + card advantage |
+| Dauthi Voidwalker | creature | hatebear + GY hate + value | Alto - Carta serve a 3 funcoes |
 
 ### 2026-05-28 — Lorehold Purpose Analyzer (Agent 2) — Deep Dissection
 - **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
