@@ -8,11 +8,11 @@
 
 || Metrica | Valor | Data ||
 |:--------|:-----:|:-----||
-| Comandantes analisados | 12 | 2026-05-27 |
-| Decks analisados | 16 | 2026-05-27 |
-| Cartas revisadas | ~1.530 | 2026-05-27 |
-| Insights documentados | 74 | 2026-05-27 |
-| Discrepancias com ManaLoom | 72 | 2026-05-27 |
+|| Comandantes analisados | 13 | 2026-05-27 |
+|| Decks analisados | 21 | 2026-05-27 |
+|| Cartas revisadas | ~1.960 | 2026-05-27 |
+|| Insights documentados | 79 | 2026-05-27 |
+|| Discrepancias com ManaLoom | 85 | 2026-05-27 |
 
 ## PostgreSQL — Dados de Conhecimento (2026-05-27)
 
@@ -60,6 +60,7 @@
 | **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
 | **Krenko, Mob Boss** | **1** | **2026-05-27** | **7** | **Nova: 100/100 EDHREC avg goblin typal** |
 | **Prosper, Tome-Bound** | **4** | **2026-05-27** | **10 novos** | **Nova: 4 corpus EDHREC (optimized, control, cEDH, artifacts) + profile 6 fontes** |
+| **Dina, Essence Brewer** | **5** | **2026-05-27** | **5** | **Nova: 5 corpus EDHREC (default, sacrifice, aristocrats, budget, tokens) + profile** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -271,6 +272,7 @@
   "storm count" e "mana positiva," com LED + Breach + Grinding Station como wincon principal
   e Prosper como plano B. Pensamento chave: "Cada carta de impulse draw e um motor pequeno que
   gera 1-3 treasures. O deck funciona com 8-10 desses motores rodando simultaneamente."
+- **Jogador de Dina, Essence Brewer (Soul Sister Aristocrats):** Estrategista incremental-paciente. Pensa em termos de triggers de ganho de vida como "micro-ataques" que passam por cima de blockers. Prefere vencer por drenagem incremental a combat. Pensamento chave: "Cada vez que eu ganho 1 de vida, cada oponente perde 1. Meu deck transforma life gain em inevitabilidade." Aceita protecao baixa (1-2) porque confia que Dina custa so 3 e pode ser recastada. Prioriza consistencia de token gen sobre qualidade individual. Aceita draw condicional porque sempre vai ter criaturas morrendo. Nao inclui combos deterministicos — prefere vencer por drenagem incremental. Valoriza scry como card selection barato — scry 1 por trigger ajuda a encontrar pecas certas.
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -546,7 +548,8 @@
 | 2026-05-27 | **EDHREC Average Deck (23.212 decks)** | **Muldrotha, the Gravetide (Graveyard Permanent Recursion Value)** | **Analise concluida — 87 cartas EDHREC avg, 3 Game Changers** |
 | 2026-05-27 | **EDHREC Average Deck** | **Edgar Markov (Vampire Tribal Aggro/Tokens/Aristocrats)** | **Analise concluida — 100/100 EDHREC avg, 8 discrepancias de classificacao, 3 novos padroes** |
 || 2026-05-27 | **EDHREC Average Deck** | **Krenko, Mob Boss (Goblin Typal Tokens Aggro)** | **Analise concluida — 100/100 EDHREC avg, 7 insights, 3 discrepancias** |
-|| 2026-05-27 | **Corpus EDHREC (4 arquétipos: optimized, control, cEDH, artifacts)** | **Prosper, Tome-Bound (Exile Value Treasure Engine)** | **Analise concluida — 4 decks x ~88 cartas, profile 6 fontes, 10 insights, 9 discrepancias** |
+||| 2026-05-27 | **Corpus EDHREC (4 arquétipos: optimized, control, cEDH, artifacts)** | **Prosper, Tome-Bound (Exile Value Treasure Engine)** | **Analise concluida — 4 decks x ~88 cartas, profile 6 fontes, 10 insights, 9 discrepancias** |
+|| 2026-05-27 | **Corpus EDHREC (5 arquétipos: default, sacrifice, aristocrats, budget, tokens)** | **Dina, Essence Brewer (Soul Sister Aristocrats)** | **Analise concluida — 5 decks x ~86 cartas, profile completo, 5 insights, 14 discrepancias** |
 
 ### Novos Insights desta Analise
 - **Muldrotha cria uma nova categoria de avaliacao:** "permanent-based efficiency." O deck prioriza permanentes mesmo se o efeito for mais fraco. Instants e sorceries sao "descartaveis" porque Muldrotha nao pode rejoga-los.
@@ -576,6 +579,13 @@
 - **Dauthi Voidwalker e hatebear + synergy** — Nao apenas impede oponentes de usar GY, mas permite castar cartas do exile deles, gerando treasures de Prosper.
 - **3 arquétipos principais identificados no corpus** — Optimized Combo/Artifacts Treasure (foco em storm + payoffs), Control Exile Treasure (foco em interacao + valor incremental), cEDH Storm Treasure (28 lands, 9 tutors, Breach storm).
 
+### Novos Insights (Dina, Essence Brewer — Soul Sister Aristocrats)
+- **Dina cria um novo subtipo de aristocrats — «Soul Sister Aristocrats»** — Diferente de Teysa (dobra death triggers) ou Korvold (recompensa sacrificar), Dina recompensa ganho de vida. Blood Artist não é apenas payoff de drenagem — é também um enabler que ativa o comandante. Cada Blood Artist trigger vira duas fontes de dano simultâneas.
+- **Scry como subproduto de cada trigger de lifegain** — Dina faz scry 1 cada vez que ganha vida. Em um deck com 7+ Blood Artist effects + Soul Sisters, você pode fazer scry 3-5 por turno. Isso substitui draw em parte do deck filtering.
+- **O quadrado de drain é o core do deck** — Blood Artist + Zulaport Cutthroat + Bastion of Remembrance + Enduring Tenacity formam o quadrado de drain. Com Dina em campo, cada morte de criatura causa 4 de dano a cada oponente (4 × 3 = 12 total). É o coração do deck.
+- **Golgari aristocrats é mais lento que Orzhov, mas mais resiliente** — Sem branco, Dina perde proteção mas ganha recursão verde (Meren, Eternal Witness). O deck é mais difícil de parar completamente.
+- **Token generation substitui creature count** — Dina não precisa de 30 criaturas. Precisa de 10-12 fontes de tokens (Awakening Zone, Ophiomancer, Tendershoot Dryad) que geram corpos descartáveis para sacrificar.
+
 ### Novos Padroes (Muldrotha — Graveyard Value)
 14. **"Strategy over power"** — Preferir cartas que se encaixam no plano do comandante a cartas objetivamente mais fortes. Spore Frog > Essence Warden.
 15. **"The graveyard is a resource, not a cost"** — Self-mill nao e "perder cartas", e "preparar o motor."
@@ -591,6 +601,13 @@
 24. **"Krenko e aggro com motor de combo escondido"** — O deck parece aggro linear, mas Conspicuous Snoop + Goblin Recruiter + Kiki-Jiki forma um combo de linha infinita. O deckbuilder medio não otimiza para o combo, mas ele está lá.
 25. **"Mono-red aceita protecao zero"** — Krenko não tem counterspells, fog, ou indestrutível. A filosofia é: se Krenko morrer, jogue outro. Isso é diferente de decks multicolor que podem incluir proteção.
 26. **"Raid Bombardment e lords tem antissinergia nao reconhecida"** — Lords aumentam poder dos goblins para >2, desqualificando-os do Raid Bombardment. EDHREC inclui ambos porque sao "boas cartas de goblin", nao por interacao otimizada.
+
+### Novos Padroes (Dina, Essence Brewer — Soul Sister Aristocrats)
+27. **"Soul Sister Aristocrats e um subtipo novo"** — Dina recompensa ganho de vida, nao apenas morte de criaturas. Blood Artist vira enabler + payoff simultaneo.
+28. **"Scry passivo substitui draw condicional"** — Em decks com 7+ fontes de lifegain, Dina gera scry 3-5 por turno, funcionando como card selection gratuito.
+29. **"Token gen > Creature count em aristocrats Golgari"** — Dina precisa de 10-12 fontes de tokens (Awakening Zone, Ophiomancer) em vez de 30 criaturas, porque tokens sao fodder descartavel.
+30. **"Resiliencia verde substitui protecao branca"** — Sem branco, Dina nao tem Teferi's Protection, mas ganha Meren, Eternal Witness, Victimize — mais dificil de parar completamente.
+31. **"Golgari aristocrats e mais lento que Orzhov, mas inevitavel"** — O deck nao explode no turno 6, mas se o jogo chegar ao turno 10 com Dina + Meren, o jogador vence por exaustao.
 
 ### Novas Discrepancias com ManaLoom (Muldrotha)
 | Carta | Tag ManaLoom | Tag Esperada | Impacto |
@@ -640,6 +657,24 @@ A analise anterior do deck Lorehold continha erros significativos nas metricas, 
 | Storm-Kiln Artist | spellslinger | ramp + payoff | Medio - Cada spell gera treasure. E ramp condicional |
 | Professional Face-Breaker | ritual_treasure | engine + ramp | Alto - Atacar gera treasure + card advantage |
 | Dauthi Voidwalker | creature | hatebear + GY hate + value | Alto - Carta serve a 3 funcoes |
+
+### Novas Discrepancias (Dina, Essence Brewer — Soul Sister Aristocrats)
+| Carta | Tag ManaLoom | Tag Esperada | Impacto |
+|:------|:------------:|:------------:|:-------:|
+| Dina, Essence Brewer (comandante) | creature | engine + payoff | Alto — IA vê como criatura genérica |
+| Blood Artist | removal | death_payoff_drain | Médio — mesmo padrão de Teysa |
+| Chatterfang, Squirrel General | creature | engine + token_maker | Alto — engine de sacrificio |
+| Pitiless Plunderer | ramp | ramp + combo_piece | Médio — mesma discrepância de Korvold |
+| Dina, Soul Steeper | creature | soul_sister + draw | Alto — IA não detecta dupla função |
+| Essence Warden | creature | soul_sister | Médio — sem tag funcional |
+| Awakening Zone | enchantment | token_gen | Médio — gera spawns que são sac fodder |
+| Ashnod's Altar | ramp | sacrifice_outlet | Alto — mesmo padrão de Teysa |
+| Greater Good | draw | draw + sac_outlet | Médio — perde que é sac outlet |
+| Enduring Tenacity | enchantment | death_payoff_drain | Médio — mesma função que Blood Artist |
+| Smothering Abomination | draw | draw + sacrifice_payoff | Médio — draw condicional que recompensa sacrificio |
+| Veinwitch Coven | enchantment | protection + recursion | Alto — IA pode sugerir corte |
+| Woe Strider | creature | sac_outlet_recursive | Médio — sac outlet que volta sozinho |
+| Plumb the Forbidden | sorcery | draw_massivo_sacrifice | Médio — draw ótimo com 2+ criaturas |
 
 ### 2026-05-28 — Lorehold Purpose Analyzer (Agent 2) — Deep Dissection
 - **Fonte:** DB knowledge.db (deck_id=6, deck "Lorehold Spellslinger")
