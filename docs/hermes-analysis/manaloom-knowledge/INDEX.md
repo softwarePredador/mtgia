@@ -6,13 +6,43 @@
 
 ## Status
 
-| Metrica | Valor | Data |
-|:--------|:-----:|:-----|
-|| Comandantes analisados | 12 | 2026-05-27 |
-|| Decks analisados | 16 | 2026-05-27 |
-|| Cartas revisadas | ~1.530 (selecao + Winota 100 + Lorehold 265 EDHREC + Muldrotha 87 + Edgar 100 + Atraxa 91 + Krenko 100 + VALIDATOR 86 + Prosper 347 corpus) | 2026-05-27 |
-|| Insights documentados | 74 | 2026-05-27 |
-|| Discrepancias com ManaLoom | 72 | 2026-05-27 |
+|| Metrica | Valor | Data ||
+|:--------|:-----:|:-----||
+| Comandantes analisados | 12 | 2026-05-27 |
+| Decks analisados | 16 | 2026-05-27 |
+| Cartas revisadas | ~1.530 | 2026-05-27 |
+| Insights documentados | 74 | 2026-05-27 |
+| Discrepancias com ManaLoom | 72 | 2026-05-27 |
+
+## PostgreSQL — Dados de Conhecimento (2026-05-27)
+
+|| Tabela | Registros | Status |
+|:-------|:--------|:---------|:-------|
+| `commander_reference_profiles` | 48 | ✅ profile_json preenchido + deck_count atualizado |
+| `theme_contextual_rules` | 27 | ✅ Importado do THEMES.md (ramp/draw/removal por tema) |
+| `card_deck_profiles` | 670 | ✅ Função contextual de carta por deck analisado |
+| `analysis_sources` | 1 | ✅ Rastreio de imports |
+
+## Crons de Conhecimento (2026-05-27)
+
+|| Cron | Schedule | Função |
+|:-----|:-----|:---------|:-------|
+| `manaloom-knowledge-import` | 30min | Importa THEMES.md → PostgreSQL |
+| `manaloom-commander-knowledge-deep` | 20min | Analisa 1 deck Commander |
+| `manaloom-gamechanger-research` | 20min | Pesquisa Game Changers |
+| `manaloom-tag-accuracy-reporter` | 360min | Relatório de precisão de tags |
+| `manaloom-mana-base-validator` | 60min | Valida base de mana |
+| `lorehold-deck-scout` | 30min | Scout do meta Lorehold |
+| `lorehold-deck-validator` | 60min | Valida deck vs EDHREC |
+| `lorehold-mulligan-analyst` | 120min | Simula mulligans |
+| `lorehold-evolution-oracle` | 360min | Evolução automática |
+
+## Backend — Ajustes Realizados (2026-05-27)
+
+- `theme_contextual_rules_service.dart`: Novo service para ler regras temáticas do PostgreSQL
+- `optimization_validator.dart`: Integração da validação temática (penalidade de score, warnings)
+- `import_knowledge.py`: Script de import THEMES.md → theme_contextual_rules
+- `import_card_profiles.py`: Script de import análise de deck → card_deck_profiles
 
 ## Comandantes Analisados
 
