@@ -2,124 +2,105 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T21:08Z**
+> Última atualização: **2026-05-27T23:17Z**
 
 ## Resumo
 
-|| Métrica | Valor |
+| Métrica | Valor |
 |:--|:--:|
 | Total de crons (`include_disabled=True`) | 15 |
 | Habilitados | 15/15 |
 | Desabilitados | 0 |
-| `last_status=error` | **1** 🔴 |
-| Nunca executaram (`last_run_at=null`) | 0 |
-| Stale (>120min atrás, `enabled=true`) | 0 |
+| `last_status=error` | **8** 🔴 |
+| Nunca executaram (`last_run_at=null`) | 1 |
+| Stale (>120min atrás, `enabled=true`) | 0 após triggers desta rodada |
 | Fleet removidos desde 2026-05-27 | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
-| Recuperados nesta sessão | 2 |
-| Regredidos nesta sessão | 0 |
+| Recuperados nesta sessão | 0 |
+| Regredidos nesta sessão | 8 |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 15/15 habilitados ✅. **1 cron em `last_status=error`** — tag-accuracy-reporter (provider error transitório). 2 crons recuperados nesta rodada (resume + run trigger). Fleet cresceu de 13 → 15 com 2 estrutura-auditor distintos.
+**Estado geral:** 15/15 habilitados ✅. **8 crons em `last_status=error`**. O padrão atual é majoritariamente sistêmico por provider/crédito: 5 crons com HTTP 402/`Insufficient Balance`, 2 com HTTP 429 (`free-models-per-day-stealth`) e 1 com `Provider returned error`. Foram aplicados 4 triggers operacionais para jobs stale/never-run; nenhum resume foi necessário.
 
-**Mudanças desde 19:29Z:**
-- `manaloom-commander-knowledge-deep` 🟢 **recuperou** — 20:53Z executou ok (deepseek-v4-flash ✅).
-- `lorehold-deck-validator` 🟢 **recuperou** — 20:35Z executou ok (deepseek-v4-flash ✅).
-- `manaloom-manager-watchdog` 🟢 **recuperou** (auto) — 20:26Z ok (esta execução).
-- `manaloom-tag-accuracy-reporter` 🔴 **mantém erro** — 19:26Z "Provider returned error". Próximo tick: 01:26Z. Sem ação (transiente, 1/15 = não sistêmico).
-- `manaloom-code-structure-auditor` (577a0a669714, weekly Sunday) — estava **DISABLED**, foi **RESUMED** ✅. Agendado para 2026-05-31 06:00Z.
-- `manaloom-code-structure-auditor` (bb03201b8911, every 4h) — **NUNCA RODOU**, trigger aceito. next_run_at: ~21:05Z.
-- `manaloom-knowledge-import` ✅ 20:40Z ok.
-- `lorehold-deck-scout` ✅ 20:32Z ok.
-- `manaloom-mana-base-validator` ✅ 20:52Z ok.
-- `lorehold-mulligan-analyst` ✅ 19:51Z ok.
-- `lorehold-evolution-oracle` ✅ 13:22Z ok (próximo: 21:29Z).
-- `manaloom-hermes-normal-audit` ✅ 21:01Z ok.
-- `manaloom-hermes-weekly-parallel-audit` ✅ 12:56Z ok.
-- `manaloom-master-watchdog` ✅ 20:26Z ok.
-- `manaloom-gamechanger-research` ✅ 20:59Z ok.
+**Mudanças desta rodada:**
+- `manaloom-hermes-normal-audit` — estava >120min desde último run; `run` aceito e `next_run_at` reprogramado para agora.
+- `manaloom-hermes-weekly-parallel-audit` — estava >120min desde último run; `run` aceito e `next_run_at` reprogramado para agora.
+- `manaloom-tag-accuracy-reporter` — estava stale (>120min) e com erro de provider; `run` aceito, ainda aguardando nova execução.
+- `manaloom-code-structure-auditor` (577a0a669714) — seguia `never-run`; `run` aceito, ainda `last_run_at=null`.
+- Demais crons permaneceram habilitados; nenhum `enabled=false` foi encontrado.
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 20:26Z | 42min | 🟢 ok | 2026-05-27 21:30Z | sem ação — rodando normalmente |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 21:01Z | 7min | 🟢 ok | 2026-05-28 16:00Z | próxima às 16:00Z |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 8h12min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 20:26Z | 42min | 🟢 ok | 2026-05-27 21:30Z | ✅ recuperou — esta execução |
-| `577a0a669714` | manaloom-code-structure-auditor | `0 6 * * 0` | ✅ | NUNCA | — | ⚪ never-run | 2026-05-31 06:00Z | 🆕 **RESUMIDO** nesta rodada. Weekly Sunday. |
-| `bb03201b8911` | manaloom-code-structure-auditor | `0 20,0,4,8,12,16 * * *` | ✅ | NUNCA | — | ⚪ never-run | 2026-05-27 21:05Z | 🆕 **TRIGGER ACEITO**. next_run_at ajustado para ~21:05Z. |
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 22:28Z | 48min | 🟢 ok | 2026-05-27 23:45Z | ✅ sem ação — rodando/agendado normalmente |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 21:01Z | 2h15min | 🟢 ok | 2026-05-27 23:16Z | 🟡 trigger aceito nesta execução; aguardando evidência de execução |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 10h21min | 🟢 ok | 2026-05-27 23:16Z | 🟡 trigger aceito nesta execução; aguardando evidência de execução |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 22:32Z | 44min | 🔴 error | 2026-05-27 23:46Z | 🔴 erro recente; output indica HTTP 402 / `Insufficient Balance`; aguardando correção externa |
+| `577a0a669714` | manaloom-code-structure-auditor | `0 6 * * 0` | ✅ | NUNCA | — | ⚪ never-run | 2026-05-27 23:16Z | ⚪ trigger aceito nesta execução; ainda never-run, aguardando scheduler |
+| `bb03201b8911` | manaloom-code-structure-auditor | `0 20,0,4,8,12,16 * * *` | ✅ | 2026-05-27 21:34Z | 1h43min | 🟢 ok | 2026-05-28 00:00Z | ✅ sem ação — rodando/agendado normalmente |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 20:53Z | 15min | 🟢 ok | 2026-05-27 21:13Z | ✅ recuperou — deepseek-v4-flash ✅ |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 20:59Z | 9min | 🟢 ok | 2026-05-27 21:19Z | ✅ rodando normalmente |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 19:26Z | 1h42min | 🔴 error | 2026-05-28 01:26Z | ⚠️ "Provider returned error" (default provider). Não sistêmico (1/15). Aguardando próximo tick. |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 20:52Z | 16min | 🟢 ok | 2026-05-27 21:52Z | ✅ rodando normalmente |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | `every 30m` | ✅ | 2026-05-27 20:40Z | 28min | 🟢 ok | 2026-05-27 21:10Z | ✅ rodando normalmente |
+| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 22:36Z | 41min | 🔴 error | 2026-05-27 23:35Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 22:37Z | 40min | 🔴 error | 2026-05-27 23:35Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 19:26Z | 3h50min | 🔴 error | 2026-05-27 23:16Z | 🟡 trigger aceito nesta execução; erro anterior do provider default permanece até novo run |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 23:15Z | 2min | 🔴 error | 2026-05-28 00:15Z | 🔴 erro recente; rate limit de modelo free (HTTP 429) |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | `every 30m` | ✅ | 2026-05-27 23:15Z | 2min | 🔴 error | 2026-05-27 23:45Z | 🔴 erro recente; rate limit de modelo free (HTTP 429) |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 20:32Z | 36min | 🟢 ok | 2026-05-27 21:02Z | ✅ rodando normalmente |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 20:35Z | 33min | 🟢 ok | 2026-05-27 21:35Z | ✅ recuperou — deepseek-v4-flash ✅ |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 19:51Z | 1h17min | 🟢 ok | 2026-05-27 21:51Z | ✅ rodando normalmente |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 7h46min | 🟢 ok | 2026-05-27 21:29Z | normal para schedule 6h |
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 23:15Z | 2min | 🔴 error | 2026-05-27 23:45Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 22:38Z | 39min | 🔴 error | 2026-05-27 23:38Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 21:56Z | 1h20min | 🟢 ok | 2026-05-27 23:56Z | ✅ sem ação — rodando/agendado normalmente |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 21:41Z | 1h35min | 🟢 ok | 2026-05-28 03:41Z | ✅ sem ação — rodando/agendado normalmente |
 
-## Ações da Rodada Atual (2026-05-27T21:08Z)
+## Ações da Rodada Atual (2026-05-27T23:17Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
-:-:|:--|:--|:--|:--|:--
-| 1 | `577a0a669714` | manaloom-code-structure-auditor (weekly) | `cronjob(action='resume')` | estava `enabled=false`, nunca rodou | ✅ Resumido. Habilitado, agendado para 2026-05-31 06:00Z |
-| 2 | `bb03201b8911` | manaloom-code-structure-auditor (4h) | `cronjob(action='run')` | `last_run_at=null`, nunca executou | ✅ Trigger aceito. next_run_at → ~21:05Z. Aguardando scheduler. |
-| 3 | — | **branch check** | `git branch --show-current` | Verificação de branch | ✅ `codex/hermes-analysis-docs` — sem ação |
-| 4 | — | **diagnóstico** | listou 15 crons | 1 erro encontrado | 🔍 Apenas tag-accuracy-reporter |
-| 5 | `75eed994c103` | commander-knowledge-deep | observação | Recuperou sozinho (20:53Z ok) | ✅ Sem intervenção necessária |
-| 6 | `712579b15767` | lorehold-deck-validator | observação | Recuperou sozinho (20:35Z ok) | ✅ Sem intervenção necessária |
-| 7 | `b340374bc4e7` | tag-accuracy-reporter | diagnóstico | "Provider returned error" — falha precoce | ⏸️ Sem ação — aguardando próximo ciclo (~01:26Z). Não sistêmico (1/15). |
-
-## Mudanças desde o Último Relatório (2026-05-27T19:29Z)
-
-| Mudança | Detalhe |
-|:--------|:--------|
-| Total de crons | 13 → 15 (2 estrutura-auditor distintos: weekly + 4h) |
-| Erros totais | 4 → 1 (3 crons recuperaram sozinhos) |
-| Regredidos | 3 → 0 |
-| Recuperados nesta rodada | 2 (resume + run trigger) |
-| Fleet total | 15 crons, 15 habilitados, 0 desabilitados |
+|:-:|:--|:--|:--|:--|:--|
+| 1 | `660397bb97e1` | manaloom-hermes-normal-audit | `cronjob(action='run')` | >120min desde último run | ✅ Trigger aceito; `next_run_at` → agora. Aguardando scheduler. |
+| 2 | `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `cronjob(action='run')` | >120min desde último run | ✅ Trigger aceito; `next_run_at` → agora. Aguardando scheduler. |
+| 3 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | `cronjob(action='run')` | stale >120min + `last_status=error` | ✅ Trigger aceito; erro anterior permanece até novo run. |
+| 4 | `577a0a669714` | manaloom-code-structure-auditor (weekly) | `cronjob(action='run')` | `last_run_at=null` | ✅ Trigger aceito; ainda never-run até scheduler executar. |
+| 5 | — | **branch check** | `git branch --show-current` | verificar branch do workdir | ✅ `codex/hermes-analysis-docs` — sem ação |
+| 6 | — | **diagnóstico sistêmico** | inspeção de outputs recentes | 8 crons em erro | 🔍 5× HTTP 402 / saldo, 2× HTTP 429 / rate limit, 1× provider default |
 
 ## Alertas Pendentes
 
-### 🔴 1 cron com `last_status=error`
+### 🔴 Crons com `last_status=error`
 
 | Cron | Último run | Erro | Provider | Model | Workdir | Tipo |
 |:-----|:----------:|:----|:--------:|:-----:|:-------:|:----:|
-| tag-accuracy-reporter | 19:26Z | Provider returned error | default | — | /opt/data/workspace/mtgia | Transitório |
+| manaloom-manager-watchdog | 22:32Z | HTTP 402: Insufficient Balance | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Saldo/provider |
+| manaloom-commander-knowledge-deep | 22:36Z | HTTP 402: Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
+| manaloom-gamechanger-research | 22:37Z | HTTP 402: Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
+| manaloom-tag-accuracy-reporter | 19:26Z | Provider returned error | default | — | /opt/data/workspace/mtgia | Provider default |
+| manaloom-mana-base-validator | 23:15Z | HTTP 429: Rate limit exceeded: free-models-per-day-stealth | default | — | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Rate limit |
+| lorehold-deck-scout | 23:15Z | HTTP 402 / Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
+| lorehold-deck-validator | 22:38Z | HTTP 402: Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
+| manaloom-knowledge-import | 23:15Z | HTTP 429: Rate limit exceeded: free-models-per-day-stealth | default | — | — | Rate limit |
 
-**Nenhuma ação corretiva estrutural necessária:**
-- 0 crons desabilitados → nenhum resume
-- 0 crons stale (>120min) → nenhum run
-- 1/15 erro = não sistêmico
-- Único erro é transitório (provider issue)
-- Scheduler reintentará em ~01:26Z
-
-### Recuperados hoje (2026-05-27):
-- manaloom-manager-watchdog: 🔴 → 🟢 (20:26Z, esta execução)
-- manaloom-code-structure-auditor (577a0a669714): DISABLED → ENABLED (21:08Z)
-- commander-knowledge-deep: 🔴 → 🟢 (20:53Z)
-- lorehold-deck-validator: 🔴 → 🟢 (20:35Z)
+**Leitura operacional:**
+- O estado atual **não** é mais “1 erro transitório”; agora há **8/15 erros** com forte indício de dependências externas compartilhadas.
+- Grupo DeepSeek/Crédito afetado: `manaloom-commander-knowledge-deep`, `manaloom-gamechanger-research`, `lorehold-deck-scout`, `lorehold-deck-validator`.
+- Grupo Rate-limit/free-model afetado: `manaloom-mana-base-validator` e `manaloom-knowledge-import`.
+- `manaloom-manager-watchdog` também falhou por HTTP 402 no output mais recente, então o próprio gerente entrou na mesma degradação de provider.
+- `manaloom-tag-accuracy-reporter` segue no provider default com erro transitório genérico; como não há model/provider explícito para corrigir localmente, a ação segura foi apenas re-trigger.
+- Como as configurações principais parecem corretas nos crons DeepSeek (`provider=deepseek`, `model=deepseek-v4-flash`, workdir certo onde aplicável), **não** reconfigurei model/workdir cegamente; o bloqueio parece financeiro/infra externo e precisa correção fora do watchdog.
 
 ## Observações Importantes
 
-- **Fleet cresceu:** 13 → 15 crons. Dois `manaloom-code-structure-auditor` distintos: weekly Sunday (577a0a669714) + every 4h (bb03201b8911).
 - **Branch confirmada:** `codex/hermes-analysis-docs` ✅
-- **`cronjob(action="list", include_disabled=True)`** retornou 15 jobs, todos `enabled=true` após resume.
-- **Ações corretivas aplicadas:** 1 resume (weekly auditor) + 1 run trigger (4h auditor).
-- **Tag-accuracy-reporter** usa provider default (sem model/provider explícito). Erro "Provider returned error" é transitório — próximo tick em ~01:26Z.
-- Working tree contém artefatos de cron não relacionados (decks lorehold, scripts de scout, `__pycache__`) — apenas `CRON_STATUS.md` será comitado.
-- Nenhum token/secret registrado neste relatório.
+- **`cronjob(action="list", include_disabled=True)`** retornou 15 jobs; nenhum desabilitado.
+- **Ações corretivas aplicadas nesta execução:** 4 triggers `run`; 0 resumes.
+- **Sem correções estruturais locais seguras para aplicar** nos erros HTTP 402/429 observados; são falhas externas de crédito/rate-limit/provider.
+- Working tree local segue com artefato não versionado `scripts/knowledge.db`; ele não faz parte deste commit.
+- Apenas `docs/hermes-analysis/manaloom-knowledge/CRON_STATUS.md` deve ser commitado pelo watchdog.
+- Nenhum token/secret foi registrado neste relatório.
 
 ---
 
