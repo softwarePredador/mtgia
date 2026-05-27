@@ -150,34 +150,34 @@ GC a preencher — qualquer erro de arquivo ou permissão interrompe o fluxo.
 
 ## Precisão das Functional Tags (último relatório)
 
-*Atualizado pelo cron manaloom-tag-accuracy-reporter — 2026-05-27T01:55Z*
+*Atualizado pelo cron manaloom-tag-accuracy-reporter — 2026-05-27T13:01Z*
 
 **Geral:** 155/187 acertos = **82.9%** (187 amostras, 6 decks)
 
 | Tag | Acertos | Total | Precisão | Status |
 |:----|:-------:|:-----:|:--------:|:------|
-| ramp | 32 | 32 | 100.0% | ✅ |
-| draw | 15 | 15 | 100.0% | ✅ |
-| tutor | 6 | 6 | 100.0% | ✅ |
-| removal | 16 | 16 | 100.0% | ✅ |
-| enabler | 12 | 12 | 100.0% | ✅ |
-| land | 37 | 37 | 100.0% | ✅ |
-| board_wipe | 3 | 3 | 100.0% | ✅ |
-| sacrifice_outlet | 1 | 1 | 100.0% | ✅ |
-| finisher | 2 | 2 | 100.0% | ✅ |
-| recursion | 3 | 3 | 100.0% | ✅ |
-| payoff | 11 | 12 | 91.7% | 🟢 |
-| engine | 6 | 7 | 85.7% | 🟢 |
-| wincon | 6 | 8 | 75.0% | 🟡 |
-| other | 1 | 2 | 50.0% | 🟡 |
-| combo_piece | 1 | 2 | 50.0% | 🟡 |
-| protection | 3 | 7 | 42.9% | 🟠 |
 | ninja | 0 | 17 | 0.0% | 🔴 |
-| ramp + combo_piece | 0 | 1 | 0.0% | 🔴 |
-| recursion + wincon | 0 | 1 | 0.0% | 🔴 |
-| ramp + payoff | 0 | 1 | 0.0% | 🔴 |
 | payoff + removal | 0 | 1 | 0.0% | 🔴 |
 | payoff + token_maker | 0 | 1 | 0.0% | 🔴 |
+| ramp + combo_piece | 0 | 1 | 0.0% | 🔴 |
+| ramp + payoff | 0 | 1 | 0.0% | 🔴 |
+| recursion + wincon | 0 | 1 | 0.0% | 🔴 |
+| protection | 3 | 7 | 42.9% | 🟠 |
+| combo_piece | 1 | 2 | 50.0% | 🟡 |
+| other | 1 | 2 | 50.0% | 🟡 |
+| wincon | 6 | 8 | 75.0% | 🟡 |
+| engine | 6 | 7 | 85.7% | 🟢 |
+| payoff | 11 | 12 | 91.7% | 🟢 |
+| board_wipe | 3 | 3 | 100.0% | ✅ |
+| draw | 15 | 15 | 100.0% | ✅ |
+| enabler | 12 | 12 | 100.0% | ✅ |
+| finisher | 2 | 2 | 100.0% | ✅ |
+| land | 37 | 37 | 100.0% | ✅ |
+| ramp | 32 | 32 | 100.0% | ✅ |
+| recursion | 3 | 3 | 100.0% | ✅ |
+| removal | 16 | 16 | 100.0% | ✅ |
+| sacrifice_outlet | 1 | 1 | 100.0% | ✅ |
+| tutor | 6 | 6 | 100.0% | ✅ |
 
 ### Status dos decks no DB
 - **6 decks** | **6 comandantes** | **18 discrepâncias** | **187 cartas classificadas**
@@ -187,7 +187,7 @@ GC a preencher — qualquer erro de arquivo ou permissão interrompe o fluxo.
 1. **🔴 ninja = 0/17 (0%)** — 17 cartas no deck Yuriko com tag esperada "ninja" que o ManaLoom não detecta. A tag `ninja` não existe no classificador atual. Impacto: toda análise de decks ninja perde informação relevante.
 2. **🟠 protection = 3/7 (42.9%)** — ManaLoom sub-detecta proteção de comandante e counterspells. 4 cartas classificadas como `other` quando deveriam ser `protection`.
 3. **🟡 wincon = 6/8 (75.0%)** — 2 wincons não detectadas. Possível: wincons que dependem de combo não-Thoracle não são capturadas.
-4. **🟡 combo_piece = 1/2 (50.0%)** — Faltam heuristicas para peças de combo não-óbvias.
+4. **🟡 combo_piece = 1/2 (50.0%)** — Faltam heurísticas para peças de combo não óbvias.
 5. **🟡 other = 1/2 (50.0%)** — 1 carta caiu em "other" que tinha tag esperada conhecida.
 6. **🔴 Multi-tags (5 casos, 0%)** — Todas as multi-tags registradas são 0% de acerto porque o sistema legacy de `tag_accuracy` só compara contra `functional_tag` (single-tag). Cartas com tags múltiplas (Smothering Tithe = ramp + engine + token_maker) são contadas como erro porque a tag primária não corresponde à tag composta. **Corrigir**: separar medição de multi-tag em coluna própria ou usar `card_tags` para comparação.
 
