@@ -608,3 +608,192 @@ Giver of Runes (19.6%), Creative Technique (26.4%), Pinnacle Monk (41.6%).
 **Detalhes completos:** `docs/hermes-analysis/manaloom-knowledge/SCOUT_LOG.md`
 
 **Dados brutos:** `scripts/_edhrec_snapshot_20260527_1943.json`
+
+---
+
+## [2026-05-27 20:27] Execução #5 — DEEP CARD-BY-CARD + CORREÇÕES CRÍTICAS
+
+### Fonte
+- **EDHREC Live** (__NEXT_DATA__): **7.651 decks** (mesma amostra da execução #4 — nenhuma mudança significativa no intervalo de 44min)
+- **Análise**: 86 cartas do nosso deck vs 285 cartas trackeadas pelo EDHREC
+- **Novo**: matching fuzzy corrigido para cartas com `//` no nome (Emeria's Call, Valakut Awakening)
+
+---
+
+### 🚨 CORREÇÃO CRÍTICA #1: Rise of the Eldrazi NÃO é 0%
+
+**O que mudou:** A análise anterior (16:45) listou Rise of the Eldrazi como "0% EDHREC" e recomendou swap para Apex of Power. **Isso estava errado.**
+
+**A verdade:** Rise of the Eldrazi está em **55.0%** dos 7.651 decks de Lorehold. Apex of Power está em **55.3%**. Eles são **essencialmente idênticos** em popularidade.
+
+**Por que o erro:** A execução #3 misturou fontes — usou o corpus de **3 decks** (EDHREC Deckpreview) para avaliar inclusão, enquanto os percentuais do EDHREC Live (7.651 decks) mostram números muito diferentes. O corpus de 3 decks não é representativo para avaliar a popularidade de cartas individuais.
+
+**Impacto prático:** NÃO corte Rise of the Eldrazi. Ela é uma big spell legítima com 55% de inclusão. O swap Rise → Apex é neutro — ambas são igualmente jogadas no meta. Mantenha as duas ou escolha com base na sua preferência de jogo (Rise: efeito garantido com 15 annihilator; Apex: mana explosiva + card advantage).
+
+**Comparação justa:**
+| Carta | Inclusão (7.651) | CMC | Efeito |
+|:------|:---------------:|:---:|:-------|
+| Rise of the Eldrazi | **55.0%** | 12 | Annihilator 4 + 7/8 |
+| Apex of Power | **55.3%** | 10 | Draw 7 + 10 mana |
+
+### 🚨 CORREÇÃO CRÍTICA #2: Emeria's Call NÃO é 0%
+
+**O que mudou:** Análise anterior listou Emeria's Call como 0%. **Problema de parsing do nome com `//`.**
+
+**A verdade:** Emeria's Call está em **43.5%** dos decks — é uma MDFC muito jogada. Não é carta de corte.
+
+### 🚨 CORREÇÃO CRÍTICA #3: Valakut Awakening NÃO é 0%
+
+**A verdade:** Valakut Awakening está em **26.9%** dos decks (também problema de parsing do `//`).
+
+---
+
+### NOVA DESCOBERTA: Improvisation Capstone (61.2%, trend +8.2)
+
+**Esta é a carta de maior destaque NÃO analisada nas execuções anteriores.**
+
+| Métrica | Valor |
+|:--------|:-----|
+| Inclusão EDHREC | **61.2%** (3.725/7.651) — top 30 |
+| Sinergia | 0.54 (alta) |
+| Trend | **+8.2** — a 2ª maior do deck |
+| Na coleção? | ✅ **SIM** (Secrets of Strixhaven, M, 1x) |
+| No deck? | ❌ NÃO |
+| CMC | 7 |
+
+**O que faz:** CMC 7 — Exile o top 7. Você pode conjurar mágicas de Instant ou Sorcery do exílio sem pagar seu custo de mana até o final do turno.
+
+**Por que é relevante:**
+1. Sinergia direta com Lorehold — exila 7, você pode conjurar as spells instant/sorcery GRATUITAMENTE
+2. Copiar com Lorehold = 2 tentativas de achar big spells
+3. Se errar, ainda exilou cartas para Volcanic Vision ou Mizzix's Mastery depois
+4. Sinergia com Penance + Scroll Rack: coloque big spells no topo ANTES de ativar
+
+**Comparação com Dance with Calamity (50.4%):**
+- Dance: CMC 8, miracle {R}{R}{R}, conjura spells até custo 10
+- Capstone: CMC 7 (mais barato), conjura só instant/sorcery (mas GRÁTIS)
+- Ambos são excelentes. Capstone é mais barato e mais previsível.
+
+**Swap recomendado:** Adicionar Improvisation Capstone. Cortar Sunbird's Invocation (13.7%) — ambos CMC 6-7 com função similar, mas Capstone é 4.5x mais popular.
+
+### NOVA DESCOBERTA: Restoration Seminar — A #1 Trending
+
+Restoration Seminar (48.0%, trend **+9.1**) é a carta com MAIOR trend no meta de Lorehold. **Já está no seu deck.** A inclusão subiu de ~30% para 48% recentemente. Boat timing.
+
+---
+
+### ANÁLISE COMPLETA: Nosso Deck vs Meta — Agrupamento por Banda
+
+#### ✅ STAPLES (80%+) — 5 cartas
+Mountain, Plains, Sol Ring, Command Tower, Arcane Signet — básicas, mantidas.
+
+#### ✅ ALTO META (50-80%) — 22 cartas
+Inclui: Hit the Mother Lode (79.4%), Library of Leng (77.7%), Clifftop Retreat (75.6%), Storm Herd (75.2%), Monument to Endurance (72.9%), Bender's Waterskin (71.2%), Swords to Plowshares (68.9%), Brass's Bounty (67.2%), Sacred Foundry (67.1%), Sensei's Divining Top (67.0%), Call Forth the Tempest (65.6%), Talisman of Conviction (64.9%), Approach of the Second Sun (63.9%), Volcanic Vision (63.9%), Sundown Pass (60.3%), Scroll Rack (59.8%), Mizzix's Mastery (57.7%), Path to Exile (57.2%), Unexpected Windfall (56.8%), Rise of the Eldrazi (55.0%), Victory Chimes (53.9%), Olórin's Searing Light (53.3%)
+
+**Cartas que parecem fracas mas o meta joga:** Bender's Waterskin (71.2%) — é um dos ramp mais jogados. Victory Chimes (53.9%) — mana floating lento mas aceito.
+
+#### 🟡 MÉDIO META (20-50%) — 28 cartas
+Penance (41.8%), Hexing Squelcher (41.0%), Ruby Medallion (42.4%), Lightning Greaves (45.2%), Arid Mesa (45.4%), Boros Charm (45.5%), Insurrection (45.5%), Double Vision (46.8%), Longshot, Rebel Bowman (48.0%), Restoration Seminar (48.0%), Teferi's Protection (21.2%), Artist's Talent (20.9%), Deflecting Palm (20.1%), Rite of the Dragoncaller (23.3%), Pearl Medallion (25.2%), Galvanoth (26.6%), Urza's Saga (26.9%), Smothering Tithe (29.4%), Jeska's Will (30.5%), Exotic Orchard (31.1%), Land Tax (31.3%), Esper Sentinel (32.3%), Austere Command (33.3%), Mother of Runes (34.5%), Perch Protection (34.7%), Taunt from the Rampart (35.3%), Deflecting Swat (36.9%), Reforge the Soul (37.9%)
+
+**Insight:** A maioria destas cartas é "aceitável" — o meta joga, mas não são obrigatórias. O deck está OK aqui.
+
+#### 🟠 BAIXO META (<20%) — 17 cartas
+Season of the Bold (9.9%), Gamble (12.1%), Inspiring Vantage (12.2%), Bloodstained Mire (13.3%), Boseiju (13.3%), Sunbird's Invocation (13.7%), Ancient Tomb (13.9%), Fated Clash (15.6%), Seething Song (16.1%), Archaeomancer's Map (17.2%), Goldspan Dragon (17.9%), Enlightened Tutor (18.3%), Surge to Victory (19.7%), Flooded Strand (9.7%), Scalding Tarn (9.8%), Windswept Heath (10.3%), Grand Abolisher (11.8%)
+
+**Advertência:** Muitas destas são cartas BOAS em outros contextos — fetches, Ancient Tomb, Enlightened Tutor — mas o meta de Lorehold simplesmente não as prioriza. Fetches azuis (Flooded Strand, Scalding Tarn) têm baixa inclusão porque são caras e o deck não precisa do shuffle com tanta frequência.
+
+#### 🔴 ZERO NO META (<1%) — 14 cartas
+Cavern of Souls, Dormant Volcano, Kor Haven, Galadriel's Dismissal, Orim's Chant, Weathered Wayfarer, Desperate Ritual, Goblin Engineer, Oswald Fiddlebender, Valakut Awakening (corrigido: 26.9%), Ancient Copper Dragon, Hellkite Tyrant, Lorehold (commander — esperado)
+
+**Confirmados 0% após verificação:** Cavern of Souls (não joga tribal, não precisa), Dormant Volcano/Kor Haven (lands lentas demais), Galadriel's Dismissal/Orim's Chant (stax/proteção sem sinergia), Weathered Wayfarer/Desperate Ritual (frágil/inconsistente), Goblin Engineer/Oswald Fiddlebender (artifact subtheme que não existe), Ancient Copper Dragon (0% apesar de ser bom — CMC 6 para payoff incerto), Hellkite Tyrant (wincon nicho que só funciona vs artefatos).
+
+---
+
+### PADRÃO IDENTIFICADO: Os lands não-básicos premium que nos faltam
+
+O meta de Lorehold premium lands que NÃO estão no deck:
+
+| Land | % EDHREC | Temos? | Nota |
+|:-----|:--------:|:------:|:-----|
+| Battlefield Forge | **63.5%** | ❌ | Pain land barata, bem melhor que Inspiring Vantage |
+| Spectator Seating | **53.4%** | ❌ | Bond land — multiplayer, quase sempre untapped |
+| Rugged Prairie | **52.3%** | ❌ | Filter land — fixa cor perfeitamente |
+| Elegant Parlor | **47.9%** | ❌ | Surveil land — topdeck synergy |
+| Radiant Summit | **46.4%** | ❌ | Verge land — quase sempre untapped |
+| Sunbillow Verge | **45.0%** | ❌ | Verge land |
+| Temple of Triumph | **44.8%** | ❌ | Scry land — topdeck synergy |
+
+**Custo estimado total (7 lands):** ~$15-25 — barato para upgrade substancial.
+
+---
+
+### PADRÃO IDENTIFICADO: O subtheme de artefatos lentos
+
+Os decks de Lorehold no meta têm uma clara preferência por **treasure ramp explosivo** em vez de **cost reduction gradual**. As evidências:
+
+- Big Score (67.2%) e Brass's Bounty (67.2%) são mais jogados que Pearl Medallion (25.2%)
+- Storm-Kiln Artist (55.4%) — gera treasure ao copiar — é preferido a cost reducers
+- Bender's Waterskin (71.2%) — é excessão, mas porque gera {C}{C} de uma vez
+
+**Swap recomendado:** Pearl Medallion (25.2%) + Ruby Medallion (42.4%) → Big Score + Storm-Kiln Artist. Troca redução gradual por explosão de mana no turno.
+
+---
+
+### PADRÃO IDENTIFICADO: Nossas lands com fetch azul são sub-utilizadas
+
+Flooded Strand (9.7%), Scalding Tarn (9.8%) e Windswept Heath (10.3%) são fetches AZUIS — só buscam Plains. Em Lorehold (Boros), o shuffle é menos importante que em decks comBrainstorm/Top. Os 3 slots de fetch azul + Boseiju + Kor Haven + Dormant Volcano poderiam ser compactados em 4 lands melhores (Spectator Seating, Battlefield Forge, Rugged Prairie, Elegant Parlor).
+
+---
+
+### LIÇÕES DESTA EXECUÇÃO
+
+1. **Fontes importam: o corpus de 3 decks enganou.** A análise anterior recomendou cortar Rise of the Eldrazi baseada em 3 decks que não a incluíam. A amostra de 7.651 decks mostra que Rise está em 55%. **Sempre verificar dados agregados antes de recomendar cortes.**
+
+2. **Cartas com `//` no nome precisam de parsing manual.** Emeria's Call (43.5%) e Valakut Awakening (26.9%) foram reportados como 0% por erro de matching. Correção aplicada.
+
+3. **Improvisation Capstone é a carta mais subestimada do seu pool.** 61.2% de inclusão, trend +8.2, está na sua coleção, não está no deck. É um upgrade óbvio e gratuito.
+
+4. **O subtheme de artefatos (Medallions, Oswald, Goblin Engineer) é o maior desvio do meta.** 6 cartas que o meta não usa. Substituí-las por Big Score, Storm-Kiln Artist, Apex of Power e Boros Signet (todas na coleção) traria o deck em linha com o meta.
+
+5. **Rise of the Eldrazi vs Apex of Power: empate técnico.** Ambos 55%. Escolha por preferência de jogo, não por meta. Rise é mais agressivo (annihilator 4), Apex é mais control (draw 7 + mana).
+
+6. **Você tem carteira cheia de upgrades gratuitos.** Das 9 cartas >=50% EDHREC que faltam no deck, 6 estão na coleção (Big Score, Storm-Kiln Artist, Apex of Power, Boros Signet, Dance with Calamity, Improvisation Capstone).
+
+---
+
+### TOP SWAPS REVISADOS (após correções)
+
+| # | Adicionar (da coleção) | % EDHREC | Remover | % EDHREC antigo | % EDHREC real | Impacto |
+|:-:|:-----------------------|:--------:|:--------|:---------------:|:-------------:|:--------|
+| 1 | **Big Score** | 67.2% | Deflecting Palm | 20.1% | 20.1% | Ramp + draw > fog nicho |
+| 2 | **Storm-Kiln Artist** | 55.4% | Ancient Copper Dragon | 0% | 0% confirmado | Treasure payoff > CMC 6 sem função |
+| 3 | **Improvisation Capstone** | 61.2% | Sunbird's Invocation | 13.7% | 13.7% | Big spell explosivo > lento |
+| 4 | **Dance with Calamity** | 50.4% | Hellkite Tyrant | 0% | 0% confirmado | Lorehold's best friend > wincon nicho |
+| 5 | **Boros Signet** | 50.4% | Oswald Fiddlebender | 0% | 0% confirmado | Ramp consistente > tutor nicho |
+| 6 | **Apex of Power** | 55.3% | Desperate Ritual | 0% | 0% confirmado | Big spell > ritual inútil |
+| 7 | **Arcane Bombardment** | 42.6% | Fated Clash | 15.6% | 15.6% | Copy engine infinito > board wipe condicional |
+
+**Correção do swap #3 da execução anterior:** O swap Rise → Apex foi removido. Mantenha Rise no deck. Adicione Apex também se quiser.
+
+### Top 8 Adições de Lands (baixo custo, alto impacto)
+
+| # | Land | % EDHREC | Função |
+|:-:|:-----|:--------:|:-------|
+| 1 | Battlefield Forge | 63.5% | Pain land, replacement para Inspiring Vantage |
+| 2 | Spectator Seating | 53.4% | Bond land para multiplayer |
+| 3 | Rugged Prairie | 52.3% | Filter land para fixação de cor |
+
+---
+
+### Próximos Passos
+
+1. Validar correções com o evolution-oracle
+2. Verificar se há novas cartas nos próximos sets (Tarkir: Dragonstorm, Edge of Eternities)
+3. Aplicar swaps P1-P5 e reavaliar consistência (mulligan analyst)
+4. Considerar adicionar as 3 lands prioritárias quando disponíveis
+
+---
+
+**Dados brutos:** `scripts/_edhrec_raw_lorehold.json` (fresco desta execução)
+**Análise detalhada:** `scripts/_edhrec_card_data.json` (285 cartas com %)
+**Scripts usados:** `scripts/verify_matches.py`, `scripts/cross_ref.py`, `scripts/deep_analysis.py`
