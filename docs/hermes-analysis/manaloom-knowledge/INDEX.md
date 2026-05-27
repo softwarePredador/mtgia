@@ -10,7 +10,7 @@
 |:--------|:-----:|:-----|
 | Comandantes analisados | 7 | 2026-05-27 |
 | Decks analisados | 7 | 2026-05-27 |
-| Cartas revisadas | ~678 (selecao + Winota 100 cartas) | 2026-05-27 |
+| Cartas revisadas | ~943 (selecao + Winota 100 + Lorehold 265 EDHREC) | 2026-05-27 |
 | Insights documentados | 37 | 2026-05-27 |
 | Discrepancias com ManaLoom | 36 | 2026-05-27 |
 
@@ -402,6 +402,9 @@
 18. **"Tutor com custo de sacrificio e vantagem, nao custo."** (Teysa — Diabolic Intent e melhor que Demonic Tutor quando sacrificio e valor, nao perda)
 19. **"Cartas ruins podem ser corretas quando cumprem o papel estrutural."** (Winota — Ornithopter/Phyrexian Walker sao triggers gratuitos, nao ameaças individuais)
 20. **"Separe enablers de payoffs antes de avaliar qualidade."** (Winota — non-Human attackers e Human hits precisam de contagens distintas)
+21. **"Big spells precisam de ramp que pague por si mesmas."** (Lorehold — CMC médio EDHREC 4.10, 21% das não-lands são CMC 7+. Big Score 67.3% e Apex of Power 55.4% são preferidos porque pagam por si ao serem lançados.)
+22. **"Topdeck manipulation substitui draw quando o comandante recompensa o topo."** (Lorehold — Library of Leng 78%, Sensei's Top 67%, Scroll Rack 60% vs draw spells mínimos. EDHREC confirma: topdeck > draw neste arquétipo.)
+23. **"Nem toda staple de Commander é staple para um comandante específico."** (Lorehold — Smothering Tithe só 29%, Teferi's Protection 21%, Ancient Tomb 14%. O que é bom no genérico pode não ser bom para Lorehold.)
 
 ## Ultimas Execucoes
 
@@ -414,3 +417,4 @@
 | 2026-05-26 | EDHREC Average Deck (20.216 decks) | Teysa Karlov (Orzhov Aristocrats Death Triggers) | Analise concluida |
 | 2026-05-26 | EDHREC Average Deck / corpus local | Aesi, Tyrant of Gyre Strait (Lands-Matter Value Engine) | Analise concluida |
 | 2026-05-27 | EDHREC live (12.840 decks) + corpus local | Winota, Joiner of Forces (Aggro-Stax Combat Triggers) | Analise concluida |
+| 2026-05-27 | **EDHREC Live (7.597 decks)** | **Lorehold, the Historian (Spellslinger/Big Spells)** | **Scout concluido — 265 cartas mapeadas, 8 cartas faltando urgentes identificadas** |
