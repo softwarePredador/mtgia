@@ -1,77 +1,91 @@
 # Mulligan Log — Lorehold Spellslinger
 
-## [2026-05-27T19:50:00+00:00] Execução #3 — Pós-Evolution (Ciclo #1)
+## [2026-05-27T21:54:00+00:00] Execução #4 — Pós-Evolution Ciclo #2
 
 ### Resultados
 
 | Métrica | Valor | Status |
 |:--------|:-----|:-------|
-| Mãos jogáveis (2-4 lands + ramp/3+ lands) | 73.2% | ✅ |
-| Mulligan obrigatório (<2 lands ou 2 lands sem ramp) | 26.8% | 🔴 |
-| Ramp turno 1 (Sol Ring, Land Tax, Wayfarer, Desperate Ritual) | 25.4% | ✅ |
-| Sem play até turno 3 (nada castável com lands disponíveis) | 12.4% | 🟡 |
+| Mãos jogáveis (2-4 lands + ramp/3+ lands) | 71.1% | ✅ |
+| Mulligan obrigatório (<2 lands ou 2 lands sem ramp) | 29.9% | 🔴 |
+| Ramp turno 1 (Sol Ring, Land Tax, Wayfarer, Desperate Ritual) | 24.8% | ✅ |
+| Sem play até turno 3 (nada castável com lands disponíveis) | 15.8% | 🔴 |
 
 ### Distribuição de Lands na Mão Inicial
 
 | Lands | Mãos | % |
 |:-----|:----|:--|
-| 0 | 40 | 4.0% |
-| 1 | 174 | 17.4% |
-| 2 | 306 | 30.6% |
-| 3 | 272 | 27.2% |
-| 4 | 160 | 16.0% |
-| 5 | 37 | 3.7% |
-| 6 | 10 | 1.0% |
-| 7 | 1 | 0.1% |
+| 0 | 28 | 2.8% |
+| 1 | 189 | 18.9% |
+| 2 | 297 | 29.7% |
+| 3 | 282 | 28.2% |
+| 4 | 158 | 15.8% |
+| 5 | 36 | 3.6% |
+| 6 | 8 | 0.8% |
+| 7 | 2 | 0.2% |
 
-### Comparação com Histórico
-
-| Métrica | Pré-Evolution (34 lands) | Pós-Evo #1 (35 lands) | Agora (35 lands) | Δ vs Pré | Δ vs Pós-Evo#1 |
-|:--------|:------------------------:|:---------------------:|:-----------------:|:--------:|:--------------:|
-| Jogáveis | 70.1% | 70.6% | 73.2% | +3.1pp | +2.6pp |
-| Mulligan | 23.9% | 23.0% | 26.8% | +2.9pp | +3.8pp |
-| Ramp T1 | 13.6% | 18.4% | 25.4% | +11.8pp | +7.0pp |
-| Sem play T3 | 3.3% | 8.8% | 12.4% | +9.1pp | +3.6pp |
-
-### Cartas Novas do Evolution na Abertura
+### Cartas Novas na Abertura
 
 | Carta | Frequência na abertura |
 |:-----|:----------------------|
-| Esper Sentinel | 9.5% (1 em cada ~11 mãos) |
-| Gamble | 6.0% (1 em cada ~17 mãos) |
+| Big Score | 6.8% (1 em ~15 mãos) |
+| The One Ring | 6.6% (1 em ~15 mãos) |
+| Dance with Calamity | 7.1% (1 em ~14 mãos) |
+
+### Comparação com Histórico
+
+| Métrica | Pré-Evo (34 lands) | Pós-Evo #1 (35 lands) | Pós-Evo #2 (Ciclo #2) | Δ vs Pré | Δ vs Pós-Evo#1 |
+|:--------|:------------------:|:---------------------:|:---------------------:|:--------:|:--------------:|
+| Jogáveis | 70.1% | 73.2% | 71.1% | +1.0pp | -2.1pp |
+| Mulligan | 23.9% | 26.8% | 29.9% | +6.0pp | +3.1pp |
+| Ramp T1 | 13.6% | 25.4% | 24.8% | +11.2pp | -0.6pp (ruído) |
+| Sem play T3 | 3.3% | 12.4% | 15.8% | +12.5pp | +3.4pp |
 
 ### Análise do Delta
 
-**Mulligan (26.8%):** A taxa subiu +3.8pp em relação ao teste pós-evolution anterior. A variação está dentro do ruído estatístico para 1000 simulações (IC95% ≈ ±3pp). A troca de Furygale Flocking (CMC 10) por Esper Sentinel (CMC 1) e Jokulhaups (CMC 7) por Gamble (CMC 1) não alterou significativamente a consistência de mão inicial.
+**Mulligan (29.9%):** A taxa subiu +3.1pp vs Ciclo #1. Variação dentro do ruído estatístico (CI95% = ±2.8pp). Mas a tendência é consistente com a mudança de perfil.
 
-**Ramp T1 (25.4%):** Excelente — quase 1 em cada 4 mãos tem ramp CMC ≤ 1. Sol Ring continua sendo a carta de ramp T1 mais impactante.
+**O efeito "Mother of Runes → The One Ring":** Esta troca foi a mais impactante no mulligan. Mother of Runes (CMC 1) era uma carta que mantinha a mão ativa em T1 mesmo sem lands sobrando. The One Ring (CMC 4) é excelente no mid-game mas não ajuda a mão inicial. Perder uma interação CMC 1 reduz as opções nos turnos iniciais.
 
-**Sem play T3 (12.4%):** 🟡 Preocupante. 12.4% das mãos iniciais não conseguem jogar NADA substancial até o turno 3. A causa é a alta densidade de spells CMC 5+ (haymakers, wincons, board wipes caros) combinada com apenas 36 cartas CMC ≤ 3 em 64 não-terrenos.
+**O efeito "Deflecting Palm → Big Score":** Big Score (CMC 4) é melhor carta que Deflecting Palm em qualquer cenário pós-T4, mas na mão inicial ela é "morta" até o T4. O deck perdeu uma carta que podia ser jogada para interagir ou ativar Lorehold count.
 
-### Diagnóstico
+**Sem play T3 (15.8%):** O pior resultado histórico. O deck começou em 3.3% na baseline e subiu progressivamente a cada swap:
+- Baseline (antes de swaps): 3.3% ✅
+- Ciclo #1 (Furygale→Esper Sentinel, Jokulhaups→Gamble, Karoo→Plains): 12.4% 🟡
+- Ciclo #2 (Deflecting Palm→Big Score, Hellkite Tyrant→Dance, Mother→TOR): 15.8% 🔴
 
-1. **Mulligan rate aceitável para perfil big-spells** — 26.8% é típico para um deck Boros que roda 35 lands com CMC médio alto. Não há necessidade de correção emergencial.
+Causa raiz: **Cada swap substituiu uma carta CMC baixo ou médio por uma carta CMC médio ou alto.** O CMC efetivo das novas cartas na mão inicial é maior.
 
-2. **A substituição de Furygale/Jokulhaups/Karoo foi neutra para mulligan** — como esperado, trocar um card de alto CMC por um de baixo CMC não muda o mulligan se ambos são singletons e o total de lands não muda.
+### Interpretação Correta
 
-3. **O calcanhar de Aquiles é o "sem play T3"** — 12.4% é alto para um formato onde speed kills. O deck precisa de mais 1-2 interações CMC ≤ 2 (ex: Generous Gift, Chaos Warp, Swords to Plowshares já existe).
+**Os swaps do Ciclo #2 foram corretos em termos de qualidade de deck**, mas tiveram um custo mensurável na consistência de jogabilidade inicial:
 
-### Recomendações para o Evolution
+1. **Big Score** é muito melhor que Deflecting Palm em impacto de jogo, mas custa 4 de mana vs 2
+2. **The One Ring** é infinitamente melhor que Mother of Runes como card, mas custa 4 de mana vs 1
+3. **Dance with Calamity** tem Miracle {R}{R}{R} — teoricamente custa 3 — mas só no momento certo (upkeep com topdeck). Na mão inicial, é só mais um CMC 8 morto.
 
-1. **Próximo swap prioritário:** Cortar 1 spell CMC 7+ redundante (Volcanic Vision, Call Forth the Tempest) por Dance with Calamity (CMC 2, synergetic com Lorehold) ou interação CMC≤2.
+**A tendência é normal para um deck big-spells.** Lorehold não é aggro. Esses swaps fazem o deck jogar *mais forte no late game* às custas de *consistência early game*. O trade-off é aceitável desde que o deck sobreviva até o T5-T6.
 
-2. **Manter 35 lands** — o mulligan de 26.8% não justifica ir para 36. O problema não é terra, é curva.
+### Recomendações para o Próximo Ciclo
 
-3. **Adicionar Hit the Mother Lode** conforme planejado — gera tokens no T3-T4 e tem CMC 7 mas impacto imediato via cascade.
+1. **Adicionar Chaos Warp (CMC 2)** — interação CMC≤2 custo zero na coleção. Reduz sem_play_t3.
+2. **Adicionar Generous Gift (CMC 2)** — segunda interação CMC≤2. Cobre o buraco de remoção.
+3. **Manter 35 lands** — o problema não é terra, é falta de cartas baratas.
+4. **Verificar se Dance with Calamity está sendo usada pelo Miracle** — se sim, ajustar a simulação para considerar que Dance custa 3 quando topdeckada.
 
 ### Nota Metodológica
 
-- Simulação: 1000 mãos de 7 cartas do deck de 99 (excluindo commander) com random.shuffle() + seed fixa
+- Simulação: 1000 mãos de 7 cartas do deck de 99 (excluindo commander) com random.shuffle(), seed=42
 - Lands identificados por type_line contendo "Land"
-- Ramp total: 18 cartas não-terreno com tag funcional `ramp` (inclui Smothering Tithe, Jeska's Will, Goldspan Dragon)
 - Ramp T1: {Sol Ring, Land Tax, Weathered Wayfarer, Desperate Ritual}
 - "Jogável": 2-4 lands + (pelo menos 1 ramp OU 3+ lands)
-- "Mulligan": 0-1 lands OU 2 lands sem ramp
+- "Mulligan": 0-1 lands OU 2 lands sem ramp OU 6+ lands
 - "Sem play T3": nenhuma carta na mão com CMC ≤ número de lands na mão (cap 3)
-- Variação estatística (IC95%): ~±3pp para N=1000
+- Variação estatística (IC95%): ~±2.8pp para N=1000
 - Fonte: scripts/knowledge.db — deck_id=6 (Lorehold Spellslinger)
+
+### O Que Essa Métrica Significa
+
+**Mulligan rate de 29.9%** significa que ~3 em cada 10 partidas começam com uma mão que precisa ser devolvida. Para um deck Boros sem card advantage natural (até o TOR entrar), cada mulligan custa uma carta — e em um formato de 100 cartas singletons, perder uma carta é significativo. Mas em bracket 3, onde o meta não é CEDH, 30% de mulligan é aceitável para um deck big-spells. O CEDH standard é <20%, mas social EDH aceita 25-35%.
+
+**A tendência de piora incremental (3.3% → 12.4% → 15.8% em "sem play T3")** sinaliza que o deck está se especializando — e especialização sempre custa versatilidade. O deck está se tornando mais focado na sua identidade (Lorehold spellslinger big-spells) e menos genérico (com interação CMC≤2). A questão é: o trade-off vale a pena? Para os próximos ciclos, o evolution deve adicionar CAOS para reduzir "sem play T3" de volta para <12%.

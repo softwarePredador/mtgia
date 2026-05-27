@@ -44,6 +44,32 @@
 | Ramp T1 | 18.4% | 25.4% | +7.0pp |
 | Sem play T3 | 8.8% | 12.4% | +3.6pp |
 
-### Conclusão
-
-As trocas foram estatisticamente neutras para mulligan. Variação dentro do ruído (±3pp para N=1000). O ponto crítico real é "sem play T3" em 12.4% — deck precisa de mais spells baratas.
+| ### Conclusão
+|
+|As trocas foram estatisticamente neutras para mulligan. Variação dentro do ruído (±3pp para N=1000). O ponto crítico real é "sem play T3" em 12.4% — deck precisa de mais spells baratas.|
+|
+|## [2026-05-27T21:54:00+00:00] Execução #4 — Pós-Evolution Ciclo #2
+|
+|### Deck state: 35 lands, 65 nonlands. Swaps: Deflecting Palm→Big Score, Hellkite Tyrant→Dance with Calamity, Mother of Runes→The One Ring
+|
+|| Métrica | Valor | Status |
+||:--------|:-----|:-------|
+|| Mãos jogáveis | 71.1% | ✅ |
+|| Mulligan | 29.9% | 🔴 |
+|| Ramp turno 1 | 24.8% | ✅ |
+|| Sem play até T3 | 15.8% | 🔴 |
+|
+|### Delta vs Ciclo #1
+|
+|| Métrica | Pós-Evo #1 | Agora (Ciclo #2) | Δ |
+||:--------|:---------:|:----------------:|:-:|
+|| Jogáveis | 73.2% | 71.1% | -2.1pp |
+|| Mulligan | 26.8% | 29.9% | +3.1pp |
+|| Ramp T1 | 25.4% | 24.8% | -0.6pp (ruído) |
+|| Sem play T3 | 12.4% | 15.8% | +3.4pp |
+|
+|### Conclusão
+|
+|Os swaps do Ciclo #2 tiveram um custo mensurável na consistência early-game. A troca de 3 cartas CMC 1-2 (Deflecting Palm, Mother of Runes) e CMC 6 (Hellkite) por 3 cartas CMC 4-4-8 (Big Score, TOR, Dance) elevou o perfil de CMC da mão inicial. O deck está mais forte no mid-late game (Dance com Miracle + Lorehold copy é devastador) mas mais vulnerável nos turnos 1-3. A tendência de piora em "sem play T3" (3.3% → 12.4% → 15.8%) precisa ser corrigida com interação CMC≤2 no próximo ciclo.|
+||
+|**Recomendação:** Adicionar Chaos Warp e/ou Generous Gift no Ciclo #3 para reduzir "sem play T3" de volta para <12%. Manter 35 lands.|
