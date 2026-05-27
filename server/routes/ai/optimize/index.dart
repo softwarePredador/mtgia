@@ -21,6 +21,7 @@ import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
+import '../../../lib/ai/theme_contextual_rules_service.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/internal_ai_request_token.dart';
@@ -2283,7 +2284,8 @@ Future<Response> onRequest(RequestContext context) async {
           // 6. VALIDAÇÃO AUTOMÁTICA (Monte Carlo + Funcional + Critic IA)
           // ═══════════════════════════════════════════════════════════
           try {
-            final validator = OptimizationValidator(openAiKey: apiKey);
+            final themeService = ThemeContextualRulesService(pool);
+            final validator = OptimizationValidator(openAiKey: apiKey, themeService: themeService);
             final validationReport = await validator.validate(
               originalDeck: allCardData,
               optimizedDeck: virtualDeck,
