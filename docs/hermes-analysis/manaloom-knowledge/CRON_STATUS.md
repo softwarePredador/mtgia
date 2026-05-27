@@ -13,9 +13,10 @@
 | Preenchimento GC | 1 | 1 | a cada 20min |
 | Precisão Tags | 1 | 1 | a cada 6h |
 | Mana Base | 1 | 1 | a cada 60min |
+| Lorehold Pipeline | 4 | 4 | 30min a 6h |
 | Gerencial | 1 | 1 | a cada 30min |
 
-**Estado geral:** 12/12 habilitados ✅ — 1 com last_status=error (commander-knowledge-deep, recuperado via resume, aguardando próximo ciclo).
+**Estado geral:** 16/16 habilitados ✅ — 1 com last_status=error (commander-knowledge-deep, recuperado via resume, aguardando proximo ciclo).
 
 ## Crons de Conhecimento (20min)
 
@@ -39,10 +40,22 @@
 
 | Cron | Schedule | Função | Status |
 |:-----|:--------:|:-------|:------|
-| manaloom-missing-gc-filler | 20min | Preenche análise dos 32 GCs faltantes | 🟢 Resumido — último ciclo 23:10Z |
-| manaloom-manager-watchdog | 30min | Monitora e recupera crons | 🟢 2ª execução |
-| manaloom-tag-accuracy-reporter | 6h | Relatório de precisão das tags | 🟢 OK — 01:55Z — 82.9% geral |
-| manaloom-mana-base-validator | 60min | Valida base de mana vs EDHREC | 🟢 Último ciclo 22:08Z |
+| manaloom-missing-gc-filler | 20min | Preenche análise dos GCs faltantes | 🟢 Resumido (estava error) |
+| manaloom-manager-watchdog | 30min | Monitora e recupera crons | 🟢 Ativo |
+| manaloom-tag-accuracy-reporter | 6h | Relatório de precisão das tags | 🟡 Aguardando próximo |
+| manaloom-mana-base-validator | 60min | Valida base de mana vs EDHREC | 🟢 Ativo |
+
+## Lorehold Knowledge Pipeline (criado 2026-05-27)
+
+| ID | Cron | Schedule | Função |
+|:---|:-----|:--------:|:-------|
+| f20ac299992b | lorehold-deck-scout | 30min | Busca decks reais (EDHREC, Moxfield) |
+| 712579b15767 | lorehold-deck-validator | 60min | Valida metricas vs EDHREC profile |
+| 08468451a06a | lorehold-mulligan-analyst | 120min | Simula 1000 mãos, mede consistência |
+| a50bef4c2a59 | lorehold-evolution-oracle | 6h | Le logs, propõe mudanças (max 3), aplica |
+
+**Logs:** `decks/lorehold-the-historian/SCOUT_LOG.md | VALIDATOR_LOG.md | MULLIGAN_LOG.md | EVOLUTION_LOG.md`
+**Pipeline doc:** `decks/lorehold-the-historian/PIPELINE.md`
 
 ## Ações da Rodada Atual (2026-05-26T23:12Z)
 
