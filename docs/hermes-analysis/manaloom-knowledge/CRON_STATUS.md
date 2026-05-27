@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T15:41Z**
+> Última atualização: **2026-05-27T16:22Z**
 
 ## Resumo
 
@@ -11,100 +11,95 @@
 | Total de crons (`include_disabled=True`) | 12 |
 | Habilitados | 12/12 |
 | Desabilitados | 0 |
-| `last_status=error` | **4** 🔴 (↓ de 9 desde 15:02Z) |
+| `last_status=error` | **2** 🔴 (↓ de 4 desde 15:41Z) |
 | Nunca executaram (`last_run_at=null`) | 0 |
 | Stale (>120min atrás, `enabled=true`) | 0 |
 | Fleet removidos desde última rodada | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
-| Recuperados desde última rodada | 2 (commander-knowledge-deep, lorehold-deck-scout) |
+| Recuperados desde última rodada | 4 (commander-knowledge-deep, lorehold-deck-scout, gamechanger-research, mana-base-validator) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
-| HEAD da branch de análise | `9a1ee1410858` |
+| HEAD da branch de análise | `dfe4451003` |
 
-**Estado geral:** 12/12 habilitados ✅. Fleet reduzido de 16 para 12 (consolidação 2026-05-27). 4 crons em `status=error` 🔴 (↓ de 9). 2 crons se recuperaram desde o último relatório. Nenhum cron stale ou desabilitado.
+**Estado geral:** 12/12 habilitados ✅. Fleet consolidado em 12 crons. 2 crons em `status=error` 🔴 (↓ de 4 desde 15:41Z). 4 crons se recuperaram desde o último relatório: commander-knowledge-deep, lorehold-deck-scout, gamechanger-research, mana-base-validator. Nenhum cron stale ou desabilitado.
 
-**Padrão:** Os 4 erros são todos de provider/model (3× GitHub 429, 1× gpt-5.5 model not found). Crons que funcionam usam `provider=deepseek` com `model=deepseek-v4-flash` e conseguiram executar. Os que falham parecem estar com provider chain caindo em copilot mesmo com deepseek configurado — ou tiveram a configuração alterada recentemente e os erros são de execuções anteriores.
+**Padrão:** 2 erros residuais (lorehold-deck-validator, lorehold-mulligan-analyst). Ambos têm config corrigida — `provider=deepseek, model=deepseek-v4-flash` com `workdir` correto — mas os últimos runs ocorreram antes da correção, então os erros (HTTP 429 e gpt-5.5 model) refletem a configuração anterior. Ambos estão agendados para nova execução (deck-validator: ~16:29Z, mulligan-analyst: ~17:29Z).
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 15:05Z | 36min | 🟢 ok | 2026-05-27 15:35Z | sem ação |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 12:19Z | 3h22min | 🟢 ok | 2026-05-27 16:00Z | agendado para 16:00 — normal |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 2h45min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 15:05Z | 36min | 🟢 ok | 2026-05-27 15:35Z | **esta execução** |
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 15:44Z | 38min | 🟢 ok | 2026-05-27 16:14Z | sem ação — rodando normalmente |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 16:09Z | 13min | 🟢 ok | 2026-05-27 21:00Z | executou às 16:09Z ✅ |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 12:56Z | 3h26min | 🟢 ok | 2026-05-31 12:30Z | aguardando domingo |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 15:44Z | 38min | 🟢 ok | 2026-05-27 16:14Z | **esta execução** |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
 | `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 15:38Z | 3min | 🟢 ok | 2026-05-27 15:58Z | ✅ **RECUPERADO** desde 15:02Z (estava error) — deepseek funcionou |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 15:01Z | 40min | 🔴 error | 2026-05-27 15:40Z | ❌ HTTP 429 (GitHub rate limit) — provider aparenta cair em copilot |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 16:22Z | <1min | 🟢 ok | 2026-05-27 16:42Z | ✅ **RECUPERADO** — agora com deepseek funcional |
 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 13:05Z | 2h36min | 🟢 ok | 2026-05-27 19:05Z | próximo ciclo às 19:05Z |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 14:40Z | 1h01min | 🔴 error | 2026-05-27 16:04Z | ❌ HTTP 429 (GitHub rate limit) — sem provider explícito, usa default chain (copilot?) |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 16:11Z | 11min | 🟢 ok | 2026-05-27 17:11Z | ✅ **RECUPERADO** — executou com deepseek funcional |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 15:16Z | 25min | 🟢 ok | 2026-05-27 15:46Z | ✅ **RECUPERADO** — trigger da rodada 15:02Z funcionou |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 14:44Z | 57min | 🔴 error | 2026-05-27 16:29Z | ❌ HTTP 429 (GitHub rate limit) |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 15:21Z | 20min | 🔴 error | 2026-05-27 17:29Z | ❌ Model `gpt-5.5` não acessível (config residual de copilot) |
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 16:17Z | 5min | 🟢 ok | 2026-05-27 16:47Z | ✅ rodando com deepseek normalmente |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 14:44Z | 1h38min | 🔴 error | 2026-05-27 16:29Z | ❌ HTTP 429 no último run (config copilot anterior). Config já corrigida para deepseek ✅. Aguardando scheduler (~16:29Z) |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 15:21Z | 1h01min | 🔴 error | 2026-05-27 17:29Z | ❌ Model `gpt-5.5` no último run (config copilot anterior). Config já corrigida para deepseek + workdir ✅. Aguardando scheduler (~17:29Z) |
 | `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 13:22Z | 2h19min | 🟢 ok | 2026-05-27 19:22Z | normal para schedule 6h |
 
-## Ações da Rodada Atual (2026-05-27T15:41Z)
+## Ações da Rodada Atual (2026-05-27T16:22Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
 |:-:|:--|:--|:--|:--|:--|
 | 1 | — | **mestre** | `git pull` | Branch `codex/hermes-analysis-docs` já atualizada | ✅ ff-only aplicado |
-| 2 | — | **diagnóstico** | diagnosticou 4 erros | 3× HTTP 429, 1× gpt-5.5 model error | 🔍 dados coletados dos arquivos de output |
+| 2 | — | **diagnóstico** | diagnosticou 12 crons | 2 erros residuais (↓ de 4 em 15:41Z) | 🔍 dados coletados |
+| 3 | — | **observação** | 2 crons se recuperaram desde 15:41Z | gamechanger-research e mana-base-validator voltaram a ok | ✅ recuperação natural via scheduler |
+| 4 | — | **config** | verificação de config | deck-validator e mulligan-analyst já com deepseek + workdir correto | ✅ config verificada, aguardando próximos runs |
 
-**Observação:** Nenhum cron estava desabilitado ou stale (>120min). Nenhum `resume` ou `run` foi necessário. Os 4 erros são sistêmicos (provider/model chain) e os crons afetados continuam habilitados e agendados.
+**Observação:** Nenhum cron estava desabilitado ou stale (>120min). Nenhum `resume` ou `run` foi necessário. 2 crons se recuperaram naturalmente via scheduler desde 15:41Z. 2 erros residuais (deck-validator, mulligan-analyst) com config já corrigida, aguardando próximos runs do scheduler.
 
-## Mudanças desde o Último Relatório (2026-05-27T15:02Z)
+## Mudanças desde o Último Relatório (2026-05-27T15:41Z)
 
 | Mudança | Detalhe |
 |:--------|:--------|
-| Fleet reduzido | 16→12 crons (4 removidos na consolidação 2026-05-27: daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
-| Commander-knowledge-deep | **RECUPERADO** ✅ — erro → ok (agora com deepseek funcional) |
-| Lorehold-deck-scout | **RECUPERADO** ✅ — stale/error → ok (trigger funcionou) |
-| Lorehold-mulligan-analyst | **NOVO ERRO** 🔴 — era ok→error (gpt-5.5 model not found) |
-| Erros totais | 9→4 (↓ devido à remoção de crons + recuperações) |
-| Stale crons | 2→0 (triggers funcionaram) |
+| Manaloom-gamechanger-research | **RECUPERADO** ✅ — erro→ok (deepseek funcional na rodada 16:22Z) |
+| Manaloom-mana-base-validator | **RECUPERADO** ✅ — erro→ok (deepseek funcional na rodada 16:11Z) |
+| Manaloom-hermes-normal-audit | **EXECUTOU** ✅ — rodada 16:09Z completada |
+| Lorehold-deck-validator | **CONFIG CORRIGIDA** ✅ — provider=deepseek, workdir correto. Aguardando próximo run (~16:29Z) |
+| Lorehold-mulligan-analyst | **CONFIG CORRIGIDA** ✅ — provider=deepseek, workdir correto. Aguardando próximo run (~17:29Z) |
+| Erros totais | 4→2 🔴 (↓ 50%) |
 
 ## Alertas Pendentes
 
-### 🔴 4 crons com `last_status=error` — padrão de provider
+### 🔴 2 crons com `last_status=error` — erros residuais de config anterior
 
-Todos os 4 erros compartilham a mesma causa raiz: problemas de provider/model chain que fazem o Hermes cair em copilot em vez de usar deepseek.
+Ambos os crons tiveram a configuração corrigida (provider=deepseek, model=deepseek-v4-flash, workdir correto) em rodadas anteriores — mas os últimos runs documentados ainda refletem a configuração antiga (copilot). Aguardando o próximo ciclo do scheduler para confirmar recuperação.
 
 | Cron | Último run | Erro | Provider configurado | Model configurado |
 |:-----|:----------:|:----|:--------------------:|:-----------------:|
-| manaloom-gamechanger-research | 15:01Z | HTTP 429 (GitHub) | `deepseek` | `deepseek-v4-flash` |
-| manaloom-mana-base-validator | 14:40Z | HTTP 429 (GitHub) | `None` (default) | `None` (default) |
 | lorehold-deck-validator | 14:44Z | HTTP 429 (GitHub) | `deepseek` | `deepseek-v4-flash` |
 | lorehold-mulligan-analyst | 15:21Z | gpt-5.5 not accessible | `deepseek` | `deepseek-v4-flash` |
 
-**Hipótese principal:** A configuração `provider=deepseek, model=deepseek-v4-flash` está sendo salva no cron config, mas o Hermes provider chain pode ter um fallback que cai em copilot quando deepseek está indisponível ou quando o modelo específico não pode ser usado. Isto explicaria por que:
-- Alguns crons com deepseek funcionam (commander-knowledge-deep, deck-scout)
-- Outros com deepseek idêntico falham com 429 do GitHub (gamechanger, deck-validator)
+**Próximo ciclo previsto:** deck-validator ~16:29Z, mulligan-analyst ~17:29Z.
 
-**3 crons com HTTP 429 (GitHub rate limit):** Estes provavelmente estão caindo no provider copilot via fallback chain. O mana-base-validator não tem provider/model explícito — usa o default, que inclui copilot.
+**2 crons que se recuperaram nesta rodada (não são mais alerta):**
+- manaloom-gamechanger-research: erro (15:01Z, HTTP 429) → ok (16:22Z) ✅
+- manaloom-mana-base-validator: erro (14:40Z, HTTP 429) → ok (16:11Z) ✅
 
-**1 cron com modelo gpt-5.5:** Herança de configuração residual de copilot. O scheduler pode estar usando a configuração antiga em vez da atual.
-
-**Nenhum action trigger enviado:** Todos os 4 crons estão `enabled=true` com `state=scheduled` e `next_run_at` avançando. A scheduler tentará executá-los novamente nos próximos ciclos. Como o padrão é sistêmico e não de scheduler, triggers `run` adicionais não resolveriam — os jobs continuariam falhando no mesmo ponto.
-
-**Recomendação:** Para resolver, cada cron afetado precisaria de:
-1. Confirmação de que `provider=deepseek, model=deepseek-v4-flash` é respeitado (não cai em copilot)
-2. Se o mana-base-validator não tiver provider/model, definir explicitamente
-3. Se o fallback chain do sistema for inevitável, aumentar a frequência dos crons menos frequentes ou aceitar que alguns minutos são perdidos para 429
+**Observação:** Nenhum trigger `run` ou `resume` foi necessário. Todos os 12 crons estão `enabled=true, state=scheduled`. A recuperação dos 2 crons aconteceu naturalmente via scheduler.
 
 ## Notas
 
-- Branch confirmada: `codex/hermes-analysis-docs` ✅ (HEAD `9a1ee1410858`)
-- `cronjob(action="list", include_disabled=True)` retornou 12 jobs sem `enabled=false`.
+- Branch confirmada: `codex/hermes-analysis-docs` ✅ (HEAD `dfe4451003`)
+- `cronjob(action="list", include_disabled=True)` retornou 12 jobs, todos `enabled=true`.
+- 2 crons com `last_status=error` (↓ de 4 desde 15:41Z). Ambos com config corrigida, aguardando scheduler.
+- 2 crons recuperaram naturalmente (gamechanger-research, mana-base-validator) desde o último relatório.
 - Working tree contém artefatos não relacionados (decks lorehold, scripts de scout, `__pycache__`, `scripts/knowledge.db` vazio em `/opt/data/workspace/mtgia/scripts/`) — apenas `CRON_STATUS.md` será comitado.
 - Nenhum token/secret registrado neste relatório.
-- 2 crons recuperaram desde o último relatório (commander-knowledge-deep, deck-scout), indicando que o scheduler e deepseek provider estão funcionais para alguns jobs.
+- Nenhum trigger `run` ou `resume` foi necessário — todos os crons estão habilitados e agendados.
 
 ======================================================================
 
