@@ -1,4 +1,188 @@
 # ManaLoom Code Structure Audit
+> Data: 2026-05-28 17:47 UTC
+> Rotacao local Codex: `module-coherence-server-lib-routes-app-lib`
+
+## Rodada focada: Coerencia entre `server/lib` ↔ `server/routes` ↔ `app/lib`
+
+Escopo desta rodada: somente coerencia de contratos, ownership e consumo entre
+helpers de `server/lib`, handlers de `server/routes` e consumidores em
+`app/lib`. Nao foi executada auditoria ampla de classes sem uso, funcoes nao
+chamadas, imports, ciclos, tabelas PostgreSQL ou duplicacao geral.
+
+### Limitacao da ferramenta
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado conforme
+o protocolo, mas falhou antes de gerar relatorio valido porque o script ainda usa
+`BASE = Path("/opt/data/workspace/mtgia")` e tentou criar
+`/opt/data/workspace/mtgia/docs/hermes-analysis`, encerrando no Mac local com
+`PermissionError: [Errno 13] Permission denied: '/opt/data'`.
+
+Resultado: os achados abaixo foram produzidos por inspecao manual focada em
+rotas chamadas por `app/lib`, rotas autenticadas que aceitam `deck_id` e
+contratos experimentais marcados como `not proven` no app. Nao foi inventada
+saida do auditor.
+
+### Achados confirmados
+
+#### P1 — `POST /ai/optimize` continua recebendo `deck_id` do app sem escopo de owner no helper de contexto
+
+- **Contrato app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
+  monta payload com `deck_id`, `archetype`, `bracket`, `keep_theme` e
+  `intensity`; `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`
+  envia `POST /ai/optimize`.
+- **Handler:** `server/routes/ai/optimize/index.dart:401`-`:405` tenta ler
+  `userId` do contexto autenticado; `server/routes/ai/optimize/index.dart:549`-`:558`
+  chama `optimize_request.loadOptimizeDeckContext(...)` com `deckId`,
+  `targetArchetype`, `requestMode`, `intensity`, `bracket` e `keepTheme`, mas
+  nao passa `userId`.
+- **Helper:** `server/lib/ai/optimize_request_support.dart:53`-`:62` nao
+  recebe `userId`; a query do deck em
+  `server/lib/ai/optimize_request_support.dart:63`-`:73` usa
+  `SELECT name, format FROM decks WHERE id = @id`, e a query de cartas em
+  `server/lib/ai/optimize_request_support.dart:87`-`:137` usa apenas
+  `WHERE dc.deck_id = @id`.
+- **Comparacao segura:** `server/routes/decks/[id]/index.dart:288`-`:317`
+  usa o padrao `FROM decks WHERE id = @deckId AND user_id = @userId` para
+  leitura app-facing de deck privado.
+- **Por que e incoerente:** o app trata optimize como acao sobre deck do usuario
+  autenticado, mas a fronteira `routes -> lib` perde o requisito de ownership
+  antes de carregar deck/cartas.
+- **Risco:** usuario autenticado que obtenha UUID de deck alheio pode
+  potencialmente disparar analise/otimizacao sobre composicao privada e consumir
+  trabalho de IA.
+- **O que valida:** alterar `loadOptimizeDeckContext` para receber `userId` e
+  consultar `decks` com `id + user_id` ou regra publica explicita; adicionar
+  teste owner vs non-owner para caminhos sync e async de `POST /ai/optimize`.
+- **O que falsifica:** contrato documentado e testado provando que optimize
+  aceita decks publicos/alheios por design, com autorizacao explicita e sem
+  expor composicao privada.
+
+#### P1 — `POST /ai/archetypes` e consumido pelo app, mas tambem carrega deck/cartas sem ownership
+
+- **Contrato app:** `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`
+  chama `POST /ai/archetypes` com `{deck_id: deckId}` para buscar opcoes de
+  otimizacao.
+- **Middleware:** `server/routes/ai/_middleware.dart:16`-`:20` aplica
+  `authMiddleware`, `aiPlanLimitMiddleware` e `aiRateLimit`, portanto a rota
+  esta em namespace autenticado/custoso de IA.
+- **Handler:** `server/routes/ai/archetypes/index.dart:27`-`:32` aceita
+  `deck_id`; `server/routes/ai/archetypes/index.dart:39`-`:42` consulta
+  `SELECT name, format FROM decks WHERE id = @id`; e
+  `server/routes/ai/archetypes/index.dart:54`-`:62` consulta cartas com
+  `WHERE dc.deck_id = @id`. O handler nao le `context.read<String>()` nem
+  filtra por `decks.user_id`.
+- **Cobertura existente:** `server/test/ai_archetypes_flow_test.dart:157`-`:234`
+  cobre cache/resposta positiva, e
+  `server/test/error_contract_test.dart:894`-`:934` cobre `deck_id` ausente e
+  deck inexistente; nao ha prova non-owner nessas evidencias.
+- **Por que e incoerente:** a rota e app-facing, usa credito/rate limit de IA e
+  retorna opcoes geradas a partir da lista real do deck, mas aceita qualquer UUID
+  de deck existente em vez de aplicar a mesma fronteira de owner dos endpoints
+  de deck privado.
+- **Risco:** usuario autenticado pode obter opcoes de arquétipo derivadas de deck
+  privado de outro usuario, revelando comandante/amostra de cartas via prompt e
+  diagnosticos.
+- **O que valida:** escopar o deck por `id + user_id` antes de montar prompt,
+  cache key e reference profile; adicionar teste owner vs non-owner para
+  `POST /ai/archetypes`.
+- **O que falsifica:** decisao de produto documentada que a rota analisa apenas
+  decks publicos/alheios por design, com query filtrando `is_public=true` ou
+  contrato separado para deck compartilhado.
+
+#### P1 — Polling de jobs async ainda aceita jobs sem `user_id`
+
+- **Contrato app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:74`-`:87`
+  trata `202` de optimize como job async e
+  `app/lib/features/decks/providers/deck_provider_support_ai.dart:190`-`:194`
+  faz polling em `/ai/optimize/jobs/$jobId`.
+- **Store:** `server/lib/ai/optimize_job.dart:25`-`:30` permite
+  `String? userId`; `server/lib/ai/optimize_job.dart:47`-`:64` persiste
+  `user_id` nullable.
+- **Criação atual:** `server/routes/ai/optimize/index.dart:457`-`:464` e
+  `server/routes/ai/optimize/index.dart:1041`-`:1048` passam o `userId`
+  capturado, mas ele ainda pode ser nulo porque o handler o captura de forma
+  tolerante em `server/routes/ai/optimize/index.dart:401`-`:405`.
+- **Handler de polling:** `server/routes/ai/optimize/jobs/[id].dart:26`-`:28`
+  le o usuario autenticado e carrega o job, mas
+  `server/routes/ai/optimize/jobs/[id].dart:39`-`:47` so bloqueia quando
+  `job.userId != null && job.userId != userId`; jobs com `user_id = NULL`
+  ficam legiveis para qualquer usuario com o `job_id`.
+- **Por que e incoerente:** o app nao tem conceito de job publico e o endpoint
+  fica sob `/ai` autenticado, mas a regra de acesso preserva um estado nulo que
+  enfraquece a fronteira de usuario.
+- **O que valida:** exigir `userId` nao nulo ao criar jobs app-facing e retornar
+  404 quando `job.userId == null` no polling, salvo rota interna separada.
+- **O que falsifica:** prova de que nenhum job async app-facing pode ser criado
+  sem usuario e teste explicito cobrindo a politica para `user_id = NULL`.
+
+#### P2 — Endpoints experimentais de deck/AI seguem sem ownership e sem consumidor app provado
+
+- **Endpoints:** `GET /decks/:id/simulate`, `POST /decks/:id/recommendations`,
+  `POST /ai/simulate-matchup`, `POST /ai/weakness-analysis`.
+- **Evidencia de rotas:**
+  - `server/routes/decks/[id]/simulate/index.dart:13`-`:26` le cartas com
+    `WHERE dc.deck_id = @deckId`, sem buscar `context.read<String>()` nem
+    validar `decks.user_id`.
+  - `server/routes/decks/[id]/recommendations/index.dart:16`-`:27` consulta
+    `SELECT name, format, description FROM decks WHERE id = @deckId`, e
+    `server/routes/decks/[id]/recommendations/index.dart:39`-`:58` le cartas
+    por `dc.deck_id = @deckId`, tambem sem `user_id`.
+  - `server/routes/ai/simulate-matchup/index.dart:24`-`:38` le
+    `my_deck_id`/`opponent_deck_id` e chama `_getDeckData`; essa funcao em
+    `server/routes/ai/simulate-matchup/index.dart:76`-`:103` usa
+    `SELECT id, name, format FROM decks WHERE id = @id` e cartas por
+    `dc.deck_id = @id`.
+  - `server/routes/ai/weakness-analysis/index.dart:17`-`:35` aceita `deck_id`
+    e consulta `SELECT name, format FROM decks WHERE id = @id`; as cartas sao
+    lidas em `server/routes/ai/weakness-analysis/index.dart:42`-`:60` por
+    `dc.deck_id = @id`.
+- **Evidencia app/contrato:** `grep -RInE` por esses endpoints em `app/lib`
+  nao encontrou chamadas; `server/doc/API_CONTRACTS_AND_DATA_MAP.md:152`-`:153`
+  e `:285`-`:286` marca consumidores como `not proven`/experimentais.
+- **Por que e incoerente:** rotas autenticadas em `server/routes/decks/_middleware.dart:7`-`:8`
+  e `server/routes/ai/_middleware.dart:16`-`:20` nao aplicam a regra de owner
+  dos endpoints de deck ja consumidos pelo app.
+- **O que valida:** antes de expor no app, escopar `deck_id`/`my_deck_id` por
+  `user_id` e definir regra separada para oponente publico/meta deck; adicionar
+  teste non-owner para cada rota mantida.
+- **O que falsifica:** decisao explicita de tornar esses endpoints internos ou
+  remove-los da superficie app-facing, com contrato atualizado e sem chamadas em
+  `app/lib`.
+
+#### P2 — `/community/decks/following` continua acoplado a branch especial em rota dinamica
+
+- **Contrato app:** `app/lib/features/social/providers/social_provider.dart:563`-`:565`
+  chama `/community/decks/following?page=...&limit=20` e
+  `app/lib/features/social/providers/social_provider.dart:581`-`:585` registra
+  o endpoint como `/community/decks/following`.
+- **Handler:** `find server/routes/community/decks -maxdepth 3 -type f` mostra
+  apenas `server/routes/community/decks/index.dart` e
+  `server/routes/community/decks/[id].dart`; nao existe
+  `server/routes/community/decks/following/index.dart`.
+- **Branch especial:** `server/routes/community/decks/[id].dart:10`-`:12`
+  trata `id == 'following'` como caso especial e desvia para
+  `_getFollowingFeed`.
+- **Por que e incoerente:** a URI consumida pelo app representa feed/colecao,
+  mas esta implementada como valor magico dentro do handler de detalhe
+  `/community/decks/:id`.
+- **O que valida:** criar rota dedicada
+  `server/routes/community/decks/following/index.dart` ou teste de contrato que
+  preserve explicitamente esse caso especial.
+- **O que falsifica:** decisao documentada de manter o branch magico por
+  compatibilidade, com teste cobrindo `GET /community/decks/following` e
+  `GET /community/decks/:id`.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- `POST /ai/rebuild` continua fora dos achados de incoerencia de ownership:
+  `app/lib/features/decks/providers/deck_provider_support_ai.dart:120`-`:168`
+  envia `deck_id`, e a rota ja foi revalidada na rodada anterior como escopando
+  o deck por `id + user_id` antes de carregar cartas e criar draft.
+- `GET /cards?set=...` e notificacoes `direct_message` nao foram reabertas nesta
+  rodada porque a revalidacao anterior ja tinha evidencias compatíveis e o foco
+  atual encontrou riscos de maior impacto em `deck_id` autenticado.
+
+## Rodada focada anterior: PostgreSQL tables not used
 > Data: 2026-05-28 15:00 UTC
 > Rotacao local Codex: `postgresql-tables-not-used`
 

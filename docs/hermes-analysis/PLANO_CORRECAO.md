@@ -11,7 +11,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
-5. **P1 — Incoerencia de ownership em rotas deck/AI**: `POST /ai/optimize` e algumas rotas experimentais aceitam `deck_id` autenticado sem escopar a leitura por `user_id`, apesar de o app tratar decks como recursos privados do usuario.
+5. **P1 — Incoerencia de ownership em rotas deck/AI**: `POST /ai/optimize`, `POST /ai/archetypes` e algumas rotas experimentais aceitam `deck_id` autenticado sem escopar a leitura por `user_id`, apesar de o app tratar decks como recursos privados do usuario.
 6. **P1 — Politicas por nome ainda parcialmente inline**: a `master` ja corrigiu prioridade `functional_tags -> semantic_tags_v2 -> heuristic`, preservacao multi-role no optimize e documentacao operacional; ainda restam excecoes por nome em scoring/premium/high-power fora de uma policy versionada unica.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 
@@ -114,6 +114,11 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
     `loadOptimizeDeckContext` sem `userId`.
   - `server/lib/ai/optimize_request_support.dart` consulta `decks` e
     `deck_cards` apenas por `deckId`.
+  - O app tambem envia `POST /ai/archetypes` com `deck_id` em
+    `app/lib/features/decks/providers/deck_provider_support_mutation.dart`, e
+    `server/routes/ai/archetypes/index.dart` consulta `decks` e `deck_cards`
+    apenas por `id`/`deck_id`, sem ler `context.read<String>()` nem validar
+    `decks.user_id`.
   - `GET /decks/:id/simulate`, `POST /decks/:id/recommendations`,
     `POST /ai/simulate-matchup` e `POST /ai/weakness-analysis` tambem leem
     decks/cartas por id sem ownership; os consumidores app desses endpoints
@@ -126,15 +131,17 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 - **Ação recomendada**:
   1. passar `userId` para `loadOptimizeDeckContext` e escopar queries de deck por
      `id + user_id`, salvo regra publica explicita;
-  2. exigir `userId` nao nulo para jobs async user-facing ou retornar 404 quando
+  2. escopar `POST /ai/archetypes` por `id + user_id` antes de montar prompt,
+     cache key e reference profile, salvo regra publica explicita;
+  3. exigir `userId` nao nulo para jobs async user-facing ou retornar 404 quando
      `job.userId == null`;
-  3. antes de expor endpoints experimentais no app, escolher entre escopar por
+  4. antes de expor endpoints experimentais no app, escolher entre escopar por
      dono, limitar a deck publico/meta deck, ou remover/ocultar o contrato;
-  4. criar rota dedicada ou teste de contrato para `/community/decks/following`,
+  5. criar rota dedicada ou teste de contrato para `/community/decks/following`,
      hoje implementada como branch `id == 'following'` em `[id].dart`.
 - **Validação**:
-  - testes owner vs non-owner para `/ai/optimize` sync/async e para cada rota
-    experimental mantida;
+  - testes owner vs non-owner para `/ai/optimize` sync/async,
+    `/ai/archetypes` e para cada rota experimental mantida;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
     continua vazio ate haver contrato seguro;
   - polling de job com `user_id = NULL` retorna 404 ou fica restrito a rota
