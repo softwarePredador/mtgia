@@ -80,7 +80,7 @@
 
 ## Precisão das Functional Tags (tag_accuracy)
 
-> Última verificação: **2026-05-28T02:00Z** (cron `manaloom-tag-accuracy-reporter`)
+> Última verificação: **2026-05-28T06:21Z** (cron `manaloom-tag-accuracy-reporter`)
 
 ### Resumo Geral
 
@@ -133,6 +133,13 @@
 | protection | 69.2% | 13 |
 | wincon | 75.0% | 8 |
 | engine | 75.0% | 8 |
+
+### Mudanças desde última verificação (02:00Z)
+
+- **Sem mudanças nos dados**: todos os 378/454 acertos e 29 tags permanecem idênticos à última verificação.
+- Nenhuma nova avaliação de tag foi inserida no banco desde 02:00Z.
+- **Status das tags problemáticas:** inalterado — ninja (0.0%, 17 erros), payoff (35.5%, 31 amostras) e enabler (50%, 42 amostras) continuam sendo as maiores fontes de erro.
+- **Recomendação mantida:** revisar heurísticas de `ninja`, `payoff`, `enabler` e `stax_disruption` quando houver bandwidth para ajuste do classificador.
 
 ### Análise
 

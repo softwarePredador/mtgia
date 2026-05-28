@@ -1,3 +1,301 @@
+## [2026-05-28T06:30:00+00:00] Execução #9 — Deep Meta Scout Pós-Ciclo #2
+
+### Contexto
+Deck 6 (Lorehold Spellslinger) encontra-se **pós-Ciclo #2**, aguardando Ciclo #3.
+Mulligan Analyst registrou **"sem play T3" = 15.8%** (CRITICO).
+Objetivo: cross-reference completo deck vs EDHREC 7.651 decks vs colecao.
+
+### Fontes consultadas
+- **EDHREC Live**: https://edhrec.com/commanders/lorehold-the-historian — 7.651 decks, 277 cartas unicas
+- **knowledge.db**: deck_cards WHERE deck_id = 6 (100 cartas: 1 comandante, 35 lands, 64 spells)
+- **user_collection**: 161 cartas na colecao
+
+---
+
+### Distribuicao de EDHREC do Deck
+
+| Faixa | Quantidade | % do deck |
+|:------|:----------:|:---------:|
+| 0% (fora do meta) | 7 | 10.6% |
+| 1-14% (marginal) | 5 | 7.6% |
+| 15-29% (baixo) | 12 | 18.2% |
+| 30-49% (medio) | 17 | 25.8% |
+| 50%+ (alto/meta) | 23 | 34.8% |
+
+**Overlap meta: ~59%** (23/64 non-land cards no tier verde)
+
+---
+
+### TIER RED: 7 Cartas a 0% EDHREC — Analise Profunda
+
+#### Galadriel's Dismissal (CMC 1, double-null)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Proteger criaturas dando phase out como instant
+- **Por que 0%:** Fase out de criaturas e um efeito defensivo fraco em um deck que tem so 12 criaturas. Com tao poucas criaturas, voce esta pagando 1 mana para dar phase out de UMA criatura em UMA fase — isso raramente muda o jogo. Decks reais preferem protecao que protege o comandante ou protege TUDO (Teferi's Protection)
+- **Alternativas comuns:** Teferi's Protection (21.2%), Boros Charm (45.5% com modo indestructible), Perch Protection (34.7%)
+- **Risco de auto-swap:** BAIXO — carta defensiva situacional, nao e motor. Cortavel.
+- **Na colecao:** SIM (qty=1)
+
+#### Orim's Chant (CMC 1, double-null)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Prevenir que oponente jogue spells por 1 turno
+- **Por que 0%:** Orim's Chant e um efeito de "silence" que depende de timing perfeito. Em Commander com 3 oponentes, silenciar 1 por 1 turno tem valor questionavel. Decks de Lorehold preferem protecao reativa (Teferi's Protection) ou vantagem continua (Storm-Kiln, Double Vision)
+- **Alternativas comuns:** Teferi's Protection, Hexing Squelcher (reactive counter)
+- **Risco de auto-swap:** BAIXO — nao e engine. Cortavel.
+- **Na colecao:** SIM (qty=1)
+
+#### Weathered Wayfarer (CMC 1, ramp)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Buscar nonbasic land revelando topo do deck
+- **Por que 0%:** ~32% de chance de revelar spell e buscar land — com 35 lands no deck, voce JA tem bastante. Decks de Lorehold reais usam fetch lands para consistencia e ramp via artifacts/treasures
+- **Nota crucial:** Weathered Wayfarer e um false-positive no draw_count do DB (classificado como ramp). Com 35 lands, este card e praticamente dead.
+- **Risco de auto-swap:** BAIXO — nao e motor. Cortavel.
+
+#### Desperate Ritual (CMC 2, ramp)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Adicionar RRR temporariamente (mana especifico de red)
+- **Por que 0%:** RRR e MANA ESPECIFICO DE RED. Voce precisa ter mana vermelho disponivel para ativar — se so tem Plains, ela so gera +1. Decks de Lorehold preferem Sorcery-speed ramp (Big Score, Brass's Bounty) que tambem compra carta / cria treasures
+- **Alternativas comuns:** Seething Song (16.1%) — adiciona 5 genericos, mais flexivel
+- **Risco de auto-swap:** BAIXO — ramp situacional. Cortavel.
+- **Na colecao:** SIM (qty=1)
+
+#### Goblin Engineer (CMC 2, recursion)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Reanimar artifact CMC do top do graveyard
+- **Por que 0%:** O deck tem ~12 artifacts no total, e muitos sao lands. Goblin Engineer precisa de alvos no graveyard — em um deck que nao carrega graveyard estrategico, quase sempre retorna nada valioso. Decks de Lorehold usam Mizzix's Mastery (top 4 do graveyard, 57.7%)
+- **Alternativas comuns:** Mizzix's Mastery, Surge to Victory
+- **Risco de auto-swap:** MEDIO — pode ser util em jogo longo, mas e fraco no current meta
+- **Na colecao:** SIM (qty=1)
+
+#### Oswald Fiddlebender (CMC 2, tutor)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Tutor artifact CMC<=2
+- **Por que 0%:** So 5-6 artifacts no deck com CMC<=2 que valem tutorar (Arcane Signet, Lightning Greaves, Talisman of Conviction). Alem disso, Oswald custa 2 mana para ativar — melhor colocar Big Country diretamente no deck. Decks reais nao usam tutores para artifact em Lorehold
+- **Risco de auto-swap:** BAIXO — nao e motor. Cortavel.
+- **Na colecao:** SIM (qty=1)
+
+#### Ancient Copper Dragon (CMC 6, token_maker)
+- **% nos decks externos:** 0.0% (0/7.651)
+- **Proposito no Lorehold:** Cada spell faz 1 Treasure token
+- **Por que 0% (razao reveladora):** CMC 6 para criar treasures e MUITO CARO. O efeito em si e bom (treasure por spell), mas o corpo 4/4 voar a CMC 6 nao justifica o custo quando voce tem Goldspan Dragon (CMC 5, 17.9%) que ja e ramp. Mais importante: **Storm-Kiln Artist faz a mesma coisa a CMC 4 (55.4% EDHREC)** e copia o efeito quando conjurado com Lorehold trigger. ACD e essencialmente um Storm-Kiln mais caro e pior
+- **Alternativas comuns:** Storm-Kiln Artist (CMC 4, 55.4%), Goldspan Dragon (CMC 5, 17.9%)
+- **Risco de auto-swap:** **CRITICO** — NAO SWAPAR sem colocar Storm-Kiln no deck primeiro! ACD e filler mas swapar por Storm e a melhor oportunidade
+- **Na colecao:** SIM (qty=1)
+
+---
+
+### TIER YELLOW-BORDERLINE (1-14%): 5 Cartas Marginais
+
+| Carta | EDHREC | CMC | Por que marginal |
+|:-------|:------:|:---:|:-----------------|
+| The One Ring | 8.4% | 4 | Game Changer. Poderoso mas consume GC slot. Em B3, e border |
+| Season of the Bold | 9.9% | 5 | Exile draw condicional a CMC 5. Ninguem joga porque e lento |
+| Grand Abolisher | 11.8% | 2 | Double-null. Protecao T1-2 mas 12 creatures no deck = valor questionavel |
+| Gamble | 12.1% | 0 | Game Changer. 12.1% porque e imprevisivel (descarta mao) |
+| Sunbird's Invocation | 13.7% | 6 | Topdeck big spell a CMC 6. Dance with Calamity (8) e mais eficiente |
+
+**Nota sobre The One Ring:** E o draw engine mais poderoso do Magic. Em Boros, e quase auto-include apesar de ser GC. A 8.4% reflete que decks B3 nao colocam por politica de GC.
+
+---
+
+### TIER GREEN: 23 Cartas no Meta (>=50% EDHREC)
+
+| Carta | EDHREC | Funcao |
+|:-------|:------:|:-------|
+| Sol Ring | 90.5% | Ramp |
+| Arcane Signet | 88.1% | Ramp |
+| Hit the Mother Lode | 79.4% | Ramp/Draw |
+| Library of Leng | 77.7% | Graveyard |
+| Storm Herd | 75.2% | Token |
+| Monument to Endurance | 72.9% | Ramp |
+| Bender's Waterskin | 71.2% | Ramp |
+| Swords to Plowshares | 68.9% | Removal |
+| Brass's Bounty | 67.2% | Ramp |
+| Big Score | 67.2% | Ramp |
+| Sensei's Divining Top | 67.0% | Draw |
+| Call Forth the Tempest | 65.6% | Board Wipe |
+| Talisman of Conviction | 64.9% | Ramp fix |
+| Volcanic Vision | 63.9% | Board Wipe |
+| Approach of the Second Sun | 63.9% | Wincon |
+| Scroll Rack | 59.8% | Double-null engine |
+| Mizzix's Mastery | 57.7% | Recursion |
+| Path to Exile | 57.2% | Removal |
+| Unexpected Windfall | 56.8% | Ramp |
+| Rise of the Eldrazi | 55.0% | Removal |
+| Victory Chimes | 53.9% | Double-null |
+| Ol�rin's Searing Light | 53.3% | Graveyard |
+| Dance with Calamity | 50.4% | Big spell (Ciclo #2) |
+
+---
+
+### ANALISE DO MOTOR — Status Pos-Ciclo #2
+
+```
+[Treasure Ramp] -> [Big Spell Gratis] -> [Lorehold Copy] -> [Payoff]
+     SIM                  SIM                   SIM            NAO
+```
+
+**Componentes:**
+1. **Treasure Ramp** (Big Score, Brass's Bounty, Hit the Mother Lode) — 3 cartas PRESENTES
+2. **Big Spells Gratis** (Dance with Calamity Miracle) — adicionado Ciclo #2
+3. **Lorehold Copy** (Commander ability) — sempre presente
+4. **Payoff de Tesouro** — **Storm-Kiln Artist FALTA (CMC 4, 55.4% EDHREC)**
+   - **Na colecao:** 1x (qty=1)
+   - Storm-Kiln cria treasures quando voce conjura spells. Com Lorehold trigger, cada spell vira 2+ treasures. Com Dance, cada spell gratis gera treasures via Storm-Kiln.
+
+**Veredito:** O motor esta 3/4 completo. Falta apenas o payoff. Storm-Kiln e a swap de maior impacto possivel.
+
+---
+
+### PADRAO DE DECKBUILDING IDENTIFICADO
+
+**O que os decks de Lorehold t em em comum que o nosso NAO tem:**
+
+1. **Ramp via treasures > rocks:** Decks reais usam Big Score (67.2%), Brass's Bounty (67.2%), Hit the Mother Lode (79.4%) + Storm-Kiln payoff. Nosso deck TEM os 3 primeiros mas NAO tem Storm-Kiln. E como ter um motor sem virabrequim.
+
+2. **Media de criaturas: 5-7:** Nosso deck tem 12 criaturas (contando commander). Decks reais rodam 5-7 porque o foco e spells. Redundancia: Goblin Engineer, Oswald, Artist's Talent, Galvanoth — todas precisam de spells nao-creature para brilhar, mas o deck nao tem engine de spell-slinging suficiente.
+
+3. **Draw esta sub-representado:** O DB registra 5 draw single-tag (Sensei's Top, Esper Sentinel, Artist's Talent, Lorehold The Historian, The One Ring). Os 3 primeiros sao draw continuo. Lorehold commander + TOR sao draw situacional. Decks reais rodam 8-12 draw sources.
+
+4. **O deck tem "ilhas tematicas desconectadas":**
+   - Ilha Artifact (Goblin Engineer, Oswald, Medallions, Library of Leng) — 6 cartas focadas em artifact, mas sem engine de artifact
+   - Ilha Topdeck (Scroll Rack, Penance, Sensei's Top, Library) — bem construida, 4 peas
+   - Ilha Spellslinger (Double Vision, Galvanoth, Rite) — apenas 3 cartas
+   - Ilha Big Spells (Dance, Approach, Insurrection, Storm Herd, Rise) — 5 cartas, bem construida
+   
+   A Ilha Artifact e um peso morto — 6 slots conectando a nada.
+
+---
+
+### COLECAO: Alta Prioridade Nao-Usada (>=40% EDHREC)
+
+| # | Carta | EDHREC | CMC | Funcao | Swap Ideal |
+|:--|:------|:------:|:---:|:-------|:-----------|
+| 1 | **Storm-Kiln Artist** | 55.4% | 4 | Treasure Payoff | Ancient Copper Dragon (0%, CMC 6) |
+| 2 | **Improvisation Capstone** | 61.2% | 7 | Big Spell Engine | Sunbird's Invocation (13.7%, CMC 6) |
+| 3 | **Boros Signet** | 50.4% | 2 | Ramp consistente | Desperate Ritual (0%, CMC 2) |
+| 4 | **Apex of Power** | 55.3% | 10 | Big mana burst | Situacional — nao prioridade Ciclo #3 |
+| 5 | **Temple of Triumph** | 44.8% | 0 | Land | Pode trocar por Inspiring Vantage |
+| 6 | **Chaos Warp** | 38.9% | 3 | Removal flex | Galadriel's Dismissal (0%, CMC 1) |
+| 7 | **Mother of Runes** | 34.5% | 1 | Protection | Orim's Chant (0%, CMC 1) |
+| 8 | **Generous Gift** | 32.5% | 3 | Removal | Orim's Chant (0%, CMC 1) |
+| 9 | **Blasphemous Act** | 40.5% | 9 | Board wipe | Situacional |
+
+---
+
+### RECOMENDACOES CICLO #3 (Defensivo — Reduzir CMC)
+
+**"Sem play T3" = 15.8% e CRITICO. Ciclo #3 DEVE ser defensivo.**
+
+#### Opcao A (Defensiva — RECOMENDADA): Foco em reduzir "sem play T3"
+
+| # | Sai | Entra | Delta CMC | Justificativa |
+|:--|:----|:------|:---------:|:--------------|
+| 1 | Ancient Copper Dragon (0%, CMC 6) | **Storm-Kiln Artist** (55.4%, CMC 4) | **-2** | Completa o motor. Filler -> Payoff. |
+| 2 | Desperate Ritual (0%, CMC 2) | **Boros Signet** (50.4%, CMC 2) | **0** | Ritual situacional -> Ramp staple. |
+| 3 | Galadriel's Dismissal (0%, CMC 1) | **Mother of Runes** (34.5%, CMC 1) | **0** | Situational -> Protection utility. |
+
+**Delta CMC total: -2** ✅ (ajuda "sem play T3")
+**Resultado esperado:** "Sem play T3" cai de 15.8% para ~10-12%
+
+#### Opcao B (Balanceada): Foco em motor + removal flexivel
+
+| # | Sai | Entra | Delta CMC | Justificativa |
+|:--|:----|:------|:---------:|:--------------|
+| 1 | Ancient Copper Dragon (0%, CMC 6) | **Storm-Kiln Artist** (55.4%, CMC 4) | **-2** | Completa o motor. |
+| 2 | Desperate Ritual (0%, CMC 2) | **Boros Signet** (50.4%, CMC 2) | **0** | Ramp staple. |
+| 3 | Galadriel's Dismissal (0%, CMC 1) | **Chaos Warp** (38.9%, CMC 3) | **+2** | Removal flexivel. |
+
+**Delta CMC total: 0** (neutro)
+**Resultado esperado:** Motor completo + melhor interacao, "Sem play T3" estavel.
+
+---
+
+### EVOLUCAO AO LONGO DOS CICLOS
+
+| Metrica | Baseline | Ciclo #1 | Ciclo #2 | Ciclo #3 proj (Op A) |
+|:--------|:--------:|:--------:|:--------:|:--------------------:|
+| Lands | 34 | 35 | 35 | 35 |
+| Ramp | 16 | 16 | 16 | 16 |
+| Draw (DB) | 5 | 5 | 5 | 5 |
+| Draw (real) | 4 | 4-5 | 5 | 5-6 |
+| Protecao | 7 | 4 | 4 | 5 |
+| Board Wipe | 6 | 4 | 4 | 4 |
+| CMC medio | ~3.55 | ~3.85 | ~3.85 | ~3.75 |
+| "Sem play T3" | 3.3% | 12.4% | 15.8% | ~10-12% |
+| Motor completo | 1/4 | 1/4 | 3/4 | **4/4** |
+| Cartas >=50% | ~15 | ~21 | ~23 | ~25 |
+
+---
+
+### DOUBLE-NULL UPDATE (Execucao #9)
+
+Cards double-null ainda no deck apos Ciclos #1-2:
+
+| Card | CMC | EDHREC | Risco |
+|:-----|:---:|:------:|:-----:|
+| Scroll Rack | 2 | 59.8% | **NUNCA CORTAR** — core engine |
+| Penance | 3 | 41.8% | **NUNCA CORTAR** — miracle enabler |
+| Grand Abolisher | 2 | 11.8% | MEDIO — Protection, mas 12 creatures |
+| Ruby Medallion | 2 | 42.4% | MEDIO — Cost reduction (red) — so 13 red spells |
+| Pearl Medallion | 2 | 25.2% | BAIXO — Cost reduction (white) — so 23 white spells |
+| Victory Chimes | 3 | 53.9% | BAIXO — Situational |
+| Galadriel's Dismissal | 1 | 0.0% | BAIXO — Cortavel |
+| Orim's Chant | 1 | 0.0% | BAIXO — Cortavel |
+
+**Double-null count:** 8 (reduzido de 10 no Ciclo #1).
+Deflecting Palm foi removida (Ciclo #2).
+
+**Taunt from the Rampart** esta a 35.3% EDHREC — acima do limite de corte. NAO e mais double-null risco. Manter.
+
+---
+
+### RESUMO DO ESTADO DO DECK (Execucao #9)
+
+| Aspecto | Status |
+|:--------|:-------|
+| Ciclo #1 | Aplicado (3 swaps) |
+| Ciclo #2 | Aplicado (3 swaps) |
+| Ciclo #3 | RECOMENDADO — aguarda Evolution Oracle |
+| Cartas >=50% EDHREC | 23/64 non-land (35.9%) |
+| Cartas 0% EDHREC | 7/64 non-land (10.9%) |
+| "Sem play T3" | 15.8% (CRITICO) |
+| Motor Lorehold | 3/4 (falta Storm-Kiln) |
+| Overlap meta | ~59% |
+| Double-null count | 8 |
+
+---
+
+### LICOES DESTA EXECUCAO
+
+1. **Storm-Kiln Artist (55.4%) e a carta mais impactante que falta no deck.** Esta na colecao. Completar o motor de Lorehold e a prioridade numero um. Criar treasures via Storm-Kiln + copiar com Lorehold + pagar Dance with Calamity = explosao de mana impossivel de responder.
+
+2. **O Ciclo #2 teve um custo escondido em "sem play T3".** Substituir Mother of Runes (CMC 1) e Deflecting Palm (CMC 2) por The One Ring (CMC 4) e Dance (CMC 8) elevou o peso das maos iniciais. O deck esta mais forte T4+ mas mais fraco T1-3 — exatamente o oposto do que um deck B3 precisa (B3 = mais mais mais partidas = consistencia e rei).
+
+3. **Ilha Artifact e o maior peso morto do deck.** 6 cartas (Goblin Engineer, Oswald, Library of Leng, Desperate Ritual, Pearl Medallion, Ruby Medallion) focadas em sub-temas desconectados. Nenhuma dessas cartas vai ser o motor. Storm-Kiln seria o unico payoff para essa ilha.
+
+4. **The One Ring e um ativo estrategico, nao so draw.** Em Boros, onde draw e escasso, TOR vale o GC slot. Mas isso significa que o deck precisa ter MAIS pecas de protecao para compensar (Mother of Runes seria util para isso!).
+
+5. **Improvisation Capstone (61.2%) com trend_zscore 8.21 esta SUBINDO FORA DE CONTROLE.** E a carta de mais rapido crescimento em Lorehold. Esta fora do deck desde o inicio. A 61.2% com trend 8.21 significa que em 2 semanas pode estar em 70%+. NAO priorizar agora por CMC, mas URGENTE para Ciclo #4.
+
+6. **Restoration Seminar (48% com trend 9.14) e outra subida rapida.** E a carta Lesson do novo set. Com trend 9.14, pode chegar a 60% em semanas. Tambem fora do deck. Mas e CMC 7 — Fase 2.
+
+7. **O padrao do Evolution Oracle e claro:** Ciclos pares sao "agressoes" (adicionam carta do meta), ciclos impares sao "defensivos" (removem fichers). Ciclo #3 deve ser defensivo porque o Ciclo #2 foi agressivo. Isso e saudavel para a consistencia do deck.
+
+---
+
+### PROXIMOS PASSOS
+
+1. **Evolution Oracle (Ciclo #3):** Aplicar Swaps Opcao A (Defensiva) — foco em reduzir "sem play T3" de 15.8% para <12%
+2. **Mulligan Analyst:** Re-simular 1000 maos apos Ciclo #3 para verificar melhoria
+3. **Scout de acompanhamento:** Verificar se Ciclo #3 foi aplicado
+4. **Ciclo #4:** Improvisation Capstone (CMC 7, 61.2%) — DEPOIS de "sem play T3" <12%
+
+---
+
+**Dados brutos:** `/tmp/edhrec_lorehold_fresh.json` (277 cartas, EDHREC Live 7.651 decks)
+
+
 # Scout Log — Lorehold, the Historian
 
 ## [2026-05-27 03:00] Execução #1
