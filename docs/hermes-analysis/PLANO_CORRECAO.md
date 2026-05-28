@@ -11,7 +11,8 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
-5. **P2 — Tabelas PostgreSQL write-only em rotas experimentais**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado.
+5. **P1 — Incoerencia de ownership em rotas deck/AI**: `POST /ai/optimize` e algumas rotas experimentais aceitam `deck_id` autenticado sem escopar a leitura por `user_id`, apesar de o app tratar decks como recursos privados do usuario.
+6. **P2 — Tabelas PostgreSQL write-only em rotas experimentais**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado.
 
 ## Achados priorizados
 
@@ -77,6 +78,40 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   - gerar artefatos necessários ou corrigir o entry point;
   - rerodar `dart analyze` até ficar verde.
 
+### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
+- **Evidência**:
+  - O app envia `POST /ai/optimize` com `deck_id` em
+    `app/lib/features/decks/providers/deck_provider_support_ai.dart`, mas
+    `server/routes/ai/optimize/index.dart` chama
+    `loadOptimizeDeckContext` sem `userId`.
+  - `server/lib/ai/optimize_request_support.dart` consulta `decks` e
+    `deck_cards` apenas por `deckId`.
+  - `GET /decks/:id/simulate`, `POST /decks/:id/recommendations`,
+    `POST /ai/simulate-matchup` e `POST /ai/weakness-analysis` tambem leem
+    decks/cartas por id sem ownership; os consumidores app desses endpoints
+    seguem `not proven`.
+  - `GET /ai/optimize/jobs/:id` permite leitura de job com `user_id = NULL`
+    porque so bloqueia quando `job.userId != null && job.userId != userId`.
+- **Impacto**: risco de exposicao de composicao/analise de deck privado caso um
+  usuario autenticado obtenha UUID ou job ID alheio; tambem cria contratos
+  ambiguos para futuras telas.
+- **Ação recomendada**:
+  1. passar `userId` para `loadOptimizeDeckContext` e escopar queries de deck por
+     `id + user_id`, salvo regra publica explicita;
+  2. exigir `userId` nao nulo para jobs async user-facing ou retornar 404 quando
+     `job.userId == null`;
+  3. antes de expor endpoints experimentais no app, escolher entre escopar por
+     dono, limitar a deck publico/meta deck, ou remover/ocultar o contrato;
+  4. criar rota dedicada ou teste de contrato para `/community/decks/following`,
+     hoje implementada como branch `id == 'following'` em `[id].dart`.
+- **Validação**:
+  - testes owner vs non-owner para `/ai/optimize` sync/async e para cada rota
+    experimental mantida;
+  - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
+    continua vazio ate haver contrato seguro;
+  - polling de job com `user_id = NULL` retorna 404 ou fica restrito a rota
+    interna documentada.
+
 ### P2 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
@@ -107,9 +142,11 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 
 1. **Primeiro**: corrigir o auditor estrutural (P0), porque ele afeta a confiabilidade do restante do relatório.
 2. **Segundo**: destravar `dart analyze` do backend via `local_test_server.dart`.
-3. **Terceiro**: atacar duplicações de maior risco no domínio de optimize/IA.
-4. **Quarto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
-5. **Quinto**: decidir destino das tabelas write-only (`deck_matchups`,
+3. **Terceiro**: corrigir ownership/escopo de deck nas rotas app-facing e
+   experimentais antes de ligar novos consumidores no app.
+4. **Quarto**: atacar duplicações de maior risco no domínio de optimize/IA.
+5. **Quinto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
+6. **Sexto**: decidir destino das tabelas write-only (`deck_matchups`,
    `deck_weakness_reports`) antes de expandir novas persistencias analiticas.
 
 ## Itens explicitamente não confirmados como bug real nesta rodada
@@ -119,6 +156,9 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 - `battle_simulations` nao entrou como tabela nao usada nesta rodada: a rota
   `server/routes/ai/simulate/index.dart` escreve nela e
   `server/bin/ml_extract_features.dart` le a tabela para extracao de features.
+- `direct_message` nao entrou como incoerencia de contrato: backend, lista de
+  notificacoes e push coordinator usam `reference_id` como conversation id de
+  forma compatível.
 
 ## Critério de saída para uma próxima rodada
 
