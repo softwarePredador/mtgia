@@ -158,52 +158,53 @@
 
 ## Mana Base Validation Report
 
-> **Última execução:** 2026-05-28T04:51Z (cron `manaloom-mana-base-validator`)
+> **Última execução:** 2026-05-28T05:45Z (cron `manaloom-mana-base-validator`)
 > **Decks analisados:** 8
 > **Nota:** Lorehold (deck 6) não possui perfil de referência no diretório de artifacts — sem validação de role_targets.
 
 ### Resumo
 
-| Deck | Commander | Status | Total Cards | DB Lands | SQLite Lands | Profile Lands | Problemas |
-|-----|:----------|:------:|:-----------:|:--------:|:------------:|:--------------:|:----------|
-| 1 — Kinnan, Bonder Prodigy | Kinnan, Bonder Prodi | 🔴 CRIT | 13 | 29 | 0 | 29-34 | lands 🔴 CRIT (0 vs 29-34); mana_dorks 🔴 CRIT (4 vs 10-16); interaction_protection 🔴 CRIT (3 vs 9-14) |
-| 2 — EDHREC Average Deck - Dim | Yuriko, the Tiger's  | 🟡 WARN | 99 | 33 | 35 | 30-34 | lands 🔵 BLUE (35 vs 30-34); interaction 🔵 BLUE (9 vs 10-16); Total Cards 🟡 WARN (99/100) |
-| 3 — EDHREC Average Default | Korvold, Fae-Cursed  | 🔴 CRIT | 11 | 25 | 0 | 34-37 | lands 🔴 CRIT (0 vs 34-37); ramp_treasure 🔴 CRIT (3 vs 10-14); draw_value 🔴 CRIT (1 vs 6-10) |
-| 4 — EDHREC Average Default | Teysa Karlov | 🔴 CRIT | 80 | 35 | 15 | 35-37 | lands 🔴 CRIT (15 vs 35-37); ramp 🔴 CRIT (15 vs 9-11); recursion 🔵 BLUE (3 vs 4-7) |
-| 5 — Aesi EDHREC Average Defau | Aesi, Tyrant of Gyre | 🔴 CRIT | 100 | 40 | 40 | 39-43 | ramp_extra_lands 🔴 CRIT (28 vs 14-18); supplemental_draw 🟡 WARN (12 vs 6-9); protection 🟡 WARN (7 vs 2-4) |
-| 6 — Lorehold Spellslinger | Lorehold, the Histor | ✅ OK | 100 | 35 | 35 | N/A | (sem perfil de referência) |
-| 7 — EDHREC Average Default | Winota, Joiner of Fo | 🟡 WARN | 100 | 34 | 34 | 31-35 | protection 🟡 WARN (10 vs 5-8) |
-| 9 — Atraxa, Praetors' Voice | Atraxa, Praetors' Vo | 🟡 WARN | 100 | 36 | 36 | 35-38 | ramp_fixing 🔵 BLUE (14 vs 10-13); counter_payoffs 🔵 BLUE (7 vs 8-14); interaction 🔵 BLUE (7 vs 8-13) |
+| Deck | Commander | Status | SQLite Cards | DB Lands | SQLite Lands | Profile Range | Problemas |
+|-----|:----------|:------:|:------------:|:--------:|:-------------:|:-------------:|:----------|
+| 1 — Kinnan, Bonder Prodigy | Kinnan, Bonder Prodigy | 🔴 CRIT | 13 | 29 | 0 | 29-34 | Total Cards 🔴 CRIT (13/100); Lands DB=29 vs SQLite=0 (diff=-29); lands 🔴 CRIT (0 vs 29-34); mana_dorks 🔴 CRIT (4 vs 10-16); interaction_protection 🔴 CRIT (3 vs 9-14) |
+| 2 — EDHREC Average Deck - Dimir Ninja T | Yuriko, the Tiger's Sh | 🟡 WARN | 99 | 33 | 35 | 30-34 | Total Cards 🟡 WARN (99/100); DB total_cards=84 desatualizado vs SQLite=99; lands 🔵 BLUE (35 vs 30-34); interaction 🔵 BLUE (9 vs 10-16) |
+| 3 — EDHREC Average Default | Korvold, Fae-Cursed Ki | 🔴 CRIT | 11 | 25 | 0 | 34-37 | Total Cards 🔴 CRIT (11/100); Lands DB=25 vs SQLite=0 (diff=-25); lands 🔴 CRIT (0 vs 34-37); ramp_treasure 🔴 CRIT (3 vs 10-14) |
+| 4 — EDHREC Average Default | Teysa Karlov | 🔴 CRIT | 80 | 35 | 15 | 35-37 | Total Cards 🔴 CRIT (80/100); Lands DB=35 vs SQLite=15 (diff=-20); lands 🔴 CRIT (15 vs 35-37); ramp 🔴 CRIT (15 vs 9-11) |
+| 5 — Aesi EDHREC Average Default | Aesi, Tyrant of Gyre S | 🔴 CRIT | 100 | 40 | 40 | 39-43 | DB total_cards=79 desatualizado vs SQLite=100; ramp_extra_lands 🔴 CRIT (28 vs 14-18); supplemental_draw 🟡 WARN (12 vs 6-9); protection 🟡 WARN (7 vs 2-4) |
+| 6 — Lorehold Spellslinger | Lorehold, the Historia | ✅ OK | 100 | 35 | 35 | N/A | — (sem perfil de referência) |
+| 7 — EDHREC Average Default — Boros Comb | Winota, Joiner of Forc | 🟡 WARN | 100 | 34 | 34 | 31-35 | protection 🟡 WARN (10 vs 5-8) |
+| 9 — Atraxa, Praetors' Voice — EDHREC Av | Atraxa, Praetor's Voic | 🟡 WARN | 100 | 36 | 36 | 35-38 | ramp_fixing 🔵 BLUE (14 vs 10-13); counter_payoffs 🔵 BLUE (7 vs 8-14); interaction 🔵 BLUE (7 vs 8-13) |
 
 ### Achados Críticos
 
-1. **4 decks incompletos/parciais:** Deck 1 (Kinnan, Bonder Prodigy): 13/100; Deck 2 (EDHREC Average Deck - Dimir Ninja Topdeck Tempo): 99/100; Deck 3 (EDHREC Average Default): 11/100; Deck 4 (EDHREC Average Default): 80/100
-2. **3 decks com divergência grave DB vs SQLite lands:** Deck 1 (Kinnan): DB=29, SQLite=0, Diff=-29; Deck 3 (Korvold): DB=25, SQLite=0, Diff=-25; Deck 4 (Teysa): DB=35, SQLite=15, Diff=-20
-3. **Deck 5 (Aesi):** ramp_count=28 vs perfil 14-18 (CRIT +10 acima do max), draw_count=12 vs perfil 6-9 (WARN +3 acima do max), protection_count=7 vs perfil 2-4 (WARN +3 acima do max)
+1. **4 decks incompletos/parciais:** Deck 1 (Kinnan, Bonder Prodigy): 13/100; Deck 2 (EDHREC Average Deck - Dimir Ninja): 99/100; Deck 3 (EDHREC Average Default): 11/100; Deck 4 (EDHREC Average Default): 80/100
+2. **4 decks com divergência DB vs SQLite lands:** Deck 1 (Kinnan): DB=29, SQLite=0, Diff=-29; Deck 2 (Yuriko): DB=33, SQLite=35, Diff=+2; Deck 3 (Korvold): DB=25, SQLite=0, Diff=-25; Deck 4 (Teysa): DB=35, SQLite=15, Diff=-20
+3. **Deck 5 (Aesi):** ramp_extra_lands=28 vs perfil 14-18 (CRIT +10 acima do max); supplemental_draw=12 vs perfil 6-9 (WARN +3 acima); protection=7 vs perfil 2-4 (WARN +3 acima); DB total_cards=79 desatualizado vs SQLite=100
 4. **Deck 7 (Winota):** protection_count=10 vs perfil 5-8 (WARN +2 acima do max)
 5. **Deck 6 (Lorehold):** único deck completo sem perfil de referência — não é possível validar role_targets contra EDHREC
-6. **Deck 9 (Atraxa):** finishers=1 vs perfil 4-7 (WARN -3 abaixo) — nova flag; ramp_fixing, counter_payoffs, interaction todos 🔵 BLUE (-1 cada)
+6. **Deck 9 (Atraxa):** finishers=1 vs perfil 4-7 (WARN -3 abaixo); ramp_fixing, counter_payoffs, interaction todos 🔵 BLUE (-1 cada)
 
 ### Divergências Lands DB vs SQLite
 
 | Deck | DB total_lands | SQLite lands | Diferença | Status |
 |-----|:---------------|:-------------|:----------|:-------|
-| 1 — Kinnan, Bonder Prodi | 29 | 0 | -29 | ❌ |
-| 2 — EDHREC Average Deck  | 33 | 35 | +2 | ⚠️ |
-| 3 — EDHREC Average Defau | 25 | 0 | -25 | ❌ |
-| 4 — EDHREC Average Defau | 35 | 15 | -20 | ❌ |
-| 5 — Aesi EDHREC Average  | 40 | 40 | 0 | ✅ |
-| 6 — Lorehold Spellslinge | 35 | 35 | 0 | ✅ |
-| 7 — EDHREC Average Defau | 34 | 34 | 0 | ✅ |
-| 9 — Atraxa, Praetors' Vo | 36 | 36 | 0 | ✅ |
+| 1 — Kinnan, Bonder Prodigy | 29 | 0 | -29 | ❌ DIVERGENT |
+| 2 — EDHREC Average Deck - Dimir Ni | 33 | 35 | +2 | ⚠️ WARN |
+| 3 — EDHREC Average Default | 25 | 0 | -25 | ❌ DIVERGENT |
+| 4 — EDHREC Average Default | 35 | 15 | -20 | ❌ DIVERGENT |
+| 5 — Aesi EDHREC Average Default | 40 | 40 | +0 | ✅ OK |
+| 6 — Lorehold Spellslinger | 35 | 35 | +0 | ✅ OK |
+| 7 — EDHREC Average Default — Boros | 34 | 34 | +0 | ✅ OK |
+| 9 — Atraxa, Praetors' Voice — EDHR | 36 | 36 | +0 | ✅ OK |
 
-### Mudanças desde última validação (03:25Z)
+### Mudanças desde última validação (04:51Z)
 
-- **Sem mudanças estruturais**: todos os decks mantêm os mesmos totais de cartas e lands desde a validação anterior.
-- **Decks 1, 3, 4** continuam com dados incompletos nas tabelas (insert parcial durante import anterior).
-- **Deck 2 (Yuriko):** total_cards no DB permanece 84 vs 99 real no SQLite — dado desatualizado desde import.
-- **Deck 9 (Atraxa):** nova flag em finishers (1 vs perfil 4-7, WARN) — anteriormente reportado como 🔵 BLUE apenas.
+- **Sem mudanças estruturais:** todos os decks mantêm os mesmos totais de cartas e lands desde a validação anterior.
+- **Deck 5 (Aesi):** DB total_cards permanece 79 (desatualizado) vs SQLite 100 — não corrigido desde rodada anterior.
+- **Deck 2 (Yuriko):** DB total_cards permanece 84 (desatualizado) vs SQLite 99 — não corrigido.
+- **Decks 1, 3, 4** continuam com dados incompletos (inserts parciais de imports anteriores).
 - **Nenhum novo deck inserido ou removido** desde última validação.
+- **Todas as violações de role_targets** (lands CRIT em decks 1,3,4; ramp_extra_lands CRIT em deck 5) **permanecem idênticas**.
 
 ---
 
