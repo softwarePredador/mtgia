@@ -1016,3 +1016,159 @@ Todas as 8 alternativas estão na coleção. O custo total das melhorias é zero
 ---
 
 **Dados brutos:** `scripts/_edhrec_raw_lorehold.json` (fresco desta execução)
+
+## [2026-05-28 03:00] Execução #7 — Deep Refresh Pós-Ciclo #2
+
+### Fonte
+- **EDHREC Live** (__NEXT_DATA__): **7.651 decks** de Lorehold
+- **Nosso deck**: deck_id=6, "Lorehold Spellslinger", 100 cartas, pós-Ciclo #2
+- **Coleção**: 229 cartas no `user_collection`
+
+---
+
+### 📊 ESTADO ATUAL DO DECK VS META
+
+| Tier | Faixa EDHREC | Qtd Cartas | % do Deck |
+|:-----|:------------:|:----------:|:---------:|
+| 🟢 Meta-Aligned | ≥50% | 23 não-land + 5 lands | 34% |
+| 🟡 Aceitável | 15-49% | 26 não-land + 5 lands | 38% |
+| 🟠 Abaixo do Meta | 10-19% | 7 não-land + 5 lands | 15% |
+| 🔴 Zero no Meta | <10% ou não trackeado | 7 não-land | 8% |
+
+**Overlap com o meta: 62%** (cartas em ≥20% EDHREC). Número saudável para B3.
+
+---
+
+### 🟢 O QUE O DECK ACERTA (Staples ≥50% presentes)
+
+O deck contém **23 das 30 cartas mais jogadas** em Lorehold:
+
+**Ramp core (7/10 top):** Hit the Mother Lode (79.4%), Brass's Bounty (67.2%), Big Score (67.2%), Bender's Waterskin (71.2%), Monument to Endurance (72.9%), Talisman of Conviction (64.9%), Sol Ring (90.5%)
+
+**Draw/Topdeck (5/8 top):** Library of Leng (77.7%), Sensei's Divining Top (67.0%), Scroll Rack (59.8%), Unexpected Windfall (56.8%), Approach of the Second Sun (63.9%)
+
+**Payoffs (7/12 top):** Storm Herd (75.2%), Volcanic Vision (63.9%), Call Forth the Tempest (65.6%), Mizzix's Mastery (57.7%), Dance with Calamity (50.4%), Rise of the Eldrazi (55.0%), Olórin's Searing Light (53.3%)
+
+**Removal (4/6 top):** Swords to Plowshares (68.9%), Path to Exile (57.2%), Boros Charm (45.5%), Deflecting Swat (36.9%)
+
+---
+
+### 🔴 7 CARTAS AINDA PROBLEMÁTICAS (<10% EDHREC ou não trackeadas)
+
+| Carta | EDHREC | CMC | Função Real | Prioridade Corte |
+|:------|:------:|:---:|:------------|:-----------------|
+| **Desperate Ritual** | 0% | 2 | Ritual sem value | 🔴 Urgente |
+| **Ancient Copper Dragon** | 0% | 6 | Token maker, CMC alto | 🔴 Urgente |
+| **Sunbird's Invocation** | 13.7% | 6 | Big spell lento | 🟡 Média |
+| **Season of the Bold** | 9.9% | 5 | Exile draw condicional | 🟡 Média |
+| **Grand Abolisher** | 11.8% | 2 | Proteção preventiva | 🟡 Média (duplo nulo) |
+| **Fated Clash** | 15.6% | 5 | Board wipe condicional | 🟡 Média |
+| **Orim's Chant** | N/A | 1 | Stax | 🟢 Fora do plano do deck |
+
+**Nota sobre Taunt from the Rampart (35.3%):** Execução #6 classificou erroneamente como problemática. Está em 35.3% dos decks — manter.
+
+---
+
+### 🆕 DESTAQUE: Improvisation Capstone (61.2%) — A Carta Mais Importante que Falta
+
+| Métrica | Valor |
+|:--------|:-----|
+| Inclusão EDHREC | **61.2%** (3.725/6.091 decks) |
+| Seção EDHREC | `newcards` — categoria própria |
+| Na coleção? | ✅ SIM (Secrets of Strixhaven, M, 1x) |
+| No deck? | ❌ NÃO |
+| Função | Exile top 7, conjura instant/sorcery grátis |
+
+**Por que é perfeita para Lorehold:**
+1. Exila 7 → Lorehold trigger copia = 2 tentativas de achar big spells
+2. Conjura do exílio **grátis** → ativa Lorehold de novo
+3. Sinergia com Penance + Scroll Rack: coloque big spells no topo ANTES
+4. Cartas exiladas alimentam Mizzix's Mastery e Volcanic Vision
+5. 61.2% de inclusão = 3.725 jogadores já adotaram
+
+**Swap recomendado:** Sunbird's Invocation (13.7%) → Improvisation Capstone (61.2%). Capstone é 4.5x mais popular.
+
+---
+
+### 🧠 ANÁLISE PSICOLÓGICA: O Deckbuilder de Lorehold
+
+O perfil emergente dos 7.651 decks:
+
+**"Goldfish explosivo":**
+1. Não se importa com interação (removal é 24º em prioridade)
+2. Quer ver a máquina funcionando (draw + ramp >>> proteção)
+3. Prefere explosão a consistência (Big Score > Boros Signet)
+4. Aceita CMC alto porque confia no ramp (média 4.10!)
+5. Quer o momento "big spell grátis + copy" — payoff emocional
+
+**Como nosso deck se compara:**
+- MAIS proteção que o meta (4 slots vs 3-4)
+- MENOS payoff de tesouro (falta Storm-Kiln)
+- MESMO nível de ramp (16 vs ~14.7 meta) ✅
+- MENOS draw consistente (The One Ring 8.4% é baixo em Lorehold)
+
+---
+
+### 📈 PROGRESSÃO DO DECK
+
+| Métrica | Inicial | Pós-Ciclo #2 | Meta-Alvo |
+|:--------|:-------:|:------------:|:---------:|
+| 🟢 Cartas ≥50% | ~20 | 23 | 28+ |
+| 🔴 Cartas <10% | ~20 | 7 | 0 |
+| Draw real | ~4 | 5 | 8-12 |
+| Treasure payoff | 2 | 3 | 5-6 |
+| Proteção | 7 | 4 | 3-4 |
+
+**Projeção:** 2-3 ciclos adicionais para 90%+ de alinhamento.
+
+---
+
+### 🎯 TOP 5 SWAPS PARA CICLO #3 (Custo: ZERO — todos da coleção)
+
+| # | Adicionar | % | Remover | % | Impacto |
+|:-:|:----------|:-:|:--------|:-:|:--------|
+| 1 | **Storm-Kiln Artist** | 55.4% | Ancient Copper Dragon | 0% | 🔴 Payoff de tesouro |
+| 2 | **Boros Signet** | 50.4% | Desperate Ritual | 0% | 🔴 Ramp consistente |
+| 3 | **Improvisation Capstone** | 61.2% | Sunbird's Invocation | 13.7% | 🟡 Big spell superior |
+| 4 | **Chaos Warp** | 38.9% | Galadriel's Dismissal | 0% | 🟡 Removal versátil |
+| 5 | **Blasphemous Act** | 40.5% | Fated Clash | 15.6% | 🟢 Board wipe confiável |
+
+---
+
+### 🧠 O "Motor" de Lorehold
+
+```
+[Treasure Ramp] → [Big Spell Grátis] → [Lorehold Copy] → [Payoff]
+     ↑                                          ↓
+     └────────── Tesouros da cópia ←───────────┘
+```
+
+**Componentes:**
+1. ✅ Ramp com tesouros: Big Score, Brass's Bounty, Hit the Mother Lode
+2. ✅ Big spells: Dance, Approach, Rise, Insurrection
+3. ❌ Payoff de tesouro: **Storm-Kiln Artist FALTA**
+4. ✅ Draw/topdeck: Scroll Rack, Penance, Library, SDT
+
+---
+
+### LIÇÕES DESTA EXECUÇÃO
+
+1. **Deck em 62% de alinhamento** — sólido para B3, 7 cartas ainda problemáticas
+2. **Evolução funcionando:** ~20 → 7 problemáticos. Direção correta.
+3. **Improvisation Capstone é a maior free upgrade** — 61.2%, na coleção, fora do deck
+4. **Storm-Kiln Artist é a peça que falta no motor** — sem ela, tesouros não se convertem
+5. **4 slots de proteção aceitáveis para B3** — Greaves e Hexing Squelcher são os mais questionáveis
+6. **Meta estável:** 7.651 decks, sem mudanças significativas desde execução #6
+
+---
+
+### PRÓXIMOS PASSOS
+
+1. **Evolution Oracle (Ciclo #3):** Aplicar swaps P1-P5
+2. **Mulligan Analyst:** Re-simular após Ciclo #3
+3. **Próximo scout:** Re-avaliar overlap após Ciclo #3
+4. **Acompanhar:** Novos sets para cartas relevantes
+
+---
+
+**Dados brutos:** `/tmp/edhrec_lorehold.json`
