@@ -142,6 +142,43 @@
 
 **Recomendação:** Revisar as heurísticas de ninja, payoff, enabler e stax_disruption. As tags compostas podem ser reviewedas para verificar se os golden labels estão corretos.
 
+## Mana Base Validation Report
+
+> **Última execução:** 2026-05-28T02:10Z (cron `manaloom-mana-base-validator`)
+> **Decks analisados:** 8
+
+### Resumo
+
+| Deck | Commander | Status | Problemas |
+|:-----|:----------|:------:|:----------|
+| 1 — Kinnan | Kinnan, Bonder Prodigy | 🔵 BLUE | Deck incompleto (13/100), 0 lands no SQLite vs 29 no DB |
+| 2 — Dimir Ninja | Yuriko, the Tiger's Shadow | 🟡 WARN | 17 unclassified, total_cards divergente (84 vs 99) |
+| 3 — Korvold | Korvold, Fae-Cursed King | 🟡 WARN | Deck incompleto (11/100), 0 lands no SQLite vs 25 no DB |
+| 4 — Teysa | Teysa Karlov | 🟡 WARN | Parcial (80/100), 20 lands fantasma, ramp CRIT (15 vs 9-11) |
+| 5 — Aesi | Aesi, Tyrant of Gyre Strait | 🟡 WARN | Ramp CRIT (28 vs 14-18), total_cards desatualizado (79 vs 100) |
+| 6 — Lorehold | Lorehold, the Historian | 🟡 WARN | Sem perfil role_targets, 9 double-null, ramp suspeito (16 vs 4-8) |
+| 7 — Winota | Winota, Joiner of Forces | 🟡 WARN | Protection acima (10 vs 5-8), categorias não mapeiam 1:1 |
+| 9 — Atraxa | Atraxa, Praetors' Voice | ✅ OK | Único deck completo, métricas majoritariamente dentro do perfil |
+
+### Achados Críticos
+
+1. **2 decks gravemente incompletos** (Kinnan 13/100, Korvold 11/100)
+2. **1 deck parcial** (Teysa 80/100 — 20 lands fantasma)
+3. **Deck 5 (Aesi):** total_cards desatualizado (79 vs 100 real)
+4. **Deck 6 (Lorehold):** ramp_count=16 provavelmente inflado por false positives
+5. **Deck 9 (Atraxa):** único deck totalmente válido
+
+### Divergências Lands DB vs SQLite
+
+| Deck | DB total_lands | SQLite lands | Diferença |
+|:-----|:---------------|:-------------|:----------|
+| 1 — Kinnan | 29 | 0 | ❌ -29 |
+| 3 — Korvold | 25 | 0 | ❌ -25 |
+| 4 — Teysa | 35 | 15 | ❌ -20 |
+| Todos os outros | ✅ | ✅ | 0 |
+
+---
+
 ## Observações Importantes
 
 - Nenhum cron desabilitado, stale (>120min) ou never-run nesta rodada — **nenhuma ação `resume`/`run` foi necessária**.
