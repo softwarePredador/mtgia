@@ -13,3 +13,6 @@ Aesi é o único comandante que une extra land drop + card draw num único slot,
 
 ## Atraxa, Praetors' Voice — 2026-05-28
 Atraxa prolifera todo end step gratuitamente, e o deck acumula 12+ fontes adicionais de multiplicar/forçar counters para vencer por veneno. Insight principal: o deck é 40% infect theme + 60% "melhores cartas genéricas do Commander" (Rhystic Study, Smothering Tithe, Doubling Season, Oko). A vitoria segue uma fórmula previsível — Prologue to Phyresis "inicia" o veneno nos 3 oponentes, depois cada Atraxa end step adiciona +3 veneno até o lethal. Problema ManaLoom: cartas como Blighted Agent e Skithiryx precisam de tags `enabler`/`wincon` simultâneas — atualmente o sistema trata apenas 1 função por carta.
+
+## Aesi, Tyrant of Gyre Strait - 2026-05-28 (Structured Analysis)
+Análise estruturada salva em analyses/aesi-tyrant-of-gyre-strait.md. Três cartas-chave identificadas: Exploration (extra land drop mais barato, habilita o motor turn 1), Avenger of Zendikar (wincon mais explosivo — 40 plantas + counters por land drop), Cyclonic Rift (mass removal que preserva terrenos do Aesi). Insight central: o deck acumula vantagem por "inércia de valor" — cada terreno é mana+draw+payoff simultâneo. Vulnerabilidade fatal: apenas 2 fontes de proteção, confiando em recastar Aesi rapidamente com ramp massivo.
