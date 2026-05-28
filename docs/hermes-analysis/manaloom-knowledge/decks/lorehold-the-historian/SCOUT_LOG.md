@@ -1,3 +1,268 @@
+
+## [2026-05-28T06:04:45+00:00] Execução #10 — Deep Meta Scout Pós-Ciclo #2 (Confirmação + Tendências)
+
+### Contexto
+Deck 6 (Lorehold Spellslinger) está **pós-Ciclo #2**, aguardando Ciclo #3 pelo Evolution Oracle.
+Sem T3" persiste em **~16% (CRÍTICO)**. Obetivo: verificar se há mudanças no meta EDHREC,
+identificar cartas em declínio acelerado, e atualizar recomendações para Ciclo #3.
+
+### Fontes consultadas
+- **EDHREC Live**: https://edhrec.com/commanders/lorehold-the-historian — 7.651 decks, 277 cartas únicas
+- **knowledge.db**: deck_cards WHERE deck_id = 6 (100 cartas: 1 comandante, 24 lands nonbasic + basics, 64 Não-eso não-terras)
+- **user_collection**: 161 cartas na coleção
+- Comparação com Execução #9 (mesma fonte, ~4h de diferença)
+
+---
+
+### DISTRIBUIÇÃO EDHREC DO DECK (Atualizada)
+
+| Faixa | Quantidade | % do deck |
+|:------|:----------:|:---------:|
+| 0% (fora do meta) | 7 | 10.6% |
+| 1-14% (marginal) | 5 | 7.6% |
+| 15-29% (baixo) | 10 | 15.2% |
+| 30-49% (médio) | 21 | 31.8% |
+| 50%+ (alto/meta) | 23 | 34.8% |
+
+**Overlap meta: ~59% — estável vs Execução #9.**
+
+---
+
+### NOVIDADE 1: TENDÊNCIAS CRÍTICAS — Cartas em Declínio Acelerado
+
+Cartas do deck com **trend_zscore < -0.3** (perdendo popularidade na comunidade):
+
+| Carta | EDHREC | Trend | CMC | Status no deck | Risco |
+|:------|:------:|:-----:|:---:|:---------------|:------|
+| **Artist's Talent** | 20.9% | **-0.72** | 2 | Draw lento | 🔴 Alto — comunidade ABANDONANDO |
+| **Esper Sentinel** | 32.3% | -0.54 | 0 | Draw staple | 🟡 Médio — ainda staple apesar da queda |
+| **Perch Protection** | 34.7% | -0.41 | 6 | Proteção | 🟡 Médio — proteção cara em queda |
+| **Rise of the Eldrazi** | 55.0% | -0.49 | 12 | Removal | 🟡 Médio — CMC 12 + tendência negativa |
+| **Seething Song** | 16.1% | -0.49 | 3 | Ramp | 🟡 Médio — ritual puro saindo de moda |
+| **Pearl Medallion** | 25.2% | -0.48 | 2 | Double-null | 🟡 Médio — cost reduction caindo |
+| **Ruby Medallion** | 42.4% | -0.40 | 2 | Double-null | 🟡 Médio — cost reduction caindo |
+
+**💡 INSIGHT: Artist's Talent com trend -0.72 é o declínio mais severo do deck.**
+A comunidade está abandonando Artist's Talent em Lorehold — provavelmente porque decks
+preferem draw que não exija setup de criatura (Sensei's Top, Scroll Rack, Big Score).
+Considerar remoção no Ciclo #4.
+
+**💡 INSIGHT: Esper Sentinel em declínio (-0.54) É PREOCUPANTE.**
+É a carta mais importante do deck para consistência T1. A queda pode refletir
+uma migração para Archivist of Oghma ou outras opções — mas nenhuma substitui
+o papel de Esper como 1-drop que compra carta em multiplayer.
+
+**💡 INSIGHT: Rise of the Eldrazi caindo (-0.49) aos 55.0% é estranho.**
+Com CMC 12, é natural que a comunidade prefira remoções mais baratas.
+Isso reforça que Rise é um "filler de big spell" que deveria ser trocado.
+
+---
+
+### NOVIDADE 2: NOVA SEÇÃO "NEWCARDS" — O Que Está Subindo
+
+| Carta | EDHREC | Trend | CMC | Na coleção? | Swappable? |
+|:------|:------:|:-----:|:---:|:-----------:|:----------:|
+| **Improvisation Capstone** | **48.7%** | **8.21** | 7 | ✅ SIM | ✅ Prioridade Ciclo #4 |
+| **Restoration Seminar** | 37.2% | **9.14** | 7 | ✅ SIM | 🟡 Futuro |
+| **The Dawning Archaic** | 23.7% | **5.31** | 3 | ❌ NÃO | ❌ |
+| **Tablet of Discovery** | 25.0% | 0.00 | 3 | ❌ NÃO | ❌ |
+| **Turbulent Steppe** | 22.7% | 0.00 | 0 | ❌ NÃO | — land |
+
+**🔥 INSIGHT CRÍTICO: Restoration Seminar com trend 9.14 é a carta SUBINDO MAIS RÁPIDO de TODO Lorehold.**
+Não é Improvisation Capstone (8.21) — é Restoration Seminar. Com 37.2% já,
+está efetivamente JOGADA e CRESCENDO. O problema: é CMC 7, o que a classifica como
+"Fase 2" (não prioridade Ciclo #3). Mas com trend 9.14, pode chegar a 45-50%
+antes do Ciclo #4.
+
+**Sobre Restoration Seminar:** É uma Lesson (mecânica de Strixhaven) que exila até 4
+cartas do graveyard para comprar cartas. Em Lorehold, onde o enchimento natural do
+graveyard é baixo (não é deck de descarte), Restoration Seminar pode ser inconsistente MAS
+com sinergia de flashback (Spellweaver Volute, Mizzix's Mastery jogados voltam ao graveyard).
+Card advantage a CMC 7 com trend 9.14 merece atenção para Ciclo #4.
+
+**Sobre Improvisation Capstone:** A situação é CLARA — 48.7% EDHREC com trend 8.21
+significa que está se tornando STANDARD em Lorehold. É o "Dance with Calamity" do
+novo meta: todos terão em 2-3 meses. Na coleção desde o início. PRIORIDADE Ciclo #4.
+
+---
+
+### NOVIDADE 3: CARTAS SURPRESA (Não Analisadas Anteriormente)
+
+Cartas do deck que merecem reavaliação à luz das novas tendências:
+
+#### Deflecting Swat (36.9% EDHRC, trend +0.03)
+Estável. Carta defensiva com modo "fog" que protege tudo. 36.9% de overlap com o meta.
+Não é excepcional mas estável. Risco de corte: baixo.
+
+#### Jeska's Will (30.5% EDHRC, trend +0.38)
+**SUBINDO.** Game Changer em EDHREC list. Em Lorehold, Jeska's Will é EXTREMAMENTE poderosa
+— compra cartas = revela topo do deck para Lorehold. Com 30.5% e subindo, é um "sleeper"
+no deck. Maner. Mas é GC slot (mesmo que não oficialmente classificado como tal em Java-side).
+
+#### Valakut Awakening // Valakut Stoneforge (0% EDHRC, MDFC land)
+0% nos decks EDHREC. MDFC que compre 3 e descarta 2 (looting) com modo land.
+O looting é útil em Lorehold (topdeck manipulation), mas a carta é cara para o que faz.
+Corte de baixa prioridade.
+
+#### Rite of the Dragoncaller (23.3% EDHRC, trend -0.21)
+Lentamente criadora de tokens de dragão. 23.3% é razoável para um card de nicho,
+mas trend negativo indica que a comunidade prefere Storm-Hit/Goldspan.
+Manter por enquanto (é payoff de big spells + tokencreator).
+
+#### Taunt from the Rampart (35.3% EDHREC, trend +0.16)
+35.3% mantém o padrão + SUBINDO levemente. Mass goad é poderoso em Commander
+multiplayer (12 criaturas inimigas devem atacar). Staple silencioso. NÃO CORTAR.
+
+---
+
+### ANÁLISE DO MOTOR — Status Pós-Ciclo #2 (Sem Mudanças)
+
+```
+[Tesouro Ramp] -> [Big Spell Grátis] -> [Lorehold Copy] -> [Tesouro Payoff]
+     ✅ 3/3              ✅ Dance            ✅ Automático        ❌ STORM-KILN
+```
+
+**Sem mudanças:** O motor continua 3/4 completo. Storm-Kiln Artist (55.4% EDHREC, na coleção)
+É a peça faltante.
+
+**NOVO: Com Improvisation Capstone no deck (Ciclo #4), o motor se torna:**
+```
+[Tesouro Ramp] -> [Improvisation Capstone] -> [Lorehold Copy] -> [Storm-Kiln]
+                     Exila top 7               Cada spell vira 2x            Tesouros infinitos
+                     Conjure spells grátis     Incluindo Capstone            Payoff final
+```
+Isso fecha o loop completamente. Storm-Kiln + Improvisation Capstone + Lorehold =
+tesouro infinito a partir de 4 mana (Capstone custa 7, mas se copiado = efetivamente
+4 mana de tesouro).
+
+---
+
+### RECOMENDAÇÕES CICLO #3 (Defensivo — Atualizadas)
+
+**"Sem play T3" = ~16% é CRÍTICO. Ciclo #3 DEVE ser defensivo.**
+
+#### Opção A (Defensiva Pura — REDUZ CMC):
+
+| # | Sai | Entra | Δ CMC | Justificativa |
+|:-:|:----|:------|:-----:|:--------------|
+| 1 | Ancient Copper Dragon (0%, CMC 6) | **Storm-Kiln Artist** (55.4%, CMC 4) | **-2** | Completa o motor. Filler → Payoff. |
+| 2 | Desperate Ritual (0%, CMC 2) | **Boros Signet** (50.4%, CMC 2) | **0** | Ritual situacional → Ramp staple. |
+| 3 | Galadriel's Dismissal (0%, CMC 1) | **Artist's Talent** (20.9%, CMC 2) | **+1** | ⚠️ NÃO — Artist's está caindo |
+
+Opção A revisada:
+| 3 | Galadriel's Dismissal (0%, CMC 1) | **Mother of Runes** (34.5%, CMC 1) | **0** | Situacional → proteção utility. |
+
+**Δ CMC total: -2** ✅
+**Resultado esperado:** "Sem play T3" cai de ~16% para ~10-12%
+
+#### Opção B (Balanceada — Recomendada):
+
+| # | Sai | Entra | Δ CMC | Justificativa |
+|:-:|:----|:------|:-----:|:--------------|
+| 1 | Ancient Copper Dragon (0%, CMC 6) | **Storm-Kiln Artist** (55.4%, CMC 4) | **-2** | Completa o motor. Payoff core. |
+| 2 | Desperate Ritual (0%, CMC 2) | **Boros Signet** (50.4%, CMC 2) | **0** | Ramp staple. |
+| 3 | Valakut Awakening (0%, CMC 3) | **Chaos Warp** (38.9%, CMC 3) | **0** | MDFC lento → Removal flexível. |
+
+**Δ CMC total: 0** (neutro, mas sem aumento)
+**Resultado esperado:** Motor completo + melhor interação, "Sem play T3" estável em ~14%.
+
+#### ⚠️ Sobre a Opção C (Agressiva — NÃO recomendar):
+
+A Opção C troca CMC baixo por CMC alto (Improvisation Capstone). Com "sem play T3" em 16%,
+Isso FURAR o limite de segurança. **NÃO APLICAR antes de "sem play T3" < 12%.**
+
+---
+
+### PROJEÇÃO CICLO #4 (Quando "sem play T3" < 12%)
+
+| # | Sai | Entra | Justificativa |
+|:-:|:----|:------|:--------------|
+| 1 | Sunbird's Invocation (13.7%, CMC 6) | **Improvisation Capstone** (48.7%, CMC 7) | Big spell engine, trend 8.21 |
+| 2 | Artist's Talent (20.9%, CMC 2, trend -0.72) | **Mother of Runes** (34.5%, CMC 1) | Declining card → protection |
+| 3 | Rise of the Eldrazi (55.0%, CMC 12, trend -0.49) | **Soulfire Eruption** (42.7%, CMC 7) | Declining → Removal/big spell |
+
+---
+
+### EVOLUÇÃO AO LONGO DOS CICLOS (Atualizada)
+
+| Métrica | Baseline | Ciclo #1 | Ciclo #2 | Ciclo #3 proj (Op B) | Ciclo #4 proj |
+|:--------|:--------:|:--------:|:--------:|:--------------------:|:-------------:|
+| Lands | 34 | 35 | 35 | 35 | 35 |
+| Ramp | 16 | 16 | 16 | 16 | 16 |
+| Draw (DB) | 5 | 5 | 5 | 5 | 5 |
+| Draw (real) | 4 | 4-5 | 5 | 5-6 | 6-7 |
+| Proteção | 7 | 4 | 4 | 4 | 5 |
+| Board Wipe | 6 | 4 | 4 | 4 | 4 |
+| CMC médio | ~3.55 | ~3.85 | ~3.85 | ~3.75 | ~3.95 |
+| "Sem play T3" | 3.3% | 12.4% | 15.8% | ~14% | ~12% |
+| Motor completo | 1/4 | 1/4 | 3/4 | **4/4** | 4/4++ |
+| Cartas >=50% | ~15 | ~21 | ~23 | ~25 | ~27 |
+
+---
+
+### RESUMO DO ESTADO DO DECK (Execução #10)
+
+| Aspecto | Status | Δ vs Exec #9 |
+|:--------|:--------|:-------------:|
+| Ciclo #1 | Aplicado (3 swaps) | — |
+| Ciclo #2 | Aplicado (3 swaps) | — |
+| Ciclo #3 | RECOMENDADO — aguarda Evolution Oracle | — |
+| Cartas >=50% EDHREC | 23/64 non-land (34.8%) | — estável |
+| Cartas 0% EDHREC | 7/64 non-land (10.9%) | — estável |
+| "Sem play T3" | ~16% (CRÍTICO) | +0.7pp (piorou) |
+| Motor Lorehold | 3/4 (falta Storm-Kiln) | — estável |
+| Overlap meta | ~59% | — estável |
+| Artist's Talent | 20.9%, trend -0.72 | ⚠️ DECLÍNIO severo |
+| Double-null count | 9 | — estável |
+
+---
+
+### LIÇÕES DESTA EXECUÇÃO
+
+1. **Restoration Seminar (trend 9.14) é a carta SUBINDO MAIS RÁPIDO de Lorehold.** Com 37.2% EDHREC
+   e crescimento explosivo, será 50%+ em semanas. CMC 7 a classifica como Fase 2.
+   Na coleção. Reservar para Ciclo #4.
+
+2. **Artist's Talent (trend -0.72) é o declínio mais severo do deck.** A comunidade está
+   abandonando este card de draw condicional. Com 20.9% e queda acelerada, é o melhor
+   candidato a corte no Ciclo #4 — o draw dele é fraco comparado a Sensei's Top + Scroll Rack
+   que o deck já tem.
+
+3. **"Sem play T3" piorou de 15.8% para 16.5% (Exec #4 → Exec #5).** O deck está no limite.
+   O Ciclo #3 NÃO PODE esperar. Cada ciclo sem ação defensiva arrisca o deck ficar
+   inconsistente demais para B3.
+
+4. **Improvisation Capstone (48.7%, trend 8.21) está se tornado STANDARD.** Não é "carta nova"
+   mais — é carta JOGADA que a comunidade ADOTOU. Na coleção desde o início.
+   A resistência a colocá-la (por CMC 7) é compreensível com "sem play T3" em 16%,
+   mas será inevitável no Ciclo #4.
+
+5. **O EDHREC de 7.651 decks AGORA INCLUI The One Ring a 8.4%.** Isso confirma que
+   TOR em Lorehold é quase exclusivamente jogado em brackets 4-5 (onde GC não conta).
+   Para B3, manter TOR é decision-aware: draw slots são mais valiosos que GC slots.
+
+6. **A ilha Artifact (Goblin Engineer, Oswald, Pear+Rub Medallions) É MORTA.**
+   5 cartas focadas em artifact sem payoff. Storm-Kiln Artist seria o ÚNICO payoff
+   para essa ilha. Sem Storm, essas cartas são apenas deletáveis.
+
+7. **O padrão "swap agressivo → defensivo" está FUNCIONANDO MAS COM ATRASO.**
+   O Ciclo #2 foi agressivo (adicionou Dance + TOR). O Ciclo #3 precisa ser defensivo
+   COM URGÊNCIA porque "sem play T3" ultrapassou o limite de 15%.
+
+---
+
+### PRÓXIMOS PASSOS
+
+1. **URGENTE — Evolution Oracle (Ciclo #3):** Aplicar Opção B (Balanceada) — foco em completar motor + remoção flexível
+2. **Mulligan Analyst:** Re-simular 1000 mãos após Ciclo #3 para verificar se "sem play T3" caiu
+3. **Scout de acompanhamento:** Verificar se Ciclo #3 foi aplicado + monitorar trend de Seminar
+4. **Ciclo #4:** Improvisation Capstone (48.7%, trend 8.21) + Restoration Seminar (37.2%, trend 9.14) — DEPOIS de "sem play T3" < 12%
+5. **Ciclo #4 (removal):** Cortar Artist's Talent (declínio -0.72), Rise of Ederazi (declínio -0.49), ou Season of the Bold (9.9%)
+
+---
+
+**Dados brutos:** `/tmp/edhrec_lorehold.html` (654KB, 277 cardview entries, EDHREC Live 7.651 decks)
+
 ## [2026-05-28T06:30:00+00:00] Execução #9 — Deep Meta Scout Pós-Ciclo #2
 
 ### Contexto
