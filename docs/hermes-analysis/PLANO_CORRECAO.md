@@ -12,7 +12,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
 5. **P1 — Incoerencia de ownership em rotas deck/AI**: `POST /ai/optimize` e algumas rotas experimentais aceitam `deck_id` autenticado sem escopar a leitura por `user_id`, apesar de o app tratar decks como recursos privados do usuario.
-6. **P1 — Semantica de cartas fragmentada**: deck analysis, candidate quality e optimize ainda nao compartilham uma fonte unica de roles/tags; `semantic_tags_v2` e preferido no optimize, mas nao vira fonte primaria de contagem no analysis, e fallbacks de optimize/complete ainda ranqueiam cartas por listas hardcoded.
+6. **P1 — Politicas por nome ainda parcialmente inline**: a `master` ja corrigiu prioridade `functional_tags -> semantic_tags_v2 -> heuristic`, preservacao multi-role no optimize e documentacao operacional; ainda restam excecoes por nome em scoring/premium/high-power fora de uma policy versionada unica.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 
 ## Achados priorizados
@@ -66,72 +66,32 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   - testes existentes seguem verdes;
   - revisão de imports mostra dependência convergindo para helpers compartilhados.
 
-### P1 — Unificar a semantica de cartas entre analysis, candidate quality e optimize
+### P1 — Centralizar as politicas por nome restantes em policy versionada
 - **Evidência**:
-  - `summarizeFunctionalTagsForDeck` recebe `semantic_tags_v2`, mas a contagem
-    principal usa `card_function_tags` persistido ou cai para
-    `inferFunctionalCardTags`; as tags v2 persistidas nao viram fonte primaria
-    quando `functional_tags` esta vazio.
-  - `classifyOptimizationFunctionalRole` usa `semantic_tags_v2` primeiro, mas
-    colapsa cada carta para um unico papel; `buildOptimizationSemanticV2Diagnostics`
-    e o quality gate calculam delta/veto sobre esse papel unico.
-  - `evaluateOptimizationSemanticV2Enforcement` em modo `partial` bloqueia
-    perdas de `draw`, `removal`, `ramp` e `wipe`; `protection` fica
-    review-only, e `engine`, `payoff`, `enabler`, `wincon` e `combo_piece` nao
-    bloqueiam perda critica.
-  - `functional_card_tags.dart` e `candidate_quality_data_support.dart`
-    continuam inferindo tags/score por nomes especificos (`Sol Ring`,
-    `Thassa's Oracle`, `Isochron Scepter`, `Dramatic Reversal`, `Blood Artist`,
-    `Lightning Greaves`, etc.), enquanto o classificador de optimize depende de
-    v2 ou de `oracle_text`/`type_line`.
-- **Impacto**: o mesmo card pode ser explicado ao usuario como combo, engine,
-  payoff ou enabler e depois ser tratado no optimize como outro papel, ou perder
-  papel secundario importante sem veto. A utilidade fica parcialmente
-  name-based em vez de vir de texto oracle/tipo/custo ou dados semanticos
-  versionados.
+  - Revalidacao Copilot em `origin/master@00437690` confirmou PASS para:
+    prioridade `functional_tags_then_semantic_v2_then_heuristic`,
+    preservacao multi-role no optimize, testes semanticos focados e docs
+    operacionais.
+  - A mesma revalidacao ficou PARTIAL para politicas por nome: fallbacks
+    Commander foram centralizados em `commander_fallback_policy.dart`, mas ainda
+    existem scoring/listas como `premiumLandNames` em
+    `optimize_runtime_support.dart` e sets premium/high-power em
+    `candidate_quality_data_support.dart`.
+- **Impacto**: a maior parte do pipeline semantico ja converge, mas parte da
+  decisao de score/bracket/premium ainda depende de listas inline, dificultando
+  versao, auditoria e rollout controlado.
 - **Ação recomendada**:
-  1. definir uma representacao compartilhada de `Set<String>` de papeis por carta
-     e expor adaptadores para UI/quality gate quando um papel primario for
-     necessario;
-  2. fazer deck analysis consumir `semantic_tags_v2.tags` antes da heuristica v1
-     quando `functional_tags` persistido nao existir;
-  3. migrar excecoes por nome para `card_semantic_tags_v2`, `card_role_scores`
-     ou tabela de policy exceptions com `source`, `reason` e `bracket_scope`;
-  4. ampliar o veto parcial para perdas contextuais de `combo_piece`, `engine`,
-     `payoff`, `enabler` e `wincon`, ou documentar por que esses papeis sao
-     apenas diagnosticos.
-- **Validação**:
-  - fixture com carta multi-tag provando delta por todos os papeis, nao apenas o
-    papel primario;
-  - fixture com apenas `semantic_tags_v2` persistido e sem `functional_tags`
-    alterando `counts`, `samples` e `source.persisted_rows`;
-  - teste cruzado mostrando que os exemplos sentinela recebem papeis coerentes
-    em analysis, candidate quality, optimization validator e quality gate.
-
-### P1 — Tirar fallback de complete/optimize de listas hardcoded de nomes
-- **Evidência**:
-  - `loadUniversalCommanderFallbacks` usa lista fixa de fillers universais e
-    consulta `cards` com `WHERE name = ANY(@names)`.
-  - `loadArchetypeCommanderFoundationFillers` usa listas fixas por identidade,
-    arquetipo e tema e consulta `cards` por esses nomes.
-  - `_premiumCommanderFillerNames` aplica bonus grande em
-    `commanderFillerQualityScore`; `_weakCommanderFillerDenylist` exclui nomes
-    antes mesmo do score semantico.
-- **Impacto**: quando a busca por sinergia/meta falha, o produto passa a
-  escolher e ranquear cartas por politica embutida no codigo. Isso dificulta
-  auditoria, ajuste por bracket e rollout controlado.
-- **Ação recomendada**:
-  1. mover listas universais, premium e denylist para tabela/config versionada;
-  2. enriquecer cada entrada com role, bracket, motivo e fonte;
-  3. manter filtros de legalidade, identidade de cor, budget/bracket e
-     `semantic_tags_v2` antes do retorno;
-  4. criar teste de fallback sem depender de nomes especificos no codigo.
+  1. mover as excecoes restantes para modulo/config/tabela de policy versionada;
+  2. enriquecer cada entrada com role, bracket, motivo, fonte e data;
+  3. manter filtros de legalidade, identidade de cor, budget/bracket e dados
+     semanticos antes do retorno;
+  4. adicionar testes focados para a policy restante.
 - **Validação**:
   - `rg "Sol Ring|Command Tower|Thassa's Oracle|Isochron Scepter|Dramatic Reversal|Blood Artist" server/lib server/routes app/lib`
-    nao encontra decisao runtime fora de fixtures, docs, prompts ou tabela/config
-    gerenciada;
-  - tests de complete/optimize provam que fallback retorna roles necessarios a
-    partir de dados persistidos.
+    nao encontra decisao runtime fora de fixtures, docs, prompts ou policy
+    versionada;
+  - testes provam que score/bracket/premium vem da policy e continua respeitando
+    legalidade, identidade de cor e bracket.
 
 ### P1 — Restaurar a analisabilidade do backend local
 - **Evidência**:
@@ -230,10 +190,11 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 2. **Segundo**: destravar `dart analyze` do backend via `local_test_server.dart`.
 3. **Terceiro**: corrigir ownership/escopo de deck nas rotas app-facing e
    experimentais antes de ligar novos consumidores no app.
-4. **Quarto**: unificar a semantica de cartas entre analysis, candidate quality,
-   validator e quality gate antes de ampliar novas heuristicas.
-5. **Quinto**: tirar fallbacks de complete/optimize de listas hardcoded de nomes
-   ou documenta-los como politica versionada.
+4. **Quarto**: centralizar as politicas por nome restantes apos os ajustes ja
+   confirmados na `master` para semantic v2, multi-tags e docs operacionais.
+5. **Quinto**: manter `/decks/:id/recommendations` e `/ai/weakness-analysis`
+   como experimentais/not-proven ate consumirem a camada semantica compartilhada
+   ou terem contrato interno explicito.
 6. **Sexto**: atacar duplicações de maior risco no domínio de optimize/IA.
 7. **Setimo**: modularizar os arquivos gigantes do otimizador com testes de regressão.
 8. **Oitavo**: decidir destino das tabelas write-only/parciais
