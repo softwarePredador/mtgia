@@ -1,8 +1,190 @@
 # ManaLoom Code Structure Audit
-> Atualizacao: 2026-05-28 18:20 UTC
-> Rotacao local Codex: `fix-structure-auditor-import-resolution`
+> Atualizacao: 2026-05-28 19:00 UTC
+> Rotacao local Codex: `duplicated-or-similar-logic`
 
-## Rodada focada: Correcao do auditor estrutural
+## Rodada focada: Duplicated or similar logic
+
+Escopo desta rodada: somente logica duplicada ou similar. Nao foi executada
+auditoria ampla de classes sem uso, funcoes nao chamadas, imports/ciclos,
+tabelas PostgreSQL ou coerencia geral entre camadas.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: branch remota sincronizada.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativo.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: limpo no inicio da rodada.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local depois da correcao do root/path resolver.
+
+Resultado:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 174.
+- Imports quebrados: 0.
+
+Limitacao atual: para duplicacao, o auditor ainda usa colisao de nomes de
+funcoes como sinal bruto. A lista inclui falsos positivos esperados (`toString`,
+`print`, callbacks chamados `Function`, wrappers finos de rota e helpers locais
+sem semantica compartilhada). Os achados abaixo foram mantidos apenas quando a
+leitura direta confirmou mesma intencao de dominio ou corpo equivalente.
+
+### Achados confirmados
+
+#### P1 — Heuristicas semanticas de combo/engine/payoff/enabler/wincon seguem divergindo em dois classificadores
+
+- **Simbolos:** `_looksLikeWincon`, `_looksLikeComboPiece`,
+  `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`.
+- **Evidencia 1:** `server/lib/ai/functional_card_tags.dart:319`-`:335`
+  chama os helpers para tags v1; as definicoes em
+  `server/lib/ai/functional_card_tags.dart:859`-`:906` usam `oracle` +
+  `normalizedName` e incluem sentinelas por nome como `thassa's oracle`,
+  `isochron scepter`, `dramatic reversal`, `blood artist`, `greaves` e
+  `boots`.
+- **Evidencia 2:** `server/lib/ai/optimization_functional_roles.dart:113`-`:117`
+  chama helpers com os mesmos nomes para `classifyOptimizationFunctionalRole`;
+  as definicoes em `server/lib/ai/optimization_functional_roles.dart:370`-`:397`
+  usam apenas `oracle` e padroes diferentes.
+- **Por que parece duplicado/similar:** ambos classificam os mesmos papeis
+  semanticos de alto nivel, mas mantem heuristicas independentes.
+- **Risco:** a analise funcional pode explicar uma carta como `combo_piece`,
+  `engine`, `payoff`, `enabler` ou `wincon`, enquanto o pipeline de optimize
+  atribui outro papel para a mesma carta.
+- **O que valida:** extrair uma fonte compartilhada de sinais semanticos ou
+  adicionar testes cruzados para cartas sentinela.
+- **O que falsifica:** contrato/testes demonstrando que os classificadores
+  divergem por design e que essa divergencia e esperada nos fluxos de analise e
+  optimize.
+
+#### P2 — `getMainType` e `calculateCmc` duplicam estatisticas de deck privado e publico
+
+- **Simbolos:** `getMainType`, `calculateCmc`.
+- **Evidencia 1:** `server/routes/decks/[id]/index.dart:405`-`:435` define
+  `getMainType` e `calculateCmc` na rota privada; os helpers alimentam
+  `groupedMainBoard` e `manaCurve` em `server/routes/decks/[id]/index.dart:452`
+  e `:464`.
+- **Evidencia 2:** `server/routes/community/decks/[id].dart:91`-`:117` define
+  os mesmos helpers na rota publica; o uso equivalente aparece em
+  `server/routes/community/decks/[id].dart:133` e `:141`.
+- **Por que parece duplicado/similar:** as duas rotas constroem tipo principal,
+  curva de mana e distribuicao de cores a partir de `cardsList` com regras quase
+  iguais.
+- **Risco:** um ajuste de regra de CMC/tipo pode chegar a uma rota e nao a outra,
+  fazendo o mesmo deck exibir estatisticas diferentes para dono e comunidade.
+- **O que valida:** helper compartilhado de estatisticas de deck, com fixture
+  comum para resposta privada e publica.
+- **O que falsifica:** testes de contrato provando que as respostas devem
+  divergir e que ambas as implementacoes locais estao travadas por fixtures.
+
+#### P2 — `_isBasicLandName` ainda tem variantes de normalizacao no backend
+
+- **Simbolo:** `_isBasicLandName` / `isBasicLandName`.
+- **Evidencia 1:** `server/lib/ai/optimize_runtime_support.dart:285` expoe
+  `isBasicLandName`; a regra privada em
+  `server/lib/ai/optimize_runtime_support.dart:4184`-`:4197` aceita nomes
+  exatos e snow lands com hifen.
+- **Evidencia 2:** `server/lib/generated_deck_validation_service.dart:752`-`:763`
+  aceita snow lands por `startsWith('snow-covered ...')`.
+- **Evidencia 3:** `server/lib/meta/meta_deck_reference_support.dart:890`-`:903`
+  aceita snow lands com espaco (`snow covered plains`), sem hifen.
+- **Evidencia 4:** `server/routes/ai/commander-reference/index.dart:621`-`:628`
+  reconhece apenas as seis basics nao snow.
+- **Por que parece duplicado/similar:** todos os trechos respondem a mesma
+  pergunta de dominio ("este nome e terreno basico?"), mas normalizam casos
+  diferentes.
+- **Risco:** validacao, optimize, referencia de meta e commander-reference podem
+  discordar sobre snow lands ou nomes normalizados.
+- **O que valida:** centralizar a regra em utilitario de dominio e adicionar
+  testes para `Wastes`, snow lands com hifen e variantes normalizadas.
+- **O que falsifica:** testes por contexto mostrando que cada variante e
+  exigida por contrato diferente.
+
+#### P2 — Boilerplate de `request_id` e `invalid_payload` segue repetido em rotas sociais
+
+- **Simbolos:** `_requestId`, `_logInvalidPayload`.
+- **Evidencia:** `_requestId` tem corpo equivalente em
+  `server/routes/trades/index.dart:330`-`:336`,
+  `server/routes/trades/[id]/messages.dart:228`-`:234`,
+  `server/routes/conversations/[id]/messages.dart:247`-`:253`,
+  `server/routes/trades/[id]/respond.dart:154`-`:160`,
+  `server/routes/trades/[id]/status.dart:260`-`:266` e
+  `server/routes/users/[id]/follow/index.dart:97`-`:103`.
+- **Evidencia adicional:** `_logInvalidPayload` repete leitura tolerante de
+  usuario, prefixo `[social_write] invalid_payload`, `request_id` e ids de
+  recurso em `server/routes/trades/index.dart:338`-`:352`,
+  `server/routes/trades/[id]/messages.dart:236`-`:252`,
+  `server/routes/conversations/[id]/messages.dart:255`-`:271`,
+  `server/routes/trades/[id]/respond.dart:162`-`:178` e
+  `server/routes/trades/[id]/status.dart:268`-`:284`.
+- **Por que parece duplicado/similar:** a responsabilidade e identica, variando
+  apenas endpoint e campo extra.
+- **Risco:** formato de log, fallback de `x-request-id` ou sanitizacao de usuario
+  podem divergir entre trades/conversas/follow.
+- **O que valida:** helper compartilhado de social write logging aceitando
+  endpoint e campos extras.
+- **O que falsifica:** decisao explicita de manter logs por rota, com teste que
+  preserve formato equivalente.
+
+#### P2 — SQL de trust em trades e duplicado entre lista e detalhe
+
+- **Simbolos:** `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql`,
+  `_buildTrustInsight`.
+- **Evidencia 1:** `server/routes/trades/index.dart:557`-`:601` define os tres
+  SQL snippets para estatisticas, tempo de resposta e tempo de envio usados na
+  listagem de trades.
+- **Evidencia 2:** `server/routes/trades/[id]/index.dart:260`-`:304` define os
+  mesmos tres snippets para o detalhe de trade.
+- **Por que parece duplicado/similar:** listagem e detalhe calculam exatamente o
+  mesmo bloco de trust para sender/receiver via `LEFT JOIN LATERAL`.
+- **Risco:** alteracoes futuras em trust score, status considerados ou janela de
+  tempo podem ser aplicadas em uma rota e esquecidas na outra.
+- **O que valida:** mover snippets e builder de trust para helper compartilhado
+  de trades, com teste para list/detail.
+- **O que falsifica:** diferenca intencional documentada entre trust de lista e
+  trust de detalhe.
+
+#### P3 — Normalizacao de `condition` de carta esta duplicada nas mutacoes de deck
+
+- **Simbolo:** `_validateCondition`.
+- **Evidencia 1:** `server/routes/decks/[id]/cards/index.dart:397`-`:403`
+  normaliza `condition` para `NM`, `LP`, `MP`, `HP` ou `DMG`, com fallback
+  `NM`.
+- **Evidencia 2:** `server/routes/decks/[id]/cards/set/index.dart:243`-`:248`
+  repete a mesma regra para ajuste de quantidade/condicao.
+- **Por que parece duplicado/similar:** ambas as mutacoes de deck aceitam o
+  mesmo campo app-facing e aplicam a mesma allow-list.
+- **Risco:** se a lista de condicoes mudar ou ganhar mapeamento mais rico, uma
+  rota pode aceitar valores que a outra normaliza para `NM`.
+- **O que valida:** extrair `normalizeCardCondition` compartilhado e testar as
+  duas rotas ou o helper.
+- **O que falsifica:** contrato documentado dizendo que as rotas podem normalizar
+  condicao de formas diferentes.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- A duplicacao direta entre `server/routes/ai/optimize/index.dart` e
+  `server/lib/ai/optimize_runtime_support.dart` para
+  `matchesFunctionalNeed`, `scoreOptimizeReplacementCandidate`,
+  `shouldRetryOptimizeWithAiFallback`,
+  `computeOptimizeStructuralRecoverySwapTarget` e
+  `isOptimizeStructuralRecoveryScenario` segue descartada: a rota possui
+  wrappers finos que delegam para `optimize_support` em
+  `server/routes/ai/optimize/index.dart:56`-`:132`.
+- `resolveOptimizeArchetype` ainda e similar, mas o duplicado real fica entre
+  `server/lib/ai/optimize_runtime_support.dart:3369`-`:3389` e
+  `server/lib/ai/deck_state_analysis.dart:573`-`:584`; o wrapper da rota apenas
+  delega.
+- Colisoes do auditor como `toString`, `print`, `Function`, `add`, `set` e
+  `_toInt` nao foram promovidas a achados sem prova de mesma regra de dominio.
+
+## Rodada focada anterior: Correcao do auditor estrutural
 
 Escopo desta rodada: corrigir o proprio `structure_auditor.py` antes de usar a
 contagem de imports quebrados como evidência de produto.

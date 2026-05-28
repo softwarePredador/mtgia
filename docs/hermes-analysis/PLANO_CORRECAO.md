@@ -70,6 +70,10 @@ Histórico do problema:
   - `_isBasicLandName` aparece em quatro locais diferentes, com variantes para snow lands: `optimize_runtime_support.dart`, `generated_deck_validation_service.dart`, `meta_deck_reference_support.dart` e `routes/ai/commander-reference/index.dart`.
   - `_requestId` e `_logInvalidPayload` repetem-se em várias rotas de trades/conversations.
   - `calculateCmc` e `getMainType` duplicados em duas rotas de decks/community.
+  - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e `_buildTrustInsight`
+    duplicam o mesmo trust de trades entre listagem e detalhe.
+  - `_validateCondition` duplica a allow-list `NM/LP/MP/HP/DMG` em duas rotas
+    de mutacao de cartas do deck.
 - **Impacto**: mudança semântica em um ponto não propaga automaticamente para os demais; risco de respostas inconsistentes por endpoint/fluxo.
 - **Ação recomendada**:
   1. agrupar duplicações por domínio (IA semântica, utilitários HTTP, utilitários de deck);
