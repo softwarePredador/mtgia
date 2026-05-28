@@ -1,18 +1,12 @@
 #!/usr/bin/env python3
 """Importa card_deck_profiles dos arquivos de análise de deck para o PostgreSQL."""
-import os, re, subprocess
+import os, re, sys
 
-DB = {'host': '143.198.230.247', 'port': '5433', 'dbname': 'halder',
-      'user': 'postgres', 'password': 'c2abeef5e66f21b0ce86'}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from db_helper import run_sql, DB_PARAMS
 
-def run_sql(sql):
-    env = os.environ.copy(); env['PGPASSWORD'] = DB['password']
-    cmd = ['psql', '-h', DB['host'], '-p', DB['port'], '-U', DB['user'],
-           '-d', DB['dbname'], '-t', '-A', '-c', sql]
-    r = subprocess.run(cmd, capture_output=True, text=True, env=env)
-    if r.returncode != 0:
-        print(f"  ERR: {r.stderr.strip()[:100]}")
-    return r.stdout.strip()
+DB = {'host': DB_PARAMS['host'], 'port': DB_PARAMS['port'], 'dbname': DB_PARAMS['dbname'],
+      'user': DB_PARAMS['user'], 'password': DB_PARAMS['password']}
 
 def esc(s):
     return s.replace("'", "''") if s else ''

@@ -8,29 +8,17 @@ import re
 import json
 import hashlib
 import os
-import subprocess
+import sys
 
-DB_PARAMS = {
-    'host': '143.198.230.247',
-    'port': '5433',
-    'dbname': 'halder',
-    'user': 'postgres',
-    'password': 'c2abeef5e66f21b0ce86'
-}
+# Ensure we can import from the scripts directory
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from db_helper import run_sql, DB_PARAMS
 
-def run_sql(sql):
-    """Executa SQL via psql"""
-    env = os.environ.copy()
-    env['PGPASSWORD'] = DB_PARAMS['password']
-    cmd = [
-        'psql', '-h', DB_PARAMS['host'], '-p', DB_PARAMS['port'],
-        '-U', DB_PARAMS['user'], '-d', DB_PARAMS['dbname'],
-        '-t', '-A', '-c', sql
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
-    if result.returncode != 0 and 'already exists' not in result.stderr and 'duplicate' not in result.stderr:
-        print(f"  SQL ERR: {result.stderr.strip()[:200]}")
-    return result.stdout.strip()
+DB_PARAMS['host'] = '143.198.230.247'
+DB_PARAMS['port'] = '5433'
+DB_PARAMS['dbname'] = 'halder'
+DB_PARAMS['user'] = 'postgres'
+DB_PARAMS['password'] = 'c2abeef5e66f21b0ce86'
 
 def parse_markdown_table(table_text):
     """Parse uma tabela markdown e retorna lista de dicts"""
@@ -170,7 +158,7 @@ def import_themes_to_db(rules):
             updated_at = now()
         """
         result = run_sql(sql)
-        if result and ('INSERT' in result or 'UPDATE' in result or result.isdigit()):
+        if result and ('INSERT' in result or 'UPDATE' in result or (result.isdigit() and int(result) >= 0)):
             inserted += 1
             print(f"  ✅ {theme}/{func}: {rule['min']}-{rule['max']}")
     
@@ -271,7 +259,7 @@ def main():
     for table in ['theme_contextual_rules', 'card_deck_profiles', 'analysis_sources', 'commander_reference_profiles']:
         result = run_sql(f"SELECT COUNT(*) FROM {table}")
         print(f"  {table}: {result}")
-    
+
     # Quantos profiles tem JSON nao-vazio
     result = run_sql("SELECT COUNT(*) FROM commander_reference_profiles WHERE profile_json IS NOT NULL AND profile_json != '{}'")
     print(f"  commander_reference_profiles (preenchidos): {result}")
