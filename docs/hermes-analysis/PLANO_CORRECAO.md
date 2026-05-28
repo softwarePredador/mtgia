@@ -200,15 +200,15 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 2. **Segundo**: manter `/decks/:id/recommendations` e `/ai/weakness-analysis`
    como experimentais/not-proven ate consumirem a camada semantica compartilhada
    ou terem contrato interno explicito.
-3. **Terceiro**: adicionar teste de rota para
-   `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` retornar
-   `OPTIMIZE_SEMANTIC_V2_REJECTED` antes de qualquer feature flag fora de
-   ambiente controlado.
-4. **Quarto**: atacar duplicações de maior risco no domínio de optimize/IA.
-5. **Quinto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
-6. **Sexto**: decidir destino das tabelas write-only/parciais
+3. **Terceiro**: atacar duplicações de maior risco no domínio de optimize/IA.
+4. **Quarto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
+5. **Quinto**: decidir destino das tabelas write-only/parciais
    (`deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback` e raws do
    Commander Reference Corpus) antes de expandir novas persistencias analiticas.
+
+Resolvido em `origin/master@32418bc6`: teste de contrato de rota para
+`SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` /
+`OPTIMIZE_SEMANTIC_V2_REJECTED`.
 
 ## Itens explicitamente não confirmados como bug real nesta rodada
 

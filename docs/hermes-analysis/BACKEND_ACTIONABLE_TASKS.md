@@ -7,6 +7,11 @@
 > guards owner-scoped de `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` com
 > `user_id = NULL`, e `POST /ai/archetypes`. Backlog ativo remanescente neste
 > arquivo: BE.2, BE.5, BE.6 e BE.7.
+>
+> Atualizacao Copilot em 2026-05-28: `origin/master@32418bc6` resolveu BE.2 com
+> `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart` e o
+> builder de contrato `buildSemanticV2OptimizeRejectedBody(...)`. Backlog ativo:
+> BE.5, BE.6 e BE.7.
 
 ## P1 — Alto
 
@@ -22,6 +27,12 @@
 - **Prioridade:** P1.
 
 ### BE.2 — Semantic Layer v2 `partial` tem helper testado, mas falta teste de rota `OPTIMIZE_SEMANTIC_V2_REJECTED`
+- **Status em `origin/master@32418bc6`: RESOLVIDO.** O contrato de payload da
+  rota agora é testado por
+  `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart`,
+  cobrindo `OPTIMIZE_SEMANTIC_V2_REJECTED`,
+  `blocked_by_semantic_v2=true`, roles criticas/review e
+  `optimize_diagnostics.semantic_layer_v2.enforcement_mode=partial`.
 - **Evidencia:** A rota le `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT` (`server/routes/ai/optimize/index.dart` linhas 435-439), avalia `evaluateOptimizationSemanticV2Enforcement` (`linhas 2509-2518`) e retorna 422 com `quality_error.code == OPTIMIZE_SEMANTIC_V2_REJECTED`, `blocked_by_semantic_v2` e diagnosticos (`linhas 2531-2556`). `server/test/optimization_validator_test.dart` cobre helpers: default disabled nao bloqueia (`linhas 146-174`) e partial bloqueia perdas criticas (`linhas 177-189`). Busca em `server/test` por `OPTIMIZE_SEMANTIC_V2_REJECTED|SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT|blocked_by_semantic_v2` encontrou apenas asserts helper-level em `optimization_validator_test.dart`.
 - **Impacto de produto:** Antes de ativar `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial`, nao ha prova de que o endpoint real retorna payload/diagnosticos corretos, nem de que a integracao sync/async preserva o contrato.
 - **Risco:** Regressao so aparecer depois de habilitar enforcement parcial, especialmente em shape de resposta, telemetria e classificacao de quality error.
