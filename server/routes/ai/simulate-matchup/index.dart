@@ -25,6 +25,7 @@ Future<Response> onRequest(RequestContext context) async {
     final myDeckId = body['my_deck_id'] as String?;
     final opponentDeckId = body['opponent_deck_id'] as String?;
     final simulationCount = body['simulations'] as int? ?? 50;
+    final userId = context.read<String>();
 
     if (myDeckId == null || opponentDeckId == null) {
       return badRequest('my_deck_id and opponent_deck_id are required');
@@ -34,8 +35,17 @@ Future<Response> onRequest(RequestContext context) async {
     final countersService = ArchetypeCountersService(pool);
 
     // 1. Buscar dados de ambos os decks
-    final myDeckData = await _getDeckData(pool, myDeckId);
-    final opponentDeckData = await _getDeckData(pool, opponentDeckId);
+    final myDeckData = await _getDeckData(
+      pool,
+      myDeckId,
+      userId: userId,
+    );
+    final opponentDeckData = await _getDeckData(
+      pool,
+      opponentDeckId,
+      userId: userId,
+      allowPublicDeck: true,
+    );
 
     if (myDeckData == null) {
       return notFound('Your deck not found');
@@ -73,11 +83,28 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 /// Busca dados completos de um deck
-Future<Map<String, dynamic>?> _getDeckData(Pool pool, String deckId) async {
+Future<Map<String, dynamic>?> _getDeckData(
+  Pool pool,
+  String deckId, {
+  required String userId,
+  bool allowPublicDeck = false,
+}) async {
   try {
     final deckResult = await pool.execute(
-      Sql.named('SELECT id, name, format FROM decks WHERE id = @id'),
-      parameters: {'id': deckId},
+      Sql.named('''
+        SELECT id, name, format
+        FROM decks
+        WHERE id = CAST(@id AS uuid)
+          AND (
+            user_id = CAST(@user_id AS uuid)
+            OR (CAST(@allow_public AS boolean) AND is_public = true)
+          )
+      '''),
+      parameters: {
+        'id': deckId,
+        'user_id': userId,
+        'allow_public': allowPublicDeck,
+      },
     );
 
     if (deckResult.isEmpty) return null;

@@ -4,10 +4,10 @@ import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
 
 /// Endpoint para análise de fraquezas do deck
-/// 
+///
 /// POST /ai/weakness-analysis
 /// Body: { "deck_id": "uuid" }
-/// 
+///
 /// Retorna lista de fraquezas identificadas com recomendações
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -17,6 +17,7 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     final body = await context.request.json() as Map<String, dynamic>;
     final deckId = body['deck_id'] as String?;
+    final userId = context.read<String>();
 
     if (deckId == null) {
       return badRequest('deck_id is required');
@@ -27,8 +28,13 @@ Future<Response> onRequest(RequestContext context) async {
 
     // 1. Buscar informações do deck
     final deckResult = await pool.execute(
-      Sql.named('SELECT name, format FROM decks WHERE id = @id'),
-      parameters: {'id': deckId},
+      Sql.named('''
+        SELECT name, format
+        FROM decks
+        WHERE id = CAST(@id AS uuid)
+          AND user_id = CAST(@user_id AS uuid)
+      '''),
+      parameters: {'id': deckId, 'user_id': userId},
     );
 
     if (deckResult.isEmpty) {
@@ -62,7 +68,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final cards = <Map<String, dynamic>>[];
     final deckColors = <String>{};
-    
+
     int totalCards = 0;
     int landCount = 0;
     int creatureCount = 0;
@@ -112,46 +118,68 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       // Detectar ramp (expanded: mana dorks, treasure, mana rocks, land ramp)
-      if (oracleText.contains('add {') || 
-          (oracleText.contains('search your library for a') && oracleText.contains('land')) ||
+      if (oracleText.contains('add {') ||
+          (oracleText.contains('search your library for a') &&
+              oracleText.contains('land')) ||
           oracleText.contains('put a land card') ||
           oracleText.contains('create a treasure') ||
           oracleText.contains('create treasure') ||
-          (typeLineLower.contains('creature') && oracleText.contains('add') && oracleText.contains('mana')) ||
-          (typeLineLower.contains('artifact') && !typeLineLower.contains('creature') && oracleText.contains('add {') && cmc <= 3)) {
+          (typeLineLower.contains('creature') &&
+              oracleText.contains('add') &&
+              oracleText.contains('mana')) ||
+          (typeLineLower.contains('artifact') &&
+              !typeLineLower.contains('creature') &&
+              oracleText.contains('add {') &&
+              cmc <= 3)) {
         rampCount += quantity;
       }
 
       // Detectar card draw (expanded: "look at the top", impulse draw, "reveal...put into hand")
       if ((oracleText.contains('draw') && oracleText.contains('card')) ||
-          (oracleText.contains('look at the top') && oracleText.contains('put') && oracleText.contains('hand')) ||
-          (oracleText.contains('exile') && oracleText.contains('may play') && !oracleText.contains('target')) ||
-          (oracleText.contains('exile') && oracleText.contains('may cast') && !oracleText.contains('target')) ||
-          (oracleText.contains('reveal') && oracleText.contains('put') && oracleText.contains('into your hand'))) {
+          (oracleText.contains('look at the top') &&
+              oracleText.contains('put') &&
+              oracleText.contains('hand')) ||
+          (oracleText.contains('exile') &&
+              oracleText.contains('may play') &&
+              !oracleText.contains('target')) ||
+          (oracleText.contains('exile') &&
+              oracleText.contains('may cast') &&
+              !oracleText.contains('target')) ||
+          (oracleText.contains('reveal') &&
+              oracleText.contains('put') &&
+              oracleText.contains('into your hand'))) {
         drawCount += quantity;
       }
 
       // Detectar removal (expanded: -X/-X, sacrifice, bounce, counter)
-      if (oracleText.contains('destroy target') || 
+      if (oracleText.contains('destroy target') ||
           oracleText.contains('exile target') ||
-          (oracleText.contains('deal') && oracleText.contains('damage to target')) ||
-          (oracleText.contains('target') && oracleText.contains('gets -') && oracleText.contains('/-')) ||
+          (oracleText.contains('deal') &&
+              oracleText.contains('damage to target')) ||
+          (oracleText.contains('target') &&
+              oracleText.contains('gets -') &&
+              oracleText.contains('/-')) ||
           oracleText.contains('counter target spell') ||
-          (oracleText.contains('target') && oracleText.contains('owner\'s hand') && typeLineLower.contains('instant'))) {
+          (oracleText.contains('target') &&
+              oracleText.contains('owner\'s hand') &&
+              typeLineLower.contains('instant'))) {
         removalCount += quantity;
       }
 
       // Detectar board wipes (expanded: "all creatures get -X/-X", "each creature", "return all")
-      if (oracleText.contains('destroy all') || 
+      if (oracleText.contains('destroy all') ||
           oracleText.contains('exile all') ||
-          (oracleText.contains('all creatures get -') && oracleText.contains('/-')) ||
-          (oracleText.contains('each creature') && oracleText.contains('damage')) ||
-          (oracleText.contains('return all') && oracleText.contains('to their owner'))) {
+          (oracleText.contains('all creatures get -') &&
+              oracleText.contains('/-')) ||
+          (oracleText.contains('each creature') &&
+              oracleText.contains('damage')) ||
+          (oracleText.contains('return all') &&
+              oracleText.contains('to their owner'))) {
         boardWipeCount += quantity;
       }
 
       // Detectar proteção
-      if (oracleText.contains('hexproof') || 
+      if (oracleText.contains('hexproof') ||
           oracleText.contains('indestructible') ||
           oracleText.contains('protection from') ||
           oracleText.contains('shroud') ||
@@ -163,14 +191,15 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       // Detectar interação com cemitério
-      if (oracleText.contains('graveyard') || 
+      if (oracleText.contains('graveyard') ||
           (oracleText.contains('return') && oracleText.contains('from'))) {
         graveyardInteractionCount += quantity;
       }
     }
 
     // 3. Detectar arquétipo do deck
-    final archetypeAnalysis = await countersService.detectDeckArchetype(cards: cards);
+    final archetypeAnalysis =
+        await countersService.detectDeckArchetype(cards: cards);
     final detectedArchetype = archetypeAnalysis['archetype'] as String;
 
     // 4. Calcular métricas
@@ -186,8 +215,12 @@ Future<Response> onRequest(RequestContext context) async {
         weaknesses.add({
           'type': 'low_land_count',
           'severity': 'high',
-          'description': 'Deck tem apenas $landCount terrenos. Commander decks geralmente precisam de 35-38.',
-          'recommendations': ['Adicionar ${35 - landCount} terrenos', 'Considerar terrenos que produzem múltiplas cores'],
+          'description':
+              'Deck tem apenas $landCount terrenos. Commander decks geralmente precisam de 35-38.',
+          'recommendations': [
+            'Adicionar ${35 - landCount} terrenos',
+            'Considerar terrenos que produzem múltiplas cores'
+          ],
           'current_value': landCount,
           'recommended_value': 36,
         });
@@ -195,8 +228,11 @@ Future<Response> onRequest(RequestContext context) async {
         weaknesses.add({
           'type': 'high_land_count',
           'severity': 'low',
-          'description': 'Deck tem $landCount terrenos. Pode ser excessivo para alguns arquétipos.',
-          'recommendations': ['Considerar reduzir terrenos se tiver muito ramp'],
+          'description':
+              'Deck tem $landCount terrenos. Pode ser excessivo para alguns arquétipos.',
+          'recommendations': [
+            'Considerar reduzir terrenos se tiver muito ramp'
+          ],
           'current_value': landCount,
           'recommended_value': 37,
         });
@@ -208,8 +244,15 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'insufficient_ramp',
         'severity': rampCount < 5 ? 'critical' : 'high',
-        'description': 'Deck tem apenas $rampCount fontes de ramp. Recomendado: 10-12.',
-        'recommendations': ['Sol Ring', 'Arcane Signet', 'Signets/Talismans das suas cores', 'Cultivate', 'Kodama\'s Reach'],
+        'description':
+            'Deck tem apenas $rampCount fontes de ramp. Recomendado: 10-12.',
+        'recommendations': [
+          'Sol Ring',
+          'Arcane Signet',
+          'Signets/Talismans das suas cores',
+          'Cultivate',
+          'Kodama\'s Reach'
+        ],
         'current_value': rampCount,
         'recommended_value': 10,
       });
@@ -220,8 +263,14 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'insufficient_card_draw',
         'severity': drawCount < 4 ? 'critical' : 'high',
-        'description': 'Deck tem apenas $drawCount fontes de draw. Recomendado: 10+.',
-        'recommendations': ['Rhystic Study', 'Mystic Remora', 'Beast Whisperer', 'Phyrexian Arena'],
+        'description':
+            'Deck tem apenas $drawCount fontes de draw. Recomendado: 10+.',
+        'recommendations': [
+          'Rhystic Study',
+          'Mystic Remora',
+          'Beast Whisperer',
+          'Phyrexian Arena'
+        ],
         'current_value': drawCount,
         'recommended_value': 10,
       });
@@ -232,8 +281,14 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'insufficient_removal',
         'severity': removalCount < 3 ? 'critical' : 'medium',
-        'description': 'Deck tem apenas $removalCount remoções pontuais. Recomendado: 8-10.',
-        'recommendations': ['Swords to Plowshares', 'Path to Exile', 'Beast Within', 'Generous Gift'],
+        'description':
+            'Deck tem apenas $removalCount remoções pontuais. Recomendado: 8-10.',
+        'recommendations': [
+          'Swords to Plowshares',
+          'Path to Exile',
+          'Beast Within',
+          'Generous Gift'
+        ],
         'current_value': removalCount,
         'recommended_value': 8,
       });
@@ -244,8 +299,14 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'insufficient_board_wipes',
         'severity': 'medium',
-        'description': 'Deck tem apenas $boardWipeCount board wipes. Recomendado: 3-4.',
-        'recommendations': ['Wrath of God', 'Damnation', 'Cyclonic Rift', 'Toxic Deluge'],
+        'description':
+            'Deck tem apenas $boardWipeCount board wipes. Recomendado: 3-4.',
+        'recommendations': [
+          'Wrath of God',
+          'Damnation',
+          'Cyclonic Rift',
+          'Toxic Deluge'
+        ],
         'current_value': boardWipeCount,
         'recommended_value': 3,
       });
@@ -256,8 +317,12 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'high_mana_curve',
         'severity': avgCMC > 4.0 ? 'high' : 'medium',
-        'description': 'CMC médio de ${avgCMC.toStringAsFixed(2)} é alto para $detectedArchetype.',
-        'recommendations': ['Reduzir cartas com CMC > 5', 'Adicionar mais cartas de custo 1-3'],
+        'description':
+            'CMC médio de ${avgCMC.toStringAsFixed(2)} é alto para $detectedArchetype.',
+        'recommendations': [
+          'Reduzir cartas com CMC > 5',
+          'Adicionar mais cartas de custo 1-3'
+        ],
         'current_value': avgCMC,
         'recommended_value': 2.5,
       });
@@ -268,8 +333,14 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'graveyard_vulnerability',
         'severity': 'high',
-        'description': 'Deck depende muito do cemitério ($graveyardInteractionCount cartas) mas tem pouca proteção.',
-        'recommendations': ['Teferi\'s Protection', 'Heroic Intervention', 'Ground Seal', 'Orbs of Warding'],
+        'description':
+            'Deck depende muito do cemitério ($graveyardInteractionCount cartas) mas tem pouca proteção.',
+        'recommendations': [
+          'Teferi\'s Protection',
+          'Heroic Intervention',
+          'Ground Seal',
+          'Orbs of Warding'
+        ],
         'current_value': graveyardInteractionCount,
         'recommended_value': 0,
       });
@@ -281,7 +352,12 @@ Future<Response> onRequest(RequestContext context) async {
         'type': 'low_protection',
         'severity': 'medium',
         'description': 'Deck tem apenas $protectionCount fontes de proteção.',
-        'recommendations': ['Lightning Greaves', 'Swiftfoot Boots', 'Heroic Intervention', 'Teferi\'s Protection'],
+        'recommendations': [
+          'Lightning Greaves',
+          'Swiftfoot Boots',
+          'Heroic Intervention',
+          'Teferi\'s Protection'
+        ],
         'current_value': protectionCount,
         'recommended_value': 5,
       });
@@ -304,9 +380,17 @@ Future<Response> onRequest(RequestContext context) async {
     if (artifactEnchantmentRemovalCount < 3) {
       weaknesses.add({
         'type': 'insufficient_artifact_enchantment_removal',
-        'severity': artifactEnchantmentRemovalCount == 0 ? 'critical' : 'medium',
-        'description': 'Deck tem apenas $artifactEnchantmentRemovalCount remoções de artefatos/encantamentos. Recomendado: 4-6.',
-        'recommendations': ['Nature\'s Claim', 'Beast Within', 'Generous Gift', 'Vandalblast', 'Austere Command'],
+        'severity':
+            artifactEnchantmentRemovalCount == 0 ? 'critical' : 'medium',
+        'description':
+            'Deck tem apenas $artifactEnchantmentRemovalCount remoções de artefatos/encantamentos. Recomendado: 4-6.',
+        'recommendations': [
+          'Nature\'s Claim',
+          'Beast Within',
+          'Generous Gift',
+          'Vandalblast',
+          'Austere Command'
+        ],
         'current_value': artifactEnchantmentRemovalCount,
         'recommended_value': 5,
       });
@@ -320,12 +404,19 @@ Future<Response> onRequest(RequestContext context) async {
       if (oracle.contains('you win the game') ||
           oracle.contains('each opponent loses') ||
           oracle.contains('extra turn') ||
-          (oracle.contains('deal') && oracle.contains('damage to each opponent')) ||
-          (typeLine.contains('creature') && oracle.contains('whenever') && oracle.contains('combat damage to a player')) ||
-          (oracle.contains('x') && oracle.contains('each opponent') && oracle.contains('loses')) ||
+          (oracle.contains('deal') &&
+              oracle.contains('damage to each opponent')) ||
+          (typeLine.contains('creature') &&
+              oracle.contains('whenever') &&
+              oracle.contains('combat damage to a player')) ||
+          (oracle.contains('x') &&
+              oracle.contains('each opponent') &&
+              oracle.contains('loses')) ||
           (oracle.contains('damage to any target') && oracle.contains('x')) ||
           oracle.contains('you gain control of target') ||
-          (oracle.contains('create') && oracle.contains('token') && oracle.contains('each'))) {
+          (oracle.contains('create') &&
+              oracle.contains('token') &&
+              oracle.contains('each'))) {
         winConditionCount += (card['quantity'] as int);
       }
     }
@@ -333,8 +424,13 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'insufficient_win_conditions',
         'severity': winConditionCount == 0 ? 'critical' : 'high',
-        'description': 'Deck tem apenas $winConditionCount condições de vitória claras. Recomendado: 2-3 caminhos distintos para vencer.',
-        'recommendations': ['Adicionar finalizadores que fechem o jogo', 'Considerar combos de 2-3 cartas', 'Incluir dano direto ou drain effects'],
+        'description':
+            'Deck tem apenas $winConditionCount condições de vitória claras. Recomendado: 2-3 caminhos distintos para vencer.',
+        'recommendations': [
+          'Adicionar finalizadores que fechem o jogo',
+          'Considerar combos de 2-3 cartas',
+          'Incluir dano direto ou drain effects'
+        ],
         'current_value': winConditionCount,
         'recommended_value': 3,
       });
@@ -353,8 +449,13 @@ Future<Response> onRequest(RequestContext context) async {
       weaknesses.add({
         'type': 'low_instant_speed_interaction',
         'severity': instantSpeedCount < 4 ? 'high' : 'medium',
-        'description': 'Deck tem apenas $instantSpeedCount cartas instant-speed. Em multiplayer, interação nos turnos dos oponentes é crucial.',
-        'recommendations': ['Priorizar instants sobre sorceries', 'Adicionar counterspells', 'Incluir removal instant-speed como Swords to Plowshares'],
+        'description':
+            'Deck tem apenas $instantSpeedCount cartas instant-speed. Em multiplayer, interação nos turnos dos oponentes é crucial.',
+        'recommendations': [
+          'Priorizar instants sobre sorceries',
+          'Adicionar counterspells',
+          'Incluir removal instant-speed como Swords to Plowshares'
+        ],
         'current_value': instantSpeedCount,
         'recommended_value': 10,
       });
@@ -382,7 +483,8 @@ Future<Response> onRequest(RequestContext context) async {
             'type': weakness['type'],
             'severity': weakness['severity'],
             'description': weakness['description'],
-            'recommendations': TypedValue(Type.textArray, weakness['recommendations'] as List<String>),
+            'recommendations': TypedValue(
+                Type.textArray, weakness['recommendations'] as List<String>),
           },
         );
       }
@@ -412,11 +514,11 @@ Future<Response> onRequest(RequestContext context) async {
       },
       'weaknesses': weaknesses,
       'weakness_count': weaknesses.length,
-      'critical_count': weaknesses.where((w) => w['severity'] == 'critical').length,
+      'critical_count':
+          weaknesses.where((w) => w['severity'] == 'critical').length,
       'hate_cards_for_archetype': hateCards,
       'colors': deckColors.toList(),
     });
-
   } catch (e, stack) {
     print('Erro em weakness-analysis: $e\n$stack');
     return internalServerError('Failed to analyze deck weaknesses');

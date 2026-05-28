@@ -12,9 +12,29 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
 Future<Response> _simulateDeck(RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
+  final userId = context.read<String>();
 
   try {
-    // 1. Buscar cartas do deck
+    // 1. Confirmar ownership antes de derivar qualquer estatística do deck.
+    final deckResult = await pool.execute(
+      Sql.named('''
+        SELECT 1
+        FROM decks
+        WHERE id = CAST(@deckId AS uuid)
+          AND user_id = CAST(@userId AS uuid)
+        LIMIT 1
+      '''),
+      parameters: {'deckId': deckId, 'userId': userId},
+    );
+
+    if (deckResult.isEmpty) {
+      return Response.json(
+        statusCode: HttpStatus.notFound,
+        body: {'error': 'Deck not found'},
+      );
+    }
+
+    // 2. Buscar cartas do deck
     final cardsResult = await pool.execute(
       Sql.named('''
         SELECT c.name, c.mana_cost, c.type_line, dc.quantity, dc.is_commander
@@ -26,10 +46,13 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
     );
 
     if (cardsResult.isEmpty) {
-      return Response.json(statusCode: HttpStatus.notFound, body: {'error': 'Deck not found or empty'});
+      return Response.json(
+        statusCode: HttpStatus.notFound,
+        body: {'error': 'Deck not found or empty'},
+      );
     }
 
-    // 2. Preparar o Baralho (Library)
+    // 3. Preparar o Baralho (Library)
     final library = <_SimCard>[];
     final commander = <_SimCard>[];
 
@@ -56,9 +79,10 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
       }
     }
 
-    // 3. Executar Simulação de Monte Carlo
+    // 4. Executar Simulação de Monte Carlo
     const iterations = 1000;
-    final landCountStats = List<int>.filled(8, 0); // 0 a 7 terrenos na mão inicial
+    final landCountStats =
+        List<int>.filled(8, 0); // 0 a 7 terrenos na mão inicial
     final onCurveStats = List<int>.filled(6, 0); // Turno 1 a 5 (index 1..5)
 
     final rng = Random();
@@ -66,11 +90,11 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
     for (var i = 0; i < iterations; i++) {
       // Embaralhar
       final deck = List<_SimCard>.from(library)..shuffle(rng);
-      
+
       // Mão Inicial (7 cartas)
       final hand = deck.take(7).toList();
       final landsInHand = hand.where((c) => c.isLand).length;
-      
+
       // Estatística 1: Terrenos na mão inicial
       if (landsInHand <= 7) {
         landCountStats[landsInHand]++;
@@ -81,7 +105,7 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
       var landsInPlay = 0;
       // Clone da mão para simular gastos (opcional, aqui faremos checagem de disponibilidade)
       // Para "On Curve", verificamos se temos Mana suficiente E uma mágica de Custo <= Mana
-      
+
       // Estado do jogo simulado
       var currentHand = List<_SimCard>.from(hand);
       var libraryIndex = 7; // Próxima carta a comprar
@@ -97,16 +121,19 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
         final landIndex = currentHand.indexWhere((c) => c.isLand);
         if (landIndex != -1) {
           landsInPlay++;
-          currentHand.removeAt(landIndex); // Remove da mão para não contar o mesmo terreno
+          currentHand.removeAt(
+              landIndex); // Remove da mão para não contar o mesmo terreno
         }
 
         // Verifica se tem jogada na curva (Mágica com CMC == Turno ou CMC <= Turno e > 0)
         // Vamos ser estritos: Jogada "On Curve" idealmente usa toda a mana.
         // Mas "Playable" é qualquer coisa não-terreno que custe <= landsInPlay.
-        final hasPlayable = currentHand.any((c) => !c.isLand && c.cmc > 0 && c.cmc <= landsInPlay);
-        
+        final hasPlayable = currentHand
+            .any((c) => !c.isLand && c.cmc > 0 && c.cmc <= landsInPlay);
+
         // Ou Commander? (Sempre disponível)
-        final hasCommanderPlayable = commander.isNotEmpty && commander.first.cmc <= landsInPlay;
+        final hasCommanderPlayable =
+            commander.isNotEmpty && commander.first.cmc <= landsInPlay;
 
         if (hasPlayable || hasCommanderPlayable) {
           onCurveStats[turn]++;
@@ -114,7 +141,7 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
       }
     }
 
-    // 4. Formatar Resultados
+    // 5. Formatar Resultados
     final landDistribution = <String, String>{};
     for (var i = 0; i < 8; i++) {
       final percent = (landCountStats[i] / iterations * 100).toStringAsFixed(1);
@@ -136,7 +163,6 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
       },
       'on_curve_probability': curveProbability,
     });
-
   } catch (e) {
     print('[ERROR] Simulation failed: $e');
     return Response.json(
