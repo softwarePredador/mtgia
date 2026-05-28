@@ -1,13 +1,13 @@
 # Hermes Analysis: UI Actionable Tasks
 
-> Tasks validadas no codigo (origin/master) em 2026-05-27.
+> Tasks validadas no codigo (origin/master) em 2026-05-28.
 > Nenhuma task foi criada por suposicao. Cada uma tem evidencia concreta.
 
 ## Life Counter / Lotus — Pendencias Ativas
 
 Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codigo.
 
-### Status atual apos `7329fbbd`
+### Status atual apos `771c9318`
 
 - **PARTIAL_PROVEN:** mesa 4p, cores por jogador, controles `+/-` visiveis em
   todos os jogadores, radial menu, history overlay, settings overlay e card

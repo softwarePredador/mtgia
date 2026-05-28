@@ -31,7 +31,7 @@ cofre/local env/handoff privado.
 ## P1 — Alto
 
 ### Gargalos de manutencao
-Validacao em `origin/master` 7329fbbd (2026-05-27) confirmou tamanhos atuais:
+Validacao em `origin/master` 771c9318 (2026-05-28) confirmou tamanhos atuais:
 - `server/routes/ai/optimize/index.dart` (3495 linhas) — rota gigante
 - `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) — logica densa
 - `app/lib/features/home/life_counter_screen.dart` (6400 linhas) — tela/engine nativa grande
@@ -45,7 +45,7 @@ Tentativas em macOS, Android emulator e iOS wireless falharam por toolchain, nao
 O smoke encerra classificavelmente, mas sem event_id confirmado.
 
 ### Cobertura de testes do app abaixo do ideal
-25 telas mapeadas no fluxo core. Auditoria de codigo em `origin/master` 7329fbbd confirmou que a cobertura melhorou em alguns pontos, mas ainda nao e ampla:
+25 telas mapeadas no fluxo core. Auditoria de codigo em `origin/master` 771c9318 confirmou que a cobertura melhorou em alguns pontos, mas ainda nao e ampla:
 - `community_screen.dart` (1729 linhas) — sem teste de widget unitario; ha runtime em `profile_community_runtime_test.dart`
 - `trade_detail_screen.dart` (1479 linhas) — cobertura de widget parcial em `trade_confirmation_flow_test.dart`, sem baseline amplo de layout/status/chat
 - `binder_screen.dart` (1628 linhas) — sem teste de widget dedicado para `BinderTabContent`
@@ -100,7 +100,7 @@ Status granular:
   lado a lado com `dddddd/` antes de marcar a task como DONE.
 
 ### Arquivos criticos continuam grandes
-Validacao em `origin/master` 7329fbbd (2026-05-27) confirmou os maiores gargalos
+Validacao em `origin/master` 771c9318 (2026-05-28) confirmou os maiores gargalos
 registrados no Technical Map:
 - `server/routes/ai/optimize/index.dart`: 3495 linhas
 - `server/lib/ai/optimize_runtime_support.dart`: 4197 linhas
@@ -119,7 +119,7 @@ Backend ja gera e propaga. Script de validacao existe (`validate_request_id_read
 A correlacao mobile → backend em device real NAO foi confirmada.
 
 ### POST /ai/optimize sem escopo de ownership no carregamento do deck
-Auditoria em `origin/master` 7329fbbd confirmou que `server/routes/ai/optimize/index.dart`
+Auditoria em `origin/master` 771c9318 confirmou que `server/routes/ai/optimize/index.dart`
 le `userId`, mas chama `loadOptimizeDeckContext` sem passa-lo; em
 `server/lib/ai/optimize_request_support.dart`, a query de deck usa apenas
 `WHERE id = @id` e as cartas usam apenas `WHERE dc.deck_id = @id`. Rotas de

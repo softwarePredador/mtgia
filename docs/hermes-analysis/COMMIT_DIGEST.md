@@ -1,7 +1,7 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-27T19:29Z (manager-watchdog — novo commit 771c9318).
+> Atualizado em 2026-05-28T01:31Z (manager-watchdog — higiene semanal, master estável em 771c9318).
 
 ## Estado atual
 

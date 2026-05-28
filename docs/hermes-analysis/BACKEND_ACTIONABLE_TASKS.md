@@ -1,6 +1,6 @@
 # Hermes Analysis: Backend Actionable Tasks
 
-> Tasks validadas no codigo (`origin/master` 7329fbbd) em 2026-05-27.
+> Tasks validadas no codigo (`origin/master` 771c9318) em 2026-05-28.
 > Escopo: contratos/rotas backend, IA semantica e optimize. Nenhuma task foi criada por suposicao.
 
 ## P1 — Alto
