@@ -11,8 +11,8 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
-5. **P1 — Incoerencia de ownership em rotas deck/AI**: `POST /ai/optimize`, `POST /ai/archetypes` e algumas rotas experimentais aceitam `deck_id` autenticado sem escopar a leitura por `user_id`, apesar de o app tratar decks como recursos privados do usuario.
-6. **P1 — Politicas por nome ainda parcialmente inline**: a `master` ja corrigiu prioridade `functional_tags -> semantic_tags_v2 -> heuristic`, preservacao multi-role no optimize e documentacao operacional; ainda restam excecoes por nome em scoring/premium/high-power fora de uma policy versionada unica.
+5. **P1 — Ownership em rotas deck/AI**: resolvido nos fluxos app-facing principais (`POST /ai/optimize`, `GET /ai/optimize/jobs/:id`, `POST /ai/archetypes`) em `origin/master@65f30387`; rotas experimentais seguem bloqueadas para promocao sem contrato owner/public/meta.
+6. **P1 — Politicas por nome**: resolvido para as listas apontadas pelo verificador (`premiumLandNames`, high-power e candidate-quality premium) via `commander_fallback_policy.dart`; novas excecoes por nome devem entrar apenas em policy versionada ou fixture/teste.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 
 ## Achados priorizados
@@ -67,6 +67,11 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   - revisão de imports mostra dependência convergindo para helpers compartilhados.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
+- **Status em `origin/master@65f30387`: RESOLVIDO para as listas apontadas pelo
+  verificador.** `premiumLandNames`, high-power e candidate-quality premium
+  passaram a usar `server/lib/ai/commander_fallback_policy.dart`. Mantido aqui
+  como histórico; novas excecoes por nome devem entrar apenas em policy
+  versionada ou fixture/teste.
 - **Evidência**:
   - Revalidacao Copilot em `origin/master@00437690` confirmou PASS para:
     prioridade `functional_tags_then_semantic_v2_then_heuristic`,
@@ -107,6 +112,11 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   - rerodar `dart analyze` até ficar verde.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
+- **Status em `origin/master@65f30387`: RESOLVIDO para os fluxos app-facing
+  principais.** `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` e
+  `POST /ai/archetypes` agora sao owner-scoped e possuem testes source/live.
+  Permanece a regra de produto: rotas experimentais abaixo nao devem ser
+  promovidas ao app sem contrato owner/public/meta e testes.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart`, mas
@@ -129,19 +139,12 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   usuario autenticado obtenha UUID ou job ID alheio; tambem cria contratos
   ambiguos para futuras telas.
 - **Ação recomendada**:
-  1. passar `userId` para `loadOptimizeDeckContext` e escopar queries de deck por
-     `id + user_id`, salvo regra publica explicita;
-  2. escopar `POST /ai/archetypes` por `id + user_id` antes de montar prompt,
-     cache key e reference profile, salvo regra publica explicita;
-  3. exigir `userId` nao nulo para jobs async user-facing ou retornar 404 quando
-     `job.userId == null`;
-  4. antes de expor endpoints experimentais no app, escolher entre escopar por
+  1. antes de expor endpoints experimentais no app, escolher entre escopar por
      dono, limitar a deck publico/meta deck, ou remover/ocultar o contrato;
-  5. criar rota dedicada ou teste de contrato para `/community/decks/following`,
+  2. criar rota dedicada ou teste de contrato para `/community/decks/following`,
      hoje implementada como branch `id == 'following'` em `[id].dart`.
 - **Validação**:
-  - testes owner vs non-owner para `/ai/optimize` sync/async,
-    `/ai/archetypes` e para cada rota experimental mantida;
+  - testes owner vs non-owner para cada rota experimental mantida;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
     continua vazio ate haver contrato seguro;
   - polling de job com `user_id = NULL` retorna 404 ou fica restrito a rota
@@ -194,17 +197,16 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 ## Sequência sugerida
 
 1. **Primeiro**: corrigir o auditor estrutural (P0), porque ele afeta a confiabilidade do restante do relatório.
-2. **Segundo**: destravar `dart analyze` do backend via `local_test_server.dart`.
-3. **Terceiro**: corrigir ownership/escopo de deck nas rotas app-facing e
-   experimentais antes de ligar novos consumidores no app.
-4. **Quarto**: centralizar as politicas por nome restantes apos os ajustes ja
-   confirmados na `master` para semantic v2, multi-tags e docs operacionais.
-5. **Quinto**: manter `/decks/:id/recommendations` e `/ai/weakness-analysis`
+2. **Segundo**: manter `/decks/:id/recommendations` e `/ai/weakness-analysis`
    como experimentais/not-proven ate consumirem a camada semantica compartilhada
    ou terem contrato interno explicito.
-6. **Sexto**: atacar duplicações de maior risco no domínio de optimize/IA.
-7. **Setimo**: modularizar os arquivos gigantes do otimizador com testes de regressão.
-8. **Oitavo**: decidir destino das tabelas write-only/parciais
+3. **Terceiro**: adicionar teste de rota para
+   `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` retornar
+   `OPTIMIZE_SEMANTIC_V2_REJECTED` antes de qualquer feature flag fora de
+   ambiente controlado.
+4. **Quarto**: atacar duplicações de maior risco no domínio de optimize/IA.
+5. **Quinto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
+6. **Sexto**: decidir destino das tabelas write-only/parciais
    (`deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback` e raws do
    Commander Reference Corpus) antes de expandir novas persistencias analiticas.
 

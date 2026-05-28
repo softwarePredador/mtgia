@@ -1500,13 +1500,20 @@ rodada porque o verificador confirmou correcao na `master`:
 - `API_CONTRACTS_AND_DATA_MAP.md` e `server/manual-de-instrucao.md` documentam
   prioridade semantica, multi-tags, diagnosticos de optimize e fallback policy.
 
-Permanecem ativos somente os achados abaixo.
+Atualizacao Copilot 2026-05-28: `origin/master@65f30387` resolveu tambem as
+politicas por nome restantes apontadas abaixo via
+`server/lib/ai/commander_fallback_policy.dart`, alem de hardening owner-scoped
+em `POST /ai/archetypes`.
+
+Permanecem ativos somente os achados abaixo que nao foram marcados como
+resolvidos por esta atualizacao.
 
 #### P1 - Politicas por nome ainda nao estao totalmente centralizadas/versionadas
 
-- **Status:** parcial. Fallbacks universais de Commander foram movidos para
-  `server/lib/ai/commander_fallback_policy.dart`, mas ainda restam politicas
-  inline por nome.
+- **Status em `origin/master@65f30387`: RESOLVIDO para as listas apontadas pelo
+  verificador.** Fallbacks universais de Commander, premium lands, high-power e
+  candidate-quality premium foram centralizados em
+  `server/lib/ai/commander_fallback_policy.dart`.
 - **Evidencia revalidada:** o verificador encontrou scoring/listas como
   `premiumLandNames` em `server/lib/ai/optimize_runtime_support.dart` e conjuntos
   premium/high-power em `server/lib/ai/candidate_quality_data_support.dart`.

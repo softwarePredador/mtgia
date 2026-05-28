@@ -2,10 +2,18 @@
 
 > Tasks validadas no codigo (`origin/master` 771c9318) em 2026-05-28.
 > Escopo: contratos/rotas backend, IA semantica e optimize. Nenhuma task foi criada por suposicao.
+>
+> Atualizacao Copilot em 2026-05-28: `origin/master@65f30387` resolveu os
+> guards owner-scoped de `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` com
+> `user_id = NULL`, e `POST /ai/archetypes`. Backlog ativo remanescente neste
+> arquivo: BE.2, BE.5, BE.6 e BE.7.
 
 ## P1 — Alto
 
 ### BE.1 — `POST /ai/optimize` carrega deck sem escopo de ownership
+- **Status em `origin/master@65f30387`: RESOLVIDO.** O loader de contexto de
+  optimize recebe `userId`, escopa deck por `id + user_id`, e os testes source
+  cobrem o guard. Mantido aqui apenas como histórico da origem do fix.
 - **Evidencia:** `server/routes/ai/optimize/index.dart` le `userId` via `context.read<String>()`, mas permite `null` (`linhas 400-405`) e chama `optimize_request.loadOptimizeDeckContext` sem `userId` (`linhas 544-557`). `server/lib/ai/optimize_request_support.dart` define o loader sem parametro `userId` (`linhas 53-62`), busca o deck com `SELECT name, format FROM decks WHERE id = @id` (`linhas 63-73`) e cartas com `WHERE dc.deck_id = @id` (`linhas 87-137`). Como contraste, `server/routes/decks/[id]/cards/bulk/index.dart` usa `WHERE id = @deckId AND user_id = @userId LIMIT 1` (`linhas 68-75`).
 - **Impacto de produto:** Usuario autenticado pode potencialmente solicitar otimizacao/analise de deck privado de outro usuario se obtiver o UUID, expondo composicao e sugestoes de IA.
 - **Risco:** Privacidade e custo/uso indevido de IA; rota fica autenticada, mas a autorizacao do recurso nao aparece no caminho inspecionado.
@@ -24,6 +32,8 @@
 ## P2 — Medio/Alto
 
 ### BE.3 — `GET /ai/optimize/jobs/:id` permite leitura de job com `user_id = NULL`
+- **Status em `origin/master@65f30387`: RESOLVIDO.** Polling de job user-facing
+  bloqueia job sem owner e non-owner; mantido aqui apenas como histórico.
 - **Evidencia:** `server/routes/ai/optimize/jobs/[id].dart` le `userId` e carrega job por id (`linhas 26-28`), mas so bloqueia quando `job.userId != null && job.userId != userId` (`linhas 39-47`). A rota de optimize cria jobs async com `userId: userId` (`server/routes/ai/optimize/index.dart` linhas 456-463 e caminho complete async equivalente), enquanto o `userId` foi capturado como nullable (`linhas 400-405`).
 - **Impacto de produto:** Qualquer job salvo com `user_id = NULL` fica consultavel por quem souber o job id, podendo revelar resultado de otimizacao/analise.
 - **Risco:** Menor que BE.1 por depender de job id de alta entropia, mas ainda e caminho de exposicao de dados.
