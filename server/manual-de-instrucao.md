@@ -3,6 +3,39 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-28 — Deck Analysis usa semantic_tags_v2 antes de heuristica
+
+Motivo:
+
+- Hermes apontou que `summarizeFunctionalTagsForDeck` ja carregava
+  `semantic_tags_v2`, mas as contagens de funcoes ainda caiam direto para
+  heuristica quando `card_function_tags` nao existia.
+
+Patch aplicado:
+
+- `summarizeFunctionalTagsForDeck` agora resolve tags por carta na ordem:
+  1. `card_function_tags` persistido;
+  2. `card_semantic_tags_v2.tags` persistido;
+  3. heuristica deterministica v1.
+- `functional_tags.source.priority` passa a reportar
+  `functional_tags_then_semantic_v2_then_heuristic`.
+- `persisted_rows` e `persisted_copies` contabilizam linhas vindas de
+  `card_function_tags` ou `semantic_tags_v2`; heuristica so entra quando as
+  duas fontes persistidas nao existem.
+
+Validacao:
+
+- `dart analyze lib/ai/functional_card_tags.dart test/functional_card_tags_test.dart`;
+- `dart test test/functional_card_tags_test.dart -r expanded`.
+
+Riscos restantes:
+
+- Optimize ainda pode colapsar multi-tags em um papel primario em alguns
+  diagnostics/gates; tratar em patch separado com fixtures de perda de papel
+  secundario.
+- Listas de fallback hardcoded de complete/optimize e rotas experimentais de
+  recomendacoes/weaknesses ainda precisam de uma politica semantica central.
+
 ## 2026-05-18 — Semantic Layer v2 para build/optimize/generate
 
 ### O Porquê

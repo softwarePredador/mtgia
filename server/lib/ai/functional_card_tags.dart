@@ -122,7 +122,7 @@ class FunctionalDeckSummary {
           'other_copies': otherCopies,
         },
         'source': {
-          'priority': 'persisted_then_heuristic',
+          'priority': 'functional_tags_then_semantic_v2_then_heuristic',
           'persisted_rows': persistedRows,
           'persisted_copies': persistedCopies,
           'heuristic_rows': heuristicRows,
@@ -434,7 +434,9 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
       countedTags: countedTags,
       minConfidence: minConfidence,
     );
-    final semanticV2 = _readPersistedSemanticV2(card['semantic_tags_v2']) ??
+    final persistedSemanticV2 =
+        _readPersistedSemanticV2(card['semantic_tags_v2']);
+    final semanticV2 = persistedSemanticV2 ??
         inferSemanticCardAnalysisV2(
           name: name,
           typeLine: (card['type_line'] as String?) ?? '',
@@ -452,6 +454,12 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
         .where((tag) =>
             countedTags.contains(tag.tag) && tag.confidence >= minConfidence)
         .toList(growable: false);
+    final semanticV2Tags = persistedSemanticV2?.tags
+            .where((tag) =>
+                countedTags.contains(tag.tag) &&
+                tag.confidence >= minConfidence)
+            .toList(growable: false) ??
+        const <FunctionalCardTag>[];
     final tagObjects = persistedTags.isNotEmpty
         ? persistedTags
             .map((tag) => FunctionalCardTag(
@@ -462,10 +470,12 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
                   evidence: semanticV2.explanationReason,
                 ))
             .toList(growable: false)
-        : inferredTags;
+        : semanticV2Tags.isNotEmpty
+            ? semanticV2Tags
+            : inferredTags;
     final tags = tagObjects.map((tag) => tag.tag).toSet();
 
-    if (persistedTags.isNotEmpty) {
+    if (persistedTags.isNotEmpty || semanticV2Tags.isNotEmpty) {
       persistedRows++;
       persistedCopies += qty;
     } else {

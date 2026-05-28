@@ -277,7 +277,8 @@ void main() {
           equals(semanticLayerV2SchemaVersion));
     });
 
-    test('prefers persisted tags and falls back to heuristic tags per row', () {
+    test('prefers persisted tags, semantic v2 and then heuristic tags per row',
+        () {
       final summary = summarizeFunctionalTagsForDeck([
         {
           'name': 'Semantic Cache Hit',
@@ -297,6 +298,25 @@ void main() {
           'functional_tags': const [],
         },
         {
+          'name': 'Semantic V2 Only',
+          'type_line': 'Instant',
+          'oracle_text': '',
+          'quantity': 4,
+          'functional_tags': const [],
+          'semantic_tags_v2': [
+            {
+              'tags': [
+                {'tag': 'removal', 'confidence': 0.91},
+              ],
+              'role_confidence': 0.91,
+              'speed': 'instant_speed',
+              'interaction_scope': 'single_target',
+              'explanation_reason': 'persisted semantic v2 fixture',
+              'source': 'test_semantic_v2',
+            },
+          ],
+        },
+        {
           'name': 'Low Confidence Persisted',
           'type_line': 'Creature',
           'oracle_text': '',
@@ -309,16 +329,24 @@ void main() {
 
       expect(summary.count('draw'), equals(2));
       expect(summary.count('ramp'), equals(1));
-      expect(summary.count('removal'), equals(0));
-      expect(summary.persistedRows, equals(1));
-      expect(summary.persistedCopies, equals(2));
+      expect(summary.count('removal'), equals(4));
+      expect(summary.persistedRows, equals(2));
+      expect(summary.persistedCopies, equals(6));
       expect(summary.heuristicRows, equals(2));
       expect(summary.heuristicCopies, equals(4));
       expect(summary.otherCopies, equals(3));
+      expect(summary.samples['removal'], equals(const ['Semantic V2 Only']));
+      expect(
+        summary.sampleDetails['removal']?.first['evidence'],
+        equals('persisted semantic v2 fixture'),
+      );
 
       final source = summary.toJson()['source'] as Map<String, dynamic>;
-      expect(source['priority'], equals('persisted_then_heuristic'));
-      expect(source['persisted_rows'], equals(1));
+      expect(
+        source['priority'],
+        equals('functional_tags_then_semantic_v2_then_heuristic'),
+      );
+      expect(source['persisted_rows'], equals(2));
     });
   });
 }
