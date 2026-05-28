@@ -50,6 +50,44 @@ const commanderPremiumFillerNames = <String>{
   'thought vessel',
 };
 
+const commanderPremiumFixingLandNames = <String>{
+  'city of brass',
+  'command tower',
+  'exotic orchard',
+  'mana confluence',
+  'path of ancestry',
+  'reflecting pool',
+};
+
+const candidateQualityHighPowerNames = <String>{
+  'mana crypt',
+  'mox diamond',
+  'chrome mox',
+  'force of will',
+  'force of negation',
+  'fierce guardianship',
+  'vampiric tutor',
+  'demonic tutor',
+  'thassa\'s oracle',
+};
+
+const candidateQualityPremiumNames = <String>{
+  'arcane signet',
+  'sol ring',
+  'swords to plowshares',
+  'path to exile',
+  'cyclonic rift',
+  'counterspell',
+  'rhystic study',
+  'lightning greaves',
+  'swiftfoot boots',
+  'teferi\'s protection',
+  'toxic deluge',
+  'blasphemous act',
+  'beast within',
+  'chaos warp',
+};
+
 const commanderCompletionStapleNames = <String>[
   'Sol Ring',
   'Arcane Signet',

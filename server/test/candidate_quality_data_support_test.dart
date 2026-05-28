@@ -1,3 +1,4 @@
+import 'package:server/ai/commander_fallback_policy.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:test/test.dart';
 
@@ -117,6 +118,22 @@ void main() {
       expect(ramp.budgetTier, equals('expensive'));
       expect(ramp.bracketScope, equals('bracket_3_4'));
       expect(ramp.score, greaterThanOrEqualTo(70));
+    });
+
+    test('uses versioned high-power and premium name policy', () {
+      expect(candidateQualityHighPowerNames, contains('thassa\'s oracle'));
+      expect(candidateQualityPremiumNames, contains('sol ring'));
+      expect(
+        inferCandidateBracketScope(
+          name: 'Thassa\'s Oracle',
+          role: 'combo_piece',
+          score: 30,
+          budgetTier: 'accessible',
+        ),
+        equals('bracket_3_4'),
+      );
+      expect(isPremiumCommanderCandidateName('Sol Ring'), isTrue);
+      expect(isPremiumCommanderCandidateName('Cancel'), isFalse);
     });
 
     test('sample pool SQL keeps legality and color identity guardrails', () {

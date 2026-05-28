@@ -403,15 +403,6 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
     },
   );
 
-  const premiumLandNames = <String>{
-    'city of brass',
-    'command tower',
-    'exotic orchard',
-    'mana confluence',
-    'path of ancestry',
-    'reflecting pool',
-  };
-
   final candidates = <Map<String, dynamic>>[];
   for (final row in result) {
     final candidate = <String, dynamic>{
@@ -451,7 +442,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
     ).length;
 
     var fixingScore = (candidate['pop_score'] as int?) ?? 0;
-    if (premiumLandNames.contains(name)) fixingScore += 250;
+    if (commanderPremiumFixingLandNames.contains(name)) fixingScore += 250;
     if (oracle.contains('add one mana of any color') ||
         oracle.contains('add one mana of any type')) {
       fixingScore += 200;

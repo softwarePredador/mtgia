@@ -394,6 +394,7 @@ void main() {
       );
       expect(commanderCompletionStapleNames, contains('Nature\'s Claim'));
       expect(commanderCompletionStapleNames, contains('Teferi\'s Protection'));
+      expect(commanderPremiumFixingLandNames, contains('command tower'));
     });
 
     test('adds mono-blue contextual foundation names without runtime hardcode',

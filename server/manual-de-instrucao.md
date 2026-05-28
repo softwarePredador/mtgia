@@ -18,14 +18,20 @@ Patch aplicado:
   `commanderFallbackPolicyVersion`.
 - Movidas para a politica versionada as listas de denylist, premium filler,
   staples de completion, fallbacks universais e foundation fillers contextuais.
+- Tambem foram movidas para a mesma policy as listas de fixing lands premium,
+  nomes high-power e nomes premium usados por candidate quality.
 - `optimize_runtime_support.dart` passa a consumir essa politica e mantém os
   gates existentes de identidade de cor, legalidade, bracket e qualidade.
+- `candidate_quality_data_support.dart` passa a consumir a policy central para
+  bracket scope high-power e bonus premium.
 
 Validacao:
 
 - Testes adicionados em `server/test/optimize_runtime_support_test.dart` para
   provar consumo da denylist, bonus premium, staples universais e foundation
   fillers contextuais.
+- Testes adicionados em `server/test/candidate_quality_data_support_test.dart`
+  para provar bracket high-power e premium name policy.
 
 Riscos restantes:
 

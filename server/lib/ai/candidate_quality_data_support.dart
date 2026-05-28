@@ -1,3 +1,4 @@
+import 'commander_fallback_policy.dart';
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimize_runtime_support.dart';
@@ -587,19 +588,8 @@ String inferCandidateBracketScope({
   required String budgetTier,
 }) {
   final normalizedName = normalizeCandidateQualityKey(name);
-  const highPowerNames = {
-    'mana crypt',
-    'mox diamond',
-    'chrome mox',
-    'force of will',
-    'force of negation',
-    'fierce guardianship',
-    'vampiric tutor',
-    'demonic tutor',
-    'thassa\'s oracle',
-  };
 
-  if (highPowerNames.contains(normalizedName) ||
+  if (candidateQualityHighPowerNames.contains(normalizedName) ||
       budgetTier == 'expensive' ||
       role == 'combo_piece' && score >= 60) {
     return 'bracket_3_4';
@@ -609,23 +599,8 @@ String inferCandidateBracketScope({
 }
 
 bool isPremiumCommanderCandidateName(String name) {
-  const premium = {
-    'arcane signet',
-    'sol ring',
-    'swords to plowshares',
-    'path to exile',
-    'cyclonic rift',
-    'counterspell',
-    'rhystic study',
-    'lightning greaves',
-    'swiftfoot boots',
-    'teferi\'s protection',
-    'toxic deluge',
-    'blasphemous act',
-    'beast within',
-    'chaos warp',
-  };
-  return premium.contains(normalizeCandidateQualityKey(name));
+  return candidateQualityPremiumNames
+      .contains(normalizeCandidateQualityKey(name));
 }
 
 String buildCandidateQualitySamplePoolSql() {
