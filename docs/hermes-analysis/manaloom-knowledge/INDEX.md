@@ -6,13 +6,13 @@
 
 ## Status
 
-|| Metrica | Valor | Data ||
-|:--------|:-----:|:-----||
-|| Comandantes analisados | 13 | 2026-05-27 |
-|| Decks analisados | 21 | 2026-05-27 |
-|| Cartas revisadas | ~1.960 | 2026-05-27 |
-|| Insights documentados | 79 | 2026-05-27 |
-|| Discrepancias com ManaLoom | 85 | 2026-05-27 |
+||| Metrica | Valor | Data ||
+||:--------|:-----:|:-----||
+||| Comandantes analisados | 14 | 2026-05-28 ||
+||| Decks analisados | 22 | 2026-05-28 ||
+||| Cartas revisadas | ~2.260 | 2026-05-28 ||
+||| Insights documentados | 94 | 2026-05-28 ||
+||| Discrepancias com ManaLoom | 97 | 2026-05-28 ||
 
 ## PostgreSQL — Dados de Conhecimento (2026-05-27)
 
@@ -60,7 +60,8 @@
 | **Edgar Markov** | **1** | **2026-05-27** | **5** | **Nova: 100/100 EDHREC avg + multi-tag** |
 | **Krenko, Mob Boss** | **1** | **2026-05-27** | **7** | **Nova: 100/100 EDHREC avg goblin typal** |
 | **Prosper, Tome-Bound** | **4** | **2026-05-27** | **10 novos** | **Nova: 4 corpus EDHREC (optimized, control, cEDH, artifacts) + profile 6 fontes** |
-| **Dina, Essence Brewer** | **5** | **2026-05-27** | **5** | **Nova: 5 corpus EDHREC (default, sacrifice, aristocrats, budget, tokens) + profile** |
+|| **Dina, Essence Brewer** | **5** | **2026-05-27** | **5** | **Nova: 5 corpus EDHREC (default, sacrifice, aristocrats, budget, tokens) + profile** |
+|| **Niv-Mizzet, Parun** | **1** | **2026-05-28** | **15 novos** | **Nova: 15,971 decks EDHREC avg (rank #97) + profile 4 fontes** |
 
 ## Padroes de Deckbuilding (Cumulativo)
 
@@ -193,6 +194,15 @@
   4.5 tutors, 0.75 board wipes, 4.25 topdeck setup, ~4 wincons (drenagem payoffs).
   CMC medio ~3.2 (estimado). Metrica central: densidade de exile casting + treasure payoffs.
   3 arquetipos: Optimized Combo (storm+payoffs), Control (valor incremental), cEDH (28 lands, 9 tutors, Breach storm).
+- **Spellslinger Draw-Damage (Niv-Mizzet, Parun, bracket 3-4):** 35 lands (profile 34-36),
+  11-13 ramp (rocks, sem dorks verdes), 17-21 draw/value (ACIMA do profile 12-18),
+  14-16 interaction (ACIMA do profile 10-14), 1.5 board wipes (profile 1-2),
+  2-4 protection (no minimo do profile 3-5), ~16-18 creatures (alto para spellslinger),
+  6-9 spellslinger payoffs (Guttersnipe, Archmage, Electrostastic, Storm-Kiln, Talrand),
+  4-6 combo enablers (Curiosity, Ophidian, Tandem Lookout), 3-5 tutors,
+  CMC medio ~2.9 (estimado). Metrica central: draw-to-spells-conjured ratio + payoff density.
+  3 arquetipos: Spellslinger Incremental (payoffs + drenagem), Wheels Burst (payoffs + wheels),
+  Competitive Draw Control (mais interacao + combo).
 
 ### Psicologia do Jogador (acumulativo)
 - **Jogador de infect/proliferate:** Conservador-incremental. Quer vencer por
@@ -273,6 +283,7 @@
   e Prosper como plano B. Pensamento chave: "Cada carta de impulse draw e um motor pequeno que
   gera 1-3 treasures. O deck funciona com 8-10 desses motores rodando simultaneamente."
 - **Jogador de Dina, Essence Brewer (Soul Sister Aristocrats):** Estrategista incremental-paciente. Pensa em termos de triggers de ganho de vida como "micro-ataques" que passam por cima de blockers. Prefere vencer por drenagem incremental a combat. Pensamento chave: "Cada vez que eu ganho 1 de vida, cada oponente perde 1. Meu deck transforma life gain em inevitabilidade." Aceita protecao baixa (1-2) porque confia que Dina custa so 3 e pode ser recastada. Prioriza consistencia de token gen sobre qualidade individual. Aceita draw condicional porque sempre vai ter criaturas morrendo. Nao inclui combos deterministicos — prefere vencer por drenagem incremental. Valoriza scry como card selection barato — scry 1 por trigger ajuda a encontrar pecas certas.
+- **Jogador de Niv-Mizzet, Parun (Izzet Spellslinger Draw-Damage):** Calculista-otimizador. Pensa em termos de "quantos turnos consigo manter Niv vivo?" Prioriza card velocity (draw massivo) sobre protection. Aceita que Niv morre e recasta. Gosta de "turnos longos" — conjurar 5+ spells seguidos, cada um causando 7+ dano com payoffs em campo. Pensamento chave: "Cada carta que eu conjuro e dano. Eu so preciso de cartas." No arquetipo Wheels Burst, pensa: "Eu nao preciso atacar para causar dano. Eu so preciso de um Windfall e mesa cheia de payoffs." No arquetipo Control, pensa: "Eu controlo a mesa ate ter Curiosity + Niv com protecao."
 
 ### Descobertas
 - **Walking Ballista como wincon:** Habilidade de mana, nao spell.
@@ -532,6 +543,10 @@
 31. **"Rituals substituem ramp verde em Rakdos."** (Prosper — Dark Ritual, Rite of Flame, Jeska's Will compensam a falta de dorks de mana. Cada ritual que leva Prosper ao campo no turno 2-3 gera valor exponencial.)
 32. **"Topdeck manipulation e o segundo motor do deck."** (Prosper — Sensei's Top + Bolas's Citadel dao controle absoluto do topo. Citadel no campo faz cada draw ser um treasure em potencial.)
 33. **"Protecao do comandante e critica em engine decks."** (Prosper — com media de 1.5 protecoes, Prosper morre e o deck para. Diferente de Krenko (re-joga), Prosper custa 4 mana e depende de acumulo.)
+34. **"Draw = ramp = dano em Niv-Mizzet."** (Niv-Mizzet — cada carta comprada PODE ser conjurada causando dano. A metrica mais importante nao e CMC ou ramp — e o ratio de draw-to-spells-conjured. 20 draw sources + 20 spells = 120-160 dano por turno com payoffs.)
+35. **"Creatures-payoffs sao tao importantes quanto spells em spellslinger."** (Niv-Mizzet — Guttersnipe, Archmage Emeritus, Electrostatic Field transformam cada spell em 6-9 dano total. O deck escala exponencialmente com cada payoff em campo.)
+36. **"Wheel effects sao burst damage em spellslinger."** (Niv-Mizzet — Windfall com Niv + 4 payoffs = 21-49 dano em um turno. Nao precisa atacar para vencer.)
+37. **"Curiosity + Niv e combo deterministico, nao sinergia."** (Niv-Mizzet — o sistema de tags precisa detectar este combo especifico. 73.4% dos decks incluem Curiosity como wincon primaria.)
 
 ## Ultimas Execucoes
 
@@ -550,6 +565,7 @@
 || 2026-05-27 | **EDHREC Average Deck** | **Krenko, Mob Boss (Goblin Typal Tokens Aggro)** | **Analise concluida — 100/100 EDHREC avg, 7 insights, 3 discrepancias** |
 ||| 2026-05-27 | **Corpus EDHREC (4 arquétipos: optimized, control, cEDH, artifacts)** | **Prosper, Tome-Bound (Exile Value Treasure Engine)** | **Analise concluida — 4 decks x ~88 cartas, profile 6 fontes, 10 insights, 9 discrepancias** |
 || 2026-05-27 | **Corpus EDHREC (5 arquétipos: default, sacrifice, aristocrats, budget, tokens)** | **Dina, Essence Brewer (Soul Sister Aristocrats)** | **Analise concluida — 5 decks x ~86 cartas, profile completo, 5 insights, 14 discrepancias** |
+|| 2026-05-28 | **EDHREC Average Deck (15,971 decks)** | **Niv-Mizzet, Parun (Izzet Spellslinger Draw-Damage Engine)** | **Analise concluida — 15,971 decks EDHREC avg, 3 arquetipos identificados, 12 discrepancias, 15 novos insights** |
 
 ### Novos Insights desta Analise
 - **Muldrotha cria uma nova categoria de avaliacao:** "permanent-based efficiency." O deck prioriza permanentes mesmo se o efeito for mais fraco. Instants e sorceries sao "descartaveis" porque Muldrotha nao pode rejoga-los.
@@ -567,7 +583,15 @@
 - **Raid Bombardment + lords = antissinergia nao reconhecida:** EDHREC inclui ambos porque sao "boas cartas de goblin", mas lords desqualificam goblins do Raid Bombardment ao aumentar poder para >2.
 - **Draw baixo (5 fontes) compensado por Skullclamp + Ringleader:** 5 draws e pouco para Commander, mas Skullclamp (equipa token 1/1 → draw 2) e Goblin Ringleader (revela 4, pega goblins) sustentam o plano aggro.
 
-### Novos Insights (Prosper, Tome-Bound — Exile Value Treasure Engine)
+### Novos Insights (Niv-Mizzet, Parun — Izzet Spellslinger Draw-Damage Engine)
+- **Niv-Mizzet e um loop draw-damage auto-sustentado:** Cada ataque bem-sucedido compra uma carta (Niv.trigger), que causa 1 dano quando conjurada (Niv.ability). O ciclo: atacar → comprar → conjurar → dano → atacar. O deck inteiro existe para manter este loop ativo.
+- **Curiosity combo e o wincon definitivo (73.4% inclusao):** Curiosity no Niv = loop infinito. Niv ataca, causa dano, compra 1 (Curiosity trigger), conjura, causa 1 dano (Niv trigger), compra outra, causa 1 dano... infinite loop. O sistema de tags PRECISA detectar Curiosity + Niv como combo deterministico.
+- **Creatures-payoffs sao tao importantes quanto spells:** Guttersnipe (56.1%), Archmage Emeritus (47.6%), Electrostatic Field (29.3%), Storm-Kiln Artist (50.8%) — cada um transforma CADA spell em 1-2 dano extra. Com 4+ payoffs em campo, cada spell causa 6-9 dano total (1 Niv + 2 Guttersnipe + 2 Archmage + 1 Electrostastic + 1 Storm-Kiln = 7 dano/spell). Escalacao exponencial.
+- **Draw e ramp simultaneamente em Niv:** Diferente de qualquer outro comandante, cada carta comprada em Niv PODE ser conjurada (causando dano). O sistema precisa entender que sources de draw = sources de dano neste deck especifico. A metrica mais importante e "draw-to-spells-conjured ratio".
+- **Wheel effects sao burst damage massivo:** Windfall (45% inclusao): 3-7 cartas compradas por jogador = 21-49 dano com payoffs em campo. Um Wheel com Niv + Guttersnipe + Archmage mata a mesa inteira.
+- **Protection baixa (2-4 vs 3-5 do profile) e o gap mais comum:** Niv custa 6 mana (UUURR). Sem protecao dedicada, remocao simples mata Niv e atrasa o deck significativamente. O deck confia em counters mas morre paraProtection barato.
+
+### Novos Insights (continuacao das analises anteriores)
 - **Prosper e o unico comandante que gera treasures por conjurar do exile** — Nao ha outro comandante que faca isto. Cada carta de impulse draw e efetivamente "R: exile top card, conjure ate o fim do turno. Se conjurar, crie um treasure."
 - **Bolas's Citadel e a melhor carta do deck** — Presente em 4/4 decks do corpus. Citadel permite conjurar do topo do library, que ativa Prosper (treasure) e ignora timing de impulse draw.
 - **Topdeck manipulation substitui draw tradicional** — Sensei's Top + Bolas's Citadel + Scroll Rack dao controle absoluto do topo, similar a Lorehold. O deck tem ~4 cartas de topdeck setup.

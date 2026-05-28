@@ -71,6 +71,77 @@
 
 **Padrão sistêmico:** 3 dos 4 erros são falhas de quota/balance do mesmo provedor (OpenRouter free-tier). Não são bugs de código nem de configuração — requerem intervenção no provedor.
 
+## Precisão das Functional Tags (tag_accuracy)
+
+> Última verificação: **2026-05-28T02:00Z** (cron `manaloom-tag-accuracy-reporter`)
+
+### Resumo Geral
+
+| Métrica | Valor |
+|:--|:--:|
+| Total de tags avaliadas | 29 |
+| Acertos / Total | **378/454** |
+| Precisão global | **83.3%** |
+
+### Tags com 100% de Precisão (15 tags)
+
+| Tag | Amostras |
+|:--|:--:|
+| land | 87 |
+| utility | 76 |
+| ramp | 53 |
+| draw | 32 |
+| removal | 30 |
+| creature | 22 |
+| tutor | 6 |
+| board_wipe | 3 |
+| recursion | 3 |
+| planeswalker | 2 |
+| artifact | 2 |
+| enchantment | 3 |
+| sacrifice_outlet | 1 |
+| finisher | 2 |
+| wipe | 1 |
+
+### Tags Problemáticas (< 50%)
+
+| Tag | Precisão | Amostras | Problema |
+|:--|:--:|:--|:--|
+| **ninja** | **0.0%** | 17 | TODAS as 17 classificações como "ninja" estão erradas |
+| ramp + combo_piece | 0.0% | 1 | Tag composta rara, sem acerto |
+| recursion + wincon | 0.0% | 1 | Tag composta rara, sem acerto |
+| ramp + payoff | 0.0% | 1 | Tag composta rara, sem acerto |
+| payoff + removal | 0.0% | 1 | Tag composta rara, sem acerto |
+| payoff + token_maker | 0.0% | 1 | Tag composta rara, sem acerto |
+| stax_disruption | 0.0% | 3 | 3/3 erradas — classificador confunde stax com outras funções |
+
+### Tags Intermediárias (50-75%)
+
+| Tag | Precisão | Amostras |
+|:--|:--:|:--:|
+| payoff | 35.5% | 31 |
+| combo_piece | 50.0% | 2 |
+| enabler | 50.0% | 42 |
+| other | 50.0% | 2 |
+| protection | 69.2% | 13 |
+| wincon | 75.0% | 8 |
+| engine | 75.0% | 8 |
+
+### Análise
+
+**Pontos fortes:**
+- Tags fundamentais (land, utility, ramp, draw, removal) estão em 100% — a base do classificador é sólida.
+- 15 de 29 tags têm precisão perfeita.
+
+**Pontos fracos críticos:**
+1. **ninja (0.0%, 17 erros):** O classificador está atribuindo "ninja" massivamente a cartas que não são ninja. Isso é um viés grave — provavelmente o regex/heurística captura retorno à mão (ninjutsu) mas classifica errado.
+2. **stax_disruption (0.0%, 3 erros):** O classificador não consegue diferenciar stax de outras formas de disruption.
+3. **Tags compostas (todas 0%):** Tags compostas como `ramp + combo_piece`, `payoff + removal` têm amostras muito pequenas (1 cada) e zero acertos. Ou o classificador não deveria gerá-las golden tags, ou precisa de ajuste.
+4. **enabler (50%, 42 amostras):** Metade dos "enablers" estão classificados errados — impacto significativo na análise de decks.
+5. **payoff (35.5%, 31 amostras):** A tag mais problemática em volume. 20 das 31 classificações estão erradas.
+
+**Recomendação:** Revisar as heurísticas de ninja, payoff, enabler e stax_disruption. As tags compostas podem ser reviewedas para verificar se os golden labels estão corretos.
+
 ## Observações Importantes
 
 - Nenhum cron desabilitado, stale (>120min) ou never-run nesta rodada — **nenhuma ação `resume`/`run` foi necessária**.
