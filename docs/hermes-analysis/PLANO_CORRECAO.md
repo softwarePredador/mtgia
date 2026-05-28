@@ -11,7 +11,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
-5. **P1 — Ownership em rotas deck/AI**: resolvido nos fluxos app-facing principais (`POST /ai/optimize`, `GET /ai/optimize/jobs/:id`, `POST /ai/archetypes`) em `origin/master@65f30387`; rotas experimentais seguem bloqueadas para promocao sem contrato owner/public/meta.
+5. **P1 — Ownership em rotas deck/AI**: aberto no checkout auditado (`codex/hermes-analysis-docs@d2b189fc`) para `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` e `POST /ai/archetypes`; rotas experimentais seguem bloqueadas para promocao sem contrato owner/public/meta.
 6. **P1 — Politicas por nome**: resolvido para as listas apontadas pelo verificador (`premiumLandNames`, high-power e candidate-quality premium) via `commander_fallback_policy.dart`; novas excecoes por nome devem entrar apenas em policy versionada ou fixture/teste.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 
@@ -130,11 +130,12 @@ Histórico do problema:
   - rerodar `dart analyze` até ficar verde.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
-- **Status em `origin/master@65f30387`: RESOLVIDO para os fluxos app-facing
-  principais.** `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` e
-  `POST /ai/archetypes` agora sao owner-scoped e possuem testes source/live.
-  Permanece a regra de produto: rotas experimentais abaixo nao devem ser
-  promovidas ao app sem contrato owner/public/meta e testes.
+- **Status em `codex/hermes-analysis-docs@d2b189fc`: ABERTO.** A rodada local
+  de 2026-05-28 23:00 UTC revalidou que `POST /ai/optimize`,
+  `GET /ai/optimize/jobs/:id` e `POST /ai/archetypes` ainda nao estao
+  owner-scoped de ponta a ponta neste checkout. Qualquer afirmacao historica de
+  resolucao em outro SHA deve ser tratada como nao aplicavel ate a correcao
+  aparecer no checkout auditado com testes.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart`, mas
@@ -157,16 +158,21 @@ Histórico do problema:
   usuario autenticado obtenha UUID ou job ID alheio; tambem cria contratos
   ambiguos para futuras telas.
 - **Ação recomendada**:
-  1. antes de expor endpoints experimentais no app, escolher entre escopar por
+  1. corrigir primeiro os fluxos app-facing principais:
+     `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` e
+     `POST /ai/archetypes`;
+  2. antes de expor endpoints experimentais no app, escolher entre escopar por
      dono, limitar a deck publico/meta deck, ou remover/ocultar o contrato;
-  2. criar rota dedicada ou teste de contrato para `/community/decks/following`,
+  3. criar rota dedicada ou teste de contrato para `/community/decks/following`,
      hoje implementada como branch `id == 'following'` em `[id].dart`.
 - **Validação**:
+  - `POST /ai/optimize` e `POST /ai/archetypes` retornam 404/403 para deck de
+    outro usuario e continuam verdes para o dono;
+  - polling de job com `user_id = NULL` retorna 404 ou fica restrito a rota
+    interna documentada;
   - testes owner vs non-owner para cada rota experimental mantida;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
     continua vazio ate haver contrato seguro;
-  - polling de job com `user_id = NULL` retorna 404 ou fica restrito a rota
-    interna documentada.
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
 - **Evidência**:

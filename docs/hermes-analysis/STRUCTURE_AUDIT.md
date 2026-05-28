@@ -1,6 +1,183 @@
 # ManaLoom Code Structure Audit
-> Atualizacao: 2026-05-28 19:00 UTC
-> Rotacao local Codex: `duplicated-or-similar-logic`
+> Atualizacao: 2026-05-28 23:00 UTC
+> Rotacao local Codex: `module-coherence-server-lib-routes-app-lib`
+
+## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib`
+
+Escopo desta rodada: somente coerencia de contratos, ownership e consumo entre
+helpers de `server/lib`, handlers de `server/routes` e consumidores em
+`app/lib`. Nao foi executada auditoria ampla de classes sem uso, funcoes nao
+chamadas, imports/ciclos, tabelas PostgreSQL ou duplicacao geral.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: branch remota sincronizada.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativo.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: limpo no inicio da rodada.
+- `git rev-parse --short HEAD`: `d2b189fc`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 174.
+- Imports quebrados: 0.
+
+Limitacao atual: o auditor estrutural continua util para mapa bruto de classes,
+imports, tabelas e nomes duplicados, mas nao entende contratos app-facing nem
+propagacao de ownership entre provider, rota e helper. Os achados abaixo foram
+produzidos por leitura direta focada usando `grep`, porque `rg` nao esta
+instalado neste shell local.
+
+### Achados confirmados
+
+#### P1 — `POST /ai/optimize` ainda perde ownership ao atravessar `routes -> lib`
+
+- **Contrato app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
+  monta o payload com `deck_id`, `archetype`, `bracket`, `keep_theme` e
+  `intensity`; `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`
+  envia `POST /ai/optimize`.
+- **Handler:** `server/routes/ai/optimize/index.dart:401`-`:405` le
+  `userId` de forma tolerante, mas `server/routes/ai/optimize/index.dart:549`-`:558`
+  chama `optimize_request.loadOptimizeDeckContext(...)` sem passar `userId`.
+- **Helper:** `server/lib/ai/optimize_request_support.dart:53`-`:62` nao recebe
+  `userId`; a query do deck em
+  `server/lib/ai/optimize_request_support.dart:63`-`:73` usa
+  `SELECT name, format FROM decks WHERE id = @id`, e as queries de cartas em
+  `server/lib/ai/optimize_request_support.dart:87`-`:137` usam apenas
+  `WHERE dc.deck_id = @id`.
+- **Comparacao segura:** `server/routes/decks/[id]/index.dart:288`-`:317`
+  usa `FROM decks WHERE id = @deckId AND user_id = @userId`; `server/routes/decks/[id]/analysis/index.dart:16`-`:25`
+  tambem escopa por `deckId + userId` antes de ler analise.
+- **Por que e incoerente:** o app trata optimize como acao sobre deck privado
+  do usuario autenticado, mas a fronteira de helper carrega qualquer deck por
+  UUID.
+- **O que valida:** `loadOptimizeDeckContext` receber `userId`, consultar o deck
+  por `id + user_id` ou por regra publica explicita, e testes owner vs non-owner
+  para caminhos sync e async.
+- **O que falsifica:** contrato documentado e testado provando que optimize
+  aceita deck publico/alheio por design sem expor composicao privada.
+
+#### P1 — `POST /ai/archetypes` e consumido pelo app, mas carrega deck/cartas sem owner
+
+- **Contrato app:** `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`
+  chama `POST /ai/archetypes` com `{deck_id: deckId}`.
+- **Handler:** `server/routes/ai/archetypes/index.dart:27`-`:35` le o
+  `deck_id` e o `Pool`, mas nao le `context.read<String>()`; a query do deck em
+  `server/routes/ai/archetypes/index.dart:39`-`:42` usa
+  `SELECT name, format FROM decks WHERE id = @id`, e a query de cartas em
+  `server/routes/ai/archetypes/index.dart:53`-`:62` usa `WHERE dc.deck_id = @id`.
+- **Middleware:** `server/routes/ai/_middleware.dart:16`-`:20` aplica auth,
+  limite de plano e rate limit, entao a rota e autenticada/custosa, mas o
+  handler nao usa o usuario autenticado para escopar o deck.
+- **Por que e incoerente:** as opcoes de arquétipo derivam da lista real do deck
+  privado, mas qualquer UUID existente pode ser analisado por um usuario
+  autenticado.
+- **O que valida:** escopar `POST /ai/archetypes` por `deck_id + user_id` antes
+  de montar prompt/cache/reference profile e adicionar teste non-owner.
+- **O que falsifica:** contrato explicito para analisar apenas decks publicos ou
+  compartilhados, com filtro `is_public=true` ou regra de acesso equivalente.
+
+#### P1 — Polling de optimize aceita job com `user_id = NULL`
+
+- **Contrato app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:74`-`:87`
+  trata `202` como job async e
+  `app/lib/features/decks/providers/deck_provider_support_ai.dart:190`-`:194`
+  faz polling em `/ai/optimize/jobs/$jobId`.
+- **Criacao:** `server/routes/ai/optimize/index.dart:459`-`:464` passa o
+  `userId` para `OptimizeJobStore.create`, mas esse `userId` pode ser `null`
+  porque foi lido de forma tolerante em `server/routes/ai/optimize/index.dart:401`-`:405`.
+- **Store:** `server/lib/ai/optimize_job.dart:50`-`:64` persiste `user_id` com
+  parametro nullable.
+- **Polling:** `server/routes/ai/optimize/jobs/[id].dart:26`-`:28` le o usuario
+  autenticado e carrega o job, mas `server/routes/ai/optimize/jobs/[id].dart:39`-`:47`
+  bloqueia apenas quando `job.userId != null && job.userId != userId`. Jobs
+  nulos ficam legiveis para qualquer usuario com o `job_id`.
+- **Por que e incoerente:** o app nao tem conceito de job publico, e a rota fica
+  sob `/ai` autenticado.
+- **O que valida:** exigir `userId` nao nulo para jobs app-facing e retornar 404
+  quando `job.userId == null`, salvo uma rota interna separada e documentada.
+- **O que falsifica:** teste provando que nenhum job app-facing pode ser criado
+  sem usuario e que o estado nulo tem politica segura.
+
+#### P2 — Endpoints experimentais de deck/AI continuam sem ownership antes de promocao app-facing
+
+- **Endpoints:** `GET /decks/:id/simulate`, `POST /decks/:id/recommendations`,
+  `POST /ai/simulate-matchup`, `POST /ai/weakness-analysis`.
+- **Evidencia de rotas:**
+  - `server/routes/decks/[id]/simulate/index.dart:13`-`:26` le cartas por
+    `WHERE dc.deck_id = @deckId`, sem ler `context.read<String>()`.
+  - `server/routes/decks/[id]/recommendations/index.dart:23`-`:27` consulta
+    `SELECT name, format, description FROM decks WHERE id = @deckId`, e
+    `server/routes/decks/[id]/recommendations/index.dart:39`-`:58` le cartas
+    por `dc.deck_id = @deckId`.
+  - `server/routes/ai/simulate-matchup/index.dart:23`-`:38` le
+    `my_deck_id`/`opponent_deck_id` e chama `_getDeckData`; essa funcao em
+    `server/routes/ai/simulate-matchup/index.dart:76`-`:103` usa
+    `SELECT id, name, format FROM decks WHERE id = @id` e cartas por
+    `dc.deck_id = @id`.
+  - `server/routes/ai/weakness-analysis/index.dart:17`-`:31` aceita `deck_id`
+    e consulta `SELECT name, format FROM decks WHERE id = @id`; as cartas sao
+    lidas em `server/routes/ai/weakness-analysis/index.dart:41`-`:60` por
+    `dc.deck_id = @id`.
+- **Evidencia app/contrato:** busca focada em `app/lib` nao encontrou chamadas
+  para esses endpoints; `server/doc/API_CONTRACTS_AND_DATA_MAP.md:152`-`:153`
+  e `:285`-`:286` marca os consumidores como `not proven`/experimentais.
+- **Por que e incoerente:** as rotas vivem em namespaces autenticados
+  (`server/routes/decks/_middleware.dart:7`-`:8` e
+  `server/routes/ai/_middleware.dart:16`-`:20`), mas nao aplicam o padrao de
+  owner dos endpoints estaveis de deck.
+- **O que valida:** antes de expor no app, escopar `deck_id`/`my_deck_id` por
+  `user_id`, definir regra separada para oponente publico/meta deck e adicionar
+  teste non-owner.
+- **O que falsifica:** decisao explicita de manter esses endpoints internos ou
+  remove-los da superficie app-facing, com contrato atualizado e sem chamada em
+  `app/lib`.
+
+#### P2 — `/community/decks/following` segue como branch magico em rota dinamica
+
+- **Contrato app:** `app/lib/features/social/providers/social_provider.dart:550`-`:584`
+  chama `/community/decks/following?page=...&limit=20` e registra o endpoint
+  como `/community/decks/following`.
+- **Handler:** `server/routes/community/decks/[id].dart:10`-`:12` trata
+  `id == 'following'` como caso especial e desvia para `_getFollowingFeed`.
+- **Implementacao:** `server/routes/community/decks/[id].dart:294`-`:410`
+  implementa o feed dentro do arquivo de detalhe dinamico; `find
+  server/routes/community/decks -maxdepth 3 -type f` mostrou apenas
+  `index.dart` e `[id].dart`, sem `following/index.dart`.
+- **Contrato documentado:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md:77`
+  ja registra o risco de manutencao e recomenda rota dedicada.
+- **Por que e incoerente:** a URI app-facing representa uma colecao/feed, mas o
+  arquivo fisico e a dispatch rule tratam `following` como valor magico de
+  `:id`.
+- **O que valida:** criar `server/routes/community/decks/following/index.dart`
+  ou teste de contrato explicito cobrindo `GET /community/decks/following` e
+  `GET /community/decks/:id`.
+- **O que falsifica:** decisao documentada de manter o branch por compatibilidade
+  com teste que trave o comportamento.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- `POST /ai/rebuild` nao foi reaberto: `server/routes/ai/rebuild/index.dart:16`
+  le `userId`, e o carregamento inicial em `server/routes/ai/rebuild/index.dart:70`
+  parte de query com deck/user antes de carregar cartas.
+- `GET /decks/:id/analysis` nao foi reaberto: `server/routes/decks/[id]/analysis/index.dart:18`-`:25`
+  le `userId` e filtra `decks` por `id + user_id` antes de consultar cartas.
+- A afirmacao historica de que `POST /ai/optimize`, `GET /ai/optimize/jobs/:id`
+  e `POST /ai/archetypes` estavam saneados em `origin/master@65f30387` nao foi
+  sustentada pelo checkout auditado (`d2b189fc`); os documentos de plano/mapa
+  foram ajustados para refletir a evidencia atual.
+
+## Rodada focada anterior: Duplicated or similar logic
 
 ## Rodada focada: Duplicated or similar logic
 
