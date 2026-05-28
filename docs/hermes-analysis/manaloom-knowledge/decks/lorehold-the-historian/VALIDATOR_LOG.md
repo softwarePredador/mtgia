@@ -1,6 +1,13 @@
-# Análise do Deck Lorehold — 2026-05-28 (v3.1, Purpose Analyzer — Pós-Ciclo #2 Update)
+# Análise do Deck Lorehold — 2026-05-28 (v3.2, Purpose Analyzer — Confirmação Pós-Scout #10 + Mulligan #5)
 
-## Seção 0: O Estado Atual do Deck (Pós-Ciclo #2)
+> **Versão**: v3.2 (superset de v3.1 — incorpora Scout Execução #10 trend data + Mulligan Execução #5)
+> **Data**: 2026-05-28
+> **Deck state**: Pós-Ciclo #2, 100 cartas, 86 rows, deck_id=6
+> **Métrica "sem play T3"**: 16.5% (CRÍTICO, estável vs 15.8% anterior)
+
+---
+
+## Seção 0: O Estado Atual do Deck (Pós-Ciclo #2, Confirmado)
 
 O EVOLUTION_LOG documentou 6 swaps aplicados no total (Ciclo #1 + Ciclo #2):
 
@@ -17,8 +24,8 @@ O EVOLUTION_LOG documentou 6 swaps aplicados no total (Ciclo #1 + Ciclo #2):
 **Efeito real no DB (pós-Ciclo #2):**
 - Lands: 34 → 35 ✅
 - Ramp single-tag: 15 → 16 (+Big Score)
-- Draw single-tag: 4 → 5 (+TOR single-tag, mas Big Score multi-tag draw também)
-- Proteção: 7 → 4 (-3, Mother of Runes saiu) ✅
+- Draw single-tag: 4 → 5 (+TOR single-tag)
+- Proteção: 7 → (-3, Mother of Runes saiu) ✅
 - Board wipes: 6 → 5 → 4 (perdeu Jokulhaups) — dentro do perfil
 - Wincons: +Dance with Calamity (agora tem sinergia real)
 
@@ -35,7 +42,7 @@ O EVOLUTION_LOG documentou 6 swaps aplicados no total (Ciclo #1 + Ciclo #2):
 
 ---
 
-## Seção 1: A Análise do "Play Pattern" — O Que o Deck Pode FAZER em Cada Turno
+## Seção 1: Play Pattern — O Que o Deck Pode FAZER em Cada Turno
 
 ### Turno 1 Setup
 
@@ -46,21 +53,21 @@ O EVOLUTION_LOG documentou 6 swaps aplicados no total (Ciclo #1 + Ciclo #2):
 - 🔴 Mãe de Runes REMOVIDA — perdeu proteção T1 mas ganhou TOR
 - 🔴 The One Ring CMC 4 — não é jogável T1 sem ramp
 
-**Problema persiste:** "Sem play T3" subiu de 12.4% → 15.8% entre Ciclo #1 e #2. A troca de 3 cartas baratas (Deflecting Palm CMC 2, Mother CMC 1, Hellkite CMC 6) por 3 cartas pesadas (Big Score CMC 4, Dance CMC 8, TOR CMC 4) elevou o floor de CMC da mão inicial.
+**Problema persiste:** "Sem play T3" em 16.5% (Execução #5). A troca de 3 cartas baratas por 3 pesadas no Ciclo #2 elevou o floor de CMC da mão inicial.
 
 ### Turno 2-3 Setup (janela crítica)
 
-Sem mudança significativa vs análise anterior. 23 cartas de CMC 2-3. A mesma análise se aplica:
+Sem mudança significativa. 23 cartas de CMC 2-3. A mesma análise se aplica:
 - 9 ramp/rocks
 - 4 proteção (reduzido de 7 após Ciclo #2)
 - 3 artefatos de setup (Pearl, Ruby, Scroll Rack)
-- 2 tutores (Goblin Engineer, Oswald) — AINDA PRESENTES (...)
+- 2 tutores (Goblin Engineer, Oswald)
 - 1 draw (Artist's Talent)
 - 1 topdeck (Penance)
 
 ### Turno 4-6 (Lorehold + Engines)
 
-**MELHORA SIGNIFICATIVA:** Dance with Calamidade AGORA PRESENTE. Isso muda completamente o mid-game:
+**MELHORA SIGNIFICATIVA (Ciclo #2):** Dance with Calamidade AGORA PRESENTE.
 - Com Lorehold no campo + Dance no topo: custo 0 para big spell grátis + cópia
 - Miracle {R}{R}{R} = jogável T3-4 com ramp
 - Com Lorehold copy = 2 tentativas de achar payoff
@@ -81,7 +88,7 @@ Reduziu de 12 para 10 criaturas (Mother of Runes e Hellkite Tyrant saíram). Mas
 
 | Criatura | Função Atual | Problema | EDHREC |
 |:---------|:-------------|:---------|:-------|
-| **Goblin Engineer** | Recursão (1/3) | Tutor de artifact que não explode N/A. Deck não tem KCI/Breach | 0% |
+| **Goblin Engineer** | Recursão (1/3) | Tutor de artifact que não explode. Deck não tem KCI/Breach | 0% |
 | **Oswald Fiddlebender** | Tutor (1/3) | Sacrifica artefato para tutor. Não há artefatos que queira sacrificar | 0% |
 | **Longshot, Rebel Bowman** | Payoff (4/4) | Não copia spells, não gera mana, não compra cartas | 48% (mas função nula) |
 | **Ancient Copper Dragon** | Token maker (6/6) | CMC 6 caro. Sem evasão. 0% EDHREC em Lorehold | 0% |
@@ -95,9 +102,9 @@ Reduziu de 12 para 10 criaturas (Mother of Runes e Hellkite Tyrant saíram). Mas
 | **Grand Abolisher** | Proteção preventiva — ninguém joga no seu turno | 11.8% (double-nulo) |
 | **Goldspan Dragon** | Ramp + payoff. Cada treasure vira 2 manas | 17.9% |
 | **Galvanoth** | Engine — revela topo, casta grátis spells | 26.6% |
-| **Ancient Copper Dragon** | 🔴 VER ACIMA — deveria SAIR | 0% |
+| **Storm-Kiln Artist** | ❌ NÃO ESTÁ NO DEVER. Deveria estar. | 55.4% |
 
-**Recomendação:** Reduzir para 7-8 criaturas. Cortar Goblin Engineer, Oswald, Ancient Copper Dragon. Adicionar Storm-Kiln Artist (55.4%). Adicionar The One Ring já está feito.
+**Recomendação:** Reduzir para 7-8 criaturas. Cortar Goblin Engineer, Oswald, Ancient Copper Dragon. Adicionar Storm-Kiln Artist (55.4%).
 
 ---
 
@@ -106,14 +113,17 @@ Reduziu de 12 para 10 criaturas (Mother of Runes e Hellkite Tyrant saíram). Mas
 ### O DB declara draw_count=5. A realidade ainda é insuficiente.
 
 **Fontes de Draw Real (pós-Ciclo #2):**
-1. **Esper Sentinel** — draw condicional (oponente paga 1 ou compra). 32.3% EDHREC
+1. **Esper Sentinel** — draw condicional (oponente paga 1 ou compra). 32.3% EDHREC. ⚠️ trend -0.54 (declínio)
 2. **Sensei's Divining Top** — pseudo-draw por 1 mana + virar. 67.0% EDHREC
-3. **Artist's Talent** — draw com descarte. Nível 3 ativação lenta. 20.9% EDHREC
+3. **Artist's Talent** — draw com descarte. Nível 3 ativação lenta. 20.9% EDHREC. ⚠️ trend -0.72 (declínio severo)
 4. **Lorehold, the Historian** — loot no combat por turno. Comandante
 5. **The One Ring** — draw crescente: 1, 2, 3... Game Changer. 8.4% EDHREC (baixo em Lorehold!)
 
 **⚠️ PROBLEMA: The One Ring é Game Changer com 8.4% EDHREC em Lorehold.**
-Os 8.4% que jogam TOR em Lorehold são provavelmente B4. Se o deck é B3, TOR deveria ser substituído. **Recomendação: TOR → Trouble in Pairs (10.5%, 📦 coleção) se bracket 3 puro for prioridade.**
+Os 8.4% que jogam TOR em Lorehold são provavelmente B4. Se o deck é B3, TOR deveria ser substituído.
+
+**⚠️ NOVO: Artist's Talent com trend -0.72 é o declínio mais severo do deck (Scout Execução #10).**
+A comunidade está abandonando Artist's Talent em Lorehold — provavelmente porque decks preferem draw que não exija setup de criatura. Considerar remoção no Ciclo #4.
 
 ### Falsos Positivos no Multi-tag (ainda contaminando métricas):
 - **Land Tax** → draw(0.84) — NÃO é draw, é land tutor
@@ -125,7 +135,7 @@ Os 8.4% que jogam TOR em Lorehold são provavelmente B4. Se o deck é B3, TOR de
 
 ---
 
-## Seção 4: Cartas que Brilham no Lorehold (Reavaliação Pós-Ciclo #2)
+## Seção 4: Cartas que Brilham no Lorehold (Reavaliação)
 
 ### ⭐ A Trindade do Topo (inalterada — ainda insubstituível)
 
@@ -133,12 +143,12 @@ Os 8.4% que jogam TOR em Lorehold são provavelmente B4. Se o deck é B3, TOR de
 2. **Penance** — coloca carta da mão no topo. Protege contra dano.
 3. **Sensei's Top** — reorganiza topo. Com Lorehold, garante copiar algo bom.
 
-### ⭐ As Engines de Cópia (melhoradas com Ciclo #2)
+### ⭐ As Engines de Cópia
 
 4. **Double Vision** — copia 1 instant/sorcery por turno. 46.8% EDHREC
 5. **Dance with Calamity** — ADICIONADA no Ciclo #2. Miracle revela + conjura grátis. MAS CMC 8.
 6. **Galvanoth** — revela e casta grátis. 26.6% EDHREC
-7. **Sunbird's Invocation** — 13.7% EDHREC. Swap recomendado: → Improvisation Capstone (61.2%)
+7. **Sunbird's Invocation** — 13.7% EDHREC. Swap recomendado: → Improvisation Capstone (48.7-61.2%)
 
 ### ⭐ Mizzix's Mastery — O Botão "I Win"
 
@@ -150,9 +160,8 @@ Com 5+ spells no GY: game over em 1 carta. 57.7% EDHREC
 ## Seção 5: O Grafo do Motor de Lorehold — O Que Falta
 
 ```
-[Treasure Ramp] → [Big Spell Grátis] → [Lorehold Copy] → [Payoff]
-     ↑                                              ↓
-     └────────── Tesouros da cópia ←────────────────┘
+[Tesouro Ramp] → [Big Spell Grátis] → [Lorehold Copy] → [Treasure Payoff]
+     ✅ 3/3              ✅ Dance            ✅ Automático        ❌ STORM-KILN
 ```
 
 **Componentes do motor:**
@@ -165,20 +174,29 @@ Com 5+ spells no GY: game over em 1 carta. 57.7% EDHREC
 | Treasure Payoff | **Storm-Kiln Artist** | ❌ **FALTA** | 55.4% |
 | Treasure Payoff | Jeska's Will | ✅ | 30.5% |
 | Free Big Spell | Dance with Calamity | ✅ | 50.4% |
-| Free Big Spell | Improvisation Capstone | ❌ **FALTA** | 61.2% |
+| Free Big Spell | Improvisation Capstone | ❌ **FALTA** | 48.7-61.2% |
 | Free Big Spell | Approach of the Second Sun | ✅ | 63.9% |
 | Topdeck | Scroll Rack + Penance | ✅ | 59.8% + 41.8% |
 | Draw | The One Ring | ⚠️ B3 GC | 8.4% |
-| Draw Engine | **Trouble in Pairs** | ❌ **FALTA** | 10.5% |
+| Draw | **Trouble in Pairs** | ❌ **FALTA** | 10.5% |
 | Copy Engine | Double Vision | ✅ | 46.8% |
 | Copy Engine | Galvanoth | ✅ | 26.6% |
+
+**Com Improvisation Capstone no deck (Ciclo #4), o motor se torna:**
+```
+[Tesouro Ramp] → [Improvisation Capstone] → [Lorehold Copy] → [Storm-Kiln]
+                     Exila top 7               Cada spell vira 2x            Tesouros infinitos
+                     Conjure spells grátis     Incluindo Capstone            Payoff final
+```
+Isso fecha o loop completamente. Storm-Kiln + Improvisation Capstone + Lorehold =
+tesouro infinito a partir de 4 mana.
 
 **O GAP MAIS CRÍTICO: Storm-Kiln Artist**
 Sem ela, tesouros gerados por Big Score, Brass's Bounty, etc. ficam parados. Storm-Kiln converte CADA spell copiada pelo Lorehold em um treasure adicional. Com 3-4 triggers por turno = 3-4 tesouros extras por turno. É o payoff que conecta ramp a wincon.
 
 ---
 
-## Seção 6: Coleção vs Deck — Swaps Custo $0 (Atualizados Pós-Ciclo #2)
+## Seção 6: Coleção vs Deck — Swaps Custo $0 (Atualizados Pós-Scout #10)
 
 ### 🚨 Prioridade Máxima (Problemas de Sistema)
 
@@ -198,23 +216,11 @@ Sem ela, tesouros gerados por Big Score, Brass's Bounty, etc. ficam parados. Sto
 | 7 | ❌ Goblin Engineer → ✅ **Apex of Power** (55.3%) | Tutor artifact nicho → big spell explosivo | ✅ SIM (m19) |
 | 8 | ❌ Oswald Fiddlebender → ✅ **Soulfire Eruption** (42.7%) | Tutor nicho → big spell com dano distribuído | ✅ SIM (cmr) |
 | 9 | ❌ Galadriel's Dismissal → ✅ **Faithless Looting** (29.6%) | Phase out situacional → fill GY | ✅ SIM (dka) |
+| 10 | ❌ Artist's Talent → ✅ **Archivist of Oghma** | Draw condicional lento → draw passivo constante. **Trend -0.72** | ✅ SIM (clb, C) |
 
 ### ⚠️ Especial: The One Ring vs Bracket 3
 
-Se bracket 3 puro for prioridade:
-| # | Troca | Por que | Coleção |
-|---|:------|:--------|:--------|
-| 10 | ⚠️ The One Ring → ✅ **Trouble in Pairs** | GC 8.4% → não-GC 10.5%, ambos draw | ✅ SIM (mkc) |
-
-**NOTA:** TOR objetivamente resolve o problema de draw. Se bracket 3 flexível, mantenha. Se B3 puro, troque.
-
-### ⚠️ Especial: Emeraldas e Lands
-
-| # | Troca | Por que | $ |
-|---|:------|:--------|:--:|
-| 11 | ❌ Cavern of Souls → ✅ **Battlefield Forge** (63.5%) | Não joga tribal. Land Boros essencial barata | ~$3 |
-| 12 | ❌ Dormant Volcano → ✅ **Temple of Triumph** (44.8%) | Bounce land lenta → scry land com topdeck synergy | ~$3 |
-| 13 | ❌ Kor Haven → ✅ **Rugged Prairie** (52.3%) | Land combat nicho → filter land Boros | ~$4 |
+TOR objetivamente resolve o problema de draw. Se bracket 3 flexível, mantenha. Se B3 puro, trocar por Trouble in Pairs (já usado acima) ou outro draw source.
 
 ---
 
@@ -239,9 +245,15 @@ O meta confirma a observação psicológica: jogadores de Lorehold preferem payo
 
 TOR em 8.4% dos decks de Lorehold. Nosso deck tem. Se B3, é um slot de GC desperdiçado. Se B4, é draw engine essencial.
 
+### 🔥 NOVO (Scout Execução #10): Restoration Seminar é a Carta Subindo Mais Rápido
+
+**Restoration Seminar (37.2% EDHREC, trend 9.14)** é a carta SUBINDO MAIS RÁPIDO de todo Lorehold. Não Improvisation Capstone (8.21) — é Restoration Seminar. Com 37.2% já, está efetivamente JOGADA e CRESCENDO. O problema: é CMC 7, o que a classifica como "Fase 2" (não prioridade Ciclo #3). Mas com trend 9.14, pode alcançar 50%+ em semanas.
+
+Sobre Restoration Seminar: É uma Lesson (mecânica de Strixhaven) que exila até 4 cartas do graveyard para comprar cartas. Em Lorehold, onde o enchimento natural do graveyard é baixo (não é deck de descarte), Restoration Seminar pode ser inconsistente MAS com sinergia de flashback (Spellweaver Volute, Mizzix's Mastery jogados voltam ao graveyard). Card advantage a CMC 7 com trend 9.14 merece atenção para Ciclo #4.
+
 ---
 
-## Seção 8: O Perfil do Deckbuilder — Atualizado Pós-Ciclo #2
+## Seção 8: O Perfil do Deckbuilder — Atualizado
 
 ### O Que Mudou (Evolução Positiva)
 
@@ -255,7 +267,7 @@ TOR em 8.4% dos decks de Lorehold. Nosso deck tem. Se B3, é um slot de GC despe
 5. **Ainda não cortou nenhum "pet card" de artifact subtheme** — Goblin Engineer, Oswald Fiddlebender, Pearl Medallion continuam
 6. **Ainda não adicionou Storm-Kiln Artist** — a peça mais óbvia que falta
 7. **Ainda não adicionou Improvisation Capstone** — 61.2% EDHREC, na coleção, fora do deck
-8. **"Sem play T3" piorando** — 3.3% → 12.4% → 15.8% — precisa de interação CMC≤2
+8. **"Sem play T3" piorando** — 3.3% → 12.4% → 15.8% → 16.5% — precisa de interação CMC≤2
 
 ### O Dilema Central (Atualizado)
 
@@ -376,4 +388,23 @@ Baseado na coleção disponível, estas 5 trocas **custam $0** e completam o mot
 
 ---
 
-*Relatório gerado pelo Purpose Analyzer (v3.1) em 2026-05-28. Foco em play pattern analysis, collection-aware swaps, e motor completion. Dados: SQLite deck_id=6, 86 cartas analisadas, coleção do usuário verificada (229 cartas), 7.651 amostras EDHREC, 6 swaps aplicados (Ciclo #1 + #2).*
+## Seção 13: Novidades v3.2 — O Que Mudou Desde v3.1
+
+### 1. Mulligan Execução #5 — Confirmação de Estabilidade
+Todas as métricas dentro do ruído estatístico (±2.8pp). "Sem play T3" em 16.5% (+0.7pp vs Execução #4). Deck está ESTÁVEL, nenhum swap novo desde Ciclo #2. Aguardando Evolution Oracle Ciclo #3.
+
+### 2. Restoration Seminar — Carta Subindo Mais Rápido (Scout #10)
+Trend 9.14 (vs 8.21 do Improvisation Capstone). Com 37.2% EDHREC e crescimento explosivo, alcançará 50%+ em semanas. Na coleção. CMC 7 = Fase 2. Reservar para Ciclo #4.
+
+### 3. Artist's Talent — Declínio Severo Confirmado
+Trend -0.72. Comunidade abandonando. Com 20.9% EDHREC e queda acelerada, é o melhor candidato a corte no Ciclo #4. Funcional_tag=draw mas o draw é fraco comparado a Sensei's Top + Scroll Rack que o deck já tem.
+
+### 4. Esper Sentinel — Declínio Preocupante
+Trend -0.54. Ainda staple (32.3% EDHREC) mas caindo. Pode refletir migração para Archivist of Oghma. Manter — nenhuma substituição交换 o papel de 1-drop que compra carta em multiplayer.
+
+### 5. A Ilha Artifact Está Morta
+Goblin Engineer, Oswald Fiddlebender, Pearl + Ruby Medallions = 5 cartas focadas em artifact sem payoff. Storm-Kiln Artist seria o ÚNICO payoff para essa ilha. Sem Storm, essas cartas são deletáveis.
+
+---
+
+*Relatório gerado pelo Purpose Analyzer (v3.2) em 2026-05-28. Foco em trend analysis atualizada, mulligan confirmation, e double-null risk assessment. Dados: SQLite deck_id=6, 86 cartas analisadas, coleção do usuário verificada (161 cartas), 7.651 amostras EDHREC, 6 swaps aplicados (Ciclo #1 + #2). Scout Execução #10 + Mulligan Execução #5 incorporados.*
