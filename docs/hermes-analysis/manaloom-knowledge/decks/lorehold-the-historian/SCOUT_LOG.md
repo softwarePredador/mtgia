@@ -1172,3 +1172,177 @@ O perfil emergente dos 7.651 decks:
 ---
 
 **Dados brutos:** `/tmp/edhrec_lorehold.json`
+
+---
+
+## [2026-05-28 04:00] Execução #8 — Scout de Urgência: O Problema "Sem Play T3"
+
+### Fonte
+- **EDHREC Live** (__NEXT_DATA__): **7.651 decks** de Lorehold (meta estável vs Execução #7)
+- **Nosso deck**: deck_id=6, "Lorehold Spellslinger", 100 cartas, pós-Ciclo #2 (Ciclo #3 NÃO aplicado)
+- **Coleção**: 229 cartas no `user_collection`
+- **Foco**: O alerta do Mulligan Log — "sem play T3" em 15.8% exige ação prioritária
+
+---
+
+### 🚨 DIAGNÓSTICO CRÍTICO: "Sem Play T3" em 15.8% — Tendência de Piora
+
+O Mulligan Log (Execução #4, pós-Ciclo #2) revela um problema crescente:
+
+| Execução | Lands | Jogáveis | Mulligan | Ramp T1 | **Sem Play T3** |
+|:---------|:-----:|:--------:|:--------:|:-------:|:---------------:|
+| #1 (baseline) | 34 | 70.1% | 23.9% | 13.6% | **3.3%** ✅ |
+| #2 (pós-Ciclo #1) | 35 | 70.6% | 23.0% | 18.4% | **8.8%** 🟡 |
+| #3 (pós-Ciclo #1 conf) | 35 | 73.2% | 26.8% | 25.4% | **12.4%** 🟡 |
+| #4 (pós-Ciclo #2) | 35 | 71.1% | 29.9% | 24.8% | **15.8%** 🔴 |
+
+**Tendência:** A cada ciclo de swaps, "sem play T3" piorou. Ciclo #1 adicionou Esper Sentinel (CMC 1) e Gamble (CMC 1) — neutro. Ciclo #2 adicionou Big Score (CMC 4), The One Ring (CMC 4) e Dance with Calamity (CMC 8), removendo Deflecting Palm (CMC 2), Hellkite Tyrant (CMC 6) e Mother of Runes (CMC 1). O efeito líquido foi **subir o CMC médio da mão inicial** — trocaram-se 2 cartas CMC≤2 por 2 cartas CMC 4+ e 1 carta CMC 8.
+
+**Raiz do problema:** As cartas removidas dos Ciclos #1-2 eram baratas (CMC 1-2). As cartas adicionadas são caras (CMC 4-8). O deck ganhou no mid-game (Dance com Miracle é devastador) mas perdeu accesso a plays nos turnos 1-3.
+
+---
+
+### 🔍 O QUE "SEM PLAY T3" SIGNIFICA NA PRÁTICA
+
+Uma mão "sem play T3" significa:
+- Zero lands nos 2 primeiros turnos OU
+- Lands mas zero spells CMC≤3 conjuráveis até T3 OU
+- Apenas spells CMC≥4 sem ramp para adiantá-los
+
+Isso é **devastador em Lorehold** porque:
+- Turnos 1-3 são quando o meta estabelece presença (Smothering Tithe, Sol Ring, Signets)
+- Se você não joga nada até T3, volta 2-3 turnos e o jogo pode estar decidido
+- Lorehold não tem draw natural — cada turno sem jogo é um turno perdido permanentemente
+
+---
+
+### 🧠 AS 7 CARTAS PROBLEMÁTICAS — Re-análise por Perspectiva de CMC
+
+Ordenando as 7 cartas problemáticas (<10% EDHREC) por CMC:
+
+| Carta | CMC | EDHREC | Problema Duplo | Swap Sugerido | CMC Swap | Δ CMC |
+|:------|:---:|:------:|:---------------|:--------------|:---------|:-----:|
+| **Orim's Chant** | 1 | 0% | Stax fora do plano | Chaos Warp | 3 | +2 |
+| **Desperate Ritual** | 2 | 0% | Ritual sem value | Generous Gift | 3 | +1 |
+| **Grand Abolisher** | 2 | 11.8% | Double-null, prot redundante | Faithless Looting | 2 | 0 |
+| **Galadriel's Dismissal** | 1* | 0% | Double-null, situacional | Chaos Warp | 3 | +2 |
+| **Season of the Bold** | 5 | 9.9% | CMC alto, sinergia questionável | Improvisation Capstone | 7 | +2 |
+| **Sunbird's Invocation** | 6 | 13.7% | CMC alto, payoff lento | Improvisation Capstone | 7 | +1 |
+| **Ancient Copper Dragon** | 6 | 0% | CMC alto, 0% meta | Storm-Kiln Artist | 3 | **-3** |
+
+*Nota: CMC de Galadriel's Dismissal listado como 1 no banco, mas tem kicker que efetivamente custa mais.*
+
+**Insight:** Se trocarmos TODAS as 7 cartas problemáticas, o CMC médio geral sobe ainda mais (+10 CMC distribuídos em 7 slots). Isso **AGRAVA** o problema "sem play T3".
+
+---
+
+### 🎯 ESTRATÉGIA REVISADA: Ciclo #3 Deve Ser Diferente
+
+Os Ciclos #1 e #2 trocaram barato por caro. O Ciclo #3 **precisa** fazer o oposto: trocar caro por barato/médio para **reduzir o piso de CMC** da mão inicial.
+
+**Nova filosofia para Ciclo #3:** "Trocar caro+inedito por barato+meta"
+
+**Top 3 swaps CICLO #3 (foco em reduzir sem play T3):**
+
+| # | Adicionar | CMC | % EDHREC | Remover | CMC | % EDHREC | Δ CMC | Impacto |
+|:-:|:----------|:---:|:--------:|:--------|:---:|:--------:|:-----:|:--------|
+| 1 | **Storm-Kiln Artist** | 3 | 55.4% | Ancient Copper Dragon | 6 | 0% | **-3** | Payoff tesouro, CMC menor |
+| 2 | **Boros Signet** | 2 | 50.4% | Season of the Bold | 5 | 9.9% | **-3** | Ramp staple, muito mais barato |
+| 3 | **Faithless Looting** | 2 | 29.6% | Sunbird's Invocation | 6 | 13.7% | **-4** | Draw/cycle, CMC muito menor |
+
+**Efeito líquido no CMC:** -10 CMC em 3 slots = redução média de ~0.3 no CMC geral. "Sem play T3" deve cair de 15.8% para ~10-12%.
+
+**NÃO fazer no Ciclo #3:**
+- Trocar cartas CMC≤2 por CMC≥4 (repetir erro do Ciclo #2)
+- Adicionar Improvisation Capstone (CMC 7) por Sunbird's Invocation (CMC 6) — sobe CMC
+- Trocar Orim's Chant (CMC 1) por Chaos Warp (CMC 3) — sobe CMC
+
+**Deixar para Ciclo #4 (após estabilizar CMC):**
+- Improvisation Capstone → Sunbird's Invocation ou Season of the Bold
+- Chaos Warp → Orim's Chant ou Galadriel's Dismissal
+- Blasphemous Act → Fated Clash
+
+---
+
+### 📊 PROJEÇÃO PÓS-CICLO #3 (Swaps Focados em CMC)
+
+| Métrica | Pós-Ciclo #2 | Pós-Ciclo #3 (proj) | Δ |
+|:--------|:------------:|:-------------------:|:-:|
+| CMC médio | ~3.85 | ~3.55 | -0.3 🟢 |
+| "Sem play T3" | 15.8% | ~10-12% | -4-6pp 🟢 |
+| Cartas ≥50% EDHREC | 23 | 25 | +2 🟢 |
+| Cartas <10% EDHREC | 7 | 4 | -3 🟢 |
+| Draw real | 5 | 6-7 | +1-2 🟢 |
+| Overlap meta | 62% | 70%+ | +8pp 🟢 |
+
+---
+
+### 🧠 NOVO INSIGHT: As Duas Fases de Lorehold
+
+Analisando os 7.651 decks, emerge que Lorehold tem **duas fases distintas** que exigem cartas diferentes:
+
+**Fase 1 (Turnos 1-4) — "Setup":**
+- Objetivo: Mana, encontrar peças, sobreviver
+- Cartas certas: Ramp CMC≤2, draw CMC≤3, proteção barata
+- Cartas erradas: Big spells, CMC≥6, payoff sem setup
+
+**Fase 2 (Turnos 5+) — "Explosão":**
+- Objetivo: Conjurar big spell + copiar com Lorehold
+- Cartas certas: Dance, Approach, Improvisation Capstone, Storm-Kiln
+- Cartas erradas: Ramp, draw — já fez o trabalho
+
+**O erro do Ciclo #2:** Adicionou 3 cartas de Fase 2 (Big Score é fronteira, TOR é Fase 1-2, Dance é Fase 2) e removeu 2 cartas de Fase 1 (Mother of Runes CMC 1, Deflecting Palm CMC 2). Ficou pesado na Fase 2 sem ter a Fase 1 resolvida.
+
+**O Ciclo #3 deve:** Adicionar Storm-Kiln Artist (payoff Fase 1-2, CMC 3), Boros Signet (ramp Fase 1, CMC 2), Faithless Looting (draw/cycle Fase 1, CMC 2) — reforçando a Fase 1.
+
+---
+
+### 📋 RESUMO DO ESTADO DO DECK (Execução #8)
+
+| Aspecto | Status |
+|:--------|:-------|
+| Ciclo #1 | ✅ Aplicado (Esper Sentinel, Gamble, Plains) |
+| Ciclo #2 | ✅ Aplicado (Big Score, Dance, TOR) |
+| Ciclo #3 | ⏳ NÃO aplicado — é a próxima prioridade |
+| Cartas ≥50% EDHREC | 23/86 não-land (27%) |
+| Cartas 0% EDHREC | 7/86 não-land (8%) |
+| "Sem play T3" | 15.8% 🔴 (CRÍTICO) |
+| CMC médio | ~3.85 |
+| Overlap meta | 62% |
+
+---
+
+### 🎯 ORDEM DE PRIORIDADE PARA O PIPELINE
+
+1. **🔥 Evolution Oracle (Ciclo #3):** Storm-Kiln → Ancient Copper Dragon, Boros Signet → Season of the Bold, Faithless Looting → Sunbird's Invocation. **FOCO: reduzir CMC, não adicionar big spells.**
+2. **Mulligan Analyst:** Re-simular após Ciclo #3 para verificar se "sem play T3" caiu para <12%.
+3. **Próximo Scout:** Verificar evolução do overlap após Ciclo #3.
+4. **Ciclo #4:** Adicionar Improvisation Capstone e Chaos Warp (após estabilizar early game).
+
+---
+
+### LIÇÕES DESTA EXECUÇÃO
+
+1. **"Sem play T3" é a métrica mais importante para Lorehold B3.** Não adianta ter o melhor mid-game se você não sobrevive até lá. Meta <10% é o alvo.
+
+2. **Trocar barato por caro é o erro mais comum nos ciclos de evolução.** Cada swap deve ser avaliado pelo impacto no CMC da mão inicial, não apenas pela qualidade da carta.
+
+3. **O Ciclo #2 foi estrategicamente caro.** Resolveu o problema de payoff (Dance) e draw (TOR) mas ignorou o custo em consistência early-game.
+
+4. **Ciclo #3 precisa ser "defensivo" — trocar caro+inedito por barato+meta.** Não é hora de adicionar Improvisation Capstone (CMC 7). É hora de adicionar Boros Signet (CMC 2) e Faithless Looting (CMC 2).
+
+5. **Storm-Kiln Artist é a exceção** — CMC 3 é barato o suficiente para Fase 1, E é o payoff que falta no motor de Lorehold. Swap triplo: reduz CMC (6→3), adiciona meta (0%→55.4%), adiciona payoff.
+
+6. **Boros Signet (50.4%) swap por Season of the Bold (9.9%)** é uma das trocas mais óbvias restantes. Signet é ramp CMC 2 staple; Season é exile draw condicional CMC 5 que ninguém joga.
+
+---
+
+### PRÓXIMOS PASSOS
+
+1. **Evolution Oracle Ciclo #3** (URGENTE) — 3 swaps focados em reduzir CMC
+2. **Mulligan Analyst** pós-Ciclo #3 — verificar "sem play T3" < 12%
+3. Scout de acompanhamento — verificar progresso do overlap meta
+
+---
+
+**Dados brutos:** `/tmp/edhrec_inclusion.json` (277 cartas, EDHREC Live 7.651 decks)
