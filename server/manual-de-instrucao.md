@@ -17846,3 +17846,24 @@ ambiguidade de contagem.
   `DABB9D79-2FDB-4585-94DB-E31F1288EE74`:
   `app/integration_test/deck_functional_tags_runtime_test.dart` PASS,
   `00:10 +1: All tests passed!`.
+
+## 150. Archetypes owner scope hardening - 2026-05-28
+
+### O Que
+
+`POST /ai/archetypes` agora escopa o `deck_id` pelo usuário autenticado antes
+de ler o deck e suas cartas.
+
+### O Porquê
+
+O endpoint sempre exigia token, mas a leitura inicial usava apenas
+`decks.id`. Isso permitiria que um usuário autenticado solicitasse opções de
+arquétipo para um deck privado de outro usuário caso conhecesse o UUID.
+
+### Resultado
+
+- lookup de deck mudou para `id + user_id`;
+- `deck_id` inexistente ou pertencente a outro usuário retorna o mesmo `404`;
+- teste source cobre o guard de ownership;
+- teste live de `/ai/archetypes` cobre cross-account com retorno `404`;
+- contrato API atualizado para explicitar que `deck_id` é owner-scoped.

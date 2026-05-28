@@ -39,13 +39,13 @@ void main() {
         : <String, dynamic>{'value': decoded};
   }
 
-  Future<String> getAuthToken() async {
+  Future<String> getAuthTokenFor(Map<String, String> user) async {
     var response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'email': testUser['email'],
-        'password': testUser['password'],
+        'email': user['email'],
+        'password': user['password'],
       }),
     );
 
@@ -53,7 +53,7 @@ void main() {
       response = await http.post(
         Uri.parse('$baseUrl/auth/register'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(testUser),
+        body: jsonEncode(user),
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -64,8 +64,8 @@ void main() {
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'email': testUser['email'],
-          'password': testUser['password'],
+          'email': user['email'],
+          'password': user['password'],
         }),
       );
     }
@@ -77,9 +77,16 @@ void main() {
     return decodeJson(response)['token'] as String;
   }
 
-  Map<String, String> authHeaders({bool withContentType = false}) => {
+  Future<String> getAuthToken() => getAuthTokenFor(testUser);
+
+  Map<String, String> authHeaders({
+    bool withContentType = false,
+    String? token,
+  }) =>
+      {
         if (withContentType) 'Content-Type': 'application/json',
-        if (authToken != null) 'Authorization': 'Bearer $authToken',
+        if ((token ?? authToken) != null)
+          'Authorization': 'Bearer ${token ?? authToken}',
       };
 
   Future<Map<String, dynamic>> findCardByName(String name) async {
@@ -277,6 +284,41 @@ void main() {
         isFalse,
         reason: response.body,
       );
+    },
+    skip: skipIntegration,
+  );
+
+  test(
+    '/ai/archetypes does not expose decks owned by another user',
+    () async {
+      final talrand = await findCardByName('Talrand, Sky Summoner');
+      final deckId = await createDeck(
+        format: 'commander',
+        cards: [
+          {
+            'card_id': talrand['id'],
+            'quantity': 1,
+            'is_commander': true,
+          },
+        ],
+      );
+      createdDeckIds.add(deckId);
+
+      final timestamp = DateTime.now().microsecondsSinceEpoch;
+      final otherToken = await getAuthTokenFor({
+        'email': 'test_archetypes_other_$timestamp@example.com',
+        'password': testUserPassword,
+        'username': 'test_archetypes_other_$timestamp',
+      });
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/ai/archetypes'),
+        headers: authHeaders(withContentType: true, token: otherToken),
+        body: jsonEncode({'deck_id': deckId}),
+      );
+
+      expect(response.statusCode, equals(404), reason: response.body);
+      expect(decodeJson(response)['error'], isNotNull);
     },
     skip: skipIntegration,
   );

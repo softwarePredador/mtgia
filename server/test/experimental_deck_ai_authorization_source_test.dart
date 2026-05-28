@@ -49,6 +49,19 @@ void main() {
       );
     });
 
+    test('/ai/archetypes scopes deck reads by owner', () {
+      final archetypes = File(
+        'routes/ai/archetypes/index.dart',
+      ).readAsStringSync();
+
+      expect(archetypes, contains('final userId = context.read<String>()'));
+      expect(archetypes, contains('AND user_id = CAST(@user_id AS uuid)'));
+      expect(
+        archetypes,
+        isNot(contains('SELECT name, format FROM decks WHERE id = @id')),
+      );
+    });
+
     test('following community feed has explicit app-facing route file', () {
       final dedicatedRoute = File(
         'routes/community/decks/following/index.dart',
