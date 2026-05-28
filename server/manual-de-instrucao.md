@@ -17867,3 +17867,29 @@ arquétipo para um deck privado de outro usuário caso conhecesse o UUID.
 - teste source cobre o guard de ownership;
 - teste live de `/ai/archetypes` cobre cross-account com retorno `404`;
 - contrato API atualizado para explicitar que `deck_id` é owner-scoped.
+
+## 151. Semantic v2 partial optimize route contract test - 2026-05-28
+
+### O Que
+
+O contrato de rejeição semântica v2 do `/ai/optimize` agora tem teste focado em
+nível de rota.
+
+### O Porquê
+
+Antes havia cobertura helper-level para
+`SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial`, mas não havia prova do shape
+que o endpoint entrega quando a Semantic Layer v2 bloqueia uma perda crítica.
+
+### Resultado
+
+- extraído builder puro `buildSemanticV2OptimizeRejectedBody(...)` usado pela
+  rota real;
+- novo teste
+  `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart`;
+- contrato validado para `quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED`,
+  `rejection_source=semantic_layer_v2`,
+  `blocked_by_semantic_v2=true`, `critical_loss_roles`, `review_loss_roles` e
+  `optimize_diagnostics.semantic_layer_v2`;
+- `protection` permanece review-only enquanto `draw/removal/ramp/wipe` e roles
+  contextuais críticas podem bloquear em modo `partial`.

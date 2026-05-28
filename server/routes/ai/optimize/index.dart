@@ -391,6 +391,56 @@ String deriveOptimizeOutcomeCode({
   }
 }
 
+Map<String, dynamic> buildSemanticV2OptimizeRejectedBody({
+  required Map<String, dynamic> semanticLayerV2,
+  required SemanticV2OptimizeEnforcementMode enforcementMode,
+  required Map<String, dynamic> validation,
+  required List<String> removals,
+  required List<String> additions,
+  required Map<String, dynamic> deckAnalysis,
+  required Map<String, dynamic>? postAnalysis,
+  required List<String> validationWarnings,
+}) {
+  final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
+    semanticLayerV2: semanticLayerV2,
+    mode: enforcementMode,
+  );
+  final semanticDiagnostics = withOptimizationSemanticV2EnforcementDiagnostics(
+    semanticLayerV2: semanticLayerV2,
+    mode: enforcementMode,
+  );
+  final semanticReasons = semanticV2Decision.criticalLossRoles
+      .map(
+        (role) => 'Semantic Layer v2 detectou perda crítica em "$role".',
+      )
+      .toList();
+
+  return {
+    'error': 'A otimizacao sugerida foi bloqueada pela validacao semantica v2.',
+    'quality_error': {
+      'code': 'OPTIMIZE_SEMANTIC_V2_REJECTED',
+      'message':
+          'As trocas passaram no gate atual, mas a Semantic Layer v2 em modo partial detectou perda critica.',
+      'rejection_source': 'semantic_layer_v2',
+      'reasons': semanticReasons,
+      'critical_loss_roles': semanticV2Decision.criticalLossRoles,
+      'review_loss_roles': semanticV2Decision.reviewLossRoles,
+      'blocked_by_semantic_v2': true,
+      'semantic_layer_v2': semanticDiagnostics,
+      'validation': validation,
+    },
+    'mode': 'optimize',
+    'removals': removals,
+    'additions': additions,
+    'deck_analysis': deckAnalysis,
+    'post_analysis': postAnalysis,
+    'validation_warnings': validationWarnings,
+    'optimize_diagnostics': {
+      'semantic_layer_v2': semanticDiagnostics,
+    },
+  };
+}
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
@@ -2538,45 +2588,20 @@ Future<Response> onRequest(RequestContext context) async {
           );
 
           if (semanticV2Decision.blockedBySemanticV2) {
-            final semanticDiagnostics =
-                withOptimizationSemanticV2EnforcementDiagnostics(
+            final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
               semanticLayerV2: semanticV2,
-              mode: semanticV2OptimizeEnforcementMode,
+              enforcementMode: semanticV2OptimizeEnforcementMode,
+              validation: optimizationValidationReport.toJson(),
+              removals: validRemovals,
+              additions: validAdditions,
+              deckAnalysis: deckAnalysis,
+              postAnalysis: postAnalysis,
+              validationWarnings: validationWarnings,
             );
-            final semanticReasons = semanticV2Decision.criticalLossRoles
-                .map(
-                  (role) =>
-                      'Semantic Layer v2 detectou perda crítica em "$role".',
-                )
-                .toList();
 
             return respondWithOptimizeTelemetry(
               statusCode: HttpStatus.unprocessableEntity,
-              body: {
-                'error':
-                    'A otimizacao sugerida foi bloqueada pela validacao semantica v2.',
-                'quality_error': {
-                  'code': 'OPTIMIZE_SEMANTIC_V2_REJECTED',
-                  'message':
-                      'As trocas passaram no gate atual, mas a Semantic Layer v2 em modo partial detectou perda critica.',
-                  'rejection_source': 'semantic_layer_v2',
-                  'reasons': semanticReasons,
-                  'critical_loss_roles': semanticV2Decision.criticalLossRoles,
-                  'review_loss_roles': semanticV2Decision.reviewLossRoles,
-                  'blocked_by_semantic_v2': true,
-                  'semantic_layer_v2': semanticDiagnostics,
-                  'validation': optimizationValidationReport.toJson(),
-                },
-                'mode': 'optimize',
-                'removals': validRemovals,
-                'additions': validAdditions,
-                'deck_analysis': deckAnalysis,
-                'post_analysis': postAnalysis,
-                'validation_warnings': validationWarnings,
-                'optimize_diagnostics': {
-                  'semantic_layer_v2': semanticDiagnostics,
-                },
-              },
+              body: semanticRejectionBody,
               postAnalysisOverride: postAnalysis,
               validationReport: optimizationValidationReport,
               removalsOverride: validRemovals,
