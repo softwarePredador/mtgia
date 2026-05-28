@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/deck_rules_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -99,7 +100,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         }
       }
 
-      final isBasicLand = typeLine.contains('basic land');
+      final isBasicLand = basic_lands.isBasicLandCard(
+        name: cardName,
+        typeLine: typeLine,
+      );
       if (isCommander) {
         if (format != 'commander' && format != 'brawl') {
           throw DeckRulesException(

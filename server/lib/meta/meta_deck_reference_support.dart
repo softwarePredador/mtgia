@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 
+import '../basic_land_utils.dart' as basic_lands;
 import 'meta_deck_analytics_support.dart';
 import 'meta_deck_card_list_support.dart';
 import 'meta_deck_format_support.dart';
@@ -729,7 +730,7 @@ List<String> _buildPriorityCardNames(
       final normalized = _normalizeMetaDeckText(name);
       if (normalized.isEmpty ||
           excluded.contains(normalized) ||
-          _isBasicLandName(normalized)) {
+          basic_lands.isBasicLandName(normalized)) {
         continue;
       }
       counts[name] = (counts[name] ?? 0) + entry.value;
@@ -764,7 +765,7 @@ List<Map<String, dynamic>> _buildInfluencedCardPayload(
       final normalized = _normalizeMetaDeckText(name);
       if (normalized.isEmpty ||
           excluded.contains(normalized) ||
-          _isBasicLandName(normalized)) {
+          basic_lands.isBasicLandName(normalized)) {
         continue;
       }
       final insight = insights.putIfAbsent(
@@ -885,22 +886,6 @@ String _humanizeSourceChainToken(String rawToken) {
       .where((part) => part.isNotEmpty)
       .map((part) => part[0].toUpperCase() + part.substring(1))
       .join(' ');
-}
-
-bool _isBasicLandName(String normalizedName) {
-  return const <String>{
-    'plains',
-    'island',
-    'swamp',
-    'mountain',
-    'forest',
-    'wastes',
-    'snow covered plains',
-    'snow covered island',
-    'snow covered swamp',
-    'snow covered mountain',
-    'snow covered forest',
-  }.contains(normalizedName);
 }
 
 class _RankedMetaDeckReference {

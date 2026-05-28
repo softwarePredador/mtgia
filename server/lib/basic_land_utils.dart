@@ -1,0 +1,47 @@
+const _regularBasicLandNames = <String>{
+  'plains',
+  'island',
+  'swamp',
+  'mountain',
+  'forest',
+  'wastes',
+};
+
+const _snowBasicLandNames = <String>{
+  'snow covered plains',
+  'snow covered island',
+  'snow covered swamp',
+  'snow covered mountain',
+  'snow covered forest',
+  'snow covered wastes',
+};
+
+String normalizeBasicLandName(String name) {
+  return name
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[‐‑‒–—−-]+'), ' ')
+      .replaceAll(RegExp(r'\s+'), ' ');
+}
+
+bool isBasicLandName(String name) {
+  final normalized = normalizeBasicLandName(name);
+  return _regularBasicLandNames.contains(normalized) ||
+      _snowBasicLandNames.contains(normalized);
+}
+
+bool isBasicLandTypeLine(String typeLine) {
+  final normalized = typeLine
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[‐‑‒–—−-]+'), ' ')
+      .replaceAll(RegExp(r'\s+'), ' ');
+  return RegExp(r'\bbasic\s+(snow\s+)?land\b').hasMatch(normalized);
+}
+
+bool isBasicLandCard({
+  required String name,
+  required String typeLine,
+}) {
+  return isBasicLandTypeLine(typeLine) || isBasicLandName(name);
+}

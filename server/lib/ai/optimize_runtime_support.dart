@@ -1,4 +1,5 @@
 import 'package:postgres/postgres.dart';
+import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
@@ -282,11 +283,10 @@ Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) {
   };
 }
 
-bool isBasicLandName(String name) => _isBasicLandName(name);
+bool isBasicLandName(String name) => basic_lands.isBasicLandName(name);
 
 bool isBasicLandTypeLine(String typeLineLower) {
-  return typeLineLower.contains('basic land') ||
-      typeLineLower.contains('basic snow land');
+  return basic_lands.isBasicLandTypeLine(typeLineLower);
 }
 
 int maxCopiesForFormat({
@@ -296,10 +296,9 @@ int maxCopiesForFormat({
 }) {
   final normalizedFormat = deckFormat.toLowerCase();
   final normalizedType = typeLine.toLowerCase();
-  final normalizedName = name.trim().toLowerCase();
 
   final isBasicLand =
-      isBasicLandTypeLine(normalizedType) || _isBasicLandName(normalizedName);
+      isBasicLandTypeLine(normalizedType) || basic_lands.isBasicLandName(name);
   if (isBasicLand) return 999;
 
   if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
@@ -3994,7 +3993,7 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   final confidenceScore = _confidenceScoreFromLevel(confidenceLevel);
   final action = type == 'add' ? 'entrada' : 'saída';
   final curveDelta = (cmcAfter - cmcBefore).toStringAsFixed(2);
-  final isBasicLand = _isBasicLandName(name);
+  final isBasicLand = basic_lands.isBasicLandName(name);
   final resolvedRole = (functionalRole == null || functionalRole.trim().isEmpty)
       ? 'utility'
       : functionalRole.trim();
@@ -4179,19 +4178,4 @@ int _toInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
   return int.tryParse(value.toString()) ?? 0;
-}
-
-bool _isBasicLandName(String name) {
-  final normalized = name.trim().toLowerCase();
-  return normalized == 'plains' ||
-      normalized == 'island' ||
-      normalized == 'swamp' ||
-      normalized == 'mountain' ||
-      normalized == 'forest' ||
-      normalized == 'wastes' ||
-      normalized == 'snow-covered plains' ||
-      normalized == 'snow-covered island' ||
-      normalized == 'snow-covered swamp' ||
-      normalized == 'snow-covered mountain' ||
-      normalized == 'snow-covered forest';
 }

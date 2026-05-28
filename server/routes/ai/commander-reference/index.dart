@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/edhrec_service.dart';
+import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/http_responses.dart';
 import '../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
@@ -246,8 +247,8 @@ Future<Response> onRequest(RequestContext context) async {
       final placement = (row[8] as String?) ?? '';
       final rawList = (row[9] as String?) ?? '';
       final formatDescriptor = describeMetaDeckFormat(storedFormat);
-      final subformatKey =
-          formatDescriptor.commanderSubformat ?? formatDescriptor.storedFormatCode;
+      final subformatKey = formatDescriptor.commanderSubformat ??
+          formatDescriptor.storedFormatCode;
       metaScopeBreakdown[subformatKey] =
           (metaScopeBreakdown[subformatKey] ?? 0) + 1;
 
@@ -278,7 +279,9 @@ Future<Response> onRequest(RequestContext context) async {
       for (final entry in parsedDeck.mainboard.entries) {
         final name = entry.key;
         final lower = name.toLowerCase();
-        if (lower == commanderLower || _isBasicLandName(lower)) continue;
+        if (lower == commanderLower || basic_lands.isBasicLandName(lower)) {
+          continue;
+        }
 
         counts[name] = (counts[name] ?? 0) + entry.value;
         if (!seenInDeck.contains(lower)) {
@@ -404,7 +407,7 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
   final averageDeckSeed = <Map<String, dynamic>>[];
   if (averageDeck != null) {
     for (final card in averageDeck.seedCards.take(180)) {
-      if (_isBasicLandName(card.name)) continue;
+      if (basic_lands.isBasicLandName(card.name)) continue;
       final cardName = card.name.trim();
       if (cardName.isEmpty) continue;
       averageDeckSeed.add({
@@ -616,16 +619,6 @@ bool _deckListContainsCommander(String cardList, String commanderToken) {
   if (cardList.trim().isEmpty || commanderToken.trim().isEmpty) return false;
   final normalized = cardList.toLowerCase();
   return normalized.contains(commanderToken);
-}
-
-bool _isBasicLandName(String name) {
-  final n = name.trim().toLowerCase();
-  return n == 'plains' ||
-      n == 'island' ||
-      n == 'swamp' ||
-      n == 'mountain' ||
-      n == 'forest' ||
-      n == 'wastes';
 }
 
 Map<String, dynamic> _buildMetaScopePayload(String requestedMetaScope) {

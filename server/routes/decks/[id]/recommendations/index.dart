@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
+import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/openai_runtime_config.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -331,8 +332,10 @@ Future<Response> _generateRecommendations(
     // Terrenos básicos em excesso em deck multicolor
     if (deckColors.length >= 3 && landCount > 38) {
       final basicLands = deckCards.where((c) {
-        final tl = (c['type_line'] as String).toLowerCase();
-        return tl.contains('basic land');
+        return basic_lands.isBasicLandCard(
+          name: c['name'] as String? ?? '',
+          typeLine: c['type_line'] as String? ?? '',
+        );
       }).toList();
       if (basicLands.isNotEmpty && removeRecommendations.length < 5) {
         removeRecommendations.add({

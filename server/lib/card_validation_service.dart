@@ -1,6 +1,8 @@
 import 'package:postgres/postgres.dart';
 import 'dart:developer' as developer;
 
+import 'basic_land_utils.dart' as basic_lands;
+
 /// Serviço de validação de cartas para prevenir alucinações da IA
 ///
 /// **Problema:**
@@ -176,9 +178,10 @@ class CardValidationService {
       }
 
       // Verifica limite de quantidade
-      final isBasicLand = (cardInfo['type_line'] as String)
-          .toLowerCase()
-          .contains('basic land');
+      final isBasicLand = basic_lands.isBasicLandCard(
+        name: cardInfo['name'] as String? ?? '',
+        typeLine: cardInfo['type_line'] as String? ?? '',
+      );
 
       if (!isBasicLand) {
         final maxQuantity =

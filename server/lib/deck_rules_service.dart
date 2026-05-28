@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import 'basic_land_utils.dart' as basic_lands;
 import 'color_identity.dart';
 
 class DeckRulesService {
@@ -403,10 +404,7 @@ class DeckRulesService {
   ///   - Snow-Covered:  "Basic Snow Land — Plains/Island/Swamp/Mountain/Forest"
   ///   - Wastes:        "Basic Land" (sem subtipo)
   static bool _isBasicLandTypeLine(String typeLineLower) {
-    // "basic land" cobre normais e Wastes.
-    // "basic snow land" cobre Snow-Covered variants.
-    return typeLineLower.contains('basic land') ||
-        typeLineLower.contains('basic snow land');
+    return basic_lands.isBasicLandTypeLine(typeLineLower);
   }
 
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
