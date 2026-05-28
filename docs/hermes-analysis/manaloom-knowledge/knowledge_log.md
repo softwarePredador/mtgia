@@ -16,3 +16,6 @@ Atraxa prolifera todo end step gratuitamente, e o deck acumula 12+ fontes adicio
 
 ## Aesi, Tyrant of Gyre Strait - 2026-05-28 (Structured Analysis)
 Análise estruturada salva em analyses/aesi-tyrant-of-gyre-strait.md. Três cartas-chave identificadas: Exploration (extra land drop mais barato, habilita o motor turn 1), Avenger of Zendikar (wincon mais explosivo — 40 plantas + counters por land drop), Cyclonic Rift (mass removal que preserva terrenos do Aesi). Insight central: o deck acumula vantagem por "inércia de valor" — cada terreno é mana+draw+payoff simultâneo. Vulnerabilidade fatal: apenas 2 fontes de proteção, confiando em recastar Aesi rapidamente com ramp massivo.
+
+## Aesi, Tyrant of Gyre Strait - 2026-05-28 (Bounce Lands & ManaLoom Gaps)
+Bounce lands (Simic Growth Chamber, Coral Atoll) são peças-chave silenciosas: re-triggar landfall e Aesi a cada ciclo, criando loops com Kodama of the East Tree. O deck inclui 2 bounce lands + 2 fetch lands + Evolving Wilds/Terramorphic Expanse — totalizando ~8 terrenos que "entram e saem" para maximizar triggers. Gap ManaLoom: 4 cartas com tags incorretas — Aesi (draw→engine), Tatyova (draw→engine), Avenger (other→wincon), Cyclonic Rift (removal→board_wipe). Recomendação: sistema precisa de tag composta "engine" para comandantes que geram valor em múltiplas dimensões.
