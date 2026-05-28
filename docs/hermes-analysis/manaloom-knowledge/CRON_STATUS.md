@@ -2,78 +2,83 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-28T03:10Z** (manager-watchdog — snapshot rotineiro)
+> Última atualização: **2026-05-28T04:21Z** (manager-watchdog — snapshot rotineiro)
 
 ## Resumo
 
 || Métrica | Valor |
 ||:--|:--:|
-|| Total de crons (`include_disabled=True`) | 15 |
-|| Habilitados | 15/15 |
-|| Desabilitados | 0 |
-|| `last_status=error` | **6** |
-|| Nunca executaram (`last_run_at=null`) | 0 |
-|| Stale (>120min atrás, `enabled=true`) | 0 |
-|| Ações de recuperação nesta execução | 0 (erros transitórios — ver abaixo) |
-|| Branch do workdir | `codex/hermes-analysis-docs` |
+||| Total de crons (`include_disabled=True`) | 15 |
+||| Habilitados | 15/15 |
+||| Desabilitados | 0 |
+||| `last_status=error` | **3** |
+||| Nunca executaram (`last_run_at=null`) | 0 |
+||| Stale (>120min atrás, `enabled=true`) | 0 |
+||| Ações de recuperação nesta execução | 0 (erros transitórios — ver abaixo) |
+||| Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** todos os 15 crons habilitados e scheduled. **6 crons com `last_status=error`** — todos erros transitórios (HTTP 429/502 rate-limit do provider, truncation de resposta). Nenhum cron desabilitado, stale (>120min) ou never-run; portanto **nenhum `resume`/`run` foi necessário** — os erros são de runtime (provider/truncation), não de configuração.
+**Estado geral:** todos os 15 crons habilitados e scheduled. **3 crons com `last_status=error`** — todos erros transitórios HTTP 502 (provider outage às 02:22Z). Desde o último snapshot (03:10Z), 3 crons se recuperaram: `commander-knowledge-deep`, `knowledge-import` e `structure-auditor (4h)`. Nenhum cron desabilitado, stale (>120min) ou never-run; portanto **nenhum `resume`/`run` foi necessário** — os erros são de runtime (provider 502), não de configuração.
 
 ## Ações da Rodada Atual
 
 || # | Ação | Resultado ||
 ||:--|:-----|:----------||
-|| 1 | `cronjob(action='list', include_disabled=True)` | ✅ 15 jobs listados |
-|| 2 | Verificação de branch (`git branch --show-current`) | ✅ `codex/hermes-analysis-docs` |
-|| 3 | Verificação do worktree (`git status --short`) | ⚠️ 1 arquivo dirty: `knowledge.db` (artefato de cron, ignorado) |
-|| 4 | Avaliação das regras gerenciais (`enabled=false`, stale>120m, never-run) | ✅ nenhuma ação corretiva requerida |
-|| 5 | Verificação de `last_status=error` | ⚠️ 6 erros encontrados (todos transitórios — ver detalhes abaixo) |
-|| 6 | Atualização do CRON_STATUS.md | ✅ snapshot 2026-05-28T03:10Z |
+||| 1 | `cronjob(action='list', include_disabled=True)` | ✅ 15 jobs listados |
+||| 2 | Verificação de branch (`git branch --show-current`) | ✅ `codex/hermes-analysis-docs` |
+||| 3 | Verificação do worktree (`git status --short`) | ✅ worktree limpo |
+||| 4 | Avaliação das regras gerenciais (`enabled=false`, stale>120m, never-run) | ✅ nenhuma ação corretiva requerida |
+||| 5 | Verificação de `last_status=error` | ⚠️ 3 erros encontrados (todos HTTP 502 transitório — ver detalhes abaixo) |
+||| 6 | Atualização do CRON_STATUS.md | ✅ snapshot 2026-05-28T04:21Z |
 
 ## Crons de Auditoria / Gerenciais
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
 ||---|---|---|---|---|---|---|---|---||
-|| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T03:10Z | 1min | 🟢 ok | scheduled | sem ação ||
-|| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30Z | 100min | 🟢 ok | scheduled | próxima: 16:00Z ||
-|| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36Z | 94min | 🟢 ok | scheduled | próxima: dom 12:30Z ||
-|| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T03:10Z | 1min | 🟢 ok | scheduled | **esta execução** ||
-|| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | sim | 2026-05-28T02:22Z | 48min | 🔴 error | scheduled | **HTTP 502** — provider error transitório ||
-|| `bb03201b8911` | manaloom-code-structure-auditor (4h) | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T02:22Z | 48min | 🔴 error | scheduled | **HTTP 502** — provider error transitório ||
+||| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T03:57Z | 24min | 🟢 ok | scheduled | sem ação ||
+||| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30Z | 171min | 🟢 ok | scheduled | próxima: 16:00Z ||
+||| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36Z | 166min | 🟢 ok | scheduled | próxima: dom 12:30Z ||
+||| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T03:48Z | 33min | 🟢 ok | scheduled | **esta execução** ||
+||| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | sim | 2026-05-28T02:22Z | 119min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: dom 06:00Z ||
+||| `bb03201b8911` | manaloom-code-structure-auditor (4h) | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T04:17Z | 4min | 🟢 ok | scheduled | ✅ recuperado do HTTP 502 ||
 
 ## Crons de Conhecimento Commander
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
 ||---|---|---|---|---|---|---|---|---||
-|| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T03:12Z | 1min | 🔴 error | scheduled | **truncated response** — ferramenta de resposta excedeu limite (arquivo 1.5KB) ||
-|| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T03:12Z | 1min | 🟢 ok | scheduled | execução OK ||
-|| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T02:05Z | 68min | 🟢 ok | scheduled | sem ação ||
-|| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T03:28Z | 5min 🟢 | 🟢 ok | scheduled | sem ação ||
-|| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T03:11Z | 2min | 🔴 error | scheduled | **HTTP 429** — rate limit do provider |
+||| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T04:06Z | 15min | 🟢 ok | scheduled | ✅ recuperado do truncated response ||
+||| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T04:08Z | 14min | 🟢 ok | scheduled | ✅ recuperado do HTTP 502 ||
+||| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T02:05Z | 137min | 🟢 ok | scheduled | sem ação ||
+||| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T03:28Z | 54min | 🟢 ok | scheduled | sem ação ||
+||| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T04:03Z | 18min | 🟢 ok | scheduled | ✅ recuperado do HTTP 429 ||
 
 ## Lorehold Knowledge Pipeline
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
 ||---|---|---|---|---|---|---|---|---||
-|| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T03:03Z | 10min | 🟢 ok | scheduled | sem ação ||
-|| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T03:42Z | 11min 🟢 | 🟢 ok | scheduled | sem ação ||
-|| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T02:22Z | 51min | 🔴 error | scheduled | **scout data mismatch** — comparação EDHREC corpus vs live (erro de dados, não de config) ||
-|| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-28T02:22Z | 51min | 🔴 error | scheduled | **scout data mismatch** — mesmo erro que mulligan-analyst ||
+||| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T03:57Z | 24min | 🟢 ok | scheduled | sem ação ||
+||| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T03:42Z | 39min | 🟢 ok | scheduled | sem ação ||
+||| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T02:22Z | 119min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: ~04:22Z ||
+||| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-28T02:22Z | 119min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: ~08:22Z ||
 
 ## Alertas Pendentes
 
-**6 crons com `last_status=error` nesta rodada** — todos classificados como erros transitórios de runtime, não requerendo ação de `resume` ou `run`:
+**3 crons com `last_status=error` nesta rodada** — todos classificados como erros transitórios de runtime, não requerendo ação de `resume` ou `run`:
 
 | Job ID | Nome | Erro | Tipo | Ação |
 |:-------|:-----|:-----|:-----|:-----|
-| `75eed994c103` | commander-knowledge-deep | `Response remained truncated after 3 continuation attempts` | Truncação de resposta (prompt muito grande?) | Monitorar — se persistir, reduzir prompt |
-| `08468451a06a` | lorehold-mulligan-analyst | Scout data mismatch — EDHREC corpus 0% vs live 55.4% | Dados EDHREC inconsistentes | Monitorar — erro nos dados de entrada, não no código |
-| `a50bef4c2a59` | lorehold-evolution-oracle | Mesmo scout data mismatch | Dados EDHREC inconsistentes | Monitorar — mesmo root cause acima |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | `HTTP 429: Rate limit exceeded` | Rate limit transitório | Auto-recupera na próxima tick |
-| `577a0a669714` | structure-auditor (weekly) | `HTTP 502: Provider returned error` | Provider outage transitório | Auto-recupera na próxima tick |
-| `bb03201b8911` | structure-auditor (4h) | `HTTP 502: Provider returned error` | Provider outage transitório | Auto-recupera na próxima tick |
+| `08468451a06a` | lorehold-mulligan-analyst | `HTTP 502: Provider returned error` | Provider outage transitório (02:22Z) | Auto-recupera na próxima tick (~04:22Z) |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `HTTP 502: Provider returned error` | Provider outage transitório (02:22Z) | Auto-recupera na próxima tick (~08:22Z) |
+| `577a0a669714` | structure-auditor (weekly) | `HTTP 502: Provider returned error` | Provider outage transitório (02:22Z) | Auto-recupera na próxima tick (dom 06:00Z) |
 
-**Nenhuma ação corretiva aplicada** — os 6 erros são de runtime (provider rate-limit, truncation, data mismatch), não de configuração (disabled, stale, never-run). Todos os crons com erro continuam `enabled=true` e `state=scheduled`, sendo reexecutados automaticamente pelo scheduler.
+**Recuperações desde snapshot anterior (03:10Z):**
+
+| Job ID | Nome | Erro anterior | Status atual |
+|:-------|:-----|:-------------|:-------------|
+| `75eed994c103` | commander-knowledge-deep | Truncated response | ✅ OK (04:06Z) |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | HTTP 429 | ✅ OK (04:03Z) |
+| `bb03201b8911` | structure-auditor (4h) | HTTP 502 | ✅ OK (04:17Z) |
+
+**Nenhuma ação corretiva aplicada** — os 3 erros são de runtime (provider 502), não de configuração (disabled, stale, never-run). Todos os crons com erro continuam `enabled=true` e `state=scheduled`, sendo reexecutados automaticamente pelo scheduler.
 
 ## Precisão das Functional Tags (tag_accuracy)
 
@@ -197,13 +202,11 @@
 
 ## Observações Importantes
 
-- **6 crons com erro** (todos `enabled=true`, `state=scheduled`): 2× HTTP 502 (provider outage), 1× HTTP 429 (rate limit), 1× truncated response, 2× scout data mismatch. **Nenhum requeriu `resume`/`run`** — todos são erros de runtime transitórios.
-- `lorehold-mulligan-analyst` e `lorehold-evolution-oracle` falharam no mesmo erro de dados EDHREC (comparação 0% vs 55.4%) — provável inconsistência temporária na fonte de dados, não bug no código.
-- `commander-knowledge-deep` com resposta truncada (1.5KB) — possivelmenteprompt muito grande ou tool-call limit. Monitorar nas próximas execuções.
-- `manaloom-knowledge-import` com HTTP 429 — rate limit do provider, auto-recupera.
-- `manaloom-code-structure-auditor` (ambos) com HTTP 502 — provider outage transitório.
-- `lorehold-deck-validator` rodou há 11min (03:42Z) — execução mais recente da frota.
-- `origin/master` estável sem novos commits desde a última análise.
+- **3 crons com erro** (todos `enabled=true`, `state=scheduled`): 3× HTTP 502 (provider outage transitório às 02:22Z). **Nenhum requeriu `resume`/`run`** — todos são erros de runtime transitórios.
+- `lorehold-mulligan-analyst` e `lorehold-evolution-oracle` falharam com HTTP 502 no mesmo momento (02:22Z) — provider outage, não bug no código. Próximas ticks: ~04:22Z e ~08:22Z.
+- `manaloom-code-structure-auditor (weekly)` em HTTP 502 — próxima execução: domingo 06:00Z.
+- **3 crons recuperados** desde snapshot anterior: `commander-knowledge-deep` (truncated→OK), `knowledge-import` (429→OK), `structure-auditor (4h)` (502→OK).
+- `origin/master` estável sem novos commits desde a última análise (HEAD: 771c9318).
 - `dart` e `flutter` continuam presentes (`/opt/data/tools/flutter/bin/`).
 - Apenas este arquivo (`CRON_STATUS.md`) foi atualizado intencionalmente nesta rodada.
 
