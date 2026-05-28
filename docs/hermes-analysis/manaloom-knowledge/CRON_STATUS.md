@@ -167,68 +167,69 @@
    167|---
    168|
    169|## Mana Base Validation Report
-   170|
-   171|> Validação de mana base dos decks armazenados contra perfis EDHREC (commander_reference_profile_anchor30_batch_*).
-   172|> Executado automaticamente pelo cron `manaloom-mana-base-validator`.
-   173|
-   174|**Última execução:** 2026-05-27 20:44 UTC
-   175|**Perfis consultados:** commander_reference_profile_anchor30_batch_a/b/c_2026-05-12 (EDHREC + Moxfield + primers)
-   176|**Decks validados:** 8
-   177|
-   178|### Legenda
-   179|
-   180|| Ícone | Significado |
-   181||:------|:------------|
-   182|| ✅ VALIDADO | Métrica dentro do range do perfil EDHREC |
-   183|| 🔵 OK | Ligeiramente fora (±1), aceitável |
-   184|| 🟡 ALERTA | Fora do range (diff ≥ 2) |
-   185|| 🔴 CRÍTICO | Muito fora (diff ≥ 4); artefato parcial = esperado |
-   186|| 🟡 EDHREC PARTIAL | Artefato com <90 declarações; métricas da análise original |
-   187|| ⚪ N/A | Sem perfil disponível |
-   188|
-   189|### Tabela Resumo
-   190|
-   191|| ID | Commander | Bracket | Qty | Lands | CMC | Ramp | Draw | Removal | Protection | Alertas |
-   192||:--:|:----------|:-------:|:---:|:-----:|:---:|:----:|:----:|:-------:|:----------:|:-------:|
-   193|| 9 | Atraxa | 4 | ✅ 100/100 | ✅ 36 [35-38] | 2.97 | 🔵 14 [10-13] | ✅ 12 [8-12] | 🔵 7 [8-13] | — | 0 |
-   194|| 7 | Winota | 4 | ✅ 100/100 | ✅ 34 [31-35] | 2.35 | — | — | ✅ 8 [6-10] | 🟡 10 [5-8] | 1 🟡 |
-   195|| 6 | Lorehold | 3 | ✅ 100/100 | ⚪ Sem perfil | 3.96 | ⚪ | ⚪ | ⚪ | ⚪ | Sem perfil |
-   196|| 4 | Teysa | 3 | 🟡 80/80 | ✅ 35 [35-37] | 2.9 | 🔴 15 [9-11]* | ✅ 11 [10-14] | ✅ 8 [8-11] | ✅ 3 [2-4] | 🔴* |
-   197|| 2 | Yuriko | 3 | 🟡 84/84 | ✅ 33 [30-34] | 2.8 | — | — | 🔵 9 [10-16] | — | 0 |
-   198|| 5 | Aesi | 3 | 🟡 79/79 | ✅ 40 [39-43] | 2.61 | 🔴 28 [14-18]* | 🟡 12 [6-9]* | ✅ 8 [8-11] | 🟡 7 [2-4]* | 🔴* |
-   199|| 1 | Kinnan | 4 | 🟡 13/13 | ✅ 29 [29-34] | 1.8 | 🔴 4 [18-26]* | — | — | — | 🔴* |
-   200|| 3 | Korvold | 3 | 🟡 11/11 | 🔴 25 [34-37]* | 3.2 | 🔴 3 [10-14]* | 🔴 1 [6-10]* | 🔴 1 [8-12]* | — | 🔴* |
-   201|
-   202|*\* = Artefato EDHREC parcial (< 90 cartas no SQLite). Críticos ESPERADOS — métricas da análise original, não do INSERT parcial.
-   203|
-   204|### Achados
-   205|
-   206|- **0 decks corrompidos** (nenhum com qty < 50% do declarado e total ≥ 90)
-   207|- **3 decks completos** (qty = 100): Atraxa ✅, Winota ✅, Lorehold ✅ (sem perfil)
-   208|- **5 artefatos EDHREC parciais** com métricas herdadas: Kinnan (13), Korvold (11), Yuriko (84), Teysa (80), Aesi (79)
-   209|- **Observação Aesi (ID=5):** ramp=28 inclui fetch lands + landfall triggers classificados como ramp+land no multi-tag. Não é corrupção.
-   210|- **Observação Teysa (ID=4):** ramp=15 inclui tesouros/tokens. Comportamento esperado para artefato EDHREC sem ramp rocks.
-   211|- **Observação Winota (ID=7):** protection=10 vs [5-8] (diff=2) — ligeiramente acima do range, mas aceitável para aggro-stax que precisa proteger Winota.
-   212|
-   213|### Ações Recomendadas
-   214|
-   215|| Prioridade | Ação | Deck |
-   216||:----------:|:-----|:-----|
-   217|| P2 | Criar profile EDHREC para Lorehold | Lorehold |
-   218|| P2 | Re-inserir com `--insert-deck` quando deck completo disponível | Kinnan (ID=1), Korvold (ID=3) |
-   219|| P3 | Verificar multi-tag (ramp vs land) para fetch lands em Aesi | Aesi |
-   220|| — | Nenhum (validado) | Atraxa, Winota, Yuriko, Teysa |
-   221|
-   222|### Histórico
-   223|
-   224|| Data | Decks | Críticos reais | Observação |
-   225||:-----|:-----:|:--------------:|:----------|
-   226|| 2026-05-27 18:18 UTC | 8 | 0 | 4 críticos são artefatos de INSERT parcial |
-   227|| 2026-05-27 19:28 UTC | 8 | 0 | Re-validação: sem mudanças. Yuriko qty corrigido 99→84. |
-   228|| 2026-05-27 20:44 UTC | 8 | 0 | Re-validação: sem mudanças nos decks. DB atualizada às 20:35 (knowledge import). |
-   229|
-   230|*Relatório gerado por manaloom-mana-base-validator*
-   231|
+
+> Validação de mana base dos decks armazenados contra perfis EDHREC (commander_reference_profile_anchor30_batch_*).
+> Executado automaticamente pelo cron `manaloom-mana-base-validator`.
+
+**Última execução:** 2026-05-28 01:08 UTC
+**Perfis consultados:** commander_reference_profile_anchor30_batch_a/b/c_2026-05-12 (EDHREC + Moxfield + primers)
+**Decks validados:** 8
+
+### Legenda
+
+| Ícone | Significado |
+|:------|:------------|
+| ✅ VALIDADO | Métrica dentro do range do perfil EDHREC |
+| 🔵 OK | Ligeiramente fora (±1), aceitável |
+| 🟡 ALERTA | Fora do range (diff 2-3) |
+| 🔴 CRÍTICO | Muito fora (diff ≥ 4); artefato parcial = esperado |
+| 🟡 EDHREC PARTIAL | Artefato com <90 declarações; métricas da análise original |
+| ⚪ N/A | Sem perfil disponível |
+
+### Tabela Resumo
+
+| ID | Commander | Bracket | Qty | Lands | CMC | Ramp | Draw | Removal | Protection | Alertas |
+|:--:|:----------|:-------:|:---:|:-----:|:---:|:----:|:----:|:-------:|:----------:|:-------:|
+| 7 | EDHREC Average Default — Boros Combat Trigger Humans | 4 | ✅ 100/100 | ✅ 34 [31-35] | 2.35 | — | — | ✅ 8 [6-10] | 🟡 10 [5-8] | 1 🟡 |
+| 6 | Lorehold Spellslinger | 3 | ✅ 100/100 | ⚪ Sem perfil | 3.96 | ⚪ | ⚪ | ⚪ | ⚪ | Sem perfil |
+| 9 | Atraxa, Praetors' Voice — EDHREC Average (41k decks) | 4 | ✅ 100/100 | ✅ 36 [35-38] | 2.97 | 🔵 14 [10-13] | ✅ 12 [8-12] | 🔵 7 [8-13] | — | 0 |
+| 3 | EDHREC Average Default | 3 | 🟡 11/11 | 🔴 25 [34-37]* | 3.2 | 🔴 3 [10-14]* | 🔴 1 [6-10]* | 🔴 1 [8-12]* | — | 4 🔴* |
+| 5 | Aesi EDHREC Average Default | 3 | 🟡 79/79 | ✅ 40 [39-43] | 2.61 | 🔴 28 [14-18]* | 🟡 12 [6-9] | ✅ 8 [8-11] | 🟡 7 [2-4] | 3 🔴* |
+| 1 | Kinnan, Bonder Prodigy | 4 | 🟡 13/13 | ✅ 29 [29-34] | 1.8 | 🔴 4 [18-26]* | — | — | — | 1 🔴* |
+| 4 | EDHREC Average Default | 3 | 🟡 80/80 | ✅ 35 [35-37] | 2.9 | 🔴 15 [9-11]* | ✅ 11 [10-14] | ✅ 8 [8-11] | ✅ 3 [2-4] | 1 🔴* |
+| 2 | EDHREC Average Deck - Dimir Ninja Topdeck Tempo | 3 | 🟡 84/84 | ⚪ Sem perfil | 2.8 | ⚪ | ⚪ | ⚪ | ⚪ | Sem perfil |
+
+*\* = Artefato EDHREC parcial (< 90 cartas no SQLite). Críticos esperados podem refletir a análise original, não corrupção do INSERT.*
+
+### Achados
+
+- **0 decks corrompidos** (nenhum com qty < 50% do declarado e total ≥ 90)
+- **3 decks completos** (qty = 100): Lorehold Spellslinger, EDHREC Average Default — Boros Combat Trigger Humans, Atraxa, Praetors' Voice — EDHREC Average (41k decks)
+- **5 artefatos EDHREC parciais** com métricas herdadas: Kinnan, Bonder Prodigy (ID=1, qty=13), EDHREC Average Deck - Dimir Ninja Topdeck Tempo (ID=2, qty=84), EDHREC Average Default (ID=3, qty=11), EDHREC Average Default (ID=4, qty=80), Aesi EDHREC Average Default (ID=5, qty=79)
+- **Sem perfil disponível:** EDHREC Average Deck - Dimir Ninja Topdeck Tempo, Lorehold Spellslinger
+
+### Ações Recomendadas
+
+| Prioridade | Ação | Deck |
+|:----------:|:-----|:-----|
+| P2 | Criar profile EDHREC para EDHREC Average Deck - Dimir Ninja Topdeck Tempo | EDHREC Average Deck - Dimir Ninja Topdeck Tempo |
+| P2 | Criar profile EDHREC para Lorehold Spellslinger | Lorehold Spellslinger |
+| P2 | Re-inserir com `--insert-deck` quando deck completo disponível | Kinnan, Bonder Prodigy |
+| P2 | Re-inserir com `--insert-deck` quando deck completo disponível | EDHREC Average Default |
+| P3 | Verificar multi-tag (ramp vs land) para fetch lands em Aesi | Aesi |
+| — | Nenhuma ação prioritária | Atraxa, Praetors' Voice — EDHREC Average (41k decks) |
+
+### Histórico
+
+| Data | Decks | Críticos reais | Observação |
+|:-----|:-----:|:--------------:|:----------|
+| 2026-05-27 18:18 UTC | 8 | 0 | 4 críticos são artefatos de INSERT parcial |
+| 2026-05-27 19:28 UTC | 8 | 0 | Re-validação: sem mudanças. Yuriko qty corrigido 99→84. |
+| 2026-05-27 20:44 UTC | 8 | 0 | Re-validação: sem mudanças nos decks. DB atualizada às 20:35 (knowledge import). |
+| 2026-05-28 01:08 UTC | 8 | 0 | Validação automática desta janela; sem corrupção nova detectada. |
+
+*Relatório gerado por manaloom-mana-base-validator*
+
 
 ## Status dos crons — atualização automática
 
