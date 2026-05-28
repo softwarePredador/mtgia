@@ -29,11 +29,18 @@ Validacao:
 
 - `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart lib/ai/optimization_quality_gate.dart test/optimization_validator_test.dart`;
 - `dart test test/optimization_validator_test.dart test/optimization_quality_gate_test.dart test/optimization_rules_test.dart -r expanded`.
+- backend completo: `dart analyze bin lib routes test` e `dart test`;
+- pos-deploy publico no SHA `cf225841297e3ed033ad97f26c1a651280f4819c`:
+  `semantic_layer_v2_optimize_scorecard.py` com limit 10 atingiu timeout global
+  apos 5 corpora, mas fechou `current_gate_approved_jobs=7`,
+  `semantic_shadow_would_block_approved_jobs=0`, `false_positive_candidates=0`,
+  `false_negative_candidates=0` e `semantic_v2_actual_blocked_jobs=0`.
 
 Riscos restantes:
 
 - A flag de enforcement segue desligada por padrao. Antes de ativar `partial`
-  em producao, rodar novo scorecard publico/controlled com corpora completos.
+  em producao, rodar novo scorecard publico/controlled com corpora completos
+  sem timeout global.
 - Fallbacks de complete/optimize ainda usam listas/politicas hardcoded para
   nomes premium/denylist; migrar para policy data versionada em patch separado.
 
