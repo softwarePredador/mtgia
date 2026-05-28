@@ -1,31 +1,33 @@
-# Deck Analysis: Aesi, Tyrant of Gyre Strait
+# Análise: Aesi, Tyrant of Gyre Strait
 
-## Commander
-**Aesi, Tyrant of Gyre Strait** — Simic (U/G) Value Midrange / Lands-Matter
+**Comandante:** Aesi, Tyrant of Gyre Strait
+**Arquetipo:** Value Midrange / Lands-Matter
+**Bracket:** 3 (High Power Casual)
+**Data de análise:** 2026-05-28
+**Fonte:** EDHREC Average Deck (amostra de 41k+ decks)
 
-## 5 Insights Estratégicos
+## 5 Insights sobre a Estratégia do Deck
 
-1. **Motor Completo de Draw + Ramp**: Aesi é o único comandante que simultaneamente dá extra land drop E card draw por land drop. Isso significa que todo terreno jogado é simultaneamente recurso (mana) e card advantage, eliminando a necessidade de slots separados de draw.
+1. **Motor centralizado no comandante:** Aesi é o único comandante UG que simultaneamente dá extra land drop E card draw. Isso significa que o deck não precisa de fontes externas de card advantage — ela é o motor completo. Cada land drop é simultaneamente mana, draw trigger e payoff trigger.
 
-2. **40 Terrenos como Escolha Deliberada**: O deck roda 40 lands (5+ acima do típico Commander) porque cada land é CMC-zero spell que ativa a engine. O custo de oportunidade é 5 slots a menos de interação/proteção, compensado pela consistência do motor.
+2. **40 terrenos como custo de aceitação:** O deck joga ~5 terrenos acima do típico Commander, sacrificando slots de spells por consistência do motor. Esse trade-off só vale porque cada terreno é um CMC-zero spell que ativa Aesi, Tatyova, Tireless Provisioner e os payoffs landfall.
 
-3. **Explosão Landfall Exponencial**: Com Aesi em campo, Avenger of Zendikar (5 mana) entra com 40 tokens Planta. Cada land drop subsequente coloca +1/+1 counter em TODOS. Com 3 land drops extras num turno, as plantas viram 3/4 — um exército impossível de bloquear.
+3. **Proteção mínima, resiliência via recast:** Com apenas 2 cartas de proteção, o deck confia em sua ramp massiva (23 fontes) para recastar Aesi imediatamente após remoção. A estratégia é ser rápido o suficiente para que remover Aesi uma vez não seja suficiente.
 
-4. **Proteção Mínima, Recorrência Máxima**: O deck default tem apenas 2 fontes de proteção (Heroic Intervention, Swiftfoot Boots). A estratégia real é recastar Aesi imediatamente com ramp de 23 fontes — remover Aesi uma vez é insuficiente quando o jogador tem manas suficientes para re-cast no mesmo turno.
+4. **Finalização por valor exponencial, não combo:** O deck escolhe deliberadamente NÃO incluir combos infinitos Deadeye Navigator + Palinchron. Vence por acumulação de valor (Avenger tokens + land drops) ou Scute Swarm exponencial — adequado para bracket 3.
 
-5. **Bracket 3 Ótimo — Não-Combo por Escolha deliberada**: O deck deixa de fora combos infinitos (Deadeye Navigator + Palinchron) mesmo sendo UG, preferindo vencer por valor massivo. Isso revela um estilo conservador e value-oriented, ideal para mesas onde combos são malvistos.
+5. **Cyclonic Rift como remoção perfeita:** A escolha do deck por Cyclonic Rift (overload) revela um princípio inteligente: devolver permanentes dos oponentes para a mão preserva os próprios terrenos, dando vantagem posicionais insuperável.
 
 ## 3 Cartas-Chave
 
-### 1. Aesi, Tyrant of Gyre Strait (Comandante)
-A engine inteira do deck. Cada land drop compra 1 carta + habilita 1 land drop extra. Sem ela, o deck perde draw e ramp simultaneamente. É tanto a maior força quanto a maior vulnerabilidade.
+### 1. Aesi, Tyrant of Gyre Strait (Comandante — 6 mana)
+O coração absoluto do deck. Sem ela, o deck perde draw E ramp simultaneamente, transformando 40 terrenos em dead cards. Define todo o arquétipo: cada escolha de construção gira em torno de maximizar seus gatilhos.
 
-### 2. Cultivate (Ramp Staple)
-Busca 2 terrenos básicos — um para a mão, um virado. Sinergia total com Aesi: o terreno virado triggera draw, e o terreno na mão permite land drop extra no turno seguinte. Está em 85%+ dos decks Aesi (EDHREC).
+### 2. Avenger of Zendikar (Payoff landfall — 7 mana)
+O finisher primário. Com 40 terrenos, entra criando 40 fichas Planta 0/1. Com Aesi, cada land drop subsequente coloca +1/+1 counter em TODAS as plantas, transformando-as em um exército impossível de bloquear. Convertida investimento em terrenos em dano direto.
 
-### 3. Avenger of Zendikar (Wincon)
-Quando entra, cria fichas Planta iguais ao número de terrenos controlados. Cada land drop subsequente dá +1/+1 counter em CADA planta. Com 40 terrenos e múltiplos land drops por turno, converte a base de mana diretamente em dano letal.
+### 3. Cyclonic Rift (Board Wipe — 2/7 mana)
+A melhor remoção do azul por um motivo específico para Aesi: ela devolve permanentes à mão em vez de destruí-los. Isso significa que os terrenos de Aei permanecem intactos enquanto os oponentes recomeçam do zero. Em 2 turnos completos, o jogador com Aesi já reconstruiu vantagem total.
 
 ---
-*Fonte: EDHREC Average Deck — amostra agregada de 41.130+ decks*
-*Data da análise: 2026-05-26*
+*CMC médio: 2.61 | Terrenos: 40 | Ramp: 23 | Proteção: 2*
