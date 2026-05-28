@@ -113,6 +113,58 @@
 
 ---
 
+## Relatório de Precisão das Functional Tags
+
+> Snapshot acumulado da tabela SQLite `tag_accuracy`.
+> Consulta executada em `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`.
+
+**Última consulta:** 2026-05-27 23:49 UTC  
+**Precisão total acumulada:** **378/454 = 83.3%**
+
+### Tags com pior precisão (prioridade de correção)
+
+| Tag | Acertos | Total | Precisão | Leitura |
+|:----|--------:|------:|---------:|:--------|
+| `ninja` | 0 | 17 | 0.0% | Colapso total — o classificador não está reconhecendo o eixo principal de Yuriko. |
+| `stax_disruption` | 0 | 3 | 0.0% | Hate/stax ainda invisível para a taxonomia atual. |
+| `ramp + combo_piece` | 0 | 1 | 0.0% | Multi-função de mana + combo não está sobrevivendo à validação. |
+| `recursion + wincon` | 0 | 1 | 0.0% | Papel híbrido não está sendo preservado. |
+| `ramp + payoff` | 0 | 1 | 0.0% | Tag composta sem acerto acumulado. |
+| `payoff + removal` | 0 | 1 | 0.0% | Tag composta sem acerto acumulado. |
+| `payoff + token_maker` | 0 | 1 | 0.0% | Tag composta sem acerto acumulado. |
+| `payoff` | 11 | 31 | 35.5% | Grande fonte de ambiguidade semântica; hoje a categoria é ampla demais. |
+| `combo_piece` | 1 | 2 | 50.0% | Base pequena, mas instável. |
+| `enabler` | 21 | 42 | 50.0% | Categoria excessivamente genérica; metade das classificações acumuladas falha. |
+
+### Tags medianas
+
+| Tag | Acertos | Total | Precisão |
+|:----|--------:|------:|---------:|
+| `other` | 1 | 2 | 50.0% |
+| `protection` | 9 | 13 | 69.2% |
+| `wincon` | 6 | 8 | 75.0% |
+| `engine` | 6 | 8 | 75.0% |
+
+### Tags estáveis (100%)
+
+`ramp` (53/53), `draw` (32/32), `tutor` (6/6), `removal` (30/30), `land` (87/87), `board_wipe` (3/3), `sacrifice_outlet` (1/1), `finisher` (2/2), `recursion` (3/3), `wipe` (1/1), `utility` (76/76), `creature` (22/22), `planeswalker` (2/2), `artifact` (2/2), `enchantment` (3/3).
+
+### Leitura operacional
+
+- O classificador está **forte nas funções tradicionais** (ramp, draw, removal, land), mas ainda **fraco em papéis contextuais e híbridos**.
+- O maior problema estrutural continua sendo **taxonomia contextual**: `ninja`, `stax_disruption`, `payoff` e `enabler` dependem mais do plano de jogo do deck do que do texto isolado da carta.
+- As **tags compostas** com 0% ainda têm amostra pequena; não provam bug sozinhas, mas sinalizam que o sistema ainda não representa bem cartas multi-papel.
+- Como a precisão global já está em **83.3%**, o ganho marginal mais importante agora não vem de mexer em `ramp/draw/removal`, e sim de corrigir os **falsos negativos de archetype/contexto**.
+
+### Próximas prioridades sugeridas
+
+1. Auditar a família `ninja` com foco em Yuriko e evasão/connectors.
+2. Refinar `payoff` vs `engine` vs `enabler`, hoje excessivamente sobrepostos.
+3. Criar heurísticas explícitas para `stax_disruption` e outros efeitos proativos não-destrutivos.
+4. Decidir se tags compostas devem continuar como classes finais ou virar metadados auxiliares.
+
+---
+
 ## Mana Base Validation Report
 
 > Validação de mana base dos decks armazenados contra perfis EDHREC (commander_reference_profile_anchor30_batch_*).
