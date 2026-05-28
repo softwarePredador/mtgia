@@ -7,3 +7,6 @@ Aesi é o único comandante que dá draw E extra land drop simultaneamente, tran
 
 ## Aesi, Tyrant of Gyre Strait (Analysis v2) — 2026-05-28
 Versão estruturada criada: analyses/aesi-tyrant-of-gyre-strait.md. Destaques: Exploration (1 mana, dobra land drops), Avenger (payoff landfall mais explosivo), Cyclonic Rift (wipe que poupa terrenos). Vulnerabilidade principal: Mass Land Destruction é quase irreversível para este arquétipo.
+
+## Aesi, Tyrant of Gyre Strait - 2026-05-28
+Aesi é o único comandante que une extra land drop + card draw num único slot, tornando cada terreno uma "tripla ameaça" (mana, draw, landfall trigger). O deck prioriza consistência (40 terrenos, 23 ramp) sobre interação, confiando que valor incremental massivo supera oponentes. Janela crítica: precisa de Aesi ativa até o turno 5 ou perde competitividade.
