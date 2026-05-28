@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-28T06:21Z** (manager-watchdog — snapshot rotineiro)
+> Última atualização: **2026-05-28T06:38Z** (manager-watchdog — snapshot + verificação de erros)
 
 ## Resumo
 
@@ -11,72 +11,71 @@
 ||| Total de crons (`include_disabled=True`) | 15 |
 |||| Habilitados | 15/15 |
 |||| Desabilitados | 0 |
-|||| `last_status=error` | **2** |
+|||| `last_status=error` | **5** |
 |||| Nunca executaram (`last_run_at=null`) | 0 |
 |||| Stale (>120min atrás, `enabled=true`) | 0 |
-|||| Ações de recuperação nesta execução | 0 (erros transitórios — ver abaixo) |
+|||| Ações de recuperação nesta execução | 0 (erro sistêmico HTTP 502 — ver abaixo) |
 |||| Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** todos os 15 crons habilitados e scheduled. **2 crons com `last_status=error`** — ambos erros transitórios HTTP 502 (provider outage às 02:22Z). Desde o último snapshot (04:21Z), 1 cron se recuperou: `lorehold-mulligan-analyst` (HTTP 502 → OK às 05:19Z). Nenhum cron desabilitado, stale (>120min) ou never-run; portanto **nenhum `resume`/`run` foi necessário** — os erros são de runtime (provider 502), não de configuração.
+**Estado geral:** todos os 15 crons habilitados e scheduled. **5 crons com `last_status=error`** — **TODOS** causados por erro sistêmico `HTTP 502: Provider returned error` (provider outage). Oberva-se 2 ondas de falha: 02:22Z (2 crons) e 05:48Z (3 crons). Desde o último snapshot (06:21Z), 3 crons regrediram de OK → ERROR: `lorehold-deck-validator`, `manaloom-knowledge-import` e `manaloom-code-structure-auditor (4h)` — todos falharam na mesma janela de 05:48Z. Nenhum cron desabilitado, stale (>120min) ou never-run; portanto **nenhum `resume`/`run` foi necessário** — os erros são de runtime (provider 502), não de configuração.
 
 ## Ações da Rodada Atual
 
-|| # | Ação | Resultado ||
+||| # | Ação | Resultado ||
 ||:--|:-----|:----------||
-| 2026-05-28T06:21Z | `cronjob(action='list', include_disabled=True)` | ✅ 15 jobs listados |
-| 2026-05-28T06:21Z | Verificação de branch | ✅ `codex/hermes-analysis-docs` |
-| 2026-05-28T06:21Z | Verificação do worktree | ⚠️ artefatos de cron (SCOUT_LOG.md, knowledge.db) — não commitados |
-| 2026-05-28T06:21Z | Avaliação das regras gerenciais | ✅ nenhuma ação corretiva requerida |
-| 2026-05-28T06:21Z | Verificação de `last_status=error` | ⚠️ 2 erros encontrados (ambos HTTP 502 transitório — ver detalhes) |
-| 2026-05-28T06:21Z | Atualização do CRON_STATUS.md | ✅ snapshot 06:21Z |
+| 2026-05-28T06:38Z | `cronjob(action='list', include_disabled=True)` | ✅ 15 jobs listados |
+| 2026-05-28T06:38Z | Verificação de branch | ✅ `codex/hermes-analysis-docs` |
+| 2026-05-28T06:38Z | Verificação do worktree | ⚠️ artefato de cron (`scripts/knowledge.db`) — não commitado |
+| 2026-05-28T06:38Z | Avaliação das regras gerenciais | ✅ nenhuma ação corretiva requerida |
+| 2026-05-28T06:38Z | Verificação de `last_status=error` | ⚠️ 5 erros encontrados (todos HTTP 502 sistêmico — ver detalhes) |
+| 2026-05-28T06:38Z | Diagnóstico de output files | ✅ todos os 5 erros são `HTTP 502: Provider returned error` — 2 ondas: 02:22Z e 05:48Z |
+| 2026-05-28T06:38Z | Atualização do CRON_STATUS.md | ✅ snapshot 06:38Z |
 
 ## Crons de Auditoria / Gerenciais
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
 ||---|---|---|---|---|---|---|---|---||
-| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T05:19Z | 62min | 🟢 ok | scheduled | sem ação |
-| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30Z | 291min | 🟢 ok | scheduled | próxima: 16:00Z |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36Z | 286min | 🟢 ok | scheduled | próxima: dom 12:30Z |
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T04:29Z | 113min | 🟢 ok | scheduled | **esta execução** |
-| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | sim | 2026-05-28T02:22Z | 240min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: dom 06:00Z |
-| `bb03201b8911` | manaloom-code-structure-auditor (4h) | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T04:17Z | 125min | 🟢 ok | scheduled | ✅ recuperado do HTTP 502 |
+|| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T06:07Z | 31min | 🟢 ok | scheduled | sem ação |
+|| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30Z | 308min | 🟢 ok | scheduled | próxima: 16:00Z |
+|| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36Z | 302min | 🟢 ok | scheduled | próxima: dom 12:30Z |
+|| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T05:34Z | 64min | 🟢 ok | scheduled | **esta execução** |
+|| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | sim | 2026-05-28T02:22Z | 256min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: dom 06:00Z |
+|| `bb03201b8911` | manaloom-code-structure-auditor (4h) | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T05:48Z | 50min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: 08:00Z |
 
 ## Crons de Conhecimento Commander
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
 ||---|---|---|---|---|---|---|---|---||
-| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T05:23Z | 58min | 🟢 ok | scheduled | sem ação |
-| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T05:23Z | 58min | 🟢 ok | scheduled | sem ação |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T02:05Z | 256min | 🟢 ok | scheduled | próxima: ~08:05Z |
-| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T05:00Z | 81min | 🟢 ok | scheduled | sem ação |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T04:03Z | 138min | 🟢 ok | scheduled | sem ação |
+|| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T05:52Z | 46min | 🟢 ok | scheduled | sem ação |
+|| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T05:52Z | 46min | 🟢 ok | scheduled | sem ação |
+|| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T05:36Z | 62min | 🟢 ok | scheduled | próxima: ~11:36Z |
+|| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T05:47Z | 51min | 🟢 ok | scheduled | sem ação |
+|| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T05:48Z | 50min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: ~06:18Z |
 
 ## Lorehold Knowledge Pipeline
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
 ||---|---|---|---|---|---|---|---|---||
-| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T05:15Z | 66min | 🟢 ok | scheduled | sem ação |
-| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T03:42Z | 159min | 🟢 ok | scheduled | sem ação |
-| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T05:19Z | 62min | 🟢 ok | scheduled | ✅ recuperado do HTTP 502 |
-| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-28T02:22Z | 240min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: ~08:22Z |
+|| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T06:07Z | 31min | 🟢 ok | scheduled | sem ação |
+|| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T05:48Z | 50min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: ~06:48Z |
+|| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T05:19Z | 79min | 🟢 ok | scheduled | sem ação |
+|| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-28T05:48Z | 50min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: ~11:48Z |
 
 ## Alertas Pendentes
 
-**2 crons com `last_status=error` nesta rodada** — ambos classificados como erros transitórios de runtime, não requerendo ação de `resume` ou `run`:
+**5 crons com `last_status=error` nesta rodada** — todos classificados como erro sistêmico de runtime (HTTP 502), não requerendo ação de `resume` ou `run`:
 
 | Job ID | Nome | Erro | Tipo | Ação |
 |:-------|:-----|:-----|:-----|:-----|
-| `08468451a06a` | lorehold-mulligan-analyst | ~~HTTP 502~~ → recuperado | Provider outage transitório (02:22Z) | ✅ Auto-recuperado em 05:19Z |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `HTTP 502: Provider returned error` | Provider outage transitório (02:22Z) | Auto-recupera na próxima tick (~08:22Z) |
+| `712579b15767` | lorehold-deck-validator | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (~06:48Z) |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (~11:48Z) |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (~06:18Z) |
 | `577a0a669714` | structure-auditor (weekly) | `HTTP 502: Provider returned error` | Provider outage transitório (02:22Z) | Auto-recupera na próxima tick (dom 06:00Z) |
+| `bb03201b8911` | structure-auditor (4h) | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (08:00Z) |
 
-**Recuperações desde snapshot anterior (04:21Z):**
+**Diagnóstico sistêmico:** 5 crons falhando com o mesmo erro HTTP 502 em duas ondas (02:22Z e 05:48Z) caracteriza **provider outage**, não falha individual de cron. Todos os crons continuam `enabled=true`, `state=scheduled`, e serão reexecutados automaticamente pelo scheduler. Nenhuma ação de `resume` ou `run` é necessária nem recomendada (o run não executaria imediatamente e o cron atingiria o mesmo provider 502).
 
-| Job ID | Nome | Erro anterior | Status atual |
-|:-------|:-----|:-------------|:-------------|
-| `08468451a06a` | lorehold-mulligan-analyst | HTTP 502 | ✅ OK (05:19Z) |
-
-**Nenhuma ação corretiva aplicada** — os 2 erros são de runtime (provider 502), não de configuração (disabled, stale, never-run). Todos os crons com erro continuam `enabled=true` e `state=scheduled`, sendo reexecutados automaticamente pelo scheduler.
+**Nenhuma ação corretiva aplicada** — os 5 erros são de runtime (provider 502), não de configuração (disabled, stale, never-run).
 
 ## Precisão das Functional Tags (tag_accuracy)
 
@@ -210,11 +209,10 @@
 
 ## Observações Importantes
 
-- **2 crons com erro** (todos `enabled=true`, `state=scheduled`): 2× HTTP 502 (provider outage transitório às 02:22Z). **Nenhum requeriu `resume`/`run`** — todos são erros de runtime transitórios.
-- `lorehold-evolution-oracle` falhou com HTTP 502 em 02:22Z — provider outage. Próxima tick: ~08:22Z.
-- `manaloom-code-structure-auditor (weekly)` em HTTP 502 — próxima execução: domingo 06:00Z.
-- **1 cron recuperado** desde snapshot anterior: `lorehold-mulligan-analyst` (05:19Z → OK).
-- `origin/master` estável sem novos commits desde a última análise (HEAD: 771c9318).
+- **5 crons com erro** (todos `enabled=true`, `state=scheduled`): 5× HTTP 502 (provider outage sistêmico — 2 ondas: 02:22Z e 05:48Z). **Nenhum requeriu `resume`/`run`** — todos são erros de runtime transitórios.
+- `origin/master` estável sem novos commits desde a última análise (HEAD: 771c9318). Produção confirma mesmo SHA via `/health`.
 - `dart` e `flutter` continuam presentes (`/opt/data/tools/flutter/bin/`).
 - Apenas este arquivo (`CRON_STATUS.md`) foi atualizado intencionalmente nesta rodada.
+- **Regressões desde snapshot anterior (06:21Z):** 3 crons regrediram de OK → ERROR (todos HTTP 502 às 05:48Z): `lorehold-deck-validator`, `manaloom-knowledge-import`, `manaloom-code-structure-auditor (4h)`.
+- **Nenhuma ação de recuperação** aplicada — erros são transitórios de provider, não de configuração.
 
