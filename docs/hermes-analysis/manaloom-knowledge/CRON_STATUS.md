@@ -137,38 +137,50 @@
 
 ## Mana Base Validation Report
 
-> **Última execução:** 2026-05-28T02:10Z (cron `manaloom-mana-base-validator`)
+> **Última execução:** 2026-05-28T03:25Z (cron `manaloom-mana-base-validator`)
 > **Decks analisados:** 8
+> **Nota:** Lorehold (deck 6) não possui perfil de referência no diretório de artifacts — sem validação de role_targets.
 
 ### Resumo
 
-| Deck | Commander | Status | Problemas |
-|:-----|:----------|:------:|:----------|
-| 1 — Kinnan | Kinnan, Bonder Prodigy | 🔵 BLUE | Deck incompleto (13/100), 0 lands no SQLite vs 29 no DB |
-| 2 — Dimir Ninja | Yuriko, the Tiger's Shadow | 🟡 WARN | 17 unclassified, total_cards divergente (84 vs 99) |
-| 3 — Korvold | Korvold, Fae-Cursed King | 🟡 WARN | Deck incompleto (11/100), 0 lands no SQLite vs 25 no DB |
-| 4 — Teysa | Teysa Karlov | 🟡 WARN | Parcial (80/100), 20 lands fantasma, ramp CRIT (15 vs 9-11) |
-| 5 — Aesi | Aesi, Tyrant of Gyre Strait | 🟡 WARN | Ramp CRIT (28 vs 14-18), total_cards desatualizado (79 vs 100) |
-| 6 — Lorehold | Lorehold, the Historian | 🟡 WARN | Sem perfil role_targets, 9 double-null, ramp suspeito (16 vs 4-8) |
-| 7 — Winota | Winota, Joiner of Forces | 🟡 WARN | Protection acima (10 vs 5-8), categorias não mapeiam 1:1 |
-| 9 — Atraxa | Atraxa, Praetors' Voice | ✅ OK | Único deck completo, métricas majoritariamente dentro do perfil |
+| Deck | Commander | Status | Total Cards | DB Lands | SQLite Lands | Profile Lands | Problemas |
+|:-----|:----------|:------:|:-----------:|:--------:|:------------:|:-------------:|:----------|
+| 1 — Kinnan | Kinnan, Bonder Prodigy | 🔴 CRIT | 13 | 29 | 0 | 29-34 | Ramp (mana_dorks) 🔴 CRIT; Protection (interaction_protection) 🔴 CRIT; Total Cards 🔴 CRIT (13/100); Lands DB vs SQLite 🔴 CRIT |
+| 2 — Dimir Ninja | Yuriko, the Tiger's Shadow | 🟡 WARN | 99 | 33 | 35 | 30-34 | Total Cards 🟡 WARN (99/100); Lands DB vs SQLite 🟡 WARN (DB=33, SQLite=35) |
+| 3 — Korvold | Korvold, Fae-Cursed King | 🔴 CRIT | 11 | 25 | 0 | 34-37 | Lands 🔴 CRIT; Ramp (ramp_treasure) 🔴 CRIT; Draw (draw_value) 🔴 CRIT; Total Cards 🔴 CRIT (11/100); Lands DB vs SQLite 🔴 CRIT |
+| 4 — Teysa | Teysa Karlov | 🔴 CRIT | 80 | 35 | 15 | 35-37 | Ramp (ramp) 🔴 CRIT; Total Cards 🔴 CRIT (80/100); Lands DB vs SQLite 🔴 CRIT |
+| 5 — Aesi | Aesi, Tyrant of Gyre Strait | 🔴 CRIT | 100 | 40 | 40 | 39-43 | Ramp (ramp_extra_lands) 🔴 CRIT; Draw (supplemental_draw) 🟡 WARN; Protection (protection) 🟡 WARN |
+| 6 — Lorehold | Lorehold, the Historian | ✅ OK | 100 | 35 | 35 | N/A (sem perfil) | (sem perfil de referência) |
+| 7 — Winota | Winota, Joiner of Forces | 🟡 WARN | 100 | 34 | 34 | 31-35 | Protection (protection) 🟡 WARN |
+| 9 — Atraxa | Atraxa, Praetors' Voice | 🔵 BLUE | 100 | 36 | 36 | 35-38 | Ramp (ramp_fixing) 🔵 BLUE |
 
 ### Achados Críticos
 
-1. **2 decks gravemente incompletos** (Kinnan 13/100, Korvold 11/100)
-2. **1 deck parcial** (Teysa 80/100 — 20 lands fantasma)
-3. **Deck 5 (Aesi):** total_cards desatualizado (79 vs 100 real)
-4. **Deck 6 (Lorehold):** ramp_count=16 provavelmente inflado por false positives
-5. **Deck 9 (Atraxa):** único deck totalmente válido
+1. **4 decks incompletos/parciais:** Deck 1 (Kinnan): 13/100; Deck 2 (Yuriko): 99/100; Deck 3 (Korvold): 11/100; Deck 4 (Teysa): 80/100
+2. **3 decks com divergência grave DB vs SQLite lands:** Deck 1 (Kinnan): DB=29, SQLite=0, Diff=-29; Deck 3 (Korvold): DB=25, SQLite=0, Diff=-25; Deck 4 (Teysa): DB=35, SQLite=15, Diff=-20
+3. **Deck 5 (Aesi):** ramp_count=28 vs perfil 14-18 (CRIT +10 acima do max), draw_count=12 vs perfil 6-9 (WARN +3 acima do max), protection_count=7 vs perfil 2-4 (WARN +3 acima do max)
+4. **Deck 7 (Winota):** protection_count=10 vs perfil 5-8 (WARN +2 acima do max)
+5. **Deck 6 (Lorehold):** único deck completo sem perfil de referência — não é possível validar role_targets contra EDHREC
 
 ### Divergências Lands DB vs SQLite
 
-| Deck | DB total_lands | SQLite lands | Diferença |
-|:-----|:---------------|:-------------|:----------|
-| 1 — Kinnan | 29 | 0 | ❌ -29 |
-| 3 — Korvold | 25 | 0 | ❌ -25 |
-| 4 — Teysa | 35 | 15 | ❌ -20 |
-| Todos os outros | ✅ | ✅ | 0 |
+| Deck | DB total_lands | SQLite lands | Diferença | Status |
+|:-----|:---------------|:-------------|:----------|:-------|
+| 1 — Kinnan | 29 | 0 | -29 | ❌ |
+| 2 — Yuriko | 33 | 35 | +2 | ⚠️ |
+| 3 — Korvold | 25 | 0 | -25 | ❌ |
+| 4 — Teysa | 35 | 15 | -20 | ❌ |
+| 5 — Aesi | 40 | 40 | 0 | ✅ |
+| 6 — Lorehold | 35 | 35 | 0 | ✅ |
+| 7 — Winota | 34 | 34 | 0 | ✅ |
+| 9 — Atraxa | 36 | 36 | 0 | ✅ |
+
+### Mudanças desde última validação (02:18Z)
+
+- **Sem mudanças estruturais**: todos os decks mantêm os mesmos totais de cartas e lands desde a validação anterior.
+- **Decks 1, 3, 4** continuam com dados incompletos nas tabelas (insert parcial durante import anterior).
+- **Deck 2 (Yuriko):** total_cards no DB permanece 84 vs 99 real no SQLite — dado desatualizado desde import.
+- **Nenhum novo deck inserido ou removido** desde última validação.
 
 ---
 
