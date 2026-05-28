@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-28T06:51Z** (manager-watchdog — snapshot + verificação de erros)
+> Última atualização: **2026-05-28T06:57Z** (mana-base-validator — validação de mana base)
 
 ## Resumo
 
@@ -159,7 +159,7 @@
 
 ## Mana Base Validation Report
 
-> **Última execução:** 2026-05-28T05:45Z (cron `manaloom-mana-base-validator`)
+> **Última execução:** 2026-05-28T06:57Z (cron `manaloom-mana-base-validator`)
 > **Decks analisados:** 8
 > **Nota:** Lorehold (deck 6) não possui perfil de referência no diretório de artifacts — sem validação de role_targets.
 
@@ -198,9 +198,10 @@
 | 7 — EDHREC Average Default — Boros | 34 | 34 | +0 | ✅ OK |
 | 9 — Atraxa, Praetors' Voice — EDHR | 36 | 36 | +0 | ✅ OK |
 
-### Mudanças desde última validação (04:51Z)
+### Mudanças desde última validação (05:45Z)
 
 - **Sem mudanças estruturais:** todos os decks mantêm os mesmos totais de cartas e lands desde a validação anterior.
+- **Todos os 8 decks com mesmos valores de SQLite e DB** — nenhum insert, update ou delete desde 05:45Z.
 - **Deck 5 (Aesi):** DB total_cards permanece 79 (desatualizado) vs SQLite 100 — não corrigido desde rodada anterior.
 - **Deck 2 (Yuriko):** DB total_cards permanece 84 (desatualizado) vs SQLite 99 — não corrigido.
 - **Decks 1, 3, 4** continuam com dados incompletos (inserts parciais de imports anteriores).
