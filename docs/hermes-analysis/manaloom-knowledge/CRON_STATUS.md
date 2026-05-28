@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-27T23:49Z**
+> Última atualização: **2026-05-28T00:22Z**
 
 ## Resumo
 
@@ -11,65 +11,68 @@
 | Total de crons (`include_disabled=True`) | 15 |
 | Habilitados | 15/15 |
 | Desabilitados | 0 |
-| `last_status=error` | **7** 🔴 |
+| `last_status=error` | **5** 🔴 |
 | Nunca executaram (`last_run_at=null`) | 0 |
 | Stale (>120min atrás, `enabled=true`) | 0 |
 | Fleet removidos desde 2026-05-27 | 4 (daily-deep-audit, weekly-memory-cleanup, themes-research, missing-gc-filler) |
-| Recuperados nesta sessão | 3 |
-| Regredidos nesta sessão | 0 novos após a rodada anterior |
+| Recuperados nesta sessão | 5 |
+| Regredidos nesta sessão | 1 novo (`lorehold-mulligan-analyst`) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 15/15 habilitados ✅. **7 crons em `last_status=error`** após os triggers da rodada anterior serem parcialmente consumidos pelo scheduler. Houve **3 recuperações observáveis** (`manaloom-master-watchdog`, `manaloom-hermes-normal-audit`, `manaloom-knowledge-import`) e o auditor estrutural semanal saiu de `never-run` para erro real de rate limit, permitindo diagnóstico concreto. O padrão remanescente segue sistêmico por provider/crédito: 4 crons com HTTP 402/`Insufficient Balance` e 3 com HTTP 429 (`free-models-per-day-stealth`). Nenhum `resume` ou novo `run` foi necessário nesta execução.
+**Estado geral:** 15/15 habilitados ✅. **5 crons em `last_status=error`** na fotografia desta execução. Houve **5 recuperações observáveis** desde a rodada anterior (`manaloom-hermes-weekly-parallel-audit`, `manaloom-tag-accuracy-reporter`, `manaloom-mana-base-validator`, `manaloom-code-structure-auditor` semanal e `manaloom-code-structure-auditor` 4h), enquanto **1 cron regrediu** (`lorehold-mulligan-analyst`) após executar às 00:07Z e falhar com HTTP 402. O padrão de falha remanescente é agora totalmente concentrado em crons OpenRouter/free-model: 5 jobs com `HTTP 402: Insufficient Balance`. Nenhum `resume` ou novo `run` foi necessário nesta execução.
 
 **Mudanças desta rodada:**
-- `manaloom-master-watchdog` — recuperado: `last_run_at` avançou para 23:45Z e `last_status=ok`.
-- `manaloom-hermes-normal-audit` — recuperado após trigger anterior: executou às 23:40Z e voltou para `ok`.
-- `manaloom-knowledge-import` — recuperado: executou às 23:47Z e voltou para `ok`.
-- `manaloom-code-structure-auditor` (577a0a669714) — deixou de ser `never-run`; executou às 23:20Z e falhou por HTTP 429, o que confirma rate limit em vez de problema de agendamento.
-- `manaloom-hermes-weekly-parallel-audit` — trigger anterior foi consumido, mas a execução de 23:19Z falhou por HTTP 429; permanece em erro aguardando janela/provider.
-- Demais crons permaneceram habilitados; nenhum `enabled=false` foi encontrado e nenhum job estava stale >120min no momento da inspeção.
+- `manaloom-hermes-weekly-parallel-audit` — recuperado: executou às 23:59Z e voltou para `ok`.
+- `manaloom-tag-accuracy-reporter` — recuperado: executou às 00:00Z e voltou para `ok`.
+- `manaloom-mana-base-validator` — recuperado: executou às 00:07Z e voltou para `ok`.
+- `manaloom-code-structure-auditor` (577a0a669714) — recuperado: executou às 00:03Z e publicou o relatório de estrutura com `last_status=ok`.
+- `manaloom-code-structure-auditor` (bb03201b8911) — recuperado: executou às 00:06Z e publicou a rotação de foco com `last_status=ok`.
+- `lorehold-mulligan-analyst` — regrediu: executou às 00:07Z e falhou por HTTP 402 / `Insufficient Balance`.
+- Demais crons permaneceram habilitados; nenhum `enabled=false`, nenhum `never-run` e nenhum job stale >120min no momento da inspeção.
 
 ## Crons de Auditoria / Gerenciais
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-27 23:45Z | 4min | 🟢 ok | 2026-05-28 00:15Z | ✅ recuperado naturalmente após atraso anterior; rodando/agendado normalmente |
-| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 23:40Z | 9min | 🟢 ok | 2026-05-28 16:00Z | ✅ trigger anterior validado — cron executou e voltou para `ok` |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 23:19Z | 30min | 🔴 error | 2026-05-31 12:30Z | 🔴 trigger anterior consumido; output mais recente indica HTTP 429 / free-model rate limit |
-| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 23:18Z | 31min | 🟢 ok | 2026-05-28 00:18Z | ✅ esta execução anterior concluiu `ok`; seguir monitorando próxima janela |
-| `577a0a669714` | manaloom-code-structure-auditor | `0 6 * * 0` | ✅ | 2026-05-27 23:20Z | 29min | 🔴 error | 2026-05-31 06:00Z | 🔴 saiu de `never-run`; execução confirmou rate limit HTTP 429 |
-| `bb03201b8911` | manaloom-code-structure-auditor | `0 20,0,4,8,12,16 * * *` | ✅ | 2026-05-27 21:34Z | 2h15min | 🟢 ok | 2026-05-28 00:00Z | ✅ sem ação — próximo tick iminente, status ainda saudável |
+| `757eefb8738b` | manaloom-master-watchdog | `every 30m` | ✅ | 2026-05-28 00:08Z | 13min | 🟢 ok | 2026-05-28 00:38Z | ✅ execução no-agent mais recente silenciosa e saudável |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `0 16,21 * * *` | ✅ | 2026-05-27 23:40Z | 41min | 🟢 ok | 2026-05-28 16:00Z | ✅ continua saudável após o [SILENT] do audit normal |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | `30 12 * * 0` | ✅ | 2026-05-27 23:59Z | 22min | 🟢 ok | 2026-05-31 12:30Z | ✅ recuperado — execução mais recente terminou em [SILENT] |
+| `2d436c71bbf7` | manaloom-manager-watchdog | `every 30m` | ✅ | 2026-05-27 23:50Z | 31min | 🟢 ok | 2026-05-28 00:51Z | ✅ última execução concluiu `ok`; esta rodada apenas consolidou novo snapshot |
+| `577a0a669714` | manaloom-code-structure-auditor | `0 6 * * 0` | ✅ | 2026-05-28 00:03Z | 18min | 🟢 ok | 2026-05-31 06:00Z | ✅ recuperado — publicou atualização do audit estrutural (`ae0cb93c`) |
+| `bb03201b8911` | manaloom-code-structure-auditor | `0 20,0,4,8,12,16 * * *` | ✅ | 2026-05-28 00:06Z | 16min | 🟢 ok | 2026-05-28 04:00Z | ✅ recuperado — publicou rotação "Classes Não Usadas" (`60b52cb9`) |
 
 ## Crons de Conhecimento Commander
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-27 23:40Z | 9min | 🔴 error | 2026-05-28 00:00Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
-| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-27 23:40Z | 9min | 🔴 error | 2026-05-28 00:00Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-27 23:19Z | 30min | 🔴 error | 2026-05-28 05:19Z | 🔴 execução pós-trigger falhou por HTTP 429 / free-model rate limit |
-| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-27 23:15Z | 34min | 🔴 error | 2026-05-28 00:15Z | 🔴 erro recente; rate limit de modelo free (HTTP 429) |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | `every 30m` | ✅ | 2026-05-27 23:47Z | 2min | 🟢 ok | 2026-05-28 00:17Z | ✅ recuperado — execução mais recente concluiu `ok` |
+| `75eed994c103` | manaloom-commander-knowledge-deep | `every 20m` | ✅ | 2026-05-28 00:19Z | 2min | 🔴 error | 2026-05-28 00:39Z | 🔴 erro recente; OpenRouter free-model devolveu HTTP 429 / free-models-per-day |
+| `7915cc2377a0` | manaloom-gamechanger-research | `every 20m` | ✅ | 2026-05-28 00:19Z | 2min | 🔴 error | 2026-05-28 00:39Z | 🔴 erro recente; OpenRouter free-model devolveu HTTP 429 / free-models-per-day |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | `every 360m` | ✅ | 2026-05-28 00:00Z | 22min | 🟢 ok | 2026-05-28 06:00Z | ✅ recuperado — publicou atualização de precisão (`36fbe0a6`) |
+| `444aa9510c2c` | manaloom-mana-base-validator | `every 60m` | ✅ | 2026-05-28 00:07Z | 14min | 🟢 ok | 2026-05-28 01:07Z | ✅ recuperado — short-circuit funcionou e cron voltou para `ok` |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | `every 30m` | ✅ | 2026-05-28 00:20Z | 1min | 🟢 ok | 2026-05-28 00:50Z | ✅ saudável; continua bloqueado apenas por ausência de `psql`, sem drift de configuração |
 
 ## Lorehold Knowledge Pipeline
 
 | ID | Cron | Schedule | Enabled | Last run | Age | Status | Next run | Observação |
 |:--|:--|:--:|:--:|:--:|:--:|:--:|:--|:--|
-| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-27 23:15Z | 2min | 🔴 error | 2026-05-27 23:45Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
-| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-27 22:38Z | 39min | 🔴 error | 2026-05-27 23:38Z | 🔴 erro recente; configuração parece correta, falha externa de saldo/provider (HTTP 402) |
-| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-27 21:56Z | 1h20min | 🟢 ok | 2026-05-27 23:56Z | ✅ sem ação — rodando/agendado normalmente |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 21:41Z | 1h35min | 🟢 ok | 2026-05-28 03:41Z | ✅ sem ação — rodando/agendado normalmente |
+| `f20ac299992b` | lorehold-deck-scout | `every 30m` | ✅ | 2026-05-28 00:07Z | 14min | 🔴 error | 2026-05-28 00:37Z | 🔴 erro recente; OpenRouter/deck-analysis falhou por HTTP 402 / `Insufficient Balance` |
+| `712579b15767` | lorehold-deck-validator | `every 60m` | ✅ | 2026-05-28 00:08Z | 13min | 🔴 error | 2026-05-28 01:08Z | 🔴 erro recente; OpenRouter/deck-analysis falhou por HTTP 402 / `Insufficient Balance` |
+| `08468451a06a` | lorehold-mulligan-analyst | `every 120m` | ✅ | 2026-05-28 00:07Z | 14min | 🔴 error | 2026-05-28 02:07Z | 🔴 regrediu nesta rodada; execução mais recente falhou por HTTP 402 / `Insufficient Balance` |
+| `a50bef4c2a59` | lorehold-evolution-oracle | `every 360m` | ✅ | 2026-05-27 21:41Z | 2h40min | 🟢 ok | 2026-05-28 03:41Z | ✅ sem ação — intervalo de 6h ainda dentro do esperado para este schedule |
 
-## Ações da Rodada Atual (2026-05-27T23:49Z)
+## Ações da Rodada Atual (2026-05-28T00:22Z)
 
 | # | ID | Cron | Ação | Motivo | Resultado |
 |:-:|:--|:--|:--|:--|:--|
 | 1 | — | **cronjob(action='list', include_disabled=True)** | inspeção completa | verificar frota atual | ✅ 15 jobs listados; nenhum `enabled=false` |
 | 2 | — | **branch check** | `git branch --show-current` | verificar branch do workdir | ✅ `codex/hermes-analysis-docs` — sem ação |
-| 3 | `660397bb97e1` | manaloom-hermes-normal-audit | validação pós-trigger anterior | confirmar execução | ✅ `last_run_at` avançou para 23:40Z e `last_status=ok` |
-| 4 | `577a0a669714` | manaloom-code-structure-auditor (weekly) | validação pós-trigger anterior | confirmar saída de `never-run` | ✅ executou às 23:20Z; falha agora diagnosticada como HTTP 429 |
-| 5 | `b2f5c21ce2d7` | manaloom-knowledge-import | validação de recuperação | checar se erro anterior persistia | ✅ executou às 23:47Z e voltou para `ok` |
-| 6 | — | **diagnóstico sistêmico** | inspeção de outputs recentes | 7 crons em erro | 🔍 4× HTTP 402 / saldo insuficiente + 3× HTTP 429 / rate limit |
-| 7 | — | **ações corretivas novas** | nenhuma | não havia jobs desabilitados/stale/never-run | ℹ️ nenhuma chamada `resume`/`run` adicional necessária nesta execução |
+| 3 | — | **git status --short** | sanity check | confirmar worktree limpo antes do patch | ✅ limpo nesta execução |
+| 4 | `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | validação pós-run | confirmar recuperação | ✅ `last_run_at` avançou para 23:59Z e `last_status=ok` |
+| 5 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | validação pós-run | confirmar recuperação | ✅ `last_run_at` avançou para 00:00Z e `last_status=ok` |
+| 6 | `444aa9510c2c` | manaloom-mana-base-validator | validação pós-run | confirmar recuperação | ✅ `last_run_at` avançou para 00:07Z e `last_status=ok` |
+| 7 | `577a0a669714` + `bb03201b8911` | manaloom-code-structure-auditor | validação pós-run | confirmar que ambos saíram de erro/stale | ✅ ambos executaram à meia-noite e ficaram `ok` |
+| 8 | `75eed994c103`, `7915cc2377a0`, `f20ac299992b`, `712579b15767`, `08468451a06a` | diagnóstico de outputs | validar causa dos erros remanescentes | 🔍 2× HTTP 429 free-models-per-day + 3× HTTP 402 / `Insufficient Balance` |
+| 9 | — | **ações corretivas novas** | nenhuma | não havia jobs desabilitados/stale/never-run | ℹ️ nenhuma chamada `resume`/`run` adicional necessária nesta execução |
 
 ## Alertas Pendentes
 
@@ -77,37 +80,35 @@
 
 | Cron | Último run | Erro | Provider | Model | Workdir | Tipo |
 |:-----|:----------:|:----|:--------:|:-----:|:-------:|:----:|
-| manaloom-commander-knowledge-deep | 23:40Z | HTTP 402: Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
-| manaloom-gamechanger-research | 23:40Z | HTTP 402: Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
-| manaloom-tag-accuracy-reporter | 23:19Z | HTTP 429: Rate limit exceeded: free-models-per-day-stealth | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Rate limit |
-| manaloom-mana-base-validator | 23:15Z | HTTP 429: Rate limit exceeded: free-models-per-day-stealth | copilot | gpt-5.4 | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Rate limit |
-| lorehold-deck-scout | 23:45Z | HTTP 402 / Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
-| lorehold-deck-validator | 23:41Z | HTTP 402: Insufficient Balance | deepseek | deepseek-v4-flash | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
-| manaloom-hermes-weekly-parallel-audit | 23:19Z | HTTP 429: Rate limit exceeded: free-models-per-day-stealth | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Rate limit |
-| manaloom-code-structure-auditor (weekly) | 23:20Z | HTTP 429: Rate limit exceeded: free-models-per-day-stealth | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Rate limit |
+| manaloom-commander-knowledge-deep | 00:19Z | HTTP 429: free-models-per-day | openrouter | nvidia/nemotron-3-super-120b-a12b:free | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Rate limit / créditos |
+| manaloom-gamechanger-research | 00:19Z | HTTP 429: free-models-per-day | openrouter | nvidia/nemotron-3-super-120b-a12b:free | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Rate limit / créditos |
+| lorehold-deck-scout | 00:07Z | HTTP 402: Insufficient Balance | openrouter | nvidia/nemotron-3-super-120b-a12b:free | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
+| lorehold-deck-validator | 00:08Z | HTTP 402: Insufficient Balance | openrouter | nvidia/nemotron-3-super-120b-a12b:free | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
+| lorehold-mulligan-analyst | 00:07Z | HTTP 402: Insufficient Balance | openrouter | nvidia/nemotron-3-super-120b-a12b:free | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Saldo/provider |
 
 ### ✅ Recuperados nesta janela
 
 | Cron | Último run | Evidência | Provider | Model | Workdir | Tipo |
 |:-----|:----------:|:---------|:--------:|:-----:|:-------:|:----:|
-| manaloom-manager-watchdog | 23:18Z | última execução concluiu `ok` | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Recuperado |
-| manaloom-knowledge-import | 23:47Z | última execução concluiu `ok` | copilot | gpt-5.4 | — | Recuperado |
+| manaloom-hermes-weekly-parallel-audit | 23:59Z | última execução terminou `[SILENT]` e voltou para `ok` | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Recuperado |
+| manaloom-tag-accuracy-reporter | 00:00Z | publicou `feat: tag accuracy report` (`36fbe0a6`) | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Recuperado |
+| manaloom-mana-base-validator | 00:07Z | última execução terminou `[SILENT]` e voltou para `ok` | copilot | gpt-5.4 | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge | Recuperado |
+| manaloom-code-structure-auditor (weekly) | 00:03Z | publicou `docs: atualização do audit de estrutura — 2026-05-28` (`ae0cb93c`) | copilot | gpt-5.4 | /opt/data/workspace/mtgia | Recuperado |
+| manaloom-code-structure-auditor (4h) | 00:06Z | publicou `docs: audit estrutura classes não usadas — 2026-05-28` (`60b52cb9`) | default | default | /opt/data/workspace/mtgia | Recuperado |
 
 **Leitura operacional:**
-- O estado atual caiu para **7/15 crons em erro** após o scheduler consumir parte dos triggers anteriores e confirmar algumas recuperações.
-- Grupo DeepSeek/Crédito afetado: `manaloom-commander-knowledge-deep`, `manaloom-gamechanger-research`, `lorehold-deck-scout`, `lorehold-deck-validator`.
-- Grupo Copilot/free-model rate limit afetado: `manaloom-hermes-weekly-parallel-audit`, `manaloom-tag-accuracy-reporter`, `manaloom-mana-base-validator`, `manaloom-code-structure-auditor` semanal.
-- `manaloom-manager-watchdog` e `manaloom-knowledge-import` mostraram recuperação observável nesta janela; não precisam ação imediata.
-- O trigger anterior do auditor estrutural semanal foi útil: agora sabemos que o problema é **rate limit HTTP 429**, não agendamento/never-run.
-- Como as configurações principais parecem corretas nos crons DeepSeek (`provider=deepseek`, `model=deepseek-v4-flash`, workdir certo onde aplicável), **não** reconfigurei model/workdir cegamente; o bloqueio segue parecendo financeiro/infra externo e precisa correção fora do watchdog.
-
+- O estado atual melhorou para **5/15 crons em erro**.
+- Todos os erros remanescentes estão concentrados no cluster **OpenRouter `nvidia/nemotron-3-super-120b-a12b:free`**.
+- O subgrupo `manaloom-commander-knowledge-deep` + `manaloom-gamechanger-research` agora falha por **HTTP 429 free-models-per-day**, enquanto o pipeline Lorehold (`scout`, `validator`, `mulligan`) falha por **HTTP 402 / Insufficient Balance**.
+- Os crons Copilot que estavam em erro na rodada passada efetivamente se recuperaram após a janela/scheduler e não exigem ação corretiva adicional agora.
+- Como os jobs em erro continuam `enabled=true`, com `workdir` correto e `last_run_at` muito recente, **não** apliquei `resume`, `run` nem mudanças de configuração cegas; o bloqueio atual é externo ao repositório (quota/crédito do provider).
 ## Observações Importantes
 
 - **Branch confirmada:** `codex/hermes-analysis-docs` ✅
 - **`cronjob(action="list", include_disabled=True)`** retornou 15 jobs; nenhum desabilitado.
-- **Ações corretivas aplicadas nesta execução:** 0 triggers novos; 0 resumes. Esta rodada foi de validação pós-trigger e consolidação do diagnóstico.
-- **Sem correções estruturais locais seguras para aplicar** nos erros HTTP 402/429 observados; são falhas externas de crédito/rate-limit/provider.
-- Working tree local segue com artefatos não relacionados (`scripts/knowledge.db`, mudanças em `docs/hermes-analysis/manaloom-knowledge/scripts/import_card_profiles.py` e `import_knowledge.py`); eles não fazem parte deste commit.
+- **Ações corretivas aplicadas nesta execução:** 0 triggers novos; 0 resumes. Esta rodada foi de reamostragem/diagnóstico após as execuções da meia-noite.
+- **Sem correções estruturais locais seguras para aplicar** nos erros atuais HTTP 402/429 do OpenRouter free-model; são falhas externas de crédito/quota/provider.
+- Working tree estava limpo no início desta execução; apenas `docs/hermes-analysis/manaloom-knowledge/CRON_STATUS.md` foi alterado intencionalmente.
 - Apenas `docs/hermes-analysis/manaloom-knowledge/CRON_STATUS.md` deve ser commitado pelo watchdog.
 - Nenhum token/secret foi registrado neste relatório.
 
