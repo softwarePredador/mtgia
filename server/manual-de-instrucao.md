@@ -3,6 +3,36 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-28 — Politica versionada para fallbacks Commander optimize/complete
+
+Motivo:
+
+- Hermes apontou que o runtime de complete/optimize mantinha listas de nomes
+  premium, denylist e staples espalhadas em `optimize_runtime_support.dart`.
+- A correcao precisava ser conservadora: mover a politica para um ponto
+  versionado sem alterar a selecao de cartas em producao.
+
+Patch aplicado:
+
+- Criado `server/lib/ai/commander_fallback_policy.dart` com
+  `commanderFallbackPolicyVersion`.
+- Movidas para a politica versionada as listas de denylist, premium filler,
+  staples de completion, fallbacks universais e foundation fillers contextuais.
+- `optimize_runtime_support.dart` passa a consumir essa politica e mantém os
+  gates existentes de identidade de cor, legalidade, bracket e qualidade.
+
+Validacao:
+
+- Testes adicionados em `server/test/optimize_runtime_support_test.dart` para
+  provar consumo da denylist, bonus premium, staples universais e foundation
+  fillers contextuais.
+
+Riscos restantes:
+
+- Esta etapa centraliza a politica, mas ainda nao substitui a curadoria por
+  tabela DB/backfill operacional. Qualquer mudanca de conteudo da politica deve
+  passar por scorecard optimize antes de deploy.
+
 ## 2026-05-28 — Optimize usa multi-tags semanticas v2 nos deltas
 
 Motivo:
@@ -41,8 +71,8 @@ Riscos restantes:
 - A flag de enforcement segue desligada por padrao. Antes de ativar `partial`
   em producao, rodar novo scorecard publico/controlled com corpora completos
   sem timeout global.
-- Fallbacks de complete/optimize ainda usam listas/politicas hardcoded para
-  nomes premium/denylist; migrar para policy data versionada em patch separado.
+- O conteudo da politica de fallbacks complete/optimize ainda e curado por
+  nomes, mas agora fica centralizado em policy data versionada.
 
 ## 2026-05-28 — Deck Analysis usa semantic_tags_v2 antes de heuristica
 

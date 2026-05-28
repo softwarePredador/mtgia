@@ -7,6 +7,7 @@ import 'aggressive_candidate_meta_signal_support.dart';
 import 'functional_card_tags.dart';
 import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
+import 'commander_fallback_policy.dart';
 
 String normalizeOptimizeReasoning(dynamic value) {
   if (value == null) return '';
@@ -1293,55 +1294,6 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
   candidates = dedupeCandidatesByName(candidates);
 
   if (candidates.length < limit) {
-    final stapleNames = [
-      'Sol Ring',
-      'Arcane Signet',
-      'Mind Stone',
-      'Fellwar Stone',
-      'Swiftfoot Boots',
-      'Lightning Greaves',
-      'Command Tower',
-      'Demonic Tutor',
-      'Vampiric Tutor',
-      'Rhystic Study',
-      'Necropotence',
-      'Cyclonic Rift',
-      'Swords to Plowshares',
-      'Anguished Unmaking',
-      'Beast Within',
-      'Nature' 's Claim',
-      'Counterspell',
-      'Mana Drain',
-      'Fact or Fiction',
-      'Ponder',
-      'Preordain',
-      'Brainstorm',
-      'Signet',
-      'Talisman',
-      'Dark Ritual',
-      'Reanimate',
-      'Animate Dead',
-      'Eternal Witness',
-      'Regrowth',
-      'Hero' 's Downfall',
-      'Mortify',
-      'Path to Exile',
-      'Generous Gift',
-      'Chaos Warp',
-      'Krosan Grip',
-      'Disenchant',
-      'Return to Nature',
-      'Mana Leak',
-      'Force of Will',
-      'Force of Negation',
-      'Teferi' 's Protection',
-      'Toxic Deluge',
-      'Blasphemous Act',
-      'Boardwipe',
-      'Draw',
-      'Ramp',
-      'Removal'
-    ];
     final stapleResult = await pool.execute(
       Sql.named('''
         SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
@@ -1355,7 +1307,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
           )
       '''),
       parameters: {
-        'names': stapleNames,
+        'names': commanderCompletionStapleNames,
         'identity': identity,
       },
     );
@@ -1944,55 +1896,6 @@ List<T> dedupeCandidatesByName<T extends Map<String, Object?>>(
   return output;
 }
 
-const _weakCommanderFillerDenylist = <String>{
-  'ancestral reminiscence',
-  'bane\'s contingency',
-  'body of knowledge',
-  'cancel',
-  'diviner\'s portent',
-  'didn\'t say please',
-  'dream fracture',
-  'dreamstone hedron',
-  'forced fruition',
-  'palladium myr',
-  'prismatic lens',
-  'sisay\'s ring',
-  'silver myr',
-  'stonespeaker crystal',
-  'ur-golem\'s eye',
-};
-
-const _premiumCommanderFillerNames = <String>{
-  'arcane denial',
-  'arcane signet',
-  'brainstorm',
-  'chrome mox',
-  'counterspell',
-  'cyclonic rift',
-  'fact or fiction',
-  'fierce guardianship',
-  'force of negation',
-  'force of will',
-  'grim monolith',
-  'lightning greaves',
-  'mana drain',
-  'mana vault',
-  'mental misstep',
-  'mind stone',
-  'mox diamond',
-  'mystical tutor',
-  'negate',
-  'pact of negation',
-  'ponder',
-  'preordain',
-  'rhystic study',
-  'sol ring',
-  'swan song',
-  'swiftfoot boots',
-  'thassa\'s oracle',
-  'thought vessel',
-};
-
 bool shouldKeepCommanderFillerCandidate({
   required Map<String, dynamic> candidate,
   required Set<String> excludeNames,
@@ -2003,7 +1906,7 @@ bool shouldKeepCommanderFillerCandidate({
   final name = (rawName is String ? rawName : '').trim().toLowerCase();
   if (name.isEmpty) return false;
   if (excludeNames.contains(name)) return false;
-  if (_weakCommanderFillerDenylist.contains(name)) return false;
+  if (commanderWeakFillerDenylist.contains(name)) return false;
 
   if (enforceCommanderIdentity || commanderColorIdentity.isNotEmpty) {
     final withinIdentity = isWithinCommanderIdentity(
@@ -2046,7 +1949,7 @@ int commanderFillerQualityScore(Map<String, dynamic> candidate) {
   score += metaDeckCount * 3;
   score += usageCount ~/ 8;
 
-  if (_premiumCommanderFillerNames.contains(name)) {
+  if (commanderPremiumFillerNames.contains(name)) {
     score += 160;
   }
 
@@ -3480,38 +3383,7 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
 }) async {
   if (limit <= 0) return const [];
 
-  const preferred = <String>[
-    'Sol Ring',
-    'Arcane Signet',
-    'Command Tower',
-    'Mind Stone',
-    'Wayfarer\'s Bauble',
-    'Swiftfoot Boots',
-    'Lightning Greaves',
-    'Swords to Plowshares',
-    'Path to Exile',
-    'Beast Within',
-    'Generous Gift',
-    'Counterspell',
-    'Negate',
-    'Arcane Denial',
-    'Brainstorm',
-    'Swan Song',
-    'Mystical Tutor',
-    'Cyclonic Rift',
-    'Rhystic Study',
-    'Ponder',
-    'Preordain',
-    'Fact or Fiction',
-    'Read the Bones',
-    'Cultivate',
-    'Kodama\'s Reach',
-    'Farseek',
-    'Nature\'s Lore',
-    'Three Visits',
-  ];
-
-  final filteredPreferred = preferred
+  final filteredPreferred = universalCommanderFallbackNames
       .where((name) => !excludeNames.contains(name.toLowerCase()))
       .toList();
   if (filteredPreferred.isEmpty) return const [];
@@ -3564,56 +3436,11 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
 }) async {
   if (limit <= 0) return const [];
 
-  final identity = commanderColorIdentity.map((e) => e.toUpperCase()).toSet();
-  final archetype = targetArchetype.toLowerCase();
-  final theme = (detectedTheme ?? '').toLowerCase();
-  final names = <String>{
-    'The One Ring',
-    'Fellwar Stone',
-    'Swiftfoot Boots',
-    'Mystic Remora',
-    'Swan Song',
-    'An Offer You Can\'t Refuse',
-  };
-
-  if (identity.length == 1 && identity.contains('U')) {
-    names.addAll(const {
-      'Fabricate',
-      'Merchant Scroll',
-      'Muddle the Mixture',
-      'Pongify',
-      'Rapid Hybridization',
-      'Reality Shift',
-      'Resculpt',
-      'Spell Pierce',
-      'Solve the Equation',
-      'Windfall',
-      'Whir of Invention',
-    });
-
-    if (archetype.contains('combo') || archetype.contains('control')) {
-      names.addAll(const {
-        'High Tide',
-        'Jace, Wielder of Mysteries',
-        'Long-Term Plans',
-        'Personal Tutor',
-        'Transmute Artifact',
-        'Tezzeret the Seeker',
-      });
-    }
-
-    if (theme.contains('proliferate') || theme.contains('phyrexian')) {
-      names.addAll(const {
-        'Contentious Plan',
-        'Experimental Augury',
-        'Inexorable Tide',
-        'Prologue to Phyresis',
-        'Tekuthal, Inquiry Dominus',
-        'Tezzeret\'s Gambit',
-        'Thrummingbird',
-      });
-    }
-  }
+  final names = commanderFoundationNamesFor(
+    commanderColorIdentity: commanderColorIdentity,
+    targetArchetype: targetArchetype,
+    detectedTheme: detectedTheme,
+  );
 
   final filteredNames = names
       .where((name) => !excludeNames.contains(name.toLowerCase()))

@@ -2,6 +2,7 @@ import 'package:test/test.dart';
 
 import '../lib/edh_bracket_policy.dart';
 import '../lib/ai/aggressive_candidate_meta_signal_support.dart';
+import '../lib/ai/commander_fallback_policy.dart';
 import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
@@ -231,6 +232,46 @@ void main() {
   });
 
   group('shouldKeepCommanderFillerCandidate', () {
+    test('uses versioned denylist policy for weak commander fillers', () {
+      expect(commanderFallbackPolicyVersion, contains('2026_05_28'));
+      expect(commanderWeakFillerDenylist, contains('cancel'));
+      expect(
+        shouldKeepCommanderFillerCandidate(
+          candidate: {
+            'name': 'Cancel',
+            'mana_cost': '{1}{U}{U}',
+            'oracle_text': 'Counter target spell.',
+            'colors': const ['U'],
+            'color_identity': const ['U'],
+          },
+          excludeNames: const <String>{},
+          commanderColorIdentity: const {'U'},
+          enforceCommanderIdentity: true,
+        ),
+        isFalse,
+      );
+    });
+
+    test('uses versioned premium policy in commander filler scoring', () {
+      final premium = commanderFillerQualityScore({
+        'name': 'Arcane Signet',
+        'type_line': 'Artifact',
+        'oracle_text': '{T}: Add one mana of any color.',
+        'mana_cost': '{2}',
+        'cmc': 2,
+      });
+      final generic = commanderFillerQualityScore({
+        'name': 'Generic Mana Rock',
+        'type_line': 'Artifact',
+        'oracle_text': '{T}: Add one mana of any color.',
+        'mana_cost': '{2}',
+        'cmc': 2,
+      });
+
+      expect(commanderPremiumFillerNames, contains('arcane signet'));
+      expect(premium, greaterThan(generic));
+    });
+
     test(
         'rejects colored spell inferred only from mana cost for colorless commander',
         () {
@@ -342,6 +383,37 @@ void main() {
         ),
         isNull,
       );
+    });
+  });
+
+  group('commander fallback policy', () {
+    test('keeps universal and completion staples in policy data', () {
+      expect(
+        universalCommanderFallbackNames.take(3),
+        equals(const ['Sol Ring', 'Arcane Signet', 'Command Tower']),
+      );
+      expect(commanderCompletionStapleNames, contains('Nature\'s Claim'));
+      expect(commanderCompletionStapleNames, contains('Teferi\'s Protection'));
+    });
+
+    test('adds mono-blue contextual foundation names without runtime hardcode',
+        () {
+      final base = commanderFoundationNamesFor(
+        commanderColorIdentity: const {'W', 'U'},
+        targetArchetype: 'midrange',
+        detectedTheme: null,
+      );
+      final monoBlueCombo = commanderFoundationNamesFor(
+        commanderColorIdentity: const {'U'},
+        targetArchetype: 'combo control',
+        detectedTheme: 'proliferate',
+      );
+
+      expect(base, contains('The One Ring'));
+      expect(base, isNot(contains('High Tide')));
+      expect(monoBlueCombo, contains('High Tide'));
+      expect(monoBlueCombo, contains('Thrummingbird'));
+      expect(monoBlueCombo, contains('Pongify'));
     });
   });
 
