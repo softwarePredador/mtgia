@@ -1,4 +1,139 @@
 # ManaLoom Code Structure Audit
+> Data: 2026-05-28 15:00 UTC
+> Rotacao local Codex: `postgresql-tables-not-used`
+
+## Rodada focada: PostgreSQL tables not used
+
+Escopo desta rodada: somente tabelas PostgreSQL sem uso, write-only ou com uso
+persistente incoerente. Nao foi executada auditoria ampla de classes, funcoes,
+imports, ciclos, duplicacao ou coerencia geral entre camadas.
+
+### Limitacao da ferramenta
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado conforme
+o protocolo, mas falhou antes de gerar relatorio valido porque o script ainda usa
+`BASE = Path("/opt/data/workspace/mtgia")` e tentou criar
+`/opt/data/workspace/mtgia/docs/hermes-analysis`, encerrando no Mac local com
+`PermissionError: [Errno 13] Permission denied: '/opt/data'`.
+
+Resultado: os achados abaixo foram produzidos por inspecao manual focada em
+definicoes `CREATE TABLE`, referencias SQL (`FROM`, `JOIN`, `INSERT INTO`,
+`UPDATE`, `DELETE FROM`) e consumidores em `server/`, `app/` e docs de contrato.
+Nao foi inventada saida do auditor.
+
+### Achados confirmados
+
+#### P2 — `deck_matchups` continua write-only no produto atual
+
+- **Tabela:** `deck_matchups`
+- **Definicao:** `server/database_setup.sql:162`-`:170`.
+- **Escrita confirmada:** `server/routes/ai/simulate-matchup/index.dart:360`
+  faz `INSERT INTO deck_matchups (...) ON CONFLICT (...) DO UPDATE`.
+- **Leitura/consumo encontrado:** `grep -RInE` por `FROM/JOIN/UPDATE/DELETE`
+  em `server/` e `app/` encontrou somente a escrita acima; nao ha
+  `SELECT ... FROM deck_matchups` em rotas, libs ou consumidores Flutter.
+- **Por que parece nao usada:** `POST /ai/simulate-matchup` calcula e retorna o
+  resultado na propria chamada, mas o snapshot salvo em
+  `deck_matchups.win_rate/notes` nao alimenta cache, historico, ranking,
+  dashboard ou contrato app-facing. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  marca `POST /ai/simulate-matchup` como consumidor `not proven`.
+- **O que valida:** adicionar ou localizar consumidor real que leia
+  `deck_matchups`, por exemplo historico/cached matchup, dashboard operacional
+  ou reuso em nova simulacao.
+- **O que falsifica:** um `SELECT ... FROM deck_matchups` em rota/lib consumida
+  pelo app ou por job operacional documentado.
+
+#### P2 — `deck_weakness_reports` acumula registros sem fluxo de leitura ou resolucao
+
+- **Tabela:** `deck_weakness_reports`
+- **Definicao:** `server/database_setup.sql:363`-`:376` e
+  `server/bin/migrate_create_missing_tables.dart:97`.
+- **Escrita confirmada:** `server/routes/ai/weakness-analysis/index.dart:374`
+  faz `INSERT INTO deck_weakness_reports (...) ON CONFLICT DO NOTHING`.
+- **Leitura/consumo encontrado:** `grep -RInE` por `FROM/JOIN/UPDATE/DELETE`
+  em `server/` e `app/` encontrou somente a escrita acima; nao ha leitura da
+  tabela nem fluxo que atualize `addressed`.
+- **Por que parece nao usada:** `POST /ai/weakness-analysis` devolve
+  `weaknesses` na resposta imediata, mas o dado persistido nao e listado,
+  reaberto, marcado como tratado ou usado em analise futura. O campo
+  `addressed` existe no schema (`server/database_setup.sql:371`) sem update
+  confirmado.
+- **O que valida:** criar/identificar endpoint, job ou UI que leia relatorios
+  persistidos e atualize `addressed` quando o usuario corrige a fraqueza.
+- **O que falsifica:** uma leitura real da tabela fora de migration/audit/teste,
+  ou decisao explicita de manter a tabela apenas como log bruto com retencao.
+
+#### P3 — `ml_prompt_feedback` tem helper de insert sem chamador e so aparece como contador operacional
+
+- **Tabela:** `ml_prompt_feedback`
+- **Definicao:** `server/bin/migrate_ml_knowledge.dart:159`-`:195`.
+- **Escrita potencial:** `server/lib/ml_knowledge_service.dart:251`-`:284`
+  define `MLKnowledgeService.recordFeedback` e faz
+  `INSERT INTO ml_prompt_feedback (...)`.
+- **Leitura/consumo encontrado:** `server/routes/ai/ml-status/index.dart:98`
+  executa apenas `SELECT COUNT(*)::int as c FROM ml_prompt_feedback`.
+- **Evidencia de nao acionamento:** `grep -RIn "recordFeedback" server app`
+  encontrou somente a definicao em `server/lib/ml_knowledge_service.dart:251`;
+  nao ha rota, provider ou job chamando o insert.
+- **Por que parece nao usada:** a tabela foi criada para feedback de usuario,
+  mas nenhum fluxo app/backend registra feedback. O unico uso runtime confirmado
+  e um contador em endpoint interno de status, que nao consome o conteudo para
+  treinamento, ranking, prompts ou produto.
+- **O que valida:** ligar um fluxo real de feedback pos-otimizacao ou job que
+  consuma `ml_prompt_feedback` para refinar prompts/modelo, com teste de contrato.
+- **O que falsifica:** chamada existente de `recordFeedback` nao capturada nesta
+  busca, trigger externo documentado, ou decisao de manter a tabela apenas como
+  placeholder sem coleta ativa.
+
+#### P3 — Tabelas raw do Commander Reference Deck Corpus sao persistidas, mas o produto le apenas o agregado
+
+- **Tabelas:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **Definicao:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1177`
+  e `:1200`.
+- **Escrita confirmada:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1245`
+  insere em `commander_reference_decks`, `:1329` apaga cards antigos por
+  `source_deck_key` e `:1345` insere em `commander_reference_deck_cards`.
+- **Leitura/consumo encontrado:** a busca por `FROM/JOIN commander_reference_decks`
+  e `FROM/JOIN commander_reference_deck_cards` em `server/` e `app/` nao
+  encontrou leituras dessas tabelas. O caminho de produto le o agregado
+  `commander_reference_deck_analysis` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:389`, e esse
+  agregado e populado em `:1394`.
+- **Por que parece uso parcial/incoerente:** os detalhes raw de deck/cartas
+  parecem servir apenas como trilha de auditoria/reprocessamento no mesmo apply,
+  enquanto generate consome somente `average_role_counts`, `top_cards` e
+  `theme_counts` do agregado. Isso pode ser intencional, mas hoje nao ha
+  consumidor de produto ou job que releia os raws para recomputar o agregado.
+- **O que valida:** documentar essas tabelas como lineage/audit com retencao, ou
+  adicionar job/endpoint que leia os raws para reprocessar o agregado e auditar
+  cards aceitos/rejeitados.
+- **O que falsifica:** `SELECT/JOIN` real sobre as tabelas raw em rota/lib/job
+  operacional ou decisao de remover a persistencia raw e manter somente o
+  agregado consumido.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- `battle_simulations` nao foi classificada como nao usada: a rota
+  `server/routes/ai/simulate/index.dart:206` insere simulacoes e
+  `server/bin/ml_extract_features.dart:76` le `FROM battle_simulations` para
+  extracao de features.
+- `ai_user_preferences` nao foi classificada como nao usada:
+  `server/lib/ai/optimize_runtime_support.dart` le e persiste preferencias de
+  IA.
+- `card_semantic_tags_v2`, `card_function_tags`, `card_role_scores`,
+  `commander_card_synergy` e `optimize_rejection_penalties` nao foram tratados
+  como tabelas nao usadas: ha backfills/jobs e consumo por analysis/optimize ou
+  candidate-quality metadata.
+- `commander_reference_deck_analysis` nao foi tratada como nao usada: e lida por
+  `loadCommanderReferenceDeckCorpusGuidance` e participa da versao/cache de
+  generate.
+- Tabelas operacionais como `schema_migrations`, `sync_state`, `sync_log`,
+  `rate_limit_events`, `ai_logs`, `ai_optimize_jobs`, `ai_generate_jobs` e
+  `activation_funnel_events` possuem referencias de leitura/escrita ou finalidade
+  operacional explicita e nao entraram como achados.
+
+## Rodada focada anterior: Coerencia entre `server/lib` ↔ `server/routes` ↔ `app/lib`
 > Data: 2026-05-28 12:51 UTC
 > Rotacao local Codex: `module-coherence-server-lib-routes-app-lib`
 

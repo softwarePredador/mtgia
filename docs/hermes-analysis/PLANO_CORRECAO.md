@@ -13,7 +13,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
 5. **P1 — Incoerencia de ownership em rotas deck/AI**: `POST /ai/optimize` e algumas rotas experimentais aceitam `deck_id` autenticado sem escopar a leitura por `user_id`, apesar de o app tratar decks como recursos privados do usuario.
 6. **P1 — Semantica de cartas fragmentada**: deck analysis, candidate quality e optimize ainda nao compartilham uma fonte unica de roles/tags; `semantic_tags_v2` e preferido no optimize, mas nao vira fonte primaria de contagem no analysis, e fallbacks de optimize/complete ainda ranqueiam cartas por listas hardcoded.
-7. **P2 — Tabelas PostgreSQL write-only em rotas experimentais**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 
 ## Achados priorizados
 
@@ -180,7 +180,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   - polling de job com `user_id = NULL` retorna 404 ou fica restrito a rota
     interna documentada.
 
-### P2 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor
+### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
     upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
@@ -190,18 +190,36 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
     `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha leitura em
     `app/`, `server/lib/` ou `server/routes`; o campo `addressed` tambem nao
     tem fluxo de update confirmado.
+  - `ml_prompt_feedback` é definida em
+    `server/bin/migrate_ml_knowledge.dart:159`, mas o unico insert fica no
+    helper `MLKnowledgeService.recordFeedback`
+    (`server/lib/ml_knowledge_service.dart:251`), sem chamador encontrado por
+    `grep -RIn "recordFeedback" server app`; `/ai/ml-status` apenas conta rows.
+  - `commander_reference_decks` e `commander_reference_deck_cards` sao definidas
+    em `server/lib/ai/commander_reference_deck_corpus_support.dart:1177` e
+    `:1200`, recebem inserts em `:1245` e `:1345`, mas nao possuem
+    `SELECT/JOIN` confirmado; o produto consome o agregado
+    `commander_reference_deck_analysis` em `:389`.
 - **Impacto**: acumulacao de dados sem produto/operacao consumindo o historico,
-  retencao indefinida e falsa impressao de que ha cache, dashboard ou workflow
-  persistente para matchup/weakness analysis.
+  retencao indefinida e falsa impressao de que ha cache, dashboard, workflow
+  persistente ou loop de aprendizado alimentado por essas persistencias.
 - **Ação recomendada**:
   1. escolher entre manter como log bruto com retencao documentada, criar
      consumidor real ou remover a persistencia dessas rotas experimentais;
-  2. se mantiver, adicionar endpoint/job/UI que leia os dados e teste de contrato;
-  3. se remover, criar migration/cleanup seguro e atualizar
+  2. ligar `ml_prompt_feedback` a um fluxo real de feedback ou remover o helper
+     ate haver coleta ativa;
+  3. documentar as tabelas raw do Commander Reference Corpus como lineage/audit,
+     com retencao e job de reprocessamento, ou persistir apenas o agregado
+     consumido;
+  4. se mantiver, adicionar endpoint/job/UI que leia os dados e teste de contrato;
+  5. se remover, criar migration/cleanup seguro e atualizar
      `API_CONTRACTS_AND_DATA_MAP.md`.
 - **Validação**:
-  - `rg "FROM deck_matchups|FROM deck_weakness_reports"` encontra consumidores
-    reais, ou a persistencia deixa de existir com decisao documentada;
+  - `grep -RInE "FROM[[:space:]]+deck_matchups|FROM[[:space:]]+deck_weakness_reports|FROM[[:space:]]+ml_prompt_feedback|FROM[[:space:]]+commander_reference_decks|FROM[[:space:]]+commander_reference_deck_cards" server app`
+    encontra consumidores reais, ou a persistencia deixa de existir com decisao
+    documentada;
+  - `grep -RIn "recordFeedback" server app` encontra chamador real, caso a
+    tabela de feedback seja mantida para coleta ativa;
   - testes das rotas experimentais continuam verdes;
   - contrato app-facing deixa claro se esses dados sao historico persistido ou
     apenas resposta efemera.
@@ -218,8 +236,9 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
    ou documenta-los como politica versionada.
 6. **Sexto**: atacar duplicações de maior risco no domínio de optimize/IA.
 7. **Setimo**: modularizar os arquivos gigantes do otimizador com testes de regressão.
-8. **Oitavo**: decidir destino das tabelas write-only (`deck_matchups`,
-   `deck_weakness_reports`) antes de expandir novas persistencias analiticas.
+8. **Oitavo**: decidir destino das tabelas write-only/parciais
+   (`deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback` e raws do
+   Commander Reference Corpus) antes de expandir novas persistencias analiticas.
 
 ## Itens explicitamente não confirmados como bug real nesta rodada
 
