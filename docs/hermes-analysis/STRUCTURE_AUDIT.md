@@ -1,8 +1,147 @@
 # ManaLoom Code Structure Audit
+> Data: 2026-05-28 12:40 UTC
+> Rotacao local Codex: `duplicated-or-similar-logic`
+
+## Rodada focada: Duplicated or similar logic
+
+Escopo desta rodada: somente logica duplicada ou similar. Nao foi executada
+auditoria ampla de classes sem uso, funcoes nao chamadas, imports, ciclos,
+tabelas PostgreSQL ou coerencia geral entre camadas.
+
+### Limitacao da ferramenta
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado conforme
+o protocolo, mas falhou antes de gerar relatorio valido porque o script ainda usa
+`BASE = Path("/opt/data/workspace/mtgia")` e tentou criar
+`/opt/data/workspace/mtgia/docs/hermes-analysis` no Mac local, encerrando com
+`PermissionError: [Errno 13] Permission denied: '/opt/data'`.
+
+Resultado: os achados abaixo foram produzidos por inspeção manual focada em
+helpers com mesmo nome/intencao e trechos de resposta equivalentes, usando `rg`
+e leitura direta dos arquivos. Nao foi inventada saida do auditor.
+
+### Achados confirmados
+
+#### P1 — Heuristicas semanticas de combo/engine/payoff/enabler/wincon divergem em dois classificadores
+
+- **Simbolos:** `_looksLikeWincon`, `_looksLikeComboPiece`,
+  `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`.
+- **Evidencia 1:** `server/lib/ai/functional_card_tags.dart:319`,
+  `:323`, `:327`, `:331`, `:335` chama esses helpers para tags v1, e as
+  definicoes em `server/lib/ai/functional_card_tags.dart:859`-`:906` usam
+  `oracle` + `normalizedName`.
+- **Evidencia 2:** `server/lib/ai/optimization_functional_roles.dart:113`-`:117`
+  chama helpers com os mesmos nomes para `classifyOptimizationFunctionalRole`,
+  e as definicoes em `server/lib/ai/optimization_functional_roles.dart:370`-`:397`
+  usam apenas `oracle` e um conjunto diferente de padroes.
+- **Por que parece duplicado/similar:** ambos os modulos tentam classificar os
+  mesmos papeis semanticos de alto nivel, mas com heuristicas independentes.
+  Exemplo: `functional_card_tags.dart` trata nomes conhecidos como
+  `thassa's oracle`, `isochron scepter`, `dramatic reversal`, `blood artist`,
+  `greaves` e `boots`; `optimization_functional_roles.dart` nao consulta nome
+  da carta nesses helpers.
+- **Risco:** uma carta pode aparecer como `combo_piece`, `engine`, `payoff`,
+  `enabler` ou `wincon` na analise funcional e receber outro papel no pipeline
+  de optimize, criando drift entre explicabilidade e decisao de swap.
+- **O que valida:** extrair uma fonte compartilhada de sinais semanticos ou
+  adicionar testes cruzados que provem que a divergencia entre tags v1 e role
+  classifier e intencional.
+- **O que falsifica:** documentacao/testes mostrando que os dois classificadores
+  possuem contratos diferentes por design e que cartas sentinela relevantes
+  continuam coerentes nos dois fluxos.
+
+#### P2 — `getMainType` e `calculateCmc` duplicam montagem de resposta de deck privado e publico
+
+- **Simbolos:** `getMainType`, `calculateCmc`.
+- **Evidencia 1:** `server/routes/decks/[id]/index.dart:405`-`:436` define
+  `getMainType` e `calculateCmc` dentro da rota de deck privado; o mesmo bloco
+  usa esses helpers em `server/routes/decks/[id]/index.dart:452` e `:464` para
+  `mainBoard` e `manaCurve`.
+- **Evidencia 2:** `server/routes/community/decks/[id].dart:91`-`:117` define
+  helpers equivalentes na rota de deck publico; o uso equivalente aparece em
+  `server/routes/community/decks/[id].dart:133` e `:141`.
+- **Por que parece duplicado/similar:** as duas rotas constroem agrupamento por
+  tipo, curva de mana e distribuicao de cores a partir de `cardsList`, com regras
+  praticamente iguais para tipo principal e CMC.
+- **Risco:** correcao de regra de CMC/tipo pode ser aplicada em uma rota e
+  esquecida na outra, fazendo o mesmo deck apresentar estatisticas diferentes
+  quando visto pelo dono e pela comunidade.
+- **O que valida:** mover estatisticas compartilhadas para um helper de resposta
+  de deck e cobrir deck privado/publico com o mesmo conjunto de fixtures.
+- **O que falsifica:** testes de contrato provando que as respostas devem divergir
+  e que as duas implementacoes locais estao travadas por fixtures equivalentes.
+
+#### P2 — `_isBasicLandName` aparece com quatro variantes no backend
+
+- **Simbolo:** `_isBasicLandName` / `isBasicLandName`.
+- **Evidencia 1:** `server/lib/ai/optimize_runtime_support.dart:285` expoe
+  `isBasicLandName`, mas a regra privada em
+  `server/lib/ai/optimize_runtime_support.dart:4184`-`:4197` compara nomes
+  exatos com hifen para snow-covered lands.
+- **Evidencia 2:** `server/lib/generated_deck_validation_service.dart:752`-`:764`
+  aceita `startsWith('snow-covered ...')`.
+- **Evidencia 3:** `server/lib/meta/meta_deck_reference_support.dart:890`-`:903`
+  aceita snow lands com espaco (`snow covered plains`) em vez de hifen.
+- **Evidencia 4:** `server/routes/ai/commander-reference/index.dart:621`-`:629`
+  reconhece apenas as seis basics nao snow.
+- **Por que parece duplicado/similar:** todos os trechos respondem a mesma
+  pergunta de dominio ("este nome e terreno basico?"), mas normalizam e aceitam
+  casos diferentes.
+- **Risco:** validacao, optimize, referencia de meta e commander-reference podem
+  discordar sobre snow-covered lands ou nomes normalizados, especialmente em
+  fluxos de singleton/legality.
+- **O que valida:** centralizar a regra em um utilitario de dominio e adaptar os
+  chamadores para normalizacao unica.
+- **O que falsifica:** testes por contexto mostrando que cada variante menor e
+  exigida por contrato diferente, incluindo casos com `Wastes` e snow lands.
+
+#### P2 — Boilerplate de `request_id` e `invalid_payload` repetido em rotas sociais
+
+- **Simbolos:** `_requestId`, `_logInvalidPayload`.
+- **Evidencia:** `_requestId` aparece com corpo equivalente em
+  `server/routes/trades/index.dart:330`-`:336`,
+  `server/routes/trades/[id]/messages.dart:228`-`:234`,
+  `server/routes/conversations/[id]/messages.dart:247`-`:253`,
+  `server/routes/trades/[id]/respond.dart:154`-`:160`,
+  `server/routes/trades/[id]/status.dart:260`-`:266` e
+  `server/routes/users/[id]/follow/index.dart:97`-`:103`.
+- **Evidencia adicional:** `_logInvalidPayload` repete o padrao de ler usuario,
+  montar log `[social_write] invalid_payload` e anexar `request_id` em
+  `server/routes/trades/index.dart:338`-`:352`,
+  `server/routes/trades/[id]/messages.dart:236`-`:252`,
+  `server/routes/conversations/[id]/messages.dart:255`-`:271`,
+  `server/routes/trades/[id]/respond.dart:162`-`:178` e
+  `server/routes/trades/[id]/status.dart:268`-`:284`.
+- **Por que parece duplicado/similar:** a responsabilidade e identica
+  (extrair `RequestTrace` com fallback e padronizar log de payload invalido),
+  variando apenas endpoint e id de recurso.
+- **Risco:** mudancas futuras no formato de log, fallback de `x-request-id` ou
+  sanitizacao de usuario podem ficar inconsistentes entre trades e conversas.
+- **O que valida:** helper compartilhado para social write logging aceitando
+  endpoint e campos extras, com testes unitarios pequenos.
+- **O que falsifica:** decisao explicita de manter logs por rota para evitar
+  dependencia compartilhada, com teste que confira formato equivalente.
+
+### Suspeitas revalidadas e ajustadas nesta rodada
+
+- A duplicacao direta entre `server/routes/ai/optimize/index.dart` e
+  `server/lib/ai/optimize_runtime_support.dart` para
+  `matchesFunctionalNeed`, `scoreOptimizeReplacementCandidate`,
+  `shouldRetryOptimizeWithAiFallback`, `computeOptimizeStructuralRecoverySwapTarget`,
+  `isOptimizeStructuralRecoveryScenario` e `resolveOptimizeArchetype` nao foi
+  confirmada como corpo duplicado nesta rodada: a rota possui wrappers finos que
+  delegam para `optimize_support` em `server/routes/ai/optimize/index.dart:56`-`:132`.
+- Ainda ha duplicacao/similaridade real em `resolveOptimizeArchetype`:
+  `server/lib/ai/optimize_runtime_support.dart:3369`-`:3389` e
+  `server/lib/ai/deck_state_analysis.dart:573`-`:584` resolvem requested vs
+  detected archetype com listas genericas diferentes (`goodstuff`/`unknown` em
+  um lado; `general`/`tempo` em outro).
+
+## Rodada focada anterior: PostgreSQL tables not used
 > Data: 2026-05-28 12:33 UTC
 > Rotacao local Codex: `postgresql-tables-not-used`
 
-## Rodada focada: PostgreSQL tables not used
+### Escopo da rodada anterior
 
 Escopo desta rodada: somente tabelas PostgreSQL sem uso ou com uso incoerente.
 Nao foi executada auditoria ampla de classes, funcoes, imports ou duplicacao.

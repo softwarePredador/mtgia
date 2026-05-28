@@ -36,11 +36,12 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 - **Evidência**:
   - `server/lib/ai/optimize_runtime_support.dart`: 4197 linhas
   - `server/routes/ai/optimize/index.dart`: 3495 linhas
-  - `STRUCTURE_AUDIT.md` também aponta duplicações diretas entre esses dois arquivos (`matchesFunctionalNeed`, `scoreOptimizeReplacementCandidate`, `shouldRetryOptimizeWithAiFallback`, `computeOptimizeStructuralRecoverySwapTarget`, `isOptimizeStructuralRecoveryScenario`, `resolveOptimizeArchetype`).
-- **Impacto**: alta dificuldade de revisão, regressões sutis, duplicação de regras de negócio e risco de drift entre helper compartilhado e rota.
+  - A rodada focada de duplicacao em 2026-05-28 revalidou que a rota agora possui wrappers finos para helpers como `matchesFunctionalNeed`, `scoreOptimizeReplacementCandidate`, `shouldRetryOptimizeWithAiFallback`, `computeOptimizeStructuralRecoverySwapTarget` e `isOptimizeStructuralRecoveryScenario`, delegando para `optimize_support` em vez de manter corpos duplicados.
+  - Ainda ha drift similar em `resolveOptimizeArchetype`: `server/lib/ai/optimize_runtime_support.dart` e `server/lib/ai/deck_state_analysis.dart` resolvem requested/detected archetype com listas genericas diferentes.
+- **Impacto**: alta dificuldade de revisão, regressões sutis e risco de drift entre helpers de dominio que parecem responder a mesma pergunta.
 - **Ação recomendada**:
   1. definir fronteiras explícitas para seleção de candidatos, archetype resolution, structural recovery e fallback AI;
-  2. mover regras duplicadas para `server/lib/ai/*_support.dart` com cobertura focada;
+  2. consolidar regras ainda duplicadas/similares em `server/lib/ai/*_support.dart` com cobertura focada;
   3. deixar a rota `ai/optimize` como orquestração fina.
 - **Validação**:
   - `dart analyze` verde;
@@ -50,7 +51,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
 - **Evidência**:
   - `_looksLikeComboPiece`, `_looksLikeEnabler`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeWincon` existem tanto em `server/lib/ai/functional_card_tags.dart` quanto em `server/lib/ai/optimization_functional_roles.dart`.
-  - `_isBasicLandName` aparece em quatro locais diferentes.
+  - `_isBasicLandName` aparece em quatro locais diferentes, com variantes para snow lands: `optimize_runtime_support.dart`, `generated_deck_validation_service.dart`, `meta_deck_reference_support.dart` e `routes/ai/commander-reference/index.dart`.
   - `_requestId` e `_logInvalidPayload` repetem-se em várias rotas de trades/conversations.
   - `calculateCmc` e `getMainType` duplicados em duas rotas de decks/community.
 - **Impacto**: mudança semântica em um ponto não propaga automaticamente para os demais; risco de respostas inconsistentes por endpoint/fluxo.
@@ -125,5 +126,5 @@ Considerar a frente de estrutura saneada quando:
 
 - o auditor não reportar imports existentes como ausentes;
 - `dart analyze` do backend estiver verde no fluxo local documentado;
-- a duplicação explícita entre `server/routes/ai/optimize/index.dart` e `server/lib/ai/optimize_runtime_support.dart` cair significativamente;
+- a duplicação/similaridade restante de alto risco em IA semantica, `resolveOptimizeArchetype`, terrenos basicos e helpers HTTP cair significativamente;
 - os maiores arquivos do domínio de optimize reduzirem tamanho e responsabilidade.
