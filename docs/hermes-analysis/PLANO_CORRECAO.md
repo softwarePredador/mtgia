@@ -11,6 +11,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
+5. **P2 — Tabelas PostgreSQL write-only em rotas experimentais**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado.
 
 ## Achados priorizados
 
@@ -75,17 +76,48 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
   - gerar artefatos necessários ou corrigir o entry point;
   - rerodar `dart analyze` até ficar verde.
 
+### P2 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor
+- **Evidência**:
+  - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
+    upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
+    `SELECT ... FROM deck_matchups` em `app/`, `server/lib/` ou `server/routes`.
+  - `deck_weakness_reports` é definida em `server/database_setup.sql:363` e
+    `server/bin/migrate_create_missing_tables.dart:97`, recebe insert em
+    `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha leitura em
+    `app/`, `server/lib/` ou `server/routes`; o campo `addressed` tambem nao
+    tem fluxo de update confirmado.
+- **Impacto**: acumulacao de dados sem produto/operacao consumindo o historico,
+  retencao indefinida e falsa impressao de que ha cache, dashboard ou workflow
+  persistente para matchup/weakness analysis.
+- **Ação recomendada**:
+  1. escolher entre manter como log bruto com retencao documentada, criar
+     consumidor real ou remover a persistencia dessas rotas experimentais;
+  2. se mantiver, adicionar endpoint/job/UI que leia os dados e teste de contrato;
+  3. se remover, criar migration/cleanup seguro e atualizar
+     `API_CONTRACTS_AND_DATA_MAP.md`.
+- **Validação**:
+  - `rg "FROM deck_matchups|FROM deck_weakness_reports"` encontra consumidores
+    reais, ou a persistencia deixa de existir com decisao documentada;
+  - testes das rotas experimentais continuam verdes;
+  - contrato app-facing deixa claro se esses dados sao historico persistido ou
+    apenas resposta efemera.
+
 ## Sequência sugerida
 
 1. **Primeiro**: corrigir o auditor estrutural (P0), porque ele afeta a confiabilidade do restante do relatório.
 2. **Segundo**: destravar `dart analyze` do backend via `local_test_server.dart`.
 3. **Terceiro**: atacar duplicações de maior risco no domínio de optimize/IA.
 4. **Quarto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
+5. **Quinto**: decidir destino das tabelas write-only (`deck_matchups`,
+   `deck_weakness_reports`) antes de expandir novas persistencias analiticas.
 
 ## Itens explicitamente não confirmados como bug real nesta rodada
 
 - Os **178 imports quebrados** do relatório **não** foram validados como defeitos reais de código; a amostragem conferida aponta falso-positivo do auditor.
 - A seção de "funções com nomes duplicados" mistura duplicação relevante com nomes esperados (`toString`, `print`, `add`), então precisa de triagem antes de virar tarefa de engenharia.
+- `battle_simulations` nao entrou como tabela nao usada nesta rodada: a rota
+  `server/routes/ai/simulate/index.dart` escreve nela e
+  `server/bin/ml_extract_features.dart` le a tabela para extracao de features.
 
 ## Critério de saída para uma próxima rodada
 

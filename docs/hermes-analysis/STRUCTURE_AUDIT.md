@@ -1,4 +1,80 @@
 # ManaLoom Code Structure Audit
+> Data: 2026-05-28 12:33 UTC
+> Rotacao local Codex: `postgresql-tables-not-used`
+
+## Rodada focada: PostgreSQL tables not used
+
+Escopo desta rodada: somente tabelas PostgreSQL sem uso ou com uso incoerente.
+Nao foi executada auditoria ampla de classes, funcoes, imports ou duplicacao.
+
+### Limitacao da ferramenta
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado conforme
+o protocolo, mas falhou antes de gerar relatorio valido porque o script ainda usa
+`BASE = Path("/opt/data/workspace/mtgia")` e tentou criar
+`/opt/data/workspace/mtgia/docs/hermes-analysis` no Mac local, encerrando com
+`PermissionError: [Errno 13] Permission denied: '/opt/data'`.
+
+Resultado: os dados abaixo foram produzidos por inspeção manual do schema e de
+referencias SQL em `server/`, sem inventar saida do auditor.
+
+### Achados confirmados
+
+#### P2 — `deck_matchups` é write-only no produto atual
+
+- **Tabela:** `deck_matchups`
+- **Definicao:** `server/database_setup.sql:162`
+- **Escrita confirmada:** `server/routes/ai/simulate-matchup/index.dart:360` faz
+  `INSERT INTO deck_matchups (...) ON CONFLICT (...) DO UPDATE`.
+- **Leitura/consumo encontrado:** nenhum `SELECT ... FROM deck_matchups` em
+  `app/`, `server/lib/` ou `server/routes/`; `rg` encontrou apenas a escrita da
+  rota, definicoes/migrations e scripts/audits.
+- **Por que parece nao usada:** a rota `POST /ai/simulate-matchup` retorna o
+  resultado calculado na propria chamada, mas o snapshot salvo em
+  `deck_matchups.win_rate/notes` nao alimenta cache, historico, ranking, UI ou
+  contrato app-facing. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` tambem marca
+  `POST /ai/simulate-matchup` com consumidor `not proven`.
+- **O que valida:** adicionar ou localizar um consumidor real que leia
+  `deck_matchups`, por exemplo historico/cached matchup, dashboard ou reuso na
+  simulacao.
+- **O que falsifica:** um `SELECT ... FROM deck_matchups` em rota/lib consumida
+  pelo app ou por job operacional documentado.
+
+#### P2 — `deck_weakness_reports` acumula registros sem fluxo de leitura
+
+- **Tabela:** `deck_weakness_reports`
+- **Definicao:** `server/database_setup.sql:363` e
+  `server/bin/migrate_create_missing_tables.dart:97`
+- **Escrita confirmada:** `server/routes/ai/weakness-analysis/index.dart:374`
+  faz `INSERT INTO deck_weakness_reports (...) ON CONFLICT DO NOTHING`.
+- **Leitura/consumo encontrado:** nenhum `SELECT ... FROM deck_weakness_reports`
+  em `app/`, `server/lib/` ou `server/routes`; `rg` encontrou somente a escrita,
+  definicoes/migrations e artefatos de auditoria.
+- **Por que parece nao usada:** `POST /ai/weakness-analysis` calcula e devolve
+  `weaknesses` na resposta imediata, mas o dado persistido nao e listado,
+  reaberto, marcado como `addressed` ou usado em analise futura. O campo
+  `addressed` existe no schema e nao possui fluxo de update no codigo auditado.
+- **O que valida:** criar/identificar endpoint, job ou UI que leia relatórios
+  persistidos e atualize `addressed` quando o usuario corrige a fraqueza.
+- **O que falsifica:** uma leitura real da tabela fora de migration/audit/teste,
+  ou decisao explicita de manter a tabela apenas como log bruto com retencao.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- `battle_simulations` nao foi classificada como nao usada: a rota
+  `server/routes/ai/simulate/index.dart:206` insere simulacoes e
+  `server/bin/ml_extract_features.dart:75` le `FROM battle_simulations` para
+  extracao de features.
+- `ai_user_preferences` nao foi classificada como nao usada:
+  `server/lib/ai/optimize_runtime_support.dart:3910` le preferencias e
+  `server/lib/ai/optimize_runtime_support.dart:3947` persiste preferencias.
+- Tabelas ML auxiliares como `card_meta_insights`, `synergy_packages`,
+  `archetype_patterns`, `ml_prompt_feedback`, `format_staples`,
+  `ai_logs`, `ai_optimize_cache` e `activation_funnel_events` possuem
+  referencias de leitura/escrita em rotas, libs ou jobs operacionais e nao foram
+  tratadas como achados de "nao usadas" nesta rotacao.
+
+## Historico gerado pelo auditor estrutural anterior
 > Data: 2026-05-28 04:08 UTC
 
 ## Arquivos Mapeados
