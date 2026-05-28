@@ -1,5 +1,5 @@
 # ManaLoom Code Structure Audit
-> Data: 2026-05-28 00:01 UTC
+> Data: 2026-05-28 04:08 UTC
 
 ## Arquivos Mapeados
 - `server/lib/`: 81 arquivos
@@ -413,6 +413,93 @@
 - `server/routes/community/decks/[id].dart` (428 linhas): getMainType, calculateCmc
 - `server/routes/decks/[id]/index.dart` (538 linhas): getMainType, calculateCmc
 
+## Funções Não Chamadas (Execução 2 — 2026-05-28 04:00 UTC)
+> Foco: funções públicas definidas em `server/lib/` que NÃO são chamadas de nenhum outro arquivo.
+
+**Resumo:** 155 funções públicas identificadas em lib/ · **118 chamadas** de outros arquivos · **37 NÃO chamadas**
+
+### Arquivos afetados e funções sem chamadas:
+
+- `server/lib/ai/battle_simulator.dart` (879 linhas):
+  - `drawCard()` — lógica de compra de carta potencialmente órfã
+  - `resetForNewTurn()` — reset de turno sem referência externa
+
+- `server/lib/ai/candidate_quality_data_support.dart` (692 linhas):
+  - `inferCandidateBracketScope()` — inferência de bracket não utilizada
+  - `isPremiumCommanderCandidateName()` — verificação de premium sem chamador
+
+- `server/lib/ai/commander_reference_deck_corpus_support.dart` (1489 linhas):
+  - `buildReferenceDeckKey()` — builder de key sem uso externo
+  - `normalizeCommanderReferenceDeckText()` — normalizador sem chamada
+
+- `server/lib/ai/commander_reference_readiness_support.dart` (494 linhas):
+  - `block()` — função de bloqueio sem referência
+
+- `server/lib/ai/edhrec_service.dart` (465 linhas):
+  - `cleanupCache()` — limpeza de cache não invocada externamente
+  - `isHighSynergy()` — verificação de sinergia sem chamador
+
+- `server/lib/ai/optimize_complete_support.dart` (1559 linhas):
+  - `mergeUniqueSpells()` — merge de spells sem uso externo
+
+- `server/lib/ai/optimize_runtime_support.dart` (4198 linhas — **maior arquivo do projeto**):
+  - `clampRequestedSwapCount()` — clamping sem referência
+  - `commanderFillerQualityScore()` — score de filler órfão
+  - `inferOptimizeFunctionalNeed()` — inferência sem chamador
+  - `landProducesCommanderColors()` — verificação de mana órfã
+  - `looksLikeBoardWipe()` — detecção de wipe sem uso
+  - `looksLikeProtectionEffect()` — detecção de proteção sem uso
+  - `looksLikeTemporaryManaBurst()` — detecção de burst sem uso
+  - `recommendedLandCountForOptimizeArchetype()` — recomendação órfã
+  - `resolveOptimizeMode()` — resolução de modo sem chamador
+
+- `server/lib/ai/optimize_state_support.dart` (981 linhas):
+  - `assessManaCurve()` — avaliação de curva não chamada
+  - `calculateConfidence()` — cálculo de confiança sem uso
+  - `qty()` — função qty órfã
+
+- `server/lib/ai/rebuild_guided_service.dart` (1748 linhas):
+  - `addWeight()` — adição de peso sem referência externa
+
+- `server/lib/ai_generate_performance_support.dart` (196 linhas):
+  - `isCommanderReferenceGuidanceFormat()` — verificação sem uso
+  - `normalizeAiGenerateBracket()` — normalizador órfão
+  - `normalizeAiGenerateCommanderName()` — normalizador órfão
+  - `normalizeAiGeneratePrompt()` — normalizador órfão
+
+- `server/lib/endpoint_cache.dart` (37 linhas):
+  - `clearExpired()` — limpeza de expirados não invocada
+
+- `server/lib/generated_deck_validation_service.dart` (818 linhas):
+  - `addLookupName()` — lookup sem chamador
+
+- `server/lib/import_card_lookup_service.dart` (450 linhas):
+  - `foldImportLookupKey()` — key folder órfão
+
+- `server/lib/meta/external_commander_meta_candidate_support.dart` (1332 linhas):
+  - `addName()` — adição de nome sem uso
+  - `canonicalizeExternalCommanderMetaSourceName()` — canonicalizador órfão
+  - `normalizeCommanderMetaFormat()` — normalizador órfão
+  - `normalizeExternalCommanderMetaValidationStatus()` — normalizador órfão
+
+- `server/lib/meta/meta_deck_commander_shell_support.dart` (355 linhas):
+  - `inferCommanderStrategyArchetypeFromCardNames()` — inferência de arquétipo sem chamador
+
+- `server/lib/observability.dart` (248 linhas):
+  - `isSentryEnabled()` — feature flag sem uso
+
+- `server/lib/request_trace.dart` (57 linhas):
+  - `generateRequestId()` — gerador de trace sem referência externa
+
+### Observações:
+1. **server/lib/ai/optimize_runtime_support.dart** é o maior arquivo (4198 linhas) com 9 funções órfãs — candidato prioritário para refatoração.
+2. **server/lib/ai_generate_performance_support.dart** tem TODAS as 4 funções extraídas sem chamadores externos.
+3. Algumas funções podem ser usadas internamente (dentro do mesmo arquivo) via closure ou callback — análise manual recomendada para confirmação.
+4. As funções `cleanupCache`, `clearExpired` e `addLookupName` sugéren manutenção não sendo disparada de nenhum lugar (verificar se são chamadas por timer/evento externo).
+
+### Execução anterior (Classes não usadas):
+> Ver seção "Classes Não Chamadas" para Execução 1 (00:00 UTC).
+
 ## Tabelas PostgreSQL Referenciadas no Código
 - `LATERAL`: 9 referências
 - `activation_funnel_events`: 1 referências
@@ -501,112 +588,105 @@
 - `want`: 1 referências
 
 ## Problemas Estruturais Identificados
-
-### Execução 1 (00:00) — Classes Não Usadas
-> Análise cruzada: 223 classes definidas em 337 arquivos Dart. Busca por referências externas (fora do arquivo de definição).
-
-**Resumo:**
-- **223** classes definidas no total
-- **93** classes referenciadas externamente (usadas)
-- **130** classes sem referência externa
-  - **49** em `bin/` (scripts CLI — esperado)
-  - **5** em `test/` (testes — esperado)
-  - **57** privadas `_prefix` (file-local — esperado)
-  - **53** públicas em `lib/` — **SUSPEITO** ⚠️
-  - **2** públicas em `routes/` — **SUSPEITO** ⚠️
-
-#### 53 Classes Públicas em `lib/` Sem Referência Externa
-
-| Classe | Arquivo |
-|--------|---------|
-| `AiGenerateOpenAiTimeoutSelection` | `server/lib/ai_generate_performance_support.dart` |
-| `ArchetypePattern` | `server/lib/ml_knowledge_service.dart` |
-| `BattleResult` | `server/lib/ai/battle_simulator.dart` |
-| `BracketFilterDecision` | `server/lib/edh_bracket_policy.dart` |
-| `BracketPolicy` | `server/lib/edh_bracket_policy.dart` |
-| `BracketTagResult` | `server/lib/edh_bracket_policy.dart` |
-| `CandidateFunctionTag` | `server/lib/ai/candidate_quality_data_support.dart` |
-| `CandidateRoleScore` | `server/lib/ai/candidate_quality_data_support.dart` |
-| `CardInsight` | `server/lib/ml_knowledge_service.dart` |
-| `CardRecommendation` | `server/lib/ml_knowledge_service.dart` |
-| `ColorIdentityBackfillDecision` | `server/lib/mtg_data_integrity_support.dart` |
-| `CommanderReferenceArchetypeStatsLoadResult` | `server/lib/ai/commander_reference_card_stats_support.dart` |
-| `CommanderReferenceCardStatsLoadResult` | `server/lib/ai/commander_reference_card_stats_support.dart` |
-| `CommanderReferenceCardStatsResolution` | `server/lib/ai/commander_reference_card_stats_support.dart` |
-| `CommanderReferenceCommanderCardResolution` | `server/lib/ai/commander_reference_card_stats_support.dart` |
-| `CommanderReferenceCorpusPackages` | `server/lib/ai/commander_reference_deck_corpus_support.dart` |
-| `CommanderReferenceDeckAnalysis` | `server/lib/ai/commander_reference_deck_corpus_support.dart` |
-| `CommanderReferenceReadinessScorecard` | `server/lib/ai/commander_reference_readiness_support.dart` |
-| `EdhrecAverageDeckCard` | `server/lib/ai/edhrec_service.dart` |
-| `EdhrecCard` | `server/lib/ai/edhrec_service.dart` |
-| `EndpointMetricSnapshot` | `server/lib/request_metrics_service.dart` |
-| `ExternalCommanderMetaCandidateIllegalCard` | `server/lib/meta/external_commander_meta_candidate_support.dart` |
-| `ExternalCommanderMetaCandidateUnresolvedCard` | `server/lib/meta/external_commander_meta_candidate_support.dart` |
-| `ExternalCommanderMetaEligibilityBatch` | `server/lib/meta/external_commander_meta_operational_runner_support.dart` |
-| `ExternalCommanderMetaEligibilityDecision` | `server/lib/meta/external_commander_meta_operational_runner_support.dart` |
-| `ExternalCommanderMetaPersistencePlan` | `server/lib/meta/external_commander_meta_import_support.dart` |
-| `ExternalCommanderMetaPromotionInsertPlan` | `server/lib/meta/external_commander_meta_promotion_support.dart` |
-| `ExternalCommanderMetaPromotionIssue` | `server/lib/meta/external_commander_meta_promotion_support.dart` |
-| `ExternalCommanderMetaPromotionResult` | `server/lib/meta/external_commander_meta_promotion_support.dart` |
-| `ExternalCommanderMetaStagingPlan` | `server/lib/meta/external_commander_meta_staging_support.dart` |
-| `GameAction` | `server/lib/ai/battle_simulator.dart` |
-| `GameCard` | `server/lib/ai/battle_simulator.dart` |
-| `GeneratedDeckValidationResult` | `server/lib/generated_deck_validation_service.dart` |
-| `ImportListParseResult` | `server/lib/import_list_service.dart` |
-| `MLContext` | `server/lib/ml_knowledge_service.dart` |
-| `MatchupResult` | `server/lib/ai/goldfish_simulator.dart` |
-| `MetaDeckAnalyticsContext` | `server/lib/meta/meta_deck_analytics_support.dart` |
-| `MetaDeckReferenceQueryParts` | `server/lib/meta/meta_deck_reference_support.dart` |
-| `OptimizationSemanticV2EnforcementDecision` | `server/lib/ai/optimization_functional_roles.dart` |
-| `OptimizationSwapGateResult` | `server/lib/ai/optimization_quality_gate.dart` |
-| `OptimizeJob` | `server/lib/ai/optimize_job.dart` |
-| `ParsedMetaDeckCardEntry` | `server/lib/meta/meta_deck_card_list_support.dart` |
-| `PlayerState` | `server/lib/ai/battle_simulator.dart` |
-| `RebuildResult` | `server/lib/ai/rebuild_guided_service.dart` |
-| `RebuildScopeDecision` | `server/lib/ai/rebuild_guided_service.dart` |
-| `RebuildTargetProfile` | `server/lib/ai/rebuild_guided_service.dart` |
-| `ReferenceGeneratedCardsIdentityFilterResult` | `server/lib/ai/commander_reference_generate_fallback_support.dart` |
-| `ReferenceGeneratedDeckEvaluation` | `server/lib/ai/commander_reference_card_stats_support.dart` |
-| `SwapFunctionalAnalysis` | `server/lib/ai/optimization_validator.dart` |
-| `SynergyPackage` | `server/lib/ml_knowledge_service.dart` |
-| `ThemeCheck` | `server/lib/ai/theme_contextual_rules_service.dart` |
-| `ThemeContextualRule` | `server/lib/ai/theme_contextual_rules_service.dart` |
-| `UserPlanSnapshot` | `server/lib/plan_service.dart` |
-
-#### 2 Classes Públicas em `routes/` Sem Referência Externa
-
-| Classe | Arquivo |
-|--------|---------|
-| `DeckThemeProfile` | `server/routes/ai/optimize/index.dart` |
-| `ManaAnalysis` | `server/routes/decks/[id]/analysis/index.dart` |
-
-#### Padrões Identificados
-
-1. **Módulo `meta/` é o mais afetado**: 15 das 53 classes são de `server/lib/meta/`. Muitas são DTOs/result classes que podem ter sido criadas para uso futuro que nunca se materializou.
-
-2. **Módulo `commander_reference/`**: 8 classes sem uso. O subsistema de referência de commander pode ter classes órfãs de refatorações anteriores.
-
-3. **Battle simulator**: `BattleResult`, `GameAction`, `GameCard`, `PlayerState` — 4 classes do simulador de batalhas sem referência externa. Possivelmente o simulador é usado internamente mas essas classes intermediárias nunca são instanciadas de fora.
-
-4. **Bracket policy**: `BracketFilterDecision`, `BracketPolicy`, `BracketTagResult` — 3 classes do módulo de bracket sem uso externo.
-
-5. **Rebuild**: `RebuildResult`, `RebuildScopeDecision`, `RebuildTargetProfile` — classes de resultado do rebuild que podem ser usadas apenas internamente no mesmo arquivo.
-
-#### Recomendações
-
-- **Revisar `meta/`**: Verificar se as 15 classes órfãs são realmente necessárias ou se podem ser removidas.
-- **Revisar `commander_reference/`**: 8 classes sem uso sugerem possível dead code.
-- **Battle simulator**: Investigar se `BattleResult`, `GameAction`, `GameCard`, `PlayerState` são usadas internamente ou se são resíduos.
-- **Nota**: Classes sem referência externa NÃO são necessariamente dead code — podem ser usadas via reflection, serialização, ou instanciadas internamente. Verificação manual recomendada antes de remover.
-
----
-
 - `server/lib/ai/candidate_quality_data_support.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
 - `server/lib/ai/functional_card_tags.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
 - `server/lib/ai/optimization_functional_roles.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
 - `server/lib/ai/optimize_request_support.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
 - `server/routes/ai/optimize/index.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
 - `server/routes/decks/[id]/analysis/index.dart` referencia `semantic_tags_v2` mas não faz INSERT/UPDATE
+- Classe `AggressiveCandidateQualitySignal` é definida mas potencialmente não é usada em outros arquivos
+- Classe `AiGenerateOpenAiTimeoutSelection` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ArchetypePattern` é definida mas potencialmente não é usada em outros arquivos
+- Classe `BattleResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `BracketFilterDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `BracketTagResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CandidateFunctionTag` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CandidateRoleScore` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CardRecommendation` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ColorIdentityBackfillDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceArchetypeStatsLoadResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCardStatsLoadResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCardStatsResolution` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCommanderCardResolution` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCorpusPackages` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceCorpusSummary` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceDeckAnalysis` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceDeckCardInput` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceDeckInput` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceReadinessInputs` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceReadinessRuntimeProof` é definida mas potencialmente não é usada em outros arquivos
+- Classe `CommanderReferenceReadinessScorecard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EdhTop16TournamentEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EdhrecAverageDeckCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EdhrecCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `EndpointMetricSnapshot` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExpandedDeckCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExpandedTopDeckDeck` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateIllegalCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateLegalityEvidence` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateLegalityRepository` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaCandidateUnresolvedCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaEligibilityBatch` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaEligibilityDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaImportConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaOperationalConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPersistencePlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionInsertPlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionIssue` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionPlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaPromotionSnapshot` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaStagingConfig` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaStagingPlan` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ExternalCommanderMetaValidationIssue` é definida mas potencialmente não é usada em outros arquivos
+- Classe `FunctionalReport` é definida mas potencialmente não é usada em outros arquivos
+- Classe `GameAction` é definida mas potencialmente não é usada em outros arquivos
+- Classe `GameCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `GeneratedDeckValidationResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ImportListParseResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MLContext` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ManaAnalysis` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MatchupResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MetaDeckAnalyticsContext` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MetaDeckReferenceQueryParts` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MonteCarloComparison` é definida mas potencialmente não é usada em outros arquivos
+- Classe `MulliganReport` é definida mas potencialmente não é usada em outros arquivos
+- Classe `OptimizationSemanticV2EnforcementDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `OptimizationSwapGateResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ParsedMetaDeckCardEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `PlayerState` é definida mas potencialmente não é usada em outros arquivos
+- Classe `PostgresExternalCommanderMetaCandidateLegalityRepository` é definida mas potencialmente não é usada em outros arquivos
+- Classe `RebuildResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `RebuildScopeDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `RebuildTargetProfile` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ReferenceGeneratedCardsIdentityFilterResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ReferenceGeneratedDeckEvaluation` é definida mas potencialmente não é usada em outros arquivos
+- Classe `SwapFunctionalAnalysis` é definida mas potencialmente não é usada em outros arquivos
+- Classe `SynergyPackage` é definida mas potencialmente não é usada em outros arquivos
+- Classe `ThemeCheck` é definida mas potencialmente não é usada em outros arquivos
+- Classe `UserPlanSnapshot` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CacheItem` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CachedAverageDeckResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CachedResult` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_CardData` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_DeckMetrics` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_DeckStats` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_EndpointMetricBucket` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_ExternalCommanderMetaParsedCardEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_InfluencedCardInsight` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_LandTrimContext` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_MarketMoversCacheEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_ParsedTradeItems` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_PasswordPreparation` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_PlayDecision` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_PromotionDeckProfile` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_QueryBuilder` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_RankedMetaDeckReference` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_ResolvedExternalCommanderMetaCardEntry` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_SimCard` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_TelemetryQuery` é definida mas potencialmente não é usada em outros arquivos
+- Classe `_WeightedCard` é definida mas potencialmente não é usada em outros arquivos
 - Arquivos grandes (>500 linhas):
   - `server/lib/ai/optimize_runtime_support.dart`: 4198 linhas
   - `server/routes/ai/optimize/index.dart`: 3498 linhas
