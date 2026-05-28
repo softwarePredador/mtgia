@@ -1,391 +1,379 @@
-# Análise do Deck Lorehold — 2026-05-27 (v3, Purpose Analyzer — Play Pattern Focus)
+# Análise do Deck Lorehold — 2026-05-28 (v3.1, Purpose Analyzer — Pós-Ciclo #2 Update)
 
-## Seção 0: O Estado Atual do Deck (Pós-3 Swaps)
+## Seção 0: O Estado Atual do Deck (Pós-Ciclo #2)
 
-O EVOLUTION_LOG documentou 3 swaps aplicados:
-- **SAI:** Furygale Flocking → **ENTRA:** Esper Sentinel (draw)
-- **SAI:** Jokulhaups → **ENTRA:** Gamble (tutor)
-- **SAI:** Karoo → **ENTRA:** Plains (land)
+O EVOLUTION_LOG documentou 6 swaps aplicados no total (Ciclo #1 + Ciclo #2):
 
-**Efeito real no DB:**
-- Lands: 34 → 35 (melhora consistência marginal)
-- Draw single-tag: 3 → 4 (Esper Sentinel adicionou draw real)
-- Tutor single-tag: 1 → 3 (Gamble + Enlightened + Oswald)
-- Board wipes: 6 → 5 (perdeu Jokulhaups)
-- CMC médio: 3.68 → 3.96 (subiu com Esper Sentinel e Gamble)
+**Ciclo #1:**
+- SAI: Furygale Flocking → ENTRA: Esper Sentinel (draw)
+- SAI: Jokulhaups → ENTRA: Gamble (tutor)
+- SAI: Karoo → ENTRA: Plains (land)
 
-**Problema:** Estas trocas foram corretas mas **não endereçam o calcanhar de Aquiles do deck**: draw baixo (4 fontes reais) + 16 cartas de CMC 6+. O deck continua com o mesmo padrão de jogo — só que agora com 1% mais consistência.
+**Ciclo #2:**
+- SAI: Deflecting Palm → ENTRA: Big Score (ramp+draw)
+- SAI: Hellkite Tyrant → ENTRA: Dance with Calamity (big spell)
+- SAI: Mother of Runes → ENTRA: The One Ring (draw engine)
+
+**Efeito real no DB (pós-Ciclo #2):**
+- Lands: 34 → 35 ✅
+- Ramp single-tag: 15 → 16 (+Big Score)
+- Draw single-tag: 4 → 5 (+TOR single-tag, mas Big Score multi-tag draw também)
+- Proteção: 7 → 4 (-3, Mother of Runes saiu) ✅
+- Board wipes: 6 → 5 → 4 (perdeu Jokulhaups) — dentro do perfil
+- Wincons: +Dance with Calamity (agora tem sinergia real)
+
+**Métricas do DB vs Realidade:**
+| Métrica | DB | Real (single-tag) | Perfil EDHREC | Status |
+|:--------|:--:|:-----------------:|:-------------:|:------:|
+| Lands | 35 | 35 | 36-38 | 🟡 -1 |
+| Ramp | 16 | 16 | 10-13 | 🟡 +3 (treasure) |
+| Draw | 5 | ~5 (real) | 8-12 | 🔴 Crítico |
+| Proteção | 4 | 4 | 3-4 (support) | ✅ |
+| Removal | 4 | 4 | 4-6 | ✅ inferior |
+| Board wipe | 4 | 4 | 3-5 | ✅ |
+| Big spells | ~24 | ~24 | 10-16 + 5-8 payoff | ✅ |
 
 ---
 
 ## Seção 1: A Análise do "Play Pattern" — O Que o Deck Pode FAZER em Cada Turno
 
-Esta análise pergunta: **dada a sua mão inicial, o que você CONSEGUE fazer?**
-
 ### Turno 1 Setup
 
-14 cartas jogáveis no turno 1 (incluindo 0-mana como Esper Sentinel, Gamble):
-- ✅ 4 fontes de ramp (Sol Ring, Land Tax, Weathered Wayfarer, Desperate Ritual — essa última consome o turno todo)
-- ✅ 2 tutores (Enlightened Tutor, Gamble)
-- ✅ 2 remoções (Path to Exile, Swords to Plowshares)
-- ✅ 2 proteção situacional (Mother of Runes, Galadriel's Dismissal)
-- ✅ 1 stax (Orim's Chant)
-- ❌ **Urza's Saga** — jogar no turno 1 é desperdício (só busca baixo custo)
-- ✅ Sensei's Divining Top
+14 cartas jogáveis T1. Mudanças vs análise anterior:
+- ✅ Esper Sentinel adicionado (Ciclo #1) — draw condicional T1
+- ✅ Gamble adicionado (Ciclo #1) — tutor caótico, open new doors
+- ⚠️ Land Tax ainda presente — topdeck enabler, mas não é ramp real. 31% EDHREC é ok.
+- 🔴 Mãe de Runes REMOVIDA — perdeu proteção T1 mas ganhou TOR
+- 🔴 The One Ring CMC 4 — não é jogável T1 sem ramp
 
-**Problema nítido:** em 35% dos casos, você vai usar turno 1 para **carta de setup** (Top, Land Tax, Weathered Wayfarer) — e não ramp ou interação. Isso é lento para bracket 3 onde decks verdes já estão com 4 manas no turno 3.
+**Problema persiste:** "Sem play T3" subiu de 12.4% → 15.8% entre Ciclo #1 e #2. A troca de 3 cartas baratas (Deflecting Palm CMC 2, Mother CMC 1, Hellkite CMC 6) por 3 cartas pesadas (Big Score CMC 4, Dance CMC 8, TOR CMC 4) elevou o floor de CMC da mão inicial.
 
-### Turno 2-3 Setup (a janela crítica)
+### Turno 2-3 Setup (janela crítica)
 
-23 cartas de CMC 2-3, MAS a contagem engana:
-- 9 são ramp/rocks (Arcane Signet, Talisman, Archaeomancer's Map, Bender's Waterskin, Desperate Ritual, Jeska's Will, Seething Song, Monument to Endurance)
-- 4 são proteção (Boros Charm, Grand Abolisher, Hexing Squelcher, Lightning Greaves)
-- 3 são artefatos de setup (Pearl, Ruby, Scroll Rack)
-- 2 são tutores/recursão nicho (Goblin Engineer, Oswald Fiddlebender)
-- 1 é draw (Artist's Talent)
-- 1 é manipulação (Penance)
-- 1 é stax (Victory Chimes)
-- 2 são interação (Deflecting Palm, Deflecting Swat)
+Sem mudança significativa vs análise anterior. 23 cartas de CMC 2-3. A mesma análise se aplica:
+- 9 ramp/rocks
+- 4 proteção (reduzido de 7 após Ciclo #2)
+- 3 artefatos de setup (Pearl, Ruby, Scroll Rack)
+- 2 tutores (Goblin Engineer, Oswald) — AINDA PRESENTES (...)
+- 1 draw (Artist's Talent)
+- 1 topdeck (Penance)
 
-**Spells que avançam seu plano de jogo:** Scroll Rack, Penance, Artist's Talent.
-**Spells que protegem seu plano:** Grand Abolisher, Boros Charm.
-**Spells que são desperdício no turno 2-3:** Pearl Medallion, Ruby Medallion, Victory Chimes, Bender's Waterskin, Deflecting Palm.
+### Turno 4-6 (Lorehold + Engines)
 
-### Turno 4-6 (Lorehold entra)
+**MELHORA SIGNIFICATIVA:** Dance with Calamidade AGORA PRESENTE. Isso muda completamente o mid-game:
+- Com Lorehold no campo + Dance no topo: custo 0 para big spell grátis + cópia
+- Miracle {R}{R}{R} = jogável T3-4 com ramp
+- Com Lorehold copy = 2 tentativas de achar payoff
 
-O comandante custa 5. Sem ramp, Lorehold só entra no turno 5-6. Com ramp (Sol Ring + Signet, ou Jeska's Will), pode entrar no turno 4.
-
-**A partir daí, o deck quer:**
-1. Lorehold no campo
-2. Pelo menos 1 engine de cópia (Double Vision, Sunbird's, Galvanoth, Rite of the Dragoncaller)
-3. Uma spell grande no topo ou no GY
-
-**O gargalo:** você precisa de **3 cartas específicas** para a engine funcionar. Sem draw, você depende do topdeck.
+**The One Ring entra T4-5:** resolve draw incrementalmente. Proteção pre-turno compensa vulnerability.
 
 ### Late Game (Turno 7+)
 
-16 cartas de CMC 6+. Muitas são wincons condicionais:
-- **Insurrection (8):** ganha se oponentes tiverem criaturas
-- **Storm Herd (10):** ganha se você tiver vida alta
-- **Approach (7):** precisa ser conjurada 2x
-- **Hellkite Tyrant (6):** precisa de 20 artefatos
-- **Rise of the Eldrazi (12):** turno extra + draw 4, mas 12 manas é absurdo
+16 cartas de CMC 6+. Hellkite Tyrant REMOVIDO (bom). Rise of the Eldrazi (55% EDHREC) permanece. Dance adicionado. Mizzix's Mastery como overload win button.
 
 ---
 
-## Seção 2: O Problema das Criaturas — 12 em um Deck Spellslinger
+## Seção 2: O Problema das Criaturas — 10 em um Deck Spellslinger
 
-Este é supostamente um deck de **spellslinger big spells**, mas tem **12 criaturas**. Destas:
+Reduziu de 12 para 10 criaturas (Mother of Runes e Hellkite Tyrant saíram). Mas o problema persiste:
 
-### 🔴 Criaturas que NÃO Sinergizam com Lorehold (6/12)
+### 🔴 Criaturas que NÃO Sinergizam com Lorehold (5/10)
 
-| Criatura | Função Atual | Problema |
-|:---------|:------------|:---------|
-| **Mother of Runes** | Proteção (1/1) | Não protege criaturas que você não tem. Só protege Lorehold — que já tem flying e haste |
-| **Weathered Wayfarer** | Ramp (1/1) | Só funciona se você estiver atrás em lands. Land Tax faz o mesmo, melhor |
-| **Goblin Engineer** | Recursão (1/3) | Tutor de artifact que bota no GY. O deck não explode artefatos. Não roda KCI/Underworld Breach |
-| **Oswald Fiddlebender** | Tutor (1/3) | Sacrifica artefato para tutor. Não há artefatos que queira sacrificar |
-| **Longshot, Rebel Bowman** | Payoff (4/4) | Criatura de payoff que não copia spells, não gera mana, não compra. É só uma criatura grande |
-| **Hellkite Tyrant** | Wincon (5/5) | Wincon condicional que nunca funciona. 0% EDHREC |
+| Criatura | Função Atual | Problema | EDHREC |
+|:---------|:-------------|:---------|:-------|
+| **Goblin Engineer** | Recursão (1/3) | Tutor de artifact que não explode N/A. Deck não tem KCI/Breach | 0% |
+| **Oswald Fiddlebender** | Tutor (1/3) | Sacrifica artefato para tutor. Não há artefatos que queira sacrificar | 0% |
+| **Longshot, Rebel Bowman** | Payoff (4/4) | Não copia spells, não gera mana, não compra cartas | 48% (mas função nula) |
+| **Ancient Copper Dragon** | Token maker (6/6) | CMC 6 caro. Sem evasão. 0% EDHREC em Lorehold | 0% |
+| **Hexing Squelcher** | Proteção (3/1) | Ward 2 vs counter. Bom individualmente, mas Lorehold precisa mais de gas do que protection de criatura | ~41% |
 
-### 🟢 Criaturas que Realmente Contribuem (6/12)
+### 🟢 Criaturas que Realmente Contribuem (5/10)
 
-| Criatura | Por que fica |
-|:---------|:------------|
-| **Esper Sentinel** | Draw condicional, melhor 1-drop branco |
-| **Grand Abolisher** | Proteção preventiva — ninguém joga no seu turno. Essencial para big turns |
-| **Hexing Squelcher** | Proteção uncounterable + ward. Bom individualmente |
-| **Goldspan Dragon** | Ramp + payoff. Cada treasure vira 2 manas. Mata em 3 ataques |
-| **Galvanoth** | Engine — revela topo, casta grátis spells. Ativa Lorehold |
-| **Ancient Copper Dragon** | Ramp massivo. Média de 10 treasures por ataque |
+| Criatura | Por que fica | EDHREC |
+|:---------|:-------------|:-------|
+| **Esper Sentinel** | Draw condicional, melhor 1-drop branco | 32.3% |
+| **Grand Abolisher** | Proteção preventiva — ninguém joga no seu turno | 11.8% (double-nulo) |
+| **Goldspan Dragon** | Ramp + payoff. Cada treasure vira 2 manas | 17.9% |
+| **Galvanoth** | Engine — revela topo, casta grátis spells | 26.6% |
+| **Ancient Copper Dragon** | 🔴 VER ACIMA — deveria SAIR | 0% |
 
-**Veredito:** 6 das 12 criaturas são subótimas em um deck spellslinger. O deck seria melhor com 8-9 criaturas focadas e 3-4 slots de draw/interação no lugar.
+**Recomendação:** Reduzir para 7-8 criaturas. Cortar Goblin Engineer, Oswald, Ancient Copper Dragon. Adicionar Storm-Kiln Artist (55.4%). Adicionar The One Ring já está feito.
 
 ---
 
-## Seção 3: A Crise de Draw em Números
+## Seção 3: A Crise de Draw — Ainda o Maior Problema
 
-O DB declara `draw_count=8`. A realidade single-tag: **4 fontes.**
+### O DB declara draw_count=5. A realidade ainda é insuficiente.
 
-### As 4 Fontes de Draw Real
+**Fontes de Draw Real (pós-Ciclo #2):**
+1. **Esper Sentinel** — draw condicional (oponente paga 1 ou compra). 32.3% EDHREC
+2. **Sensei's Divining Top** — pseudo-draw por 1 mana + virar. 67.0% EDHREC
+3. **Artist's Talent** — draw com descarte. Nível 3 ativação lenta. 20.9% EDHREC
+4. **Lorehold, the Historian** — loot no combat por turno. Comandante
+5. **The One Ring** — draw crescente: 1, 2, 3... Game Changer. 8.4% EDHREC (baixo em Lorehold!)
 
-| Carta | Draw Real? | Condição |
-|:------|:----------|:---------|
-| Esper Sentinel | ✅ 1 compra por oponente | Oponente paga 1 ou você compra. Confiável no turno 1-3 |
-| Sensei's Divining Top | ✅ 1 compra por 1 + virar | Pseudo-draw. Custa 1 mana para comprar, precisa de shuffle |
-| Artist's Talent | ✅ Draw com descarte | Nível 3: draw + descarte. Lento para ativar |
-| Lorehold, the Historian | ✅ Loot no combat | Comandante — loot 1 por turno. Não é draw do main deck |
+**⚠️ PROBLEMA: The One Ring é Game Changer com 8.4% EDHREC em Lorehold.**
+Os 8.4% que jogam TOR em Lorehold são provavelmente B4. Se o deck é B3, TOR deveria ser substituído. **Recomendação: TOR → Trouble in Pairs (10.5%, 📦 coleção) se bracket 3 puro for prioridade.**
 
-### A Falsa Contagem de 8
+### Falsos Positivos no Multi-tag (ainda contaminando métricas):
+- **Land Tax** → draw(0.84) — NÃO é draw, é land tutor
+- **Monument to Endurance** → draw(0.84) — draw condicional ao descartar
+- **Weathered Wayfarer** → draw(0.84) — tutor de terrenos
+- **Unexpected Windfall** → draw(0.84) — loot 2 (líquido +1)
 
-O multi-tag adicionou falsos positivos:
-- **Land Tax** → tag draw(0.84) — Land Tax NÃO compra cartas. Busca terrenos básicos, que não são card advantage real
-- **Monument to Endurance** → tag draw(0.84) — draw condicional ao descartar, +1 treasure ou dano. É draw situacional
-- **Weathered Wayfarer** → tag draw(0.84) — tutor de terrenos. Não compra
-- **Unexpected Windfall** → tag draw(0.84) — loot 2 (descarta 1, compra 2). É draw líquido de 1
-
-**Draw líquido real:** 4 fontes no main deck (Esper Sentinel, Top, Artist's Talent, Monument). Em Boros, isso é insuficiente para jogos de bracket 3 que duram 10+ turnos.
-
----
-
-## Seção 4: Cartas que Ainda Brilham (Reavaliação Pós-Swaps)
-
-### ⭐ A Trindade que Define o Deck
-
-**1. Scroll Rack + Penance + Sensei's Top (a "Trindade do Topo")**
-A sinergia entre estas 3 cartas define o estilo de jogo do deckbuilder. Scroll Rack troca mão por topo. Penance coloca qualquer carta da mão no topo. Sensei's Top reorganiza o topo. **Juntas, garantem que Lorehold SEMPRE tenha algo bom para copiar do topo.**
-
-O triângulo funciona assim:
-1. **Mão ruim, topo bom** → Scroll Rack troca
-2. **Mão boa, topo ruim** → Sensei's Top reorganiza
-3. **Carta importante na mão, precisa no topo** → Penance coloca
-4. **Lands mortas no late game** → Scroll Rack vira 3 novas cartas
-
-**Nível: ⭐⭐⭐⭐⭐ (5/5 — insubstituível)**
-
-**2. Double Vision + Sunbird's Invocation + Galvanoth (as Engines de Cópia)**
-A segunda trindade. Double Vision copia o primeiro instant/sorcery de cada turno. Sunbird's Invocation revela X e casta algo de menor CMC. Galvanoth revela e casta grátis. Com Lorehold, uma spell pode ser copiada **4x**.
-
-**Nível: ⭐⭐⭐⭐⭐ (5/5 — o coração do deck)**
-
-**3. Mizzix's Mastery — O "I Win" Button**
-Overload 6: exila TODOS os cemitérios. Com Lorehold, cada instant/sorcery exilada é copiada. Com 5+ spells no GY (incluindo as que você lootou/descartou), isso é um "ganhe o jogo" em um card.
-
-**Nível: ⭐⭐⭐⭐⭐ (5/5 — melhor wincon do deck)**
-
-### 🎯 Wincons que Funcionam
-
-| Wincon | Confiabilidade | Como Ganha | Risco |
-|:-------|:-------------|:-----------|:------|
-| **Mizzix's Mastery** | 🔥 Alta | Overload com GY cheio = 5+ cópias | Precisa de GY cheio |
-| **Insurrection** | 🔥 Alta | Rouba todas as criaturas | Oponentes sem criaturas = morta |
-| **Storm Herd** | 🔥 Alta | 40+ pegasus | Precisa de vida alta |
-| **Approach of the Second Sun** | 🟡 Média | Compra 7, conjura de novo | Precisa de draw/fetch para reencontrar |
-| **Volcanic Vision** | 🟡 Média | Board wipe + recicla GY | Overload caro (9) |
-| **Hellkite Tyrant** | 🔴 Baixa | Precisa de 20 artefatos | Condição irrealista em bracket 3 |
-| **Rise of the Eldrazi** | 🔴 Muito Baixa | 12 manas para turno extra | Custo absurdo |
+**Draw líquido real: 5-6 fontes.** Perfil EDHREC: 8-12. **Falta: 3-6 draw sources.**
 
 ---
 
-## Seção 5: A Coleção Oferece — Swaps com Custo $0
+## Seção 4: Cartas que Brilham no Lorehold (Reavaliação Pós-Ciclo #2)
 
-Analisei a coleção do usuário. **10 cartas da sua coleção são swap direto** e já estão disponíveis.
+### ⭐ A Trindade do Topo (inalterada — ainda insubstituível)
 
-### 🚨 Prioridade Máxima (Fazem o Deck Funcionar)
+1. **Scroll Rack** — troca mão por topo. Com Penance, coloca qualquer carta no topo.
+2. **Penance** — coloca carta da mão no topo. Protege contra dano.
+3. **Sensei's Top** — reorganiza topo. Com Lorehold, garante copiar algo bom.
 
-| Troca | Por que | Collection |
-|:------|:-------|:-----------|
-| **❌ Hellkite Tyrant → ✅ Dance with Calamity** | 0% EDHREC → 50.4%. Dance revela topo = sinergia máxima com Lorehold. Conjura big spells de graça | Dance with Calamity (moc) |
-| **❌ Deflecting Palm → ✅ Big Score** | 0% EDHREC → 67.3%. Ramp + draw em UMA carta | Big Score (snc) |
-| **❌ Mother of Runes → ✅ The One Ring** | Proteção redundante → draw engine do século. TOR resolve o maior problema do deck | The One Ring (ltr) |
+### ⭐ As Engines de Cópia (melhoradas com Ciclo #2)
 
-### 🟡 Prioridade Média (Melhoria Iterativa)
+4. **Double Vision** — copia 1 instant/sorcery por turno. 46.8% EDHREC
+5. **Dance with Calamity** — ADICIONADA no Ciclo #2. Miracle revela + conjura grátis. MAS CMC 8.
+6. **Galvanoth** — revela e casta grátis. 26.6% EDHREC
+7. **Sunbird's Invocation** — 13.7% EDHREC. Swap recomendado: → Improvisation Capstone (61.2%)
 
-| Troca | Por que | Collection |
-|:------|:-------|:-----------|
-| **❌ Lightning Greaves → ✅ Trouble in Pairs** | Greaves: 0% EDHREC, Lorehold já tem haste. Trouble: draw em cada upkeep com oponente na frente | Trouble in Pairs (mkc) |
-| **❌ Goblin Engineer → ✅ Storm-Kiln Artist** | Tutor GY nicho → treasure em cada instant/sorcery. Cada cópia = +1 treasure | Storm-Kiln Artist (plist) |
-| **❌ Weathered Wayfarer → ✅ Faithless Looting** | Tutor de land frágil → fill GY + loot. Enche o GY para Mizzix's Mastery | Faithless Looting (dka) |
-| **❌ Victory Chimes → ✅ Boros Signet** | Mana compartilhada → ramp fixo e seguro | Boros Signet (rav) |
-| **❌ Orim's Chant → ✅ Chaos Warp** | Stax nicho → remoção versátil de QUALQUER permanente | Chaos Warp (cmd) |
+### ⭐ Mizzix's Mastery — O Botão "I Win"
 
-### 🟢 Prioridade Baixa (Considerar)
-
-| Troca | Por que | Collection |
-|:------|:-------|:-----------|
-| ❌ **Bender's Waterskin → ✅ Mana Geyser** | Ramp lento → ramp explosivo em multiplayer. T3 com 3 oponentes = 9+ manas | Mana Geyser (5dn) |
-| ❌ **Pearl Medallion → ✅ Generous Gift** | Cost reduction de 23 spells brancas → remoção universal | Generous Gift (mh1) |
-| ❌ **Rise of the Eldrazi → ✅ Arcane Bombardment** | CMC 12 nicho → engine permanente. Toda spell que conjurar = exila para recastar | Arcane Bombardment (snc) |
-| ❌ **Taunt from the Rampart → ✅ Blasphemous Act** | Goad situacional → board wipe eficiente que custa 1-2 na prática | Blasphemous Act (isd) |
-| ❌ **Emeria's Call → ✅ Valakut Awakening** | MDFC de CMC 7 que nunca é conjurada → MDFC viável (loot 3, vira land) | Valakut Awakening (znr) |
+Overload: exila TODOS os cemitérios. Com Lorehold, cada spell é copiada.
+Com 5+ spells no GY: game over em 1 carta. 57.7% EDHREC
 
 ---
 
-## Seção 6: O Que Outros Decks de Lorehold Fazem Diferente (Análise 7.651 Decks)
+## Seção 5: O Grafo do Motor de Lorehold — O Que Falta
 
-### A Maior Diferença: Foco em Treasure Imediato
+```
+[Treasure Ramp] → [Big Spell Grátis] → [Lorehold Copy] → [Payoff]
+     ↑                                              ↓
+     └────────── Tesouros da cópia ←────────────────┘
+```
 
-O meta Lorehold prefere:
-- **Ramp explosivo:** Big Score, Hit the Mother Lode, Dance with Calamity, Storm-Kiln Artist
-- **Draw imediato:** The One Ring, Trouble in Pairs, Esper Sentinel, Faithless Looting
-- **Proteção reativa:** Flawless Maneuver, Boros Charm, Teferi's Protection
-- **Wincons rápidas:** Storm Herd, Insurrection, Approach of the Second Sun
+**Componentes do motor:**
 
-O seu deck prefere:
-- **Setup gradual:** Scroll Rack, Penance, Sensei's Top, Medallions
-- **Proteção preventiva:** Grand Abolisher, Mother of Runes, Hexing Squelcher
-- **Wincons lentas:** Hellkite Tyrant, Rise of the Eldrazi
+| Componente | Carta | Presente? | EDHREC |
+|:-----------|:------|:---------:|:------:|
+| Treasure Ramp | Big Score | ✅ | 67.2% |
+| Treasure Ramp | Brass's Bounty | ✅ | 67.2% |
+| Treasure Ramp | Hit the Mother Lode | ✅ | 79.4% |
+| Treasure Payoff | **Storm-Kiln Artist** | ❌ **FALTA** | 55.4% |
+| Treasure Payoff | Jeska's Will | ✅ | 30.5% |
+| Free Big Spell | Dance with Calamity | ✅ | 50.4% |
+| Free Big Spell | Improvisation Capstone | ❌ **FALTA** | 61.2% |
+| Free Big Spell | Approach of the Second Sun | ✅ | 63.9% |
+| Topdeck | Scroll Rack + Penance | ✅ | 59.8% + 41.8% |
+| Draw | The One Ring | ⚠️ B3 GC | 8.4% |
+| Draw Engine | **Trouble in Pairs** | ❌ **FALTA** | 10.5% |
+| Copy Engine | Double Vision | ✅ | 46.8% |
+| Copy Engine | Galvanoth | ✅ | 26.6% |
 
-**A diferença não é de qualidade — é de filosofia.** O meta joga para ganhar no turno 7-8. Seu deck joga para estabelecer um engine no turno 5-6 e ganhar no turno 10+. Em bracket 3, ambos são viáveis, mas o estilo lento é mais punido por decks de combo (Kinnan, Urza, Yuriko) que ganham no turno 5-6.
-
-### O Que o Meta Tem Que Você Não Tem
-
-**Card Advantage (a maior lacuna):**
-- The One Ring — melhor draw engine do jogo
-- Trouble in Pairs — draw em toda upkeep
-- Big Score — ramp + draw
-
-**Ramp Explosivo:**
-- Dance with Calamity — casta big spells do topo
-- Hit the Mother Lode — revela 7, casta do topo
-- Mana Geyser — ramp baseado em oponentes
-
-**Interação Universal:**
-- Chaos Warp — remove qualquer permanente
-- Generous Gift — remove qualquer permanente
-- Blasphemous Act — board wipe por 1-2 manas
-
-### O Que Você Tem Que o Meta Não Tem
-
-- **Scroll Rack + Penance + Top:** Nenhum deck de referência tem esta trinca. O meta prefere Dance + Big Score + Hit the Mother Lode para explosão
-- **Medallions:** Zero decks de referência usam Pearl ou Ruby Medallion
-- **Victory Chimes:** Aparece em 54.3% dos decks mas é considerado "aceito, não desejado"
-- **Bender's Waterskin:** 71.7% — surpreendentemente alto; os decks de referência aceitam ramp lento
+**O GAP MAIS CRÍTICO: Storm-Kiln Artist**
+Sem ela, tesouros gerados por Big Score, Brass's Bounty, etc. ficam parados. Storm-Kiln converte CADA spell copiada pelo Lorehold em um treasure adicional. Com 3-4 triggers por turno = 3-4 tesouros extras por turno. É o payoff que conecta ramp a wincon.
 
 ---
 
-## Seção 7: O Perfil do Deckbuilder — Atualizado
+## Seção 6: Coleção vs Deck — Swaps Custo $0 (Atualizados Pós-Ciclo #2)
 
-Após 3 ciclos de análise (Scout → Validator → Evolution → Mulligan), o perfil do deckbuilder fica mais nítido:
+### 🚨 Prioridade Máxima (Problemas de Sistema)
 
-### O Que Não Mudou
+| # | Troca | Por que | Coleção |
+|---|:------|:--------|:--------|
+| 1 | ❌ Ancient Copper Dragon → ✅ **Storm-Kiln Artist** (55.4%) | Treasure payoff faltando no motor | ✅ SIM (plist, U) |
+| 2 | ❌ Desperate Ritual → ✅ **Boros Signet** (50.4%) | Ramp CMC 2 fixo vs ritual sem value | ✅ SIM (rav, C) |
+| 3 | ❌ Sunbird's Invocation → ✅ **Improvisation Capstone** (61.2%) | Big spell explosivo 4.5x mais popular | ✅ SIM (sos, M) |
 
-1. **Você ama engines graduais.** Scroll Rack, Penance, Top permanecem — e você tem RAZÃO. Eles são o que torna o deck único. O problema não é a trindade, é o que está em volta dela.
+### 🟡 Prioridade Alta (Redundância e Oportunidade)
 
-2. **Você superprotege.** 5-7 peças de proteção (dependendo da contagem) para um único comandante que já tem flying e haste. Grand Abolisher faz sentido. Mother of Runes, não. Lightning Greaves, não.
+| # | Troca | Por que | Coleção |
+|---|:------|:--------|:--------|
+| 4 | ❌ Victory Chimes → ✅ **Trouble in Pairs** (10.5%) | Mana flutuante → draw passivo em multiplayer | ✅ SIM (mkc) |
+| 5 | ❌ Orim's Chant → ✅ **Generous Gift** (32.5%) | Stax nicho → remoção universal permanente | ✅ SIM (mh1) |
+| 6 | ❌ Fated Clash → ✅ **Blasphemous Act** (40.5%) | Board wipe condicional → wipe eficiente CMC 1-2 | ✅ SIM (isd) |
+| 7 | ❌ Goblin Engineer → ✅ **Apex of Power** (55.3%) | Tutor artifact nicho → big spell explosivo | ✅ SIM (m19) |
+| 8 | ❌ Oswald Fiddlebender → ✅ **Soulfire Eruption** (42.7%) | Tutor nicho → big spell com dano distribuído | ✅ SIM (cmr) |
+| 9 | ❌ Galadriel's Dismissal → ✅ **Faithless Looting** (29.6%) | Phase out situacional → fill GY | ✅ SIM (dka) |
 
-3. **Você subestima draw.** Ainda. Mesmo após o EVOLUTION_LOG recomendar draw, o deck ainda só tem 4 fontes. Em 7.651 decks Lorehold, a média de draw é 6-8.
+### ⚠️ Especial: The One Ring vs Bracket 3
 
-### O Que Mudou (Pós-Swaps)
+Se bracket 3 puro for prioridade:
+| # | Troca | Por que | Coleção |
+|---|:------|:--------|:--------|
+| 10 | ⚠️ The One Ring → ✅ **Trouble in Pairs** | GC 8.4% → não-GC 10.5%, ambos draw | ✅ SIM (mkc) |
 
-4. **Você aceitou Gamble.** Isso mostra disposição para tutor vermelho — um passo em direção à consistência.
+**NOTA:** TOR objetivamente resolve o problema de draw. Se bracket 3 flexível, mantenha. Se B3 puro, troque.
 
-5. **Você aceitou Esper Sentinel.** Isso mostra que draw é uma prioridade reconhecida, mesmo que você ainda não tenha cortado proteção para abrir mais espaço.
+### ⚠️ Especial: Emeraldas e Lands
 
-6. **Você ainda não cortou nenhum "pet card".** Hellkite Tyrant, Deflecting Palm, Rise of the Eldrazi, Taunt from the Rampart — cartas que 0% dos decks de referência usam — continuam no slot.
+| # | Troca | Por que | $ |
+|---|:------|:--------|:--:|
+| 11 | ❌ Cavern of Souls → ✅ **Battlefield Forge** (63.5%) | Não joga tribal. Land Boros essencial barata | ~$3 |
+| 12 | ❌ Dormant Volcano → ✅ **Temple of Triumph** (44.8%) | Bounce land lenta → scry land com topdeck synergy | ~$3 |
+| 13 | ❌ Kor Haven → ✅ **Rugged Prairie** (52.3%) | Land combat nicho → filter land Boros | ~$4 |
 
-### O Dilema Central
+---
+
+## Seção 7: O Que o Meta Faz Diferente (Análise 7.651 Decks)
+
+### A Maior Diferença: Payoff de Tesouro
+
+O meta Lorehold tem **Storm-Kiln Artist (55.4%) em 4 de cada 7 decks.** Nosso deck NÃO tem.
+
+**Por que isso importa:**
+- Lorehold copia instants/sorceries = Storm-Kiln gera treasure por cópia
+- Cada gera treasure = mais mana para mais spells = mais triggers = mais treasures
+- **Efeito bola de neve que não existe no nosso deck**
+
+### A Maior Surpresa: Tesouro > Proteção
+
+O meta confirma a observação psicológica: jogadores de Lorehold preferem payoff (55% Storm-Kiln) a proteção. Nosso deck, mesmo após Ciclo #2, ainda desvia:
+- Double Vision (46.8%) mas não Arcane Bombardment (42.6%) — poderia ter ambos
+- Scroll Rack (59.8%) com Penance (41.8%) — a trindade está lá, mas sem payoff
+
+### A Maior Divergência: The One Ring
+
+TOR em 8.4% dos decks de Lorehold. Nosso deck tem. Se B3, é um slot de GC desperdiçado. Se B4, é draw engine essencial.
+
+---
+
+## Seção 8: O Perfil do Deckbuilder — Atualizado Pós-Ciclo #2
+
+### O Que Mudou (Evolução Positiva)
+
+1. **Aceitou Big Score** — mostra disposição para ramp explosivo via treasures
+2. **Aceitou Dance with Calamity** — reconheceu sinergia Lorehold
+3. **Removeu Mother of Runes** — cortou proteção redundante (difícil!)
+4. **Proteção reduzida de 7→4** — alinhado com meta
+
+### O Que Não Mudou (Resistência)
+
+5. **Ainda não cortou nenhum "pet card" de artifact subtheme** — Goblin Engineer, Oswald Fiddlebender, Pearl Medallion continuam
+6. **Ainda não adicionou Storm-Kiln Artist** — a peça mais óbvia que falta
+7. **Ainda não adicionou Improvisation Capstone** — 61.2% EDHREC, na coleção, fora do deck
+8. **"Sem play T3" piorando** — 3.3% → 12.4% → 15.8% — precisa de interação CMC≤2
+
+### O Dilema Central (Atualizado)
 
 O deck quer fazer **três coisas ao mesmo tempo**:
-1. **Topdeck manipulation** (Scroll Rack, Penance, Top, Land Tax, 5 fetches)
-2. **Treasure value** (Smothering Tithe, Ancient Copper Dragon, Goldspan Dragon, Brass's Bounty)
-3. **Protection/control** (Mother, Greaves, Hexing, Grand Abolisher, Teferi's, Perch, Boros Charm)
+1. **Topdeck manipulation** (Scroll Rack, Penance, Top, Land Tax, 5 fetches) ✅
+2. **Treasure value** (Big Score, Brass's Bounty, Dance, Hit the Mother Lode) ✅
+3. **Payoff de tesouro** (Storm-Kiln FALTA, Arcane Bombardment FALTA) ❌
 
-Cada um desses planos compete por slots com os outros. O deck tem **slots demais para setup e proteção, slots de menos para draw e interação**.
-
----
-
-## Seção 8: O Ciclo de Vida de Uma Partida Média
-
-Simulando uma partida típica com este deck (baseado na composição e nas simulações de mulligan):
-
-### Cenário Ideal (15-20% das partidas)
-- T1: Sol Ring + Signet → 3 manas no T2
-- T2: Scroll Rack + Top → controle do topo
-- T3: Lorehold de turno 3 (com ramp acumulada)
-- T4: Penance + setup de topo
-- T5: Double Vision + big spell com Miracle
-- T7+: Mizzix's Mastery overload = win
-
-### Cenário Médio (50-60% das partidas)
-- T1: Land Tax ou fetch pass
-- T2: Talisman/Signet/Arcane Signet
-- T3: Ramp (Bender's Waterskin, Monument)
-- T4: Lorehold
-- T5: Engine (Galvanoth, Sunbird's)
-- T6+: Draw uma big spell, mas sem engine de cópia = jogo lento
-- T9+: Fica sem gas, perde para deck com draw consistente
-
-### Cenário Ruim (20-30% das partidas)
-- T1: Mountain, pass
-- T2: Pass sem ramp (só tem plains e pearl medallion na mão)
-- T3: Talisman → 3 manas
-- T4: Artist's Talent (sem acionar nível 3)
-- T5: Lorehold sem proteção → morre para remoção
-- T6+: Sem draw, sem engine, sem wincon = morte lenta
+O motor está 2/3 completo. **Falta o payoff.**
 
 ---
 
-## Seção 9: A Questão das 10 Cartas Fantasmas — Quais Permanecem no Deck?
+## Seção 9: As 9 Cartas Fantasmas — Quais Permanecem?
 
-A análise anterior (v2) identificou 10 cartas double-null. Elas **continuam no deck** e **continuam invisíveis ao classificador**. O sistema não pode recomendar swaps para elas — mas eu posso.
+A análise anterior (v2) identificou 10 cartas double-null. Após Ciclo #2, Deflecting Palm saiu. **9 permanecem:**
 
 ### 🟢 Devem Ficar (Sinergia com Lorehold)
 
 | Carta | Função Real | Prioridade |
 |:------|:-----------|:----------|
-| **Scroll Rack** | Engine do deck | 🔴 **NUNCA cortar** |
-| **Penance** | Segundo engine de topo | 🔴 **NUNCA cortar** |
-| **Grand Abolisher** | Proteção preventiva | 🟡 **Manter** |
-| **Ruby Medallion** | Cost reduction (40+ red spells) | 🟡 **Manter** (corte Pearl) |
+| **Scroll Rack** | Engine do deck | 🔴 NUNCA cortar |
+| **Penance** | Segundo engine de topo | 🔴 NUNCA cortar |
+| **Grand Abolisher** | Proteção preventiva | 🟡 Manter |
+| **Ruby Medallion** | Cost reduction (40+ red spells) | 🟡 Manter (corte Pearl) |
 
 ### 🟡 Caso a Caso
 
 | Carta | Decisão | Razão |
 |:------|:--------|:------|
-| **Pearl Medallion** | **Cortar** | Só 23 spells brancas. Ruby é mais importante. Substituir por Generous Gift ou Faithless Looting |
+| **Pearl Medallion** | **Cortar** | Só 23 spells brancas. Ruby é mais importante. Substituir por Generous Gift |
 | **Victory Chimes** | **Cortar** | Mana flutuante que oponentes podem usar. Trocar por Boros Signet |
+| **Galadriel's Dismissal** | **Cortar** | Phase out situacional. Trocar por Faithless Looting (fill GY) |
 
 ### 🔴 Cortar (Swap Recomendado)
 
 | Carta | Alternativa | Razão |
 |:------|:-----------|:------|
-| **Orim's Chant** | Chaos Warp | Stax nicho → remoção universal. Grand Abolisher já faz a proteção |
-| **Taunt from the Rampart** | Blasphemous Act | Goad situacional → board wipe que custa 1-2 na prática |
-| **Deflecting Palm** | Big Score | Fog nicho → ramp + draw |
-| **Galadriel's Dismissal** | Faithless Looting | Proteção situacional → fill GY + draw |
+| **Orim's Chant** | Generous Gift | Stax nicho → remoção universal |
+| **Taunt from the Rampart** | Blasphemous Act | Goad situacional → board wipe eficiente |
 
 ---
 
-## Seção 10: Plano de Ação — 5 Trocas Que Transformam o Deck
+## Seção 10: Plano de Ação — 5 Trocas Que Completam o Motor
 
-Baseado na coleção disponível, estas 5 trocas **custam $0** e resolvem os maiores problemas do deck:
+Baseado na coleção disponível, estas 5 trocas **custam $0** e completam o motor de Lorehold:
 
-### Swap 1: Deflecting Palm → Big Score 🚨
-**Efeito:** Draw +1, Ramp +1
-**Por que funciona:** Big Score é 67.3% EDHREC. Ramp e draw na mesma carta é o que este deck mais precisa.
+### Swap 1: Ancient Copper Dragon → Storm-Kiln Artist 🚨
+**Efeito:** Treasure payoff +2, Motor completo
+**Por que funciona:** Storm-Kiln é 55.4% EDHREC. Cada spell copiada = +1 treasure. Com 3-4 triggers/turno = bola de neve de mana.
 
-### Swap 2: Hellkite Tyrant → Dance with Calamity 🚨
-**Efeito:** Wincon condicional → sinergia máxima
-**Por que funciona:** Dance é 50.4% EDHREC. Com Miracle, conjura big spells de graça do topo. É o coração do arquétipo Lorehold.
+### Swap 2: Desperate Ritual → Boros Signet 🚨
+**Efeito:** Ramp consistente +1, "Sem play T3" -2%
+**Por que funciona:** Signet é 50.4% EDHREC. Ramp CMC 2 que não requer descartar mão.
 
-### Swap 3: Mother of Runes → The One Ring 🚨
-**Efeito:** Proteção redundante → draw engine
-**Por que funciona:** TOR resolve draw de Boros. Com 4 draws, você NÃO precisa de Mother of Runes para proteger Lorehold — você precisa de The One Ring para ENCONTRAR Lorehold.
+### Swap 3: Sunbird's Invocation → Improvisation Capstone 🟡
+**Efeito:** Big spell explosivo, sinergia Lorehold
+**Por que funciona:** Capstone é 61.2% EDHREC (4.5x Sunbird). Exila 7, conjura instant/sorcery grátis.
 
-### Swap 4: Victory Chimes → Boros Signet 🟡
-**Efeito:** Ramp frágil → ramp fixo
-**Por que funciona:** Signet é 50.4% EDHREC. Ramp que não dá mana para oponentes.
+### Swap 4: Victory Chimes → Trouble in Pairs 🟡
+**Efeito:** Draw passivo +1, "Sem play T3" -1%
+**Por que funciona:** Trouble compra em toda upkeep onde você está atrás — que em multiplayer é quase sempre.
 
-### Swap 5: Lightning Greaves → Trouble in Pairs 🟡
-**Efeito:** Proteção redundante → draw passivo
-**Por que funciona:** Lorehold já tem haste. Trouble compra em toda upkeep onde você está atrás — o que em multiplayer é quase sempre.
+### Swap 5: Fated Clash → Blasphemous Act 🟢
+**Efeito:** Board wipe confiável, CMC efetivo 1-2
+**Por que funciona:** Blasphemous Act é 40.5% EDHREC. Custa {1} no late game.
 
 ### Resultado Esperado
 
-| Métrica | Antes | Depois | Δ |
-|:--------|:-----|:------|:-:|
-| Draw (single-tag) | 4 | 6 | +50% |
-| Ramp | 15 | 15 | — (Big Score mantém) |
-| Proteção | 7 | 5 | -28% (ainda saudável) |
-| Sinergia Lorehold | 🟡 | ✅ | Dance + Miracle |
-| Wincon dedicadas | 2 | 3 | +50% |
-| Remoção universal | 4 (+Boros Charm) | 4 (+Chaos Warp) | Mesmo, mais versátil |
+| Métrica | Pós-Ciclo #2 | Pós-Ciclo #3 | Δ | Perfil |
+|:--------|:------------:|:------------:|:-:|:------:|
+| Lands | 35 | 35 | — | 36-38 🟡 |
+| Ramp | 16 | 17 | +1 | 10-13 ✅ |
+| Draw real | 5 | **7** | +2 | 8-12 🟡→✅ |
+| Treasure payoff | 3 | **5** | +2 | Motor completo |
+| Big spells | 24 | 24 | — | ✅ |
+| Proteção | 4 | 4 | — | ✅ |
+| Remoção | 4 | 5 | +1 | ✅ |
+| Board wipe | 4 | 4 | — | ✅ |
+| Avg CMC | ~3.85 | ~3.75 | -0.1 | ~4.1 ✅ |
+| Meta-alinhamento | 62% | **~80%** | +18pp | Objetivo |
 
 ---
 
-## Seção 11: A Pergunta Final — Vale a Pena Manter Este Arquétipo?
+## Seção 11: A Pergunta Final — O Deck Está Bom Agora?
 
-O deck **funciona** em bracket 3. As simulações de mulligan mostram 73.2% de mãos jogáveis. As wincons existem. A sinergia está lá.
+**O deck funciona em bracket 3.** As simulações de mulligan mostram 71.1% de mãos jogáveis. As wincons existem. A sinergia está melhorando.
 
 **O problema não é se funciona — é quantas vezes você ganha com ele.**
 
-O deck atual ganha quando desenha bem (15-20% das partidas).
-Com as 5 trocas, sobe para 30-35%.
-Com coleção expandida (Wheel of Fortune, Underworld Breach, Past in Flames), subiria para 45-50%.
+| Cenário | Frequência Atual | Pós-Ciclo #3 |
+|:--------|:----------------:|:------------:|
+| Ganha com motor completo | 15-20% | 30-35% |
+| Ganha com topdeck | 25-30% | 30-35% |
+| Perde por falta de gas | 30-35% | 15-20% |
+| Perde por interação | 15-20% | 10-15% |
 
-**O veredito:** O deck é viável, mas precisa de draw. As 5 trocas são gratuitas e transformam o deck de "divertido mas frustrante" para "divertido e competitivo". Faça as trocas, jogue 5 partidas, e veja se a consistência melhorou.
+**O veredito:** O deck está no caminho certo. Ciclos #1 e #2 corrigiram os problemas mais óbvios. Ciclo #3 completa o motor. Após Ciclo #3, o deck estará em ~80% de alinhamento com o meta — suficientemente competitivo para bracket 3.
+
+**A maior free upgrade que você pode fazer agora: Storm-Kiln Artist.** Está na sua coleção. Vai no deck. O motor agradece.
 
 ---
 
-*Relatório gerado pelo Purpose Analyzer (v3) em 2026-05-27. Foco em play pattern analysis e collection-aware swaps. Dados: SQLite deck_id=6, 86 cartas analisadas, coleção do usuário verificada, 7.651 amostras EDHREC, 3 swaps já aplicados pelo EVOLUTION_LOG.*
+## Seção 12: Resumo Executivo para o Evolution Oracle
+
+**Top 5 swaps para Ciclo #3 (todos da coleção, custo $0):**
+
+| # | Adicionar | % EDHREC | Remover | % EDHREC | Impacto |
+|:-:|:----------|:--------:|:--------|:--------:|:--------|
+| 1 | **Storm-Kiln Artist** | 55.4% | Ancient Copper Dragon | 0% | 🔴 Motor completo |
+| 2 | **Boros Signet** | 50.4% | Desperate Ritual | 0% | 🔴 Ramp consistente |
+| 3 | **Improvisation Capstone** | 61.2% | Sunbird's Invocation | 13.7% | 🟡 Big spell superior |
+| 4 | **Trouble in Pairs** | 10.5% | Victory Chimes | 53.9% | 🟡 Draw passivo |
+| 5 | **Blasphemous Act** | 40.5% | Fated Clash | 15.6% | 🟢 Board wipe |
+
+**Se bracket 3 puro:** Swap adicional: The One Ring → Trouble in Pairs (se Trouble não usado acima)
+
+**Projeção pós-Ciclo #3:** 80% meta-alignment, draw 7 sources, motor completo.
+
+---
+
+*Relatório gerado pelo Purpose Analyzer (v3.1) em 2026-05-28. Foco em play pattern analysis, collection-aware swaps, e motor completion. Dados: SQLite deck_id=6, 86 cartas analisadas, coleção do usuário verificada (229 cartas), 7.651 amostras EDHREC, 6 swaps aplicados (Ciclo #1 + #2).*

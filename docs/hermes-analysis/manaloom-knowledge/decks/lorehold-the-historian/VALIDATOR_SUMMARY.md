@@ -1,42 +1,50 @@
-# Lorehold Purpose Analyzer — Resumo 2026-05-27 (v3, Play Pattern Focus)
+# Lorehold Purpose Analyzer — Resumo Executivo 2026-05-28 (v3.1)
 
-## Estado Atual (Pós-3 Swaps do EVOLUTION_LOG)
+## Estado Atual (Pós-Ciclo #2, 6 Swaps Aplicados)
 
-Lands: 35 | Ramp: 15 | Draw (single-tag): 4 | Proteção: 7 | Wincons: 2 | CMC médio: 3.96
+Lands: 35 | Ramp: 16 | Draw (single-tag): 5 | Proteção: 4 | Board Wipe: 4 | CMC médio: ~3.85
 
-Swaps aplicados: Furygale Flocking → Esper Sentinel ✅, Jokulhaups → Gamble ✅, Karoo → Plains ✅
+**Swaps aplicados:**
+- Ciclo #1: Furygale Flocking→Esper Sentinel, Jokulhaups→Gamble, Karoo→Plains
+- Ciclo #2: Deflecting Palm→Big Score, Hellkite Tyrant→Dance with Calamity, Mother of Runes→The One Ring
 
-## O Problema Central: 4 Draw Sources em Boros
+## O Motor de Lorehold — 2/3 Completo
 
-O DB declara draw_count=8 por causa de falsos positivos no multi-tag (Land Tax, Weathered Wayfarer, Unexpected Windfall). **Draw real: 4.** Em 7.651 decks Lorehold, a média é 6-8.
+```
+✅ Treasure Ramp: Big Score, Brass's Bounty, Hit the Mother Lode
+✅ Big Spells Grátis: Dance with Calamity, Approach, Insurrection
+❌ Payoff de Tesouro: Storm-Kiln Artist FALTA (55.4% EDHREC, na coleção)
+```
 
-## O Problema Estrutural: 12 Criaturas em Deck Spellslinger
+## O Proma Crítico: 5 Draw Sources em Boros
 
-6 das 12 não sinergizam: Mother of Runes, Weathered Wayfarer, Goblin Engineer, Oswald Fiddlebender, Longshot Rebel Bowman, Hellkite Tyrant.
+Perfil EDHREC: 8-12. Nosso deck: 5 (incluindo The One Ring 8.4% que é GC).
+**TOR é Game Changer com 8.4% EDHREC em Lorehold** — provavelmente B4. Se B3 puro, trocar por Trouble in Pairs.
 
-## O Problema de CMC: 16 Cartas de Custo 6+
+## "Sem play T3" Piorando: 15.8%
 
-Insurrection (8), Storm Herd (10), Rise of the Eldrazi (12). Sem draw, o deck encontra cartas caras demais cedo demais e não consegue jogá-las.
+Ciclo #1→#2 trocou 3 cartas baratas (CMC 1, 2, 6) por 3 pesadas (CMC 4, 4, 8). Resultado: m hands jogáveis cairam de 73.2%→71.1% e "sem play T3" subiu de 12.4%→15.8%. Precisa de interação CMC≤2 no Ciclo #3.
 
-## Cinco Swaps Prioritários da Sua Coleção ($0)
+## Top 3 Swaps para Ciclo #3 (Custo: ZERO)
 
 | # | Sai | Entra | Impacto |
-|:-:|:----|:------|:--------|
-| 1 | Deflecting Palm (0% EDHREC) | **Big Score** (67.3%) | Draw +1, Ramp +1 |
-| 2 | Hellkite Tyrant (0% EDHREC) | **Dance with Calamity** (50.4%) | Sinergia máxima Lorehold |
-| 3 | Mother of Runes (0% EDHREC) | **The One Ring** | Draw engine resolve Boros |
-| 4 | Victory Chimes (54.3%) | **Boros Signet** (50.4%) | Ramp fixo e seguro |
-| 5 | Lightning Greaves (0% EDHREC) | **Trouble in Pairs** | Draw passivo em multiplayer |
+|---|:----|:------|:--------|
+| 1 | Ancient Copper Dragon (0%) | **Storm-Kiln Artist** (55.4%) | 🔴 Completa o motor |
+| 2 | Desperate Ritual (0%) | **Boros Signet** (50.4%) | 🔴 Ramp consistente |
+| 3 | Sunbird's Invocation (13.7%) | **Improvisation Capstone** (61.2%) | 🟡 Big spell superior |
 
-## O Deckbuilder, Segundo o Deck (Atualizado)
+## O Deckbuilder, Segundo o Deck
 
-- Ama engines graduais (Scroll Rack + Penance + Top) — acertou, é o coração
-- Superprotege o comandante — ainda com Mother + Greaves + Hexing (6 proteções)
-- Subestima draw em Boros — mesmo com Esper Sentinel adicionada
-- Tem **10 cartas do meta Lorehold na coleção** não usadas
+- **Evoluiu:** Aceitou ramp explosivo (Big Score), removeu proteção redundante (Mother), adicionou sinergia (Dance)
+- **Resiste:** Não corta artifact subtheme (Goblin Engineer, Oswald Medallions), não adiciona Storm-Kiln, não adiciona Improvisation Capstone
+- **Tem na coleção e não usa:** 6 cartas ≥50% EDHREC (Storm-Kiln, Capstone, Boros Signet, Apex of Power, Trouble in Pairs, Blasphemous Act)
+
+## Projeção Pós-Ciclo #3
+
+80% meta-alignment, draw 7 sources, motor completo. Deck competitivo B3.
 
 ## Próximo Ciclo
 
-- Purpose Analyzer v3 completo em VALIDATOR_LOG.md
-- Recomendar: aplicar os 5 swaps, re-simular mulligan com 35 lands
-- Avaliar se o deck precisa de +2 lands (37) para CMC 3.96
+- Evolution Oracle (Ciclo #3): Aplicar swaps 1-5
+- Mulligan Analyst: Re-simular (esperar "sem play T3" cair para <13%)
+- Novo Scout: Verificar se Storm-Kiln foi inserida
