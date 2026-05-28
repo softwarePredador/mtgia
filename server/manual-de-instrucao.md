@@ -3,6 +3,40 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-28 — Optimize usa multi-tags semanticas v2 nos deltas
+
+Motivo:
+
+- Hermes apontou que o optimize lia `semantic_tags_v2`, mas colapsava cada carta
+  para um unico papel. Isso escondia perdas de papel secundario, por exemplo uma
+  carta `draw + engine` trocada por `removal`.
+
+Patch aplicado:
+
+- Criado `optimizationFunctionalRolesForCard`, que retorna o conjunto de papeis
+  semanticos confiaveis de uma carta quando `semantic_tags_v2` existe.
+- `classifyOptimizationFunctionalRole` continua retornando um papel primario
+  para compatibilidade, mas escolhe a prioridade a partir desse conjunto.
+- `OptimizationValidator` agora calcula `roleDelta` e diagnostics v2 usando
+  todos os papeis semanticos confiaveis, nao apenas o primario.
+- `filterUnsafeOptimizeSwapsByCardData` usa multi-tags v2 quando presentes e
+  preserva o fallback v1 anterior quando v2 nao existe.
+- `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` passa a bloquear tambem
+  perdas negativas de `wincon`, `combo_piece`, `engine`, `payoff` e `enabler`;
+  `protection` segue review-only.
+
+Validacao:
+
+- `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart lib/ai/optimization_quality_gate.dart test/optimization_validator_test.dart`;
+- `dart test test/optimization_validator_test.dart test/optimization_quality_gate_test.dart test/optimization_rules_test.dart -r expanded`.
+
+Riscos restantes:
+
+- A flag de enforcement segue desligada por padrao. Antes de ativar `partial`
+  em producao, rodar novo scorecard publico/controlled com corpora completos.
+- Fallbacks de complete/optimize ainda usam listas/politicas hardcoded para
+  nomes premium/denylist; migrar para policy data versionada em patch separado.
+
 ## 2026-05-28 — Deck Analysis usa semantic_tags_v2 antes de heuristica
 
 Motivo:
@@ -30,9 +64,6 @@ Validacao:
 
 Riscos restantes:
 
-- Optimize ainda pode colapsar multi-tags em um papel primario em alguns
-  diagnostics/gates; tratar em patch separado com fixtures de perda de papel
-  secundario.
 - Listas de fallback hardcoded de complete/optimize e rotas experimentais de
   recomendacoes/weaknesses ainda precisam de uma politica semantica central.
 

@@ -53,9 +53,13 @@ bool looksLikeOptimizationLandSearchText(String oracleText) {
 }
 
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
-  final semanticRole =
-      _classifySemanticV2FunctionalRole(card['semantic_tags_v2']);
-  if (semanticRole != null) return semanticRole;
+  final semanticRoles = optimizationFunctionalRolesForCard(
+    card,
+    semanticOnly: true,
+  );
+  if (semanticRoles.isNotEmpty) {
+    return _primaryOptimizationRole(semanticRoles);
+  }
 
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
@@ -125,6 +129,43 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   return 'utility';
 }
 
+Set<String> optimizationFunctionalRolesForCard(
+  Map<String, dynamic> card, {
+  bool semanticOnly = false,
+}) {
+  final semanticRoles =
+      _semanticV2FunctionalRoles(card['semantic_tags_v2']).toSet();
+  if (semanticRoles.isNotEmpty) return semanticRoles;
+  if (semanticOnly) return const <String>{};
+  return {classifyOptimizationFunctionalRole(card)};
+}
+
+String _primaryOptimizationRole(Set<String> roles) {
+  for (final role in const [
+    'wipe',
+    'draw',
+    'removal',
+    'ramp',
+    'tutor',
+    'protection',
+    'recursion',
+    'wincon',
+    'combo_piece',
+    'engine',
+    'payoff',
+    'enabler',
+    'land',
+    'creature',
+    'artifact',
+    'enchantment',
+    'planeswalker',
+    'utility',
+  ]) {
+    if (roles.contains(role)) return role;
+  }
+  return roles.isEmpty ? 'utility' : (roles.toList()..sort()).first;
+}
+
 const _knownWinconNames = <String>{
   'walking ballista',
   'laboratory maniac',
@@ -180,43 +221,63 @@ const _knownProtectionNames = <String>{
   'flawless maneuver',
 };
 
-String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
+Set<String> _semanticV2FunctionalRoles(Object? rawSemanticTags) {
   var semanticTags = rawSemanticTags;
   if (semanticTags is String && semanticTags.trim().isNotEmpty) {
     try {
       semanticTags = jsonDecode(semanticTags);
     } catch (_) {
-      return null;
+      return const <String>{};
     }
   }
-  if (semanticTags is! Iterable) return null;
-  Map? best;
+  if (semanticTags is! Iterable) return const <String>{};
+  final roles = <String>{};
   for (final raw in semanticTags) {
     if (raw is! Map) continue;
     final confidence = _safeSemanticConfidence(raw['role_confidence']);
-    final currentConfidence =
-        best == null ? -1.0 : _safeSemanticConfidence(best['role_confidence']);
-    if (confidence > currentConfidence) best = raw;
-  }
-  if (best == null || _safeSemanticConfidence(best['role_confidence']) < 0.65) {
-    return null;
-  }
-
-  final tags = <String>{};
-  final rawTags = best['tags'];
-  if (rawTags is Iterable) {
-    for (final item in rawTags) {
-      if (item is String) {
-        tags.add(item.trim().toLowerCase());
-      } else if (item is Map) {
-        final tag = item['tag']?.toString().trim().toLowerCase();
-        if (tag != null && tag.isNotEmpty) tags.add(tag);
+    if (confidence < 0.65) continue;
+    final rawTags = raw['tags'];
+    if (rawTags is Iterable) {
+      for (final item in rawTags) {
+        String? tag;
+        var tagConfidence = confidence;
+        if (item is String) {
+          tag = item.trim().toLowerCase();
+        } else if (item is Map) {
+          tag = item['tag']?.toString().trim().toLowerCase();
+          tagConfidence = _safeSemanticConfidence(
+            item['confidence'] ?? item['role_confidence'] ?? confidence,
+          );
+        }
+        final role = _roleFromSemanticV2Tag(tag);
+        if (role != null && tagConfidence >= 0.65) roles.add(role);
       }
     }
+    if (raw['wincon'] == true) roles.add('wincon');
+    if (raw['combo_piece'] == true) roles.add('combo_piece');
+    if (raw['engine'] == true) roles.add('engine');
+    if (raw['payoff'] == true) roles.add('payoff');
+    if (raw['enabler'] == true) roles.add('enabler');
   }
+  return roles;
+}
 
-  if (tags.contains('board_wipe')) return 'wipe';
-  for (final role in const [
+String? _roleFromSemanticV2Tag(String? tag) {
+  if (tag == null || tag.isEmpty) return null;
+  if (tag == 'board_wipe') return 'wipe';
+  if (tag == 'loot' || tag == 'card_selection') return 'draw';
+  if (tag == 'ritual') return 'ramp';
+  if (tag == 'aristocrat_payoff' || tag == 'drain') return 'wincon';
+  if (tag == 'payoff') return 'payoff';
+  if (tag == 'enabler') return 'enabler';
+  if (tag == 'spellslinger' ||
+      tag == 'artifact_synergy' ||
+      tag == 'enchantment_synergy' ||
+      tag == 'graveyard_synergy' ||
+      tag == 'sacrifice_outlet') {
+    return 'engine';
+  }
+  if (const {
     'draw',
     'removal',
     'ramp',
@@ -225,14 +286,17 @@ String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
     'recursion',
     'wincon',
     'combo_piece',
-  ]) {
-    if (tags.contains(role)) return role;
+    'engine',
+    'wipe',
+    'land',
+    'creature',
+    'artifact',
+    'enchantment',
+    'planeswalker',
+    'utility',
+  }.contains(tag)) {
+    return tag;
   }
-  if (best['wincon'] == true) return 'wincon';
-  if (best['combo_piece'] == true) return 'combo_piece';
-  if (best['engine'] == true) return 'engine';
-  if (best['payoff'] == true) return 'payoff';
-  if (best['enabler'] == true) return 'enabler';
   return null;
 }
 
@@ -290,7 +354,17 @@ OptimizationSemanticV2EnforcementDecision
 }) {
   final roleDelta = _readSemanticRoleDelta(semanticLayerV2['role_delta']);
   final criticalLossRoles = <String>[
-    for (final role in const ['draw', 'removal', 'ramp', 'wipe'])
+    for (final role in const [
+      'draw',
+      'removal',
+      'ramp',
+      'wipe',
+      'wincon',
+      'combo_piece',
+      'engine',
+      'payoff',
+      'enabler',
+    ])
       if ((roleDelta[role] ?? 0) < 0) role,
   ];
   final reviewLossRoles = <String>[
@@ -362,25 +436,29 @@ Map<String, dynamic> buildOptimizationSemanticV2Diagnostics({
   for (var i = 0; i < removals.length && i < additions.length; i++) {
     final removed = originalByName[_normalizeRoleCardName(removals[i])];
     final added = optimizedByName[_normalizeRoleCardName(additions[i])];
-    final removedRole = _classifySemanticV2FunctionalRole(
-      removed?['semantic_tags_v2'],
-    );
-    final addedRole = _classifySemanticV2FunctionalRole(
-      added?['semantic_tags_v2'],
-    );
+    final removedRoles = removed == null
+        ? const <String>{}
+        : optimizationFunctionalRolesForCard(removed, semanticOnly: true);
+    final addedRoles = added == null
+        ? const <String>{}
+        : optimizationFunctionalRolesForCard(added, semanticOnly: true);
 
-    if (removedRole != null) {
-      removedSemanticRoleCount++;
-      roleDelta[removedRole] = (roleDelta[removedRole] ?? 0) - 1;
+    if (removedRoles.isNotEmpty) {
+      removedSemanticRoleCount += removedRoles.length;
+      for (final role in removedRoles) {
+        roleDelta[role] = (roleDelta[role] ?? 0) - 1;
+      }
     }
-    if (addedRole != null) {
-      addedSemanticRoleCount++;
-      roleDelta[addedRole] = (roleDelta[addedRole] ?? 0) + 1;
+    if (addedRoles.isNotEmpty) {
+      addedSemanticRoleCount += addedRoles.length;
+      for (final role in addedRoles) {
+        roleDelta[role] = (roleDelta[role] ?? 0) + 1;
+      }
     }
-    if (removedRole != null || addedRole != null) {
+    if (removedRoles.isNotEmpty || addedRoles.isNotEmpty) {
       pairsWithAnySemanticSignal++;
     }
-    if (removedRole != null && addedRole != null) {
+    if (removedRoles.isNotEmpty && addedRoles.isNotEmpty) {
       pairsWithBothSemanticSignals++;
     }
   }

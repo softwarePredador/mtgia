@@ -247,6 +247,8 @@ class OptimizationValidator {
       // Classificar papel funcional
       final removedRole = classifyOptimizationFunctionalRole(removedCard);
       final addedRole = classifyOptimizationFunctionalRole(addedCard);
+      final removedRoles = optimizationFunctionalRolesForCard(removedCard);
+      final addedRoles = optimizationFunctionalRolesForCard(addedCard);
 
       // CMC comparison
       final removedCmc = _getCmc(removedCard);
@@ -259,7 +261,8 @@ class OptimizationValidator {
       // ATENÇÃO: a condição anterior era `(removedRole == 'utility' || addedRole == 'utility')`,
       // o que avaliava como verdadeiro sempre que QUALQUER card fosse 'utility' — bug de precedência.
       final rolePreserved = removedRole == addedRole ||
-          (removedRole == 'utility' && addedRole == 'utility');
+          (removedRole == 'utility' && addedRole == 'utility') ||
+          removedRoles.intersection(addedRoles).isNotEmpty;
 
       // Gerar veredito
       String verdict;
@@ -293,9 +296,6 @@ class OptimizationValidator {
         swapAnalysis.where((s) => s.verdict == 'questionável').length;
 
     // Análise de categorias (deck perde removal? perde draw?)
-    final removedRoles = swapAnalysis.map((s) => s.removedRole).toList();
-    final addedRoles = swapAnalysis.map((s) => s.addedRole).toList();
-
     final roleDelta = <String, int>{};
     for (final role in [
       'draw',
@@ -316,8 +316,22 @@ class OptimizationValidator {
       'payoff',
       'enabler'
     ]) {
-      final lost = removedRoles.where((r) => r == role).length;
-      final gained = addedRoles.where((r) => r == role).length;
+      var lost = 0;
+      var gained = 0;
+      for (final swap in swapAnalysis) {
+        final removedCard =
+            _findCardByName(originalDeck, swap.removed) ?? <String, dynamic>{};
+        final addedCard =
+            _findCardByName(optimizedDeck, swap.added) ?? <String, dynamic>{};
+        if (removedCard.isNotEmpty &&
+            optimizationFunctionalRolesForCard(removedCard).contains(role)) {
+          lost++;
+        }
+        if (addedCard.isNotEmpty &&
+            optimizationFunctionalRolesForCard(addedCard).contains(role)) {
+          gained++;
+        }
+      }
       roleDelta[role] = gained - lost;
     }
 

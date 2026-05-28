@@ -132,20 +132,24 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
 Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
   final primaryRole = classifyOptimizationFunctionalRole(card);
-  final inferredRoles = <String>{};
+  final semanticRoles =
+      optimizationFunctionalRolesForCard(card, semanticOnly: true);
+  final inferredRoles = <String>{...semanticRoles};
   final typeLine = (card['type_line'] as String?) ?? '';
   final oracleText = (card['oracle_text'] as String?) ?? '';
 
-  for (final tag in inferFunctionalCardTags(
-    name: (card['name'] as String?) ?? '',
-    typeLine: typeLine,
-    oracleText: oracleText,
-    manaCost: card['mana_cost'] as String?,
-    cmc: card['cmc'],
-  )) {
-    if (tag.confidence < 0.65) continue;
-    final role = _gateRoleForFunctionalTag(tag.tag);
-    if (role != null) inferredRoles.add(role);
+  if (semanticRoles.isEmpty) {
+    for (final tag in inferFunctionalCardTags(
+      name: (card['name'] as String?) ?? '',
+      typeLine: typeLine,
+      oracleText: oracleText,
+      manaCost: card['mana_cost'] as String?,
+      cmc: card['cmc'],
+    )) {
+      if (tag.confidence < 0.65) continue;
+      final role = _gateRoleForFunctionalTag(tag.tag);
+      if (role != null) inferredRoles.add(role);
+    }
   }
 
   final roles = inferredRoles.isEmpty ? <String>{primaryRole} : inferredRoles;
