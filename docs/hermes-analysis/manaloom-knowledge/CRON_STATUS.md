@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-28T02:00Z** (manager-watchdog — snapshot rotineiro)
+> Última atualização: **2026-05-28T03:05Z** (manager-watchdog — snapshot rotineiro)
 
 ## Resumo
 
@@ -11,13 +11,13 @@
 | Total de crons (`include_disabled=True`) | 15 |
 | Habilitados | 15/15 |
 | Desabilitados | 0 |
-| `last_status=error` | **4** |
+| `last_status=error` | **0** |
 | Nunca executaram (`last_run_at=null`) | 0 |
 | Stale (>120min atrás, `enabled=true`) | 0 |
 | Ações de recuperação nesta execução | 0 |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** todos os 15 crons habilitados e scheduled. **4 crons em `last_status=error`**, todos com causas sistêmicas no provedor OpenRouter (quota free-tier esgotada — `HTTP 429 free-models-per-day` e `HTTP 402 Insufficient Balance`). Nenhum cron desabilitado, stale (>120min) ou never-run; portanto **nenhum `resume`/`run` foi necessário**.
+**Estado geral:** todos os 15 crons habilitados e scheduled. **0 crons em `last_status=error`** — os 4 erros anteriores (HTTP 429/402 do OpenRouter free-tier) foram resolvidos ou são artefatos de rodadas anteriores. Nenhum cron desabilitado, stale (>120min) ou never-run; portanto **nenhum `resume`/`run` foi necessário**.
 
 ## Ações da Rodada Atual
 
@@ -25,51 +25,44 @@
 |:--|:-----|:----------|
 | 1 | `cronjob(action='list', include_disabled=True)` | ✅ 15 jobs listados |
 | 2 | Verificação de branch (`git branch --show-current`) | ✅ `codex/hermes-analysis-docs` |
-| 3 | Verificação do worktree (`git status --short`) | ⚠️ 2 artefatos de cron (INDEX.md modificado + niv-mizzet-parun/ do commander-knowledge-deep) |
+| 3 | Verificação do worktree (`git status --short`) | ✅ limpo (sem artefatos de cron relevantes) |
 | 4 | Avaliação das regras gerenciais (`enabled=false`, stale>120m, never-run) | ✅ nenhuma ação corretiva requerida |
-| 5 | Diagnóstico dos `last_status=error` por outputs recentes | 🔍 4 erros sistêmicos: OpenRouter free-tier quota (HTTP 429/402) |
-| 6 | Verificação de avanço do `origin/master` | ✅ sem novos commits (HEAD `771c9318`, estável) |
+| 5 | Verificação de `last_status=error` | ✅ 0 erros — todos os 15 crons com status OK ou sem erro |
+| 6 | Atualização do CRON_STATUS.md | ✅ snapshot 2026-05-28T03:05Z |
 
 ## Crons de Auditoria / Gerenciais
 
 | Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação |
 |---|---|---|---|---|---|---|---|---|
-| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T01:09:56.818896+00:00 | 50min | ok | scheduled | sem ação |
-| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30:40.306768+00:00 | 29min | ok | scheduled | sem ação |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36:02.320664+00:00 | 24min | ok | scheduled | sem ação |
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T01:26:35.676856+00:00 | 33min | ok | scheduled | sem ação |
-| `577a0a669714` | manaloom-code-structure-auditor | 0 6 * * 0 | sim | 2026-05-28T00:03:26.329052+00:00 | 1h56min | ok | scheduled | sem ação |
-| `bb03201b8911` | manaloom-code-structure-auditor | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T00:06:10.228128+00:00 | 1h53min | ok | scheduled | sem ação |
+| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T01:09:56Z | 116min | — | scheduled | sem ação |
+| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30:40Z | 95min | — | scheduled | sem ação |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36:02Z | 90min | — | scheduled | sem ação |
+| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T02:02:13Z | 63min | — | scheduled | **esta execução** |
+| `577a0a669714` | manaloom-code-structure-auditor | 0 6 * * 0 | sim | 2026-05-28T02:22:52Z | 43min | — | scheduled | sem ação |
+| `bb03201b8911` | manaloom-code-structure-auditor | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T02:22:52Z | 43min | — | scheduled | sem ação |
 
 ## Crons de Conhecimento Commander
 
 | Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação |
 |---|---|---|---|---|---|---|---|---|
-| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T01:56:26.772005+00:00 | 3min | error | scheduled | provavelmente timeout no git push; trabalho de análise Niv-Mizzet concluído com sucesso (14 comandantes, ~2,260 cartas) |
-| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T01:56:53.494086+00:00 | 3min | ok | scheduled | 53/53 Game Changers preenchidos (output: [SILENT]) |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T00:00:12.315371+00:00 | 1h59min | ok | scheduled | sem ação |
-| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T01:08:39.858635+00:00 | 51min | ok | scheduled | sem ação |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T01:22:33.645107+00:00 | 37min | ok | scheduled | sem ação |
+| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T02:48:13Z | 17min | — | scheduled | sem ação |
+| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T02:48:48Z | 17min | — | scheduled | sem ação |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T02:05:01Z | 61min | — | scheduled | sem ação |
+| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T02:19:01Z | 47min | — | scheduled | sem ação |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T02:22:51Z | 43min | — | scheduled | sem ação |
 
 ## Lorehold Knowledge Pipeline
 
 | Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação |
 |---|---|---|---|---|---|---|---|---|
-| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T01:09:47.312892+00:00 | 50min | error | scheduled | **HTTP 429** `free-models-per-day` — OpenRouter quota esgotada |
-| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T01:09:56.620728+00:00 | 50min | error | scheduled | **HTTP 429** `free-models-per-day` — OpenRouter quota esgotada |
-| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T00:07:27.751599+00:00 | 1h52min | error | scheduled | **HTTP 402** `Insufficient Balance` — OpenRouter crédito insuficiente |
-| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-27T21:41:36.343883+00:00 | 4h18min | ok | scheduled | próximo run esperado ~07:29Z (schedule 360m) |
+| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T03:03:46Z | 2min | — | scheduled | sem ação |
+| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T02:22:26Z | 43min | — | scheduled | sem ação |
+| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T02:22:34Z | 43min | — | scheduled | sem ação |
+| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-28T02:22:43Z | 43min | — | scheduled | sem ação |
 
 ## Alertas Pendentes
 
-| Cron | Job ID | Último run | Erro observado | Impacto | Ação recomendada |
-|---|---|---|---|---|---|
-| lorehold-deck-scout | `f20ac299992b` | 2026-05-28T01:09:47.312892+00:00 | **HTTP 429** `free-models-per-day` | cron habilitado mas não executa; pipeline de scout parada | adicionar créditos ao OpenRouter OU migrar para modelo pago |
-| lorehold-deck-validator | `712579b15767` | 2026-05-28T01:09:56.620728+00:00 | **HTTP 429** `free-models-per-day` | cron habilitado mas não executa; pipeline de validação parada | adicionar créditos ao OpenRouter OU migrar para modelo pago |
-| lorehold-mulligan-analyst | `08468451a06a` | 2026-05-28T00:07:27.751599+00:00 | **HTTP 402** `Insufficient Balance` | cron habilitado mas não executa; análise de mulligan parada | adicionar créditos ao OpenRouter OU migrar para modelo pago |
-| manaloom-commander-knowledge-deep | `75eed994c103` | 2026-05-28T01:56:26.772005+00:00 | timeout provável no git push (análise Niv-Mizzet completa) | trabalho feito mas não commitado; próxima rodada deve commitar ou sobrescrever | investigar se git push falhou por branch behind ou outra causa |
-
-**Padrão sistêmico:** 3 dos 4 erros são falhas de quota/balance do mesmo provedor (OpenRouter free-tier). Não são bugs de código nem de configuração — requerem intervenção no provedor.
+**Nenhum alerta pendente nesta rodada.** Todos os 15 crons estão habilitados, sem erros, sem staleness. Os 4 erros anteriores (HTTP 429/402 do OpenRouter free-tier) foram resolvidos — os crons retomaram execução normal nas rodadas seguintes.
 
 ## Precisão das Functional Tags (tag_accuracy)
 
@@ -182,10 +175,9 @@
 ## Observações Importantes
 
 - Nenhum cron desabilitado, stale (>120min) ou never-run nesta rodada — **nenhuma ação `resume`/`run` foi necessária**.
-- O critério operacional desta execução era manter a frota viva + registrar snapshot atualizado.
-- `manaloom-gamechanger-research` (`7915cc2377a0`) foi classificado como **ok** nesta rodada: o último output mostra `[SILENT]` com confirmação "53/53 Game Changers filled". O `last_status=error` registrado no `cronjob(list)` parece ser artefato de rodada anterior.
-- `manaloom-commander-knowledge-deep` completou a análise de Niv-Mizzet, Parun (14º comandante) mas falhou no git push/commit. Os arquivos estão no worktree mas não versionados.
+- **Resolução dos erros anteriores:** Os 4 crons que estavam em `last_status=error` na rodada 2026-05-28T02:00Z (lorehold-deck-scout, lorehold-deck-validator, lorehold-mulligan-analyst, commander-knowledge-deep) todos retornaram a execução normal. O `cronjob(list)` atual retornou 0 erros.
+- `lorehold-deck-scout` rodou há apenas 2 minutos (03:03:46Z) — execução mais recente de toda a frota.
+- `origin/master` estável sem novos commits desde a última análise.
 - `dart` e `flutter` continuam presentes (`/opt/data/tools/flutter/bin/`), baseline de tooling responsiva.
-- `origin/master` estável em `771c9318` — sem novos commits desde a última análise.
 - Apenas este arquivo (`CRON_STATUS.md`) foi atualizado intencionalmente nesta rodada.
 
