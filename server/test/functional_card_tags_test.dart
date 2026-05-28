@@ -210,6 +210,37 @@ void main() {
       expect(drownTags, contains('board_wipe'));
     });
 
+    test('reduces generic payoff and enabler false positives', () {
+      final blasphemousActTags = inferFunctionalCardTags(
+        name: 'Blasphemous Act',
+        typeLine: 'Sorcery',
+        oracleText:
+            'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
+        manaCost: '{8}{R}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(blasphemousActTags, contains('board_wipe'));
+      expect(blasphemousActTags, isNot(contains('payoff')));
+
+      final glimpseTags = inferFunctionalCardTags(
+        name: 'Glimpse the Unthinkable',
+        typeLine: 'Sorcery',
+        oracleText: 'Target player mills ten cards.',
+        manaCost: '{U}{B}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(glimpseTags, isNot(contains('enabler')));
+
+      final greavesTags = inferFunctionalCardTags(
+        name: 'Lightning Greaves',
+        typeLine: 'Artifact - Equipment',
+        oracleText: 'Equipped creature has haste and shroud. Equip {0}.',
+        manaCost: '{2}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(greavesTags, containsAll({'enabler', 'protection'}));
+    });
+
     test('summarizes counts and bounded samples using quantities', () {
       final summary = summarizeFunctionalTagsForDeck([
         {

@@ -26,6 +26,12 @@ Response notFound(
 }) =>
     apiError(HttpStatus.notFound, message, details: details);
 
+Response unauthorized(
+  String message, {
+  Object? details,
+}) =>
+    apiError(HttpStatus.unauthorized, message, details: details);
+
 Response internalServerError(
   String message, {
   Object? details,

@@ -53,6 +53,7 @@ class OptimizeDeckContextData {
 Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   required Pool pool,
   required String deckId,
+  required String userId,
   required String targetArchetype,
   required String requestMode,
   required String intensity,
@@ -63,13 +64,23 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   final deckResult = await (telemetry?.trackAsync(
         'deck_context.deck_query',
         () => pool.execute(
-          Sql.named('SELECT name, format FROM decks WHERE id = @id'),
-          parameters: {'id': deckId},
+          Sql.named('''
+            SELECT name, format
+            FROM decks
+            WHERE id = CAST(@id AS uuid)
+              AND user_id = CAST(@user_id AS uuid)
+          '''),
+          parameters: {'id': deckId, 'user_id': userId},
         ),
       ) ??
       pool.execute(
-        Sql.named('SELECT name, format FROM decks WHERE id = @id'),
-        parameters: {'id': deckId},
+        Sql.named('''
+          SELECT name, format
+          FROM decks
+          WHERE id = CAST(@id AS uuid)
+            AND user_id = CAST(@user_id AS uuid)
+        '''),
+        parameters: {'id': deckId, 'user_id': userId},
       ));
 
   if (deckResult.isEmpty) {
@@ -318,6 +329,26 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     deckState: deckState,
     effectiveOptimizeArchetype: effectiveOptimizeArchetype,
   );
+}
+
+Future<void> verifyOptimizeDeckAccess({
+  required Pool pool,
+  required String deckId,
+  required String userId,
+}) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT 1
+      FROM decks
+      WHERE id = CAST(@id AS uuid)
+        AND user_id = CAST(@user_id AS uuid)
+      LIMIT 1
+    '''),
+    parameters: {'id': deckId, 'user_id': userId},
+  );
+  if (result.isEmpty) {
+    throw const OptimizeDeckContextException('DECK_NOT_FOUND');
+  }
 }
 
 Future<String> _semanticV2SelectSql(Pool pool) async {

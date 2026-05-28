@@ -886,7 +886,9 @@ bool _looksLikeEngine(String oracle) {
 
 bool _looksLikePayoff(String oracle, String normalizedName) {
   return normalizedName == 'blood artist' ||
-      oracle.contains('for each') ||
+      oracle.contains('for each') &&
+          !oracle.contains('costs {') &&
+          !oracle.contains('costs {1} less') ||
       oracle.contains('whenever') &&
           (oracle.contains('creature dies') ||
               oracle.contains('you cast') ||
@@ -900,10 +902,26 @@ bool _looksLikeEnabler(String oracle, String normalizedName) {
       normalizedName.contains('boots') ||
       oracle.contains('costs {') && oracle.contains('less to cast') ||
       oracle.contains('you may play an additional land') ||
-      oracle.contains('haste') ||
-      oracle.contains('mill') ||
+      oracle.contains('creatures you control have haste') ||
+      oracle.contains('gains haste') ||
+      oracle.contains('has haste') ||
+      _looksLikeSelfMillSetup(oracle) ||
       oracle.contains('sacrifice another') ||
       oracle.contains('search your library');
+}
+
+bool _looksLikeSelfMillSetup(String oracle) {
+  if (!oracle.contains('mill')) return false;
+  if (oracle.contains('target opponent') ||
+      oracle.contains('target player') ||
+      oracle.contains('each opponent') ||
+      oracle.contains('opponent mills')) {
+    return false;
+  }
+  return oracle.contains('you mill') ||
+      oracle.contains('mill cards') ||
+      oracle.contains('surveil') ||
+      oracle.contains('dredge');
 }
 
 String _inferSpeed(String typeLine, String oracle) {

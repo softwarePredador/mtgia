@@ -444,6 +444,11 @@ Future<Response> onRequest(RequestContext context) async {
       return badRequest('deck_id and archetype are required');
     }
 
+    if (userId == null || userId.isEmpty) {
+      return unauthorized('Authentication required');
+    }
+    final authenticatedUserId = userId;
+
     // 1. Fetch Deck Data
     final pool = context.read<Pool>();
 
@@ -453,13 +458,29 @@ Future<Response> onRequest(RequestContext context) async {
       forceSync: forceSyncExecutor,
       asyncRequested: asyncRequested,
     )) {
+      try {
+        await telemetry.trackAsync(
+          'request.deck_access',
+          () => optimize_request.verifyOptimizeDeckAccess(
+            pool: pool,
+            deckId: deckId,
+            userId: authenticatedUserId,
+          ),
+        );
+      } on optimize_request.OptimizeDeckContextException catch (e) {
+        if (e.code == 'DECK_NOT_FOUND') {
+          return notFound('Deck not found');
+        }
+        rethrow;
+      }
+
       final jobId = await telemetry.trackAsync(
         'request.async_job_create',
         () => OptimizeJobStore.create(
           pool: pool,
           deckId: deckId,
           archetype: archetype,
-          userId: userId,
+          userId: authenticatedUserId,
         ),
       );
       final syncPayload = Map<String, dynamic>.from(body)
@@ -548,6 +569,7 @@ Future<Response> onRequest(RequestContext context) async {
         () => optimize_request.loadOptimizeDeckContext(
           pool: pool,
           deckId: deckId,
+          userId: authenticatedUserId,
           targetArchetype: archetype,
           requestMode: requestMode,
           intensity: intensity.selected,
@@ -1043,7 +1065,7 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           deckId: deckId,
           archetype: targetArchetype,
-          userId: userId,
+          userId: authenticatedUserId,
         ),
       );
 
@@ -1070,7 +1092,7 @@ Future<Response> onRequest(RequestContext context) async {
             bracket: bracket,
             keepTheme: keepTheme,
             deckAnalysis: deckAnalysis,
-            userId: userId,
+            userId: authenticatedUserId,
             deckSignature: deckSignature,
             cacheKey: cacheKey,
             intensity: intensity,

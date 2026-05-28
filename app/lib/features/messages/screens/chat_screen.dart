@@ -70,14 +70,27 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    _messageController.clear();
     final ok = await context.read<MessageProvider>().sendMessage(
       widget.conversationId,
       text,
     );
-    if (ok && mounted) {
+    if (!mounted) return;
+    if (ok) {
+      _messageController.clear();
       _markAsRead();
+      return;
     }
+    if (_messageController.text.trim().isEmpty) {
+      _messageController.text = text;
+      _messageController.selection = TextSelection.collapsed(
+        offset: _messageController.text.length,
+      );
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Não foi possível enviar a mensagem. Tente novamente.'),
+      ),
+    );
   }
 
   @override
@@ -147,6 +160,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (provider.isLoadingMessages && provider.messages.isEmpty) {
                   return const Center(
                     child: CircularProgressIndicator(color: AppTheme.brass400),
+                  );
+                }
+
+                if (provider.error != null && provider.messages.isEmpty) {
+                  return AppStatePanel(
+                    key: const Key('chat-error-state'),
+                    icon: Icons.cloud_off_outlined,
+                    title: 'Não foi possível carregar a conversa',
+                    message:
+                        'Verifique sua conexão e tente carregar as mensagens novamente.',
+                    accent: AppTheme.error,
+                    actionLabel: 'Tentar novamente',
+                    onAction: _loadMessages,
                   );
                 }
 

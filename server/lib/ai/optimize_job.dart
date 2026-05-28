@@ -26,7 +26,7 @@ class OptimizeJobStore {
     required Pool pool,
     required String deckId,
     required String archetype,
-    String? userId,
+    required String userId,
   }) async {
     unawaited(
       _cleanupIfDue(pool).catchError(
