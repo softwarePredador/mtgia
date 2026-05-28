@@ -1,4 +1,37 @@
 # ManaLoom Code Structure Audit
+> Atualizacao: 2026-05-28 18:20 UTC
+> Rotacao local Codex: `fix-structure-auditor-import-resolution`
+
+## Rodada focada: Correcao do auditor estrutural
+
+Escopo desta rodada: corrigir o proprio `structure_auditor.py` antes de usar a
+contagem de imports quebrados como evidência de produto.
+
+### Resultado
+
+- `docs/hermes-analysis/scripts/structure_auditor.py` agora resolve o root do
+  repo por `MTGIA_REPO_ROOT` ou `Path.cwd()`, evitando o caminho fixo
+  `/opt/data/workspace/mtgia` em execucoes locais.
+- Imports relativos agora sao resolvidos a partir do diretorio do arquivo Dart
+  que contem o import, alinhado ao comportamento do analyzer.
+- Imports `package:server/...`, `package:manaloom/...` e o alias historico
+  `package:ai/...` sao resolvidos apenas quando pertencem ao repositorio;
+  pacotes externos continuam fora do escopo do auditor estrutural.
+- O script preserva rodadas manuais do `STRUCTURE_AUDIT.md` e substitui somente
+  o bloco gerado automaticamente.
+- Nova execucao: `Imports quebrados: 0`.
+
+### Validacao
+
+- `MTGIA_REPO_ROOT=/Users/desenvolvimentomobile/.manaloom-agents/mtgia python3 docs/hermes-analysis/scripts/structure_auditor.py`
+- `python3 -m py_compile docs/hermes-analysis/scripts/structure_auditor.py`
+
+### Impacto no backlog
+
+O P0 de falso-positivo em massa de imports fica **resolvido para a ferramenta**.
+As rodadas historicas abaixo foram preservadas como contexto, mas as referencias
+antigas a 178 imports quebrados nao devem mais ser usadas como bug real.
+
 > Data: 2026-05-28 17:47 UTC
 > Rotacao local Codex: `module-coherence-server-lib-routes-app-lib`
 
@@ -694,7 +727,6 @@ referencias SQL em `server/`, sem inventar saida do auditor.
   tratadas como achados de "nao usadas" nesta rotacao.
 
 ## Historico gerado pelo auditor estrutural anterior
-> Data: 2026-05-28 04:08 UTC
 
 ## Arquivos Mapeados
 - `server/lib/`: 81 arquivos
@@ -871,184 +903,7 @@ referencias SQL em `server/`, sem inventar saida do auditor.
 - `_WeightedCard` → `server/lib/ai/rebuild_guided_service.dart`
 
 ## Imports Potencialmente Quebrados
-- `server/routes/ai/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/ai/_middleware.dart` importa `../../lib/plan_middleware.dart` (não encontrado)
-- `server/routes/ai/_middleware.dart` importa `../../lib/rate_limit_middleware.dart` (não encontrado)
-- `server/routes/ai/archetypes/index.dart` importa `../../../lib/endpoint_cache.dart` (não encontrado)
-- `server/routes/ai/archetypes/index.dart` importa `../../../lib/ai/commander_reference_profile_support.dart` (não encontrado)
-- `server/routes/ai/archetypes/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/archetypes/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/ai/archetypes/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/ai/archetypes/index.dart` importa `../../../lib/openai_runtime_config.dart` (não encontrado)
-- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/ai/edhrec_service.dart` (não encontrado)
-- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/meta/meta_deck_card_list_support.dart` (não encontrado)
-- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/meta/meta_deck_format_support.dart` (não encontrado)
-- `server/routes/ai/commander-reference/index.dart` importa `../../../lib/meta/mtgtop8_meta_support.dart` (não encontrado)
-- `server/routes/ai/explain/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/explain/index.dart` importa `../../../lib/openai_runtime_config.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai_generate_job.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai_generate_internal_url_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai_generate_performance_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_card_stats_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_deck_corpus_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_generate_fallback_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/commander_reference_profile_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/ai/functional_card_tags.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/color_identity.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/generated_deck_validation_service.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/import_card_lookup_service.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/internal_ai_request_token.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/meta/meta_deck_format_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/meta/meta_deck_reference_support.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/ai/generate/index.dart` importa `../../../lib/openai_runtime_config.dart` (não encontrado)
-- `server/routes/ai/ml-status/index.dart` importa `../../../lib/database.dart` (não encontrado)
-- `server/routes/ai/ml-status/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/color_identity.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/card_validation_service.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_analysis_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_complete_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_deck_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_request_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_state_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_stage_telemetry.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/otimizacao.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimization_functional_roles.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimization_quality_gate.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_runtime_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_runtime_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimization_validator.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/edhrec_service.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/optimize_job.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai/theme_contextual_rules_service.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/ai_generate_internal_url_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/internal_ai_request_token.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/edh_bracket_policy.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/meta/meta_deck_reference_support.dart` (não encontrado)
-- `server/routes/ai/optimize/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/ai/rebuild/index.dart` importa `../../../lib/ai/rebuild_guided_service.dart` (não encontrado)
-- `server/routes/ai/rebuild/index.dart` importa `../../../lib/ai/deck_state_analysis.dart` (não encontrado)
-- `server/routes/ai/rebuild/index.dart` importa `../../../lib/deck_rules_service.dart` (não encontrado)
-- `server/routes/ai/rebuild/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/simulate/index.dart` importa `../../../lib/ai/battle_simulator.dart` (não encontrado)
-- `server/routes/ai/simulate/index.dart` importa `../../../lib/ai/goldfish_simulator.dart` (não encontrado)
-- `server/routes/ai/simulate/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/simulate/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/ai/simulate-matchup/index.dart` importa `../../../lib/archetype_counters_service.dart` (não encontrado)
-- `server/routes/ai/simulate-matchup/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/ai/simulate-matchup/index.dart` importa `../../../lib/meta/meta_deck_card_list_support.dart` (não encontrado)
-- `server/routes/ai/weakness-analysis/index.dart` importa `../../../lib/archetype_counters_service.dart` (não encontrado)
-- `server/routes/ai/weakness-analysis/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/auth/_middleware.dart` importa `../../lib/rate_limit_middleware.dart` (não encontrado)
-- `server/routes/auth/login.dart` importa `../../lib/auth_service.dart` (não encontrado)
-- `server/routes/auth/login.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/auth/me.dart` importa `../../lib/auth_service.dart` (não encontrado)
-- `server/routes/auth/register.dart` importa `../../lib/auth_service.dart` (não encontrado)
-- `server/routes/auth/register.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/binder/[id]/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/binder/[id]/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/binder/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/binder/index.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/binder/index.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/cards/index.dart` importa `../../lib/card_query_contract.dart` (não encontrado)
-- `server/routes/cards/index.dart` importa `../../lib/endpoint_cache.dart` (não encontrado)
-- `server/routes/cards/index.dart` importa `../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/cards/printings/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/cards/resolve/index.dart` importa `../../../lib/card_resolution_support.dart` (não encontrado)
-- `server/routes/cards/resolve/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/community/decks/[id].dart` importa `../../../lib/auth_service.dart` (não encontrado)
-- `server/routes/community/decks/[id].dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/community/decks/[id].dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/community/decks/[id].dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/community/decks/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/community/decks/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/community/decks/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/community/marketplace/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/community/marketplace/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/community/users/[id].dart` importa `../../../lib/auth_service.dart` (não encontrado)
-- `server/routes/community/users/[id].dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/community/users/[id].dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/community/users/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/community/users/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/notification_service.dart` (não encontrado)
-- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/conversations/[id]/messages.dart` importa `../../../lib/request_trace.dart` (não encontrado)
-- `server/routes/conversations/[id]/read.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/conversations/[id]/read.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/conversations/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/conversations/index.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/conversations/index.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/conversations/unread-count.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/conversations/unread-count.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/decks/[id]/index.dart` importa `../../../lib/deck_rules_service.dart` (não encontrado)
-- `server/routes/decks/[id]/index.dart` importa `../../../lib/deck_schema_support.dart` (não encontrado)
-- `server/routes/decks/[id]/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/decks/[id]/index.dart` importa `../../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/decks/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/decks/index.dart` importa `../../lib/deck_schema_support.dart` (não encontrado)
-- `server/routes/decks/index.dart` importa `../../lib/deck_rules_service.dart` (não encontrado)
-- `server/routes/decks/index.dart` importa `../../lib/http_responses.dart` (não encontrado)
-- `server/routes/decks/index.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/decks/index.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/decks/index.dart` importa `../../lib/scryfall_image_url.dart` (não encontrado)
-- `server/routes/health/dashboard/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/health/dashboard/index.dart` importa `../../../lib/request_metrics_service.dart` (não encontrado)
-- `server/routes/health/index.dart` importa `../../lib/http_responses.dart` (não encontrado)
-- `server/routes/health/metrics/index.dart` importa `../../../lib/request_metrics_service.dart` (não encontrado)
-- `server/routes/health/metrics/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/health/ready/index.dart` importa `../../../lib/health_readiness_support.dart` (não encontrado)
-- `server/routes/health/ready/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/import/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/import/index.dart` importa `../../lib/deck_rules_service.dart` (não encontrado)
-- `server/routes/import/index.dart` importa `../../lib/http_responses.dart` (não encontrado)
-- `server/routes/import/index.dart` importa `../../lib/import_card_lookup_service.dart` (não encontrado)
-- `server/routes/import/index.dart` importa `../../lib/import_list_service.dart` (não encontrado)
-- `server/routes/import/to-deck/index.dart` importa `../../../lib/deck_rules_service.dart` (não encontrado)
-- `server/routes/import/to-deck/index.dart` importa `../../../lib/import_card_lookup_service.dart` (não encontrado)
-- `server/routes/import/to-deck/index.dart` importa `../../../lib/import_list_service.dart` (não encontrado)
-- `server/routes/import/to-deck/index.dart` importa `../../../lib/http_responses.dart` (não encontrado)
-- `server/routes/import/validate/index.dart` importa `../../../lib/import_list_service.dart` (não encontrado)
-- `server/routes/import/validate/index.dart` importa `../../../lib/import_card_lookup_service.dart` (não encontrado)
-- `server/routes/notifications/[id]/read.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/notifications/[id]/read.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/notifications/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/notifications/count.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/notifications/count.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/notifications/index.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/notifications/index.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/notifications/read-all.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/notifications/read-all.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/sets/index.dart` importa `../../lib/endpoint_cache.dart` (não encontrado)
-- `server/routes/sets/index.dart` importa `../../lib/sets_catalog_contract.dart` (não encontrado)
-- `server/routes/trades/[id]/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/trades/[id]/index.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/trades/[id]/messages.dart` importa `../../../lib/notification_service.dart` (não encontrado)
-- `server/routes/trades/[id]/messages.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/trades/[id]/messages.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/trades/[id]/messages.dart` importa `../../../lib/request_trace.dart` (não encontrado)
-- `server/routes/trades/[id]/respond.dart` importa `../../../lib/notification_service.dart` (não encontrado)
-- `server/routes/trades/[id]/respond.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/trades/[id]/respond.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/trades/[id]/respond.dart` importa `../../../lib/request_trace.dart` (não encontrado)
-- `server/routes/trades/[id]/status.dart` importa `../../../lib/notification_service.dart` (não encontrado)
-- `server/routes/trades/[id]/status.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/trades/[id]/status.dart` importa `../../../lib/observability.dart` (não encontrado)
-- `server/routes/trades/[id]/status.dart` importa `../../../lib/request_trace.dart` (não encontrado)
-- `server/routes/trades/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/trades/index.dart` importa `../../lib/notification_service.dart` (não encontrado)
-- `server/routes/trades/index.dart` importa `../../lib/logger.dart` (não encontrado)
-- `server/routes/trades/index.dart` importa `../../lib/observability.dart` (não encontrado)
-- `server/routes/trades/index.dart` importa `../../lib/request_trace.dart` (não encontrado)
-- `server/routes/users/_middleware.dart` importa `../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/users/me/index.dart` importa `../../../lib/auth_middleware.dart` (não encontrado)
-- `server/routes/users/me/index.dart` importa `../../../lib/logger.dart` (não encontrado)
-- `server/routes/users/me/index.dart` importa `../../../lib/observability.dart` (não encontrado)
+- Nenhum import quebrado encontrado
 
 ## Funções Públicas (primeiros 5 por arquivo)
 - `server/lib/ai/aggressive_candidate_meta_signal_support.dart` (194 linhas): isCommanderCandidateLegalityAllowed, isExternalCommanderCandidateTrusted, confidenceLabel, scoreAggressiveMetaSignal, bracketScopeForMetaSignal
@@ -1107,93 +962,6 @@ referencias SQL em `server/`, sem inventar saida do auditor.
 - `server/routes/ai/optimize/index.dart` (3498 linhas): resolveOptimizeArchetype, shouldRetryOptimizeWithAiFallback, matchesFunctionalNeed, scoreOptimizeReplacementCandidate, isOptimizeStructuralRecoveryScenario
 - `server/routes/community/decks/[id].dart` (428 linhas): getMainType, calculateCmc
 - `server/routes/decks/[id]/index.dart` (538 linhas): getMainType, calculateCmc
-
-## Funções Não Chamadas (Execução 2 — 2026-05-28 04:00 UTC)
-> Foco: funções públicas definidas em `server/lib/` que NÃO são chamadas de nenhum outro arquivo.
-
-**Resumo:** 155 funções públicas identificadas em lib/ · **118 chamadas** de outros arquivos · **37 NÃO chamadas**
-
-### Arquivos afetados e funções sem chamadas:
-
-- `server/lib/ai/battle_simulator.dart` (879 linhas):
-  - `drawCard()` — lógica de compra de carta potencialmente órfã
-  - `resetForNewTurn()` — reset de turno sem referência externa
-
-- `server/lib/ai/candidate_quality_data_support.dart` (692 linhas):
-  - `inferCandidateBracketScope()` — inferência de bracket não utilizada
-  - `isPremiumCommanderCandidateName()` — verificação de premium sem chamador
-
-- `server/lib/ai/commander_reference_deck_corpus_support.dart` (1489 linhas):
-  - `buildReferenceDeckKey()` — builder de key sem uso externo
-  - `normalizeCommanderReferenceDeckText()` — normalizador sem chamada
-
-- `server/lib/ai/commander_reference_readiness_support.dart` (494 linhas):
-  - `block()` — função de bloqueio sem referência
-
-- `server/lib/ai/edhrec_service.dart` (465 linhas):
-  - `cleanupCache()` — limpeza de cache não invocada externamente
-  - `isHighSynergy()` — verificação de sinergia sem chamador
-
-- `server/lib/ai/optimize_complete_support.dart` (1559 linhas):
-  - `mergeUniqueSpells()` — merge de spells sem uso externo
-
-- `server/lib/ai/optimize_runtime_support.dart` (4198 linhas — **maior arquivo do projeto**):
-  - `clampRequestedSwapCount()` — clamping sem referência
-  - `commanderFillerQualityScore()` — score de filler órfão
-  - `inferOptimizeFunctionalNeed()` — inferência sem chamador
-  - `landProducesCommanderColors()` — verificação de mana órfã
-  - `looksLikeBoardWipe()` — detecção de wipe sem uso
-  - `looksLikeProtectionEffect()` — detecção de proteção sem uso
-  - `looksLikeTemporaryManaBurst()` — detecção de burst sem uso
-  - `recommendedLandCountForOptimizeArchetype()` — recomendação órfã
-  - `resolveOptimizeMode()` — resolução de modo sem chamador
-
-- `server/lib/ai/optimize_state_support.dart` (981 linhas):
-  - `assessManaCurve()` — avaliação de curva não chamada
-  - `calculateConfidence()` — cálculo de confiança sem uso
-  - `qty()` — função qty órfã
-
-- `server/lib/ai/rebuild_guided_service.dart` (1748 linhas):
-  - `addWeight()` — adição de peso sem referência externa
-
-- `server/lib/ai_generate_performance_support.dart` (196 linhas):
-  - `isCommanderReferenceGuidanceFormat()` — verificação sem uso
-  - `normalizeAiGenerateBracket()` — normalizador órfão
-  - `normalizeAiGenerateCommanderName()` — normalizador órfão
-  - `normalizeAiGeneratePrompt()` — normalizador órfão
-
-- `server/lib/endpoint_cache.dart` (37 linhas):
-  - `clearExpired()` — limpeza de expirados não invocada
-
-- `server/lib/generated_deck_validation_service.dart` (818 linhas):
-  - `addLookupName()` — lookup sem chamador
-
-- `server/lib/import_card_lookup_service.dart` (450 linhas):
-  - `foldImportLookupKey()` — key folder órfão
-
-- `server/lib/meta/external_commander_meta_candidate_support.dart` (1332 linhas):
-  - `addName()` — adição de nome sem uso
-  - `canonicalizeExternalCommanderMetaSourceName()` — canonicalizador órfão
-  - `normalizeCommanderMetaFormat()` — normalizador órfão
-  - `normalizeExternalCommanderMetaValidationStatus()` — normalizador órfão
-
-- `server/lib/meta/meta_deck_commander_shell_support.dart` (355 linhas):
-  - `inferCommanderStrategyArchetypeFromCardNames()` — inferência de arquétipo sem chamador
-
-- `server/lib/observability.dart` (248 linhas):
-  - `isSentryEnabled()` — feature flag sem uso
-
-- `server/lib/request_trace.dart` (57 linhas):
-  - `generateRequestId()` — gerador de trace sem referência externa
-
-### Observações:
-1. **server/lib/ai/optimize_runtime_support.dart** é o maior arquivo (4198 linhas) com 9 funções órfãs — candidato prioritário para refatoração.
-2. **server/lib/ai_generate_performance_support.dart** tem TODAS as 4 funções extraídas sem chamadores externos.
-3. Algumas funções podem ser usadas internamente (dentro do mesmo arquivo) via closure ou callback — análise manual recomendada para confirmação.
-4. As funções `cleanupCache`, `clearExpired` e `addLookupName` sugéren manutenção não sendo disparada de nenhum lugar (verificar se são chamadas por timer/evento externo).
-
-### Execução anterior (Classes não usadas):
-> Ver seção "Classes Não Chamadas" para Execução 1 (00:00 UTC).
 
 ## Tabelas PostgreSQL Referenciadas no Código
 - `LATERAL`: 9 referências
@@ -1459,9 +1227,9 @@ referencias SQL em `server/`, sem inventar saida do auditor.
   - `toString` em: server/lib/ai/battle_simulator.dart, server/lib/ai/edhrec_service.dart, server/lib/ai/rebuild_guided_service.dart, server/lib/deck_rules_service.dart
 
 ## Gaps Conhecidos (manual)
-- `card_function_tags`: 112K multi-tag records, mas otimizador usa `classifyOptimizationFunctionalRole()` (single-tag)
+- `card_function_tags` / `card_semantic_tags_v2`: fluxo core de analysis/optimize ja usa multi-tags; rotas experimentais de recommendations/weakness ainda precisam convergir antes de promocao app-facing
 - `card_deck_profiles`: 670 perfis, mas `filterUnsafeOptimizeSwapsByCardData` não consulta
-- `semantic_layer_v2`: Shadow mode (diagnóstico sem poder de veto)
+- `semantic_layer_v2`: default `disabled`, modo `partial` existe e tem teste de contrato; habilitar apenas em ambiente controlado com scorecard
 - `archetype_patterns`: 69 registros, não validado contra código
 
 ## Rodada focada: Semantica de cartas no runtime

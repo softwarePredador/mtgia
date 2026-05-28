@@ -15,11 +15,13 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
-BASE = Path("/opt/data/workspace/mtgia")
+BASE = Path(os.environ.get("MTGIA_REPO_ROOT", Path.cwd())).resolve()
 SERVER_LIB = BASE / "server" / "lib"
 SERVER_ROUTES = BASE / "server" / "routes"
 APP_LIB = BASE / "app" / "lib"
 OUTPUT = BASE / "docs" / "hermes-analysis" / "STRUCTURE_AUDIT.md"
+GENERATED_SECTION_MARKER = "## Historico gerado pelo auditor estrutural anterior"
+MANUAL_SUFFIX_MARKER = "## Rodada focada: Semantica de cartas no runtime"
 
 # ============================================================
 # 1. MAPEAR TODOS OS ARQUIVOS DART
@@ -57,6 +59,61 @@ def extract_table_references(content):
     for m in re.finditer(r'CREATE TABLE.*?(\w+)\s*\(', content):
         tables.add(m.group(1))
     return tables
+
+def resolve_dart_import(source_path, import_uri):
+    """Resolve only repo-local Dart imports.
+
+    Relative imports are resolved from the importing file directory, matching
+    Dart analyzer behavior. Package imports are resolved for local package names
+    only; third-party packages are intentionally ignored by this structural
+    audit.
+    """
+    if import_uri.startswith("dart:"):
+        return None
+
+    if import_uri.startswith("package:"):
+        package_path = import_uri[len("package:"):]
+        package_name, _, relative = package_path.partition("/")
+        if not relative:
+            return None
+        if package_name == "server":
+            return SERVER_LIB / relative
+        if package_name == "manaloom":
+            return APP_LIB / relative
+        # Historical alias kept for older Hermes docs/runs.
+        if package_name == "ai":
+            return SERVER_LIB / relative
+        return None
+
+    if import_uri.startswith("."):
+        return (source_path.parent / import_uri).resolve()
+
+    return None
+
+def merge_generated_report_with_manual_history(generated_report):
+    """Keep focused manual audit rounds while refreshing generated evidence.
+
+    STRUCTURE_AUDIT.md is both a living manual audit log and the output target
+    for this script. Only the generated section should be replaced by reruns.
+    """
+    if not OUTPUT.exists():
+        return generated_report
+
+    existing = read_file(OUTPUT)
+    if GENERATED_SECTION_MARKER not in existing:
+        return generated_report
+
+    prefix = existing.split(GENERATED_SECTION_MARKER, 1)[0].rstrip()
+    suffix = ""
+    if MANUAL_SUFFIX_MARKER in existing:
+        suffix = existing.split(MANUAL_SUFFIX_MARKER, 1)[1].strip()
+
+    generated_lines = generated_report.splitlines()
+    generated_body = "\n".join(generated_lines[3:]).strip()
+    merged = f"{prefix}\n\n{GENERATED_SECTION_MARKER}\n\n{generated_body}"
+    if suffix:
+        merged = f"{merged}\n\n{MANUAL_SUFFIX_MARKER}\n{suffix}"
+    return merged
 
 # ============================================================
 # 2. ANALISAR ESTRUTURA
@@ -111,19 +168,12 @@ def analyze():
     for rel, info in file_map.items():
         for imp in info['imports']:
             # Verificar se import local existe
-            if imp.startswith('package:ai/') or imp.startswith('../'):
-                # Resolver path
-                if imp.startswith('package:ai/'):
-                    imp_path = SERVER_LIB / imp.replace('package:ai/', '')
-                elif imp.startswith('../../../lib/'):
-                    imp_path = BASE / imp.replace('../../../', '')
-                elif imp.startswith('../../lib/'):
-                    imp_path = BASE / imp.replace('../../', '')
-                else:
-                    continue
-                
-                if not imp_path.exists():
-                    broken.append(f"- `{rel}` importa `{imp}` (não encontrado)")
+            imp_path = resolve_dart_import(info['path'], imp)
+            if imp_path is None:
+                continue
+
+            if not imp_path.exists():
+                broken.append(f"- `{rel}` importa `{imp}` (não encontrado)")
     
     if broken:
         for b in broken:
@@ -210,15 +260,16 @@ def analyze():
     
     # 2.8 Resumo de gaps conhecidos
     report.append("## Gaps Conhecidos (manual)")
-    report.append("- `card_function_tags`: 112K multi-tag records, mas otimizador usa `classifyOptimizationFunctionalRole()` (single-tag)")
+    report.append("- `card_function_tags` / `card_semantic_tags_v2`: fluxo core de analysis/optimize ja usa multi-tags; rotas experimentais de recommendations/weakness ainda precisam convergir antes de promocao app-facing")
     report.append("- `card_deck_profiles`: 670 perfis, mas `filterUnsafeOptimizeSwapsByCardData` não consulta")
-    report.append("- `semantic_layer_v2`: Shadow mode (diagnóstico sem poder de veto)")
+    report.append("- `semantic_layer_v2`: default `disabled`, modo `partial` existe e tem teste de contrato; habilitar apenas em ambiente controlado com scorecard")
     report.append("- `archetype_patterns`: 69 registros, não validado contra código")
     report.append("")
     
     # Escrever relatório
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text('\n'.join(report), encoding='utf-8')
+    final_report = merge_generated_report_with_manual_history('\n'.join(report))
+    OUTPUT.write_text(final_report, encoding='utf-8')
     
     print(f"Relatório gerado: {OUTPUT}")
     print(f"- Arquivos analisados: {len(all_server)}")

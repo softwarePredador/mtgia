@@ -5,9 +5,9 @@
 
 ## Resumo executivo
 
-O auditor gerou muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podem ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Ainda assim, as rodadas focadas revelaram frentes prioritárias de organização:
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a nova execução reporta `Imports quebrados: 0`. Ainda assim, as rodadas focadas revelaram frentes prioritárias de organização:
 
-1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: o próprio relatório produz evidência estrutural pouco confiável e pode induzir correções erradas.
+1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
@@ -18,6 +18,20 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 ## Achados priorizados
 
 ### P0 — Corrigir o `structure_auditor.py` antes de usar a contagem de imports quebrados como verdade
+
+**Status 2026-05-28: RESOLVIDO na ferramenta.**
+
+- O auditor agora aceita `MTGIA_REPO_ROOT`/`Path.cwd()` em vez de path fixo do
+  container Hermes.
+- Imports relativos sao resolvidos a partir do arquivo Dart origem.
+- Imports locais `package:server/...`, `package:manaloom/...` e alias historico
+  `package:ai/...` sao tratados explicitamente; pacotes externos sao ignorados.
+- Nova execucao do auditor: `Imports quebrados: 0`.
+- O script preserva as rodadas manuais do `STRUCTURE_AUDIT.md` e substitui
+  somente o bloco gerado automaticamente.
+
+Histórico do problema:
+
 - **Evidência**:
   - `STRUCTURE_AUDIT.md` lista imports como "não encontrado" para arquivos que existem, por exemplo:
     - `server/routes/ai/_middleware.dart` → `../../lib/auth_middleware.dart`
@@ -26,9 +40,9 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 - **Impacto**: priorização errada, documentação enganosa e risco de criar refactors desnecessários.
 - **Causa provável**: o auditor resolve caminhos relativos de import contra o diretório errado (provavelmente o root do repo, não o diretório do arquivo origem).
 - **Ação recomendada**:
-  1. ajustar a resolução de imports relativos no script;
-  2. separar "imports potencialmente quebrados pelo parser" de "imports inválidos confirmados por analyzer";
-  3. deduplicar ocorrências repetidas no relatório.
+  1. manter a resolucao corrigida no script;
+  2. separar "imports potencialmente quebrados pelo parser" de "imports inválidos confirmados por analyzer" se o auditor voltar a reportar falhas;
+  3. deduplicar ocorrências repetidas no relatório em uma melhoria futura de legibilidade.
 - **Validação**:
   - rerodar `python3 docs/hermes-analysis/scripts/structure_auditor.py`;
   - conferir redução drástica dos falsos positivos;
@@ -196,7 +210,7 @@ O auditor gerou muito ruído por inferir imports relativos a partir do root do r
 
 ## Sequência sugerida
 
-1. **Primeiro**: corrigir o auditor estrutural (P0), porque ele afeta a confiabilidade do restante do relatório.
+1. **Primeiro**: manter o auditor estrutural corrigido e confrontar novas falhas com analyzer antes de abrir tasks.
 2. **Segundo**: manter `/decks/:id/recommendations` e `/ai/weakness-analysis`
    como experimentais/not-proven ate consumirem a camada semantica compartilhada
    ou terem contrato interno explicito.
