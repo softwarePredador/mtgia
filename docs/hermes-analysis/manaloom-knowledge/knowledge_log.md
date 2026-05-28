@@ -1,5 +1,10 @@
 # Knowledge Log — ManaLoom Deck Analysis
 
+## Dina, Essence Brewer — 2026-05-28
+Dina é um aristocrats híbrido Soul Sisters único: converte lifegain em dano + scry, diferente de Teysa (dobra death triggers) ou Korvold (recompensa sac de permanente). O deck opera com triângulo aristocrats clássico (fodder + outlet + payoff) mas com 4 Blood Artist effects + Dina = 12 dano total por morte de criatura. Resiliência via recursão verde compensa a falta de proteção branca.
+
+Insight central: o "quadrado de drain" (Blood Artist + Zulaport Cutthroat + Bastion + Enduring Tenacity) é o coração — sem ele, Dina perde 75% do dano. Skullclamp transforma tokens 1/1 em card advantage. Gap crítico: 1 proteção, 0 tutores, ramp abaixo do ideal — deck confia em consistência natural para funcionar.
+
 ## Aesi, Tyrant of Gyre Strait — 2026-05-28
 Aesi é o único comandante que dá draw E extra land drop simultaneamente, transformando cada terreno em card advantage. O deck default EDHREC opera com 40 terrenos e 23 fontes de ramp — acima do range ideal do perfil — sacrificando slots de proteção pela consistência do motor. Problema ManaLoom: Aesi é classificada apenas como "draw", perdendo metade da função (ramp embutido via extra land drops).
 
