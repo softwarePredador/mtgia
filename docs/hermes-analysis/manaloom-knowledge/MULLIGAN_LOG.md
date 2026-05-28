@@ -88,4 +88,22 @@ Causa raiz: **Cada swap substituiu uma carta CMC baixo ou médio por uma carta C
 
 **Mulligan rate de 29.9%** significa que ~3 em cada 10 partidas começam com uma mão que precisa ser devolvida. Para um deck Boros sem card advantage natural (até o TOR entrar), cada mulligan custa uma carta — e em um formato de 100 cartas singletons, perder uma carta é significativo. Mas em bracket 3, onde o meta não é CEDH, 30% de mulligan é aceitável para um deck big-spells. O CEDH standard é <20%, mas social EDH aceita 25-35%.
 
-**A tendência de piora incremental (3.3% → 12.4% → 15.8% em "sem play T3")** sinaliza que o deck está se especializando — e especialização sempre custa versatilidade. O deck está se tornando mais focado na sua identidade (Lorehold spellslinger big-spells) e menos genérico (com interação CMC≤2). A questão é: o trade-off vale a pena? Para os próximos ciclos, o evolution deve adicionar CAOS para reduzir "sem play T3" de volta para <12%.
+**"A tendência de piora incremental (3.3% → 12.4% → 15.8% em "sem play T3")** sinaliza que o deck está se especializando — e especialização sempre custa versatilidade. O deck está se tornando mais focado na sua identidade (Lorehold spellslinger big-spells) e menos genérico (com interação CMC≤2). A questão é: o trade-off vale a pena? Para os próximos ciclos, o evolution deve adicionar CAOS para reduzir "sem play T3" de volta para <12%.
+
+---
+
+## [2026-05-28T07:00:00+00:00] Execução #5 — Estabilidade Pós-Ciclo #2
+
+**Status:** Sem mudanças desde Ciclo #2. Evolution Oracle ainda não executou Ciclo #3.
+
+| Métrica | Exec#4 | Exec#5 | Δ |
+|:--------|:------:|:------:|:-:|
+| Jogáveis | 71.1% | 71.1% | +0.0pp |
+| Mulligan | 29.9% | 29.8% | -0.1pp |
+| Ramp T1 | 24.8% | 27.2% | +2.4pp |
+| Sem play T3 | 15.8% | 16.5% | +0.7pp |
+
+**Conclusão:** Deck está ESTÁVEL. Todos os deltas dentro do ruído estatístico (±2.8pp). Aguardando Ciclo #3 com Chaos Warp/Generous Gift para reduzir "sem play T3" (~16%) de volta para <12%.
+
+---
+*Simulação: 1000 mãos de 7 cartas do deck de 99 (excluindo commander) com random.shuffle(), seed=42. IC95% = ±2.8pp.*

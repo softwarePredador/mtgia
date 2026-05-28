@@ -72,4 +72,34 @@
 |
 |Os swaps do Ciclo #2 tiveram um custo mensurável na consistência early-game. A troca de 3 cartas CMC 1-2 (Deflecting Palm, Mother of Runes) e CMC 6 (Hellkite) por 3 cartas CMC 4-4-8 (Big Score, TOR, Dance) elevou o perfil de CMC da mão inicial. O deck está mais forte no mid-late game (Dance com Miracle + Lorehold copy é devastador) mas mais vulnerável nos turnos 1-3. A tendência de piora em "sem play T3" (3.3% → 12.4% → 15.8%) precisa ser corrigida com interação CMC≤2 no próximo ciclo.|
 ||
-|**Recomendação:** Adicionar Chaos Warp e/ou Generous Gift no Ciclo #3 para reduzir "sem play T3" de volta para <12%. Manter 35 lands.|
+|**Recomendação:** Adicionar Chaos Warp e/ou Generous Gift no Ciclo #3 para reduzir "sem play T3" de volta para <12%. Manter 35 lands.
+
+## [2026-05-28T07:00:00+00:00] Execução #5 — Estabilidade Pós-Ciclo #2
+
+### Status: Sem mudanças no deck desde Ciclo #2
+Nenhuma evoluçōes nova aplicada. Evolution Oracle ainda não executou o Ciclo #3.
+Simulação de confirmação: 1000 mãos, seed=42.
+
+### Resultados
+
+| Métrica | Valor | Status |
+|:--------|:-----|:-------|
+| Mãos jogáveis | 71.1% | ✅ |
+| Mulligan | 29.8% | 🔴 |
+| Ramp T1 | 27.2% | ✅ |
+| Sem play T3 | 16.5% | 🔴 |
+
+### Delta vs Execução #4
+
+| Métrica | Exec#4 | Exec#5 | Δ |
+|:--------|:------:|:------:|:-:|
+| Jogáveis | 71.1% | 71.1% | +0.0pp |
+| Mulligan | 29.9% | 29.8% | -0.1pp |
+| Ramp T1 | 24.8% | 27.2% | +2.4pp |
+| Sem play T3 | 15.8% | 16.5% | +0.7pp |
+
+### Conclusão
+Deck está ESTÁVEL. Todas as métricas dentro do ruído estatístico (±2.8pp). Nenhum swap novo para testar. Aguardando Evolution Oracle Ciclo #3 para aplicar interação CMC≤2 (Chaos Warp, Generous Gift) e reduzir "sem play T3" do nível crítico atual (~16%).
+
+### O Que Essa Métrica Significa
+**"Sem play T3" em 16.5%** significa que ~1 em cada 6 partidas abre sem nenhuma carta jogável nos 3 primeiros turnos. Para um deck Boros que depende de ativar triggers de legends/instants/sorceries, cada turno "morto" é um turno onde o comandante não gera valor. O deck precisa de mais cartas CMC≤2 que geram valor imediato (remoção, ramp, draw). O Ciclo #3 precisa resolver isso.|
