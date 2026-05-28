@@ -126,10 +126,18 @@ mtgia/
 
 - `flutter analyze --no-pub --no-fatal-infos`: VERDE (2026-05-27)
 - `dart test`: VERDE, 599 tests (backend, 2026-05-27)
+- `dart analyze` do backend: **BLOQUEADO/P1** em 2026-05-28 por `server/bin/local_test_server.dart` importar `../.dart_frog/server.dart`, ausente no checkout atual
 - `flutter test`: VERDE historico; nao reexecutado integralmente nesta higiene semanal
 - Corpus estavel de resolucao Commander: 19/19 passed
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
+
+## Achados do audit de estrutura (2026-05-28)
+
+- **P0 — Falso-positivo em massa no auditor estrutural**: `STRUCTURE_AUDIT.md` reportou 178 imports "quebrados", mas a amostragem manual confirmou que varios alvos existem em `server/lib/` (ex.: `auth_middleware.dart`, `auth_service.dart`, `http_responses.dart`, `logger.dart`). A evidência aponta erro de resolução de caminho no `docs/hermes-analysis/scripts/structure_auditor.py`, então a contagem não deve ser tratada como defeito real sem revalidação.
+- **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem concentrando regra de negócio, com duplicações explícitas detectadas pelo audit (`matchesFunctionalNeed`, `resolveOptimizeArchetype`, `scoreOptimizeReplacementCandidate`, `shouldRetryOptimizeWithAiFallback`, entre outras).
+- **P1 — Helpers duplicados com risco de drift**: heurísticas semânticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart`; utilitários de request/payload repetem-se em múltiplas rotas de trades/conversations.
+- Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
 

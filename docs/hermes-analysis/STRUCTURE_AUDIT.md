@@ -1,5 +1,5 @@
 # ManaLoom Code Structure Audit
-> Data: 2026-05-27 21:28 UTC
+> Data: 2026-05-28 00:01 UTC
 
 ## Arquivos Mapeados
 - `server/lib/`: 81 arquivos
@@ -681,28 +681,3 @@
 - `card_deck_profiles`: 670 perfis, mas `filterUnsafeOptimizeSwapsByCardData` não consulta
 - `semantic_layer_v2`: Shadow mode (diagnóstico sem poder de veto)
 - `archetype_patterns`: 69 registros, não validado contra código
-
-## Coerência entre Módulos (Execução #6 — 2026-05-27)
-
-> Análise completa em: [modules_coherence.md](modules_coherence.md)
-
-### Resumo dos Achados
-
-| ID | Achado | Severidade | Arquivo(s) |
-|---|---|---|---|
-| C1 | Classes `DeckArchetypeAnalyzer` e `DeckOptimizationState` duplicadas entre lib/ e routes/ | ALTA | `server/lib/ai/deck_state_analysis.dart` ↔ `server/routes/ai/optimize/index.dart` |
-| C2 | 7 classes package-privadas definidas em rotas (uso interno) | MÉDIA | `routes/ai/optimize/`, `routes/cards/`, `routes/decks/`, `routes/trades/` |
-| C3 | Classe pública `ManaAnalysis` definida em routes/ em vez de lib/ | MÉDIA | `server/routes/decks/[id]/analysis/index.dart` |
-| C4 | 22 arquivos de rotas com >300 linhas de lógica inline | ALTA | Principal: `routes/ai/optimize/index.dart` (3089 linhas) |
-| C5 | Função `assessDeckOptimizationState` duplicada | BAIXA | `lib/ai/deck_state_analysis.dart` ↔ `routes/ai/optimize/index.dart` |
-
-### Recomendações Prioritárias
-1. Consolidar `DeckArchetypeAnalyzer` e `DeckOptimizationState` em local único (preferencialmente lib/)
-2. Extrair lógica de negócio dos arquivos de rota >300 linhas para serviros em lib/
-3. Mover `ManaAnalysis` para `server/lib/`
-
-### Pontos Positivos
-- App Flutter (`app/lib/`) comunica-se com server apenas via HTTP (sem acoplamento direto) ✅
-- 18 módulos lib/ corretamente compartilhados entre grupos de rotas ✅
-- Sem acoplamento estreito entre grupos de rotas ✅
-- Scripts server/bin/ acessam lib/ diretamente para ops batch (correto) ✅
