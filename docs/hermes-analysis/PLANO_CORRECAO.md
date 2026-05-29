@@ -14,6 +14,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 5. **P1 — Ownership em rotas deck/AI**: aberto no checkout auditado (`codex/hermes-analysis-docs@d2b189fc`) para `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` e `POST /ai/archetypes`; rotas experimentais seguem bloqueadas para promocao sem contrato owner/public/meta.
 6. **P1 — Politicas por nome**: resolvido para as listas apontadas pelo verificador (`premiumLandNames`, high-power e candidate-quality premium) via `commander_fallback_policy.dart`; novas excecoes por nome devem entrar apenas em policy versionada ou fixture/teste.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
+8. **P1/P2 — Classes app sem uso de runtime confirmado**: rodada focada de
+   2026-05-29 confirmou `LifeCounterScreen` legado sem chamada em `app/lib`,
+   `DeckCard` testado mas fora da listagem real, `DeckProgressChip` sem
+   chamador e `LotusPresentationMode` sem import.
 
 ## Achados priorizados
 
@@ -217,6 +221,36 @@ Histórico do problema:
   - testes das rotas experimentais continuam verdes;
   - contrato app-facing deixa claro se esses dados sao historico persistido ou
     apenas resposta efemera.
+
+### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
+
+- **Evidência**:
+  - `app/lib/features/home/life_counter_screen.dart:61` define
+    `LifeCounterScreen`, mas `app/lib/main.dart:283` usa
+    `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
+    `LifeCounterScreen` apenas no proprio arquivo.
+  - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
+    listagem ativa usa `_DeckSpotlightCard` e `_DeckGalleryCard` em
+    `app/lib/features/decks/screens/deck_list_screen.dart`; `DeckCard` aparece
+    apenas em testes.
+  - `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` define
+    `DeckProgressChip`, sem ocorrencias alem de declaracao/construtor.
+  - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
+    `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()`.
+- **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
+  mantem testes que podem nao proteger o runtime real e tornam ambigua a
+  documentacao de gargalos ativos.
+- **Ação recomendada**:
+  1. decidir se `LifeCounterScreen` e fixture/harness legado ou deve ser removido
+     em favor do Lotus runtime;
+  2. remover `DeckCard`, `DeckProgressChip` e `LotusPresentationMode` se nao
+     houver plano imediato de reconectar essas classes;
+  3. atualizar/remover testes que hoje exercitam widgets fora do runtime real.
+- **Validação**:
+  - `grep -RIn --include='*.dart' '\bLifeCounterScreen\b\|\bDeckCard\b\|\bDeckProgressChip\b\|\bLotusPresentationMode\b' app/lib app/test app/integration_test`
+    mostra apenas classes intencionalmente mantidas;
+  - `flutter analyze --no-pub --no-fatal-infos` e suites focadas de decks/life
+    counter seguem verdes apos remocao ou reconexao.
 
 ## Sequência sugerida
 
