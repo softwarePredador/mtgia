@@ -59,5 +59,39 @@ void main() {
             equals(const ['kept for contract test']));
       },
     );
+
+    test('success diagnostics can expose bracket policy blocked additions', () {
+      final body = <String, dynamic>{
+        'optimize_diagnostics': {
+          'existing_signal': true,
+        },
+      };
+
+      optimize_route.attachOptimizeBracketPolicyDiagnostics(
+        body,
+        bracket: 1,
+        blockedByBracket: const [
+          {
+            'name': 'Mana Crypt',
+            'reason': 'fast_mana_limit',
+          },
+        ],
+      );
+
+      final diagnostics =
+          (body['optimize_diagnostics'] as Map).cast<String, dynamic>();
+      final bracketPolicy =
+          (diagnostics['bracket_policy'] as Map).cast<String, dynamic>();
+
+      expect(diagnostics['existing_signal'], isTrue);
+      expect(bracketPolicy['bracket'], equals(1));
+      expect(bracketPolicy['blocked_count'], equals(1));
+      expect(bracketPolicy['blocked_additions'], isA<List>());
+      expect(
+        (bracketPolicy['blocked_additions'] as List).single,
+        containsPair('name', 'Mana Crypt'),
+      );
+      expect(bracketPolicy['message'], contains('bloqueadas'));
+    });
   });
 }

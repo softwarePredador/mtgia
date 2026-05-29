@@ -441,6 +441,39 @@ Map<String, dynamic> buildSemanticV2OptimizeRejectedBody({
   };
 }
 
+Map<String, dynamic> buildOptimizeBracketPolicyDiagnostics({
+  required int? bracket,
+  required List<Map<String, dynamic>> blockedByBracket,
+}) {
+  return {
+    'bracket': bracket,
+    'blocked_count': blockedByBracket.length,
+    'blocked_additions': blockedByBracket,
+    'message':
+        'Algumas adições sugeridas foram bloqueadas por exceder limites do bracket.',
+  };
+}
+
+void attachOptimizeBracketPolicyDiagnostics(
+  Map<String, dynamic> responseBody, {
+  required int? bracket,
+  required List<Map<String, dynamic>> blockedByBracket,
+}) {
+  if (blockedByBracket.isEmpty) return;
+
+  final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
+      ? (responseBody['optimize_diagnostics'] as Map).cast<String, dynamic>()
+      : <String, dynamic>{};
+
+  responseBody['optimize_diagnostics'] = {
+    ...existingDiagnostics,
+    'bracket_policy': buildOptimizeBracketPolicyDiagnostics(
+      bracket: bracket,
+      blockedByBracket: blockedByBracket,
+    ),
+  };
+}
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
@@ -3028,6 +3061,12 @@ Future<Response> onRequest(RequestContext context) async {
               'Algumas adições sugeridas foram bloqueadas por exceder limites do bracket.',
         };
       }
+
+      attachOptimizeBracketPolicyDiagnostics(
+        responseBody,
+        bracket: bracket,
+        blockedByBracket: blockedByBracket,
+      );
 
       if (blockedByTheme.isNotEmpty) {
         warnings['blocked_by_theme'] = {
