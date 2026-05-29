@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
-import '../../community/screens/community_deck_detail_screen.dart';
 import '../../binder/providers/binder_provider.dart';
 import '../../messages/providers/message_provider.dart';
 import '../../messages/screens/chat_screen.dart';
@@ -466,12 +466,7 @@ class _DecksTab extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDeckDetailScreen(deckId: deck.id),
-                ),
-              );
+              context.push('/community/decks/${deck.id}');
             },
             child: Padding(
               padding: const EdgeInsets.all(12),

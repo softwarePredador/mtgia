@@ -1,8 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/core/utils/mana_helper.dart';
 import 'package:provider/provider.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../../core/utils/mana_helper.dart';
+
 import '../providers/deck_provider.dart';
 import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';

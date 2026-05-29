@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/providers/deck_provider.dart';
-import '../../social/screens/user_profile_screen.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../providers/community_provider.dart';
 
@@ -205,17 +205,9 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                       child: GestureDetector(
                         onTap:
                             deck['owner_id'] != null
-                                ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (_) => UserProfileScreen(
-                                            userId: deck['owner_id'] as String,
-                                          ),
-                                    ),
-                                  );
-                                }
+                                ? () => context.push(
+                                  '/community/user/${deck['owner_id']}',
+                                )
                                 : null,
                         child: Text(
                           deck['owner_username'] ?? 'Anônimo',

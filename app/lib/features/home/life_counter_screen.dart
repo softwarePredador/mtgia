@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_theme.dart';
 import '../cards/providers/card_provider.dart';
 import '../cards/screens/card_detail_screen.dart';
 import '../decks/models/deck_card_item.dart';
