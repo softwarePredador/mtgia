@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-29 11:00 UTC
+> Data: 2026-05-29 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -17,7 +17,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    trata `SIGINT`/`SIGTERM`.
 5. **P1 — Ownership em rotas deck/AI**: revalidado como **RESOLVIDO no `master` atual** para `POST /ai/optimize`, `GET /ai/optimize/jobs/:id`, `POST /ai/archetypes`, simulate/recommendations/matchup/weakness via source guards. Rotas experimentais continuam bloqueadas para promocao sem contrato UX/produto, mas nao por falta de owner-scope no codigo atual.
 6. **P1 — Politicas por nome / semantica de cartas**: reaberto no checkout local `7014a2cc`. `commander_fallback_policy.dart` nao existe nesta branch, e ainda ha excecoes por nome em `functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart` e rotas de recomendacao.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-29 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: rodada focada de
    2026-05-29 confirmou `LifeCounterScreen` legado sem chamada em `app/lib`,
    `DeckCard` testado mas fora da listagem real, `DeckProgressChip` sem
@@ -455,6 +455,10 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
     continua vazio ate haver contrato seguro;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
+- **Status 2026-05-29 15:00 UTC: REVALIDADO.** A rodada local focada em
+  `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
+  pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
+  por ser tabela interna do migrador.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
     upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
@@ -489,9 +493,9 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
   5. se remover, criar migration/cleanup seguro e atualizar
      `API_CONTRACTS_AND_DATA_MAP.md`.
 - **Validação**:
-  - `grep -RInE "FROM[[:space:]]+deck_matchups|FROM[[:space:]]+deck_weakness_reports|FROM[[:space:]]+ml_prompt_feedback|FROM[[:space:]]+commander_reference_decks|FROM[[:space:]]+commander_reference_deck_cards" server app`
-    encontra consumidores reais, ou a persistencia deixa de existir com decisao
-    documentada;
+  - `grep -RInE "^[[:space:]]*(FROM|JOIN)[[:space:]]+(deck_matchups|deck_weakness_reports|commander_reference_decks|commander_reference_deck_cards)\\b" server/routes server/lib server/bin app`
+    encontra consumidores reais de leitura, ou a persistencia deixa de existir
+    com decisao documentada;
   - `grep -RIn "recordFeedback" server app` encontra chamador real, caso a
     tabela de feedback seja mantida para coleta ativa;
   - testes das rotas experimentais continuam verdes;
