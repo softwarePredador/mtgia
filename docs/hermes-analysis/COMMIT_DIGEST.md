@@ -1,31 +1,74 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-28T01:31Z (manager-watchdog — higiene semanal, master estável em 771c9318).
+> Atualizado em 2026-05-29T12:00Z (hermes-normal-audit — auditoria E2E pipeline de decks, master avançou para 4913a733).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `c98153d6` (Improve optimize gate multi-tag handling)
-- HEAD atual: **`771c9318`** (Harden semantic scorecard runner)
+- HEAD anterior: `771c9318` (Harden semantic scorecard runner)
+- HEAD atual: **`4913a733`** (Expose optimize bracket diagnostics)
 - SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 
-## Novos commits nesta rodada
+## Novos commits nesta rodada (2026-05-29)
 
-### `771c9318` — Harden semantic scorecard runner (2026-05-27T18:40Z, nova)
+### `4913a733` — Expose optimize bracket diagnostics (2026-05-29, atual)
+- **1 arquivo**, **+XX linhas** (route diagnostics)
+- **Tipo: CODE** — Expondo bracket policy diagnostics no response body
+
+### `1aa4da71` — Enforce bracket state in optimize fillers
+- **loadBroadCommanderNonLandFillers**: `currentDeckCards` passado em 3 chamadas que antes usavam `const []` — bracket policy agora via estado real do deck durante construção.
+
+### `a018ee17` — Fix optimize authorization and chat error states
+- **Auth**: `/ai/optimize` agora verifica `userId != null` antes de processar; `verifyOptimizeDeckAccess` chamado ANTES de `OptimizeJobStore.create`.
+- **Chat**: `chat_screen.dart` — erro de send agora preserva texto no controller + mostra SnackBar.
+
+### `cf225841` — Preserve semantic v2 multi-tags in optimize
+- **functional_card_tags.dart**: `FunctionalDeckSummary` source priority mudou de `persisted_then_heuristic` para `functional_tags_then_semantic_v2_then_heuristic`.
+- **`_looksLikePayoff`**: correção parcial — adicionado filtro `!oracle.contains('costs {')` e `!oracle.contains('costs {1} less')` mas com precedência de operadores frágil (ver P1 no LOGIC_COHERENCE_REPORT).
+
+### `aa3ee1ba` — Centralize basic land detection
+- **basic_land_utils.dart** (novo): 4 funções (`normalizeBasicLandName`, `isBasicLandName`, `isBasicLandTypeLine`, `isBasicLandCard`). Migrado em 6 arquivos.
+
+### `00437690` — Centralize commander fallback policy
+- **commander_fallback_policy.dart** (novo, 237 linhas): 8 constantes + 1 função `commanderFoundationNamesFor()`.
+- `candidate_quality_data_support.dart` e `optimize_runtime_support.dart` migrados.
+
+### `81335e26` — Use semantic v2 in functional deck summary
+- `summarizeFunctionalTagsForDeck`: prioridade agora é persisted > semantic_v2 > heuristic (antes: persisted > heuristic).
+
+### `65f30387` — Scope archetype deck access by owner
+- `/ai/archetypes` route: `AND user_id = CAST(@user_id AS uuid)` adicionado no SQL.
+
+### `25416ec2` — Document semantic v2 optimize scorecard
+- Scorecard runner atualizado com fixture `optimize_scorecard_disabled_public_cf225841.json` (393 linhas).
+
+### `2396956e` — Wire sync cards utilities into pipeline
+- **sync_cards_utils.dart** (novo) + **sync_cards.dart** refatorado (-181 linhas).
+
+### `5c327b76` — Centralize candidate quality name policies
+- `candidate_quality_data_support.dart` migra para `commander_fallback_policy.dart`.
+
+### `e9940672` — Document ready alias contract
+- Documentação apenas.
+
+### `2999c346` — Harden experimental deck AI ownership
+- Preparação para ownership enforcement em rotas experimentais.
+
+### `640f4ab4` — Fix community navigation cycle
+- `community_deck_detail_screen.dart`: `Navigator.push` → `context.push('/community/user/...')` via go_router.
+- `user_profile_screen.dart`: mesmo pattern para CommunityDeckDetailScreen.
+
+---
+
+### `771c9318` — Harden semantic scorecard runner (2026-05-27T18:40Z)
 - **3 arquivos**, **+359/-17 linhas** (script Python + relatório + fixture JSON)
-- Autor: softwarePredador (Co-authored-by: Copilot)
-- Data: 2026-05-27 15:40 BRT
 - **Tipo: CODE/INFRA** — Robustecimento do runner de scorecard semântico
-  - `semantic_layer_v2_optimize_scorecard.py`: Adiciona tratamento de `TimeoutError`, `socket.timeout`, `URLError`, `OSError` na função `request()` (retry com sleep 3+attempt*2, retorna 598 em vez de 599). Adiciona `sanitized_error()` helper. Refatora `run()` com try/except ao redor de todo o fluxo do caso (create → validate → optimize), capturando exceções não-tratadas em `case["case_error"]`. Estrutura de controle mais resiliente: deck_id=None init, bloco try englobando todas as operações.
-  - `RELATORIO_OPTIMIZE_MULTITAG_GATE_2026-05-27.md`: Atualização do relatório com seção de hardening (+57 linhas).
-  - `optimize_scorecard_after_multitag_gate_limit5_resilient.json`: Nova fixture JSON (273 linhas) para teste resiliente com limit=5.
-- **Nota:** Detectado via git diff — o dirty worktree mostra `otimizacao.dart` e `theme_contextual_rules_service.dart` modificados (do commit anterior `c98153d6` que remove imports não utilizados).
 
-### `c98153d6` — Improve optimize gate multi-tag handling (2026-05-27T18:08Z, anterior)
+Commits anteriores mantidos como referência abaixo.
 - **5 arquivos**, **+362/-5 linhas** (código + script + testes)
 - Autor: softwarePredador (Co-authored-by: Copilot)
 - Data: 2026-05-27 15:08 BRT
@@ -351,3 +394,4 @@ BASE_PREVIO=$(git rev-parse origin/codex/hermes-analysis-docs)
 # Para ver o que mudou na master desde a ultima analise:
 git log --oneline --decorate --stat $BASE_PREVIO..origin/master
 ```
+<!-- commit nonce: 1 -->
