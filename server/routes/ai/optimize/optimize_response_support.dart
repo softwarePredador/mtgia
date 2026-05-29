@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:dart_frog/dart_frog.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
-import '../../../lib/ai/optimization_validator.dart';
-import '../../../lib/ai/optimize_runtime_support.dart';
 
 // ============================================================================
 // Optimize Response Builders

@@ -19,6 +19,7 @@ void main() {
             },
           },
           enforcementMode: SemanticV2OptimizeEnforcementMode.partial,
+          expandedCriticalRoles: false,
           validation: const {
             'verdict': 'aprovado',
             'score': 88,
