@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/health_readiness_support.dart';
@@ -23,6 +25,22 @@ void main() {
     test('maps unhealthy readiness to 503', () {
       expect(readinessStatusCode(false), equals(503));
       expect(readinessStatusCode(true), equals(200));
+    });
+  });
+
+  group('ready route contract', () {
+    test('/ready delegates to /health/ready handler', () {
+      final route = File('routes/ready/index.dart').readAsStringSync();
+      final contract = File(
+        'doc/API_CONTRACTS_AND_DATA_MAP.md',
+      ).readAsStringSync();
+
+      expect(route, contains("import '../health/ready/index.dart'"));
+      expect(route, contains('health_ready.onRequest(context)'));
+      expect(
+          contract, contains('| `GET /ready` | internal/stable ops alias |'));
+      expect(
+          contract, isNot(contains('| `GET /ready` | internal/deprecated |')));
     });
   });
 }

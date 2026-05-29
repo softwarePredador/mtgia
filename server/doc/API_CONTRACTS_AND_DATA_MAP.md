@@ -303,7 +303,7 @@ HTTP and returning redirect/HTML instead of JSON.
 | `GET /health/live` | stable/internal | probes | `server/routes/health/live/index.dart` | None. | `status`, `timestamp`. | None. | None. | Process state. | Not proven. | Equivalent lightweight liveness. |
 | `GET /health/metrics` | internal | ops only | `server/routes/health/metrics/index.dart` | None. | Source keys show `status`; exact metrics payload **not fully proven**. | Internal metrics contract. | Not proven. | Runtime metrics. | Not proven. | Do not build app UI on it. |
 | `GET /health/dashboard` | internal | ops only | `server/routes/health/dashboard/index.dart` | Query not proven. | `dashboard`, `generated_at`, `ai_optimize`, `ai_cost_proxy`, errors/request counts. | Internal operational fields. | `ai_logs`, `ai_optimize_fallback_telemetry`, `information_schema`. | DB metrics. | Not proven. | Keep admin/internal. |
-| `GET /ready` | internal/deprecated | scripts may use | `server/routes/ready/index.dart` | Not audited. | Not proven. | Deprecated in favor of `/health/ready` unless caller proves otherwise. | Not proven. | Not proven. | Not proven. | Prefer `/health/ready`. |
+| `GET /ready` | internal/stable ops alias | scripts/runtime checks | `server/routes/ready/index.dart` | None. | Same readiness payload/status semantics as `GET /health/ready`: `status`, DB/cards checks, 200 or 503. | Exact check labels may evolve with `/health/ready`. | `cards`. | Delegates to `/health/ready` handler. | `health_readiness_support_test.dart`; source guard confirms `/ready` delegates to `health/ready`; go-live checklist validates published `/ready`. | Short operational alias for deploy/smoke/probes; keep behavior aligned with `/health/ready`. |
 
 ## Data Sources
 
