@@ -1,4 +1,45 @@
 # ManaLoom Code Structure Audit
+> Atualizacao Copilot: 2026-05-29 12:10 UTC
+> Commit verificado: `origin/master@2396956e`
+
+## Revalidacao pos-correcao: `sync_cards_utils.dart` ligado ao sync operacional
+
+O Copilot cruzou o achado de helper testado sem chamador runtime contra a
+`master` real e aplicou correcao segura em `origin/master@2396956e`.
+
+### Resolvido em `origin/master@2396956e`
+
+- `server/bin/sync_cards.dart` agora importa `server/lib/sync_cards_utils.dart`.
+- O CLI operacional passou a usar `parseSinceDays`,
+  `getNewSetCodesSinceFromData`, `extractCardRow`, `extractSetCardRow`,
+  `extractOracleIds` e `extractLegalities`.
+- As copias privadas `_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+  `_extractCardRow` foram removidas do binario.
+- Os loops inline de rows incrementais, oracle IDs e legalidades foram
+  substituidos pelos helpers compartilhados.
+- `extractSetCardRow` foi alinhado ao prepared statement real de sync
+  incremental e agora retorna tambem `collector_number` e `foil`.
+
+### Validacao executada
+
+- `dart format lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart`
+- `dart analyze lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart`
+- `dart test test/sync_cards_test.dart -r expanded`
+- `dart analyze bin lib routes test`
+- `dart test` em `server/`: 610 testes passaram.
+- `git diff --check`
+- Scan simples de segredos no diff/stage.
+- Hermes post-push smoke para `2396956e`: `PASS`.
+
+### Observacoes
+
+- Esta rodada nao executou o sync MTGJSON real contra banco. A alteracao foi
+  limitada a religar o caminho operacional aos helpers ja testados e preservar o
+  contrato SQL existente.
+- Permanecem abertos os outros helpers publicos sem chamador runtime listados
+  nesta auditoria (`request_trace`, Commander Reference, PerformanceService,
+  MTGTop8 e candidate quality sample SQL).
+
 > Atualizacao Copilot: 2026-05-29 11:56 UTC
 > Commit verificado: `origin/master@640f4ab4`
 
@@ -213,10 +254,23 @@ operacionais fora do runtime app/API.
 
 ### Achados confirmados
 
-#### P1 — `sync_cards_utils.dart` esta testado, mas nao e chamado pelo sync real
+#### P1 — `sync_cards_utils.dart` estava testado, mas nao era chamado pelo sync real
+
+**Status 2026-05-29: RESOLVIDO em `origin/master@2396956e`.**
 
 - **Funcoes:** `extractCardRow`, `parseSinceDays`, `extractSetCardRow`,
   `extractOracleIds` e `extractLegalities`.
+- **Correcao aplicada:** `server/bin/sync_cards.dart` agora importa
+  `sync_cards_utils.dart` e usa esses helpers no full sync, sync incremental,
+  selecao de sets, oracle IDs e legalidades. O helper `extractSetCardRow` foi
+  expandido para devolver `collector_number` e `foil`, mantendo compatibilidade
+  com o INSERT incremental de 12 colunas.
+- **Validacao:** `dart analyze bin lib routes test` e `dart test` em `server/`
+  passaram; `test/sync_cards_test.dart` foi ampliado para o shape incremental
+  real.
+
+Historico do achado:
+
 - **Definicoes:** `server/lib/sync_cards_utils.dart:16`, `:102`, `:116`,
   `:161` e `:172`.
 - **Evidencia de nao chamada no runtime:** `grep -RIn --include='*.dart'

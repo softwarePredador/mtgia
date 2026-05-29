@@ -22,9 +22,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `card_function_tags`, mas optimize/validator/quality gate carregam apenas
    `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
    colapsado em um unico role.
-10. **P1/P2 — Funcoes publicas sem chamador runtime**: rodada focada de
-    2026-05-29 07:04 UTC confirmou que `sync_cards_utils.dart` e coberto por
-    teste, mas nao importado pelo `server/bin/sync_cards.dart`; tambem ha
+10. **P1/P2 — Funcoes publicas sem chamador runtime**:
+    `sync_cards_utils.dart` foi **RESOLVIDO em `origin/master@2396956e`** e
+    agora e usado pelo `server/bin/sync_cards.dart`. Permanecem abertos
     wrappers/helpers sem chamador em request trace, Commander Reference,
     PerformanceService, MTGTop8 e candidate quality sample SQL.
 11. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
@@ -286,16 +286,17 @@ apenas o fluxo operacional do `local_test_server.dart` em clones sem
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
+**Status 2026-05-29:** `sync_cards_utils.dart` **RESOLVIDO em
+`origin/master@2396956e`**; demais helpers deste bloco continuam pendentes.
+
 - **Evidência**:
-  - `server/lib/sync_cards_utils.dart` define `extractCardRow`,
-    `parseSinceDays`, `extractSetCardRow`, `extractOracleIds` e
-    `extractLegalities`, mas `grep -RIn "sync_cards_utils" server` encontra
-    apenas `server/test/sync_cards_test.dart`.
-  - O sync operacional `server/bin/sync_cards.dart` nao importa
-    `sync_cards_utils.dart` e mantem copias privadas/loops inline:
-    `_parseSinceDays` em `:376`, `_extractCardRow` em `:680`, montagem
-    incremental de rows em `:604`-`:663` e legalidades/oracle IDs em
-    `:806`-`:838`.
+  - Resolvido: `server/bin/sync_cards.dart` importa `sync_cards_utils.dart` e
+    usa `parseSinceDays`, `getNewSetCodesSinceFromData`, `extractCardRow`,
+    `extractSetCardRow`, `extractOracleIds` e `extractLegalities`.
+  - Resolvido: as copias privadas `_parseSinceDays`,
+    `_getNewSetCodesSinceFromData` e `_extractCardRow` foram removidas do CLI.
+  - Resolvido: `extractSetCardRow` agora cobre o shape operacional incremental
+    de 12 colunas, incluindo `collector_number` e `foil`.
   - `server/lib/request_trace.dart:48` (`getRequestTrace`) e `:51`
     (`tryGetRequestId`) nao tem chamador runtime; rotas usam
     `context.read<RequestTrace>()` diretamente.
@@ -314,20 +315,20 @@ apenas o fluxo operacional do `local_test_server.dart` em clones sem
     (`buildCandidateQualitySamplePoolSql`) aparece apenas em teste; o runner
     `candidate_quality_data_foundation.dart` monta seus pools por outro caminho.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
-  sync de cartas, onde a promessa de helpers extraidos nao corresponde ao CLI
-  ativo. Helpers publicos sem chamador tambem aumentam a superficie aparente da
-  API interna.
+  caso de helpers publicos restantes. O risco especifico do sync de cartas foi
+  encerrado; os testes agora exercitam helpers usados pelo CLI operacional.
 - **Ação recomendada**:
-  1. priorizar `sync_cards_utils.dart`: escolher entre importar os helpers no
-     `server/bin/sync_cards.dart` ou remover o arquivo/testes como legado;
+  1. manter `sync_cards_utils.dart` como fonte compartilhada do sync e evitar
+     reabrir copias privadas no CLI;
   2. para wrappers pequenos (`request_trace`, Commander Reference,
      PerformanceService, MTGTop8), remover se nao houver contrato planejado ou
      religar com teste focado;
   3. decidir se `buildCandidateQualitySamplePoolSql` deve virar parte real de
      um scorecard/runner ou sair junto com o teste test-only.
 - **Validação**:
-  - `grep -RIn "sync_cards_utils" server` passa a encontrar o binario ativo ou
-    o arquivo/teste deixa de existir;
+  - `grep -RIn "sync_cards_utils" server` encontra o binario ativo;
+  - `dart analyze bin lib routes test` e `dart test` em `server/` passaram em
+    `origin/master@2396956e`;
   - buscas por cada simbolo retornam pelo menos um chamador runtime/binario
     intencional alem de testes, ou o simbolo e removido;
   - testes de sync/candidate quality continuam verdes depois da decisao.
