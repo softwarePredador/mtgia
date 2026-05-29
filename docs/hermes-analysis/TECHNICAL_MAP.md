@@ -139,6 +139,14 @@ mtgia/
 - **P1 — Ownership app-facing de IA/deck segue aberto no checkout auditado**: revalidacao local em `codex/hermes-analysis-docs@d2b189fc` confirmou que `POST /ai/optimize` e `POST /ai/archetypes` ainda recebem `deck_id` do app, mas carregam `decks`/`deck_cards` por id sem `user_id` na fronteira `routes -> lib`; `GET /ai/optimize/jobs/:id` ainda permite leitura de job com `user_id = NULL`. Rotas experimentais `simulate`, `recommendations`, `simulate-matchup` e `weakness-analysis` continuam not-proven/advisory e tambem precisam de contrato owner/public/meta antes de virarem superficie app-facing.
 - **P1/P2 — Helpers duplicados com risco de drift**: heurísticas semânticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart`; `_isBasicLandName` tem variantes em optimize, generated deck validation, meta reference e commander-reference; utilitários de request/payload repetem-se em múltiplas rotas de trades/conversations; trust SQL de trades e normalizacao de `condition` de cartas tambem foram revalidados como duplicacao menor em 2026-05-28.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local `codex/hermes-analysis-docs@7014a2cc`, essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: rodada local
+  `functions-not-called` em 2026-05-29 07:04 UTC confirmou que
+  `server/lib/sync_cards_utils.dart` e usado apenas por
+  `server/test/sync_cards_test.dart`, enquanto o CLI ativo
+  `server/bin/sync_cards.dart` mantem copias privadas/loops inline. Tambem ha
+  wrappers/helpers sem chamador runtime em `request_trace.dart`,
+  `commander_reference_profile_support.dart`, `mtgtop8_meta_support.dart` e
+  `candidate_quality_data_support.dart`.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

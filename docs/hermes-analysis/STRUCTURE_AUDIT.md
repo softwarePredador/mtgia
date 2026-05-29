@@ -1,6 +1,165 @@
 # ManaLoom Code Structure Audit
-> Atualizacao: 2026-05-29 05:30 UTC
-> Rotacao local Codex: `card-semantics-audit`
+> Atualizacao: 2026-05-29 07:04 UTC
+> Rotacao local Codex: `functions-not-called`
+
+## Rodada focada: Functions not called
+
+Escopo desta rodada: somente funcoes aparentemente nao chamadas ou chamadas
+apenas por testes/harnesses fora do fluxo runtime. Nao foi executada auditoria
+ampla de classes, imports/ciclos, tabelas PostgreSQL, duplicacao geral ou
+coerencia entre camadas.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: branch remota sincronizada.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativo.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: limpo no inicio da rodada.
+- `git rev-parse --short HEAD`: `e5de80fd`.
+- `rg` nao esta instalado neste shell local; buscas focadas usaram
+  `grep -RIn --include='*.dart' --include='*.md'`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 174.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor lista apenas "Funcoes Publicas
+(primeiros 5 por arquivo)" e "Funcoes com nomes duplicados"; ele nao prova
+chamadores. A triagem abaixo usou busca textual de simbolos e manteve apenas
+casos em que o nome aparece so na propria definicao, em testes, ou em scripts
+operacionais fora do runtime app/API.
+
+### Achados confirmados
+
+#### P1 — `sync_cards_utils.dart` esta testado, mas nao e chamado pelo sync real
+
+- **Funcoes:** `extractCardRow`, `parseSinceDays`, `extractSetCardRow`,
+  `extractOracleIds` e `extractLegalities`.
+- **Definicoes:** `server/lib/sync_cards_utils.dart:16`, `:102`, `:116`,
+  `:161` e `:172`.
+- **Evidencia de nao chamada no runtime:** `grep -RIn --include='*.dart'
+  "sync_cards_utils" server` encontrou apenas
+  `server/test/sync_cards_test.dart:3`; nenhum `server/bin/*.dart`,
+  `server/lib/*.dart` ou rota importa esse arquivo.
+- **Comparacao com o sync ativo:** `server/bin/sync_cards.dart` importa
+  `mtg_data_integrity_support.dart`, mas nao `sync_cards_utils.dart`; ele mantem
+  implementacoes privadas equivalentes em `server/bin/sync_cards.dart:376`
+  (`_parseSinceDays`), `:680` (`_extractCardRow`) e loops inline para oracle IDs
+  e legalidades em `:806`-`:838`. O bloco incremental de carta tambem monta rows
+  inline em `:604`-`:663`, em vez de chamar `extractSetCardRow`.
+- **Por que parece nao chamada:** as buscas por simbolo mostram os helpers
+  publicos usados somente por `server/test/sync_cards_test.dart`; o binario que
+  roda o sync operacional usa codigo privado no proprio arquivo.
+- **Risco:** os testes podem estar validando uma copia morta da logica, enquanto
+  mudancas no sync real passam sem exercitar os helpers testados. Isso tambem
+  preserva duplicacao entre a promessa do comentario de `sync_cards_utils.dart`
+  ("extraidas do sync_cards.dart") e o estado real do CLI.
+- **O que valida:** importar `sync_cards_utils.dart` em
+  `server/bin/sync_cards.dart` e substituir as copias privadas/loops inline por
+  esses helpers, mantendo `server/test/sync_cards_test.dart` como cobertura
+  direta do caminho operacional.
+- **O que falsifica:** remover `sync_cards_utils.dart` e seus testes como
+  harness legado, ou provar outro entrypoint operacional que o importe.
+
+#### P2 — Wrapper de request trace existe, mas os chamadores usam `context.read<RequestTrace>()` direto
+
+- **Funcoes:** `getRequestTrace` e `tryGetRequestId`.
+- **Definicoes:** `server/lib/request_trace.dart:48` e
+  `server/lib/request_trace.dart:51`.
+- **Evidencia:** `grep -RIn --include='*.dart' "\btryGetRequestId\b" server app`
+  encontrou apenas a propria definicao. `getRequestTrace` aparece apenas na
+  definicao e dentro de `tryGetRequestId`. Em contraste, rotas e middlewares
+  acessam `RequestTrace` diretamente, por exemplo
+  `server/routes/_middleware.dart:29` cria o trace,
+  `server/routes/_middleware.dart:64` injeta o provider,
+  `server/routes/trades/index.dart:332` e
+  `server/routes/conversations/[id]/messages.dart:249` leem
+  `context.read<RequestTrace>().requestId`.
+- **Por que parece nao chamada:** nao ha chamador runtime nem teste direto para
+  `tryGetRequestId`; o wrapper `getRequestTrace` so existe para alimentar esse
+  helper sem uso.
+- **O que valida:** trocar rotas/helpers que fazem acesso direto por
+  `getRequestTrace`/`tryGetRequestId` quando o fallback for intencional.
+- **O que falsifica:** remover os wrappers e manter o contrato atual de acesso
+  direto, ou adicionar chamador real coberto por teste.
+
+#### P2 — `normalizedCommanderReferenceCandidate` nao tem chamador
+
+- **Funcao:** `normalizedCommanderReferenceCandidate`.
+- **Definicao:** `server/lib/ai/commander_reference_profile_support.dart:49`.
+- **Evidencia:** `grep -RIn --include='*.dart'
+  "\bnormalizedCommanderReferenceCandidate\b" server/lib server/routes
+  server/bin server/test` encontrou apenas a propria definicao. O codigo ativo
+  usa `normalizeCommanderReferenceName` diretamente em
+  `server/lib/ai/commander_reference_card_stats_support.dart:308`, `:559`,
+  `:717`, `server/lib/ai/commander_reference_readiness_support.dart:304` e
+  `server/routes/ai/generate/index.dart:581`.
+- **Por que parece nao chamada:** a funcao nullable parece ser um wrapper
+  residual de normalizacao, mas os consumidores fazem normalizacao direta.
+- **O que valida:** substituir consumidores que precisam de retorno nullable
+  por esse wrapper e adicionar teste.
+- **O que falsifica:** apagar o wrapper e manter `normalizeCommanderReferenceName`
+  como API unica.
+
+#### P2 — `extractMtgTop8FormatCodeFromSourceUrl` e test-only no checkout atual
+
+- **Funcao:** `extractMtgTop8FormatCodeFromSourceUrl`.
+- **Definicao:** `server/lib/meta/mtgtop8_meta_support.dart:139`.
+- **Evidencia:** `grep -RIn --include='*.dart'
+  "\bextractMtgTop8FormatCodeFromSourceUrl\b" .` encontrou somente
+  `server/test/mtgtop8_meta_support_test.dart:147` e a definicao. A funcao
+  vizinha `extractMtgTop8EventIdFromSourceUrl` e usada pelo reparo operacional
+  em `server/bin/repair_mtgtop8_meta_history.dart:59`, mas o format code nao e
+  consumido.
+- **Por que parece nao chamada:** o helper de formato foi mantido junto do
+  helper de event id, mas o pipeline atual nao usa o parametro `f` extraido da
+  URL.
+- **O que valida:** usar o helper no reparo/import/promocao quando o formato da
+  URL for parte do contrato.
+- **O que falsifica:** remover o helper e o teste, se o formato for derivado de
+  outra fonte mais confiavel.
+
+#### P2 — `buildCandidateQualitySamplePoolSql` so e exercitado por teste
+
+- **Funcao:** `buildCandidateQualitySamplePoolSql`.
+- **Definicao:** `server/lib/ai/candidate_quality_data_support.dart:631`.
+- **Evidencia:** `grep -RIn --include='*.dart'
+  "\bbuildCandidateQualitySamplePoolSql\b" server/bin server/lib server/routes
+  server/test` encontrou apenas
+  `server/test/candidate_quality_data_support_test.dart:123` e a definicao. O
+  runner operacional `server/bin/candidate_quality_data_foundation.dart` importa
+  `candidate_quality_data_support.dart`, mas monta seus pools via
+  `_loadCandidateCards`, `_buildSampleCandidatePools` e SQL proprio; a busca por
+  `optimize_candidate_quality_summary cqs` aparece somente no builder sem uso.
+- **Por que parece nao chamada:** o SQL builder pode ser resquicio de uma
+  amostragem anterior; hoje nao ha rota, lib runtime ou binario que execute a
+  string retornada.
+- **O que valida:** chamar esse builder a partir do runner/scorecard que precisa
+  da amostra, com teste de integracao ou dry-run.
+- **O que falsifica:** remover o builder e seu teste se a amostragem atual for
+  responsabilidade definitiva de `candidate_quality_data_foundation.dart`.
+
+### Itens verificados e nao classificados como problema
+
+- `auditCommanderReferenceTables`, `ensureCommanderReferenceProfileTable`,
+  `ensureCommanderReferenceCardStatsTable`, `ensureCardLocalizedNamesTable`,
+  `decodeExternalCommanderMetaArtifact`, `isCommanderCandidateLegalityAllowed`,
+  `loadExistingMetaDeckFingerprints` e `metaDeckAnalyticsFormatKey` aparecem com
+  baixa contagem em `server/lib`, mas tem chamadores em `server/bin`; foram
+  classificados como suporte operacional, nao como funcoes mortas.
+- Funcoes top-level em rotas Dart Frog chamadas por convencao (`onRequest`) nao
+  foram auditadas como "nao chamadas".
 
 ## Rodada focada: Card semantics audit
 

@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-29 05:30 UTC
+> Data: 2026-05-29 07:04 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -22,6 +22,11 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `card_function_tags`, mas optimize/validator/quality gate carregam apenas
    `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
    colapsado em um unico role.
+10. **P1/P2 — Funcoes publicas sem chamador runtime**: rodada focada de
+    2026-05-29 07:04 UTC confirmou que `sync_cards_utils.dart` e coberto por
+    teste, mas nao importado pelo `server/bin/sync_cards.dart`; tambem ha
+    wrappers/helpers sem chamador em request trace, Commander Reference,
+    MTGTop8 e candidate quality sample SQL.
 
 ## Achados priorizados
 
@@ -194,6 +199,49 @@ Histórico do problema:
 - **Validação**:
   - gerar artefatos necessários ou corrigir o entry point;
   - rerodar `dart analyze` até ficar verde.
+
+### P1 — Religar ou remover helpers publicos sem chamador runtime
+
+- **Evidência**:
+  - `server/lib/sync_cards_utils.dart` define `extractCardRow`,
+    `parseSinceDays`, `extractSetCardRow`, `extractOracleIds` e
+    `extractLegalities`, mas `grep -RIn "sync_cards_utils" server` encontra
+    apenas `server/test/sync_cards_test.dart`.
+  - O sync operacional `server/bin/sync_cards.dart` nao importa
+    `sync_cards_utils.dart` e mantem copias privadas/loops inline:
+    `_parseSinceDays` em `:376`, `_extractCardRow` em `:680`, montagem
+    incremental de rows em `:604`-`:663` e legalidades/oracle IDs em
+    `:806`-`:838`.
+  - `server/lib/request_trace.dart:48` (`getRequestTrace`) e `:51`
+    (`tryGetRequestId`) nao tem chamador runtime; rotas usam
+    `context.read<RequestTrace>()` diretamente.
+  - `server/lib/ai/commander_reference_profile_support.dart:49`
+    (`normalizedCommanderReferenceCandidate`) nao tem chamador; consumidores
+    usam `normalizeCommanderReferenceName`.
+  - `server/lib/meta/mtgtop8_meta_support.dart:139`
+    (`extractMtgTop8FormatCodeFromSourceUrl`) aparece apenas em teste, enquanto
+    o helper de event id vizinho e usado por
+    `server/bin/repair_mtgtop8_meta_history.dart`.
+  - `server/lib/ai/candidate_quality_data_support.dart:631`
+    (`buildCandidateQualitySamplePoolSql`) aparece apenas em teste; o runner
+    `candidate_quality_data_foundation.dart` monta seus pools por outro caminho.
+- **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
+  sync de cartas, onde a promessa de helpers extraidos nao corresponde ao CLI
+  ativo. Helpers publicos sem chamador tambem aumentam a superficie aparente da
+  API interna.
+- **Ação recomendada**:
+  1. priorizar `sync_cards_utils.dart`: escolher entre importar os helpers no
+     `server/bin/sync_cards.dart` ou remover o arquivo/testes como legado;
+  2. para wrappers pequenos (`request_trace`, Commander Reference, MTGTop8),
+     remover se nao houver contrato planejado ou religar com teste focado;
+  3. decidir se `buildCandidateQualitySamplePoolSql` deve virar parte real de
+     um scorecard/runner ou sair junto com o teste test-only.
+- **Validação**:
+  - `grep -RIn "sync_cards_utils" server` passa a encontrar o binario ativo ou
+    o arquivo/teste deixa de existir;
+  - buscas por cada simbolo retornam pelo menos um chamador runtime/binario
+    intencional alem de testes, ou o simbolo e removido;
+  - testes de sync/candidate quality continuam verdes depois da decisao.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
 - **Status em `codex/hermes-analysis-docs@d2b189fc`: ABERTO.** A rodada local
