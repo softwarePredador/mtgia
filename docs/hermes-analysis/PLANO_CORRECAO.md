@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-28 00:01 UTC
+> Data: 2026-05-29 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -12,12 +12,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
 4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
 5. **P1 — Ownership em rotas deck/AI**: aberto no checkout auditado (`codex/hermes-analysis-docs@d2b189fc`) para `POST /ai/optimize`, `GET /ai/optimize/jobs/:id` e `POST /ai/archetypes`; rotas experimentais seguem bloqueadas para promocao sem contrato owner/public/meta.
-6. **P1 — Politicas por nome**: resolvido para as listas apontadas pelo verificador (`premiumLandNames`, high-power e candidate-quality premium) via `commander_fallback_policy.dart`; novas excecoes por nome devem entrar apenas em policy versionada ou fixture/teste.
+6. **P1 — Politicas por nome / semantica de cartas**: reaberto no checkout local `7014a2cc`. `commander_fallback_policy.dart` nao existe nesta branch, e ainda ha excecoes por nome em `functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart` e rotas de recomendacao.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: rodada focada de
    2026-05-29 confirmou `LifeCounterScreen` legado sem chamada em `app/lib`,
    `DeckCard` testado mas fora da listagem real, `DeckProgressChip` sem
    chamador e `LotusPresentationMode` sem import.
+9. **P1 — Drift entre deck analysis e optimize**: deck analysis prefere
+   `card_function_tags`, mas optimize/validator/quality gate carregam apenas
+   `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
+   colapsado em um unico role.
 
 ## Achados priorizados
 
@@ -89,36 +93,94 @@ Histórico do problema:
   - revisão de imports mostra dependência convergindo para helpers compartilhados.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
-- **Status em `origin/master@65f30387`: RESOLVIDO para as listas apontadas pelo
-  verificador.** `premiumLandNames`, high-power e candidate-quality premium
-  passaram a usar `server/lib/ai/commander_fallback_policy.dart`. Mantido aqui
-  como histórico; novas excecoes por nome devem entrar apenas em policy
-  versionada ou fixture/teste.
+- **Status em `codex/hermes-analysis-docs@7014a2cc`: REABERTO.** A revalidacao
+  local nao encontrou `server/lib/ai/commander_fallback_policy.dart`; o unico
+  arquivo `*policy*` em `server/lib` e `server/lib/edh_bracket_policy.dart`.
+  Portanto a anotacao historica de resolucao em `origin/master@65f30387` nao
+  deve ser aplicada a este checkout.
 - **Evidência**:
-  - Revalidacao Copilot em `origin/master@00437690` confirmou PASS para:
-    prioridade `functional_tags_then_semantic_v2_then_heuristic`,
-    preservacao multi-role no optimize, testes semanticos focados e docs
-    operacionais.
-  - A mesma revalidacao ficou PARTIAL para politicas por nome: fallbacks
-    Commander foram centralizados em `commander_fallback_policy.dart`, mas ainda
-    existem scoring/listas como `premiumLandNames` em
-    `optimize_runtime_support.dart` e sets premium/high-power em
-    `candidate_quality_data_support.dart`.
+  - `server/lib/ai/functional_card_tags.dart:220`-`:226` classifica ramp por
+    `signet`, `talisman`, `sol ring` e `arcane signet`; `:714`-`:717`,
+    `:754`-`:780` e `:859`-`:899` usam nomes conhecidos para protecao,
+    aristocrats, wincon, combo, payoff e enabler.
+  - `server/lib/ai/candidate_quality_data_support.dart:375`-`:379`,
+    `:439`-`:445`, `:472`-`:478`, `:590`-`:605` e `:611`-`:628` repetem
+    checks por nome e aplicam `highPowerNames`/`premium` ao bracket/score.
+  - `server/lib/ai/optimize_runtime_support.dart:406`-`:454`, `:1296`-`:1345`,
+    `:1948`-`:2052`, `:3476`-`:3509` e `:3565`-`:3615` mantem listas fixas de
+    terrenos premium, staples, denylist/premium filler e fallbacks universais ou
+    contextuais.
+  - `server/routes/decks/[id]/recommendations/index.dart:262`-`:268` recomenda
+    `Command Tower` diretamente quando `landCount < 34`.
+  - `server/routes/ai/weakness-analysis/index.dart:206`-`:285` retorna listas
+    fixas de nomes para ramp, draw, removal, wipes e protecao.
 - **Impacto**: a maior parte do pipeline semantico ja converge, mas parte da
   decisao de score/bracket/premium ainda depende de listas inline, dificultando
-  versao, auditoria e rollout controlado.
+  versao, auditoria e rollout controlado. No checkout local, a divergencia e
+  maior que o historico sugeria, porque a policy central citada nao esta
+  presente.
 - **Ação recomendada**:
-  1. mover as excecoes restantes para modulo/config/tabela de policy versionada;
-  2. enriquecer cada entrada com role, bracket, motivo, fonte e data;
-  3. manter filtros de legalidade, identidade de cor, budget/bracket e dados
-     semanticos antes do retorno;
-  4. adicionar testes focados para a policy restante.
+  1. criar/restaurar modulo/config/tabela de policy versionada para excecoes de
+     nome realmente intencionais;
+  2. enriquecer cada entrada com role, bracket, motivo, fonte, confidence e data;
+  3. manter `oracle_text`, `type_line`, `mana_cost`, `cmc`,
+     `card_function_tags`, `semantic_tags_v2`, legalidade, identidade de cor e
+     budget/bracket como sinais primarios antes de qualquer bonus por nome;
+  4. remover checks inline dos classificadores puros ou transforma-los em
+     backfill de dados semanticos persistidos;
+  5. adicionar testes focados para policy, incluindo cartas com texto equivalente
+     e nomes diferentes.
 - **Validação**:
   - `rg "Sol Ring|Command Tower|Thassa's Oracle|Isochron Scepter|Dramatic Reversal|Blood Artist" server/lib server/routes app/lib`
-    nao encontra decisao runtime fora de fixtures, docs, prompts ou policy
-    versionada;
+    nao encontra decisao runtime fora de fixtures, docs, prompts, seed/corpus
+    declarado ou policy versionada;
   - testes provam que score/bracket/premium vem da policy e continua respeitando
     legalidade, identidade de cor e bracket.
+
+### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
+
+- **Status em `codex/hermes-analysis-docs@7014a2cc`: ABERTO.**
+- **Evidência**:
+  - `GET /decks/:id/analysis` seleciona `card_function_tags` e
+    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
+    `POST /decks/:id/ai-analysis` faz o mesmo em
+    `server/routes/decks/[id]/ai-analysis/index.dart:119`-`:135`.
+  - `summarizeFunctionalTagsForDeck` prefere `functional_tags` persistidos e so
+    usa heuristica depois em `server/lib/ai/functional_card_tags.dart:432`-`:465`.
+  - `loadOptimizeDeckContext` carrega `semantic_tags_v2`, mas nao
+    `card_function_tags`, em `server/lib/ai/optimize_request_support.dart:86`-`:105`
+    e monta `allCardData` sem `functional_tags` em `:186`-`:198`.
+  - `classifyOptimizationFunctionalRole` usa `semantic_tags_v2` primeiro e
+    depois `type_line`/`oracle_text`, sem ler `functional_tags`, em
+    `server/lib/ai/optimization_functional_roles.dart:55`-`:124`.
+  - `OptimizationValidator` e `OptimizationSwapGateResult` chamam esse
+    classificador em `server/lib/ai/optimization_validator.dart:265`-`:267` e
+    `server/lib/ai/optimization_quality_gate.dart:52`-`:53`.
+  - O mesmo arquivo colapsa `semantic_tags_v2` para um unico role em
+    `server/lib/ai/optimization_functional_roles.dart:127`-`:180` e calcula
+    `role_delta` sobre esse role unico em `:292`-`:323`.
+  - Candidate quality aplica outro mapa de normalizacao em
+    `server/lib/ai/candidate_quality_data_support.dart:290`-`:309`.
+- **Impacto**: a aba de analise pode contar uma carta por `card_function_tags`
+  persistido, enquanto optimize/validator a tratam por heuristica ou role unico
+  de `semantic_tags_v2`. Swaps podem parecer seguros no gate por perderem roles
+  secundarios como `engine`, `payoff`, `enabler`, `drain` ou `exile_value`.
+- **Ação recomendada**:
+  1. criar adapter unico `resolveCardFunctionalRoles` que receba
+     `functional_tags`, `semantic_tags_v2`, `oracle_text`, `type_line`,
+     `mana_cost` e `cmc`;
+  2. retornar conjunto de roles + `primary_role` compatível, nao apenas string;
+  3. usar o adapter em deck analysis, optimize context, validator, quality gate
+     e candidate quality;
+  4. carregar `card_function_tags` nas queries de optimize e additions;
+  5. cobrir com testes: persisted functional sem v2, v2 multi-tag, v2 abaixo de
+     confianca e fallback por oracle/tipo.
+- **Validação**:
+  - uma carta com `functional_tags=[draw]` e sem `semantic_tags_v2` e `draw` em
+    deck analysis, validator e quality gate;
+  - uma carta com `semantic_tags_v2.tags=[draw, engine]` preserva ambos os
+    papeis no role delta;
+  - candidate quality e optimize usam a mesma normalizacao de roles.
 
 ### P1 — Restaurar a analisabilidade do backend local
 - **Evidência**:
