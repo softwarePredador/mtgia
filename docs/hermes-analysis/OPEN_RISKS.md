@@ -1,6 +1,6 @@
 # Hermes Analysis: Open Risks
 
-> Riscos abertos do ManaLoom. Atualizado em 2026-05-27.
+> Riscos abertos do ManaLoom. Atualizado em 2026-05-29T20:15Z (E2E logic audit).
 > Este arquivo nao substitui os documentos canonicos; resume a leitura operacional atual.
 
 ## P0 — Bloqueante
@@ -224,3 +224,23 @@ Price history pode ser vazio para cartas sem dados. A UI precisa tolerar estados
 - Toda mudanca em contrato app-facing precisa atualizar `API_CONTRACTS_AND_DATA_MAP.md`
 - Toda mudanca de UI runtime precisa consultar `UI_TEST_SURFACE_MAP.md`
 - O corpus de resolucao Commander (19/19 passando) e gate recorrente
+
+## Riscos E2E Pipeline (2026-05-29)
+
+### P1 — Drift entre classificadores funcionais
+**Local:** `server/lib/ai/optimization_functional_roles.dart:55-58`
+`classifyOptimizationFunctionalRole()` não consulta `functional_tags` persistidas como fonte primária. Usa apenas `semantic_tags_v2` + heurísticas de oracle text. O `summarizeFunctionalTagsForDeck` (usado no deck analysis) prioriza `functional_tags → semantic_v2 → heuristic`. Isso causa inconsistência: deck analysis diz `draw`, optimize diz `utility` para a mesma carta.
+**Impacto:** Trocas sugeridas pela IA podem remover cartas que o Analysis considerava essenciais.
+**Recomendação:** Alinhar `classifyOptimizationFunctionalRole()` para consultar `functional_tags` persistidas.
+
+### P1 — Doc incompleta do flag `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES`
+**Local:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md` (pós-3f7d784f)
+A documentação menciona apenas `true` como valor truthy, mas o código aceita `1/true/yes/on/expanded`.
+**Impacto:** Configuradores não descobrem todos os valores válidos sem ler código.
+**Recomendação:** Listar todos os valores aceitos na documentação.
+
+### P2 — `looksLikePayoff` frágil para payoffs de dano direto
+**Local:** `server/lib/ai/optimization_functional_roles.dart:388-392`
+Não detecta "whenever a creature enters, deal N damage" (Impact Tremors, Guttersnipe).
+**Impacto:** Payoffs de dano direto nunca são classificados como `payoff`.
+**Recomendação:** Adicionar padrões para "deals *damage* to any target" combinado com triggers ETB/cast.

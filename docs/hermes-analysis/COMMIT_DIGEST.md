@@ -1,13 +1,13 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-29T16:15Z (pos-correcao — semantic v2 fallback guardrail, master avancou para c3531df7).
+> Atualizado em 2026-05-29T20:15Z (E2E logic coherence audit — 3f7d784f guard expanded roles behind flag).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `771c9318` (Harden semantic scorecard runner)
-- HEAD atual: **`c3531df7`** (Cover semantic v2 low confidence fallback)
+- HEAD anterior: `c3531df7` (Cover semantic v2 low confidence fallback)
+- HEAD atual: **`3f7d784f`** (Guard expanded semantic roles behind flag)
 - SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
@@ -15,7 +15,13 @@
 
 ## Novos commits nesta rodada (2026-05-29)
 
-### `c3531df7` — Cover semantic v2 low confidence fallback (2026-05-29, atual)
+### `3f7d784f` — Guard expanded semantic roles behind flag (2026-05-29, atual)
+- **7 arquivos**, código + doc + testes.
+- **Tipo: CODE/FEATURE-FLAG** — Introduz `resolveSemanticV2ExpandedCriticalRoles()` e propaga `expandedCriticalRoles` em todo o pipeline de enforcement. Default seguro: expanded roles ficam review-only. Flag `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES` (valores: `1/true/yes/on/expanded`) ativa bloqueio.
+- **Validação:** `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/functional_card_tags.dart lib/edh_bracket_policy.dart routes/ai/optimize/index.dart` — sem erros. `dart test` 599/599 PASS.
+- **Status Hermes:** P1 encontrada — doc no `API_CONTRACTS_AND_DATA_MAP.md` não lista todos os valores truthy aceitos. P1 encontrada — `classifyOptimizationFunctionalRole` não consulta `functional_tags` persistidas.
+
+### `c3531df7` — Cover semantic v2 low confidence fallback (2026-05-29)
 - **1 arquivo**, teste.
 - **Tipo: QA/GUARDRAIL** — adiciona teste provando que `semantic_tags_v2` com baixa confiança e role incorreta e ignorado, caindo para heuristica de `oracle_text`.
 - **Validação:** `dart analyze bin lib routes test`, `dart test` em `server/` com 613 testes, `dart test test/optimization_quality_gate_test.dart -r expanded`, `git diff --check`, scan simples de secrets, smoke Hermes pos-push.
