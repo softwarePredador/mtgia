@@ -368,6 +368,27 @@ void main() {
       expect(role, equals('ramp'));
     });
 
+    test('falls back to oracle heuristics when semantic v2 confidence is low',
+        () {
+      final card = {
+        'name': 'Low Confidence Study',
+        'type_line': 'Enchantment',
+        'mana_cost': '{2}{U}',
+        'oracle_text':
+            'Whenever an opponent casts a spell, you may draw a card.',
+        'semantic_tags_v2': const [
+          {
+            'role_confidence': 0.42,
+            'tags': ['removal'],
+          },
+        ],
+      };
+
+      expect(optimizationFunctionalRolesForCard(card, semanticOnly: true),
+          isEmpty);
+      expect(classifyOptimizationFunctionalRole(card), equals('draw'));
+    });
+
     test('classifies curated semantic staples before oracle fallback roles',
         () {
       final samples = {
