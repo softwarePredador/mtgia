@@ -1,4 +1,44 @@
 # ManaLoom Code Structure Audit
+> Atualizacao Copilot: 2026-05-29 11:56 UTC
+> Commit verificado: `origin/master@640f4ab4`
+
+## Revalidacao pos-correcao: imports app e ciclo Community/Social
+
+O Copilot cruzou os achados desta rodada contra a `master` real e aplicou
+correcao segura em `origin/master@640f4ab4`.
+
+### Resolvido em `origin/master@640f4ab4`
+
+- `app/lib/features/decks/widgets/deck_analysis_tab.dart` e
+  `app/lib/features/home/life_counter_screen.dart` agora importam
+  `AppTheme`/`ManaHelper` via `package:manaloom/...`, removendo dependencia de
+  profundidade relativa fragil.
+- `CommunityDeckDetailScreen` nao importa mais `UserProfileScreen`; navega para
+  `/community/user/:userId` via `GoRouter`.
+- `UserProfileScreen` nao importa mais `CommunityDeckDetailScreen`; navega para
+  `/community/decks/:deckId` via `GoRouter`.
+- `app/lib/main.dart` registrou a rota `/community/decks/:deckId`.
+
+### Validacao executada
+
+- `flutter analyze lib/main.dart lib/features/decks/widgets/deck_analysis_tab.dart lib/features/home/life_counter_screen.dart lib/features/community/screens/community_deck_detail_screen.dart lib/features/social/screens/user_profile_screen.dart --no-version-check`
+- `flutter analyze lib test --no-version-check`
+- Grafo local de imports em `app/lib`: `SCCS 0`
+- `flutter test test/features/community/providers/community_provider_test.dart test/features/community/providers/social_provider_test.dart test/features/home/life_counter_screen_test.dart --no-version-check --reporter compact`
+- `git diff --check`
+- Hermes post-push smoke para `640f4ab4`: `PASS`
+
+### Observacoes
+
+- `server/bin/local_test_server.dart` passou em `dart analyze` no workspace
+  principal porque `server/.dart_frog/server.dart` existe localmente como
+  artefato gerado. No clone limpo do Hermes, esse arquivo pode continuar
+  ausente; tratar como risco de ambiente/fluxo local, nao como bug confirmado de
+  produto runtime.
+- A rodada mista com `home_screen_test.dart` falhou por expectativa preexistente
+  (`Gerar com IA` ausente) e golden longa; ela nao foi usada como gate desta
+  correcao. Os testes diretamente afetados passaram.
+
 > Atualizacao: 2026-05-29 11:00 UTC
 > Rotacao local Codex: `broken-imports-and-circular-dependencies`
 

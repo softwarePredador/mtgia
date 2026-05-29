@@ -27,12 +27,12 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     teste, mas nao importado pelo `server/bin/sync_cards.dart`; tambem ha
     wrappers/helpers sem chamador em request trace, Commander Reference,
     PerformanceService, MTGTop8 e candidate quality sample SQL.
-11. **P1/P2 — Imports quebrados e ciclo app**: rodada focada de
-    2026-05-29 11:00 UTC confirmou imports relativos quebrados em
-    `deck_analysis_tab.dart` e `life_counter_screen.dart`, o import ausente
-    `server/bin/local_test_server.dart -> ../.dart_frog/server.dart` confirmado
-    por `dart analyze`, e um ciclo direto entre `CommunityDeckDetailScreen` e
-    `UserProfileScreen`.
+11. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
+    `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
+    `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
+    direto entre `CommunityDeckDetailScreen` e `UserProfileScreen` foi removido
+    via GoRouter. O ponto restante e apenas operacional: `local_test_server.dart`
+    depende do artefato gerado `.dart_frog/server.dart` em clones limpos.
 
 ## Achados priorizados
 
@@ -208,6 +208,17 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
+**Status 2026-05-29: RESOLVIDO para app em `origin/master@640f4ab4`; pendente
+apenas o fluxo operacional do `local_test_server.dart` em clones sem
+`.dart_frog/server.dart`.**
+
+- `deck_analysis_tab.dart` e `life_counter_screen.dart` foram migrados para
+  imports `package:manaloom/...`.
+- Validado com `flutter analyze` focado e `flutter analyze lib test`.
+- O workspace principal tinha `server/.dart_frog/server.dart` gerado e
+  `dart analyze bin/local_test_server.dart` passou; o clone limpo do Hermes
+  ainda pode precisar de bootstrap documentado/automatizado.
+
 - **Evidência**:
   - `app/lib/features/decks/widgets/deck_analysis_tab.dart:5` importa
     `../../../../core/utils/mana_helper.dart`, que resolve para
@@ -239,6 +250,14 @@ Histórico do problema:
     sem `uri_does_not_exist` para os imports core corrigidos.
 
 ### P2 — Quebrar o ciclo direto entre `CommunityDeckDetailScreen` e `UserProfileScreen`
+
+**Status 2026-05-29: RESOLVIDO em `origin/master@640f4ab4`.**
+
+- `CommunityDeckDetailScreen` navega para `/community/user/:userId` via
+  `GoRouter`.
+- `UserProfileScreen` navega para `/community/decks/:deckId` via `GoRouter`.
+- `app/lib/main.dart` registra a rota `/community/decks/:deckId`.
+- Grafo local de imports em `app/lib`: `SCCS 0`.
 
 - **Evidência**:
   - `app/lib/features/community/screens/community_deck_detail_screen.dart:8`
