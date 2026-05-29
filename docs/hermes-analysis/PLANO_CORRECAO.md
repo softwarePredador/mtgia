@@ -15,7 +15,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    mais `../.dart_frog/server.dart` estaticamente; ele valida o artefato gerado
    em runtime, sobe `dart run .dart_frog/server.dart` como processo filho e
    trata `SIGINT`/`SIGTERM`.
-5. **P1 — Ownership em rotas deck/AI**: revalidado como **RESOLVIDO no `master` atual** para `POST /ai/optimize`, `GET /ai/optimize/jobs/:id`, `POST /ai/archetypes`, simulate/recommendations/matchup/weakness via source guards. Rotas experimentais continuam bloqueadas para promocao sem contrato UX/produto, mas nao por falta de owner-scope no codigo atual.
+5. **P1 — Ownership em rotas deck/AI**: **REABERTO no checkout local `b071080e`**. A rodada de coerencia de 2026-05-29 23:05 UTC mostrou que `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing.
 6. **P1 — Politicas por nome / semantica de cartas**: reaberto no checkout local `7014a2cc`. `commander_fallback_policy.dart` nao existe nesta branch, e ainda ha excecoes por nome em `functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart` e rotas de recomendacao.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-29 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: rodada focada de
@@ -453,45 +453,46 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
   - testes de sync/candidate quality continuam verdes depois da decisao.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
-- **Status 2026-05-29:** RESOLVIDO no `master` atual para as rotas
-  app-facing principais e para os endpoints experimentais cobertos por source
-  guard. Defense-in-depth adicional de `GET /decks/:id/simulate` foi
-  **RESOLVIDO em `origin/master@a466adb6`**: a leitura de `deck_cards` agora
-  tambem faz `JOIN decks` e filtra `d.user_id = CAST(@userId AS uuid)`.
-  A pendencia remanescente e de produto/contrato: nao promover rotas
-  experimentais para UX sem prova runtime e contrato claro de owner/public/meta.
+- **Status 2026-05-29 23:05 UTC:** REABERTO no checkout local `b071080e`.
+  Defense-in-depth de `GET /decks/:id/simulate` permanece citado
+  historicamente como resolvido em `origin/master@a466adb6`, mas a coerencia
+  app-facing de `/ai/optimize`, `/ai/archetypes` e jobs async nao esta
+  resolvida nesta branch.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
-    `app/lib/features/decks/providers/deck_provider_support_ai.dart`; o
-    backend agora exige usuario autenticado e chama
-    `loadOptimizeDeckContext(..., userId: authenticatedUserId)`.
-  - `server/lib/ai/optimize_request_support.dart` consulta `decks` por
-    `id + user_id` antes de carregar cartas.
+    `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`; a
+    rota tenta ler `userId`, mas chama `loadOptimizeDeckContext` em
+    `server/routes/ai/optimize/index.dart:549`-`:558` sem passar usuario.
+  - `server/lib/ai/optimize_request_support.dart:53`-`:73` declara o loader
+    sem `userId` e consulta `SELECT name, format FROM decks WHERE id = @id`;
+    `:87`-`:110` carrega cartas por `WHERE dc.deck_id = @id`.
   - O app tambem envia `POST /ai/archetypes` com `deck_id` em
-    `app/lib/features/decks/providers/deck_provider_support_mutation.dart`; a
-    rota le `context.read<String>()` e escopa `decks` por `id + user_id`.
-  - `GET /ai/optimize/jobs/:id` bloqueia job sem owner e job de outro usuario.
-  - `server/test/experimental_deck_ai_authorization_source_test.dart` cobre
-    simulate, recommendations, matchup, weakness-analysis e archetypes.
-  - `origin/master@a466adb6` adicionou source guard especifico para
-    `JOIN decks d ON d.id = dc.deck_id` e
-    `AND d.user_id = CAST(@userId AS uuid)` na rota de simulate.
-- **Impacto**: risco principal encerrado no codigo atual. O risco restante e
-  reabrir endpoints experimentais no app sem contrato/teste runtime especifico.
+    `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`;
+    `server/routes/ai/archetypes/index.dart:39`-`:42` busca o deck por `id`
+    apenas e `:54`-`:60` carrega cartas por `dc.deck_id = @id`.
+  - `OptimizeJobStore.create` aceita `String? userId` em
+    `server/lib/ai/optimize_job.dart:25`-`:30`, e
+    `server/routes/ai/optimize/jobs/[id].dart:39`-`:47` so bloqueia quando o
+    job tem owner diferente; job nulo continua legivel.
+- **Impacto**: usuario autenticado pode potencialmente disparar analise/opcoes
+  ou leitura de job para recursos sem owner-scope se obtiver IDs validos. Alem
+  disso, a memoria tecnica anterior registrava um estado resolvido que nao bate
+  com o codigo local.
 - **Ação recomendada**:
-  1. manter source guards de ownership nos endpoints app-facing e experimentais;
-  2. antes de expor novos endpoints experimentais no app, escolher entre escopar por
-     dono, limitar a deck publico/meta deck, ou remover/ocultar o contrato;
-  3. exigir teste owner vs non-owner quando qualquer rota nova aceitar `deck_id`.
+  1. adicionar `userId` obrigatorio a `loadOptimizeDeckContext` e filtrar
+     `decks`/`deck_cards` por dono;
+  2. aplicar o mesmo owner-scope em `/ai/archetypes`;
+  3. tornar `OptimizeJobStore.create` owner-obrigatorio para jobs app-facing e
+     retornar 404 quando `job.userId == null || job.userId != userId`;
+  4. exigir teste owner vs non-owner quando qualquer rota nova aceitar
+     `deck_id`.
 - **Validação**:
-  - `dart test test/experimental_deck_ai_authorization_source_test.dart -r expanded`
-    passou em 2026-05-29;
-  - source mostra `loadOptimizeDeckContext` com `userId` obrigatorio e consulta
+  - teste de `POST /ai/optimize` com deck de outro usuario retorna 404;
+  - teste de `POST /ai/archetypes` com deck de outro usuario retorna 404;
+  - source mostra `loadOptimizeDeckContext` com `userId` obrigatorio e query de
     `decks` por `id + user_id`;
-  - source mostra `/ai/archetypes` com `context.read<String>()` e
-    `AND user_id = CAST(@user_id AS uuid)`;
-  - source mostra polling de optimize bloqueando `job.userId == null` ou
-    diferente do usuario autenticado;
+  - source mostra polling de optimize bloqueando `job.userId == null` ou owner
+    diferente;
   - source mostra simulate lendo cartas via `deck_cards` + `decks` filtrado por
     owner;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`

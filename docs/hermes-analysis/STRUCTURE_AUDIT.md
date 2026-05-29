@@ -1,7 +1,146 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-05-29 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-05-29 23:05 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre modulos `server/lib` ↔ `server/routes` ↔ `app/lib` — revalidacao 2026-05-29 23:05 UTC
+
+Escopo desta rodada: somente coerencia entre camada de suporte backend
+(`server/lib`), rotas Dart Frog (`server/routes`) e consumidores Flutter
+(`app/lib`). Nao foi executada auditoria ampla de classes sem uso, funcoes sem
+chamada, imports/ciclos, tabelas PostgreSQL ou duplicacao fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: branch remota sincronizada.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: limpo no inicio da rodada; depois o auditor base
+  atualizou este arquivo.
+- `git rev-parse --short HEAD`: `b071080e`.
+- `rg` nao esta instalado neste shell local; buscas focadas usaram
+  `grep -RIn`, `nl -ba` e leitura direta dos arquivos.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 174.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor base nao compara contrato app-facing
+entre app, rota e camada de support. A triagem abaixo foi manual e ficou
+restrita aos fluxos onde o app chama uma rota que delega para `server/lib` ou
+usa dados calculados por `server/lib`.
+
+### Achados revalidados
+
+#### P1 — `POST /ai/optimize` continua carregando deck por `id` sem owner-scope na camada `server/lib`
+
+- **Consumidor app:** `app/lib/features/decks/providers/deck_provider.dart:543`-`:550`
+  chama `requestOptimizeDeck(...)`; `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`
+  envia `POST /ai/optimize` com `deck_id`.
+- **Rota:** `server/routes/ai/optimize/index.dart:401`-`:406` tenta ler
+  `userId`, mas a chamada para `loadOptimizeDeckContext` em
+  `server/routes/ai/optimize/index.dart:549`-`:558` passa `pool`, `deckId`,
+  `targetArchetype`, `requestMode`, `intensity`, `bracket`, `keepTheme` e
+  `telemetry`, sem `userId`.
+- **Camada `server/lib`:** `server/lib/ai/optimize_request_support.dart:53`-`:73`
+  declara `loadOptimizeDeckContext` sem parametro `userId` e executa
+  `SELECT name, format FROM decks WHERE id = @id`; a consulta de cartas em
+  `server/lib/ai/optimize_request_support.dart:87`-`:110` usa somente
+  `WHERE dc.deck_id = @id`.
+- **Por que e incoerente:** o app trata optimize como operacao do deck do
+  usuario autenticado, e o contrato global em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` exige ownership mobile em rotas
+  protegidas. Nesta branch, a rota autentica, mas a camada que monta o contexto
+  nao escopa `decks` por `user_id`, entao o contrato app-facing e a query real
+  divergem.
+- **O que valida:** adicionar `userId` obrigatorio a
+  `loadOptimizeDeckContext`, aplicar `WHERE id = @id AND user_id = @userId`
+  na query de deck e proteger a query de `deck_cards` por `JOIN decks d ON
+  d.id = dc.deck_id AND d.user_id = @userId`; criar teste owner vs non-owner
+  cobrindo `POST /ai/optimize`.
+- **O que falsifica:** documentar uma regra explicita de optimize para decks
+  publicos ou compartilhados, implementar essa regra na query e cobrir o caso
+  com teste de contrato app/backend.
+
+#### P1 — `POST /ai/archetypes` tambem diverge do contrato app-facing de ownership
+
+- **Consumidor app:** `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`
+  chama `POST /ai/archetypes` com `deck_id` e espera `data['options']`.
+- **Rota:** `server/routes/ai/archetypes/index.dart:27`-`:42` le `deck_id`,
+  mas busca `SELECT name, format FROM decks WHERE id = @id`, sem
+  `context.read<String>()` nem filtro por `user_id`. A consulta de cartas em
+  `server/routes/ai/archetypes/index.dart:54`-`:60` tambem usa apenas
+  `WHERE dc.deck_id = @id`.
+- **Camada `server/lib`:** a rota usa
+  `loadUsableCommanderReferenceProfile` de
+  `server/lib/ai/commander_reference_profile_support.dart` quando encontra um
+  comandante; a escolha do profile e das opcoes fica correta para o comandante,
+  mas recebe um deck ja carregado sem owner-scope.
+- **Por que e incoerente:** o app so apresenta opcoes para decks do usuario,
+  mas a rota pode montar opcoes a partir de qualquer UUID de deck existente. O
+  `TECHNICAL_MAP.md` anterior dizia que `/ai/archetypes` ja lia
+  `context.read<String>()` e escopava owner; isso nao e verdadeiro no checkout
+  local `b071080e`.
+- **O que valida:** ler `userId` na rota, trocar a query de deck para
+  `WHERE id = @id AND user_id = @userId`, proteger a query de cartas com join
+  em `decks`, e adicionar teste de non-owner retornando 404.
+- **O que falsifica:** mover `/ai/archetypes` para um contrato formal de deck
+  publico/compartilhado e provar por teste que decks privados continuam
+  inacessiveis.
+
+#### P2 — Jobs async de optimize ainda aceitam `user_id` nulo em `server/lib` e na rota de polling
+
+- **Consumidor app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:74`-`:87`
+  aceita `202` de `/ai/optimize` e faz polling em
+  `app/lib/features/decks/providers/deck_provider_support_ai.dart:190`-`:194`.
+- **Camada `server/lib`:** `OptimizeJobStore.create` em
+  `server/lib/ai/optimize_job.dart:25`-`:30` declara `String? userId`, persiste
+  `user_id` nullable em `:49`-`:64`, e `OptimizeJob.userId` tambem e nullable
+  em `server/lib/ai/optimize_job.dart:268`-`:290`.
+- **Rota de polling:** `server/routes/ai/optimize/jobs/[id].dart:39`-`:47`
+  bloqueia apenas quando `job.userId != null && job.userId != userId`; jobs sem
+  dono salvo continuam legiveis por qualquer usuario autenticado que conheca o
+  ID.
+- **Por que e incoerente:** a rota app-facing de polling e consumida como
+  recurso do usuario autenticado, mas o modelo `server/lib` permite job sem
+  owner e a rota preserva esse estado como legivel. Mesmo que a criacao normal
+  passe `userId`, o contrato estrutural continua permitindo drift por chamadas
+  internas futuras, persistencia antiga ou falha de contexto.
+- **O que valida:** tornar `userId` obrigatorio em `OptimizeJobStore.create` e
+  em `OptimizeJob`, migrar/rejeitar jobs nulos, e trocar a rota de polling para
+  retornar 404 quando `job.userId == null || job.userId != userId`, salvo uma
+  rota interna separada.
+- **O que falsifica:** documentar uma categoria de job interno sem usuario,
+  impedir seu uso pelo endpoint app-facing e cobrir esse isolamento com teste.
+
+### Itens verificados e nao classificados como novo problema
+
+- `POST /ai/rebuild` esta coerente com o contrato de ownership: a rota le
+  `userId` em `server/routes/ai/rebuild/index.dart:16` e busca o deck com
+  `WHERE d.id = @deckId AND d.user_id = @userId` em
+  `server/routes/ai/rebuild/index.dart:61`-`:78`; o app chama esse endpoint em
+  `app/lib/features/decks/providers/deck_provider_support_ai.dart:165`-`:174`.
+- Notificacoes DB/FCM mantem coerencia de tipos e destinos para os fluxos
+  app-facing verificados: `direct_message`, `trade_*` e `new_follower` sao
+  emitidos por `NotificationService.createFromActorDeferred` e mapeados no app
+  por `RealtimeNotificationCoordinator.routeForPayload` e
+  `NotificationScreen._navigateToContext`.
+- `/decks/:id/analysis` continua alinhado entre rota e app para
+  `functional_tags`: a rota retorna `functionalSummary.toJson()` em
+  `server/routes/decks/[id]/analysis/index.dart:430`, e
+  `DeckAnalysisData.fromJson` consome `json['functional_tags']` em
+  `app/lib/features/decks/models/deck_analysis.dart:14`-`:28`.
 
 ## Rodada focada: Duplicated or similar logic — revalidacao 2026-05-29 19:00 UTC
 
