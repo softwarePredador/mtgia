@@ -60,6 +60,13 @@
 
 ### Achado P1 (CRÍTICO) — Precedência de operadores em `_looksLikePayoff`
 
+- **Status 2026-05-29:** **RESOLVIDO em `origin/master@1463732a`**.
+  `_looksLikePayoff` foi reescrito com branches explicitos para nomes
+  aristocrats, escala `for each`, triggers `whenever` e enters/dies/cast.
+  O filtro de custo agora usa regex para `costs? {…} less`. Testes confirmam
+  `Impact Tremors` como `payoff` e `The One Ring` como `draw+protection`, nao
+  `payoff`.
+
 - **Severidade:** P1 (incoerência / potencial quebra)
 - **Local:** `server/lib/ai/functional_card_tags.dart:896-900`
 - **Descrição:**
@@ -113,6 +120,10 @@ Isso também corrigiria a precedência implícita que, embora "funcional" hoje, 
 - Novo helper `_looksLikeSelfMillSetup` exclui explicitamente "target opponent mills" — correção importante para decks como Lorehold que dependem de self-mill.
 
 ### Achado P2 — `_looksLikePayoff`: filtro `costs {` hardcoded é frágil
+
+- **Status 2026-05-29:** **RESOLVIDO em `origin/master@1463732a`** junto com o
+  P1 acima. O match hardcoded foi substituido por expressao regular de custo
+  reduzido.
 
 - **Severidade:** P2 (melhoria)
 - **Local:** `functional_card_tags.dart:897-899`
@@ -248,9 +259,9 @@ final rolePreserved = removedRole == addedRole ||
 
 ## Top 3 Prioridades para Ação
 
-1. **P1 — `_looksLikePayoff` precedência operadores** (functional_card_tags.dart:896) — Refatorar com variáveis intermediárias para eliminar ambiguidade.
-2. **P1 — Semantic enforcement critical_loss_roles expandido sem flag** (optimization_functional_roles.dart:354) — Considerar rollout gradual ou shadow mode.
-3. **P2 — `_functionalRolesForGate` sem fallback para heurística** (optimization_quality_gate.dart:132) — Adicionar fallback quando semantic roles são de baixa confiança.
+1. **P1 — Semantic enforcement critical_loss_roles expandido sem flag** (optimization_functional_roles.dart:354) — Considerar rollout gradual ou shadow mode.
+2. **P2 — `_functionalRolesForGate` sem fallback para heurística** (optimization_quality_gate.dart:132) — Adicionar fallback quando semantic roles são de baixa confiança.
+3. **P2 — `simulate/index.dart` defense-in-depth** — adicionar `AND user_id = @userId` na query de `deck_cards` mesmo que o deck ja tenha sido validado por owner.
 
 ## Arquivos Analisados (leitura completa)
 
@@ -258,7 +269,7 @@ final rolePreserved = removedRole == addedRole ||
 |:--------|:-------|
 | `server/lib/ai/commander_fallback_policy.dart` | ✅ Novo, limpo |
 | `server/lib/ai/optimization_functional_roles.dart` | ✅ Mudanças sólidas |
-| `server/lib/ai/functional_card_tags.dart` | ⚠️ P1 em `_looksLikePayoff` |
+| `server/lib/ai/functional_card_tags.dart` | ✅ P1 `_looksLikePayoff` resolvido em `1463732a` |
 | `server/lib/ai/optimization_validator.dart` | ✅ Bug fix correto |
 | `server/lib/ai/optimization_quality_gate.dart` | ⚠️ P2 em fallback |
 | `server/lib/ai/optimize_runtime_support.dart` | ✅ Boa centralização |
@@ -283,7 +294,8 @@ final rolePreserved = removedRole == addedRole ||
 | `1aa4da71` — Enforce bracket state in optimize fillers | CORREÇÃO | ✅ Resolve P2 anterior |
 | `a018ee17` — Fix optimize authorization and chat error states | SEGURANÇA | ✅ Auth + UX fix |
 | `25416ec2` — Document semantic v2 optimize scorecard | INFRA | ✅ Scorecard atualizado |
-| `cf225841` — Preserve semantic v2 multi-tags in optimize | FEATURE | ⚠️ P1 _looksLikePayoff |
+| `1463732a` — Clarify payoff functional tag rules | CORREÇÃO | ✅ Resolve P1 _looksLikePayoff |
+| `cf225841` — Preserve semantic v2 multi-tags in optimize | FEATURE | ✅ P1 _looksLikePayoff posteriormente resolvido |
 | `aa3ee1ba` — Centralize basic land detection | REFACTOR | ✅ Novo módulo limpo |
 | `2396956e` — Wire sync cards utilities into pipeline | REFACTOR | ✅ DRY |
 | `81335e26` — Use semantic v2 in functional deck summary | FEATURE | ⚠️ Source priority mudado |

@@ -142,6 +142,10 @@ mtgia/
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1 — Ownership app-facing de IA/deck revalidado como resolvido no `master` atual**: `POST /ai/optimize` passa `userId` obrigatorio para `loadOptimizeDeckContext`, que escopa `decks` por `id + user_id`; `POST /ai/archetypes` le `context.read<String>()` e tambem escopa deck por owner; `GET /ai/optimize/jobs/:id` bloqueia jobs sem owner e non-owner. `server/test/experimental_deck_ai_authorization_source_test.dart` cobre archetypes, simulate, recommendations, matchup e weakness-analysis. Rotas experimentais continuam advisory/not-proven para UX ate haver contrato runtime especifico, mas nao ficam abertas por falta de owner-scope no codigo atual.
 - **P1/P2 — Helpers duplicados com risco de drift**: heurísticas semânticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart`; `_isBasicLandName` tem variantes em optimize, generated deck validation, meta reference e commander-reference; utilitários de request/payload repetem-se em múltiplas rotas de trades/conversations; trust SQL de trades e normalizacao de `condition` de cartas tambem foram revalidados como duplicacao menor em 2026-05-28.
+- **P1 — Payoff functional tag fragil por precedencia**: resolvido em
+  `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
+  regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
+  `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local `codex/hermes-analysis-docs@7014a2cc`, essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
 - **P2 — Fillers de optimize/complete com bracket state**: resolvido em
   `origin/master@1aa4da71`. Os loaders de fillers passam a aplicar policy de
@@ -159,10 +163,11 @@ mtgia/
   `origin/master@2396956e`: o CLI ativo `server/bin/sync_cards.dart` agora
   importa e usa seus helpers no full sync, incremental sync, oracle IDs e
   legalidades. O helper incremental foi alinhado ao INSERT real de 12 colunas
-  (`collector_number`, `foil`). Permanecem wrappers/helpers sem chamador runtime
-  em `request_trace.dart`, `commander_reference_profile_support.dart`,
-  `performance_service.dart`, `mtgtop8_meta_support.dart` e
-  `candidate_quality_data_support.dart`.
+  (`collector_number`, `foil`). A limpeza de backend em
+  `origin/master@dafffc1b` removeu `tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
+  e `buildCandidateQualitySamplePoolSql`. `PerformanceService` permanece como
+  API publica intencional de observabilidade mobile.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

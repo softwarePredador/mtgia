@@ -1,13 +1,13 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-29T12:00Z (hermes-normal-audit — auditoria E2E pipeline de decks, master avançou para 4913a733).
+> Atualizado em 2026-05-29T15:40Z (pos-correcao — helper cleanup + payoff functional tags, master avancou para 1463732a).
 
 ## Estado atual
 
 - Branch observada: `master`
 - HEAD anterior: `771c9318` (Harden semantic scorecard runner)
-- HEAD atual: **`4913a733`** (Expose optimize bracket diagnostics)
+- HEAD atual: **`1463732a`** (Clarify payoff functional tag rules)
 - SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
@@ -15,7 +15,24 @@
 
 ## Novos commits nesta rodada (2026-05-29)
 
-### `4913a733` — Expose optimize bracket diagnostics (2026-05-29, atual)
+### `1463732a` — Clarify payoff functional tag rules (2026-05-29, atual)
+- **2 arquivos**, codigo + testes.
+- **Tipo: CODE/QA** — Refatora `_looksLikePayoff` para branches explicitos, removendo a fragilidade de precedencia apontada no `LOGIC_COHERENCE_REPORT_2026-05-29.md`.
+- **Validação:** `dart analyze bin lib routes test`, `dart test` em `server/` com 612 testes, `dart test test/functional_card_tags_test.dart -r expanded`, `git diff --check`, scan simples de secrets, smoke Hermes pos-push.
+- **Status Hermes:** fecha o achado P1 de payoff; `Impact Tremors` segue como payoff e `The One Ring` fica `draw+protection`, nao `payoff`.
+
+### `dafffc1b` — Remove unused backend helper APIs
+- **4 arquivos**, codigo + testes.
+- **Tipo: CODE/HIGIENE** — Remove helpers publicos sem chamador runtime: `tryGetRequestId`, `normalizedCommanderReferenceCandidate`, `buildCandidateQualitySamplePoolSql` e `extractMtgTop8FormatCodeFromSourceUrl`.
+- **Validação:** `dart analyze bin lib routes test`, `dart test` em `server/` com 612 testes, testes focados de request trace, Commander Reference, MTGTop8 e candidate quality, `git diff --check`, scan simples de secrets, smoke Hermes pos-push.
+- **Status Hermes:** reduz a pendencia de "helpers publicos sem chamador"; `PerformanceService` permanece como API publica intencional de observabilidade mobile, nao como item para remocao automatica.
+
+### `a830f9f3` — Make local test server wrapper analyzable
+- **1 arquivo**, wrapper operacional.
+- **Tipo: CODE/INFRA** — `server/bin/local_test_server.dart` deixou de importar `.dart_frog/server.dart` estaticamente e passou a executar o artefato gerado como processo filho.
+- **Validação:** `dart analyze bin/local_test_server.dart`, smoke local em `PORT=18082`, shutdown por `SIGTERM`, backend analyze/test completo.
+
+### `4913a733` — Expose optimize bracket diagnostics
 - **1 arquivo**, **+XX linhas** (route diagnostics)
 - **Tipo: CODE** — Expondo bracket policy diagnostics no response body
 

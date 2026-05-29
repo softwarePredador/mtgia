@@ -38,7 +38,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `sync_cards_utils.dart` foi **RESOLVIDO em `origin/master@2396956e`** e
     agora e usado pelo `server/bin/sync_cards.dart`. Permanecem abertos
     wrappers/helpers sem chamador em request trace, Commander Reference,
-    PerformanceService, MTGTop8 e candidate quality sample SQL.
+    MTGTop8 e candidate quality sample SQL ate `origin/master@dafffc1b`.
+    Apos `dafffc1b`, estes helpers mortos foram removidos; `PerformanceService`
+    permanece como API publica intencional de observabilidade mobile.
 13. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
     `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
     `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
@@ -354,7 +356,10 @@ entrypoint local backend em `origin/master@a830f9f3`.**
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
 **Status 2026-05-29:** `sync_cards_utils.dart` **RESOLVIDO em
-`origin/master@2396956e`**; demais helpers deste bloco continuam pendentes.
+`origin/master@2396956e`**. A limpeza de helpers publicos sem chamador foi
+**RESOLVIDA em `origin/master@dafffc1b`** para os simbolos backend confirmados
+como mortos. `PerformanceService` foi mantido por ser API publica de
+observabilidade mobile e nao deve ser removido sem decisao de produto.
 
 - **Evidência**:
   - Resolvido: `server/bin/sync_cards.dart` importa `sync_cards_utils.dart` e
@@ -364,40 +369,42 @@ entrypoint local backend em `origin/master@a830f9f3`.**
     `_getNewSetCodesSinceFromData` e `_extractCardRow` foram removidas do CLI.
   - Resolvido: `extractSetCardRow` agora cobre o shape operacional incremental
     de 12 colunas, incluindo `collector_number` e `foil`.
-  - `server/lib/request_trace.dart:48` (`getRequestTrace`) e `:51`
-    (`tryGetRequestId`) nao tem chamador runtime; rotas usam
-    `context.read<RequestTrace>()` diretamente.
-  - `server/lib/ai/commander_reference_profile_support.dart:49`
-    (`normalizedCommanderReferenceCandidate`) nao tem chamador; consumidores
-    usam `normalizeCommanderReferenceName`.
+  - Resolvido em `dafffc1b`: `server/lib/request_trace.dart` removeu
+    `tryGetRequestId`; `getRequestTrace` ficou como wrapper minimo ainda
+    disponivel para consumidores futuros.
+  - Resolvido em `dafffc1b`:
+    `server/lib/ai/commander_reference_profile_support.dart` removeu
+    `normalizedCommanderReferenceCandidate`; consumidores seguem usando
+    `normalizeCommanderReferenceName`.
   - `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
     `:210`, `:220` e `:248` expõem traces/metricas/debug manuais sem chamador
     em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init`,
     `traceAsync` e `PerformanceNavigatorObserver`.
-  - `server/lib/meta/mtgtop8_meta_support.dart:139`
-    (`extractMtgTop8FormatCodeFromSourceUrl`) aparece apenas em teste, enquanto
-    o helper de event id vizinho e usado por
-    `server/bin/repair_mtgtop8_meta_history.dart`.
-  - `server/lib/ai/candidate_quality_data_support.dart:631`
-    (`buildCandidateQualitySamplePoolSql`) aparece apenas em teste; o runner
-    `candidate_quality_data_foundation.dart` monta seus pools por outro caminho.
+  - Resolvido em `dafffc1b`: `server/lib/meta/mtgtop8_meta_support.dart`
+    removeu `extractMtgTop8FormatCodeFromSourceUrl`; o helper de event id
+    vizinho continua usado por `server/bin/repair_mtgtop8_meta_history.dart`.
+  - Resolvido em `dafffc1b`:
+    `server/lib/ai/candidate_quality_data_support.dart` removeu
+    `buildCandidateQualitySamplePoolSql` e o teste test-only correspondente.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos restantes. O risco especifico do sync de cartas foi
   encerrado; os testes agora exercitam helpers usados pelo CLI operacional.
 - **Ação recomendada**:
   1. manter `sync_cards_utils.dart` como fonte compartilhada do sync e evitar
      reabrir copias privadas no CLI;
-  2. para wrappers pequenos (`request_trace`, Commander Reference,
-     PerformanceService, MTGTop8), remover se nao houver contrato planejado ou
-     religar com teste focado;
-  3. decidir se `buildCandidateQualitySamplePoolSql` deve virar parte real de
-     um scorecard/runner ou sair junto com o teste test-only.
+  2. manter `PerformanceService` como API publica enquanto houver plano de
+     observabilidade mobile/manual traces; se a decisao mudar, abrir rodada
+     propria com validacao app;
+  3. continuar usando busca de chamadores como guardrail antes de adicionar
+     novos helpers publicos.
 - **Validação**:
   - `grep -RIn "sync_cards_utils" server` encontra o binario ativo;
   - `dart analyze bin lib routes test` e `dart test` em `server/` passaram em
     `origin/master@2396956e`;
-  - buscas por cada simbolo retornam pelo menos um chamador runtime/binario
-    intencional alem de testes, ou o simbolo e removido;
+  - buscas pelos simbolos removidos retornam apenas historico/docs, nao codigo
+    runtime;
+  - `dart analyze bin lib routes test` e `dart test` em `server/` passaram em
+    `origin/master@dafffc1b`;
   - testes de sync/candidate quality continuam verdes depois da decisao.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
