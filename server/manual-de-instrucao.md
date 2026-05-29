@@ -57,9 +57,13 @@ Patch aplicado:
   todos os papeis semanticos confiaveis, nao apenas o primario.
 - `filterUnsafeOptimizeSwapsByCardData` usa multi-tags v2 quando presentes e
   preserva o fallback v1 anterior quando v2 nao existe.
-- `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` passa a bloquear tambem
-  perdas negativas de `wincon`, `combo_piece`, `engine`, `payoff` e `enabler`;
-  `protection` segue review-only.
+- `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` bloqueia por padrao apenas
+  perdas negativas em `draw`, `removal`, `ramp` e `wipe`; `wincon`,
+  `combo_piece`, `engine`, `payoff`, `enabler` e `protection` ficam
+  review-only.
+- `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES=true` promove `wincon`,
+  `combo_piece`, `engine`, `payoff` e `enabler` para bloqueio critico em
+  ambiente controlado.
 
 Validacao:
 
@@ -17601,8 +17605,11 @@ aprovados pelo quality gate atual, o status volta para `BLOCKED`.
 - Em `partial`, a decisao semantica roda somente apos o fluxo atual aprovar a
   otimizacao. O bloqueio fica restrito a deltas negativos de `draw`, `removal`,
   `ramp` ou `wipe`.
-- `protection` permanece review-only: aparece em `review_loss_roles`, mas nao
-  bloqueia.
+- `wincon`, `combo_piece`, `engine`, `payoff`, `enabler` e `protection`
+  permanecem review-only: aparecem em `review_loss_roles`, mas nao bloqueiam.
+- `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES=true` pode promover
+  `wincon/combo_piece/engine/payoff/enabler` para bloqueio critico em ambiente
+  controlado. Ausente, vazio ou desconhecido resolve para `false`.
 - Requests com `partial` bypassam leitura e escrita do cache persistente de
   optimize para nao misturar respostas geradas com enforcement desligado.
 - Rejeicoes semanticas usam `quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED`

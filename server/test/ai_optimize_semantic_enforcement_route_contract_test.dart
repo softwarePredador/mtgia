@@ -19,6 +19,7 @@ void main() {
             },
           },
           enforcementMode: SemanticV2OptimizeEnforcementMode.partial,
+          expandedCriticalRoles: false,
           validation: const {
             'verdict': 'aprovado',
             'score': 88,
@@ -50,6 +51,7 @@ void main() {
         );
         expect(semanticLayerV2['enforcement_mode'], equals('partial'));
         expect(semanticLayerV2['enforcement'], equals('partial'));
+        expect(semanticLayerV2['expanded_critical_roles'], isFalse);
         expect(semanticLayerV2['blocked_by_semantic_v2'], isTrue);
         expect(diagnostics, equals(semanticLayerV2));
         expect(qualityError['validation'], containsPair('verdict', 'aprovado'));

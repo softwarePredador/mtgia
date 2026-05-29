@@ -230,9 +230,14 @@ void main() {
       expect(resolveSemanticV2OptimizeEnforcementMode('full'), equals(mode));
       expect(resolveSemanticV2OptimizeEnforcementMode('PARTIAL'),
           equals(SemanticV2OptimizeEnforcementMode.partial));
+      expect(resolveSemanticV2ExpandedCriticalRoles(null), isFalse);
+      expect(resolveSemanticV2ExpandedCriticalRoles(''), isFalse);
+      expect(resolveSemanticV2ExpandedCriticalRoles('true'), isTrue);
+      expect(resolveSemanticV2ExpandedCriticalRoles('1'), isTrue);
       expect(diagnostics['mode'], equals('shadow'));
       expect(diagnostics['enforcement'], equals('disabled'));
       expect(diagnostics['enforcement_mode'], equals('disabled'));
+      expect(diagnostics['expanded_critical_roles'], isFalse);
       expect(diagnostics['critical_loss_roles'], equals(const ['draw']));
       expect(diagnostics['blocked_by_semantic_v2'], isFalse);
     });
@@ -243,11 +248,6 @@ void main() {
         'removal',
         'ramp',
         'wipe',
-        'wincon',
-        'combo_piece',
-        'engine',
-        'payoff',
-        'enabler',
       ]) {
         final decision = evaluateOptimizationSemanticV2Enforcement(
           semanticLayerV2: {
@@ -259,6 +259,37 @@ void main() {
         expect(decision.criticalLossRoles, equals([role]));
         expect(decision.reviewLossRoles, isEmpty);
         expect(decision.blockedBySemanticV2, isTrue);
+      }
+
+      for (final role in const [
+        'wincon',
+        'combo_piece',
+        'engine',
+        'payoff',
+        'enabler',
+      ]) {
+        final defaultDecision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+        );
+
+        expect(defaultDecision.criticalLossRoles, isEmpty);
+        expect(defaultDecision.reviewLossRoles, equals([role]));
+        expect(defaultDecision.blockedBySemanticV2, isFalse);
+
+        final expandedDecision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+          expandedCriticalRoles: true,
+        );
+
+        expect(expandedDecision.criticalLossRoles, equals([role]));
+        expect(expandedDecision.reviewLossRoles, isEmpty);
+        expect(expandedDecision.blockedBySemanticV2, isTrue);
       }
     });
 
