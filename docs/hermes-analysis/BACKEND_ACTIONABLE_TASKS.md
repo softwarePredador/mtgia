@@ -22,7 +22,12 @@
 > threadando `currentDeckCards`/`state.virtualDeck` nos fillers de
 > optimize/complete, removendo fallback `bracket: null` quando o bracket foi
 > definido e adicionando source guard em `optimize_runtime_support_test`.
-> Backlog ativo apos essa rodada: BE.7.
+>
+> Atualizacao Codex em 2026-05-29: `origin/master@4913a733` resolveu BE.7 com
+> `optimize_diagnostics.bracket_policy` em respostas de sucesso que tiveram
+> sugestoes filtradas por bracket, mantendo `warnings.blocked_by_bracket` por
+> compatibilidade e atualizando o contrato de `/ai/optimize`.
+> Backlog ativo deste arquivo apos essa rodada: nenhum BE.* aberto.
 
 ## P1 — Alto
 
@@ -102,6 +107,14 @@
 ## P3 — Baixo
 
 ### BE.7 — Bloqueios por bracket sao detalhados no 422, mas quase invisiveis em sucesso parcial
+- **Status em `origin/master@4913a733`: RESOLVIDO.** Respostas de sucesso agora
+  podem expor `optimize_diagnostics.bracket_policy` com `bracket`,
+  `blocked_count`, `blocked_additions` e `message` quando a policy removeu
+  sugestoes mas ainda restaram swaps acionaveis. `warnings.blocked_by_bracket`
+  permanece como campo compatível. O contrato foi atualizado em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`, e
+  `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart`
+  cobre preservacao de diagnosticos existentes.
 - **Evidencia:** A rota calcula `blockedByBracket` e filtra `validAdditions` (`server/routes/ai/optimize/index.dart` linhas 1728-1763). O detalhe entra em `quality_error.blocked_by_bracket` quando nao sobram swaps acionaveis e retorna 422 (`linhas 1950-1972`). O mesmo dado e passado para telemetria, mas nao aparece como campo claro do JSON de sucesso parcial.
 - **Impacto de produto:** Quando a otimizacao ainda tem swaps validos, o usuario/app pode nao saber que outras sugestoes foram removidas por bracket, reduzindo explicabilidade.
 - **Risco:** UX/diagnostico, nao seguranca.

@@ -147,6 +147,11 @@ mtgia/
   fica restrito a `bracket == null`. `optimize_runtime_support_test` guarda
   contra regressao para `currentDeckCards: const []` e complete sem estado
   virtual.
+- **P3 — Diagnostics de bracket em sucesso parcial do optimize**: resolvido em
+  `origin/master@4913a733`. Quando sugestões sao filtradas por bracket mas ainda
+  restam swaps validos, a resposta pode incluir
+  `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
+  `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**:
   `server/lib/sync_cards_utils.dart` foi resolvido em
   `origin/master@2396956e`: o CLI ativo `server/bin/sync_cards.dart` agora

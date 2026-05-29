@@ -26,12 +26,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
     foi definido.
-11. **P1/P2 — Funcoes publicas sem chamador runtime**:
+11. **P3 — Diagnosticos de bracket em sucesso parcial do optimize**:
+    **RESOLVIDO em `origin/master@4913a733`**. Sucessos com sugestoes filtradas
+    por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
+    `warnings.blocked_by_bracket` para compatibilidade.
+12. **P1/P2 — Funcoes publicas sem chamador runtime**:
     `sync_cards_utils.dart` foi **RESOLVIDO em `origin/master@2396956e`** e
     agora e usado pelo `server/bin/sync_cards.dart`. Permanecem abertos
     wrappers/helpers sem chamador em request trace, Commander Reference,
     PerformanceService, MTGTop8 e candidate quality sample SQL.
-12. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
+13. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
     `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
     `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
     direto entre `CommunityDeckDetailScreen` e `UserProfileScreen` foi removido
@@ -220,6 +224,27 @@ Histórico do problema:
   - `dart test test/optimize_runtime_support_test.dart -r expanded`
   - `git diff --check`
   - smoke Hermes pos-push para `1aa4da71cb012698372923438a58716ab2f7a75a`
+
+### P3 — Expor bracket policy em sucesso parcial do optimize
+
+**Status 2026-05-29: RESOLVIDO em `origin/master@4913a733`.**
+
+- `server/routes/ai/optimize/index.dart` adiciona
+  `optimize_diagnostics.bracket_policy` quando `blockedByBracket` nao esta
+  vazio em uma resposta de sucesso.
+- O payload inclui `bracket`, `blocked_count`, `blocked_additions` e `message`.
+- `warnings.blocked_by_bracket` continua existindo para compatibilidade com
+  clientes antigos.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` documenta o campo aditivo.
+- `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart` cobre
+  o helper e garante que diagnosticos existentes sao preservados.
+
+- **Validacao executada**:
+  - `dart analyze bin lib routes test`
+  - `dart test` em `server/` com 612 testes
+  - `dart test test/ai_optimize_semantic_enforcement_route_contract_test.dart -r expanded`
+  - `git diff --check`
+  - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
 - **Evidência**:
