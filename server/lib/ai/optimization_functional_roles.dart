@@ -1,333 +1,394 @@
 import 'dart:convert';
 
-bool looksLikeOptimizationBoardWipeText(String oracleText) {
-  final oracle = oracleText.toLowerCase();
-  final ownBoardOnly = oracle.contains('all creatures you control') ||
-      oracle.contains('each creature you control');
-  final combatDamageAssignment = oracle.contains('assigns combat damage');
+// ============================================================================
+// CARD ROLES ADAPTER — Single source of truth for functional role resolution
+// Used by: Deck Analysis, Optimize, Validator, Quality Gate, Candidate Quality
+//
+// Priority order:
+//   1. persisted functional_tags (card_function_tags table)
+//   2. semantic_tags_v2 (AI-generated, confidence >= 0.65)
+//   3. heuristic oracle_text + type_line + name classification
+// ============================================================================
 
-  if (ownBoardOnly || combatDamageAssignment) return false;
+class CardRoles {
+  final Set<String> roles;
+  final String primaryRole;
+  final String source; // 'persisted' | 'semantic_v2' | 'heuristic'
 
-  return oracle.contains('destroy all') ||
-      oracle.contains('exile all') ||
-      oracle.contains('all creatures get -') ||
-      oracle.contains('all colored permanents') ||
-      oracle.contains('each player sacrifices all') ||
-      oracle.contains('each opponent sacrifices all') ||
-      oracle.contains('damage to each creature') ||
-      oracle.contains('deals') &&
-          oracle.contains('damage') &&
-          oracle.contains('to each creature');
+  const CardRoles({
+    required this.roles,
+    required this.primaryRole,
+    required this.source,
+  });
+
+  bool get isEmpty => roles.isEmpty;
+  bool get isNotEmpty => roles.isNotEmpty;
+  bool contains(String role) => roles.contains(role);
+
+  Map<String, dynamic> toJson() => {
+        'roles': roles.toList(),
+        'primary_role': primaryRole,
+        'source': source,
+      };
 }
 
-bool looksLikeOptimizationRampText(String oracleText) {
-  final oracle = oracleText.toLowerCase();
-
-  if (oracle.contains('add {') || oracle.contains('mana of any')) {
-    return true;
+/// Resolve card functional roles from all available sources.
+/// This is the SINGLE adapter used everywhere — no more drift between modules.
+CardRoles resolveCardFunctionalRoles({
+  Object? functionalTags,
+  Object? semanticTagsV2,
+  String? oracleText,
+  String? typeLine,
+  String? name,
+  String? manaCost,
+  Object? cmc,
+}) {
+  if (functionalTags != null) {
+    final parsed = _parseFunctionalTags(functionalTags);
+    if (parsed.isNotEmpty) {
+      return CardRoles(
+        roles: parsed,
+        primaryRole: _selectPrimaryRole(parsed),
+        source: 'persisted',
+      );
+    }
   }
 
-  if (oracle.contains('search your library') &&
-      looksLikeOptimizationLandSearchText(oracle)) {
-    return true;
+  if (semanticTagsV2 != null) {
+    final parsed = _parseSemanticV2Roles(semanticTagsV2);
+    if (parsed.isNotEmpty) {
+      return CardRoles(
+        roles: parsed,
+        primaryRole: _selectPrimaryRole(parsed),
+        source: 'semantic_v2',
+      );
+    }
   }
 
-  return oracle.contains('additional land this turn') ||
-      oracle.contains('additional land on each of your turns') ||
-      oracle.contains('put a land card from your hand onto the battlefield') ||
-      oracle.contains('put up to') && oracle.contains('land cards') ||
-      oracle.contains('create a treasure token') ||
-      oracle.contains('create two treasure tokens') ||
-      oracle.contains('create three treasure tokens');
+  if (oracleText != null && oracleText.isNotEmpty) {
+    final heuristicRoles = _resolveHeuristicRoles(
+      oracleText: oracleText,
+      typeLine: typeLine ?? '',
+      name: name ?? '',
+      manaCost: manaCost,
+      cmc: cmc,
+    );
+    if (heuristicRoles.isNotEmpty) {
+      return CardRoles(
+        roles: heuristicRoles,
+        primaryRole: _selectPrimaryRole(heuristicRoles),
+        source: 'heuristic',
+      );
+    }
+  }
+
+  return const CardRoles(
+    roles: {},
+    primaryRole: 'utility',
+    source: 'heuristic',
+  );
 }
 
-bool looksLikeOptimizationLandSearchText(String oracleText) {
-  final oracle = oracleText.toLowerCase();
-  return oracle.contains('land card') ||
-      oracle.contains('basic land') ||
-      oracle.contains('forest card') ||
-      oracle.contains('plains card') ||
-      oracle.contains('island card') ||
-      oracle.contains('swamp card') ||
-      oracle.contains('mountain card');
+// ---------------------------------------------------------------------------
+// Parsers
+// ---------------------------------------------------------------------------
+
+Set<String> _parseFunctionalTags(Object? raw) {
+  if (raw == null) return const {};
+  if (raw is String) {
+    try { raw = jsonDecode(raw); } catch (_) { return const {}; }
+  }
+  if (raw is! Iterable) return const {};
+  final roles = <String>{};
+  for (final item in raw) {
+    if (item is String) { roles.add(item.trim().toLowerCase()); }
+    else if (item is Map) {
+      final tag = item['tag']?.toString().trim().toLowerCase();
+      if (tag != null && tag.isNotEmpty) roles.add(tag);
+    }
+  }
+  return roles;
 }
+
+Set<String> _parseSemanticV2Roles(Object? raw) {
+  var semanticTags = raw;
+  if (semanticTags is String && semanticTags.trim().isNotEmpty) {
+    try { semanticTags = jsonDecode(semanticTags); } catch (_) { return const {}; }
+  }
+  if (semanticTags is! Iterable) return const {};
+  Map? best;
+  for (final raw in semanticTags) {
+    if (raw is! Map) continue;
+    final confidence = _safeSemanticConfidence(raw['role_confidence']);
+    final currentConfidence = best == null ? -1.0 : _safeSemanticConfidence(best['role_confidence']);
+    if (confidence > currentConfidence) best = raw;
+  }
+  if (best == null || _safeSemanticConfidence(best['role_confidence']) < 0.65) return const {};
+  final tags = <String>{};
+  final rawTags = best['tags'];
+  if (rawTags is Iterable) {
+    for (final item in rawTags) {
+      if (item is String) { tags.add(item.trim().toLowerCase()); }
+      else if (item is Map) {
+        final tag = item['tag']?.toString().trim().toLowerCase();
+        if (tag != null && tag.isNotEmpty) tags.add(tag);
+      }
+    }
+  }
+  return tags;
+}
+
+// ---------------------------------------------------------------------------
+// Heuristic classification (multi-tag)
+// ---------------------------------------------------------------------------
+
+Set<String> _resolveHeuristicRoles({
+  required String oracleText,
+  required String typeLine,
+  required String name,
+  String? manaCost,
+  Object? cmc,
+}) {
+  final t = typeLine.toLowerCase();
+  final o = oracleText.toLowerCase();
+  final n = name.toLowerCase().trim();
+  final estimatedCmc = _safeDouble(cmc, _estimateManaValue(manaCost ?? ''));
+  final roles = <String>{};
+
+  if (t.contains('land')) { roles.add('land'); return roles; }
+
+  if (_knownWinconNames.contains(n)) roles.add('wincon');
+  if (_knownComboPieceNames.contains(n)) roles.add('combo_piece');
+  if (_knownEngineNames.contains(n)) roles.add('engine');
+  if (_knownProtectionNames.contains(n)) roles.add('protection');
+
+  if (looksLikeOptimizationBoardWipeText(oracleText)) roles.add('wipe');
+  if (o.contains('hexproof') || o.contains('indestructible') ||
+      o.contains('shroud') || o.contains('ward') || o.contains('protection from'))
+    roles.add('protection');
+  if (o.contains('destroy target') || o.contains('exile target') ||
+      o.contains('counter target') ||
+      (o.contains('return target') && o.contains('to its owner')) ||
+      (o.contains('deals') && o.contains('damage') &&
+       (o.contains('target creature') || o.contains('target planeswalker') || o.contains('any target'))))
+    roles.add('removal');
+  if (looksLikeOptimizationRampText(oracleText) || (t.contains('artifact') && o.contains('add')))
+    roles.add('ramp');
+  if (o.contains('draw') || o.contains('look at the top') || (o.contains('scry') && o.contains('draw')))
+    roles.add('draw');
+  if (o.contains('search your library') && !o.contains('land')) roles.add('tutor');
+  if (_looksLikeWincon(o)) roles.add('wincon');
+  if (_looksLikeEngine(o)) roles.add('engine');
+  if (_looksLikeComboPiece(o)) roles.add('combo_piece');
+  if (_looksLikePayoff(o)) roles.add('payoff');
+  if (_looksLikeEnabler(o)) roles.add('enabler');
+  if (_looksLikeEtb(o)) roles.add('etb');
+  if (_looksLikeBlink(o, n)) { roles.add('blink'); roles.add('protection'); }
+  if (o.contains('create') && o.contains('token')) roles.add('token_maker');
+  if (estimatedCmc >= 6) roles.add('big_spell');
+
+  if (roles.isEmpty) {
+    if (t.contains('creature')) roles.add('creature');
+    else if (t.contains('artifact')) roles.add('artifact');
+    else if (t.contains('enchantment')) roles.add('enchantment');
+    else if (t.contains('planeswalker')) roles.add('planeswalker');
+  }
+  return roles;
+}
+
+String _selectPrimaryRole(Set<String> roles) {
+  if (roles.isEmpty) return 'utility';
+  for (final role in const [
+    'wipe', 'wincon', 'combo_piece', 'engine', 'payoff',
+    'draw', 'removal', 'ramp', 'tutor', 'protection',
+    'recursion', 'token_maker', 'enabler',
+    'land', 'creature', 'artifact', 'enchantment', 'planeswalker',
+  ]) { if (roles.contains(role)) return role; }
+  return roles.first;
+}
+
+double _safeDouble(Object? value, double fallback) {
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? fallback;
+  return fallback;
+}
+
+double _estimateManaValue(String manaCost) {
+  if (manaCost.isEmpty) return 0;
+  final matches = RegExp(r'\{(\d+)\}').allMatches(manaCost);
+  return matches.fold<double>(0, (sum, m) => sum + (double.tryParse(m.group(1)!) ?? 0));
+}
+
+double _safeSemanticConfidence(Object? value) {
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0;
+  return 0;
+}
+
+Map<String, Map<String, dynamic>> _cardsByNormalizedName(List<Map<String, dynamic>> cards) {
+  final byName = <String, Map<String, dynamic>>{};
+  for (final card in cards) {
+    final key = (card['name']?.toString() ?? '').trim().toLowerCase();
+    if (key.isNotEmpty) byName[key] = card;
+  }
+  return byName;
+}
+
+String _normalizeRoleCardName(String value) => value.trim().toLowerCase();
+
+// ---------------------------------------------------------------------------
+// Legacy single-role classifier — kept for backward compatibility
+// ---------------------------------------------------------------------------
 
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
-  final semanticRoles = optimizationFunctionalRolesForCard(
-    card,
-    semanticOnly: true,
+  final oracle = ((card['oracle_text'] as String?) ?? '');
+  final typeLine = ((card['type_line'] as String?) ?? '');
+  final name = card['name']?.toString() ?? '';
+  final result = resolveCardFunctionalRoles(
+    semanticTagsV2: card['semantic_tags_v2'],
+    oracleText: oracle,
+    typeLine: typeLine,
+    name: name,
+    manaCost: card['mana_cost']?.toString(),
+    cmc: card['cmc'],
   );
-  if (semanticRoles.isNotEmpty) {
-    return _primaryOptimizationRole(semanticRoles);
-  }
-
-  final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-  final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-  final name = ((card['name'] as String?) ?? '').toLowerCase().trim();
-
-  if (typeLine.contains('land')) return 'land';
-
-  if (_knownWinconNames.contains(name) || oracle.contains('you win the game')) {
-    return 'wincon';
-  }
-
-  if (_knownComboPieceNames.contains(name)) {
-    return 'combo_piece';
-  }
-
-  if (_knownEngineNames.contains(name)) {
-    return 'engine';
-  }
-
-  if (_knownProtectionNames.contains(name)) {
-    return 'protection';
-  }
-
-  if (oracle.contains('draw') ||
-      oracle.contains('look at the top') ||
-      (oracle.contains('scry') && oracle.contains('draw'))) {
-    return 'draw';
-  }
-
-  if (oracle.contains('destroy target') ||
-      oracle.contains('exile target') ||
-      oracle.contains('counter target') ||
-      (oracle.contains('return target') && oracle.contains('to its owner')) ||
-      (oracle.contains('deals') &&
-          oracle.contains('damage') &&
-          (oracle.contains('target creature') ||
-              oracle.contains('target planeswalker') ||
-              oracle.contains('any target')))) {
-    return 'removal';
-  }
-
-  if (looksLikeOptimizationBoardWipeText(oracle)) {
-    return 'wipe';
-  }
-
-  if (looksLikeOptimizationRampText(oracle) ||
-      (typeLine.contains('artifact') && oracle.contains('add'))) {
-    return 'ramp';
-  }
-
-  if (oracle.contains('search your library') && !oracle.contains('land')) {
-    return 'tutor';
-  }
-
-  if (oracle.contains('hexproof') ||
-      oracle.contains('indestructible') ||
-      oracle.contains('shroud') ||
-      oracle.contains('ward')) {
-    return 'protection';
-  }
-
-  if (typeLine.contains('creature')) return 'creature';
-  if (typeLine.contains('artifact')) return 'artifact';
-  if (typeLine.contains('enchantment')) return 'enchantment';
-  if (typeLine.contains('planeswalker')) return 'planeswalker';
-
-  return 'utility';
+  return result.primaryRole;
 }
 
-Set<String> optimizationFunctionalRolesForCard(
-  Map<String, dynamic> card, {
-  bool semanticOnly = false,
-}) {
-  final semanticRoles =
-      _semanticV2FunctionalRoles(card['semantic_tags_v2']).toSet();
+Set<String> optimizationFunctionalRolesForCard(Map<String, dynamic> card, {bool semanticOnly = false}) {
+  final semanticRoles = _parseSemanticV2Roles(card['semantic_tags_v2']).toSet();
   if (semanticRoles.isNotEmpty) return semanticRoles;
   if (semanticOnly) return const <String>{};
   return {classifyOptimizationFunctionalRole(card)};
 }
 
-String _primaryOptimizationRole(Set<String> roles) {
-  for (final role in const [
-    'wipe',
-    'draw',
-    'removal',
-    'ramp',
-    'tutor',
-    'protection',
-    'recursion',
-    'wincon',
-    'combo_piece',
-    'engine',
-    'payoff',
-    'enabler',
-    'land',
-    'creature',
-    'artifact',
-    'enchantment',
-    'planeswalker',
-    'utility',
-  ]) {
-    if (roles.contains(role)) return role;
+String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
+  final roles = _parseSemanticV2Roles(rawSemanticTags);
+  if (roles.isEmpty) return null;
+  for (final role in const ['wipe', 'board_wipe', 'draw', 'removal', 'ramp', 'tutor', 'protection', 'recursion', 'wincon', 'combo_piece']) {
+    if (roles.contains(role)) return role == 'board_wipe' ? 'wipe' : role;
   }
-  return roles.isEmpty ? 'utility' : (roles.toList()..sort()).first;
+  if (rawSemanticTags is List) {
+    for (final raw in rawSemanticTags) {
+      if (raw is! Map) continue;
+      if (raw['wincon'] == true) return 'wincon';
+      if (raw['combo_piece'] == true) return 'combo_piece';
+      if (raw['engine'] == true) return 'engine';
+      if (raw['payoff'] == true) return 'payoff';
+      if (raw['enabler'] == true) return 'enabler';
+    }
+  }
+  return roles.first;
 }
 
+// ---------------------------------------------------------------------------
+// Oracle text pattern matchers
+// ---------------------------------------------------------------------------
+
+bool looksLikeOptimizationBoardWipeText(String oracleText) {
+  final oracle = oracleText.toLowerCase();
+  if (oracle.contains('all creatures you control') || oracle.contains('each creature you control')) return false;
+  if (oracle.contains('assigns combat damage')) return false;
+  return oracle.contains('destroy all') || oracle.contains('exile all') ||
+      oracle.contains('all creatures get -') || oracle.contains('all colored permanents') ||
+      oracle.contains('each player sacrifices all') || oracle.contains('each opponent sacrifices all') ||
+      oracle.contains('damage to each creature') ||
+      (oracle.contains('deals') && oracle.contains('damage') && oracle.contains('to each creature'));
+}
+
+bool looksLikeOptimizationRampText(String oracleText) {
+  final oracle = oracleText.toLowerCase();
+  if (oracle.contains('add {') || oracle.contains('mana of any')) return true;
+  if (oracle.contains('search your library') && looksLikeOptimizationLandSearchText(oracle)) return true;
+  return oracle.contains('additional land this turn') || oracle.contains('additional land on each of your turns') ||
+      oracle.contains('put a land card from your hand onto the battlefield') ||
+      (oracle.contains('put up to') && oracle.contains('land cards')) ||
+      oracle.contains('create a treasure token') || oracle.contains('create two treasure tokens') ||
+      oracle.contains('create three treasure tokens');
+}
+
+bool looksLikeOptimizationLandSearchText(String oracleText) {
+  final oracle = oracleText.toLowerCase();
+  return oracle.contains('land card') || oracle.contains('basic land') ||
+      oracle.contains('forest card') || oracle.contains('plains card') ||
+      oracle.contains('island card') || oracle.contains('swamp card') || oracle.contains('mountain card');
+}
+
+bool _looksLikeWincon(String oracle) =>
+    oracle.contains('you win the game') || oracle.contains('opponent loses the game') || oracle.contains('opponents lose the game');
+
+bool _looksLikeEngine(String oracle) =>
+    (oracle.contains('at the beginning of your upkeep') && oracle.contains('you may')) ||
+    (oracle.contains('whenever') && oracle.contains('you may') && (oracle.contains('draw') || oracle.contains('create') || oracle.contains('add'))) ||
+    (oracle.contains('your end step') && oracle.contains('you may'));
+
+bool _looksLikeComboPiece(String oracle) =>
+    (oracle.contains('remove') && oracle.contains('counter') && oracle.contains('from among')) ||
+    (oracle.contains('search your library') && oracle.contains('may cast') && oracle.contains('without paying'));
+
+bool _looksLikePayoff(String oracle) =>
+    (oracle.contains('whenever') && oracle.contains('create') && oracle.contains('token')) ||
+    (oracle.contains('whenever you cast') && oracle.contains('copy')) ||
+    (oracle.contains('whenever you cast') && oracle.contains('scry'));
+
+bool _looksLikeEnabler(String oracle) =>
+    oracle.contains('instant and sorcery spells you cast cost') ||
+    oracle.contains('cost less to cast') ||
+    (oracle.contains('spells you cast') && oracle.contains('cost') && oracle.contains('less'));
+
+bool _looksLikeEtb(String oracle) => oracle.contains('enters the battlefield');
+
+bool _looksLikeBlink(String oracle, String name) =>
+    (oracle.contains('exile') && oracle.contains('return') && oracle.contains('battlefield')) || oracle.contains('blink');
+
+// ---------------------------------------------------------------------------
+// Named card lists
+// ---------------------------------------------------------------------------
+
 const _knownWinconNames = <String>{
-  'walking ballista',
-  'laboratory maniac',
-  "thassa's oracle",
-  'jace, wielder of mysteries',
-  'approach of the second sun',
-  'craterhoof behemoth',
-  'torment of hailfire',
-  'exsanguinate',
-  'aetherflux reservoir',
-  'finale of devastation',
-  'triskaidekaphile',
+  'walking ballista', "laboratory maniac", "thassa's oracle",
+  'helix pinnacle', 'aetherflux reservoir', 'combat celebration',
+  'felidar usurper', 'approach of the second sun',
+  'devastation tide', 'inexorable tide',
 };
 
 const _knownEngineNames = <String>{
-  'the one ring',
-  'thrasios, triton hero',
-  'kinnan, bonder prodigy',
-  'seedborn muse',
-  'consecrated sphinx',
-  'necropotence',
-  "bolas's citadel",
-  'mystic forge',
-  'future sight',
-  'magus of the future',
-  "sensei's divining top",
-  'rhystic study',
-  'mystic remora',
-  'esper sentinel',
+  'the one ring', 'rhystic study', 'seedborn muse', 'mystic remora',
+  'birds of paradise', 'metalworker', 'smothering tithe', 'consecrated sphinx',
 };
 
 const _knownComboPieceNames = <String>{
-  'basalt monolith',
-  'grim monolith',
-  'freed from the real',
-  "pemmin's aura",
-  'dramatic reversal',
-  'isochron scepter',
-  'underworld breach',
-  "lion's eye diamond",
-  'demonic consultation',
-  'tainted pact',
-  'hermit druid',
+  'basalt monolith', 'dramatic reversal', 'underworld breach',
+  'grand architect', 'sensei\'s divining top', 'power artifact',
 };
 
 const _knownProtectionNames = <String>{
-  'fierce guardianship',
-  'deflecting swat',
-  'deadly rollick',
-  'endurance',
-  "teferi's protection",
-  'heroic intervention',
-  'flawless maneuver',
+  'fierce guardianship', 'deflecting swat', 'swiftfoot boots',
 };
 
-Set<String> _semanticV2FunctionalRoles(Object? rawSemanticTags) {
-  var semanticTags = rawSemanticTags;
-  if (semanticTags is String && semanticTags.trim().isNotEmpty) {
-    try {
-      semanticTags = jsonDecode(semanticTags);
-    } catch (_) {
-      return const <String>{};
-    }
-  }
-  if (semanticTags is! Iterable) return const <String>{};
-  final roles = <String>{};
-  for (final raw in semanticTags) {
-    if (raw is! Map) continue;
-    final confidence = _safeSemanticConfidence(raw['role_confidence']);
-    if (confidence < 0.65) continue;
-    final rawTags = raw['tags'];
-    if (rawTags is Iterable) {
-      for (final item in rawTags) {
-        String? tag;
-        var tagConfidence = confidence;
-        if (item is String) {
-          tag = item.trim().toLowerCase();
-        } else if (item is Map) {
-          tag = item['tag']?.toString().trim().toLowerCase();
-          tagConfidence = _safeSemanticConfidence(
-            item['confidence'] ?? item['role_confidence'] ?? confidence,
-          );
-        }
-        final role = _roleFromSemanticV2Tag(tag);
-        if (role != null && tagConfidence >= 0.65) roles.add(role);
-      }
-    }
-    if (raw['wincon'] == true) roles.add('wincon');
-    if (raw['combo_piece'] == true) roles.add('combo_piece');
-    if (raw['engine'] == true) roles.add('engine');
-    if (raw['payoff'] == true) roles.add('payoff');
-    if (raw['enabler'] == true) roles.add('enabler');
-  }
-  return roles;
-}
+// ============================================================================
+// Semantic V2 Enforcement (F0 — behind flag)
+// ============================================================================
 
-String? _roleFromSemanticV2Tag(String? tag) {
-  if (tag == null || tag.isEmpty) return null;
-  if (tag == 'board_wipe') return 'wipe';
-  if (tag == 'loot' || tag == 'card_selection') return 'draw';
-  if (tag == 'ritual') return 'ramp';
-  if (tag == 'aristocrat_payoff' || tag == 'drain') return 'wincon';
-  if (tag == 'payoff') return 'payoff';
-  if (tag == 'enabler') return 'enabler';
-  if (tag == 'spellslinger' ||
-      tag == 'artifact_synergy' ||
-      tag == 'enchantment_synergy' ||
-      tag == 'graveyard_synergy' ||
-      tag == 'sacrifice_outlet') {
-    return 'engine';
-  }
-  if (const {
-    'draw',
-    'removal',
-    'ramp',
-    'tutor',
-    'protection',
-    'recursion',
-    'wincon',
-    'combo_piece',
-    'engine',
-    'wipe',
-    'land',
-    'creature',
-    'artifact',
-    'enchantment',
-    'planeswalker',
-    'utility',
-  }.contains(tag)) {
-    return tag;
-  }
-  return null;
-}
+enum SemanticV2OptimizeEnforcementMode { disabled, partial }
 
-enum SemanticV2OptimizeEnforcementMode {
-  disabled,
-  partial,
-}
-
-extension SemanticV2OptimizeEnforcementModeWire
-    on SemanticV2OptimizeEnforcementMode {
+extension SemanticV2OptimizeEnforcementModeWire on SemanticV2OptimizeEnforcementMode {
   String get wireValue => switch (this) {
-        SemanticV2OptimizeEnforcementMode.disabled => 'disabled',
-        SemanticV2OptimizeEnforcementMode.partial => 'partial',
-      };
+    SemanticV2OptimizeEnforcementMode.disabled => 'disabled',
+    SemanticV2OptimizeEnforcementMode.partial => 'partial',
+  };
 }
 
-SemanticV2OptimizeEnforcementMode resolveSemanticV2OptimizeEnforcementMode(
-  String? rawValue,
-) {
-  final normalized = rawValue?.trim().toLowerCase();
-  return switch (normalized) {
+SemanticV2OptimizeEnforcementMode resolveSemanticV2OptimizeEnforcementMode(String? rawValue) {
+  return switch (rawValue?.trim().toLowerCase()) {
     'partial' => SemanticV2OptimizeEnforcementMode.partial,
     _ => SemanticV2OptimizeEnforcementMode.disabled,
   };
 }
 
-/// Resolve whether expanded critical roles (wincon, combo_piece, engine, payoff, enabler)
-/// should be enforced as blocking. Default: false (review-only) until scorecard validates.
 bool resolveSemanticV2ExpandedCriticalRoles(String? rawValue) {
-  final normalized = rawValue?.trim().toLowerCase();
-  return normalized == 'true' || normalized == '1' || normalized == 'yes';
+  final n = rawValue?.trim().toLowerCase();
+  return n == 'true' || n == '1' || n == 'yes';
 }
 
 class OptimizationSemanticV2EnforcementDecision {
@@ -342,62 +403,40 @@ class OptimizationSemanticV2EnforcementDecision {
   });
 
   bool get blockedBySemanticV2 =>
-      mode == SemanticV2OptimizeEnforcementMode.partial &&
-      criticalLossRoles.isNotEmpty;
+      mode == SemanticV2OptimizeEnforcementMode.partial && criticalLossRoles.isNotEmpty;
 
   Map<String, dynamic> toDiagnostics() => {
-        'enforcement_mode': mode.wireValue,
-        'critical_loss_roles': criticalLossRoles,
-        'review_loss_roles': reviewLossRoles,
-        'blocked_by_semantic_v2': blockedBySemanticV2,
-        'enforcement_signal': 'role_delta_negative',
-      };
+    'enforcement_mode': mode.wireValue,
+    'critical_loss_roles': criticalLossRoles,
+    'review_loss_roles': reviewLossRoles,
+    'blocked_by_semantic_v2': blockedBySemanticV2,
+    'enforcement_signal': 'role_delta_negative',
+  };
 }
 
-OptimizationSemanticV2EnforcementDecision
-    evaluateOptimizationSemanticV2Enforcement({
+OptimizationSemanticV2EnforcementDecision evaluateOptimizationSemanticV2Enforcement({
   required Map<String, dynamic> semanticLayerV2,
   required SemanticV2OptimizeEnforcementMode mode,
   bool expandedCriticalRoles = false,
 }) {
   final roleDelta = _readSemanticRoleDelta(semanticLayerV2['role_delta']);
-  // Base critical roles always enforced (draw, removal, ramp, wipe)
-  final baseCriticalRoles = <String>[
-    for (final role in const [
-      'draw',
-      'removal',
-      'ramp',
-      'wipe',
-    ])
+  final baseCritical = <String>[
+    for (final role in const ['draw', 'removal', 'ramp', 'wipe'])
       if ((roleDelta[role] ?? 0) < 0) role,
   ];
-  // Expanded critical roles (wincon, combo_piece, engine, payoff, enabler)
-  // Only enforced when expandedCriticalRoles=true (requires scorecard validation first)
-  final expandedCritical = <String>[
-    for (final role in const [
-      'wincon',
-      'combo_piece',
-      'engine',
-      'payoff',
-      'enabler',
-    ])
+  final expanded = <String>[
+    for (final role in const ['wincon', 'combo_piece', 'engine', 'payoff', 'enabler'])
       if ((roleDelta[role] ?? 0) < 0) role,
   ];
-  // Review-only roles: expanded roles when not enabled + protection
   final reviewOnly = <String>[
     for (final role in const ['protection'])
       if ((roleDelta[role] ?? 0) < 0) role,
-    if (!expandedCriticalRoles) ...expandedCritical,
+    if (!expandedCriticalRoles) ...expanded,
   ];
-
   return OptimizationSemanticV2EnforcementDecision(
     mode: mode,
-    criticalLossRoles: expandedCriticalRoles
-        ? [...baseCriticalRoles, ...expandedCritical]
-        : baseCriticalRoles,
-    reviewLossRoles: expandedCriticalRoles
-        ? reviewOnly
-        : [...reviewOnly, ...expandedCritical],
+    criticalLossRoles: expandedCriticalRoles ? [...baseCritical, ...expanded] : baseCritical,
+    reviewLossRoles: expandedCriticalRoles ? reviewOnly : [...reviewOnly, ...expanded],
   );
 }
 
@@ -407,16 +446,9 @@ Map<String, dynamic> withOptimizationSemanticV2EnforcementDiagnostics({
   bool expandedCriticalRoles = false,
 }) {
   final decision = evaluateOptimizationSemanticV2Enforcement(
-    semanticLayerV2: semanticLayerV2,
-    mode: mode,
-    expandedCriticalRoles: expandedCriticalRoles,
+    semanticLayerV2: semanticLayerV2, mode: mode, expandedCriticalRoles: expandedCriticalRoles,
   );
-  return {
-    ...semanticLayerV2,
-    ...decision.toDiagnostics(),
-    'enforcement': mode.wireValue,
-    'expanded_critical_roles': expandedCriticalRoles,
-  };
+  return {...semanticLayerV2, ...decision.toDiagnostics(), 'enforcement': mode.wireValue, 'expanded_critical_roles': expandedCriticalRoles};
 }
 
 Map<String, int> _readSemanticRoleDelta(Object? rawRoleDelta) {
@@ -426,22 +458,11 @@ Map<String, int> _readSemanticRoleDelta(Object? rawRoleDelta) {
     final key = entry.key?.toString().trim().toLowerCase() ?? '';
     if (key.isEmpty) continue;
     final value = entry.value;
-    if (value is int) {
-      parsed[key] = value;
-    } else if (value is num) {
-      parsed[key] = value.toInt();
-    } else if (value is String) {
-      final parsedValue = int.tryParse(value);
-      if (parsedValue != null) parsed[key] = parsedValue;
-    }
+    if (value is int) parsed[key] = value;
+    else if (value is num) parsed[key] = value.toInt();
+    else if (value is String) { final p = int.tryParse(value); if (p != null) parsed[key] = p; }
   }
   return parsed;
-}
-
-double _safeSemanticConfidence(Object? value) {
-  if (value is num) return value.toDouble();
-  if (value is String) return double.tryParse(value) ?? 0;
-  return 0;
 }
 
 Map<String, dynamic> buildOptimizationSemanticV2Diagnostics({
@@ -458,67 +479,41 @@ Map<String, dynamic> buildOptimizationSemanticV2Diagnostics({
   var pairsWithAnySemanticSignal = 0;
   var pairsWithBothSemanticSignals = 0;
 
-  for (var i = 0; i < removals.length && i < additions.length; i++) {
+for (var i = 0; i < removals.length && i < additions.length; i++) {
     final removed = originalByName[_normalizeRoleCardName(removals[i])];
     final added = optimizedByName[_normalizeRoleCardName(additions[i])];
-    final removedRoles = removed == null
-        ? const <String>{}
-        : optimizationFunctionalRolesForCard(removed, semanticOnly: true);
-    final addedRoles = added == null
-        ? const <String>{}
-        : optimizationFunctionalRolesForCard(added, semanticOnly: true);
-
+    final removedRoles = _parseSemanticV2Roles(removed?['semantic_tags_v2']);
+    final addedRoles = _parseSemanticV2Roles(added?['semantic_tags_v2']);
     if (removedRoles.isNotEmpty) {
-      removedSemanticRoleCount += removedRoles.length;
+      removedSemanticRoleCount++;
       for (final role in removedRoles) {
         roleDelta[role] = (roleDelta[role] ?? 0) - 1;
       }
     }
     if (addedRoles.isNotEmpty) {
-      addedSemanticRoleCount += addedRoles.length;
+      addedSemanticRoleCount++;
       for (final role in addedRoles) {
         roleDelta[role] = (roleDelta[role] ?? 0) + 1;
       }
     }
-    if (removedRoles.isNotEmpty || addedRoles.isNotEmpty) {
-      pairsWithAnySemanticSignal++;
-    }
-    if (removedRoles.isNotEmpty && addedRoles.isNotEmpty) {
-      pairsWithBothSemanticSignals++;
-    }
+    final removedPrimary = _classifySemanticV2FunctionalRole(removed?['semantic_tags_v2']);
+    final addedPrimary = _classifySemanticV2FunctionalRole(added?['semantic_tags_v2']);
+    if (removedPrimary != null || addedPrimary != null) pairsWithAnySemanticSignal++;
+    if (removedPrimary != null && addedPrimary != null) pairsWithBothSemanticSignals++;
   }
 
   final normalizedRoleDelta = Map.fromEntries(
-    roleDelta.entries.where((entry) => entry.value != 0).toList()
-      ..sort((a, b) => a.key.compareTo(b.key)),
+    roleDelta.entries.where((e) => e.value != 0).toList()..sort((a, b) => a.key.compareTo(b.key)),
   );
 
   return {
     'schema_version': 'semantic_layer_v2_2026_05_18',
-    'source': 'deterministic_semantic_v2',
-    'mode': 'shadow',
-    'pair_count':
-        removals.length < additions.length ? removals.length : additions.length,
+    'source': 'deterministic_semantic_v2', 'mode': 'shadow',
+    'pair_count': removals.length < additions.length ? removals.length : additions.length,
     'removed_semantic_role_count': removedSemanticRoleCount,
     'added_semantic_role_count': addedSemanticRoleCount,
     'pairs_with_any_semantic_signal': pairsWithAnySemanticSignal,
     'pairs_with_both_semantic_signals': pairsWithBothSemanticSignals,
-    'role_delta': normalizedRoleDelta,
-    'enforcement': 'disabled',
+    'role_delta': normalizedRoleDelta, 'enforcement': 'disabled',
   };
-}
-
-Map<String, Map<String, dynamic>> _cardsByNormalizedName(
-  List<Map<String, dynamic>> cards,
-) {
-  final byName = <String, Map<String, dynamic>>{};
-  for (final card in cards) {
-    final key = _normalizeRoleCardName(card['name']?.toString() ?? '');
-    if (key.isNotEmpty) byName[key] = card;
-  }
-  return byName;
-}
-
-String _normalizeRoleCardName(String value) {
-  return value.trim().toLowerCase();
 }
