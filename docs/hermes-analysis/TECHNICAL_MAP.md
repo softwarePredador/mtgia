@@ -147,6 +147,9 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local `codex/hermes-analysis-docs@7014a2cc`, essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P2 — Fallback de semantic v2 baixa confianca**: revalidado e coberto em
+  `origin/master@c3531df7`. Tags semantic v2 abaixo de 0.65 sao ignoradas e a
+  classificacao cai para heuristica por `oracle_text`/`type_line`.
 - **P2 — Fillers de optimize/complete com bracket state**: resolvido em
   `origin/master@1aa4da71`. Os loaders de fillers passam a aplicar policy de
   bracket com `currentDeckCards`/`state.virtualDeck`, e o fallback sem bracket

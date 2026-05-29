@@ -25,7 +25,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 9. **P1 — Drift entre deck analysis e optimize**: deck analysis prefere
    `card_function_tags`, mas optimize/validator/quality gate carregam apenas
    `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
-   colapsado em um unico role.
+   colapsado em um unico role. O fallback de baixa confianca de semantic v2
+   para heuristica foi revalidado e coberto por teste em
+   `origin/master@c3531df7`.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket

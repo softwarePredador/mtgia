@@ -182,6 +182,14 @@ final rolePreserved = removedRole == addedRole ||
 
 ### Achado P2 — `_functionalRolesForGate` ignora heuristic tags quando semantic roles existem
 
+- **Status 2026-05-29:** **REVALIDADO / COBERTO em `origin/master@c3531df7`**.
+  A implementacao atual de `optimizationFunctionalRolesForCard(..., semanticOnly: true)`
+  descarta tags semantic v2 abaixo de 0.65; quando isso resulta em set vazio,
+  `_functionalRolesForGate` usa `inferFunctionalCardTags` e
+  `classifyOptimizationFunctionalRole` cai para `oracle_text`/`type_line`.
+  O teste novo cobre semantic v2 low-confidence apontando para `removal` em uma
+  carta que o oracle classifica como `draw`.
+
 - **Severidade:** P2 (melhoria)
 - **Local:** `optimization_quality_gate.dart:132-150`
 - **Descrição:** Quando `semanticRoles` (de `optimizationFunctionalRolesForCard(semanticOnly: true)`) é não-vazio, o gate ignora completamente as `inferFunctionalCardTags`. Isso é intencional (semantic v2 substitui heurística), MAS se a semantic layer retornar roles de baixa confiança (< 0.65), o gate não tem fallback para heurística. A carta pode ficar "invisível" para o gate.
@@ -260,7 +268,7 @@ final rolePreserved = removedRole == addedRole ||
 ## Top 3 Prioridades para Ação
 
 1. **P1 — Semantic enforcement critical_loss_roles expandido sem flag** (optimization_functional_roles.dart:354) — Considerar rollout gradual ou shadow mode.
-2. **P2 — `_functionalRolesForGate` sem fallback para heurística** (optimization_quality_gate.dart:132) — Adicionar fallback quando semantic roles são de baixa confiança.
+2. **P2 — `_functionalRolesForGate` sem fallback para heurística** — revalidado como comportamento existente e coberto por teste em `c3531df7`; manter monitoramento para casos multi-tag de baixa confianca.
 3. **P2 — `_looksLikePayoff` edge cases restantes** — ampliar fixtures futuras se aparecerem novas cartas com custo alternativo e payoff textual ambiguo.
 
 ## Arquivos Analisados (leitura completa)
@@ -271,7 +279,7 @@ final rolePreserved = removedRole == addedRole ||
 | `server/lib/ai/optimization_functional_roles.dart` | ✅ Mudanças sólidas |
 | `server/lib/ai/functional_card_tags.dart` | ✅ P1 `_looksLikePayoff` resolvido em `1463732a` |
 | `server/lib/ai/optimization_validator.dart` | ✅ Bug fix correto |
-| `server/lib/ai/optimization_quality_gate.dart` | ⚠️ P2 em fallback |
+| `server/lib/ai/optimization_quality_gate.dart` | ✅ fallback low-confidence coberto em `c3531df7` |
 | `server/lib/ai/optimize_runtime_support.dart` | ✅ Boa centralização |
 | `server/lib/ai/optimize_request_support.dart` | ✅ Auth correto |
 | `server/lib/ai/optimize_complete_support.dart` | ✅ Bug fix bracket |
@@ -296,6 +304,7 @@ final rolePreserved = removedRole == addedRole ||
 | `25416ec2` — Document semantic v2 optimize scorecard | INFRA | ✅ Scorecard atualizado |
 | `1463732a` — Clarify payoff functional tag rules | CORREÇÃO | ✅ Resolve P1 _looksLikePayoff |
 | `a466adb6` — Harden deck simulation card ownership | SEGURANÇA | ✅ Resolve P2 simulate defense-in-depth |
+| `c3531df7` — Cover semantic v2 low confidence fallback | QA | ✅ Cobre fallback semantic v2 low-confidence |
 | `cf225841` — Preserve semantic v2 multi-tags in optimize | FEATURE | ✅ P1 _looksLikePayoff posteriormente resolvido |
 | `aa3ee1ba` — Centralize basic land detection | REFACTOR | ✅ Novo módulo limpo |
 | `2396956e` — Wire sync cards utilities into pipeline | REFACTOR | ✅ DRY |
