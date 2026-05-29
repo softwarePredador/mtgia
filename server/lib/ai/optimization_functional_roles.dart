@@ -387,17 +387,22 @@ SemanticV2OptimizeEnforcementMode resolveSemanticV2OptimizeEnforcementMode(Strin
 }
 
 bool resolveSemanticV2ExpandedCriticalRoles(String? rawValue) {
-  final n = rawValue?.trim().toLowerCase();
-  return n == 'true' || n == '1' || n == 'yes';
+  final normalized = rawValue?.trim().toLowerCase();
+  return switch (normalized) {
+    '1' || 'true' || 'yes' || 'on' || 'expanded' => true,
+    _ => false,
+  };
 }
 
 class OptimizationSemanticV2EnforcementDecision {
   final SemanticV2OptimizeEnforcementMode mode;
+  final bool expandedCriticalRoles;
   final List<String> criticalLossRoles;
   final List<String> reviewLossRoles;
 
   const OptimizationSemanticV2EnforcementDecision({
     required this.mode,
+    required this.expandedCriticalRoles,
     required this.criticalLossRoles,
     required this.reviewLossRoles,
   });
@@ -406,12 +411,13 @@ class OptimizationSemanticV2EnforcementDecision {
       mode == SemanticV2OptimizeEnforcementMode.partial && criticalLossRoles.isNotEmpty;
 
   Map<String, dynamic> toDiagnostics() => {
-    'enforcement_mode': mode.wireValue,
-    'critical_loss_roles': criticalLossRoles,
-    'review_loss_roles': reviewLossRoles,
-    'blocked_by_semantic_v2': blockedBySemanticV2,
-    'enforcement_signal': 'role_delta_negative',
-  };
+        'enforcement_mode': mode.wireValue,
+        'expanded_critical_roles': expandedCriticalRoles,
+        'critical_loss_roles': criticalLossRoles,
+        'review_loss_roles': reviewLossRoles,
+        'blocked_by_semantic_v2': blockedBySemanticV2,
+        'enforcement_signal': 'role_delta_negative',
+      };
 }
 
 OptimizationSemanticV2EnforcementDecision evaluateOptimizationSemanticV2Enforcement({
@@ -420,23 +426,42 @@ OptimizationSemanticV2EnforcementDecision evaluateOptimizationSemanticV2Enforcem
   bool expandedCriticalRoles = false,
 }) {
   final roleDelta = _readSemanticRoleDelta(semanticLayerV2['role_delta']);
-  final baseCritical = <String>[
-    for (final role in const ['draw', 'removal', 'ramp', 'wipe'])
+  final criticalLossRoles = <String>[
+    for (final role in const [
+      'draw',
+      'removal',
+      'ramp',
+      'wipe',
+    ])
       if ((roleDelta[role] ?? 0) < 0) role,
+    if (expandedCriticalRoles)
+      for (final role in const [
+        'wincon',
+        'combo_piece',
+        'engine',
+        'payoff',
+        'enabler',
+      ])
+        if ((roleDelta[role] ?? 0) < 0) role,
   ];
-  final expanded = <String>[
-    for (final role in const ['wincon', 'combo_piece', 'engine', 'payoff', 'enabler'])
-      if ((roleDelta[role] ?? 0) < 0) role,
-  ];
-  final reviewOnly = <String>[
+  final reviewLossRoles = <String>[
+    if (!expandedCriticalRoles)
+      for (final role in const [
+        'wincon',
+        'combo_piece',
+        'engine',
+        'payoff',
+        'enabler',
+      ])
+        if ((roleDelta[role] ?? 0) < 0) role,
     for (final role in const ['protection'])
       if ((roleDelta[role] ?? 0) < 0) role,
-    if (!expandedCriticalRoles) ...expanded,
   ];
   return OptimizationSemanticV2EnforcementDecision(
     mode: mode,
-    criticalLossRoles: expandedCriticalRoles ? [...baseCritical, ...expanded] : baseCritical,
-    reviewLossRoles: expandedCriticalRoles ? reviewOnly : [...reviewOnly, ...expanded],
+    expandedCriticalRoles: expandedCriticalRoles,
+    criticalLossRoles: criticalLossRoles,
+    reviewLossRoles: reviewLossRoles,
   );
 }
 
@@ -446,7 +471,9 @@ Map<String, dynamic> withOptimizationSemanticV2EnforcementDiagnostics({
   bool expandedCriticalRoles = false,
 }) {
   final decision = evaluateOptimizationSemanticV2Enforcement(
-    semanticLayerV2: semanticLayerV2, mode: mode, expandedCriticalRoles: expandedCriticalRoles,
+    semanticLayerV2: semanticLayerV2,
+    mode: mode,
+    expandedCriticalRoles: expandedCriticalRoles,
   );
   return {...semanticLayerV2, ...decision.toDiagnostics(), 'enforcement': mode.wireValue, 'expanded_critical_roles': expandedCriticalRoles};
 }

@@ -886,6 +886,7 @@ Future<Response> onRequest(RequestContext context) async {
           'semantic_layer_v2': withOptimizationSemanticV2EnforcementDiagnostics(
             semanticLayerV2: validationReport!.functional.semanticLayerV2,
             mode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           ),
         };
       }
@@ -2625,6 +2626,7 @@ Future<Response> onRequest(RequestContext context) async {
           final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
             semanticLayerV2: semanticV2,
             mode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           );
 
           if (semanticV2Decision.blockedBySemanticV2) {
@@ -3022,6 +3024,7 @@ Future<Response> onRequest(RequestContext context) async {
             semanticLayerV2:
                 optimizationValidationReport!.functional.semanticLayerV2,
             mode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           ),
         };
       }

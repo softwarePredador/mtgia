@@ -230,9 +230,14 @@ void main() {
       expect(resolveSemanticV2OptimizeEnforcementMode('full'), equals(mode));
       expect(resolveSemanticV2OptimizeEnforcementMode('PARTIAL'),
           equals(SemanticV2OptimizeEnforcementMode.partial));
+      expect(resolveSemanticV2ExpandedCriticalRoles(null), isFalse);
+      expect(resolveSemanticV2ExpandedCriticalRoles(''), isFalse);
+      expect(resolveSemanticV2ExpandedCriticalRoles('true'), isTrue);
+      expect(resolveSemanticV2ExpandedCriticalRoles('1'), isTrue);
       expect(diagnostics['mode'], equals('shadow'));
       expect(diagnostics['enforcement'], equals('disabled'));
       expect(diagnostics['enforcement_mode'], equals('disabled'));
+      expect(diagnostics['expanded_critical_roles'], isFalse);
       expect(diagnostics['critical_loss_roles'], equals(const ['draw']));
       expect(diagnostics['blocked_by_semantic_v2'], isFalse);
     });
@@ -273,8 +278,9 @@ void main() {
           },
           mode: SemanticV2OptimizeEnforcementMode.partial,
         );
+
         expect(defaultDecision.criticalLossRoles, isEmpty);
-        expect(defaultDecision.reviewLossRoles, contains(role));
+        expect(defaultDecision.reviewLossRoles, equals([role]));
         expect(defaultDecision.blockedBySemanticV2, isFalse);
 
         // With expandedCriticalRoles=true: blocking
@@ -285,6 +291,7 @@ void main() {
           mode: SemanticV2OptimizeEnforcementMode.partial,
           expandedCriticalRoles: true,
         );
+
         expect(expandedDecision.criticalLossRoles, equals([role]));
         expect(expandedDecision.reviewLossRoles, isEmpty);
         expect(expandedDecision.blockedBySemanticV2, isTrue);
