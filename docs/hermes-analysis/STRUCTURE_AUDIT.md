@@ -71,11 +71,11 @@ correcao segura em `origin/master@640f4ab4`.
 
 ### Observacoes
 
-- `server/bin/local_test_server.dart` passou em `dart analyze` no workspace
-  principal porque `server/.dart_frog/server.dart` existe localmente como
-  artefato gerado. No clone limpo do Hermes, esse arquivo pode continuar
-  ausente; tratar como risco de ambiente/fluxo local, nao como bug confirmado de
-  produto runtime.
+- `server/bin/local_test_server.dart` foi corrigido em
+  `origin/master@a830f9f3`: nao importa mais `../.dart_frog/server.dart`
+  estaticamente, valida `.dart_frog/server.dart` em runtime e encerra o processo
+  filho em `SIGINT`/`SIGTERM`. `dart analyze bin/local_test_server.dart` passou
+  sem depender do arquivo gerado.
 - A rodada mista com `home_screen_test.dart` falhou por expectativa preexistente
   (`Gerar com IA` ausente) e golden longa; ela nao foi usada como gate desta
   correcao. Os testes diretamente afetados passaram.
@@ -124,9 +124,10 @@ partir do arquivo origem.
 
 Validação adicional:
 
-- `dart analyze` em `server/` confirmou 1 erro de import:
+- `dart analyze` em `server/` confirmou 1 erro de import na rodada original:
   `bin/local_test_server.dart:3:8 - Target of URI doesn't exist:
-  '../.dart_frog/server.dart'`.
+  '../.dart_frog/server.dart'`. Esse ponto foi resolvido posteriormente em
+  `origin/master@a830f9f3`.
 - `flutter analyze --no-pub --no-fatal-infos` em `app/` nao foi conclusivo para
   estes achados porque `app/.dart_tool/package_config.json` nao existe neste
   checkout; o analyzer reportou dezenas de milhares de erros de pacote ausente
@@ -163,6 +164,18 @@ Validação adicional:
   faca `app/core/...` existir no ambiente de build.
 
 #### P1 — `server/bin/local_test_server.dart` importa artefato Dart Frog ausente
+
+**Status 2026-05-29: RESOLVIDO em `origin/master@a830f9f3`.**
+
+- O import estatico para `../.dart_frog/server.dart` foi removido.
+- O wrapper checa `.dart_frog/server.dart` em runtime e imprime instrucao clara
+  quando o artefato ainda nao foi gerado.
+- Quando o artefato existe, o wrapper executa `dart run .dart_frog/server.dart`
+  com `PORT`, repassa stdout/stderr e encerra o processo filho em
+  `SIGINT`/`SIGTERM`.
+- Validado com `dart analyze bin/local_test_server.dart`, health local em
+  `PORT=18082`, encerramento sem listener residual, `dart analyze bin lib routes
+  test`, `dart test` e Hermes smoke.
 
 - **Import quebrado:** `server/bin/local_test_server.dart:3` importa
   `../.dart_frog/server.dart`.

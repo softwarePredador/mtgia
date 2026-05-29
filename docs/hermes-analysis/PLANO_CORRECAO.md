@@ -10,7 +10,11 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: múltiplas funções com mesmo nome e mesma intenção aparecem em módulos de IA, meta e rotas HTTP, aumentando risco de drift.
-4. **P1 — Entry point local quebrado**: `server/bin/local_test_server.dart` depende de `../.dart_frog/server.dart`, inexistente no checkout atual, e faz `dart analyze` do backend falhar.
+4. **P1 — Entry point local quebrado**: **RESOLVIDO em
+   `origin/master@a830f9f3`**. `server/bin/local_test_server.dart` nao importa
+   mais `../.dart_frog/server.dart` estaticamente; ele valida o artefato gerado
+   em runtime, sobe `dart run .dart_frog/server.dart` como processo filho e
+   trata `SIGINT`/`SIGTERM`.
 5. **P1 — Ownership em rotas deck/AI**: revalidado como **RESOLVIDO no `master` atual** para `POST /ai/optimize`, `GET /ai/optimize/jobs/:id`, `POST /ai/archetypes`, simulate/recommendations/matchup/weakness via source guards. Rotas experimentais continuam bloqueadas para promocao sem contrato UX/produto, mas nao por falta de owner-scope no codigo atual.
 6. **P1 — Politicas por nome / semantica de cartas**: reaberto no checkout local `7014a2cc`. `commander_fallback_policy.dart` nao existe nesta branch, e ainda ha excecoes por nome em `functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart` e rotas de recomendacao.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
@@ -39,8 +43,8 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
     `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
     direto entre `CommunityDeckDetailScreen` e `UserProfileScreen` foi removido
-    via GoRouter. O ponto restante e apenas operacional: `local_test_server.dart`
-    depende do artefato gerado `.dart_frog/server.dart` em clones limpos.
+    via GoRouter. O ponto operacional restante do `local_test_server.dart` foi
+    resolvido em `origin/master@a830f9f3`.
 
 ## Achados priorizados
 
@@ -247,6 +251,12 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
+- **Status 2026-05-29: RESOLVIDO em `origin/master@a830f9f3`.**
+  `server/bin/local_test_server.dart` deixou de importar o artefato gerado
+  `../.dart_frog/server.dart` no topo do arquivo. O wrapper agora checa
+  `.dart_frog/server.dart` em runtime, emite erro claro se o artefato nao
+  existir, executa `dart run .dart_frog/server.dart` com `PORT` e encerra o
+  processo filho em `SIGINT`/`SIGTERM`.
 - **Evidência**:
   - `dart analyze` em `server/` falhou com:
     - `bin/local_test_server.dart:3:8 - Target of URI doesn't exist: '../.dart_frog/server.dart'`
@@ -256,21 +266,25 @@ Histórico do problema:
   2. documentar ou automatizar esse passo no fluxo local;
   3. se o arquivo não for mais usado, substituir por entry point resiliente ou removê-lo.
 - **Validação**:
-  - gerar artefatos necessários ou corrigir o entry point;
-  - rerodar `dart analyze` até ficar verde.
+  - `dart analyze bin/local_test_server.dart`: PASS.
+  - `PORT=18082 dart run bin/local_test_server.dart` com
+    `.dart_frog/server.dart` presente respondeu `/health`.
+  - `SIGTERM` no wrapper encerrou o listener filho; porta `18082` ficou livre.
+  - `dart analyze bin lib routes test`: PASS.
+  - `dart test` em `server/`: 612 testes PASS.
+  - smoke Hermes pos-push para `a830f9f30b8bd106431e3bef6fd40211f4b46a86`: PASS.
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-05-29: RESOLVIDO para app em `origin/master@640f4ab4`; pendente
-apenas o fluxo operacional do `local_test_server.dart` em clones sem
-`.dart_frog/server.dart`.**
+**Status 2026-05-29: RESOLVIDO para app em `origin/master@640f4ab4` e para
+entrypoint local backend em `origin/master@a830f9f3`.**
 
 - `deck_analysis_tab.dart` e `life_counter_screen.dart` foram migrados para
   imports `package:manaloom/...`.
 - Validado com `flutter analyze` focado e `flutter analyze lib test`.
-- O workspace principal tinha `server/.dart_frog/server.dart` gerado e
-  `dart analyze bin/local_test_server.dart` passou; o clone limpo do Hermes
-  ainda pode precisar de bootstrap documentado/automatizado.
+- `server/bin/local_test_server.dart` nao importa mais o arquivo gerado em
+  tempo de analyze; em runtime ele exige `.dart_frog/server.dart` com mensagem
+  explicita.
 
 - **Evidência**:
   - `app/lib/features/decks/widgets/deck_analysis_tab.dart:5` importa
