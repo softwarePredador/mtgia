@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-29 07:04 UTC
+> Data: 2026-05-29 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -27,6 +27,12 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     teste, mas nao importado pelo `server/bin/sync_cards.dart`; tambem ha
     wrappers/helpers sem chamador em request trace, Commander Reference,
     PerformanceService, MTGTop8 e candidate quality sample SQL.
+11. **P1/P2 — Imports quebrados e ciclo app**: rodada focada de
+    2026-05-29 11:00 UTC confirmou imports relativos quebrados em
+    `deck_analysis_tab.dart` e `life_counter_screen.dart`, o import ausente
+    `server/bin/local_test_server.dart -> ../.dart_frog/server.dart` confirmado
+    por `dart analyze`, e um ciclo direto entre `CommunityDeckDetailScreen` e
+    `UserProfileScreen`.
 
 ## Achados priorizados
 
@@ -199,6 +205,65 @@ Histórico do problema:
 - **Validação**:
   - gerar artefatos necessários ou corrigir o entry point;
   - rerodar `dart analyze` até ficar verde.
+
+### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
+
+- **Evidência**:
+  - `app/lib/features/decks/widgets/deck_analysis_tab.dart:5` importa
+    `../../../../core/utils/mana_helper.dart`, que resolve para
+    `app/core/utils/mana_helper.dart`; o arquivo real esta em
+    `app/lib/core/utils/mana_helper.dart`.
+  - `app/lib/features/home/life_counter_screen.dart:7` importa
+    `../../../core/theme/app_theme.dart`, que resolve para
+    `app/core/theme/app_theme.dart`; o arquivo real esta em
+    `app/lib/core/theme/app_theme.dart`.
+  - `server/bin/local_test_server.dart:3` importa
+    `../.dart_frog/server.dart`; `dart analyze` confirma `uri_does_not_exist`
+    porque `server/.dart_frog/server.dart` nao existe no checkout atual.
+- **Impacto**: builds/checks com package config valido tendem a falhar no app
+  quando esses arquivos entram no grafo; no backend, `dart analyze` segue
+  bloqueado pelo entrypoint local.
+- **Ação recomendada**:
+  1. corrigir a profundidade dos dois imports relativos do app ou migrar para
+     imports `package:manaloom/...` consistentes;
+  2. decidir se `local_test_server.dart` deve gerar/depender explicitamente do
+     artefato Dart Frog ou sair do conjunto analisado;
+  3. apos `flutter pub get`, rerodar `flutter analyze --no-pub --no-fatal-infos`
+     para confirmar que os imports locais nao voltam a falhar.
+- **Validação**:
+  - resolvedor local de imports reporta 0 imports quebrados em `server/` e
+    `app/`;
+  - `dart analyze` em `server/` deixa de falhar por
+    `../.dart_frog/server.dart`;
+  - `flutter analyze` roda com `app/.dart_tool/package_config.json` presente e
+    sem `uri_does_not_exist` para os imports core corrigidos.
+
+### P2 — Quebrar o ciclo direto entre `CommunityDeckDetailScreen` e `UserProfileScreen`
+
+- **Evidência**:
+  - `app/lib/features/community/screens/community_deck_detail_screen.dart:8`
+    importa `../../social/screens/user_profile_screen.dart` e navega para
+    `UserProfileScreen` em `:213`.
+  - `app/lib/features/social/screens/user_profile_screen.dart:7` importa
+    `../../community/screens/community_deck_detail_screen.dart` e navega para
+    `CommunityDeckDetailScreen` em `:469`.
+  - A rodada focada de 721 arquivos Dart encontrou 1 unico SCC com mais de um
+    arquivo, composto por essas duas telas; nao encontrou ciclos locais no
+    backend.
+- **Impacto**: `community` e `social` ficam acoplados por classes concretas de
+  tela, dificultando teste isolado, reorganizacao de rotas e evolucao de cada
+  dominio.
+- **Ação recomendada**:
+  1. mover a navegacao cruzada para GoRouter/rotas nomeadas ou para helper de
+     navegacao fora dos dois dominios;
+  2. alternativamente, injetar callbacks de navegacao para evitar import mutuo
+     entre as telas;
+  3. manter testes de perfil/comunidade cobrindo os dois caminhos de navegacao.
+- **Validação**:
+  - grafo local de imports retorna `SCCS 0`;
+  - `profile_community_runtime_test.dart` ou teste equivalente continua cobrindo
+    abrir perfil a partir de deck publico e abrir deck publico a partir do
+    perfil.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
