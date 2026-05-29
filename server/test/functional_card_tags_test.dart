@@ -239,6 +239,27 @@ void main() {
       ).map((tag) => tag.tag).toSet();
 
       expect(greavesTags, containsAll({'enabler', 'protection'}));
+
+      final oneRingTags = inferFunctionalCardTags(
+        name: 'The One Ring',
+        typeLine: 'Legendary Artifact',
+        oracleText:
+            'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
+        manaCost: '{4}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(oneRingTags, containsAll({'draw', 'protection'}));
+      expect(oneRingTags, isNot(contains('payoff')));
+
+      final impactTremorsTags = inferFunctionalCardTags(
+        name: 'Impact Tremors',
+        typeLine: 'Enchantment',
+        oracleText:
+            'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
+        manaCost: '{1}{R}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(impactTremorsTags, contains('payoff'));
     });
 
     test('summarizes counts and bounded samples using quantities', () {

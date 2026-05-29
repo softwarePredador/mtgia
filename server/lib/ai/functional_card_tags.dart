@@ -895,16 +895,25 @@ bool _looksLikeEngine(String oracle) {
 }
 
 bool _looksLikePayoff(String oracle, String normalizedName) {
-  return normalizedName == 'blood artist' ||
-      oracle.contains('for each') &&
-          !oracle.contains('costs {') &&
-          !oracle.contains('costs {1} less') ||
-      oracle.contains('whenever') &&
-          (oracle.contains('creature dies') ||
-              oracle.contains('you cast') ||
-              oracle.contains('artifact enters') ||
-              oracle.contains('enchantment enters') ||
-              oracle.contains('you sacrifice'));
+  if (normalizedName == 'blood artist') return true;
+
+  final isCostReductionText =
+      RegExp(r'\bcosts?\s+\{[^}]+\}\s+less').hasMatch(oracle);
+  final isDrawScalingText = oracle.contains('draw a card for each') ||
+      oracle.contains('draw cards equal to');
+  if (oracle.contains('for each') &&
+      !isCostReductionText &&
+      !isDrawScalingText) {
+    return true;
+  }
+
+  if (!oracle.contains('whenever')) return false;
+  return oracle.contains('creature dies') ||
+      oracle.contains('creature enters') ||
+      oracle.contains('you cast') ||
+      oracle.contains('artifact enters') ||
+      oracle.contains('enchantment enters') ||
+      oracle.contains('you sacrifice');
 }
 
 bool _looksLikeEnabler(String oracle, String normalizedName) {
