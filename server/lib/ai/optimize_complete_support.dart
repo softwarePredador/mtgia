@@ -685,6 +685,7 @@ Future<int> _bootstrapSparseCompleteInput({
   if (selected.length < spellSlotsToFill) {
     final broadPool = await loadBroadCommanderNonLandFillers(
       pool: pool,
+      currentDeckCards: state.virtualDeck,
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: existingNames.union(selectedNames),
       bracket: bracket,
@@ -951,6 +952,7 @@ Future<void> fillCompleteDeckRemainder({
         if (selectedSpells.length < spellsNeeded) {
           final broadPool = await loadBroadCommanderNonLandFillers(
             pool: pool,
+            currentDeckCards: state.virtualDeck,
             commanderColorIdentity: commanderColorIdentity,
             excludeNames: existingNames.union(selectedSpellNames),
             bracket: bracket,
@@ -1099,6 +1101,7 @@ Future<void> fillCompleteDeckRemainder({
       final emergencyRemaining = maxTotal - state.virtualTotal;
       final emergencyFillers = await loadEmergencyNonBasicFillers(
         pool: pool,
+        currentDeckCards: state.virtualDeck,
         excludeNames: state.virtualDeck
             .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
             .where((n) => n.isNotEmpty)

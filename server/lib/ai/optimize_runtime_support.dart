@@ -847,6 +847,7 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
 
   final candidates = await loadCompetitiveNonLandFillers(
     pool: pool,
+    currentDeckCards: currentDeckCards,
     commanderColorIdentity: commanderColorIdentity,
     bracket: bracket,
     excludeNames: excludeNames,
@@ -1002,6 +1003,7 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
 
 Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
   required Pool pool,
+  required List<Map<String, dynamic>> currentDeckCards,
   required Set<String> commanderColorIdentity,
   required Set<String> excludeNames,
   required int? bracket,
@@ -1097,7 +1099,7 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
   if (bracket != null && candidates.isNotEmpty) {
     final decision = applyBracketPolicyToAdditions(
       bracket: bracket,
-      currentDeckCards: const [],
+      currentDeckCards: currentDeckCards,
       additionsCardsData: candidates.map((c) {
         return {
           'name': c['name'],
@@ -1113,9 +1115,7 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
         .toList();
     Log.d(
         '  [broad] bracket=$bracket allowed=${allowedSet.length} filtered=${filtered.length}');
-    if (filtered.isNotEmpty) {
-      candidates = filtered;
-    }
+    candidates = filtered;
   }
 
   Log.d('  [broad] final rows=${candidates.length}');
@@ -1159,7 +1159,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
   );
   addUnique(withBracket);
 
-  if (aggregated.length < limit) {
+  if (aggregated.length < limit && bracket == null) {
     final noBracket = await loadDeterministicSlotFillers(
       pool: pool,
       currentDeckCards: currentDeckCards,
@@ -1180,12 +1180,17 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
       excludeNames: excludeNames.union(seen),
       limit: limit - aggregated.length,
     );
-    addUnique(metaFillers);
+    addUnique(_filterCandidatesByBracketPolicy(
+      candidates: metaFillers,
+      bracket: bracket,
+      currentDeckCards: currentDeckCards,
+    ));
   }
 
   if (aggregated.length < limit) {
     final broadWithBracket = await loadBroadCommanderNonLandFillers(
       pool: pool,
+      currentDeckCards: currentDeckCards,
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: excludeNames.union(seen),
       bracket: bracket,
@@ -1194,9 +1199,10 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
     addUnique(broadWithBracket);
   }
 
-  if (aggregated.length < limit) {
+  if (aggregated.length < limit && bracket == null) {
     final broadNoBracket = await loadBroadCommanderNonLandFillers(
       pool: pool,
+      currentDeckCards: currentDeckCards,
       commanderColorIdentity: commanderColorIdentity,
       excludeNames: excludeNames.union(seen),
       bracket: null,
@@ -1210,6 +1216,7 @@ Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
 
 Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
   required Pool pool,
+  required List<Map<String, dynamic>> currentDeckCards,
   required Set<String> commanderColorIdentity,
   required int? bracket,
   required Set<String> excludeNames,
@@ -1328,7 +1335,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
   if (bracket != null && candidates.isNotEmpty) {
     final decision = applyBracketPolicyToAdditions(
       bracket: bracket,
-      currentDeckCards: const [],
+      currentDeckCards: currentDeckCards,
       additionsCardsData: candidates.map((c) {
         return {
           'name': c['name'],
@@ -1343,9 +1350,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
         .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
         .toList();
 
-    if (filtered.isNotEmpty) {
-      candidates = filtered;
-    }
+    candidates = filtered;
   }
 
   return dedupeCandidatesByName(candidates).take(limit).toList();
@@ -1353,6 +1358,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
 
 Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
   required Pool pool,
+  required List<Map<String, dynamic>> currentDeckCards,
   required Set<String> excludeNames,
   required int? bracket,
   required int limit,
@@ -1407,7 +1413,7 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
   if (bracket != null && candidates.isNotEmpty) {
     final decision = applyBracketPolicyToAdditions(
       bracket: bracket,
-      currentDeckCards: const [],
+      currentDeckCards: currentDeckCards,
       additionsCardsData: candidates.map((c) {
         return {
           'name': c['name'],
@@ -1421,12 +1427,35 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
     final filtered = candidates
         .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
         .toList();
-    if (filtered.isNotEmpty) {
-      candidates = filtered;
-    }
+    candidates = filtered;
   }
 
   return dedupeCandidatesByName(candidates).take(limit).toList();
+}
+
+List<Map<String, dynamic>> _filterCandidatesByBracketPolicy({
+  required List<Map<String, dynamic>> candidates,
+  required int? bracket,
+  required List<Map<String, dynamic>> currentDeckCards,
+}) {
+  if (bracket == null || candidates.isEmpty) return candidates;
+
+  final decision = applyBracketPolicyToAdditions(
+    bracket: bracket,
+    currentDeckCards: currentDeckCards,
+    additionsCardsData: candidates.map((c) {
+      return {
+        'name': c['name'],
+        'type_line': c['type_line'],
+        'oracle_text': c['oracle_text'],
+        'quantity': 1,
+      };
+    }),
+  );
+  final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
+  return candidates
+      .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
+      .toList();
 }
 
 Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({

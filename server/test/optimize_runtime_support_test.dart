@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/edh_bracket_policy.dart';
@@ -347,6 +349,24 @@ void main() {
 
       expect(decision.allowed, isEmpty);
       expect(decision.blocked.single['name'], equals('Mana Crypt'));
+    });
+
+    test('filler loaders use current deck state for bracket policy', () {
+      final source = File(
+        'lib/ai/optimize_runtime_support.dart',
+      ).readAsStringSync();
+      final completeSource = File(
+        'lib/ai/optimize_complete_support.dart',
+      ).readAsStringSync();
+
+      expect(source, isNot(contains('currentDeckCards: const []')));
+      expect(source, isNot(contains('if (filtered.isNotEmpty)')));
+      expect(source, contains('currentDeckCards: currentDeckCards'));
+      expect(completeSource, contains('currentDeckCards: state.virtualDeck'));
+      expect(
+        source,
+        contains('aggregated.length < limit && bracket == null'),
+      );
     });
   });
 
