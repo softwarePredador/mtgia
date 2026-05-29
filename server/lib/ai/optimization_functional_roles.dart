@@ -323,6 +323,13 @@ SemanticV2OptimizeEnforcementMode resolveSemanticV2OptimizeEnforcementMode(
   };
 }
 
+/// Resolve whether expanded critical roles (wincon, combo_piece, engine, payoff, enabler)
+/// should be enforced as blocking. Default: false (review-only) until scorecard validates.
+bool resolveSemanticV2ExpandedCriticalRoles(String? rawValue) {
+  final normalized = rawValue?.trim().toLowerCase();
+  return normalized == 'true' || normalized == '1' || normalized == 'yes';
+}
+
 class OptimizationSemanticV2EnforcementDecision {
   final SemanticV2OptimizeEnforcementMode mode;
   final List<String> criticalLossRoles;
@@ -351,14 +358,23 @@ OptimizationSemanticV2EnforcementDecision
     evaluateOptimizationSemanticV2Enforcement({
   required Map<String, dynamic> semanticLayerV2,
   required SemanticV2OptimizeEnforcementMode mode,
+  bool expandedCriticalRoles = false,
 }) {
   final roleDelta = _readSemanticRoleDelta(semanticLayerV2['role_delta']);
-  final criticalLossRoles = <String>[
+  // Base critical roles always enforced (draw, removal, ramp, wipe)
+  final baseCriticalRoles = <String>[
     for (final role in const [
       'draw',
       'removal',
       'ramp',
       'wipe',
+    ])
+      if ((roleDelta[role] ?? 0) < 0) role,
+  ];
+  // Expanded critical roles (wincon, combo_piece, engine, payoff, enabler)
+  // Only enforced when expandedCriticalRoles=true (requires scorecard validation first)
+  final expandedCritical = <String>[
+    for (final role in const [
       'wincon',
       'combo_piece',
       'engine',
@@ -367,30 +383,39 @@ OptimizationSemanticV2EnforcementDecision
     ])
       if ((roleDelta[role] ?? 0) < 0) role,
   ];
-  final reviewLossRoles = <String>[
+  // Review-only roles: expanded roles when not enabled + protection
+  final reviewOnly = <String>[
     for (final role in const ['protection'])
       if ((roleDelta[role] ?? 0) < 0) role,
+    if (!expandedCriticalRoles) ...expandedCritical,
   ];
 
   return OptimizationSemanticV2EnforcementDecision(
     mode: mode,
-    criticalLossRoles: criticalLossRoles,
-    reviewLossRoles: reviewLossRoles,
+    criticalLossRoles: expandedCriticalRoles
+        ? [...baseCriticalRoles, ...expandedCritical]
+        : baseCriticalRoles,
+    reviewLossRoles: expandedCriticalRoles
+        ? reviewOnly
+        : [...reviewOnly, ...expandedCritical],
   );
 }
 
 Map<String, dynamic> withOptimizationSemanticV2EnforcementDiagnostics({
   required Map<String, dynamic> semanticLayerV2,
   required SemanticV2OptimizeEnforcementMode mode,
+  bool expandedCriticalRoles = false,
 }) {
   final decision = evaluateOptimizationSemanticV2Enforcement(
     semanticLayerV2: semanticLayerV2,
     mode: mode,
+    expandedCriticalRoles: expandedCriticalRoles,
   );
   return {
     ...semanticLayerV2,
     ...decision.toDiagnostics(),
     'enforcement': mode.wireValue,
+    'expanded_critical_roles': expandedCriticalRoles,
   };
 }
 

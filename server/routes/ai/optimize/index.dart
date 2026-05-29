@@ -394,6 +394,7 @@ String deriveOptimizeOutcomeCode({
 Map<String, dynamic> buildSemanticV2OptimizeRejectedBody({
   required Map<String, dynamic> semanticLayerV2,
   required SemanticV2OptimizeEnforcementMode enforcementMode,
+  required bool expandedCriticalRoles,
   required Map<String, dynamic> validation,
   required List<String> removals,
   required List<String> additions,
@@ -404,10 +405,12 @@ Map<String, dynamic> buildSemanticV2OptimizeRejectedBody({
   final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
     semanticLayerV2: semanticLayerV2,
     mode: enforcementMode,
+    expandedCriticalRoles: expandedCriticalRoles,
   );
   final semanticDiagnostics = withOptimizationSemanticV2EnforcementDiagnostics(
     semanticLayerV2: semanticLayerV2,
     mode: enforcementMode,
+    expandedCriticalRoles: expandedCriticalRoles,
   );
   final semanticReasons = semanticV2Decision.criticalLossRoles
       .map(
@@ -519,6 +522,10 @@ Future<Response> onRequest(RequestContext context) async {
     final semanticV2OptimizeEnforcementMode =
         resolveSemanticV2OptimizeEnforcementMode(
       env['SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT'],
+    );
+    final semanticV2ExpandedCriticalRoles =
+        resolveSemanticV2ExpandedCriticalRoles(
+      env['SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES'],
     );
 
     _optimizeRequestCount++;
@@ -2624,6 +2631,7 @@ Future<Response> onRequest(RequestContext context) async {
             final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
               semanticLayerV2: semanticV2,
               enforcementMode: semanticV2OptimizeEnforcementMode,
+              expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
               validation: optimizationValidationReport.toJson(),
               removals: validRemovals,
               additions: validAdditions,

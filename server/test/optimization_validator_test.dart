@@ -238,16 +238,12 @@ void main() {
     });
 
     test('semantic v2 partial blocks critical and contextual role losses', () {
+      // Base critical roles (draw, removal, ramp, wipe) block by default
       for (final role in const [
         'draw',
         'removal',
         'ramp',
         'wipe',
-        'wincon',
-        'combo_piece',
-        'engine',
-        'payoff',
-        'enabler',
       ]) {
         final decision = evaluateOptimizationSemanticV2Enforcement(
           semanticLayerV2: {
@@ -259,6 +255,39 @@ void main() {
         expect(decision.criticalLossRoles, equals([role]));
         expect(decision.reviewLossRoles, isEmpty);
         expect(decision.blockedBySemanticV2, isTrue);
+      }
+
+      // Expanded critical roles (wincon, combo_piece, engine, payoff, enabler)
+      // require expandedCriticalRoles=true to block (default: false = review-only)
+      for (final role in const [
+        'wincon',
+        'combo_piece',
+        'engine',
+        'payoff',
+        'enabler',
+      ]) {
+        // Default (false): review-only, NOT blocking
+        final defaultDecision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+        );
+        expect(defaultDecision.criticalLossRoles, isEmpty);
+        expect(defaultDecision.reviewLossRoles, contains(role));
+        expect(defaultDecision.blockedBySemanticV2, isFalse);
+
+        // With expandedCriticalRoles=true: blocking
+        final expandedDecision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+          expandedCriticalRoles: true,
+        );
+        expect(expandedDecision.criticalLossRoles, equals([role]));
+        expect(expandedDecision.reviewLossRoles, isEmpty);
+        expect(expandedDecision.blockedBySemanticV2, isTrue);
       }
     });
 
