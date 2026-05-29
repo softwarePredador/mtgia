@@ -46,11 +46,6 @@ bool isLoreholdCommanderReferenceCandidate(String? commanderName) {
       normalizeCommanderReferenceName(loreholdReferenceCommanderName);
 }
 
-String? normalizedCommanderReferenceCandidate(String? commanderName) {
-  final normalized = normalizeCommanderReferenceName(commanderName ?? '');
-  return normalized.isEmpty ? null : normalized;
-}
-
 bool isReferenceProfileConfidenceUsable(Object? confidence) {
   return commanderReferenceConfidenceRank(confidence) >=
       commanderReferenceConfidenceRank('medium');

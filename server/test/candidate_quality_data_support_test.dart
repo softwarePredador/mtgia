@@ -136,17 +136,6 @@ void main() {
       expect(isPremiumCommanderCandidateName('Cancel'), isFalse);
     });
 
-    test('sample pool SQL keeps legality and color identity guardrails', () {
-      final sql = buildCandidateQualitySamplePoolSql().toLowerCase();
-
-      expect(sql, contains('card_legalities'));
-      expect(sql, contains("cl.format = 'commander'"));
-      expect(sql, contains('cl.status = \'legal\''));
-      expect(sql, contains('c.color_identity <@ @identity::text[]'));
-      expect(sql, isNot(contains('insert into cards')));
-      expect(sql, isNot(contains('update cards')));
-    });
-
     test('schema is additive and targets metadata tables only', () {
       final schema = [
         ...candidateQualitySchemaStatements,

@@ -603,39 +603,6 @@ bool isPremiumCommanderCandidateName(String name) {
       .contains(normalizeCandidateQualityKey(name));
 }
 
-String buildCandidateQualitySamplePoolSql() {
-  return '''
-SELECT
-  cqs.card_id::text,
-  cqs.card_name,
-  cqs.function_tags,
-  cqs.best_role_score,
-  cqs.meta_deck_count
-FROM optimize_candidate_quality_summary cqs
-JOIN cards c ON c.id = cqs.card_id
-LEFT JOIN card_legalities cl
-  ON cl.card_id = c.id
-  AND cl.format = 'commander'
-WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-  AND c.type_line NOT ILIKE '%land%'
-  AND (
-    c.color_identity <@ @identity::text[]
-    OR c.color_identity = '{}'
-    OR (
-      c.color_identity IS NULL
-      AND (
-        c.colors <@ @identity::text[]
-        OR c.colors = '{}'
-        OR c.colors IS NULL
-      )
-    )
-  )
-  AND @role = ANY(cqs.scored_roles)
-ORDER BY cqs.best_role_score DESC, cqs.meta_deck_count DESC, cqs.card_name ASC
-LIMIT @limit
-''';
-}
-
 double _estimateManaCostCmc(String manaCost) {
   if (manaCost.trim().isEmpty) return 0;
   var total = 0.0;

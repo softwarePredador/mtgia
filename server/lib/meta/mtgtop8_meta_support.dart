@@ -136,13 +136,6 @@ String? extractMtgTop8EventIdFromSourceUrl(String sourceUrl) {
   return eventId;
 }
 
-String? extractMtgTop8FormatCodeFromSourceUrl(String sourceUrl) {
-  final uri = Uri.tryParse(sourceUrl);
-  final formatCode = uri?.queryParameters['f']?.trim();
-  if (formatCode == null || formatCode.isEmpty) return null;
-  return formatCode;
-}
-
 String? _normalizeEventPath(String href) {
   final resolved = resolveMtgTop8Url(href);
   final uri = Uri.parse(resolved);
