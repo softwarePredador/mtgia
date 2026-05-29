@@ -113,6 +113,11 @@ int? parseSinceDays(List<String> args) {
 ///
 /// Diferente de [extractCardRow], recebe o JSON direto do set
 /// (não do AtomicCards).
+///
+/// Índices do retorno:
+/// [0] oracleId, [1] name, [2] manaCost, [3] typeLine, [4] oracleText,
+/// [5] colors, [6] colorIdentity, [7] imageUrl, [8] setCode, [9] rarity,
+/// [10] collectorNumber, [11] foil
 List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   final ids = card['identifiers'] as Map<String, dynamic>?;
@@ -143,6 +148,16 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
         'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
   }
 
+  final collectorNumber = card['number']?.toString();
+  final hasFoil = card['hasFoil'] as bool?;
+  final hasNonFoil = card['hasNonFoil'] as bool?;
+  bool? foil;
+  if (hasFoil == true && hasNonFoil != true) {
+    foil = true;
+  } else if (hasNonFoil == true && hasFoil != true) {
+    foil = false;
+  }
+
   return [
     oracleId,
     name,
@@ -154,6 +169,8 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
     imageUrl,
     canonicalSetCode,
     card['rarity']?.toString(),
+    collectorNumber,
+    foil,
   ];
 }
 
