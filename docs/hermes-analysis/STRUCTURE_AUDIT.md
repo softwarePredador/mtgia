@@ -112,6 +112,32 @@ operacionais fora do runtime app/API.
 - **O que falsifica:** apagar o wrapper e manter `normalizeCommanderReferenceName`
   como API unica.
 
+#### P2 — Parte da API customizada de `PerformanceService` nao e chamada pelo app
+
+- **Funcoes/metodos:** `startTrace`, `stopTrace`, `addMetric`,
+  `addAttribute`, `getLocalStats` e `printLocalStats`.
+- **Definicoes:** `app/lib/core/services/performance_service.dart:110`,
+  `:130`, `:200`, `:210`, `:220` e `:248`.
+- **Evidencia:** `grep -RIn --include='*.dart'
+  "\bPerformanceService\b\|\bstartTrace\b\|\bstopTrace\b\|\baddMetric\b\|\baddAttribute\b\|\bprintLocalStats\b\|\bgetLocalStats\b"
+  app/lib app/test app/integration_test` encontrou inicializacao em
+  `app/lib/main.dart:121`, uso de `traceAsync` no smoke
+  `app/integration_test/release_observability_smoke_test.dart:51` e o
+  `PerformanceNavigatorObserver`, mas nao encontrou chamadas runtime para os
+  metodos customizados listados alem das proprias definicoes. `getLocalStats`
+  so e chamado por `printLocalStats`, que tambem nao tem chamador externo.
+- **Por que parece nao chamada:** a observabilidade ativa usa `init`,
+  `traceAsync` e o observer de navegacao; a API manual de traces/metricas parece
+  ter ficado como superficie planejada ou legado de debug.
+- **Risco:** baixo/medio. Nao afeta fluxo de produto diretamente, mas aumenta a
+  superficie de observabilidade aparente e pode sugerir que metricas customizadas
+  estao instrumentadas quando nao estao.
+- **O que valida:** instrumentar chamadas reais para operacoes criticas
+  (`fetch_decks`, optimize, import, etc.) usando esses metodos, ou adicionar
+  testes/smokes que provem consumo.
+- **O que falsifica:** remover os metodos manuais e manter `traceAsync`/observer
+  como contrato unico de performance.
+
 #### P2 — `extractMtgTop8FormatCodeFromSourceUrl` e test-only no checkout atual
 
 - **Funcao:** `extractMtgTop8FormatCodeFromSourceUrl`.

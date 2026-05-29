@@ -26,7 +26,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     2026-05-29 07:04 UTC confirmou que `sync_cards_utils.dart` e coberto por
     teste, mas nao importado pelo `server/bin/sync_cards.dart`; tambem ha
     wrappers/helpers sem chamador em request trace, Commander Reference,
-    MTGTop8 e candidate quality sample SQL.
+    PerformanceService, MTGTop8 e candidate quality sample SQL.
 
 ## Achados priorizados
 
@@ -218,6 +218,10 @@ Histórico do problema:
   - `server/lib/ai/commander_reference_profile_support.dart:49`
     (`normalizedCommanderReferenceCandidate`) nao tem chamador; consumidores
     usam `normalizeCommanderReferenceName`.
+  - `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
+    `:210`, `:220` e `:248` expõem traces/metricas/debug manuais sem chamador
+    em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init`,
+    `traceAsync` e `PerformanceNavigatorObserver`.
   - `server/lib/meta/mtgtop8_meta_support.dart:139`
     (`extractMtgTop8FormatCodeFromSourceUrl`) aparece apenas em teste, enquanto
     o helper de event id vizinho e usado por
@@ -232,8 +236,9 @@ Histórico do problema:
 - **Ação recomendada**:
   1. priorizar `sync_cards_utils.dart`: escolher entre importar os helpers no
      `server/bin/sync_cards.dart` ou remover o arquivo/testes como legado;
-  2. para wrappers pequenos (`request_trace`, Commander Reference, MTGTop8),
-     remover se nao houver contrato planejado ou religar com teste focado;
+  2. para wrappers pequenos (`request_trace`, Commander Reference,
+     PerformanceService, MTGTop8), remover se nao houver contrato planejado ou
+     religar com teste focado;
   3. decidir se `buildCandidateQualitySamplePoolSql` deve virar parte real de
      um scorecard/runner ou sair junto com o teste test-only.
 - **Validação**:

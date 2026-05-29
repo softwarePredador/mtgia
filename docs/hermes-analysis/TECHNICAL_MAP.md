@@ -145,8 +145,8 @@ mtgia/
   `server/test/sync_cards_test.dart`, enquanto o CLI ativo
   `server/bin/sync_cards.dart` mantem copias privadas/loops inline. Tambem ha
   wrappers/helpers sem chamador runtime em `request_trace.dart`,
-  `commander_reference_profile_support.dart`, `mtgtop8_meta_support.dart` e
-  `candidate_quality_data_support.dart`.
+  `commander_reference_profile_support.dart`, `performance_service.dart`,
+  `mtgtop8_meta_support.dart` e `candidate_quality_data_support.dart`.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
