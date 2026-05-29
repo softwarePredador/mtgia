@@ -14,6 +14,8 @@ void main() {
 
       expect(simulate, contains('final userId = context.read<String>()'));
       expect(simulate, contains('AND user_id = CAST(@userId AS uuid)'));
+      expect(simulate, contains('JOIN decks d ON d.id = dc.deck_id'));
+      expect(simulate, contains('AND d.user_id = CAST(@userId AS uuid)'));
       expect(
           recommendations, contains('final userId = context.read<String>()'));
       expect(

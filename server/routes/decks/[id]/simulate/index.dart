@@ -39,10 +39,12 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
       Sql.named('''
         SELECT c.name, c.mana_cost, c.type_line, dc.quantity, dc.is_commander
         FROM deck_cards dc
+        JOIN decks d ON d.id = dc.deck_id
         JOIN cards c ON dc.card_id = c.id
         WHERE dc.deck_id = @deckId
+          AND d.user_id = CAST(@userId AS uuid)
       '''),
-      parameters: {'deckId': deckId},
+      parameters: {'deckId': deckId, 'userId': userId},
     );
 
     if (cardsResult.isEmpty) {
