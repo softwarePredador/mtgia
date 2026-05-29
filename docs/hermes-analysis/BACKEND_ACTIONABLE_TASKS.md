@@ -17,7 +17,12 @@
 > de BE.1/BE.3/archetypes permanece resolvido por source guards. BE.6 foi
 > encaminhado no codigo/docs com `GET /ready` documentado como alias operacional
 > estavel de `/health/ready` e source guard em `health_readiness_support_test`.
-> Backlog ativo apos essa rodada: BE.5 e BE.7.
+>
+> Atualizacao Codex em 2026-05-29: `origin/master@1aa4da71` resolveu BE.5
+> threadando `currentDeckCards`/`state.virtualDeck` nos fillers de
+> optimize/complete, removendo fallback `bracket: null` quando o bracket foi
+> definido e adicionando source guard em `optimize_runtime_support_test`.
+> Backlog ativo apos essa rodada: BE.7.
 
 ## P1 — Alto
 
@@ -67,6 +72,14 @@
 - **Prioridade:** P2.
 
 ### BE.5 — Fillers de optimize/complete aplicam bracket sem estado atual do deck em alguns caminhos
+- **Status em `origin/master@1aa4da71`: RESOLVIDO.** Os loaders de fillers
+  agora recebem o estado atual/virtual do deck em `loadCompetitiveNonLandFillers`,
+  `loadBroadCommanderNonLandFillers` e `loadEmergencyNonBasicFillers`.
+  `loadGuaranteedNonBasicFillers` nao cai mais para fallback `bracket: null`
+  quando o bracket foi informado, e o source guard em
+  `server/test/optimize_runtime_support_test.dart` bloqueia regressao para
+  `currentDeckCards: const []`, fallback condicional `if (filtered.isNotEmpty)`
+  e complete sem `state.virtualDeck`.
 - **Evidencia:** Filtro final de optimize usa estado atual corretamente (`server/routes/ai/optimize/index.dart` linhas 1750-1753). Mas `loadDeterministicSlotFillers` recebe `currentDeckCards` para slot needs (`server/lib/ai/optimize_runtime_support.dart` linhas 840-855) e chama `loadCompetitiveNonLandFillers` sem passar esse estado (`linhas 857-863`). Dentro dos loaders, a politica de bracket e aplicada com `currentDeckCards: const []` em tres pontos (`optimize_runtime_support.dart` linhas 1106-1110, 1386-1390 e 1465-1469). `loadGuaranteedNonBasicFillers` ainda cai para chamadas com `bracket: null` quando falta preencher (`linhas 1171-1182` e 1206-1214). `optimize_complete_support.dart` chama emergency fillers com `bracket`, mas sem `currentDeckCards` (`linhas 1098-1107`).
 - **Impacto de produto:** Decks low-bracket que ja consumiram budget de fast mana/tutor/free interaction podem gerar pools de filler como se nao tivessem cartas relevantes, reduzindo determinismo de power-level em complete/rebuild/top-up.
 - **Risco:** Medio; filtro final pode segurar alguns casos, mas a geracao de candidatos e fallbacks sem bracket degradam explicabilidade/consistencia.

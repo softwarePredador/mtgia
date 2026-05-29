@@ -22,12 +22,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `card_function_tags`, mas optimize/validator/quality gate carregam apenas
    `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
    colapsado em um unico role.
-10. **P1/P2 — Funcoes publicas sem chamador runtime**:
+10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
+    `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
+    atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
+    foi definido.
+11. **P1/P2 — Funcoes publicas sem chamador runtime**:
     `sync_cards_utils.dart` foi **RESOLVIDO em `origin/master@2396956e`** e
     agora e usado pelo `server/bin/sync_cards.dart`. Permanecem abertos
     wrappers/helpers sem chamador em request trace, Commander Reference,
     PerformanceService, MTGTop8 e candidate quality sample SQL.
-11. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
+12. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
     `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
     `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
     direto entre `CommunityDeckDetailScreen` e `UserProfileScreen` foi removido
@@ -192,6 +196,30 @@ Histórico do problema:
   - uma carta com `semantic_tags_v2.tags=[draw, engine]` preserva ambos os
     papeis no role delta;
   - candidate quality e optimize usam a mesma normalizacao de roles.
+
+### P2 — Threadar estado atual do deck nos fillers de optimize/complete
+
+**Status 2026-05-29: RESOLVIDO em `origin/master@1aa4da71`.**
+
+- `loadDeterministicSlotFillers` passa `currentDeckCards` para fillers
+  competitivos.
+- `loadBroadCommanderNonLandFillers`, `loadCompetitiveNonLandFillers` e
+  `loadEmergencyNonBasicFillers` recebem `currentDeckCards` e aplicam a policy
+  de bracket contra o estado real/virtual.
+- `loadGuaranteedNonBasicFillers` so usa fallback sem bracket quando
+  `bracket == null`, evitando degradacao silenciosa de power-level.
+- `optimize_complete_support.dart` passa `state.virtualDeck` para os caminhos
+  broad/spells/emergency.
+- `server/test/optimize_runtime_support_test.dart` possui source guard contra
+  regressao para `currentDeckCards: const []`, `if (filtered.isNotEmpty)` e
+  complete sem `state.virtualDeck`.
+
+- **Validacao executada**:
+  - `dart analyze bin lib routes test`
+  - `dart test` em `server/` com 612 testes
+  - `dart test test/optimize_runtime_support_test.dart -r expanded`
+  - `git diff --check`
+  - smoke Hermes pos-push para `1aa4da71cb012698372923438a58716ab2f7a75a`
 
 ### P1 — Restaurar a analisabilidade do backend local
 - **Evidência**:
