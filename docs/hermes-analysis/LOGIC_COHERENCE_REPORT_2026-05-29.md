@@ -261,7 +261,7 @@ final rolePreserved = removedRole == addedRole ||
 
 1. **P1 — Semantic enforcement critical_loss_roles expandido sem flag** (optimization_functional_roles.dart:354) — Considerar rollout gradual ou shadow mode.
 2. **P2 — `_functionalRolesForGate` sem fallback para heurística** (optimization_quality_gate.dart:132) — Adicionar fallback quando semantic roles são de baixa confiança.
-3. **P2 — `simulate/index.dart` defense-in-depth** — adicionar `AND user_id = @userId` na query de `deck_cards` mesmo que o deck ja tenha sido validado por owner.
+3. **P2 — `_looksLikePayoff` edge cases restantes** — ampliar fixtures futuras se aparecerem novas cartas com custo alternativo e payoff textual ambiguo.
 
 ## Arquivos Analisados (leitura completa)
 
@@ -285,7 +285,7 @@ final rolePreserved = removedRole == addedRole ||
 | `server/routes/ai/optimize/index.dart` | ✅ Auth + refactoring |
 | `server/routes/ai/weakness-analysis/index.dart` | ✅ Auth added |
 | `server/routes/decks/[id]/recommendations/index.dart` | ✅ Auth added |
-| `server/routes/decks/[id]/simulate/index.dart` | ⚠️ P2 defense-in-depth |
+| `server/routes/decks/[id]/simulate/index.dart` | ✅ P2 defense-in-depth resolvido em `a466adb6` |
 
 ## Commit-level Analysis
 
@@ -295,6 +295,7 @@ final rolePreserved = removedRole == addedRole ||
 | `a018ee17` — Fix optimize authorization and chat error states | SEGURANÇA | ✅ Auth + UX fix |
 | `25416ec2` — Document semantic v2 optimize scorecard | INFRA | ✅ Scorecard atualizado |
 | `1463732a` — Clarify payoff functional tag rules | CORREÇÃO | ✅ Resolve P1 _looksLikePayoff |
+| `a466adb6` — Harden deck simulation card ownership | SEGURANÇA | ✅ Resolve P2 simulate defense-in-depth |
 | `cf225841` — Preserve semantic v2 multi-tags in optimize | FEATURE | ✅ P1 _looksLikePayoff posteriormente resolvido |
 | `aa3ee1ba` — Centralize basic land detection | REFACTOR | ✅ Novo módulo limpo |
 | `2396956e` — Wire sync cards utilities into pipeline | REFACTOR | ✅ DRY |

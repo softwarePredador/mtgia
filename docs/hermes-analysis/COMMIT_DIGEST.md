@@ -1,13 +1,13 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-29T15:40Z (pos-correcao — helper cleanup + payoff functional tags, master avancou para 1463732a).
+> Atualizado em 2026-05-29T16:00Z (pos-correcao — simulate owner defense-in-depth, master avancou para a466adb6).
 
 ## Estado atual
 
 - Branch observada: `master`
 - HEAD anterior: `771c9318` (Harden semantic scorecard runner)
-- HEAD atual: **`1463732a`** (Clarify payoff functional tag rules)
+- HEAD atual: **`a466adb6`** (Harden deck simulation card ownership)
 - SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
@@ -15,7 +15,13 @@
 
 ## Novos commits nesta rodada (2026-05-29)
 
-### `1463732a` — Clarify payoff functional tag rules (2026-05-29, atual)
+### `a466adb6` — Harden deck simulation card ownership (2026-05-29, atual)
+- **2 arquivos**, rota + source guard.
+- **Tipo: CODE/SECURITY** — `GET /decks/:id/simulate` agora reforca owner-scope tambem na query de `deck_cards`, via `JOIN decks d ON d.id = dc.deck_id` e `AND d.user_id = CAST(@userId AS uuid)`.
+- **Validação:** `dart analyze bin lib routes test`, `dart test` em `server/` com 612 testes, `dart test test/experimental_deck_ai_authorization_source_test.dart -r expanded`, `git diff --check`, scan simples de secrets, smoke Hermes pos-push.
+- **Status Hermes:** fecha a recomendacao P2 de defense-in-depth em `simulate/index.dart`.
+
+### `1463732a` — Clarify payoff functional tag rules
 - **2 arquivos**, codigo + testes.
 - **Tipo: CODE/QA** — Refatora `_looksLikePayoff` para branches explicitos, removendo a fragilidade de precedencia apontada no `LOGIC_COHERENCE_REPORT_2026-05-29.md`.
 - **Validação:** `dart analyze bin lib routes test`, `dart test` em `server/` com 612 testes, `dart test test/functional_card_tags_test.dart -r expanded`, `git diff --check`, scan simples de secrets, smoke Hermes pos-push.

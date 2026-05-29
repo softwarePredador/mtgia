@@ -410,7 +410,10 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
 - **Status 2026-05-29:** RESOLVIDO no `master` atual para as rotas
   app-facing principais e para os endpoints experimentais cobertos por source
-  guard. A pendencia remanescente e de produto/contrato: nao promover rotas
+  guard. Defense-in-depth adicional de `GET /decks/:id/simulate` foi
+  **RESOLVIDO em `origin/master@a466adb6`**: a leitura de `deck_cards` agora
+  tambem faz `JOIN decks` e filtra `d.user_id = CAST(@userId AS uuid)`.
+  A pendencia remanescente e de produto/contrato: nao promover rotas
   experimentais para UX sem prova runtime e contrato claro de owner/public/meta.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
@@ -425,6 +428,9 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
   - `GET /ai/optimize/jobs/:id` bloqueia job sem owner e job de outro usuario.
   - `server/test/experimental_deck_ai_authorization_source_test.dart` cobre
     simulate, recommendations, matchup, weakness-analysis e archetypes.
+  - `origin/master@a466adb6` adicionou source guard especifico para
+    `JOIN decks d ON d.id = dc.deck_id` e
+    `AND d.user_id = CAST(@userId AS uuid)` na rota de simulate.
 - **Impacto**: risco principal encerrado no codigo atual. O risco restante e
   reabrir endpoints experimentais no app sem contrato/teste runtime especifico.
 - **Ação recomendada**:
@@ -441,6 +447,8 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
     `AND user_id = CAST(@user_id AS uuid)`;
   - source mostra polling de optimize bloqueando `job.userId == null` ou
     diferente do usuario autenticado;
+  - source mostra simulate lendo cartas via `deck_cards` + `decks` filtrado por
+    owner;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
     continua vazio ate haver contrato seguro;
 
