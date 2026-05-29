@@ -12,6 +12,12 @@
 > `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart` e o
 > builder de contrato `buildSemanticV2OptimizeRejectedBody(...)`. Backlog ativo:
 > BE.5, BE.6 e BE.7.
+>
+> Atualizacao Codex em 2026-05-29: revalidado no `master` atual que ownership
+> de BE.1/BE.3/archetypes permanece resolvido por source guards. BE.6 foi
+> encaminhado no codigo/docs com `GET /ready` documentado como alias operacional
+> estavel de `/health/ready` e source guard em `health_readiness_support_test`.
+> Backlog ativo apos essa rodada: BE.5 e BE.7.
 
 ## P1 — Alto
 
@@ -69,6 +75,10 @@
 - **Prioridade:** P2.
 
 ### BE.6 — `/ready` documentado como deprecated/not audited apesar de ser alias operacional de `/health/ready`
+- **Status em `master` atual:** RESOLVIDO. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  documenta `GET /ready` como `internal/stable ops alias`, com mesmo contrato de
+  `/health/ready`; `server/test/health_readiness_support_test.dart` possui source
+  guard garantindo delegacao para `health/ready`.
 - **Evidencia:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md` linha 306 classifica `GET /ready` como `internal/deprecated`, request/response/data source/test `Not proven`. `server/routes/ready/index.dart` linhas 5-10 documenta explicitamente `/ready` como readiness check para deploy/smoke e delega para `health_ready.onRequest(context)`. `CHECKLIST_GO_LIVE_FINAL.md` linhas 16 e 25-29 registra `/ready` publicado/validado junto de `/health/ready` e eco de `x-request-id`.
 - **Impacto de produto:** Ops e agentes podem tratar uma rota ativa de smoke/deploy como deprecated e deixar de validar/monitorar corretamente.
 - **Risco:** Doc drift operacional, nao bug runtime.
