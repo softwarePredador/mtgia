@@ -16,11 +16,15 @@
 - P3 (nit): 3
 
 **Top 3 Prioridades:**
-1. **P0 — Ownership enforcement inconsistente em rotas de simulacao/recommendations/weakness-analysis** — A onda de commits adicionou owner-scoping em recommendations e weakness-analysis, mas `simulate/index.dart` verifica ownership APENAS no passo 1 (deck_cards) sem impedir acesso ao deck em si; qualquer user autenticado pode simular decks de outros se souber o deck_id (o check é `SELECT 1 FROM decks WHERE... AND user_id`, mas o `deck_cards` query posterior não filtra por user).
+1. **P1 — Semantic V2 enforcement: critical_loss_roles agora inclui wincon/combo_piece/engine/payoff/enabler** — Mudança semântica significativa em modo `partial`; precisa continuar em rollout controlado e com scorecard antes de virar padrão.
 
-2. **P1 — `_looksLikePayoff` com precedência de operadores quebrada** — A correção adicionou `&& !oracle.contains('costs {')` mas a precedência `||` faz com que `normalizedName == 'blood artist'` OU `oracle.contains('whenever')` sejam avaliados isoladamente, ignorando o filtro de custo para o caso `'for each'`.
+2. **P1 — Adapter semântico único** — Deck Analysis, Optimize, Validator, Quality Gate e Candidate Quality ainda podem ler/normalizar sinais semânticos por caminhos diferentes.
 
-3. **P1 — Semantic V2 enforcement: critical_loss_roles agora inclui wincon/combo_piece/engine/payoff/enabler** — Mudança semântica significativa: swaps que removem cartas com tags de combo/engenho agora são bloqueados em modo partial. Pode ser agressivo demais para decks que trocam um wincon por outro.
+3. **P2/P3 — Tabelas persistidas sem consumidor claro** — decidir retenção/consumo para `deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback` e corpus bruto Commander Reference.
+
+**Itens deste resumo já corrigidos depois da geração do relatório:** simulate
+defense-in-depth (`a466adb6`), `_looksLikePayoff` (`1463732a`) e fallback
+semantic v2 low-confidence (`c3531df7`).
 
 ---
 
@@ -153,8 +157,12 @@ Isso também corrigiria a precedência implícita que, embora "funcional" hoje, 
 
 - **Severidade:** P1 (incoerência / comportamento alterado)
 - **Local:** `optimization_functional_roles.dart:354-365`
-- **Descrição:** A lista de `criticalLossRoles` cresceu de 4 para 9 papéis. Swaps que antes eram permitidos (ex: trocar um "wincon" específico por outro "wincon" diferente, ou trocar "engine" por "combo_piece") agora são BLOREADOS em modo partial. Isso pode ser a intenção, mas:
-  1. Não há A/B testing ou feature flag.
+- **Status 2026-05-29:** **ABERTO / CONTROLADO.** Existe flag
+  `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=disabled|partial`, default
+  `disabled`; portanto nao ha enforcement duro por padrao. O risco restante e
+  promover `partial` sem scorecard maior para os papeis expandidos.
+- **Descrição:** A lista de `criticalLossRoles` cresceu de 4 para 9 papéis. Swaps que antes eram permitidos (ex: trocar um "wincon" específico por outro "wincon" diferente, ou trocar "engine" por "combo_piece") agora são bloqueados em modo partial. Isso pode ser a intenção, mas:
+  1. O rollout de `partial` precisa continuar controlado por flag desligada por padrao.
   2. A mensagem de erro ao usuário ("Semantic Layer v2 detectou perda crítica em wincon") pode confundir — especialmente se o deck tiver múltiplas wincons e a troca substituir uma por outra.
   3. `_primaryOptimizationRole` retorna a primeira role na lista de prioridade — se um carta tem tags [wincon, removal], retorna `wincon`. Mas `optimizationFunctionalRolesForCard` retorna todas. Há um mismatch: `classifyOptimizationFunctionalRole` retorna 1 role, `optimizationFunctionalRolesForCard` retorna N roles. O validator usa ambos.
 - **Impacto:** Otimizações que antes succeediam agora serão bloqueadas. Não é necessariamente errado, mas é uma mudança breaking sem comunicação.
