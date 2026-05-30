@@ -124,4 +124,64 @@ Este snapshot: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
 
 ---
 
+## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
+
+> Relatório gerado automaticamente. Última atualização: **2026-05-30T14:34Z**
+
+### Resumo Geral
+
+| Métrica | Valor |
+|:--------|:-----:|
+| **Precisão total** | **83.3%** (378/454 classificações corretas) |
+| Tags avaliadas | 29 |
+| Tags com 100% | 14 |
+| Tags com < 50% | 7 |
+
+### Tags com Precisão 100% (14)
+
+`land` (87/87), `ramp` (53/53), `draw` (32/32), `removal` (30/30), `tutor` (6/6), `board_wipe` (3/3), `recursion` (3/3), `wipe` (1/1), `sacrifice_outlet` (1/1), `finisher` (2/2), `utility` (76/76), `creature` (22/22), `planeswalker` (2/2), `artifact` (2/2), `enchantment` (3/3)
+
+### Tags com Precisão < 50% — Atenção Requerida (7)
+
+| Tag | Precisão | Amostra | Problema |
+|:----|:--------:|:-------:|:---------|
+| `ninja` | 0.0% | 17/17 erradas | Tag muito específica — classificador não reconhece ninja como função |
+| `ramp + combo_piece` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
+| `recursion + wincon` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
+| `ramp + payoff` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
+| `payoff + removal` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
+| `payoff + token_maker` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
+| `stax_disruption` | 0.0% | 3/3 erradas | Classificador não possui categoria stax |
+
+### Tags com Precisão 50-75% (3)
+
+| Tag | Precisão | Amostra |
+|:----|:--------:|:-------:|
+| `payoff` | 35.5% | 11/31 |
+| `combo_piece` | 50.0% | 1/2 |
+| `enabler` | 50.0% | 21/42 |
+| `other` | 50.0% | 1/2 |
+| `protection` | 69.2% | 9/13 |
+| `wincon` | 75.0% | 6/8 |
+| `engine` | 75.0% | 6/8 |
+
+### Análise
+
+**Pontos fortes:** Tags estruturais (`land`, `creature`, `artifact`, `enchantments`) e funções primárias (`ramp`, `draw`, `removal`, `tutor`) têm precisão perfeita. O classificador é confiável para categorias básicas.
+
+**Pontos fracos:**
+1. **Tags compostas** (ex: `ramp + combo_piece`, `payoff + removal`) têm amostra mínima (1 caso cada) e 0% de precisão — o classificador não lida bem com multi-função composta.
+2. **`stax_disruption` (0/3):** O classificador não possui uma categoria dedicada para stax. Cartas como `Orim's Chant` são classificadas como algo diferente.
+3. **`ninja` (0/17):** Tag muito específica de tribo — o classificador funcional não captura tribos como função.
+4. **`payoff` (35.5%):** Tag ambígua — o classificador confunde payoff com wincon ou engine.
+5. **`enabler` (50.0%):** Fronteira difícil — distinção entre enabler e engine é sutil.
+
+**Recomendações:**
+- Tags compostas com amostra = 1 devem ser ignoradas estatisticamente (ruído).
+- `stax_disruption` precisa de uma categoria dedicada no classificador.
+- `payoff` e `enabler` precisam de regras mais claras na classificação.
+- `ninja` deve ser reclassificada como `creature` (tribo não é função).
+
+---
+
 *Snapshot: 2026-05-30T14:34Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 15 ok, 2 error)*
