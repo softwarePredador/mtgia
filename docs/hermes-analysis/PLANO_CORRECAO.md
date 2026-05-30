@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-30 11:00 UTC
+> Data: 2026-05-30 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -16,7 +16,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    nao existe neste checkout, e `dart analyze` do backend falha com
    `uri_does_not_exist`. A resolucao historica em `origin/master@a830f9f3` nao
    esta presente nesta branch de memoria.
-5. **P1 — Ownership em rotas deck/AI**: **REABERTO no checkout local `b071080e`**. A rodada de coerencia de 2026-05-29 23:05 UTC mostrou que `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing.
+5. **P1 — Ownership em rotas deck/AI**: **REVALIDADO no checkout local `ea158a39` em 2026-05-30 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild` foi verificado como controle positivo porque faz gate de `decks.id + decks.user_id` antes de carregar cartas.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado em
    2026-05-30 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,

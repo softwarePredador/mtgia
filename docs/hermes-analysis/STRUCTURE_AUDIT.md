@@ -1,7 +1,125 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-05-30 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-05-30 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre modulos `server/lib` ↔ `server/routes` ↔ `app/lib` — revalidacao 2026-05-30 23:00 UTC
+
+Escopo desta rodada: somente coerencia entre `server/lib`, `server/routes` e
+`app/lib`, com foco em endpoints app-facing chamados pelo Flutter. Nao foi
+executada auditoria ampla de classes sem uso, funcoes sem chamada,
+imports/ciclos, tabelas PostgreSQL ou duplicacao geral fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: branch remota sincronizada.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `ea158a39`.
+- `rg` nao esta instalado neste shell local (`command -v rg` sem saida);
+  buscas focadas usaram `grep -RIn --include='*.dart'`, `nl -ba` e leitura
+  pontual dos arquivos.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
+`server/routes`, mas nao constroi mapa de consumo do Flutter nem valida
+ownership/contratos app-facing. Nesta execucao local, a escrita automatica do
+script tambem duplicou historico manual no fim do Markdown; a duplicacao gerada
+foi descartada e os achados abaixo foram registrados manualmente com evidencia
+direta.
+
+### Achados revalidados
+
+#### P1 — `POST /ai/optimize` continua incoerente com o contrato app-facing de deck do usuario
+
+- **Fluxo app-facing:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
+  monta payload com `deck_id`, `archetype`, `bracket`, `keep_theme` e
+  `intensity`; `:56` envia esse payload para `POST /ai/optimize`.
+- **Rota:** `server/routes/ai/optimize/index.dart:401`-`:406` le `userId`
+  do contexto, mas `:549`-`:558` chama
+  `optimize_request.loadOptimizeDeckContext(...)` sem passar `userId`.
+- **Support lib:** `server/lib/ai/optimize_request_support.dart:53`-`:62`
+  nao aceita `userId`; a query de deck em `:66` usa
+  `SELECT name, format FROM decks WHERE id = @id`, e as queries de cartas em
+  `:107`-`:109` e `:132`-`:134` filtram somente `dc.deck_id = @id`.
+- **Por que parece risco real:** o app trata optimize como acao autenticada no
+  deck do usuario, mas a camada `routes -> lib` nao aplica o mesmo ownership
+  guard usado por rotas de deck. Um usuario autenticado com UUID de outro deck
+  pode potencialmente carregar composicao privada ou gastar processamento de IA.
+- **O que valida:** mudar `loadOptimizeDeckContext` para receber `userId` e
+  buscar `decks` com `WHERE id = @id AND user_id = @userId` antes de carregar
+  cartas, com teste owner vs non-owner para `POST /ai/optimize`.
+- **O que falsifica:** documentar e testar uma regra explicita de acesso a deck
+  publico/compartilhado para optimize, incluindo resposta esperada do app.
+
+#### P1 — `POST /ai/archetypes` tambem carrega deck/cartas por id sem owner-scope
+
+- **Fluxo app-facing:** `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`
+  chama `POST /ai/archetypes` com apenas `{'deck_id': deckId}` e espera
+  `options` em status 200.
+- **Rota:** `server/routes/ai/archetypes/index.dart:27`-`:32` aceita
+  `deck_id`, mas o arquivo nao le `context.read<String>()` nem `getUserId`.
+  A query de deck em `:39`-`:41` usa
+  `SELECT name, format FROM decks WHERE id = @id`; a query de cartas em
+  `:54`-`:60` usa somente `WHERE dc.deck_id = @id`.
+- **Por que parece risco real:** o endpoint e consumido pelo provider de decks
+  como parte do fluxo autenticado do usuario, mas a rota consegue gerar opcoes
+  de arquétipo para qualquer deck cujo UUID seja conhecido, sem alinhar com a
+  politica de ownership das rotas `/decks`.
+- **O que valida:** ler `userId` na rota e aplicar `WHERE d.id = @id AND
+  d.user_id = @userId`, ou centralizar o lookup em support compartilhado com
+  `POST /ai/optimize`.
+- **O que falsifica:** contrato app-facing que permita archetypes para decks
+  publicos/terceiros, com checagem explicita de `is_public` e teste cobrindo
+  deck privado alheio.
+
+#### P2 — Polling de jobs optimize ainda aceita jobs persistidos sem dono
+
+- **Fluxo app-facing:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:190`-`:194`
+  faz polling em `GET /ai/optimize/jobs/$jobId`.
+- **Rota:** `server/routes/ai/optimize/jobs/[id].dart:26` le o usuario
+  autenticado e `:28` carrega o job; o bloqueio em `:39`-`:47` so retorna 404
+  quando `job.userId != null && job.userId != userId`.
+- **Support lib:** `server/lib/ai/optimize_job.dart:25`-`:30` permite criar
+  job com `String? userId`; `OptimizeJob.userId` tambem e nullable em
+  `server/lib/ai/optimize_job.dart:268`-`:272`, e `fromRow` preserva
+  `row['user_id'] as String?` em `:303`-`:308`.
+- **Por que parece risco real:** a rota de IA esta sob auth middleware, mas o
+  contrato de storage ainda permite `user_id = NULL` e o polling considera
+  esses jobs legiveis para qualquer usuario com o id do job. Isso fica
+  incoerente com o app, que trata jobs de optimize como resultado privado de um
+  deck.
+- **O que valida:** exigir `userId` non-null na criacao de jobs app-facing,
+  migrar/expirar jobs nulos ou retornar 404 quando `job.userId == null` fora de
+  uma rota interna documentada.
+- **O que falsifica:** separar jobs internos sem dono de jobs app-facing, com
+  endpoint/prefixo distinto e teste que prove que o app nunca recebe job nulo.
+
+### Itens verificados e nao classificados como novo problema
+
+- `POST /ai/rebuild` esta mais coerente com o contrato de deck do usuario:
+  `server/routes/ai/rebuild/index.dart:61`-`:78` busca o deck com
+  `WHERE d.id = @deckId AND d.user_id = @userId` antes de carregar cartas em
+  `:96`-`:128`.
+- A middleware de IA continua exigindo auth:
+  `server/routes/ai/_middleware.dart:16`-`:20` aplica `authMiddleware`,
+  `aiPlanLimitMiddleware` e `aiRateLimit`; o problema acima nao e ausencia de
+  auth, e sim falta de owner-scope no lookup de deck dentro de rotas/libs.
 
 ## Rodada focada: Duplicated or similar logic — revalidacao 2026-05-30 19:00 UTC
 
