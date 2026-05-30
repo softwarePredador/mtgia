@@ -24,7 +24,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `/decks/:id/recommendations` e `/ai/weakness-analysis`. Ha tambem excecoes
    intencionais em `edh_bracket_policy.dart` que devem virar policy versionada
    com fonte/teste dedicado.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-29 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-30 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado na
    rotacao local Codex de 2026-05-30 03:00 UTC. `LifeCounterScreen` segue como
    caminho legado sem chamada runtime em `app/lib`; `DeckCard` continua testado
@@ -533,28 +533,32 @@ presentes e sem chamador runtime confirmado.
     continua vazio ate haver contrato seguro;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-05-29 15:00 UTC: REVALIDADO.** A rodada local focada em
+- **Status 2026-05-30 15:00 UTC: REVALIDADO.** A rodada local focada em
   `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
   pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
   por ser tabela interna do migrador.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
     upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
-    `SELECT ... FROM deck_matchups` em `app/`, `server/lib/` ou `server/routes`.
+    leitura operacional em `app/lib`, `server/bin`, `server/lib` ou
+    `server/routes`.
   - `deck_weakness_reports` é definida em `server/database_setup.sql:363` e
     `server/bin/migrate_create_missing_tables.dart:97`, recebe insert em
     `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha leitura em
-    `app/`, `server/lib/` ou `server/routes`; o campo `addressed` tambem nao
-    tem fluxo de update confirmado.
+    `app/lib`, `server/bin`, `server/lib` ou `server/routes`; o campo
+    `addressed` tambem nao tem fluxo de update confirmado.
   - `ml_prompt_feedback` é definida em
     `server/bin/migrate_ml_knowledge.dart:159`, mas o unico insert fica no
     helper `MLKnowledgeService.recordFeedback`
-    (`server/lib/ml_knowledge_service.dart:251`), sem chamador encontrado por
-    `grep -RIn "recordFeedback" server app`; `/ai/ml-status` apenas conta rows.
+    (`server/lib/ml_knowledge_service.dart:251`, SQL em `:264`), sem chamador
+    encontrado por busca focada de `recordFeedback(` em
+    `server/lib`, `server/routes`, `server/bin`, `server/test` ou `app/lib`;
+    `/ai/ml-status` apenas conta rows em
+    `server/routes/ai/ml-status/index.dart:98`.
   - `commander_reference_decks` e `commander_reference_deck_cards` sao definidas
     em `server/lib/ai/commander_reference_deck_corpus_support.dart:1177` e
-    `:1200`, recebem inserts em `:1245` e `:1345`, mas nao possuem
-    `SELECT/JOIN` confirmado; o produto consome o agregado
+    `:1200`, recebem insert/delete/insert em `:1245`, `:1329` e `:1345`, mas
+    nao possuem `SELECT/JOIN` confirmado; o produto consome o agregado
     `commander_reference_deck_analysis` em `:389`.
 - **Impacto**: acumulacao de dados sem produto/operacao consumindo o historico,
   retencao indefinida e falsa impressao de que ha cache, dashboard, workflow
