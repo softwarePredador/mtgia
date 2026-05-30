@@ -1,5 +1,8 @@
 # Knowledge Log — ManaLoom Deck Analysis
 
+## Aesi, Tyrant of Gyre Strait — 2026-05-30
+Aesi é o único comandante UG que dá extra land drop + card draw simultaneamente, funcionando como motor completo de draw/ramp em um slot. Com 40 terrenos e 23 fontes de ramp, cada land drop cascateia em valor (carta + token + contador). Vulnerabilidade central: apenas 2 proteções — a estratégia é recastar Aesi rapidamente via ramp massiva em vez de protegê-la.
+
 ## Dina, Essence Brewer — 2026-05-28
 Dina é um aristocrats híbrido Soul Sisters único: converte lifegain em dano + scry, diferente de Teysa (dobra death triggers) ou Korvold (recompensa sac de permanente). O deck opera com triângulo aristocrats clássico (fodder + outlet + payoff) mas com 4 Blood Artist effects + Dina = 12 dano total por morte de criatura. Resiliência via recursão verde compensa a falta de proteção branca.
 

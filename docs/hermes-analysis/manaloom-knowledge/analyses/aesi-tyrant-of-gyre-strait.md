@@ -1,43 +1,32 @@
-# Deck Analysis: Aesi, Tyrant of Gyre Strait
+# Análise: Aesi, Tyrant of Gyre Strait
 
 ## Informações Gerais
-- **Nome:** Aesi, Tyrant of Gyre Strait
-- **Commander:** Aesi, Tyrant of Gyre Strait (5 CMC — 3UG)
-- **Archetype:** Value Midrange / Lands-Matter
-- **CMC Médio:** 2.61
-- **Total Terrenos:** 40
+- **Nome do deck:** Aesi, Tyrant of Gyre Strait (EDHREC Average)
+- **Commander:** Aesi, Tyrant of Gyre Strait
+- **Cores:** Simic (UG)
+- **Arquetipo:** Value Midrange / Lands-Matter
 - **Bracket:** 3 (High Power Casual)
+- **Fonte:** EDHREC Average Deck — amostra de 41k+ decks
 
----
+## 5 Insights sobre a Estratégia do Deck
 
-## 5 Insights Estratégicos
+1. **Aesi é um motor duplo sem igual:** Ela é o único comandante UG que simultaneamente dá extra land drop E card draw por land drop. Tatyova dá draw sem extra drop; Azusa dá drop sem draw. Aesi concentra duas funções em um único slot de comandante, liberando ~10-15 slots do deck para payoffs em vez de draw/ramp separados.
 
-1. **A Engine Suprema:** Aesi é o único comandante que simultaneamente dá extra land drop E card draw por land drop. Cada terreno jogado após Aesi resolve automaticamente como "compre 1 carta" — convertendo recursos do jogo (terrenos) em vantagem de cartas sem gastar slots adicionais.
+2. **Terrenos são recursos multifuncionais (CMC-0 spells):** Com 40 terrenos no deck, cada terra é ao mesmo tempo fonte de mana, gatilho de draw (via Asei), gatilho de token (via Avenger/Scute Swarm/Tireless Provisioner) e gatilho de recursão (via Kodama of the East Tree). Essa densidade sinérgica significa que land drops nunca são "gastas" — cada uma gera valor em cascata.
 
-2. **Redundância em Múltiplas Camadas:** O deck tem 23 sources de ramp, 5+ fontes de extra land drop (Exploration, Burgeoning, Azusa, Dryad, Aesi mesma), 11 payoffs de landfall, e 3 fontes de recorrencia de terrenos. Isso garante que pelo menos uma peça de cada categoria esteja disponível a cada partida — consistência é prioridade.
+3. **A vulnerabilidade central é Aesi, não os terrenos:** O deck tem apenas 2 fontes de proteção (Heroic Intervention, Swiftfoot Boots) — abaixo do range ideal (3-5). A estratégia implícita é que com 23 efeitos de ramp, Aesi pode ser recastida no mesmo turno em que é removida. A confiança está na resiliência, não na proteção dedicada.
 
-3. **CMC-Zero Synergy:** Terrenos são CMC 0 mas ativam Aesi (draw), Tatyova (draw + lifegain), Tireless Provisioner (token/food), Avenger of Zendikar (counters), e Scute Swarm (token exponencial). Cada drop de terreno é simultaneamente mana, card advantage, e payoff.
+4. **Cyclonic Rift é a única mass removal que faz sentido:** Como Aesi depende de 40 terrenos, qualquer wipe que destrua lands seria auto-sabotagem. Cyclonic Rift overload devolve apenas permanentes não-terreno, preservando a base de mana enquanto reseta o board adversário — uma vantagem posicional quase insuperável 2 turnos depois.
 
-4. **O Deck Vence por Inércia, Não por Explosão:** O plano de jogo é acumular vantagem incremental até o oponente não conseguir acompanhar. Avenger of Zendikar + multiplo land drops cria um exército impossível de bloquear. Scute Swarm escala exponencialmente. Kodama of the East Tree + bounce land = loop infinito.
+5. **O plano de jogo é exponencial, não linear:** Turnos 1-3 são sobre sobreviver e ramp. Turno 4-5 é jogar Aesi. A partir daí, cada land drop dobra de valor: compra carta + gera token + alimenta contadores. O ponto de virada (normalmente turno 7-8 com Avenger de Zendikar ou Scute Swarm) é quando o board se torna incontrolável — e Cyclonic Rift garante que não haja competição no board.
 
-5. **Vulnerabilidade Compartilhada:** O deck tem apenas 2 fontes de proteção (Heroic Intervention, Swiftfoot Boots). Contra mass land destruction ou stax, o deck colapsa. A estratégia implícita é "virar o jogo rápido o suficiente para que uma remoção de Aesi não resolva."
+## 3 Cartas-Chave e Por Que São Importantes
 
----
+### 1. Aesi, Tyrant of Ghyre Strait (Comandante)
+**Por que é importante:** É o motor completo do deck. Sem ela, o deck é 40 terrenos e spells desconectados com ela, cada land drop = 1 carta extra + 1 drop extra. Ela elimina a necessidade de slots dedicados de draw e ramp separados, permitindo que o deck investa pesado em payoffs. Sua remoção é o único evento que pode parar o motor — motivo pelo qual proteção, mesmo sendo baixa, é crítica.
 
-## 3 Cartas-Chave
+### 2. Avenger of Zendikar (Wincon/Landfall Payoff)
+**Por que é importante:** É o conversor de terrenos em dano. Com 40 terrenos, Avenger entra com ~40 tokens Planta 0/1. Cada land drop subsequente coloca +1/+1 counter em cada uma. Com Aensi gerando 2-3 land drops por turno, as plantas viram um exército de 6/7 ou maior em 2 turnos. É o "por que meu deck de terrenos te mata" — converte o recurso acumulado em ameaça concreta.
 
-### 1. Exploration (1 mana)
-**Por que é crítica:** É o extra land drop mais barato do jogo. Combinado com Aesi, cada land drop = 1 card draw. Exploration no turno 1 habilita 2+ terrenos por turno desde o início — o sonho máximo do deck. Custo de oportunidade zero: se Aesi não estiver em campo, ainda assim permite múltiplos land drops.
-
-### 2. Avenger of Zendikar (7 mana)  
-**Por que é crítica:** É o payoff landfall mais explosivo. Com 40 terrenos, Avenger entra criando 40 plantas 0/1. Cada land drop subsequente põe +1/+1 counter em todas — 3 land drops = 40 criaturas 3/4. Combinado com Aesi (que compra cartas), o jogador nunca fica sem terrenos para ativar Avenger. É o wincondo deck.
-
-### 3. Cyclonic Rift (2/7 mana)
-**Por que é crítica:** É a única mass removal que Aesi respeita — devolve permanentes não-terrenos para a manodos donos, NÃO afetando os 40 terrenos do deck. Após o overload, os oponentes recomeçam do zero enquanto Aesi ainda tem 40 terrenos. É um dos 53 Game Changers oficiais e está em 79%+ dos decks Commander azuis.
-
----
-
-## Fonte
-- EDHREC Average Deck (amostra de 41.130+ decks): https://edhrec.com/average-decks/aesi-tyrant-of-gyre-strait
-- Perfil técnico: `commander_reference_profile_anchor30_batch_b_2026-05-12/profiles/aesi_tyrant_of_gyre_strait.json`
-- Análise completa: `decks/aesi-tyrant-of-gyre-strait/2026-05-26-edhrec.md`
+### 3. Cyclonic Rift (Board Wipe Estratégico)
+**Por que é importante:** É o equalizador de mesa. Em bracket 3, oponentes montam boards complexos no turno 5-6. Rift overload (7 manas) limpa tudo exceto terrenos — preservando a base de 40 terras de Aesi enquanto força os oponentes a reconstruir do zero. Com Aesi comprando cartas extras e 23 fontes de ramp, a vantagem posicional pós-Rift é esmagadora. É também um dos 53 Game Changers oficiais.
