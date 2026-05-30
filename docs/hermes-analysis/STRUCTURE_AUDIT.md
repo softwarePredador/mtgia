@@ -1,6 +1,6 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-05-30 11:00 UTC
-> Rotacao: `broken-imports-and-circular-dependencies`
+> Atualizacao local Codex: 2026-05-30 13:00 UTC
+> Rotacao: `postgresql-tables-inventory`
 > Branch de memoria: `codex/hermes-analysis-docs`
 
 ## Rodada focada: Broken imports and circular dependencies — revalidacao 2026-05-30 11:00 UTC
@@ -7169,3 +7169,134 @@ resolvidos por esta atualizacao.
   nesta rodada como decisao direta por nome porque a decisao final ainda passa
   por validacao/quality gate. O risco relevante ficou documentado nos pontos em
   que o codigo escolhe, ranqueia ou classifica nomes diretamente.
+
+## Rodada focada: PostgreSQL tables inventory — 2026-05-30 13:00 UTC
+
+Escopo desta rodada: inventario completo de tabelas PostgreSQL referenciadas no
+codigo (scripts SQL + Dart migrations + Dart CREATE TABLE).
+Nao foi executada auditoria ampla de classes, funcoes, imports/ciclos, duplicacao
+ou coerencia entre camadas.
+
+### Setup executado
+
+- pwd confirmou o root do repositorio: /opt/data/workspace/mtgia.
+- git checkout codex/hermes-analysis-docs: branch ja ativa.
+- git pull --ff-only origin codex/hermes-analysis-docs: Already up to date.
+- git rev-parse --short HEAD: b8b0f0af.
+- Auditor base executado: python3 docs/hermes-analysis/scripts/structure_auditor.py.
+- Tabelas PostgreSQL detectadas pelo auditor base (regex FROM/JOIN/CREATE TABLE): 85 referencias.
+- Fontes adicionais inventariadas manualmente:
+  server/database_setup.sql, server/database_indexes.sql,
+  server/bin/migrate*.dart, server/lib/**/*.dart, server/routes/**/*.dart.
+
+### Resultado do auditor base
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas (regex): 85.
+- Problemas identificados: 99.
+- Imports quebrados: 0 (so server/lib + server/routes).
+
+Limitacao: o auditor detecta referencias textuais (incluindo CTEs). Abaixo, o
+inventario real com CTEs filtrados.
+
+### Inventario completo de tabelas PostgreSQL
+
+Total: 53 tabelas permanentes + 2 views + 2 tabelas temporarias = 57 objetos.
+
+#### Tabelas permanentes (53) — por dominio
+
+**Dominio Core (cards/decks)**
+1. users — usuarios do sistema
+2. cards — catalogo de cartas MTG
+3. card_legalities — legalidade/banimentos por formato
+4. card_localized_names — nomes localizados (PT-BR etc)
+5. sets — edicoes/sets do MTG
+6. rules — regras do jogo
+7. decks — decks dos usuarios
+8. deck_cards — relacionamento deck-cartas
+9. deck_matchups — estatisticas de matchup
+10. deck_weakness_reports — relatorios de fraquezas
+
+**Dominio IA/ML — Semantic Layer v2**
+11. card_function_tags — tags funcionais por carta (multi-role)
+12. card_semantic_tags_v2 — tags semanticas v2 por carta
+13. card_role_scores — scores de role por carta
+14. card_meta_insights — insights meta por carta
+15. commander_card_synergy — sinergias carta-commander
+16. optimize_rejection_penalties — penalidades de rejeicao
+
+**Dominio IA/ML — Commander Reference**
+17. commander_reference_profiles — perfis por commander
+18. commander_reference_card_stats — estatisticas por commander
+19. commander_reference_decks — decks de referencia
+20. commander_reference_deck_cards — cartas dos decks de referencia
+21. commander_reference_deck_analysis — analise de decks de referencia
+
+**Dominio IA/ML — ML Knowledge**
+22. archetype_patterns — padroes de construcao (69 registros)
+23. archetype_counters — hate cards por arquétipo
+24. synergy_packages — pacotes de sinergia
+25. ml_learning_state — estado de aprendizado
+26. ml_prompt_feedback — feedback de prompts
+
+**Dominio IA/ML — Otimizacao**
+27. ai_optimize_cache — cache de /ai/optimize
+28. ai_optimize_jobs — jobs assincronos
+29. ai_generate_jobs — jobs de geracao
+30. ai_optimize_fallback_telemetry — telemetria de fallback
+31. optimization_analysis_logs — logs de analise
+32. ai_user_preferences — preferencias por usuario
+33. format_staples — staples por formato (EDHREC rank)
+34. ai_logs — logs de observabilidade IA
+
+**Dominio Social/Comunidade**
+35. user_follows — follow entre usuarios
+36. conversations — conversas
+37. direct_messages — mensagens diretas
+38. notifications — notificacoes
+39. external_commander_meta_candidates — candidatos externos
+
+**Dominio Marketplace/Binder/Trades**
+40. user_binder_items — itens no binder
+41. trade_offers — ofertas de troca
+42. trade_items — itens nas ofertas
+43. trade_messages — mensagens em ofertas
+44. trade_status_history — historico de status
+
+**Dominio Integracao/Infra**
+45. user_plans — planos (free/pro)
+46. activation_funnel_events — eventos de funil
+47. rate_limit_events — rate limit distribuido
+48. meta_decks — decks do meta (crawler)
+49. battle_simulations — simulacoes (ML dataset)
+50. price_history — historico de precos
+51. sync_log — log de sincronizacao
+52. sync_state — estado de sync incremental
+53. schema_migrations — controle de migrations
+
+#### Views (2)
+- optimize_candidate_quality_summary (candidate_quality_data_support.dart:192)
+- optimization_effectiveness_summary (migrate_optimization_analysis_logs.dart:136)
+
+#### Tabelas temporarias (2)
+- tmp_mtgjson_prices (sync_prices_mtgjson_fast.dart:189) — CREATE TEMP
+- tmp_price_backfill (backfill_price_history.dart:181) — CREATE TEMP
+
+#### Objetos que NAO sao tabelas (CTEs, nao persistidos)
+Estes nomes aparecem em FROM/JOIN mas sao CTEs (WITH clauses):
+today_prices, previous_prices, deck_usage, canonical_sets, duplicate_codes,
+follower_counts, following_counts, public_deck_counts, requested, role_rows,
+tag_rows, synergy_rows, penalty_rows.
+
+#### Gaps / notas
+
+- semantic_layer_v2: referenciado como string/mapa em codigo Dart.
+  Nao e tabela SQL, nao ha CREATE TABLE semantic_layer_v2 neste checkout.
+  E uma camada logica, nao uma tabela persistida.
+- card_deck_profiles: mencionado no "Gaps Conhecidos" existente como tendo
+  670 perfis, mas nao ha CREATE TABLE em nenhum migration neste checkout
+  (nem em server/bin/migrate* nem em database_setup.sql).
+  Pode ser tabela em producao ainda nao versionada no repo,
+  ou referencia obsoleta.
+
