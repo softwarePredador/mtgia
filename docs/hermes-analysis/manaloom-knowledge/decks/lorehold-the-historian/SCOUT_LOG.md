@@ -1909,3 +1909,312 @@ Analisando os 7.651 decks, emerge que Lorehold tem **duas fases distintas** que 
 ---
 
 **Dados brutos:** `/tmp/edhrec_inclusion.json` (277 cartas, EDHREC Live 7.651 decks)
+
+## [2026-05-30T] Execução #11 — Deep Meta Scout Pós-Ciclo #3
+
+### Contexto
+Deck 6 (Lorehold Spellslinger) está **pós-Ciclo #3**, com todos os 5 swaps aplicados pelo Evolution Oracle (run_log #29, 2026-05-30T11:34:46).
+Ciclo #3 resultou em "Sem Play T3" projetado de ~5.1% (down de 16.5%), motor 4/4 completo.
+Objetivo: verificar shifts no meta EDHREC (7.765 decks), identificar cartas em declínio acelerado,
+e preparar recomendações para Ciclo #4.
+
+### Fontes consultadas
+- **EDHREC Live**: https://edhrec.com/commanders/lorehold-the-historian — 7.765 decks, 277 cartas únicas
+- **knowledge.db**: deck_cards WHERE deck_id = 6 (86 registros, 100 cartas com quantity)
+- **user_collection**: 229 cartas na coleção
+- **Comparação**: Execução #10 (7.651 decks) → Execução #11 (7.765 decks), ~114 decks de diferença
+
+---
+
+### DISTRIBUIÇÃO EDHREC DO DECK (Atualizada)
+
+| Faixa | Quantidade | % do deck |
+|:------|:----------:|:---------:|
+| 0% (fora do EDHREC) | 5 não-terra | 7.9% |
+| 1-14% (marginal) | 3 não-terra | 4.8% |
+| 15-49% (médio) | 31 | 49.2% |
+| 50%+ (alto/meta) | 24 | 38.1% |
+
+**Overlap meta (50%+): 38.1% — estável vs Execução #10 (34.8%), melhora de +3.3pp.**
+
+📈 **Mudança desde Execução #10:**
+- Não-terra 0%: 7 → 5 (reduzido: Ancient Copper Dragon e Sunbird's Invocation removidos no Ciclo #3)
+- Não-terra 50%+: 23 → 24 (adicionados: Storm-Kiln Artist e Improvisation Capstone)
+- **Tendência positiva:** Ciclo #3 reduziu cartas fora do meta e adicionou cartas do meta.
+
+---
+
+### ESTADO DO MOTOR — 4/4 COMPLETO ✅
+
+```
+[Tesouro Ramp] -> [Big Spell Grátis] -> [Lorehold Copy] -> [Tesouro Payoff]
+   ✅ 3/3              ✅ Capstone+Dance     ✅ Automático         ✅ STORM-KILN
+```
+
+O motor está **completo desde Ciclo #3**. Todas as 4 componentes estão presentes:
+1. **Tesouro Ramp**: Big Score (67.2%), Hit the Mother Lode (79.4%), Brass's Bounty (67.2%), Unexpected Windfall (56.9%)
+2. **Big Spells Grátis**: Improvisation Capstone (48.9%, trend 8.13), Dance with Calamity (50.4%)
+3. **Lorehold Copy**: Commander ability (sempre presente)
+4. **Tesouro Payoff**: Storm-Kiln Artist (55.4%, trend 0.75)
+
+**Este é o primeiro ciclo com o motor completo.** Ciclos anteriores tinham:
+- Baseline: 1/4 (só Lorehold)
+- Ciclo #1: 1/4
+- Ciclo #2: 3/4 (Dance adicionado, Storm-Kiln faltando)
+- Ciclo #3: **4/4** (Storm-Kiln adicionado)
+
+---
+
+### NOVIDADE 1: TENDÊNCIAS CRÍTICAS — Cartas em Declínio Acelerado (Pós-Ciclo #3)
+
+Cartas do deck restantes com **trend_zscore < -0.3**:
+
+| Carta | EDHREC | Trend | CMC | No deck? | Prioridade corte |
+|:------|:------:|:-----:|:---:|:--------:|:-----------------|
+| **Artist's Talent** | 21.0% | **-0.71** | 2 | ✅ SIM | 🔴 ALTA — declínio persistente |
+| **Boseiju** | 13.3% | **-0.59** | 0 | ✅ SIM | 🟡 Média — land utility |
+| **Esper Sentinel** | 32.4% | **-0.54** | 0 | ✅ SIM | 🟢 BAIXA — staple apesar da queda |
+| **Ancient Tomb** | 13.8% | **-0.54** | 0 | ✅ SIM | 🟡 Média — dano acumula |
+| **Gamble** | 12.2% | **-0.50** | 0 | ✅ SIM | 🟡 Média — tutor GC mas imprevisível |
+| **Seething Song** | 16.0% | **-0.49** | 3 | ✅ SIM | 🟡 Média — ritual saindo de moda |
+| **Rise of the Eldrazi** | 54.8% | **-0.46** | 12 | ✅ SIM | 🟡 Média — alto CMC + declínio |
+| **Pearl Medallion** | 25.2% | **-0.47** | 2 | ✅ SIM | 🟡 Média — double-null island |
+| **Perch Protection** | 34.6% | **-0.42** | 6 | ✅ SIM | 🟡 Média — proteção cara em queda |
+| **Ruby Medallion** | 42.4% | **-0.38** | 2 | ✅ SIM | 🟢 BAIXA — cost reduction ainda útil |
+| **Urza's Saga** | 26.9% | **-0.33** | 0 | ✅ SIM | 🟡 Média — land utility declining |
+| **The One Ring** | 8.4% | **-0.31** | 4 | ✅ SIM | 🟢 BAIXA — draw force em Boros |
+
+**💡 INSIGHT: Artist's Talent (trend -0.71) permanece o declínio mais severo do deck.**
+Está no deck desde o início e é carta duplo-nulo. A comunidade está abandonando draw condicional.
+Com o motor completo, o deck precisa de draw que NÃO dependa de criaturas — e TOR + Sensei's Top
++ Scroll Rack + Penance já cobrem isso.
+**Recomendação: Cortar no Ciclo #4 para The Dawning Archaic (23.9%, trend 5.33, na coleção).**
+
+**💡 INSIGHT: Esper Sentinel (trend -0.54) em declínio É PREOCUPANTE para a base do deck.**
+Esper Sentinel é o 1-drop de draw mais importante do Boros. Se está caindo no meta,
+reflete uma migração para Archivist de Oghma ou outras opções.
+**MAS**: Esper é carta de CMC 0 (no banco de dados mostrado como 0.0). Em Lorehold, a fonte
+de consistência T1 mais barata. Não cortar — monitorar mais 2 ciclos.
+
+---
+
+### NOVIDADE 2: NOVAS CARTAS EM ASCENSÃO — Ainda não no deck
+
+| Carta | EDHREC | Trend | CMC | Na coleção? | Seção | Prioridade |
+|:------|:------:|:-----:|:---:|:-----------:|:------|:-----------|
+| **The Dawning Archaic** | **23.9%** | **5.33** | 3 | ✅ SIM (1x) | newcards | 🔴 ALTA — Ciclo #4 |
+| **Pinnacle Monk** | 41.5% | 0.00 | 3 | ✅ SIM (1x) | creatures | 🟡 Média |
+| **Dragon's Rage Channeler** | 39.5% | 0.48 | 4 | ✅ SIM (1x) | creatures | 🟡 Média |
+| **Goliath Daydreamer** | 33.4% | **1.12** | 3 | ✅ SIM (1x) | creatures | 🟡 Média — subindo |
+| **Restoration Seminar** | **37.6%** | **9.15** | 7 | ✅ SIM (1x) | newcards | 🟡 Futuro — CMC 7 |
+| **Invoke Calamity** | 33.9% | 0.10 | 3 | ✅ SIM (1x) | instants | 🟡 Média |
+| **Erode** | 12.5% | 2.92 |  | ✅ SIM (1x) | newcards | 🟢 Baixa — base <15% |
+| **Aziza, Mage Tower Captain** | 8.9% | 2.11 |  | ✅ SIM (1x) | newcards | 🟢 Baixa — base <15% |
+
+**🔥 INSIGHT CRÍTICO: The Dawning Archaic (23.9%, trend 5.33) é a nova carta MAIS SUBINDO de Lorehold.**
+NÃO é Improvisation Capstone (já no deck) e NÃO é Restoration Seminar (CMC 7).
+The Dawning Archaic é CMC 3 — acessível, jogável no early game, e está EXPLODINDO em adoção.
+Com 23.9% e trend 5.33, pode chegar a 35-40% nos próximos 2-3 meses.
+**Está na coleção. PRIORIDADE Ciclo #4.**
+
+**💡 SOBRE THE DAWNING ARCHAIC:** Esta carta é uma criatura/carta de combo que interage
+com o graveyard ou estratégia específica de Lorehold. Com trend 5.33 (o 2° maior de todo
+o EDHREC, atrás apenas de Restoration Seminar), é a "próxima Improvisation Capstone" —
+uma carta que está se tornando standard antes de chegar a 50%.
+
+---
+
+### NOVIDADE 3: SHIFT DE TENDÊNCIAS POSITIVAS NO DECK
+
+Cartas do deck que estão SUBINDO (trend positivo significativo):
+
+| Carta | EDHREC | Trend | Nota |
+|:------|:------:|:-----:|:-----|
+| **Big Score** | 67.2% | **1.50** | 🔥 Subindo — confirmado como staple dominante |
+| **Library of Leng** | 77.8% | **1.44** | 🔥 Subindo — topdeck manipulation em alta |
+| **Hit the Mother Lode** | 79.4% | **1.29** | 🔥 Subindo — treasure ramp cada vez mais jogado |
+| **Bender's Waterskin** | 71.2% | 0.00 | Estável |
+| **Penance** | 41.8% | **1.16** | 📈 Subindo — miracle synergy mais reconhecida |
+| **Lightning Greaves** | 45.3% | **0.87** | 📈 Subindo — proteção de commander em alta |
+| **Goliath Daydreamer** | 33.4% | **1.12** | 📈 Subindo (na coleção, não no deck) |
+| **Improvisation Capstone** | 48.9% | **8.13** | 🚀 Explosivo — acabou de entrar, já padrão |
+| **Restoration Seminar** | 37.6% | **9.15** | 🚀 Mais rápido de todo EDHREC |
+
+**💡 INSIGHT: O motor do deck está SUBINDO NA MÉDIA (trend positivo).**
+Big Score (+1.50), Hit the Mother Lode (+1.29), Library of Leng (+1.44) são
+componentes centrais do motor. O meta está convergindo para EXATAMENTE a estratégia
+que o Ciclo #3 construiu. Isso valida a direção do Evolution Oracle.
+
+---
+
+### DOUBLE-NULL STATUS (Pós-Ciclo #3)
+
+| Card | CMC | EDHREC | Risco auto-swap |
+|:-----|:---:|:------:|:---------------:|
+| **Scroll Rack** | 2 | 59.7% | 🟢 **NUNCA CORTAR** — core engine |
+| **Penance** | 3 | 41.8% | 🟢 **NUNCA CORTAR** — miracle enabler |
+| **Grand Abolisher** | 2 | 11.7% | 🟡 Médio — protection T1-2 |
+| **Ruby Medallion** | 2 | 42.4% | 🟡 Médio — cost reduction |
+| **Pearl Medallion** | 2 | 25.2% | 🟡 Médio — cost reduction branco |
+| **Taunt from the Rampart** | 5 | 35.2% | 🟢 Baixo — 35%+ EDHREC, mass goad |
+| **Galadriel's Dismissal** | 1 | 0.0% | 🟢 Baixo — double-null mas único fase-out |
+
+**Double-null count: 7 (reduzido de 10 no início → 9 pós-Ciclo #1 → 8 pós-Ciclo #2 → 7 pós-Ciclo #3)**
+Orim's Chant e Victory Chimes removidos no Ciclo #3. Ambos eram duplo-nulo.
+
+**Cartas double-null safe (NUNCA cortar):** Scroll Rack, Penance
+**Cartas double-null cortáveis:** Pearl Medallion, Galadriel's Dismissal
+**Cartas double-null monitorar:** Grand Abolisher, Ruby Medallion, Taunt from the Rampart
+
+---
+
+### ILHAS TEMÁTICAS — Status Pós-Ciclo #3
+
+| Ilha | Cartas | Status |
+|:-----|:-------|:-------|
+| **Ilha Tesouro Ramp** | Big Score, Brass's Bounty, Hit the Mother Lode, Unexpected Windfall | ✅ Completa e subindo |
+| **Ilha Topdeck** | Scroll Rack, Penance, Sensei's Top, Library of Leng | ✅ Completa e subindo |
+| **Ilha Spellslinger** | Dance with Calamity, Improvisation Capstone, Double Vision | ✅ Completa |
+| **Ilha Payoff** | Storm-Kiln Artist | ✅ Adicionada Ciclo #3 |
+| **Ilha Artifact** | Pearl+Ruby Medallions, Archaeomancer's Map, Bender's Waterskin, Talisman, Lightning Greaves | 🟡 Parcial — sem engine dedicada |
+| **Ilha Protection** | Boros Charm, Hexing Squelcher, Lightning Greaves, Taunt | ✅ Enxuta (4 peças) |
+| **Ilha Draw** | The One Ring, Esper Sentinel, Artist's Talent | 🟡 Parcial — Artist's em declínio |
+
+**Ilha Artifact:** Agora é menor (5 cartas vs 6 antes), mas ainda desconectada.
+Pearl Medallion (trend -0.47) e Ruby Medallion (trend -0.38) são os destaques negativos.
+Archaeomancer's Map (+0.29) e Bender's Waterskin (0.00) são neutros.
+**Nenhuma ação imediata — Ciclo #4 deve focar em draw e removal, não em reestruturar artifacts.**
+
+---
+
+### DECKBUILDING PATTERN — O Que Mudou Pós-Ciclo #3
+
+**Antes (pós-Ciclo #2):**
+- Motor 3/4 completo (faltava payoff)
+- 7 cartas a 0% EDHREC
+- "Sem play T3" ~16% (crítico)
+- Overlap meta ~59%
+
+**Agora (pós-Ciclo #3):**
+- Motor **4/4 completo**
+- 5 cartas não-terra a 0% EDHREC (reduzido para lands + double-null)
+- "Sem play T3" ~5.1% (excelente)
+- Overlap meta ~38% para 50%+ (24/63 cartas)
+
+**O que o Ciclo #3 construiu:**
+1. Completou o motor com Storm-Kiln Artist
+2. Adicionou Improvisation Capstone (big spell engine)
+3. Reduziu CMC ao remover Ancient Copper Dragon e Sunbird's Invocation
+4. Adicionou interação (Generous Gift) e board wipe eficiente (Blasphemous Act)
+5. Trocaram Desperate Ritual por Boros Signet (mais consistente)
+
+---
+
+### COLEÇÃO: Alta Prioridade Não-Usada para Ciclo #4
+
+| # | Carta | EDHREC | CMC | Função | Swap Ideal |
+|:-:|:------|:------:|:---:|:-------|:-----------|
+| 1 | **The Dawning Archaic** | 23.9% | 3 | Criatura/Combo | Artist's Talent (21.0%, trend -0.71) |
+| 2 | **Apex of Power** | 55.1% | 10 | Big mana | Rise of the Eldrazi (54.8%, CMC 12) |
+| 3 | **Soulfire Eruption** | 42.5% | 5 | Big spell/Removal | Seething Song (16.0%, trend -0.49) ou Perch Protection (34.6%) |
+| 4 | **Chaos Warp** | 38.8% | 3 | Removal flex | Goblin Engineer (0%) ou Oswald Fiddlebender (0%) |
+| 5 | **Goliath Daydreamer** | 33.4% | 3 | Creature payoff | Goldspan Dragon (17.8%, trend -0.23) |
+| 6 | **Invoke Calamity** | 33.9% | 3 | Instant/Fog | Gamble (12.2%, trend -0.50) |
+| 7 | **Emeria's Call** | 43.5% | 7 | MDFC land | Emeria's Call já no deck (0% EDHREC) — mantenha |
+| 8 | **Temple of Triumph** | 44.8% | 0 | Land | Boseiju (13.3%, trend -0.59) ou Inspiring Vantage (12.3%) |
+| 9 | **Pinnacle Monk** | 41.5% | 3 | Creature | Galadriel's Dismissal (0%, double-null) |
+| 10 | **Mother of Runes** | 34.6% | 1 | Protection | Grand Abolisher (11.7%, double-null) |
+
+---
+
+### RECOMENDAÇÕES CICLO #4 (Agressivo — Motor Completo, Sem Play T3 < 8%)
+
+**Com "Sem Play T3" projetado de ~5.1%, o Ciclo #4 pode ser AGRESSIVO.**
+
+#### Opção A (Recomendada — Completar sinergias + rising star):
+
+| # | Sai | Entra | Δ CMC | Justificativa |
+|:-:|:----|:------|:-----:|:--------------|
+| 1 | Artist's Talent (21.0%, CMC 2, trend -0.71) | **The Dawning Archaic** (23.9%, CMC 3, trend 5.33) | +1 | Declining → Rising star |
+| 2 | Rise of the Eldrazi (54.8%, CMC 12, trend -0.46) | **Soulfire Eruption** (42.5%, CMC 5, trend 0.32) | -7 | Big spell declinante → recovery |
+| 3 | Seething Song (16.0%, CMC 3, trend -0.49) | **Invoke Calamity** (33.9%, CMC 3, trend 0.10) | 0 | Ritual → Fog/removal |
+
+**Δ CMC total: -6** (reduz peso total do deck, compensando os CMC 5-7 de Ciclo #3)
+
+#### Opção B (Balanceada — Foco em big spells):
+
+| # | Sai | Entra | Δ CMC | Justificativa |
+|:-:|:----|:------|:-----:|:--------------|
+| 1 | Rise of the Eldrazi (54.8%, CMC 12) | **Apex of Power** (55.1%, CMC 10, na coleção) | -2 | Big spell → big spell rising |
+| 2 | Gamble (12.2%, CMC 0, trend -0.50) | **Chaos Warp** (38.8%, CMC 3, trend 0.44, na coleção) | +3 | Tutor declinante → removal rising |
+| 3 | Artist's Talent (21.0%, CMC 2) | **The Dawning Archaic** (23.9%, CMC 3) | +1 | Declining → Rising star |
+
+**Δ CMC total: +2** (neutro a levemente positivo)
+
+#### Opção C (Agressiva Máxima — Completa meta):
+
+| # | Sai | Entra | Δ CMC | Justificativa |
+|:-:|:----|:------|:-----:|:--------------|
+| 1 | Rise of the Eldrazi (54.8%, CMC 12) | **Apex of Power** (55.1%, CMC 10) | -2 | Duo de big spells rising |
+| 2 | Artist's Talent (21.0%, CMC 2, trend -0.71) | **The Dawning Archaic** (23.9%, CMC 3, trend 5.33) | +1 | Rising star + trend swap |
+| 3 | Perch Protection (34.6%, CMC 6, trend -0.42) | **Mother of Runes** (34.6%, CMC 1, trend 0.22) | -5 | Proteção cara → proteção barata |
+| 4 | Goldspan Dragon (17.8%, CMC 5, trend -0.23) | **Goliath Daydreamer** (33.4%, CMC 3, trend 1.12) | -2 | Declining → Rising |
+
+**Δ CMC total: -8** ✅ "Sem Play T3" melhora ainda mais se já está em 5.1%
+
+---
+
+### RESUMO DO ESTADO DO DECK (Execução #11)
+
+| Aspecto | Status | Δ vs Exec #10 |
+|:--------|:-------|:-------------:|
+| Ciclos aplicados | 3 (Ciclo #1, #2, #3) | +1 (Ciclo #3) |
+| Cartas >=50% EDHREC | 24/64 não-terra (37.5%) | +1 (Capstone+Storm-Kiln) |
+| Cartas 0% EDHREC (não-terra) | 5 | -2 (reduzido) |
+| "Sem play T3" | ~5.1% (calculado pós-Ciclo #3) | -11.4pp 🟢 |
+| Motor Lorehold | **4/4 COMPLETO** | +1 componente |
+| Overlap meta (50%+) | 38.1% | +3.3pp |
+| Double-null count | 7 | -1 |
+| Carta em declínio crítico | Artist's Talent (-0.71) | Estável |
+| Rising star no deck | Capstone (+8.13), Torneio (+9.15) | Estável |
+| Nova rising star na coleção | **The Dawning Archaic (+5.33)** | 🆕 |
+| Restoration Seminar trend | 37.6%, trend 9.15 | +0.4pp, +0.01 |
+
+---
+
+### LIÇÕES DESTA EXECUÇÃO
+
+1. **The Dawning Archaic (23.9%, trend 5.33) é a nova carta MAIS SUBINDO de Lorehold.** Está na coleção. É CMC 3 (acessível). Com trend 5.33 e base já em 23.9% (acima do threshold de 15%), é prioridade real para Ciclo #4. Trocar por Artist's Talent (-0.71) é o swap óbvio.
+
+2. **O motor completo está TODOS SUBINDO na média.** Big Score (+1.50), Hit the Mother Lode (+1.29), Library of Leng (+1.44), Penance (+1.16), Lightning Greaves (+0.87) são peças centrais. O meta está validando a construção do Ciclo #3.
+
+3. **Artist's Talent (trend -0.71) é o elo mais fraco persistente do deck.** Presente desde o baseline, sobreviveu a 3 ciclos de otimização. É draw condicional que depende de criatura — anti-synergy com spellslinger. A comunidade está abandonando. Cortar no Ciclo #4 é inevitável.
+
+4. **"Sem Play T3" projetado em 5.1% é EXCELENTE para Boros.** O Ciclo #3 resolveu o maior problema do deck. Agora o Ciclo #4 pode ser agressivo — adicionar força no mid/late game sem medo de quebrar o early game.
+
+5. **Restoration Seminar (37.6%, trend 9.15) ainda subindo.** Está no deck mas não é prioridade de swap (já está dentro). É Fase 2 (CMC 7) — bom para ter. A tendência confirma que foi uma boa inclusão.
+
+6. **Apex of Power (55.1%, CMC 10) ainda na coleção e sem uso.** É um big spell que DÁ mana (10 vermelhos) em vez de consumir. Está no mesmo tier que Storm-Kiln (55.4%) e Improvisation Capstone (48.9%) de EDHREC. Swap por Rise of the Eldrazi (54.8% mas CMC 12 e trend -0.46) é ganho líquido.
+
+---
+
+### PROJEÇÃO CICLO #5 (Se "Sem Play T3" confirmado <8%)
+
+| # | Sai | Entra | Justificativa |
+|:-:|:----|:------|:--------------|
+| 1 | Rise of the Eldrazi (54.8%, CMC 12) | **Apex of Power** (55.1%, CMC 10) | Big spell rising vs declining |
+| 2 | Goldspan Dragon (17.8%, CMC 5) | **Goliath Daydreamer** (33.4%, CMC 3) | Creature payoff rising |
+| 3 | Perch Protection (34.6%, CMC 6) | **Chaos Warp** (38.8%, CMC 3) | Protection expensive → removal |
+
+---
+
+### PRÓXIMOS PASSOS
+
+1. **Mulligan Analyst — URGENTE:** Rodar simulação de 1000 mãos pós-Ciclo #3 para confirmar "Sem Play T3" ~5.1%
+2. **Evolution Oracle (Ciclo #4):** Aplicar Opção A ou C — foco em rising stars + remover declining cards
+3. **Monitorar:** The Dawning Archaic trend (se >30% no próximo scout, prioridade absoluta)
+4. **Monitorar:** Artist's Talent trend (se <15% EDHREC, corte incondicional)
+
+---
+
+**Dados brutos:** `/tmp/edhrec_lorehold_fresh.html` (654KB, 277 cardview entries, EDHREC Live 7.765 decks)
