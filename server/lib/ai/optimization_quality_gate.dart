@@ -22,6 +22,8 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   required List<Map<String, dynamic>> originalDeck,
   required List<Map<String, dynamic>> additionsData,
   required String archetype,
+  String? commanderName,
+  Map<String, Map<String, dynamic>>? cardDeckProfiles,
 }) {
   final pairCount = [
     removals.length,
@@ -76,6 +78,27 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     final addedIsLand = ((addedCard['type_line'] as String?) ?? '')
         .toLowerCase()
         .contains('land');
+
+    // ── Card deck profiles: protect core cards, prioritize filler removals ──
+    if (cardDeckProfiles != null && cardDeckProfiles.isNotEmpty) {
+      final removalProfile = cardDeckProfiles[removalName.toLowerCase()];
+
+      // Block swaps that try to remove a core card
+      if (removalProfile != null &&
+          removalProfile['importance']?.toString().toLowerCase() == 'core') {
+        droppedReasons.add(
+          '$removalName -> $additionName bloqueada: $removalName é carta CORE neste deck (card_deck_profiles).',
+        );
+        continue;
+      }
+
+      // Allow swaps that remove a filler card even if role is preserved
+      if (removalProfile != null &&
+          removalProfile['importance']?.toString().toLowerCase() == 'filler' &&
+          losingCriticalRole == false) {
+        // Filler cards get a pass — they can be swapped more freely
+      }
+    }
 
     final removedIsLand = removedRole == 'land' ||
         (((removedCard['type_line'] as String?) ?? '')
