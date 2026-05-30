@@ -1,91 +1,111 @@
 # VALIDATOR SUMMARY — Lorehold Spellslinger (2026-05-30)
 
-## Estado do Deck: Pos-Ciclo #2 (6 swaps aplicados)
+## Estado do Deck: Pós-Ciclo #3 (14 swaps aplicados)
 
-| Swap | Saiu | Entrou |
-|:-----|:-----|:-------|
-| Ciclo #1 | Furygale Flocking | Esper Sentinel |
-| Ciclo #1 | Jokulhaups | Gamble |
-| Ciclo #1 | Karoo | Plains |
-| Ciclo #2 | Deflecting Palm | Big Score |
-| Ciclo #2 | Hellkite Tyrant | Dance with Calamity |
-| Ciclo #2 | Mother of Runes | The One Ring |
+| Ciclo | Swap | Saiu | Entrou |
+|:------|:-----|:-----|:-------|
+| #1 | 1 | Furygale Flocking | Esper Sentinel |
+| #1 | 2 | Jokulhaups | Gamble |
+| #1 | 3 | Karoo | Plains |
+| #2 | 1 | Deflecting Palm | Big Score |
+| #2 | 2 | Hellkite Tyrant | Dance with Calamity |
+| #2 | 3 | Mother of Runes | The One Ring |
+| #3 | 1 | Ancient Copper Dragon | Storm-Kiln Artist |
+| #3 | 2 | Desperate Ritual | Boros Signet |
+| #3 | 3 | Sunbird's Invocation | Improvisation Capstone |
+| #3 | 4 | Victory Chimes | Generous Gift |
+| #3 | 5 | Orim's Chant | Blasphemous Act |
 
-## Metricas Atuais vs Perfil EDHREC
+## Métricas Atuais vs Perfil EDHREC
 
-| Metrica | Deck | Perfil | Status |
+| Métrica | Deck | Perfil | Status |
 |:--------|:----:|:------:|:------:|
-| Lands | 35 | 36-38 | -1 (ok) |
-| Ramp | 16 | 10-13 | +3 (treasure heavy) |
-| Draw | 5 real | 8-12 | CRITICO |
-| Remocao | 4 | 4-6 | no range |
-| Board wipe | 4 | 3-5 | no range |
-| Protecao | 4 | 3-4 | ok |
-| Big spells | ~24 | 23-24 | ok |
+| Lands | 35 | 36-38 | 🟡 -1 (ok com MDFCs) |
+| Ramp | 16 | 10-13 | 🟡 +3 (treasure-heavy) |
+| Draw (real) | 5 | 8-12 | 🔴 Crítico |
+| Removal | 5 | 4-6 | 🟢 No range |
+| Board Wipe | 5 | 3-5 | 🟡 No limite |
+| Protection | 4 | 3-4 | 🟢 No range |
+| Recursion | 4 | 2-5 | 🟢 No range |
+| Wincon (dedicated) | 1 | 4-7 | 🔴 Muito abaixo |
+| Engine/Big Spell | 4 | 5-8 | 🟡 Abaixo |
+| Tutor | 3 | — | 🟢 Adequado |
+| CMC médio | ~3.8 | ~4.1 | 🟢 Melhorou |
 
-## Motor de Lorehold: 2/3 Completo
+## Motor de Lorehold: ✅ 4/4 COMPLETO
 
-- Tesouro Ramp: COMPLETO (Big Score, Brass's Bounty, Hit the Mother Lode)
-- Big Spell Free: COMPLETO (Dance with Calamity, Approach)
-- Treasure Payoff: FALTA Storm-Kiln Artist + Improvisation Capstone
+1. **Treasure Ramp** — Big Score, Brass's Bounty, Hit the Mother Lode ✅
+2. **Big Spell Free** — Dance with Calamity, Improvisation Capstone, Approach ✅
+3. **Lorehold Copy** — Commander ability ✅
+4. **Treasure Payoff** — Storm-Kiln Artist ✅
+
+## Simulação Pós-Ciclo #3 (rigorous, N=1000)
+
+| Métrica | Valor | Status |
+|:--------|:-----:|:------:|
+| Jogáveis | 69.3% | 🟢 |
+| Mulligan | ~30.7% | 🟡 |
+| Ramp T1 | 20.6% | 🟢 |
+| Sem Play T3 | **5.1%** | 🟢 Excelente |
 
 ## Top 3 Problemas
 
-1. **Draw real = 5** (perfil quer 8-12). Artist's Talent em declinio severo (-0.71).
-2. **"Sem play T3" = 16.5%** — deck precisa de mais cartas CMC baixo.
-3. **Island artifact morta** — Goblin Engineer, Oswald, Pearl Medallion sem payoff.
+1. **Draw real = 5** (perfil quer 8-12). Maior gap.
+2. **Wincon dedicado = 1** (Approach). Perfil quer 4-7.
+3. **Rise of the Eldrazi CMC 12** — carta ineficiente que precisa sair.
 
-## Top 5 Swaps para Ciclo #3 (custo $0)
+## Top Swaps para Ciclo #4 (custo $0)
 
-| # | Sai | Entra | EDHREC | Impacto | Delta CMC |
-|:-:|:----|:------|:------:|:--------|:---------:|
-| 1 | Ancient Copper Dragon | Storm-Kiln Artist | 55.4% | Motor completo | -3 |
-| 2 | Desperate Ritual | Boros Signet | 50.3% | Ramp consistente | 0 |
-| 3 | Sunbird's Invocation | Improvisation Capstone | 48.9% | Big spell superior | -1 |
-| 4 | Victory Chimes | Generous Gift | 32.5% | Remocao universal | -1 |
-| 5 | Orim's Chant | Blasphemous Act | 40.4% | Board wipe | +1 |
+| # | Sai | Entra | EDHREC | Impacto | ΔCMC |
+|:-:|:----|:------|:------:|:--------|:----:|
+| 1 | Rise of the Eldrazi | **Arcane Bombardment** | 42.4% | Copy engine | -6 |
+| 2 | Season of the Bold | **Faithless Looting** | 29.6% | Draw + GY setup | -4 |
+| 3 | Goblin Engineer | **Dragon's Rage Channeler** | 39.6% | Topdeck enabler | 0 |
+| 4 | Longshot, Rebel Bowman | **Thrill of Possibility** | common | Draw 2 | 0 |
+| 5 | Pearl Medallion | **Archivist of Oghma** | 30% | Draw vs fetch | 0 |
 
-Net Delta CMC: ~-4. Esperado: "Sem play T3" melhora 2-4pp para ~12-14%.
+**Estratégia Ciclo #4: AGGRESSIVE** (Sem Play T3 = 5.1% permite)
+**Net ΔCMC: ≈-10** (mas margem de segurança em Sem Play T3 permite)
 
-## Proximos Ciclos
+## Double-Null Cards (7 restantes)
 
-**Ciclo #4 (apos "sem play T3" < 14%):**
-- Adicionar: Restoration Seminar (37.6%, trend +9.15), Apex of Power (55.1%)
-- Cortar: Artist's Talent, Pearl Medallion, Rise of the Eldrazi
-
-**Ciclo #5:**
-- Adicionar: Faithless Looting, Chaos Warp
-- Cortar: Goblin Engineer, Oswald Fiddlebender
-
-## Tendencias-Chave EDHREC (7765 decks)
-
-| Carta |% | Trend | Sinal |
-|:------|:|:------|:------|
-| Restoration Seminar | 37.6% | +9.15 | Crescendo mais rapido |
-| Improvisation Capstone | 48.9% | +8.13 | Explosao |
-| Storm-Kiln Artist | 55.4% | +0.75 | Estavel/crescente |
-| Big Score | 67.2% | +1.50 | Staple+crescendo |
-| Artist's Talent | 21.0% | -0.71 | DECLINIO GRAVE |
-| Esper Sentinel | 32.4% | -0.54 | Declinio |
-| The One Ring | 8.4% | -0.31 | GC em declinio em Lorehold |
-
-## Double-Null Cards (9 restantes)
-
-| Carta | Risco de Corte | Acao |
+| Carta | Risco de Corte | Ação |
 |:------|:---------------|:-----|
-| Scroll Rack | CRITICO | Nunca cortar |
-| Penance | CRITICO | Nunca cortar |
-| Grand Abolisher | Alto | Manter |
-| Ruby Medallio | Medio | Manter, cortar Pearl |
-| Pearl Medallion | Medio | CORTAR |
-| Galadriel's Dismissal | Baixo | Cortar por draw |
-| Victory Chimes | Baixo | Cortar por removal |
-| Orim's Chant | Baixo | Cortar por removal |
-| Taunt from Rampart | Baixo | Cortar por wipe |
+| Scroll Rack | 🔴 CRÍTICO | Nunca cortar |
+| Penance | 🔴 CRÍTICO | Nunca cortar |
+| Grand Abolisher | 🟡 Alto | Manter |
+| Ruby Medallion | 🟡 Médio | Manter |
+| Pearl Medallion | 🟡 Médio | Cortar no Ciclo #4 P2 |
+| Galadriel's Dismissal | 🟢 Baixo | Monitorar |
+| Taunt from Rampart | 🟢 Baixo | **NÃO CORTAR** (35.3% EDHREC) |
+
+## Tendências-Chave EDHREC (7765 decks)
+
+| Carta | % | Trend | Sinal |
+|:------|:-:|:------|:------|
+| Restoration Seminar | 37.6% | +9.15 | Crescendo mais rápido |
+| Improvisation Capstone | 48.9% | +8.13 | Explosão |
+| Storm-Kiln Artist | 55.4% | +0.75 | Estável/crescente |
+| Big Score | 67.2% | +1.50 | Staple + crescendo |
+| Artist's Talent | 21.0% | -0.71 | DECLÍNIO GRAVE |
+| Esper Sentinel | 32.4% | -0.54 | Declínio |
+| The One Ring | 8.4% | -0.31 | GC em declínio em Lorehold |
+
+## Swaps na Coleção (não no deck, >30% EDHREC)
+
+1. Arcane Bombardment (42.4%) — Ciclo #4 P0
+2. Apex of Power (55.1%) — Ciclo #5 (Sem Play T3 check)
+3. Faithless Looting (29.6%) — Ciclo #4 P0
+4. Dragon's Rage Channeler (39.6%) — Ciclo #4 P1
+5. Blasphemous Act (40.4%) — ✅ já no deck
+6. Thrill of Possibility (common) — Ciclo #4 P1
+7. Chaos Warp (38.9%) — Ciclo #5
+8. Trouble in Pairs (29%) — verificar coleção
 
 ## Veredito
 
-Deck funciona em bracket 3. 6 swaps aplicados, 5 recomendados para Ciclo #3. Maior free upgrade: Storm-Kiln Artist (55.4% EDHREC, na colecao, fora do deck).
+Deck funciona em bracket 3. 14 swaps aplicados ao longo de 3 ciclos. Ciclo #3 foi um sucesso — completou o motor e restaurou Sem Play T3 para 5.1%. Próximo ciclo deve focar em draw + wincons. Maior custo-zero upgrade: Arcane Bombardment (coleção, 42.4% EDHREC).
 
 ---
-*Atualizado: 2026-05-30. Fonte: EDHREC 7765 decks, knowledge.db deck_id=6, 229 cartas na colecao.*
+*Atualizado: 2026-05-30. Fonte: EDHREC 7765 decks, knowledge.db deck_id=6 pós-Ciclo #3, 229 cartas na coleção.*
+*Analista: Hermes Agent — Purpose Analyzer v3.4*
