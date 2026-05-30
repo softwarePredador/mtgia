@@ -241,7 +241,7 @@ Future<Response> _importDeck(RequestContext context) async {
       await DeckRulesService(session).validateAndThrow(
         format: normalizedFormat,
         cards: validatedCards,
-        strict: false,
+        strict: requiresCommander,
       );
 
       // 1. Criar o Deck

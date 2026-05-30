@@ -422,10 +422,10 @@ List<String> buildOptimizationRejectionReasons({
 
 Set<String> _criticalRolesForArchetype(String archetype) {
   return switch (archetype.trim().toLowerCase()) {
-    'aggro' => {'creature', 'ramp', 'removal', 'protection'},
+    'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe'},
     'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection'},
-    'midrange' => {'removal', 'ramp', 'draw'},
-    _ => {'removal', 'ramp'},
+    'midrange' => {'removal', 'ramp', 'draw', 'wipe'},
+    _ => {'removal', 'ramp', 'wipe'},
   };
 }
 
@@ -437,8 +437,8 @@ bool _looksLikeOffThemeRoleSwap({
   final normalized = archetype.trim().toLowerCase();
 
   if (normalized == 'aggro' &&
-      {'creature', 'removal', 'protection', 'engine'}.contains(removedRole) &&
-      !{'creature', 'removal', 'protection', 'engine'}.contains(addedRole)) {
+      {'creature', 'ramp', 'removal', 'protection', 'wipe'}.contains(removedRole) &&
+      !{'creature', 'ramp', 'removal', 'protection', 'wipe'}.contains(addedRole)) {
     return true;
   }
 
@@ -449,8 +449,8 @@ bool _looksLikeOffThemeRoleSwap({
   }
 
   if (normalized == 'midrange' &&
-      {'removal', 'ramp', 'draw'}.contains(removedRole) &&
-      !{'removal', 'ramp', 'draw', 'creature', 'protection'}
+      {'removal', 'ramp', 'draw', 'wipe'}.contains(removedRole) &&
+      !{'removal', 'ramp', 'draw', 'wipe', 'creature', 'protection'}
           .contains(addedRole)) {
     return true;
   }
