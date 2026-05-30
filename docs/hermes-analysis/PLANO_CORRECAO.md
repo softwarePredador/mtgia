@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-30 07:00 UTC
+> Data: 2026-05-30 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -10,11 +10,12 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada na rotacao de 2026-05-29 19:00 UTC. O maior risco atual esta em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos), alem de duplicacoes menores em trust, logs sociais, condicao de carta e CMC/tipo.
-4. **P1 — Entry point local quebrado**: **RESOLVIDO em
-   `origin/master@a830f9f3`**. `server/bin/local_test_server.dart` nao importa
-   mais `../.dart_frog/server.dart` estaticamente; ele valida o artefato gerado
-   em runtime, sobe `dart run .dart_frog/server.dart` como processo filho e
-   trata `SIGINT`/`SIGTERM`.
+4. **P1 — Entry point local quebrado**: **REABERTO no checkout local
+   `df8291d7`**. `server/bin/local_test_server.dart:3` ainda importa
+   `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
+   nao existe neste checkout, e `dart analyze` do backend falha com
+   `uri_does_not_exist`. A resolucao historica em `origin/master@a830f9f3` nao
+   esta presente nesta branch de memoria.
 5. **P1 — Ownership em rotas deck/AI**: **REABERTO no checkout local `b071080e`**. A rodada de coerencia de 2026-05-29 23:05 UTC mostrou que `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado em
    2026-05-30 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
@@ -53,12 +54,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     logica. Tambem seguem sem chamador runtime confirmado wrappers/helpers em
     request trace, Commander Reference, MTGTop8, candidate quality, optimize
     utility samples e a API manual de metricas de `PerformanceService`.
-13. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
-    `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
-    `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
-    direto entre `CommunityDeckDetailScreen` e `UserProfileScreen` foi removido
-    via GoRouter. O ponto operacional restante do `local_test_server.dart` foi
-    resolvido em `origin/master@a830f9f3`.
+13. **P1/P2 — Imports quebrados e ciclo app**: **REABERTO no checkout local
+    `df8291d7` (2026-05-30 11:00 UTC).** `deck_analysis_tab.dart:5` e
+    `life_counter_screen.dart:7` ainda usam imports relativos que saem de
+    `app/lib` e resolvem para `app/core/...`, enquanto os arquivos existentes
+    estao em `app/lib/core/...`. O ciclo direto entre
+    `CommunityDeckDetailScreen` e `UserProfileScreen` tambem permanece: cada
+    tela importa e instancia a outra por `Navigator.push`.
 
 ## Achados priorizados
 
