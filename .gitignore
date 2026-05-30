@@ -43,3 +43,5 @@ server/test/artifacts/*.port
 # AI optimize debug artifacts (generated during HTTP optimize flow tests)
 server/test/artifacts/ai_optimize/source_deck_optimize_*.json
 !server/test/artifacts/ai_optimize/source_deck_optimize_latest.json
+*.pyc
+__pycache__/

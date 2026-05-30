@@ -1,134 +1,135 @@
 # Implementation Tasks — ManaLoom
 
-> Gerado por sintese manual: cruzamento do conhecimento MTG do Hermes × codigo atual.
-> Data: 2026-05-30 | Branch: master | SHA: 516e79c
+> Gerado por sintese: cruzamento do conhecimento MTG do Hermes × codigo atual.
+> Data: 2026-05-30 | Branch: origin/master | SHA: 49b6b1e1
+
+## Resumo de Status
+
+| # | Prioridade | Titulo | Status |
+|:--|:-----------|:-------|:-------|
+| P1-a | P1 | BracketCategory enum nao detecta Game Changers | ✅ RESOLVIDO (ae886b11) |
+| P1-b | P1 | card_deck_profiles nao consultado pelo optimize | ✅ RESOLVIDO (d8b7b26b) |
+| P1-c | P1 | Weakness-analysis usa heuristicas legacy (sem adapter F1) | 🔴 ATIVO |
+| P2-a | P2 | _looksLikePayoff nao detecta payoffs de dano direto | ✅ RESOLVIDO (3fb17356) |
+| P2-b | P2 | Tags ninja/stax_disruption com 0% de acuracia no SQLite | 🔴 ATIVO |
+| P3-a | P3 | CONTEXTO_PRODUTO_ATUAL.md desatualizado | ✅ RESOLVIDO (7ed5b863) |
+| P3-b | P3 | Weakness-analysis wincon detection fragil (oracle text) | 🔴 ATIVO |
+| P3-c | P3 | manual-de-instrucao.md nao reflete F1/F3/bracket expansion | 🔴 ATIVO |
 
 ---
 
-### [P1] BracketCategory enum nao detecta 29/53 Game Changers oficiais
+### [P1] Weakness-analysis usa heuristicas legacy — sem adapter F1
 
-**Conhecimento MTG:** O Commander oficial definiu 53 Game Changers — cartas que distorcem o jogo e sao restritas por bracket. O Hermes pesquisou todas e identificou 10 categorias de impacto: fast_mana, tutor, card_advantage, free_interaction, board_wipe, stax, value_engine, combo_piece, protection, extra_turns.
-
-**Evidencia no codigo:** `server/lib/edh_bracket_policy.dart:7-13`
-```dart
-enum BracketCategory {
-  fastMana,
-  tutor,
-  freeInteraction,
-  extraTurns,
-  infiniteCombo,
-}
-```
-Apenas 5 categorias. 29 GCs nao detectados incluindo: Rhystic Study, Cyclonic Rift, The One Ring, Smothering Tithe, Teferi's Protection, Drannith Magistrate, Opposition Agent, Grand Abolisher, etc.
-
-**Gap:** O sistema de brackets do ManaLoom cobre 24/53 GCs (45%). Cartas como Cyclonic Rift (board wipe unilateral game-winning) e Rhystic Study (23% do formato EDHREC) passam sem deteccao.
-
-**Impacto:** Decks em bracket 3 podem incluir GCs nao-detectados sem consumir o limite de 3. O sistema de otimizacao pode sugerir trocas que adicionam GCs sem alertar o usuario.
-
-**Acao recomendada:**
-1. Adicionar `boardWipe`, `cardAdvantage`, `stax`, `protection`, `valueEngine` ao `BracketCategory` enum
-2. Expandir `tagCardForBracket()` com heuristicas para cada nova categoria
-3. Adicionar `boardWipe` aos limites de bracket em `BracketPolicy.forBracket()`
-4. Atualizar `applyBracketPolicyToAdditions()` para usar as novas categorias
-
-**Validacao:**
-```bash
-cd server
-dart analyze lib/edh_bracket_policy.dart
-dart test test/edh_bracket_policy_test.dart
-```
-
----
-
-### [P1] card_deck_profiles (670 perfis) nao consultado pelo optimize
-
-**Conhecimento MTG:** O Hermes importou 670 perfis de cartas por deck (`card_deck_profiles` no PostgreSQL) com dados de funcao, importancia e contexto estrategico por comandante. Estes perfis dizem quais cartas sao ESSENCIAIS vs FILLER em cada deck especifico.
-
-**Evidencia no codigo:** `server/lib/ai/candidate_quality_data_support.dart` e `server/lib/ai/optimize_runtime_support.dart` — `filterUnsafeOptimizeSwapsByCardData` usa `card_meta_insights` e `card_function_tags`, mas NAO consulta `card_deck_profiles`.
-
-**Gap:** 670 perfis de carta-por-deck existem no banco mas nao sao usados pelo fluxo de otimizacao. O optimize decide swaps baseado em metricas genericas (pop_score, usage_count), nao em conhecimento contextual ("esta carta e FILLER no deck X, pode ser removida").
-
-**Impacto:** O optimize pode sugerir remover cartas que sao CORE no contexto do comandante, ou manter cartas que sao FILLER conhecido.
-
-**Acao recomendada:**
-1. Adicionar consulta a `card_deck_profiles` em `filterUnsafeOptimizeSwapsByCardData`
-2. Usar `importance` e `functional_role` do perfil para ajustar scores de candidatos
-3. Cartas marcadas como `importance=filler` devem ter prioridade de remocao aumentada
-4. Cartas marcadas como `importance=core` devem ser protegidas contra remocao
-
-**Validacao:**
-```bash
-cd server
-dart analyze lib/ai/candidate_quality_data_support.dart lib/ai/optimize_runtime_support.dart
-dart test test/candidate_quality_data_support_test.dart test/optimization_validator_test.dart
-```
-
----
-
-### [P2] Recommendations e weakness-analysis usam heuristicas legacy (sem semantic v2)
-
-**Conhecimento MTG:** O fluxo core (analysis/optimize) ja usa `functional_tags` + `semantic_tags_v2` com cobertura de 72.3% das cartas. As tags semanticas v2 fornecem classificacao multi-tag com confidence score.
+**Conhecimento MTG:** O fluxo core ja usa o `resolveCardFunctionalRoles()` (adapter F1, commit eb051a80) que unifica tags funcionais com prioridade: `persistida > semantic_v2 > heuristica`. Tag `payoff` agora detecta payoffs de dano direto. Suporte multi-tag via `Set<String> roles`.
 
 **Evidencia no codigo:**
-- `server/routes/decks/[id]/recommendations/index.dart:110-130` — conta ramp/draw/removal/wipes por `oracle_text` local, sem `functional_tags` ou `semantic_tags_v2`
-- `server/routes/ai/weakness-analysis/index.dart:114-163` — mesmo problema, + nomes hardcoded (`teferi's protection`, `heroic intervention`)
-- `server/routes/ai/weakness-analysis/index.dart:206-248` — recomendacoes sao listas fixas de nomes de carta
+- `server/routes/ai/weakness-analysis/index.dart:114-170` — Conta ramp/draw/removal/wipes por `oracle_text` local com patterns hardcoded
+- `server/routes/ai/weakness-analysis/index.dart:380-430` — Recomendacoes sao listas fixas de nomes de carta
+- `server/routes/decks/[id]/recommendations/index.dart:1-30` — Usa OpenAI como fonte primaria, sem usar tags funcionais locais
 
-**Gap:** Duas rotas publicas usam heuristica unidimensional enquanto o pipeline core ja tem classificacao multi-tag precisa. Se expostas ao app, o usuario recebe recomendacoes de qualidade inferior.
+**Gap:** Duas rotas publicas operam com classificacao inferior ao adapter F1. Recomendacoes sao genericas e nao consideram colecao do usuario nem comandante.
 
-**Impacto:** Antes de serem promovidas a fluxo de produto, estas rotas precisam ser atualizadas para usar a mesma camada semantica do resto do sistema.
+**Impacto:**
+1. Usuario recebe analise de fraquezas inferior a capacidade real do sistema
+2. Recomendacoes de remocao iguais para qualquer deck
+3. Qualidade inconsistente com o pipeline de otimizacao
 
 **Acao recomendada:**
-1. Substituir contagem por `oracle_text` em recommendations por `summarizeFunctionalTagsForDeck()`
-2. Substituir listas fixas de nomes em weakness-analysis por queries filtradas por `functional_tags` + identidade de cor + bracket
-3. Adicionar `semantic_tags_v2` como fonte secundaria de classificacao
+1. Refatorar weakness-analysis para usar `resolveCardFunctionalRoles()`
+2. Substituir recomendacoes hardcoded por queries em `card_function_tags` + `card_semantic_tags_v2`
+3. Usar `card_deck_profiles` para contextualizar recomendacoes por archetype
+4. Em recommendations, usar `summarizeFunctionalTagsForDeck()` como fonte primaria
 
 **Validacao:**
 ```bash
 cd server
-dart analyze routes/decks/[id]/recommendations/index.dart routes/ai/weakness-analysis/index.dart
+dart analyze routes/ai/weakness-analysis/index.dart routes/decks/\[id\]/recommendations/index.dart
+dart test test/optimization_quality_gate_test.dart
+```
+
+---
+
+### [P2] Tags ninja (0/17) e stax_disruption (0/3) corrompem relatorios de acuracia
+
+**Conhecimento MTG:** O cron `manaloom-tag-accuracy-reporter` (2026-05-30T08:00Z) identificou 7 tags com acuracia 0%: `ninja`, `ramp+combo_piece`, `recursion+wincon`, `ramp+payoff`, `payoff+removal`, `payoff+token_maker`, `stax_disruption`. Tag `payoff`: 35.5% (11/31).
+
+**Evidencia no codigo:**
+- `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` → `tag_accuracy`: `ninja: 0/17`, `stax_disruption: 0/3`
+- O adapter F1 nao produz tags `ninja` ou `stax_disruption`; cartas ninja recebem `creature`; cartas stax sao detectadas pela bracket policy
+
+**Gap:** Tags fantasmas no SQLite corrompem relatorios. Tags compostas com `+` nao sao lidas pelo F1 que usa `Set<String>` simples.
+
+**Impacto:** Relatorios de qualidade para o operador mostram tags inexistentes. Se algum modulo consulta `tag_name = ninja`, retorna resultados incorretos.
+
+**Acao recomendada:**
+1. Remover tags fantasmas do SQLite (ja executado nesta rodada)
+2. Recalcular `tag_accuracy` para `payoff` apos expansao de padroes
+3. Unificar tags compostas no SQLite
+4. Atualizar `tag-accuracy-reporter` para pular tags que nao existem mais
+
+**Validacao:**
+```sql
+DELETE FROM tag_accuracy WHERE tag_name IN (ninja, stax_disruption, ramp + combo_piece, recursion + wincon, ramp + payoff, payoff + removal, payoff + token_maker);
+```
+
+---
+
+### [P3] Weakness-analysis wincon detection fragil
+
+**Conhecimento MTG:** A deteccao de win conditions no weakness-analysis (linhas ~400-420) procura por patterns fixos. Mas muitas wincons nao sao detectadas: Thassa Oracle, Walking Ballista, combos de 2+ cartas.
+
+**Evidencia no codigo:**
+- `server/routes/ai/weakness-analysis/index.dart:400-420` — Patterns fixos que nao detectam combos multi-carta
+
+**Gap:** Decks combo que vencem por mecanicas nao-obvias sao classificados como insufficient win conditions.
+
+**Impacto:** Falso positivo na analise de fraquezas para decks combo.
+
+**Acao recomendada:**
+1. Consultar `card_meta_insights` wincon_score do PostgreSQL
+2. Consultar `commander_card_synergy` para cartas marcadas como combo_piece
+3. Usar tag `wincon` do adapter F1
+
+**Validacao:**
+```bash
+cd server
+dart analyze routes/ai/weakness-analysis/index.dart
 dart test test/functional_card_tags_test.dart
 ```
 
 ---
 
-### [P2] _looksLikePayoff nao detecta payoffs de dano direto com triggers ETB/cast
+### [P3] manual-de-instrucao.md nao reflete F1/F3/bracket expansion
 
-**Conhecimento MTG:** Em Commander, payoffs de dano direto como Impact Tremors, Guttersnipe, e Purphoros sao win conditions legitimas em decks de tokens/spellslinger. O Scout do Hermes identificou que Guttersnipe esta em 32.4% dos decks Lorehold.
+**Evidencia no codigo:**
+- `docs/CONTEXTO_PRODUTO_ATUAL.md` — Atualizado em 2026-05-30 (7ed5b863) OK
+- `server/manual-de-instrucao.md` — Ultimo registro e F0. Nao menciona F1, F3, bracket expansion, card_deck_profiles, payoff expansion
 
-**Evidencia no codigo:** `server/lib/ai/optimization_functional_roles.dart:388-392`
-A funcao `_looksLikePayoff` detecta "whenever...create...token" e "whenever you cast...copy/scry" mas NAO detecta "whenever [trigger]...deals damage to [target]".
+**Gap:** O diario tecnico esta ~10 commits atras.
 
-**Gap:** Cartas como Impact Tremors ("whenever a creature enters... deals 1 damage to each opponent") e Guttersnipe ("whenever you cast an instant or sorcery... deals 2 damage to each opponent") nunca sao classificadas como `payoff`.
+**Impacto:** Decisoes recentes nao documentadas. Risco de retrabalho.
 
-**Impacto:** O quality gate pode permitir swaps que removem estas cartas sem reconhecer que sao win conditions, ou nao prioriza-las em decks onde sao o payoff principal.
+**Acao recomendada:** Atualizar `server/manual-de-instrucao.md` com:
+- Adapter F1: `resolveCardFunctionalRoles()`
+- Bracket expansion: 5 novas categorias, 53/53 GCs
+- card_deck_profiles integrado
+- Modularizacao F3
+- Payoff expansion
 
-**Acao recomendada:** Adicionar padrao em `_looksLikePayoff`: "whenever [trigger]...deals [X] damage to [target]" combinado com triggers ETB/cast/spell.
-
-**Validacao:**
-```bash
-cd server
-dart analyze lib/ai/optimization_functional_roles.dart
-dart test test/optimization_quality_gate_test.dart -N "payoff"
-```
+**Validacao:** Revisao manual.
 
 ---
 
-### [P3] docs/CONTEXTO_PRODUTO_ATUAL.md desatualizado desde 2026-03-25
+## Tasks Resolvidos (referencia historica)
 
-**Conhecimento MTG:** N/A (task de documentacao)
+### ✅ [P1] BracketCategory enum — RESOLVIDO (ae886b11)
+Adicionadas: boardWipe, cardAdvantage, stax, protection, valueEngine. Detecta 53/53 GCs.
 
-**Evidencia no codigo:** `docs/CONTEXTO_PRODUTO_ATUAL.md` — ultima atualizacao 2026-03-25. `server/manual-de-instrucao.md` vai ate 2026-05-21. Ha ~2 meses de decisoes nao refletidas na fonte de verdade operacional.
+### ✅ [P1] card_deck_profiles integration — RESOLVIDO (d8b7b26b)
+filterUnsafeOptimizeSwapsByCardData consulta card_deck_profiles e bloqueia remocao de core cards.
 
-**Gap:** O documento que define a prioridade do produto esta 2 meses desatualizado. Decisoes recentes (F0-F3, extracao de gargalos, Semantic V2, Commander Reference Sprint 4, Life Counter benchmark clone) nao estao documentadas.
+### ✅ [P2] _looksLikePayoff damage payoffs — RESOLVIDO (3fb17356)
+Adicionado: whenever + deals + damage + (each opponent | any target | target opponent)
 
-**Impacto:** Novos contribuidores ou agentes (Hermes) podem tomar decisoes baseadas em prioridades de marco/2025 que ja foram concluidas ou alteradas.
-
-**Acao recomendada:** Atualizar `docs/CONTEXTO_PRODUTO_ATUAL.md` com:
-- Status atual dos gargalos (F0-F3 aplicados)
-- Semantic V2 status (partial mode, flag expandida)
-- Life Counter status (benchmark clone concluido)
-- Hermes agent integrado
-- Novos modulos extraidos
-
-**Validacao:** Revisao manual do documento.
+### ✅ [P3] CONTEXTO_PRODUTO_ATUAL.md — RESOLVIDO (7ed5b863)
+Atualizado com F0-F3, bracket expansion, card_deck_profiles, Hermes status.
