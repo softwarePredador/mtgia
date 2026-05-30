@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-29 19:00 UTC
+> Data: 2026-05-30 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -16,7 +16,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    em runtime, sobe `dart run .dart_frog/server.dart` como processo filho e
    trata `SIGINT`/`SIGTERM`.
 5. **P1 — Ownership em rotas deck/AI**: **REABERTO no checkout local `b071080e`**. A rodada de coerencia de 2026-05-29 23:05 UTC mostrou que `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing.
-6. **P1 — Politicas por nome / semantica de cartas**: reaberto no checkout local `7014a2cc`. `commander_fallback_policy.dart` nao existe nesta branch, e ainda ha excecoes por nome em `functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart` e rotas de recomendacao.
+6. **P1 — Politicas por nome / semantica de cartas**: revalidado em
+   2026-05-30 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
+   branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
+   `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`,
+   `/decks/:id/recommendations` e `/ai/weakness-analysis`. Ha tambem excecoes
+   intencionais em `edh_bracket_policy.dart` que devem virar policy versionada
+   com fonte/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-29 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado na
    rotacao local Codex de 2026-05-30 03:00 UTC. `LifeCounterScreen` segue como
@@ -24,12 +30,14 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    mas sem import/chamada na listagem real; `DeckProgressChip` nao tem chamada
    de construtor; `LotusPresentationMode` nao tem import nem chamada para
    `enter()`/`exit()`.
-9. **P1 — Drift entre deck analysis e optimize**: deck analysis prefere
-   `card_function_tags`, mas optimize/validator/quality gate carregam apenas
-   `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
-   colapsado em um unico role. O fallback de baixa confianca de semantic v2
-   para heuristica foi revalidado e coberto por teste em
-   `origin/master@c3531df7`.
+9. **P1 — Drift entre deck analysis e optimize**: revalidado em 2026-05-30
+   05:30 UTC. Deck analysis prefere `card_function_tags`, mas
+   optimize/validator/quality gate carregam apenas `semantic_tags_v2` e
+   heuristica; alem disso, `semantic_tags_v2` multi-tag e colapsado em um unico
+   role. O fallback de baixa confianca de semantic v2 para heuristica foi
+   revalidado e coberto por teste em `origin/master@c3531df7`, mas esse teste
+   nao resolve a perda de roles secundarios nem a ausencia de
+   `card_function_tags` no optimize.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -165,11 +173,11 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
-- **Status em `codex/hermes-analysis-docs@7014a2cc`: REABERTO.** A revalidacao
-  local nao encontrou `server/lib/ai/commander_fallback_policy.dart`; o unico
-  arquivo `*policy*` em `server/lib` e `server/lib/edh_bracket_policy.dart`.
-  Portanto a anotacao historica de resolucao em `origin/master@65f30387` nao
-  deve ser aplicada a este checkout.
+- **Status 2026-05-30 05:30 UTC: REVALIDADO/ABERTO.** A revalidacao local nao
+  encontrou `server/lib/ai/commander_fallback_policy.dart`; o unico arquivo
+  `*policy*` em `server/lib` e `server/lib/edh_bracket_policy.dart`. Portanto a
+  anotacao historica de resolucao em `origin/master@65f30387` nao deve ser
+  aplicada a este checkout.
 - **Evidência**:
   - `server/lib/ai/functional_card_tags.dart:220`-`:226` classifica ramp por
     `signet`, `talisman`, `sol ring` e `arcane signet`; `:714`-`:717`,
@@ -183,9 +191,19 @@ Histórico do problema:
     terrenos premium, staples, denylist/premium filler e fallbacks universais ou
     contextuais.
   - `server/routes/decks/[id]/recommendations/index.dart:262`-`:268` recomenda
-    `Command Tower` diretamente quando `landCount < 34`.
+    `Command Tower` diretamente quando `landCount < 34`, e `_findStaples` em
+    `:408`-`:438` trata raridade `rare/mythic` como proxy de alto impacto sem
+    role semantico.
   - `server/routes/ai/weakness-analysis/index.dart:206`-`:285` retorna listas
-    fixas de nomes para ramp, draw, removal, wipes e protecao.
+    fixas de nomes para ramp, draw, removal, wipes e protecao, apos calcular
+    contagens por heuristica local que nao carrega `card_function_tags` nem
+    `semantic_tags_v2` (`:41`-`:59`, `:114`-`:162`).
+  - `server/lib/edh_bracket_policy.dart:134`-`:142` usa listas por nome para
+    combos infinitos e Game Changers; este caso e excecao intencional de regra
+    externa, mas ainda precisa de fonte/versionamento/teste dedicado. O teste
+    atual em `server/test/optimize_runtime_support_test.dart:274`-`:298`
+    protege bloqueio de bracket com `Mana Crypt`, mas nao a lista de Game
+    Changers nem `_knownInfiniteComboPieces`.
 - **Impacto**: a maior parte do pipeline semantico ja converge, mas parte da
   decisao de score/bracket/premium ainda depende de listas inline, dificultando
   versao, auditoria e rollout controlado. No checkout local, a divergencia e
@@ -211,7 +229,7 @@ Histórico do problema:
 
 ### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
 
-- **Status em `codex/hermes-analysis-docs@7014a2cc`: ABERTO.**
+- **Status 2026-05-30 05:30 UTC: REVALIDADO/ABERTO.**
 - **Evidência**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
     `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
@@ -233,6 +251,10 @@ Histórico do problema:
     `role_delta` sobre esse role unico em `:292`-`:323`.
   - Candidate quality aplica outro mapa de normalizacao em
     `server/lib/ai/candidate_quality_data_support.dart:290`-`:309`.
+  - `server/routes/ai/optimize/index.dart:2068`-`:2099` monta
+    `additionsData` com `semantic_tags_v2`, mas sem `functional_tags`; o helper
+    local de select v2 em `:3197`-`:3213` tambem nao agrega
+    `card_function_tags`.
 - **Impacto**: a aba de analise pode contar uma carta por `card_function_tags`
   persistido, enquanto optimize/validator a tratam por heuristica ou role unico
   de `semantic_tags_v2`. Swaps podem parecer seguros no gate por perderem roles
