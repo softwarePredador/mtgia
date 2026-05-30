@@ -2,219 +2,139 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-28T06:57Z** (mana-base-validator — validação de mana base)
+> Última atualização: **2026-05-30T07:39Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
 || Métrica | Valor ||
-||:--|:--:||
-||| Total de crons (`include_disabled=True`) | 15 ||
-|||| Habilitados | 15/15 ||
-|||| Desabilitados | 0 ||
-|||| `last_status=error` | **5** ||
-|||| Nunca executaram (`last_run_at=null`) | 0 ||
-|||| Stale (>1.5× schedule atrás, `enabled=true`) | 0 ||
-|||| Ações de recuperação nesta execução | 0 (erro sistêmico HTTP 502 — ver abaixo) ||
-|||| Branch do workdir | `codex/hermes-analysis-docs` ||
+|:--|:--:||
+| Total de crons (`include_disabled=True`) | **17** ||
+| Habilitados | 14/17 ||
+| Desabilitados | **3** ||
+| `last_status=error` | **13** ||
+| Nunca executaram (`last_run_at=null`) | **1** ||
+| Stale (>1.5× schedule atrás, `enabled=true`) | **8+** |
+| Ações de recuperação nesta execução | 0 (bloqueado — ver abaixo) |
+| Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** todos os 15 crons habilitados e scheduled. **5 crons com `last_status=error`** — **TODOS** causados por erro sistêmico `HTTP 502: Provider returned error`. Observam-se 3 ondas de falha: 02:22Z (weekly-structure-auditor), 05:48Z (4 crons), 06:44Z (lorehold-deck-scout). Nenhum cron desabilitado, stale (>1.5× schedule) ou never-run; portanto **nenhum `resume`/`run` foi necessário** — todos os erros são de runtime (provider 502), não de configuração.
+**Estado geral:** 17 crons no total, **3 desabilitados**, **13 com erro**, **3 OK**, 1 nunca executou. Degradação severa desde último snapshot (2026-05-28T06:57Z: 15 crons, 0 desabilitados, 5 erros).
 
-**Regressões desde snapshot anterior (06:38Z):** 1 cron regrediu: `lorehold-deck-scout` (f20ac299992b) de 🟢 ok → 🔴 error (HTTP 502 às 06:44Z). **Recuperação:** `manaloom-knowledge-import` (b2f5c21ce2d7) recuperou-se de 🔴 error → 🟢 ok.
+**🚨 BLOQUEIO CRÍTICO:** O arquivo `/opt/data/cron/jobs.json` estava com permissão `0600` owned por `root` durante parte da execução. O processo Hermes roda como usuário `hermes` e **não conseguiu ler nem escrever** no banco de dados de crons no segundo pedido de listagem. Ações de `resume` e `run` **não puderam ser executadas**.
 
-## Ações da Rodada Atual
+**Correção necessária (operador):**
+```bash
+chmod 644 /opt/data/cron/jobs.json
+# ou
+chown hermes:hermes /opt/data/cron/jobs.json
+```
 
-||| # | Ação | Resultado ||
-||:--|:-----|:----------||
-| 2026-05-28T06:51Z | `cronjob(action='list', include_disabled=True)` | ✅ 15 jobs listados |
-| 2026-05-28T06:51Z | Verificação de branch | ✅ `codex/hermes-analysis-docs` |
-| 2026-05-28T06:51Z | Verificação de stale crons | ✅ 0 stale (todos dentro de 1.5× schedule) |
-| 2026-05-28T06:51Z | Avaliação das regras gerenciais | ✅ nenhuma ação corretiva requerida |
-| 2026-05-28T06:51Z | Verificação de `last_status=error` | ⚠️ 5 erros encontrados (todos HTTP 502 sistêmico — ver detalhes) |
-| 2026-05-28T06:51Z | Diagnóstico de output files | ✅ todos os 5 erros são `HTTP 502: Provider returned error` — 3 ondas: 02:22Z, 05:48Z, 06:44Z |
-| 2026-05-28T06:51Z | Atualização do CRON_STATUS.md | ✅ snapshot 06:51Z |
+## Análise de Degradação
+
+Último snapshot válido: **2026-05-28T06:57Z** (15 crons, 5 erros todos HTTP 502).
+Este snapshot: **2026-05-30T07:39Z** (17 crons, 13 erros, 3 desabilitados, 1 never-run).
+
+| Métrica | 2026-05-28T06:57Z | 2026-05-30T07:39Z | Delta |
+|:--|:--:|:--:|:--:|
+| Total crons | 15 | 17 | +2 🆕 |
+| Desabilitados | 0 | **3** | **+3** 🔴 |
+| Errors | 5 | **13** | **+8** 🔴 |
+| OK | 10 | 3 | -7 |
+| Never-run | 0 | **1** | +1 |
+
+**Novos crons (não presentes no snapshot anterior):**
+- `manaloom-logic-coherence-auditor` (de6fb777f5d1) — every 120m, 🔴 error
+- `manaloom-knowledge-synthesis` (10a59b3bdf4d) — every 120m, never-run
 
 ## Crons de Auditoria / Gerenciais
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
-||---|---|---|---|---|---|---|---|---||
-|| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-28T06:44Z | 7min | 🟢 ok | scheduled | sem ação |
-|| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-28T01:30Z | 321min | 🟢 ok | scheduled | próxima: 16:00Z |
-|| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 30 12 * * 0 | sim | 2026-05-28T01:36Z | 315min | 🟢 ok | scheduled | próxima: dom 12:30Z |
-|| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-28T06:18Z | 33min | 🟢 ok | scheduled | **esta execução** |
-|| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | sim | 2026-05-28T02:22Z | 269min | 🔴 error | scheduled | **HTTP 502** — provider error transitório, próxima: dom 06:00Z |
-|| `bb03201b8911` | manaloom-code-structure-auditor (4h) | 0 20,0,4,8,12,16 * * * | sim | 2026-05-28T05:48Z | 63min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: 08:00Z |
+|---|---|---|---|---|---|---|---|---|---|
+|| `757eefb8738b` | manaloom-master-watchdog | every 30m | **não** | 2026-05-28T11:28Z | ~44h | 🟢 ok | **paused** | 🔴 **DESABILITADO** — precisa `resume` |
+|| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | **não** | 2026-05-28T01:30Z | ~44h | 🟢 ok | **paused** | 🔴 **DESABILITADO** — precisa `resume` |
+|| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | sim | 2026-05-28T01:36Z | ~44h | 🟢 ok | scheduled | próxima: dom 12:00Z |
+|| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-30T07:06Z | 33min | 🔴 error | scheduled | **esta execução** |
+|| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | **não** | 2026-05-28T02:22Z | ~49h | 🔴 error | **paused** | 🔴 **DESABILITADO** — precisa `resume` |
+|| `bb03201b8911` | manaloom-code-structure-auditor (4h) | every 180m | sim | 2026-05-28T11:32Z | ~44h | 🔴 error | scheduled | ~44h sem rodar |
+|| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | sim | 2026-05-30T00:22Z | 7h17m | 🔴 error | scheduled | 🆕 desde snapshot anterior |
 
 ## Crons de Conhecimento Commander
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
-||---|---|---|---|---|---|---|---|---||
-|| `75eed994c103` | manaloom-commander-knowledge-deep | every 20m | sim | 2026-05-28T06:47Z | 3min | 🟢 ok | scheduled | sem ação |
-|| `7915cc2377a0` | manaloom-gamechanger-research | every 20m | sim | 2026-05-28T06:48Z | 2min | 🟢 ok | scheduled | sem ação |
-|| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 360m | sim | 2026-05-28T05:36Z | 74min | 🟢 ok | scheduled | próxima: ~11:36Z |
-|| `444aa9510c2c` | manaloom-mana-base-validator | every 60m | sim | 2026-05-28T05:47Z | 63min | 🟢 ok | scheduled | sem ação |
-|| `b2f5c21ce2d7` | manaloom-knowledge-import | every 30m | sim | 2026-05-28T06:35Z | 15min | 🟢 ok | scheduled | ✅ recuperou de erro 502 |
+|---|---|---|---|---|---|---|---|---|---|
+|| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | sim | 2026-05-30T07:06Z | 33min | 🔴 error | scheduled |
+|| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | sim | 2026-05-28T11:49Z | ~44h | 🔴 error | scheduled |
+|| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | sim | 2026-05-28T11:37Z | ~44h | 🔴 error | scheduled |
+|| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | sim | 2026-05-28T11:07Z | ~44h | 🔴 error | scheduled |
+|| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | sim | 2026-05-28T11:28Z | ~44h | 🔴 error | scheduled |
+|| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | sim | **nunca** | — | — | scheduled | 🆕 **NEVER-RUN** — precisa `run` |
 
 ## Lorehold Knowledge Pipeline
 
 || Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
-||---|---|---|---|---|---|---|---|---||
-|| `f20ac299992b` | lorehold-deck-scout | every 30m | sim | 2026-05-28T06:44Z | 7min | 🔴 error | scheduled | ⚠️ **REGRESSÃO** de 🟢 ok → 🔴 error (HTTP 502, 06:44Z) |
-|| `712579b15767` | lorehold-deck-validator | every 60m | sim | 2026-05-28T05:48Z | 63min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: ~07:48Z |
-|| `08468451a06a` | lorehold-mulligan-analyst | every 120m | sim | 2026-05-28T05:19Z | 91min | 🟢 ok | scheduled | sem ação |
-|| `a50bef4c2a59` | lorehold-evolution-oracle | every 360m | sim | 2026-05-28T05:48Z | 62min | 🔴 error | scheduled | **HTTP 502** — provider error transitório (05:48Z), próxima: ~11:48Z |
+|---|---|---|---|---|---|---|---|---|---|
+|| `f20ac299992b` | lorehold-deck-scout | every 240m | sim | 2026-05-28T11:28Z | ~44h | 🔴 error | scheduled |
+|| `712579b15767` | lorehold-deck-validator | every 480m | sim | 2026-05-28T11:19Z | ~44h | 🔴 error | scheduled |
+|| `08468451a06a` | lorehold-mulligan-analyst | every 1440m | sim | 2026-05-28T11:26Z | ~44h | 🔴 error | scheduled |
+|| `a50bef4c2a59` | lorehold-evolution-oracle | every 1440m | sim | 2026-05-28T07:23Z | ~48h | 🔴 error | scheduled |
+
+## Ações Necessárias (bloqueadas por permissão)
+
+> ⚠️ **As seguintes ações NÃO puderam ser executadas** porque o banco de crons ficou inacessível. Devem ser aplicadas assim que `/opt/data/cron/jobs.json` for corrigido.
+
+### Crons Desabilitados (precisam `resume`)
+
+|| Job ID | Nome | Motivo |
+|:-------|:------|:------|
+| `757eefb8738b` | manaloom-master-watchdog | `enabled=false`, último status ok |
+| `660397bb97e1` | manaloom-hermes-normal-audit | `enabled=false`, último status ok |
+| `577a0a669714` | manaloom-code-structure-auditor (weekly) | `enabled=false`, último status error |
+
+### Cron Nunca Executado (precisa `run`)
+
+|| Job ID | Nome | Motivo |
+|:-------|:------|:------|
+| `10a59b3bdf4d` | manaloom-knowledge-synthesis | `last_run_at=null`, never-run |
 
 ## Alertas Pendentes
 
-**5 crons com `last_status=error` nesta rodada** — todos classificados como erro sistêmico de runtime (HTTP 502), não requerendo ação de `resume` ou `run`:
+**🚨 P0 — Banco de crons inacessível:** `/opt/data/cron/jobs.json` com permissão 0600 owned por root. Operador deve corrigir manualmente.
 
-| Job ID | Nome | Erro | Tipo | Ação |
-|:-------|:-----|:-----|:-----|:-----|
-| `f20ac299992b` | lorehold-deck-scout | `RuntimeError: ERROR` (HTTP 502 implícito) | Provider outage transitório (06:44Z) | Auto-recupera na próxima tick (~07:14Z) |
-| `712579b15767` | lorehold-deck-validator | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (~07:48Z) |
-| `a50bef4c2a59` | lorehold-evolution-oracle | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (~11:48Z) |
-| `577a0a669714` | structure-auditor (weekly) | `HTTP 502: Provider returned error` | Provider outage transitório (02:22Z) | Auto-recupera na próxima tick (dom 06:00Z) |
-| `bb03201b8911` | structure-auditor (4h) | `HTTP 502: Provider returned error` | Provider outage transitório (05:48Z) | Auto-recupera na próxima tick (08:00Z) |
+**🔴 P1 — 3 crons desabilitados há ~44h+:** master-watchdog, hermes-normal-audit, code-structure-auditor (weekly).
 
-**Diagnóstico sistêmico:** 5 crons falhando com o mesmo erro HTTP 502 em três ondas (02:22Z, 05:48Z, 06:44Z) caracteriza **provider outage prolongado**, não falha individual de cron. Todos os crons continuam `enabled=true`, `state=scheduled`, e serão reexecutados automaticamente pelo scheduler. Nenhuma ação de `resume` ou `run` é necessária nem recomendada.
+**🔴 P1 — 13 crons com erro:** Todos os crons de conhecimento e import estão falhando há ~44h. Pipeline de conhecimento parado.
 
-**Nenhuma ação corretiva aplicada** — os 5 erros são de runtime (provider 502), não de configuração (disabled, stale, never-run).
+**🟡 P1 — Cron nunca executado:** knowledge-synthesis (10a59b3bdf4d) nunca rodou desde criação.
 
-## Precisão das Functional Tags (tag_accuracy)
+## Mudanças desde Snapshot Anterior
 
-> Última verificação: **2026-05-28T06:21Z** (cron `manaloom-tag-accuracy-reporter`)
+### Crons que Regrediram (🟢 → 🔴 ou 🟢 → desabilitado)
 
-### Resumo Geral
+| Cron | Snapshot anterior (06:57Z) | Agora (07:39Z) |
+|:-----|:---------------------------|:----------------|
+| manaloom-master-watchdog | 🟢 ok | **DESABILITADO** |
+| manaloom-hermes-normal-audit | 🟢 ok | **DESABILITADO** |
+| manaloom-commander-knowledge-deep | 🟢 ok | 🔴 error |
+| manaloom-gamechanger-research | 🟢 ok | 🔴 error |
+| manaloom-manager-watchdog | 🟢 ok | 🔴 error |
+| manaloom-tag-accuracy-reporter | 🟢 ok | 🔴 error |
+| manaloom-mana-base-validator | 🟢 ok | 🔴 error |
+| manaloom-knowledge-import | 🟢 ok | 🔴 error |
+| code-structure-auditor (weekly) | 🔴 error | **DESABILITADO** |
 
-| Métrica | Valor |
-|:--|:--:|
-| Total de tags avaliadas | 29 |
-| Acertos / Total | **378/454** |
-| Precisão global | **83.3%** |
+### Novos Crons
 
-### Tags com 100% de Precisão (15 tags)
-
-| Tag | Amostras |
-|:--|:--:|
-| land | 87 |
-| utility | 76 |
-| ramp | 53 |
-| draw | 32 |
-| removal | 30 |
-| creature | 22 |
-| tutor | 6 |
-| board_wipe | 3 |
-| recursion | 3 |
-| planeswalker | 2 |
-| artifact | 2 |
-| enchantment | 3 |
-| sacrifice_outlet | 1 |
-| finisher | 2 |
-| wipe | 1 |
-
-### Tags Problemáticas (< 50%)
-
-| Tag | Precisão | Amostras | Problema |
-|:--|:--:|:--|:--|
-| **ninja** | **0.0%** | 17 | TODAS as 17 classificações como "ninja" estão erradas |
-| ramp + combo_piece | 0.0% | 1 | Tag composta rara, sem acerto |
-| recursion + wincon | 0.0% | 1 | Tag composta rara, sem acerto |
-| ramp + payoff | 0.0% | 1 | Tag composta rara, sem acerto |
-| payoff + removal | 0.0% | 1 | Tag composta rara, sem acerto |
-| payoff + token_maker | 0.0% | 1 | Tag composta rara, sem acerto |
-| stax_disruption | 0.0% | 3 | 3/3 erradas — classificador confunde stax com outras funções |
-
-### Tags Intermediárias (50-75%)
-
-| Tag | Precisão | Amostras |
-|:--|:--:|:--:|
-| payoff | 35.5% | 31 |
-| combo_piece | 50.0% | 2 |
-| enabler | 50.0% | 42 |
-| other | 50.0% | 2 |
-| protection | 69.2% | 13 |
-| wincon | 75.0% | 8 |
-| engine | 75.0% | 8 |
-
-### Mudanças desde última verificação (02:00Z)
-
-- **Sem mudanças nos dados**: todos os 378/454 acertos e 29 tags permanecem idênticos à última verificação.
-- Nenhuma nova avaliação de tag foi inserida no banco desde 02:00Z.
-- **Status das tags problemáticas:** inalterado — ninja (0.0%, 17 erros), payoff (35.5%, 31 amostras) e enabler (50%, 42 amostras) continuam sendo as maiores fontes de erro.
-- **Recomendação mantida:** revisar heurísticas de `ninja`, `payoff`, `enabler` e `stax_disruption` quando houver bandwidth para ajuste do classificador.
-
-### Análise
-
-**Pontos fortes:**
-- Tags fundamentais (land, utility, ramp, draw, removal) estão em 100% — a base do classificador é sólida.
-- 15 de 29 tags têm precisão perfeita.
-
-**Pontos fracos críticos:**
-1. **ninja (0.0%, 17 erros):** O classificador está atribuindo "ninja" massivamente a cartas que não são ninja. Isso é um viés grave — provavelmente o regex/heurística captura retorno à mão (ninjutsu) mas classifica errado.
-2. **stax_disruption (0.0%, 3 erros):** O classificador não consegue diferenciar stax de outras formas de disruption.
-3. **Tags compostas (todas 0%):** Tags compostas como `ramp + combo_piece`, `payoff + removal` têm amostras muito pequenas (1 cada) e zero acertos. Ou o classificador não deveria gerá-las golden tags, ou precisa de ajuste.
-4. **enabler (50%, 42 amostras):** Metade dos "enablers" estão classificados errados — impacto significativo na análise de decks.
-5. **payoff (35.5%, 31 amostras):** A tag mais problemática em volume. 20 das 31 classificações estão erradas.
-
-**Recomendação:** Revisar as heurísticas de ninja, payoff, enabler e stax_disruption. As tags compostas podem ser reviewedas para verificar se os golden labels estão corretos.
-
-## Mana Base Validation Report
-
-> **Última execução:** 2026-05-28T06:57Z (cron `manaloom-mana-base-validator`)
-> **Decks analisados:** 8
-> **Nota:** Lorehold (deck 6) não possui perfil de referência no diretório de artifacts — sem validação de role_targets.
-
-### Resumo
-
-| Deck | Commander | Status | SQLite Cards | DB Lands | SQLite Lands | Profile Range | Problemas |
-|-----|:----------|:------:|:------------:|:--------:|:-------------:|:-------------:|:----------|
-| 1 — Kinnan, Bonder Prodigy | Kinnan, Bonder Prodigy | 🔴 CRIT | 13 | 29 | 0 | 29-34 | Total Cards 🔴 CRIT (13/100); Lands DB=29 vs SQLite=0 (diff=-29); lands 🔴 CRIT (0 vs 29-34); mana_dorks 🔴 CRIT (4 vs 10-16); interaction_protection 🔴 CRIT (3 vs 9-14) |
-| 2 — EDHREC Average Deck - Dimir Ninja T | Yuriko, the Tiger's Sh | 🟡 WARN | 99 | 33 | 35 | 30-34 | Total Cards 🟡 WARN (99/100); DB total_cards=84 desatualizado vs SQLite=99; lands 🔵 BLUE (35 vs 30-34); interaction 🔵 BLUE (9 vs 10-16) |
-| 3 — EDHREC Average Default | Korvold, Fae-Cursed Ki | 🔴 CRIT | 11 | 25 | 0 | 34-37 | Total Cards 🔴 CRIT (11/100); Lands DB=25 vs SQLite=0 (diff=-25); lands 🔴 CRIT (0 vs 34-37); ramp_treasure 🔴 CRIT (3 vs 10-14) |
-| 4 — EDHREC Average Default | Teysa Karlov | 🔴 CRIT | 80 | 35 | 15 | 35-37 | Total Cards 🔴 CRIT (80/100); Lands DB=35 vs SQLite=15 (diff=-20); lands 🔴 CRIT (15 vs 35-37); ramp 🔴 CRIT (15 vs 9-11) |
-| 5 — Aesi EDHREC Average Default | Aesi, Tyrant of Gyre S | 🔴 CRIT | 100 | 40 | 40 | 39-43 | DB total_cards=79 desatualizado vs SQLite=100; ramp_extra_lands 🔴 CRIT (28 vs 14-18); supplemental_draw 🟡 WARN (12 vs 6-9); protection 🟡 WARN (7 vs 2-4) |
-| 6 — Lorehold Spellslinger | Lorehold, the Historia | ✅ OK | 100 | 35 | 35 | N/A | — (sem perfil de referência) |
-| 7 — EDHREC Average Default — Boros Comb | Winota, Joiner of Forc | 🟡 WARN | 100 | 34 | 34 | 31-35 | protection 🟡 WARN (10 vs 5-8) |
-| 9 — Atraxa, Praetors' Voice — EDHREC Av | Atraxa, Praetor's Voic | 🟡 WARN | 100 | 36 | 36 | 35-38 | ramp_fixing 🔵 BLUE (14 vs 10-13); counter_payoffs 🔵 BLUE (7 vs 8-14); interaction 🔵 BLUE (7 vs 8-13) |
-
-### Achados Críticos
-
-1. **4 decks incompletos/parciais:** Deck 1 (Kinnan, Bonder Prodigy): 13/100; Deck 2 (EDHREC Average Deck - Dimir Ninja): 99/100; Deck 3 (EDHREC Average Default): 11/100; Deck 4 (EDHREC Average Default): 80/100
-2. **4 decks com divergência DB vs SQLite lands:** Deck 1 (Kinnan): DB=29, SQLite=0, Diff=-29; Deck 2 (Yuriko): DB=33, SQLite=35, Diff=+2; Deck 3 (Korvold): DB=25, SQLite=0, Diff=-25; Deck 4 (Teysa): DB=35, SQLite=15, Diff=-20
-3. **Deck 5 (Aesi):** ramp_extra_lands=28 vs perfil 14-18 (CRIT +10 acima do max); supplemental_draw=12 vs perfil 6-9 (WARN +3 acima); protection=7 vs perfil 2-4 (WARN +3 acima); DB total_cards=79 desatualizado vs SQLite=100
-4. **Deck 7 (Winota):** protection_count=10 vs perfil 5-8 (WARN +2 acima do max)
-5. **Deck 6 (Lorehold):** único deck completo sem perfil de referência — não é possível validar role_targets contra EDHREC
-6. **Deck 9 (Atraxa):** finishers=1 vs perfil 4-7 (WARN -3 abaixo); ramp_fixing, counter_payoffs, interaction todos 🔵 BLUE (-1 cada)
-
-### Divergências Lands DB vs SQLite
-
-| Deck | DB total_lands | SQLite lands | Diferença | Status |
-|-----|:---------------|:-------------|:----------|:-------|
-| 1 — Kinnan, Bonder Prodigy | 29 | 0 | -29 | ❌ DIVERGENT |
-| 2 — EDHREC Average Deck - Dimir Ni | 33 | 35 | +2 | ⚠️ WARN |
-| 3 — EDHREC Average Default | 25 | 0 | -25 | ❌ DIVERGENT |
-| 4 — EDHREC Average Default | 35 | 15 | -20 | ❌ DIVERGENT |
-| 5 — Aesi EDHREC Average Default | 40 | 40 | +0 | ✅ OK |
-| 6 — Lorehold Spellslinger | 35 | 35 | +0 | ✅ OK |
-| 7 — EDHREC Average Default — Boros | 34 | 34 | +0 | ✅ OK |
-| 9 — Atraxa, Praetors' Voice — EDHR | 36 | 36 | +0 | ✅ OK |
-
-### Mudanças desde última validação (05:45Z)
-
-- **Sem mudanças estruturais:** todos os decks mantêm os mesmos totais de cartas e lands desde a validação anterior.
-- **Todos os 8 decks com mesmos valores de SQLite e DB** — nenhum insert, update ou delete desde 05:45Z.
-- **Deck 5 (Aesi):** DB total_cards permanece 79 (desatualizado) vs SQLite 100 — não corrigido desde rodada anterior.
-- **Deck 2 (Yuriko):** DB total_cards permanece 84 (desatualizado) vs SQLite 99 — não corrigido.
-- **Decks 1, 3, 4** continuam com dados incompletos (inserts parciais de imports anteriores).
-- **Nenhum novo deck inserido ou removido** desde última validação.
-- **Todas as violações de role_targets** (lands CRIT em decks 1,3,4; ramp_extra_lands CRIT em deck 5) **permanecem idênticas**.
-
----
+| Cron | Status |
+|:-----|:-------|
+| manaloom-logic-coherence-auditor (de6fb777f5d1) | 🔴 error |
+| manaloom-knowledge-synthesis (10a59b3bdf4d) | never-run |
 
 ## Observações Importantes
 
-- **5 crons com erro** (todos `enabled=true`, `state=scheduled`): 5× HTTP 502 (provider outage sistêmico — 3 ondas: 02:22Z, 05:48Z, 06:44Z). **Nenhum requeriu `resume`/`run`** — todos são erros de runtime transitórios.
-- `origin/master` estável sem novos commits desde a última análise (HEAD: 771c9318). Produção confirma mesmo SHA via `/health`.
-- `dart` e `flutter` continuam presentes (`/opt/data/tools/flutter/bin/`).
-- Apenas este arquivo (`CRON_STATUS.md`) foi atualizado intencionalmente nesta rodada.
-- **Regressões desde snapshot anterior (06:38Z):** `lorehold-deck-scout` (f20ac299992b) regrediu de 🟢 ok → 🔴 error (HTTP 502 às 06:44Z). `manaloom-knowledge-import` (b2f5c21ce2d7) recuperou-se de 🔴 error → 🟢 ok.
-- **Nenhuma ação de recuperação** aplicada — todos os 5 erros são transitórios de provider, não de configuração.
+- **Branch era `codex/hermes-fixes-f0-f3`** no início da execução. Trocado para `codex/hermes-analysis-docs` com `git checkout --force`. Vários arquivos em `docs/hermes-analysis/` mostraram "Permission denial" na troca — possivelmente root-owned naquele momento por outra execução de cron.
+- **`/opt/data/cron/jobs.json`** ficou inacessível (root 0600) durante parte da execução, bloqueando `resume`/`run`. Snapshot inicial de 17 crons foi obtido com sucesso.
+- Os **3 crons desabilitados** provavelmente foram pausados por um branch switch (padrão documentado).
+- A degradação de 5→13 erros em ~48h sugere que o manager-watchdog anterior também não conseguiu recuperar os crons (possivelmente mesmo bloqueio de permissão).
+
+---
+
+*Snapshot: 2026-05-30T07:39Z | Branch: codex/hermes-analysis-docs | Fleet: 17 crons*
