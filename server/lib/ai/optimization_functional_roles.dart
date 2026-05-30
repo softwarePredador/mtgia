@@ -65,18 +65,19 @@ CardRoles resolveCardFunctionalRoles({
     }
   }
 
+  final normalizedName = (name ?? '').trim().toLowerCase();
   if (oracleText != null && oracleText.isNotEmpty) {
     final heuristicRoles = _resolveHeuristicRoles(
       oracleText: oracleText,
       typeLine: typeLine ?? '',
-      name: name ?? '',
+      name: normalizedName,
       manaCost: manaCost,
       cmc: cmc,
     );
     if (heuristicRoles.isNotEmpty) {
       return CardRoles(
         roles: heuristicRoles,
-        primaryRole: _selectPrimaryRole(heuristicRoles),
+        primaryRole: _selectPrimaryRole(heuristicRoles, name: normalizedName),
         source: 'heuristic',
       );
     }
@@ -196,8 +197,15 @@ Set<String> _resolveHeuristicRoles({
   return roles;
 }
 
-String _selectPrimaryRole(Set<String> roles) {
+String _selectPrimaryRole(Set<String> roles, {String name = ''}) {
   if (roles.isEmpty) return 'utility';
+  // Curated known-name roles always take priority over generic heuristic matches
+  if (name.isNotEmpty) {
+    if (_knownWinconNames.contains(name) && roles.contains('wincon')) return 'wincon';
+    if (_knownComboPieceNames.contains(name) && roles.contains('combo_piece')) return 'combo_piece';
+    if (_knownEngineNames.contains(name) && roles.contains('engine')) return 'engine';
+    if (_knownProtectionNames.contains(name) && roles.contains('protection')) return 'protection';
+  }
   for (final role in const [
     'wipe', 'wincon', 'combo_piece', 'engine', 'payoff',
     'draw', 'removal', 'ramp', 'tutor', 'protection',
@@ -364,6 +372,7 @@ const _knownComboPieceNames = <String>{
 
 const _knownProtectionNames = <String>{
   'fierce guardianship', 'deflecting swat', 'swiftfoot boots',
+  'endurance',
 };
 
 // ============================================================================

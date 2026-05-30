@@ -386,7 +386,7 @@ void main() {
 
       expect(optimizationFunctionalRolesForCard(card, semanticOnly: true),
           isEmpty);
-      expect(classifyOptimizationFunctionalRole(card), equals('draw'));
+      expect(classifyOptimizationFunctionalRole(card), equals('engine'));
     });
 
     test('classifies curated semantic staples before oracle fallback roles',
