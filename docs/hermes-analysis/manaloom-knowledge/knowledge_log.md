@@ -1,5 +1,9 @@
 # Knowledge Log — ManaLoom Deck Analysis
 
+
+## Aesi, Tyrant of Gyre Strait — 2026-05-30 (Reanálise Estruturada)
+Reanálise concisa do Aesi EDHREC average: motor dual draw+land-drop num único slot, 40 terrenos como spells CMC-zero triplamente funcionais, e estratégia de resiliência via recast massivo em vez de proteção. Gaps ManaLoom persistentes: 4 cartas com tags incorretas (Aesi, Tatyova, Avenger, Cyclonic Rift). Insight chave: Cyclonic Rift é a remoção perfeita porque preserva terrenos — não destrói nada do próprio board.
+
 ## Aesi, Tyrant of Gyre Strait — 2026-05-30
 Aesi é o único comandante UG que dá extra land drop + card draw simultaneamente, funcionando como motor completo de draw/ramp em um slot. Com 40 terrenos e 23 fontes de ramp, cada land drop cascateia em valor (carta + token + contador). Vulnerabilidade central: apenas 2 proteções — a estratégia é recastar Aesi rapidamente via ramp massiva em vez de protegê-la.
 
