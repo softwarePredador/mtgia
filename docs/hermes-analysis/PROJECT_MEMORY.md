@@ -10,9 +10,9 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Estado em 2026-05-28: **PASS_WITH_RISKS** para release interno non-scanner; master sem novos commits desde 771c9318
-- Backend tests: 599 (2026-05-27), mantido
-- Master HEAD: 771c9318 (2026-05-27, Harden semantic scorecard runner)
+- Estado em 2026-05-30: **PASS_WITH_RISKS** para release interno non-scanner; 22 novos commits desde 3f7d784f
+- Backend tests: 599+ (2026-05-30), modularização F0-F3 em progresso
+- Master HEAD: 21768cca (2026-05-30, Layout: tablet viewport test)
 
 ## Branch de analise
 

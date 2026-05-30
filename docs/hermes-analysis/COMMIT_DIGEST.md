@@ -13,7 +13,91 @@
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 
-## Novos commits nesta rodada (2026-05-29)
+
+## Novos commits nesta rodada (2026-05-30)
+
+### `21768cca` — Layout: add tablet viewport test (820px) to deck_card_overflow_test (2026-05-30, atual HEAD)
+- **1 arquivo**, **+16 linhas**
+- **Tipo: TEST/LAYOUT** — Teste de viewport tablet (820px) para deck_card_overflow_test
+
+### `8ef05d99` — Layout: add overflow test for TradeDetailScreen
+### `df889a38` — Layout: add overflow test for BinderTabContent
+### `e113215f` — Layout: add overflow test for LotusLifeCounterScreen
+- **Tipo: TEST/LAYOUT** — Suite de testes de overflow/responsividade para telas core (320px, 375px, 280px + text scaler)
+
+### `49b6b1e1` — docs: comprehensive layout test map
+- **1 arquivo**, **+134 linhas**
+- **Tipo: DOC** — Mapeamento completo de testes de layout: overflow, golden, responsive, WebView DOM
+
+### `7ed5b863` — P3: Update CONTEXTO_PRODUTO_ATUAL.md
+- **1 arquivo**, **+51 linhas**
+- **Tipo: DOC** — Reflete extrações F0-F3, bracket expansion, card_deck_profiles, status Hermes
+
+### `3fb17356` — P2: Expand _looksLikePayoff to detect direct damage payoffs
+- **1 arquivo**, **+4 linhas**
+- **Tipo: CODE/FEATURE** — ETB/cast triggers (Impact Tremors, Guttersnipe, Purphoros) agora detectados como payoff
+
+### `d8b7b26b` — P1: Integrate card_deck_profiles into filterUnsafeOptimizeSwapsByCardData
+- **1 arquivo**, **+23 linhas**
+- **Tipo: CODE/FEATURE** — Protege cartas core da remoção, permite swaps de filler cards
+
+### `ae886b11` — P1: Expand BracketCategory enum with 5 new categories
+- **1 arquivo**, **+122 linhas**
+- **Tipo: CODE/FEATURE** — boardWipe, cardAdvantage, stax, protection, valueEngine. Agora detecta 53/53 Game Changers
+
+### `516e79cc` — Cleanup: remove duplicate response builders from index.dart
+- **1 arquivo**, **-86 linhas**
+- **Tipo: CODE/HIGIENE** — Remove 88 linhas duplicadas (já em optimize_response_support.dart)
+
+### `0aa939eb` — Fix P2: add wipe to _criticalRolesForArchetype for all archetypes
+- **2 arquivos**, **+8 linhas**
+- **Tipo: CODE/FIX** — Alinha _looksLikeOffThemeRoleSwap, validação estrita para Commander imports
+
+### `2320310c` — F3d: Extract optimize_route_internal.dart (430 lines) from optimize/index.dart
+- **2 arquivos**, **+584 linhas**
+- **Tipo: CODE/MODULARIZATION** — optimize/index.dart: 3589→3162 linhas
+
+### `e201d4b0` — Docs: list all truthy values for SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES flag
+- **Tipo: DOC** — Documentação de valores truthy aceitos
+
+### `e84f3457` — F3: Extract optimize_filler_loader_support.dart (~1300 lines)
+- **4 arquivos**, **+1342 linhas**
+- **Tipo: CODE/MODULARIZATION** — optimize_runtime_support.dart: 4028→2718 linhas
+
+### `8b4ed523` — Fix: resolve merge test failures
+- **2 arquivos**, **+13 linhas**
+- **Tipo: CODE/FIX** — curated name priority em _selectPrimaryRole + testes atualizados
+
+### `797d6518` — Merge master: resolve conflicts in optimization_functional_roles and tests
+- **6 arquivos**, **+71 linhas**
+- **Tipo: CODE/MERGE**
+
+### `9230ae93` — Add Hermes operating protocol
+- **1 arquivo**, **+84 linhas**
+- **Tipo: DOC** — Protocolo operacional Hermes
+
+### `45431b41` — Fix semantic optimize route contract analysis
+- **Tipo: CODE/FIX**
+
+### `0f583310` — F3: Plan for breaking optimize gargalhos into submodules
+- **2 arquivos**, **+223 linhas**
+- **Tipo: DOC/PLAN** — Plano de modularização do domínio optimize
+
+### `a751fa5c` — F2: Add migration to remove unused write-only tables
+- **1 arquivo**, **+16 linhas**
+- **Tipo: CODE/DB** — Migração para remover tabelas write-only não utilizadas
+
+### `eb051a80` — F1: Card Roles adapter — unify functional role resolution
+- **1 arquivo**, **+363 linhas**
+- **Tipo: CODE/REFACTOR** — Unifica resolução de roles funcionais
+
+### `2ad9a55a` — F0: Semantic V2 expanded critical roles behind flag
+- **3 arquivos**, **+70 linhas**
+- **Tipo: CODE/FEATURE** — Base do feature flag para expanded critical roles
+
+---
+
+## Novos commits anteriores (2026-05-29)
 
 ### `3f7d784f` — Guard expanded semantic roles behind flag (2026-05-29, atual)
 - **7 arquivos**, código + doc + testes.
