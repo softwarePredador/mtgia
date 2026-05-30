@@ -180,16 +180,19 @@ gate ainda nao carregam `card_function_tags` e reduzem v2 a um role unico.
   restam swaps validos, a resposta pode incluir
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
-- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**:
-  `server/lib/sync_cards_utils.dart` foi resolvido em
-  `origin/master@2396956e`: o CLI ativo `server/bin/sync_cards.dart` agora
-  importa e usa seus helpers no full sync, incremental sync, oracle IDs e
-  legalidades. O helper incremental foi alinhado ao INSERT real de 12 colunas
-  (`collector_number`, `foil`). A limpeza de backend em
-  `origin/master@dafffc1b` removeu `tryGetRequestId`,
-  `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
-  e `buildCandidateQualitySamplePoolSql`. `PerformanceService` permanece como
-  API publica intencional de observabilidade mobile.
+- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
+  2026-05-30 07:00 UTC como aberto no checkout local
+  `codex/hermes-analysis-docs@af3d8575`. `server/lib/sync_cards_utils.dart`
+  segue importado apenas por teste, enquanto `server/bin/sync_cards.dart` mantem
+  copias privadas/inline de parse/extracao. Tambem seguem sem chamador runtime
+  confirmado `getRequestTrace`/`tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`,
+  `buildLoreholdReferenceCardStatsFromProfile`,
+  `extractMtgTop8FormatCodeFromSourceUrl`,
+  `buildCandidateQualitySamplePoolSql`,
+  `summarizeAggressiveOptimizeUtilitySamples` e a API manual de metricas de
+  `PerformanceService`. As anotacoes historicas de resolucao em outros SHAs nao
+  foram aplicadas como evidencia para esta branch.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

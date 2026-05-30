@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-30 05:30 UTC
+> Data: 2026-05-30 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -46,13 +46,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     **RESOLVIDO em `origin/master@4913a733`**. Sucessos com sugestoes filtradas
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
-12. **P1/P2 — Funcoes publicas sem chamador runtime**:
-    `sync_cards_utils.dart` foi **RESOLVIDO em `origin/master@2396956e`** e
-    agora e usado pelo `server/bin/sync_cards.dart`. Permanecem abertos
-    wrappers/helpers sem chamador em request trace, Commander Reference,
-    MTGTop8 e candidate quality sample SQL ate `origin/master@dafffc1b`.
-    Apos `dafffc1b`, estes helpers mortos foram removidos; `PerformanceService`
-    permanece como API publica intencional de observabilidade mobile.
+12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
+    `codex/hermes-analysis-docs@af3d8575` (2026-05-30 07:00 UTC) como **ABERTO
+    neste checkout**. `sync_cards_utils.dart` segue importado apenas por teste,
+    enquanto `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma
+    logica. Tambem seguem sem chamador runtime confirmado wrappers/helpers em
+    request trace, Commander Reference, MTGTop8, candidate quality, optimize
+    utility samples e a API manual de metricas de `PerformanceService`.
 13. **P1/P2 — Imports quebrados e ciclo app**: **RESOLVIDO para app em
     `origin/master@640f4ab4`.** `deck_analysis_tab.dart` e
     `life_counter_screen.dart` usam imports `package:manaloom/...`, e o ciclo
@@ -424,57 +424,65 @@ entrypoint local backend em `origin/master@a830f9f3`.**
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-05-29:** `sync_cards_utils.dart` **RESOLVIDO em
-`origin/master@2396956e`**. A limpeza de helpers publicos sem chamador foi
-**RESOLVIDA em `origin/master@dafffc1b`** para os simbolos backend confirmados
-como mortos. `PerformanceService` foi mantido por ser API publica de
-observabilidade mobile e nao deve ser removido sem decisao de produto.
+**Status 2026-05-30 07:00 UTC:** **REABERTO no checkout local
+`codex/hermes-analysis-docs@af3d8575`**. As anotacoes historicas de resolucao em
+outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
+presentes e sem chamador runtime confirmado.
 
 - **Evidência**:
-  - Resolvido: `server/bin/sync_cards.dart` importa `sync_cards_utils.dart` e
-    usa `parseSinceDays`, `getNewSetCodesSinceFromData`, `extractCardRow`,
-    `extractSetCardRow`, `extractOracleIds` e `extractLegalities`.
-  - Resolvido: as copias privadas `_parseSinceDays`,
-    `_getNewSetCodesSinceFromData` e `_extractCardRow` foram removidas do CLI.
-  - Resolvido: `extractSetCardRow` agora cobre o shape operacional incremental
-    de 12 colunas, incluindo `collector_number` e `foil`.
-  - Resolvido em `dafffc1b`: `server/lib/request_trace.dart` removeu
-    `tryGetRequestId`; `getRequestTrace` ficou como wrapper minimo ainda
-    disponivel para consumidores futuros.
-  - Resolvido em `dafffc1b`:
-    `server/lib/ai/commander_reference_profile_support.dart` removeu
-    `normalizedCommanderReferenceCandidate`; consumidores seguem usando
-    `normalizeCommanderReferenceName`.
+  - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:116`, `:161` e
+    `:172` definem helpers cobertos por `server/test/sync_cards_test.dart`, mas
+    `grep` nao encontrou import desse arquivo em `server/bin`, `server/lib`
+    runtime ou rotas. `server/bin/sync_cards.dart:9`-`:10` importa apenas
+    `database.dart` e `mtg_data_integrity_support.dart`, e ainda possui
+    `_parseSinceDays` em `:376`-`:384`, montagem incremental inline em
+    `:604`-`:663`, `_extractCardRow` em `:679` e coleta de oracle IDs/legalidade
+    inline em `:806`-`:839`.
+  - `server/lib/request_trace.dart:48` e `:51` definem
+    `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
+    `context.read<RequestTrace>()` diretamente, por exemplo
+    `server/lib/auth_middleware.dart:57`, `server/lib/observability.dart:225`,
+    `server/routes/trades/index.dart:332` e
+    `server/routes/conversations/[id]/messages.dart:249`.
+  - `server/lib/ai/commander_reference_profile_support.dart:49` define
+    `normalizedCommanderReferenceCandidate`; consumidores ativos usam
+    `normalizeCommanderReferenceName` diretamente.
+  - `server/lib/ai/commander_reference_card_stats_support.dart:257` define
+    `buildLoreholdReferenceCardStatsFromProfile`, mas a busca encontrou apenas
+    teste e definicao; o builder generico e usado no runtime em `:368`.
+  - `server/lib/meta/mtgtop8_meta_support.dart:139` define
+    `extractMtgTop8FormatCodeFromSourceUrl`; a busca encontrou apenas teste e
+    definicao. O helper de event id vizinho segue usado pelo reparo operacional.
+  - `server/lib/ai/candidate_quality_data_support.dart:631` define
+    `buildCandidateQualitySamplePoolSql`; o runner operacional monta pools por
+    `_loadCandidateCards`/`_buildSampleCandidatePools`.
+  - `server/lib/ai/optimize_runtime_support.dart:3326` define
+    `summarizeAggressiveOptimizeUtilitySamples`; a busca encontrou apenas teste
+    e definicao.
   - `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
     `:210`, `:220` e `:248` expõem traces/metricas/debug manuais sem chamador
-    em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init`,
-    `traceAsync` e `PerformanceNavigatorObserver`.
-  - Resolvido em `dafffc1b`: `server/lib/meta/mtgtop8_meta_support.dart`
-    removeu `extractMtgTop8FormatCodeFromSourceUrl`; o helper de event id
-    vizinho continua usado por `server/bin/repair_mtgtop8_meta_history.dart`.
-  - Resolvido em `dafffc1b`:
-    `server/lib/ai/candidate_quality_data_support.dart` removeu
-    `buildCandidateQualitySamplePoolSql` e o teste test-only correspondente.
+    em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init` e
+    `PerformanceNavigatorObserver`, e `traceAsync` aparece somente no smoke de
+    observabilidade.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
-  caso de helpers publicos restantes. O risco especifico do sync de cartas foi
-  encerrado; os testes agora exercitam helpers usados pelo CLI operacional.
+  caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
+  porque o teste cobre uma copia que nao participa do CLI operacional.
 - **Ação recomendada**:
-  1. manter `sync_cards_utils.dart` como fonte compartilhada do sync e evitar
-     reabrir copias privadas no CLI;
-  2. manter `PerformanceService` como API publica enquanto houver plano de
-     observabilidade mobile/manual traces; se a decisao mudar, abrir rodada
-     propria com validacao app;
-  3. continuar usando busca de chamadores como guardrail antes de adicionar
+  1. decidir se `sync_cards_utils.dart` e fonte compartilhada real ou harness
+     legado; se for fonte real, importar no CLI e remover as copias privadas;
+  2. para cada wrapper test-only, ligar ao runner/rota esperado ou remover o
+     helper e o teste correspondente;
+  3. manter `PerformanceService` como API publica apenas se houver plano de
+     observabilidade mobile/manual traces; caso contrario, simplificar para
+     `init` + observer + `traceAsync`;
+  4. continuar usando busca de chamadores como guardrail antes de adicionar
      novos helpers publicos.
 - **Validação**:
-  - `grep -RIn "sync_cards_utils" server` encontra o binario ativo;
-  - `dart analyze bin lib routes test` e `dart test` em `server/` passaram em
-    `origin/master@2396956e`;
-  - buscas pelos simbolos removidos retornam apenas historico/docs, nao codigo
-    runtime;
-  - `dart analyze bin lib routes test` e `dart test` em `server/` passaram em
-    `origin/master@dafffc1b`;
-  - testes de sync/candidate quality continuam verdes depois da decisao.
+  - `grep -RIn "sync_cards_utils" server` encontra o binario ativo, ou o arquivo
+    deixa de existir;
+  - `dart analyze` e testes focados do sync/Commander Reference/meta/candidate
+    quality continuam verdes;
+  - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
 - **Status 2026-05-29 23:05 UTC:** REABERTO no checkout local `b071080e`.
