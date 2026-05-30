@@ -337,7 +337,10 @@ bool _looksLikeComboPiece(String oracle) =>
 bool _looksLikePayoff(String oracle) =>
     (oracle.contains('whenever') && oracle.contains('create') && oracle.contains('token')) ||
     (oracle.contains('whenever you cast') && oracle.contains('copy')) ||
-    (oracle.contains('whenever you cast') && oracle.contains('scry'));
+    (oracle.contains('whenever you cast') && oracle.contains('scry')) ||
+    (oracle.contains('whenever') && oracle.contains('deals') && oracle.contains('damage') &&
+        (oracle.contains('each opponent') || oracle.contains('any target') ||
+         oracle.contains('target opponent')));
 
 bool _looksLikeEnabler(String oracle) =>
     oracle.contains('instant and sorcery spells you cast cost') ||
