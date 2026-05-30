@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-29.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-30.
 
 ## Estrutura do repositorio
 
@@ -140,13 +140,32 @@ mtgia/
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclo local fora do recorte do auditor base**: resolvido para app em `origin/master@640f4ab4` e para o entrypoint local backend em `origin/master@a830f9f3`. `deck_analysis_tab.dart` e `life_counter_screen.dart` usam imports `package:manaloom/...`; `CommunityDeckDetailScreen` e `UserProfileScreen` nao se importam mais mutuamente e navegam via GoRouter (`/community/user/:userId`, `/community/decks/:deckId`). Grafo local de imports em `app/lib`: `SCCS 0`. `local_test_server.dart` agora valida `.dart_frog/server.dart` apenas em runtime e segue analisavel em clones limpos.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
-- **P1 — Ownership app-facing de IA/deck revalidado como resolvido no `master` atual**: `POST /ai/optimize` passa `userId` obrigatorio para `loadOptimizeDeckContext`, que escopa `decks` por `id + user_id`; `POST /ai/archetypes` le `context.read<String>()` e tambem escopa deck por owner; `GET /ai/optimize/jobs/:id` bloqueia jobs sem owner e non-owner. `GET /decks/:id/simulate` foi reforcado em `origin/master@a466adb6`: a query de `deck_cards` tambem faz `JOIN decks` e filtra `d.user_id`. `server/test/experimental_deck_ai_authorization_source_test.dart` cobre archetypes, simulate, recommendations, matchup e weakness-analysis. Rotas experimentais continuam advisory/not-proven para UX ate haver contrato runtime especifico, mas nao ficam abertas por falta de owner-scope no codigo atual.
+- **P1 — Ownership app-facing de IA/deck reaberto no checkout local `b071080e`**: a rodada de coerencia de 2026-05-29 23:05 UTC encontrou drift entre app, rotas e support. `POST /ai/optimize` e chamado pelo app com `deck_id`, mas `server/routes/ai/optimize/index.dart` nao passa `userId` para `loadOptimizeDeckContext`, e `server/lib/ai/optimize_request_support.dart` consulta `decks`/`deck_cards` somente por `id`. `POST /ai/archetypes` tambem e chamado pelo app, mas a rota busca `SELECT name, format FROM decks WHERE id = @id` e cartas por `dc.deck_id = @id`, sem owner-scope. `GET /ai/optimize/jobs/:id` ainda aceita jobs com `user_id = NULL` porque so bloqueia quando `job.userId != null && job.userId != userId`. Corrigir antes de tratar esses endpoints como owner-safe; `GET /decks/:id/simulate` permanece citado historicamente como reforcado em `origin/master@a466adb6`, mas nao foi o foco desta rodada.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado em 2026-05-29 19:00 UTC. `resolveOptimizeArchetype` diverge entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`; heuristicas semanticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart` com regras diferentes; `_isBasicLandName` tem variantes em optimize, generated deck validation, meta reference e commander-reference; utilitarios de request/payload repetem-se em rotas de trades/conversations; trust SQL/serializer de trades/marketplace, normalizacao de `condition` e helpers de CMC/tipo tambem continuam duplicados.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
-- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local `codex/hermes-analysis-docs@7014a2cc`, essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado em 2026-05-30 05:30 UTC. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao e bonus por nome. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-05-30 classificou como permitidos exemplos de UI/import, aliases localizados manuais e seeds/corpus Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve ganhar fonte/versionamento/teste dedicado.
+
+## Pipeline semantico de cartas
+
+Fluxo desejado para qualquer decisao de utilidade no core de decks:
+
+1. Preferir dados persistidos e versionados: `card_function_tags`,
+   `card_semantic_tags_v2`, `card_role_scores`, Commander Reference/meta e
+   rejection penalties.
+2. Usar fallback por `oracle_text`, `type_line`, `mana_cost`, `cmc`, legalidade,
+   identidade de cor, bracket e budget quando o dado persistido nao existir ou
+   estiver abaixo do limiar de confianca.
+3. Manter excecoes por nome somente como policy versionada ou seed/corpus
+   declarado, nunca como lista inline espalhada por classificadores, gates e
+   rotas.
+
+Estado atual revalidado: deck analysis segue mais proximo do fluxo desejado
+porque usa `card_function_tags` e `semantic_tags_v2`; optimize/validator/quality
+gate ainda nao carregam `card_function_tags` e reduzem v2 a um role unico.
 - **P2 — Fallback de semantic v2 baixa confianca**: revalidado e coberto em
   `origin/master@c3531df7`. Tags semantic v2 abaixo de 0.65 sao ignoradas e a
   classificacao cai para heuristica por `oracle_text`/`type_line`.
@@ -161,16 +180,19 @@ mtgia/
   restam swaps validos, a resposta pode incluir
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
-- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**:
-  `server/lib/sync_cards_utils.dart` foi resolvido em
-  `origin/master@2396956e`: o CLI ativo `server/bin/sync_cards.dart` agora
-  importa e usa seus helpers no full sync, incremental sync, oracle IDs e
-  legalidades. O helper incremental foi alinhado ao INSERT real de 12 colunas
-  (`collector_number`, `foil`). A limpeza de backend em
-  `origin/master@dafffc1b` removeu `tryGetRequestId`,
-  `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
-  e `buildCandidateQualitySamplePoolSql`. `PerformanceService` permanece como
-  API publica intencional de observabilidade mobile.
+- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
+  2026-05-30 07:00 UTC como aberto no checkout local
+  `codex/hermes-analysis-docs@af3d8575`. `server/lib/sync_cards_utils.dart`
+  segue importado apenas por teste, enquanto `server/bin/sync_cards.dart` mantem
+  copias privadas/inline de parse/extracao. Tambem seguem sem chamador runtime
+  confirmado `getRequestTrace`/`tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`,
+  `buildLoreholdReferenceCardStatsFromProfile`,
+  `extractMtgTop8FormatCodeFromSourceUrl`,
+  `buildCandidateQualitySamplePoolSql`,
+  `summarizeAggressiveOptimizeUtilitySamples` e a API manual de metricas de
+  `PerformanceService`. As anotacoes historicas de resolucao em outros SHAs nao
+  foram aplicadas como evidencia para esta branch.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
