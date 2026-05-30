@@ -124,6 +124,77 @@ Este snapshot: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
 
 ---
 
+## Mana Base Validation Report (manaloom-mana-base-validator)
+
+> Relatório gerado automaticamente. Última atualização: **2026-05-30T14:47Z**
+
+**Decks analisados:** 8
+**Critérios:** Lands vs perfil EDHREC, Ramp/Draw/Remoção vs ranges do perfil
+**Thresholds:** diff=0 ✅ OK | diff=1 🔵 BLUE | diff 2-3 🟡 WARN | diff≥4 🔴 CRIT
+**Regras especiais:** SUM(quantity) < 50 → ⚪ INCOMPLETE DATA | Sem perfil → ✅ OK (sem perfil) | 99/100 cards = 🟡 WARN (within tolerance)
+
+### Resumo Geral
+
+| # | Deck | Total Cards | Status | Lands SQLite | Lands Perfil | Observação |
+|---|------|:-----------:|:------:|:------------:|:------------:|------------|
+| 1 | Kinnan, Bonder Prodigy | 13/100 | ⚪ INCOMPLETE | 0 | 29-34 | Apenas 13/100 cartas inseridas |
+| 2 | EDHREC Average - Dimir Ninja Topdeck Tempo | 99/100 | 🟡 WARN | 35 | 30-34 | 99/100 cards (1 short); Lands 35 vs 30-34 |
+| 3 | EDHREC Average Default (Korvold) | 11/100 | ⚪ INCOMPLETE | 0 | 34-37 | Apenas 11/100 cartas inseridas |
+| 4 | EDHREC Average Default (Teysa) | 80/100 | 🔴 CRIT | 15 | 35-37 | Teysa: 80 cards, lands=15 (perfil 35-37), ramp CRIT |
+| 5 | Aesi EDHREC Average Default | 100/100 | 🟡 WARN | 40 | 39-43 | protection: DB=7 vs perfil [2-4] |
+| 6 | Lorehold Spellslinger | 100/100 | ✅ OK | 35 | — | Sem perfil de referência |
+| 7 | EDHREC Average - Boros Combat Trigger Humans | 100/100 | 🟡 WARN | 34 | 31-35 | protection: DB=10 vs perfil [5-8] |
+| 9 | Atraxa EDHREC Average (41k decks) | 100/100 | ✅ OK | 36 | 35-38 | Dentro do perfil |
+
+### Detalhamento — Decks Com Perfis EDHREC
+
+**Deck #4: EDHREC Average Default (Teysa Karlov)** — 🔴 CRIT
+- Total: 80/100 cards | Lands: 15 (perfil: 35-37)
+- 🔴 Incomplete deck: apenas 80/100 cartas inseridas (faltam 20)
+- 🔴 Lands 15 está 20 abaixo do perfil [35-37]
+- 🔴 ramp: DB=15 vs perfil [9-11] (4 acima)
+- 🔵 board_wipes: DB=1 vs perfil [2-4]
+- 🔵 recursion: DB=3 vs perfil [4-7]
+- **Nota:** EDHREC aggregate parcial — deck não está completo, métricas podem não representar deck real.
+
+**Deck #5: Aesi EDHREC Average Default** — 🟡 WARN
+- Total: 100/100 cards | Lands: 40 (perfil: 39-43)
+- 🟡 protection: DB=7 vs perfil [2-4] (d=3)
+- ✅ Lands 40 in [39-43]
+
+**Deck #7: EDHREC Average - Boros Combat Trigger Humans (Winota)** — 🟡 WARN
+- Total: 100/100 cards | Lands: 34 (perfil: 31-35)
+- 🟡 protection: DB=10 vs perfil [5-8] (d=2)
+- ✅ Lands 34 in [31-35]
+
+**Deck #9: Atraxa EDHREC Average (41k decks)** — ✅ OK
+- Total: 100/100 cards | Lands: 36 (perfil: 35-38)
+- ✅ Lands 36 in [35-38]
+
+### Decks com Dados Incompletos (SUM(quantity) < 50)
+
+| # | Deck | Total Cards | Motivo |
+|---|------|:-----------:|--------|
+| 1 | Kinnan, Bonder Prodigy | 13/100 | cEDH seed — apenas 13 cartas inseridas |
+| 3 | EDHREC Average Default (Korvold) | 11/100 | Estatística agregada EDHREC, não deck real |
+
+**Ação:** Estes decks precisam de inserção completa. Métricas de mana não são significativas.
+
+### Decks Sem Perfil de Referência
+
+| # | Deck | Total Cards | Nota |
+|---|------|:-----------:|------|
+| 6 | Lorehold Spellslinger | 100/100 | Sem profile no artifact — validação manual |
+
+**Nota:** Sem perfil não podem ser validados contra EDHREC. ✅ OK (sem perfil).
+
+---
+*Validação: 2026-05-30T14:47Z | validate_mana.py | 8 decks (5 c/ perfil, 2 incompletos, 1 s/ perfil)*
+
+**Legenda:** ✅ OK | 🟡 WARN (d=2-3) | 🔴 CRIT (d≥4) | ⚪ INCOMPLETE (<50 cards)
+
+---
+
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
 > Relatório gerado automaticamente. Última atualização: **2026-05-30T14:34Z**
