@@ -18,10 +18,12 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 5. **P1 — Ownership em rotas deck/AI**: **REABERTO no checkout local `b071080e`**. A rodada de coerencia de 2026-05-29 23:05 UTC mostrou que `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing.
 6. **P1 — Politicas por nome / semantica de cartas**: reaberto no checkout local `7014a2cc`. `commander_fallback_policy.dart` nao existe nesta branch, e ainda ha excecoes por nome em `functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart` e rotas de recomendacao.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-29 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
-8. **P1/P2 — Classes app sem uso de runtime confirmado**: rodada focada de
-   2026-05-29 confirmou `LifeCounterScreen` legado sem chamada em `app/lib`,
-   `DeckCard` testado mas fora da listagem real, `DeckProgressChip` sem
-   chamador e `LotusPresentationMode` sem import.
+8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado na
+   rotacao local Codex de 2026-05-30 03:00 UTC. `LifeCounterScreen` segue como
+   caminho legado sem chamada runtime em `app/lib`; `DeckCard` continua testado
+   mas sem import/chamada na listagem real; `DeckProgressChip` nao tem chamada
+   de construtor; `LotusPresentationMode` nao tem import nem chamada para
+   `enter()`/`exit()`.
 9. **P1 — Drift entre deck analysis e optimize**: deck analysis prefere
    `card_function_tags`, mas optimize/validator/quality gate carregam apenas
    `semantic_tags_v2` e heuristica; alem disso, `semantic_tags_v2` multi-tag e
@@ -548,19 +550,29 @@ observabilidade mobile e nao deve ser removido sem decisao de produto.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
+- **Status 2026-05-30 03:00 UTC: REVALIDADO.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:283` usa
     `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
-    `LifeCounterScreen` apenas no proprio arquivo.
+    `LifeCounterScreen(` apenas no proprio arquivo. Os testes
+    `app/test/features/home/life_counter_screen_test.dart:1`-`:2` e
+    `app/test/features/home/life_counter_clone_proof_test.dart:1`-`:2`
+    declaram explicitamente que essa cobertura e legado/paridade historica e
+    que o caminho vivo mira `LotusLifeCounterScreen`.
   - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
-    listagem ativa usa `_DeckSpotlightCard` e `_DeckGalleryCard` em
-    `app/lib/features/decks/screens/deck_list_screen.dart`; `DeckCard` aparece
-    apenas em testes.
+    busca por `DeckCard(` em `app/lib` encontrou somente classes privadas com
+    nomes similares (`_RecentDeckCard`, `_EmptyDeckCard`, `_CommunityDeckCard`,
+    `_FollowingDeckCard`) e a propria definicao. `DeckCard` aparece apenas em
+    `app/test/features/decks/widgets/deck_card_test.dart` e
+    `app/test/features/decks/widgets/deck_card_overflow_test.dart`.
   - `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` define
-    `DeckProgressChip`, sem ocorrencias alem de declaracao/construtor.
+    `DeckProgressChip`, sem ocorrencias alem de declaracao/construtor em
+    `app/lib` e `app/test`. `DeckProgressIndicator` no mesmo arquivo permanece
+    usado e nao faz parte deste achado.
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
-    `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()`.
+    `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
+    `app/lib` ou `app/test`.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
