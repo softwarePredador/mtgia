@@ -353,7 +353,7 @@ void main() {
 
     test('filler loaders use current deck state for bracket policy', () {
       final source = File(
-        'lib/ai/optimize_runtime_support.dart',
+        'lib/ai/optimize_filler_loader_support.dart',
       ).readAsStringSync();
       final completeSource = File(
         'lib/ai/optimize_complete_support.dart',
