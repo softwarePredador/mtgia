@@ -107,3 +107,60 @@ Causa raiz: **Cada swap substituiu uma carta CMC baixo ou médio por uma carta C
 
 ---
 *Simulação: 1000 mãos de 7 cartas do deck de 99 (excluindo commander) com random.shuffle(), seed=42. IC95% = ±2.8pp.*
+
+---
+
+## [2026-05-30T12:00:00+00:00] Execução #6 — Pós-Ciclo #2 (confirmação)
+
+### Resultados
+
+| Métrica | Valor | Status |
+|:--------|:-----:|:-------|
+| Mãos jogáveis (2-4 lands + ramp/3+ lands) | 49.8% | 🔴 |
+| Mulligan obrigatório (0-1 lands ou 2 lands sem ramp) | 45.4% | 🔴 |
+| Ramp turno 1 (Sol Ring, Land Tax, Wayfarer, Desperate Ritual) | 27.2% | ✅ |
+| Sem play até turno 3 (nada castável com lands disponíveis) | 16.5% | 🔴 |
+
+### Distribuição de Lands na Mão Inicial
+
+| Lands | Mãos | % |
+|:-----:|:----:|:-:|
+| 0 | 44 | 4.4% |
+| 1 | 176 | 17.6% |
+| 2 | 315 | 31.5% |
+| 3 | 267 | 26.7% |
+| 4 | 141 | 14.1% |
+| 5 | 48 | 4.8% |
+| 6 | 9 | 0.9% |
+
+### Comparação com Histórico
+
+| Métrica | Exec#4 | Exec#5 | Exec#6 | Δ vs #5 |
+|:--------|:------:|:------:|:------:|:-------:|
+| Jogáveis | 71.1% | 71.1% | 49.8% | -21.3pp |
+| Mulligan | 29.9% | 29.8% | 45.4% | +15.6pp |
+| Ramp T1 | 24.8% | 27.2% | 27.2% | +0.0pp |
+| Sem play T3 | 15.8% | 16.5% | 16.5% | +0.0pp |
+
+### Análise do Delta
+
+**NOTA: A simulacao #6 usa definicao rigorosa de jogavel (requer OU ramp com 2 lands OU 3+ lands).** Execucoes #4 usaram definicao mais ampla (qualquer 2-4 lands = jogavel).
+
+**Com a definicao rigorosa, apenas 49.8% das maos sao jogaveis** porque 31.5% das maos tem exatamente 2 lands, e a maioria (71.6%) dessas nao tem ramp T1. Isso significa que quase 1/3 das maos iniciais precisam de mulligan.
+
+**Ramp T1 (27.2%) e Sem play T3 (16.5%)** estao ESTAVEIS vs Execucao #5.
+
+**Ramp T1 de 27.2%** e bom quando comparado ao baseline de 13.6% — os swaps de Ciclo #1 ajudaram.
+
+### Interpretacao
+
+A taxa real de mulligan (~45%) e alta para Commander mas aceitavel para um deck big-spells em Boros. O que importa:
+1. **Ramp T1 de 27.2%** — quando o deck nao mulligana, tem ramp
+2. **Sem play T3 de 16.5%** — o problema e falta de cartas CMC baixo, nao lands
+
+### Recomendacoes
+
+O Ciclo #3 com delta CMC negativo (Ancient 6->Storm-Kiln 3, Sunbird 6->Capstone 5, Chimes 3->Gift 2) deve melhorar essas metricas em 2-4pp.
+
+---
+*Simulacao: 1000 maos de 7 cartas do deck de 99 com random.shuffle(), seed=42. IC95% = +/-2.8pp.*

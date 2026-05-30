@@ -1,27 +1,91 @@
-Como um jogador EXPERIENTE analisaria este deck Lorehold:
+# VALIDATOR SUMMARY — Lorehold Spellslinger (2026-05-30)
 
-## História Real de um Deckbuilder
+## Estado do Deck: Pos-Ciclo #2 (6 swaps aplicados)
 
-Você construiu um Lorehold com uma tese clara: "Vou acumular treasures, encher o graveyard de spells caras, e explodir tudo com Mizzix's Mastery copiado pelo Lorehold." Isso é UM PLANO DE VERDADE. Muito jogador chega com "vou por cartas boas" — você não.
+| Swap | Saiu | Entrou |
+|:-----|:-----|:-------|
+| Ciclo #1 | Furygale Flocking | Esper Sentinel |
+| Ciclo #1 | Jokulhaups | Gamble |
+| Ciclo #1 | Karoo | Plains |
+| Ciclo #2 | Deflecting Palm | Big Score |
+| Ciclo #2 | Hellkite Tyrant | Dance with Calamity |
+| Ciclo #2 | Mother of Runes | The One Ring |
 
-Mas tem dois problemas:
+## Metricas Atuais vs Perfil EDHREC
 
-**Primeiro:** Draw = 3 fontes confiáveis. Não 3 fontes BONS — 3 fontes TOTAL. Você depende de Sensei's Divining Top e Artist's Talent para encontrar suas peças. Em um deck que precisa de 3+ peças para explodir (Lorehold + Mizzix's + graveyard cheio), isso é muito pouco.
+| Metrica | Deck | Perfil | Status |
+|:--------|:----:|:------:|:------:|
+| Lands | 35 | 36-38 | -1 (ok) |
+| Ramp | 16 | 10-13 | +3 (treasure heavy) |
+| Draw | 5 real | 8-12 | CRITICO |
+| Remocao | 4 | 4-6 | no range |
+| Board wipe | 4 | 3-5 | no range |
+| Protecao | 4 | 3-4 | ok |
+| Big spells | ~24 | 23-24 | ok |
 
-Sua coleção tem Trouble in Pairs, Archivist of Oghma, Dawn's Truce. Cada uma dessas é melhor que Victory Chimes, Pearl Medallion ou Taunt from the Rampart no seu deck atual.
+## Motor de Lorehold: 2/3 Completo
 
-**Segundo:** Você tem 10 cartas que o classificador do ManaLoom não entende. Isso significa que o sistema pode sugerir remover Scroll Rack, Grand Abolisher, Orim's Chant — cartas CRUCIAIS pro seu plano. Você precisa corrigir as tags dessas cartas antes de rodar otimização automática, senão a IA vai sugerir trocar Scroll Rack por um draw spell qualquer, sem entender que Scroll Rack É o seu draw.
+- Tesouro Ramp: COMPLETO (Big Score, Brass's Bounty, Hit the Mother Lode)
+- Big Spell Free: COMPLETO (Dance with Calamity, Approach)
+- Treasure Payoff: FALTA Storm-Kiln Artist + Improvisation Capstone
 
-### Swap que você pode fazer AGORA (tudo na sua coleção):
+## Top 3 Problemas
 
-1. Taunt from the Rampart → Trouble in Pairs (draw massivo)
-2. Victory Chimes → Archivist of Oghma (draw por tutor)
-3. Pearl Medallion → Flawless Maneuver (proteção grátis)
+1. **Draw real = 5** (perfil quer 8-12). Artist's Talent em declinio severo (-0.71).
+2. **"Sem play T3" = 16.5%** — deck precisa de mais cartas CMC baixo.
+3. **Island artifact morta** — Goblin Engineer, Oswald, Pearl Medallion sem payoff.
 
-3 swaps. Zero custo. Draw sobe de 3 para 5+. Proteção ganha uma peça free. Perde 2 cartas que não faziam nada.
+## Top 5 Swaps para Ciclo #3 (custo $0)
 
-### Meta-reflexão
+| # | Sai | Entra | EDHREC | Impacto | Delta CMC |
+|:-:|:----|:------|:------:|:--------|:---------:|
+| 1 | Ancient Copper Dragon | Storm-Kiln Artist | 55.4% | Motor completo | -3 |
+| 2 | Desperate Ritual | Boros Signet | 50.3% | Ramp consistente | 0 |
+| 3 | Sunbird's Invocation | Improvisation Capstone | 48.9% | Big spell superior | -1 |
+| 4 | Victory Chimes | Generous Gift | 32.5% | Remocao universal | -1 |
+| 5 | Orim's Chant | Blasphemous Act | 40.4% | Board wipe | +1 |
 
-Seu deck me lembra um jogador que tentou fazer Lorehold funcionar apesar de Boros ser ruim de draw. A criatividade está aí — treasures + recursion é uma abordagem original. Mas a teimosia de não incluir draw suficiente vai te custar partidas que você poderia ter ganhado.
+Net Delta CMC: ~-4. Esperado: "Sem play T3" melhora 2-4pp para ~12-14%.
 
-Pense assim: cada fonte de draw que você adiciona é uma chance a mais de encontrar Mizzix's Mastery no turno 6 em vez do turno 10. Em Commander, 4 turnos de diferença separam ganhar de perder.
+## Proximos Ciclos
+
+**Ciclo #4 (apos "sem play T3" < 14%):**
+- Adicionar: Restoration Seminar (37.6%, trend +9.15), Apex of Power (55.1%)
+- Cortar: Artist's Talent, Pearl Medallion, Rise of the Eldrazi
+
+**Ciclo #5:**
+- Adicionar: Faithless Looting, Chaos Warp
+- Cortar: Goblin Engineer, Oswald Fiddlebender
+
+## Tendencias-Chave EDHREC (7765 decks)
+
+| Carta |% | Trend | Sinal |
+|:------|:|:------|:------|
+| Restoration Seminar | 37.6% | +9.15 | Crescendo mais rapido |
+| Improvisation Capstone | 48.9% | +8.13 | Explosao |
+| Storm-Kiln Artist | 55.4% | +0.75 | Estavel/crescente |
+| Big Score | 67.2% | +1.50 | Staple+crescendo |
+| Artist's Talent | 21.0% | -0.71 | DECLINIO GRAVE |
+| Esper Sentinel | 32.4% | -0.54 | Declinio |
+| The One Ring | 8.4% | -0.31 | GC em declinio em Lorehold |
+
+## Double-Null Cards (9 restantes)
+
+| Carta | Risco de Corte | Acao |
+|:------|:---------------|:-----|
+| Scroll Rack | CRITICO | Nunca cortar |
+| Penance | CRITICO | Nunca cortar |
+| Grand Abolisher | Alto | Manter |
+| Ruby Medallio | Medio | Manter, cortar Pearl |
+| Pearl Medallion | Medio | CORTAR |
+| Galadriel's Dismissal | Baixo | Cortar por draw |
+| Victory Chimes | Baixo | Cortar por removal |
+| Orim's Chant | Baixo | Cortar por removal |
+| Taunt from Rampart | Baixo | Cortar por wipe |
+
+## Veredito
+
+Deck funciona em bracket 3. 6 swaps aplicados, 5 recomendados para Ciclo #3. Maior free upgrade: Storm-Kiln Artist (55.4% EDHREC, na colecao, fora do deck).
+
+---
+*Atualizado: 2026-05-30. Fonte: EDHREC 7765 decks, knowledge.db deck_id=6, 229 cartas na colecao.*

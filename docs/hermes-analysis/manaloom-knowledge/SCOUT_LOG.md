@@ -511,3 +511,32 @@ setup 1 abaixo. Nenhum P0 ou P1.
 **Detalhes completos:** `decks/lorehold-the-historian/SCOUT_LOG.md` Execução #3.
 
 (Mantido histórico: Execuções #1 e #2 abaixo.)
+
+---
+
+## [2026-05-30] Execução #11 — deep cross-ref (7765 decks)
+
+### Dados EDHREC atualizados
+- Total decks: 7765
+- Cartas rastreadas: 277
+- Cartas do deck encontradas: 73
+- Cartas do deck NÃO encontradas: 12 (Ancient Copper Dragon, Desperate Ritual, Goblin Engineer, Oswald Fiddlebender, Orim's Chant, Galadriel's Dismissal, Weathered Wayfarer, Valakut Awakening, Emeria's Call, Dormant Volcano, Kor Haven, Cavern of Souls)
+
+### Trend Update
+- Artist's Talent: 21.0%, trend -0.71 (declínio grave confirmado)
+- Esper Sentinel: 32.4%, trend -0.54 (declínio)
+- The One Ring: 8.4%, trend -0.31 (GC em declínio em Lorehold)
+- Improvisation Capstone: 48.9%, trend +8.13 (explosão)
+- Storm-Kiln Artist: 55.4%, trend +0.75 (estável/crescente)
+- Restoration Seminar: 37.6%, trend +9.15 (subindo mais rápido que Capstone)
+
+### Top Collection Not In Deck (EDHREC > 40%)
+1. Storm-Kiln Artist (55.4%, trend +0.75)
+2. Apex of Power (55.1%, trend +0.10)
+3. Boros Signet (50.3%)
+4. Improvisation Capstone (48.9%, trend +8.13)
+5. Arcane Bombardment (42.4%, trend +0.09)
+6. Blasphemous Act (40.4%, trend +0.08)
+
+### Recomendações para Ciclo #3
+Ver VALIDATOR_LOG.md v3.14, Seção 14.
