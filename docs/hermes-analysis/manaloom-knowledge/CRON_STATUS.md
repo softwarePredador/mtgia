@@ -135,6 +135,69 @@ Este snapshot: **2026-05-30T07:39Z** (17 crons, 13 erros, 3 desabilitados, 1 nev
 - Os **3 crons desabilitados** provavelmente foram pausados por um branch switch (padrão documentado).
 - A degradação de 5→13 erros em ~48h sugere que o manager-watchdog anterior também não conseguiu recuperar os crons (possivelmente mesmo bloqueio de permissão).
 
+## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
+
+> Relatório gerado automaticamente pelo cron `manaloom-tag-accuracy-reporter`.
+> Última atualização: **2026-05-30T08:00Z**
+
+### Resumo Geral
+
+| Métrica | Valor |
+|:--|:--:|
+| **Acurácia global** | **83.3%** (378/454 correções) |
+| Tags avaliadas | 29 |
+| Tags com 100% | 14 |
+| Tags com <50% | 8 |
+| Tags com 0% | 7 |
+
+### Tags com Acurácia 0% (CRÍTICO — nenhum acerto registrado)
+
+| Tag | Amostras | Problema |
+|:--|:--:|:--|
+| `ninja` | 17/17 erradas | Tag obscura, alta taxa de falsos positivos no classificador |
+| `ramp + combo_piece` | 1/1 errada | Tag composta rara, classificador não reconhece |
+| `recursion + wincon` | 1/1 errada | Tag composta rara |
+| `ramp + payoff` | 1/1 errada | Tag composta rara |
+| `payoff + removal` | 1/1 errada | Tag composta rara |
+| `payoff + token_maker` | 1/1 errada | Tag composta rara |
+| `stax_disruption` | 3/3 erradas | Tag sem suporte no classificador |
+
+### Tags Problemáticas (< 75%)
+
+| Tag | Acurácia | Observação |
+|:--|:--:|:--|
+| `payoff` | 35.5% (11/31) | Alta confusão com `wincon` e `engine` |
+| `combo_piece` | 50.0% (1/2) | Amostra pequena, confusão com `engine` |
+| `enabler` | 50.0% (21/42) | Conceito vago, sobreposição com `ramp` e `engine` |
+| `other` | 50.0% (1/2) | Bucket genérico, sem critério claro |
+| `protection` | 69.2% (9/13) | Confusão com `removal` reativa |
+| `wincon` | 75.0% (6/8) | Sobreposição com `payoff` e `finisher` |
+| `engine` | 75.0% (6/8) | Confusão com `combo_piece` |
+
+### Tags Perfeitas (100% — 14 tags)
+
+`ramp`, `draw`, `tutor`, `removal`, `land`, `board_wipe`, `sacrifice_outlet`, `finisher`, `recursion`, `wipe`, `utility`, `creature`, `planeswalker`, `artifact`, `enchantment`
+
+> Estas tags representam categorias estruturais ou de tipo de carta — mais fáceis de classificar. As tags problemáticas são todas **tags funcionais compostas ou conceituais** que requerem julgamento contextual.
+
+### Análise de Risco
+
+| Categoria | Tags | Impacto |
+|:--|:--|:--|
+| 🔴 **Inutilizáveis** | `ninja`, `stax_disruption`, +5 compostas 0% | Decisões baseadas nestas tags são aleatórias |
+| 🟡 **Não confiáveis** | `payoff` (35.5%), `enabler` (50%), `combo_piece` (50%) | Usar apenas como sinal fraco, nunca como única justificativa |
+| 🟢 **Confiáveis** | `ramp`, `draw`, `removal`, `tutor`, `land`, `utility`, tipo-based | Base segura para decisões de swap |
+
+### Recomendações
+
+1. **Remover ou fundir `ninja`** — 0% em 17 amostras é pior que aleatório
+2. **Rever definição de `payoff`** — 35.5% indica sobreposição severa com `wincon`/`engine`
+3. **Fundir tags compostas** — Tags com `+` (`ramp + combo_piece`, etc.) falham consistentemente; o classificador não lida bem com multi-conceito
+4. **Rever `stax_disruption`** — Pode ser fundido com `removal` ou `other`; 0% de acerto em 3 amostras
+5. **Manter tags de tipo** (`creature`, `artifact`, etc.) — 100% confiáveis como estão
+6. **`enabler` precisa definição mais restrita** — 50% com 42 amostras indica que metade das cartas tagged são falsos positivos
+
 ---
 
 *Snapshot: 2026-05-30T07:39Z | Branch: codex/hermes-analysis-docs | Fleet: 17 crons*
+*Tag Accuracy: 2026-05-30T08:00Z | Global: 83.3% (378/454) | Tags: 29 avaliadas, 14 perfeitas, 8 críticas (<50%)*
