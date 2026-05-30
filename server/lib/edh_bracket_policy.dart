@@ -10,6 +10,11 @@ enum BracketCategory {
   freeInteraction,
   extraTurns,
   infiniteCombo,
+  boardWipe,
+  cardAdvantage,
+  stax,
+  protection,
+  valueEngine,
 }
 
 class BracketPolicy {
@@ -33,6 +38,11 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 0,
             BracketCategory.extraTurns: 0,
             BracketCategory.infiniteCombo: 0,
+            BracketCategory.boardWipe: 1,
+            BracketCategory.cardAdvantage: 1,
+            BracketCategory.stax: 0,
+            BracketCategory.protection: 1,
+            BracketCategory.valueEngine: 1,
           },
         );
       case 2:
@@ -44,6 +54,11 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 2,
             BracketCategory.extraTurns: 1,
             BracketCategory.infiniteCombo: 0,
+            BracketCategory.boardWipe: 2,
+            BracketCategory.cardAdvantage: 2,
+            BracketCategory.stax: 1,
+            BracketCategory.protection: 2,
+            BracketCategory.valueEngine: 2,
           },
         );
       case 3:
@@ -55,11 +70,15 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 6,
             BracketCategory.extraTurns: 2,
             BracketCategory.infiniteCombo: 2,
+            BracketCategory.boardWipe: 4,
+            BracketCategory.cardAdvantage: 6,
+            BracketCategory.stax: 3,
+            BracketCategory.protection: 4,
+            BracketCategory.valueEngine: 6,
           },
         );
       case 4:
       default:
-        // cEDH: sem limite (mantém números altos só para não “filtrar” na prática)
         return BracketPolicy(
           bracket: 4,
           maxCounts: const {
@@ -68,6 +87,11 @@ class BracketPolicy {
             BracketCategory.freeInteraction: 99,
             BracketCategory.extraTurns: 99,
             BracketCategory.infiniteCombo: 99,
+            BracketCategory.boardWipe: 99,
+            BracketCategory.cardAdvantage: 99,
+            BracketCategory.stax: 99,
+            BracketCategory.protection: 99,
+            BracketCategory.valueEngine: 99,
           },
         );
     }
@@ -130,6 +154,31 @@ BracketTagResult tagCardForBracket({
     categories.add(BracketCategory.infiniteCombo);
   }
 
+  // Board wipe: destruicao/exilio/bounce em massa assimetrico ou unilateral
+  if (_looksLikeGameChangerBoardWipe(n, o)) {
+    categories.add(BracketCategory.boardWipe);
+  }
+
+  // Card advantage: draw repetitivo/passivo, tax effects, burst draw massivo
+  if (_looksLikeGameChangerCardAdvantage(n, o)) {
+    categories.add(BracketCategory.cardAdvantage);
+  }
+
+  // Stax: restringe acoes dos oponentes
+  if (_looksLikeGameChangerStax(n, o)) {
+    categories.add(BracketCategory.stax);
+  }
+
+  // Protection: protecao absoluta ou free protection spells
+  if (_looksLikeGameChangerProtection(n, o)) {
+    categories.add(BracketCategory.protection);
+  }
+
+  // Value engine: gera valor recorrente todo turno
+  if (_knownValueEngineNames.contains(n)) {
+    categories.add(BracketCategory.valueEngine);
+  }
+
   return BracketTagResult(categories);
 }
 
@@ -142,6 +191,11 @@ Map<BracketCategory, int> countBracketCategories(
     BracketCategory.freeInteraction: 0,
     BracketCategory.extraTurns: 0,
     BracketCategory.infiniteCombo: 0,
+    BracketCategory.boardWipe: 0,
+    BracketCategory.cardAdvantage: 0,
+    BracketCategory.stax: 0,
+    BracketCategory.protection: 0,
+    BracketCategory.valueEngine: 0,
   };
 
   for (final c in cards) {
@@ -266,8 +320,74 @@ const _fastManaLandNames = <String>{
 };
 
 const _knownInfiniteComboPieces = <String>{
-  // Placeholder inicial (lista curada evolui depois)
   'thassa\'s oracle',
   'demonic consultation',
   'tainted pact',
+};
+
+bool _looksLikeGameChangerBoardWipe(String normalizedName, String oracleLower) {
+  // Curated GC board wipes
+  if (normalizedName == 'cyclonic rift' || normalizedName == 'farewell') return true;
+  // Board wipes that are asymmetric (only opponents) or mass exile
+  if (oracleLower.contains('exile all') && oracleLower.contains('opponents control')) return true;
+  if (oracleLower.contains('destroy all') && oracleLower.contains('opponents control')) return true;
+  if (oracleLower.contains('return all') && oracleLower.contains('opponents control') && oracleLower.contains('hand')) return true;
+  return false;
+}
+
+bool _looksLikeGameChangerCardAdvantage(String normalizedName, String oracleLower) {
+  // Curated GC card advantage engines
+  if (normalizedName == 'rhystic study' || normalizedName == 'mystic remora' ||
+      normalizedName == 'the one ring' || normalizedName == 'smothering tithe' ||
+      normalizedName == 'necropotence' || normalizedName == 'ad nauseam' ||
+      normalizedName == 'consecrated sphinx') return true;
+  // Tax-based draw: "unless that player pays"
+  if (oracleLower.contains('unless') && oracleLower.contains('pays') &&
+      (oracleLower.contains('draw') || oracleLower.contains('create'))) return true;
+  // Necropotence-style: pay life for cards
+  if (oracleLower.contains('pay') && oracleLower.contains('life') &&
+      oracleLower.contains('draw') && oracleLower.contains('card') &&
+      oracleLower.contains('skip your draw step')) return true;
+  return false;
+}
+
+bool _looksLikeGameChangerStax(String normalizedName, String oracleLower) {
+  // Curated GC stax pieces
+  if (normalizedName == 'drannith magistrate' || normalizedName == 'opposition agent' ||
+      normalizedName == 'grand abolisher' || normalizedName == 'winter orb' ||
+      normalizedName == 'static orb' || normalizedName == 'torpor orb' ||
+      normalizedName == 'rule of law' || normalizedName == 'deafening silence') return true;
+  if (normalizedName == 'eidolon of rhetoric' || normalizedName == 'ethersworn canonist' ||
+      normalizedName == 'archon of emeria') return true;
+  // Spells-per-turn restrictions
+  if (oracleLower.contains('cast') && oracleLower.contains('more than one spell') ||
+      oracleLower.contains('can\'t cast more than one spell')) return true;
+  // ETB hate
+  if (oracleLower.contains('creatures entering') && oracleLower.contains('don\'t cause')) return true;
+  // Search hate
+  if (oracleLower.contains('search') && oracleLower.contains('library') &&
+      oracleLower.contains('control')) return true;
+  return false;
+}
+
+bool _looksLikeGameChangerProtection(String normalizedName, String oracleLower) {
+  // Curated GC protection
+  if (normalizedName == 'teferi\'s protection' || normalizedName == 'deflecting swat' ||
+      normalizedName == 'fierce guardianship' || normalizedName == 'heroic intervention' ||
+      normalizedName == 'flawless maneuver' || normalizedName == 'deadly rollick') return true;
+  // Free protection spells
+  if (oracleLower.contains('rather than pay') && (oracleLower.contains('indestructible') ||
+      oracleLower.contains('hexproof') || oracleLower.contains('phase out') ||
+      oracleLower.contains('protection from'))) return true;
+  // Teferi's Protection pattern: phase out + protection from everything
+  if (oracleLower.contains('phase out') && oracleLower.contains('protection from everything')) return true;
+  return false;
+}
+
+const _knownValueEngineNames = <String>{
+  'seedborn muse',
+  'tergrid, god of fright',
+  'bolas\'s citadel',
+  'sensei\'s divining top',
+  'aetherflux reservoir',
 };
