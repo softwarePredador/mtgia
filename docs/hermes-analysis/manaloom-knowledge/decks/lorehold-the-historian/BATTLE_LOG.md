@@ -222,3 +222,151 @@ Deck: 100c | L=35 R=14 X=11 C=9 CMC=3.74
 - vs Midrange (Korvold): life_zero=58
 - vs Spellslinger (Niv-Mizzet): life_zero=35
 - vs Stax (Winota): life_zero=40
+
+## [2026-05-31T16:20:28Z] Battle Analyst v7 — Commander Rule-Compliant
+Games: 100 | Deck: 1+99c | L=35 R=14 X=11 CMC=3.72
+v7: Commander Zone, Commander Damage, Blockers, Summoning Sickness, Cleanup, Colored Mana, Postcombat Main
+
+| Opponent | WR | Wins | Losses | Stalls | Avg Win Turn | Win Reasons |
+|:---------|----:|-----:|-------:|-------:|-------------:|:------------|
+| Aggro (Krenko) | 97.0% | 97 | 1 | 2 | 14.5 | approach=31, elimination=66 |
+| Control (Atraxa) | 93.0% | 93 | 0 | 7 | 17.1 | approach=34, elimination=59 |
+| Combo (Kinnan) | 93.0% | 93 | 1 | 6 | 13.6 | elimination=72, approach=21 |
+| Midrange (Korvold) | 97.0% | 97 | 1 | 2 | 14.9 | approach=44, elimination=53 |
+| Spellslinger (Niv) | 90.0% | 90 | 1 | 9 | 14.8 | approach=29, elimination=61 |
+| Stax (Winota) | 95.0% | 95 | 0 | 5 | 15.3 | approach=33, elimination=62 |
+
+**Overall WR: 94.2%** (565W/4L/31S)
+
+## [2026-05-31T16:22:10Z] Battle Analyst v7 — Commander Rule-Compliant
+Games: 100 | Deck: 1+99c | L=35 R=14 X=11 CMC=3.72
+v7: Commander Zone, Commander Damage, Blockers, Summoning Sickness, Cleanup, Colored Mana, Postcombat Main
+
+| Opponent | WR | Wins | Losses | Stalls | Avg Win Turn | Win Reasons |
+|:---------|----:|-----:|-------:|-------:|-------------:|:------------|
+| Aggro (Krenko) | 81.0% | 81 | 0 | 19 | 17.4 | approach=55, elimination=26 |
+| Control (Atraxa) | 77.0% | 77 | 1 | 22 | 18.4 | approach=50, elimination=27 |
+| Combo (Kinnan) | 84.0% | 84 | 1 | 15 | 17.1 | approach=58, elimination=26 |
+| Midrange (Korvold) | 77.0% | 77 | 1 | 22 | 16.0 | elimination=27, approach=50 |
+| Spellslinger (Niv) | 72.0% | 72 | 4 | 24 | 17.5 | approach=51, elimination=21 |
+| Stax (Winota) | 82.0% | 82 | 0 | 18 | 17.7 | approach=54, elimination=28 |
+
+**Overall WR: 78.8%** (473W/7L/120S)
+
+## [2026-05-31T16:49:15Z] Battle Analyst v8 — Interactive Commander
+Games: 100 4-player | Deck: L=35 R=14 X=11 CMC=3.72 Instants=15
+v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Aggro (Krenko) | 67.0% | 67 | 8 | 25 | 20.7 | approach=62, elimination=5 |
+| Control (Atraxa) | 77.0% | 77 | 2 | 21 | 22.2 | approach=68, elimination=9 |
+| Combo (Kinnan) | 66.0% | 66 | 7 | 27 | 22.2 | approach=62, elimination=4 |
+| Midrange (Korvold) | 68.0% | 68 | 12 | 20 | 22.5 | approach=63, elimination=5 |
+| Spellslinger (Niv) | 70.0% | 70 | 11 | 19 | 23.2 | approach=63, elimination=7 |
+| Stax (Winota) | 68.0% | 68 | 11 | 21 | 21.9 | approach=64, elimination=4 |
+
+**Overall WR: 69.3%** (416W/51L/133S)
+
+## [2026-05-31T17:53:53Z] Battle Analyst v8 — Interactive Commander
+Games: 100 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Aggro (Krenko) | 69.0% | 69 | 1 | 30 | 22.1 | approach=64, elimination=5 |
+| Control (Atraxa) | 69.0% | 69 | 9 | 22 | 23.6 | approach=62, elimination=7 |
+| Combo (Kinnan) | 67.0% | 67 | 8 | 25 | 21.6 | approach=58, elimination=9 |
+| Midrange (Korvold) | 65.0% | 65 | 7 | 28 | 22.7 | approach=53, elimination=12 |
+| Spellslinger (Niv) | 69.0% | 69 | 9 | 22 | 23.9 | approach=62, elimination=7 |
+| Stax (Winota) | 67.0% | 67 | 4 | 29 | 20.9 | approach=66, elimination=1 |
+
+**Overall WR: 67.7%** (406W/38L/156S)
+
+
+### Qualitative Analysis — 2026-05-31 Battle Cycle v8 #2
+
+**Overall WR: 67.7%** (delta **-1.6pp** from v8 #1 baseline of 69.3%) — within ±3pp threshold, **STABLE**.
+
+#### WR by Archetype (with Delta vs v8 #1)
+
+| Archetype | v8 #1 WR | v8 #2 WR | Δ WR | Losses Δ | Stalls Δ |
+|:----------|---------:|---------:|-----:|---------:|---------:|
+| Aggro (Krenko) | 67.0% | **69.0%** | +2.0pp | -7 (8→1) | +5 (25→30) |
+| Control (Atraxa) | 77.0% | **69.0%** | -8.0pp | +7 (2→9) | +1 (21→22) |
+| Combo (Kinnan) | 66.0% | **67.0%** | +1.0pp | +1 (7→8) | -2 (27→25) |
+| Midrange (Korvold) | 68.0% | **65.0%** | -3.0pp | -5 (12→7) | +8 (20→28) |
+| Spellslinger (Niv) | 70.0% | **69.0%** | -1.0pp | -2 (11→9) | +3 (19→22) |
+| Stax (Winota) | 68.0% | **67.0%** | -1.0pp | -7 (11→4) | +8 (21→29) |
+| **OVERALL** | **69.3%** | **67.7%** | **-1.6pp** | **-13 (51→38)** | **+23 (133→156)** |
+
+#### Critical Findings
+
+**1. Loss-to-Stall Migration (Structural Shift)**
+Net losses dropped 13 (51→38) but stalls increased 23 (133→156). The deck is **dying less but timing out more**. This suggests:
+- Better defensive play (instants, indestructible, Miracle timing) is keeping Lorehold alive
+- But the deck still lacks the speed to close before turn 35
+- The max_turns=35 ceiling is the silent bottleneck
+
+**2. Aggro & Stax Dramatically Improved**
+- **Aggro losses: 8→1** (-87.5%). Miracle + instant-speed removal is crushing goblin rushes
+- **Stax losses: 11→4** (-63.6%). Better stack management counters Winota's hatebear lock
+- These 2 archetypes account for 14 fewer losses vs v8 #1
+
+**3. Control Deteriorated (⚠️ Watch)**
+- **Control losses: 2→9** (+350%). Atraxa's 6 counterspells are now cancelling our Approach of the Second Sun
+- The stack's `top_is_threat()` detects Approach as a threat, triggering opponent counterspell AI
+- An 8.0pp drop suggests some runs had Approach countered multiple times (needs 2 successful casts)
+- Our deck has **zero counterspells** — we can't fight over the stack defensively
+
+**4. Stalls Are the Ceiling (26.0% avg)**
+- 156/600 games (26.0%) hit turn 35 without resolution
+- 49 mana sources (35 lands + 14 ramp) against CMC 3.69 curve = ramp-heavy but slow to deploy
+- Avg win turn: **21.6–23.9** — extremely late for Commander
+- Approach needs 2 casts + 7 cards between them → earliest possible win is ~turn 12 in ideal conditions
+
+**5. Approach Dominance (89.9% of Wins)**
+| Win Reason | Count | % of Wins |
+|:-----------|------:|----------:|
+| Approach of the Second Sun | 365 | 89.9% |
+| Elimination (combat damage) | 41 | 10.1% |
+
+The deck is a **one-trick pony**. If Approach is countered, there's no backup plan. When it works (mostly), the deck wins. When it doesn't (Control matchups, bad draws), we stall out.
+
+**6. v8 Mechanics Working Well**
+- Priority system correctly gives opponents counter windows
+- Miracle {2} on Lorehold provides cost reduction for instants/sorceries
+- Lifelink and Haste on Lorehold contribute to combat survival
+- Indestructible per-creature protects key pieces from board wipes
+- Double Strike is correctly applying 2x (not 3x)
+
+#### Recommendations
+
+1. **Add alternate wincon** — Approach is countered too easily vs Control (6 counterspells vs our 0). Aetherflux Reservoir, Comet Storm, or Aria of Flame bypass counterspell windows
+2. **Reduce stalls** — Lower the mana curve (target CMC < 3.0) to deploy threats turns 3-5 instead of turns 6-8
+3. **Graveyard recursion** — Lorehold's core mechanic (copy from graveyard) is under-modeled. Mizzix's Mastery is the only recursion wincon coded
+4. **Counterplay vs Control** — Grand Abolisher, Defense Grid, or redirection effects needed specifically against Atraxa's counterspell density
+5. **Increase max_turns to 45** — 26% of games time out at turn 35; extending to 45 would convert some stalls to wins or clarify true stalemates
+
+#### VERDICT
+
+**No GAP CRITICO** — all archetype WRs are ≥65%, well above the 40% critical threshold.
+
+**STABLE** — overall delta (-1.6pp) within ±3pp threshold. The Control drop (-8.0pp) is the only archetype-level concern but doesn't cross the 40% line.
+
+**Next priority:** Address the stall problem (26% timeout rate) by lowering mana curve and adding secondary win conditions not susceptible to counterspells.
+
+## [2026-05-31T17:56:47Z] Battle Analyst v8 — Interactive Commander
+Games: 100 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Aggro (Krenko) | 69.0% | 69 | 1 | 30 | 22.1 | approach=64, elimination=5 |
+| Control (Atraxa) | 69.0% | 69 | 9 | 22 | 23.6 | approach=62, elimination=7 |
+| Combo (Kinnan) | 67.0% | 67 | 8 | 25 | 21.6 | approach=58, elimination=9 |
+| Midrange (Korvold) | 65.0% | 65 | 7 | 28 | 22.7 | approach=53, elimination=12 |
+| Spellslinger (Niv) | 69.0% | 69 | 9 | 22 | 23.9 | approach=62, elimination=7 |
+| Stax (Winota) | 67.0% | 67 | 4 | 29 | 20.9 | approach=66, elimination=1 |
+
+**Overall WR: 67.7%** (406W/38L/156S)
