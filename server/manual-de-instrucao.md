@@ -17900,3 +17900,37 @@ que o endpoint entrega quando a Semantic Layer v2 bloqueia uma perda crítica.
   `optimize_diagnostics.semantic_layer_v2`;
 - `protection` permanece review-only enquanto `draw/removal/ramp/wipe` e roles
   contextuais críticas podem bloquear em modo `partial`.
+
+## 2026-05-30 — Refatoração weakness-analysis + Wincon Detection + Write-only tables
+
+### Weakness-analysis agora usa adapter F1
+
+- `POST /ai/weakness-analysis` substituiu ~80 linhas de heurísticas oracle_text por
+  `resolveCardFunctionalRoles()` (adapter F1, prioridade: `persistida > semantic_v2 > heurística`)
+- Contagem de ramp/draw/removal/wipes/protection/graveyard/wincon agora usa tags funcionais
+- Detecção de wincon usa `roles.contains('wincon') || roles.contains('combo_piece')`
+- Recomendações hardcoded preservadas como exemplos — não afetam a lógica de classificação
+
+### Wincon como critical role no quality gate
+
+- `_criticalRolesForArchetype()` em `optimization_quality_gate.dart` agora inclui `wincon`
+  para todos os arquétipos (aggro, control, midrange, default)
+- Quality gate bloqueia swaps que removem win conditions do deck
+- `weakness-analysis` reporta `wincon_count` via F1 adapter
+
+### Tabelas Write-only — documentadas como audit logs
+
+Três tabelas operam como audit logs (escritas, nunca lidas pelo runtime). Política:
+- `deck_matchups` — resultados de `POST /ai/simulate-matchup`. Uso futuro: cache de matchup.
+- `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`. Uso futuro: histórico.
+- `ml_prompt_feedback` — helper em `ml_knowledge_service.dart`, sem chamador runtime.
+
+Retenção recomendada: DELETE > 90 dias para evitar acúmulo sem consumidor.
+
+### F1/F3/Bracket — status atual
+
+- Adapter F1 (`resolveCardFunctionalRoles`): unificado em `optimization_functional_roles.dart`
+- F3 modularização: `optimize_filler_loader_support.dart`, `optimize_route_internal.dart`, `optimize_response_support.dart`
+- Bracket expansion: 5 novas categorias (boardWipe, cardAdvantage, stax, protection, valueEngine) — 53/53 GCs detectados
+- `card_deck_profiles` (670 perfis) integrado ao `filterUnsafeOptimizeSwapsByCardData`
+- `_looksLikePayoff` expandido para detectar payoffs de dano direto (Impact Tremors, Guttersnipe)
