@@ -2,7 +2,7 @@
 
 > Relat�rio gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> �ltima atualiza��o: **2026-05-31T02:12Z** (manaloom-manager-watchdog)
+> Última atualização: **2026-05-31T02:51Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
@@ -11,14 +11,14 @@
 | Total de crons (`include_disabled=True`) | **18** |
 | Habilitados | 18/18 |
 | Desabilitados | **0** |
-| `last_status=error` | **6** |
-| `last_status=ok` | **12** |
+| `last_status=error` | **5** |
+| `last_status=ok` | **13** |
 | Nunca executaram (`last_run_at=null`) | **0** |
 | Stale (>1.5x schedule atr�s, `enabled=true`) | **0** |
 | A��es de recupera��o nesta execu��o | 0 (rate limit lifting -- auto-recupera��o em progresso) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 18 crons habilitados, **12 OK**, **6 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 erros em ~1h**.
+**Estado geral:** 18 crons habilitados, **13 OK**, **5 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 → 5 erros em ~2h**.
 
 ## An�lise de Recupera��o
 
@@ -28,17 +28,16 @@
 | 2 | 2026-05-31T01:32Z | 10 | 8 | -4 |
 | 3 | 2026-05-31T02:12Z | 12 | 6 | -2 |
 
-**Recupera��o acumulada: 12 → 6 erros (-50%)**
+**Recupera��o acumulada: 12 → 5 erros (-58%)**
 
-**Mudan�as desde snapshot anterior (01:32Z → 02:12Z):**
-- **2 crons recuperados (error → ok):**
-  - `lorehold-deck-scout` — rodou OK �s 01:53Z
-  - `manaloom-code-structure-auditor` (3h) — rodou OK �s 01:59Z
+**Mudan�as desde snapshot anterior (02:12Z → 02:51Z):**
+- **1 cron recuperado (error → ok):**
+  - `manaloom-commander-knowledge-deep` — rodou OK �s 02:47Z
 - **Diagn�stico:** Rate limit continuando a recuperar gradualmente
 - **A��o tomada:** Nenhuma -- recupera��o autom�tica pelo scheduler
-- **Previs�o:** 6 crons restantes devem recuperar nos pr�ximos ticks conforme scheduler
+- **Previs�o:** 5 crons restantes devem recuperar nos pr�ximos ticks conforme scheduler
 
-## Crons OK (12)
+## Crons OK (13)
 
 | Job ID | Nome | Schedule | Last run | Status | Observa��o |
 |---|---|---|---|---|---|
@@ -47,15 +46,16 @@
 | `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-31T01:59Z | ok | ✅ recuperado de 429 (agora!) |
 | `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-30T14:30Z | ok | semanal |
 | `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-31T01:20Z | ok | ✅ recuperado de 429 |
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T01:43Z | ok | **esta execu��o** |
+| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T02:51Z | ok | **esta execu��o** |
 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ok | di�rio |
 | `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-31T01:08Z | ok | ✅ recuperado de 429 |
 | `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | 2026-05-30T16:11Z | ok | 12h schedule |
 | `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-31T01:31Z | ok | ✅ recuperado de 429 |
+| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-31T02:47Z | ok | ✅ recuperado de 429 (agora!) |
 | `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-31T01:16Z | ok | ✅ recuperado de 429 |
 | `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-31T01:18Z | ok | 8h schedule |
 
-## Crons com Erro (6) -- Rate Limit Residual
+## Crons com Erro (5) -- Rate Limit Residual
 
 Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` que est� se recuperando.
 
@@ -71,7 +71,6 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 | Job ID | Nome | Schedule | Last run | �ltimo erro | Pr�ximo tick |
 |---|---|---|---|---|---|
-| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-30T22:33Z | 429 | ~02:33Z |
 | `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-30T20:50Z | 429 | ~02:50Z |
 
 ### Lorehold Pipeline com Erro
@@ -84,20 +83,20 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 **Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` (recuperando gradualmente)
 **Provider:** OpenRouter (free-tier shared pool)
-**Afetados:** 6/18 crons (redu��o de 12 para 6 -- melhora de 50%)
+**Afetados:** 5/18 crons (redu��o de 12 para 5 -- melhora de 58%)
 **Dura��o total do incidente:** ~5h (desde ~21:00Z 30/05)
-**Status:** **RECUPERA��O EM ANDAMENTO** -- 6 crons j� voltaram a ok desde o pico
+**Status:** **RECUPERA��O EM ANDAMENTO** -- 7 crons j� voltaram a ok desde o pico
 
 **Por que nenhum `run` foi disparado:**
-- Com 6 crons j� recuperados, o rate limit est� claramente lifting
-- Todos os 6 crons de erro t�m next_run_at no futuro (pr�ximos ticks pendentes)
+- Com 7 crons j� recuperados, o rate limit est� claramente lifting
+- Todos os 5 crons de erro t�m next_run_at no futuro (pr�ximos ticks pendentes)
 - Disparar `run` em crons que est�o prestes a rodar naturalmente desperdi�a chamadas
 
 **Recupera��o esperada:**
-- Os 6 crons restantes devem auto-recuperar nos pr�ximos 30-60min conforme o scheduler tick
+- Os 5 crons restantes devem auto-recuperar nos pr�ximos 30-60min conforme o scheduler tick
 - Se algum cron ainda estiver em erro ap�s 2-3 ticks naturais, pode indicar problema estrutural
 
-## A��es Realizadas Neste Cycle (2026-05-31T02:12Z)
+## A��es Realizadas Neste Cycle (2026-05-31T02:51Z)
 
 | A��o | Cron | Resultado |
 |:-----|:------|:----------|
@@ -105,16 +104,16 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 ## Alertas Pendentes
 
-**P1 -- 6 crons ainda com HTTP 429 (rate limit residual, melhorando):**
+**P1 -- 5 crons ainda com HTTP 429 (rate limit residual, melhorando):**
 - **Sintoma:** Crons `openrouter/owl-alpha` com schedules curtos ainda falhando com 429
 - **Impacto:** Produ��o de conhecimento/audits parcialmente reduzida
-- **Tend�ncia:** MELHORA CONT�NUA -- de 12 para 6 erros (50% de melhora)
+- **Tend�ncia:** MELHORA CONTÍNUA -- de 12 para 5 erros (58% de melhora)
 - **Recupera��o:** Autom�tica conforme scheduler tick
-- **A��o do watchdog:** Monitorar pr�ximo tick. Se os 6 crons restantes n�o recuperarem em 90min, investigar individualmente
+- **A��o do watchdog:** Monitorar pr�ximo tick. Se os 5 crons restantes n�o recuperarem em 90min, investigar individualmente
 
 ## Mudan�as desde Snapshot Anterior
 
-### Crons que Recuperaram (ERROR → OK) -- 2
+### Crons que Recuperaram (ERROR → OK) -- 3 (cumulativo)
 
 | Cron | Schedule | Recuperou em |
 |:-----|:--------|:-----------|
@@ -151,7 +150,7 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 - **6 crons ainda em erro** -- redu��o de 12→8→6 (melhor cont�nua de 50%)
 - **Rate limit em recupera��o** -- tend�ncia positiva consistente em 3 snapshots
 - **Nenhum cron foi desabilitado** -- recupera��o ser� autom�tica
-- **Nenhum `run` ou `resume` necess�rio** -- scheduler natural processando todos os ticks
+- **Nenhum `run` ou `resume` necess�rio** -- scheduler natural processando todos os ticks (mana-base-validator next_run_at=02:50Z, 1min em atraso, dentro da tolerância)
 
 ---
 
@@ -235,4 +234,4 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 *Status snapshot: 2026-05-31T02:12Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 12 ok, 6 error -- rate limit em recupera��o, tend�ncia positiva cont�nua: 12→8→6 erros / 50% melhora)*
 
-*Recupera��o timeline: 00:53Z (12 erros) → 01:32Z (8 erros, -4) → 02:12Z (6 erros, -2) | Pr�xima valida��o: ~02:42Z*
+*Recuperação timeline: 00:53Z (12 erros) → 01:32Z (8 erros, -4) → 02:12Z (6 erros, -2) → 02:51Z (5 erros, -1) | Próxima validação: ~03:21Z*

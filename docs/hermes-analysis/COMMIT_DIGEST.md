@@ -1,19 +1,44 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-31T03:00Z (Incremento: weakness-analysis F1 adapter + manual update — 84553ef8).
+> Atualizado em 2026-05-31T03:00Z (Incremento: dead code cleanup + test infrastructure + singleton reset — d3cfaf3b).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `3f7d784f` (Guard expanded semantic roles behind flag)
-- HEAD atual: **`84553ef8`** (Document write-only tables + manual-de-instrucao update)
+- HEAD anterior: `84553ef8` (Document write-only tables + manual-de-instrucao update)
+- HEAD atual: **`d3cfaf3b`** (Architecture: add resetForTesting/clear/reset to all singletons)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 
 
-## Novos commits nesta rodada (2026-05-30 a 2026-05-31)
+## Novos commits nesta rodada (2026-05-31)
+### `d3cfaf3b` — Architecture: add resetForTesting/clear/reset to all singletons (atual HEAD)
+- **18 arquivos** (9 serviços × 2 arquivos cada: source + test)
+- **Tipo: CODE/TEST-INFRA** — Adiciona métodos `resetForTesting()`, `clear()`, `reset()` a 9 singletons: ApiClient, PerformanceService, PushNotificationService, EdhrecService, OptimizeJobStore, RateLimiter, AuthService, Database, AiGenerateJobStore
+- **Impacto:** Permite isolamento de estado entre testes, eliminando shared state que causava falhas intermitentes
+
+### `a6b60d59` — Test: fix 2/3 flutter failures — golden baseline, shared state
+- **Tipo: CODE/FIX** — Corrige golden test baseline e adiciona SharedPreferences.clear() no setUp/tearDown
+
+### `0e4ffd0e` — Test: add setUp/tearDown to deck_provider_support and life_counter tests
+- **Tipo: CODE/FIX** — Reduz shared state entre testes Flutter
+
+### `d3d924da` — Test: update home_hero_sma135m golden baseline
+- **Tipo: CODE/FIX** — Atualiza baseline golden para refletir rendering atual
+
+### `8cab6400` — Dead code cleanup: remove 64 one-shot scripts + ~30 test artifact directories
+- **828 arquivos**, **~1.2M linhas removidas**
+- **Tipo: CODE/HIGIENE** — Remove scripts únicos (migrations/backfill/demo/debug/python), logs, .bak, e diretórios de test artifacts não referenciados. Mantém apenas sistema de migração ativo e artifacts referenciados por testes
+- **Segurança:** Apenas remoção — sem mudança de lógica de negócio; artifacts em uso preservados
+
+### `2880a94c` — Fix: restore test artifact referenced by external_commander_meta_candidate_support_test
+- **Tipo: CODE/FIX** — Restaura artefato de teste que foi removido incorretamente no cleanup anterior
+
+---
+
+## Novos commits anteriores (2026-05-30 a 2026-05-31)
 
 ### `21768cca` — Layout: add tablet viewport test (820px) to deck_card_overflow_test (2026-05-30, atual HEAD)
 - **1 arquivo**, **+16 linhas**
