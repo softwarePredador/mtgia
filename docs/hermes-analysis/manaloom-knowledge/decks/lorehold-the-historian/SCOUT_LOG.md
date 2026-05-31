@@ -2584,3 +2584,67 @@ Archaeomancer's Map (+0.29) e Bender's Waterskin (0.00) são neutros.
 ---
 
 **Dados brutos:** `/tmp/edhrec_lorehold_fresh.html` (654KB, 277 cardview entries, EDHREC Live 7.765 decks)
+
+---
+
+## [2026-05-31T12:00:00+00:00] Execução #14 — Purpose Analyzer v3.6 (Pós-Ciclo #4, EDHREC 7802 decks)
+
+### Fonte de Dados
+- **EDHREC JSON API:** 7802 decks (atualizado)
+- **knowledge.db:** deck_id=6, 86 rows, SUM(qty)=100 ✅
+- **user_collection:** 196 cartas
+
+### Dados do Deck (Pós-Ciclo #4)
+
+| Aspecto | Valor | Status |
+|:--------|:-----:|:-------|
+| Ciclos aplicados | 4 (19 swaps desde baseline) | — |
+| Cartas ≥30% EDHREC (não-terra) | 39/62 (62.9%) | ✅ |
+| Cartas 0% EDHREC (não-terra) | 0 | ✅ |
+| Motor Lorehold | **4/4 COMPLETO** | ✅ |
+| Double-null cards | 7 | 🟡 Estável |
+| Sem Play T3 (simulação Exec#8) | 12.0% | 🟡 BALANCED |
+
+### Resumo de Tendências
+
+**RISING STARS (EDHREC confirmed):**
+1. Improvisation Capstone: 49.0% trend +8.09 — JÁ NO DECK ✅
+2. Restoration Seminar: 37.8% trend +9.14 — JÁ NO DECK ✅
+3. The Dawning Archaic: 24.0% trend +5.31 — ❌ NÃO NO DECK, PRIORIDADE C#5
+4. Big Score: 67.3% trend +1.51 — JÁ NO DECK ✅
+5. Storm-Kiln Artist: 55.4% trend +0.76 — JÁ NO DECK ✅
+
+**DECLINING (cartas no deck):**
+1. Artist's Talent: 21.1% trend -0.70 — 4º ciclo em declínio, corte C#5
+2. Esper Sentinel: 32.5% trend -0.54 — declínio lento, manter
+3. Perch Protection: 34.5% trend -0.43 — corte C#5
+4. Pearl Medallion: 25.2% trend -0.46 — monitorar
+5. Ruby Medallion: 42.3% trend -0.37 — monitorar
+6. Call Forth the Tempest: 65.5% trend -0.30 — manter (ainda alto)
+
+### Cartas da Coleção Fora do Deck (EDHREC >30%)
+
+1. **The Dawning Archaic** — 24.0% (trend +5.31, rising star)
+2. **Apex of Power** — 55.0% (trend +0.11, high base)
+3. **Rise of the Eldrazi** — 54.8% (trend -0.46, declining)
+4. **Victory Chimes** — 53.6% (trend 0.00, estável)
+5. **Rugged Prairie** — 52.2% (trend +0.15, dual land)
+
+### Análise Qualitativa
+
+**Estado do motor 4/4 COMPLETO ✅** com todos subindo no meta. Não há gap motor.
+
+**Gap de draw PERSISTENTE** (5 vs 8-12 EDHREC): Estrutural em Boros. Compensado com topdeck manipulation (Scroll Rack, Penance, Sensei's Top) + Treasures.
+
+**Gap de removal:** Só 5 peças. Chaos Warp adiciona camada universal que falta. Recomendado C#5.
+
+**Treasure > Cost Reduction confirmado:** Community abandoning Medallions in favor of Treasure synergy. Nosso deck reflete corretamente — 16 ramp mas só 2 Medallions.
+
+### Reccomendações Ciclo #5 (BALANCED, net ΔCMC ≈ +2)
+
+1. Artist's Talent → Chaos Warp (declining draw → universal removal)
+2. Oswald Fiddlebender → The Dawning Archaic (0% → rising star 24%)
+3. Perch Protection → Arcane Bombardment (proteção CMC 6 → copy engine 42.5%)
+
+### Dados Brutos
+EDHREC JSON API 7802 decks via json.edhrec.com/api/pages/commanders/lorehold-the-historian.json
