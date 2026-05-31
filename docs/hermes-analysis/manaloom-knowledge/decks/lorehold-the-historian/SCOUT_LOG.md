@@ -16,6 +16,40 @@ para Ciclo #6**, com base nas tendências, gaps, e evolução do meta.
 
 ---
 
+## [2026-05-31T07:42:01+00:00] Execuçao #14 — Purpose Analyzer v3.7 (Pos-Ciclo #5)
+
+### Dados EDHREC (7.802 decks)
+- Sem mudancas numericas significativas desde Execucao #13
+- Rising stars confirmadas: Improvisation Capstone (+8.09), Restoration Seminar (+9.14), The Dawning Archaic (+5.31)
+- Declinios confirmados: Esper Sentinel (-0.54), Seething Song (-0.49), Pearl Medallion (-0.46)
+
+### Cartas na Colecao >30% EDHREC Fora do Deck
+1. **Apex of Power (55.0%)** — draw explosivo, maior gap do deck
+2. **Victory Chimes (53.6%)** — artifact synergy draw
+3. **Soulfire Eruption (42.5%)** — dano massivo copiavel
+4. **Emeria's Call (43.4%)** — MDFC land + board wipe
+5. **Pinnacle Monk (41.6%)** — flicker spell
+
+### Double-Null Cards (7)
+- Seguros: Scroll Rack (59.7%), Penance (41.8%)
+- Cortaveis: Pearl Medallion (25.2%, trend -0.46)
+- Monitorar: Grand Abolisher (11.7%), Ruby Medallion (42.3%)
+
+### Recomendacao Ciclo #6 (DEFENSIVO)
+1. Goldspan Dragon (CMC 5, 17.8%) -> Apex of Power (CMC 5, 55.0%) [draw, net ΔCMC 0]
+2. Pearl Medallion (CMC 2, 25.2%) -> Victory Chimes (CMC 2, 53.6%) [draw, net ΔCMC 0]
+3. Galvanoth (CMC 5, 26.5%) -> Soulfire Eruption (CMC 4, 42.5%) [spell, net ΔCMC -1]
+
+**Estrategia:** DEFENSIVO — precisa net ΔCMC -5 a -10 para reduzir T3 de 15.3% para <12%.
+Os 3 swaps acima dao net ΔCMC = -1. Necessario mais 2-3 swaps com ΔCMC negativo.
+
+### Tendencias Estaveis
+- Nenhuma mudança significativa desde v3.6
+- Comunidade continua valorizando: tesouro generators, copy engines, cost cheating
+- Comunidade continua abandonando: cost reduction (Medallions), rituals (Seething Song)
+
+---
+
 ### ESTADO ATUAL DO DECK (Pós-Ciclo #5, Confirmado)
 
 #### Métricas vs Perfil EDHREC

@@ -32,5 +32,8 @@ Análise estruturada salva em analyses/aesi-tyrant-of-gyre-strait.md. Três cart
 ## Aesi, Tyrant of Gyre Strait - 2026-05-28 (Bounce Lands & ManaLoom Gaps)
 Bounce lands (Simic Growth Chamber, Coral Atoll) são peças-chave silenciosas: re-triggar landfall e Aesi a cada ciclo, criando loops com Kodama of the East Tree. O deck inclui 2 bounce lands + 2 fetch lands + Evolving Wilds/Terramorphic Expanse — totalizando ~8 terrenos que "entram e saem" para maximizar triggers. Gap ManaLoom: 4 cartas com tags incorretas — Aesi (draw→engine), Tatyova (draw→engine), Avenger (other→wincon), Cyclonic Rift (removal→board_wipe). Recomendação: sistema precisa de tag composta "engine" para comandantes que geram valor em múltiplas dimensões.
 
+## Aesi, Tyrant of Gyre Strait — 2026-05-31 (Gap Tags ManaLoom)
+Releitura do deck corpus revela 4 tags ManaLome persistentes incorretas: Aesi (draw→engine), Tatyova (draw→engine), Avenger (other→wincon), Cyclonic Rift (removal→board_wipe). Problema estrutural: o sistema de 1-tag-per-carta não captura comandantes multi-função. Recomendação: tag composta "engine" para cartas que geram valor em múltiplas dimensões (draw+ramp simultâneo).
+
 ## Aesi, Tyrant of Gyre Strait — 2026-05-31 (Consolidação Final)
 Reconsolidação: o deck opera com filosofia de resiliência via velocidade de recast (23 ramp), não via proteção (apenas 2 cartas). Triângulo de winning: Exploration habilita o motor cedo, Avenger converte terrenos em exército, Cyclonic Rift resetar oponentes sem tocar nos 40 terrenos. Insight deckbuilding: "proteção real" em Asei = ramp massiva, não Counterspell. Vulnerabilidades: Mass Land Destruction é quase irreversível; decks combo rápidos bracket 4 vencem antes da inércia de valor se estabelecer.
