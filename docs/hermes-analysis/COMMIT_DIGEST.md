@@ -1,13 +1,13 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-31T03:00Z (Incremento: dead code cleanup + test infrastructure + singleton reset — d3cfaf3b).
+> Atualizado em 2026-05-31T04:2118Z (Incremento: restore test artifact + dead code cleanup — 2880a94c).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `84553ef8` (Document write-only tables + manual-de-instrucao update)
-- HEAD atual: **`d3cfaf3b`** (Architecture: add resetForTesting/clear/reset to all singletons)
+- HEAD anterior: `d3cfaf3b` (Architecture: add resetForTesting/clear/reset to all singletons)
+- HEAD atual: **`2880a94c`** (Fix: restore test artifact referenced by external_commander_meta_candidate_support_test)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)

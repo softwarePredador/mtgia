@@ -1,158 +1,129 @@
 # ManaLoom Cron Status
 
-> Relat�rio gerencial de todos os crons do projeto.
+> Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-31T03:37Z** (manaloom-manager-watchdog)
+> Última atualização: **2026-05-31T04:21:01Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
-| M�trica | Valor |
+| Métrica | Valor |
 |:--|:--:|
 | Total de crons (`include_disabled=True`) | **18** |
 | Habilitados | 18/18 |
 | Desabilitados | **0** |
-| `last_status=error` | **4** |
-| `last_status=ok` | **14** |
+| `last_status=error` | **3** |
+| `last_status=ok` | **15** |
 | Nunca executaram (`last_run_at=null`) | **0** |
-| Stale (>1.5x schedule atr�s, `enabled=true`) | **0** |
-| A��es de recupera��o nesta execu��o | 0 (rate limit lifting -- auto-recupera��o em progresso) |
+| Stale (>1.5x schedule atrás, `enabled=true`) | **0** |
+| Ações de recuperação nesta execução | 0 (rate limit lifting -- auto-recuperação em progresso) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 18 crons habilitados, **14 OK**, **4 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 → 5 → 4 erros em ~3h**.
+**Estado geral:** 18 crons habilitados, **15 OK**, **3 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 → 5 → 4 → 3 erros em ~4h**.
 
-## An�lise de Recupera��o
+## Análise de Recuperação
 
-| Snapshot | Hor�rio | OK | Erros | Delta Erros |
+| Snapshot | Horário | OK | Erros | Delta Erros |
 |:--|:--:|:--:|:--:|:--:|
 | 1 | 2026-05-31T00:53Z | 6 | 12 | — |
 | 2 | 2026-05-31T01:32Z | 10 | 8 | -4 |
 | 3 | 2026-05-31T02:12Z | 12 | 6 | -2 |
-| 4 | 2026-05-31T03:37Z | 14 | 4 | -1 |
+| 4 | 2026-05-31T02:51Z | 13 | 5 | -1 |
+| 5 | 2026-05-31T03:37Z | 14 | 4 | -1 |
+| 6 | 2026-05-31T04:21:01Z | **15** | **3** | **-1** |
 
-**Recupera��o acumulada: 12 → 5 erros (-58%)**
+**Recuperação acumulada: 12 → 3 erros (-75%)**
 
-**Mudan�as desde snapshot anterior (02:12Z → 02:51Z):**
+**Mudanças desde snapshot anterior (03:37Z → 2026-05-31T04:21:01Z):**
 - **1 cron recuperado (error → ok):**
-  - `manaloom-commander-knowledge-deep` — rodou OK �s 02:47Z
-- **Diagn�stico:** Rate limit continuando a recuperar gradualmente
-- **A��o tomada:** Nenhuma -- recupera��o autom�tica pelo scheduler
-- **Previs�o:** 5 crons restantes devem recuperar nos pr�ximos ticks conforme scheduler
+  - `manaloom-mana-base-validator` — rodou OK às 03:12Z
+- **Diagnóstico:** Rate limit continuando a recuperar gradualmente
+- **Ação tomada:** Nenhuma -- recuperação automática pelo scheduler
+- **Previsão:** 3 crons restantes devem recuperar nos próximos ticks conforme scheduler. Crons de longo schedule (weekly, 0 16,21) podem demorar mais.
 
-## Crons OK (13)
+## Crons OK (15)
 
-| Job ID | Nome | Schedule | Last run | Status | Observa��o |
+| Job ID | Nome | Schedule | Last run | Status | Observação |
 |---|---|---|---|---|---|
-| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-31T01:54Z | ok | script-based |
-| `f20ac299992b` | lorehold-deck-scout | every 120m | 2026-05-31T01:53Z | ok | ✅ recuperado de 429 (agora!) |
-| `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-31T01:59Z | ok | ✅ recuperado de 429 (agora!) |
+| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-31T03:27Z | ok | script-based |
+| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | **error** | 429 residual, next 16:00Z |
 | `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-30T14:30Z | ok | semanal |
-| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-31T01:20Z | ok | ✅ recuperado de 429 |
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T02:51Z | ok | **esta execu��o** |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ok | di�rio |
+| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-31T02:47Z | ok | ✅ recuperado de 429 |
+| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-31T03:28Z | ok | ✅ recuperado de 429 |
+| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T03:42Z | ok | **esta execução** |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ok | diário |
+| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-31T03:12Z | ok | ✅ recuperado de 429 (agora!) |
+| `f20ac299992b` | lorehold-deck-scout | every 120m | 2026-05-31T04:04Z | ok | ✅ recuperado de 429 |
 | `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-31T01:08Z | ok | ✅ recuperado de 429 |
+| `08468451a06a` | lorehold-mulligan-analyst | every 360m | 2026-05-31T04:16Z | ok | ✅ recuperado de 429 |
 | `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | 2026-05-30T16:11Z | ok | 12h schedule |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-31T01:31Z | ok | ✅ recuperado de 429 |
-| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-31T02:47Z | ok | ✅ recuperado de 429 (agora!) |
-| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-31T01:16Z | ok | ✅ recuperado de 429 |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-31T03:55Z | ok | ✅ recuperado de 429 |
+| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-31T03:37Z | ok | ✅ recuperado de 429 |
 | `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-31T01:18Z | ok | 8h schedule |
+| `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-31T01:59Z | ok | ✅ recuperado de 429 |
 
-## Crons com Erro (4) -- Rate Limit Residual
+## Crons com Erro (3) -- Rate Limit Residual
 
-Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` que est� se recuperando.
+Todos os erros abaixo são provavelmente resíduos do rate limit `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` que está se recuperando.
 
-### Crons de Auditoria / Gerenciais com Erro
-
-| Job ID | Nome | Schedule | Last run | �ltimo erro | Pr�ximo tick |
+| Job ID | Nome | Schedule | Last run | Último erro | Próximo tick |
 |---|---|---|---|---|---|
-| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | 429 | 16:00Z |
-| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | 2026-05-30T16:56Z | 429 | domingo 06:00Z |
-| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-31T00:52Z | 429 | ~02:52Z |
+| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-31T21:00Z | 429 | 2026-05-31T16:00Z |
+| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | 2026-05-30T16:56Z | 429 | próximo domingo 06:00Z |
+| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-31T03:26Z | 429* | ~05:26Z |
 
-### Crons de Conhecimento Commander com Erro
+*Nota: `manaloom-logic-coherence-auditor` marcou FAILED mas output contém audit report válido com apenas P2 findings (doc drift). Erro provavelmente de tool-call limit, não de rate limit. Próximo tick natural para validar.
 
-| Job ID | Nome | Schedule | Last run | �ltimo erro | Pr�ximo tick |
-|---|---|---|---|---|---|
-| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-30T20:50Z | 429 | ~02:50Z |
-
-### Lorehold Pipeline com Erro
-
-| Job ID | Nome | Schedule | Last run | �ltimo erro | Pr�ximo tick |
-|---|---|---|---|---|---|
-| `08468451a06a` | lorehold-mulligan-analyst | every 360m | 2026-05-30T21:53Z | 429 | ~03:53Z |
-
-## An�lise de Erro
+## Análise de Erro
 
 **Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` (recuperando gradualmente)
 **Provider:** OpenRouter (free-tier shared pool)
-**Afetados:** 5/18 crons (redu��o de 12 para 5 -- melhora de 58%)
-**Dura��o total do incidente:** ~5h (desde ~21:00Z 30/05)
-**Status:** **RECUPERA��O EM ANDAMENTO** -- 7 crons j� voltaram a ok desde o pico
+**Afetados:** 3/18 crons (redução de 12 para 3 -- melhora de 75%)
+**Duração total do incidente:** ~7h (desde ~21:00Z 30/05)
+**Status:** **RECUPERAÇÃO EM ANDAMENTO** -- 15 crons já voltaram a ok desde o pico
 
 **Por que nenhum `run` foi disparado:**
-- Com 7 crons j� recuperados, o rate limit est� claramente lifting
-- Todos os 5 crons de erro t�m next_run_at no futuro (pr�ximos ticks pendentes)
-- Disparar `run` em crons que est�o prestes a rodar naturalmente desperdi�a chamadas
+- Com 15 crons já recuperados, o rate limit está claramente lifting
+- Todos os 3 crons de erro têm next_run_at no futuro (próximos ticks pendentes)
+- `manaloom-logic-coherence-auditor`: próximo tick em ~05:26Z (~45min de agora)
+- `manaloom-hermes-normal-audit`: próximo tick em 16:00Z (~4.5h de agora)
+- `manaloom-code-structure-auditor` (weekly): próximo domingo 06:00Z
+- Disparar `run` em crons que estão prestes a rodar naturalmente desperdiçaria chamadas
 
-**Recupera��o esperada:**
-- Os 5 crons restantes devem auto-recuperar nos pr�ximos 30-60min conforme o scheduler tick
-- Se algum cron ainda estiver em erro ap�s 2-3 ticks naturais, pode indicar problema estrutural
+**Recuperação esperada:**
+- `logic-coherence-auditor` deve auto-recuperar no próximo tick (~05:26Z)
+- `hermes-normal-audit` deve auto-recuperar no tick das 16:00Z
+- `code-structure-auditor` (weekly) recupera no próximo domingo
 
-## A��es Realizadas Neste Cycle (2026-05-31T02:51Z)
+## Ações Realizadas Neste Cycle (2026-05-31T04:21:01Z)
 
-| A��o | Cron | Resultado |
+| Ação | Cron | Resultado |
 |:-----|:------|:----------|
-| -- | Nenhuma (auto-recupera��o em progresso) | 2 crons recuperados naturalmente | Aguardando pr�ximos ticks para os 6 restantes |
+| -- | Nenhuma (auto-recuperação em progresso) | 1 cron recuperado naturalmente (mana-base-validator) |
 
 ## Alertas Pendentes
 
-**P1 -- 5 crons ainda com HTTP 429 (rate limit residual, melhorando):**
-- **Sintoma:** Crons `openrouter/owl-alpha` com schedules curtos ainda falhando com 429
-- **Impacto:** Produ��o de conhecimento/audits parcialmente reduzida
-- **Tend�ncia:** MELHORA CONTÍNUA -- de 12 para 5 erros (58% de melhora)
-- **Recupera��o:** Autom�tica conforme scheduler tick
-- **A��o do watchdog:** Monitorar pr�ximo tick. Se os 5 crons restantes n�o recuperarem em 90min, investigar individualmente
+**P2 -- 3 crons ainda com HTTP 429 (rate limit residual, melhorando):**
+- **Sintoma:** Crons `openrouter/owl-alpha` com schedules longos ainda falhando com 429
+- **Impacto:** Redução temporária de auditorias e análises
+- **Tendência:** MELHORA CONTÍNUA -- de 12 para 3 erros (75% de melhora)
+- **Recuperação:** Automática conforme scheduler tick
+- **Ação do watchdog:** Monitorar próximo tick. Se `logic-coherence-auditor` não recuperar no tick das 05:26Z, investigar individualmente
 
-## Mudan�as desde Snapshot Anterior
+## Mudanças desde Snapshot Anterior
 
-### Crons que Recuperaram (ERROR → OK) -- 4 (cumulativo)
+### Crons que Recuperaram (ERROR → OK) -- 2 neste cycle (cumulativo -6)
 
 | Cron | Schedule | Recuperou em |
 |:-----|:--------|:-----------|
-| lorehold-deck-scout | every 120m | 2026-05-31T01:53Z |
-| manaloom-code-structure-auditor (3h) | every 180m | 2026-05-31T01:59Z |
 | manaloom-mana-base-validator | every 360m | 2026-05-31T03:12Z |
+| manaloom-commander-knowledge-deep | every 240m | 2026-05-31T02:47Z |
 
 ### Crons que Regrediram (OK → ERROR)
 *(nenhum)*
 
-### Crons Est�veis
+### Outras Observações
 
-| Cron | Status |
-|:-----|:--------|
-| manaloom-manager-watchdog | ok |
-| manaloom-master-watchdog | ok |
-| manaloom-hermes-weekly-parallel-audit | ok |
-| manaloom-tag-accuracy-reporter | ok |
-| lorehold-evolution-oracle | ok |
-| lorehold-battle-analyst | ok |
-| lorehold-deck-validator | ok |
-| manaloom-gamechanger-research | ok |
-| manaloom-knowledge-import | ok |
-| manaloom-knowledge-synthesis | ok |
-| manaloom-hermes-normal-audit | 429 |
-| manaloom-commander-knowledge-deep | 429 |
-| manaloom-mana-base-validator | 429 |
-| lorehold-mulligan-analyst | 429 |
-| manaloom-code-structure-auditor (weekly) | 429 |
-| manaloom-logic-coherence-auditor | 429 |
-
-## Observa��es Importantes
-
-- **Fleet: 18 crons** (sem mudan�a)
-- **6 crons ainda em erro** -- redu��o de 12→8→6 (melhor cont�nua de 50%)
-- **Rate limit em recupera��o** -- tend�ncia positiva consistente em 3 snapshots
-- **Nenhum cron foi desabilitado** -- recupera��o ser� autom�tica
-- **Nenhum `run` ou `resume` necess�rio** -- scheduler natural processando todos os ticks (mana-base-validator next_run_at=02:50Z, 1min em atraso, dentro da tolerância)
+- `/health` endpoint retornou HTTP 502 (Bad Gateway) às 2026-05-31T04:21:01Z -- serviço de produção pode estar instável ou ciclando
 
 ---
 
@@ -189,38 +160,38 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 ---
 
-## Precis�o das Functional Tags (manaloom-tag-accuracy-reporter)
+## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
-> �ltima atualiza��o: **2026-05-30T14:42Z**
+> Última atualização: **2026-05-30T14:42Z**
 
 ### Resumo Geral
 
-| M�trica | Valor |
+| Métrica | Valor |
 |:--------|:-----:|
-| **Precis�o total** | **83.3%** (378/454 classifica��es corretas) |
+| **Precisão total** | **83.3%** (378/454 classificações corretas) |
 | Tags avaliadas | 29 |
 | Tags com 100% | 14 |
 | Tags com < 50% | 7 |
 
-### Tags com Precis�o 100% (14)
+### Tags com Precisão 100% (14)
 
 `land` (87/87), `ramp` (53/53), `draw` (32/32), `removal` (30/30), `tutor` (6/6), `board_wipe` (3/3), `recursion` (3/3), `wipe` (1/1), `sacrifice_outlet` (1/1), `finisher` (2/2), `utility` (76/76), `creature` (22/22), `planeswalker` (2/2), `artifact` (2/2), `enchantment` (3/3)
 
-### Tags com Precis�o < 50% (7)
+### Tags com Precisão < 50% (7)
 
-| Tag | Precis�o | Amostra | Problema |
+| Tag | Precisão | Amostra | Problema |
 |:----|:--------:|:-------:|:---------|
-| `ninja` | 0.0% | 17/17 erradas | Tag muito espec�fica -- classificador n�o reconhece ninja como fun��o |
+| `ninja` | 0.0% | 17/17 erradas | Tag muito específica -- classificador não reconhece ninja como função |
 | `ramp + combo_piece` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `recursion + wincon` | 0.0% | 1/1 errada | Tag compoda rara -- amostra insuficiente |
+| `recursion + wincon` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
 | `ramp + payoff` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
 | `payoff + removal` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
 | `payoff + token_maker` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `stax_disruption` | 0.0% | 3/3 erradas | Classificador n�o possui categoria stax |
+| `stax_disruption` | 0.0% | 3/3 erradas | Classificador não possui categoria stax |
 
-### Tags com Precis�o 50-75% (8)
+### Tags com Precisão 50-75% (8)
 
-| Tag | Precis�o | Amostra |
+| Tag | Precisão | Amostra |
 |:----|:--------:|:-------:|
 | `payoff` | 35.5% | 11/31 |
 | `combo_piece` | 50.0% | 1/2 |
@@ -230,19 +201,19 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 | `wincon` | 75.0% | 6/8 |
 | `engine` | 75.0% | 6/8 |
 
-### An�lise
+### Análise
 
-**Pontos fortes:** Tags estruturais (`land`, `creature`, `artifact`, `enchantments`) e fun��es prim�rias (`ramp`, `draw`, `removal`, `tutor`) t�m precis�o perfeita.
+**Pontos fortes:** Tags estruturais (`land`, `creature`, `artifact`, `enchantments`) e funções primárias (`ramp`, `draw`, `removal`, `tutor`) têm precisão perfeita.
 
 **Pontos fracos:**
-1. **Tags compostas** t�m amostra m�nima (1 caso cada) e 0% de precis�o
-2. **`stax_disruption` (0/3):** Classificador n�o possui categoria dedicada para stax
-3. **`ninja` (0/17):** Tag muito espec�fica de tribo -- classificador funcional n�o captura tribos
-4. **`payoff` (35.5%):** Tag amb�gua -- classificador confunde payoff com wincon ou engine
-5. **`enabler` (50.0%):** Fronteira dif�cil -- distin��o entre enabler e engine � sutil
+1. **Tags compostas** têm amostra mínima (1 caso cada) e 0% de precisão
+2. **`stax_disruption` (0/3):** Classificador não possui categoria dedicada para stax
+3. **`ninja` (0/17):** Tag muito específica de tribo -- classificador funcional não captura tribos
+4. **`payoff` (35.5%):** Tag ambígua -- classificador confunde payoff com wincon ou engine
+5. **`enabler` (50.0%):** Fronteira difícil -- distinção entre enabler e engine é sutil |
 
 ---
 
-*Status snapshot: 2026-05-31T02:12Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 12 ok, 6 error -- rate limit em recupera��o, tend�ncia positiva cont�nua: 12→8→6 erros / 50% melhora)*
+*Status snapshot: 2026-05-31T04:21:01Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 15 ok, 3 error -- rate limit em recuperação, tendência positiva contínua: 12→3 erros / 75% melhora)*
 
-*Recuperação timeline: 00:53Z (12 erros) → 01:32Z (8 erros, -4) → 02:12Z (6 erros, -2) → 02:51Z (5 erros, -1) | Próxima validação: ~03:21Z*
+*Recuperação timeline: 00:53Z (12 erros) → 01:32Z (8 erros, -4) → 02:12Z (6 erros, -2) → 02:51Z (5 erros, -1) → 03:37Z (4 erros, -1) → 2026-05-31T04:21:01Z (3 erros, -1) | Próxima validação: ~04:12Z*
