@@ -165,6 +165,10 @@ void main() {
       SharedPreferences.setMockInitialValues({});
     });
 
+    tearDown(() {
+      SharedPreferences.setMockInitialValues({});
+    });
+
     testWidgets('opens native day night from a shell fallback shortcut', (
       tester,
     ) async {

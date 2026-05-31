@@ -4,6 +4,7 @@ import 'package:manaloom/features/decks/models/deck.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/providers/deck_provider_support.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeApiClient extends ApiClient {
   _FakeApiClient({
@@ -63,6 +64,10 @@ class _FakeApiClient extends ApiClient {
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   test('readFreshDeckDetailsFromCache returns only fresh entries', () {
     final cachedDeck = DeckDetails(
       id: 'deck-1',
