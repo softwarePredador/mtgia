@@ -249,3 +249,52 @@ Com T3 = 12.0% (fronteira DEFENSIVO/BALANCED), o Ciclo #5 pode usar estratégia 
 
 *Simulação: 1000 mãos, seed=42, definição rigorosa. IC95% = ±2.8pp.*
 *Ramp T1 estrita: {Sol Ring, Land Tax, Weathered Wayfarer}.*
+
+---
+## Execução #9 — Pós-Ciclo #5 (2026-05-31T04:43:13Z)
+
+### Mudanças no Deck (Ciclo #5)
+- SAIU: Artist's Talent (CMC 2), Oswald Fiddlebender (CMC 2), Perch Protection (CMC 6)
+- ENTROU: Chaos Warp (CMC 3), The Dawning Archaic (CMC 3), Arcane Bombardment (CMC 5)
+- Net ΔCMC: +1
+
+### Resultados (seed=42, N=1000, definição rigorosa)
+
+| Métrica | Pos-C#4 (Exec#8) | Pos-C#5 (Exec#9) | Δ |
+|:--------:|:----------------:|:----------------:|:-:|
+| Jogáveis | 47.9% | 48.0% | +0.1pp |
+| Mulligan | 52.1% | 52.0% | -0.1pp |
+| Ramp T1 | 20.9% | 21.2% | +0.3pp |
+| Sem Play T3 | 13.0% | **15.3%** | **+2.3pp** |
+
+### Análise do Delta
+
+**Ramp T1 (estrita: Sol Ring + Land Tax + Wayfarer):** 20.9→21.2% (+0.3pp, ruído). Nenhuma carta de T1 ramp foi adicionada ou removida em Ciclo #5.
+
+**Sem Play T3:** 13.0→15.3% (+2.3pp). Piora causada pelo net ΔCMC +1 (Artist +2→+3, Oswald +2→+3, Perch +6→+5). Cada +1 CMC líquido em Boros 35 lands custa ~2pp em T3.
+
+**Jogáveis:** Estável (47.9→48.0%, +0.1pp). Dentro do ruído estatístico.
+
+### Estratégia para Ciclo #6: DEFENSIVA
+
+Com T3 = 15.3% (>12%), o Ciclo #6 DEVE usar estratégia DEFENSIVA:
+- Net ΔCMC alvo: -5 a -10
+- Prioridade: remover cartas CMC 5-6 com baixa EDHREC e substituir por CMC 1-2
+
+### Candidatos a Corte Ciclo #6 (DEFENSIVO)
+
+| Carta | CMC | EDHREC | Razão |
+|:------|:---:|:------:|:------|
+| Goldspan Dragon | 5 | 0% | Nenhuma presença EDHREC, duplo-null |
+| Galvanoth | 5 | 26.5% | Spellling subótimo, caro |
+| Taunt from Rampart | 5 | 35.2% | EDHREC ok mas CMC alto |
+| Double Vision | 5 | 46.6% | Muito bom para manter |
+
+### Recomendação
+
+Ciclo #6 DEFENSIVO: Goldspan Dragon (CMC 5, 0% EDHREC) → carta CMC 1-2 com >30% EDHREC da coleção. Galvanoth como segundo candidato se +2 swaps necessários.
+
+Meta: reduzir T3 de 15.3% para <12%.
+
+*Simulação: 1000 mãos, seed=42, definição rigorosa. IC95% = ±2.8pp.*
+*Ramp T1 estrita: {Sol Ring, Land Tax, Weathered Wayfarar}.*

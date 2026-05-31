@@ -147,3 +147,17 @@ A métrica de "jogáveis rigorosos" permanece ~49.5% — este é um **limite est
 ---
 
 *Simulação: 1000 maos, seed=42, definicao rigorosa. IC95% = ±2.8pp.*
+
+---
+## Execução #9 — Pós-Ciclo #5 (2026-05-31T04:43:48Z)
+
+### Resultados (seed=42, N=1000, definição rigorosa)
+
+| Métrica | Pos-C#4 (Exec#8) | Pos-C#5 (Exec#9) | Δ |
+|:--------:|:----------------:|:----------------:|:-:|
+| Jogáveis | 47.9% | 48.0% | +0.1pp |
+| Mulligan | 52.1% | 52.0% | -0.1pp |
+| Ramp T1 | 20.9% | 21.2% | +0.3pp |
+| Sem Play T3 | 13.0% | **15.3%** | **+2.3pp** |
+
+Sem Play T3 ultrapassou 12% → Estratégia Ciclo #6: DEFENSIVA (net ΔCMC -5 a -10).

@@ -166,3 +166,108 @@ Baseado na distribuição de CMC (novas cartas: Big Score CMC 4, Dance CMC 8, Th
 - Adicionar: Chaos Warp (38.9%), Trouble in Pairs, Faithless Looting
 - Cortar: Orim's Chant, Victory Chimes, Taunt from the Rampart
 - Prioridade: Reduzir "sem play T3" com interação CMC≤2
+
+---
+
+## [2026-05-31T04:42:18Z] Ciclo #5 — Evolution Oracle (BALANCED)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execução #13):**
+- Dados EDHREC estaveis (7.802 decks) vs Execução #12 — sem mudança numerica
+- Motor 4/4 completo desde Ciclo #3
+- Artist's Talent em declinio grave (-0.70, 21.1% EDHREC) — corte prioritario
+- The Dawning Archaic rising star confirmada 4+ ciclos (24.0%, trend +5.31)
+- Chaos Warp (38.8%) como removao universal missing
+- Arcane Bombardment (42.5%) como copy engine missing
+
+**VALIDATOR (v3.5):**
+- Deck pos-Ciclo #4: draw real = 5 (perfil quer 8-12), maior gap
+- Wincon dedicado = 1 (perfil quer 4-7)
+- Artist's Talent (-0.70) = carta mais urgente para cortar
+- Double-nulls seguros: Scroll Rack, Penance (manter)
+- Double-nulos cortaveis: Pearl Medallion, Galadriel's Dismissal
+
+**MULLIGAN (Exec#8 pos-Ciclo #4):**
+- Jogaveis: 49.5%, Mulligan: 46.4%
+- Ramp T1: 21.2%
+- Sem Play T3: 12.0%
+- Estrategia recomendada: BALANCED
+
+### Swap 1: Artist's Talent → Chaos Warp
+
+**Diagnóstico:** Artist's Talent é a carta em declínio mais grave do deck. 21.1% EDHREC com trend -0.70 — 4º ciclo consecutivo caindo. É um draw condicional (requer criatura atacante) que não escala. Em Lorehold, draw engine passivo é inferior a cartas que geram valor por si só.
+
+**Solução:** Chaos Warp é a melhor removal universal do jogo. Destrói QUALQUER permanente por CMC 3. É a única removal "qualquer coisa" do deck. 38.8% EDHREC. Instant speed. Na coleção.
+
+**Da sua coleção:** ✅ Sim (qty: 1, cmd, R)
+
+**Princípio:** Remoção universal > draw condicional. Em Lorehold, ter múltiplas formas de interação é mais valioso do que mais draw, especialmente em bracket 3 onde você enfrenta ameaças variadas de 3 oponentes.
+
+**Impacto esperado no mulligan:** T3 piora levemente (+1 CMC: 2→3). Dentro da estrategia BALANCED com margem de segurança.
+
+### Swap 2: Oswald Fiddlebender → The Dawning Archaic
+
+**Diagnóstico:** Oswald Fiddlebender (0% EDHREC) é um tutor condicional que requer sacrifício de artefato. Em um deck que gera tesouros, sacrificar artefatos para buscar um artefato específicos é contraditório — você perde valor imediato para ganho futuro incerto. Double-nulo do classificador.
+
+**Solução:** The Dawning Archaic é uma rising star confirmada em 4+ ciclos (24.0%, trend +5.31). CMC 3, criatura, voa, exilia top 7 e conjura permanente de CMC 7+ grátis. Quando copiada pelo Lorehold, gera valor absurdo. Complementa Approach e Dance como "cost cheating" engine.
+
+**Da sua coleção:** ✅ Sim (qty: 1, sos, M)
+
+**Princípio:** Rising stars confirmados (>20% base, >5.0 trend por 3+ ciclos) não são noise — são sinais claros da comunidade priorizando cartas que o deck não tem. O Dawning Archaic CMC 3 vs Oswald CMC 2, mas voa e é permanente (não precisa de setup).
+
+**Impacto esperado no mulligan:** Neutro a leve (+1 CMC). Voar compensa no mid-game.
+
+### Swap 3: Perch Protection → Arcane Bombardment
+
+**Diagnóstico:** Perch Protection (CMC 6) é uma protection encantamento que dá hexproof ao comandante. Em Lorehold, proteger o comandante é bom mas CMC 6 é caro demais — deck já tem 4 peças de proteção. O maior problema é falta de motores de valor, não falta de proteção.
+
+**Solução:** Arcane Bombardment (42.5% EDHREC, trend +0.09) é o copy engine que faltava. Com Double Vision + Arcane Bombardment + Lorehold commander, o deck tem 3 camadas de copy/spell value. Quando o oponente remove Double Vision, Arcane Bombardment continua gerando valor.
+
+**Da sua coleção:** ✅ Sim (qty: 1, snc, M)
+
+**Princípio:** Copy engines são a identidade de Lorehold. Mais copy = mais triggers = mais tesouros = mais big spells. Não há "demais" de copy em Lorehold.
+
+**Impacto esperado no mulligan:** T3 melhora leve (CMC 6 → 5).
+
+### Resumo do Ciclo
+
+| Métrica | Pos-C#4 | Pos-C#5 | Δ |
+|:--------|:-------:|:-------:|:-:|
+| Jogaveis | 47.9% | 48.0% | +0.1pp |
+| Mulligan | 52.1% | 52.0% | -0.1pp |
+| Ramp T1 | 20.9% | 21.2% | +0.3pp |
+| **Sem Play T3** | **13.0%** | **15.3%** | **+2.3pp** |
+
+**Net ΔCMC:** +1 (Artist +2→+3, Oswald +2→+3, Perch +6→+5)
+
+### Analise do Ciclo #5
+
+O Ciclo #5 atingiu seu objetivo principal: remover Artist's Talent (declinio -0.70), adicionar The Dawning Archaic (rising star), e adicionar Chaos Warp (removal universal + Arcane Bombardment (copy engine).
+
+**Ponto de atencao:** Sem Play T3 subiu de 13.0% para 15.3% (+2.3pp), ultrapassando o limite de 12% que define estrategia DEFENSIVI para o proximo ciclo. Ciclo #6 deve ser DEFENSIVO com net ΔCMC de -5 a -10.
+
+### Ciclo #6 Recomendado (DEFENSIVO)
+
+Com T3 = 15.3%, estrategia DEFENSIVA:
+- Goldspan Dragon (CMC 5, 0% EDHREC) → Faithless Looting já está no deck; considerar substituir por cartas CMC ≤2
+- Prioridade: reduzir CMC medio com cartas CMC 1-2 de alta EDHREC
+- Galvanoth (CMC 5, baixo impacto) é candidato a corte
+
+### Licoes do Ciclo #5
+
+1. **Artist's Talent é o tipo de carta que se esconde no deck por ter funcional_tag=draw** — mas o trend -0.70 revela que a comunidade já percebeu que é fraco. Confiar em EDHREC trend > funcional_tag para decisões de corte.
+2. **The Dawning Archaic (rising star) pode substituir tutores condicionais** — Oswald buscava artefatos; Dawning Archaic conjura permanentes de CMC 7+ sem condição.
+3. **Arcane Bombardment completa a trifaria de copy** — Double Vision + Arcane Bombardment + Lorehold Commander. Remover um, os outros dois continuam funcionando.
+4. **Net ΔCMC +1 piora T3 significativamente** — em Boros com 35 lands, cada +1 CMC liquido custa ~2pp em T3. Ciclo #6 precisara compensar com -5 a -10.
+
+### Estado Final do Deck
+
+- Total cartas: 100 ✅
+- Commander: 1 ✅
+- Lands: 35
+- Motor: 4/4 completo ✅
+- Copy engines: 3 (Double Vision, Arcane Bombardment, Lorehold Cmdr)
+- Draw real: 5 (meta: 8-12) — proximo gap a resolver
+
+---
