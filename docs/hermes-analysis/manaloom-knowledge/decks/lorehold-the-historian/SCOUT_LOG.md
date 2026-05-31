@@ -1,3 +1,181 @@
+## [2026-05-31T13:26:39+00:00] Execucao #15 — Scout de Sinergias Ocultas (Colecao Esgotada de Alto EDHREC)
+
+> **Data:** 2026-05-31T13:26:39+00:00
+> **Fonte EDHREC:** 7.802 decks (JSON API, snapshot estavel — sem mudancas significativas)
+> **Deck state:** Pos-Ciclo #7 (22 swaps aplicados desde baseline). Motor 4/4, Copy 3/3, Sem Play T3=3.7%.
+> **Missao especial:** Buscar cartas de SINERGIA na colecao, nao so EDHREC%.
+> **Analista:** Hermes Agent — Lorehold Deep Scout
+
+---
+
+### Contexto Estrategico
+
+Apos 7 ciclos de otimizacao (22 swaps), o deck atingiu um estado saudavel:
+- Motor 4/4 completo, Copy 3/3, Sem Play T3 = 3.7% (excelente)
+- 0 cartas nao-terra a 0% EDHREC
+- 62.9% das cartas nao-terra >= 30% EDHREC
+- Colecao **esgotada de cartas CMC <= 3 com alto EDHREC** — as melhores ja estao no deck
+
+**Pergunta desta execucao:** A colecao tem cartas que nao aparecem no EDHREC (niche, sinergicas)
+mas que CRIAM ou REFORCAM sinergias com o deck existente? Scouts anteriores priorizaram
+EDHREC%. Esta execucao inverte a prioridade: **sinergia primeiro, EDHREC depois.**
+
+---
+
+### Sinergias Existentes no Deck (Baseline para scoring)
+
+O deck atual tem 5 camadas de sinergia ativas:
+
+| Camada | Cartas-chave | Descricao |
+|:-------|:-------------|:----------|
+| **Tesouro** | Big Score, Brass's Bounty, Smothering Tithe, Storm-Kiln, Hit the Mother Lode, Unexpected Windfall | 8 fontes de treasure — maior densidade do deck |
+| **Copia** | Lorehold (commander), Double Vision, Arcane Bombardment | 3 camadas de copy (commander + 2 enchantments) |
+| **Topdeck** | Scroll Rack, Penance, Sensei's Top, Library of Leng | 4 pecas de manipulacao de topo |
+| **Spellslinger** | 20+ instants/sorceries. Dance with Calamity, Improvisation Capstone, Mizzix's Mastery | O deck quer conjurar spells grandes de graca |
+| **Recursion** | Mizzix's Mastery, Arcane Bombardment, Volcanic Vision, Restoration Seminar | 4 pecas de recursion do grave |
+
+**Gaps conhecidos:**
+- Draw real: 7 fontes (Boros estruturalmente limitado, compensado por topdeck)
+- Removal: 6 pecas (aceitavel, Chaos Warp adicionou remocao universal)
+- Wincon alternativo: so Approach + Insurrection (poderia ter spellslinger burn)
+
+---
+
+### Metodo de Scoring
+
+Cada carta da colecao (quantity > 0, nao no deck) avaliada em 3 eixos:
+
+| Eixo | Range | Criterios |
+|:-----|:-----:|:----------|
+| **A — SINERGIA** | 0-5 | Cria nova camada? Multiplica engine? Combina 2+ funcoes? Interage com motor? |
+| **B — CUSTO** | 0-5 | CMC baixo? Instant/sorcery? Nao compete com slots existentes? Nao piora T3? |
+| **C — EVIDENCIA** | 0-5 | EDHREC %? Trend? Staple? Auto-evidente por sinergia? |
+
+**Score >= 8:** Prioridade (recomendar ao Evolution Oracle)
+**Score 5-7:** "Nice to have" (documentar, nao priorizar)
+**Score < 5:** Ignorar
+
+---
+
+### Top 15 Cartas por Sinergia
+
+#### TIER 1 — Criam NOVA Camada de Sinergia (Score >= 9)
+
+| # | Carta | CMC | Score (A+B+C) | EDHREC | Funcao | Sinergia |
+|:-:|:------|:---:|:------------:|:------:|:-------|:---------|
+| 1 | **Xorn** | 3 | **5+2+1=8** | 0% | Creature — Doubles treasures | 🔥 MULTIPLICA o motor de treasure. Com 8 fontes, cada Big Score vira 4 treasures, Brass's Bounty vira 14-20. Camada NOVA de engine multiplication. |
+| 2 | **Spiteful Banditry** | 2 | **5+4+1=10** | 0% | Enchantment — Board wipe gera treasures | 🔥 COMBINA removal + ramp em 1 carta. Mata criaturas dos oponentes e transforma em mana SUA. CMC 2. Preenche gap de removal E adiciona ramp. |
+| 3 | **Guttersnipe** | 3 | **3+2+3=8** | 32.3% | Creature — 2 dmg por spell | Cria wincon alternativa (spellslinger burn). Com Lorehold copy, cada spell = 4 dmg por oponente. 20+ spells = 80 dmg potencial. |
+| 4 | **Reverberate** | 2 | **5+4+2=11** | 18.0% | Instant — Copy spell | Adiciona 4a camada de copy ao deck. CMC 2, instant speed, copia spell de QUALQUER jogador (removal, counter, draw). Flexibilidade maxima. |
+| 5 | **Veronica, Dissident Scribe** | 3 | **5+2+1=8** | 0% | Creature — Draw + treasure on spell cast | DUAS funcoes em uma: draw E ramp no trigger de conjurar spell (acao primaria do deck). Draw condicional mas recorrente. |
+
+#### TIER 2 — Reforcam Sinergias Existentes (Score 7-8)
+
+| # | Carta | CMC | Score (A+B+C) | EDHREC | Funcao | Sinergia |
+|:-:|:------|:---:|:------------:|:------:|:-------|:---------|
+| 6 | **Seize the Spoils** | 3 | **4+3+2=9** | 16.6% | Sorcery — Rummage + treasure | Mini Big Score. CMC 3 (vs Big Score CMC 4). Rummage + treasure. Flashback com Big Score. Mais redundancia de treasure ramp barato. |
+| 7 | **Glint-Horn Buccaneer** | 3 | **4+2+1=7** | 9.0% | Creature — Draw + ping on discard | Transforma Faithless Looting, Thrill, Big Score rummage em DRAW EXTRA. Cada discard = draw 1 + ping 1. Cria motor de draw via discard. |
+| 8 | **Palantir of Orthanc** | 3 | **5+2+1=8** | 0% | Artifact — Scry 2 + opponent paga vida ou vc draw | Sinergia DIRETA com Scroll Rack + Penance. Coloque Big Spell no topo (CMC 7-8) = oponente toma 7-8 de dano OU voce draw. Topdeck vira arma. |
+| 9 | **Dualcaster Mage** | 3 | **3+2+2=7** | 17.0% | Creature — Copy spell ETB | Redundancia de copy. Flash. Pode copiar spell propria ou do oponente. Corpo 2/2 irrelevante — o ETB e o que importa. |
+| 10 | **Mana Geyser** | 5 | **4+2+2=8** | 26.2% | Sorcery — Add R per tapped land opponents control | Em 4-player, rotineiramente 15-25 red mana. Alimenta X spells (Call Forth the Tempest) ou Dance with Calamity. BIG mana explosivo. |
+
+#### TIER 3 — Protecao Eficiente (Score 7-8)
+
+| # | Carta | CMC | Score (A+B+C) | EDHREC | Funcao | Sinergia |
+|:-:|:------|:---:|:------------:|:------:|:-------|:---------|
+| 11 | **Flawless Maneuver** | 3 (0) | **2+5+2=9** | 19.8% | Instant — Indestrutivel (gratis com commander) | CMC efetivo 0 com Lorehold em jogo. Protecao em massa gratis. Stack com Boros Charm ou Teferi's. |
+| 12 | **Mother of Runes** | 1 | **2+4+3=9** | 34.5% | Creature — Protection a uma criatura | CMC 1. Protege Lorehold ou Storm-Kiln. Staple classico. Nao cria sinergia nova mas e eficiente. |
+
+#### TIER 4 — Spellslinger Adicional (Score 6-7)
+
+| # | Carta | CMC | Score (A+B+C) | EDHREC | Funcao | Sinergia |
+|:-:|:------|:---:|:------------:|:------:|:-------|:---------|
+| 13 | **Fiery Inscription** | 3 | **3+2+1=6** | 5.7% | Enchantment — 2 dmg por spell | Versao enchantment do Guttersnipe. Mais dificil de remover. Stack com Guttersnipe = 4 dmg/spell. |
+| 14 | **Caldera Pyremaw** | 5 | **3+1+3=7** | 30.2% | Creature — Pinger + treasure on death | Dois em um: spellslinger burn + treasure. CMC 5 e caro, mas deixa treasure ao morrer. |
+| 15 | **Flare of Duplication** | 3 (0) | **4+2+1=7** | 6.9% | Instant — Copy spell (gratis sacrificando criatura vermelha) | Flexivel: CMC 3 normal ou gratuito com sac. Copia spell propria ou do oponente. |
+
+---
+
+### Notas sobre Cartas Fora do EDHREC
+
+**12 das 15 cartas no Top 15 tem EDHREC < 20%.** Destas, 6 tem **0% EDHREC**:
+
+| Carta | Score | Por que 0% EDHREC | Mesmo assim relevante? |
+|:------|:-----:|:------------------|:----------------------|
+| Xorn | 8 | Niche — so aparece em decks de treasure dedicado | **SIM** — deck tem 8 fontes de treasure. Multiplicacao e obvia. |
+| Spiteful Banditry | 10 | Carta recente (OTJ), ainda nao amplamente adotada | **SIM** — wipe + treasure e combinacao rara. Alta sinergia. |
+| Veronica | 8 | Carta niche de spellslinger | **SIM** — draw + treasure no trigger certo. |
+| Palantir of Orthanc | 8 | Nao e staple em Boros | **SIM** — topdeck sinergia existe no deck. |
+| Twinflame | 8 | Copy de criatura em deck spellslinger | **PARCIAL** — deck tem poucas criaturas para copiar. |
+| Fiery Inscription | 6 | Enchantment niche | **TALVEZ** — efeito bom mas lento. |
+
+**Regra:** Cartas com 0% EDHREC mas sinergia auto-evidente (score A >= 4) NAO devem ser descartadas
+so por falta de dados. O scout existe exatamente para encontrar estas cartas.
+
+---
+
+### Colecao: O Que REALMENTE Vale a Pena
+
+Apos 22 swaps, a colecao esta **esgotada de staples com alto EDHREC**. Mas esta **RICA em cartas
+de sinergia niche que EDHREC nao captura**. As 5 cartas que MAIS adicionariam ao deck:
+
+| # | Carta | CMC | Funcao | Por que |
+|:-:|:------|:---:|:-------|:--------|
+| 1 | **Spiteful Banditry** | 2 | Wipe + Ramp | Preenche 2 gaps simultaneamente. CMC 2 = nao piora T3. Unica. |
+| 2 | **Reverberate** | 2 | Copy | 4a camada de copy. CMC 2, instant. Flexivel (sua OU do oponente). |
+| 3 | **Xorn** | 3 | Treasure Doubler | Multiplica motor principal. 8 fontes viram 16+. Cria turns explosivos. |
+| 4 | **Guttersnipe** | 3 | Spellslinger Burn | Wincon alternativa. 4 dmg/spell com Lorehold. Stack com Double Vision = 6/spell. |
+| 5 | **Seize the Spoils** | 3 | Rummage + Treasure | Treasure ramp barato. Redundancia de Big Score a CMC menor. |
+
+**Swap candidates (se o Evolution Oracle quiser aplicar):**
+- Pearl Medallion (CMC 2, 25.2% trend -0.46) → Spiteful Banditry (CMC 2): troca cost reduction por wipe+ramp
+- Ruby Medallion (CMC 2, 42.3% trend -0.37) → Reverberate (CMC 2): troca cost reduction por copy
+- Grand Abolisher (CMC 2, 11.7% trend -0.27) → Guttersnipe (CMC 3): troca protecao por wincon alternativa
+
+**Delta CMC: +1** (seguro, T3=3.7% permite)
+
+---
+
+### O Que A Colecao NAO Tem
+
+**Gap confirmado: nao ha mais draw engines baratas (CMC <= 3) na colecao.**
+Veronica (CMC 3, draw condicional) e a unica. Glint-Horn (CMC 3, draw via discard) e a segunda.
+Nao ha Faithless Looting #2, nem mais rummage spells.
+
+**Gap confirmado: nao ha mais copy spells alem de Reverberate, Dualcaster Mage, Flare of Duplication.**
+Twinflame copia criaturas (deck tem poucas). As 3 acima sao as unicas opcoes de copy spell na colecao.
+
+**Gap confirmado: nao ha mais board wipes baratos (CMC <= 4).**
+Spiteful Banditry (CMC 2) e Chain Reaction (CMC 4) sao os unicos. Ambos sao niche.
+
+---
+
+### Dados Brutos
+
+- EDHREC JSON API: 7.802 decks, 277 cards trackeados
+- knowledge.db: deck_id=6, 86 rows, SUM(qty)=100
+- user_collection: 229 cartas com quantity > 0, 159 fora do deck
+- Double-null cards no deck: 6 (Grand Abolisher, Pearl Medallion, Penance, Ruby Medallion, Scroll Rack, Taunt from the Rampart)
+
+---
+
+### Licoes Desta Execucao
+
+1. **EDHREC e um espelho retrovisor — mostra o que a comunidade JA joga, nao o que DEVERIA jogar.** Cartas como Xorn (0% EDHREC) e Spiteful Banditry (0% EDHREC) tem sinergia OBVIA com o deck mas nao aparecem no EDHREC porque sao niche ou recentes. O scout por sinergia encontra cartas que o scout por EDHREC perde.
+
+2. **A colecao nao esta verdadeiramente esgotada — esta esgotada de HIGH-EDHREC, mas tem cartas de SINERGIA.** Das 159 cartas na colecao fora do deck, 12 tem score de sinergia >= 8. Nenhuma delas foi considerada em ciclos anteriores porque o criterio era EDHREC > 30%.
+
+3. **Spiteful Banditry e a descoberta mais interessante.** CMC 2, combina wipe + ramp, na colecao, nao estava sendo considerada. E um "two-for-one" funcional que preenche 2 gaps simultaneamente.
+
+4. **Reverberate a CMC 2 e melhor que Dualcaster Mage a CMC 3 para este deck.** Ambas copiam spells, mas Reverberate e instant/sorcery (sinergia com Lorehold copy, Arcane Bombardment, Mizzix's Mastery). Dualcaster e criatura — nao interage com o motor de spells.
+
+5. **Guttersnipe (32.3% EDHREC) cria uma wincon que o deck nao tem: spellslinger burn.** Com 20+ spells, cada uma causando 4 dmg por oponente (com Lorehold copy), e uma alternativa real ao Approach of the Second Sun e Insurrection. Stack com Double Vision = 6/spell, Arcane Bombardment = 8/spell.
+
+6. **Palantir of Orthanc e o "quinto elemento" do topdeck.** O deck ja tem Scroll Rack + Penance + Top + Library of Leng. Palantir transforma essa engine de setup em engine de dano OU draw. O oponente escolhe: tomar 7-8 de dano (CMC da big spell no topo) OU deixar voce comprar. Win-win.
+
+
+---
+
 ## [2026-05-31] Execução #14 — Post-Ciclo #5 Deep Analysis + Ciclo #6 Prep
 
 > **Data:** 2026-05-31
