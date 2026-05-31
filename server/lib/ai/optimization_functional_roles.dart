@@ -253,6 +253,7 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   final typeLine = ((card['type_line'] as String?) ?? '');
   final name = card['name']?.toString() ?? '';
   final result = resolveCardFunctionalRoles(
+    functionalTags: card['functional_tags'],
     semanticTagsV2: card['semantic_tags_v2'],
     oracleText: oracle,
     typeLine: typeLine,

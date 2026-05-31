@@ -95,6 +95,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   }
 
   final semanticV2Select = await _semanticV2SelectSql(pool);
+  final functionalTagsSelect = await _functionalTagsSelectSql(pool);
   final cardsResult = await (telemetry?.trackAsync(
         'deck_context.cards_query',
         () => pool.execute(
@@ -114,7 +115,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              c.oracle_text,
              c.color_identity,
              c.id::text,
-             $semanticV2Select
+             $semanticV2Select,
+             $functionalTagsSelect
       FROM deck_cards dc 
       JOIN cards c ON c.id = dc.card_id 
       WHERE dc.deck_id = @id
@@ -139,7 +141,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              c.oracle_text,
              c.color_identity,
              c.id::text,
-             $semanticV2Select
+             $semanticV2Select,
+             $functionalTagsSelect
       FROM deck_cards dc 
       JOIN cards c ON c.id = dc.card_id 
       WHERE dc.deck_id = @id
@@ -189,6 +192,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     final colorIdentity = (row[8] as List?)?.cast<String>() ?? const <String>[];
     final cardId = row[9] as String;
     final semanticTagsV2 = row.length > 10 ? row[10] : null;
+    final functionalTags = row.length > 11 ? row[11] : null;
 
     currentTotalCards += quantity;
     originalCountsById[cardId] = (originalCountsById[cardId] ?? 0) + quantity;
@@ -206,6 +210,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       'quantity': quantity,
       'card_id': cardId,
       'semantic_tags_v2': semanticTagsV2,
+      'functional_tags': functionalTags,
     };
     allCardData.add(cardData);
 
@@ -368,6 +373,24 @@ Future<String> _semanticV2SelectSql(Pool pool) async {
                FROM card_semantic_tags_v2 cstv2
                WHERE cstv2.card_id = c.id
              ) AS semantic_tags_v2''';
+}
+
+Future<String> _functionalTagsSelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_function_tags');
+  if (!exists) return "'[]'::jsonb AS functional_tags";
+  return '''
+             COALESCE(
+               (SELECT jsonb_agg(jsonb_build_object(
+                 'tag', cft.tag,
+                 'confidence', cft.confidence,
+                 'evidence', cft.evidence,
+                 'source', cft.source
+               ) ORDER BY cft.confidence DESC, cft.tag)
+               FROM card_function_tags cft
+               WHERE cft.card_id = c.id
+               ),
+               '[]'::jsonb
+             ) AS functional_tags''';
 }
 
 Future<bool> _hasTable(Pool pool, String tableName) async {
