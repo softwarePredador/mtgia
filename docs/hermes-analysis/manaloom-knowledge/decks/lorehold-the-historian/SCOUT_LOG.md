@@ -1,3 +1,216 @@
+## [2026-05-31T06:00:00+00:00] Execução #12 — Deep Meta Scout Pós-Ciclo #4 (Tendências Confirmadas + Novos Sinais)
+
+### Contexto
+Deck 6 (Lorehold Spellslinger) está **pós-Ciclo #4**, aguardando Ciclo #5 pelo Evolution Oracle.
+Ciclo #4 aplicou 3 swaps defensivos (net ΔCMC -15): Rise→Faithless Looting, Season→DRC, Goblin→Thrill.
+Sem Play T3 reduziu de 16.4% para 13.8% (Execução pós-Ciclo #4). Estratégia Ciclo #5: BALANCED.
+
+### Fontes consultadas
+- **EDHREC Live (JSON API)**: https://json.edhrec.com/pages/commanders/lorehold-the-historian.json — 7.802 decks
+- **knowledge.db**: deck_cards WHERE deck_id = 6 (100 cartas: 1 comandante, 35 lands, 64 nonlands)
+- **user_collection**: 241 cartas na coleção
+
+---
+
+### DISTRIBUIÇÃO EDHREC DO DECK (Atualizada — 7.802 decks)
+
+| Faixa | Quantidade (nonland) | % do deck |
+|:------|:--------------------:|:---------:|
+| 0% (fora do EDHREC) | 4 (Oswald, Galadriel's Dismissal, Weathered Wayfarer, Lorehold Cmdr) | 6.1% |
+| 1-14%
+| 3 (Thrill of Possibility 13.9%, Grand Abolisher 11.7%, The One Ring 8.5%) | 4.5% |
+| 15-29% (baixo) | 10 | 15.2% |
+| 30-49% (médio) | 21 | 31.8% |
+| 50%+ (alto/meta) | 26 | 39.4% |
+
+**Overlap meta (30%+): ~71.2% — estável vs Execução #11 (~59% era pré-Ciclo #3; Ciclos #3+#4 melhoraram alinhamento).**
+
+---
+
+### NOVIDADE 1: TENDÊNCIAS CONFIRMADAS — 3 Rising Stars Estáveis
+
+Todos os 3 rising stars identificados na Execução #11 mantêm tendências fortes:
+
+| Carta | EDHREC | Trend | Status no Deck | Notas |
+|:------|:------:|:-----:|:---------------|:------|
+| **Improvisation Capstone** | 49.0% | **+8.09** | ✅ NO DECK (Ciclo #3) | Trend estável (+8.13→+8.09), base subiu 48.7%→49.0% |
+| **Restoration Seminar** | 37.8% | **+9.14** | ✅ NO DECK (Ciclo #2) | Fastest-rising de TODO Lorehold. Base 37.2%→37.8%. |
+| **The Dawning Archaic** | 24.0% | **+5.31** | ❌ **NÃO NO DECK** | **3º ciclo consecutivo confirmado como rising star.** Base 23.7%→24.0%. |
+
+**🔥 INSIGHT CRÍTICO: The Dawning Archaic chegou ao threshold de "confirmed rising star".**
+- Base >20% por 3 ciclos consecutivos ✅
+- Trend >5.0 por 3 ciclos consecutivos ✅
+- Na coleção ✅
+- CMC 3 (jogável em Fase 1) ✅
+- Ciclo #5 proposto: Oswald Fiddlebender → The Dawning Archaic (VALIDATOR_SUMMARY v3.5)
+
+---
+
+### NOVIDADE 2: DECLÍNIOS ACELERADOS — 6 Cartas do Deck em Queda
+
+| Carta | EDHREC | Trend | CMC | Status | Risco |
+|:------|:------:|:-----:|:---:|:-------|:------|
+| **Artist's Talent** | 21.1% | **-0.70** | 2 | No deck | 🔴 **DECLÍNIO CONTÍNUO** — era -0.72, mantém queda acelerada |
+| **Seething Song** | 16.0% | -0.49 | 3 | No deck | 🟡 Ritual puro saindo de moda |
+| **Pearl Medallion** | 25.2% | -0.46 | 2 | No deck | 🟡 Cost reduction caindo |
+| **Perch Protection** | 34.5% | -0.43 | 6 | No deck | 🟡 Proteção cara, tendência negativa 3º ciclo |
+| **Ruby Medallion** | 42.3% | -0.37 | 2 | No deck | 🟡 Cost reduction caindo |
+| **Call Forth the Tempest** | 65.5% | -0.30 | 8 | No deck | 🟡 Board wipe cara, primeiro ciclo negativo |
+
+**💡 INSIGHT: Artist's Talent (-0.70) lidera declínios pelo 3º ciclo consecutivo.**
+A comunidade abandonou Artist's Talent por ser draw lento (exige equipar criatura).
+A tendência se manteve estável (~-0.70): não é ruído, é êxodo sustentado.
+**Ciclo #5 proposto: Artist's Talent → Chaos Warp** (swap #1 no VALIDATOR_SUMMARY v3.5)
+
+---
+
+### NOVIDADE 3: CARTAS >30% EDHREC NA COLEÇÃO, FORA DO DECK
+
+Cartas na coleção com EDHREC ≥30% que NÃO estão no deck (priorizadas por Ciclo #5):
+
+| Carta | EDHREC | Trend | CMC | Seção | Prioridade |
+|:------|:------:|:-----:|:---:|:------|:----------:|
+| **Chaos Warp** | 38.8% | +0.46 | 3 | Instants | 🔴 **Ciclo #5 proposto** — universal removal, rising |
+| **Arcane Bombardment** | 42.5% | +0.09 | 5 | Enchantments | 🔴 **Ciclo #5 proposto** — copy engine |
+| **Soulfire Eruption** | 42.5% | +0.33 | 3 | Sorceries | 🟡 Futuro — big spell com dano |
+| **Apex of Power** | 55.0% | +0.11 | 7 | Sorceries | 🟡 Futuro (T3 alto) — rising star quando T3<8% |
+| **Victory Chimes** | 53.6% | 0.00 | 3 | Mana Artifacts | ⚪ Neutro — staple firme mas não urgente |
+| **Temple of Triumph** | 44.7% | 0.00 | 0 | Lands | ⚪ Land — substituir basic se preciso |
+| **Emeria's Call** | 43.4% | 0.00 | 7 | Lands | ⚪ MDFC — pré-existente como "Emeria's Call //..." |
+| **Pinnacle Monk** | 41.6% | 0.00 | 0 | Lands (MDFC) | ⚪ Jogável como land |
+| **Invoke Calamity** | 34.0% | +0.11 | 3 | Instants | 🟡 Instant removal/big spell |
+| **Mother of Runes** | 34.5% | +0.22 | 1 | Creatures | 🟡 Protection barata, mas deck tem 4 proteção |
+| **Guttersnipe** | 32.3% | -0.08 | 3 | Creatures | ⚪ Neutro — spellslinger damage |
+| **Reliquary Tower** | 34.3% | -0.00 | 0 | Utility Lands | 🟡 Anti-flood, mas não urgente |
+| **Goliath Daydreamer** | 33.4% | +1.13 | 1 | Creatures | 🟡 Topdeck manipulation rising |
+| **Caldera Pyremaw** | 30.2% | +0.14 | 3 | Creatures | 🟡 Treasure maker |
+| **Velomachus Lorehold** | 32.6% | +0.02 | 1 | Creatures | ⚪ Neutro — Lorehold commander synergy |
+| **Invincible Hymn** | 30.3% | +0.29 | 3 | Sorceries | 🟡 Wincon alternativo rising |
+| **Primal Amulet** | 30.4% | -0.29 | 4 | Artifacts | ⚪ Declining — não priorizar |
+
+**Top 3 Ciclo #5:**
+1. **Chaos Warp** (38.8%, rising) → universal removal que Lorehold não tem
+2. **The Dawning Archaic** (24.0%, trend +5.31) → rising star confirmado 3 ciclos
+3. **Arcane Bombardment** (42.5%, estável) → copy engine complementar ao Double Vision
+
+---
+
+### NOVIDADE 4: ANÁLISE DA MEDALHÃO (Double-Null Medallions)
+
+| Medallion | EDHREC | Trend | No deck? | Custo real | Avaliação |
+|:----------|:------:|:-----:|:--------:|:----------:|:---------:|
+| **Ruby Medallion** | 42.3% | -0.37 | Sim | {2}→{1} para red | Duplo-nulo. 42.3% é alto MAS caindo. 31 red spells = impacto moderado. Manter por enquanto. |
+| **Pearl Medallion** | 25.2% | -0.46 | Sim | {2}→{1} para white | Duplo-nulo. 25.2% baixo + falling. Apenas 23 white spells = impacto menor que Ruby. **Cuttable.** |
+
+**💡 INSIGHT: Pearl Medallion é a carta mais cortável entre os double-null.**
+Com apenas 23 white spells no deck vs 31 red spells, Pearl impacta menos mãos que Ruby.
+Se precisar de CMC slot, Pearl é a saída mais lógica.
+
+---
+
+### NOVIDADE 5: ANÁLISE DE CURVA E FASES
+
+Por CMC band (nonland spells apenas):
+
+| CMC | Cartas | % do deck | Funções |
+|:----|:------:|:---------:|:--------|
+| 0-1 | 8 (Sol Ring, Esper Sentinel, Enlightened Tutor, Land Tax, Gamble, Path to Exile, StP, DRC, Faithless Looting, Galadriel's) | ~15% | Ramp, draw, removal, tutor |
+| 2 | 14 (Arcane Signet, Artist's Talent, Boros Charm, Boros Signet, Grand Abolisher, Hexing Squelcher, Lightning Greaves, Oswald, Pearl Medallion, Ruby Medallion, Scroll Rack, Talisman, Thrill of Possibility, Deflecting Swat) | ~22% | Ramp, protection, draw, removal |
+| 3 | 6 (Archaeomancer's Map, Bender's Waterskin, Generous Gift, Jeska's Will, Monument to Endurance, Penance, Seething Song, Valakut Awakening) | ~9% | Ramp, removal, draw, recursion |
+| 4+ | 26 | ~39% | Big spells, recursion, board wipes, wincons |
+
+Pós-Ciclo #4, com Foco na Fase 1 (turns 1-3):
+- CMC ≤2: ~37% das spells → bom para abertura
+- Mas "Sem Play T3" = 13.8%. Ainda acima do target 8% para AGGRESSIVE.
+
+---
+
+### NOVIDADE 6: MATCHUP CONTEXT (from BATTLE_LOG 2026-05-31)
+
+Win rate por arquiétépico (6-archetype sim, estável 3 execuções):
+
+| Matchup | WR | Status | Notas |
+|:--------|:---:|:-------|:------|
+| vs Aggro | 52.5% | ✅ Equilibrado | Mais ramp e removal vs aggro |
+| vs Control | 56.0% | ✅ Favorável | Mais ramp (16 vs 12) |
+| vs Combo | 46.5% | ⚠️ Contra | Curva alta + spellslinger penalidade |
+| vs Midrange | 52.5% | ✅ Equilibrado | Mais ramp (16 vs 12) |
+| vs Spellslinger | 52.5% | ✅ Equilibrado | Mais ramp (16 vs 10) |
+| vs Stax | 52.5% | ✅ Equilibrado | Mais ramp (16 vs 8) |
+| **Média** | **52.1%** | **✅ Estável** | **Zero variance across 3 runs** |
+
+**Para Ciclo #5:** Chaos Warp (universal removal) aborda diretamente o matchup vs Combo (46.5%), que é o mais fraco. Chaos Warp pode exilarcombo pieces.
+
+---
+
+### NOVIDADE 7: PADRÃO DECKBUILDING — O Que o Deck Revela
+
+**O que o Lorehold médio faz que este deck também faz:**
+- 35 lands ✅ (meta)
+- Arcade Signet (88.2%) ✅ no deck
+- Sol Ring (90.5%) ✅ no deck
+- Treasure makers (Big Score, Brass's Bounty, Unexpected Windfall) ✅ todos no deck
+- Scroll Rack (59.7%) ✅ no deck
+- Library of Leng (77.8%) ✅ no deck
+- Topdeck manipulation (Sensei's Top, Scroll Rack) ✅ ambos no deck
+- Big spells (Dance, Approach, Capstone) ✅ todos no deck
+- Storm-Kiln Artist (55.4%) ✅ adicionado Ciclo #3
+
+**O que o Lorehold médio faz que este deck NÃO faz:**
+- Chaos Warp (38.8%) ❌ falta — universal removal gap
+- Arcane Bombardment (42.5%) ❌ falta — copy engine gap
+- Tutores como Enlightened Tutor (18.5%) ✅ já no deck
+- Apex of Power (55.0%) ❌ na coleção mas não no deck — precisa T3 < 8%
+- Tablet of Discovery (26.1%) ❌ não na coleção
+- Emeria's Call (43.4%) ✅ já no deck como MDFC
+
+**O que este deck tem que o Lorehold médio NÃO joga:**
+- Fated Clash (15.6%) — EDHREC baixo, mas não é 0. Pode ser keep situacional
+- Galvanoth (26.5%) — beacon spellslinger, meta mas não mainstream
+- Rite of the Dragoncaller (23.4%) — dragon subtheme marginal
+- Perch Protection (34.5%) — declining, CMC 6 caro para proteção
+- Longshot, Rebel Bowman (48.0%) — criatura lendária, flavor win
+- Goldspan Dragon (17.8%) — declining, marginal
+
+---
+
+### LIÇÕES DESTA RODADA
+
+1. **The Dawning Archaic é prioridade confirmada**: 3 ciclos consecutivos com trend >5.0 e base >20%. Não é mais "monitorar" — é "inserir". CMC 3 é acessível. Na coleção.
+
+2. **Chaos Warp aborda o matchup mais fraco**: vs Combo em 46.5%. Universal removal exila (não apenas destrói) — critical contra combo pieces recorrents. Rising trend (+0.46).
+
+3. **Artist's Talent lidera declínios**: -0.70, 3º ciclo. Draw lento que exige setup. Em um deck com Scroll Rack e Sensei's Top (topdeck manipulation), Artist's Talent é anti-tético.
+
+4. **O deck não precisa de muita coisa**: Motor 4/4 completo. 71% meta-alignment. 52.1% WR médio. Os gaps são: (a) Chaos Warp (universal removal), (b) Dawning Archaic (rising star), (c) Arcane Bombardment (copy engine).
+
+5. **Pearl Medallion é o próximo double-null a cortar**: Se precisar de CMC slot pós-Ciclo #5, Pearl tem o menor impacto (23 white spells) e tendência mais negativa (-0.46).
+
+6. **Post-Ciclo #5, quando T3 < 12%, AGGRESSIVE com Apex of Power + Soulfire Eruption**: Ambos na coleção, ambos >40% EDHREC. Apex (55%, CMC 7) é o melhor big spell que o deck não joga. Soulfire Eruption (42.5%, CMC 3) é rising removal/wincon.
+
+---
+
+### RECOMENDAÇÕES PARA CICLO #5
+
+Alinhado com VALIDATOR_SUMMARY v3.5:
+
+| # | Sai | Entra | ΔCMC | Impacto | Justificativa |
+|:--|:----|:------|:----:|:--------|:-------------|
+| 1 | Artist's Talent (21.1%, ▼-0.70) | **Chaos Warp** (38.8%, ▲+0.46) | +1 | 🔴 Removal universal | Declínio contínuo 3º ciclo + matchup combo fraco |
+| 2 | Oswald Fiddlebender (0%) | **The Dawning Archaic** (24.0%, ▲+5.31) | +1 | 🟡 Rising star confirmado | 3º ciclo trend>5.0, base>20%, na coleção |
+| 3 | Perch Protection (34.5%, ▼-0.43) | **Arcane Bombardment** (42.5%, ▲+0.09) | -4 | 🟡 Copy engine | Declining + CMC 6 caro vs copy engine estável |
+
+**Net ΔCMC: -2.** BALANCED strategy confirmed.
+
+---
+
+> **Data:** 2026-05-31
+> **Commander:** Lorehold, the Historian (RW, Strixhaven)
+> **Fonte:** EDHREC 7.802 decks (JSON API)
+> **Data de coleta:** 2026-05-31T06:00:00Z
+> **Analista:** Hermes Agent (Lorehold Deep Scout cron)
+
+
 
 ## [2026-05-28T06:04:45+00:00] Execução #10 — Deep Meta Scout Pós-Ciclo #2 (Confirmação + Tendências)
 
