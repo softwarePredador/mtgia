@@ -1,3 +1,177 @@
+## [2026-05-31T08:38:37+00:00] Ciclo #6 — Evolution Oracle (DEFENSIVO corrigido)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execucao #14):**
+- Dados EDHREC identicos a Execucao #13 (7.802 decks)
+- Motor 4/4 completo, copy engines 3/3 completo
+- Rising stars confirmadas: Improvisation Capstone (+8.09), Restoration Seminar (+9.14), Dawning Archaic (+5.31)
+- Declinios: Esper Sentinel (-0.54, 5o ciclo), Seething Song (-0.49, abaixo de 15%), Pearl Medallion (-0.46)
+
+**VALIDATOR (v3.7):**
+- ⚠️ v3.7 continha ERROS GRAVES de CMC: Apex of Power = CMC 10 (nao 5), Victory Chimes = CMC 3 (nao 2), Soulfire Eruption = CMC 9 (nao 4)
+- Recomendacoes corrigidas: os top picks da v3.7 (Apex, Chimes, Soulfire) sao CMCs ALTOS (+5, +1, +4) — DISASTROSOS para DEFENSIVO
+- Draw real = 5 (perfil quer 8-12) — MAIOR GAP
+- Sem Play T3 = 15.3% — acima do limite de 12%
+- Wincon dedicado = 1 (perfil quer 4-7)
+
+**MULLIGAN (Exec#9 pos-Ciclo #5):**
+- Jogaveis: 48.0%, Mulligan: 52.0%
+- Ramp T1: 21.2%
+- Sem Play T3: 15.3%
+- Estrategia recomendada: DEFENSIVO (net DCMC -5 a -10)
+
+**BATTLE (Exec#8 pos-Ciclo #4):**
+- Avg WR: 52.1% (estavel)
+- Pior matchup: Combo (46.5%)
+- Melhor matchup: Control (56.0%)
+
+### Analise Estrategica (PASSO 0)
+
+**1. COMO ESTE DECK GANHA?**
+Wincons: Approach of the Second Sun (CMC 7, 63.9%), Insurrection (CMC 8), Storm Herd (CMC 10, 75.2%),
+Mizzix's Mastery overload, Dance with Calamity chain. O plano primario e conjurar big spells e
+copia-las com Lorehold + Double Vision + Arcane Bombardment. Apenas 1 wincon dedicada (Approach)
+vs perfil 4-7.
+
+**2. COMO ESTE DECK EVITA PERDER?**
+Board wipes: 5 (Blasphemous Act, Austere Command, Call Forth the Tempest, Volcanic Vision, Fated Clash).
+Removal pontual: 5. Protecao: 3. Defesa adequada mas sem counterspell ou stax — vulneravel a
+combo (46.5% WR).
+
+**3. COMO ESTE DECK SE MANTEM NO JOGO?**
+Draw real: 5 (The One Ring, Sensei's Divining Top, Faithless Looting, Thrill of Possibility,
+Esper Sentinel condicional). Recursion: 4. O deck FICA sem gasolina — este e o maior gap estrutural.
+
+**4. COMO ESTE DECK ACELERA?**
+Ramp: 16 incluindo rocks e treasure generators. Ramp T1: apenas 3 cartas (Sol Ring, Land Tax,
+Weathered Wayfarer). Ramp solido para mid-game.
+
+**5. QUAL O PLANO DE JOGO?**
+T1-3: Setup (ramp, topdeck). T4-6: Lorehold + engines. T7+: Win. O plano e claro mas a
+execucao early-game e inconsistente (15.3% Sem Play T3).
+
+### ⚠️ Correcao Critica: Erro de CMC no v3.7
+
+O VALIDATOR v3.7 listou CMCs incorretos para as cartas recomendadas:
+
+| Carta | CMC v3.7 (errado) | CMC REAL | Erro |
+|:------|:-----------------:|:--------:|:----:|
+| Apex of Power | 5 | **10** (7RRR) | +5 |
+| Victory Chimes | 2 | **3** | +1 |
+| Soulfire Eruption | 4 | **9** | +5 |
+
+As recomendacoes v3.7 teriam net DCMC +10, PIORANDO Sem Play T3 para ~25%.
+Correcao aplicada: swaps com CMCs verificados no banco de dados.
+
+### Swap 1: Goldspan Dragon -> Wedding Ring
+
+**Diagnostico:** Goldspan Dragon (CMC 5, 17.8% EDHREC, trend -0.23) e um dragon que cria
+treasures mas tambem os sacrifica (contraditorio com Storm-Kiln Artist que quer acumula-los).
+Em declinio no meta. E functionally ramp, mas o deck ja tem 16 fontes de ramp.
+
+**Solucao:** Wedding Ring (CMC 4) e draw engine simetrica. Em Commander multiplayer com
+3 oponentes, voce escolhe o oponente que mais compra e se beneficia. Draw passivo que nao
+requer ataque ou condicao. CMC 4, castavel T3-4 com ramp. Aborda o maior gap do deck: draw.
+
+**Da sua colecao:** ✅ Sim (qty: 1, voc, M)
+
+**Principio:** Em Boros, draw passivo > ramp redundante. O deck ja gera tesouros abundantes;
+o gargalo e achar as wincons, nao paga-las. Wedding Ring converte o slot de ramp excedente
+em draw consistente.
+
+**Impacto esperado no mulligan:** DCMC = -1 (5->4). Neutro a ligeira melhora em T3.
+Ganho qualitativo: draw engine que nao depende de ataque ou condicao.
+
+### Swap 2: Seething Song -> Abrade
+
+**Diagnostico:** Seething Song (CMC 3, 16.0% EDHREC, trend -0.49) e um ritual que adiciona
+5 manas vermelhas por 3 mana. Em declinio severo (-0.49, 5o ciclo). Abaixo do limiar de 15%
+de inclusao. Em Lorehold, tesouros sao superiores a rituais porque ativam Storm-Kiln Artist
+e contam para Lorehold count. Seething Song nao gera tesouro, nao ativa Storm-Kiln, e e one-shot.
+
+**Solucao:** Abrade (CMC 2) e remocao versatil: destroi artefato OU causa 3 dano a criatura.
+CMC 2, castavel T2 sem ramp. Adiciona interacao que ajuda contra o pior matchup (Combo 46.5%
+WR) e contra Aggro. Staple vermelho universal em Commander.
+
+**Da sua colecao:** ✅ Sim (qty: 1, hou, U)
+
+**Principio:** Remocao versatil > ritual one-shot em deck que ja gera mana explosiva via
+tesouros. Abrade responde a ameacas enquanto Seething Song apenas acelera — mas acelerar
+para que se nao ha draw para encontrar as ameacas?
+
+**Impacto esperado no mulligan:** DCMC = -1 (3->2). Melhora T3 e adiciona interacao early-game.
+
+### Por que APENAS 2 swaps? (Sem Swap 3)
+
+A colecao esta esgotada de cartas CMC <= 3 com alto EDHREC em Lorehold.
+Os candidatos restantes com CMC verificado correto:
+
+| Candidato | CMC Real | CMC v3.7 | Por que NAO |
+|:----------|:--------:|:--------:|:------------|
+| Apex of Power | 10 | 5 (erro!) | DCMC +5 — DISASTROSO para T3 |
+| Soulfire Eruption | 9 | 4 (erro!) | DCMC +4 — DISASTROSO para T3 |
+| Victory Chimes | 3 | 2 (erro!) | DCMC +1 vs Pearl Medallion (2) — PIORA T3 |
+
+Nao ha cartas CMC 1-2 na colecao com alto EDHREC e funcao que o deck precisa.
+Futuros ciclos DEFENSIVOS dependem de AQUISICAO de novas cartas baratas.
+
+### Resumo do Ciclo
+
+| Metrica | Pos-C#5 | Pos-C#6 | D |
+|:--------|:-------:|:-------:|:-:|
+| Jogaveis | 48.0% | — (aguarda simulacao) | — |
+| Mulligan | 52.0% | — | — |
+| Ramp T1 | 21.2% | — | — |
+| Sem Play T3 | 15.3% | — (aguarda simulacao) | — |
+
+**Net DCMC:** -2 (Goldspan 5->4, Seething Song 3->2)
+**Draw real estimado:** 5 -> 6 (+Wedding Ring)
+**Removal:** 4 -> 6 (+Abrade, functional_tag ajustado)
+**Ramp:** 16 -> 14 (-Goldspan, -Seething Song)
+
+### Licoes do Ciclo #6
+
+1. **SEMPRE verificar CMC de cartas recomendadas contra o banco de dados.** O v3.7 continha
+   erros graves (Apex of Power CMC 10, nao 5; Victory Chimes CMC 3, nao 2; Soulfire Eruption
+   CMC 9, nao 4). Se aplicados, teriam PIORADO Sem Play T3 em ~10pp.
+
+2. **A colecao esta no limite de upgrades com custo zero.** As cartas de alto impacto ja estao
+   no deck (21 swaps aplicados). Proximos upgrades defensivos exigem adquirir cartas CMC 1-2
+   como: Ranger-Captain of Eos, Skullclamp, Mana Vault, Chrome Mox.
+
+3. **Net DCMC -2 e insuficiente para DEFENSIVO (-5 a -10).** Com a colecao atual, nao ha
+   como atingir esse target sem cortar staples de alta EDHREC (Call Forth the Tempest CMC 8
+   a 65.5%, Storm Herd CMC 10 a 75.2%). Isso seria contraproducente.
+
+4. **Wedding Ring como draw engine em Boros:** Draw simetrico em Commander multiplayer e
+   subestimado. Voce escolhe o oponente que mais compra (geralmente o deck de control ou
+   combo) e se beneficia passivamente.
+
+5. **Rituais (Seething Song) sao inferiores a tesouros em Lorehold.** Tesouros ativam
+   Storm-Kiln Artist, contam para Lorehold count, e podem ser acumulados. Rituais sao
+   one-shot e nao interagem com as engines do deck.
+
+### Estado Final do Deck
+
+- Total cartas: 100 ✅
+- Commander: 1 ✅
+- Lands: 35
+- Motor: 4/4 completo ✅
+- Copy engines: 3/3 completo ✅
+- Draw real: ~6 (Wedding Ring adicionado)
+- Removal: 6 (Abrade adicionado)
+- Swaps totais desde baseline: 21 (C#1: 3, C#2: 3, C#3: 5, C#4: 3, C#5: 3, C#6: 2)
+
+### Proximo Ciclo (C#7)
+
+- Executar mulligan simulacao para medir impacto do DCMC = -2
+- Se T3 > 12%: continuar DEFENSIVO (mas colecao esgotada — precisa de aquisicoes)
+- Se T3 10-12%: BALANCED (trocar Pearl Medallion por algo CMC 2-3)
+- Prioridade: adquirir cartas CMC 1-2 com draw/removal em Boros
+
+---
+
 # Evolution Log — Lorehold
 
 ## [2026-05-27 03:05:39 UTC] Ciclo #1

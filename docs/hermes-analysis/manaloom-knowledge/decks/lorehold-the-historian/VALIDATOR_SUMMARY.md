@@ -1,6 +1,6 @@
 # VALIDATOR SUMMARY — Lorehold Spellslinger (2026-05-31)
 
-## Estado do Deck: Pos-Ciclo #5 (17 swaps aplicados)
+## Estado do Deck: Pos-Ciclo #6 (21 swaps aplicados)
 
 | Ciclo | # | Saiu | Entra |
 |:------:|:-:|:-----|:-------|
@@ -21,22 +21,24 @@
 | #5 | 1 | Artist's Talent | Chaos Warp |
 | #5 | 2 | Oswald Fiddlebender | The Dawning Archaic |
 | #5 | 3 | Perch Protection | Arcane Bombardment |
+| #6 | 1 | Goldspan Dragon | Wedding Ring |
+| #6 | 2 | Seething Song | Abrade |
 
 ## Metricas Atuais vs Perfil EDHREC
 
 | Metrica | Deck | Perfil | Status |
 |:--------|:----:|:------:|:------:|
 | Lands | 35 | 36-38 | OK (-1, MDFCs contam) |
-| Ramp | 16 | 10-13 | +3 (treasure-heavy) |
-| Draw (real) | 5 | 8-12 | CRITICO |
-| Removal | 5 | 4-6 | No range |
+| Ramp | 14 | 10-13 | +1 (treasure-heavy) |
+| Draw (real) | 6 | 8-12 | CRITICO (melhorou +1) |
+| Removal | 6 | 4-6 | No range (melhorou +1) |
 | Board Wipe | 5 | 3-5 | No limite |
 | Protection | 3 | 3-4 | No range |
 | Recursion | 4 | 2-5 | No range |
 | Wincon (dedicado) | 1 | 4-7 | Muito abaixo |
-| Engine/Big Spell | 5 | 5-8 | No range |
-| Tutor | 3 | -- | Adequado |
-| CMC medio | ~3.9 | ~4.1 | OK |
+| Engine/Big Spell | 12 | 5-8 | Acima (motor 4/4 + copy 3/3) |
+| Tutor | 1 | -- | Baixo (so Gamble) |
+| CMC medio | 3.79 | ~4.1 | OK (melhorou -0.17) |
 
 ## Motor de Lorehold: 4/4 COMPLETO
 
@@ -54,11 +56,20 @@
 | Ramp T1 | 21.2% | OK |
 | Sem Play T3 | **15.3%** | > 12% |
 
-## Top 3 Problemas
+> **Nota:** Simulacao pos-Ciclo #6 pendente. Net DCMC = -2 (Goldspan 5->4, Seething Song 3->2).
+> Espera-se reducao modesta de ~2pp em Sem Play T3 (15.3% -> ~13%).
 
-1. **Sem Play T3 = 15.3%** — acima do limite de 12%. Ciclo #6 deve ser DEFENSIVO.
-2. **Draw real = 5** (perfil quer 8-12). Maior gap funcional.
-3. **Jogaveis estruturais ~48%** — limite inferior com 35 lands e 3 T1 ramp sources.
+## ⚠️ Ciclo #6: Correcao de Erro de CMC do v3.7
+
+O VALIDATOR v3.7 listou CMCs incorretos: Apex of Power = CMC 10 (nao 5), Victory Chimes = CMC 3 (nao 2),
+Soulfire Eruption = CMC 9 (nao 4). Se aplicados, teriam net DCMC +10 e destruido o early-game.
+Swaps corrigidos com CMCs verificados no banco: Wedding Ring (CMC 4) e Abrade (CMC 2).
+
+## Top 3 Problemas (Pos-Ciclo #6)
+
+1. **Sem Play T3 = ~13-15%** — ainda acima do limite de 12%. Aguardando mulligan para medir impacto.
+2. **Draw real = 6** (perfil quer 8-12). Melhorou +1 com Wedding Ring. Ainda e o maior gap.
+3. **Colecao esgotada de cartas CMC 1-2 com alto EDHREC.** Proximos upgrades defensivos requerem aquisicao.
 
 ## Double-Null Cards (7)
 
@@ -68,21 +79,23 @@
 | Penance | CRITICO | Nunca cortar |
 | Grand Abolisher | Alto | Manter |
 | Ruby Medallion | Medio | Monitorar |
-| Pearl Medallion | Medio | CORTAR Ciclo #6 (defensivo) |
+| Pearl Medallion | Medio | Monitorar (sem替代 CMC 2 na colecao) |
 | Galadriel's Dismissal | Baixo | Monitorar |
 | Taunt from the Rampart | Baixo | Manter |
 
-## Ciclo #6 (DEFENSIVO) — Prioridades
+## Ciclo #7 — Prioridades
 
-Com T3 = 15.3%, estrategia DEFENSIVA (net ΔCMC -5 a -10):
-1. **Goldspan Dragon (CMC 5, 17.8%)** -> Apex of Power (CMC 5, 55.0%) [draw, net ΔCMC 0]
-2. **Pearl Medallion (CMC 2, 25.2%)** -> Victory Chimes (CMC 2, 53.6%) [net ΔCMC 0]
-3. **Galvanoth (CMC 5, 26.5%)** -> Soulfire Eruption (CMC 4, 42.5%) [net ΔCMC -1]
-4. **Seething Song (CMC 3, 16.0%)** -> carta CMC 1-2 [net ΔCMC -1 a -2]
-5. **Call Forth the Tempest (CMC 8, 65.5%)** -> carta CMC 3-4 com trend positivo [net ΔCMC -4 a -5]
+Se mulligan confirmar T3 > 12%: continuar DEFENSIVO mas colecao esta esgotada.
+Opcoes limitadas na colecao para defensivo:
+1. **Pearl Medallion (CMC 2, 25.2%, -0.46)** -> Abraded Bluffs (CMC 0, land MDFC) [net DCMC -2]
+2. **Galvanoth (CMC 5, 26.5%)** -> Flawless Maneuver (CMC 0 com commander) [net DCMC -5]
 
-Meta: reduzir T3 de 15.3% para <12%.
+Melhor cenario (T3 < 12%): BALANCED.
+1. **Pearl Medallion** -> **Inti, Seneschal of the Sun** (CMC 2, loot) [net DCMC 0]
+2. **Galadriel's Dismissal** -> **Palantir of Orthanc** (CMC 3, draw/mill) [net DCMC +2]
+
+**Prioridade absoluta: ADQUIRIR cartas CMC 1-2 com draw em Boros** (Ranger-Captain of Eos, Skullclamp).
 
 ---
-*Atualizado: 2026-05-31. Fonte: EDHREC 7.802 decks, knowledge.db deck_id=6 pos-Ciclo #5.*
-*Analista: Hermes Agent — Purpose Analyzer v3.7*
+*Atualizado: 2026-05-31. Fonte: EDHREC 7.802 decks, knowledge.db deck_id=6 pos-Ciclo #6.*
+*Analista: Hermes Agent — Evolution Oracle Ciclo #6*
