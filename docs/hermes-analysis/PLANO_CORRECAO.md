@@ -50,12 +50,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    `codex/hermes-analysis-docs@af3d8575` (2026-05-30 07:00 UTC) como **ABERTO
-    neste checkout**. `sync_cards_utils.dart` segue importado apenas por teste,
-    enquanto `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma
-    logica. Tambem seguem sem chamador runtime confirmado wrappers/helpers em
-    request trace, Commander Reference, MTGTop8, candidate quality, optimize
-    utility samples e a API manual de metricas de `PerformanceService`.
+    2026-05-31 07:00 UTC como **ABERTO neste checkout**.
+    `sync_cards_utils.dart` segue importado apenas por teste, enquanto
+    `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma logica.
+    Tambem seguem sem chamador runtime confirmado wrappers/helpers em request
+    trace, Commander Reference, MTGTop8, candidate quality, optimize utility
+    samples, `MLKnowledgeService.recordFeedback` e a API manual de metricas de
+    `PerformanceService`.
 13. **P1/P2 — Imports quebrados e ciclo app**: **REABERTO no checkout local
     `df8291d7` (2026-05-30 11:00 UTC).** `deck_analysis_tab.dart:5` e
     `life_counter_screen.dart:7` ainda usam imports relativos que saem de
