@@ -1,6 +1,14 @@
-# VALIDATOR SUMMARY — Lorehold Spellslinger (2026-05-31)
+# VALIDATOR SUMMARY — Lorehold Spellslinger
 
-## Estado do Deck: Pos-Ciclo #7 (22 swaps aplicados)
+> **Ultima atualizacao:** 2026-05-31T18:56:33+00:00 (v3.10 Purpose Analyzer)
+> **Deck:** Pos-Ciclo #10, 25 swaps, 100 cards, 86 rows, 35 lands, CMC medio 3.71
+> **Pipelines ativos:** Scout (#17) + Validator (v3.10) + Mulligan (#11 pendente) + Evolution (#10)
+
+---
+
+## Estado do Deck: EXCELENTE — Motor 4/4, Copy 6, Nivel 1 VAZIO
+
+### Ciclos de Swap Completos (25 swaps em 10 ciclos)
 
 | Ciclo | # | Saiu | Entra |
 |:------:|:-:|:-----|:-------|
@@ -24,79 +32,131 @@
 | #6 | 1 | Goldspan Dragon | Wedding Ring |
 | #6 | 2 | Seething Song | Abrade |
 | #7 | 1 | Galadriel's Dismissal | Victory Chimes |
+| #9 | 1 | Pearl Medallion | Akroma's Will |
+| #10 | 1 | Ruby Medallion | Twinflame |
+| #10 | 2 | Galvanoth | Flare of Duplication |
 
-## Metricas Atuais vs Perfil EDHREC
+---
+
+## Metricas Atuais (post-C#10) vs Perfil EDHREC
 
 | Metrica | Deck | Perfil | Status |
 |:--------|:----:|:------:|:------:|
-| Lands | 35 | 36-38 | OK (-1, MDFCs contam) |
+| Lands | 35 | 36-38 | OK (-1, MDFCs compensam) |
 | Ramp | 14 | 10-13 | +1 (treasure-heavy) |
-| Draw (real) | 7 | 8-12 | -1 (melhorou +1) |
-| Removal | 6 | 4-6 | No range |
+| Draw (real) | 7 | 8-12 | -1 (estrutural Boros) |
+| Removal | 6 | 4-6 | No limite |
 | Board Wipe | 5 | 3-5 | No limite |
-| Protection | 3 | 3-4 | No range |
+| Protection | 3 | 3-4 | OK (+3 stack: Swat, Squelcher, Abolisher) |
 | Recursion | 4 | 2-5 | No range |
-| Wincon (dedicado) | 1 | 4-7 | Muito abaixo |
-| Engine/Big Spell | 12 | 5-8 | Acima (motor 4/4 + copy 3/3) |
-| Tutor | 1 | -- | Baixo (so Gamble) |
-| CMC medio | ~3.8 | ~4.1 | OK |
-
-## Simulacao Pos-Ciclo #6 (rigorous, N=1000, seed=42)
-
-| Metrica | Valor | Status |
-|:--------|:-----:|:------:|
-| Jogaveis | 48.4% | Estrutural (35 lands, 3 T1 ramp) |
-| Mulligan | 41.5% | |
-| Ramp T1 | 19.7% | OK |
-| **Sem Play T3** | **3.7%** | EXCELENTE (< 8%) |
-
-> **Ciclo #7 — AGGRESSIVE:** Net DCMC +2 (Galadriel 1 → Victory Chimes 3).
-> T3 estimado pos-C#7: ~5%. Aguardando mulligan confirmatorio.
-
-## Motor de Lorehold: 4/4 COMPLETO
-
-1. **Treasure Ramp** — Big Score, Brass's Bounty, Hit the Mother Lode ✅
-2. **Big Spell Free** — Dance with Calamity, Improvisation Capstone, Dawning Archaic ✅
-3. **Lorehold Copy** — Commander ability ✅
-4. **Treasure Payoff** — Storm-Kiln Artist ✅
-
-## Copy Engines: 3/3 COMPLETO
-
-- Double Vision (46.6%)
-- Arcane Bombardment (42.5%)
-- Lorehold Commander
-
-## Double-Null Cards (6, reduzido de 7)
-
-| Carta | Risco de Corte | Acao |
-|:------|:---------------|:-----|
-| Scroll Rack | CRITICO | Nunca cortar |
-| Penance | CRITICO | Nunca cortar |
-| Grand Abolisher | Alto | Manter |
-| Ruby Medallion | Medio | Monitorar |
-| Pearl Medallion | Medio | Candidato a corte C#8 |
-| Taunt from the Rampart | Baixo | Manter |
-
-> ~~Galadriel's Dismissal~~ → FORA (Ciclo #7). Era double-null, 0% EDHREC.
-
-## Top 3 Problemas (Pos-Ciclo #7)
-
-1. **Draw real = 7** (perfil quer 8-12). A 1 fonte do minimo — quase resolvido.
-2. **Wincon dedicado = 1** (perfil quer 4-7). Varias wincons nao-taggeadas (Insurrection, Storm Herd, Mizzix's) compensam.
-3. **Colecao esgotada de CMC 1-2 com alto EDHREC.** Proximos upgrades requerem aquisicao.
-
-## Ciclo #8 — Prioridades
-
-Se mulligan confirmar T3 < 8% → AGGRESSIVE:
-- **Pearl Medallion (CMC 2, 25.2%, -0.46)** → carta CMC 3-4 com draw/wincon
-- Opcoes limitadas na colecao: Flawless Maneuver (19.8%), Radiant Scrollwielder (26.5%)
-
-Se T3 > 8% → BALANCED:
-- **Pearl Medallion (CMC 2)** → **Inti, Seneschal of the Sun (CMC 2, loot)** [net DCMC 0]
-- Ou manter e aguardar aquisicao de Ranger-Captain of Eos, Skullclamp
-
-**Prioridade absoluta: ADQUIRIR cartas CMC 1-2 com draw em Boros.**
+| Wincon (dedicado) | 2 | 4-7 | Funcionalmente 8+ paths |
+| Engine/Big Spell | 9 | 5-8 | Copy 6 + Motor 4/4 |
+| Tutor | 2 | -- | Enlightened + Gamble |
+| CMC medio | **3.71** | ~4.1 | OK (-0.40 do baseline) |
 
 ---
-*Atualizado: 2026-05-31. Fonte: EDHREC 7.802 decks, knowledge.db deck_id=6 pos-Ciclo #7.*
-*Analista: Hermes Agent — Evolution Oracle Ciclo #7*
+
+## Mulligan (pos-C#9 = ultima simulacao; #11 pendente)
+
+| Metrica | Execucao #10 (pos-C#9) | Pos-C#10 (est.) | Target |
+|:--------|:----------------------:|:---------------:|:------:|
+| Jogaveis | 46.3% | ~48% | -- |
+| Mulligan | 49.3% | ~47% | -- |
+| Ramp T1 (estrito) | 20.1% | ~20% | -- |
+| **Sem Play T3** | **16.9%** | **~15%** | **< 12%** |
+
+> ⚠️ O T3=3.7% reportado em ciclos anteriores era a **taxa de free mulligan** (0 ou 7 lands),
+> NAO o Sem Play T3 correto. Correcao aplicada nos v3.9/v3.10.
+> Ciclos #7/#8/#9 usaram T3 errado para escolher AGGRESSIVE (devia ser DEFENSIVE).
+> **Ciclo #10 foi o PRIMEIRO com T3 correto (16.9%) → DEFENSIVE.**
+
+**Trajetoria T3:** C#5(15.3%) → C#6(-2CMC) → C#7(+2CMC) → C#8(0CMC) → C#9(+2CMC) → C#9(16.9%) → C#10(-2CMC, ~15% est.)
+**Net DCMC desde C#5:** +2 (AGGRESSIVE desnecessario #7/#8/#9 causou inchaco).
+
+---
+
+## Motor: 4/4 COMPLETO
+
+1. ✅ Treasure Ramp — Big Score, Brass's Bounty, Hit the Mother Lode
+2. ✅ Free Big Spell — Dance with Calamity, Improvisation Capstone, Dawning Archaic
+3. ✅ Lorehold Copy — Commander ability
+4. ✅ Treasure Payoff — Storm-Kiln Artist
+
+## Copy Engines: 6 ativas 🆕
+
+1. Lorehold (commander)
+2. Double Vision (46.6%)
+3. Arcane Bombardment (42.5%)
+4. The Dawning Archaic (24.0%, rising +5.31)
+5. **Flare of Duplication** 🆕 (instant copy, Approach+Flare = win 1 turno)
+6. **Twinflame** 🆕 (creature copy, Surge chain)
+
+---
+
+## SYNERGY_MAP (v3.10 — 7 Eixos)
+
+| Eixo | Score | Mudanca (vs v3.9) | Nota |
+|:-----|:-----:|:-----------------:|:-----|
+| Token+Pump | 8/10 | -- | Akroma's Will + Boros Charm + Twinflame chain |
+| Wipes+Protection | 8/10 | -- | 5 wipes / 4 protecoes. Balanceado. |
+| Recursion | 8/10 | -- | Mizzix + Bombardment + Surge + Seminar |
+| Mana Explosiva | 7/10 | -- | 6+ treasure generators. Sem fast mana. |
+| **Combo Pieces** | **9/10** | **+1** | **Approach+Flare = win MESMO turno** |
+| **Stack Interaction** | **7/10** | **+1** | Flare responde a counterspell |
+| **Graveyard Resilience** | **6/10** | **+1** | Plano B (Approach+Flare) dispensa grave |
+
+---
+
+## Win Conditions (8+ paths, 2 novos no C#10)
+
+- **Approach + Flare de Duplication** 🆕 — 7 mana + criatura vermelha = vitoria NO MESMO TURNO
+- **Twinflame + Surge + Approach** 🆕 — creature copy dobra copias de Approach
+- Approach of the Second Sun (hardcast ou com Sensei's Top)
+- Insurrection (rouba board + haste)
+- Storm Herd + Akroma's Will (overkill: 20-40 tokens flying indestructible)
+- Rite of the Dragoncaller + Akroma's Will (3-5 dragons letais)
+- Surge to Victory + Approach (cada criatura = 1 copia)
+- Mizzix's Mastery overload (todo grave gratis)
+- Arcane Bombardment chain + Double Vision (3-4 spells/turno)
+
+---
+
+## Double-Null Cards: 4 (eram 10 no baseline)
+
+| Carta | CMC | EDHREC | Trend | Risco | Acao |
+|:------|:---:|:------:|:-----:|:-----:|:-----|
+| Scroll Rack | 2 | 59.7% | +0.15 | 🔴 | NEVER CUT — core engine |
+| Penance | 3 | 41.8% | +1.15 | 🔴 | NEVER CUT — miracle enabler |
+| Taunt from the Rampart | 5 | 35.2% | +0.10 | 🟢 | KEEP — util em multiplayer |
+| Grand Abolisher | 2 | 11.7% | -0.27 | 🟡 | KEEP — unica protecao proativa anti-counterspell |
+
+**Ruby Medallion removido no C#10** (declinio -0.37, 3+ ciclos). Nivel 1 agora VAZIO.
+
+---
+
+## GAPS Atuais
+
+| # | Gap | Severidade | Solucao |
+|:-:|:-----|:----------:|:--------|
+| 1 | **Sem Play T3 ~15%** (>12%) | 🔴 DEFENSIVE | Fast mana (Chrome Mox, Mana Vault) — requer AQUISICAO |
+| 2 | Colecao esgotada de CMC <= 2 | 🔴 | Aquisicao de Skullclamp ($5-8), Chrome Mox ($60-80) |
+| 3 | Draw = 7 (vs perfil 8-12) | 🟡 | Skullclamp ($5-8) |
+| 4 | Fated Clash 15.6% EDHREC declinio | 🟡 | Sem substituto viavel na colecao |
+
+---
+
+## Estrategia para Ciclo #11
+
+**0 SWAPS previstos.** Deck saudavel, Nivel 1 vazio, colecao esgotada.
+Prioridade: Executar Mulligan Execucao #11 pos-C#10 para medir impacto do DCMC=-2.
+
+**Recomendacoes de Aquisicao:**
+1. Skullclamp (CMC 1, draw engine, $5-8) — PRIORIDADE #1
+2. Chrome Mox (CMC 0, fast mana, $60-80)
+3. Mana Vault (CMC 1, fast mana, $40-60)
+4. Underworld Breach (CMC 2, recursion, $15-20)
+
+---
+
+*Relatorio gerado por Purpose Analyzer v3.10 em 2026-05-31T18:56:33+00:00*
+*Proximo: v3.11 apos Mulligan Execucao #11 confirmar T3 pos-C#10*
