@@ -370,3 +370,33 @@ v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm 
 | Stax (Winota) | 67.0% | 67 | 4 | 29 | 20.9 | approach=66, elimination=1 |
 
 **Overall WR: 67.7%** (406W/38L/156S)
+
+## [2026-05-31T18:12:19Z] Battle Analyst v8 — Interactive Commander
+Games: 100 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Aggro (Krenko) | 69.0% | 69 | 1 | 30 | 22.1 | approach=64, elimination=5 |
+| Control (Atraxa) | 69.0% | 69 | 9 | 22 | 23.6 | approach=62, elimination=7 |
+| Combo (Kinnan) | 67.0% | 67 | 8 | 25 | 21.6 | approach=58, elimination=9 |
+| Midrange (Korvold) | 65.0% | 65 | 7 | 28 | 22.7 | approach=53, elimination=12 |
+| Spellslinger (Niv) | 69.0% | 69 | 9 | 22 | 23.9 | approach=62, elimination=7 |
+| Stax (Winota) | 67.0% | 67 | 4 | 29 | 20.9 | approach=66, elimination=1 |
+
+**Overall WR: 67.7%** (406W/38L/156S)
+
+## [2026-05-31T19:11:51Z] Battle Analyst v8 — Interactive Commander
+Games: 100 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Aggro (Krenko) | 69.0% | 69 | 1 | 30 | 22.1 | approach=64, elimination=5 |
+| Control (Atraxa) | 69.0% | 69 | 9 | 22 | 23.6 | approach=62, elimination=7 |
+| Combo (Kinnan) | 67.0% | 67 | 8 | 25 | 21.6 | approach=58, elimination=9 |
+| Midrange (Korvold) | 65.0% | 65 | 7 | 28 | 22.7 | approach=53, elimination=12 |
+| Spellslinger (Niv) | 69.0% | 69 | 9 | 22 | 23.9 | approach=62, elimination=7 |
+| Stax (Winota) | 67.0% | 67 | 4 | 29 | 20.9 | approach=66, elimination=1 |
+
+**Overall WR: 67.7%** (406W/38L/156S)
