@@ -1,111 +1,71 @@
-# VALIDATOR SUMMARY — Lorehold Spellslinger (2026-05-30)
+# VALIDATOR SUMMARY -- Lorehold Spellslinger (v3.11 — 2026-05-31T20:04:12+00:00)
 
-## Estado do Deck: Pós-Ciclo #3 (14 swaps aplicados)
+## Estado do Deck: MATURIDADE ATINGIDA — Pós-Ciclo #11 (25 swaps, 0 no C#11)
 
-| Ciclo | Swap | Saiu | Entrou |
-|:------|:-----|:-----|:-------|
-| #1 | 1 | Furygale Flocking | Esper Sentinel |
-| #1 | 2 | Jokulhaups | Gamble |
-| #1 | 3 | Karoo | Plains |
-| #2 | 1 | Deflecting Palm | Big Score |
-| #2 | 2 | Hellkite Tyrant | Dance with Calamity |
-| #2 | 3 | Mother of Runes | The One Ring |
-| #3 | 1 | Ancient Copper Dragon | Storm-Kiln Artist |
-| #3 | 2 | Desperate Ritual | Boros Signet |
-| #3 | 3 | Sunbird's Invocation | Improvisation Capstone |
-| #3 | 4 | Victory Chimes | Generous Gift |
-| #3 | 5 | Orim's Chant | Blasphemous Act |
+| Indicador | Valor | Status |
+|:----------|:-----:|:------:|
+| Motor | 4/4 COMPLETO | ✅ |
+| Copy Engines | 6 ativas | ✅ |
+| Token+Pump | 8/10 | ✅ |
+| Wipes+Protection | 8/10 | ✅ |
+| Recursion | 8/10 | ✅ |
+| Mana Explosiva | 7/10 | ✅ |
+| Combo Pieces | 9/10 | ✅ |
+| Stack Interaction | 7/10 | ✅ |
+| Graveyard Resilience | 6/10 | 🟡 |
+| Sem Play T3 | **13.3%** | 🟡 DEFENSIVE (>12%) |
+| Draw Real | 7 (perfil 8-12) | 🟡 -1 do perfil |
+| Nivel 1 | VAZIO | ✅ Sem filler |
+| Double-nulls | 4 (0 cortaveis) | ✅ |
+| Colecao | ESGOTADA | 🔴 38 candidatos rejeitados |
 
-## Métricas Atuais vs Perfil EDHREC
+### Histórico de Swaps (25 em 11 ciclos)
+
+| Ciclo | Data | Swaps | Net DCMC | Estrategia | T3 |
+|:-----:|:-----|:-----:|:--------:|:----------|:--:|
+| #1 | 2026-05-28 | 3 | +3 | AGGRESSIVE | 12.4% |
+| #2 | 2026-05-28 | 3 | +4 | AGGRESSIVE | 16.5% |
+| #3 | 2026-05-30 | 5 | -4 | DEFENSIVO | 16.4% |
+| #4 | 2026-05-30 | 3 | -15 | DEFENSIVO | 12.0% |
+| #5 | 2026-05-31 | 3 | +1 | BALANCED | 15.3% |
+| #6 | 2026-05-31 | 2 | -2 | DEFENSIVO | ~13-14% |
+| #7 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | ~14-15% |
+| #8 | 2026-05-31 | 0 | 0 | (0 swaps) | ~14-15% |
+| #9 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | 16.9% |
+| #10 | 2026-05-31 | 2 | -2 | DEFENSIVO | **13.3%** |
+| #11 | 2026-05-31 | 0 | 0 | (0 swaps) | **13.3%** |
+
+*Ciclos #7/#8/#9 usaram T3=3.7% (free mulligan rate) erroneamente.
+
+### Métricas Atuais vs Perfil EDHREC
 
 | Métrica | Deck | Perfil | Status |
 |:--------|:----:|:------:|:------:|
-| Lands | 35 | 36-38 | 🟡 -1 (ok com MDFCs) |
-| Ramp | 16 | 10-13 | 🟡 +3 (treasure-heavy) |
-| Draw (real) | 5 | 8-12 | 🔴 Crítico |
-| Removal | 5 | 4-6 | 🟢 No range |
-| Board Wipe | 5 | 3-5 | 🟡 No limite |
-| Protection | 4 | 3-4 | 🟢 No range |
-| Recursion | 4 | 2-5 | 🟢 No range |
-| Wincon (dedicated) | 1 | 4-7 | 🔴 Muito abaixo |
-| Engine/Big Spell | 4 | 5-8 | 🟡 Abaixo |
-| Tutor | 3 | — | 🟢 Adequado |
-| CMC médio | ~3.8 | ~4.1 | 🟢 Melhorou |
+| Lands | 35 | 36-38 | 🟡 -1 (MDFCs compensam) |
+| Ramp | 14 | 10-13 | 🟡 +1 (treasure-heavy) |
+| Draw (real) | 7 | 8-12 | 🟡 -1 |
+| Removal | 6 | 4-6 | 🟢 No limite |
+| Board Wipe | 5 | 3-5 | 🟢 No limite |
+| Protection (total) | 6 | 3-4 | 🟢 (3 DB + 3 stack) |
+| Recursion | 4 | 2-5 | 🟢 |
+| Wincon (funcional) | 8+ paths | 4-7 | 🟢 Excelente |
+| Engine/Big Spell | 9 | 5-8 | 🟢 |
+| CMC medio | 3.71 | ~4.1 | 🟢 |
 
-## Motor de Lorehold: ✅ 4/4 COMPLETO
+### Destaques do v3.11
 
-1. **Treasure Ramp** — Big Score, Brass's Bounty, Hit the Mother Lode ✅
-2. **Big Spell Free** — Dance with Calamity, Improvisation Capstone, Approach ✅
-3. **Lorehold Copy** — Commander ability ✅
-4. **Treasure Payoff** — Storm-Kiln Artist ✅
+1. **T3 = 13.3% CONFIRMADO (Exec#11)** — melhoria de -3.6pp vs pos-C#9. Impacto do Ciclo #10 foi quase o DOBRO do projetado.
+2. **Approach + Flare de Duplication = COMBO DETERMINISTICO.** Vitoria no MESMO turno com 7 mana + qualquer criatura vermelha.
+3. **Ciclo #11: 0 swaps.** 38 candidatos avaliados — nenhum atinge Necessidade >= 3 + Evidencia >= 3.
+4. **Deck maturity atingida.** Nivel 1 vazio. 8+ paths de vitoria. Todos os eixos funcionais (6-9/10).
+5. **Proximo upgrade:** Skullclamp ($5-8, prioridade #1). Fated Clash -> Skullclamp = DCMC -4, T3 projetado ~10%.
 
-## Simulação Pós-Ciclo #3 (rigorous, N=1000)
+### Análises Disponíveis
 
-| Métrica | Valor | Status |
-|:--------|:-----:|:------:|
-| Jogáveis | 69.3% | 🟢 |
-| Mulligan | ~30.7% | 🟡 |
-| Ramp T1 | 20.6% | 🟢 |
-| Sem Play T3 | **5.1%** | 🟢 Excelente |
-
-## Top 3 Problemas
-
-1. **Draw real = 5** (perfil quer 8-12). Maior gap.
-2. **Wincon dedicado = 1** (Approach). Perfil quer 4-7.
-3. **Rise of the Eldrazi CMC 12** — carta ineficiente que precisa sair.
-
-## Top Swaps para Ciclo #4 (custo $0)
-
-| # | Sai | Entra | EDHREC | Impacto | ΔCMC |
-|:-:|:----|:------|:------:|:--------|:----:|
-| 1 | Rise of the Eldrazi | **Arcane Bombardment** | 42.4% | Copy engine | -6 |
-| 2 | Season of the Bold | **Faithless Looting** | 29.6% | Draw + GY setup | -4 |
-| 3 | Goblin Engineer | **Dragon's Rage Channeler** | 39.6% | Topdeck enabler | 0 |
-| 4 | Longshot, Rebel Bowman | **Thrill of Possibility** | common | Draw 2 | 0 |
-| 5 | Pearl Medallion | **Archivist of Oghma** | 30% | Draw vs fetch | 0 |
-
-**Estratégia Ciclo #4: AGGRESSIVE** (Sem Play T3 = 5.1% permite)
-**Net ΔCMC: ≈-10** (mas margem de segurança em Sem Play T3 permite)
-
-## Double-Null Cards (7 restantes)
-
-| Carta | Risco de Corte | Ação |
-|:------|:---------------|:-----|
-| Scroll Rack | 🔴 CRÍTICO | Nunca cortar |
-| Penance | 🔴 CRÍTICO | Nunca cortar |
-| Grand Abolisher | 🟡 Alto | Manter |
-| Ruby Medallion | 🟡 Médio | Manter |
-| Pearl Medallion | 🟡 Médio | Cortar no Ciclo #4 P2 |
-| Galadriel's Dismissal | 🟢 Baixo | Monitorar |
-| Taunt from Rampart | 🟢 Baixo | **NÃO CORTAR** (35.3% EDHREC) |
-
-## Tendências-Chave EDHREC (7765 decks)
-
-| Carta | % | Trend | Sinal |
-|:------|:-:|:------|:------|
-| Restoration Seminar | 37.6% | +9.15 | Crescendo mais rápido |
-| Improvisation Capstone | 48.9% | +8.13 | Explosão |
-| Storm-Kiln Artist | 55.4% | +0.75 | Estável/crescente |
-| Big Score | 67.2% | +1.50 | Staple + crescendo |
-| Artist's Talent | 21.0% | -0.71 | DECLÍNIO GRAVE |
-| Esper Sentinel | 32.4% | -0.54 | Declínio |
-| The One Ring | 8.4% | -0.31 | GC em declínio em Lorehold |
-
-## Swaps na Coleção (não no deck, >30% EDHREC)
-
-1. Arcane Bombardment (42.4%) — Ciclo #4 P0
-2. Apex of Power (55.1%) — Ciclo #5 (Sem Play T3 check)
-3. Faithless Looting (29.6%) — Ciclo #4 P0
-4. Dragon's Rage Channeler (39.6%) — Ciclo #4 P1
-5. Blasphemous Act (40.4%) — ✅ já no deck
-6. Thrill of Possibility (common) — Ciclo #4 P1
-7. Chaos Warp (38.9%) — Ciclo #5
-8. Trouble in Pairs (29%) — verificar coleção
-
-## Veredito
-
-Deck funciona em bracket 3. 14 swaps aplicados ao longo de 3 ciclos. Ciclo #3 foi um sucesso — completou o motor e restaurou Sem Play T3 para 5.1%. Próximo ciclo deve focar em draw + wincons. Maior custo-zero upgrade: Arcane Bombardment (coleção, 42.4% EDHREC).
-
----
-*Atualizado: 2026-05-30. Fonte: EDHREC 7765 decks, knowledge.db deck_id=6 pós-Ciclo #3, 229 cartas na coleção.*
-*Analista: Hermes Agent — Purpose Analyzer v3.4*
+- `VALIDATOR_LOG_v3.11.md` — Mais recente (T3 confirmado, Ciclo #11 sintese)
+- `VALIDATOR_LOG_v3.10.md` — Pos-Ciclo #10, SYNERGY_MAP 7 eixos
+- `VALIDATOR_LOG_v3.9.md` — 7 eixos + Stack & Resilience
+- `VALIDATOR_LOG_v3.8.md` — SYNERGY_MAP original 5 eixos
+- `VALIDATOR_LOG_v3.7.md` — Declinio tracking + CMC correction
+- `MULLIGAN_LOG.md` — Histórico completo de simulações (Exec#1-#11)
+- `EVOLUTION_LOG.md` — Histórico de todos os ciclos (#1-#11)
