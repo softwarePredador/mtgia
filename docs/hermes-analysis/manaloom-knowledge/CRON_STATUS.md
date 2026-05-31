@@ -2,7 +2,7 @@
 
 > Relat�rio gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-31T02:51Z** (manaloom-manager-watchdog)
+> Última atualização: **2026-05-31T03:37Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
@@ -11,14 +11,14 @@
 | Total de crons (`include_disabled=True`) | **18** |
 | Habilitados | 18/18 |
 | Desabilitados | **0** |
-| `last_status=error` | **5** |
-| `last_status=ok` | **13** |
+| `last_status=error` | **4** |
+| `last_status=ok` | **14** |
 | Nunca executaram (`last_run_at=null`) | **0** |
 | Stale (>1.5x schedule atr�s, `enabled=true`) | **0** |
 | A��es de recupera��o nesta execu��o | 0 (rate limit lifting -- auto-recupera��o em progresso) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 18 crons habilitados, **13 OK**, **5 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 → 5 erros em ~2h**.
+**Estado geral:** 18 crons habilitados, **14 OK**, **4 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 → 5 → 4 erros em ~3h**.
 
 ## An�lise de Recupera��o
 
@@ -27,6 +27,7 @@
 | 1 | 2026-05-31T00:53Z | 6 | 12 | — |
 | 2 | 2026-05-31T01:32Z | 10 | 8 | -4 |
 | 3 | 2026-05-31T02:12Z | 12 | 6 | -2 |
+| 4 | 2026-05-31T03:37Z | 14 | 4 | -1 |
 
 **Recupera��o acumulada: 12 → 5 erros (-58%)**
 
@@ -55,7 +56,7 @@
 | `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-31T01:16Z | ok | ✅ recuperado de 429 |
 | `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-31T01:18Z | ok | 8h schedule |
 
-## Crons com Erro (5) -- Rate Limit Residual
+## Crons com Erro (4) -- Rate Limit Residual
 
 Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` que est� se recuperando.
 
@@ -113,12 +114,13 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 ## Mudan�as desde Snapshot Anterior
 
-### Crons que Recuperaram (ERROR → OK) -- 3 (cumulativo)
+### Crons que Recuperaram (ERROR → OK) -- 4 (cumulativo)
 
 | Cron | Schedule | Recuperou em |
 |:-----|:--------|:-----------|
 | lorehold-deck-scout | every 120m | 2026-05-31T01:53Z |
 | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-31T01:59Z |
+| manaloom-mana-base-validator | every 360m | 2026-05-31T03:12Z |
 
 ### Crons que Regrediram (OK → ERROR)
 *(nenhum)*
