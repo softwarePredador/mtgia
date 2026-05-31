@@ -1,0 +1,111 @@
+{
+  "candidates": [
+    {
+      "source_name": "TopDeck.gg",
+      "source_url": "https://topdeck.gg/event/the-quest-part-1#pilot-rograkh-silas",
+      "deck_name": "Quest Dry-Run Rograkh Silas",
+      "commander_name": "Rograkh, Son of Rohgahh",
+      "partner_commander_name": "Silas Renn, Seeker Adept",
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Turbo Naus",
+      "placement": "Top 16",
+      "color_identity": ["U", "B", "R"],
+      "is_commander_legal": true,
+      "validation_status": "candidate",
+      "validation_notes": "Stage 1 dry-run fixture. Event metadata proven; full decklist expansion still pending.",
+      "card_entries": [
+        { "quantity": 1, "name": "Rograkh, Son of Rohgahh" },
+        { "quantity": 1, "name": "Silas Renn, Seeker Adept" },
+        { "quantity": 1, "name": "Mana Crypt" },
+        { "quantity": 1, "name": "Underworld Breach" },
+        { "quantity": 1, "name": "Ad Nauseam" }
+      ],
+      "research_payload": {
+        "collection_method": "manual_web_review",
+        "source_context": "topdeck_event_page",
+        "source_category": "official event page",
+        "event_url": "https://topdeck.gg/event/the-quest-part-1",
+        "note": "Event page text proves cEDH event metadata only."
+      }
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#pilot-kraum-tymna",
+      "deck_name": "Arcanum Dry-Run Kraum Tymna",
+      "commander_name": "Kraum, Ludevic's Opus",
+      "partner_commander_name": "Tymna the Weaver",
+      "format": "commander",
+      "subformat": "cEDH",
+      "archetype": "Blue Farm",
+      "placement": "Top 16",
+      "color_identity": ["W", "U", "B", "R"],
+      "is_commander_legal": true,
+      "validation_status": "candidate",
+      "validation_notes": "Stage 1 dry-run fixture. Tournament page proven; full decklist fetch not yet automated.",
+      "card_entries": [
+        { "quantity": 1, "name": "Kraum, Ludevic's Opus" },
+        { "quantity": 1, "name": "Tymna the Weaver" },
+        { "quantity": 1, "name": "Mana Crypt" },
+        { "quantity": 1, "name": "Esper Sentinel" },
+        { "quantity": 1, "name": "Fierce Guardianship" }
+      ],
+      "research_payload": {
+        "collection_method": "manual_web_review",
+        "source_context": "edhtop16_tournament_page",
+        "source_category": "official tournament page",
+        "event_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+        "note": "Tournament page proves cEDH standings context."
+      }
+    },
+    {
+      "source_name": "TopDeck.gg",
+      "source_url": "https://topdeck.gg/event/the-quest-part-1#broad-commander-example",
+      "deck_name": "Reject Broad Commander Example",
+      "commander_name": "Kenrith, the Returned King",
+      "format": "commander",
+      "subformat": "commander",
+      "archetype": "Commander Broad",
+      "placement": "Not Proven",
+      "color_identity": ["W", "U", "B", "R", "G"],
+      "is_commander_legal": true,
+      "validation_status": "candidate",
+      "validation_notes": "Expected reject in stage 1 because subformat is broad commander.",
+      "card_entries": [
+        { "quantity": 1, "name": "Kenrith, the Returned King" },
+        { "quantity": 1, "name": "Command Tower" },
+        { "quantity": 1, "name": "Sol Ring" }
+      ],
+      "research_payload": {
+        "collection_method": "manual_web_review",
+        "source_context": "topdeck_event_page",
+        "source_category": "official event page"
+      }
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/about#bad-fixture",
+      "deck_name": "Reject Bad Path Example",
+      "commander_name": "Tymna the Weaver",
+      "partner_commander_name": "Thrasios, Triton Hero",
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Midrange",
+      "placement": "Not Proven",
+      "color_identity": ["W", "U", "B", "G"],
+      "is_commander_legal": true,
+      "validation_status": "candidate",
+      "validation_notes": "Expected reject in stage 1 because source_url is not a tournament path.",
+      "card_entries": [
+        { "quantity": 1, "name": "Tymna the Weaver" },
+        { "quantity": 1, "name": "Thrasios, Triton Hero" },
+        { "quantity": 1, "name": "Mana Crypt" }
+      ],
+      "research_payload": {
+        "collection_method": "manual_web_review",
+        "source_context": "about_page_fixture",
+        "source_category": "official about page"
+      }
+    }
+  ]
+}
