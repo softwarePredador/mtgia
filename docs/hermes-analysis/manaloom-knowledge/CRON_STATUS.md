@@ -156,25 +156,34 @@ Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Ra
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> �ltima atualiza��o: **2026-05-30T14:47Z** (antes do 429)
+> Última atualização: **2026-05-31T03:08Z**
 
 **Decks analisados:** 8
-**Crit�rios:** Lands vs perfil EDHREC, Ramp/Draw/Remo��o vs ranges do perfil
+**Critérios:** Lands vs perfil EDHREC, Ramp/Draw/Remoção vs ranges do perfil
 
 ### Resumo Geral
 
-| # | Deck | Total Cards | Status | Lands SQLite | Lands Perfil | Observa��o |
-|---|---|------|:-----------:|:------:|:------------:|:------------|------------|
-| 1 | Kinnan, Bonder Prodigy | 13/100 | INCOMPLETE | 0 | 29-34 | Apenas 13/100 cartas inseridas |
-| 2 | EDHREC Average - Dimir Ninja Topdeck Tempo | 99/100 | WARN | 35 | 30-34 | 99/100 cards (1 short); Lands 35 vs 30-34 |
-| 3 | EDHREC Average Default (Korvold) | 11/100 | INCOMPLETE | 0 | 34-37 | Apenas 11/100 cartas inseridas |
-| 4 | EDHREC Average Default (Teysa) | 80/100 | CRIT | 15 | 35-37 | Teysa: 80 cards, lands=15 (perfil 35-37), ramp CRIT |
-| 5 | Aesi EDHREC Average Default | 100/100 | WARN | 40 | 39-43 | protection: DB=7 vs perfil [2-4] |
-| 6 | Lorehold Spellslinger | 100/100 | OK | 35 | -- | Sem perfil de refer�ncia |
-| 7 | EDHREC Average - Boros Combat Trigger Humans | 100/100 | WARN | 34 | 31-35 | protection: DB=10 vs perfil [5-8] |
-| 9 | Atraxa EDHREC Average (41k decks) | 100/100 | OK | 36 | 35-38 | Dentro do perfil |
+| # | Deck | Total Cards | Status | Lands SQLite | Lands Perfil | Observação |
+|---|------|:-----------:|:------:|:-----------:|:------------:|------------|
+| 1 | Kinnan, Bonder Prodigy | 13/100 | ⚪ INCOMPLETE | — | 29-34 | Apenas 13 cartas inseridas (seed cEDH) |
+| 2 | EDHREC Average - Dimir Ninja Topdeck Tempo | 99/100 | 🟡 WARN | 35 | 30-34 | 99/100 cards (1 short); Lands BLUE(d=1); interaction BLUE(d=1) |
+| 3 | EDHREC Average Default (Korvold) | 11/100 | ⚪ INCOMPLETE | — | 34-37 | Apenas 11 cartas inseridas |
+| 4 | EDHREC Average Default (Teysa) | 80/100 | 🔴 CRIT* | 15 | 35-37 | *Parcial: aggregate EDHREC (80 cards). Corpus artifact, não deck real. |
+| 5 | Aesi EDHREC Average Default | 100/100 | 🟡 WARN | 40 | 39-43 | Lands OK. ramp_extra_lands sub-role CRIT(d=10,INFO). protection WARN(d=3). finishers WARN(d=3) |
+| 6 | Lorehold Spellslinger | 100/100 | ✅ OK | 35 | — | Sem perfil de referência EDHREC |
+| 7 | EDHREC Average - Boros Combat Trigger Humans | 100/100 | 🟡 WARN | 34 | 31-35 | Lands OK. protection=10 vs 5-8 (WARN d=2) |
+| 9 | Atraxa EDHREC Average (41k decks) | 100/100 | 🟡 WARN | 36 | 35-38 | Lands OK. finishers=1 vs 4-7 (WARN d=3). ramp_fixing BLUE(d=1) |
 
-*Legenda: OK | WARN (d=2-3) | CRIT (d>=4) | INCOMPLETE (<50 cards)*
+*Legenda: ✅ OK | 🟡 BLUE (d=1) | 🟡 WARN (d=2-3) | 🔴 CRIT (d>=4) | ⚪ INCOMPLETE (<50 cards)*
+
+### Notas de Interpretação
+
+1. **Decks INCOMPLETE (<50 cards):** Kinnan (#1) e Korvold (#3) são seeds parciais — métricas não acionáveis.
+2. **Teysa CRIT*:** 80-card aggregate EDHREC, não deck real. Lands=15 vs 35-37 é corpus artifact.
+3. **Sub-roles:** `ramp_extra_lands` mapeia para `ramp_count` agregado — valor INFO, não CRIT acionável.
+4. **Atraxa (#9):** finishers=1 vs [4-7] (WARN d=3) — natureza "goodstuff" de Atraxa, finishers menos definidos.
+5. **Tendência vs validação anterior (2026-05-30):** Sem mudanças críticas novas. WARNs estruturais dos aggregates EDHREC.
+6. **Aesi (#5):** DB metadata total_cards=79 mas SUM(quantity)=100 — possível metadata stale.
 
 ---
 
