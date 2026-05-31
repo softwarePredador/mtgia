@@ -103,3 +103,47 @@ Deck está ESTÁVEL. Todas as métricas dentro do ruído estatístico (±2.8pp).
 
 ### O Que Essa Métrica Significa
 **"Sem play T3" em 16.5%** significa que ~1 em cada 6 partidas abre sem nenhuma carta jogável nos 3 primeiros turnos. Para um deck Boros que depende de ativar triggers de legends/instants/sorceries, cada turno "morto" é um turno onde o comandante não gera valor. O deck precisa de mais cartas CMC≤2 que geram valor imediato (remoção, ramp, draw). O Ciclo #3 precisa resolver isso.|
+
+---
+
+## [2026-05-31T06:00:00+00:00] Execução #8 — Pós-Ciclo #4 (DEFENSIVO confirmado)
+
+### Deck state: 35 lands, 64 nonlands. Ciclo #4 swaps: Rise of the Eldrazi→Faithless Looting, Season of the Bold→Dragon's Rage Channeler, Goblin Engineer→Thrill of Possibility. Net ΔCMC = -15.
+
+### Resultados
+
+| Métrica | Valor | Status |
+|:--------|:-----:|:-------|
+| Mãos jogáveis (2-4 lands + ramp/3+ lands) | 49.5% | 🔴 |
+| Mulligan obrigatório (0-1 lands ou 2 lands sem ramp) | 46.4% | 🔴 |
+| Ramp turno 1 (Sol Ring, Land Tax, Wayfarer) | 21.2% | ✅ |
+| Sem play até turno 3 (nada castável com lands disponíveis) | 12.0% | 🟡 |
+
+### Comparação com Histórico (definição rigorosa)
+
+| Métrica | Exec#6 (pós-C#2) | Exec#8 (pós-C#4) | Δ |
+|:--------:|:----------------:|:----------------:|:-:|
+| Jogáveis (rigoroso) | 49.8% | 49.5% | -0.3pp |
+| Mulligan | 45.4% | 46.4% | +1.0pp |
+| Ramp T1 estrito | 27.2% | 21.2% | -6.0pp |
+| Sem play T3 | 16.5% | 12.0% | **-4.4pp ✅** |
+
+### Análise
+
+**O Ciclo #4 atingiu seu objetivo primário:** reduzir Sem Play T3 de 16.5% para 12.0% (-4.4pp). A estratégia DEFENSIVA com net ΔCMC = -15 funcionou.
+
+A métrica de "jogáveis rigorosos" permanece ~49.5% — este é um **limite estrutural** de um deck com 35 lands e apenas 3 fontes de T1 ramp. P(2 lands) = 31%, dos quais ~79% não têm ramp T1 → ~24.5% de todas as mãos são "2 lands sem ramp" (mulligan pela definição rigorosa). Para melhorar: ramp T2 (Signets) ou +1-2 lands.
+
+**Com T3 = 12.0%, o Ciclo #5 pode usar estratégia BALANCED** (net ΔCMC 0 a -2).
+
+### O Que Essa Métrica Significa
+
+**Sem Play T3 = 12.0%** significa que ~1 em cada 8 partidas abre sem nenhuma carta jogável nos 3 primeiros turnos. Melhorou de ~1 em 6 (pré-Ciclo #4). Para um deck Boros big-spells em bracket 3, 12% é aceitável — o deck compensa com poder explosivo no mid-late game (motor 4/4 completo).
+
+**Jogáveis "rigorosos" = 49.5%** significa que cerca de metade das mãos iniciais precisam de mulligan pela definição estrita. Parece alto, mas lembrando: a definição rigorosa exige OU ramp T1 (só 3 cartas no deck) OU 3+ lands, para mãos com 2-4 lands. Mãos com 2 lands sem ramp (~24.5%) são marcadas como mulligan. Isso é intencional — sem ramp adicional, 2 lands em Boros é lento demais para competir.
+
+**Próximo teste:** Após Ciclo #5 (BALANCED, com Dawning Archaic + Chaos Warp + Arcane Bombardment).
+
+---
+
+*Simulação: 1000 maos, seed=42, definicao rigorosa. IC95% = ±2.8pp.*

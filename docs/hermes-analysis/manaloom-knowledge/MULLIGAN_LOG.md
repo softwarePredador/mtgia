@@ -164,3 +164,88 @@ O Ciclo #3 com delta CMC negativo (Ancient 6->Storm-Kiln 3, Sunbird 6->Capstone 
 
 ---
 *Simulacao: 1000 maos de 7 cartas do deck de 99 com random.shuffle(), seed=42. IC95% = +/-2.8pp.*
+
+---
+
+## [2026-05-31T06:00:00+00:00] Execução #8 — Pós-Ciclo #4 (DEFENSIVO confirmado)
+
+### Deck state: 35 lands, 64 nonlands. Ciclo #4 swaps: Rise of the Eldrazi→Faithless Looting, Season of the Bold→Dragon's Rage Channeler, Goblin Engineer→Thrill of Possibility. Net ΔCMC = -15.
+
+### Resultados
+
+| Métrica | Valor | Status |
+|:--------|:-----:|:-------|
+| Mãos jogáveis (2-4 lands + ramp/3+ lands) | 49.5% | 🔴 |
+| Mulligan obrigatório (0-1 lands ou 2 lands sem ramp) | 46.4% | 🔴 |
+| Ramp turno 1 (Sol Ring, Land Tax, Wayfarer) | 21.2% | ✅ |
+| Sem play até turno 3 (nada castável com lands disponíveis) | 12.0% | 🟡 |
+
+### Distribuição de Lands na Mão Inicial
+
+| Lands | Mãos | % |
+|:-----:|:----:|:-:|
+| 0 | 41 | 4.1% |
+| 1 | 180 | 18.0% |
+| 2 | 310 | 31.0% |
+| 3 | 259 | 25.9% |
+| 4 | 163 | 16.3% |
+| 5 | 41 | 4.1% |
+| 6 | 6 | 0.6% |
+
+### Comparação com Histórico (definição rigorosa)
+
+| Métrica | Exec#6 (pós-C#2) | Exec#8 (pós-C#4) | Δ |
+|:--------:|:----------------:|:----------------:|:-:|
+| Jogáveis | 49.8% | 49.5% | -0.3pp |
+| Mulligan | 45.4% | 46.4% | +1.0pp |
+| Ramp T1 | 27.2% | 21.2% | -6.0pp |
+| Sem play T3 | 16.5% | 12.0% | **-4.4pp ✅** |
+
+### Análise do Delta
+
+**Comparação justa (Exec#6→Exec#8, mesma definição rigorosa):**
+- Jogáveis: 49.8→49.5% (-0.3pp, ruído estatístico)
+- Mulligan: 45.4→46.4% (+1.0pp, ruído)
+- Ramp T1: 27.2→21.2% (-6.0pp — perda de Desperate Ritual)
+- **Sem play T3: 16.5→12.0% (-4.4pp)** — objetivo DEFENSIVO atingido
+
+O Ciclo #4 atingiu seu objetivo primário: **reduzir Sem Play T3 de 16.5% para 12.0%.** A redução de 4.4pp reflete a adição de 3 cartas CMC 1-2 (Faithless Looting, Dragon's Rage Channeler, Thrill of Possibility) que substituíram 3 cartas CMC 5-12.
+
+⚠️ **Jogáveis "rigorosos" permanecem ~49.5%:** Este é um LIMITE ESTRUTURAL do deck com 35 lands e apenas 3 fontes de T1 ramp. P(2 lands) = 31% e ~79% dessas mãos não têm T1 ramp → ~24.5% de todas as mãos são "2 lands sem ramp" (mulligan pela definição rigorada).
+
+**Para melhorar jogáveis estruturalmente:** adicionar ramp T2 (Arcane Signet, Boros Signet) OU aumentar lands para 36-37.
+
+### Novas Cartas na Abertura
+
+| Carta | Freq | Impacto na mão |
+|:------|:-----|:---------------|
+| Faithless Looting (CMC 1) | 6.3% | Carta jogável T1, draw+GY setup |
+| Dragon's Rage Channeler (CMC 1) | 7.1% | Jogável T1, smoothing topdeck |
+| Thrill of Possibility (CMC 2) | 8.7% | Jogável T2, draw instantâneo |
+
+~22% de chance de abrir com pelo menos uma das 3 novas cartas.
+
+### Estratégia para Ciclo #5: BALANCED
+
+Com T3 = 12.0% (fronteira DEFENSIVO/BALANCED), o Ciclo #5 pode usar estratégia BALANCED:
+
+**Swaps recomendados (custo zero, todos da coleção):**
+1. **Oswald Fiddlebender → The Dawning Archaic** — rising star 3 ciclos consecutivos (24.0%, trend +5.31)
+2. **Artist's Talent → Chaos Warp** — Artist's Talent declínio -0.70, Chaos Warp removal universal
+3. **Goldspan Dragon → Arcane Bombardment** — copy engine, CMC similar
+
+**Net ΔCMC estimado: -2 a 0** (Dawning Archaic CMC 10 pesado, mas Chaos Warp CMC 3 compensa)
+**Estratégia:** BALANCED — melhorar qualidade sem piorar consistência
+
+### Recomendações
+
+1. Estratégia Ciclo #5: BALANCED (net ΔCMC 0 a -2)
+2. Prioridade: The Dawning Archaic (rising star confirmado, 5 ciclos meta, na coleção)
+3. Artist's Talent DEVE sair (declínio -0.70, 20.9% EDHREC e caindo)
+4. Manter 35 lands — déficit de jogáveis é estrutural (resolvido com ramp T2, não com land)
+5. Pós-Ciclo #5: rodar mulligan para verificar se T3 caiu para <11%
+
+---
+
+*Simulação: 1000 mãos, seed=42, definição rigorosa. IC95% = ±2.8pp.*
+*Ramp T1 estrita: {Sol Ring, Land Tax, Weathered Wayfarer}.*
