@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-30.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-05-31.
 
 ## Estrutura do repositorio
 
@@ -155,8 +155,8 @@ mtgia/
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
-- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado em 2026-05-30 05:30 UTC. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao e bonus por nome. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
-- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-05-30 classificou como permitidos exemplos de UI/import, aliases localizados manuais e seeds/corpus Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve ganhar fonte/versionamento/teste dedicado.
+- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado novamente em 2026-05-31 05:30 UTC. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao e bonus por nome. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam experimentais/not-proven ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-05-31 classificou como permitidos exemplos de UI/import e comentarios de contrato, e como excecao intencional a policy externa de EDH/bracket. Permanecem como risco as listas inline que decidem tags, score, fillers, fallback generate/rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `commander_reference_generate_fallback_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve ganhar fonte/versionamento/teste dedicado.
 
 ## Pipeline semantico de cartas
 
@@ -172,9 +172,13 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado: deck analysis segue mais proximo do fluxo desejado
-porque usa `card_function_tags` e `semantic_tags_v2`; optimize/validator/quality
-gate ainda nao carregam `card_function_tags` e reduzem v2 a um role unico.
+Estado atual revalidado em 2026-05-31 05:30 UTC: deck analysis segue mais
+proximo do fluxo desejado porque usa `card_function_tags` e
+`semantic_tags_v2`; optimize/validator/quality gate ainda nao carregam
+`card_function_tags` e reduzem v2 a um role unico. Weakness analysis e
+recommendations continuam fora do adapter compartilhado: a primeira recalcula
+buckets localmente e retorna nomes fixos; a segunda recomenda `Command Tower`
+diretamente e usa raridade como proxy de impacto.
 - **P2 — Fallback de semantic v2 baixa confianca**: revalidado e coberto em
   `origin/master@c3531df7`. Tags semantic v2 abaixo de 0.65 sao ignoradas e a
   classificacao cai para heuristica por `oracle_text`/`type_line`.
