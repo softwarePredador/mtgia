@@ -1,3 +1,156 @@
+## [2026-05-31T12:00:00+00:00] Execução #13 — Deep Meta Scout Pós-Ciclo #4 (Análise Qualitativa + Padrões de Deckbuilding)
+
+### Contexto
+Deck 6 (Lorehold Spellslinger) está **pós-Ciclo #4**, aguardando Ciclo #5 pelo Evolution Oracle.
+Dados EDHREC são **idênticos à Execução #12** (mesmo snapshot de 7.802 decks) — nenhuma mudança numérica.
+Este scout foca em **análise qualitativa profunda**: padrões de deckbuilding, lições estratégicas, e refinamento das recomendações Ciclo #5.
+
+### Fontes consultadas
+- **EDHREC Live (JSON API)**: https://json.edhrec.com/pages/commanders/lorehold-the-historian.json — 7.802 decks
+- **knowledge.db**: deck_cards WHERE deck_id = 6 (100 cartas: 1 comandante, 35 lands, 64 nonlands)
+
+---
+
+### DISTRIBUIÇÃO EDHREC DO DECK (Estável vs Execução #12)
+
+| Faixa | Quantidade (nonland) | % do deck |
+|:------|:--------------------:|:---------:|
+| 0% (fora do EDHREC) | 4 (Oswald, Galadriel's Dismissal, Weathered Wayfarer, Lorehold Cmdr) | 6.1% |
+| 1-14% | 3 (Thrill 13.9%, Grand Abolisher 11.7%, The One Ring 8.5%) | 4.5% |
+| 15-29% (baixo) | 10 | 15.2% |
+| 30-49% (médio) | 20 | 31.7% |
+| 50%+ (alto/meta) | 23 | 36.5% |
+
+**Overlap meta (30%+): ~68.2% — estável. Nenhuma mudança desde Execução #12.**
+
+---
+
+### NOVIDADE 1: ANÁLISE DE PADRÕES DE DECKBUILDING LOREHOLD
+
+#### Padrão 1: O Motor de Tesouro é a Identidade do Lorehold
+
+O Lorehold é, acima de tudo, um comando de **Tesouro → Spell Grande → Cópia**. Os dados EDHREC confirmam:
+
+| Componente | Cartas EDHREC | Tendência | No deck? |
+|:-----------|:-------------|:---------:|:--------:|
+| **Treasure Generation** | | | |
+| Hit the Mother Lode | 79.4% | +1.29 ✅ | ✅ |
+| Big Score | 67.3% | +1.51 ✅ | ✅ |
+| Brass's Bounty | 67.2% | +1.14 ✅ | ✅ |
+| Unexpected Windfall | 56.9% | +0.65 ✅ | ✅ |
+| Monument to Endurance | 72.9% | +1.28 ✅ | ✅ |
+| **Big Spells** | | | |
+| Improvisation Capstone | 49.0% | +8.09 ✅ | ✅ (Ciclo #3) |
+| Restoration Seminar | 37.8% | +9.14 ✅ | ✅ (Ciclo #2) |
+| Dance with Calamity | 50.3% | +0.58 ✅ | ✅ |
+| Approach of the Second Sun | 63.8% | +0.74 ✅ | ✅ |
+| **Copy Engines** | | | |
+| Double Vision | 46.6% | +0.15 ✅ | ✅ |
+| Arcane Bombardment | 42.5% | +0.09 ✅ | ❌ NÃO |
+| Storm Herd | 75.1% | +1.21 ✅ | ✅ (wincon) |
+| **Treasure Payoff** | | | |
+| Storm-Kiln Artist | 55.4% | +0.76 ✅ | ✅ (Ciclo #3) |
+
+**Insight:** O motor está 4/4 completo. A peça que falta é Arcane Bombardment (42.5%) como segundo copy engine — isto é particularmente valioso quando Double Vision é removido pelo oponente.
+
+#### Padrão 2: Medallions em Declínio Estrutural
+
+A comunidade Lorehold está **abandonando Medallions** sistematicamente:
+
+| Medallion | EDHREC | Trend | No deck? |
+|:----------|:------:|:-----:|:--------:|
+| Lightning Greaves | 45.3% | +0.86 | ✅ (não é Medallion, mas equip) |
+| Ruby Medallion | 42.3% | **-0.37** | ✅ |
+| Pearl Medallion | 25.2% | **-0.46** | ✅ |
+
+**Por que a comunidade abandona Medallions?**
+- Lorehold vermelho tem poucas spells vermelhas caras que se beneficiam de Ruby
+- Pearl é mais forte, mas deck tem poucas spells brancas (apenas ~23 de 64 nonland)
+- Cost reduction é menos valioso quando o gera tesouro para pagar
+- **A ironia:** Medallions são double-nulls (invisíveis ao classificador), mas o EDHREC mostra que a comunidade está certa em abandoná-los — são lentos em um formato que valoriza explosividade
+
+**Recomendação:** Ambos são cuttable. Se Ciclo #5 cortar apenas Artist's Talent, ciclos futuros devem considerar cortar Medallions.
+
+#### Padrão 3: Creature Payoffs Estão Sub-representados
+
+O deck atual tem **4 criaturas non-commander** (64 nonlands). A comunidade Lorehold favorece:
+
+| Criatura | EDHREC | Trend | No deck? | Função |
+|:---------|:------:|:-----:|:--------:|:-------|
+| Storm-Kiln Artist | 55.4% | +0.76 | ✅ | Treasure payoff |
+| Longshot, Rebel Bowman | 48.0% | +0.40 | ✅ | Spell copy payoff |
+| Hexing Squelcher | 40.9% | +0.35 | ✅ | Protection |
+| Dragon's Rage Channeler | 39.5% | +0.46 | ✅ | Draw + reciclagem |
+| Esper Sentinel | 32.5% | -0.54 | ❌ | Draw (declining) |
+| Grand Abolisher | 11.7% | -0.27 | ✅ | Protection (caro em CMC) |
+| Galvanoth | 26.5% | +0.05 | ✅ | Free spell (greedy em CMC 5) |
+| Guttersnipe | 32.3% | -0.08 | ❌ | Spellslinger damage |
+
+**Insight:** O deck tem baixa criatura count — bom para spellslinger (menos vulnerável a wipes). Mas Galvanoth (5 mana) é caro demais para o que entrega, e Grand Abolisher é marcado por ser lento (proteção reativa, não proativa). Estes são os dois creatures mais dispensáveis.
+
+---
+
+### NOVIDADE 2: RECOMENDAÇÕES CICLO #5 — RANKING REFINADO
+
+Baseado na análise triaxial (EDHREC + collection + impacto estratégico):
+
+| Rank | Sai | Entra | Justificativa | ΔCMC |
+|:----:|:----|:------|:--------------|:----:|
+| **1** | Artist's Talent (21.1%, ▼-0.70) | **Chaos Warp** (38.8%, ▲+0.46) | Remoção universal. Deck tem 4 removal — meta tem 5-6. Chaos Warp é instant speed, qualquer permanente. Única removal "qualquer coisa" do deck. | +1 |
+| **2** | Oswald Fiddlebender (0%, double-null) | **The Dawning Archaic** (24.0%, ▲+5.31) | Rising star confirmada 4 ciclos. CCMC 3, na coleção, staple emergente. | +1 |
+| **3** | Perch Protection (34.5%, ▼-0.43) | **Arcane Bombardment** (42.5%, ▲+0.09) | Copy engine — protege contra hate a Double Vision. | -4 |
+
+**Net ΔCMC: -2. Estimativa T3: 12-11%. BALANCED.**
+
+#### Swap #3 Alternativas Consideradas:
+- **Perch Protection → Chaos Warp** e **Artist's Talent → Arcane Bombardment** e **Oswald → Dawning Archaic** (mesmo resultado, ordem diferente)
+- **Por que Perch → Arcane Bombardment como #3?** Porque é o swap com maior ΔEDHREC (+8pp) e maior impacto estratégico defensivo (proteção contra artifact removal no Double Vision).
+
+---
+
+### NOVIDADE 3: CICLO #6 PREVIEW (Planejamento Antecipado)
+
+Após Ciclo #5, deck terá:
+- T3 estimado: ~11-12% (BALANCED → pode virar AGGRESSIVE)
+- Artist's Talent removido (declínio -0.70)
+- Chaos Warp adicionado (removal universal)
+- Arcane Bombardment adicionado (copy engine)
+- Dawning Archaic adicionado (rising star)
+
+**Ciclo #6 Prioridade (se deck estável):**
+1. **Ruby Medallion (42.3%, -0.37)** → **Tablet of Discovery (26.1%, 0.00)** — Tablet é draw engine simples, barato, e o Medallion trend é negativo há 3+ ciclos
+2. **Galvanoth (26.5%, +0.05, CMC 5)** → **Spellscorge Witch (não na coleção)** — se ciclo comprar cartas
+3. Grande CMCs restantes para polir: Insurrection (8), Storm Herd (10)
+
+---
+
+### LIÇÕES APRENDIDAS NESTA RODADA
+
+1. **O Treasure Motor é a ALMA do Lorehold.** Copiar Hit the Mother Lode significa 7 tesouros. Copiar Brass's Bounty significa X tesouros. O valor exponencial do tesouro é por isso que Storm-Kiln Artist é indispensável.
+
+2. **Cost Reduction não escala com Tesouro.** Medallions reduzem CMC por 1, Tesouro pagam o custo inteiro. Em um deck de big spells, tesouro > reduction. Explica o declínio EDHREC dos Medallions.
+
+3. **Double-nulls não são automaticamente seguros.** Grand Abolisher é double-null (invisível ao classificador) E está em declínio EDHREC (-0.27). Precisamos classificar melhor ou revisar manualmente.
+
+4. **O mulligan T3 (13.8%) é mais revelador que a distribuição EDHREC.** 13.8% de mãos sem play T3 significa ~1 em 7 jogos começa fraco. Esperar que Ciclo #5 (defensivo, ΔCMC -2) reduzam isso para ~11%.
+
+5. **A comunidade correu certo sempre que adicionamos Ciclos #3-4.** O modelo de swaps defensivos T3>12% está calibrado: Ciclo #3: 16.4%, Ciclo #4: 13.8%. Ciclo #5 deve chegar a ~11-12%.
+
+---
+
+### ESTADO DO PIPELINE
+
+- ✅ Scout Exec #13 completado
+- ⏳ Ciclo #5 aguardando Evolution Oracle
+- 📊 Sem Play T3: 13.8% (→ 11-12% pós-Ciclo #5)
+- 📈 Meta alignment: 68.2% (30%+)
+
+### COMMIT
+Nenhuma mudança de dados — commit apenas do log de scout.
+
+
+---
+
 ## [2026-05-31T06:00:00+00:00] Execução #12 — Deep Meta Scout Pós-Ciclo #4 (Tendências Confirmadas + Novos Sinais)
 
 ### Contexto
