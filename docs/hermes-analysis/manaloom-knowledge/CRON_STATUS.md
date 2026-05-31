@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-31T04:21:01Z** (manaloom-manager-watchdog)
+> Última atualização: **2026-05-31T04:52:00Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
@@ -18,7 +18,7 @@
 | Ações de recuperação nesta execução | 0 (rate limit lifting -- auto-recuperação em progresso) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 18 crons habilitados, **15 OK**, **3 com erro**. Rate limit do OpenRouter continuando a recuperar: **12 → 8 → 6 → 5 → 4 → 3 erros em ~4h**.
+**Estado geral:** 18 crons habilitados, **15 OK**, **3 com erro**. Estagnação desde ~03:37Z (última recuperação: mana-base-validator). Recovery stalled: 12→3 erros, mas 0 melhoras nos últimos 3 snapshots.
 
 ## Análise de Recuperação
 
@@ -30,67 +30,74 @@
 | 4 | 2026-05-31T02:51Z | 13 | 5 | -1 |
 | 5 | 2026-05-31T03:37Z | 14 | 4 | -1 |
 | 6 | 2026-05-31T04:21:01Z | **15** | **3** | **-1** |
+| 7 | 2026-05-31T04:52:00Z | **15** | **3** | **0** |
 
 **Recuperação acumulada: 12 → 3 erros (-75%)**
+
+**⚠️ Aviso de estagnação: Nenhuma mudança desde snapshot 6 (04:21Z). Recuperação parou em 3 erros.**
+
+**Mudanças desde snapshot anterior (04:21Z → 2026-05-31T04:52:00Z):**
+- **Nenhuma mudança** — mesmos 3 crons com error desde o último cycle
+- **Diagnóstico:** Recuperação de rate limit estagnada em 3 erros desde ~03:37Z
+- **Ação tomada:** Nenhuma -- todos os 3 crons com error têm `next_run_at` no futuro
+- **Próximo tick relevante:** `manaloom-logic-coherence-auditor` em ~05:27Z (~35min)
 
 **Mudanças desde snapshot anterior (03:37Z → 2026-05-31T04:21:01Z):**
 - **1 cron recuperado (error → ok):**
   - `manaloom-mana-base-validator` — rodou OK às 03:12Z
 - **Diagnóstico:** Rate limit continuando a recuperar gradualmente
 - **Ação tomada:** Nenhuma -- recuperação automática pelo scheduler
-- **Previsão:** 3 crons restantes devem recuperar nos próximos ticks conforme scheduler. Crons de longo schedule (weekly, 0 16,21) podem demorar mais.
 
 ## Crons OK (15)
 
 | Job ID | Nome | Schedule | Last run | Status | Observação |
 |---|---|---|---|---|---|
-| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-31T03:27Z | ok | script-based |
+| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-31T04:49Z | ok | script-based |
 | `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | **error** | 429 residual, next 16:00Z |
 | `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-30T14:30Z | ok | semanal |
 | `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-31T02:47Z | ok | ✅ recuperado de 429 |
 | `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-31T03:28Z | ok | ✅ recuperado de 429 |
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T03:42Z | ok | **esta execução** |
+| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T04:52Z | ok | **esta execução** |
 | `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ok | diário |
 | `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-31T03:12Z | ok | ✅ recuperado de 429 (agora!) |
 | `f20ac299992b` | lorehold-deck-scout | every 120m | 2026-05-31T04:04Z | ok | ✅ recuperado de 429 |
-| `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-31T01:08Z | ok | ✅ recuperado de 429 |
+| `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-31T04:31Z | ok | ✅ recuperado de 429 |
 | `08468451a06a` | lorehold-mulligan-analyst | every 360m | 2026-05-31T04:16Z | ok | ✅ recuperado de 429 |
-| `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | 2026-05-30T16:11Z | ok | 12h schedule |
+| `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | 2026-05-31T04:48Z | ok | 12h schedule |
 | `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-31T03:55Z | ok | ✅ recuperado de 429 |
 | `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-31T03:37Z | ok | ✅ recuperado de 429 |
 | `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-31T01:18Z | ok | 8h schedule |
 | `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-31T01:59Z | ok | ✅ recuperado de 429 |
 
-## Crons com Erro (3) -- Rate Limit Residual
+## Crons com Erro (3) -- Estagnação desde ~03:37Z
 
-Todos os erros abaixo são provavelmente resíduos do rate limit `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` que está se recuperando.
+Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos últimos 3 snapshots). Provável rate limit residual do OpenRouter free-tier.
 
 | Job ID | Nome | Schedule | Last run | Último erro | Próximo tick |
 |---|---|---|---|---|---|
-| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-31T21:00Z | 429 | 2026-05-31T16:00Z |
+| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | error | 2026-05-31T16:00Z |
 | `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | 2026-05-30T16:56Z | 429 | próximo domingo 06:00Z |
-| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-31T03:26Z | 429* | ~05:26Z |
+| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-31T03:26Z | error | ~05:27Z |
 
 *Nota: `manaloom-logic-coherence-auditor` marcou FAILED mas output contém audit report válido com apenas P2 findings (doc drift). Erro provavelmente de tool-call limit, não de rate limit. Próximo tick natural para validar.
 
 ## Análise de Erro
 
-**Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` (recuperando gradualmente)
+**Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` (estagnado)
 **Provider:** OpenRouter (free-tier shared pool)
-**Afetados:** 3/18 crons (redução de 12 para 3 -- melhora de 75%)
-**Duração total do incidente:** ~7h (desde ~21:00Z 30/05)
-**Status:** **RECUPERAÇÃO EM ANDAMENTO** -- 15 crons já voltaram a ok desde o pico
+**Afetados:** 3/18 crons (redução de 12 para 3 -- melhora de 75% -- mas **estagnado**)
+**Duração total do incidente:** ~8h (desde ~21:00Z 30/05)
+**Status:** **ESTAGNADO** -- sem melhora desde 03:37Z (última recuperação: `mana-base-validator`)
 
 **Por que nenhum `run` foi disparado:**
-- Com 15 crons já recuperados, o rate limit está claramente lifting
-- Todos os 3 crons de erro têm next_run_at no futuro (próximos ticks pendentes)
-- `manaloom-logic-coherence-auditor`: próximo tick em ~05:26Z (~45min de agora)
-- `manaloom-hermes-normal-audit`: próximo tick em 16:00Z (~4.5h de agora)
-- `manaloom-code-structure-auditor` (weekly): próximo domingo 06:00Z
-- Disparar `run` em crons que estão prestes a rodar naturalmente desperdiçaria chamadas
+- Todos os 3 crons de erro têm `next_run_at` no futuro (próximos ticks pendentes)
+- `manaloom-logic-coherence-auditor`: próximo tick em ~05:27Z (~35min) — cron mais frequente, deve validar se rate limit persiste
+- `manaloom-hermes-normal-audit`: próximo tick em 16:00Z (~11h) — cron diário com horários fixos
+- `manaloom-code-structure-auditor` (weekly): próximo domingo 06:00Z — semanal, sem pressa
+- Disparar `run` em crons que estão prestes a rodar naturalmente desperdiçaria chamadas e poderia agravar rate limit
 
 **Recuperação esperada:**
-- `logic-coherence-auditor` deve auto-recuperar no próximo tick (~05:26Z)
+- `logic-coherence-auditor` deve auto-recuperar no próximo tick (~05:27Z) — **critério de validação:** se não recuperar em 2 ticks consecutivos, investigar output
 - `hermes-normal-audit` deve auto-recuperar no tick das 16:00Z
 - `code-structure-auditor` (weekly) recupera no próximo domingo
 
@@ -102,12 +109,12 @@ Todos os erros abaixo são provavelmente resíduos do rate limit `HTTP 429: Rate
 
 ## Alertas Pendentes
 
-**P2 -- 3 crons ainda com HTTP 429 (rate limit residual, melhorando):**
-- **Sintoma:** Crons `openrouter/owl-alpha` com schedules longos ainda falhando com 429
+**P2 -- 3 crons ainda com error (estagnação desde ~03:37Z):**
+- **Sintoma:** 3 crons `openrouter/owl-alpha` mantendo `last_status=error` há ~4.5h sem mudança
 - **Impacto:** Redução temporária de auditorias e análises
-- **Tendência:** MELHORA CONTÍNUA -- de 12 para 3 erros (75% de melhora)
-- **Recuperação:** Automática conforme scheduler tick
-- **Ação do watchdog:** Monitorar próximo tick. Se `logic-coherence-auditor` não recuperar no tick das 05:26Z, investigar individualmente
+- **Tendência:** MELHORA ESTAGNADA -- parou em 3 erros desde 03:37Z (snapshot 5), sem melhora nos últimos 3 snapshots
+- **Recuperação:** Automática conforme scheduler tick. `logic-coherence-auditor` é o próximo a rodar (~05:27Z)
+- **Ação do watchdog:** Monitorar tick do `logic-coherence-auditor` (~05:27Z). Se não recuperar, investigar output individual. `hermes-normal-audit` (16:00Z) e `code-structure-auditor` weekly (domingo 06:00Z) têm ticks mais distantes.
 
 ## Mudanças desde Snapshot Anterior
 
@@ -214,6 +221,6 @@ Todos os erros abaixo são provavelmente resíduos do rate limit `HTTP 429: Rate
 
 ---
 
-*Status snapshot: 2026-05-31T04:21:01Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 15 ok, 3 error -- rate limit em recuperação, tendência positiva contínua: 12→3 erros / 75% melhora)*
+*Status snapshot: 2026-05-31T04:52:00Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 15 ok, 3 error -- estagnação desde 03:37Z, 12→3 erros / 75% melhora / sem progresso nos últimos 3 snapshots)*
 
-*Recuperação timeline: 00:53Z (12 erros) → 01:32Z (8 erros, -4) → 02:12Z (6 erros, -2) → 02:51Z (5 erros, -1) → 03:37Z (4 erros, -1) → 2026-05-31T04:21:01Z (3 erros, -1) | Próxima validação: ~04:12Z*
+*Recuperação timeline: 00:53Z (12 erros) → 01:32Z (8 erros, -4) → 02:12Z (6 erros, -2) → 02:51Z (5 erros, -1) → 03:37Z (4 erros, -1) → 04:21Z (3 erros, -1) → 04:52Z (3 erros, 0, estagnado) | Próxima validação: ~05:22Z*
