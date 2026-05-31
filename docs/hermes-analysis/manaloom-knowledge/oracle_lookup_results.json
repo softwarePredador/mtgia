@@ -1,0 +1,1577 @@
+{
+  "Abrupt Decay": {
+    "oracle_text": "This spell can't be countered.\nDestroy target nonland permanent with mana value 3 or less.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{B}{G}",
+    "scryfall_uri": "https://scryfall.com/card/mm3/146/abrupt-decay?utm_source=api"
+  },
+  "Abzan Ascendancy": {
+    "oracle_text": "When this enchantment enters, put a +1/+1 counter on each creature you control.\nWhenever a nontoken creature you control dies, create a 1/1 white Spirit creature token with flying.",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{W}{B}{G}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/165/abzan-ascendancy?utm_source=api"
+  },
+  "Academy Manufactor": {
+    "oracle_text": "If you would create a Clue, Food, or Treasure token, instead create one of each.",
+    "cmc": 3.0,
+    "type_line": "Artifact Creature \u2014 Assembly-Worker",
+    "mana_cost": "{3}",
+    "scryfall_uri": "https://scryfall.com/card/otc/251/academy-manufactor?utm_source=api"
+  },
+  "Academy Ruins": {
+    "oracle_text": "{T}: Add {C}.\n{1}{U}, {T}: Put target artifact card from your graveyard on top of your library.",
+    "cmc": 0.0,
+    "type_line": "Legendary Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/2xm/309/academy-ruins?utm_source=api"
+  },
+  "Adarkar Wastes": {
+    "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {U}. This land deals 1 damage to you.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/eoc/147/adarkar-wastes?utm_source=api"
+  },
+  "Aether Spellbomb": {
+    "oracle_text": "{U}, Sacrifice this artifact: Return target creature to its owner's hand.\n{1}, Sacrifice this artifact: Draw a card.",
+    "cmc": 1.0,
+    "type_line": "Artifact",
+    "mana_cost": "{1}",
+    "scryfall_uri": "https://scryfall.com/card/jmp/456/aether-spellbomb?utm_source=api"
+  },
+  "Aetherize": {
+    "oracle_text": "Return all attacking creatures to their owner's hand.",
+    "cmc": 4.0,
+    "type_line": "Instant",
+    "mana_cost": "{3}{U}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/151/aetherize?utm_source=api"
+  },
+  "Agatha's Soul Cauldron": {
+    "oracle_text": "You may spend mana as though it were mana of any color to activate abilities of creatures you control.\nCreatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.\n{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1 counter on target creature you control.",
+    "cmc": 2.0,
+    "type_line": "Legendary Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/woe/242/agathas-soul-cauldron?utm_source=api"
+  },
+  "Arcane Sanctum": {
+    "oracle_text": "This land enters tapped.\n{T}: Add {W}, {U}, or {B}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/dsc/259/arcane-sanctum?utm_source=api"
+  },
+  "Archmage Emeritus": {
+    "oracle_text": "Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, draw a card.",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Human Wizard",
+    "mana_cost": "{2}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/soc/188/archmage-emeritus?utm_source=api"
+  },
+  "Archmage of Runes": {
+    "oracle_text": "Instant and sorcery spells you cast cost {1} less to cast.\nWhenever you cast an instant or sorcery spell, draw a card.",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Giant Wizard",
+    "mana_cost": "{3}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/30/archmage-of-runes?utm_source=api"
+  },
+  "Arena of Glory": {
+    "oracle_text": "This land enters tapped unless you control a Mountain.\n{T}: Add {R}.\n{R}, {T}, Exert this land: Add {R}{R}. If that mana is spent on a creature spell, it gains haste until end of turn. (An exerted permanent won't untap during your next untap step.)",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/mh3/215/arena-of-glory?utm_source=api"
+  },
+  "Armored Scrapgorger": {
+    "oracle_text": "This creature gets +3/+0 as long as it has three or more oil counters on it.\n{T}: Add one mana of any color.\nWhenever this creature becomes tapped, exile target card from a graveyard and put an oil counter on this creature.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Phyrexian Beast",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/one/158/armored-scrapgorger?utm_source=api"
+  },
+  "Assassin's Trophy": {
+    "oracle_text": "Destroy target permanent an opponent controls. Its controller may search their library for a basic land card, put it onto the battlefield, then shuffle.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{B}{G}",
+    "scryfall_uri": "https://scryfall.com/card/soc/294/assassins-trophy?utm_source=api"
+  },
+  "Atomize": {
+    "oracle_text": "Destroy target nonland permanent. Proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)",
+    "cmc": 4.0,
+    "type_line": "Instant",
+    "mana_cost": "{2}{B}{G}",
+    "scryfall_uri": "https://scryfall.com/card/pip/94/atomize?utm_source=api"
+  },
+  "Authority of the Consuls": {
+    "oracle_text": "Creatures your opponents control enter tapped.\nWhenever a creature an opponent controls enters, you gain 1 life.",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{W}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/137/authority-of-the-consuls?utm_source=api"
+  },
+  "Avacyn's Pilgrim": {
+    "oracle_text": "{T}: Add {W}.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Human Monk",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/mic/132/avacyns-pilgrim?utm_source=api"
+  },
+  "Aven Interrupter": {
+    "oracle_text": "Flash\nFlying\nWhen this creature enters, exile target spell. It becomes plotted. (Its owner may cast it as a sorcery on a later turn without paying its mana cost.)\nSpells your opponents cast from graveyards or from exile cost {2} more to cast.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Bird Rogue",
+    "mana_cost": "{1}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/otj/4/aven-interrupter?utm_source=api"
+  },
+  "Awakening Zone": {
+    "oracle_text": "At the beginning of your upkeep, you may create a 0/1 colorless Eldrazi Spawn creature token. It has \"Sacrifice this token: Add {C}.\"",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{2}{G}",
+    "scryfall_uri": "https://scryfall.com/card/soc/262/awakening-zone?utm_source=api"
+  },
+  "Azor's Elocutors": {
+    "oracle_text": "At the beginning of your upkeep, put a filibuster counter on this creature. Then if this creature has five or more filibuster counters on it, you win the game.\nWhenever a source deals damage to you, remove a filibuster counter from this creature.",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Human Advisor",
+    "mana_cost": "{3}{W/U}{W/U}",
+    "scryfall_uri": "https://scryfall.com/card/rtr/210/azors-elocutors?utm_source=api"
+  },
+  "Azorius Chancery": {
+    "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {W}{U}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/dsc/261/azorius-chancery?utm_source=api"
+  },
+  "Azorius Signet": {
+    "oracle_text": "{1}, {T}: Add {W}{U}.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/312/azorius-signet?utm_source=api"
+  },
+  "Back to Basics": {
+    "oracle_text": "Nonbasic lands don't untap during their controllers' untap steps.",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{2}{U}",
+    "scryfall_uri": "https://scryfall.com/card/uma/46/back-to-basics?utm_source=api"
+  },
+  "Badgermole Cub": {
+    "oracle_text": "When this creature enters, earthbend 1. (Target land you control becomes a 0/0 creature with haste that's still a land. Put a +1/+1 counter on it. When it dies or is exiled, return it to the battlefield tapped.)\nWhenever you tap a creature for mana, add an additional {G}.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Badger Mole",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/tla/167/badgermole-cub?utm_source=api"
+  },
+  "Baird, Steward of Argive": {
+    "oracle_text": "Vigilance\nCreatures can't attack you or planeswalkers you control unless their controller pays {1} for each of those creatures.",
+    "cmc": 4.0,
+    "type_line": "Legendary Creature \u2014 Human Soldier",
+    "mana_cost": "{2}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/cmm/15/baird-steward-of-argive?utm_source=api"
+  },
+  "Ballot Broker": {
+    "oracle_text": "While voting, you may vote an additional time. (The votes can be for different choices or for the same choice.)",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Advisor",
+    "mana_cost": "{2}{W}",
+    "scryfall_uri": "https://scryfall.com/card/cn2/13/ballot-broker?utm_source=api"
+  },
+  "Balmor, Battlemage Captain": {
+    "oracle_text": "Flying\nWhenever you cast an instant or sorcery spell, creatures you control get +1/+0 and gain trample until end of turn.",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Bird Wizard",
+    "mana_cost": "{U}{R}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/237/balmor-battlemage-captain?utm_source=api"
+  },
+  "Baral, Chief of Compliance": {
+    "oracle_text": "Instant and sorcery spells you cast cost {1} less to cast.\nWhenever a spell or ability you control counters a spell, you may draw a card. If you do, discard a card.",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Human Wizard",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/aer/28/baral-chief-of-compliance?utm_source=api"
+  },
+  "Bartolom\u00e9 del Presidio": {
+    "oracle_text": "Sacrifice another creature or artifact: Put a +1/+1 counter on Bartolom\u00e9 del Presidio.",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Vampire Knight",
+    "mana_cost": "{W}{B}",
+    "scryfall_uri": "https://scryfall.com/card/lci/224/bartolom%C3%A9-del-presidio?utm_source=api"
+  },
+  "Basking Broodscale": {
+    "oracle_text": "Devoid (This card has no color.)\n{1}{G}: Adapt 1. (If this creature has no +1/+1 counters on it, put a +1/+1 counter on it.)\nWhenever one or more +1/+1 counters are put on this creature, you may create a 0/1 colorless Eldrazi Spawn creature token with \"Sacrifice this token: Add {C}.\"",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Eldrazi Lizard",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/mh3/145/basking-broodscale?utm_source=api"
+  },
+  "Battle Cry Goblin": {
+    "oracle_text": "{1}{R}: Goblins you control get +1/+0 and gain haste until end of turn.\nPack tactics \u2014 Whenever this creature attacks, if you attacked with creatures with total power 6 or greater this combat, create a 1/1 red Goblin creature token that's tapped and attacking.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/afr/132/battle-cry-goblin?utm_source=api"
+  },
+  "Battle Hymn": {
+    "oracle_text": "Add {R} for each creature you control.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/avr/128/battle-hymn?utm_source=api"
+  },
+  "Bayou": {
+    "oracle_text": "({T}: Add {B} or {G}.)",
+    "cmc": 0.0,
+    "type_line": "Land \u2014 Swamp Forest",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/vma/293/bayou?utm_source=api"
+  },
+  "Beetleback Chief": {
+    "oracle_text": "When this creature enters, create two 1/1 red Goblin creature tokens.",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Goblin Warrior",
+    "mana_cost": "{2}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/205/beetleback-chief?utm_source=api"
+  },
+  "Bilious Skulldweller": {
+    "oracle_text": "Deathtouch\nToxic 1 (Players dealt combat damage by this creature also get a poison counter.)",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Phyrexian Insect",
+    "mana_cost": "{B}",
+    "scryfall_uri": "https://scryfall.com/card/one/83/bilious-skulldweller?utm_source=api"
+  },
+  "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+    "oracle_text": "",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 God // Legendary Artifact",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/khm/123/birgi-god-of-storytelling-harnfel-horn-of-bounty?utm_source=api"
+  },
+  "Black Market Connections": {
+    "oracle_text": "At the beginning of your first main phase, choose one or more \u2014\n\u2022 Sell Contraband \u2014 Create a Treasure token. You lose 1 life.\n\u2022 Buy Information \u2014 Draw a card. You lose 2 life.\n\u2022 Hire a Mercenary \u2014 Create a 3/2 colorless Shapeshifter creature token with changeling. You lose 3 life. (It is every creature type.)",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{2}{B}",
+    "scryfall_uri": "https://scryfall.com/card/lcc/181/black-market-connections?utm_source=api"
+  },
+  "Blind Obedience": {
+    "oracle_text": "Extort (Whenever you cast a spell, you may pay {W/B}. If you do, each opponent loses 1 life and you gain that much life.)\nArtifacts and creatures your opponents control enter tapped.",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/rvr/9/blind-obedience?utm_source=api"
+  },
+  "Blood Crypt": {
+    "oracle_text": "({T}: Add {B} or {R}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+    "cmc": 0.0,
+    "type_line": "Land \u2014 Swamp Mountain",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/ecl/262/blood-crypt?utm_source=api"
+  },
+  "Blood Moon": {
+    "oracle_text": "Nonbasic lands are Mountains.",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/2xm/118/blood-moon?utm_source=api"
+  },
+  "Bloom Tender": {
+    "oracle_text": "Vivid \u2014 {T}: For each color among permanents you control, add one mana of that color.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Elf Druid",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/ecl/166/bloom-tender?utm_source=api"
+  },
+  "Boggart Shenanigans": {
+    "oracle_text": "Whenever another Goblin you control is put into a graveyard from the battlefield, you may have this enchantment deal 1 damage to target player or planeswalker.",
+    "cmc": 3.0,
+    "type_line": "Kindred Enchantment \u2014 Goblin",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/evg/54/boggart-shenanigans?utm_source=api"
+  },
+  "Bootleggers' Stash": {
+    "oracle_text": "Lands you control have \"{T}: Create a Treasure token.\"",
+    "cmc": 6.0,
+    "type_line": "Artifact",
+    "mana_cost": "{5}{G}",
+    "scryfall_uri": "https://scryfall.com/card/snc/134/bootleggers-stash?utm_source=api"
+  },
+  "Boseiju, Who Endures": {
+    "oracle_text": "{T}: Add {G}.\nChannel \u2014 {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.",
+    "cmc": 0.0,
+    "type_line": "Legendary Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/neo/266/boseiju-who-endures?utm_source=api"
+  },
+  "Brago's Representative": {
+    "oracle_text": "While voting, you get an additional vote. (The votes can be for different choices or for the same choice.)",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Advisor",
+    "mana_cost": "{2}{W}",
+    "scryfall_uri": "https://scryfall.com/card/cns/14/bragos-representative?utm_source=api"
+  },
+  "Brash Taunter": {
+    "oracle_text": "Indestructible\nWhenever this creature is dealt damage, it deals that much damage to target opponent.\n{2}{R}, {T}: This creature fights another target creature.",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{4}{R}",
+    "scryfall_uri": "https://scryfall.com/card/dsc/161/brash-taunter?utm_source=api"
+  },
+  "Breath of Fury": {
+    "oracle_text": "Enchant creature you control\nWhen enchanted creature deals combat damage to a player, sacrifice it and attach this Aura to a creature you control. If you do, untap all creatures you control and after this phase, there is an additional combat phase.",
+    "cmc": 4.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "mana_cost": "{2}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/c16/121/breath-of-fury?utm_source=api"
+  },
+  "Buried Ruin": {
+    "oracle_text": "{T}: Add {C}.\n{2}, {T}, Sacrifice this land: Return target artifact card from your graveyard to your hand.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/eoc/150/buried-ruin?utm_source=api"
+  },
+  "Capital Punishment": {
+    "oracle_text": "Council's dilemma \u2014 Starting with you, each player votes for death or taxes. Each opponent sacrifices a creature of their choice for each death vote and discards a card for each taxes vote.",
+    "cmc": 6.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{4}{B}{B}",
+    "scryfall_uri": "https://scryfall.com/card/cn2/40/capital-punishment?utm_source=api"
+  },
+  "Captain of the Watch": {
+    "oracle_text": "Vigilance (Attacking doesn't cause this creature to tap.)\nOther Soldier creatures you control get +1/+1 and have vigilance.\nWhen this creature enters, create three 1/1 white Soldier creature tokens.",
+    "cmc": 6.0,
+    "type_line": "Creature \u2014 Human Soldier",
+    "mana_cost": "{4}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/ddo/3/captain-of-the-watch?utm_source=api"
+  },
+  "Carpet of Flowers": {
+    "oracle_text": "At the beginning of each of your main phases, if you haven't added mana with this ability this turn, you may add X mana of any one color, where X is the number of Islands target opponent controls.",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/usg/240/carpet-of-flowers?utm_source=api"
+  },
+  "Cascade Bluffs": {
+    "oracle_text": "{T}: Add {C}.\n{U/R}, {T}: Add {U}{U}, {U}{R}, or {R}{R}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/soc/364/cascade-bluffs?utm_source=api"
+  },
+  "Castle Embereth": {
+    "oracle_text": "This land enters tapped unless you control a Mountain.\n{T}: Add {R}.\n{1}{R}{R}, {T}: Creatures you control get +1/+0 until end of turn.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/tdc/347/castle-embereth?utm_source=api"
+  },
+  "Centaur Garden": {
+    "oracle_text": "{T}: Add {G}. This land deals 1 damage to you.\nThreshold \u2014 {G}, {T}, Sacrifice this land: Target creature gets +3/+3 until end of turn. Activate only if there are seven or more cards in your graveyard.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/ody/316/centaur-garden?utm_source=api"
+  },
+  "Chain of Vapor": {
+    "oracle_text": "Return target nonland permanent to its owner's hand. Then that permanent's controller may sacrifice a land of their choice. If the player does, they may copy this spell and may choose a new target for that copy.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/c16/84/chain-of-vapor?utm_source=api"
+  },
+  "Charismatic Conqueror": {
+    "oracle_text": "Vigilance\nWhenever an artifact or creature an opponent controls enters untapped, they may tap that permanent. If they don't, you create a 1/1 white Vampire creature token with lifelink.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Vampire Soldier",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/lcc/70/charismatic-conqueror?utm_source=api"
+  },
+  "Cinder Glade": {
+    "oracle_text": "({T}: Add {R} or {G}.)\nThis land enters tapped unless you control two or more basic lands.",
+    "cmc": 0.0,
+    "type_line": "Land \u2014 Mountain Forest",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/tmc/61/cinder-glade?utm_source=api"
+  },
+  "City of Brass": {
+    "oracle_text": "Whenever this land becomes tapped, it deals 1 damage to you.\n{T}: Add one mana of any color.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/tmc/62/city-of-brass?utm_source=api"
+  },
+  "Clever Impersonator": {
+    "oracle_text": "You may have this creature enter as a copy of any nonland permanent on the battlefield.",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Shapeshifter",
+    "mana_cost": "{2}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/c19/82/clever-impersonator?utm_source=api"
+  },
+  "Cliffside Rescuer": {
+    "oracle_text": "Vigilance\n{T}, Sacrifice this creature: Target permanent you control gains protection from each of your opponents until end of turn. (It can't be blocked, targeted, dealt damage, enchanted, or equipped by anything controlled by those players.)",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Kor Soldier",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/c19/1/cliffside-rescuer?utm_source=api"
+  },
+  "Coat of Arms": {
+    "oracle_text": "Each creature gets +1/+1 for each other creature on the battlefield that shares at least one creature type with it. (For example, if two Goblin Warriors and a Goblin Shaman are on the battlefield, each gets +2/+2.)",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "mana_cost": "{5}",
+    "scryfall_uri": "https://scryfall.com/card/dds/58/coat-of-arms?utm_source=api"
+  },
+  "Codex Shredder": {
+    "oracle_text": "{T}: Target player mills a card. (They put the top card of their library into their graveyard.)\n{5}, {T}, Sacrifice this artifact: Return target card from your graveyard to your hand.",
+    "cmc": 1.0,
+    "type_line": "Artifact",
+    "mana_cost": "{1}",
+    "scryfall_uri": "https://scryfall.com/card/cmr/304/codex-shredder?utm_source=api"
+  },
+  "Colossal Skyturtle": {
+    "oracle_text": "Flying, ward {2}\nChannel \u2014 {2}{G}, Discard this card: Return target card from your graveyard to your hand.\nChannel \u2014 {1}{U}, Discard this card: Return target creature to its owner's hand.",
+    "cmc": 7.0,
+    "type_line": "Enchantment Creature \u2014 Turtle",
+    "mana_cost": "{4}{G}{G}{U}",
+    "scryfall_uri": "https://scryfall.com/card/neo/216/colossal-skyturtle?utm_source=api"
+  },
+  "Commander's Sphere": {
+    "oracle_text": "{T}: Add one mana of any color in your commander's color identity.\nSacrifice this artifact: Draw a card.",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "mana_cost": "{3}",
+    "scryfall_uri": "https://scryfall.com/card/ecc/139/commanders-sphere?utm_source=api"
+  },
+  "Consecrated Sphinx": {
+    "oracle_text": "Flying\nWhenever an opponent draws a card, you may draw two cards.",
+    "cmc": 6.0,
+    "type_line": "Creature \u2014 Sphinx",
+    "mana_cost": "{4}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/43/consecrated-sphinx?utm_source=api"
+  },
+  "Consider": {
+    "oracle_text": "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/148/consider?utm_source=api"
+  },
+  "Containment Priest": {
+    "oracle_text": "Flash\nIf a nontoken creature would enter and it wasn't cast, exile it instead.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Cleric",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/m21/13/containment-priest?utm_source=api"
+  },
+  "Contentious Plan": {
+    "oracle_text": "Proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)\nDraw a card.",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/war/46/contentious-plan?utm_source=api"
+  },
+  "Copy Artifact": {
+    "oracle_text": "You may have this enchantment enter as a copy of any artifact on the battlefield, except it's an enchantment in addition to its other types.",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/me4/44/copy-artifact?utm_source=api"
+  },
+  "Coruscation Mage": {
+    "oracle_text": "Offspring {2} (You may pay an additional {2} as you cast this spell. If you do, when this creature enters, create a 1/1 token copy of it.)\nWhenever you cast a noncreature spell, this creature deals 1 damage to each opponent.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Otter Wizard",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/blb/131/coruscation-mage?utm_source=api"
+  },
+  "Council's Judgment": {
+    "oracle_text": "Will of the council \u2014 Starting with you, each player votes for a nonland permanent you don't control. Exile each permanent with the most votes or tied for most votes.",
+    "cmc": 3.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/otc/79/councils-judgment?utm_source=api"
+  },
+  "Crash Through": {
+    "oracle_text": "Creatures you control gain trample until end of turn. (Each of those creatures can deal excess combat damage to the player or planeswalker it's attacking.)\nDraw a card.",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/620/crash-through?utm_source=api"
+  },
+  "Cryptolith Rite": {
+    "oracle_text": "Creatures you control have \"{T}: Add one mana of any color.\"",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/inr/189/cryptolith-rite?utm_source=api"
+  },
+  "Culling Ritual": {
+    "oracle_text": "Destroy each nonland permanent with mana value 2 or less. Add {B} or {G} for each permanent destroyed this way.",
+    "cmc": 4.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{2}{B}{G}",
+    "scryfall_uri": "https://scryfall.com/card/soc/302/culling-ritual?utm_source=api"
+  },
+  "Curiosity": {
+    "oracle_text": "Enchant creature\nWhenever enchanted creature deals damage to an opponent, you may draw a card.",
+    "cmc": 1.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/jmp/147/curiosity?utm_source=api"
+  },
+  "Cursed Totem": {
+    "oracle_text": "Activated abilities of creatures can't be activated.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/mh2/295/cursed-totem?utm_source=api"
+  },
+  "Darksteel Citadel": {
+    "oracle_text": "Indestructible\n{T}: Add {C}.",
+    "cmc": 0.0,
+    "type_line": "Artifact Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/c21/285/darksteel-citadel?utm_source=api"
+  },
+  "Deathrite Shaman": {
+    "oracle_text": "{T}: Exile target land card from a graveyard. Add one mana of any color.\n{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.\n{G}, {T}: Exile target creature card from a graveyard. You gain 2 life.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Elf Shaman",
+    "mana_cost": "{B/G}",
+    "scryfall_uri": "https://scryfall.com/card/rvr/175/deathrite-shaman?utm_source=api"
+  },
+  "Decanter of Endless Water": {
+    "oracle_text": "You have no maximum hand size.\n{T}: Add one mana of any color.",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "mana_cost": "{3}",
+    "scryfall_uri": "https://scryfall.com/card/clb/309/decanter-of-endless-water?utm_source=api"
+  },
+  "Delighted Halfling": {
+    "oracle_text": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a legendary spell, and that spell can't be countered.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Halfling Citizen",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/ltr/158/delighted-halfling?utm_source=api"
+  },
+  "Demonic Consultation": {
+    "oracle_text": "Choose a card name. Exile the top six cards of your library, then reveal cards from the top of your library until you reveal a card with the chosen name. Put that card into your hand and exile all other cards revealed this way.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{B}",
+    "scryfall_uri": "https://scryfall.com/card/me2/85/demonic-consultation?utm_source=api"
+  },
+  "Den of the Bugbear": {
+    "oracle_text": "If you control two or more other lands, this land enters tapped.\n{T}: Add {R}.\n{3}{R}: Until end of turn, this land becomes a 3/2 red Goblin creature with \"Whenever this creature attacks, create a 1/1 red Goblin creature token that's tapped and attacking.\" It's still a land.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/afr/254/den-of-the-bugbear?utm_source=api"
+  },
+  "Deserted Beach": {
+    "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {W} or {U}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/inr/276/deserted-beach?utm_source=api"
+  },
+  "Devoted Druid": {
+    "oracle_text": "{T}: Add {G}.\nPut a -1/-1 counter on this creature: Untap this creature.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Elf Druid",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/ecc/104/devoted-druid?utm_source=api"
+  },
+  "Dispel": {
+    "oracle_text": "Counter target instant spell.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/bfz/76/dispel?utm_source=api"
+  },
+  "Displacer Kitten": {
+    "oracle_text": "Avoidance \u2014 Whenever you cast a noncreature spell, exile up to one target nonland permanent you control, then return that card to the battlefield under its owner's control.",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Cat Beast",
+    "mana_cost": "{3}{U}",
+    "scryfall_uri": "https://scryfall.com/card/clb/63/displacer-kitten?utm_source=api"
+  },
+  "Dovin's Veto": {
+    "oracle_text": "This spell can't be countered.\nCounter target noncreature spell.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{W}{U}",
+    "scryfall_uri": "https://scryfall.com/card/war/193/dovins-veto?utm_source=api"
+  },
+  "Dragonskull Summit": {
+    "oracle_text": "This land enters tapped unless you control a Swamp or a Mountain.\n{T}: Add {B} or {R}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/tmc/64/dragonskull-summit?utm_source=api"
+  },
+  "Dramatic Reversal": {
+    "oracle_text": "Untap all nonland permanents you control.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/gn2/20/dramatic-reversal?utm_source=api"
+  },
+  "Drift of Phantasms": {
+    "oracle_text": "Defender (This creature can't attack.)\nFlying\nTransmute {1}{U}{U} ({1}{U}{U}, Discard this card: Search your library for a card with the same mana value as this card, reveal it, put it into your hand, then shuffle. Transmute only as a sorcery.)",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Spirit",
+    "mana_cost": "{2}{U}",
+    "scryfall_uri": "https://scryfall.com/card/rvr/42/drift-of-phantasms?utm_source=api"
+  },
+  "Earthcraft": {
+    "oracle_text": "Tap an untapped creature you control: Untap target basic land.",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/tmp/222/earthcraft?utm_source=api"
+  },
+  "Efficient Construction": {
+    "oracle_text": "Whenever you cast an artifact spell, create a 1/1 colorless Thopter artifact creature token with flying.",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{3}{U}",
+    "scryfall_uri": "https://scryfall.com/card/cmm/88/efficient-construction?utm_source=api"
+  },
+  "Eldritch Evolution": {
+    "oracle_text": "As an additional cost to cast this spell, sacrifice a creature.\nSearch your library for a creature card with mana value X or less, where X is 2 plus the sacrificed creature's mana value. Put that card onto the battlefield, then shuffle. Exile Eldritch Evolution.",
+    "cmc": 3.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{G}{G}",
+    "scryfall_uri": "https://scryfall.com/card/inr/195/eldritch-evolution?utm_source=api"
+  },
+  "Electrostatic Field": {
+    "oracle_text": "Defender\nWhenever you cast an instant or sorcery spell, this creature deals 1 damage to each opponent.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Wall",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/otc/164/electrostatic-field?utm_source=api"
+  },
+  "Elesh Norn, Grand Cenobite": {
+    "oracle_text": "Vigilance\nOther creatures you control get +2/+2.\nCreatures your opponents control get -2/-2.",
+    "cmc": 7.0,
+    "type_line": "Legendary Creature \u2014 Phyrexian Praetor",
+    "mana_cost": "{5}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/ima/18/elesh-norn-grand-cenobite?utm_source=api"
+  },
+  "Elves of Deep Shadow": {
+    "oracle_text": "{T}: Add {B}. This creature deals 1 damage to you.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Elf Druid",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/ddj/47/elves-of-deep-shadow?utm_source=api"
+  },
+  "Elvish Mystic": {
+    "oracle_text": "{T}: Add {G}.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Elf Druid",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/soc/266/elvish-mystic?utm_source=api"
+  },
+  "Elvish Spirit Guide": {
+    "oracle_text": "Exile this creature from your hand: Add {G}.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Elf Spirit",
+    "mana_cost": "{2}{G}",
+    "scryfall_uri": "https://scryfall.com/card/dmr/157/elvish-spirit-guide?utm_source=api"
+  },
+  "Empty the Warrens": {
+    "oracle_text": "Create two 1/1 red Goblin creature tokens.\nStorm (When you cast this spell, copy it for each spell cast before it this turn.)",
+    "cmc": 4.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{3}{R}",
+    "scryfall_uri": "https://scryfall.com/card/dmr/118/empty-the-warrens?utm_source=api"
+  },
+  "Emry, Lurker of the Loch": {
+    "oracle_text": "Affinity for artifacts (This spell costs {1} less to cast for each artifact you control.)\nWhen Emry enters, mill four cards.\n{T}: Choose target artifact card in your graveyard. You may cast that card this turn. (You still pay its costs. Timing rules still apply.)",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Merfolk Wizard",
+    "mana_cost": "{2}{U}",
+    "scryfall_uri": "https://scryfall.com/card/eoc/71/emry-lurker-of-the-loch?utm_source=api"
+  },
+  "Enduring Vitality": {
+    "oracle_text": "Vigilance\nCreatures you control have \"{T}: Add one mana of any color.\"\nWhen Enduring Vitality dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)",
+    "cmc": 3.0,
+    "type_line": "Enchantment Creature \u2014 Elk Glimmer",
+    "mana_cost": "{1}{G}{G}",
+    "scryfall_uri": "https://scryfall.com/card/dsk/176/enduring-vitality?utm_source=api"
+  },
+  "Ephemerate": {
+    "oracle_text": "Exile target creature you control, then return it to the battlefield under its owner's control.\nRebound (If you cast this spell from your hand, exile it as it resolves. At the beginning of your next upkeep, you may cast this card from exile without paying its mana cost.)",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{W}",
+    "scryfall_uri": "https://scryfall.com/card/mh1/7/ephemerate?utm_source=api"
+  },
+  "Evangel of Heliod": {
+    "oracle_text": "When this creature enters, create a number of 1/1 white Soldier creature tokens equal to your devotion to white. (Each {W} in the mana costs of permanents you control counts toward your devotion to white.)",
+    "cmc": 6.0,
+    "type_line": "Creature \u2014 Human Cleric",
+    "mana_cost": "{4}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/khc/23/evangel-of-heliod?utm_source=api"
+  },
+  "Expedite": {
+    "oracle_text": "Target creature gains haste until end of turn.\nDraw a card.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/cmr/413/expedite?utm_source=api"
+  },
+  "Expressive Iteration": {
+    "oracle_text": "Look at the top three cards of your library. Put one of them into your hand, put one of them on the bottom of your library, and exile one of them. You may play the exiled card this turn.",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{U}{R}",
+    "scryfall_uri": "https://scryfall.com/card/soc/309/expressive-iteration?utm_source=api"
+  },
+  "Expropriate": {
+    "oracle_text": "Council's dilemma \u2014 Starting with you, each player votes for time or money. For each time vote, take an extra turn after this one. For each money vote, choose a permanent owned by the voter and gain control of it. Exile Expropriate.",
+    "cmc": 9.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{7}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/cn2/30/expropriate?utm_source=api"
+  },
+  "Fabricate": {
+    "oracle_text": "Search your library for an artifact card, reveal it, put it into your hand, then shuffle.",
+    "cmc": 3.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{2}{U}",
+    "scryfall_uri": "https://scryfall.com/card/hop/9/fabricate?utm_source=api"
+  },
+  "Faeburrow Elder": {
+    "oracle_text": "Vigilance\nThis creature gets +1/+1 for each color among permanents you control.\n{T}: For each color among permanents you control, add one mana of that color.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Treefolk Druid",
+    "mana_cost": "{1}{G}{W}",
+    "scryfall_uri": "https://scryfall.com/card/ecc/53/faeburrow-elder?utm_source=api"
+  },
+  "Faerie Mastermind": {
+    "oracle_text": "Flash\nFlying\nWhenever an opponent draws their second card each turn, you draw a card.\n{3}{U}: Each player draws a card.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Faerie Rogue",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/soc/114/faerie-mastermind?utm_source=api"
+  },
+  "Fatespinner": {
+    "oracle_text": "At the beginning of each opponent's upkeep, that player chooses draw step, main phase, or combat phase. The player skips each instance of the chosen step or phase this turn.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Wizard",
+    "mana_cost": "{1}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/mrd/36/fatespinner?utm_source=api"
+  },
+  "Fervor": {
+    "oracle_text": "Creatures you control have haste. (They can attack and {T} as soon as they come under your control.)",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/m13/129/fervor?utm_source=api"
+  },
+  "Fiery Inscription": {
+    "oracle_text": "When this enchantment enters, the Ring tempts you.\nWhenever you cast an instant or sorcery spell, this enchantment deals 2 damage to each opponent.",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/ltr/126/fiery-inscription?utm_source=api"
+  },
+  "Firebrand Archer": {
+    "oracle_text": "Whenever you cast a noncreature spell, this creature deals 1 damage to each opponent.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Archer",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/196/firebrand-archer?utm_source=api"
+  },
+  "Flame of Anor": {
+    "oracle_text": "Choose one. If you control a Wizard as you cast this spell, you may choose two instead.\n\u2022 Target player draws two cards.\n\u2022 Destroy target artifact.\n\u2022 Flame of Anor deals 5 damage to target creature.",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "mana_cost": "{1}{U}{R}",
+    "scryfall_uri": "https://scryfall.com/card/ltr/203/flame-of-anor?utm_source=api"
+  },
+  "Flawless Maneuver": {
+    "oracle_text": "If you control a commander, you may cast this spell without paying its mana cost.\nCreatures you control gain indestructible until end of turn.",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "mana_cost": "{2}{W}",
+    "scryfall_uri": "https://scryfall.com/card/cmm/24/flawless-maneuver?utm_source=api"
+  },
+  "Flesh Duplicate": {
+    "oracle_text": "You may have this creature enter as a copy of any creature on the battlefield, except it has vanishing 3 if that creature doesn't have vanishing. (A permanent with vanishing 3 enters with three time counters on it. At the beginning of your upkeep, remove a time counter from it. When the last is removed, sacrifice it.)",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Shapeshifter Rebel",
+    "mana_cost": "{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/who/44/flesh-duplicate?utm_source=api"
+  },
+  "Flusterstorm": {
+    "oracle_text": "Counter target instant or sorcery spell unless its controller pays {1}.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/ima/55/flusterstorm?utm_source=api"
+  },
+  "Force of Negation": {
+    "oracle_text": "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "mana_cost": "{1}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/50/force-of-negation?utm_source=api"
+  },
+  "Force of Vigor": {
+    "oracle_text": "If it's not your turn, you may exile a green card from your hand rather than pay this spell's mana cost.\nDestroy up to two target artifacts and/or enchantments.",
+    "cmc": 4.0,
+    "type_line": "Instant",
+    "mana_cost": "{2}{G}{G}",
+    "scryfall_uri": "https://scryfall.com/card/mh1/164/force-of-vigor?utm_source=api"
+  },
+  "Frantic Search": {
+    "oracle_text": "Draw two cards, then discard two cards. Untap up to three lands.",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "mana_cost": "{2}{U}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/153/frantic-search?utm_source=api"
+  },
+  "Frostboil Snarl": {
+    "oracle_text": "As this land enters, you may reveal an Island or Mountain card from your hand. If you don't, this land enters tapped.\n{T}: Add {U} or {R}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/soc/374/frostboil-snarl?utm_source=api"
+  },
+  "Frozen Aether": {
+    "oracle_text": "Artifacts, creatures, and lands your opponents control enter tapped.",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{3}{U}",
+    "scryfall_uri": "https://scryfall.com/card/plc/54/frozen-aether?utm_source=api"
+  },
+  "Gaea's Cradle": {
+    "oracle_text": "{T}: Add {G} for each creature you control.",
+    "cmc": 0.0,
+    "type_line": "Legendary Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/usg/321/gaeas-cradle?utm_source=api"
+  },
+  "Gavony Township": {
+    "oracle_text": "{T}: Add {C}.\n{2}{G}{W}, {T}: Put a +1/+1 counter on each creature you control.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/moc/406/gavony-township?utm_source=api"
+  },
+  "Geist-Honored Monk": {
+    "oracle_text": "Vigilance\nGeist-Honored Monk's power and toughness are each equal to the number of creatures you control.\nWhen this creature enters, create two 1/1 white Spirit creature tokens with flying.",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Human Monk",
+    "mana_cost": "{3}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/khc/25/geist-honored-monk?utm_source=api"
+  },
+  "Gempalm Incinerator": {
+    "oracle_text": "Cycling {1}{R} ({1}{R}, Discard this card: Draw a card.)\nWhen you cycle this card, you may have it deal X damage to target creature, where X is the number of Goblins on the battlefield.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/dmr/122/gempalm-incinerator?utm_source=api"
+  },
+  "Gemstone Caverns": {
+    "oracle_text": "If this card is in your opening hand and you're not the starting player, you may begin the game with Gemstone Caverns on the battlefield with a luck counter on it. If you do, exile a card from your hand.\n{T}: Add {C}. If Gemstone Caverns has a luck counter on it, instead add one mana of any color.",
+    "cmc": 0.0,
+    "type_line": "Legendary Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/tsr/280/gemstone-caverns?utm_source=api"
+  },
+  "General Kreat, the Boltbringer": {
+    "oracle_text": "Whenever one or more Goblins you control attack, create a 1/1 red Goblin creature token that's tapped and attacking.\nWhenever another creature you control enters, General Kreat deals 1 damage to each opponent.",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Goblin Soldier",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/j25/48/general-kreat-the-boltbringer?utm_source=api"
+  },
+  "Gilded Drake": {
+    "oracle_text": "Flying\nWhen this creature enters, exchange control of this creature and up to one target creature an opponent controls. If you don't or can't make an exchange, sacrifice this creature. This ability still resolves if its target becomes illegal.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Drake",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/usg/76/gilded-drake?utm_source=api"
+  },
+  "Gitaxian Probe": {
+    "oracle_text": "({U/P} can be paid with either {U} or 2 life.)\nLook at target player's hand.\nDraw a card.",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{U/P}",
+    "scryfall_uri": "https://scryfall.com/card/nph/35/gitaxian-probe?utm_source=api"
+  },
+  "Glacial Fortress": {
+    "oracle_text": "This land enters tapped unless you control a Plains or an Island.\n{T}: Add {W} or {U}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/eoc/160/glacial-fortress?utm_source=api"
+  },
+  "Glen Elendra Archmage": {
+    "oracle_text": "Flying\n{U}, Sacrifice this creature: Counter target noncreature spell.\nPersist (When this creature dies, if it had no -1/-1 counters on it, return it to the battlefield under its owner's control with a -1/-1 counter on it.)",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Faerie Wizard",
+    "mana_cost": "{3}{U}",
+    "scryfall_uri": "https://scryfall.com/card/uma/58/glen-elendra-archmage?utm_source=api"
+  },
+  "Goblin Bombardment": {
+    "oracle_text": "Sacrifice a creature: This enchantment deals 1 damage to any target.",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/mh2/279/goblin-bombardment?utm_source=api"
+  },
+  "Goblin Electromancer": {
+    "oracle_text": "Instant and sorcery spells you cast cost {1} less to cast.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin Wizard",
+    "mana_cost": "{U}{R}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/99/goblin-electromancer?utm_source=api"
+  },
+  "Goblin Grenade": {
+    "oracle_text": "As an additional cost to cast this spell, sacrifice a Goblin.\nGoblin Grenade deals 5 damage to any target.",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/ddt/45/goblin-grenade?utm_source=api"
+  },
+  "Goblin Instigator": {
+    "oracle_text": "When this creature enters, create a 1/1 red Goblin creature token.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin Rogue",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/moc/282/goblin-instigator?utm_source=api"
+  },
+  "Goblin Lackey": {
+    "oracle_text": "Whenever this creature deals damage to a player, you may put a Goblin permanent card from your hand onto the battlefield.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/vma/167/goblin-lackey?utm_source=api"
+  },
+  "Goblin Lookout": {
+    "oracle_text": "{T}, Sacrifice a Goblin: Goblin creatures get +2/+0 until end of turn.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/lgn/101/goblin-lookout?utm_source=api"
+  },
+  "Goblin Motivator": {
+    "oracle_text": "{T}: Target creature gains haste until end of turn. (It can attack and {T} this turn.)",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Goblin Warrior",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/m19/143/goblin-motivator?utm_source=api"
+  },
+  "Goblin Negotiation": {
+    "oracle_text": "Goblin Negotiation deals X damage to target creature. Create a number of 1/1 red Goblin creature tokens equal to the amount of excess damage dealt to that creature this way.",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{X}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/88/goblin-negotiation?utm_source=api"
+  },
+  "Goblin Piledriver": {
+    "oracle_text": "Protection from blue (This creature can't be blocked, targeted, dealt damage, or enchanted by anything blue.)\nWhenever this creature attacks, it gets +2/+0 until end of turn for each other attacking Goblin.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin Warrior",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/ori/151/goblin-piledriver?utm_source=api"
+  },
+  "Goblin Ringleader": {
+    "oracle_text": "Haste (This creature can attack and {T} as soon as it comes under your control.)\nWhen this creature enters, reveal the top four cards of your library. Put all Goblin cards revealed this way into your hand and the rest on the bottom of your library in any order.",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{3}{R}",
+    "scryfall_uri": "https://scryfall.com/card/m20/143/goblin-ringleader?utm_source=api"
+  },
+  "Goblin Sharpshooter": {
+    "oracle_text": "This creature doesn't untap during your untap step.\nWhenever a creature dies, untap this creature.\n{T}: This creature deals 1 damage to any target.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Goblin",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/c13/111/goblin-sharpshooter?utm_source=api"
+  },
+  "Goblin Surprise": {
+    "oracle_text": "Choose one \u2014\n\u2022 Creatures you control get +2/+0 until end of turn.\n\u2022 Create two 1/1 red Goblin creature tokens.",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/200/goblin-surprise?utm_source=api"
+  },
+  "Gold-Forged Thopteryx": {
+    "oracle_text": "Flying, lifelink\nEach legendary permanent you control has ward {2}. (Whenever it becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)",
+    "cmc": 2.0,
+    "type_line": "Artifact Creature \u2014 Dinosaur Thopter",
+    "mana_cost": "{W}{U}",
+    "scryfall_uri": "https://scryfall.com/card/mat/31/gold-forged-thopteryx?utm_source=api"
+  },
+  "Goldspan Dragon": {
+    "oracle_text": "Flying, haste\nWhenever this creature attacks or becomes the target of a spell, create a Treasure token.\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of any one color.\"",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Dragon",
+    "mana_cost": "{3}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/soc/245/goldspan-dragon?utm_source=api"
+  },
+  "Good-Fortune Unicorn": {
+    "oracle_text": "Whenever another creature you control enters, put a +1/+1 counter on that creature.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Unicorn",
+    "mana_cost": "{1}{G}{W}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/240/good-fortune-unicorn?utm_source=api"
+  },
+  "Goro-Goro, Disciple of Ryusei": {
+    "oracle_text": "{R}: Creatures you control gain haste until end of turn.\n{3}{R}{R}: Create a 5/5 red Dragon Spirit creature token with flying. Activate only if you control an attacking modified creature. (Equipment, Auras you control, and counters are modifications.)",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Goblin Samurai",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/neo/145/goro-goro-disciple-of-ryusei?utm_source=api"
+  },
+  "Grand Arbiter Augustin IV": {
+    "oracle_text": "White spells you cast cost {1} less to cast.\nBlue spells you cast cost {1} less to cast.\nSpells your opponents cast cost {1} more to cast.",
+    "cmc": 4.0,
+    "type_line": "Legendary Creature \u2014 Human Advisor",
+    "mana_cost": "{2}{W}{U}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/221/grand-arbiter-augustin-iv?utm_source=api"
+  },
+  "Grapeshot": {
+    "oracle_text": "Grapeshot deals 1 damage to any target.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/dmr/125/grapeshot?utm_source=api"
+  },
+  "Grateful Apparition": {
+    "oracle_text": "Flying\nWhenever this creature deals combat damage to a player or planeswalker, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Spirit",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/cmm/824/grateful-apparition?utm_source=api"
+  },
+  "Green Sun's Zenith": {
+    "oracle_text": "Search your library for a green creature card with mana value X or less, put it onto the battlefield, then shuffle. Shuffle Green Sun's Zenith into its owner's library.",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{X}{G}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/150/green-suns-zenith?utm_source=api"
+  },
+  "Grenzo, Havoc Raiser": {
+    "oracle_text": "Whenever a creature you control deals combat damage to a player, choose one \u2014\n\u2022 Goad target creature that player controls.\n\u2022 Exile the top card of that player's library. Until end of turn, you may cast that card and you may spend mana as though it were mana of any color to cast that spell.",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Goblin Rogue",
+    "mana_cost": "{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/216/grenzo-havoc-raiser?utm_source=api"
+  },
+  "Greymond, Avacyn's Stalwart": {
+    "oracle_text": "As Greymond, Avacyn's Stalwart enters, choose two abilities from among first strike, vigilance, and lifelink.\nHumans you control have each of the chosen abilities.\nAs long as you control four or more Humans, Humans you control get +2/+2.",
+    "cmc": 4.0,
+    "type_line": "Legendary Creature \u2014 Human Soldier",
+    "mana_cost": "{2}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/slx/18/greymond-avacyns-stalwart?utm_source=api"
+  },
+  "Grim Monolith": {
+    "oracle_text": "This artifact doesn't untap during your untap step.\n{T}: Add {C}{C}{C}.\n{4}: Untap this artifact.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/ulg/126/grim-monolith?utm_source=api"
+  },
+  "Grudge Keeper": {
+    "oracle_text": "Whenever players finish voting, each opponent who voted for a choice you didn't vote for loses 2 life.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Zombie Wizard",
+    "mana_cost": "{1}{B}",
+    "scryfall_uri": "https://scryfall.com/card/cns/28/grudge-keeper?utm_source=api"
+  },
+  "Guttersnipe": {
+    "oracle_text": "Whenever you cast an instant or sorcery spell, this creature deals 2 damage to each opponent.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Goblin Shaman",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/217/guttersnipe?utm_source=api"
+  },
+  "Harmonic Prodigy": {
+    "oracle_text": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nIf a triggered ability of a Shaman or another Wizard you control triggers, that ability triggers an additional time.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Wizard",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/soc/123/harmonic-prodigy?utm_source=api"
+  },
+  "Hazoret's Monument": {
+    "oracle_text": "Red creature spells you cast cost {1} less to cast.\nWhenever you cast a creature spell, you may discard a card. If you do, draw a card.",
+    "cmc": 3.0,
+    "type_line": "Legendary Artifact",
+    "mana_cost": "{3}",
+    "scryfall_uri": "https://scryfall.com/card/dmc/183/hazorets-monument?utm_source=api"
+  },
+  "High Fae Trickster": {
+    "oracle_text": "Flash (You may cast this spell any time you could cast an instant.)\nFlying\nYou may cast spells as though they had flash.",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Faerie Wizard",
+    "mana_cost": "{3}{U}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/40/high-fae-trickster?utm_source=api"
+  },
+  "Hordeling Outburst": {
+    "oracle_text": "Create three 1/1 red Goblin creature tokens.",
+    "cmc": 3.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/a25/134/hordeling-outburst?utm_source=api"
+  },
+  "Howling Mine": {
+    "oracle_text": "At the beginning of each player's draw step, if this artifact is untapped, that player draws an additional card.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/c16/257/howling-mine?utm_source=api"
+  },
+  "Howlsquad Heavy": {
+    "oracle_text": "Start your engines!\nOther Goblins you control have haste.\nAt the beginning of combat on your turn, create a 1/1 red Goblin creature token. That token attacks this combat if able.\nMax speed \u2014 {T}: Add {R} for each Goblin you control.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Goblin Mercenary",
+    "mana_cost": "{2}{R}",
+    "scryfall_uri": "https://scryfall.com/card/dft/134/howlsquad-heavy?utm_source=api"
+  },
+  "Hullbreaker Horror": {
+    "oracle_text": "Flash\nThis spell can't be countered.\nWhenever you cast a spell, choose up to one \u2014\n\u2022 Return target spell you don't control to its owner's hand.\n\u2022 Return target nonland permanent to its owner's hand.",
+    "cmc": 7.0,
+    "type_line": "Creature \u2014 Kraken Horror",
+    "mana_cost": "{5}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/inr/68/hullbreaker-horror?utm_source=api"
+  },
+  "Hushbringer": {
+    "oracle_text": "Flying, lifelink\nCreatures entering or dying don't cause abilities to trigger.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Faerie",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/eld/18/hushbringer?utm_source=api"
+  },
+  "Hydroelectric Specimen // Hydroelectric Laboratory": {
+    "oracle_text": "",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Weird // Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/mh3/240/hydroelectric-specimen-hydroelectric-laboratory?utm_source=api"
+  },
+  "Icatian Moneychanger": {
+    "oracle_text": "This creature enters with three credit counters on it.\nWhen this creature enters, it deals 3 damage to you.\nAt the beginning of your upkeep, put a credit counter on this creature.\nSacrifice this creature: You gain 1 life for each credit counter on this creature. Activate only during your upkeep.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Human",
+    "mana_cost": "{W}",
+    "scryfall_uri": "https://scryfall.com/card/fem/10a/icatian-moneychanger?utm_source=api"
+  },
+  "Idyllic Tutor": {
+    "oracle_text": "Search your library for an enchantment card, reveal it, put it into your hand, then shuffle.",
+    "cmc": 3.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{2}{W}",
+    "scryfall_uri": "https://scryfall.com/card/thb/24/idyllic-tutor?utm_source=api"
+  },
+  "Ignoble Hierarch": {
+    "oracle_text": "Exalted (Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.)\n{T}: Add {B}, {R}, or {G}.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Goblin Shaman",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/ecc/52/ignoble-hierarch?utm_source=api"
+  },
+  "Illusion of Choice": {
+    "oracle_text": "You choose how each player votes this turn.\nDraw a card.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/cn2/31/illusion-of-choice?utm_source=api"
+  },
+  "Ilysian Caryatid": {
+    "oracle_text": "{T}: Add one mana of any color. If you control a creature with power 4 or greater, add two mana of any one color instead.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Plant",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/cmm/297/ilysian-caryatid?utm_source=api"
+  },
+  "Imperial Seal": {
+    "oracle_text": "Search your library for a card, then shuffle and put that card on top. You lose 2 life.",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{B}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/79/imperial-seal?utm_source=api"
+  },
+  "Impulsive Pilferer": {
+    "oracle_text": "When this creature dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nEncore {3}{R} ({3}{R}, Exile this card from your graveyard: For each opponent, create a token copy that attacks that opponent this turn if able. They gain haste. Sacrifice them at the beginning of the next end step. Activate only as a sorcery.)",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Goblin Pirate",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/otc/171/impulsive-pilferer?utm_source=api"
+  },
+  "Incubation Druid": {
+    "oracle_text": "{T}: Add one mana of any type that a land you control could produce. If this creature has a +1/+1 counter on it, add three mana of that type instead.\n{3}{G}{G}: Adapt 3. (If this creature has no +1/+1 counters on it, put three +1/+1 counters on it.)",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Elf Druid",
+    "mana_cost": "{1}{G}",
+    "scryfall_uri": "https://scryfall.com/card/moc/302/incubation-druid?utm_source=api"
+  },
+  "Insidious Roots": {
+    "oracle_text": "Creature tokens you control have \"{T}: Add one mana of any color.\"\nWhenever one or more creature cards leave your graveyard, create a 0/1 green Plant creature token, then put a +1/+1 counter on each Plant you control.",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{B}{G}",
+    "scryfall_uri": "https://scryfall.com/card/mkm/208/insidious-roots?utm_source=api"
+  },
+  "Into the Flood Maw": {
+    "oracle_text": "Gift a tapped Fish (You may promise an opponent a gift as you cast this spell. If you do, they create a tapped 1/1 blue Fish creature token before its other effects.)\nReturn target creature an opponent controls to its owner's hand. If the gift was promised, instead return target nonland permanent an opponent controls to its owner's hand.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}",
+    "scryfall_uri": "https://scryfall.com/card/blb/52/into-the-flood-maw?utm_source=api"
+  },
+  "Inventors' Fair": {
+    "oracle_text": "At the beginning of your upkeep, if you control three or more artifacts, you gain 1 life.\n{T}: Add {C}.\n{4}, {T}, Sacrifice Inventors' Fair: Search your library for an artifact card, reveal it, put it into your hand, then shuffle. Activate only if you control three or more artifacts.",
+    "cmc": 0.0,
+    "type_line": "Legendary Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/kld/247/inventors-fair?utm_source=api"
+  },
+  "Izzet Boilerworks": {
+    "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {U}{R}.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/otc/302/izzet-boilerworks?utm_source=api"
+  },
+  "Izzet Charm": {
+    "oracle_text": "Choose one \u2014\n\u2022 Counter target noncreature spell unless its controller pays {2}.\n\u2022 Izzet Charm deals 2 damage to target creature.\n\u2022 Draw two cards, then discard two cards.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}{R}",
+    "scryfall_uri": "https://scryfall.com/card/rvr/190/izzet-charm?utm_source=api"
+  },
+  "Izzet Signet": {
+    "oracle_text": "{1}, {T}: Add {U}{R}.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/tdc/320/izzet-signet?utm_source=api"
+  },
+  "Jeweled Amulet": {
+    "oracle_text": "{1}, {T}: Put a charge counter on this artifact. Note the type of mana spent to pay this activation cost. Activate only if there are no charge counters on this artifact.\n{T}, Remove a charge counter from this artifact: Add one mana of this artifact's last noted type.",
+    "cmc": 0.0,
+    "type_line": "Artifact",
+    "mana_cost": "{0}",
+    "scryfall_uri": "https://scryfall.com/card/me2/212/jeweled-amulet?utm_source=api"
+  },
+  "Jin-Gitaxias, Progress Tyrant": {
+    "oracle_text": "Whenever you cast an artifact, instant, or sorcery spell, copy that spell. You may choose new targets for the copy. This ability triggers only once each turn. (A copy of a permanent spell becomes a token.)\nWhenever an opponent casts an artifact, instant, or sorcery spell, counter that spell. This ability triggers only once each turn.",
+    "cmc": 7.0,
+    "type_line": "Legendary Creature \u2014 Phyrexian Praetor",
+    "mana_cost": "{5}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/neo/59/jin-gitaxias-progress-tyrant?utm_source=api"
+  },
+  "Juri, Master of the Revue": {
+    "oracle_text": "Whenever you sacrifice a permanent, put a +1/+1 counter on Juri.\nWhen Juri dies, it deals damage equal to its power to any target.",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Human Shaman",
+    "mana_cost": "{B}{R}",
+    "scryfall_uri": "https://scryfall.com/card/eoc/119/juri-master-of-the-revue?utm_source=api"
+  },
+  "Kappa Cannoneer": {
+    "oracle_text": "Improvise (Your artifacts can help cast this spell. Each artifact you tap after you're done activating mana abilities pays for {1}.)\nWard {4}\nWhenever this creature or another artifact you control enters, put a +1/+1 counter on this creature. It can't be blocked this turn.",
+    "cmc": 6.0,
+    "type_line": "Artifact Creature \u2014 Turtle Warrior",
+    "mana_cost": "{5}{U}",
+    "scryfall_uri": "https://scryfall.com/card/eoc/74/kappa-cannoneer?utm_source=api"
+  },
+  "Karn, the Great Creator": {
+    "oracle_text": "Activated abilities of artifacts your opponents control can't be activated.\n+1: Until your next turn, up to one target noncreature artifact becomes an artifact creature with power and toughness each equal to its mana value.\n\u22122: You may reveal an artifact card you own from outside the game or choose a face-up artifact card you own in exile. Put that card into your hand.",
+    "cmc": 4.0,
+    "type_line": "Legendary Planeswalker \u2014 Karn",
+    "mana_cost": "{4}",
+    "scryfall_uri": "https://scryfall.com/card/rvr/1/karn-the-great-creator?utm_source=api"
+  },
+  "Kessig Flamebreather": {
+    "oracle_text": "Whenever you cast a noncreature spell, this creature deals 1 damage to each opponent.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Shaman",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/vow/164/kessig-flamebreather?utm_source=api"
+  },
+  "Kiki-Jiki, Mirror Breaker": {
+    "oracle_text": "Haste\n{T}: Create a token that's a copy of target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.",
+    "cmc": 5.0,
+    "type_line": "Legendary Creature \u2014 Goblin Shaman",
+    "mana_cost": "{2}{R}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/ima/136/kiki-jiki-mirror-breaker?utm_source=api"
+  },
+  "Kinnan, Bonder Prodigy": {
+    "oracle_text": "Whenever you tap a nonland permanent for mana, add one mana of any type that permanent produced.\n{5}{G}{U}: Look at the top five cards of your library. You may put a non-Human creature card from among them onto the battlefield. Put the rest on the bottom of your library in a random order.",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Human Druid",
+    "mana_cost": "{G}{U}",
+    "scryfall_uri": "https://scryfall.com/card/iko/192/kinnan-bonder-prodigy?utm_source=api"
+  },
+  "Krark, the Thumbless": {
+    "oracle_text": "Whenever you cast an instant or sorcery spell, flip a coin. If you lose the flip, return that spell to its owner's hand. If you win the flip, copy that spell, and you may choose new targets for the copy.\nPartner (You can have two commanders if both have partner.)",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Goblin Wizard",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/cmr/189/krark-the-thumbless?utm_source=api"
+  },
+  "Krenko, Mob Boss": {
+    "oracle_text": "{T}: Create X 1/1 red Goblin creature tokens, where X is the number of Goblins you control.",
+    "cmc": 4.0,
+    "type_line": "Legendary Creature \u2014 Goblin Warrior",
+    "mana_cost": "{2}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/204/krenko-mob-boss?utm_source=api"
+  },
+  "Laboratory Maniac": {
+    "oracle_text": "If you would draw a card while your library has no cards in it, you win the game instead.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Wizard",
+    "mana_cost": "{2}{U}",
+    "scryfall_uri": "https://scryfall.com/card/inr/71/laboratory-maniac?utm_source=api"
+  },
+  "Legion Loyalist": {
+    "oracle_text": "Haste\nBattalion \u2014 Whenever this creature and at least two other creatures attack, creatures you control gain first strike and trample until end of turn and can't be blocked by creature tokens this turn.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Goblin Soldier",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/gtc/97/legion-loyalist?utm_source=api"
+  },
+  "Leonin Arbiter": {
+    "oracle_text": "Players can't search libraries. Any player may pay {2} for that player to ignore this effect until end of turn.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Cat Cleric",
+    "mana_cost": "{1}{W}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/16/leonin-arbiter?utm_source=api"
+  },
+  "Liberator, Urza's Battlethopter": {
+    "oracle_text": "Flash\nFlying\nYou may cast colorless spells and artifact spells as though they had flash.\nWhenever you cast a spell, if the amount of mana spent to cast that spell is greater than Liberator's power, put a +1/+1 counter on Liberator.",
+    "cmc": 3.0,
+    "type_line": "Legendary Artifact Creature \u2014 Thopter",
+    "mana_cost": "{3}",
+    "scryfall_uri": "https://scryfall.com/card/bro/237/liberator-urzas-battlethopter?utm_source=api"
+  },
+  "Lightning Bolt": {
+    "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{R}",
+    "scryfall_uri": "https://scryfall.com/card/clu/141/lightning-bolt?utm_source=api"
+  },
+  "Linvala, Keeper of Silence": {
+    "oracle_text": "Flying\nActivated abilities of creatures your opponents control can't be activated.",
+    "cmc": 4.0,
+    "type_line": "Legendary Creature \u2014 Angel",
+    "mana_cost": "{2}{W}{W}",
+    "scryfall_uri": "https://scryfall.com/card/jmp/119/linvala-keeper-of-silence?utm_source=api"
+  },
+  "Lion's Eye Diamond": {
+    "oracle_text": "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant.",
+    "cmc": 0.0,
+    "type_line": "Artifact",
+    "mana_cost": "{0}",
+    "scryfall_uri": "https://scryfall.com/card/vma/271/lions-eye-diamond?utm_source=api"
+  },
+  "Llanowar Elves": {
+    "oracle_text": "{T}: Add {G}.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Elf Druid",
+    "mana_cost": "{G}",
+    "scryfall_uri": "https://scryfall.com/card/fdn/227/llanowar-elves?utm_source=api"
+  },
+  "Llanowar Wastes": {
+    "oracle_text": "{T}: Add {C}.\n{T}: Add {B} or {G}. This land deals 1 damage to you.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/soc/383/llanowar-wastes?utm_source=api"
+  },
+  "Lotho, Corrupt Shirriff": {
+    "oracle_text": "Whenever a player casts their second spell each turn, you lose 1 life and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Halfling Rogue",
+    "mana_cost": "{W}{B}",
+    "scryfall_uri": "https://scryfall.com/card/ltr/213/lotho-corrupt-shirriff?utm_source=api"
+  },
+  "Mahadi, Emporium Master": {
+    "oracle_text": "At the beginning of your end step, create a Treasure token for each creature that died this turn. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Devil",
+    "mana_cost": "{1}{B}{R}",
+    "scryfall_uri": "https://scryfall.com/card/clb/282/mahadi-emporium-master?utm_source=api"
+  },
+  "Mana Confluence": {
+    "oracle_text": "{T}, Pay 1 life: Add one mana of any color.",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "mana_cost": "",
+    "scryfall_uri": "https://scryfall.com/card/jou/163/mana-confluence?utm_source=api"
+  },
+  "Mana Drain": {
+    "oracle_text": "Counter target spell. At the beginning of your next main phase, add an amount of {C} equal to that spell's mana value.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/57/mana-drain?utm_source=api"
+  },
+  "Mana Geyser": {
+    "oracle_text": "Add {R} for each tapped land your opponents control.",
+    "cmc": 5.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{3}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/soc/247/mana-geyser?utm_source=api"
+  },
+  "Mana Leak": {
+    "oracle_text": "Counter target spell unless its controller pays {3}.",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/58/mana-leak?utm_source=api"
+  },
+  "Mana Vault": {
+    "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}.",
+    "cmc": 1.0,
+    "type_line": "Artifact",
+    "mana_cost": "{1}",
+    "scryfall_uri": "https://scryfall.com/card/2x2/308/mana-vault?utm_source=api"
+  },
+  "Manglehorn": {
+    "oracle_text": "When this creature enters, you may destroy target artifact.\nArtifacts your opponents control enter tapped.",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Beast",
+    "mana_cost": "{2}{G}",
+    "scryfall_uri": "https://scryfall.com/card/akh/175/manglehorn?utm_source=api"
+  },
+  "Manifold Key": {
+    "oracle_text": "{1}, {T}: Untap another target artifact.\n{3}, {T}: Target creature can't be blocked this turn.",
+    "cmc": 1.0,
+    "type_line": "Artifact",
+    "mana_cost": "{1}",
+    "scryfall_uri": "https://scryfall.com/card/clb/319/manifold-key?utm_source=api"
+  },
+  "Marionette Master": {
+    "oracle_text": "Fabricate 3 (When this creature enters, put three +1/+1 counters on it or create three 1/1 colorless Servo artifact creature tokens.)\nWhenever an artifact you control is put into a graveyard from the battlefield, target opponent loses life equal to this creature's power.",
+    "cmc": 6.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "mana_cost": "{4}{B}{B}",
+    "scryfall_uri": "https://scryfall.com/card/afc/102/marionette-master?utm_source=api"
+  },
+  "Marvin, Murderous Mimic": {
+    "oracle_text": "Marvin has all activated abilities of creatures you control that don't have the same name as this creature.",
+    "cmc": 2.0,
+    "type_line": "Legendary Artifact Creature \u2014 Toy",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/dsk/253/marvin-murderous-mimic?utm_source=api"
+  },
+  "Massive Raid": {
+    "oracle_text": "Massive Raid deals damage to any target equal to the number of creatures you control.",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "mana_cost": "{1}{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/gtc/100/massive-raid?utm_source=api"
+  },
+  "Mental Misstep": {
+    "oracle_text": "({U/P} can be paid with either {U} or 2 life.)\nCounter target spell with mana value 1.",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "mana_cost": "{U/P}",
+    "scryfall_uri": "https://scryfall.com/card/nph/38/mental-misstep?utm_source=api"
+  },
+  "Merchant Scroll": {
+    "oracle_text": "Search your library for a blue instant card, reveal that card, put it into your hand, then shuffle.",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{U}",
+    "scryfall_uri": "https://scryfall.com/card/8ed/91/merchant-scroll?utm_source=api"
+  },
+  "Mind Stone": {
+    "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/soc/352/mind-stone?utm_source=api"
+  },
+  "Mindbreak Trap": {
+    "oracle_text": "If an opponent cast three or more spells this turn, you may pay {0} rather than pay this spell's mana cost.\nExile any number of target spells.",
+    "cmc": 4.0,
+    "type_line": "Instant \u2014 Trap",
+    "mana_cost": "{2}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/zen/57/mindbreak-trap?utm_source=api"
+  },
+  "Mirrormade": {
+    "oracle_text": "You may have this enchantment enter as a copy of any artifact or enchantment on the battlefield.",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "mana_cost": "{1}{U}{U}",
+    "scryfall_uri": "https://scryfall.com/card/dsc/120/mirrormade?utm_source=api"
+  },
+  "Mob Justice": {
+    "oracle_text": "Mob Justice deals damage to target player or planeswalker equal to the number of creatures you control.",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/sth/90/mob-justice?utm_source=api"
+  },
+  "Mockingbird": {
+    "oracle_text": "Flying\nYou may have this creature enter as a copy of any creature on the battlefield with mana value less than or equal to the amount of mana spent to cast this creature, except it's a Bird in addition to its other types and it has flying.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Bird Bard",
+    "mana_cost": "{X}{U}",
+    "scryfall_uri": "https://scryfall.com/card/blb/61/mockingbird?utm_source=api"
+  },
+  "Mogg War Marshal": {
+    "oracle_text": "Echo {1}{R} (At the beginning of your upkeep, if this came under your control since the beginning of your last upkeep, sacrifice it unless you pay its echo cost.)\nWhen this creature enters or dies, create a 1/1 red Goblin creature token.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin Warrior",
+    "mana_cost": "{1}{R}",
+    "scryfall_uri": "https://scryfall.com/card/dmr/131/mogg-war-marshal?utm_source=api"
+  },
+  "Moonshadow": {
+    "oracle_text": "Menace\nThis creature enters with six -1/-1 counters on it.\nWhenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.",
+    "cmc": 1.0,
+    "type_line": "Creature \u2014 Elemental",
+    "mana_cost": "{B}",
+    "scryfall_uri": "https://scryfall.com/card/ecl/110/moonshadow?utm_source=api"
+  },
+  "Moonsilver Key": {
+    "oracle_text": "{1}, {T}, Sacrifice this artifact: Search your library for an artifact card with a mana ability or a basic land card, reveal it, put it into your hand, then shuffle.",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "mana_cost": "{2}",
+    "scryfall_uri": "https://scryfall.com/card/mid/255/moonsilver-key?utm_source=api"
+  },
+  "Moria Marauder": {
+    "oracle_text": "Double strike\nWhenever a Goblin or Orc you control deals combat damage to a player, exile the top card of your library. You may play that card this turn.",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Goblin Warrior",
+    "mana_cost": "{R}{R}",
+    "scryfall_uri": "https://scryfall.com/card/ltr/138/moria-marauder?utm_source=api"
+  },
+  "Mox Amber": {
+    "oracle_text": "{T}: Add one mana of any color among legendary creatures and planeswalkers you control.",
+    "cmc": 0.0,
+    "type_line": "Legendary Artifact",
+    "mana_cost": "{0}",
+    "scryfall_uri": "https://scryfall.com/card/dom/224/mox-amber?utm_source=api"
+  },
+  "Mox Diamond": {
+    "oracle_text": "If this artifact would enter, you may discard a land card instead. If you do, put this artifact onto the battlefield. If you don't, put it into its owner's graveyard.\n{T}: Add one mana of any color.",
+    "cmc": 0.0,
+    "type_line": "Artifact",
+    "mana_cost": "{0}",
+    "scryfall_uri": "https://scryfall.com/card/tpr/228/mox-diamond?utm_source=api"
+  },
+  "Mox Opal": {
+    "oracle_text": "Metalcraft \u2014 {T}: Add one mana of any color. Activate only if you control three or more artifacts.",
+    "cmc": 0.0,
+    "type_line": "Legendary Artifact",
+    "mana_cost": "{0}",
+    "scryfall_uri": "https://scryfall.com/card/2xm/275/mox-opal?utm_source=api"
+  }
+}
