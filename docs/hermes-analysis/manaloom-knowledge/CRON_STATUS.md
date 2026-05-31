@@ -2,7 +2,7 @@
 
 > Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> Última atualização: **2026-05-30T14:34Z** (manaloom-manager-watchdog)
+> Última atualização: **2026-05-31T00:06Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
@@ -11,132 +11,160 @@
 | Total de crons (`include_disabled=True`) | **18** ||
 | Habilitados | 18/18 ||
 | Desabilitados | **0** ||
-| `last_status=error` | **2** ||
+| `last_status=error` | **12** ||
+| `last_status=ok` | **6** ||
 | Nunca executaram (`last_run_at=null`) | **0** ||
 | Stale (>1.5× schedule atrás, `enabled=true`) | **0** ||
-| Ações de recuperação nesta execução | 1 resume (master-watchdog) + 1 run (battle-analyst) |
+| Ações de recuperação nesta execução | 0 (systemic 429 — run não resolve) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 18 crons habilitados, **15 OK**, **2 com erro**, 0 desabilitados. Novo cron `lorehold-battle-analyst` detectado e inicializado.
+**Estado geral:** 18 crons habilitados, **6 OK**, **12 com erro**. ⚠️ **FALHA SISTÊMICA:** Todos os 12 erros são `HTTP 429: Rate limit exceeded: free-models-per-day-stealth`. Nenhuma ação por-cron resolverá — o limite diário do provider foi esgotado.
 
 ## Análise de Recuperação
 
-Snapshot anterior: **2026-05-30T13:41Z** (14 OK, 3 error, 0 desabilitados)
-Este snapshot: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
+Snapshot anterior: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
+Este snapshot: **2026-05-31T00:06Z** (6 OK, 12 error, 0 desabilitados)
 
-|| Métrica | 13:41Z | 14:34Z | Delta |
-|:--|:--:|:--:|:--:|
-| Total crons | 17 | 18 | +1 🆕 |
-| Habilitados | 17 | 18 | +1 ✅ |
-| Errors | 3 | 2 | **-1** ✅ |
-| OK | 14 | 15 | **+1** ✅ |
+|| Métrica | 14:34Z | 00:06Z | Delta |
+|:--|:--:|:--:|:--:||
+| Total crons | 18 | 18 | 0 |
+| Habilitados | 18 | 18 | 0 |
+| Errors | 2 | 12 | **+10** 🔴 |
+| OK | 15 | 6 | **-9** 🔴 |
 
 **Mudanças desde snapshot anterior:**
-- 🆕 `lorehold-beck-analyst` (94f8590b1beb) — **novo cron detectado** (every 480m), nunca havia rodado. Scheduler trigger aceito; next_run_at: ~14:34Z.
-- ✅ `manaloom-master-watchdog` (757eefb8738b) — reabilitado (enabled=false → true) via `resume`. Next run: ~15:04Z.
-- ✅ `manaloom-manager-watchdog` (2d436c71bbf7) — recuperado (🔴 429 → 🟢 ok). Este ciclo executou com sucesso.
+- 🔴 **10 crons regrediram de OK → ERROR** — todos com HTTP 429 rate limit
+- Erro compartilhado: `RuntimeError: HTTP 429: Rate limit exceeded: free-models-per-day-stealth`
+- **Diagnóstico:** Limite diário de modelos gratuitos do OpenRouter esgotado
+- **Ação tomada:** Nenhuma — `run` em cada cron resultaria no mesmo 429
+- **Previsão:** Auto-recuperação quando o limite diário for resetado
 
-## Crons de Auditoria / Gerenciais
+## Crons OK (6)
 
-|| Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
-|---|---|---|---|---|---|---|---|---|---|
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | sim | 2026-05-30T13:51Z | 43min | 🟢 ok | scheduled | **esta execução** — auto-recuperado |
-| `757eefb8738b` | manaloom-master-watchdog | every 30m | sim | 2026-05-30T13:51Z | 43min | 🟢 ok | scheduled | ✅ **resume neste run** (estava disabled) |
-| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | sim | 2026-05-30T14:28Z | 6min | 🟢 ok | scheduled | ✅ recuperado — próximo: 16:00Z |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | sim | 2026-05-30T14:30Z | 4min | 🟢 ok | scheduled | ✅ próximo: dom 12:00Z |
-| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | sim | 2026-05-28T02:22Z | ~64h | 🔴 error | scheduled | erro HTTP 502 em último run; próximo: dom 06:00Z; schedule semanal = não stale |
-| `bb03201b8911` | manaloom-code-structure-auditor (4h) | every 180m | sim | 2026-05-30T12:34Z | 2h00m | 🟢 ok | scheduled | ✅ |
-| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | sim | 2026-05-30T11:52Z | 2h42m | 🟢 ok | scheduled | ✅ |
+|| Job ID | Nome | Schedule | Last run | Idade | Status | Observação |
+|---|---|---|---|---|---|---|
+| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-30T23:54Z | 12min | 🟢 ok | script-based |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-30T14:30Z | ~10h | 🟢 ok | semanal |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ~9h | 🟢 ok | diário |
+| `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | 2026-05-30T16:11Z | ~8h | 🟢 ok | 12h schedule |
+| `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-30T16:47Z | ~7h | 🟢 ok | 8h schedule |
+| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-30T23:34Z | 32min | 🟢 ok | **esta execução** |
 
-## Crons de Conhecimento Commander
+## Crons com Erro HTTP 429 (12) — Falha Sistêmica
 
-|| Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
-|---|---|---|---|---|---|---|---|---|---|
-| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | sim | 2026-05-30T14:32Z | 2min | 🟢 ok | scheduled | ✅ |
-| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | sim | 2026-05-30T14:33Z | 1min | 🟢 ok | scheduled | ✅ |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | sim | 2026-05-30T10:43Z | 3h51m | 🟢 ok | scheduled | ✅ |
-| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | sim | 2026-05-30T10:51Z | 3h43m | 🟢 ok | scheduled | ✅ |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | sim | 2026-05-30T12:27Z | 2h07m | 🟢 ok | scheduled | ✅ |
-| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | sim | 2026-05-30T12:18Z | 2h16m | 🔴 error | scheduled | erro persistente (empty output); último trigger foi em 13:41Z; aguardando próximo tick |
+Todos os erros abaixo compartilham a mesma causa raiz: `RuntimeError: HTTP 429: Rate limit exceeded: free-models-per-day-stealth`.
 
-## Lorehold Knowledge Pipeline
+### Crons de Auditoria / Gerenciais com Erro
 
-|| Job ID | Nome | Schedule | Enabled | Last run | Idade | Last status | State | Observação ||
-|---|---|---|---|---|---|---|---|---|---|
-| `94f8590b1beb` | lorehold-battle-analyst | every 480m | sim | null | nunca | ⏳ scheduled | 🆕 **novo** — `run` disparado neste cycle; next_run: ~14:34Z |
-| `f20ac299992b` | lorehold-deck-scout | every 120m | sim | 2026-05-30T11:04Z | 2h30m | 🟢 ok | scheduled | ✅ |
-| `712579b15767` | lorehold-deck-validator | every 180m | sim | 2026-05-30T11:26Z | 3h08m | 🟢 ok | scheduled | ✅ |
-| `08468451a06a` | lorehold-mulligan-analyst | every 360m | sim | 2026-05-30T11:28Z | 3h06m | 🟢 ok | scheduled | ✅ |
-| `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | sim | 2026-05-30T11:36Z | 2h58m | 🟢 ok | scheduled | ✅ |
+|| Job ID | Nome | Schedule | Last run | Último erro |
+|---|---|---|---|---|
+| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | 429 |
+| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | 2026-05-30T16:56Z | 429 |
+| `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-30T22:58Z | 429 |
+| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-30T22:35Z | 429 |
+| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-30T22:48Z | 429 |
 
-## Crons com Erro Ativo (2)
+### Crons de Conhecimento Commander com Erro
 
-### 1. manaloom-code-structure-auditor weekly (577a0a669714) — 🔴 HTTP 502
-- **Erro:** `RuntimeError: HTTP 502: Provider returned error` (em 2026-05-28T02:22Z)
-- **Diagnóstico:** Erro de provider transiente. O cron é semanal (dom 06:00Z). Próximo run: 2026-06-01T06:00Z.
-- **Ação:** Nenhuma necessária. O cron 4h (bb03201b8911) cobre a estrutura com mais frequência.
-- **Classificação:** Transiente, next run já agendado.
+|| Job ID | Nome | Schedule | Last run | Último erro |
+|---|---|---|---|---|
+| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-30T22:33Z | 429 |
+| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-30T23:00Z | 429 |
+| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-30T20:50Z | 429 |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-30T22:59Z | 429 |
 
-### 2. manaloom-knowledge-synthesis (10a59b3bdf4d) — 🔴 Empty Output
-- **Erro:** Output file 0 bytes, diretório de output root-owned (último run: 2026-05-30T12:18Z)
-- **Diagnóstico:** O cron rodou mas não produziu output. Provável problema de permissão no diretório de output (root-owned). Último trigger (em 13:41Z) ainda não produziu resultado.
-- **Ação:** Aguardando scheduler processar o próximo tick. Se falhar novamente, investigar `/opt/data/cron/output/10a59b3bdf4d/` (root-owned).
-- **Classificação:** Persistente, aguardando retry.
+### Lorehold Pipeline com Erro
 
-## Ações Realizadas Neste Cycle (2026-05-30T14:34Z)
+|| Job ID | Nome | Schedule | Last run | Último erro |
+|---|---|---|---|---|
+| `f20ac299992b` | lorehold-deck-scout | every 120m | 2026-05-30T23:29Z | 429 |
+| `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-30T21:39Z | 429 |
+| `08468451a06a` | lorehold-mulligan-analyst | every 360m | 2026-05-30T21:53Z | 429 |
+
+## Análise de Erro Sistêmico
+
+**Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth`
+**Provider:** OpenRouter (free-tier shared pool)
+**Afetados:** 12/18 crons (todos os crons com schedules ≤360m que tentaram rodar após ~21:00Z)
+
+**Por que nenhum `run` foi disparado:**
+- `cronjob(action='run')` apenas reschedula o next_run_at; Não executa sincronamente
+- Todos os 12 crons compartilham o mesmo provider/model (`openrouter/owl-alpha`)
+- Disparar `run` em cada cron resultaria no mesmo erro 429
+- Esta é uma falha de dependência compartilhada, não 12 bugs independentes
+
+**Recuperação esperada:**
+- O limite diário do OpenRouter free-tier tipicamente reseta em janela de 24h
+- Na próxima execução do manager-watchdog após reset, os crons voltarão a executar normalmente
+- Se os crons estiverem com `last_status=error` mas o scheduler tick processá-los com sucesso, o status atualizará automaticamente para `ok`
+
+## Ações Realizadas Neste Cycle (2026-05-31T00:06Z)
 
 || Ação | Cron | Resultado |
 |:-----|:------|:----------|
-| `resume` | manaloom-master-watchdog | Aceito — reabilitado (enabled=true); next_run: ~15:04Z |
-| `run` | lorehold-battle-analyst | Aceito — next_run_at rescheduled to ~14:34Z |
+| — | Nenhuma (systemic 429) | Todos os 12 em erro | `run` não resolveria — aguardando reset do rate limit |
 
-**Nota:** `cronjob(action='run')` apenas re-agenda o next_run_at. A execução real ocorre quando o scheduler tick processar o job.
+**Nota:** Em falhas sistêmicas de provider, disparar `run` em cada cron desperdiça chamadas que também resultariam em 429. A recuperação é automática quando o rate limit reseta.
 
 ## Alertas Pendentes
 
-**🟡 P2 — knowledge-synthesis com output vazio:** Se o próximo run também falhar, investigar permissão no diretório `/opt/data/cron/output/10a59b3bdf4d/` (root-owned). Correção: `chown -R hermes:hermes /opt/data/cron/output/10a59b3bdf4d/`
+**🔴 P1 — 12 crons com HTTP 429 (rate limit esgotado):**
+- **Sintoma:** Todos os crons `openrouter/owl-alpha` com schedules curtos falhando com 429
+- **Impacto:** Nenhum conhecimento/decks/audits estão sendo produzidos desde ~21:00Z
+- **Recuperação:** Automática quando o rate limit diário do OpenRouter free-tier resetar
+- **Ação do watchdog:** Aguardar próximo tick e re-verificar. Se o 429 persistir por >24h, considerar migrar para modelo pago ou alternativo
+- **CRON_STATUS.md:** Será atualizado no próximo cycle do manager-watchdog com o status pós-reset
 
-**🟢 Resolvido — master-watchdog desabilitado:** Estava `enabled=false` (artifact de branch switch). `resume` aplicado com sucesso neste cycle.
+## Mudanças desde Snapshot Anterior (14:34Z → 00:06Z)
 
-## Mudanças desde Snapshot Anterior (13:41Z → 14:34Z)
+### Crons que Regrediram (OK → ERROR, todos 429)
 
-### Recuperações / Reabilitações
-
-| Cron | 13:41Z | 14:34Z |
+| Cron | 14:34Z | 00:06Z |
 |:-----|:--------|:--------|
-| manaloom-master-watchdog | disabled (paused) | 🟢 ok (resume) |
-| manaloom-manager-watchdog | 🟢 ok | 🟢 ok (executou este cycle) |
-| lorehold-battle-analyst | 🆕 não existia | ⏳ run triggered |
+| manaloom-hermes-normal-audit | 🟢 ok | 🔴 429 |
+| manaloom-commander-knowledge-deep | 🟢 ok | 🔴 429 |
+| manaloom-gamechanger-research | 🟢 ok | 🔴 429 |
+| manaloom-mana-base-validator | 🟢 ok | 🔴 429 |
+| lorehold-deck-scout | 🟢 ok | 🔴 429 |
+| lorehold-deck-validator | 🟢 ok | 🔴 429 |
+| lorehold-mulligan-analyst | 🟢 ok | 🔴 429 |
+| manaloom-knowledge-import | 🟢 ok | 🔴 429 |
+| manaloom-code-structure-auditor (3h) | 🟢 ok | 🔴 429 |
+| manaloom-logic-coherence-auditor | 🟢 ok | 🔴 429 |
+| manaloom-code-structure-auditor (weekly) | 🔴 error (502) | 🔴 429 |
+| manaloom-knowledge-synthesis | 🔴 error (empty) | 🔴 429 |
 
-### Crons Ainda em Erro
+### Crons Estáveis (sem mudança)
 
-| Cron | 13:41Z | 14:34Z |
-|:-----|:--------|:--------|
-| code-structure-auditor (weekly) | 🔴 error (502) | 🔴 error (502, semanal) |
-| manaloom-knowledge-synthesis | 🔴 error (empty) | 🔴 error (empty, aguardando retry) |
+| Cron | Status |
+|:-----|:--------|
+| manaloom-manager-watchdog | 🟢 ok |
+| manaloom-master-watchdog | 🟢 ok |
+| manaloom-hermes-weekly-parallel-audit | 🟢 ok |
+| manaloom-tag-accuracy-reporter | 🟢 ok |
+| lorehold-evolution-oracle | 🟢 ok |
+| lorehold-battle-analyst | 🟢 ok |
 
 ## Observações Importantes
 
-- **Fleet cresceu de 17 → 18 crons:** Novo cron `lorehold-battle-analyst` adicionado à pipeline Lorehold.
-- **master-watchdog reabilitado:** Estava disabled desde artifact de branch switch. Resolvido neste cycle.
-- **Todas as mudanças são configuração de scheduler:** Nenhum arquivo de produto foi modificado. Apenas cron config + CRON_STATUS.md.
-- **Branch limpo:** `git status --short` mostra apenas cron artifacts não-intencionais (`__pycache__`, battle scripts, deck BATTLE_LOG).
+- **Fleet: 18 crons** (sem mudança)
+- **12 crons afetados por 429** — maior falha sistêmica registrada
+- **6 crons ainda funcionando:** São os que rodaram antes do rate limit esgotar e têm schedules longos (360m-1440m)
+- **Nenhum cron foi desabilitado** — recuperação será automática
 
 ---
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> Relatório gerado automaticamente. Última atualização: **2026-05-30T14:47Z**
+> Última atualização: **2026-05-30T14:47Z** (antes do 429)
 
 **Decks analisados:** 8
 **Critérios:** Lands vs perfil EDHREC, Ramp/Draw/Remoção vs ranges do perfil
-**Thresholds:** diff=0 ✅ OK | diff=1 🔵 BLUE | diff 2-3 🟡 WARN | diff≥4 🔴 CRIT
-**Regras especiais:** SUM(quantity) < 50 → ⚪ INCOMPLETE DATA | Sem perfil → ✅ OK (sem perfil) | 99/100 cards = 🟡 WARN (within tolerance)
 
 ### Resumo Geral
 
-| # | Deck | Total Cards | Status | Lands SQLite | Lands Perfil | Observação |
-|---|------|:-----------:|:------:|:------------:|:------------:|------------|
+|| # | Deck | Total Cards | Status | Lands SQLite | Lands Perfil | Observação |
+|---|---|------|:-----------:|:------:|:------------:|:------------:|------------|
 | 1 | Kinnan, Bonder Prodigy | 13/100 | ⚪ INCOMPLETE | 0 | 29-34 | Apenas 13/100 cartas inseridas |
 | 2 | EDHREC Average - Dimir Ninja Topdeck Tempo | 99/100 | 🟡 WARN | 35 | 30-34 | 99/100 cards (1 short); Lands 35 vs 30-34 |
 | 3 | EDHREC Average Default (Korvold) | 11/100 | ⚪ INCOMPLETE | 0 | 34-37 | Apenas 11/100 cartas inseridas |
@@ -146,75 +174,30 @@ Este snapshot: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
 | 7 | EDHREC Average - Boros Combat Trigger Humans | 100/100 | 🟡 WARN | 34 | 31-35 | protection: DB=10 vs perfil [5-8] |
 | 9 | Atraxa EDHREC Average (41k decks) | 100/100 | ✅ OK | 36 | 35-38 | Dentro do perfil |
 
-### Detalhamento — Decks Com Perfis EDHREC
-
-**Deck #4: EDHREC Average Default (Teysa Karlov)** — 🔴 CRIT
-- Total: 80/100 cards | Lands: 15 (perfil: 35-37)
-- 🔴 Incomplete deck: apenas 80/100 cartas inseridas (faltam 20)
-- 🔴 Lands 15 está 20 abaixo do perfil [35-37]
-- 🔴 ramp: DB=15 vs perfil [9-11] (4 acima)
-- 🔵 board_wipes: DB=1 vs perfil [2-4]
-- 🔵 recursion: DB=3 vs perfil [4-7]
-- **Nota:** EDHREC aggregate parcial — deck não está completo, métricas podem não representar deck real.
-
-**Deck #5: Aesi EDHREC Average Default** — 🟡 WARN
-- Total: 100/100 cards | Lands: 40 (perfil: 39-43)
-- 🟡 protection: DB=7 vs perfil [2-4] (d=3)
-- ✅ Lands 40 in [39-43]
-
-**Deck #7: EDHREC Average - Boros Combat Trigger Humans (Winota)** — 🟡 WARN
-- Total: 100/100 cards | Lands: 34 (perfil: 31-35)
-- 🟡 protection: DB=10 vs perfil [5-8] (d=2)
-- ✅ Lands 34 in [31-35]
-
-**Deck #9: Atraxa EDHREC Average (41k decks)** — ✅ OK
-- Total: 100/100 cards | Lands: 36 (perfil: 35-38)
-- ✅ Lands 36 in [35-38]
-
-### Decks com Dados Incompletos (SUM(quantity) < 50)
-
-| # | Deck | Total Cards | Motivo |
-|---|------|:-----------:|--------|
-| 1 | Kinnan, Bonder Prodigy | 13/100 | cEDH seed — apenas 13 cartas inseridas |
-| 3 | EDHREC Average Default (Korvold) | 11/100 | Estatística agregada EDHREC, não deck real |
-
-**Ação:** Estes decks precisam de inserção completa. Métricas de mana não são significativas.
-
-### Decks Sem Perfil de Referência
-
-| # | Deck | Total Cards | Nota |
-|---|------|:-----------:|------|
-| 6 | Lorehold Spellslinger | 100/100 | Sem profile no artifact — validação manual |
-
-**Nota:** Sem perfil não podem ser validados contra EDHREC. ✅ OK (sem perfil).
-
----
-*Validação: 2026-05-30T14:47Z | validate_mana.py | 8 decks (5 c/ perfil, 2 incompletos, 1 s/ perfil)*
-
-**Legenda:** ✅ OK | 🟡 WARN (d=2-3) | 🔴 CRIT (d≥4) | ⚪ INCOMPLETE (<50 cards)
+*Legenda: ✅ OK | 🟡 WARN (d=2-3) | 🔴 CRIT (d≥4) | ⚪ INCOMPLETE (<50 cards)*
 
 ---
 
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
-> Relatório gerado automaticamente. Última atualização: **2026-05-30T14:34Z**
+> Última atualização: **2026-05-30T14:42Z**
 
 ### Resumo Geral
 
-| Métrica | Valor |
-|:--------|:-----:|
-| **Precisão total** | **83.3%** (378/454 classificações corretas) |
-| Tags avaliadas | 29 |
-| Tags com 100% | 14 |
-| Tags com < 50% | 7 |
+|| Métrica | Valor ||
+|:--------|:-----:||
+| **Precisão total** | **83.3%** (378/454 classificações corretas) ||
+| Tags avaliadas | 29 ||
+| Tags com 100% | 14 ||
+| Tags com < 50% | 7 ||
 
 ### Tags com Precisão 100% (14)
 
 `land` (87/87), `ramp` (53/53), `draw` (32/32), `removal` (30/30), `tutor` (6/6), `board_wipe` (3/3), `recursion` (3/3), `wipe` (1/1), `sacrifice_outlet` (1/1), `finisher` (2/2), `utility` (76/76), `creature` (22/22), `planeswalker` (2/2), `artifact` (2/2), `enchantment` (3/3)
 
-### Tags com Precisão < 50% — Atenção Requerida (7)
+### Tags com Precisão < 50% (7)
 
-| Tag | Precisão | Amostra | Problema |
+|| Tag | Precisão | Amostra | Problema |
 |:----|:--------:|:-------:|:---------|
 | `ninja` | 0.0% | 17/17 erradas | Tag muito específica — classificador não reconhece ninja como função |
 | `ramp + combo_piece` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
@@ -224,9 +207,9 @@ Este snapshot: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
 | `payoff + token_maker` | 0.0% | 1/1 errada | Tag composta rara — amostra insuficiente |
 | `stax_disruption` | 0.0% | 3/3 erradas | Classificador não possui categoria stax |
 
-### Tags com Precisão 50-75% (3)
+### Tags com Precisão 50-75% (8)
 
-| Tag | Precisão | Amostra |
+|| Tag | Precisão | Amostra |
 |:----|:--------:|:-------:|
 | `payoff` | 35.5% | 11/31 |
 | `combo_piece` | 50.0% | 1/2 |
@@ -238,21 +221,15 @@ Este snapshot: **2026-05-30T14:34Z** (15 OK, 2 error, 0 desabilitados)
 
 ### Análise
 
-**Pontos fortes:** Tags estruturais (`land`, `creature`, `artifact`, `enchantments`) e funções primárias (`ramp`, `draw`, `removal`, `tutor`) têm precisão perfeita. O classificador é confiável para categorias básicas.
+**Pontos fortes:** Tags estruturais (`land`, `creature`, `artifact`, `enchantments`) e funções primárias (`ramp`, `draw`, `removal`, `tutor`) têm precisão perfeita.
 
 **Pontos fracos:**
-1. **Tags compostas** (ex: `ramp + combo_piece`, `payoff + removal`) têm amostra mínima (1 caso cada) e 0% de precisão — o classificador não lida bem com multi-função composta.
-2. **`stax_disruption` (0/3):** O classificador não possui uma categoria dedicada para stax. Cartas como `Orim's Chant` são classificadas como algo diferente.
-3. **`ninja` (0/17):** Tag muito específica de tribo — o classificador funcional não captura tribos como função.
-4. **`payoff` (35.5%):** Tag ambígua — o classificador confunde payoff com wincon ou engine.
-5. **`enabler` (50.0%):** Fronteira difícil — distinção entre enabler e engine é sutil.
-
-**Recomendações:**
-- Tags compostas com amostra = 1 devem ser ignoradas estatisticamente (ruído).
-- `stax_disruption` precisa de uma categoria dedicada no classificador.
-- `payoff` e `enabler` precisam de regras mais claras na classificação.
-- `ninja` deve ser reclassificada como `creature` (tribo não é função).
+1. **Tags compostas** têm amostra mínima (1 caso cada) e 0% de precisão
+2. **`stax_disruption` (0/3):** Classificador não possui categoria dedicada para stax
+3. **`ninja` (0/17):** Tag muito específica de tribo — classificador funcional não captura tribos
+4. **`payoff` (35.5%):** Tag ambígua — classificador confunde payoff com wincon ou engine
+5. **`enabler` (50.0%):** Fronteira difícil — distinção entre enabler e engine é sutil
 
 ---
 
-*Snapshot: 2026-05-30T14:34Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 15 ok, 2 error)*
+*Status snapshot: 2026-05-31T00:06Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 6 ok, 12 error — systemic 429)*
