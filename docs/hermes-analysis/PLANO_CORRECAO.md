@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-31 05:30 UTC
+> Data: 2026-05-31 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -9,7 +9,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada na rotacao de 2026-05-30 19:00 UTC no checkout local `2079ad28`. O maior risco atual esta em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos), alem de duplicacoes menores em trust, logs sociais, condicao de carta e CMC/tipo.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao de 2026-05-31 19:00 UTC. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos), alem de duplicacoes menores em trust, logs sociais, condicao de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REABERTO no checkout local
    `df8291d7`**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
@@ -115,7 +115,7 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-05-30 19:00 UTC: REVALIDADO no checkout local `2079ad28`.**
+- **Status 2026-05-31 19:00 UTC: REVALIDADO/ABERTO nesta branch.**
 - **Evidência**:
   - `resolveOptimizeArchetype` existe em
     `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
@@ -139,8 +139,9 @@ Histórico do problema:
   - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
     `_buildTrustInsight` duplicam o mesmo trust em listagem/detalhe de trades
     (`server/routes/trades/index.dart:557`-`:635`,
-    `server/routes/trades/[id]/index.dart:260`-`:338`) e o serializer tambem
-    aparece no marketplace (`server/routes/community/marketplace/index.dart:316`-`:348`).
+    `server/routes/trades/[id]/index.dart:260`-`:338`). O marketplace repete
+    os LATERALs inline em `server/routes/community/marketplace/index.dart:131`-`:162`
+    e tambem duplica o serializer em `:316`-`:348`.
   - `_requestId` e `_logInvalidPayload` repetem o mesmo padrao em
     `server/routes/trades/[id]/status.dart:260`-`:284`,
     `server/routes/trades/[id]/respond.dart:154`-`:178`,
