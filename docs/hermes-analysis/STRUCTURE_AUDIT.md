@@ -1,7 +1,136 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-05-30 23:00 UTC
-> Rotacao: `module-coherence-server-lib-routes-app-lib`
+> Atualizacao local Codex: 2026-05-31 03:00 UTC
+> Rotacao: `classes-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Classes not used — revalidacao 2026-05-31 03:00 UTC
+
+Escopo desta rodada: somente classes definidas sem uso runtime confirmado. Nao
+foi executada auditoria ampla de funcoes sem chamada, imports/ciclos, tabelas
+PostgreSQL, duplicacao geral ou coerencia entre camadas fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: branch remota sincronizada.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `a1a48fe9`.
+- `rg` nao esta instalado neste shell local (`command -v rg` sem saida);
+  buscas focadas usaram `grep -RIn --include='*.dart'`, `find`, `nl -ba` e
+  uma triagem textual local para filtrar classes publicas sem referencia fora
+  do arquivo de definicao.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
+`server/routes`, inventaria classes, mas nao constroi grafo de chamadas nem
+cobre consumo do Flutter em `app/lib`. A escrita automatica do script tambem
+pode duplicar blocos historicos no Markdown; nesta rodada a duplicacao gerada
+foi descartada antes de registrar os achados manuais abaixo.
+
+### Achados revalidados
+
+#### P1 — `LifeCounterScreen` legado segue fora do caminho runtime do app
+
+- **Classe:** `LifeCounterScreen` em
+  `app/lib/features/home/life_counter_screen.dart:61`.
+- **Rota ativa:** `app/lib/main.dart:54` importa
+  `features/home/lotus_life_counter_screen.dart`; `app/lib/main.dart:281`-`:283`
+  registra `path: lifeCounterRoutePath` com `const LotusLifeCounterScreen()`.
+- **Evidencia de ausencia em `app/lib`:** busca focada por `LifeCounterScreen`
+  em `app/lib` encontrou apenas a propria definicao/construtor/createState em
+  `app/lib/features/home/life_counter_screen.dart:61`-`:77`.
+- **Evidencia de teste legado:** `app/test/features/home/life_counter_screen_test.dart:9`
+  e `app/test/features/home/life_counter_clone_proof_test.dart:10` importam
+  `life_counter_screen.dart`; os testes instanciam `LifeCounterScreen`, mas nao
+  provam a rota viva do app.
+- **Por que parece nao usada:** o runtime roteado para `/life-counter` usa Lotus,
+  enquanto a tela Flutter nativa permanece como caminho legado/test harness.
+- **O que valida:** remover a tela nativa ou documenta-la como fixture legado
+  com ownership claro e testes nomeados como legacy.
+- **O que falsifica:** uma rota, flag ou chamada em `app/lib` que instancie
+  `LifeCounterScreen` fora dos testes.
+
+#### P2 — `DeckCard` permanece testado, mas sem uso confirmado na listagem real
+
+- **Classe:** `DeckCard` em `app/lib/features/decks/widgets/deck_card.dart:17`.
+- **Evidencia de ausencia em `app/lib`:** busca focada por import de
+  `deck_card.dart` em `app/lib` nao retornou ocorrencias; busca por `DeckCard`
+  em `app/lib` encontrou apenas a definicao e o construtor em
+  `app/lib/features/decks/widgets/deck_card.dart:17` e `:22`.
+- **Evidencia de uso apenas por testes:**
+  `app/test/features/decks/widgets/deck_card_test.dart:4` e
+  `app/test/features/decks/widgets/deck_card_overflow_test.dart:4` importam o
+  widget e instanciam `DeckCard`.
+- **Por que parece nao usada:** a listagem real de decks parece ter migrado para
+  outros cards locais, enquanto esse widget mantem cobertura de teste sem
+  consumidor runtime.
+- **O que valida:** remover `DeckCard` e seus testes, ou religar a listagem real
+  de decks para usar este widget.
+- **O que falsifica:** import de `deck_card.dart` ou chamada `DeckCard(...)` em
+  uma tela ativa de `app/lib`.
+
+#### P2 — `DeckProgressChip` nao tem chamada de construtor confirmada
+
+- **Classe:** `DeckProgressChip` em
+  `app/lib/features/decks/widgets/deck_progress_indicator.dart:286`.
+- **Evidencia de ausencia:** busca focada por `DeckProgressChip` em `app/lib` e
+  `app/test` encontrou somente a declaracao da classe e o construtor em
+  `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` e `:292`.
+- **Controle positivo no mesmo arquivo:** `DeckProgressIndicator` permanece vivo:
+  `app/lib/features/decks/screens/deck_details_screen.dart:403` e
+  `app/lib/features/decks/widgets/deck_details_overview_tab.dart:328` instanciam
+  `DeckProgressIndicator`.
+- **Por que parece nao usada:** o componente compacto ficou no arquivo, mas nao
+  aparece em cards/listas nem em testes.
+- **O que valida:** remover `DeckProgressChip` ou conecta-lo explicitamente a uma
+  lista/card que precise do indicador compacto.
+- **O que falsifica:** chamada direta a `DeckProgressChip(...)` em `app/lib` ou
+  teste dedicado que represente um contrato de componente ainda planejado.
+
+#### P2 — `LotusPresentationMode` nao e usado pelo fluxo Lotus atual
+
+- **Classe:** `LotusPresentationMode` em
+  `app/lib/features/home/lotus/lotus_presentation_mode.dart:4`.
+- **Evidencia de ausencia:** busca focada por `LotusPresentationMode` em
+  `app/lib`, `app/test` e `app/integration_test` encontrou somente a classe e o
+  construtor privado em `lotus_presentation_mode.dart:4`-`:5`; busca por
+  `enter()`/`exit()` nesse escopo nao encontrou chamada aos metodos estaticos em
+  `:15` e `:26`.
+- **Por que parece nao usada:** o fluxo vivo `LotusLifeCounterScreen` nao importa
+  `lotus_presentation_mode.dart`, entao as chamadas de fullscreen/orientacao nao
+  participam do ciclo de vida atual.
+- **O que valida:** remover o utilitario ou chamar `LotusPresentationMode.enter`
+  e `LotusPresentationMode.exit` no lifecycle do Lotus com teste de contrato.
+- **O que falsifica:** import do arquivo e chamada dos metodos no fluxo vivo.
+
+### Itens verificados e nao classificados como novo problema
+
+- `AppObservabilityNavigatorObserver`, `PerformanceNavigatorObserver`,
+  `CardRecognitionService` e `MatchupAnalyzer` apareceram em baixa contagem na
+  triagem textual, mas tem chamadores runtime confirmados em `app/lib/main.dart`,
+  `scanner_provider.dart` e `server/routes/ai/simulate/index.dart`.
+- `PostgresExternalCommanderMetaCandidateLegalityRepository` parecia sem uso
+  quando a busca cobria apenas `server/lib`/`server/routes`, mas e instanciado
+  em `server/bin/import_external_commander_meta_candidates.dart:36` e
+  `server/bin/run_external_commander_meta_pipeline.dart:62`.
+- DTOs/classes publicas usadas como retorno interno no proprio arquivo nao foram
+  promovidas a achado sem prova de que o entrypoint que as produz tambem esta
+  sem uso.
 
 ## Rodada focada: Coerencia entre modulos `server/lib` ↔ `server/routes` ↔ `app/lib` — revalidacao 2026-05-30 23:00 UTC
 
