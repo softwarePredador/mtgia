@@ -1,3 +1,154 @@
+## [2026-05-31T10:40:37+00:00] Ciclo #7 — Evolution Oracle (AGGRESSIVE)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execucao #14):**
+- 7.802 decks. Motor 4/4 completo. Copy engines 3/3 completo.
+- EDHREC estavel — sem mudancas numericas desde Execucao #13.
+- Rising stars: Improvisation Capstone (+8.09), Restoration Seminar (+9.14), Dawning Archaic (+5.31).
+- Declinios: Esper Sentinel (-0.54, 5o ciclo), Pearl Medallion (-0.46), Ruby Medallion (-0.37).
+- Galadriel's Dismissal: 0% EDHREC — completamente ausente.
+
+**VALIDATOR (v3.7 pos-Ciclo #6):**
+- Draw real = 6 (perfil quer 8-12) — MAIOR GAP
+- Wincon dedicado = 1 (perfil quer 4-7) — SEGUNDO GAP
+- v3.7 CMC errors corrigidos no Ciclo #6 (Apex=10, Chimes=3, Soulfire=9)
+
+**MULLIGAN (simulacao fresh, N=1000, seed=42, rigoroso):**
+- Jogaveis: 48.4%, Mulligan: 41.5%
+- Ramp T1: 19.7%
+- **Sem Play T3: 3.7%** — MUITO abaixo de 8%! Estrategia AGGRESSIVE liberada.
+
+**BATTLE (Exec#8 pos-Ciclo #4):**
+- Avg WR: 52.1% (estavel)
+- Pior matchup: Combo (46.5%)
+
+### Analise Estrategica (PASSO 0)
+
+**1. COMO ESTE DECK GANHA?**
+Approach of the Second Sun (CMC 7), Insurrection (CMC 8), Storm Herd (CMC 10),
+Mizzix's Mastery overload, Dance with Calamity chain, Arcane Bombardment copies.
+Apenas 1 wincon dedicada por tag, mas multiplos caminhos de vitoria. Motor 4/4
+completo com redundancia de copy engines (3/3).
+
+**2. COMO ESTE DECK EVITA PERDER?**
+Board wipes: 5. Removal: 6. Protecao: 3. Maior fraqueza: resposta a combo (46.5% WR).
+Sem counterspell. Depende de remocao pontual para interromper combos.
+
+**3. COMO ESTE DECK GERA VANTAGEM?**
+Draw: 6→7 (pos-Ciclo #6 Wedding Ring +1). Recursion: 4. Tesouros abundantes
+(Smothering Tithe, Storm-Kiln, Big Score, Brass's Bounty, Hit the Mother Lode).
+O deck NAO fica sem gasolina no mid-game, mas draw ainda esta abaixo do perfil (8-12).
+
+**4. COMO ESTE DECK ACELERA?**
+Ramp: 14 fontes. T1 ramp: 3 (Sol Ring, Land Tax, Wayfarer). Treasure-heavy ramp
+sobrevive melhor a board wipes que mana rocks.
+
+**5. QUAL O PLANO DE JOGO?**
+T1-3: Setup (ramp, topdeck). T4-6: Lorehold + engines. T7+: Win.
+Execucao early-game e EXCELENTE (Sem Play T3 = 3.7%). O deck chega consistente ao mid-game.
+
+### Determinacao de Estrategia
+
+Sem Play T3 = 3.7% (<< 8%) → **AGGRESSIVE**. Pode adicionar cartas CMC 3-4
+sem comprometer early-game. Net DCMC ate +2 e aceitavel.
+
+### Por que APENAS 1 swap?
+
+O deck esta saudavel: T3 = 3.7%, WR = 52.1%, motor 4/4, copy 3/3.
+A colecao esta esgotada de cartas CMC 1-2 com alto EDHREC em Lorehold.
+Restam apenas cartas CMC 3+ de qualidade na colecao.
+
+Os outros candidatos a corte (Pearl Medallion, Grand Abolisher, Fated Clash)
+nao tem substitutos claramente superiores na colecao. Pearl Medallion (25.2%,
+-0.46) e cortavel, mas Victory Chimes ja foi usado neste ciclo. Grand Abolisher
+(11.7%, -0.27) tem utilidade unica (protecao proativa). Fated Clash (15.6%,
+-0.19) e um board wipe que nao tem substituto melhor.
+
+1 swap de qualidade > 3 swaps mediocres. 0 swaps seria valido — o deck esta
+saudavel — mas Victory Chimes aborda o maior gap estrutural (draw) com forte
+evidencia EDHREC (53.6%).
+
+### Swap 1: Galadriel's Dismissal → Victory Chimes
+
+**Diagnostico:** Galadriel's Dismissal (CMC 1) e um phase out de criaturas com
+kicker. Tem 0% EDHREC — completamente ausente do meta Lorehold. E double-null:
+ambos classificadores (single-tag e multi-tag) falham em categoriza-la. O efeito
+de phase out e situacional e raramente decisivo em Commander multiplayer.
+
+**Solucao:** Victory Chimes (CMC 3) e um artifact com 53.6% EDHREC que desvira
+em cada turno dos oponentes E compra carta quando outro artifact entra sob seu
+controle. Com 15+ artifacts no deck, gera draw consistente e passivo. Aborda o
+maior gap do deck: fontes de draw.
+
+**Da sua colecao:** ✅ Sim (qty: 1, bbd, U)
+
+**Principio:** Em Lorehold spellslinger, draw passivo > efeito situacional.
+Galadriel's Dismissal resolve um problema que raramente acontece (precisa proteger
+criaturas em um deck com 10-12 criaturas). Victory Chimes resolve o problema que
+SEMPRE acontece: ficar sem cartas na mao em Boros.
+
+**Impacto esperado:** Net DCMC = +2 (1→3). Draw real: 6→7 fontes. T3: 3.7%→~5%.
+Dentro do range AGGRESSIVE com ampla margem de seguranca.
+
+### Resumo do Ciclo
+
+| Metrica | Pos-C#6 | Pos-C#7 | D |
+|:--------|:-------:|:-------:|:-:|
+| Jogaveis | 48.4% | — (aguarda simulacao) | — |
+| Mulligan | 41.5% | — | — |
+| Ramp T1 | 19.7% | — | — |
+| Sem Play T3 | 3.7% | ~5% (est.) | +1.3pp |
+
+**Net DCMC:** +2 (Galadriel 1 → Victory Chimes 3)
+**Draw real:** 6 → 7
+**Ramp:** 14 (mantido)
+**Lands:** 35 (mantido)
+
+### Licoes do Ciclo #7
+
+1. **Sem Play T3 = 3.7% e o nivel mais baixo ja registrado.** O acumulo de
+   6 ciclos de swaps melhorou drasticamente o early-game: +1 land, +cheap
+   interaction (Faithless, DRC, Thrill, Abrade), -expensive dead cards
+   (Rise of the Eldrazi CMC 12, Jokulhaups, Furygale Flocking).
+
+2. **O deck chegou ao "ponto otimo" de early-game.** Com 35 lands e 34 cartas
+   CMC <= 3, ha margem para upgrades AGGRESSIVE (+1 a +2 CMC) sem comprometer
+   a consistencia.
+
+3. **Victory Chimes (53.6% EDHREC) e subestimado.** Untap em cada turno +
+   draw em artifact ETB = engine de valor em Commander multiplayer. Com 15+
+   artifacts no deck, e 15+ triggers de draw ao longo do jogo.
+
+4. **Galadriel's Dismissal a 0% EDHREC confirma que phase out e overrated
+   em Lorehold.** O meta prefere remocao universal (Chaos Warp, Path, Swords)
+   e draw engines a efeitos defensivos situacionais.
+
+5. **A colecao esta ESGOtada de upgrades defensivos.** Com 22 swaps aplicados,
+   as cartas restantes na colecao sao CMC 3+ ou tem baixo EDHREC. Proximos
+   ciclos devem focar em BALANCED ou AGGRESSIVE, ou recomendar aquisicao de
+   cartas CMC 1-2 (Skullclamp, Mana Vault, Chrome Mox, Ragavan).
+
+### Estado Final do Deck
+
+- Total cartas: 100 ✅
+- Commander: 1 ✅
+- Lands: 35
+- Motor: 4/4 completo ✅
+- Copy engines: 3/3 completo ✅
+- Draw real: 7 (Wedding Ring + Victory Chimes adicionados nos C#6 e C#7)
+- Removal: 6
+- Swaps totais desde baseline: 22 (C#1:3, C#2:3, C#3:5, C#4:3, C#5:3, C#6:2, C#7:1)
+
+### Proximo Ciclo (C#8)
+
+- Executar mulligan simulacao para medir impacto do DCMC = +2
+- Se T3 < 8%: AGGRESSIVE — considerar cortar Pearl Medallion (-0.46 trend)
+- Se T3 8-12%: BALANCED — trocar Pearl Medallion por carta CMC 2-3
+- Prioridade: adquirir cartas CMC 1-2 com draw/removal em Boros
+
+---
+
 ## [2026-05-31T08:38:37+00:00] Ciclo #6 — Evolution Oracle (DEFENSIVO corrigido)
 
 ### Sintese dos 3 Agentes
