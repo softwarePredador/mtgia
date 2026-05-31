@@ -1,0 +1,2021 @@
+{
+  "Improvisation Capstone": {
+    "edhrec_section": "newcards",
+    "edhrec_inclusion_pct": 49.0,
+    "edhrec_trend_zscore": 8.131248375025232,
+    "edhrec_synergy": 0.54,
+    "oracle": "Exile cards from the top of your library until you exile cards with total mana value 4 or greater. You may cast any number of spells from among them without paying their mana costs.\nParadigm (Then exile this spell. After you first resolve a spell with this name, you may cast a copy of it from exile without paying its mana cost at the beginning of each of your first main phases.)",
+    "cmc": 7.0,
+    "type": "Sorcery \u2014 Lesson",
+    "mana_cost": "{5}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Restoration Seminar": {
+    "edhrec_section": "newcards",
+    "edhrec_inclusion_pct": 37.9,
+    "edhrec_trend_zscore": 9.1601133663616,
+    "edhrec_synergy": 0.4,
+    "oracle": "Return target nonland permanent card from your graveyard to the battlefield.\nParadigm (Then exile this spell. After you first resolve a spell with this name, you may cast a copy of it from exile without paying its mana cost at the beginning of each of your first main phases.)",
+    "cmc": 7.0,
+    "type": "Sorcery \u2014 Lesson",
+    "mana_cost": "{5}{W}{W}",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ]
+  },
+  "Tablet of Discovery": {
+    "edhrec_section": "newcards",
+    "edhrec_inclusion_pct": 26.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.3
+  },
+  "The Dawning Archaic": {
+    "edhrec_section": "newcards",
+    "edhrec_inclusion_pct": 24.0,
+    "edhrec_trend_zscore": 5.2674929966219315,
+    "edhrec_synergy": 0.27,
+    "oracle": "This spell costs {1} less to cast for each instant and sorcery card in your graveyard.\nReach\nWhenever The Dawning Archaic attacks, you may cast target instant or sorcery card from your graveyard without paying its mana cost. If that spell would be put into your graveyard, exile it instead.",
+    "cmc": 10.0,
+    "type": "Legendary Creature \u2014 Avatar",
+    "mana_cost": "{10}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Turbulent Steppe": {
+    "edhrec_section": "newcards",
+    "edhrec_inclusion_pct": 23.0,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.11
+  },
+  "Hit the Mother Lode": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 79.3,
+    "edhrec_trend_zscore": 1.2920624667862401,
+    "edhrec_synergy": 0.76,
+    "oracle": "Discover 10. If the discovered card's mana value is less than 10, create a number of tapped Treasure tokens equal to the difference. (To discover 10, exile cards from the top of your library until you exile a nonland card with mana value 10 or less. Cast it without paying its mana cost or put it into your hand. Put the rest on the bottom in a random order.)",
+    "cmc": 7.0,
+    "type": "Sorcery",
+    "mana_cost": "{4}{R}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Library of Leng": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 77.8,
+    "edhrec_trend_zscore": 1.4377122484808842,
+    "edhrec_synergy": 0.75,
+    "oracle": "You have no maximum hand size.\nIf an effect causes you to discard a card, discard it, but you may put it on top of your library instead of into your graveyard.",
+    "cmc": 1.0,
+    "type": "Artifact",
+    "mana_cost": "{1}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Storm Herd": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 75.0,
+    "edhrec_trend_zscore": 1.2109574252118238,
+    "edhrec_synergy": 0.72,
+    "oracle": "Create X 1/1 white Pegasus creature tokens with flying, where X is your life total.",
+    "cmc": 10.0,
+    "type": "Sorcery",
+    "mana_cost": "{8}{W}{W}",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ]
+  },
+  "Monument to Endurance": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 72.8,
+    "edhrec_trend_zscore": 1.2678771784108773,
+    "edhrec_synergy": 0.68,
+    "oracle": "Whenever you discard a card, choose one that hasn't been chosen this turn \u2014\n\u2022 Draw a card.\n\u2022 Create a Treasure token.\n\u2022 Each opponent loses 3 life.",
+    "cmc": 3.0,
+    "type": "Artifact",
+    "mana_cost": "{3}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Brass's Bounty": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 67.1,
+    "edhrec_trend_zscore": 1.1298853529105188,
+    "edhrec_synergy": 0.64,
+    "oracle": "For each land you control, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 7.0,
+    "type": "Sorcery",
+    "mana_cost": "{6}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Call Forth the Tempest": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 65.3,
+    "edhrec_trend_zscore": -0.30578661736535323,
+    "edhrec_synergy": 0.63,
+    "oracle": "Cascade, cascade (When you cast this spell, exile cards from the top of your library until you exile a nonland card that costs less. You may cast it without paying its mana cost. Put the exiled cards on the bottom of your library in a random order. Then do it again.)\nCall Forth the Tempest deals damage to each creature your opponents control equal to the total mana value of other spells you've cast this turn.",
+    "cmc": 8.0,
+    "type": "Sorcery",
+    "mana_cost": "{5}{R}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Sensei's Divining Top": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 66.8,
+    "edhrec_trend_zscore": 0.5534388569914096,
+    "edhrec_synergy": 0.63,
+    "oracle": "{1}: Look at the top three cards of your library, then put them back in any order.\n{T}: Draw a card, then put this artifact on top of its owner's library.",
+    "cmc": 1.0,
+    "type": "Artifact",
+    "mana_cost": "{1}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Volcanic Vision": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 63.8,
+    "edhrec_trend_zscore": 1.215032289420419,
+    "edhrec_synergy": 0.62,
+    "oracle": "Return target instant or sorcery card from your graveyard to your hand. Volcanic Vision deals damage equal to that card's mana value to each creature your opponents control. Exile Volcanic Vision.",
+    "cmc": 7.0,
+    "type": "Sorcery",
+    "mana_cost": "{5}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Approach of the Second Sun": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 63.8,
+    "edhrec_trend_zscore": 0.7416914038822159,
+    "edhrec_synergy": 0.62,
+    "oracle": "If this spell was cast from your hand and you've cast another spell named Approach of the Second Sun this game, you win the game. Otherwise, put Approach of the Second Sun into its owner's library seventh from the top and you gain 7 life.",
+    "cmc": 7.0,
+    "type": "Sorcery",
+    "mana_cost": "{6}{W}",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ]
+  },
+  "Scroll Rack": {
+    "edhrec_section": "highsynergycards",
+    "edhrec_inclusion_pct": 59.5,
+    "edhrec_trend_zscore": 0.47768414696877115,
+    "edhrec_synergy": 0.57,
+    "oracle": "{1}, {T}: Exile any number of cards from your hand face down. Put that many cards from the top of your library into your hand. Then look at the exiled cards and put them on top of your library in any order.",
+    "cmc": 2.0,
+    "type": "Artifact",
+    "mana_cost": "{2}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Swords to Plowshares": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 69.0,
+    "edhrec_trend_zscore": 1.2356507582766956,
+    "edhrec_synergy": 0.03,
+    "oracle": "Exile target creature. Its controller gains life equal to its power.",
+    "cmc": 1.0,
+    "type": "Instant",
+    "mana_cost": "{W}",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ]
+  },
+  "Big Score": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 67.3,
+    "edhrec_trend_zscore": 1.5233638274391208,
+    "edhrec_synergy": 0.55,
+    "oracle": "As an additional cost to cast this spell, discard a card.\nDraw two cards and create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 4.0,
+    "type": "Instant",
+    "mana_cost": "{3}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Mizzix's Mastery": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 57.4,
+    "edhrec_trend_zscore": 1.0657895954573315,
+    "edhrec_synergy": 0.55,
+    "oracle": "Exile target card that's an instant or sorcery from your graveyard. For each card exiled this way, copy it, and you may cast the copy without paying its mana cost. Exile Mizzix's Mastery.\nOverload {5}{R}{R}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+    "cmc": 4.0,
+    "type": "Sorcery",
+    "mana_cost": "{3}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Path to Exile": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 57.4,
+    "edhrec_trend_zscore": 0.9126232788473366,
+    "edhrec_synergy": 0.0
+  },
+  "Unexpected Windfall": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 56.7,
+    "edhrec_trend_zscore": 0.6572646942306257,
+    "edhrec_synergy": 0.48,
+    "oracle": "As an additional cost to cast this spell, discard a card.\nDraw two cards and create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 4.0,
+    "type": "Instant",
+    "mana_cost": "{2}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Storm-Kiln Artist": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 55.3,
+    "edhrec_trend_zscore": 0.7567767265821771,
+    "edhrec_synergy": 0.48,
+    "oracle": "This creature gets +1/+0 for each artifact you control.\nMagecraft \u2014 Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 4.0,
+    "type": "Creature \u2014 Dwarf Shaman",
+    "mana_cost": "{3}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Apex of Power": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 54.9,
+    "edhrec_trend_zscore": 0.10567916771341988,
+    "edhrec_synergy": 0.53,
+    "oracle": "Exile the top seven cards of your library. Until end of turn, you may cast spells from among them.\nIf this spell was cast from your hand, add ten mana of any one color.",
+    "cmc": 10.0,
+    "type": "Sorcery",
+    "mana_cost": "{7}{R}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Rise of the Eldrazi": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 54.6,
+    "edhrec_trend_zscore": -0.46509849090041505,
+    "edhrec_synergy": 0.53,
+    "oracle": "This spell can't be countered.\nDestroy target permanent. Target player draws four cards. Take an extra turn after this one.\nExile Rise of the Eldrazi.",
+    "cmc": 12.0,
+    "type": "Sorcery",
+    "mana_cost": "{9}{C}{C}{C}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Ol\u00f3rin's Searing Light": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 53.1,
+    "edhrec_trend_zscore": 0.5915080293865677,
+    "edhrec_synergy": 0.49
+  },
+  "Dance with Calamity": {
+    "edhrec_section": "topcards",
+    "edhrec_inclusion_pct": 50.2,
+    "edhrec_trend_zscore": 0.5798684795269834,
+    "edhrec_synergy": 0.48,
+    "oracle": "Shuffle your library. As many times as you choose, you may exile the top card of your library. If the total mana value of the cards exiled this way is 13 or less, you may cast any number of spells from among those cards without paying their mana costs.",
+    "cmc": 8.0,
+    "type": "Sorcery",
+    "mana_cost": "{7}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Jeska's Will": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 30.5,
+    "edhrec_trend_zscore": 0.389263457648211,
+    "edhrec_synergy": 0.15,
+    "oracle": "Choose one. If you control a commander as you cast this spell, you may choose both instead.\n\u2022 Add {R} for each card in target opponent's hand.\n\u2022 Exile the top three cards of your library. You may play them this turn.",
+    "cmc": 3.0,
+    "type": "Sorcery",
+    "mana_cost": "{2}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Smothering Tithe": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 29.4,
+    "edhrec_trend_zscore": 0.12138478309106812,
+    "edhrec_synergy": 0.11,
+    "oracle": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "cmc": 4.0,
+    "type": "Enchantment",
+    "mana_cost": "{3}{W}",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ]
+  },
+  "Teferi's Protection": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 21.2,
+    "edhrec_trend_zscore": 0.03265582070050449,
+    "edhrec_synergy": 0.05
+  },
+  "Enlightened Tutor": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 18.4,
+    "edhrec_trend_zscore": -0.1358686443744163,
+    "edhrec_synergy": 0.03
+  },
+  "Farewell": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 17.5,
+    "edhrec_trend_zscore": -0.9496268439461691,
+    "edhrec_synergy": 0.07
+  },
+  "Ancient Tomb": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 13.9,
+    "edhrec_trend_zscore": -0.5256229014549839,
+    "edhrec_synergy": 0.07
+  },
+  "Gamble": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 12.1,
+    "edhrec_trend_zscore": -0.5028329076016568,
+    "edhrec_synergy": 0.05
+  },
+  "The One Ring": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 8.5,
+    "edhrec_trend_zscore": -0.3137756477334083,
+    "edhrec_synergy": 0.02
+  },
+  "Underworld Breach": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 6.6,
+    "edhrec_trend_zscore": -0.3748356946021607,
+    "edhrec_synergy": 0.04
+  },
+  "Mana Vault": {
+    "edhrec_section": "gamechangers",
+    "edhrec_inclusion_pct": 5.8,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.02
+  },
+  "Longshot, Rebel Bowman": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 47.9,
+    "edhrec_trend_zscore": 0.3925722330042196,
+    "edhrec_synergy": 0.44
+  },
+  "Pinnacle Monk": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 41.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.35
+  },
+  "Hexing Squelcher": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 40.8,
+    "edhrec_trend_zscore": 0.3269043726213537,
+    "edhrec_synergy": 0.33
+  },
+  "Dragon's Rage Channeler": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 39.5,
+    "edhrec_trend_zscore": 0.466254123103666,
+    "edhrec_synergy": 0.38
+  },
+  "Mother of Runes": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 34.5,
+    "edhrec_trend_zscore": 0.2278146548301873,
+    "edhrec_synergy": 0.22
+  },
+  "Goliath Daydreamer": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 33.3,
+    "edhrec_trend_zscore": 1.1255063624985997,
+    "edhrec_synergy": 0.3
+  },
+  "Velomachus Lorehold": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 32.6,
+    "edhrec_trend_zscore": 0.005366655602621806,
+    "edhrec_synergy": 0.31,
+    "oracle": "Flying, vigilance, haste\nWhenever Velomachus Lorehold attacks, look at the top seven cards of your library. You may cast an instant or sorcery spell with mana value less than or equal to Velomachus Lorehold's power from among them without paying its mana cost. Put the rest on the bottom of your library in a random order.",
+    "cmc": 7.0,
+    "type": "Legendary Creature \u2014 Elder Dragon",
+    "mana_cost": "{5}{R}{W}",
+    "colors": [
+      "R",
+      "W"
+    ],
+    "color_identity": [
+      "R",
+      "W"
+    ]
+  },
+  "Esper Sentinel": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 32.4,
+    "edhrec_trend_zscore": -0.5390132218974297,
+    "edhrec_synergy": 0.08
+  },
+  "Guttersnipe": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 32.2,
+    "edhrec_trend_zscore": -0.07945969587594144,
+    "edhrec_synergy": 0.26
+  },
+  "Caldera Pyremaw": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 30.2,
+    "edhrec_trend_zscore": 0.12986650543070108,
+    "edhrec_synergy": 0.28
+  },
+  "Verge Rangers": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 29.7,
+    "edhrec_trend_zscore": 0.04980162590542848,
+    "edhrec_synergy": 0.29
+  },
+  "Galvanoth": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 26.5,
+    "edhrec_trend_zscore": 0.05646862568520299,
+    "edhrec_synergy": 0.26
+  },
+  "Radiant Scrollwielder": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 26.5,
+    "edhrec_trend_zscore": -0.44793539775982444,
+    "edhrec_synergy": 0.24
+  },
+  "Electro, Assaulting Battery": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 23.4,
+    "edhrec_trend_zscore": -0.5264909285788038,
+    "edhrec_synergy": 0.21
+  },
+  "Surly Badgersaur": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 21.4,
+    "edhrec_trend_zscore": -0.086467529266961,
+    "edhrec_synergy": 0.2
+  },
+  "Giver of Runes": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 19.5,
+    "edhrec_trend_zscore": -0.2972267048207466,
+    "edhrec_synergy": 0.13
+  },
+  "Witch Enchanter": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 19.0,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.06
+  },
+  "Goldspan Dragon": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 17.8,
+    "edhrec_trend_zscore": -0.2339338522744225,
+    "edhrec_synergy": 0.14
+  },
+  "Dualcaster Mage": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 16.9,
+    "edhrec_trend_zscore": -0.25372304012520797,
+    "edhrec_synergy": 0.14
+  },
+  "Young Pyromancer": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 16.9,
+    "edhrec_trend_zscore": -0.21142471833484158,
+    "edhrec_synergy": 0.12
+  },
+  "Biblioplex Assistant": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 15.8,
+    "edhrec_trend_zscore": 0.1859971428894179,
+    "edhrec_synergy": 0.15
+  },
+  "Inti, Seneschal of the Sun": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 12.1,
+    "edhrec_trend_zscore": -0.04032337697091449,
+    "edhrec_synergy": 0.09
+  },
+  "Monastery Mentor": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 11.8,
+    "edhrec_trend_zscore": -0.008692612375740098,
+    "edhrec_synergy": 0.07
+  },
+  "Grand Abolisher": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 11.7,
+    "edhrec_trend_zscore": -0.2736731565814425,
+    "edhrec_synergy": 0.01
+  },
+  "Aziza, Mage Tower Captain": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 9.0,
+    "edhrec_trend_zscore": 2.10891018398174,
+    "edhrec_synergy": 0.09
+  },
+  "Spinerock Tyrant": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 10.7,
+    "edhrec_trend_zscore": -0.849398949624489,
+    "edhrec_synergy": 0.09
+  },
+  "Claim Jumper": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 9.5,
+    "edhrec_trend_zscore": -0.09128800690102881,
+    "edhrec_synergy": 0.05
+  },
+  "Balefire Liege": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 9.3,
+    "edhrec_trend_zscore": -0.7094488761205258,
+    "edhrec_synergy": 0.02
+  },
+  "Heartflame Duelist": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 9.2,
+    "edhrec_trend_zscore": -0.3092459047597643,
+    "edhrec_synergy": 0.07
+  },
+  "Containment Construct": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 9.1,
+    "edhrec_trend_zscore": -0.3769722258588257,
+    "edhrec_synergy": 0.06
+  },
+  "Glint-Horn Buccaneer": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 9.0,
+    "edhrec_trend_zscore": -0.08224868655504006,
+    "edhrec_synergy": 0.08
+  },
+  "Quintorius, Loremaster": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 8.6,
+    "edhrec_trend_zscore": -0.27258936683653523,
+    "edhrec_synergy": 0.06
+  },
+  "Senu, Keen-Eyed Protector": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 8.5,
+    "edhrec_trend_zscore": -0.1651433417528924,
+    "edhrec_synergy": 0.07
+  },
+  "Solemn Simulacrum": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 8.5,
+    "edhrec_trend_zscore": -0.3834560876892654,
+    "edhrec_synergy": -0.13
+  },
+  "Naktamun Lorespinner": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 6.7,
+    "edhrec_trend_zscore": 1.0748108183549774,
+    "edhrec_synergy": 0.04
+  },
+  "Firesong and Sunspeaker": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 8.0,
+    "edhrec_trend_zscore": -0.7631551393001103,
+    "edhrec_synergy": 0.07
+  },
+  "Twinflame Tyrant": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.9,
+    "edhrec_trend_zscore": -0.6885795770505827,
+    "edhrec_synergy": 0.06
+  },
+  "Burning Prophet": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.8,
+    "edhrec_trend_zscore": -0.036685970508261154,
+    "edhrec_synergy": 0.07
+  },
+  "Magmakin Artillerist": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.8,
+    "edhrec_trend_zscore": -0.15233377163632036,
+    "edhrec_synergy": 0.07
+  },
+  "Birgi, God of Storytelling": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.5,
+    "edhrec_trend_zscore": -0.6476850684575133,
+    "edhrec_synergy": 0.04
+  },
+  "Knight of the White Orchid": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.3,
+    "edhrec_trend_zscore": -0.2874304679455304,
+    "edhrec_synergy": -0.02
+  },
+  "Ragavan, Nimble Pilferer": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.2,
+    "edhrec_trend_zscore": -0.48278672087522645,
+    "edhrec_synergy": -0.0
+  },
+  "Coruscation Mage": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.1,
+    "edhrec_trend_zscore": -0.5115311426409525,
+    "edhrec_synergy": 0.05
+  },
+  "Squee, Goblin Nabob": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 7.0,
+    "edhrec_trend_zscore": 0.30334516474348855,
+    "edhrec_synergy": 0.04
+  },
+  "Renegade Bull": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 5.6,
+    "edhrec_trend_zscore": 1.065513796613506,
+    "edhrec_synergy": 0.06
+  },
+  "Impulsivity": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 6.8,
+    "edhrec_trend_zscore": -0.5658090792176276,
+    "edhrec_synergy": 0.06
+  },
+  "Prismari Pianist": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 5.3,
+    "edhrec_trend_zscore": 0.9269178817600938,
+    "edhrec_synergy": 0.05
+  },
+  "Archivist of Oghma": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 6.5,
+    "edhrec_trend_zscore": -0.3525756458553332,
+    "edhrec_synergy": 0.01
+  },
+  "Ashling, Flame Dancer": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 5.8,
+    "edhrec_trend_zscore": -0.5264577671127701,
+    "edhrec_synergy": 0.04
+  },
+  "Wandering Archaic": {
+    "edhrec_section": "creatures",
+    "edhrec_inclusion_pct": 5.5,
+    "edhrec_trend_zscore": -0.5876198626471903,
+    "edhrec_synergy": 0.05
+  },
+  "Boros Charm": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 45.5,
+    "edhrec_trend_zscore": 0.345218906736093,
+    "edhrec_synergy": -0.02
+  },
+  "Chaos Warp": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 38.8,
+    "edhrec_trend_zscore": 0.4599771800478339,
+    "edhrec_synergy": 0.09
+  },
+  "Deflecting Swat": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 36.8,
+    "edhrec_trend_zscore": 0.08675558691297246,
+    "edhrec_synergy": 0.2,
+    "oracle": "If you control a commander, you may cast this spell without paying its mana cost.\nYou may choose new targets for target spell or ability.",
+    "cmc": 3.0,
+    "type": "Instant",
+    "mana_cost": "{2}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Perch Protection": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 34.4,
+    "edhrec_trend_zscore": -0.44516983513836555,
+    "edhrec_synergy": 0.33
+  },
+  "Beacon of Immortality": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 34.2,
+    "edhrec_trend_zscore": -0.4049133518297643,
+    "edhrec_synergy": 0.33
+  },
+  "Invoke Calamity": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 33.9,
+    "edhrec_trend_zscore": 0.10769691450628818,
+    "edhrec_synergy": 0.33
+  },
+  "Generous Gift": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 32.4,
+    "edhrec_trend_zscore": 0.25127568105478676,
+    "edhrec_synergy": 0.01
+  },
+  "Bolt Bend": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 28.5,
+    "edhrec_trend_zscore": 0.477083140748506,
+    "edhrec_synergy": 0.24
+  },
+  "Valakut Awakening": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 26.8,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.2
+  },
+  "Reprieve": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 24.0,
+    "edhrec_trend_zscore": 0.3347069252214775,
+    "edhrec_synergy": 0.15
+  },
+  "Redirect Lightning": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 20.7,
+    "edhrec_trend_zscore": -0.22533696572338832,
+    "edhrec_synergy": 0.15
+  },
+  "Deflecting Palm": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 20.2,
+    "edhrec_trend_zscore": -0.03888914839912432,
+    "edhrec_synergy": 0.02
+  },
+  "Flawless Maneuver": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 19.8,
+    "edhrec_trend_zscore": -0.2805151640725912,
+    "edhrec_synergy": 0.02
+  },
+  "Stroke of Midnight": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 18.0,
+    "edhrec_trend_zscore": -0.18870344630885072,
+    "edhrec_synergy": 0.01
+  },
+  "Untimely Malfunction": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 18.0,
+    "edhrec_trend_zscore": -0.22899176961452075,
+    "edhrec_synergy": 0.07
+  },
+  "Reverberate": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 17.9,
+    "edhrec_trend_zscore": -0.518011400164694,
+    "edhrec_synergy": 0.16
+  },
+  "Searing Wind": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 17.0,
+    "edhrec_trend_zscore": -0.6351270842211599,
+    "edhrec_synergy": 0.17
+  },
+  "Loran's Escape": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 16.5,
+    "edhrec_trend_zscore": 0.49859402978347794,
+    "edhrec_synergy": 0.09
+  },
+  "Erode": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 12.6,
+    "edhrec_trend_zscore": 2.9353270479688582,
+    "edhrec_synergy": 0.07
+  },
+  "Seething Song": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 16.0,
+    "edhrec_trend_zscore": -0.4912353497792054,
+    "edhrec_synergy": 0.13
+  },
+  "Return the Favor": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 15.0,
+    "edhrec_trend_zscore": 0.8322096345504086,
+    "edhrec_synergy": 0.11
+  },
+  "Sejiri Shelter": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 14.0,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.06
+  },
+  "Thrill of Possibility": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 13.9,
+    "edhrec_trend_zscore": 0.009592796638757888,
+    "edhrec_synergy": 0.03
+  },
+  "Gods Willing": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 13.8,
+    "edhrec_trend_zscore": -0.13514262320691994,
+    "edhrec_synergy": 0.09
+  },
+  "Lorehold Command": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 13.4,
+    "edhrec_trend_zscore": -0.9495511192054635,
+    "edhrec_synergy": 0.11
+  },
+  "Flashback": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 10.3,
+    "edhrec_trend_zscore": 2.5027158109860643,
+    "edhrec_synergy": 0.07
+  },
+  "Tibalt's Trickery": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 12.8,
+    "edhrec_trend_zscore": -0.5076200628611481,
+    "edhrec_synergy": 0.08
+  },
+  "Lorehold Charm": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 10.4,
+    "edhrec_trend_zscore": 1.699112998825595,
+    "edhrec_synergy": -0.0
+  },
+  "Demand Answers": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 10.9,
+    "edhrec_trend_zscore": -0.5574107812214547,
+    "edhrec_synergy": 0.02
+  },
+  "Dawn's Truce": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 10.8,
+    "edhrec_trend_zscore": -0.5211841465672449,
+    "edhrec_synergy": 0.01
+  },
+  "Abrade": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 9.9,
+    "edhrec_trend_zscore": 0.15762759739488102,
+    "edhrec_synergy": -0.03
+  },
+  "Riddle of Lightning": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 8.8,
+    "edhrec_trend_zscore": -0.23858515159643484,
+    "edhrec_synergy": 0.09
+  },
+  "Gideon's Phalanx": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 8.5,
+    "edhrec_trend_zscore": -0.6016482783937824,
+    "edhrec_synergy": 0.08
+  },
+  "Wear // Tear": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 8.3,
+    "edhrec_trend_zscore": -0.6933459939912089,
+    "edhrec_synergy": -0.11
+  },
+  "Legion Leadership": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 7.8,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.1
+  },
+  "Lightning Bolt": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 7.5,
+    "edhrec_trend_zscore": -0.5764654977284756,
+    "edhrec_synergy": -0.03
+  },
+  "Pyretic Ritual": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 7.3,
+    "edhrec_trend_zscore": -0.2616698575219988,
+    "edhrec_synergy": 0.06
+  },
+  "Increasing Vengeance": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 7.3,
+    "edhrec_trend_zscore": -0.5304286059818888,
+    "edhrec_synergy": 0.07
+  },
+  "Flare of Duplication": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 6.9,
+    "edhrec_trend_zscore": -0.7234962336009961,
+    "edhrec_synergy": 0.05
+  },
+  "Silence": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 6.5,
+    "edhrec_trend_zscore": -0.6087383592360951,
+    "edhrec_synergy": 0.01
+  },
+  "Restoration Magic": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 6.0,
+    "edhrec_trend_zscore": -0.2840755105372699,
+    "edhrec_synergy": -0.04
+  },
+  "Red Elemental Blast": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 5.7,
+    "edhrec_trend_zscore": -0.5276429621130408,
+    "edhrec_synergy": 0.01
+  },
+  "Explosive Welcome": {
+    "edhrec_section": "instants",
+    "edhrec_inclusion_pct": 5.7,
+    "edhrec_trend_zscore": -0.5251133447420954,
+    "edhrec_synergy": 0.06
+  },
+  "Insurrection": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 45.2,
+    "edhrec_trend_zscore": 0.03318275194413069,
+    "edhrec_synergy": 0.42,
+    "oracle": "Untap all creatures and gain control of them until end of turn. They gain haste until end of turn.",
+    "cmc": 8.0,
+    "type": "Sorcery",
+    "mana_cost": "{5}{R}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Emeria's Call": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 43.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.41
+  },
+  "Soulfire Eruption": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 42.4,
+    "edhrec_trend_zscore": 0.3502954251994404,
+    "edhrec_synergy": 0.41,
+    "oracle": "Choose any number of target creatures, planeswalkers, and/or players. For each of them, exile the top card of your library, then Soulfire Eruption deals damage equal to that card's mana value to that permanent or player. You may play the exiled cards until the end of your next turn.",
+    "cmc": 9.0,
+    "type": "Sorcery",
+    "mana_cost": "{6}{R}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Blasphemous Act": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 40.4,
+    "edhrec_trend_zscore": 0.08851469820072584,
+    "edhrec_synergy": 0.08,
+    "oracle": "This spell costs {1} less to cast for each creature on the battlefield.\nBlasphemous Act deals 13 damage to each creature.",
+    "cmc": 9.0,
+    "type": "Sorcery",
+    "mana_cost": "{8}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Reforge the Soul": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 37.8,
+    "edhrec_trend_zscore": 0.34945740703355693,
+    "edhrec_synergy": 0.35
+  },
+  "Taunt from the Rampart": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 35.2,
+    "edhrec_trend_zscore": 0.1860369094221833,
+    "edhrec_synergy": 0.28
+  },
+  "Austere Command": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 33.3,
+    "edhrec_trend_zscore": -0.16425222276088797,
+    "edhrec_synergy": 0.17
+  },
+  "Invincible Hymn": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 30.3,
+    "edhrec_trend_zscore": 0.2916781148692694,
+    "edhrec_synergy": 0.3
+  },
+  "Faithless Looting": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 29.7,
+    "edhrec_trend_zscore": 0.4561393978108253,
+    "edhrec_synergy": 0.12
+  },
+  "Creative Technique": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 26.3,
+    "edhrec_trend_zscore": 0.4725251859567166,
+    "edhrec_synergy": 0.25
+  },
+  "Mana Geyser": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 26.1,
+    "edhrec_trend_zscore": -0.22028810302645704,
+    "edhrec_synergy": 0.22
+  },
+  "Promise of Loyalty": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 24.5,
+    "edhrec_trend_zscore": 0.8748751615476075,
+    "edhrec_synergy": 0.2
+  },
+  "Reckless Endeavor": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 22.2,
+    "edhrec_trend_zscore": -0.5406060340600561,
+    "edhrec_synergy": 0.21
+  },
+  "Deploy to the Front": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 20.4,
+    "edhrec_trend_zscore": 0.1839203351763856,
+    "edhrec_synergy": 0.19
+  },
+  "Surge to Victory": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 19.5,
+    "edhrec_trend_zscore": 0.5274641264581785,
+    "edhrec_synergy": 0.18
+  },
+  "Reverse the Sands": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 18.9,
+    "edhrec_trend_zscore": 0.029119832253168918,
+    "edhrec_synergy": 0.18
+  },
+  "Seize the Spoils": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 16.7,
+    "edhrec_trend_zscore": 1.2283903847154805,
+    "edhrec_synergy": 0.12
+  },
+  "Borrowed Knowledge": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 12.9,
+    "edhrec_trend_zscore": 3.619418865477764,
+    "edhrec_synergy": 0.11
+  },
+  "Fated Clash": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 15.6,
+    "edhrec_trend_zscore": -0.19060539122502088,
+    "edhrec_synergy": 0.15
+  },
+  "Explosive Singularity": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 15.5,
+    "edhrec_trend_zscore": -0.22064450153039925,
+    "edhrec_synergy": 0.15
+  },
+  "Furygale Flocking": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 12.2,
+    "edhrec_trend_zscore": 2.203688253480128,
+    "edhrec_synergy": 0.13
+  },
+  "Prisoner's Dilemma": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 14.5,
+    "edhrec_trend_zscore": -0.5259167442139383,
+    "edhrec_synergy": 0.13
+  },
+  "Avatar's Wrath": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 13.9,
+    "edhrec_trend_zscore": -0.38018302958483935,
+    "edhrec_synergy": 0.11
+  },
+  "Pirate's Pillage": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 13.2,
+    "edhrec_trend_zscore": -0.2864756100812524,
+    "edhrec_synergy": 0.11
+  },
+  "Starfall Invocation": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 13.1,
+    "edhrec_trend_zscore": 0.2894386135662485,
+    "edhrec_synergy": 0.11
+  },
+  "Ultima": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 11.1,
+    "edhrec_trend_zscore": -0.3101615019258278,
+    "edhrec_synergy": 0.1
+  },
+  "Sevinne's Reclamation": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 10.6,
+    "edhrec_trend_zscore": -0.11404925825546335,
+    "edhrec_synergy": -0.03
+  },
+  "Will of the Jeskai": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 10.5,
+    "edhrec_trend_zscore": -0.19433545548981881,
+    "edhrec_synergy": 0.09
+  },
+  "Wheel of Fortune": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 10.5,
+    "edhrec_trend_zscore": -0.5889396500461999,
+    "edhrec_synergy": 0.08
+  },
+  "Disrupt Decorum": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 10.1,
+    "edhrec_trend_zscore": -0.34689826107234906,
+    "edhrec_synergy": 0.05
+  },
+  "Season of the Bold": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 9.9,
+    "edhrec_trend_zscore": -0.1768792667480534,
+    "edhrec_synergy": 0.09
+  },
+  "Cut a Deal": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 9.8,
+    "edhrec_trend_zscore": -0.21138797945210322,
+    "edhrec_synergy": 0.03
+  },
+  "Chandra's Ignition": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 9.8,
+    "edhrec_trend_zscore": -0.4118717935025286,
+    "edhrec_synergy": 0.05
+  },
+  "Inspired Tinkering": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 9.7,
+    "edhrec_trend_zscore": -0.6186823270757419,
+    "edhrec_synergy": 0.08
+  },
+  "Pursue the Past": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 6.8,
+    "edhrec_trend_zscore": 2.185621668838284,
+    "edhrec_synergy": 0.01
+  },
+  "Single Combat": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 8.7,
+    "edhrec_trend_zscore": -0.0651418633125807,
+    "edhrec_synergy": 0.05
+  },
+  "Vandalblast": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 8.4,
+    "edhrec_trend_zscore": -0.7568682727642077,
+    "edhrec_synergy": -0.07
+  },
+  "Heroes Remembered": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 8.1,
+    "edhrec_trend_zscore": -0.7845122716845088,
+    "edhrec_synergy": 0.08
+  },
+  "Sundering Eruption": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 7.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.02
+  },
+  "Secret Rendezvous": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 7.3,
+    "edhrec_trend_zscore": -0.4493287760764362,
+    "edhrec_synergy": 0.02
+  },
+  "Ondu Inversion": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 7.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Worldfire": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 7.3,
+    "edhrec_trend_zscore": -0.31470966131551015,
+    "edhrec_synergy": 0.07
+  },
+  "Wheel of Misfortune": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 7.2,
+    "edhrec_trend_zscore": -0.25755172980948815,
+    "edhrec_synergy": 0.05
+  },
+  "Mass Calcify": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 7.2,
+    "edhrec_trend_zscore": -0.2685810342389593,
+    "edhrec_synergy": 0.07
+  },
+  "Ensnared by the Mara": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 7.1,
+    "edhrec_trend_zscore": -0.20809165938205873,
+    "edhrec_synergy": 0.06
+  },
+  "Terminus": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 6.8,
+    "edhrec_trend_zscore": -0.4843647773202432,
+    "edhrec_synergy": 0.06
+  },
+  "Profound Journey": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 6.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.06
+  },
+  "Reconstruct History": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 6.5,
+    "edhrec_trend_zscore": -0.4446953611553613,
+    "edhrec_synergy": 0.03
+  },
+  "Invoke Justice": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 6.4,
+    "edhrec_trend_zscore": -0.3154849098920104,
+    "edhrec_synergy": 0.06
+  },
+  "Into the Time Vortex": {
+    "edhrec_section": "sorceries",
+    "edhrec_inclusion_pct": 6.4,
+    "edhrec_trend_zscore": -0.5046752436151443,
+    "edhrec_synergy": 0.06
+  },
+  "Lightning Greaves": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 45.2,
+    "edhrec_trend_zscore": 0.8627058745306583,
+    "edhrec_synergy": 0.17
+  },
+  "Ruby Medallion": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 42.3,
+    "edhrec_trend_zscore": -0.3720978916704855,
+    "edhrec_synergy": 0.37
+  },
+  "Primal Amulet": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 30.3,
+    "edhrec_trend_zscore": -0.2875372144960592,
+    "edhrec_synergy": 0.29
+  },
+  "Swiftfoot Boots": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 25.4,
+    "edhrec_trend_zscore": -0.02787325097465467,
+    "edhrec_synergy": -0.17
+  },
+  "Pearl Medallion": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 25.2,
+    "edhrec_trend_zscore": -0.4576320868437966,
+    "edhrec_synergy": 0.19
+  },
+  "Brainstone": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 18.3,
+    "edhrec_trend_zscore": -0.31136647667296224,
+    "edhrec_synergy": 0.18
+  },
+  "Planetarium of Wan Shi Tong": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 17.6,
+    "edhrec_trend_zscore": 0.2153348172052873,
+    "edhrec_synergy": 0.16
+  },
+  "Archaeomancer's Map": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 17.4,
+    "edhrec_trend_zscore": 0.28743082712230233,
+    "edhrec_synergy": 0.09
+  },
+  "Palant\u00edr of Orthanc": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 16.4,
+    "edhrec_trend_zscore": -0.2223407524617273,
+    "edhrec_synergy": 0.15
+  },
+  "Semblance Anvil": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 13.7,
+    "edhrec_trend_zscore": -0.2948158045761163,
+    "edhrec_synergy": 0.13
+  },
+  "Crystal Ball": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 10.4,
+    "edhrec_trend_zscore": -0.14121489621513672,
+    "edhrec_synergy": 0.1
+  },
+  "Currency Converter": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 9.5,
+    "edhrec_trend_zscore": 0.004204054511514116,
+    "edhrec_synergy": 0.07
+  },
+  "Helm of Awakening": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 9.2,
+    "edhrec_trend_zscore": -0.6528602338894536,
+    "edhrec_synergy": 0.08
+  },
+  "Cloud Key": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 7.9,
+    "edhrec_trend_zscore": -0.6984415295854557,
+    "edhrec_synergy": 0.06
+  },
+  "Mystic Forge": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 7.7,
+    "edhrec_trend_zscore": -0.46250863407009857,
+    "edhrec_synergy": 0.03
+  },
+  "Wayfarer's Bauble": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 6.9,
+    "edhrec_trend_zscore": -0.2874083744660199,
+    "edhrec_synergy": -0.03
+  },
+  "Mithril Coat": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 6.2,
+    "edhrec_trend_zscore": -0.5570242349487808,
+    "edhrec_synergy": -0.04
+  },
+  "Unwinding Clock": {
+    "edhrec_section": "utilityartifacts",
+    "edhrec_inclusion_pct": 5.1,
+    "edhrec_trend_zscore": -0.37845637973508833,
+    "edhrec_synergy": 0.03
+  },
+  "Double Vision": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 46.5,
+    "edhrec_trend_zscore": 0.16486000412747687,
+    "edhrec_synergy": 0.44,
+    "oracle": "Whenever you cast your first instant or sorcery spell each turn, copy that spell. You may choose new targets for the copy.",
+    "cmc": 5.0,
+    "type": "Enchantment",
+    "mana_cost": "{3}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Arcane Bombardment": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 42.4,
+    "edhrec_trend_zscore": 0.1023380182128032,
+    "edhrec_synergy": 0.41,
+    "oracle": "Whenever you cast your first instant or sorcery spell each turn, exile an instant or sorcery card at random from your graveyard. Then copy each card exiled with this enchantment. You may cast any number of the copies without paying their mana costs.",
+    "cmc": 6.0,
+    "type": "Enchantment",
+    "mana_cost": "{4}{R}{R}",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ]
+  },
+  "Penance": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 41.7,
+    "edhrec_trend_zscore": 1.1546468343180245,
+    "edhrec_synergy": 0.41,
+    "oracle": "Put a card from your hand on top of your library: The next time a black or red source of your choice would deal damage this turn, prevent that damage.",
+    "cmc": 3.0,
+    "type": "Enchantment",
+    "mana_cost": "{2}{W}",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ]
+  },
+  "Land Tax": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 31.5,
+    "edhrec_trend_zscore": 0.8056044929172058,
+    "edhrec_synergy": 0.2
+  },
+  "Rite of the Dragoncaller": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 23.3,
+    "edhrec_trend_zscore": -0.20484681286659376,
+    "edhrec_synergy": 0.22
+  },
+  "Artist's Talent": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 21.0,
+    "edhrec_trend_zscore": -0.716798178881508,
+    "edhrec_synergy": 0.19
+  },
+  "Hidden Retreat": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 17.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.17
+  },
+  "Cool but Rude": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 16.5,
+    "edhrec_trend_zscore": 0.8243708990332587,
+    "edhrec_synergy": 0.14
+  },
+  "Ghostly Prison": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 15.2,
+    "edhrec_trend_zscore": -0.3792007370417215,
+    "edhrec_synergy": 0.06
+  },
+  "Sunbird's Invocation": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 13.6,
+    "edhrec_trend_zscore": -0.13917604544566325,
+    "edhrec_synergy": 0.13
+  },
+  "Trouble in Pairs": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 10.5,
+    "edhrec_trend_zscore": -0.4267613093514976,
+    "edhrec_synergy": 0.02
+  },
+  "Monologue Tax": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 8.4,
+    "edhrec_trend_zscore": -0.02591183793329314,
+    "edhrec_synergy": 0.04
+  },
+  "Powerbalance": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 8.2,
+    "edhrec_trend_zscore": -0.25916936201526,
+    "edhrec_synergy": 0.07
+  },
+  "Fiery Inscription": {
+    "edhrec_section": "enchantments",
+    "edhrec_inclusion_pct": 5.6,
+    "edhrec_trend_zscore": -0.40466681770371055,
+    "edhrec_synergy": 0.03
+  },
+  "Chandra, Hope's Beacon": {
+    "edhrec_section": "planeswalkers",
+    "edhrec_inclusion_pct": 15.0,
+    "edhrec_trend_zscore": -0.6215726491113965,
+    "edhrec_synergy": 0.14
+  },
+  "Reliquary Tower": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 34.2,
+    "edhrec_trend_zscore": -0.002716285264871856,
+    "edhrec_synergy": 0.15
+  },
+  "Urza's Saga": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 26.7,
+    "edhrec_trend_zscore": -0.33263781114913765,
+    "edhrec_synergy": 0.17
+  },
+  "Command Beacon": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 20.4,
+    "edhrec_trend_zscore": -0.22264204669996762,
+    "edhrec_synergy": 0.15
+  },
+  "Boseiju, Who Shelters All": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 13.2,
+    "edhrec_trend_zscore": -0.5917877958553415,
+    "edhrec_synergy": 0.13
+  },
+  "War Room": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 11.3,
+    "edhrec_trend_zscore": -0.5550461377884095,
+    "edhrec_synergy": 0.02
+  },
+  "Zhalfirin Void": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 10.0,
+    "edhrec_trend_zscore": -0.13758268236629778,
+    "edhrec_synergy": 0.1
+  },
+  "Eiganjo, Seat of the Empire": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 10.0,
+    "edhrec_trend_zscore": -0.44144642065007733,
+    "edhrec_synergy": -0.03
+  },
+  "Lindblum, Industrial Regency": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 9.1,
+    "edhrec_trend_zscore": -0.3131070534265151,
+    "edhrec_synergy": 0.07
+  },
+  "Temple of the False God": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 8.9,
+    "edhrec_trend_zscore": -0.2511734708731417,
+    "edhrec_synergy": 0.0
+  },
+  "Emergence Zone": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 5.7,
+    "edhrec_trend_zscore": -0.5136052935147889,
+    "edhrec_synergy": 0.05
+  },
+  "Spinerock Knoll": {
+    "edhrec_section": "utilitylands",
+    "edhrec_inclusion_pct": 5.2,
+    "edhrec_trend_zscore": -0.5719069596775274,
+    "edhrec_synergy": 0.01
+  },
+  "Sol Ring": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 90.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.06,
+    "oracle": "{T}: Add {C}{C}.",
+    "cmc": 1.0,
+    "type": "Artifact",
+    "mana_cost": "{1}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Arcane Signet": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 88.1,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.08,
+    "oracle": "{T}: Add one mana of any color in your commander's color identity.",
+    "cmc": 2.0,
+    "type": "Artifact",
+    "mana_cost": "{2}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Bender's Waterskin": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 71.1,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.65,
+    "oracle": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+    "cmc": 3.0,
+    "type": "Artifact",
+    "mana_cost": "{3}",
+    "colors": [],
+    "color_identity": []
+  },
+  "Talisman of Conviction": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 64.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.13,
+    "oracle": "{T}: Add {C}.\n{T}: Add {R} or {W}. This artifact deals 1 damage to you.",
+    "cmc": 2.0,
+    "type": "Artifact",
+    "mana_cost": "{2}",
+    "colors": [],
+    "color_identity": [
+      "R",
+      "W"
+    ]
+  },
+  "Victory Chimes": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 53.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.52
+  },
+  "Boros Signet": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 50.2,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.0
+  },
+  "Fellwar Stone": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 34.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.09
+  },
+  "Mind Stone": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 22.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.02
+  },
+  "Thought Vessel": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 18.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Pyromancer's Goggles": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 15.9,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.14
+  },
+  "Thran Dynamo": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 7.9,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.03
+  },
+  "Worn Powerstone": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 7.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Commander's Sphere": {
+    "edhrec_section": "manaartifacts",
+    "edhrec_inclusion_pct": 6.2,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.08
+  },
+  "Mountain": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 98.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.01
+  },
+  "Plains": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 97.9,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.0
+  },
+  "Command Tower": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 88.2,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.02,
+    "oracle": "{T}: Add one mana of any color in your commander's color identity.",
+    "cmc": 0.0,
+    "type": "Land",
+    "mana_cost": "",
+    "colors": [],
+    "color_identity": []
+  },
+  "Clifftop Retreat": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 75.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.09,
+    "oracle": "This land enters tapped unless you control a Mountain or a Plains.\n{T}: Add {R} or {W}.",
+    "cmc": 0.0,
+    "type": "Land",
+    "mana_cost": "",
+    "colors": [],
+    "color_identity": [
+      "R",
+      "W"
+    ]
+  },
+  "Sacred Foundry": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 67.0,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.2,
+    "oracle": "({T}: Add {R} or {W}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+    "cmc": 0.0,
+    "type": "Land \u2014 Mountain Plains",
+    "mana_cost": "",
+    "colors": [],
+    "color_identity": [
+      "R",
+      "W"
+    ]
+  },
+  "Battlefield Forge": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 63.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.06,
+    "oracle": "{T}: Add {C}.\n{T}: Add {R} or {W}. This land deals 1 damage to you.",
+    "cmc": 0.0,
+    "type": "Land",
+    "mana_cost": "",
+    "colors": [],
+    "color_identity": [
+      "R",
+      "W"
+    ]
+  },
+  "Sundown Pass": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 60.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.23,
+    "oracle": "This land enters tapped unless you control two or more other lands.\n{T}: Add {R} or {W}.",
+    "cmc": 0.0,
+    "type": "Land",
+    "mana_cost": "",
+    "colors": [],
+    "color_identity": [
+      "R",
+      "W"
+    ]
+  },
+  "Spectator Seating": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 53.1,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.14
+  },
+  "Rugged Prairie": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 52.1,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.08
+  },
+  "Elegant Parlor": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 47.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.28
+  },
+  "Radiant Summit": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 46.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.24
+  },
+  "Arid Mesa": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 45.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.16
+  },
+  "Sunbillow Verge": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 44.9,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.21
+  },
+  "Temple of Triumph": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 44.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.07
+  },
+  "Furycalm Snarl": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 39.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.05
+  },
+  "Exotic Orchard": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 31.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.02
+  },
+  "Needleverge Pathway": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 30.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Boros Garrison": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 25.0,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.12
+  },
+  "Sunscorched Divide": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 21.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.0
+  },
+  "Sunbaked Canyon": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 21.0,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.04
+  },
+  "Fabled Passage": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 19.2,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.08
+  },
+  "Plateau": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 18.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.06
+  },
+  "Glittering Massif": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 13.8,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Bloodstained Mire": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 13.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.07
+  },
+  "Inspiring Vantage": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 12.2,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.04
+  },
+  "Myriad Landscape": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 11.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.07
+  },
+  "Marsh Flats": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 11.1,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Wooded Foothills": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 10.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Windswept Heath": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 10.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.04
+  },
+  "Scalding Tarn": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 9.8,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Flooded Strand": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 9.7,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.03
+  },
+  "Evolving Wilds": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 9.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.09
+  },
+  "Fields of Strife": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 7.6,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.02
+  },
+  "Terramorphic Expanse": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 9.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.04
+  },
+  "Lorehold Campus": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 9.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "Prismatic Vista": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 8.9,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.03
+  },
+  "Path of Ancestry": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 7.8,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.08
+  },
+  "Plaza of Heroes": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 6.4,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.02
+  },
+  "Sacred Peaks": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 5.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": -0.06
+  },
+  "Conduit Pylons": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 5.5,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.05
+  },
+  "City of Brass": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 5.3,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.01
+  },
+  "Gemstone Caverns": {
+    "edhrec_section": "lands",
+    "edhrec_inclusion_pct": 5.1,
+    "edhrec_trend_zscore": 0.0,
+    "edhrec_synergy": 0.01
+  }
+}
