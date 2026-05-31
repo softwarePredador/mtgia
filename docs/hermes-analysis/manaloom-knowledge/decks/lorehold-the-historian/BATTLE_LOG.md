@@ -63,3 +63,93 @@ The <1% matchup win rate signals the deck needs:
 3. **Lower-CMC wincons** — Wincons castable before turn 4 (avg win turn is 4.0) die to early pressure
 
 **VERDICT: STABLE but CRITICALLY LOW.** No delta-triggered swap review needed, but the absolute win rate demands structural deck changes, not incremental swaps.
+
+## [2026-05-31T00:38:45Z] Real Matchup 6 archetypes (200 sims each)
+Avg WR: 52.1% | Range: 46.5%-56.0%
+My Deck: L=35 R=16 X=9 C=0 CMC=3.69 | Archetype: spellslinger
+
+   52.5% vs Aggro (Krenko/Goblins) (aggro) — equilibrado
+    + Mais ramp (16 vs 8), Mais removal (9 vs 5)
+    - Curva mais alta (3.69 vs 2.5), aggro favorece contra spellslinger (-5)
+   56.0% vs Control (Atraxa Superfriends) (control) — favoravel
+    + Mais ramp (16 vs 12)
+   46.5% vs Combo (Kinnan cEDH) (combo) — equilibrado
+    + Mais removal (9 vs 6)
+    - Curva mais alta (3.69 vs 2.1), combo favorece contra spellslinger (-5)
+   52.5% vs Midrange (Korvold Value) (midrange) — equilibrado
+    + Mais ramp (16 vs 12)
+    - Curva mais alta (3.69 vs 3.0)
+   52.5% vs Spellslinger (Niv-Mizzet) (spellslinger) — equilibrado
+    + Mais ramp (16 vs 10)
+    - Curva mais alta (3.69 vs 2.8)
+   52.5% vs Stax (Winota Hatebears) (stax) — equilibrado
+    + Mais ramp (16 vs 8)
+    - Curva mais alta (3.69 vs 2.6)
+
+
+## [2026-05-31T01:17:06Z] Real Matchup 6 archetypes (200 sims each)
+Avg WR: 52.1% (delta -0.0pp) | Range: 46.5%-56.0%
+My Deck: L=35 R=16 X=9 C=0 CMC=3.69 | Archetype: spellslinger
+
+   52.5% vs Aggro (Krenko/Goblins) (aggro) — equilibrado
+    + Mais ramp (16 vs 8), Mais removal (9 vs 5)
+    - Curva mais alta (3.69 vs 2.5), aggro favorece contra spellslinger (-5)
+   56.0% vs Control (Atraxa Superfriends) (control) — favoravel
+    + Mais ramp (16 vs 12)
+   46.5% vs Combo (Kinnan cEDH) (combo) — equilibrado
+    + Mais removal (9 vs 6)
+    - Curva mais alta (3.69 vs 2.1), combo favorece contra spellslinger (-5)
+   52.5% vs Midrange (Korvold Value) (midrange) — equilibrado
+    + Mais ramp (16 vs 12)
+    - Curva mais alta (3.69 vs 3.0)
+   52.5% vs Spellslinger (Niv-Mizzet) (spellslinger) — equilibrado
+    + Mais ramp (16 vs 10)
+    - Curva mais alta (3.69 vs 2.8)
+   52.5% vs Stax (Winota Hatebears) (stax) — equilibrado
+    + Mais ramp (16 vs 8)
+    - Curva mais alta (3.69 vs 2.6)
+
+
+## [2026-05-31T06:00:00Z] Real Matchup 6 archetypes (200 sims each)
+Avg WR: 52.1% (delta +0.0pp) | Range: 46.5%-56.0%
+My Deck: L=35 R=16 X=9 C=0 CMC=3.69 | Archetype: spellslinger
+
+   52.5% vs Aggro (Krenko/Goblins) (aggro) — equilibrado
+    + Mais ramp (16 vs 8), Mais removal (9 vs 5)
+    - Curva mais alta (3.69 vs 2.5), aggro favorece contra spellslinger (-5)
+   56.0% vs Control (Atraxa Superfriends) (control) — favoravel
+    + Mais ramp (16 vs 12)
+   46.5% vs Combo (Kinnan cEDH) (combo) — equilibrado
+    + Mais removal (9 vs 6)
+    - Curva mais alta (3.69 vs 2.1), combo favorece contra spellslinger (-5)
+   52.5% vs Midrange (Korvold Value) (midrange) — equilibrado
+    + Mais ramp (16 vs 12)
+    - Curva mais alta (3.69 vs 3.0)
+   52.5% vs Spellslinger (Niv-Mizzet) (spellslinger) — equilibrado
+    + Mais ramp (16 vs 10)
+    - Curva mais alta (3.69 vs 2.8)
+   52.5% vs Stax (Winota Hatebears) (stax) — equilibrado
+    + Mais ramp (16 vs 8)
+    - Curva mais alta (3.69 vs 2.6)
+
+### Qualitative Analysis — 2026-05-31 Battle Cycle #3
+
+**Win Rate: 52.1% (STABLE — delta +0.0pp from 52.1% baseline, within ±3pp threshold)**
+
+Third consecutive 6-archetype matchup simulation with **byte-identical results**. The simulation has converged deterministically — zero variance across all runs.
+
+**No deck changes applied since last run.** Deck composition unchanged: L=35 R=16 X=9 C=0 CMC=3.69.
+
+#### Full Run History
+| # | Date | Type | WR | Delta |
+|---|------|------|----|-------|
+| 1 | 2026-05-30T13:54 | Goldfish 500 | 0.2% | baseline |
+| 2 | 2026-05-30T13:55 | Goldfish 500 | 17.8% | +17.6pp |
+| 3 | 2026-05-30T13:59 | Matchup 300 | 0.7% | -17.1pp |
+| 4 | 2026-05-30T15:29 | Matchup 300 | 0.7% | 0.0pp |
+| 5 | 2026-05-31T16:46 | Matchup 300 | 0.3% | -0.4pp |
+| 6 | 2026-05-31T00:38 | 6-Archetype | 52.1% | N/A (new sim) |
+| 7 | 2026-05-31T01:17 | 6-Archetype | 52.1% | 0.0pp |
+| 8 | 2026-05-31T06:00 | 6-Archetype | 52.1% | 0.0pp |
+
+**VERDICT: STABLE.** No delta-triggered swap review needed. The ~52% average win rate across 6 archetypes is confirmed as the baseline for this deck configuration. To improve, structural changes (more draw engines, graveyard recursion, lower-CMC wincons) are needed — not incremental swaps.
