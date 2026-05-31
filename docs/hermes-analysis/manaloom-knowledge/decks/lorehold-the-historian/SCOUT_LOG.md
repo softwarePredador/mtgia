@@ -1,3 +1,201 @@
+## [2026-05-31] Execução #14 — Post-Ciclo #5 Deep Analysis + Ciclo #6 Prep
+
+> **Data:** 2026-05-31
+> **Fonte EDHREC:** 7.802 decks (JSON API, 2026-05-31)
+> **Deck state:** Pós-Ciclo #5 (19 swaps applied since baseline)
+> **Analista:** Hermes Agent — Lorehold Deep Scout
+
+### Contexto
+
+O EDHREC data é **numericamente idênticu à Execução #13** (mesmo snapshot de 7.802 decks,
+todas as mudanças ≤0.2pp). Seguindo a regra do skill: quando dados são idênticos,
+**mudar para análise qualitativa** — não re-reportar números.
+
+Foco desta rodada: **Entender o estado pós-Ciclo #5 e preparar recomendações defensivas
+para Ciclo #6**, com base nas tendências, gaps, e evolução do meta.
+
+---
+
+### ESTADO ATUAL DO DECK (Pós-Ciclo #5, Confirmado)
+
+#### Métricas vs Perfil EDHREC
+
+| Métrica | Deck | Perfil EDHREC | Status |
+|:--------|:----:|:-------------:|:------:|
+| Lands | 35 | 36-38 | 🟡 -1 (compensado por MDFCs) |
+| Ramp | 16 | 10-13 | 🟡 +3 (treasure-heavy) |
+| Draw (real single-tag) | 6 | 8-12 | 🔴 -2 do mínimo |
+| Removal | 4 | 4-6 | 🟢 No range |
+| Board Wipe | 5 | 3-5 | 🟡 No limite superior |
+| Protection | 4 | 3-4 | 🟢 No range |
+| Recursion | 4 | 2-5 | 🟢 No range |
+| Wincon dedicado | 1 | 4-7 | 🔴 Muito abaixo (só Approach) |
+| Engine/Big Spell | 4 | 5-8 | 🟡 Abaixo |
+| Tutor | 3 | — | 🟢 Adequado |
+| CMC médio | ~3.96 | ~4.1 | 🟢 Melhor que o meta |
+
+#### Simulação Pós-Ciclo #5 (Execução #9, seed=42, N=1000)
+
+| Métrica | Pós-C#4 | Pós-C#5 | Δ | Status |
+|:--------|:--------:|:-------:|:-:|:------:|
+| Jogáveis (rigoroso) | 47.9% | 48.0% | +0.1pp | 🟡 |
+| Mulligan | 52.1% | 52.0% | -0.1pp | 🟡 |
+| Ramp T1 (estrita) | 20.9% | 21.2% | +0.3pp | 🟢 |
+| **Sem Play T3** | **13.0%** | **15.3%** | **+2.3pp** | 🔴 |
+
+**Estratégia Ciclo #6: DEFENSIVA** (Sem Play T3 > 12%, net ΔCMC alvo: -5 a -10)
+
+---
+
+### ANÁLISE QUALITATIVA
+
+#### 1. Faithless Looting: Tendência Revertida (+0.44)
+
+Faithless Looting agora mostra **trend_zscore +0.44** (29.7% EDHREC). Em análises anteriores,
+não tinha tendência reportada. Sinal positivo: a comunidade está redescobrindo
+o valor do looting em Lorehold (setup de Miracle + filtragem de mão).
+
+**Implicação para Ciclo #6:** Faithless Looting é um swap defensivo ideal (CMC 2, draw+GY setup).
+Alinha com a estratégia DEFENSIVA (reduz CMC efetivo, aumenta draw real).
+
+#### 2. Farewell: Declínio Acelerado (-0.95, 17.5% EDHREC)
+
+Farewell é o **card com pior tendência de todo o meta Lorehold** (trend -0.95). Está na seção
+de Game Changers mas caindo rápido. A comunidade está percebendo que é lento demais.
+
+**Implicação:** Se Farewell for considerado no futuro, NÃO priorize. Prefira
+board wipes com tendência estável ou positiva (Blasphemous Act +0.08, Volcanic Vision +1.20).
+
+#### 3. Volcanic Vision: Tendência Fortemente Positiva (+1.20)
+
+Volcanic Vision (63.9% EDHREC, trend +1.20) está subindo no meta. É um board wipe que
+também funciona como spell grande para copiar. Já está no deck — **manter sem dúvida**.
+
+#### 4. Goliath Daydreamer: Rising Star Escondida (+1.13, 33.4%)
+
+Goliath Daydreamer (33.4% EDHREC, trend +1.13) é uma criatura que não aparecia em análises
+anteriores. Está na coleção e não no deck. É um 3/3 voar por CMC 3 que gera valor com
+spells. Não é prioridade (trend +1.13 é moderado), mas é uma opção para Ciclo #6.
+
+#### 5. Pearly Medallion e Ruby Medallion: Declínio Continuado
+
+Ambas Medallions continuam caindo: Pearl -0.46 (25.2%), Ruby -0.37 (42.3%). O meta está
+abandonando cost reduction em favor de treasure generation. Pearl é o mais cortável.
+
+#### 6. Esper Sentinel: Declínio Confirmado (-0.54, 32.5%)
+
+Esper Sentinel (32.5%, trend -0.54) é um draw condicional que está caindo no meta.
+Em Lorehold, draw que requer ataque é inferior a draw passivo ou looting.
+
+---
+
+### GAPS CRÍTICOS PARA CICLO #6
+
+#### Gap 1: Draw Real = 6 (perfil quer 8-12) — Maior Problema
+
+O deck tem apenas 6 fontes de draw real (single-tag). O perfil EDHREC pede 8-12.
+Este é o **maior gap estrutural** do deck e contribui diretamente para o Sem Play T3 alto.
+
+**Cartas de draw na coleção que poderiam entrar:**
+- Faithless Looting (29.7%, trend +0.44) — CMC 2, draw 2 + GY setup para Miracle
+- Soulfire Eruption (42.5%, trend +0.33) — CMC 4, mas também removal
+
+#### Gap 2: Wincon Dedicado = 1 (perfil quer 4-7)
+
+Além de Approach of the Second Sun, o deck não tem wincons dedicados. Storm Herd (75.1%)
+é um wincon indireto. **Apex of Power (55.0%, trend +0.11)** na coleção é um wincon
+natural para Lorehold.
+
+#### Gap 3: Sem Play T3 = 15.3% (precisa reduzir para <12%)
+
+Com T3 em 15.3%, o deck precisa de **estratégia DEFENSIVA** com net ΔCMC de -5 a -10.
+Cada -1 CMC líquido reduz T3 em ~2pp. Precisam de -5 a -10 para chegar a 10-13%.
+
+---
+
+### SWAP RECOMENDADOS PARA CICLO #6 (DEFENSIVO)
+
+**Estratégia:** net ΔCMC -5 a -10, priorizando draw e cartas CMC ≤2.
+
+**Swap Set Recomendado (3 swaps, net ΔCMC = -5):**
+
+| # | Sai | Entra | ΔCMC | Razão |
+|:-:|:----|:------|:----:|:------|
+| 1 | **Goldspan Dragon** (CMC 5, 0% EDHREC) | **Faithless Looting** (CMC 2, trend +0.44) | -3 | Goldspan não está em nenhum deck EDHREC. Looting é draw real + GY setup para Miracle. |
+| 2 | **Galvanoth** (CMC 5, baixo impacto) | **Goliath Daydreamer** (CMC 3, trend +1.13) | -2 | Galvanoth é topdeck conditional. Daydreamer é rising star na coleção. |
+| 3 | **Seething Song** (CMC 3, trend -0.49) | **Invoke Calamity** (CMC 3, trend +0.11) | 0 | Seething em declínio. Invoke é instant-speed GY cast na coleção. |
+
+**Net ΔCMC: -5. Esperado ΔT3: -2 a -4pp (para ~11-13%).**
+
+**Alternativa com Pearl Medallion (mais agressiva defensivamente):**
+
+| # | Sai | Entra | ΔCMC | Razão |
+|:-:|:----|:------|:----:|:------|
+| 1 | **Pearl Medallion** (CMC 2, trend -0.46) | **Faithless Looting** (CMC 2, trend +0.44) | 0 | Pearl é double-null em declínio. Looting é draw real. |
+| 2 | **Goldspan Dragon** (CMC 5) | **Goliath Daydreamer** (CMC 3, trend +1.13) | -2 | Goldspan não está em nenhum deck EDHREC. |
+| 3 | **Galvanoth** (CMC 5) | **Invoke Calamity** (CMC 3) | -2 | Galvanoth é conditional. Invoke é instant-speed. |
+| 4 | **Esper Sentinel** (CMC 1, trend -0.54) | **Thrill of Possibility** (CMC 2, trend +0.01) | +1 | Esper em declínio grave. Thrill é draw 2 instantáneo. |
+
+**Net ΔCMC (alternativa): -3. Mais swaps (4), mas também remove Pearl (double-null) e Esper (declínio).**
+
+---
+
+### DOUBLE-NULL CARDS: Status Atual (7 restantes)
+
+| Carta | CMC | EDHREC% | Trend | Risco | Ação |
+|:------|:---:|:-------:|:-----:|:-----:|:----|
+| Scroll Rack | 2 | 59.7% | +0.48 | 🔴 Crítico | NUNCA cortar — core engine |
+| Penance | 3 | 41.8% | +1.15 | 🔴 Crítico | NUNCA cortar — miracle enabler |
+| Grand Abolisher | 2 | 11.7% | -0.27 | 🟡 Alto | Manter — proteção proativa |
+| Ruby Medallion | 2 | 42.3% | -0.37 | 🟡 Médio | Monitorar — tendência negativa |
+| Pearl Medallion | 2 | 25.2% | -0.46 | 🟡 Médio | **Cortar no Ciclo #6** — declínio + draw é mais importante |
+| Taunt from Rampart | 5 | 35.2% | +0.18 | 🟢 Baixo | Manter — 35.2% EDHREC, tendência positiva |
+| Galadriel's Dismissal | 1 | 0% | N/A | 🟢 Baixo | Monitorar — carta nova, sem dados |
+
+---
+
+### MOTOR LOREHOLD: 4/4 COMPLETO
+
+1. Treasure Ramp: Big Score, Brass's Bounty, Hit the Mother Lode 
+2. Free Big Spell: Dance with Calamity, Improvisation Capstone, Approach 
+3. Lorehold Copy: Commander ability 
+4. Treasure Payoff: Storm-Kiln Artist 
+
+**Copy Engines: 3/3 completos** - Double Vision, Arcane Bombardment, Mizzix's Mastery
+
+---
+
+### LIÇÕES DESTA RODADA
+
+1. **O meta de Lorehold está estável** - 7765 para 7802 decks (+37 decks, +0.5%), nenhuma mudança significativa de tendência. O deck está bem posicionado no meta.
+
+2. **Faithless Looting é a carta defensiva ideal** - trend +0.44, CMC 2, draw real + GY setup. Deve ser prioridade de swap no Ciclo #6.
+
+3. **Pearl Medallion é o elo fraco** - double-null, trend -0.46, 25.2% EDHREC. Cortar para Faithless Looting é o swap defensivo mais limpo.
+
+4. **Farewell está morrendo no meta** - trend -0.95 é o pior de qualquer carta relevante. Nunca priorizar.
+
+5. **O deck precisa de wincons** - 1 wincon dedicado (Approach) vs 4-7 do perfil. Apex of Power (55% EDHREC, na coleção) é o próximo swap agressivo quando T3 melhorar.
+
+6. **Sem Play T3 = 15.3% é o problema central** - cada ciclo defensivo com net ΔCMC -5 reduz ~2pp. Precisam de 2-3 ciclos defensivos para chegar a <10%.
+
+---
+
+### PRÓXIMOS PASSOS
+
+1. **Ciclo #6 DEFENSIVO** - Goldspan Dragon para Faithless Looting (net ΔCMC -3, draw real)
+2. **Ciclo #6 DEFENSIVO** - Galvanoth para Goliath Daydreamer (net ΔCMC -2, rising star)
+3. **Ciclo #6 DEFENSIVO** - Pearl Medallion para Faithless Looting (swap defensivo, draw real)
+4. **Ciclo #7 (se T3 < 12%)** - Ruby Medallion para Apex of Power (swap agressivo)
+5. **Simular mulligan após Ciclo #6** para confirmar T3 < 12%
+
+---
+
+*Atualizado: 2026-05-31. Fonte: EDHREC 7802 decks (JSON API), knowledge.db deck_id=6 pós-Ciclo #5.*
+*Analista: Hermes Agent - Lorehold Deep Scout Execução #14*
+
+---
+
 ## [2026-05-31T12:00:00+00:00] Execução #13 — Deep Meta Scout Pós-Ciclo #4 (Análise Qualitativa + Padrões de Deckbuilding)
 
 ### Contexto
