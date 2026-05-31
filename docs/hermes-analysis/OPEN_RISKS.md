@@ -101,9 +101,9 @@ Status granular:
 
 ### Arquivos criticos continuam grandes
 Validacao em `origin/master` 771c9318 (2026-05-28) confirmou os maiores gargalos
-registrados no Technical Map:
-- `server/routes/ai/optimize/index.dart`: 3495 linhas
-- `server/lib/ai/optimize_runtime_support.dart`: 4197 linhas
+F3 Modularizacao (2026-05-30): optimize_runtime_support.dart extraido em 3 submodulos (filler_loader ~1300, route_internal ~430, response ~144). optimize/index.dart reduzido em 514 linhas. Tamanhos atuais em origin/master 84553ef8:
+- `server/routes/ai/optimize/index.dart`: 3075 linhas (F3 mod: -420)
+- `server/lib/ai/optimize_runtime_support.dart`: 2718 linhas (F3 mod: -1479)
 - `app/lib/features/home/life_counter_screen.dart`: 6400 linhas
 - `app/lib/features/home/lotus/lotus_visual_skin.dart`: 1991 linhas
 - `app/lib/features/decks/providers/deck_provider.dart`: 1226 linhas

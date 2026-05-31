@@ -1,20 +1,19 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-29T20:15Z (E2E logic coherence audit — 3f7d784f guard expanded roles behind flag).
+> Atualizado em 2026-05-31T03:00Z (Incremento: weakness-analysis F1 adapter + manual update — 84553ef8).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `c3531df7` (Cover semantic v2 low confidence fallback)
-- HEAD atual: **`3f7d784f`** (Guard expanded semantic roles behind flag)
-- SHA publicado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
+- HEAD anterior: `3f7d784f` (Guard expanded semantic roles behind flag)
+- HEAD atual: **`84553ef8`** (Document write-only tables + manual-de-instrucao update)
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 
 
-## Novos commits nesta rodada (2026-05-30)
+## Novos commits nesta rodada (2026-05-30 a 2026-05-31)
 
 ### `21768cca` — Layout: add tablet viewport test (820px) to deck_card_overflow_test (2026-05-30, atual HEAD)
 - **1 arquivo**, **+16 linhas**
@@ -514,3 +513,13 @@ BASE_PREVIO=$(git rev-parse origin/codex/hermes-analysis-docs)
 git log --oneline --decorate --stat $BASE_PREVIO..origin/master
 ```
 <!-- commit nonce: 1 -->
+
+### `6fa76bac` — P1-c+d: refactor weakness-analysis to use F1 adapter + add wincon to _criticalRolesForArchetype (2026-05-31)
+- **2 arquivos**, **+34/-101 linhas**
+- **Tipo: REFACTOR/P1** — weakness-analysis substitui ~80 linhas de heuristicas oracle_text por resolveCardFunctionalRoles()
+- _criticalRolesForArchetype agora inclui 'wincon' para todos os arquetipos
+
+### `84553ef8` — P2-c + P3-c: document write-only tables + manual-de-instrucao update (2026-05-31)
+- **1 arquivo**, **+34 linhas**
+- **Tipo: DOC/MANUAL** — Deck_matchups, deck_weakness_reports, ml_prompt_feedback documentados como audit logs
+- manual-de-instrucao.md atualizado com status F1/F3/bracket/weakness-analysis
