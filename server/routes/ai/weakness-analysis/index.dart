@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/ai/optimization_functional_roles.dart';
 
 /// Endpoint para análise de fraquezas do deck
 ///
@@ -105,7 +106,15 @@ Future<Response> onRequest(RequestContext context) async {
 
       final typeLineLower = typeLine.toLowerCase();
 
-      // Contar tipos e categorias
+      // Usar adapter F1 (resolveCardFunctionalRoles) em vez de heuristicas oracle_text
+      final cardRoles = resolveCardFunctionalRoles(
+        oracleText: oracleText,
+        typeLine: typeLine,
+        name: name,
+        manaCost: manaCost,
+        cmc: cmc,
+      );
+
       if (typeLineLower.contains('land')) {
         landCount += quantity;
       } else {
@@ -117,84 +126,13 @@ Future<Response> onRequest(RequestContext context) async {
         creatureCount += quantity;
       }
 
-      // Detectar ramp (expanded: mana dorks, treasure, mana rocks, land ramp)
-      if (oracleText.contains('add {') ||
-          (oracleText.contains('search your library for a') &&
-              oracleText.contains('land')) ||
-          oracleText.contains('put a land card') ||
-          oracleText.contains('create a treasure') ||
-          oracleText.contains('create treasure') ||
-          (typeLineLower.contains('creature') &&
-              oracleText.contains('add') &&
-              oracleText.contains('mana')) ||
-          (typeLineLower.contains('artifact') &&
-              !typeLineLower.contains('creature') &&
-              oracleText.contains('add {') &&
-              cmc <= 3)) {
-        rampCount += quantity;
-      }
-
-      // Detectar card draw (expanded: "look at the top", impulse draw, "reveal...put into hand")
-      if ((oracleText.contains('draw') && oracleText.contains('card')) ||
-          (oracleText.contains('look at the top') &&
-              oracleText.contains('put') &&
-              oracleText.contains('hand')) ||
-          (oracleText.contains('exile') &&
-              oracleText.contains('may play') &&
-              !oracleText.contains('target')) ||
-          (oracleText.contains('exile') &&
-              oracleText.contains('may cast') &&
-              !oracleText.contains('target')) ||
-          (oracleText.contains('reveal') &&
-              oracleText.contains('put') &&
-              oracleText.contains('into your hand'))) {
-        drawCount += quantity;
-      }
-
-      // Detectar removal (expanded: -X/-X, sacrifice, bounce, counter)
-      if (oracleText.contains('destroy target') ||
-          oracleText.contains('exile target') ||
-          (oracleText.contains('deal') &&
-              oracleText.contains('damage to target')) ||
-          (oracleText.contains('target') &&
-              oracleText.contains('gets -') &&
-              oracleText.contains('/-')) ||
-          oracleText.contains('counter target spell') ||
-          (oracleText.contains('target') &&
-              oracleText.contains('owner\'s hand') &&
-              typeLineLower.contains('instant'))) {
-        removalCount += quantity;
-      }
-
-      // Detectar board wipes (expanded: "all creatures get -X/-X", "each creature", "return all")
-      if (oracleText.contains('destroy all') ||
-          oracleText.contains('exile all') ||
-          (oracleText.contains('all creatures get -') &&
-              oracleText.contains('/-')) ||
-          (oracleText.contains('each creature') &&
-              oracleText.contains('damage')) ||
-          (oracleText.contains('return all') &&
-              oracleText.contains('to their owner'))) {
-        boardWipeCount += quantity;
-      }
-
-      // Detectar proteção
-      if (oracleText.contains('hexproof') ||
-          oracleText.contains('indestructible') ||
-          oracleText.contains('protection from') ||
-          oracleText.contains('shroud') ||
-          oracleText.contains('ward') ||
-          oracleText.contains('counter target spell') ||
-          name.toLowerCase().contains('teferi\'s protection') ||
-          name.toLowerCase().contains('heroic intervention')) {
-        protectionCount += quantity;
-      }
-
-      // Detectar interação com cemitério
-      if (oracleText.contains('graveyard') ||
-          (oracleText.contains('return') && oracleText.contains('from'))) {
-        graveyardInteractionCount += quantity;
-      }
+      // Contagem via adapter F1
+      if (cardRoles.contains('ramp') || cardRoles.contains('ritual')) rampCount += quantity;
+      if (cardRoles.contains('draw') || cardRoles.contains('loot')) drawCount += quantity;
+      if (cardRoles.contains('removal')) removalCount += quantity;
+      if (cardRoles.contains('wipe') || cardRoles.contains('board_wipe')) boardWipeCount += quantity;
+      if (cardRoles.contains('protection')) protectionCount += quantity;
+      if (cardRoles.contains('recursion') || cardRoles.contains('graveyard')) graveyardInteractionCount += quantity;
     }
 
     // 3. Detectar arquétipo do deck
@@ -399,24 +337,19 @@ Future<Response> onRequest(RequestContext context) async {
     // Verificar win conditions (cartas que podem fechar o jogo)
     int winConditionCount = 0;
     for (final card in cards) {
-      final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-      final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-      if (oracle.contains('you win the game') ||
-          oracle.contains('each opponent loses') ||
-          oracle.contains('extra turn') ||
-          (oracle.contains('deal') &&
-              oracle.contains('damage to each opponent')) ||
-          (typeLine.contains('creature') &&
-              oracle.contains('whenever') &&
-              oracle.contains('combat damage to a player')) ||
-          (oracle.contains('x') &&
-              oracle.contains('each opponent') &&
-              oracle.contains('loses')) ||
-          (oracle.contains('damage to any target') && oracle.contains('x')) ||
-          oracle.contains('you gain control of target') ||
-          (oracle.contains('create') &&
-              oracle.contains('token') &&
-              oracle.contains('each'))) {
+      final name = (card['name'] as String?) ?? '';
+      final oracle = ((card['oracle_text'] as String?) ?? '');
+      final typeLine = ((card['type_line'] as String?) ?? '');
+      final manaCost = (card['mana_cost'] as String?) ?? '';
+      final cmc = card['cmc'];
+      final roles = resolveCardFunctionalRoles(
+        oracleText: oracle,
+        typeLine: typeLine,
+        name: name,
+        manaCost: manaCost,
+        cmc: cmc,
+      );
+      if (roles.contains('wincon') || roles.contains('combo_piece')) {
         winConditionCount += (card['quantity'] as int);
       }
     }

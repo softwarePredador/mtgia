@@ -445,10 +445,10 @@ List<String> buildOptimizationRejectionReasons({
 
 Set<String> _criticalRolesForArchetype(String archetype) {
   return switch (archetype.trim().toLowerCase()) {
-    'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe'},
-    'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection'},
-    'midrange' => {'removal', 'ramp', 'draw', 'wipe'},
-    _ => {'removal', 'ramp', 'wipe'},
+    'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe', 'wincon'},
+    'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection', 'wincon'},
+    'midrange' => {'removal', 'ramp', 'draw', 'wipe', 'wincon'},
+    _ => {'removal', 'ramp', 'wipe', 'wincon'},
   };
 }
 
