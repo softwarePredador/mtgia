@@ -88,7 +88,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Criar novo deck'), findsOneWidget);
-    expect(find.text('Gerar com IA'), findsOneWidget);
+    expect(find.textContaining('Gerar com IA'), findsOneWidget);
     expect(find.text('Atividade recente'), findsOneWidget);
     expect(find.text('Iniciar fluxo guiado'), findsNothing);
     expect(

@@ -169,6 +169,10 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  tearDown(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   group('DeckProvider.createDeck', () {
     test('fails when batch resolve endpoint fails', () async {
       final apiClient = _FakeApiClient(
@@ -1088,6 +1092,7 @@ void main() {
                     'is_public': false,
                     'created_at': '2026-03-23T00:00:00.000Z',
                     'card_count': 37,
+                    'color_identity': ['W'],
                   },
                 ]),
             '/decks/deck-1':
@@ -1127,6 +1132,7 @@ void main() {
                     'is_public': false,
                     'created_at': '2026-03-23T00:00:00.000Z',
                     'card_count': 37,
+                    'color_identity': ['W'],
                   },
                 ]),
             '/decks/deck-1':
@@ -1207,6 +1213,7 @@ void main() {
                     'is_public': false,
                     'created_at': '2026-03-23T00:00:00.000Z',
                     'card_count': 37,
+                    'color_identity': ['W'],
                   },
                 ]),
             '/decks/deck-1':
@@ -1282,6 +1289,7 @@ void main() {
                 'is_public': false,
                 'created_at': '2026-03-23T00:00:00.000Z',
                 'card_count': 37,
+                'color_identity': ['W', 'R'],
               },
             ]);
           },
