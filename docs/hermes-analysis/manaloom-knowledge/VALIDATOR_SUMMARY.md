@@ -1,6 +1,6 @@
-# VALIDATOR SUMMARY -- Lorehold Spellslinger (v3.11 — 2026-05-31T20:04:12+00:00)
+# VALIDATOR SUMMARY -- Lorehold Spellslinger (v3.11 — 2026-05-31T20:58:47+00:00, Ciclo #13: 0 swaps)
 
-## Estado do Deck: MATURIDADE ATINGIDA — Pós-Ciclo #11 (25 swaps, 0 no C#11)
+## Estado do Deck: MATURIDADE ATINGIDA — Pós-Ciclo #13 (25 swaps, C#11/#12/#13 = 0 swaps)
 
 | Indicador | Valor | Status |
 |:----------|:-----:|:------:|
