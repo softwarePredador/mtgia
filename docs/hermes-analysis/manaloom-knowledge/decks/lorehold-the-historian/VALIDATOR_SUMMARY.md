@@ -1,8 +1,8 @@
 # VALIDATOR SUMMARY — Lorehold Spellslinger
 
-> **Ultima atualizacao:** 2026-05-31T18:56:33+00:00 (v3.10 Purpose Analyzer)
-> **Deck:** Pos-Ciclo #10, 25 swaps, 100 cards, 86 rows, 35 lands, CMC medio 3.71
-> **Pipelines ativos:** Scout (#17) + Validator (v3.10) + Mulligan (#11 pendente) + Evolution (#10)
+> **Ultima atualizacao:** 2026-05-31T19:10:00+00:00 (Evolution Oracle C#11 + v3.10)
+> **Deck:** Pos-Ciclo #11 (0 swaps), 25 swaps totais, 100 cards, 86 rows, 35 lands, CMC medio 3.71
+> **Pipelines ativos:** Scout (#17) + Validator (v3.10) + Mulligan (#11 concluida) + Evolution (#11 concluido)
 
 ---
 
@@ -63,15 +63,15 @@
 | Jogaveis | 46.3% | ~48% | -- |
 | Mulligan | 49.3% | ~47% | -- |
 | Ramp T1 (estrito) | 20.1% | ~20% | -- |
-| **Sem Play T3** | **16.9%** | **~15%** | **< 12%** |
+| **Sem Play T3** | **13.3%** | **~13%** | **< 12%** |
 
 > ⚠️ O T3=3.7% reportado em ciclos anteriores era a **taxa de free mulligan** (0 ou 7 lands),
 > NAO o Sem Play T3 correto. Correcao aplicada nos v3.9/v3.10.
 > Ciclos #7/#8/#9 usaram T3 errado para escolher AGGRESSIVE (devia ser DEFENSIVE).
 > **Ciclo #10 foi o PRIMEIRO com T3 correto (16.9%) → DEFENSIVE.**
 
-**Trajetoria T3:** C#5(15.3%) → C#6(-2CMC) → C#7(+2CMC) → C#8(0CMC) → C#9(+2CMC) → C#9(16.9%) → C#10(-2CMC, ~15% est.)
-**Net DCMC desde C#5:** +2 (AGGRESSIVE desnecessario #7/#8/#9 causou inchaco).
+**Trajetoria T3:** C#5(15.3%) → C#6(-2CMC) → C#7(+2CMC) → C#8(0CMC) → C#9(+2CMC) → Exec#10(16.9%) → C#10(-2CMC) → Exec#11(13.3%)
+**Net DCMC desde C#5:** +2 (AGGRESSIVE #7/#8/#9 causou inchaco). **Ciclo #11: 0 swaps.** Colecao esgotada.
 
 ---
 
@@ -145,18 +145,22 @@
 
 ---
 
-## Estrategia para Ciclo #11
+## Estrategia para Ciclo #11 — EXECUTADO (0 SWAPS) e Ciclo #12
 
-**0 SWAPS previstos.** Deck saudavel, Nivel 1 vazio, colecao esgotada.
-Prioridade: Executar Mulligan Execucao #11 pos-C#10 para medir impacto do DCMC=-2.
+**Ciclo #11: 0 SWAPS aplicados.** 38 cartas CMC<=2 analisadas, nenhuma atinge Necessidade >= 3.
+Mulligan Execucao #11 confirmou T3 = 13.3% (-3.6pp vs C#9, -1.9pp vs projecao).
+Deck saudavel, Nivel 1 vazio, colecao esgotada.
 
-**Recomendacoes de Aquisicao:**
-1. Skullclamp (CMC 1, draw engine, $5-8) — PRIORIDADE #1
-2. Chrome Mox (CMC 0, fast mana, $60-80)
-3. Mana Vault (CMC 1, fast mana, $40-60)
-4. Underworld Breach (CMC 2, recursion, $15-20)
+**Ciclo #12 previsto: 0 SWAPS** (a menos que Skullclamp seja adquirido).
+Se Skullclamp adquirido: Fated Clash (CMC 5) -> Skullclamp (CMC 1), net DCMC = -4, T3 projetado ~10%.
+
+**Recomendacoes de Aquisicao (sem mudanca — colecao ainda esgotada):**
+1. **Skullclamp (CMC 1, draw engine, $5-8) — PRIORIDADE ABSOLUTA.** Equipa em Spirit 3/2 = draw 2. Impacto T3: -3pp a -5pp.
+2. Chrome Mox (CMC 0, fast mana, $60-80) — T3: -2pp a -3pp.
+3. Mana Vault (CMC 1, fast mana, $40-60) — T3: -1.5pp a -2pp.
+4. Underworld Breach (CMC 2, recursion, $15-20) — Yawgmoth's Will Boros.
 
 ---
 
-*Relatorio gerado por Purpose Analyzer v3.10 em 2026-05-31T18:56:33+00:00*
-*Proximo: v3.11 apos Mulligan Execucao #11 confirmar T3 pos-C#10*
+*Relatorio atualizado por Evolution Oracle C#11 em 2026-05-31T19:10:00+00:00*
+*Proximo: Ciclo #12 — verificar se Skullclamp foi adquirido. Se nao, 0 swaps novamente.*

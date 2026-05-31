@@ -1,3 +1,972 @@
+## [2026-05-31T19:10:00+00:00] Ciclo #11 — Evolution Oracle (0 SWAPS — Colecao Esgotada, Deck Saudavel)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execucao #17, ultimo):**
+- EDHREC estavel (7.802 decks). Motor 4/4, Copy 6.
+- Rising stars todas no deck. Declinios: Grand Abolisher (-0.27), Fated Clash (15.6%, estavel).
+- NOVAS cartas de alto EDHREC: Nenhuma — colecao esgotada de cartas com EDHREC > 15% nao presentes no deck.
+- T3 = 13.3% (Execucao #11, N=1000, seed=42) — DEFENSIVE zone (>12%).
+- **Colecao esgotada de CMC <= 2 com alta sinergia para Lorehold.**
+
+**VALIDATOR (v3.10 SYNERGY_MAP, ultimo):**
+- 7 eixos de sinergia pontuados. Token+Pump 8/10, Wipes+Prot 8/10, Recursion 8/10, Mana 7/10, Combo 9/10, Stack 7/10, Grave Resilience 6/10.
+- Nivel 1 VAZIO — Ruby Medallion removido no C#10. Sem cartas claramente cortaveis.
+- Double-nulls: 4 (Scroll Rack, Penance, Grand Abolisher, Taunt from the Rampart). Todos com funcao estrategica comprovada.
+- **0 swaps recomendados.** Proximos upgrades: aquisicao de Skullclamp (CMC 1), Chrome Mox (CMC 0), Mana Vault (CMC 1).
+
+**MULLIGAN (Execucao #11, pos-Ciclo #10, N=1000, seed=42, rigoroso):**
+- Jogaveis: 46.7%, Mulligan: 47.9%
+- Ramp T1 (estrito, Sol Ring only): 6.3%
+- **Sem Play T3: 13.3%** — melhoria de -3.6pp vs Exec#10 (16.9%). Impacto maior que o projetado (-1.9pp previsto vs -3.6pp real) porque Flare of Duplication e instant FREE (sacrificio) que cria linhas de jogo em T1-T3 que Galvanoth nunca oferecia.
+- **T3 ainda > 12% -> DEFENSIVO obrigatorio para Ciclo #11.**
+
+**BATTLE (Exec#8 pos-Ciclo #4):**
+- Avg WR: 52.1% (estavel). Combo: 46.5% (pior matchup). Control: 56.0% (melhor).
+
+---
+
+### PASSO 0: Analise Estrategica (Respostas Obrigatorias)
+
+#### 1. COMO ESTE DECK GANHA? (8+ paths de vitoria — EXCELENTE)
+
+**Win conditions diretas (2 reconhecidas, 8+ funcionais):**
+- **Approach of the Second Sun** (CMC 7) — 2 casts = vitoria. Com Scroll Rack + Top + Penance, sobe de volta instantaneamente.
+- **Approach + Flare of Duplication** (C#10) — COMBO DETERMINISTICO. 7 mana + criatura vermelha: cast Approach -> sacrifica criatura -> Flare gratis -> copia Approach. Dois casts NO MESMO TURNO. Nao precisa esperar 1 turno. Combo comecou EM CIMA da mesa (Top 3) = vitoria imediata.
+- **Twinflame + Surge to Victory + Approach** (C#10) — Twinflame cria copia de criatura com haste -> Surge copia Approach com TODAS as criaturas (incluindo a copia) -> duas copias de Approach no mesmo turno. Chain de dano exponencial.
+- **Insurrection** (CMC 8) — rouba board + haste. Com Boros Charm double strike = lethal se oponentes tem criaturas grandes.
+- **Akroma's Will** (CMC 4) — flying + double strike + vigilance + lifelink + prot all colors + indestructible. Transforma QUALQUER token board em lethal imediato. Com Storm Herd (20-40 tokens) = overkill absoluto.
+- **Mizzix's Mastery overload** (CMC 4) — todos instants/sorceries do cemiterio gratis. Com Double Vision ou Arcane Bombardment no campo = 2 copias de cada spell. Se Approach ja foi castado e foi pro grave, Mizzix's Mastery o traz de volta.
+- **Arcane Bombardment + Double Vision + Dawning Archaic** — 3 copy engines redundantes. Bombardment copia a cada turno. Double Vision copia primeiro spell por turno. Dawning Archaic copia spell free exileada. Combined: 3-4 spells por turno, cada um copiado.
+- **Surge to Victory + Akroma's Will** — Surge copia spell para cada criatura atacante + buffa poder. Com Akroma's Will, todas ganham double strike, flying, indestructible. Qualquer board de 4+ criaturas = lethal.
+
+**Motor Treasure -> Copy (4/4 completo):**
+1. Treasure Ramp — Big Score (CMC 4), Brass's Bounty (CMC 7), Hit the Mother Lode (CMC 7), Smothering Tithe (CMC 4), Storm-Kiln Artist (CMC 4), Unexpected Windfall (CMC 4)
+2. Free Big Spell — Dance with Calamity (CMC 8, Miracle), Improvisation Capstone (CMC 7, topdeck), Dawning Archaic (CMC 3, exile+cast)
+3. Copy (6 engines) — Lorehold, Double Vision, Arcane Bombardment, Dawning Archaic, Mizzix's Mastery, Flare of Duplication, Twinflame
+4. Treasure Payoff — Storm-Kiln Artist
+
+**Token makers (5):** Storm Herd, Call Forth the Tempest, Rite of the Dragoncaller, Restoration Seminar, Twinflame
+
+**Pump effects (3):** Akroma's Will, Boros Charm (double strike), Surge to Victory (+buffa)
+
+**Total: 8+ caminhos de vitoria FUNCIONAIS e DIVERSOS.** O deck ganha por combo deterministico (Approach+Flare), token+pump (6 combinacoes), roubo em massa (Insurrection), recursao explosiva (Mizzix), e copy engine chain (Bombardment+Double Vision).
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa robusta, balanceada)
+
+**Board wipes (5) — 4/5 assimetricos:**
+| Carta | CMC | Assimetrica? |
+|:------|:---:|:-------------|
+| Blasphemous Act | ~R | Nao (mata suas tambem, mas custa R) |
+| Austere Command | 6 | SIM — pode poupar artefatos E criaturas <= 3 |
+| Call Forth the Tempest | 8 | SIM — voce ganha dragoes |
+| Volcanic Vision | 7 | SIM — voce recorre um spell |
+| Fated Clash | 5 | SIM — voce escolhe o que volta |
+
+**Protecao (5 fontes):** Boros Charm (indestrutivel), Teferi's Protection (faseia), Lightning Greaves (shroud+haste), Deflecting Swat (redirect), Hexing Squelcher (nega habilidades).
+
+**Stack interaction (5 fontes):** Grand Abolisher (sem spells no seu turno), Flare of Duplication (copia em resposta a counterspell), Boseiju (incounteravel), Cavern of Souls (incounteravel), Hexing Squelcher (nega habilidades de combo).
+
+**Balanco: 5 wipes vs 5 protecoes + 5 stack interaction. EXCELENTE.** Wipes assimetricos sao maioria. Stack interaction cobre counterspell e combo.
+
+**Contra combo (46.5% WR):** Hexing Squelcher + Deflecting Swat + Chaos Warp + Grand Abolisher + Flare of Duplication. Sem counterspell hard (estrutural Boros), mas 5 fontes de interacao na stack compensam parcialmente.
+
+**Contra aggro (52.5% WR):** 5 wipes + 6 remocoes pontuais. Blasphemous Act custa R contra go-wide.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw suficiente, tesouros abundantes)
+
+**Draw REAL (7 fontes):**
+| Carta | CMC | Continuo? |
+|:------|:---:|:----------|
+| Sensei's Divining Top | 1 | Sim |
+| Scroll Rack | 2 | Sim |
+| Esper Sentinel | 1 | Sim (oponente paga) |
+| Thrill of Possibility | 2 | One-shot (draw 2, descarta 1) |
+| The One Ring | 4 | Sim (custa vida) |
+| Wedding Ring | 4 | Sim (oponente tambem) |
+| Victory Chimes | 3 | Sim (artifact ETB) |
+
+**Draw INDIRETO (nao conta na metrica):** Monument to Endurance (loot), Dragon's Rage Channeler (surveil), Faithless Looting (draw 2/descarta 2, flashback), Reforge the Soul (wheel), Land Tax (thinning).
+
+**Recursion (4 fontes):** Mizzix's Mastery (overload = todos), Restoration Seminar (1 + token), Arcane Bombardment (1/turno), Surge to Victory (copiado por cada criatura).
+
+**Tesouros (8+ fontes):** Big Score, Brass's Bounty, Hit the Mother Lode, Smothering Tithe, Storm-Kiln Artist, Unexpected Windfall, Victory Chimes (indireto).
+
+**O deck NAO fica sem gasolina.** Cemiterio = segundo hand com Mizzix + Bombardment + Surge + Seminar.
+
+#### 4. COMO ESTE DECK ACELERA? (Ramp robusto, foco em tesouros)
+
+**Ramp (14 fontes funcionais):**
+- Artefatos de mana (4): Sol Ring, Arcane Signet, Boros Signet, Talisman of Conviction
+- Ramp de terrenos (4): Land Tax, Weathered Wayfarer, Archaeomancer's Map, Bender's Waterskin
+- Treasure one-shot (4): Big Score, Brass's Bounty, Hit the Mother Lode, Unexpected Windfall
+- Treasure continuo (2): Smothering Tithe, Storm-Kiln Artist
+- Ritual (1): Jeska's Will
+- Cost reduction (0): Ruby Medallion removido C#10
+
+**Curva vs ramp:** CMC medio 3.71. Ramp T1 (Sol Ring only): 6.3%. Ramp T2: 3 signets. Ramp T3+: Jeska's Will + Map + Waterskin + Land Tax.
+
+**O ramp e suficiente para a curva.** 17 fontes totais de mana extra. Foco em tesouros (8 fontes) = sobrevive a board wipes.
+
+#### 5. QUAL O PLANO DE JOGO?
+
+**FASE 1 — Setup (Turns 1-3):**
+- Mao ideal: T1 Sol Ring + signet. T2 Smothering Tithe ou Esper Sentinel + Weathered Wayfarer. T3 Lorehold.
+- Mao media: T1 Land Tax/Wayfarer. T2 Signet + Top. T3 Lorehold ou Smothering Tithe.
+- Mao ruim (13.3%): Abre sem cartas castaveis. Mulligan.
+- Objetivo: Chegar a 6-7 mana turno 4.
+
+**FASE 2 — Motor (Turns 4-6):**
+- Turno 4: Lorehold ou Double Vision. Big Score/Unexpected Windfall gera tesouros + draw.
+- Turno 5: Arcane Bombardment ou Dawning Archaic. Copy engine principal online.
+- Turno 6: Flare de Duplication pronto. Storm-Kiln Artist gera tesouro por spell.
+
+**FASE 3 — Fechamento (Turns 7+):**
+- Plano A: Approach + Flare (CMC 7, deterministico) — vitoria NO MESMO TURNO.
+- Plano B: Storm Herd + Akroma's Will (CMC 10 + CMC 4) — 20-40 tokens indestructiveis.
+- Plano C: Mizzix's Mastery overload (CMC 4) — todos spells gratis do cemiterio.
+- Plano D: Insurrection (CMC 8) — rouba board + haste.
+- Plano E: Surge to Victory + Approach (CMC 6, 3+ criaturas) — copias em cadeia.
+- Fallback: Motor copy chain (Bombardment + Double Vision + Dawning Archaic).
+
+**Resiliencia a interacao:**
+- Counterspell: Flare copia em resposta. Boseiju/Cavern tornam incounteravel.
+- Board wipe: Teferi's / Boros Charm protegem. Wipes assimetricos poupam artefatos/enchantments.
+- Grave hate: Planos A, D, E nao dependem do cemiterio.
+
+**O plano e CONSISTENTE mas vulneravel no early game (13.3% Sem Play T3).**
+
+---
+
+### PASSO 1: Sintese dos Agentes (RESUMO)
+
+| Agente | Ultima Execucao | Dado Critico |
+|:-------|:---------------:|:-------------|
+| SCOUT #17 | 2026-05-31 | EDHREC estavel. Colecao esgotada. |
+| VALIDATOR v3.10 | 2026-05-31 | 7 eixos 6-9/10. Nivel 1 vazio. 0 swaps. |
+| MULLIGAN #11 | 2026-05-31 | T3 = 13.3% (DEFENSIVE). -3.6pp vs C#9. |
+| BATTLE #8 | 2026-05-31 | WR 52.1%. Pior: Combo (46.5%). |
+
+**Consenso: Deck saudavel, Nivel 1 vazio, colecao esgotada. Acao: AQUISICAO.**
+
+---
+
+### PASSO 2: Identificar Gaps Estrategicos
+
+| # | Gap | Severidade | Status |
+|:-:|:-----|:----------:|:-------|
+| 1 | Sem Play T3 = 13.3% (>12%) | DEFENSIVE | ATIVO — requer fast mana |
+| 2 | Colecao esgotada de CMC <= 2 | BLOQUEANTE | ATIVO — 38 cartas, nenhuma com impacto >= 3 |
+| 3 | Draw = 7 (perfil 8-12) | ESTRUTURAL | ATIVO — Skullclamp resolveria |
+| 4 | Fated Clash 15.6% EDHREC declining | TOLERAVEL | MONITORAR |
+| 5 | Combo matchup 46.5% | TOLERAVEL | MONITORAR |
+
+---
+
+### PASSO 3: Priorizar Swaps — TABELA DE REJEICAO
+
+**Criterio: Necessidade Estrategica (0-5) + Evidencia de Dados (0-5). Swap apenas se soma >= 6.**
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------|
+| Demand Answers | 2 | 2 | 1 | 3 | Draw 2 descarta 1 = net 0. Thrill ja faz isso. |
+| Strike It Rich | 1 | 2 | 1 | 3 | 1 treasure. Muito fraco. |
+| Reverberate | 2 | 2 | 3 | 5 | Otimo, mas deck ja tem 6 copy engines. Redundancia. |
+| Spiteful Banditry | 2 | 2 | 1 | 3 | Wipe lento, nao acelera T1-T3. |
+| Desperate Ritual | 2 | 1 | 1 | 2 | Ja foi cortado C#3. Nao voltar atras. |
+| Drannith Magistrate | 2 | 2 | 2 | 4 | Stax forte, mas nao avanca o plano. |
+| Mother of Runes | 1 | 1 | 1 | 2 | Cortado C#2. Protecao pontual fraca. |
+| Ragavan | 1 | 2 | 1 | 3 | Criatura 2/1 sem evasao. Nao sobrevive. |
+| Artist's Talent | 2 | 1 | 1 | 2 | Cortado C#5, declinio -0.70. |
+| Oswald Fiddlebender | 2 | 1 | 0 | 1 | 0% EDHREC. Cortado com razao. |
+| Goblin Engineer | 2 | 1 | 1 | 2 | Cortado C#4. Tutor de artefato para grave. |
+| Inti, Seneschal | 2 | 2 | 1 | 3 | Draw condicional de combate. Spellslinger nao ataca. |
+| Burning Prophet | 2 | 2 | 1 | 3 | Scry. Top+Scroll Rack+Penance ja suprem. |
+
+**CMC 3 (trocar CMC baixo por medio PIORA T3):**
+| Carta | CMC | Nec. | Evid. | Total | Por que NAO |
+|:------|:---:|:----:|:-----:|:-----:|:------------|
+| Birgi | 3 | 2 | 2 | 4 | Bom mas CMC 3, nao reduz T3. |
+| Dualcaster Mage | 3 | 2 | 3 | 5 | Infinite com Twinflame, mas CMC 3. |
+| Simian Spirit Guide | 3 | 3 | 1 | 4 | Fast mana, mas CMC 3 e so R. |
+| Seething Song | 3 | 1 | 1 | 2 | Cortado C#6. Ritual one-shot. |
+| Flawless Maneuver | 3 | 2 | 2 | 4 | FREE com commander, mas 6a protecao e overkill. |
+| Monastery Mentor | 3 | 2 | 2 | 4 | Bom, mas CMC 3. Nao reduz T3. |
+| Ranger-Captain of Eos | 3 | 3 | 2 | 5 | Silence + tutor Sol Ring. Melhor candidato, mas CMC 3. |
+
+**Conclusao: NENHUM candidato atinge Necessidade >= 3 COM Evidencia >= 3.**
+
+---
+
+### PASSO 4: Aplicar — NAO APLICAVEL (0 swaps)
+
+**Decisao: 0 swaps no Ciclo #11.**
+
+Deck em estado EXCELENTE:
+- Motor 4/4 completo
+- Copy engines 6 (expansao C#10)
+- Win conditions 8+ (combo deterministico Approach+Flare)
+- Nivel 1 vazio — sem cartas cortaveis
+- Wipes/Protecao balanceados 5/5
+- Stack interaction robusta 5 fontes
+- CMC medio 3.71
+- T3 em melhoria: 16.9% -> 13.3% (-3.6pp)
+
+**GAP #1 — T3 > 12%:** So resolve com fast mana (Chrome Mox, Mana Vault) ou draw engine barato (Skullclamp). NENHUM na colecao.
+
+**GAP #2 — Colecao esgotada:** 51 cartas CMC<=2 Boros-legais. 13 no deck. 38 analisadas — nenhuma atinge criterio.
+
+---
+
+### DECISAO FINAL: CICLO #11 — 0 SWAPS
+
+**Deck saudavel. Motor 4/4, Copy 6, Nivel 1 vazio, T3 melhorando. Colecao esgotada de upgrades viaveis.**
+
+**Recomendacoes de Aquisicao (prioridade por impacto em T3):**
+1. **Skullclamp (CMC 1, $5-8) — PRIORIDADE ABSOLUTA.** Equipa em Spirit 3/2 = draw 2. Impacto T3: -3pp a -5pp.
+2. **Chrome Mox (CMC 0, $60-80).** Fast mana T0. Impacto T3: -2pp a -3pp.
+3. **Mana Vault (CMC 1, $40-60).** Fast mana T1. Impacto T3: -1.5pp a -2pp.
+4. **Underworld Breach (CMC 2, $15-20).** Recursao de cemiterio Boros.
+
+**Projecao Ciclo #12 (se Skullclamp adquirido):** DEFENSIVO. Fated Clash (CMC 5) -> Skullclamp (CMC 1). Net DCMC = -4. T3 projetado: 13.3% -> ~10%.
+
+---
+
+### Verificacao de Integridade (sem mudancas)
+
+```
+Total cards: 100 OK
+Commander: Lorehold (qty=1) OK
+Lands: 35 (>=34) OK
+Singleton: Sem duplicatas OK
+```
+
+---
+
+*Evolution Oracle Ciclo #11 executado em modo co-pilot.*
+*Proxima execucao: Ciclo #12 — verificar se Skullclamp foi adquirido.*
+
+
+## [2026-05-31T17:51:16+00:00] Ciclo #10 — Evolution Oracle (2 SWAPS — DEFENSIVE: Flare of Duplication + Twinflame)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execucao #17, synergy-first):**
+- EDHREC estavel (7.802 decks). Motor 4/4, Copy 3/3.
+- Rising stars todas no deck. Declinios: Ruby Medallion (-0.37, 3+ ciclos), Grand Abolisher (-0.27).
+- **NOVO:** Identificou Twinflame (Score 8) e Reverberate (Score 8) como expansao de copy layer.
+- Flare of Duplication (Score 7) como copy spell FREE com commander no campo.
+- **T3 = 16.9% (Execucao #10, N=1000, seed=42)** — DEFENSIVE zone (>12%).
+- Colecao esgotada de CMC <= 2 com alta sinergia.
+
+**VALIDATOR (v3.9 SYNERGY_MAP + Stack & Resilience):**
+- **CORRECAO CRITICA:** T3 REAL = 16.9%, NAO 3.7% (o 3.7% era free mulligan rate).
+- Ciclos #7/#8/#9 operaram com T3 errado (AGGRESSIVE quando devia ser DEFENSIVE).
+- Token+Pump: 8/10 (+2 com Akroma's Will). Wipes+Prot: 8/10. Recursion: 8/10. Mana: 7/10. Combo: 8/10.
+- Stack Interaction: 6/10 (novo eixo). Graveyard Resilience: 5/10.
+- **0 swaps previstos** — colecao esgotada. Proximos upgrades: aquisicao de Skullclamp, Chrome Mox, Mana Vault.
+
+**MULLIGAN (Execucao #10, pos-Ciclo #9, N=1000, seed=42, rigoroso):**
+- Jogaveis: 46.3%, Mulligan: 49.3%
+- Ramp T1 (estrito): 20.1%
+- **Sem Play T3: 16.9%** — DEFENSIVE zone confirmada. Trajetoria: C#5(15.3%) -> C#6(-2CMC, ~13-14%) -> C#7(+2CMC) -> C#8(0CMC) -> C#9(+2CMC) -> C#9(16.9%)
+- Net DCMC desde C#5: +4. Cada +1 CMC = ~0.8pp T3 pior.
+
+**BATTLE (Exec#8 pos-Ciclo #4):**
+- Avg WR: 52.1% (estavel). Combo: 46.5% (pior matchup). Control: 56.0% (melhor).
+
+---
+
+### PASSO 0: Analise Estrategica (Respostas Obrigatorias)
+
+#### 1. COMO ESTE DECK GANHA? (8+ paths de vitoria)
+
+**Win conditions diretas:**
+- Approach of the Second Sun (CMC 7) — 2 casts = vitoria. Com Scroll Rack + Top + Penance, sobe de volta instantaneamente.
+- Insurrection (CMC 8) — rouba board + haste. Com Boros Charm double strike = lethal se oponentes tem criaturas grandes.
+
+**Token + Pump:**
+- Storm Herd (CMC 10) — X Pegasus = PVs (20-40 tokens flying)
+- Call Forth the Tempest (CMC 8) — dano + dragoes + cascade
+- Rite of the Dragoncaller (CMC 6) — Dragon 5/5 a cada spell nao-criatura
+- Surge to Victory (CMC 6) — copia spell com criaturas atacando. Com Akroma's Will: cada criatura causa dano E buffa todas.
+- Boros Charm (CMC 2) — double strike para TODAS as criaturas
+- **Akroma's Will (CMC 4) — flying + double strike + vigilance + lifelink + prot all colors + indestructible. Transforma QUALQUER token board em lethal imediato.**
+- **Twinflame (CMC 2) — NOVO: cria copia de criatura com haste. Com Surge to Victory + Akroma's Will: copia criatura -> Surge copia spell -> Akroma buffa TUDO. Chain exponencial de dano.**
+
+**Recursao explosiva:**
+- Mizzix's Mastery overload (CMC 4) — todos instants/sorceries do cemiterio gratis
+- Restoration Seminar (CMC 7) — retorna spell + cria token 3/2
+- Arcane Bombardment (CMC 5) — a cada turno, exile e copia spell do cemiterio
+
+**Motor Treasure -> Copy (4/4 completo):**
+- Treasure: Big Score, Brass's Bounty, Hit the Mother Lode, Smothering Tithe, Storm-Kiln
+- Free Big Spell: Dance with Calamity, Improvisation Capstone, Dawning Archaic
+- Copy: Lorehold, Double Vision, Arcane Bombardment, Dawning Archaic, Mizzix's Mastery, **Flare of Duplication (NOVO)**
+- Payoff: Storm-Kiln Artist
+
+**Burn massivo:**
+- Call Forth the Tempest (CMC 8) — dano massivo + cascade
+
+**Total: 8+ caminhos de vitoria funcionais.** O classificador so reconhece Approach e Akroma's Will como "wincon", mas funcionalmente o deck fecha jogos com Insurrection, Storm Herd, Mizzix, Surge to Victory, e o motor treasure-copy.
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa robusta, vulneravel a combo)
+
+**Board wipes (5):** Blasphemous Act (CMC ~R, 13 dano), Austere Command (CMC 6, modular), Call Forth the Tempest (CMC 8, dano+cascade), Volcanic Vision (CMC 7, dano+recursao), Fated Clash (CMC 5, bounce por oponente+scry)
+
+**Protecao (5 fontes):** Boros Charm (indestrutivel), Teferi's Protection (faseia TUDO), Lightning Greaves (shroud+haste para Lorehold), Deflecting Swat (redirect), Hexing Squelcher (nega habilidades).
+
+**Balanco: 5 wipes vs 5 protecoes.** Sem risco de auto-destruicao. Wipes assimetricos (Austere pode poupar artefatos/enchantments, Volcanic Vision causa dano E recorre spell). Grand Abolisher removido — perda de protecao proativa, mas Boseiju + Cavern of Souls suprem anticounterspell para as pecas-chave.
+
+**Contra combo (46.5% WR):** Sem counterspell (estrutural de Boros). Depende de remocao instantanea (Swords, Path, Abrade, Chaos Warp, Generous Gift) + Deflecting Swat + Hexing Squelcher (nega habilidades de combo).
+
+**Stax:** Boseiju (uncounterable), Cavern of Souls (uncounterable para Lorehold). Remocao pontual para pecas de stax.
+
+**Aggro:** 5 wipes + 6 remocoes pontuais. Bem coberto.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw suficiente, tesouros abundantes)
+
+**Draw REAL (7 fontes):**
+- Continuo (3): Sensei's Divining Top, The One Ring, Wedding Ring, Victory Chimes
+- One-shot (3): Faithless Looting, Thrill of Possibility, Big Score, Unexpected Windfall
+- Condicional (1): Esper Sentinel (32.5%, declining)
+
+**Topdeck manipulation (draw-enablers, 3):**
+- Scroll Rack (CMC 2), Penance (CMC 3), Library of Leng (CMC 1)
+- Sensei's Top tambem manipula topo
+
+**Recursao (4):**
+- Mizzix's Mastery (CMC 4, overload = todo grave gratis)
+- Restoration Seminar (CMC 7, retorna spell + token)
+- Faithless Looting flashback (auto-recorre)
+- Surge to Victory (CMC 6, exile sorcery do grave + copia)
+
+**Tesouros (6+ geradores, 14+ fontes de ramp total):**
+- Permanente: Smothering Tithe, Storm-Kiln Artist
+- Ritual: Big Score, Brass's Bounty, Unexpected Windfall, Hit the Mother Lode, Jeska's Will
+
+**O deck NAO fica sem gasolina.** Draw + topdeck manipulation + recursion suprem consistentemente. O gargalo e o early game (T3=16.9%), nao a falta de gasolina no mid-late.
+
+#### 4. COMO ESTE DECK ACELERA? (Ramp treasure-heavy, sobrevive a wipes)
+
+**Ramp (14 fontes, Ruby Medallion removido):**
+- T1 (3): Sol Ring, Land Tax, Weathered Wayfarer
+- T2 (3): Arcane Signet, Boros Signet, Talisman of Conviction
+- T3+ (7): Archaeomancer's Map, Bender's Waterskin, Monument to Endurance, Jeska's Will, Smothering Tithe, Big Score, Unexpected Windfall
+
+**Big mana (5, nao e ramp mas gera mana massiva):**
+- Brass's Bounty (CMC 7), Hit the Mother Lode (CMC 7), Jeska's Will (CMC 3), Storm-Kiln Artist (CMC 4), Smothering Tithe (CMC 4)
+
+**CMC medio: 3.81 (-0.05 vs pre-C#10). Pico em CMC 2-3 e 5-7.**
+Ramp justifica a curva. T1 ramp = 20.1% (limite do formato Boros).
+Tesouros sobrevivem a board wipes — vantagem estrutural sobre ramp de criatura/artefato.
+
+#### 5. QUAL O PLANO DE JOGO? (Claro, consistente, sobrevive a interacao)
+
+**T1-T3 (Setup):**
+- Ideal: T1 Sol Ring+Signet, T2 Scroll Rack+Top, T3 Lorehold com Greaves ou Teferi's Protection
+- Medio: T1 Land Tax, T2 Signet+Top, T3 Archaeomancer's Map, T4 Lorehold
+- Ruim (16.9%): T1-T3 sem jogo (Sem Play T3). Maior fraqueza do deck — target < 12%.
+- Comum: T1 Top, T2 Signet+Thrill/Esper Sentinel, T3 Monument/Jeska's Will, T4 Lorehold
+
+**T4-T6 (Mid-game):**
+- Lorehold entra, comeca a copiar spells
+- Smothering Tithe / The One Ring / Wedding Ring geram vantagem
+- Double Vision / Arcane Bombardment / Dawning Archaic criam camadas de copia
+- Big Score / Unexpected Windfall geram tesouros + draw
+- Board wipes se necessario (Austere, Blasphemous Act, Volcanic Vision)
+
+**T7+ (Fechar o jogo):**
+- Approach of the Second Sun — 2 casts = win. Com Flare of Duplication: 1o cast + Flare copy = 2 casts no MESMO TURNO, vitoria imediata!
+- Insurrection + Boros Charm/Akroma's Will = lethal com board dos oponentes
+- Storm Herd + Akroma's Will = 20-40 tokens flying double strike lifelink indestructible
+- Mizzix's Mastery overload = todo grave gratis (com Arcane Bombardment ja tendo exilado varias)
+- Arcane Bombardment chain + Double Vision = 3-4 spells gratis por turno
+- Twinflame + Surge to Victory + Akroma's Will chain = dano exponencial com criaturas copiadas
+
+**O plano sobrevive a interacao:**
+- Tesouros sobrevivem a board wipes
+- Recursao (Mizzix, Restoration Seminar, Bombardment) reconstroi
+- Deflecting Swat + Hexing Squelcher protegem spells-chave
+- Boseiju + Cavern of Souls tornam pecas-chave uncounterable
+- Teferi's Protection + Boros Charm protegem board de wipes
+
+**Vulnerabilidades reais:**
+- Grave-hate (Rest in Peace, Leyline of the Void) desliga Mizzix, Bombardment, Seminar, Surge. Respostas: Chaos Warp, Generous Gift, Boseiju. Moderadamente vulneravel.
+- Counterspell em cadeia (2+ counters no mesmo turno) — Deflecting Swat so redireciona 1.
+- Combo turn 2-3 (Kinnan cEDH, Godo) — deck e muito lento sem fast mana (Mana Vault, Chrome Mox ausentes).
+
+---
+
+### Determinacao de Estrategia
+
+**Sem Play T3 = 16.9% (Execucao #10, rigoroso).** Acima do limite de 12% -> **DEFENSIVE obrigatorio.**
+Net DCMC necessario: -5 a -15. Porem, colecao esgotada de cartas CMC <= 2 com alta sinergia.
+
+**Estrategia escolhida: DEFENSIVE light (net DCMC = -2).** O melhor viavel com a colecao atual.
+
+---
+
+### CORRECAO HISTORICA: O Erro do T3=3.7%
+
+**Os Ciclos #7, #8 e #9 usaram T3=3.7% como base.** Esse valor e a **taxa de free mulligan**
+(maos com 0 ou 7 terrenos = ~3.7%), NAO o Sem Play T3 correto.
+
+| Ciclo | T3 usado | T3 REAL (pos-C#9 sim) | Estrategia aplicada | Estrategia correta |
+|:------|:--------:|:---------------------:|:--------------------|:-------------------|
+| #7 | 3.7% | ~13-14% | AGGRESSIVE (+2) | DEFENSIVE |
+| #8 | 3.7% | ~14-15% | 0 SWAPS | BALANCED/DEFENSIVE |
+| #9 | 3.7% | 16.9% | AGGRESSIVE (+2) | DEFENSIVE |
+
+**Impacto acumulado:** Net DCMC +4 desde pos-C#5. T3 piorou de 15.3% -> 16.9% (+1.6pp).
+O Ciclo #10 e o PRIMEIRO ciclo com T3 correto = 16.9%.
+
+---
+
+### Por que APENAS 2 swaps?
+
+O SCOUT #17 recomendou 3 swaps (Twinflame + Reverberate + Flare of Duplication).
+Apenas 2 foram aplicados neste ciclo por avaliacao estrategica:
+
+| # | Swap | Necessidade | Aplicado? | Motivo |
+|:-:|:-----|:-----------:|:---------:|:-------|
+| 1 | Ruby Medallion -> Twinflame | **3/5** | ✅ SIM | Ruby declining -0.37 (3+ ciclos). Cost reduction redundante em deck de tesouros (14 ramp). Twinflame expande copy layer + interage com Surge/Akroma's Will. DCMC=0. |
+| 2 | Galvanoth -> Flare of Duplication | **4/5** | ✅ SIM | Galvanoth (CMC 5) e criatura fragil (3/3, precisa sobreviver 1 turno). Efeito de "free spell do topo" duplicado por Dance+Capstone. Flare (CMC 3) copia spell FREE com commander -> **Approach + Flare = vitoria no MESMO turno** (2 casts). DCMC=-2 DEFENSIVE. |
+| 3 | Grand Abolisher -> Reverberate | **2/5** | ❌ NAO | Sidegrade. Grand Abolisher (11.7% declining) e a UNICA protecao proativa contra counters no seu turno. Boseiju cobre Approach mas nao Insurrection/Storm Herd. Reverberate expandiria copy layer mas DCMC=0 nao ajuda T3. Protecao anti-counterspell e mais valiosa que a 5a camada de copia. |
+
+---
+
+### Swap 1: Ruby Medallion -> Twinflame
+
+**Diagnostico:** Ruby Medallion (CMC 2, ~42% EDHREC) e cost reduction para spells vermelhas. Esta em declinio ha 3+ ciclos (-0.37 trend). Em deck com 14 fontes de ramp + 6+ geradores de tesouro, reducao de custo em 1 mana e marginal. Afeta 35+ red spells, mas os tesouros ja pagam custos cheios. Double-null (classificador cego para cost reduction). Nao e ma carta — e redundante.
+
+**Solucao:** Twinflame (CMC 2, Sorcery, mono-R) cria copias de criaturas com haste. Com Surge to Victory + Akroma's Will: Twinflame copia uma criatura -> Surge to Victory (exilada do cemiterio) e copiada por CADA criatura atacando (incluindo a copia) -> Akroma's Will buffa TODAS as criaturas com flying, double strike, lifelink, vigilance, protection from all colors, indestructible. Chain de dano EXPONENCIAL.
+
+**Da colecao:** Sim (qty: 1). Cor: R (legal em Lorehold).
+
+**Principio:** Em spellslinger com token makers, copiar criaturas com Surge to Victory dobra o numero de copias de spell. Com Akroma's Will, cada criatura vira uma ameaca letal. Ruby Medallion reduzia 1 mana em ~35 cartas. Twinflame CRIA um novo eixo de dano exponencial. Custo de oportunidade baixo (CMC igual, DCMC=0), upside altissimo.
+
+**Impacto esperado:** DCMC=0. T3 inalterado. Copy layers: 4 -> 5 (via criatura). Token+Pump sinergia: reforcada.
+
+### Swap 2: Galvanoth -> Flare of Duplication
+
+**Diagnostico:** Galvanoth (CMC 5, 3/3 creature) revela topo na upkeep e casta instant/sorcery gratis. Problema: e uma criatura 3/3 que PRECISA sobreviver um turno inteiro para ativar. Em Commander, criaturas sem protecao raramente sobrevivem um ciclo. O deck ja tem Dance with Calamity + Improvisation Capstone para "free spell do topo" — efeito duplicado. EDHREC modesto, tag "spellslinger" compartilhada com cartas mais impactantes (Double Vision, Arcane Bombardment).
+
+**Solucao:** Flare of Duplication (CMC 3, Instant, mono-R) copia target instant/sorcery spell. Pode ser conjurada DE GRACA sacrificando uma criatura vermelha nao-ficha (Lorehold? Storm-Kiln? Dragon's Rage Channeler?). Sinergia CRITICA: Approach of the Second Sun — 1o cast + Flare copy = 2 casts no mesmo turno = VITORIA IMEDIATA. Sem esperar 1 turno para o 2o cast. Tambem copia qualquer big spell (Dance, Call Forth, Insurrection, Brass's Bounty).
+
+**Da colecao:** Sim (qty: 1). Cor: R (legal em Lorehold).
+
+**Principio:** Em spellslinger, copiar spells e melhor que revelar do topo com criatura fragil. Flare of Duplication transforma o Approach de "vitoria em 2 turnos" para "vitoria em 1 turno com 7+ mana e Flare na mao." Galvanoth precisava sobreviver 1 turno para talvez revelar algo util. Flare e instant — pode ser usada em resposta ou no seu turno com protecao.
+
+**Impacto esperado:** DCMC=-2 (DEFENSIVE). T3: 16.9% -> ~15% (estimado, -2pp por -2CMC). Copy layers: 5 -> 6 (com Flare). Approach clock: 2 turnos -> 1 turno. Remocao de criatura fragil que raramente ativa.
+
+---
+
+### Licoes do Ciclo #10
+
+1. **O T3=3.7% era o free mulligan rate, nao Sem Play T3.** Este erro custou 3 ciclos de estrategia errada (AGGRESSIVE quando devia ser DEFENSIVE). O Mulligan Tester (Execucoes #7-#10) e a fonte da verdade. A Evolution Oracle DEVE ler MULLIGAN_LOG.md, nao confiar em calculo interno.
+
+2. **Colecao esgotada limita swaps DEFENSIVE.** Com 229 cartas na colecao e 24 swaps ja aplicados, as opcoes de CMC <= 2 com alta sinergia sao minimas. O SCOUT #17 encontrou Twinflame e Flare of Duplication como as MELHORES opcoes restantes. Ambas sao synergy-first (Score 8 e 7), nao EDHREC-first.
+
+3. **Flare of Duplication + Approach = vitoria no mesmo turno.** Esta e a descoberta mais impactante do ciclo. Nenhum outro card na colecao permite "double Approach" sem esperar 1 turno. Com 7+ mana, Approach (7) + Flare free (sacrificando criatura vermelha) = 2 casts = win.
+
+4. **Grand Abolisher foi CORRETAMENTE mantido.** Apesar de declining (11.7%) e double-null, Grand Abolisher e a UNICA carta que impede counters no seu turno. Boseiju cobre Approach mas nao Insurrection/Storm Herd. Com o meta tendo Control (56% WR favoravel mas ainda com counters), manter protecao proativa e melhor que adicionar a 5a camada de copia.
+
+5. **Net DCMC=-2 e modesto, mas e o melhor viavel.** O ideal seria DCMC=-5 a -10 (como C#4 que fez -15 e reduziu T3 em 4.4pp). Porem, a colecao simplesmente nao tem cartas CMC 1-2 com sinergia suficiente para substituir cartas CMC 5+. Skullclamp (CMC 1, draw engine com tokens) e Chrome Mox (CMC 0, fast mana) resolveriam este problema — sao as prioridades de aquisicao.
+
+---
+
+### Estado Final do Deck
+
+- Total cartas: 100
+- Commander: 1
+- Lands: 35
+- CMC medio: 3.81 (-0.05)
+- Motor: 4/4 completo
+- Copy engines: 6 ativas (Lorehold, Double Vision, Bombardment, Dawning Archaic, Mizzix, Flare of Duplication) + 1 criatura (Twinflame)
+- Draw real: 7
+- Removal: 6
+- Board wipes: 5
+- Protection: 5 (Grand Abolisher mantido; Ruby Medallion removido)
+- Wincon paths: 8+ (Flare + Approach = nova opcao de vitoria em 1 turno)
+- Double-null cards: 4 (eram 6 no baseline, 5 pos-C#7, Ruby Medallion removido)
+- Swaps totais desde baseline: 25 (C#1:3, C#2:3, C#3:5, C#4:3, C#5:3, C#6:2, C#7:1, C#8:0, C#9:1, C#10:2)
+
+### Resumo do Ciclo
+
+| Metrica | Pos-C#9 | Pos-C#10 | D |
+|:--------|:-------:|:--------:|:-:|
+| Sem Play T3 | 16.9% | ~15% (est.) | -1.9pp (proj.) |
+| Jogaveis | 46.3% | +1-2pp (est.) | +1-2pp |
+| Copy layers | 4 | 6 | +2 |
+| Double-null | 5 | 4 | -1 |
+| CMC medio | 3.86 | 3.81 | -0.05 |
+| Protection | 6 | 5 | -1 |
+| Engine/Big Spell | 5 | 9 | +4 (tags: Flare e Twinflame com multi-tags) |
+
+**Net DCMC:** -2 (Galvanoth 5 -> Flare 3 = -2, Ruby 2 -> Twinflame 2 = 0)
+**Swaps totais desde baseline:** 25
+
+### Gaps Remanescentes
+
+1. **T3 = 16.9% (-> ~15% pos-C#10).** Ainda na zona DEFENSIVE (>12%). Net DCMC=-2 e insuficiente. Precisamos de -5 a -10 para impacto significativo. Bloqueado por colecao esgotada.
+2. **Draw = 7 vs 8-12** (perfil EDHREC). -1 do minimo. Bedlam Reveler (CMC efetivo RR=2, draw 3) e opcao na colecao mas e criatura (nao sinergiza com spellslinger). Skullclamp (aquisicao) resolveria.
+3. **Esper Sentinel em declinio (-0.54, 6 ciclos).** 32.5% EDHREC ainda e alto, mas tendencia consistente preocupa. Monitorar; se cair abaixo de 30%, cut candidate.
+4. **Fated Clash (15.6% EDHREC, -0.19).** Pairando no limite. Se substituivel por algo CMC 2-3 com funcao similar.
+5. **Protecao = 5 (era 6).** Ruby Medallion removido (nao era protecao, era ramp). Protecao real caiu de 6 -> 5 com reclassificacao. Ainda dentro do perfil (3-4 mas deck spellslinger precisa de mais).
+6. **Fast mana ausente.** Mana Vault, Chrome Mox, Mox Diamond — nenhum na colecao. T1 ramp = 20.1% (estrito, apenas 3 cartas). Fast mana reduziria T3 dramaticamente.
+7. **Stack interaction = 6/10.** Deflecting Swat + Hexing Squelcher sao as unicas respostas de stack. Flare of Duplication pode copiar counterspell do oponente contra ele mesmo — +0.5 no eixo de stack.
+
+### Recomendacoes de Aquisicao (Prioridade)
+
+| # | Carta | CMC | Funcao | Impacto no T3 | Preco aprox |
+|:-:|:------|:---:|:-------|:-------------:|:------------|
+| 1 | **Skullclamp** | 1 | Draw engine com tokens | 0 (nao afeta T3 diretamente, mas draw CMC 1 reduz necessidade de draw CMC 4) | $5-8 |
+| 2 | **Chrome Mox** | 0 | Fast mana T0 | ALTO (reduz T3 em ~2pp sozinho) | $60-80 |
+| 3 | **Mana Vault** | 1 | Fast mana T1 | ALTO (reduz T3 em ~1.5pp) | $40-60 |
+| 4 | **Underworld Breach** | 2 | Recursao massiva | Moderado | $15-20 |
+
+**Skullclamp e a prioridade #1** porque: menor custo ($5-8), maior impacto por dolar (draw engine que transforma tokens em draw 2), e sinergia direta com Storm Herd, Rite of the Dragoncaller, Call Forth the Tempest.
+
+### Proximo Ciclo (C#11)
+
+- Executar mulligan simulacao para medir impacto do DCMC=-2
+- Se T3 < 15%: melhoria modesta mas insuficiente — colecao esgotada, 0 swaps previstos
+- Se T3 15-16%: zona DEFENSIVE — sem opcoes de swap. Documentar gap.
+- Verificar se houve aquisicoes novas (Skullclamp?)
+- Reavaliar Esper Sentinel se cair abaixo de 30% EDHREC
+- Considerar Bedlam Reveler (RR=2 efetivo, draw 3) como opcao draw CMC baixo — mas e criatura, conflita com 60% do motor spellslinger
+
+
+## [2026-05-31T14:21:14+00:00] Ciclo #9 — Evolution Oracle (1 SWAP — AGGRESSIVE: Akroma's Will)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execucao #16, synergy-first):**
+- EDHREC estavel (7.802 decks, sem mudancas desde Execucao #14)
+- Motor 4/4, Copy 3/3 completos
+- Rising stars todas no deck. Declinios monitorados.
+- **NOVO:** Scout synergy-first (#15+#16) identificou Akroma's Will (Score 9), carta que cria wincon path NOVO
+- Spiteful Banditry (Score 10), Sunforger (Score 8), Bedlam Reveler (Score 8) tambem identificados
+
+**VALIDATOR (v3.8 SYNERGY_MAP):**
+- Pearl Medallion: Nivel 1 de corte (prioritario). Declining -0.46 ha 5+ ciclos. Afeta apenas 23 white spells.
+- Draw real = 7 (perfil 8-12). Motor 4/4, Copy 3/3, T3 = 3.7%.
+- SYNERGY_MAP: Token+Pump (6/10), Wipes+Prot (8/10), Recursion (8/10), Mana (7/10), Combo (8/10)
+- Recomendacao: adquirir Skullclamp, Mana Vault. 0 swaps se sem aquisicoes.
+
+**MULLIGAN (pos-Ciclo #6, N=1000, seed=42, rigoroso):**
+- Jogaveis: 48.4%, Mulligan: 41.5%
+- Ramp T1: 19.7% (estrito)
+- Sem Play T3: 3.7% — EXCELENTE, amplamente abaixo de 8%. AGGRESSIVE liberada.
+- Pos-Ciclo #7: T3 estimado ~5% (DCMC +2 do C#7). Mulligan nao executado.
+
+**BATTLE (Exec#8 pos-Ciclo #4):**
+- Avg WR: 52.1% (estavel). Combo: 46.5% (pior matchup).
+
+---
+
+### PASSO 0: Analise Estrategica (Respostas Obrigatorias)
+
+#### 1. COMO ESTE DECK GANHA? (7+ paths de vitoria, +1 NOVO com Akroma's Will)
+
+**Win conditions diretas:**
+- Approach of the Second Sun (CMC 7) — conjura 2x = vitoria
+- Insurrection (CMC 8) — rouba board + haste. Com Boros Charm double strike = letal
+
+**Token + Pump:**
+- Storm Herd (CMC 10) — X Pegasus = PVs (20-40 tokens)
+- Call Forth the Tempest (CMC 8) — dano + dragoes + cascade
+- Rite of the Dragoncaller (CMC 6) — Dragon 5/5 por spell
+- Surge to Victory (CMC 6) — copia spell com criaturas atacando
+- Boros Charm (CMC 2) — double strike para TODAS as criaturas
+- **Akroma's Will (CMC 4) — NOVO: flying + double strike + vigilance + lifelink + prot all colors + indestructible. Transforma QUALQUER token board em lethal imediato.**
+
+**Recursao explosiva:**
+- Mizzix's Mastery overload (CMC 4) — todos instants/sorceries do cemiterio gratis
+- Restoration Seminar (CMC 7) — retorna spell + cria token
+
+**Motor Treasure → Copy (4/4 completo):**
+- Treasure: Big Score, Brass's Bounty, Hit the Mother Lode, Smothering Tithe, Storm-Kiln
+- Free Big Spell: Dance with Calamity, Improvisation Capstone, Dawning Archaic
+- Copy: Lorehold, Double Vision, Arcane Bombardment
+- Payoff: Storm-Kiln Artist
+
+**Total: 8+ caminhos de vitoria funcionais.** So Approach e taggeado "wincon" pelo classificador, mas o deck fecha jogos com Insurrection, Storm Herd, Mizzix, Akroma's Will, e o motor treasure-copy.
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa adequada, vulneravel a combo)
+
+**Board wipes (5):** Blasphemous Act (CMC ~R), Austere Command (CMC 6, modular), Call Forth the Tempest (CMC 8, dano+cascade), Volcanic Vision (CMC 7, dano+recursao), Fated Clash (CMC 5, bounce 1/oponente + scry)
+
+**Protecao (5 fontes):** Boros Charm (indestrutivel), Teferi's Protection (faseia), Lightning Greaves (shroud+haste), Deflecting Swat (redirect), Hexing Squelcher (nega habilidades)
+
+**Balanco: 5 wipes vs 5 protecoes.** Sem risco de auto-destruicao. Wipes assimetricos (Austere, Call Forth, Volcanic Vision). Grand Abolisher removido? Nao — Grand Abolisher ainda no deck (protecao proativa).
+
+**Contra combo (46.5% WR):** Sem counterspell. Depende de remocao instantanea. Fraqueza estrutural de Boros.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw suficiente, tesouros abundantes)
+
+**Draw REAL (7 fontes):** Sensei's Divining Top, Esper Sentinel, Faithless Looting, Thrill of Possibility, Victory Chimes, The One Ring, Wedding Ring
+
+**Topdeck manipulation:** Scroll Rack, Penance, Library of Leng complementam draw
+
+**Recursao (4):** Mizzix's Mastery, Restoration Seminar, Faithless Looting flashback, Surge to Victory
+
+**Tesouros (6+ geradores):** Smothering Tithe, Storm-Kiln Artist, Big Score, Brass's Bounty, Hit the Mother Lode, Unexpected Windfall
+
+**O deck NAO fica sem gasolina.** Draw + topdeck manipulation suprem consistentemente.
+
+#### 4. COMO ESTE DECK ACELERA? (Ramp treasure-heavy, sobrevive a wipes)
+
+**Ramp (14 fontes):**
+- T1 (3): Sol Ring, Land Tax, Weathered Wayfarer
+- T2 (3): Arcane Signet, Boros Signet, Talisman of Conviction (+ Ruby Medallion)
+- T3+ (7): Archaeomancer's Map, Bender's Waterskin, Monument to Endurance, Jeska's Will, Smothering Tithe, Big Score, Unexpected Windfall
+
+**CMC medio 3.86, pico em 2-3 e 5-7.** Ramp justifica a curva. T1 ramp = 19.7% (limite do formato Boros).
+
+#### 5. QUAL O PLANO DE JOGO? (Claro, consistente, sobrevive a interacao)
+
+**T1-T3 (Setup):** Ramp + topdeck manipulation + protecao para Lorehold
+- Ideal: T1 Sol Ring+Signet, T2 Scroll Rack+Top, T3 Lorehold com Greaves
+- Medio: T1 Land Tax, T2 Signet, T3 Monument, T4 Lorehold
+- Ruim (3.7%): T1-T3 sem jogo — o menor nivel ja registrado
+
+**T4-T6 (Mid-game):** Lorehold + engines (Tithe, TOR, Wedding Ring, Double Vision). Big spells.
+**T7+ (Fechar):** Approach, Insurrection, Storm Herd + Akroma's Will/Boros Charm, Mizzix's Mastery, Arcane Bombardment chain.
+
+**O plano sobrevive a interacao:** Tesouros sobrevivem a wipes. Recursao reconstrói. Deflecting Swat + Grand Abolisher contra counterspell. Remocao pontual contra stax.
+
+---
+
+### Determinacao de Estrategia
+
+**Sem Play T3 = 3.7% (pos-C#6, rigoroso).** Pos-C#7 estimado ~5% (DCMC +2).
+Amplamente abaixo do limite de 8% → **AGGRESSIVE liberada.** Pode adicionar cartas CMC 3-4 sem comprometer early-game.
+
+### Por que EXATAMENTE 1 swap?
+
+O deck esta saudavel: T3 ~3.7-5%, WR 52.1%, motor 4/4, copy 3/3. A colecao esta esgotada de upgrades CMC 1-2.
+
+**O que mudou desde o Ciclo #8:**
+O Ciclo #8 resultou em 0 swaps porque nenhum candidato atingia Necessidade Estrategica >= 3. Porem, os Scouts #15 e #16 (executados APOS o C#8) identificaram Akroma's Will (Score 9) como a MELHOR carta da colecao para este deck — algo que o C#8 nao considerou.
+
+Akroma's Will NAO e um sidegrade. E um upgrade que CRIA uma nova win condition: transformar qualquer token board em lethal imediato. O deck tem 4+ token makers (Storm Herd, Call Forth, Rite, Surge to Victory) mas o unico pump era Boros Charm (double strike). Akroma's Will adiciona flying + double strike + vigilance + lifelink + prot all colors + indestructible — e um "I win" button.
+
+**Candidatos AVALIADOS e REJEITADOS:**
+
+| Carta | EDHREC | CMC | Por que NAO |
+|:------|:------:|:---:|:------------|
+| Pearl → Spiteful Banditry | N/A | 2 | Sidegrade. Deck ja tem 5 wipes + 14 ramp. Banditry seria o 6o wipe e +1 ramp redundante. |
+| Grand Abolisher → Sunforger | N/A | 3 | CMC 3 + equip 3 = 6 mana total. Deck spellslinger tem apenas ~10 criaturas. Toolbox interessante mas custo de ativacao alto. |
+| Ruby Medallion → Reverberate | 42.3% | 2 | Ruby afeta 35+ red spells (meta-aligned). Reverberate seria 4a camada de copy (redundancia). |
+| Pearl → Bedlam Reveler | N/A | 8 (RR) | Draw 3 e excelente, mas o draw ja subiu para 7. Revealer e criatura (nao sinergiza com spellslinger). CMC 8 impresso confunde. |
+
+**Apenas Pearl → Akroma's Will atinge Necessidade Estrategica >= 3.**
+
+### Swap 1: Pearl Medallion → Akroma's Will
+
+**Diagnostico:** Pearl Medallion (CMC 2, 25.2% EDHREC, trend -0.46) e cost reduction que afeta apenas 23 white spells no deck. Esta em declinio ha 5+ ciclos. E double-null (classificador cego). Com 14 fontes de ramp, cost reduction e redundante — o deck gera tesouros que pagam custos cheios.
+
+**Solucao:** Akroma's Will (CMC 4) e um instant que da flying, double strike, vigilance, lifelink, protection from all colors, e indestructible para TODAS as suas criaturas. Com Storm Herd (20-40 Pegasus), Call Forth the Tempest (dragoes), Rite of the Dragoncaller (dragoes), ou Surge to Victory, transforma QUALQUER board em lethal imediato. E uma win condition que nao existia no deck.
+
+**Da sua colecao:** Sim (qty: 1)
+
+**Principio:** Em Lorehold, criar tokens e facil (4+ fontes). Transforma-los em vitoria e o gargalo. Pearl Medallion reduzia custo em 1 para 23 cartas brancas. Akroma's Will transforma 20+ Pegasus em 40+ de dano voar com double strike e protection from everything. Custo de oportunidade baixo, upside altissimo.
+
+**Impacto esperado:** DCMC = +2 (2->4). T3: ~3.7% -> ~5-6% (dentro do range AGGRESSIVE com folga). Wincon paths: 7+ -> 8+ (nova opcao de lethal com token board).
+
+### Licoes do Ciclo #9
+
+1. **"0 swaps" nao e permanente.** O Ciclo #8 foi correto em nao forcar swaps, mas os Scouts #15/#16 encontraram Akroma's Will (que nao estava no radar do C#8) usando busca synergy-first alem do EDHREC.
+
+2. **Cost reduction em deck de tesouros e redundante.** Pearl Medallion (25.2%, declining) afetava so 23 cartas. Os 14 ramp + tesouros ja suprem mana suficiente.
+
+3. **Akroma's Will e uma staple subestimada em Lorehold.** Nao aparece no EDHREC de Lorehold (carta generica, nao especifica do commander), mas e uma das melhores cartas para qualquer deck branco com token makers.
+
+4. **T3 = 3.7% da MUITA margem para upgrades.** O acumulo de 6 ciclos de swaps defensivos (C#1 a C#6) criou um early-game tao robusto que upgrades CMC +2 sao perfeitamente seguros.
+
+5. **O deck atingiu 23 swaps.** O limite de upgrades com custo zero esta proximo. A colecao tem mais cartas boas (Spiteful Banditry, Sunforger, Reverberate, Bedlam Reveler) mas sao sidegrades ou redundancias. Skullclamp e Mana Vault continuam sendo as prioridades de aquisicao.
+
+### Estado Final do Deck
+
+- Total cartas: 100
+- Commander: 1
+- Lands: 35
+- Motor: 4/4 completo
+- Copy engines: 3/3 completo
+- Draw real: 7
+- Removal: 6
+- Board wipes: 5
+- Wincon paths: 8+ (Akroma's Will adicionado)
+- Double-null cards: 5 (Pearl Medallion removido)
+- Swaps totais desde baseline: 23 (C#1:3, C#2:3, C#3:5, C#4:3, C#5:3, C#6:2, C#7:1, C#8:0, C#9:1)
+
+### Resumo do Ciclo
+
+| Metrica | Pos-C#7 (est.) | Pos-C#9 | D |
+|:--------|:--------------:|:-------:|:-:|
+| Jogaveis | ~48% | = | 0 |
+| Mulligan | ~42% | = | 0 |
+| Ramp T1 | 19.7% | = | 0 |
+| Sem Play T3 | ~5% (est.) | ~6-7% (est.) | +1-2pp |
+| Draw real | 7 | 7 | 0 |
+| Wincon dedicado | 1 | 2 | +1 |
+| Protection | 3 | 3 | 0 |
+
+**Net DCMC:** +2 (Pearl 2 -> Akroma's Will 4)
+**Swaps totais desde baseline:** 23
+
+### Gaps Remanescentes
+
+1. **Draw = 7 vs 8-12** (perfil EDHREC). Gap estrutural de Boros. Bedlam Reveler (RR=2, draw 3) e opcao mas e criatura.
+2. **Esper Sentinel em declinio (-0.54, 6 ciclos).** 32.5% ainda meta-aligned mas tendencia preocupa.
+3. **Fated Clash (15.6%, -0.19).** Pairando no limite de corte.
+4. **Grand Abolisher (11.7%, -0.27).** Double-null, declining. Efeito unico mas substituivel por Sunforger.
+5. **Ruby Medallion (42.3%, -0.37).** Declinio menor. Afeta 35+ red spells. Monitorar.
+
+### Recomendacoes de Aquisicao
+
+| Carta | CMC | Funcao | Por que |
+|:------|:---:|:-------|:--------|
+| Skullclamp | 1 | Draw engine com tokens | Melhor draw em deck com token |
+| Mana Vault | 1 | Fast mana T1/T2 | Melhorar ramp T1 (19.7% -> ~22%) |
+| Chrome Mox | 0 | Fast mana T0 | Impulse T1-T2 |
+| Wheel of Fortune | 3 | Draw massivo | Sinergia com Library of Leng |
+
+### Proximo Ciclo (C#10)
+
+- Executar mulligan simulacao para medir impacto de ambos C#7 (DCMC +2) e C#9 (DCMC +2)
+- Se T3 < 8%: AGGRESSIVE — considerar Grand Abolisher -> Sunforger
+- Se T3 8-12%: BALANCED — trocar Fated Clash por algo CMC 2-3
+- Prioridade: verificar aquisicoes novas (Skullclamp?)
+- Reavaliar Esper Sentinel se cair abaixo de 30%
+
+---
+
+## [2026-05-31T12:33:00+00:00] Ciclo #8 — Evolution Oracle (0 SWAPS — Deck Saudável)
+
+### Sintese dos 3 Agentes
+
+**SCOUT (Execução #14, 7.802 decks):**
+- Motor 4/4 completo. Copy engines 3/3 completo.
+- EDHREC estável — snapshot idêntico desde Execução #13.
+- Rising stars todas no deck: Improvisation Capstone (+8.09), Restoration Seminar (+9.14), The Dawning Archaic (+5.31).
+- Declinios persistentes: Pearl Medallion (-0.46, 5+ ciclos), Esper Sentinel (-0.54, 6 ciclos), The One Ring (-0.32, Game Changer).
+- Nenhuma carta nova de alto impacto ausente do deck (todas as rising stars já incluídas).
+
+**VALIDATOR (v3.7, pós-Ciclo #7):**
+- Draw real = 7 (perfil quer 8-12). A 1 fonte do mínimo — quase resolvido.
+- Wincon dedicado = 1 (perfil quer 4-7). Deficiência de TAG, não de deck. Funcionalmente 7+ paths.
+- Motor 4/4, copy 3/3. Todos os sistemas completos.
+- Double-null restantes: 6 cartas (Scroll Rack, Penance, Grand Abolisher, Ruby Medallion, Pearl Medallion, Taunt).
+
+**MULLIGAN (simulação pós-Ciclo #6, N=1000, seed=42, rigoroso):**
+- Jogáveis: 48.4%, Mulligan: 41.5%
+- Ramp T1: 19.7% (estrito: Sol Ring, Land Tax, Weathered Wayfarer)
+- Sem Play T3: 3.7% — EXCELENTE, muito abaixo dos 8%. Estratégia AGGRESSIVE liberada.
+- Simulação pós-Ciclo #7 NÃO executada. T3 estimado ~5% (net DCMC +2 do C#7).
+
+**BATTLE (Exec#8 pós-Ciclo #4):**
+- Avg WR: 52.1% (estável)
+- Pior matchup: Combo (46.5%)
+- Melhor matchup: Control (56.0%)
+
+---
+
+### PASSO 0: Análise Estratégica (Respostas Obrigatórias)
+
+#### 1. COMO ESTE DECK GANHA? (7+ paths de vitória)
+
+**Win conditions diretas:**
+- Approach of the Second Sun (CMC 7, 63.8% EDHREC) — conjura 2x = vitória. Copy com Lorehold acelera o clock.
+
+**Token + Pump:**
+- Storm Herd (CMC 10, 75.1% EDHREC) — X Pegasus = PVs. Com 40 PVs, 40 tokens com flying.
+- Boros Charm (CMC 2) — double strike para TODAS as criaturas.
+- Surge to Victory (CMC 6) — exile feitiço do cemitério, criaturas copiam ao causar dano.
+
+**Roubo em massa:**
+- Insurrection (CMC 8, 45.3% EDHREC) — rouba TODAS as criaturas, haste.
+
+**Recursão explosiva:**
+- Mizzix's Mastery overload (CMC 4, 57.5% EDHREC) — conjura TODOS instants/sorceries do cemitério grátis. Com Double Vision + Lorehold + Arcane Bombardment = 3-4x cópias.
+- Restoration Seminar (CMC 7, 37.8% EDHREC) — retorna instant/sorcery do cemitério + cria token.
+
+**Burn / Cascade:**
+- Call Forth the Tempest (CMC 8, 65.5% EDHREC) — dano massivo + cascade. Pode cascade em Approach.
+- Volcanic Vision (CMC 7, 63.9% EDHREC) — dano = CMC de carta revelada + retorna instant/sorcery.
+
+**Motor completo (Treasure to Big Spell to Copy to Payoff):**
+- Big Score/Brass's Bounty/Hit the Mother Lode geram tesouros
+- Dance with Calamity/Improvisation Capstone conjuram big spells grátis
+- Lorehold + Double Vision + Arcane Bombardment copiam as spells
+- Storm-Kiln Artist: cada cópia gera tesouro, realimenta o motor
+
+**Total: 7+ caminhos de vitória funcionais.** Só Approach é taggeado "wincon" mas o deck fecha jogos de múltiplas formas.
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa adequada, vulnerável a combo)
+
+**Board wipes (5):**
+- Blasphemous Act (CMC 9, custo ~R) — Protegido por Boros Charm (indestrutível) e Teferi's Protection (faseia)
+- Austere Command (CMC 6) — Modular: pode escolher NÃO destruir criaturas
+- Call Forth the Tempest (CMC 8) — Dano + cascade, beneficia o deck
+- Volcanic Vision (CMC 7) — Dano = CMC revelada + retorna spell do cemitério
+- Fated Clash (CMC 5, 15.6% EDHREC) — Bounce 1 criatura/oponente + scry (mais fraco)
+
+**Proteção (6 fontes):**
+- Boros Charm (CMC 2, 45.5% EDHREC) — indestrutível para board wipes
+- Teferi's Protection (CMC 3, 21.2%) — faseia TUDO, funciona com qualquer wipe
+- Lightning Greaves (CMC 2, 45.3%) — shroud + haste para Lorehold
+- Deflecting Swat (CMC 3, 36.8%) — redireciona spell/ability, responde a counterspell
+- Grand Abolisher (CMC 2, 11.7%) — oponentes NÃO conjuram no seu turno
+- Hexing Squelcher (CMC 2, 40.9%) — oponentes não ativam habilidades
+
+**Balanço: 5 board wipes vs 6 proteções.** Sem risco de auto-destruição.
+
+**Contra combo (46.5% WR):** Sem counterspell. Depende de remoção instantânea. Fraqueza estrutural de Boros.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw suficiente, tesouros abundantes)
+
+**Draw REAL (7 fontes):**
+- Sensei's Divining Top (CMC 1, 66.9% EDHREC) — topdeck contínuo, draw virtual com fetch
+- Esper Sentinel (CMC 1, 32.5%) — draw condicional oponente
+- Faithless Looting (CMC 1, 29.7%) — draw 2 discard 2, flashback
+- Thrill of Possibility (CMC 2, 13.9%) — draw 2 discard 1, instant
+- Victory Chimes (CMC 3, 53.6%) — draw passivo em artifact ETB, 15+ artifacts no deck
+- The One Ring (CMC 4, 8.5%) — draw engine contínuo + proteção (Game Changer)
+- Wedding Ring (CMC 4) — draw simétrico, sempre eficiente em 4 jogadores
+
+**Topdeck manipulation (complementa draw):**
+- Scroll Rack (CMC 2, 59.7%), Penance (CMC 3, 41.8%), Library of Leng (CMC 1, 77.8%)
+
+**Recursão (4):** Mizzix's Mastery, Restoration Seminar, Faithless Looting flashback, Surge to Victory
+
+**Tesouros (6+ geradores):** Smothering Tithe, Storm-Kiln Artist, Big Score, Brass's Bounty, Hit the Mother Lode, Unexpected Windfall
+
+#### 4. COMO ESTE DECK ACELERA? (Ramp treasure-heavy, sobrevive a wipes)
+
+**Ramp (14 fontes):**
+- T1 (3): Sol Ring, Land Tax, Weathered Wayfarer
+- T2 (4): Arcane Signet, Boros Signet, Talisman of Conviction, Ruby/Pearl Medallion
+- T3+ (7): Archaeomancer's Map, Bender's Waterskin, Monument to Endurance, Jeska's Will, Smothering Tithe, Big Score, Unexpected Windfall
+
+**CMC médio 3.79, pico em 2-3 e 5-7.** Ramp justifica a curva — financia consistentemente o mid-game.
+**T1 ramp: 3 fontes (~19.7%).** Limite do formato para Boros.
+
+#### 5. QUAL O PLANO DE JOGO? (Claro, consistente, sobrevive a interação)
+
+**T1-T3 (Setup):** Ramp + topdeck manipulation + proteção para Lorehold
+- Ideal: T1 Sol Ring+Signet, T2 Scroll Rack+Top, T3 Lorehold com Greaves
+- Médio: T1 Land Tax, T2 Signet, T3 Monument, T4 Lorehold
+- Ruim (3.7%): T1-T3 sem jogo
+
+**T4-T6 (Mid-game):** Lorehold + engines (Smothering Tithe, One Ring, Wedding Ring, Double Vision). Big Score gera tesouros. Improvisation Capstone/Dance geram valor explosivo.
+
+**T7+ (Fechar):** Approach, Insurrection, Storm Herd+Surge, Mizzix's Mastery overload, Arcane Bombardment chain.
+
+**O plano sobrevive a interação:**
+- Board wipe: tesouros sobrevivem, recursão reconstrói
+- Counterspell: Deflecting Swat + Grand Abolisher
+- Remoção no Lorehold: Greaves, recasting factível com tesouros
+- Stax: remoção pontual abundante
+
+---
+
+### Determinacao de Estrategia
+
+**Sem Play T3 = 3.7% (pós-C#6, simulação rigorosa).** Pós-C#7 estimado ~5%.
+Amplamente abaixo do limite de 8% → **AGGRESSIVE liberada.**
+
+Mesmo com margem para swaps agressivos, a coleção está ESGOTADA de upgrades de qualidade. O deck recebeu 22 swaps desde o baseline e atingiu um **ponto ótimo**.
+
+### Por que 0 SWAPS?
+
+O deck está saudável. Aplicar swaps agora seria trocar cartas aceitáveis por outras igualmente aceitáveis — sidegrades sem ganho estratégico real. **Cada swap precisa de JUSTIFICATIVA ESTRATÉGICA, não apenas estatística.**
+
+**Candidatos a corte AVALIADOS e REJEITADOS:**
+
+| Carta | EDHREC | Trend | Por que NÃO cortar AGORA |
+|:------|:------:|:-----:|:-------------------------|
+| Pearl Medallion (CMC 2) | 25.2% | -0.46 | Substituto ideal (CMC 1-2, draw) não existe na coleção. Mother of Runes seria sidegrade. |
+| Fated Clash (CMC 5) | 15.6% | -0.19 | Board wipe mais fraco, mas 5 wipes no total. Substituto Farewell é PIOR (-0.95 trend). |
+| Grand Abolisher (CMC 2) | 11.7% | -0.27 | Efeito único — prevenir interação no seu turno é insubstituível. |
+| Ruby Medallion (CMC 2) | 42.3% | -0.37 | Acima de 40% — meta-aligned. Cobre 42+ red spells. |
+| Esper Sentinel (CMC 1) | 32.5% | -0.54 | Em declínio mas CMC 1 com draw condicional ainda é bom. Sem substituto CMC 1. |
+
+**Avaliação dos possíveis swaps IN:**
+| Carta | EDHREC | CMC | Por que NÃO |
+|:------|:------:|:---:|:------------|
+| Mother of Runes | 34.5% | 1 | Sidegrade. 6 fontes de proteção já. 10-12 criaturas no deck. |
+| Fellwar Stone | 34.3% | 2 | Redundante. 3 Signets já no deck. |
+| Guttersnipe | 32.3% | 3 | 2 dano/spell em 120 PVs multiplayer = inócuo. |
+| Flawless Maneuver | 19.8% | 3 | Declinando (-0.27). 19.8% é baixo. |
+| Apex of Power | 55.0% | 10 | CMC 10 — DISASTROSO para T3. |
+
+**Conclusão:** Nenhum swap atinge os critérios mínimos de Necessidade Estratégica (>= 3).
+
+### Gaps Remanescentes
+
+1. **Draw = 7 vs 8-12** (perfil EDHREC). Gap estrutural de Boros. Compensado por topdeck manipulation.
+2. **Pearl Medallion em declínio (-0.46, 5+ ciclos).** Monitorar. Se <20%, corte C#9.
+3. **Fated Clash (15.6%, -0.19).** Pairando no limite de corte. Aguardar scout fresco.
+4. **Esper Sentinel em declínio (-0.54, 6 ciclos).** 32.5% ainda meta-aligned. CMC 1 valioso.
+5. **Coleção ESGOTADA de upgrades CMC 1-2.** GAP MAIS IMPORTANTE. Necessário adquirir novas cartas.
+
+### Recomendações de Aquisição
+
+| Carta | CMC | Função |
+|:------|:---:|:-------|
+| Skullclamp | 1 | Draw engine com tokens |
+| Mana Vault | 1 | Fast mana T1/T2 |
+| Chrome Mox | 0 | Fast mana T0 |
+| Wheel of Fortune | 3 | Draw massivo, sinergia com Library of Leng |
+| Ranger-Captain of Eos | 3 | Tutor + Silence, busca Wayfarer/Sentinel |
+
+### Licoes do Ciclo #8
+
+1. **O deck atingiu maturidade.** 22 swaps em 7 ciclos: T3 de 16.5% para 3.7%, motor de 1/4 para 4/4. Ganhos marginais decrescentes.
+2. **Sidegrades não são upgrades.** Pearl Medallion (25.2%) por Mother of Runes (34.5%) = sidegrade. Nenhum gap resolvido.
+3. **"0 swaps é válido quando o deck está saudável."** Forçar swaps é pior que não fazer nada.
+4. **O gargalo agora é aquisição, não otimização.** Evolution Oracle documenta e passa o bastão.
+5. **Mulligan pós-C#7 é o próximo passo crítico.** Verificar T3 real vs estimado (~5%).
+
+### Resumo do Ciclo
+
+| Métrica | Pós-C#7 (est.) | Pós-C#8 | D |
+|:--------|:--------------:|:-------:|:-:|
+| Jogaveis | ~48% | = | 0 |
+| Mulligan | ~42% | = | 0 |
+| Ramp T1 | 19.7% | = | 0 |
+| Sem Play T3 | ~5% (est.) | = | 0 |
+| Draw real | 7 | = | 0 |
+| Lands | 35 | = | 0 |
+
+**Net DCMC:** 0 (sem swaps)
+**Swaps totais desde baseline:** 22 (C#1:3, C#2:3, C#3:5, C#4:3, C#5:3, C#6:2, C#7:1, C#8:0)
+
+### Estado Final do Deck
+
+- Total cartas: 100
+- Commander: 1
+- Lands: 35
+- Motor: 4/4 completo
+- Copy engines: 3/3 completo
+- Draw real: 7
+- Removal: 6
+- Board wipes: 5
+- Proteção: 6 fontes
+- Double-null cards: 6
+
+### Próximo Ciclo (C#9)
+
+- Executar mulligan simulação pós-C#7
+- Se T3 < 8%: AGGRESSIVE — Pearl Medallion candidato a corte
+- Se T3 8-12%: BALANCED — swap Pearl Medallion por carta CMC 2
+- Prioridade: verificar aquisições novas
+- Reavaliar Esper Sentinel se tendência continuar (32.5% para <30%)
+
+---
 ## [2026-05-31T10:40:37+00:00] Ciclo #7 — Evolution Oracle (AGGRESSIVE)
 
 ### Sintese dos 3 Agentes
