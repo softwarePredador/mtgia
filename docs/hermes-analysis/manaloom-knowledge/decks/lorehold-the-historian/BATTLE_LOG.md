@@ -153,3 +153,72 @@ Third consecutive 6-archetype matchup simulation with **byte-identical results**
 | 8 | 2026-05-31T06:00 | 6-Archetype | 52.1% | 0.0pp |
 
 **VERDICT: STABLE.** No delta-triggered swap review needed. The ~52% average win rate across 6 archetypes is confirmed as the baseline for this deck configuration. To improve, structural changes (more draw engines, graveyard recursion, lower-CMC wincons) are needed — not incremental swaps.
+
+## [2026-05-31T14:43:16Z] Real Matchup 6 archetypes (200 sims each)
+Avg WR: 51.1% (delta -1.0pp) | Range: 46.5%-56.0%
+My Deck: L=35 R=14 X=11 C=0 CMC=3.74 | Archetype: spellslinger
+
+   52.5% vs Aggro (Krenko/Goblins) (aggro) — equilibrado
+    + Mais ramp (14 vs 8), Mais removal (11 vs 5)
+    - Curva mais alta (3.74 vs 2.5), aggro favorece contra spellslinger (-5)
+   46.5% vs Control (Atraxa Superfriends) (control) — equilibrado
+    - Curva mais alta (3.74 vs 3.2)
+   46.5% vs Combo (Kinnan cEDH) (combo) — equilibrado
+    + Mais removal (11 vs 6)
+    - Curva mais alta (3.74 vs 2.1), combo favorece contra spellslinger (-5)
+   52.5% vs Midrange (Korvold Value) (midrange) — equilibrado
+    + Mais removal (11 vs 8)
+    - Curva mais alta (3.74 vs 3.0)
+   52.5% vs Spellslinger (Niv-Mizzet) (spellslinger) — equilibrado
+    + Mais ramp (14 vs 10)
+    - Curva mais alta (3.74 vs 2.8)
+   56.0% vs Stax (Winota Hatebears) (stax) — favoravel
+    + Mais ramp (14 vs 8), Mais removal (11 vs 8)
+    - Curva mais alta (3.74 vs 2.6)
+
+
+## [2026-05-31T15:52:54Z] Battle Analyst v6 — REAL Game Simulation
+Games per opponent: 100
+Deck: 100c | L=35 R=14 X=11 C=9 CMC=3.74
+
+| Opponent | Archetype | WR | Wins | Losses | Stalls | Avg Win Turn |
+|:---------|:----------|---:|-----:|-------:|-------:|-------------:|
+| Aggro (Krenko) | aggro | 23.0% | 23 | 77 | 0 | 13.1 |
+| Control (Atraxa) | control | 64.0% | 64 | 33 | 3 | 17.3 |
+| Combo (Kinnan) | combo | 36.0% | 36 | 64 | 0 | 13.6 |
+| Midrange (Korvold) | midrange | 42.0% | 42 | 58 | 0 | 14.7 |
+| Spellslinger (Niv-Mizzet) | spellslinger | 65.0% | 65 | 35 | 0 | 15.7 |
+| Stax (Winota) | stax | 60.0% | 60 | 40 | 0 | 14.8 |
+
+**Overall WR: 48.3%** (290W/307L/3S)
+
+### Loss Reasons
+- vs Aggro (Krenko): life_zero=77
+- vs Control (Atraxa): life_zero=33
+- vs Combo (Kinnan): life_zero=64
+- vs Midrange (Korvold): life_zero=58
+- vs Spellslinger (Niv-Mizzet): life_zero=35
+- vs Stax (Winota): life_zero=40
+
+## [2026-05-31T15:55:03Z] Battle Analyst v6 — REAL Game Simulation
+Games per opponent: 100
+Deck: 100c | L=35 R=14 X=11 C=9 CMC=3.74
+
+| Opponent | Archetype | WR | Wins | Losses | Stalls | Avg Win Turn |
+|:---------|:----------|---:|-----:|-------:|-------:|-------------:|
+| Aggro (Krenko) | aggro | 23.0% | 23 | 77 | 0 | 13.1 |
+| Control (Atraxa) | control | 64.0% | 64 | 33 | 3 | 17.3 |
+| Combo (Kinnan) | combo | 36.0% | 36 | 64 | 0 | 13.6 |
+| Midrange (Korvold) | midrange | 42.0% | 42 | 58 | 0 | 14.7 |
+| Spellslinger (Niv-Mizzet) | spellslinger | 65.0% | 65 | 35 | 0 | 15.7 |
+| Stax (Winota) | stax | 60.0% | 60 | 40 | 0 | 14.8 |
+
+**Overall WR: 48.3%** (290W/307L/3S)
+
+### Loss Reasons
+- vs Aggro (Krenko): life_zero=77
+- vs Control (Atraxa): life_zero=33
+- vs Combo (Kinnan): life_zero=64
+- vs Midrange (Korvold): life_zero=58
+- vs Spellslinger (Niv-Mizzet): life_zero=35
+- vs Stax (Winota): life_zero=40
