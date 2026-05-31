@@ -2,7 +2,7 @@
 
 > Relat�rio gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
-> �ltima atualiza��o: **2026-05-31T00:53Z** (manaloom-manager-watchdog)
+> �ltima atualiza��o: **2026-05-31T01:32Z** (manaloom-manager-watchdog)
 
 ## Resumo
 
@@ -11,122 +11,126 @@
 | Total de crons (`include_disabled=True`) | **18** ||
 | Habilitados | 18/18 ||
 | Desabilitados | **0** ||
-| `last_status=error` | **12** ||
-| `last_status=ok` | **6** ||
+| `last_status=error` | **8** ||
+| `last_status=ok` | **10** ||
 | Nunca executaram (`last_run_at=null`) | **0** ||
-| Stale (>1.5x schedule atr�s, `enabled=true`) | **0** ||
-| A��es de recupera��o nesta execu��o | 0 (systemic 429 -- run n�o resolve) |
+| Stale (>1.5x schedule atr�s, `enabled=true`) | **0** |
+| A��es de recupera��o nesta execu��o | 0 (rate limit parcialmente lifting -- auto-recupera��o em progresso) |
 | Branch do workdir | `codex/hermes-analysis-docs` |
 
-**Estado geral:** 18 crons habilitados, **6 OK**, **12 com erro**. -- **FALHA SIST�MICA CONT�NUA:** Todos os 12 erros s�o `HTTP 429: Rate limit exceeded: free-models-per-day-stealth`. Nenhuma a��o por-cron resolver� -- o limite di�rio do provider continua esgotado.
+**Estado geral:** 18 crons habilitados, **10 OK**, **8 com erro**. -- **MELHORA:** Rate limit do OpenRouter parcialmente recuperado. 4 crons voltaram de error para ok desde snapshot anterior. Erros restantes ainda podem ser 429 residuais -- aguardando pr�ximos ticks.
 
 ## An�lise de Recupera��o
 
-Snapshot anterior: **2026-05-31T00:06Z** (6 OK, 12 error, 0 desabilitados)
-Este snapshot: **2026-05-31T00:53Z** (6 OK, 12 error, 0 desabilitados)
+Snapshot anterior: **2026-05-31T00:53Z** (6 OK, 12 error, 0 desabilitados)
+Este snapshot: **2026-05-31T01:32Z** (10 OK, 8 error, 0 desabilitados)
 
-|| M�trica | 00:06Z | 00:53Z | Delta |
-|:--|:--:|:--:|:--:||
+|| M�trica | 00:53Z | 01:32Z | Delta |
+|:--|:--:|:--:|:--:|:--:||
 | Total crons | 18 | 18 | 0 |
 | Habilitados | 18 | 18 | 0 |
-| Errors | 12 | 12 | 0 |
-| OK | 6 | 6 | 0 |
+| Errors | 12 | 8 | **-4** |
+| OK | 6 | 10 | **+4** |
 
 **Mudan�as desde snapshot anterior:**
-- **Nenhuma mudan�a** -- mesmos 6 OK, mesmos 12 em erro
-- 429 persistente: `manaloom-logic-coherence-auditor` rodou aos 00:52Z (1min atr�s) e j� errou com 429 -- confirma rate limit ainda ativo
-- **Diagn�stico:** Limite di�rio de modelos gratuitos do OpenRouter continua esgotado
-- **A��o tomada:** Nenhuma -- `run` em cada cron resultaria no mesmo 429
-- **Previs�o:** Auto-recupera��o quando o limite di�rio for resetado
+- **4 crons recuperados (error → ok):**
+  - `manaloom-gamechanger-research` — rodou OK �s 01:20Z
+  - `lorehold-deck-validator` — rodou OK �s 01:08Z
+  - `manaloom-knowledge-import` — rodou OK �s 01:31Z
+  - `manaloom-knowledge-synthesis` — rodou OK �s 01:16Z
+- **Diagn�stico:** Rate limit parcialmente recuperado -- crons come�am a passar
+- **A��o tomada:** Nenhuma -- recupera��o autom�tica pelo scheduler
+- **Previs�o:** Demais crons devem recuperar nos pr�ximos ticks
 
-## Crons OK (6)
+## Crons OK (10)
 
 || Job ID | Nome | Schedule | Last run | Idade | Status | Observa��o |
 |---|---|---|---|---|---|---|
-| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-31T00:24Z | 29min | ok | script-based |
-| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-30T14:30Z | ~10h | ok | semanal |
-| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ~10h | ok | di�rio |
+| `757eefb8738b` | manaloom-master-watchdog | every 30m | 2026-05-31T00:24Z | 67min | ok | script-based |
+| `aeaeb666d377` | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-30T14:30Z | ~11h | ok | semanal |
+| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-31T01:20Z | 11min | ok | ✅ recuperado de 429 |
+| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T00:58Z | 33min | ok | **esta execu��o** |
+| `b340374bc4e7` | manaloom-tag-accuracy-reporter | every 1440m | 2026-05-30T14:42Z | ~11h | ok | di�rio |
+| `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-31T01:08Z | 23min | ok | ✅ recuperado de 429 |
 | `a50bef4c2a59` | lorehold-evolution-oracle | every 720m | 2026-05-30T16:11Z | ~9h | ok | 12h schedule |
-| `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-30T16:47Z | ~8h | ok | 8h schedule |
-| `2d436c71bbf7` | manaloom-manager-watchdog | every 30m | 2026-05-31T00:13Z | 40min | ok | **esta execu��o** |
+| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-31T01:31Z | 0min | ok | ✅ recuperado de 429 (agora!) |
+| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-31T01:16Z | 15min | ok | ✅ recuperado de 429 |
+| `94f8590b1beb` | lorehold-battle-analyst | every 480m | 2026-05-31T01:18Z | 13min | ok | 8h schedule |
 
-## Crons com Erro HTTP 429 (12) -- Falha Sist�mica
+## Crons com Erro (8) -- Rate Limit Residual
 
-Todos os erros abaixo compartilham a mesma causa raiz: `RuntimeError: HTTP 429: Rate limit exceeded: free-models-per-day-stealth`.
+Todos os erros abaixo s�o provavelmente res�duos do rate limit `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` que est� se recuperando.
 
 ### Crons de Auditoria / Gerenciais com Erro
 
 || Job ID | Nome | Schedule | Last run | �ltimo erro |
 |---|---|---|---|---|
-| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | 429 |
-| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | 2026-05-30T16:56Z | 429 |
-| `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-30T22:58Z | 429 |
-| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-31T00:52Z | 429 (acabou de rodar e falhar) |
-| `10a59b3bdf4d` | manaloom-knowledge-synthesis | every 120m | 2026-05-30T22:48Z | 429 |
+| `660397bb97e1` | manaloom-hermes-normal-audit | 0 16,21 * * * | 2026-05-30T21:00Z | 429 -- pr�ximo tick: 16:00Z |
+| `577a0a669714` | manaloom-code-structure-auditor (weekly) | 0 6 * * 0 | 2026-05-30T16:56Z | 429 -- pr�ximo tick: domingo 06:00Z |
+| `bb03201b8911` | manaloom-code-structure-auditor (3h) | every 180m | 2026-05-30T22:58Z | 429 -- pr�ximo tick: ~01:58Z |
+| `de6fb777f5d1` | manaloom-logic-coherence-auditor | every 120m | 2026-05-31T00:52Z | 429 -- pr�ximo tick: ~02:52Z |
 
 ### Crons de Conhecimento Commander com Erro
 
 || Job ID | Nome | Schedule | Last run | �ltimo erro |
 |---|---|---|---|---|
-| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-30T22:33Z | 429 |
-| `7915cc2377a0` | manaloom-gamechanger-research | every 120m | 2026-05-30T23:00Z | 429 |
-| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-30T20:50Z | 429 |
-| `b2f5c21ce2d7` | manaloom-knowledge-import | every 120m | 2026-05-30T22:59Z | 429 |
+| `75eed994c103` | manaloom-commander-knowledge-deep | every 240m | 2026-05-30T22:33Z | 429 -- pr�ximo tick: ~02:33Z |
+| `444aa9510c2c` | manaloom-mana-base-validator | every 360m | 2026-05-30T20:50Z | 429 -- pr�ximo tick: ~02:50Z |
 
 ### Lorehold Pipeline com Erro
 
 || Job ID | Nome | Schedule | Last run | �ltimo erro |
 |---|---|---|---|---|
-| `f20ac299992b` | lorehold-deck-scout | every 120m | 2026-05-30T23:29Z | 429 |
-| `712579b15767` | lorehold-deck-validator | every 180m | 2026-05-30T21:39Z | 429 |
-| `08468451a06a` | lorehold-mulligan-analyst | every 360m | 2026-05-30T21:53Z | 429 |
+| `f20ac299992b` | lorehold-deck-scout | every 120m | 2026-05-30T23:29Z | 429 -- pr�ximo tick: ~01:29Z |
+| `08468451a06a` | lorehold-mulligan-analyst | every 360m | 2026-05-30T21:53Z | 429 -- pr�ximo tick: ~01:53Z |
 
-## An�lise de Erro Sist�mico
+## An�lise de Erro
 
-**Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth`
+**Causa raiz:** `HTTP 429: Rate limit exceeded: free-models-per-day-stealth` (parcialmente recuperado)
 **Provider:** OpenRouter (free-tier shared pool)
-**Afetados:** 12/18 crons (todos os crons com schedules <=360m que tentaram rodar ap�s ~21:00Z de 30/05)
-**Dura��o:** ~4 horas de rate limit cont�nuo (desde ~21:00Z 30/05 at� 00:53Z 31/05)
+**Afetados:** 8/18 crons (redu��o de 12 para 8 -- melhora de 33%)
+**Dura��o total do incidente:** ~6.5h (desde ~21:00Z 30/05)
+**Status:** **RECUPERA��O EM ANDAMENTO** -- 4 crons j� voltaram a ok
 
 **Por que nenhum `run` foi disparado:**
-- `cronjob(action='run')` apenas reschedula o next_run_at; N�o executa sincronamente
-- Todos os 12 crons compartilham o mesmo provider/model (`openrouter/owl-alpha`)
-- Disparar `run` em cada cron resultaria no mesmo erro 429
-- Esta � uma falha de depend�ncia compartilhada, n�o 12 bugs independentes
-- **Nota:** `manaloom-logic-coherence-auditor` rodou h� 1 minuto (00:52Z) e j� falhou -- confirma 429 ativo AGORA
+- Com 4 crons j� recuperados, o rate limit est� claramente lifting
+- Disparar `run` em crons que est�o prestes a rodar naturalmente desperdi�a chamadas
+- Os pr�ximos ticks naturais devem processar os 8 crons restantes sem interven��o
 
 **Recupera��o esperada:**
-- O limite di�rio do OpenRouter free-tier tipicamente reseta em janela de 24h
-- Na pr�xima execu��o do manager-watchdog ap�s reset, os crons voltar�o a executar normalmente
-- Se os crons estiverem com `last_status=error` mas o scheduler tick process�-los com sucesso, o status atualizar� automaticamente para `ok`
-- **Se o 429 persistir por >24h, considerar migrar para modelo pago ou alternativo**
+- Os 8 crons restantes devem auto-recuperar nos pr�ximos 30-60min conforme o scheduler tick
+- Se algum cron ainda estiver em erro ap�s 2-3 ticks naturais, pode indicar problema estrutural
 
-## A��es Realizadas Neste Cycle (2026-05-31T00:53Z)
+## A��es Realizadas Neste Cycle (2026-05-31T01:32Z)
 
 || A��o | Cron | Resultado |
 |:-----|:------|:----------|
-| -- | Nenhuma (systemic 429) | Todos os 12 em erro | `run` n�o resolveria -- aguardando reset do rate limit |
-
-**Nota:** Em falhas sist�micas de provider, disparar `run` em cada cron desperdi�a chamadas que tamb�m resultariam em 429. A recupera��o � autom�tica quando o rate limit reseta.
+| -- | Nenhuma (auto-recupera��o em progresso) | 4 crons recuperados naturalmente | Aguardando pr�ximos ticks para os 8 restantes |
 
 ## Alertas Pendentes
 
-**P1 -- 12 crons com HTTP 429 (rate limit esgotado):**
-- **Sintoma:** Todos os crons `openrouter/owl-alpha` com schedules curtos falhando com 429
-- **Impacto:** Nenhum conhecimento/decks/audits est�o sendo produzidos desde ~21:00Z (30/05)
-- **Dura��o:** ~4h de rate limit cont�nuo
-- **Recupera��o:** Autom�tica quando o limite di�rio do OpenRouter free-tier resetar
-- **A��o do watchdog:** Aguardar pr�ximo tick e re-verificar. Se o 429 persistir por >24h, considerar migrar para modelo pago ou alternativo
+**P1 -- 8 crons ainda com HTTP 429 (rate limit residual, melhorando):**
+- **Sintoma:** Crons `openrouter/owl-alpha` com schedules curtos ainda falhando com 429
+- **Impacto:** Produ��o de conhecimento/audits parcialmente reduzida
+- **Tend�ncia:** MELHORA -- de 12 para 8 erros em 39min
+- **Recupera��o:** Autom�tica conforme scheduler tick
+- **A��o do watchdog:** Monitorar pr�ximo tick. Se os 8 crons restantes n�o recuperarem em 60min, investigar individualmente
 
-## Mudan�as desde Snapshot Anterior (00:06Z -> 00:53Z)
+## Mudan�as desde Snapshot Anterior (00:53Z -> 01:32Z)
 
-### Crons que Regrediram (OK -> ERROR)
-*(nenhum -- est�vel)*
+### Crons que Recuperaram (ERROR → OK) -- 4
 
-### Crons que Recuperaram (ERROR -> OK)
-*(nenhum -- est�vel)*
+|| Cron | Schedule | Recuperou em |
+|:-----|:--------|:-----------|
+| manaloom-gamechanger-research | every 120m | 2026-05-31T01:20Z |
+| lorehold-deck-validator | every 180m | 2026-05-31T01:08Z |
+| manaloom-knowledge-import | every 120m | 2026-05-31T01:31Z |
+| manaloom-knowledge-synthesis | every 120m | 2026-05-31T01:16Z |
 
-### Crons Est�veis (sem mudan�a)
+### Crons que Regrediram (OK → ERROR)
+*(nenhum)*
+
+### Crons Est�veis
 
 || Cron | Status |
 |:-----|:--------|
@@ -138,24 +142,20 @@ Todos os erros abaixo compartilham a mesma causa raiz: `RuntimeError: HTTP 429: 
 | lorehold-battle-analyst | ok |
 | manaloom-hermes-normal-audit | 429 |
 | manaloom-commander-knowledge-deep | 429 |
-| manaloom-gamechanger-research | 429 |
 | manaloom-mana-base-validator | 429 |
 | lorehold-deck-scout | 429 |
-| lorehold-deck-validator | 429 |
 | lorehold-mulligan-analyst | 429 |
-| manaloom-knowledge-import | 429 |
 | manaloom-code-structure-auditor (weekly) | 429 |
 | manaloom-code-structure-auditor (3h) | 429 |
 | manaloom-logic-coherence-auditor | 429 |
-| manaloom-knowledge-synthesis | 429 |
 
 ## Observa��es Importantes
 
 - **Fleet: 18 crons** (sem mudan�a)
-- **12 crons afetados por 429** -- falha sist�mica cont�nua h� ~4h
-- **6 crons ainda funcionando:** S�o os que rodaram antes do rate limit esgotar e t�m schedules longos (360m-1440m)
+- **8 crons ainda em erro** -- redu��o de 12→8 (33% de melhora)
+- **Rate limit parcialmente recuperado** -- tend�ncia positiva
 - **Nenhum cron foi desabilitado** -- recupera��o ser� autom�tica
-- **manaloom-logic-coherence-auditor** �ltima execu��o h� 1min (00:52Z) -- 429 confirmado ativo neste momento
+- **Nenhum `run` ou `resume` necess�rio** -- scheduler natural processando
 
 ---
 
@@ -237,4 +237,4 @@ Todos os erros abaixo compartilham a mesma causa raiz: `RuntimeError: HTTP 429: 
 
 ---
 
-*Status snapshot: 2026-05-31T00:53Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 6 ok, 12 error -- systemic 429 persistente ~4h)*
+*Status snapshot: 2026-05-31T01:32Z | Branch: codex/hermes-analysis-docs | Fleet: 18 crons (18 enabled, 10 ok, 8 error -- rate limit parcialmente recuperado, tend�ncia positiva)*
