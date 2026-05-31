@@ -1,71 +1,103 @@
-# VALIDATOR SUMMARY -- Lorehold Spellslinger (v3.11 — 2026-05-31T20:58:47+00:00, Ciclo #13: 0 swaps)
+# VALIDATOR_SUMMARY — Lorehold Spellslinger (v3.14 / C#15)
 
-## Estado do Deck: MATURIDADE ATINGIDA — Pós-Ciclo #13 (25 swaps, C#11/#12/#13 = 0 swaps)
+**Data:** 2026-05-31 | **Timestamp:** 2026-05-31T23:52:20+00:00
+**Estado:** MATURIDADE ABSOLUTA CONSOLIDADA (5 ciclos consecutivos com 0 swaps: C#11-C#15)
+**Swaps acumulados:** 25 desde baseline (10 ciclos com swaps)
+**Sem Play T3:** 13.3% (Execucao #11, estavel, 5 ciclos confirmado)
+**Evolution Oracle:** C#15 — 0 SWAPS. SCOUT #24 avaliado com 6 novos angulos, todos rejeitados.
 
-| Indicador | Valor | Status |
-|:----------|:-----:|:------:|
-| Motor | 4/4 COMPLETO | ✅ |
-| Copy Engines | 6 ativas | ✅ |
-| Token+Pump | 8/10 | ✅ |
-| Wipes+Protection | 8/10 | ✅ |
-| Recursion | 8/10 | ✅ |
-| Mana Explosiva | 7/10 | ✅ |
-| Combo Pieces | 9/10 | ✅ |
-| Stack Interaction | 7/10 | ✅ |
-| Graveyard Resilience | 6/10 | 🟡 |
-| Sem Play T3 | **13.3%** | 🟡 DEFENSIVE (>12%) |
-| Draw Real | 7 (perfil 8-12) | 🟡 -1 do perfil |
-| Nivel 1 | VAZIO | ✅ Sem filler |
-| Double-nulls | 4 (0 cortaveis) | ✅ |
-| Colecao | ESGOTADA | 🔴 38 candidatos rejeitados |
+---
 
-### Histórico de Swaps (25 em 11 ciclos)
+## Metricas Principais
 
-| Ciclo | Data | Swaps | Net DCMC | Estrategia | T3 |
-|:-----:|:-----|:-----:|:--------:|:----------|:--:|
-| #1 | 2026-05-28 | 3 | +3 | AGGRESSIVE | 12.4% |
-| #2 | 2026-05-28 | 3 | +4 | AGGRESSIVE | 16.5% |
-| #3 | 2026-05-30 | 5 | -4 | DEFENSIVO | 16.4% |
-| #4 | 2026-05-30 | 3 | -15 | DEFENSIVO | 12.0% |
-| #5 | 2026-05-31 | 3 | +1 | BALANCED | 15.3% |
-| #6 | 2026-05-31 | 2 | -2 | DEFENSIVO | ~13-14% |
-| #7 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | ~14-15% |
-| #8 | 2026-05-31 | 0 | 0 | (0 swaps) | ~14-15% |
-| #9 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | 16.9% |
-| #10 | 2026-05-31 | 2 | -2 | DEFENSIVO | **13.3%** |
-| #11 | 2026-05-31 | 0 | 0 | (0 swaps) | **13.3%** |
+| Metrica | Valor | Status |
+|:--------|:-----:|:------|
+| Lands | 35 | OK |
+| Avg CMC | 3.71 | OK |
+| Ramp | 14 | OK |
+| Draw (real, conservador) | 7 | -1 do perfil |
+| Draw (real, expandido v3.13) | 12+ | OK |
+| Removal | 6 | OK |
+| Wipes | 5 | OK |
+| Protecoes | 5 | OK (+2 stack) |
+| Tutores (real) | 2 | OK |
+| Wincons (funcional) | 8+ paths | EXCELENTE |
+| Copy Engines | 6 | EXCELENTE |
 
-*Ciclos #7/#8/#9 usaram T3=3.7% (free mulligan rate) erroneamente.
+## SYNERGY_MAP — 7 Eixos
 
-### Métricas Atuais vs Perfil EDHREC
+| Eixo | Nota | Status |
+|:-----|:----:|:------|
+| A) Token Makers + Pump | 7/10 | Bom, nao e o plano A |
+| B) Wipes + Protection | 8/10 | Ratio 0.86, assimetricos |
+| C) Recursion Chains | 8/10 | 5 engines, loop Bombardment+Seminar |
+| D) Mana Explosiva | 7/10 | Treasure + ritual + rocks |
+| E) Combo Pieces | 9/10 | Approach deterministico, Flare combo |
+| F) Stack Interaction | 6/10 | Boros sem counterspell (5 ferramentas) |
+| G) Graveyard Resilience | 6/10 | 3 respostas a grave hate |
 
-| Métrica | Deck | Perfil | Status |
-|:--------|:----:|:------:|:------:|
-| Lands | 35 | 36-38 | 🟡 -1 (MDFCs compensam) |
-| Ramp | 14 | 10-13 | 🟡 +1 (treasure-heavy) |
-| Draw (real) | 7 | 8-12 | 🟡 -1 |
-| Removal | 6 | 4-6 | 🟢 No limite |
-| Board Wipe | 5 | 3-5 | 🟢 No limite |
-| Protection (total) | 6 | 3-4 | 🟢 (3 DB + 3 stack) |
-| Recursion | 4 | 2-5 | 🟢 |
-| Wincon (funcional) | 8+ paths | 4-7 | 🟢 Excelente |
-| Engine/Big Spell | 9 | 5-8 | 🟢 |
-| CMC medio | 3.71 | ~4.1 | 🟢 |
+**Media: 7.3/10** — Deck consistente e resiliente.
 
-### Destaques do v3.11
+## Classificacao Estrategica
 
-1. **T3 = 13.3% CONFIRMADO (Exec#11)** — melhoria de -3.6pp vs pos-C#9. Impacto do Ciclo #10 foi quase o DOBRO do projetado.
-2. **Approach + Flare de Duplication = COMBO DETERMINISTICO.** Vitoria no MESMO turno com 7 mana + qualquer criatura vermelha.
-3. **Ciclo #11: 0 swaps.** 38 candidatos avaliados — nenhum atinge Necessidade >= 3 + Evidencia >= 3.
-4. **Deck maturity atingida.** Nivel 1 vazio. 8+ paths de vitoria. Todos os eixos funcionais (6-9/10).
-5. **Proximo upgrade:** Skullclamp ($5-8, prioridade #1). Fated Clash -> Skullclamp = DCMC -4, T3 projetado ~10%.
+| Nivel | Cartas | Descricao |
+|:-----:|:------:|:----------|
+| 5 | 3 | Nao se joga sem (Lorehold, Approach, Mizzix's) |
+| 4 | 12 | Core da estrategia (copy engines, topdeck engines) |
+| 3 | 36 | Suporte forte (ramp, draw, wipes, wincons) |
+| 2 | 35 | Utilidade situacional (removal, lands) |
+| **1** | **0** | **VAZIO — Nenhum filler** |
 
-### Análises Disponíveis
+## Double-Nulls Restantes: 4
 
-- `VALIDATOR_LOG_v3.11.md` — Mais recente (T3 confirmado, Ciclo #11 sintese)
-- `VALIDATOR_LOG_v3.10.md` — Pos-Ciclo #10, SYNERGY_MAP 7 eixos
-- `VALIDATOR_LOG_v3.9.md` — 7 eixos + Stack & Resilience
-- `VALIDATOR_LOG_v3.8.md` — SYNERGY_MAP original 5 eixos
-- `VALIDATOR_LOG_v3.7.md` — Declinio tracking + CMC correction
-- `MULLIGAN_LOG.md` — Histórico completo de simulações (Exec#1-#11)
-- `EVOLUTION_LOG.md` — Histórico de todos os ciclos (#1-#11)
+| Carta | Importancia | EDHREC | Acao |
+|:------|:-----------:|:------:|:-----|
+| Scroll Rack | NIVEL 4 | ~40% | NUNCA cortar |
+| Penance | NIVEL 4 | ~15% | NUNCA cortar |
+| Grand Abolisher | NIVEL 2 | ~12% | ANTI-COUNTERSPELL. Manter. |
+| Taunt from the Rampart | NIVEL 2 | ~35% | Manter |
+
+## Timeline de Ciclos
+
+| Ciclo | Swaps | Net DCMC | T3 | Estrategia |
+|:-----:|:-----:|:--------:|:--:|:----------|
+| #1-#10 | 25 | varios | 3.3%->13.3% | Misto |
+| #11 | 0 | 0 | 13.3% | Colecao esgotada |
+| #12 | 0 | 0 | 13.3% | Maturidade confirmada |
+| #13 | 0 | 0 | 13.3% | Maturidade persistente |
+| #14 | 0 | 0 | 13.3% | Maturidade absoluta |
+| **#15** | **0** | **0** | **13.3%** | **Maturidade absoluta consolidada** |
+
+## SCOUT #24 — Destaques (C#15)
+
+6 novos angulos ineditos encontrados. Nenhum atinge Nec>=3 + Evid>=3:
+
+| Carta | Score SCOUT | Total Evo | Motivo Rejeicao |
+|:------|:----------:|:---------:|:----------------|
+| Ashling, Flame Dancer | 9 | 5 | Upgrade de qualidade vs Longshot (CMC 4). Nec=3 marginal, Evid=2 fraca. |
+| Seething Song | 10 | 5 | Ritual garantido. Deck ja tem 14 ramp. Sem substituto. |
+| Voice of Victory | 9 | 3 | Sidegrade sobre Grand Abolisher (intocavel). |
+| Spiteful Banditry | 8 | 3 | "Once each turn" limita. 5 wipes + 8 treasures ja bastam. |
+| Manaform Hellkite | 8 | 4 | CMC 4. Sinergia tripla mas Nec baixa. |
+| Invoke Calamity | 9 | 5 | CMC 5 piora T3. Ja rejeitado C#13. |
+
+## Gaps
+
+1. **T3 > 12%** — DEFENSIVO. So 1 fonte de T1 ramp estrito (Sol Ring 6.3%). Solucao: aquisicao.
+2. **Colecao ESGOTADA** — 63 cartas CMC <= 3 disponiveis, 54+ avaliadas, 0 viaveis. 
+3. **Vulnerabilidade a COUNTERSPELL** — 89.9% wins via Approach. Rotas B-E existem. Aceitavel.
+4. **Stalls 26%** — Limite max_turns=35 no simulador.
+
+## Conclusao
+
+**MATURIDADE ABSOLUTA CONSOLIDADA.** 5 ciclos consecutivos com 0 swaps. SCOUT #24 confirmou que mesmo angulos ineditos nao produzem candidatos viaveis. O deck atingiu o OTIMO com a colecao atual.
+
+**Proximo upgrade requer AQUISICAO:**
+1. Skullclamp (CMC 1, $5-8) — prioridade ABSOLUTA
+2. Chrome Mox (CMC 0, $60-80) — fast mana T0
+3. Mana Vault (CMC 1, $40-60) — fast mana T1
+4. Ashling, Flame Dancer (CMC 4, $1-2) — upgrade de qualidade (opcional)
+
+---
+
+*VALIDATOR_SUMMARY v3.14 / C#15 — 2026-05-31T23:52:20+00:00*

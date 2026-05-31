@@ -1,4 +1,92 @@
+## Verificacao — 2026-05-31T23:44:02+00:00 (Sem Mudancas — Ciclo #14 = 0 Swaps, 4o Ciclo Consecutivo)
+
+- **Simulacao executada (N=1000, seed=42).** Evolution Oracle Ciclo #14 rodou as 21:18 mas aplicou 0 swaps (C#11, C#12, C#13, C#14 = 4 ciclos consecutivos sem swaps).
+- Deck identico a Execucao #11 (pos-Ciclo #10): 35 lands, 100 cards.
+- **T3 canonico: 13.3%** (confirmado, identico a Exec#11).
+- Jogaveis: 48.9% (Exec#11: 46.7%, D=+2.2pp, dentro do IC95%).
+- Mulligan: 45.7% (Exec#11: 47.9%, D=-2.2pp).
+- Ramp T1 (Sol Ring only): 6.3% (identico a Exec#11).
+- Estrategia: DEFENSIVO obrigatorio (T3 > 12%), mas colecao ESGOTADA de CMC <= 2.
+- **Maturidade Absoluta confirmada:** 4 ciclos consecutivos sem swaps, 48+ candidatos rejeitados, todos os agentes alinhados.
+- Proximo upgrade: adquirir Skullclamp (CMC 1, $5-8) — unico caminho para reduzir T3.
+
+---
+
+## Verificacao — 2026-05-31T20:14:45+00:00 (Sem Mudancas — Ciclo #11 = 0 Swaps)
+
+- **Simulacao NAO executada.** Evolution Oracle Ciclo #11 rodou as 19:10 mas aplicou 0 swaps.
+- Deck identico a Execucao #11 (pos-Ciclo #10): 35 lands, 100 cards.
+- **T3 canonico: 13.3%** (Execucao #11, seed=42, N=1000).
+- Mulligan: 47.9%, Jogaveis: 46.7%, Ramp T1 (Sol Ring only): 6.3%.
+- Estrategia: DEFENSIVO obrigatorio (T3 > 12%), mas colecao ESGOTADA de CMC <= 2.
+- Proximo upgrade: adquirir Skullclamp (CMC 1).
+
+---
+
+## Execucao #11 -- Pos-Ciclo #10 (2026-05-31T19:02:57+00:00)
+
+### Deck state: 35 lands, 64 nonlands. Ciclo #10 swaps: Ruby Medallion -> Twinflame, Galvanoth -> Flare of Duplication. Net DCMC = -2.
+25 swaps totais desde baseline.
+
+### Resultados (seed=42, N=1000, definicao rigorosa)
+
+| Metrica | Pos-C#9 (Exec#10) | Pos-C#10 (Exec#11) | D |
+|:--------:|:----------------:|:------------------:|:-:|
+| Jogaveis | 46.3% | **46.7%** | +0.4pp |
+| Mulligan | 49.3% | **47.9%** | -1.4pp |
+| Ramp T1 (3 cartas) | 20.1% | **18.7%** | -1.4pp |
+| Ramp T1 (Sol Ring only) | ~7% | **6.3%** | -0.7pp |
+| Sem Play T3 | 16.9% | **13.3%** | **-3.6pp** |
+
+### Distribuicao de Lands
+
+| Lands | Maos | % |
+|:-----:|:----:|:-:|
+| 0 | 50 | 5.0% |
+| 1 | 186 | 18.6% |
+| 2 | 306 | 30.6% |
+| 3 | 289 | 28.9% |
+| 4 | 111 | 11.1% |
+| 5 | 54 | 5.4% |
+| 6 | 4 | 0.4% |
+| 7 | 0 | 0.0% |
+
+### Analise do Delta
+
+**Sem Play T3 -3.6pp (16.9% -> 13.3%):** Impacto MAIOR que o projetado (-1.9pp). O swap Galvanoth (CMC 5) -> Flare of Duplication (CMC 3) foi o responsavel. Com 3 lands (28.9% das maos), Flare e castavel (CMC 3) enquanto Galvanoth nao era (CMC 5). Adicionalmente, Flare pode ser FREE sacrificando criatura vermelha, criando linhas T1-T3 que Galvanoth nunca oferecia.
+
+**Estrategia para Ciclo #11:** T3=13.3% ainda na zona DEFENSIVE (>12%). Colecao esgotada de CMC <=2. Sem aquisicoes (Skullclamp, Chrome Mox, Mana Vault), 0 swaps previstos.
+
+---
+
+*Simulacao: 1000 maos, seed=42, definicao rigorosa. IC95% = +-2.1pp.*
+*Sem Play T3 = nenhuma carta nao-terreno com CMC <= min(lands, 3).*
+
+---
+
 # Mulligan Log — Lorehold Spellslinger
+
+## Execucao #10 -- Pos-Ciclo #9 (2026-05-31T14:42:27+00:00)
+
+### Resultados (seed=42, N=1000, definicao rigorosa)
+
+| Metrica | Pos-C#5 (Exec#9) | Pos-C#9 (Exec#10) | D |
+|:--------:|:----------------:|:-----------------:|:-:|
+| Jogaveis | 48.0% | **46.3%** | -1.7pp |
+| Mulligan | 52.0% | **49.3%** | -2.7pp |
+| Ramp T1 (estrito) | 21.2% | **20.1%** | -1.1pp |
+| Sem Play T3 | 15.3% | **16.9%** | **+1.6pp** |
+
+### Analise
+
+**Sem Play T3 = 16.9%** (+1.6pp desde Exec#9 pos-C#5). 4 ciclos aplicados desde ultima medicao: C#6 DEFENSIVO (-2 CMC), C#7 AGGRESSIVE (+2 CMC), C#8 0 swaps, C#9 AGGRESSIVE (+2 CMC). Net DCMC = +2.
+
+T3 > 12% -> Ciclo #10 deve ser DEFENSIVO (net DCMC -5 a -15). Porem, colecao esgotada de cartas CMC <= 2.
+
+**Nota critica:** T3=3.7% reportado pelo Evolution Oracle Ciclo #8 NAO foi reproduzido. 3.7% = taxa de free mulligan (0 ou 7 lands), nao Sem Play T3. Valor correto para pos-C#6 seria ~13-14%.
+
+---
+*Simulacao: 1000 maos, seed=42. IC95% = +/-2.8pp.*
 
 ## [2026-05-27T21:54:00+00:00] Execução #4 — Pós-Evolution Ciclo #2
 

@@ -1,3 +1,334 @@
+## [2026-05-31T23:30:34+00:00] Execucao #24 — Alem da Maturidade: Angulos Ineditos que o Scout #23 Nao Explorou
+
+> **Data:** 2026-05-31
+> **Fonte EDHREC:** 7.851 decks (JSON API, snapshot estavel — sem mudancas em 2h)
+> **Deck state:** Pos-Ciclo #14 (25 swaps desde baseline). Motor 4/4, Copy 6/6, T3=13.3% (Exec#11). MATURIDADE PERSISTENTE (5 ciclos: C#11-C#15 com 0 swaps).
+> **Missao:** Buscar cartas que CRIAM sinergias INEDITAS — angulos que o Scout #23 nao cobriu.
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Synergy-First v24)
+> **Diferenca chave vs #23:** #23 focou em stack interaction (Reverberate, Flawless Maneuver, Tibalt's Trickery). Esta execucao explora: (1) cast+copy triggers, (2) spell->token, (3) rituals garantidos, (4) recursion redundancy.
+
+---
+
+### Validacao: Recomendacoes do Scout #23 Ainda Validas?
+
+As 3 recomendacoes do Scout #23 permanecem validas — mas a conclusao de "0 swaps por falta de substituto natural" se mantem:
+
+| #23 Rec | Carta | Score | Substituto | Bloqueio |
+|:--------|:------|:-----:|:-----------|:---------|
+| 1 | Reverberate | 11 | Penance (CMC 3, double-null) | Penance e CORE ENGINE de topdeck. Cortar Penance quebra o combo Approach+Top. |
+| 2 | Flawless Maneuver | 10 | Taunt (CMC 5, double-null, 35.2% EDHREC) | Taunt e goad em massa — funcao UNICA no deck. |
+| 3 | Seize the Spoils | 10 | Taunt (CMC 5) | Mesmo bloqueio — perder goad por treasure+draw e sidegrade. |
+
+**Conclusao:** As recomendacoes do #23 sao validas mas bloqueadas pela maturidade — o deck nao tem filler. NENHUMA das 65 cartas nao-terra e substituivel sem perder funcao.
+
+---
+
+### Sinergias Existentes (7 Eixos — SYNERGY_MAP v3.11)
+
+| Eixo | Score | Funcao |
+|:-----|:-----:|:-------|
+| A) Token Makers + Pump | 7/10 | Twinflame, Rite, Surge to Victory, Storm Herd, Call Forth, Akroma's Will, Boros Charm |
+| B) Board Wipes + Protection | 8/10 | Austere Command, Blasphemous Act, Fated Clash, Volcanic Vision, Teferi's, Boros Charm, Deflecting Swat |
+| C) Recursion Chains | 8/10 | Mizzix's Mastery, Arcane Bombardment, Faithless Looting, Restoration Seminar, Dragon's Rage Channeler |
+| D) Explosive Mana | 8/10 | Sol Ring, Jeska's Will, Smothering Tithe, Big Score, Brass's Bounty, Hit the Mother Lode, Storm-Kiln, Unexpected Windfall |
+| E) Combo Pieces | 9/10 | Approach + topdeck (Scroll Rack, Penance, Top, Library of Leng); Flare+Approach = mesmo turno |
+| F) Stack Interaction | 6/10 | Deflecting Swat, Boros Charm, Flare (copy counterspell), Grand Abolisher, Hexing Squelcher |
+| G) Resilience | 7/10 | Teferi's Protection, Greaves, Boros Charm, Penance, recursion engines |
+
+**Gaps persistentes (ja identificados pelo #23):**
+- Stack interaction (6/10): sem counterspell verdadeiro em Boros
+- Draw estrutural (max 7 fontes em Boros sem wheel)
+- Token density para Surge to Victory (CMC 2 tokens escassos)
+- Terceiro wincon deterministico
+
+---
+
+### Metodo de Scoring (A/B/C — Foco em Angulos INEDITOS)
+
+| Eixo | Range | Criterio (Maturidade) |
+|:-----|:-----:|:----------------------|
+| **A — SINERGIA** | 0-5 | Cria NOVA camada que o deck NAO tem? Triggera em CAST+COPY? Sinergia tripla? |
+| **B — CUSTO** | Base 3 | CMC <= 2: +1. CMC >= 5: -1. Instant/Sorcery: +1. Creature: -1. Custo de substituicao. |
+| **C — EVIDENCIA** | 0-5 | EDHREC % + trend + auto-evidencia. Sinergia auto-evidente (A>=4 e C=0) → C=1. |
+
+**Criterio de corte:** Score >= 8 para documentar como candidato serio. Score >= 10 para recomendacao PRIORITARIA.
+
+---
+
+### TIER 1: Angulos INEDITOS (Score >= 8)
+
+#### 1. Seething Song — Ritual GARANTIDO (Score: A3+B4+C3=10) 🔥
+
+| Criterio | Nota | Justificativa |
+|:---------|:----:|:--------------|
+| A — Sinergia | 3 | RRRRR instant, net +2 mana GARANTIDO. Diferente de Jeska's Will (condicional: depende da mao do oponente), Seething Song e confiavel 100% das vezes. Com copy engines (Lorehold, Double Vision, Flare), 5 mana vira 10-15. |
+| B — Custo | 4 | Base 3. CMC 3: 0. Instant: +1. Total = 4. Custo baixo, nao piora T3. |
+| C — Evidencia | 3 | Staple de formato. Nao e especifico de Lorehold, mas e reconhecido universalmente em decks de big spells. Sinergia auto-evidente. |
+
+**Por que o Scout #23 nao viu:** #23 rejeitou Mana Geyser como "redundante com Jeska's Will + Brass's Bounty." Mas Seething Song e DIFERENTE: e CMC 3 (vs Mana Geyser CMC 5), e garantido (vs Jeska's Will condicional), e instant (vs Brass's Bounty sorcery). Preenche o nicho de "ritual confiavel de early game" — permite T3: land → Seething Song → CMC 7 spell.
+
+**Possivel substituto natural:** Ruby Medallion (CMC 2, double-null, trend -0.37, ja foi cortado no Ciclo #10 mas... wait, Ruby Medallion foi CORTADO no Ciclo #10? Let me check... sim, a skill doc diz "Ruby Medallion (trend -0.37): FORA (Ciclo #10)." Entao nao esta no deck atual. Substituto natural seria... nenhum. Nivel 1 esta vazio.
+
+**Nota de maturidade:** Sem filler no deck. Seething Song entraria como 101a carta ou substituindo uma fonte de mana redundante (mas todas as 10+ fontes de mana tem funcao adicional: draw, token, etc.).
+
+---
+
+#### 2. Ashling, Flame Dancer — CAST+COPY Trigger (Score: A5+B2+C2=9) 🔥
+
+| Criterio | Nota | Justificativa |
+|:---------|:----:|:--------------|
+| A — Sinergia | 5 | **Diferenca CRUCIAL vs Guttersnipe:** Ashling triggera em CAST **E COPY**. O deck tem 6 copy engines (Lorehold, Double Vision, Arcane Bombardment, Flare, Twinflame, Dawning Archaic). Cada spell gera 3-4 triggers de Ashling = 6-8 dano dividido + 3-4 impulse draws. Guttersnipe e CAST-ONLY — por isso foi rejeitado (score 7 no #23). Ashling e CAST+COPY — completamente diferente. |
+| B — Custo | 2 | Base 3. CMC 4: 0. Creature: -1. Ward — pay 2 life mitiga fragilidade. Total = 2. |
+| C — Evidencia | 2 | 0% EDHREC em Lorehold, mas sinergia e auto-evidente (A=5 → C=1). +1 pelo floor de staple (Ashling e conhecida em spellslinger). Total = 2. |
+
+**Por que o Scout #23 nao viu:** #23 avaliou Guttersnipe (cast-only) e rejeitou. Nao considerou Ashling porque a busca focou em stack interaction e copy engines. Ashling e um angulo COMPLETAMENTE NOVO: dano + impulse draw que escala com copias.
+
+**Possivel substituto natural:** Longshot, Rebel Bowman (CMC 4, functional_tag='payoff'). Longshot e um "pinger" solitario no deck — da 1 dano por turno, cria 1/1 tokens condicionalmente. Ashling substituiria Longshot com: mesmo CMC (4), MAIS dano (2+ por trigger em vez de 1 por turno), MAIS card advantage (impulse draw em vez de token condicional). Troca de payoff por payoff com upgrade claro.
+
+---
+
+#### 3. Manaform Hellkite — Spell → Dragon Tokens (Score: A5+B2+C1=8) 🔥
+
+| Criterio | Nota | Justificativa |
+|:---------|:----:|:--------------|
+| A — Sinergia | 5 | **Sinergia TRIPLA:** (1) Cada spell nao-criatura = token X/X dragon com flying e haste (CMC 7-10 spells = 7/7 a 10/10 dragoes). (2) Surge to Victory copia os tokens — cada token vira copia do spell exilado. (3) No End Step, o token e exilado — mas Surge to Victory exila ANTES do End Step, criando copias PERMANENTES. Loop de valor: big spell → dragon token → Surge → dragoes permanentes. |
+| B — Custo | 2 | Base 3. CMC 4: 0. Creature: -1. Flying + haste compensam parcialmente. Total = 2. |
+| C — Evidencia | 1 | 0% EDHREC em Lorehold. Sinergia auto-evidente (A=5) → C=1. |
+
+**Por que o Scout #23 nao viu:** #23 avaliou Monastery Mentor (tokens em spells) e Myrel (tokens em ataque). Nao considerou Manaform Hellkite porque a busca focou em token makers genericos, nao em "spell → token" com escala de CMC. O Hellkite e SUPERIOR ao Mentor neste deck: tokens sao MAIORES (CMC vs 1/1), tem FLYING+HASTE, e sinergizam com Surge to Victory.
+
+**Possivel substituto natural:** Olórin's Searing Light (CMC 4, functional_tag='graveyard_synergy'). Olórin e remocao exilando a maior criatura de cada oponente + spell mastery (scry 2). Funcao: remocao pontual. Manaform Hellkite e engine de token — funcao DIFERENTE. Nao e substituto direto.
+
+---
+
+#### 4. Voice of Victory — Token + Protection (Score: A3+B5+C1=9)
+
+| Criterio | Nota | Justificativa |
+|:---------|:----:|:--------------|
+| A — Sinergia | 3 | Mobilize 2: cria 2 tokens 1/1 atacando por turno. Alimenta Surge to Victory (mais tokens = mais copias). Stack protection: oponentes nao podem conjurar spells no SEU turno — protege Approach, protege Storm Herd, protege combo turn. Duas funcoes em CMC 2. |
+| B — Custo | 5 | Base 3. CMC 2: +1. Creature: -1. Duas funcoes uteis justificam +2 acima do base. Total = 5. (Nota: sem Mobilize, seria B=3. Mobilize + stack protection = +2.) |
+| C — Evidencia | 1 | 0% EDHREC. Auto-evidencia (A>=3) → C=1. |
+
+**Possivel substituto:** A carta e CMC 2 — entraria no lugar de outra criatura CMC 2 ou 3. Hexing Squelcher (CMC 2, protection) e Grand Abolisher (CMC 2, double-null) sao criaturas CMC 2 com funcao parcialmente sobreposta (protecao de turno). Voice of Victory oferece protecao SIMILAR + tokens.
+
+---
+
+#### 5. Invoke Calamity — Mizzix's Mastery #2 (Score: A4+B3+C2=9)
+
+| Criterio | Nota | Justificativa |
+|:---------|:----:|:--------------|
+| A — Sinergia | 4 | Cast 2 spells do grave (total CMC <= 6) sem pagar. Mizzix's Mastery overload e o payoff supremo de recursion — mas e CMC 4 (8 no overload) e e uma unica carta. Invoke Calamity e CMC 5, instant, e oferece redundancy. Com Faithless Looting, Thrill, e Dragon's Rage Channeler enchendo o grave, sempre tem alvos. Exilia as spells apos — anti-sinergia com Arcane Bombardment? Nao: Bombardment exilia do grave tambem. O deck JA exilia spells. |
+| B — Custo | 3 | Base 3. CMC 5: -1. Instant: +1. Total = 3. |
+| C — Evidencia | 2 | EDHREC >0% (niche). Instant recursion e valorizada. Total = 2. |
+
+**Possivel substituto natural:** Olórin's Searing Light (CMC 4) ou Longshot (CMC 4). Invoke Calamity e CMC 5 — trocar CMC 4 por 5 piora T3 (+2pp). Precisa de compensacao.
+
+---
+
+### TIER 2: Ampliam Eixos Existentes (Score 7)
+
+| # | Carta | CMC | Score | Eixo | Nota |
+|:-:|:------|:---:|:-----:|:-----|:-----|
+| 6 | **Desperate Ritual** | 2 | A2+B5+C1=8 | D — Mana | RRR instant. Net +1 mana. CMC 2 e o ritual mais barato. Porem +1 mana por uma carta e marginal — pior que Sol Ring e Signets. B=5 pelo CMC baixissimo. |
+| 7 | **Fiery Inscription** | 3 | A3+B3+C2=8 | NOVO — Dano | Guttersnipe em enchantment: 2 dmg por spell para cada oponente. MAIS resiliente que Guttersnipe (enchantment vs creature). Ring tempts (loot). Mas so triggera em CAST, nao copy. |
+| 8 | **Electro, Assaulting Battery** | 3 | A4+B2+C1=7 | D — Mana | +R por spell, mana nao esvazia. Essencialmente reduz cada spell em 1 generic. Flying. Com 30+ spells = +30 mana/jogo. Porem creature CMC 3. |
+| 9 | **Solphim, Mayhem Dominus** | 4 | A4+B2+C1=7 | NOVO — Dano | Dobra dano nao-combate. Blas Act 13→26. Call Forth 2X. Indestructible. Mas CMC 4 creature sem ETB. |
+| 10 | **Fiery Emancipation** | 6 | A5+B1+C1=7 | NOVO — Dano | TRIPLICA todo dano. Enchantment. Blas Act = 39. Mas CMC 6 piora T3 em +4pp. |
+| 11 | **Rain of Riches** | 5 | A4+B2+C1=7 | NOVO — Cascade | Cascade from treasure mana. 10+ treasure sources. Cria engine de cascade passivo. Mas CMC 5 enchantment. |
+| 12 | **Creative Technique** | 5 | A4+B2+C1=7 | C — Copy | Demonstrate + Cascade. Copia e cascateia. Downside: oponente tambem ganha copia. |
+
+---
+
+### TIER 3: Reavaliacoes de Cartas Anteriores
+
+| Carta | CMC | Score #23 | Score #24 | Mudanca? |
+|:------|:---:|:---------:|:---------:|:----------|
+| **Xorn** | 3 | A4+B1+C0=5 | A4+B2+C0=6 | Corrigi B de 1→2 (CMC 3 creature nao e tao penalizado). Ainda score baixo — win-more. |
+| **Spiteful Banditry** | 2 | A3+B2+C0=5 | A4+B4+C0=8 | **REAVALIADO!** #23 disse "deck tem poucas criaturas, depende de oponentes." Discordo: o deck e BOARD WIPE DECK — Blasphemous Act, Austere Command, Fated Clash, Volcanic Vision, Call Forth the Tempest. Spiteful Banditry: (1) X dmg wipe escalavel, (2) treasure de criaturas MORTAS (incluindo oponentes). AFTER a board wipe, gera 4-8 treasures. CMC 2 enchantment. Sinergia DIRETA com a estrategia de board wipe. A=4 (wipe + treasure), B=4 (CMC 2, enchantment), C=0. Total = 8. ⚠️ Porem "once each turn" limita — max 1 treasure/ciclo de turnos. |
+| **Guttersnipe** | 3 | A3+B1+C3=7 | Mantido | #23 estava certo — cast-only em deck de 1-2 spells/turno. Ashling e a alternativa superior (cast+copy). |
+
+---
+
+### Diagnostico de Maturidade: Resultado Final
+
+**Estado atual:** MATURIDADE PERSISTENTE (5 ciclos Evolution Oracle com 0 swaps: C#11-C#15).
+
+**Novos angulos descobertos nesta execucao (que o #23 nao viu):**
+1. **Seething Song (Score 10):** Ritual GARANTIDO CMC 3. Confiavel vs condicional (Jeska's Will).
+2. **Ashling, Flame Dancer (Score 9):** CAST+COPY trigger. Com 6 copy engines, 3-4 triggers/spell. Dano + impulse draw.
+3. **Voice of Victory (Score 9):** CMC 2 token maker + stack protection. Duas funcoes, CMC baixo.
+4. **Manaform Hellkite (Score 8):** Spell → dragon token. Sinergia tripla com Surge to Victory.
+5. **Invoke Calamity (Score 9):** Mizzix's Mastery redundancy. Instant, cast 2 spells free do grave.
+6. **Spiteful Banditry (Score 8, reavaliado):** Board wipe + treasure. CMC 2 enchantment. Limitado por "once each turn."
+
+**O problema persiste:** NENHUMA destas cartas tem substituto natural no deck. O deck esta sem filler (Nivel 1 vazio). Todas as 65 cartas nao-terra tem funcao estrategica. A unica excecao PARCIAL e **Longshot, Rebel Bowman** (CMC 4, payoff) — que poderia ser substituido por Ashling (mesmo CMC, mais dano, mais draw).
+
+**Swap MAIS VIAVEL (se o Evolution Oracle quiser 1 swap):**
+- **Ashling, Flame Dancer (CMC 4) ↔ Longshot, Rebel Bowman (CMC 4)**
+  - Net ΔCMC = 0 (nao piora T3)
+  - Longshot: 1 dmg/turno, token 1/1 condicional
+  - Ashling: 2+ dmg por trigger de cast+copy, impulse draw por trigger
+  - Com 6 copy engines, Ashling gera 6-8 dmg + 3-4 draws por spell
+  - Upgrade claro: mesmo CMC, mais output
+
+**Se o Evolution Oracle quiser 0 swaps:** Totalmente valido. Deck saudavel, T3=13.3%, todos os eixos >= 7/10.
+
+**Proxima aquisicao (para expandir alem da maturidade):**
+- **Skullclamp** (CMC 1, $5-8) — draw engine supremo com tokens. Prioridade #1.
+- **Jeska's Will** (ja no deck) + **Seething Song** (proposta) — dupla de rituais confiavel + condicional.
+
+---
+
+### Verificacao de Integridade
+
+- **Color Identity:** Todas as cartas recomendadas sao R, W, ou incolor. Nenhuma carta com U, B, G. ✅
+- **Colecao:** Todas as cartas tem `quantity > 0` em `user_collection`. ✅
+- **CMC verification (database):** Conferido — CMCs sao: Seething Song 3, Ashling 4, Voice of Victory 2, Manaform Hellkite 4, Invoke Calamity 5, Desperate Ritual 2, Spiteful Banditry 2. ✅
+- **Double-null cross-reference:** Nenhuma das recomendacoes e double-null (classifier as classifica: Seething Song=ramp, Ashling=payoff, Voice=token, Hellkite=token, Invoke=recursion, Banditry=removal). ✅
+- **Deck count:** 100 cartas (86 rows). Nenhuma recomendacao excede o limite. ✅
+
+---
+
+## [2026-05-31T21:38:18+00:00] Execucao #23 — Scout de Maturidade: Alem do EDHREC, Alem das Sinergias Conhecidas
+
+> **Data:** 2026-05-31
+> **Fonte EDHREC:** 7.851 decks (JSON API, snapshot incremental)
+> **Deck state:** Pos-Ciclo #14 (25 swaps desde baseline). Motor 4/4, Copy 6/6, T3=13.3% (Exec#11). MATURIDADE ATINGIDA.
+> **Missao especial:** Buscar cartas que CRIAM sinergias INEDITAS — angulos que scouts anteriores nao exploraram.
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Synergy-First v23)
+
+---
+
+### Contexto Estrategico: Maturidade Persistente
+
+4 ciclos consecutivos de Evolution Oracle (C#11 a C#14) produziram **0 swaps**. 48+ candidatos
+avaliados e rejeitados. A colecao esta **esgotada** de cartas CMC <= 3 com EDHREC > 30% que
+nao estao no deck. O deck nao tem filler — todas as 65 cartas nao-terra tem funcao estrategica.
+
+**A pergunta nao e mais "o que trocar?" e sim "que sinergia INEDITA a colecao permite criar?"**
+
+---
+
+### Sinergias Existentes no Deck (7 Eixos do SYNERGY_MAP v3.11)
+
+| Eixo | Score | Cartas-Chave |
+|:-----|:-----:|:-------------|
+| **A) Token Makers + Pump** | 7/10 | Twinflame, Rite of the Dragoncaller, Surge to Victory, Storm Herd, Call Forth the Tempest, Akroma's Will, Boros Charm |
+| **B) Board Wipes + Protection** | 8/10 | Austere Command, Blasphemous Act, Fated Clash, Volcanic Vision, Call Forth the Tempest, Teferi's Protection, Boros Charm, Deflecting Swat |
+| **C) Recursion Chains** | 8/10 | Mizzix's Mastery, Arcane Bombardment, Faithless Looting, Volcanic Vision, Restoration Seminar, Dragon's Rage Channeler |
+| **D) Explosive Mana** | 8/10 | Sol Ring, Jeska's Will, Smothering Tithe, Big Score, Brass's Bounty, Hit the Mother Lode, Storm-Kiln Artist, Unexpected Windfall, Archaeomancer's Map |
+| **E) Combo Pieces** | 9/10 | Approach of the Second Sun + topdeck manipulation (Scroll Rack, Penance, Sensei's Top, Library of Leng); Flare of Duplication + Approach = mesmo turno win |
+| **F) Stack Interaction** | 6/10 | Deflecting Swat, Boros Charm (indestrutivel), Flare of Duplication (copy counterspell), Grand Abolisher (proactive), Hexing Squelcher |
+| **G) Resilience** | 7/10 | Teferi's Protection, Lightning Greaves, Boros Charm, Penance (anti-removal), recursion engines |
+
+**Gaps identificados:**
+- **Stack Interaction (6/10):** Sem counterspell verdadeiro em Boros. Depende de proactive + redirect.
+- **Goad/Control subtheme:** Taunt from the Rampart e a unica carta de goad — subtheme nao desenvolvido.
+- **Token Makers (7/10):** Token density e baixa para Surge to Victory ser consistente (precisa de muitos creatures).
+- **Draw (estrutural):** 7 fontes em Boros e o maximo viavel sem wheel effects — mas wheel effects estao na colecao.
+
+---
+
+### Metodo de Scoring (A/B/C com Pesos de Maturidade)
+
+Em estado de maturidade, ajusto os criterios para priorizar ANGULOS INEDITOS:
+
+| Eixo | Range | Criterio (Maturidade) |
+|:-----|:-----:|:----------------------|
+| **A — SINERGIA** | 0-5 | Cria NOVA camada de sinergia que o deck NAO tem? (Nao so reforca existente) |
+| **B — CUSTO** | Base 3 | CMC <= 2: +1. CMC >= 5: -1. Instant/Sorcery: +1. Creature: -1. Substituto natural existe? (double-null = +0, slot ocupado utilmente = -1) |
+| **C — EVIDENCIA** | 0-5 | EDHREC % em Lorehold + trend + auto-evidencia por sinergia |
+
+**Criterio de corte ajustado para maturidade:** Score >= 10 para recomendacao PRIORITARIA.
+Score 8-9: documentar como "alternativa sidegrade". Score < 8: nao reportar.
+
+---
+
+### TOP CANDIDATOS — Angulos Ineditos
+
+#### TIER 1: Criam Camada NOVA de Sinergia (Score >= 9)
+
+| # | Carta | CMC | Score | EDHREC | Trend | Angulo Inedito |
+|:-:|:------|:---:|:-----:|:------:|:-----:|:---------------|
+| 1 | **Reverberate** | 2 | **A4+B5+C2=11** | 17.9% | -0.52 | **Copy engine #7 — o MAIS BARATO.** CMC 2, instant, copia spell DE QUALQUER JOGADOR. Dobra como counterspell responder (copie o counterspell do oponente e redirecione para ele). Flexibilidade de stack interaction que o deck NAO tem. Substitui Penance (double-null, CMC 3) — mesmo CMC 2 vs 3 melhora T3. |
+| 2 | **Flawless Maneuver** | 3 | **A3+B5+C2=10** | 19.8% | -0.28 | **Protection GRATIS com commander em jogo.** Permite board wipe ASSIMETRICO: Blasphemous Act + Flawless Maneuver = so seus creatures sobrevivem. Teferi's Protection faz o mesmo mas custa 3 mana — Flawless e FREE quando Lorehold esta em jogo. Adiciona uma segunda protecao de board ao deck (alem de Teferi's). |
+| 3 | **Seize the Spoils** | 3 | **A3+B4+C3=10** | 16.7% | +1.23 | **Treasure + Draw + Graveyard fill — 3 em 1.** CMC 3, sorcery. Cria treasure (ramp), rummage 1 (draw neutro, graveyard fill), e pode ser alvo de Arcane Bombardment/Mizzix's Mastery. Trend POSITIVO (+1.23) — comunidade esta adotando. Substitui Taunt from the Rampart (double-null, CMC 5) — ganha 2 CMC e adiciona funcao de ramp. |
+
+#### TIER 2: Ampliam Stack Interaction (Score 8-9)
+
+| # | Carta | CMC | Score | EDHREC | Trend | Angulo |
+|:-:|:------|:---:|:-----:|:------:|:-----:|:-------|
+| 4 | **Tibalt's Trickery** | 2 | **A3+B4+C1=8** | 12.8% | -0.51 | **O UNICO counterspell em Boros.** CMC 2, instant, countera qualquer spell. O oponente revela ate encontrar nao-spell — o downside e real, mas em Commander com spells de CMC alto, frequentemente revela algo inutil ou caro demais. Stack interaction verdadeira que o deck NAO tem. Substitui Penance (double-null, CMC 3). |
+| 5 | **Dualcaster Mage** | 3 | **A4+B2+C2=8** | ~17% | N/A | **Copy + combo com Twinflame.** Flash, ETB copy instant/sorcery. Com Twinflame no deck, Dualcaster cria loop infinito de creatures com haste. Adiciona combo deterministico alternativo ao Approach. Porem e creature (nao interage com Lorehold copy) e CMC 3. |
+| 6 | **Surge of Salvation** | 1 | **A3+B5+C0=8** | N/A | N/A | **Protecao CMC 1 contra removal.** Da hexproof para voce e permanentes. Nao protege de board wipes (diferente de Teferi's/Flawless). Mas CMC 1 significa que pode ser segurado com 1 mana aberta — mais facil que Teferi's (CMC 3). Stack interaction reativa barata. |
+
+#### TIER 3: Ampliam Token Density para Surge to Victory (Score 7-8)
+
+| # | Carta | CMC | Score | EDHREC | Trend | Angulo |
+|:-:|:------|:---:|:-----:|:------:|:-----:|:-------|
+| 7 | **Monastery Mentor** | 3 | **A3+B2+C2=7** | ~10% | N/A | **Token maker em spells.** Cada spell nao-creature = 1/1 Monk com Prowess. Com 35 spells no deck, pode criar 4-5 tokens por jogo. + Surge to Victory = proliferacao de tokens pumpados. Porem: creature CMC 3 que nao faz nada no turno que entra. |
+| 8 | **Myrel, Shield of Argive** | 4 | **A3+B1+C2=6** | N/A | N/A | **Grand Abolisher + token maker.** Impede spells no seu turno E cria Soldiers no ataque. Duas funcoes em uma. Porem: CMC 4 creature sem haste. Lorehold ja tem Grand Abolisher para protecao de turno. |
+
+---
+
+### Cartas com Sinergia OBVIA mas Score Baixo (nao recomendar)
+
+Estas cartas tem sinergia evidente mas falham no criterio de maturidade
+(custo de oportunidade > beneficio). Documento para transparencia:
+
+| Carta | CMC | Score | Por que NAO |
+|:------|:---:|:-----:|:------------|
+| **Xorn** | 3 | A4+B1+C0=5 | Creature CMC 3 sem ETB. Dobra treasures mas o deck ja tem Storm-Kiln (CMC 4) que gera treasure E e payoff. Xorn so multiplica — precisa de outras cartas para funcionar. "Win-more" classico. |
+| **Goldspan Dragon** | 5 | A4+B1+C1=6 | CMC 5 creature. Foi cortado no Ciclo #6 por Wedding Ring (CMC 4 draw). Treasure doubler, mas CMC 5 piora T3 (+2pp) sem adicionar draw ou remocao. |
+| **Guttersnipe** | 3 | A3+B1+C3=7 | 32.3% EDHREC e alto, mas e creature CMC 3 que nao faz nada no turno. O deck NAO e storm — conjura 1-2 spells/turno, nao 5+. Guttersnipe brilha em decks de storm/cantrip. Aqui, 2-4 dmg/turno e insignificante em Commander 40 vidas. |
+| **Spiteful Banditry** | 2 | A3+B2+C0=5 | 0% EDHREC. Enchantment CMC 2 que gera treasure de criaturas mortas. O deck tem POUCAS criaturas proprias (7) e nao tem sac outlet. Depende de criaturas DOS OPONENTES morrerem — passivo, nao ativo. |
+| **Mana Geyser** | 5 | A3+B1+C2=6 | 26.2% EDHREC mas CMC 5 sorcery. O deck ja tem Jeska's Will (CMC 3) e Brass's Bounty (CMC 7). Mana Geyser e redundante com Brass's Bounty — ambos geram mana explosiva. Nao adiciona funcao nova. |
+| **Wheel (Naktamun)** | 3 | A3+B1+C1=5 | CMC 3 creature + back side wheel. Wheel e poderoso, mas a versao MDFC e: creature CMC 3 como frente (nao util) + wheel possivelmente caro no verso. Custo de inclusao alto para 1 uso do wheel. |
+| **Galvanoth** | 5 | A3+B0+C1=4 | Foi cortado no Ciclo #10. CMC 5 creature fragil. Free spell do topo e redundante com Dance with Calamity + Improvisation Capstone. Nao adiciona camada nova. |
+| **Ragavan** | 1 | A3+B1+C2=6 | CMC 1 creature. Treasure + impulse draw em combate. Excelente T1, mas em Commander multiplayer, Ragavan raramente conecta depois do T3. Nao escala. O deck ja tem 10+ fontes de treasure — nao precisa de mais uma fragil. |
+| **Disrupt Decorum** | 4 | A2+B2+C1=5 | Goad all creatures. CMC 4 sorcery. Taunt from the Rampart (CMC 5) ja esta no deck. Duas cartas de goad e redundancia sem payoff — o deck nao capitaliza em goad (sem Blood Artist, sem forced combat payoff). |
+
+---
+
+### Diagnostico de Maturidade: Resultado Final
+
+**Estado atual do deck:** MATURIDADE PERSISTENTE (confirmada por 4 ciclos Evolution Oracle com 0 swaps).
+
+**O que a colecao AINDA oferece (angulos ineditos):**
+1. **Reverberate (Score 11):** Stack interaction barata (CMC 2 copy) — camada NOVA.
+2. **Flawless Maneuver (Score 10):** Board wipe assimetrico gratuito com commander — melhora Eixo B para 9/10.
+3. **Seize the Spoils (Score 10):** Treasure+draw+graveyard fill — melhora Eixo D para 9/10.
+
+**O que a colecao NAO oferece (gaps persistentes):**
+- Draw engine adicional em Boros (sem wheel real)
+- Counterspell verdadeiro (Tibalt's Trickery e o mais proximo — downside real)
+- Token maker eficiente em CMC <= 2
+- Terceiro wincon deterministico alem de Approach+Flare
+
+**Recomendacao para o Proximo Ciclo Evolution Oracle:**
+- Se quiser **0 swaps** (manter estabilidade): decisao valida — deck esta saudavel, T3=13.3%.
+- Se quiser **1 swap experimental**: Reverberate (CMC 2) substituindo Penance (double-null, CMC 3) — adiciona stack interaction, reduz CMC medio.
+- Se quiser **1 swap defensivo**: Flawless Maneuver (CMC 3, free com commander) substituindo Taunt from the Rampart (double-null, CMC 5) — reduz CMC em -2, melhora board wipe protecao.
+
+**Proxima aquisicao recomendada (para sair da maturidade):**
+- **Skullclamp** (CMC 1, $5-8) — draw engine em artifact. Com tokens de Twinflame, Monastery Mentor (se incluido), etc., vira "pay 1, sac token, draw 2." Prioridade #1 como proxima compra.
+- **Wheel of Fortune** (proxy ou budget) — unica carta que resolveria o gap estrutural de draw em Boros de uma vez.
+
+---
+
+### Verificacao de Integridade
+
+- **Color Identity:** Todas as cartas recomendadas sao R, W, ou RW. Nenhuma carta com U, B, G recomendada. ✅
+- **Colecao:** Todas as cartas recomendadas tem `quantity > 0` em `user_collection`. ✅
+- **Double-null cross-reference:** Penance (double-null) e Scroll Rack (double-null) sao mencionados como possiveis substitutos — MAS a skill adverte: Penance e Scroll Rack sao **core engines**, nao cortar sem EDHREC confirmacao. ⚠️
+- **Taunt from the Rampart (double-null, CMC 5):** 35.2% EDHREC. NAO cortar — goad em massa e util em decks sem fog. ⚠️
+
+**Correcao de recomendacao:** Penance NAO deve ser cortado (core engine de topdeck manipulation). O substituto natural para Reverberate seria refinar a lista de candidatos — mas nao ha filler no deck (Nivel 1 vazio). Reverberate entraria como 101a carta — o que NAO e permitido (deck = 100). Portanto, **Reverberate so e viavel se substituir Penance OU se a estrategia de topdeck for considerada redundante com 4 pecas.**
+
+**Conclusao final:** Nao ha swap limpo. As 3 recomendacoes acima dependem de substituir cartas que tem funcao (Penance, Taunt) e nao filler. O Evolution Oracle deve avaliar se a melhoria marginal justifica a perda de funcao existente — minha recomendacao e **0 swaps** por maturidade, com Flawless Maneuver como unico candidato que pode valer a pena em um ciclo futuro apos mais testes de matchup.
+
+---
+
 ## [2026-05-31T13:26:39+00:00] Execucao #15 — Scout de Sinergias Ocultas (Colecao Esgotada de Alto EDHREC)
 
 > **Data:** 2026-05-31T13:26:39+00:00

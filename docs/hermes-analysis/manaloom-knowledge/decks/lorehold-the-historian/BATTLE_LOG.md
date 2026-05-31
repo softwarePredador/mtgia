@@ -400,3 +400,45 @@ v8: Priority, Stack, Instant/Sorcery, Counterspells, SBAs, Miracle, Boros Charm 
 | Stax (Winota) | 67.0% | 67 | 4 | 29 | 20.9 | approach=66, elimination=1 |
 
 **Overall WR: 67.7%** (406W/38L/156S)
+
+## [2026-05-31T22:00:52Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Tayam, Luminous Enigma (real) | 98.0% | 49 | 0 | 1 | 10.5 | approach=49 |
+| Winota, Joiner of Forces (real) | 90.0% | 45 | 0 | 5 | 10.8 | approach=45 |
+| Veyran, Voice of Duality (real) | 94.0% | 47 | 0 | 3 | 11.0 | approach=47 |
+| Niv-Mizzet, Parun (real) | 94.0% | 47 | 0 | 3 | 10.7 | approach=47 |
+| Tivit, Seller of Secrets (real) | 96.0% | 48 | 0 | 2 | 10.8 | approach=48 |
+| Korvold, Fae-Cursed King (real) | 100.0% | 50 | 0 | 0 | 10.9 | approach=50 |
+| Grand Arbiter Augustin IV (real) | 96.0% | 48 | 0 | 2 | 10.9 | approach=48 |
+| Atraxa, Praetors' Voice (real) | 98.0% | 49 | 0 | 1 | 11.4 | approach=49 |
+| Urza, Lord High Artificer (real) | 98.0% | 49 | 0 | 1 | 10.9 | approach=49 |
+| Kinnan, Bonder Prodigy (real) | 98.0% | 49 | 0 | 1 | 10.6 | approach=49 |
+| Winota, Joiner of Forces (real) | 96.0% | 48 | 0 | 2 | 10.9 | approach=48 |
+| Krenko, Mob Boss (real) | 96.0% | 48 | 0 | 2 | 10.7 | approach=48 |
+
+**Overall WR: 96.2%** (577W/0L/23S)
+
+## [2026-05-31T22:01:30Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Tayam, Luminous Enigma (real) | 56.0% | 28 | 20 | 2 | 10.2 | approach=19, elimination=9 |
+| Winota, Joiner of Forces (real) | 64.0% | 32 | 15 | 3 | 10.4 | approach=23, elimination=9 |
+| Veyran, Voice of Duality (real) | 54.0% | 27 | 21 | 2 | 10.4 | approach=19, elimination=8 |
+| Niv-Mizzet, Parun (real) | 72.0% | 36 | 12 | 2 | 11.1 | approach=24, elimination=12 |
+| Tivit, Seller of Secrets (real) | 58.0% | 29 | 20 | 1 | 11.4 | approach=24, elimination=5 |
+| Korvold, Fae-Cursed King (real) | 64.0% | 32 | 15 | 3 | 10.6 | elimination=9, approach=23 |
+| Grand Arbiter Augustin IV (real) | 68.0% | 34 | 14 | 2 | 10.4 | approach=25, elimination=9 |
+| Atraxa, Praetors' Voice (real) | 56.0% | 28 | 19 | 3 | 10.3 | approach=26, elimination=2 |
+| Urza, Lord High Artificer (real) | 62.0% | 31 | 15 | 4 | 10.3 | approach=23, elimination=8 |
+| Kinnan, Bonder Prodigy (real) | 60.0% | 30 | 19 | 1 | 10.7 | approach=24, elimination=6 |
+| Winota, Joiner of Forces (real) | 66.0% | 33 | 14 | 3 | 10.8 | approach=24, elimination=9 |
+| Krenko, Mob Boss (real) | 52.0% | 26 | 19 | 5 | 10.5 | approach=21, elimination=5 |
+
+**Overall WR: 61.0%** (366W/203L/31S)
