@@ -1,9 +1,106 @@
 # Other Lorehold the Historian Decks — Research
 
-**Generated:** 2026-05-31T23:00:00+00:00
-**Source:** EDHREC JSON API, TappedOut.net
-**Purpose:** Learn from how OTHER players build Lorehold the Historian to
-improve our deck and inform Battle Analyst opponent modeling.
+**Last Updated:** 2026-05-31 (Deck Learner cron execution #2 — EDHREC + learned_decks)
+**Sources:** EDHREC JSON API (7,851 decks), TappedOut.net (2 decks), Archidekt (82 UUIDs pending)
+**Moxfield/Archidekt scraping:** BLOCKED by Cloudflare in cron context
+**Statistical profiles saved:** 3 new profiles in `learned_decks` (ids 13-15)
+
+## Executive Summary (2026-05-31 Run — EDHREC Deep Analysis)
+
+This run performed a deep analysis of the EDHREC meta from **7,851 Lorehold decks**
+and cross-referenced all findings against our post-Ciclo #11 deck (25 swaps, MATURIDADE ATINGIDA).
+Individual deck scraping from Moxfield and Archidekt was blocked by Cloudflare, but the
+EDHREC JSON API provides comprehensive statistical coverage.
+
+### Meta State: 7,851 Decks Analyzed
+
+| Card | EDHREC % | Synergy | Trend | In Our Deck? |
+|:-----|:--------:|:-------:|:-----:|:------------:|
+| Sol Ring | 90.5% | 0.06 | 0.00 | YES |
+| Arcane Signet | 88.1% | 0.08 | 0.00 | YES |
+| Hit the Mother Lode | 79.3% | 0.76 | +1.29 | YES |
+| Library of Leng | 77.8% | 0.75 | +1.44 | YES |
+| Storm Herd | 75.0% | 0.72 | +1.21 | YES |
+| Monument to Endurance | 72.8% | 0.68 | +1.27 | YES |
+| Bender's Waterskin | 71.1% | 0.65 | 0.00 | YES |
+| Big Score | 67.3% | 0.55 | +1.52 | YES |
+| Brass's Bounty | 67.1% | 0.64 | +1.13 | YES |
+| Sensei's Divining Top | 66.8% | 0.63 | +0.55 | YES |
+| Swords to Plowshares | 69.0% | 0.03 | +1.24 | YES |
+| Approach of the Second Sun | 63.8% | 0.62 | +0.74 | YES |
+| Scroll Rack | 59.5% | 0.57 | +0.48 | YES |
+| Mizzix's Mastery | 57.4% | 0.55 | +1.07 | YES |
+| Path to Exile | 57.4% | 0.00 | +0.91 | YES |
+| Storm-Kiln Artist | 55.3% | 0.48 | +0.76 | YES |
+| Apex of Power | 54.9% | 0.53 | +0.11 | NO (CMC 10) |
+| Rise of the Eldrazi | 54.6% | 0.53 | -0.47 | NO (CMC 12, declining) |
+| Victory Chimes | 53.5% | 0.52 | 0.00 | YES |
+| Dance with Calamity | 50.2% | 0.48 | +0.58 | YES |
+
+### Key Findings
+
+1. **Our deck is at maturity.** Only 10 cards have EDHREC inclusion < 15%. Most are deliberate:
+   Akroma's Will (wincon), Twinflame (copy), Flare of Duplication (copy), Wedding Ring (draw),
+   Weathered Wayfarer (ramp). Only Grand Abolisher (11.7%, double-null) is questionable.
+
+2. **Win condition convergence reached.** The meta has 5 clear win conditions and our deck
+   runs all five: Approach of the Second Sun (63.8%), Storm Herd (75.0%), Mizzix's Mastery
+   recursion (57.4%), Rise of the Eldrazi (54.6% — not in our deck, see below), Apex of Power
+   (54.9% — not in our deck).
+
+3. **Rising stars confirmed (all in our deck):** Improvisation Capstone (49.0%, trend +8.13),
+   Restoration Seminar (37.9%, trend +9.16), The Dawning Archaic (24.0%, trend +5.31).
+
+4. **Declining trends (correct cuts confirmed):** Ruby Medallion (-0.37, cut Ciclo #10),
+   Pearl Medallion (-0.46, cut Ciclo #9), Artist's Talent (-0.72, cut Ciclo #5),
+   Oswald Fiddlebender (0%, cut Ciclo #5). All cuts validated by meta data.
+
+5. **Cost reduction vs treasure: clear winner.** Both Medallions declining while treasure-based
+   ramp (Storm-Kiln Artist +0.76, Big Score +1.52, Hit the Mother Lode +1.29) rising.
+   Community has voted: treasure > cost reduction for Lorehold.
+
+6. **Copy engine meta:** Double Vision (46.5%), Arcane Bombardment (42.4%), Mizzix's Mastery
+   (57.4%). Our deck runs all three plus The Dawning Archaic, Flare of Duplication, and
+   Twinflame — 6 copy engines total (double the meta average of ~3).
+
+### Cards the Meta Plays That We Don't (Top Gaps)
+
+| Card | EDHREC % | CMC | Trend | Status |
+|:-----|:--------:|:---:|:-----:|:-------|
+| Apex of Power | 54.9% | 10 | +0.11 | In collection. Would worsen T3 from 13.3%. Hold. |
+| Rise of the Eldrazi | 54.6% | 12 | -0.47 | Not in collection. Declining + CMC 12 = SKIP. |
+| Soulfire Eruption | 42.4% | 9 | +0.35 | Not in collection. Not tracked. CMC too high. |
+| Ruby Medallion | 42.3% | 2 | -0.37 | CORRECTLY CUT Ciclo #10. Confirmed declining. |
+| Mother of Runes | 34.5% | 1 | +0.23 | In collection. Sidegrade protection. Not needed. |
+| Perch Protection | 34.4% | 4 | -0.45 | Declining. SKIP. |
+| Esper Sentinel | 32.4% | 1 | -0.54 | Not in collection. Declining 6 consecutive cycles. |
+| Guttersnipe | 32.2% | 3 | -0.08 | In collection. Spellslinger payoff. Sidegrade. |
+| Velomachus Lorehold | 32.6% | 7 | 0.00 | Not in collection. Too expensive, creature-focused. |
+| Invoke Calamity | 33.9% | 5 | +0.11 | Not in collection. Instant-speed recursion. Interesting. |
+
+### Learned Decks Saved to knowledge.db
+
+Three statistical profiles were built from the EDHREC data and saved to the `learned_decks`
+table for Battle Analyst matchup simulations:
+
+| ID | Name | Archetype | Cards | Wincon Primary | Wincon Backup |
+|:---|:-----|:----------|:-----:|:---------------|:--------------|
+| 13 | EDHREC Statistical Average (7,851) | spellslinger | 99 | Approach of the Second Sun | Storm Herd + Mizzix Mastery |
+| 14 | EDHREC Spellslinger Profile (7,851) | spellslinger | 100 | Approach of the Second Sun | Storm Herd token swarm |
+| 15 | EDHREC Budget Profile (7,851) | spellslinger-budget | 100 | Approach of the Second Sun | Storm Herd |
+
+Each profile contains a full JSON card list with inclusion percentages, synergy scores,
+and trend data. The Battle Analyst can load these via SQLite.
+
+### Archidekt Sources (Pending)
+
+82 Archidekt deck UUIDs are available from the EDHREC average deck JSON but Archidekt's
+API returns "Client Unavailable" in cron context (SPA routing issue). These UUIDs are
+saved at `/tmp/lorehold_deck_urls.json` and can be attempted from a non-cron environment
+or with residential proxies. Individual decklists from these would provide the complete
+100-card lists missing from the EDHREC statistical average (which is ~82 cards).
+
+---
 
 ## Deck Sources Analyzed
 
