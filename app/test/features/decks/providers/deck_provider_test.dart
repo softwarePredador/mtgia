@@ -171,6 +171,7 @@ void main() {
 
   tearDown(() {
     SharedPreferences.setMockInitialValues({});
+    ApiClient.resetForTesting();
   });
 
   group('DeckProvider.createDeck', () {

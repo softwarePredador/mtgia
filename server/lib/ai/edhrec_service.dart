@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart' show visibleForTesting;
 import '../logger.dart';
 
 /// Serviço para integração com EDHREC JSON API
@@ -16,6 +17,12 @@ class EdhrecService {
   // Cache em memória para evitar requests repetidos no mesmo ciclo de vida do server
   static final Map<String, _CachedResult> _cache = {};
   static final Map<String, _CachedAverageDeckResult> _averageDeckCache = {};
+
+  @visibleForTesting
+  static void clearCache() {
+    _cache.clear();
+    _averageDeckCache.clear();
+  }
   
   /// Busca os dados de co-ocorrência para um comandante específico.
   /// 

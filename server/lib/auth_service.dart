@@ -4,6 +4,7 @@ import 'package:bcrypt/bcrypt.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dotenv/dotenv.dart';
+import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'database.dart';
 import 'plan_service.dart';
@@ -16,12 +17,16 @@ import 'plan_service.dart';
 /// - Operações de autenticação no banco de dados
 class AuthService {
   static const String _bcryptSha256Prefix = 'bcrypt_sha256\$';
-  static final AuthService _instance = AuthService._internal();
+  static AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
 
   late final String _jwtSecret;
 
-  AuthService._internal() {
+  AuthService._internal({String? jwtSecret}) {
+    if (jwtSecret != null) {
+      _jwtSecret = jwtSecret;
+      return;
+    }
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final secret = env['JWT_SECRET'] ?? Platform.environment['JWT_SECRET'];
 
@@ -33,6 +38,11 @@ class AuthService {
     }
 
     _jwtSecret = secret;
+  }
+
+  @visibleForTesting
+  static void resetForTesting({String jwtSecret = 'hermes-local-test-secret'}) {
+    _instance = AuthService._internal(jwtSecret: jwtSecret);
   }
 
   /// Duração de validade do token (24 horas)

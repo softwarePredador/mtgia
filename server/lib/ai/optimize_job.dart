@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
 import '../logger.dart';
@@ -20,6 +21,12 @@ class OptimizeJobStore {
   static const _cleanupInterval = Duration(minutes: 5);
   static final Map<String, OptimizeJob> _memoryJobs = <String, OptimizeJob>{};
   static DateTime? _lastCleanupAt;
+
+  @visibleForTesting
+  static void reset() {
+    _memoryJobs.clear();
+    _lastCleanupAt = null;
+  }
 
   /// Cria um novo job e retorna seu ID.
   static Future<String> create({

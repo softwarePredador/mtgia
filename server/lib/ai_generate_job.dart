@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
 class AiGenerateJobStore {
@@ -8,6 +9,11 @@ class AiGenerateJobStore {
 
   static const _jobTtl = Duration(minutes: 30);
   static bool _schemaReady = false;
+
+  @visibleForTesting
+  static void resetSchemaFlag() {
+    _schemaReady = false;
+  }
 
   static Future<String> create({
     required Pool pool,

@@ -56,9 +56,21 @@ class ApiClient {
   }
 
   /// Instância singleton do http.Client para reutilizar conexões TCP.
-  static final http.Client _httpClient = http.Client();
+  /// Pode ser injetada via construtor para testes.
+  static http.Client _httpClient = http.Client();
   static bool _performanceUnavailable = false;
   static final Random _requestIdRandom = Random.secure();
+
+  @visibleForTesting
+  static void resetForTesting({
+    http.Client? httpClient,
+    String? token,
+    bool performanceUnavailable = false,
+  }) {
+    _cachedToken = token;
+    _httpClient = httpClient ?? http.Client();
+    _performanceUnavailable = performanceUnavailable;
+  }
 
   // Retorna a URL correta dependendo do ambiente
   static String get baseUrl {
