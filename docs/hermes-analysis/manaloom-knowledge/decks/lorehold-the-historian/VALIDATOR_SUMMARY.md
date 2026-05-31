@@ -1,61 +1,69 @@
-# Lorehold Purpose Analyzer — Resumo Executivo 2026-05-28 (v3.2)
+# Lorehold Purpose Analyzer — Resumo Executivo 2026-05-31 (v3.5)
 
-## Estado Atual (Pós-Ciclo #2, 6 Swaps Aplicados)
+## Estado Atual (Pós-Ciclo #4, 9 Swaps Aplicados)
 
-Lands: 35 | Ramp: 16 | Draw (single-tag): 5 | Proteção: 4 | Board Wipe: 4 | CMC médio: ~3.85
+Lands: 35 | Ramp: 16 | Draw: 6 | Removal: 4 | Board Wipe: 5 | Proteção: 4 | Recursion: 4
+Avg CMC: 3.96 | Wincons: 1 (DB) / ~5 (real)
 
-**Swaps aplicados:**
-- Ciclo #1: Furygale Flocking→Esper Sentinel, Jokulhaups→Gamble, Karoo→Plains
-- Ciclo #2: Deflecting Palm→Big Score, Hellkite Tyrant→Dance with Calamity, Mother of Runes→The One Ring
+**Swaps aplicados (9 total):**
+- Ciclo #1: Furygale→Esper, Jokulhaups→Gamble, Karoo→Plains
+- Ciclo #2: Deflecting→Big Score, Hellkite→Dance, Mother→TOR
+- Ciclo #3: Copper Dragon→Storm-Kiln, Desperate→Signet, Sunbird→Capstone, Chimes→Gift, Chant→Blasphemous
+- Ciclo #4: Rise→Faithless, +DRC, +Thrill (3 swaps defensivos, net ΔCMC -15)
 
-## O Motor de Lorehold — 3/4 Completo
+## Motor de Lorehold — 4/4 COMPLETO ✅
 
-```
-✅ Treasure Ramp: Big Score, Brass's Bounty, Hit the Mother Lode
-✅ Big Spells Grátis: Dance with Calamity, Approach, Insurrection
-❌ Payoff de Tesouro: Storm-Kiln Artist FALTA (55.4% EDHREC, na coleção)
-```
+✅ Treasure Ramp (Big Score, Brass's Bounty, Hit the Mother Lode)
+✅ Free Big Spell (Dance with Calamity, Capstone, Approach)
+✅ Lorehold Copy (comando)
+✅ Treasure Payoff (Storm-Kiln Artist) — adicionado Ciclo #3
 
-## O Problema Crítico: 5 Draw Sources em Boros
+## Sem Play T3: 13.8% (BALANCED)
 
-Perfil EDHREC: 8-12. Nosso deck: 5 (incluindo The One Ring 8.4% que é GC).
-**TOR é Game Changer com 8.4% EDHREC em Lorehold** — provavelmente B4. Se B3 puro, trocar por Trouble in Pairs.
+Ciclo #1: 3.3% → #2: 16.5% → #3: 16.4% → #4: **13.8%** (estável, melhorando)
+**Estratégia Ciclo #5: BALANCED** (net ΔCMC alvo: 0 a -2)
 
-## "Sem play T3" Piorando: 16.5%
+## Matchup Performance: 52.1% Average (2026-05-31)
 
-Ciclo #1→#2 trocou 3 cartas baratas (CMC 1, 2, 6) por 3 pesadas (CMC 4, 4, 8). Resultado: mãos jogáveis cairam de 73.2%→71.1% e "sem play T3" subiu de 12.4%→15.8%→16.5%. Precisa de interação CMC≤2 no Ciclo #3.
+vs Aggro: 52.5% | vs Control: 56.0% | vs Combo: 46.5% | vs Midrange: 52.5% | vs Spellslinger: 52.5% | vs Stax: 52.5%
 
-**Mulligan Execução #5 confirma: deck ESTÁVEL, todas as métricas dentro do ruído (±2.8pp). Aguardando Ciclo #3.**
+## Top 3 Swaps para Ciclo #5 (Custo: ZERO)
 
-## Top 3 Swaps para Ciclo #3 (Custo: ZERO)
+| # | Sai | Entra | Impacto | ΔCMC |
+|:-:|:----|:------|:--------|:----:|
+| 1 | Artist's Talent (21.1%, ▼-0.70) | **Chaos Warp** (38.8%, ▲+0.46) | 🔴 Removal universal | +1 |
+| 2 | Oswald Fiddlebender (0%) | **The Dawning Archaic** (24.0%, ▲+5.31) | 🟡 Rising star | +1 |
+| 3 | Perch Protection (34.5%, ▼-0.43) | **Arcane Bombardment** (42.5%, ▲+0.09) | 🟡 Copy engine | -4 |
 
-| # | Sai | Entra | Impacto |
-|---|:----|:------|:--------|
-| 1 | Ancient Copper Dragon (0%) | **Storm-Kiln Artist** (55.4%) | 🔴 Completa o motor |
-| 2 | Desperate Ritual (0%) | **Boros Signet** (50.4%) | 🔴 Ramp consistente |
-| 3 | Sunbird's Invocation (13.7%) | **Improvisation Capstone** (61.2%) | 🟡 Big spell superior |
+**Net ΔCMC: -2.** Sem Play T3 estimado pós-Ciclo #5: 12-13%. BALANCED.
 
-## 🔥 Novidade v3.2: Restoration Seminar
+## 🔥 Tendências Crítdas (EDHREC 7802 decks)
 
-**Trend 9.14** — carta SUBINDO MAIS RÁPIDO de todo Lorehold (não Improvisation Capstone). Com 37.2% EDHREC. Na coleção. CMC 7 = Fase 2. **Reservar para Ciclo #4.**
+**Rising Stars:**
+- Restoration Seminar: 37.8% trend **+9.14** (JÁ NO DECK ✅)
+- Improvisation Capstone: 49.0% trend **+8.09** (JÁ NO DECK ✅)
+- **The Dawning Archaic: 24.0% trend +5.31** (NÃO NO DECK — prioridade Ciclo #5)
+- Penance: 41.8% trend **+1.15** (engine do deck, JÁ NO DECK)
 
-## ⚠️ Novidade v3.2: Artist's Talent em Declínio Severo
+**Em declínio:**
+- Artist's Talent: 21.1% trend **-0.70** (corte confirmado Ciclo #5)
+- Esper Sentinel: 32.5% trend -0.54 (manter — ainda staple, declínio lento)
+- Perch Protection: 34.5% trend -0.43 (Ciclo #5 — swap para Bombardment)
 
-**Trend -0.72**. Comunidade abandonando. 20.9% EDHREC. Melhor candidato a corte no Ciclo #4.
+## Deckbuilder, Segundo o Deck
 
-## O Deckbuilder, Segundo o Deck
+- **Evoluiu:** Aceitou motor completo (Ciclo #3), reduziu T3 (Ciclo #4), adicionou draw (4 fontes novas em 4 ciclos)
+- **Ainda não adicionou:** Chaos Warp (universal removal), Dawning Archaic (rising star), Arcane Bombardment (copy engine)
+- **Tem na coleção e não usa:** Chaos Warp, Dawning Archaic, Arcane Bombardment, Apex of Power, Soulfire Eruption
 
-- **Evoluiu:** Aceitou ramp explosivo (Big Score), removeu proteção redundante (Mother), adicionou sinergia (Dance)
-- **Resiste:** Não corta artifact subtheme (Goblin Engineer, Oswald, Medallions), não adiciona Storm-Kiln, não adiciona Improvisation Capstone
-- **Tem na coleção e não usa:** Storm-Kiln (55.4%), Capstone (61.2%), Boros Signet (50.4%), Blasphemous Act (40.5%), Trouble in Pairs (10.5%)
+## Projeção Pós-Ciclo #5
 
-## Projeção Pós-Ciclo #3
+82% meta-alignment, motor completo, removal diversity melhorada, rising star adicionada.
+Deck competitivo B3. Pronto para Ciclo #6 (quando T3 < 12%, estratégia AGGRESSIVE com Apex of Power / Soulfire Eruption).
 
-80% meta-alignment, draw 7 sources, motor completo. Deck competitivo B3.
+## Proximo Ciclo
 
-## Próximo Ciclo
-
-- Evolution Oracle (Ciclo #3): Aplicar swaps 1-5
-- Mulligan Analyst: Re-simular (esperar "sem play T3" cair para <13%)
-- Novo Scout: Verificar se Storm-Kiln foi inserida
-- Ciclo #4: Improvisation Capstone + Restoration Seminar (trend 9.14) — DEPOIS de "sem play T3" < 12%
+- Evolution Oracle (Ciclo #5): Aplicar swaps 1-3 acima
+- Mulligan Analyst: Re-simular (esperar Sem Play T3 → 12-13%)
+- Scout: Verificar se Dawning Archaic e Chaos Warp mantêm trend positivo
+- Ciclo #6: Estratégia AGGRESSIVE (T3 < 12%) — Apex of Power + Soulfire Eruption
