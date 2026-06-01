@@ -1,73 +1,71 @@
-# Lorehold Spellslinger — Executive Summary (v3.19 + C#23)
+# VALIDATOR SUMMARY — Lorehold Spellslinger
 
-> **Data:** 2026-06-01T08:23Z | **Hash:** `30d00347764fc2a215edb4e668994871`
-> **Status:** 🚨 DECK MUDOU desde v3.17. Pipeline integrity quebrado por 5 ciclos.
-> **Ciclo atual:** C#23 — 2 SWAPS DEFENSIVOS RECOMENDADOS
+> **Ultima atualizacao:** 2026-06-01T11:27:33+00:00
+> **Versao:** Purpose Analyzer v3.21 (re-confirmation)
+> **Card hash:** `30d00347764fc2a215edb4e668994871`
+> **Status:** ✅ DECK ESTAVEL — Nenhuma mudanca desde v3.19
 
-## PG Reference Profile Comparison
+## Deck Snapshot
 
-| PG Role | Ideal | Actual | Diff | Status |
-|:--------|:-----:|:------:|:----:|:------:|
-| lands | 32.00 | 35.0 | +3.0 | 🟡 |
-| ramp | 3.67 | 7.0 | +3.3 | 🟡 |
-| ritual_treasure | 10.00 | 12.0 | +2.0 | 🟡 |
-| big_spell_payoff | 7.67 | 17.0 | +9.3 | 🟡 |
-| miracle_topdeck | 4.33 | 7.0 | +2.7 | 🟡 |
-| interaction | 5.33 | 9.0 | +3.7 | 🟡 |
-| protection | 3.67 | 8.0 | +4.3 | 🟡 |
-| draw_value | 2.67 | 8.0 | +5.3 | 🟡 |
-| **tutor** | **3.67** | **2.0** | **-1.7** | **🔴 UNICO GAP** |
-| win_condition | 1.33 | 5.0 | +3.7 | 🟡 |
-| board_wipe | 2.00 | 5.0 | +3.0 | 🟡 |
-| recursion | 3.33 | 3.0 | -0.3 | ✅ |
-| exile_value | 3.67 | 2.0 | -1.7 | 🟡 |
-| spellslinger | 3.67 | 7.0 | +3.3 | 🟡 |
+| Metrica | Valor | PG Ideal | Status |
+|:--------|:-----:|:--------:|:------:|
+| Cards | 100 (86 rows) | — | ✅ |
+| Lands | 35 | 32 | 🟡 +3 |
+| CMC medio | 3.61 | — | — |
+| Ramp (rocks) | 7 | 3.67 | 🟡 +3.3 |
+| Ritual/Treasure | 12 | 10 | 🟡 +2.0 |
+| Draw | 8 | 2.67 | 🟡 +5.3 |
+| Interaction | 9 | 5.33 | 🟡 +3.7 |
+| Protection | 8 | 3.67 | 🟡 +4.3 |
+| **Tutor** | **2** | **3.67** | 🔴 **-1.67** |
+| Win Condition | 5 | 1.33 | 🟡 +3.7 |
+| Recursion | 3 | 3.33 | ✅ IDEAL |
 
-## SYNERGY_MAP 7 Eixos
+## SYNERGY_MAP (via v3.19)
 
 | Eixo | Score |
 |:-----|:-----:|
-| A) Token + Pump | 7/10 |
-| B) Wipes + Protection | 8/10 |
-| C) Recursion | 7/10 |
+| A) Token Makers + Pump | 7/10 |
+| B) Board Wipes + Protection | 8/10 |
+| C) Recursion Chains | 7/10 |
 | D) Explosive Mana | 9/10 |
 | E) Combo Pieces | 8/10 |
 | F) Stack Interaction | 5/10 |
 | G) Resilience | 8/10 |
-| **MEDIA** | **7.4/10** |
+| **Media** | **7.4/10** |
 
-## Mudancas vs C#17
+## T3 Sem Play
 
-- **8 cartas removidas:** Ashling, Austere Command, Demand Answers, Flare of Duplication, Surge to Victory, Thrill of Possibility, Twinflame, Weathered Wayfarer
-- **5 cartas adicionadas:** Dualcaster Mage, Fellwar Stone, Flawless Maneuver, Primal Amulet, Valakut Awakening
-- **Manabase refeita:** 8 fetches + utility lands (Ancient Tomb, Boseiju, Cavern, Kor Haven)
-- **T3 piorou: 11.3% → 13.3%** (Exec#13, N=1000, seed=42)
+| Execucao | Data | T3 | Estrategia |
+|:---------|:-----|:--:|:----------|
+| Exec #13 | 2026-06-01 | 13.3% | 🔴 DEFENSIVO (>12%) |
 
-## C#23 Swaps Recomendados (DEFENSIVO, net ΔCMC = -16)
+## Double-Nulls: 4
 
-| # | OUT | CMC | IN | CMC | ΔCMC |
-|:-:|:-----|:---:|:----|:---:|:----:|
-| 1 | Apex of Power | 10 | Demand Answers | 2 | -8 |
-| 2 | Storm Herd | 10 | Thrill of Possibility | 2 | -8 |
-| **Total** | | | | | **-16** |
+- Scroll Rack (CMC 2, 🔴 CRITICAL — core engine)
+- Penance (CMC 3, 🔴 CRITICAL — miracle enabler)
+- Grand Abolisher (CMC 2, 🟡 HIGH — declining trend)
+- Taunt from the Rampart (CMC 5, 🟢 LOW — 35.2% EDHREC)
 
-**T3 projetado pos-C#23: ~9-10%** (BALANCED).
+## Gaps Ativos
 
-## Gaps Prioritarios
+| # | Gap | Severidade | Acao |
+|:-:|:-----|:----------:|:-----|
+| 1 | Tutor -1.67 | 🔴 | Aquisicao Idyllic Tutor ($15-20) |
+| 2 | C#23 nao aplicado | 🔴 | Evolution Oracle: aplicar Apex→Demand, Storm Herd→Thrill |
+| 3 | T3 13.3% (>12%) | 🔴 | C#23 swaps (DCMC -16) corrigem |
+| 4 | Stack interaction 5/10 | 🟡 | Aceitar (Boros). Flare opcional. |
 
-1. **🔴 tutor -1.7** — Aquisicao: Idyllic Tutor ($15-20). Unico gap real.
-2. **🟡 exile_value -1.7** — Capstone + Dance cobrem. Monitorar.
-3. **🟡 stack interaction 5/10** — Flare perdida. Dualcaster ajuda.
-4. **🟢 Valakut duplicado** — Corrigir DB (2 rows MDFC).
+## C#23 Swaps Pendentes
 
-## Checklist
+| OUT | CMC | IN | CMC | DCMC |
+|:----|:---:|:--|:---:|:----:|
+| Apex of Power | 10 | Demand Answers | 2 | -8 |
+| Storm Herd | 10 | Thrill of Possibility | 2 | -8 |
+| **NET** | | | | **-16** |
 
-| Item | Status |
-|:-----|:------:|
-| 100 cartas | ✅ |
-| 35 lands | ✅ |
-| Motor 4/4 | ✅ |
-| Copy engines 7 | ✅ |
-| **T3 Sem Play** | **13.3% → 🔴 DEFENSIVO** |
-| **Estrategia C#23** | **DEFENSIVO (2 swaps)** |
-| Pipeline Integrity | 🚨 Quebrado 5 ciclos — Corrigido C#23 |
+## Proximo Passo
+
+1. **Aplicar C#23 swaps** — urgente, T3 > 12%
+2. **Adquirir Idyllic Tutor** — fecha unico gap metrico real
+3. **Corrigir Valakut duplicado** — remove id=653

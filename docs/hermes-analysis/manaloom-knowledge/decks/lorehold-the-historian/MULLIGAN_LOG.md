@@ -1,3 +1,55 @@
+## Verificacao -- 2026-06-01T09:26:05+00:00 (Sem Mudancas -- Deck Inalterado desde Exec#13, T3=13.3% Estavel, C#23 Swaps Documentados Mas NAO Aplicados)
+
+### Estado do Deck
+- **Card hash:** `30d00347764fc2a215edb4e668994871` — identico a Execucao #13
+- **Deck:** 100 cartas (86 rows, 35 lands), nao mudou
+- **Apex of Power (CMC 10):** ✅ IN DECK (C#23 recomenda OUT)
+- **Storm Herd (CMC 10):** ✅ IN DECK (C#23 recomenda OUT)
+- **Demand Answers (CMC 2):** ❌ NOT IN DECK (C#23 recomenda IN)
+- **Thrill of Possibility (CMC 2):** ❌ NOT IN DECK (C#23 recomenda IN)
+
+### Metricas (Execucao #13 -- ainda validas pois deck nao mudou)
+
+| Metrica | Exec#13 (ATUAL) | Limiar |
+|:--------|:---------------:|:------:|
+| **Sem Play T3** | **13.3%** | > 12% = DEFENSIVO |
+| Mulligan | 30.1% | — |
+| Jogavel | 66.0% | — |
+| Ramp T1 (Sol Ring) | 8.5% | — |
+| Free Mulligan | 4.6% | — |
+
+### Alerta: Swaps C#23 DOCUMENTADOS mas NAO APLICADOS
+
+O Evolution Oracle Ciclo #23 (2026-06-01T08:23:45) propos 2 swaps DEFENSIVOS:
+
+| # | OUT | CMC | IN | CMC | Net DCMC | Projecao T3 |
+|:-:|:-----|:--:|:----|:--:|:--------:|:-----------|
+| 1 | Apex of Power | 10 | Demand Answers | 2 | -8 | — |
+| 2 | Storm Herd | 10 | Thrill of Possibility | 2 | -8 | — |
+| **Total** | — | — | — | — | **-16** | **~9-10%** |
+
+**Status: Swaps escritos no EVOLUTION_LOG mas NAO executados no knowledge.db.**
+Ambos os cards IN estao na colecao (`user_collection quantity > 0`).
+Ambos os cards OUT estao redundantes (Apex = 5o wincon, Storm Herd = 3o token maker).
+
+### Implicacoes Estrategicas
+
+- **T3 = 13.3% > 12% → ZONA DEFENSIVA.** O deck PRECISA das swaps do C#23.
+- **Draw tag DB = 5.** Apos as swaps, subiria para 7 (Demand + Thrill = draw CMC 2).
+- **Draw real = ~8 → ~10.** Fontes nao-tagged (Lorehold, Reforge, Valakut) permanecem.
+- **Apex of Power e Storm Herd sao "wincon simbolicas"** — CMC 10, raramente castadas. Custa pouca perda de capacidade real remove-las.
+- **Projecao T3 pos-C#23: ~9-10% → BALANCED (<12%).** Abriria espaco para Ciclo #24 considerar Ashling (CMC 4, Score 9).
+
+### O Que Essa Metrica Significa (Licao)
+
+**Documentar swaps NAO e o mesmo que aplica-los.** O Evolution Oracle C#23 fez uma analise completa com rejection table, PG comparison, e sintese dos 4 agentes — mas as swaps nunca chegaram ao `deck_cards`. O `run_log` mostra `status='ok'` para C#23, mas isso reflete a ANALISE, nao a EXECUCAO das swaps.
+
+**Causa provavel:** O Evolution Oracle e restrito a escrever em `docs/hermes-analysis/**` e o `knowledge.db` esta em `docs/hermes-analysis/manaloom-knowledge/scripts/` — o Oracle pode escrever no .db via Python? O `run_log` foi escrito com sucesso. Talvez o script de swap nao foi executado (so documentado).
+
+**Recomendacao:** O proximo Evolution Oracle (C#24) deve verificar se as swaps de C#23 foram aplicadas e, se nao, aplica-las como PASSO 0 antes de qualquer nova analise.
+
+---
+
 ## Execucao #13 -- 2026-06-01T08:14:16+00:00 (PIPELINE INTEGRITY ALERT — Deck Mudou, C#17 Swaps Revertidos, T3=13.3%)
 
 ### 🚨 ALERTA DE INTEGRIDADE

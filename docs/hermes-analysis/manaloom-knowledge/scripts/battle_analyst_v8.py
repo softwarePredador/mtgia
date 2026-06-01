@@ -1166,7 +1166,7 @@ def load_learned_opponents():
     try:
         conn = sqlite3.connect(DB)
         conn.row_factory = sqlite3.Row
-        rows = conn.execute("SELECT * FROM learned_decks ORDER BY id DESC LIMIT 12").fetchall()
+        rows = conn.execute("SELECT * FROM learned_decks WHERE commander NOT LIKE '%Lorehold%' ORDER BY id DESC LIMIT 12").fetchall()
         conn.close()
         decks = []
         for row in rows:

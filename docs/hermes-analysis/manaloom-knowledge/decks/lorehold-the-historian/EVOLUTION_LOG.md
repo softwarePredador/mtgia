@@ -1,3 +1,176 @@
+## [2026-06-01T09:22:17+00:00] Oracle Wincon Diversity — Analise de Categorias & Scoring
+
+### PASSO 0: Pipeline Integrity Check
+
+**Card hash (DB):** `30d00347764fc2a215edb4e668994871`
+**Estado:** PRE-C#23 — swaps documentadas no EVOLUTION_LOG mas NAO aplicadas no DB.
+- Apex of Power ✅ IN DECK (deveria estar OUT per C#23)
+- Storm Herd ✅ IN DECK (deveria estar OUT per C#23)
+- Demand Answers ❌ NOT IN DECK (deveria estar IN per C#23)
+- Thrill of Possibility ❌ NOT IN DECK (deveria estar IN per C#23)
+
+**Analise realizada sobre estado REAL do DB (PRE-C#23).**
+
+---
+
+### PASSO 1: Wincon Diversity — Categorizacao 3 Eixos
+
+Regra: Deck precisa de wincons em 3 categorias:
+1. **RAPIDA** (speed >= 6): fecha antes de virar arqui-inimigo
+2. **RESILIENTE** (resilience >= 7): impossivel de parar
+3. **STEALTH** (stealth >= 7): ninguem percebe ate morrer
+
+#### Wincons no Deck (scored, enriched=1, deduplicated):
+
+| Carta | Speed | Resilience | Stealth | Total | Role DB | CMC | Categoria |
+|:------|:-----:|:----------:|:-------:|:-----:|:--------|:---:|:----------|
+| Mizzix's Mastery | 4 | 6 | 6 | 16 | wincon | 4 | — (quase stealth) |
+| Rite of the Dragoncaller | 5 | 4 | 6 | 15 | wincon | 6 | — (quase stealth) |
+| **Worldfire** | 2 | **7** ✅ | 5 | 14 | wincon | 9 | **RESILIENTE** |
+| Apex of Power | 4 | 4 | 5 | 13 | wincon | 10 | — (sobrescrito por Approach) |
+| **Approach of the Second Sun** | **6** ✅ | 5 | 1 | 12 | wincon | 7 | **RAPIDA** |
+| Call Forth the Tempest | 4 | 3 | 5 | 12 | wincon | 8 | — (fragil) |
+| Storm Herd | 3 | 3 | 3 | 9 | wincon | 10 | — (fragil) |
+
+#### Resumo por Categoria:
+
+| Categoria | Threshold | Melhor no Deck | Score | Status |
+|:----------|:---------:|:---------------|:-----:|:------:|
+| **RAPIDA** | speed >= 6 | Approach of the Second Sun | speed=6 | ✅ **COBERTA** |
+| **RESILIENTE** | resilience >= 7 | Worldfire | resilience=7 | ✅ **COBERTA** |
+| **STEALTH** | stealth >= 7 | Mizzix's Mastery, Rite | stealth=6 | ❌ **VAZIA** |
+
+**GAP CRITICO: NENHUM wincon no deck atinge stealth >= 7.**
+Os dois melhores (Mizzix's Mastery, Rite) pontuam stealth=6 — quase la, mas ainda abaixo do threshold.
+
+---
+
+### PASSO 2: Busca de STEALTH Wincon na Colecao
+
+#### card_deck_analysis (stealth >= 7):
+
+| Carta | Speed | Resilience | Stealth | Total | Na Colecao? | No Deck? |
+|:------|:-----:|:----------:|:-------:|:-----:|:-----------:|:--------:|
+| **Guttersnipe** | 5 | **2** ❌ | 8 | 15 | Sim (qty=1) | Nao |
+
+**Guttersnipe: REJEITADO.** Resilience=2 (morre pra qualquer removal). Regra: "Nao recomende cartas com resilience <= 2."
+
+#### Outros candidatos stealth na colecao (nao scored pelo card_deck_analysis):
+
+| Carta | CMC | Por que Stealth? | Status |
+|:------|:---:|:-----------------|:-------|
+| **Twinflame** | 2 | Combo infinito com Dualcaster Mage (ja no deck). 2RR + criatura = infinite hasty 2/2s. Oponentes veem 2 cartas inocentes. | ✅ Na colecao, **NAO no deck** |
+| Flare of Duplication | 3 | Free copy (sacrifice creature). Stack interaction. Nao e standalone wincon. | ✅ Na colecao, **NAO no deck** |
+| Spiteful Banditry | 2 | Treasure + board wipe. 0% EDHREC Lorehold. Sidegrade. | Na colecao, nao no deck |
+| Fiery Inscription | 3 | Pinger por spell cast. Similar a Guttersnipe (mas encantamento = mais resiliente). | Na colecao, nao no deck |
+
+**Recomendacao Primaria: Twinflame (CMC 2)**
+
+- **Sinergia:** Combo infinito com Dualcaster Mage (ja no deck como "engine").
+- **Custo de stealth:** 2RR se Dualcaster ja em campo. 3RRRR se ambos cast no mesmo turno.
+- **Por que stealth:** Dualcaster parece so "copy engine". Twinflame parece so "creature copy". Ninguem suspeita do combo infinito.
+- **Delta CMC:** +2 (adiciona carta sem remover). Ou 0 se trocar por filler.
+- **Contra-indicacao:** Ciclo #23 (DEFENSIVO) planeja remover Apex (CMC 10) e Storm Herd (CMC 10) para draws CMC 2. Twinflame CMC 2 e consistente com estrategia DEFENSIVA.
+
+**Nota: card_deck_analysis da scores DEFAULT (5/5/5) para Twinflame — nunca foi enriquecido como wincon.** O combo Twinflame+Dualcaster nao esta capturado nas metricas do sistema. Isso e um gap de classificacao — o sistema ve "creature copy" mas nao "infinite hasty tokens = I win."
+
+**Recomendacao Secundaria: Fiery Inscription (CMC 3)**
+
+- Encantamento — mais dificil de remover que criatura (resilience efetiva > Guttersnipe)
+- Pinger por spell cast (consistente com deck spellslinger)
+- Nao e combo-kill imediato (nao substitui necessidade de stealth infinito)
+- CMC 3 — nao piora T3 significativamente
+
+---
+
+### PASSO 3: Protecao para Wincons Frafrageis
+
+| Wincon | Resilience | Protecao Necessaria | Tem no Deck? | Status |
+|:-------|:----------:|:--------------------|:------------:|:------:|
+| **Approach** | 5 | Grand Abolisher, Silence, Boseiju | Grand Abolisher ✅, Boseiju ✅, Silence ❌ | **ADEQUADO** (2/3) |
+| **Storm Herd** | 3 | Akroma's Will, Flawless Maneuver | Ambos ✅ | **ADEQUADO** (mas planejado para cut) |
+| **Rite of the Dragoncaller** | 4 | Lightning Greaves, Swiftfoot Boots | Greaves ✅, Boots ❌ | **PARCIAL** (1/2 haste) |
+| **Worldfire** | 7 | Post-resolution finisher | Nenhum confiavel | **VULNERAVEL** — sem plano pos-Worldfire |
+| **Apex of Power** | 4 | Cast protection (Grand Abolisher, Boseiju) | Ambos ✅ | **ADEQUADO** para cast |
+| **Call Forth the Tempest** | 3 | Board wipe protection | Flawless Maneuver ✅, Teferi's ✅ | **ADEQUADO** |
+
+#### ⚠️ Alerta: Post-Worldfire Gap
+
+Worldfire (resilience=7) e quase impossivel de interagir, mas o deck nao tem plano confiavel para VENCER apos resolver Worldfire:
+
+- Worldfire custa 9 mana, exila todas as permanentes, maos e cemiterios, life=1
+- Para vencer: precisa de 14+ mana (9+5 para commander), ou criatura phasada, ou suspended card
+- Deck atual: Simian Spirit Guide da R apos Worldfire, mas nao ha spell para conjurar (mao exilada)
+- Teferi's Protection pode phasar criaturas, mas custa 3 + Worldfire 9 = 12 mana
+
+**Worldfire e RESILIENTE (ninguem remove) mas NAO e um wincon pratico sem suporte.** E um "wincon simbolico" — intimida mas raramente fecha jogos.
+
+---
+
+### PASSO 4: Scoring Alternativo (Wincons nao-tagueados como wincon)
+
+Cartas com potencial de wincon que o sistema NAO classifica como `functional_tag='wincon'`:
+
+| Carta | Tag DB | Por que e Wincon | Tipo |
+|:------|:-------|:-----------------|:-----|
+| Blasphemous Act | board_wipe | 1 mana wipe + Boros Charm = dano unilateral. Com Repercussion (nao no deck) seria lethal. | Soft |
+| Boros Charm | removal | Double strike no turno certo = lethal com board estabelecido. | Soft |
+| Akroma's Will | wincon | Ja tagueado. Double strike + lifelink + flying + vigilance. Fecha jogos com qualquer board. | Hard |
+| Dance with Calamity | exile_value | Exila N cartas, joga gratis. Pode achar Approach + copy engine. | Enabler |
+| Arcane Bombardment | spellslinger | Acumula spells exiladas. Eventualmente gera vantagem insuperavel. | Engine→Wincon |
+| Primal Amulet // Primal Wellspring | engine | Copia spells + gera mana. Em late game, dobra qualquer wincon. | Enabler |
+
+**Conclusao:** O deck tem MAIS wincons que o sistema detecta. Alem dos 7 scored, ha ~3-4 soft/engine wincons. Mas NENHUM atinge stealth >= 7.
+
+---
+
+### PASSO 5: Recomendacoes
+
+#### Curto Prazo (proximo ciclo — C#24):
+
+1. **Adicionar Twinflame (CMC 2)** para fechar o gap STEALTH. Combo com Dualcaster Mage.
+   - Necessidade Estrategica: 4 (fecha gap stealth vazio ha 23+ ciclos)
+   - Evidencia de Dados: 3 (combo conhecido, mas card_deck_analysis nao pontua)
+   - Net DCMC: +2 (ou 0 se trocar por filler CMC 2)
+   - **Atencao:** Se C#23 for aplicado (OUT Apex + Storm Herd), deck fica com 2 slots abertos.
+
+2. **Aplicar swaps do Ciclo #23** (documentadas mas NAO executadas):
+   - OUT Apex of Power (CMC 10) → IN Demand Answers (CMC 2)
+   - OUT Storm Herd (CMC 10) → IN Thrill of Possibility (CMC 2)
+   - Net DCMC: -16. T3 projetado: 13.3% → ~9-10%.
+
+3. **Adicionar Swiftfoot Boots** se disponivel — protecao extra para Rite of the Dragoncaller.
+   - ❌ Nao esta na colecao.
+
+#### Medio Prazo (aquisicoes):
+
+| # | Carta | CMC | Funcao | Preenche Gap? | Custo |
+|:-:|:------|:---:|:-------|:--------------|:-----:|
+| 1 | **Idyllic Tutor** | 3 | Tutor enchantment | SIM — tutor gap | $15-20 |
+| 2 | **Skullclamp** | 1 | Draw engine CMC 1 | Draw extra | $5-8 |
+| 3 | **Underworld Breach** | 2 | Combo enabler | Stealth combo com LED/Brain Freeze (fora do escopo) | $15-20 |
+| 4 | **Impact Tremors** | 2 | Pinger por ETB | Stealth: cada token = 1 dano. Com Twinflame infinite = win. | $3-5 |
+
+---
+
+### PASSO 6: Resumo Executivo
+
+| Metrica | Valor | Status |
+|:--------|:-----:|:------:|
+| Wincons scored (total > 0) | 7 | Saudavel |
+| **RAPIDA (speed >= 6)** | Approach (speed=6) | ✅ COBERTA |
+| **RESILIENTE (resilience >= 7)** | Worldfire (resilience=7) | ⚠️ COBERTA mas sem plano pos-resolution |
+| **STEALTH (stealth >= 7)** | NENHUM | ❌ VAZIA — GAP ha 23+ ciclos |
+| Protecao Approach | 2/3 (sem Silence) | ADEQUADO |
+| Protecao Rite | 1/2 (sem Boots) | PARCIAL |
+| Post-Worldfire win | Nenhum confiavel | VULNERAVEL |
+| **Solucao stealth** | Twinflame (CMC 2, na colecao) | Pronto para aplicar |
+| **Solucao post-Worldfire** | Nenhuma na colecao | Requer aquisicao ou cut do Worldfire |
+
+**Acao Imediata:** Aplicar swaps C#23 + adicionar Twinflame no proximo ciclo.
+**Risco:** Se Worldfire for a unica wincon RESILIENTE e o deck nao tiver como vencer apos ele, e uma wincon "de fachada." Considerar substituir Worldfire por um wincon resiliente PRATICAVEL (ex: Comet Storm com infinito mana, Crackle with Power).
+
+
 ## [2026-06-01T08:23:45+00:00] Ciclo #23 -- Evolution Oracle PG-Enhanced (PIPELINE INTEGRITY BREAK -- Hash Mismatch, 2 SWAPS DEFENSIVOS)
 
 ### PASSO 0: Integridade do Pipeline -- FALHA SISTEMICA DETECTADA

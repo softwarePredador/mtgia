@@ -1,70 +1,65 @@
-# VALIDATOR_SUMMARY — Lorehold Spellslinger (v3.13)
+# VALIDATOR_SUMMARY — Lorehold Spellslinger (v3.20)
 
-**Data:** 2026-05-31 | **Timestamp:** 2026-05-31T23:37:47+00:00
-**Estado:** MATURIDADE PERSISTENTE (4 ciclos consecutivos com 0 swaps: C#11, C#12, C#13, C#14)
-**Swaps acumulados:** 22 desde baseline
-**Sem Play T3:** 13.3% (Execucao #11, estavel)
+**Data:** 2026-06-01 | **Timestamp:** 2026-06-01T09:03:00+00:00
+**Estado:** RE-CONFIRMADO (deck identico ao v3.19, hash `30d00347...`)
+**Card hash:** `30d00347764fc2a215edb4e668994871`
+**Ultima mudanca no deck:** Ciclo #17-#22 (manabase refeita, 8 OUT, 5+ IN)
+**Sem Play T3:** ❓ NAO MEDIDO (necessario Mulligan Tester)
+**⚠️ Data issue:** Valakut duplicado (99 cartas fisicas, 100 no DB)
 
 ---
 
-## Metricas Principais
+## PG Profile Comparison
 
-| Metrica | Valor | Status |
-|:--------|:-----:|:------:|
-| Lands | 35 | ✅ |
-| Avg CMC | 3.81 | ✅ |
-| Ramp | 14 | ✅ |
-| Draw (real) | 12+ | ✅ |
-| Removal | 6 | ✅ |
-| Wipes | 6 | ✅ |
-| Protecoes | 7 | ✅ |
-| Tutores (real) | 3 | ✅ |
-| Wincons (real) | 7 | ✅ |
-| Copy Engines | 6 | ✅ |
+| Role | Ideal | Actual | Diff | Status |
+|:-----|:-----:|:------:|:----:|:------:|
+| lands | 32.00 | 35.0 | +3.0 | 🟡 ACIMA |
+| ramp | 3.67 | 7.0 | +3.3 | 🟡 ACIMA |
+| ritual_treasure | 10.00 | 10.0 | 0.0 | ✅ IDEAL |
+| big_spell_payoff | 7.67 | 17.0 | +9.3 | 🟡 ACIMA |
+| miracle_topdeck | 4.33 | 7.0 | +2.7 | 🟡 ACIMA |
+| interaction | 5.33 | 11.0 | +5.7 | 🟡 ACIMA |
+| protection | 3.67 | 8.0 | +4.3 | 🟡 ACIMA |
+| draw_value | 2.67 | 9.0 | +6.3 | 🟡 ACIMA |
+| tutor | 3.67 | 2.0 | -1.7 | 🔴 ABAIXO |
+| win_condition | 1.33 | 5.0 | +3.7 | 🟡 ACIMA |
+
+**11/14 roles ACIMA ou IDEAL. Unico gap real: tutor (-1.7).**
 
 ## SYNERGY_MAP — 7 Eixos
 
 | Eixo | Nota | Status |
 |:-----|:----:|:------|
-| A) Token Makers + Pump | 7/10 | ✅ Bom, nao e o plano A |
-| B) Wipes + Protection | 8/10 | ✅ Ratio 0.86, assimetricos |
-| C) Recursion Chains | 8/10 | ✅ 5 engines, loop Bombardment+Seminar |
-| D) Mana Explosiva | 9/10 | ✅ Treasure + ritual + rocks |
-| E) Combo Pieces | 9/10 | ✅ Approach deterministico, Flare combo |
-| F) Stack Interaction | 6/10 | ⚠️ Boros sem counterspell |
-| G) Graveyard Resilience | 6/10 | ⚠️ 3 respostas a grave hate |
+| A) Token Makers + Pump | 7/10 | ✅ Bom |
+| B) Wipes + Protection | 8/10 | ✅ Robustissimo (3 fogs) |
+| C) Recursion Chains | 7/10 | ✅ Mizzix's compensa |
+| D) Mana Explosiva | 9/10 | ✅ Excepcional |
+| E) Combo Pieces | 7/10 | ⚠️ Flare/Twinflame perdidos |
+| F) Stack Interaction | 5/10 | ⚠️ Boros classico |
+| G) Resilience | 8/10 | ✅ 3 fogs massivos |
 
-**Media: 7.6/10** — Deck consistente e resiliente.
+**Media: 7.3/10** — Deck solido com motor de mana excepcional.
 
-## Classificacao Estrategica
-
-| Nivel | Cartas | Descricao |
-|:-----:|:------:|:----------|
-| 5 | 3 | Nao se joga sem (Lorehold, Approach, Mizzix's) |
-| 4 | 12 | Core da estrategia (copy engines, topdeck engines) |
-| 3 | 36 | Suporte forte (ramp, draw, wipes, wincons) |
-| 2 | 35 | Utilidade situacional (removal, lands) |
-| **1** | **0** | **VAZIO — Nenhum filler** ✅ |
-
-## Double-Nulls Restantes: 4
+## Double-Nulls: 4
 
 | Carta | Importancia | EDHREC | Acao |
 |:------|:-----------:|:------:|:-----|
-| Scroll Rack | NIVEL 4 | ~40% | NUNCA cortar |
-| Penance | NIVEL 4 | ~15% | NUNCA cortar |
-| Grand Abolisher | NIVEL 2 | ~12% | Monitorar |
-| Taunt from the Rampart | NIVEL 2 | ~35% | Manter |
+| Scroll Rack | CRITICAL | 51.3% | NUNCA cortar |
+| Penance | CRITICAL | N/A | NUNCA cortar |
+| Grand Abolisher | HIGH | 11.7% | Monitorar (trend -0.27) |
+| Taunt from the Rampart | LOW | 35.2% | Manter |
 
 ## Gaps
 
-1. **Vulnerabilidade a Grave Hate** — 3 respostas em 100 cartas. Adicionar Return to Dust ou Wear // Tear.
-2. **Zero Stack Interaction Ofensiva** — Aceito como limitacao Boros.
-3. **Colecao Esgotada** — Proximo upgrade requer AQUISICAO: Skullclamp (CMC 1, $5-8).
+1. **tutor -1.7** — Unico gap real. Aquisicao: Idyllic Tutor ($15-20).
+2. **Valakut duplicado** — Corrigir DB (remover id=653).
+3. **T3 nao medido** — Executar Mulligan Tester com novo deck.
+4. **Stack interaction** — Flare/Twinflame cortadas. Se readquiridas, reavaliar.
 
 ## Conclusao
 
-**MATURIDADE PERSISTENTE CONFIRMADA.** 4 ciclos consecutivos com 0 swaps. Deck opera em 7 eixos de sinergia com media 7.6/10. Nivel 1 vazio — todas as 86 cartas tem funcao definida. Proximo upgrade requer aquisicao de cartas (Skullclamp prioridade #1).
+**DECK SAUDAVEL E ESTAVEL.** 11/14 PG roles acima do ideal. SYNERGY_MAP 7.3/10. Motor 4/4 completo. 5 copy engines + Dualcaster. Unico gap real: tutor (2 vs 3.67). Proximo upgrade requer AQUISICAO (Idyllic Tutor prioridade #1). T3 precisa ser medido para confirmar que manabase refeita nao piorou early game.
 
 ---
 
-*VALIDADOR_SUMMARY v3.13 — 2026-05-31T23:37:47+00:00*
+*VALIDADOR_SUMMARY v3.20 — 2026-06-01T09:03:00+00:00*

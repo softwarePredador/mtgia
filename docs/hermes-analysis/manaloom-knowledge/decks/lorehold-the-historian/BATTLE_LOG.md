@@ -463,3 +463,45 @@ Opponents: 12 (real)
 | Lorehold, the Historian (real) | 48.0% | 24 | 26 | 0 | 10.5 | approach=20, elimination=4 |
 
 **Overall WR: 46.3%** (278W/317L/5S)
+
+## [2026-06-01T02:46:56Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=35 R=14 X=10 CMC=3.61 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Lorehold, the Historian (real) | 46.0% | 23 | 25 | 2 | 10.3 | approach=17, elimination=6 |
+| Lorehold, the Historian (real) | 50.0% | 25 | 25 | 0 | 10.2 | approach=23, elimination=2 |
+| Lorehold, the Historian (real) | 54.0% | 27 | 22 | 1 | 9.5 | approach=26, elimination=1 |
+| Lorehold, the Historian (real) | 44.0% | 22 | 27 | 1 | 10.1 | approach=21, elimination=1 |
+| Lorehold, the Historian (real) | 50.0% | 25 | 25 | 0 | 9.8 | approach=22, elimination=3 |
+| Lorehold, the Historian (real) | 44.0% | 22 | 27 | 1 | 9.5 | approach=21, elimination=1 |
+| Lorehold, the Historian (real) | 48.0% | 24 | 26 | 0 | 9.8 | approach=21, elimination=3 |
+| Lorehold, the Historian (real) | 52.0% | 26 | 23 | 1 | 9.4 | approach=26 |
+| Lorehold, the Historian (real) | 46.0% | 23 | 27 | 0 | 9.3 | approach=22, elimination=1 |
+| Lorehold, the Historian (real) | 52.0% | 26 | 22 | 2 | 10.5 | approach=23, elimination=3 |
+| Lorehold, the Historian (real) | 52.0% | 26 | 23 | 1 | 10.0 | approach=24, elimination=2 |
+| Lorehold, the Historian (real) | 34.0% | 17 | 32 | 1 | 9.5 | elimination=3, approach=14 |
+
+**Overall WR: 47.7%** (286W/304L/10S)
+
+## [2026-06-01T06:59:59Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=35 R=16 X=9 CMC=3.61 Instants=14
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 56.0% | 28 | 20 | 2 | 10.4 | approach=27, elimination=1 |
+| Lier, Disciple of the Drowned (real) | 64.0% | 32 | 15 | 3 | 9.6 | approach=31, elimination=1 |
+| Aragorn, King of Gondor (real) | 64.0% | 32 | 15 | 3 | 10.0 | approach=27, elimination=5 |
+| Tasigur, the Golden Fang (real) | 64.0% | 32 | 17 | 1 | 10.0 | approach=31, elimination=1 |
+| Cloud, Midgar Mercenary (real) | 68.0% | 34 | 15 | 1 | 10.0 | approach=32, elimination=2 |
+| Deadpool, Trading Card (real) | 72.0% | 36 | 14 | 0 | 10.2 | approach=31, elimination=5 |
+|  (real) | 70.0% | 35 | 15 | 0 | 10.6 | approach=33, elimination=2 |
+| Malcolm, Keen-Eyed Navigator (real) | 66.0% | 33 | 13 | 4 | 10.2 | approach=28, elimination=5 |
+| Slimefoot and Squee (real) | 72.0% | 36 | 8 | 6 | 9.6 | elimination=4, approach=32 |
+| Rograkh, Son of Rohgahh (real) | 58.0% | 29 | 19 | 2 | 10.6 | approach=28, elimination=1 |
+| Kenrith, the Returned King (real) | 68.0% | 34 | 15 | 1 | 10.4 | approach=32, elimination=2 |
+| The Jolly Balloon Man (real) | 68.0% | 34 | 13 | 3 | 9.7 | approach=32, elimination=2 |
+
+**Overall WR: 65.8%** (395W/179L/26S)

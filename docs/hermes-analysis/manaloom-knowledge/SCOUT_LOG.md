@@ -1,3 +1,73 @@
+## [2026-06-01T02:39:00+00:00] Execucao #29 — Pos-C#17: Ashling Ja No Deck, Colecao Esgotada, Pipeline Corrigido
+
+> **Data:** 2026-06-01
+> **Fonte EDHREC:** 7.851 decks (JSON API, identico desde Scout #24 — snapshot inalterado ha 19h+)
+> **Deck state:** Pos-Ciclo #17 (27 swaps desde baseline). C#17 aplicou Ashling + Demand Answers, removeu Rise of the Eldrazi + Longshot. Motor 4/4, Copy 7/7 (Ashling adiciona CAST+COPY payoff), Draw 8, T3 pendente de re-simulacao (projetado ~11-12% com ΔCMC -8).
+> **Missao:** Buscar cartas com MALICIA que CRIAM ou REFORCAM sinergias — mas com Ashling ja no deck, reavaliar candidatos que ganham forca com CAST+COPY payoff.
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Synergy-First v29)
+> **Resultado:** Nenhuma descoberta nova. C#17 aplicou o melhor candidato (Ashling) identificado pelo Scout #24. Colecao esgotada para upgrades com score >= 8. Deck em MATURIDADE PERSISTENTE.
+
+---
+
+### 🚨 Pipeline Integrity: Hash Mudou (VALIDO — C#17 Aplicou Swaps)
+
+| Verificacao | Resultado |
+|:------------|:----------|
+| Card hash Scout #28 (02:10) | `84bc87988d4ba64919f68b565f46482b` |
+| Card hash ATUAL (02:30) | `a440c497da4280d6769238737062b3dd` |
+| **Hash match?** | ❌ NAO (MAS VALIDO — C#17 aplicou swaps em 02:15) |
+| Mudancas desde Scout #28 | Ashling, Flame Dancer ✅ IN, Demand Answers ✅ IN, Rise of the Eldrazi ❌ OUT, Longshot, Rebel Bowman ❌ OUT |
+| Net ΔCMC | **-8** (CMC 10+4 → 4+2) — DEFENSIVO forte |
+| EDHREC num_decks | 7.851 (identico aos #24-#28) |
+| Deck rows | 86, 100 cartas (SUM quantity) |
+| CMC medio | ~3.61 (caiu de ~3.75, -0.14 vs pre-C#17) |
+
+### EDHREC Snapshot (Inalterado — 19h+)
+
+| Metrica | Valor |
+|:--------|:------|
+| Total decks | 7.851 |
+| Rising stars | Restoration Seminar 37.9% (+9.16), Improvisation Capstone 49.0% (+8.13), The Dawning Archaic 24.0% (+5.27) — TODAS NO DECK |
+| Declining (deck) | Esper Sentinel 32.4% (-0.54), Call Forth the Tempest 65.3% (-0.31), Urza's Saga 26.7% (-0.33) |
+| Deck cards NOT in EDHREC | 9 (Akroma's Will, Cavern of Souls, Dormant Volcano, Emeria's Call, Kor Haven, Lorehold, Twinflame, Valakut Awakening, Weathered Wayfarer) |
+
+### Novo Contexto: Ashling Como CAST+COPY Payoff
+
+Com Ashling (CMC 4) agora no deck, cada spell gera 3-6 triggers de Ashling (cast + copy do Lorehold + Double Vision/Bombardment/Dawning Archaic/Flare/Twinflame). Cada trigger = impulse draw + 1 dano a cada oponente.
+
+Isso MUDA a avaliacao de cartas que amplificam dano nao-combate ou que geram copias adicionais:
+
+| Carta (colecao) | CMC | A (Sinergia) | B (Custo) | C (Evidencia) | Total | Por que NAO |
+|:----------------|:---:|:------------:|:---------:|:-------------:|:-----:|:------------|
+| **Solphim, Mayhem Dominus** | 4 | 4 | 1 | 1 | **6** | CMC 4 creature. Dobra dano Ashling (1→2 por trigger) + Blasphemous Act (13→26) + Call Forth + Volcanic Vision. MAS: ocupa slot CMC 4 ja lotado (Ashling, Akroma's Will, The One Ring, Mizzix's, Smothering Tithe). Substituiria Olorin's Searing Light (CMC 4, graveyard_synergy) — sidegrade no mesmo CMC. |
+| **Fiery Emancipation** | 6 | 4 | 1 | 2 | **7** | TRIPLA dano. Com Ashling: 3 dano/trigger × 4 triggers = 12 dano/spell. MAS: CMC 6 encarece curva (ΔCMC +2 vs Olorin's). Deck acabou de reduzir CMC medio com C#17 DEFENSIVO. |
+| **Spiteful Banditry** | 2 | 4 | 3 | 1 | **8** | CMC 2 enchantment. Board wipe → treasures. Com 4 wipes (Austere Command, Blasphemous Act, Call Forth, Worldfire) = 10+ treasures/wipe. Substituiria Hexing Squelcher (CMC 2, protecao de nicho). MAS: Hexing e 1 das 5 camadas de stack interaction. Remover reduz stack de 5→4. |
+| **Dualcaster Mage** | 3 | 5 | 3 | 3 | **11** | COPY #8. Com Ashling: Dualcaster copy → Ashling trigger extra. Substituiria Bender's Waterskin (CMC 3, ramp nicho). MAS: trocar ramp por copy quando deck ja tem 7 copy engines e 14 ramp sources = sidegrade funcional. |
+| **Reverberate** | 2 | 4 | 4 | 1 | **9** | Instant copy #8. CMC 2, instant (dispara Ashling + Lorehold + Bombardment). Substituiria Hexing Squelcher (CMC 2). MAS: +1 copy engine em deck com 7 = redundancia marginal. |
+| **Surge of Salvation** | 1 | 3 | 5 | 1 | **9** | CMC 1 instant. Protecao FREE para combo turn. Substituiria Mother of Runes? Sidegrade de protecao CMC 1. Mãe e REPETIVEL, Surge e one-shot mas protege TODAS permanentes. |
+
+### Cartas CMC 3+ (Trocar CMC Baixo Por Medio PIORA T3)
+
+| Carta (colecao) | CMC | A | B | C | Total | Por que NAO |
+|:----------------|:---:|:-:|:-:|:-:|:-----:|:------------|
+| **Trouble in Pairs** | 4 | 4 | 2 | 2 | **8** | Draw engine em Boros (2-4 cartas/ciclo). MAS: CMC 4. Ashling e The One Ring ja ocupam draw no CMC 4. Adicionar 3o draw engine no mesmo CMC = redundancia. |
+| **Monastery Mentor** | 3 | 4 | 2 | 2 | **8** | Token + spellslinger. Cada spell = 1 Monk com prowess. MAS: CMC 3 creature sem ETB. Surge to Victory + Twinflame + Rite ja suprem token. Monastery e fragil (morre pra qualquer wipe). |
+| **Insurrection** | 8 | 5 | 0 | 3 | **8** | Wincon alternativa FORTE. MAS: CMC 8. Deck acabou de CORTAR Rise of the Eldrazi (CMC 10) para REDUZIR CMC. Substituir Worldfire (CMC 9) por Insurrection (CMC 8) = ΔCMC -1, sidegrade de wincon high-CMC. |
+| **Mana Geyser** | 5 | 3 | 2 | 2 | **7** | Ritual massivo (sorcery, CMC 5). MAS: deck ja tem 14 fontes de ramp. Mais ramp high-CMC nao e o que o deck precisa. |
+
+### Conclusao
+
+**Colecao esgotada para sinergias novas.** Vinte e nove execucoes de scout exploraram 9 angulos distintos. O melhor candidato (Ashling, Score 9, Scout #24) foi APLICADO pelo C#17. O pipeline de 7 ciclos baseado em deck fantasma foi CORRIGIDO pelo VALIDATOR v3.14 + Evolution Oracle C#17.
+
+**Dualcaster Mage (Score 11) e o unico candidato acima de 9** — mas requer substituir Bender's Waterskin (ramp) por copy #8, uma troca que nao resolve nenhum gap sistemico.
+
+**Spiteful Banditry (Score 8) e promissor** — board wipes → treasures com sinergia direta com os 4 wipes do deck. Porem, substituiria Hexing Squelcher (stack interaction) e reduz protecao de 5→4 camadas. E um sidegrade que troca protecao por ramp condicional.
+
+**Proximo upgrade requer AQUISICAO** — nenhuma carta na colecao com CMC <= 2 oferece upgrade sistemico (Necessidade >= 3 + Evidencia >= 3). Skullclamp (CMC 1, $5-8) continua sendo a prioridade #1 de aquisicao.
+
+### Nota para o Evolution Oracle
+O Scout #28 e #29 CONCORDAM: Ashling foi o melhor swap pendente e C#17 o aplicou corretamente. O deck esta em MATURIDADE PERSISTENTE. A unica carta na colecao com score >= 8 que nao e sidegrade completo e **Spiteful Banditry** (converte board wipes em tesouros, Score 8), mas requer sacrificar Hexing Squelcher (protecao de nicho). Se o Oracle quiser explorar esse swap no C#18, e um DEFENSIVO ΔCMC=0 que adiciona sinergia wipe→treasure sem piorar T3.
+
 ## [2026-05-31T23:30:34+00:00] Execucao #24 — Lorehold Scout (Synergy-First v24)
 
 > MATURIDADE PERSISTENTE. 6 novos angulos explorados: Seething Song (Score 10), Ashling (9), Voice of Victory (9), Invoke Calamity (9), Manaform Hellkite (8), Spiteful Banditry reavaliado (8). Swap mais viavel: Ashling ↔ Longshot (mesmo CMC, upgrade). 0 swaps esperado por falta de filler.

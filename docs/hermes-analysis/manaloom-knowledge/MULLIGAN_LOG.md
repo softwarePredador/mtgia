@@ -1,3 +1,25 @@
+## Lorehold Verificacao -- 2026-06-01T09:26:05+00:00 (Sem Mudancas, T3=13.3% Estavel, C#23 Swaps Documentados Mas NAO Aplicados)
+## Verificacao -- 2026-06-01T10:32:50+00:00 (Sem Mudancas — C#23 Swaps Documentados Mas NAO Aplicados, T3=13.3% Estavel)
+
+- Evolution Oracle C#23 (2026-06-01T08:23:57): 2 swaps DEFENSIVOS documentados — OUT Apex of Power (CMC 10) + Storm Herd (CMC 10) → IN Demand Answers (CMC 2) + Thrill of Possibility (CMC 2). Net DCMC=-16.
+- Swaps NAO aplicados no DB. Deck inalterado desde Execucao #13.
+- Card hash: `30d00347764fc2a215edb4e668994871` — MATCH.
+- Sem Play T3 canonico: **13.3%** (Execucao #13, N=1000, seed=42, rigoroso) — ZONA DEFENSIVA (>12%).
+- Mulligan: 30.1%, Jogaveis: 66.0%, Ramp T1 (Sol Ring only): 8.5%, Free Mulligan: 4.6%.
+- Simulacao NAO re-executada — deck inalterado. Projecao pos-C#23: T3 ~9-10%.
+- Evolution Oracle "Wincon Diversity" (09:22): identificou gap STEALTH, recomenda Twinflame para C#24.
+
+---
+
+- Deck inalterado desde Execucao #13. Hash: `30d00347764fc2a215edb4e668994871`
+- Apex of Power (CMC 10) e Storm Herd (CMC 10) ainda no deck
+- Demand Answers (CMC 2) e Thrill of Possibility (CMC 2) ausentes
+- Evolution Oracle C#23 documentou 2 swaps DEFENSIVOS (net DCMC=-16) mas NAO os aplicou
+- T3 permanece em 13.3% (>12% = zona DEFENSIVA)
+- Projecao pos-swaps: T3 ~9-10%
+
+---
+
 ## Lorehold Execucao #13 — 2026-06-01T08:14:37+00:00
 
 ### 🚨 Pipeline Integrity Alert
