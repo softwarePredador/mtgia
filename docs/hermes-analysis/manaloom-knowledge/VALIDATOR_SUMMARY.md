@@ -1,94 +1,72 @@
-# VALIDATOR_SUMMARY -- Lorehold Spellslinger (v3.15 / C#16)
+# Lorehold Spellslinger — Resumo Executivo
 
-**Data:** 2026-06-01 | **Timestamp:** 2026-06-01T00:59:20+00:00
-**Estado:** MATURIDADE ABSOLUTA CONSOLIDADA (6 ciclos consecutivos com 0 swaps: C#11-C#16)
-**Swaps acumulados:** 25 desde baseline (10 ciclos com swaps)
-**Sem Play T3:** 13.3% (Execucao #11, estavel, 6 ciclos confirmado)
-**Evolution Oracle:** C#16 -- 0 SWAPS. SCOUTS #25 e #26 avaliados, nenhum candidato viavel.
+> **Atualizado:** 2026-06-01T02:15:55+00:00 (Evolution Oracle Ciclo #17)
+> **Fonte:** knowledge.db deck_id=6 — DB REAL (pos-C#17)
+> **Estado:** BOM — Draw gap corrigido, pior carta removida, Ashling engine adicionada
 
----
+## Metricas Principais (pos-C#17)
 
-## Metricas Principais
+| Metrica | Valor | Perfil | Status |
+|:--------|:-----:|:------:|:------:|
+| Lands | 35 | 36-38 | OK (MDFCs compensam) |
+| Ramp | 14 | 10-13 | +1 |
+| **Draw (DB-tagged)** | **8** | **8-12** | **✅ CORRIGIDO (+2 vs pre-C#17)** |
+| Removal | 6 | 4-6 | OK |
+| Board Wipe | 4 | 3-5 | OK |
+| Protection | 4+2 | 3-4 | OK |
+| Recursion | 4 | 2-5 | OK |
+| Wincon | 7+ paths | 4+ | EXCELENTE |
+| Copy Engines | 6 | -- | EXCELENTE |
+| **CMC medio** | **3.61** | ~4.1 | **MELHOROU (-0.14)** |
 
-| Metrica | Valor | Status |
-|:--------|:-----:|:------|
-| Lands | 35 | OK |
-| Avg CMC | 3.71 | OK |
-| Ramp | 14 | OK |
-| Draw (real, conservador) | 7 | -1 do perfil |
-| Draw (real, expandido v3.13) | 12+ | OK |
-| Removal | 6 | OK |
-| Wipes | 5 | OK |
-| Protecoes | 5 | OK (+2 stack) |
-| Tutores (real) | 2 | OK |
-| Wincons (funcional) | 8+ paths | EXCELENTE |
-| Copy Engines | 6 | EXCELENTE |
+## Health Indicators (pos-C#17)
 
-## SYNERGY_MAP -- 7 Eixos
+| Indicador | Valor | Status |
+|:----------|:-----:|:------:|
+| Motor | 4/4 | ✅ COMPLETO |
+| **Sem Play T3** | **~10-12% (projetado)** | **🟡 PENDENTE SIMULACAO** |
+| Double-nulls | 4 (0 cortaveis) | ✅ OK |
+| **Nivel 1** | **1 (Worldfire)** | **🟡 Reduzido (Rise cortada)** |
+| SYNERGY_MAP medio | 7.9/10 | ✅ EXCELENTE |
+| Wipes/Protection ratio | 0.8:1 | ✅ EXCELENTE |
 
-| Eixo | Nota | Status |
-|:-----|:----:|:------|
-| A) Token Makers + Pump | 7/10 | Bom, nao e o plano A |
-| B) Wipes + Protection | 8/10 | Ratio 0.86, assimetricos |
-| C) Recursion Chains | 8/10 | 5 engines, loop Bombardment+Seminar |
-| D) Mana Explosiva | 7/10 | Treasure + ritual + rocks |
-| E) Combo Pieces | 9/10 | Approach deterministico, Flare combo |
-| F) Stack Interaction | 6/10 | Boros sem counterspell (5 ferramentas) |
-| G) Graveyard Resilience | 6/10 | 3 respostas a grave hate |
+## Ciclo #17 — Swaps Aplicados (DEFENSIVO, Net DCMC = -8)
 
-**Media: 7.3/10** -- Deck consistente e resiliente.
+### Swap 1: Rise of the Eldrazi (CMC 10, <5% EDHREC) → Demand Answers (CMC 2, draw)
+- **DCMC = -8.** Pior carta do deck removida. Demand Answers: instant CMC 2 — draw 2 discard 1 OU sac artifact → draw 3. Preenche grave, ajuda T3.
+- Draw sobe de 6 → 7 com esta carta.
 
-## Classificacao Estrategica
+### Swap 2: Longshot, Rebel Bowman (CMC 4, ping 1/turno) → Ashling, Flame Dancer (CMC 4, impulse draw + dano)
+- **DCMC = 0.** Ashling escala com 6 copy engines: 3-4 triggers/spell = 3-4 impulse draws + 6-8 dano distribuido.
+- Draw sobe de 7 → 8 com esta carta. Dentro do perfil pela primeira vez desde as mudancas nao documentadas.
 
-| Nivel | Cartas | Descricao |
-|:-----:|:------:|:----------|
-| 5 | 3 | Nao se joga sem (Lorehold, Approach, Mizzix's) |
-| 4 | 12 | Core da estrategia (copy engines, topdeck engines) |
-| 3 | 36 | Suporte forte (ramp, draw, wipes, wincons) |
-| 2 | 35 | Utilidade situacional (removal, lands) |
-| **1** | **0** | **VAZIO -- Nenhum filler** |
+## 🔴 Pipeline Integrity — Corrigido
 
-## Double-Nulls Restantes: 4
+O EVOLUTION_LOG C#14-C#16 operava sobre deck FANTASMA (Insurrection, Wedding Ring, Fated Clash). O DB real ja continha Worldfire, Rise of the Eldrazi, Mother of Runes desde mudancas do usuario nao documentadas. O VALIDATOR v3.14 descobriu a discrepancia. C#17 e o primeiro ciclo a operar sobre o DB REAL verificado.
 
-| Carta | Importancia | EDHREC | Acao |
-|:------|:-----------:|:------:|:-----|
-| Scroll Rack | NIVEL 4 | ~40% | NUNCA cortar |
-| Penance | NIVEL 4 | ~15% | NUNCA cortar |
-| Grand Abolisher | NIVEL 2 | ~12% | ANTI-COUNTERSPELL. Manter. |
-| Taunt from the Rampart | NIVEL 2 | ~35% | Manter |
+**Hash detection implementado:**
+- Card hash pre-mudancas nao documentadas: `84bc87988d4ba64919f68b565f46482b`
+- Card hash pos-C#17: `a440c497da4280d6769238737062b3dd`
 
-## Timeline de Ciclos
+## Top 3 GAPS (pos-C#17)
 
-| Ciclo | Swaps | Net DCMC | T3 | Estrategia |
-|:-----:|:-----:|:--------:|:--:|:----------|
-| #1-#10 | 25 | varios | 3.3%->13.3% | Misto |
-| #11-#16 | 0 | 0 | 13.3% | MATURIDADE |
+1. **T3 precisa ser re-simulado:** Mulligan Tester deve rodar com N=1000, seed=42. Net DCMC=-8 projeta T3 ~10-12%.
 
-## SCOUTS #25 e #26 -- Destaques (C#16)
+2. **Worldfire (CMC 9) anti-sinergico com recursao:** Exila cemiterio, anulando Mizzix/Bombardment/Surge. Candidato a corte no proximo ciclo. Seize the Spoils (CMC 3, draw + Treasure) na colecao como substituto.
 
-**SCOUT #25 (Verificacao de Maturidade):** No-change confirmado. Todos os candidatos com score >= 8 ja identificados e rejeitados em scouts anteriores.
+3. **Skullclamp (CMC 1, $5-8):** Prioridade #1 de aquisicao. Draw engine com token makers. Substituiria Worldfire (DCMC -8).
 
-**SCOUT #26 (Free Spells & Ritual Chain):** Explorou angulo INEDITO que os Scouts #23/#24 nao cobriram. 11 candidatos avaliados (Flare of Fortitude, Bolt Bend, Desperate Ritual, Seething Song, Simian Spirit Guide, Treasonous Ogre, Rousing Refrain, Mana Geyser, Rain of Riches, Fiery Emancipation, Solphim). Todos rejeitados (win-more, redundantes, ou sem substituto).
+## Historico de Ciclos
 
-**Cobertura total: 26 execucoes de scout em 6 angulos distintos.** Evidencia suficiente para encerrar busca ativa por swaps.
+| Ciclo | Swaps | Net DCMC | T3 |
+|:-----:|:-----:|:--------:|:--:|
+| #1-#10 | 25 | — | 13.3% (Exec#11) |
+| #11-#16 | 0 (Oracle) | 0 | — |
+| Nao documentado | 3 | +3 | ~13-14% (estimado) |
+| **#17** | **2** | **-8** | **~10-12% (projetado)** |
 
-## Gaps
-
-1. **T3 > 12%** -- DEFENSIVO. So 1 fonte de T1 ramp estrito (Sol Ring 6.3%). Solucao: aquisicao.
-2. **Colecao ESGOTADA** -- 63 cartas CMC <= 3 disponiveis, 54+ avaliadas, 0 viaveis.
-3. **Vulnerabilidade a COUNTERSPELL** -- 89.9% wins via Approach. Rotas B-E existem. Aceitavel.
-4. **Stalls 26%** -- Limite max_turns=35 no simulador.
-
-## Conclusao
-
-**MATURIDADE ABSOLUTA CONSOLIDADA.** 6 ciclos consecutivos com 0 swaps. SCOUTS #25 e #26 confirmaram que mesmo angulos INEDITOS (free spells, ritual chain) nao produzem candidatos viaveis. Cobertura de 26 scouts em 6 angulos distintos e evidencia SUFICIENTE para encerrar busca ativa. O deck atingiu o OTIMO com a colecao atual.
-
-**Proximo upgrade requer AQUISICAO:**
-1. Skullclamp (CMC 1, $5-8) -- prioridade ABSOLUTA
-2. Chrome Mox (CMC 0, $60-80) -- fast mana T0
-3. Mana Vault (CMC 1, $40-60) -- fast mana T1
-4. Ashling, Flame Dancer (CMC 4, $1-2) -- upgrade de qualidade (opcional)
+**Total: 27 swaps em 11 ciclos com swaps + 6 ciclos sem swaps + 3 mudancas nao documentadas.**
 
 ---
 
-*VALIDATOR_SUMMARY v3.15 / C#16 -- 2026-06-01T00:59:20+00:00*
+*Resumo atualizado por Evolution Oracle Ciclo #17 — 2026-06-01T02:15+00:00*

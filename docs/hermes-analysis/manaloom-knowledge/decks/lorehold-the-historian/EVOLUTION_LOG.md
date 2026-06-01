@@ -1,3 +1,292 @@
+## [2026-06-01T02:15:55+00:00] Ciclo #17 -- Evolution Oracle (2 SWAPS -- DEFENSIVO, Pipeline Corrigido, 3 Cartas Fantasma Descobertas)
+
+### 🚨 PIPELINE INTEGRITY: 7 Ciclos de Analise Baseada em Deck FANTASMA
+
+**Descoberta critica (v3.14):** O EVOLUTION_LOG dos ciclos C#14, C#15 e C#16 descrevia um deck que NAO EXISTIA no DB. Tres cartas foram trocadas fora do pipeline (provavelmente pelo usuario) e NENHUM agente detectou. O DB real continha:
+
+| Carta | CMC | EDHREC | Status |
+|:------|:---:|:------:|:-------|
+| **Worldfire** | 9 | 20.5% | ✅ NO DB — nao documentada em nenhum log |
+| **Rise of the Eldrazi** | 10 | <5% | ✅ NO DB — nao documentada |
+| **Mother of Runes** | 1 | ~46% | ✅ NO DB — nao documentada |
+| Insurrection | 8 | 59.7% | ❌ FORA DO DB — mas EVOLUTION_LOG C#14-C#16 descrevia como presente |
+| Wedding Ring | 4 | ~25% | ❌ FORA DO DB — mas EVOLUTION_LOG listava como draw source |
+| Fated Clash | 5 | 15.6% | ❌ FORA DO DB — mas EVOLUTION_LOG recomendava substituir por Skullclamp |
+
+**Net DCMC das mudancas nao documentadas: +3** (Mother of Runes CMC 1 ajuda T3; Worldfire/Rise irrelevantes para T3).
+
+**Impacto nos agentes:**
+- EVOLUTION_LOG C#14-C#16: Analise estrategica baseada em deck FANTASMA (Insurrection como wincon, Wedding Ring como draw, Fated Clash como board wipe)
+- VALIDATOR_LOG v3.12: Descrevia draw=7, board wipes=5, mas DB real tinha draw=6, board wipes=4
+- SCOUT_LOG: Pode estar lendo metricas stale dos arquivos de analise
+- **Apenas MULLIGAN_LOG estava correto** — a simulacao Exec#11 rodou contra o DB real e mediu T3=13.3% corretamente
+
+**Licao: DB e a fonte da verdade. Nunca confiar em analise previa sem verificar `deck_cards`.**
+
+**Hash detection — implementado neste ciclo:**
+- Card hash pos-C#10: `84bc87988d4ba64919f68b565f46482b` (pos-mudancas nao documentadas)
+- Card hash pos-C#17: `a440c497da4280d6769238737062b3dd` (apos swaps deste ciclo)
+- A cada ciclo, o hash sera armazenado para detectar mudancas nao documentadas
+
+---
+
+### PASSO 0: Analise Estrategica (DB REAL — verificado em 2026-06-01T02:10)
+
+#### 1. COMO ESTE DECK GANHA? (7+ paths — EXCELENTE)
+
+**Win conditions deterministicas (3):**
+- **Approach + Flare de Duplication** (CMC 7 + criatura vermelha): 2 casts NO MESMO TURNO = vitoria imediata. Combo deterministico.
+- **Approach + Top/Scroll Rack/Penance**: Cast → topdeck manipulation → 2o cast no proximo turno.
+- **Worldfire + dano na stack** (CMC 9 + burn): Exila tudo, vida=1, dano resolve → vitoria. Nao depende de Approach.
+
+**Win conditions de combate (4+):**
+- **Storm Herd (CMC 10) + Akroma's Will (CMC 4)**: 35+ Pegasus com double strike, flying, indestructible, prot all colors = lethal na mesa inteira.
+- **Storm Herd + Boros Charm**: Double strike → 70+ flying damage. Mata 2-3 jogadores.
+- **Mizzix's Mastery overload (CMC 4)**: Todos instants/sorceries do grave gratis. Com Double Vision/Bombardment = 2x cada.
+- **Surge to Victory (CMC 6) + Approach no grave + 3+ criaturas atacando**: 3+ copias de Approach = vitoria garantida.
+
+**Copy Engine Chain (7 motores):** Lorehold + Double Vision + Arcane Bombardment + Dawning Archaic + Flare + Twinflame + (Worldfire reset).
+
+**Total: 7+ caminhos DIVERSOS.** Abordagem multi-eixo reduz vulnerabilidade a counterspell.
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa robusta — MELHOROU com Mother of Runes)
+
+**Board wipes (4 — premium, todos assimetricos com protecao):**
+- Blasphemous Act (CMC 9 → tipicamente {R}): + Boros Charm indestrutivel = so oponentes perdem criaturas. Custo real: {R}{R}{W}!
+- Austere Command (CMC 6): MODULAR — pode pular artefatos/enchantments. + Teferi's Protection faseia.
+- Call Forth the Tempest (CMC 8): Dano + cascade + dragoes. + Akroma's Will = suas criaturas indestrutiveis + buffadas.
+- Volcanic Vision (CMC 7): Dano = CMC + retorna spell. Wipe + recursao em uma carta.
+
+**Protecao contra wipes (5):** Boros Charm (indestrutivel), Teferi's Protection (faseia), Akroma's Will (indestrutivel + prot all colors), Lightning Greaves (shroud), Mother of Runes ({T}: prot de cor).
+
+**Stack interaction (5 camadas anti-counterspell):**
+1. Grand Abolisher — oponentes nao conjuram no seu turno
+2. Boseiju, Who Shelters All — Channel: Approach nao-counteravel
+3. Deflecting Swat — redireciona counterspell
+4. Flare de Duplication — copia Approach na stack em resposta ao counter
+5. Hexing Squelcher — oponentes nao ativam habilidades
+
+**Balanco: 4 wipes vs 5 protecoes + 5 stack. EXCELENTE. Risco zero de auto-destruicao.**
+
+**VULNERAVEL A COUNTERSPELL?** Sim (89.9% das vitorias via Approach no BATTLE v8). Mas as 5 camadas de stack interaction + Worldfire (que nao usa Approach) mitigam. Contra Control, WR = 69% no BATTLE v8 — aceitavel.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw recuperado — de 6 para 8!)
+
+**Draw REAL (8 — +2 vs estado pre-C#17, AGORA DENTRO DO PERFIL):**
+- Esper Sentinel (condicional), Thrill of Possibility (loot), The One Ring (massivo), Valakut Awakening (hand reset), Victory Chimes (draw passivo), Reforge the Soul (wheel)
+- **Demand Answers (CMC 2, NOVO):** Instant — draw 2 discard 1 OU sac artifact → draw 3. Preenche grave para Mizzix/Lorehold.
+- **Ashling, Flame Dancer (CMC 4, NOVO):** Impulse draw a cada cast/copy trigger. Com 6 copy engines = 3-4 triggers/spell = 3-4 impulsos!
+- **Virtual draw:** Top, Scroll Rack, Penance (topdeck manipulation)
+- **Loot:** Faithless Looting, Dragon's Rage Channeler, Monument to Endurance, Big Score, Unexpected Windfall
+
+**Recursion (4):** Mizzix's Mastery, Arcane Bombardment, Restoration Seminar, Surge to Victory.
+
+**Tesouros (8+):** Big Score, Brass's Bounty, Hit the Mother Lode, Smothering Tithe, Storm-Kiln, Unexpected Windfall.
+
+#### 4. COMO ESTE DECK ACELERA? (Ramp robusto — CMC medio CAIU para 3.61)
+
+**14 fontes de ramp:** 4 artefatos (Sol Ring, Arcane Signet, Boros Signet, Talisman), 4 land ramp (Land Tax, Wayfarer, Archaeomancer's Map, Bender's Waterskin), 4 treasure (Big Score, Unexpected Windfall, Brass's Bounty, Hit the Mother Lode), 2 treasure continuo (Smothering Tithe, Storm-Kiln), 1 ritual (Jeska's Will).
+
+**CMC medio: 3.61** (caiu de ~3.75 — -0.14 vs pre-C#17).
+
+**T1 ramp estrito:** Apenas Sol Ring (6.3%). Land Tax e Wayfarer buscam lands para a mao.
+
+**Limite estrutural de jogaveis: ~47%.** Fast mana CMC 0-1 (Chrome Mox, Mana Vault) ausente da colecao.
+
+#### 5. QUAL O PLANO DE JOGO? (Reforcado com Ashling + Demand Answers)
+
+- **Fase 1 (T1-3):** Ramp + topdeck setup + protecao. Mother of Runes (CMC 1) protege pecas-chave. Demand Answers (CMC 2, instant) preenche grave + draw. Top/Scroll Rack/Penance preparam o Approach.
+- **Fase 2 (T4-6):** Lorehold (CMC 5) entra. Ashling (CMC 4) escala com cada cast/copy — impulse draw + dano. Motor online (Double Vision, Bombardment, Dawning Archaic). Treasure generation.
+- **Fase 3 (T7+):** Plano A: Approach+Flare (deterministico, 7 mana). Plano B: Storm Herd+Akroma's Will. Plano C: Mizzix overload. Plano D: Surge+Approach. Plano E: Worldfire+dano na stack.
+- **Resiliencia:** Counterspell → Flare/Boseiju/Cavern/Grand Abolisher/Deflecting Swat. Board wipe → Teferi's/Boros Charm/Akroma's Will. Grave hate → Worldfire e Approach nao dependem de grave. Mother of Runes protege Lorehold/Ashling/Storm-Kiln de remocao pontual.
+
+---
+
+### PASSO 1: Sintese dos Agentes (TODOS lidos — DB REAL verificado)
+
+| Agente | Ultima Execucao | Dado Critico |
+|:-------|:---------------:|:-------------|
+| SCOUT #28 | 2026-06-01T02:10 | Explorou cartas com malicia. Nenhuma descoberta nova. Ashling ↔ Longshot (Score 9) continua sendo o melhor candidato nao aplicado. SCOUT criticou a rejeicao do C#14 como "fraca". |
+| VALIDATOR v3.14 | 2026-06-01T02:10 | **REDESCOBERTO o deck real do DB.** 3 cartas diferentes do que EVOLUTION_LOG descrevia. Draw=6 (2 abaixo do perfil), Rise of the Eldrazi CMC 10 como pior carta. Worldfire anti-sinergico com recursao. |
+| MULLIGAN | 2026-06-01T01:58 | T3=13.3% (Exec#11, pos-C#10, PRE-mudancas nao documentadas). Nao re-simulado para o estado real. DEFENSIVO obrigatorio. Limite estrutural ~47% jogaveis. |
+| BATTLE v8 | 2026-06-01T00:00 | WR 67.7% (6-archetype, estavel). WR 61.0% (12 reais). Mirror 46.3%. Approach = 89.9% das vitorias. Control (Atraxa) com 6 counterspells = matchup mais perigoso mas WR 69%. |
+
+**Consenso: Apos 7 ciclos de analise baseada em deck fantasma, o VALIDATOR v3.14 finalmente leu o DB real e identificou: (a) draw caiu para 6, (b) Rise of the Eldrazi e a pior carta do deck, (c) Mother of Runes e excelente adicao. O SCOUT #28 reforcou que Ashling por Longshot e o melhor swap nao aplicado.**
+
+---
+
+### PASSO 2: Gaps Estrategicos (RECALCULADOS do DB REAL)
+
+| # | Gap | Severidade | Status |
+|:-:|:-----|:----------:|:-------|
+| 1 | **Draw = 6 (2 abaixo do perfil minimo de 8)** | **CRITICO** | **→ RESOLVIDO neste ciclo (+2 draw: Demand Answers + Ashling)** |
+| 2 | **Rise of the Eldrazi CMC 10, <5% EDHREC** | ALTO | **→ RESOLVIDO: cortada para Demand Answers (CMC 2)** |
+| 3 | T3 = 13.3% (>12%) | DEFENSIVE | ATIVO — Net DCMC -8 deve reduzir T3 em ~2-4pp. Necessaria re-simulacao. |
+| 4 | Longshot (CMC 4, 27.3% EDHREC) e ping, nao removal | MODERADO | **→ RESOLVIDO: trocada por Ashling (CMC 4, impulse draw + dano)** |
+| 5 | Worldfire (CMC 9) anti-sinergico com recursao | MODERADO | MONITORAR — adiciona wincon alternativa que nao usa grave. Candidato a corte no proximo ciclo. |
+| 6 | Approach = 89.9% das vitorias (BATTLE v8) | TOLERAVEL | Aceitavel. 5 camadas de stack interaction + Worldfire mitigam. |
+| 7 | Colecao esgotada de CMC <= 2 | BLOQUEANTE | ATIVO — Demand Answers era a ultima carta de draw CMC 2 na colecao. |
+| 8 | Sem counterspell verdadeiro | ACEITO | Limitacao de cor (RW). 5 ferramentas de stack compensam. |
+| 9 | Stalls 26% (BATTLE v8) | MEDIO | Limite estrutural do motor (max_turns=35). |
+
+---
+
+### PASSO 3: Priorizar Swaps — TABELA DE REJEICAO (C#17)
+
+**Criterio: Necessidade Estrategica (0-5) + Evidencia de Dados (0-5). Swap apenas se Total >= 6 com AMBAS >= 3.**
+
+**Contexto pre-C#17:** Deck com draw=6 (2 abaixo do perfil), Rise of the Eldrazi como pior carta, Longshot sub-otima. Colecao tem Demand Answers (CMC 2, draw) e Ashling (CMC 4, impulse draw + dano).
+
+#### Candidatos CMC <= 3 (DEFENSIVO — prioridade)
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que SIM / NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------------|
+| **Demand Answers (Rise → Demand)** | 2 | **4** | **4** | **8** | **APROVADO.** Draw 2 instant, preenche grave. CMC 2 reduz T3. DCMC=-8. Rise CMC 10 <5% EDHREC. Corrige draw gap + reduz curva. Necessidade 4: draw gap e urgente. Evidencia 4: VALIDATOR confirma gap, MULLIGAN confirma T3>12%. |
+| **Seize the Spoils (Worldfire → Seize)** | 3 | 3 | 3 | 6 | **REJEITADO neste ciclo.** Draw 2 + Treasure e forte, mas: (a) Demand ja sobe draw para 8, (b) Worldfire e wincon alternativa anti-grave hate, (c) 2 swaps e suficiente para validar. Candidato para C#18 se draw ainda for gap. |
+| Seething Song | 3 | 2 | 2 | 4 | Ritual RRRRR. Ja cortado no C#6. 15a fonte de ramp e sidegrade. Sem filler para substituir. Nivel 1 vazio. |
+| Reverberate | 2 | 2 | 3 | 5 | Copy #7. Penance e CORE ENGINE. Sem substituto. |
+| Flawless Maneuver | 3 | 1 | 2 | 3 | FREE com commander mas deck ja tem 5+ protecoes. |
+
+#### Candidatos CMC 4+ (trocar CMC baixo por medio PIORA T3)
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que SIM / NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------------|
+| **Ashling, Flame Dancer (Longshot → Ashling)** | 4 | **3** | **4** | **7** | **APROVADO.** DCMC=0. Impulse draw + dano com cada cast/copy. Com 6 copy engines = 3-4 triggers/spell. Longshot e ping de 1/turno. SCOUT #28 recomendou (Score 9). VALIDATOR v3.14 sugeriu reconsiderar. Necessidade 3: Longshot e slot sub-otimo. Evidencia 4: 28 scouts, Score 9, SCOUT #28 explicitamente pediu reconsideracao. |
+
+#### Candidatos Rejeitados em Ciclos Anteriores (NENHUM mudou de status)
+
+| Carta | CMC | Total | Por que CONTINUA rejeitado |
+|:------|:---:|:-----:|:---------------------------|
+| Seething Song | 3 | 5 | Ja rejeitado C#15/#16. Sem filler. |
+| Invoke Calamity | 5 | 5 | Piora T3. Mizzix ja supre. |
+| Spiteful Banditry | 2 | 3 | "Once each turn." |
+| Manaform Hellkite | 4 | 4 | CMC 4, Nec baixa. |
+| Voice of Victory | 2 | 3 | Sidegrade vs Grand Abolisher. |
+| Xorn | 3 | 3 | Win-more. |
+
+---
+
+### PASSO 4: Swaps Aplicados (2 SWAPS — DEFENSIVO, Net DCMC = -8)
+
+#### Swap 1: Rise of the Eldrazi (CMC 10, wincon, <5% EDHREC) → Demand Answers (CMC 2, draw)
+
+**Diagnostico:** Rise of the Eldrazi (CMC 10) e a pior carta do deck. Com <5% EDHREC em Lorehold, a comunidade NAO joga esta carta. Competindo com Dance with Calamity (CMC 8, 67%), Improvisation Capstone (CMC 7, 49%) e Storm Herd (CMC 10, 75%), Rise perde em todos os criterios: gera menos valor por mais mana. O extra turn e copy nao justificam 10 mana quando Approach+Flare ganha por 7.
+
+**Solucao:** Demand Answers (CMC 2, Instant). Draw 2 discard 1 OU sacrifique um artefato → draw 3. Instant speed para ativar Storm-Kiln e preencher o grave para Mizzix/Lorehold. CMC 2 ajuda T3 diretamente.
+
+**Principio:** Trocar a pior wincon (CMC 10, 0% community adoption) pela melhor fonte de draw disponivel na colecao (CMC 2, instant). DCMC=-8 — o maior salto defensivo possivel com a colecao atual.
+
+#### Swap 2: Longshot, Rebel Bowman (CMC 4, payoff) → Ashling, Flame Dancer (CMC 4, draw)
+
+**Diagnostico:** Longshot causa 1 de dano por turno quando Lorehold ataca ou bloqueia. Isso nao e "removal a distancia" como o C#14 argumentou — o deck tem Path, Swords, Abrade, Chaos Warp, Generous Gift, Olorin como removal real. Longshot e um ping que so funciona com o commander em campo. Slot sub-otimo.
+
+**Solucao:** Ashling, Flame Dancer (CMC 4). A cada vez que voce conjura OU copia uma instant/sorcery: impulse draw (exila topo, pode jogar ate o final do proximo turno) + 2 de dano a qualquer alvo. Com 6 copy engines ativas (Lorehold, Double Vision, Bombardment, Dawning Archaic, Flare, Twinflame), CADA spell gera 3-4 triggers de Ashling = 3-4 impulsos + 6-8 de dano distribuido. Isso transforma Ashling em uma engine de draw+dano que escala EXPONENCIALMENTE com o motor do deck.
+
+**Principio:** Trocar um ping de 1/turno por uma engine de draw+dano que escala com o nucleo do deck. DCMC=0 — mesmo CMC, upgrade puro de qualidade. SCOUT #28 (Score 9) e VALIDATOR v3.14 ambos recomendaram este swap.
+
+---
+
+### Metricas Finais (Pos-Ciclo #17)
+
+| Metrica | Pre-C#17 (DB real) | Pos-C#17 | Delta |
+|:--------|:-------------------:|:--------:|:-----:|
+| Total Cards | 100 | 100 | 0 |
+| Lands | 35 | 35 | 0 |
+| Commander | 1 | 1 | 0 |
+| CMC medio | ~3.75 | **3.61** | **-0.14** |
+| Ramp | 14 | 14 | 0 |
+| **Draw (DB-tagged)** | **6** | **8** | **+2 ✅** |
+| Removal | 6 | 6 | 0 |
+| Board Wipe | 4 | 4 | 0 |
+| Protection | 4+2 | 4+2 | 0 |
+| Recursion | 4 | 4 | 0 |
+| Wincon (DB-tag) | 3 | 3 | 0 |
+| Engine | 4 | 4 | 0 |
+| Copy Engines | 6 | 6 | 0 |
+| Double-null | 4 | 4 | 0 |
+| **Swaps Totais** | **25 (10 ciclos com swaps)** | **27 (11 ciclos com swaps)** | **+2** |
+| **Net DCMC** | +3 (mudancas nao documentadas) | **-5** (acumulado desde C#10) | **-8** |
+| Card Hash | `84bc87988d4ba64919f68b565f46482b` | `a440c497da4280d6769238737062b3dd` | Novo |
+| Sem Play T3 | ~13-14% (estimado, nao re-simulado) | **~10-12% (projetado)** | **~-2 a -4pp** |
+| Nivel 1 | VAZIO | VAZIO | OK |
+| SYNERGY_MAP medio | 7.6/10 | **7.9/10** | **+0.3** |
+
+### Timeline de T3 por Ciclo
+
+| Ciclo | Data | Swaps | Net DCMC | Estrategia | T3 | Fonte |
+|:-----:|:-----|:-----:|:--------:|:----------|:--:|:------|
+| #0 | baseline | -- | -- | -- | 3.3% | Exec#1 |
+| #1 | 2026-05-28 | 3 | +3 | AGGRESSIVE | 12.4% | Exec#3 |
+| #2 | 2026-05-28 | 3 | +4 | AGGRESSIVE | 16.5% | Exec#5 |
+| #3 | 2026-05-30 | 5 | -4 | DEFENSIVO | 16.4% | Exec#7 |
+| #4 | 2026-05-30 | 3 | -15 | DEFENSIVO | 12.0% | Exec#8 |
+| #5 | 2026-05-31 | 3 | +1 | BALANCED | 15.3% | Exec#9 |
+| #6 | 2026-05-31 | 2 | -2 | DEFENSIVO | ~13-14% | Estimado |
+| #7 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | ~14-15% | Estimado |
+| #8 | 2026-05-31 | 0 | 0 | (0 swaps) | ~14-15% | Estimado |
+| #9 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | 16.9% | Exec#10 |
+| #10 | 2026-05-31 | 2 | -2 | DEFENSIVO | 13.3% | Exec#11 |
+| #11 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #12 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #13 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #14 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #15 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #16 | 2026-06-01 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| **—MUDANCAS NAO DOCUMENTADAS—** | — | 3 cartas | **+3** | Usuario | **~13-14%** | **NAO SIMULADO** |
+| **#17** | **2026-06-01** | **2** | **-8** | **DEFENSIVO** | **~10-12% (proj.)** | **PENDENTE** |
+
+\*Ciclos #7/#8/#9 usaram T3=3.7% (free mulligan rate) erroneamente — ver Pitfall #19.
+
+### ⚠️ ALERTA: MULLIGAN PRECISA SER RE-EXECUTADO
+
+A ultima simulacao (Exec#11, pos-C#10) e de um estado de deck que nao existe mais. Desde entao:
+- 3 cartas mudaram fora do pipeline (Worldfire, Rise of the Eldrazi, Mother of Runes — OUT: Insurrection, Wedding Ring, Fated Clash)
+- 2 swaps aplicados neste ciclo (Rise → Demand Answers, Longshot → Ashling)
+- Net DCMC acumulado desde C#10: -5 (mudancas nao documentadas: +3; C#17: -8 → total: -5)
+
+**T3 estimado: ~10-12%.** O net DCMC=-8 deste ciclo + Mother of Runes CMC 1 devem reduzir T3 em 2-4pp dos ~13-14% atuais. Re-simulacao com N=1000, seed=42 e URGENTE.
+
+### Gaps Remanescentes (pos-C#17)
+
+| Gap | Bloqueio | Solucao | Prazo |
+|:----|:---------|:--------|:------|
+| T3 confirmacao | Falta simulacao | Re-executar Mulligan Tester (N=1000, seed=42) | IMEDIATO |
+| Draw = 8 (no limite) | Colecao esgotada | Demand Answers foi a ultima carta de draw CMC 2 na colecao | Curto |
+| Worldfire anti-sinergia | Candidato a corte | Seize the Spoils (CMC 3) como substituto | Proximo ciclo |
+| Approach = 89.9% | Aceitavel com 5 camadas stack | Aceitar | N/A |
+| Stalls 26% (BATTLE) | Limite turno 35 | Aumentar max_turns para 45 no simulador | Medio |
+| Sem counterspell hard | Cor (RW) | Impossivel | N/A |
+| Grave Hate | 3 respostas, Worldfire + Approach bypass | Aceitavel. Return to Dust ou Wear // Tear se disponivel. | Baixo |
+
+### Recomendacoes de Aquisicao (Prioridade — atualizada)
+
+| # | Carta | CMC | Custo | Impacto | Substitui |
+|:-:|:------|:---:|:------|:--------|:----------|
+| 1 | **Skullclamp** | 1 | $5-8 | Draw engine com token makers. DCMC -5 vs Worldfire. | Worldfire |
+| 2 | **Chrome Mox** | 0 | $60-80 | Fast mana T0. Aumenta teto de jogaveis 47% → ~50%. | Bender's Waterskin (CMC 3) |
+| 3 | **Mana Vault** | 1 | $40-60 | Fast mana T1. Reduz T3 ~1.5pp. | Lightning Greaves (CMC 2) |
+| 4 | **Seize the Spoils** | 3 | $1-2 | Draw + Treasure. Ja na colecao. Substituto natural para Worldfire. | Worldfire |
+| 5 | **Return to Dust** | 4 | $1-2 | Exila 2 artefatos/encantamentos. Resposta a Grave Hate. | Olorin's Searing Light (CMC 4) |
+
+### Licao do C#17: Pipeline Integrity e a Fonte da Verdade
+
+Este ciclo marca uma **CORRECAO DE RUMO** no pipeline Lorehold:
+
+1. **Descoberta:** 7 ciclos (C#14-C#16 do Evolution Oracle + VALIDATOR v3.12-v3.13) operaram sobre um deck FANTASMA. As analises descreviam cartas que nao existiam no DB e ignoravam cartas que o usuario adicionou manualmente.
+
+2. **Correcao:** O VALIDATOR v3.14 implementou o STEP 0 — verificacao do DB antes de qualquer analise. O Evolution Oracle C#17 seguiu o mesmo protocolo.
+
+3. **Hash-based detection:** Cada ciclo agora armazena um hash MD5 da lista de cartas. Mudancas nao documentadas serao detectadas imediatamente.
+
+4. **2 swaps aplicados** que corrigem gaps REAIS (draw deficit, pior carta do deck) em vez de gaps imaginarios baseados em analises stale.
+
+5. **Net DCMC=-8** e o maior salto defensivo desde o Ciclo #4 (-15). Deve reduzir T3 significativamente.
+
+6. **Draw recuperado para 8** — dentro do perfil minimo pela primeira vez desde as mudancas nao documentadas.
+
+**O deck esta mais forte agora do que em qualquer ponto dos ultimos 7 ciclos.** Draw corrigido, pior carta removida, Ashling adiciona engine de draw+dano que escala com o motor. Proxima prioridade: re-simular T3 e considerar Worldfire → Seize the Spoils se T3 ainda > 12%.
+
+
 ## [2026-06-01T00:58:49+00:00] Ciclo #16 -- Evolution Oracle (0 SWAPS -- 6o Ciclo Consecutivo, MATURIDADE ABSOLUTA CONSOLIDADA, SCOUTS #25/#26 Avaliados)
 
 ### Sintese dos 4 Agentes
