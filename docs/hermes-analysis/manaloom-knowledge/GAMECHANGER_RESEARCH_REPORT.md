@@ -4,27 +4,33 @@
 > Objetivo: identificar lacunas de explicação, categoria ou detecção nos 53 Game Changers.
 > Este relatório é **read-only** — não altera DB nem produto.
 
-**Data:** 2026-06-01
+**Data:** 2026-06-01 (execução #2)
 **Fonte:** `scripts/knowledge.db` (53/53 GCs preenchidos com `why_game_changer`)
-**Detectados pelo ManaLoom:** 24/53 (45%)
+**Detectados pelo ManaLoom:** 24/53 (45%) — **com 2 erros de detecção** (1 falso positivo, 1 falso negativo)
 **Não detectados:** 29/53 (55%)
 
 ---
 
 ## Resumo Executivo
 
-Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos no SQLite, a auditoria de qualidade revelou **10 lacunas** distribuídas em 4 categorias de problema:
+Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos no SQLite, a auditoria de qualidade revelou **12 lacunas** distribuídas em 5 categorias de problema:
 
 | Tipo de Lacuna | Quantidade | Impacto |
 |:---------------|:----------:|:--------|
 | Categoria incorreta (erro de classificação) | 4 | 🔴 Alto — afeta análise de função e swap |
-| Falso positivo de detecção (`manaloom_detected=1` indevido) | 1 | 🔴 Alto — mascara gap real |
-| Heurística de detecção faltando | 4 | 🟡 Médio — cartas conhecidas sem cobertura |
+| Falso positivo de detecção (`manaloom_detected=1` indevido) | 2 | 🔴 Alto — mascara gaps reais |
+| Falso negativo de detecção (`manaloom_detected=0` com código atual) | 1 | 🟡 Médio — DB não reflete código Dart |
+| Heurística de código faltando | 3 | 🟡 Médio — fast mana lands sem cobertura |
 | Categoria incompleta (função dual) | 1 | 🟡 Médio — subestima impacto |
+| Heurística de detecção para não-detectados | 1 | 🟡 Médio — carta sem categoria de bracket |
+
+**🆕 Novidades nesta execução (vs relatório 2026-06-01 #1):**
+- 🆕 **Underworld Breach** — falso positivo de detecção (DB=1, Sim=0). Nenhuma das 5 categorias funcionais de bracket o detecta. Similar ao Field of the Dead.
+- 🆕 **Fierce Guardianship** — falso negativo (DB=0, Sim=1). O código Dart atual (`edh_bracket_policy.dart` linha 130) JÁ detecta `without paying` como `freeInteraction`. O DB está desatualizado em relação ao código.
 
 ---
 
-## Lacunas Detectadas (Top 10)
+## Lacunas Detectadas (Top 12)
 
 ### 🔴 Lacuna 1: Force of Will — Categoria Errada
 
@@ -54,7 +60,7 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 | **Risco de falso positivo** | 🟢 Baixo — a carta não interage com oponentes, apenas gera valor próprio. |
 | **Possível regra futura** | `if 'copy' in oracle and 'upkeep' in oracle and 'without paying' in oracle → combo_piece` |
 
-**Diagnóstico:** Panoptic Mirror é uma peça de combo (tranca o jogo com extra turns), não free interaction. O ManaLoom já o detecta como `infiniteCombo` no bracket system, reforçando que `combo_piece` é a categoria correta.
+**Diagnóstico:** Panoptic Mirror é uma peça de combo (tranca o jogo com extra turns), não free interaction. O código Dart o detecta como `freeInteraction` via `without paying` (linha 130), o que é tecnicamente correto (é free spell), mas a categoria funcional primária é `combo_piece`.
 
 ---
 
@@ -74,7 +80,7 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 
 ---
 
-### 🔴 Lacuna 4: Field of the Dead — Falso Positivo de Detecção
+### 🔴 Lacuna 4: Field of the Dead — Falso Positivo de Detecção + Categoria Errada
 
 | Campo | Valor |
 |:------|:------|
@@ -82,15 +88,15 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 | **Categoria atual** | `fast_mana` (errada — deveria ser `value_engine`) |
 | **Categoria sugerida** | `value_engine` |
 | **Impacto** | 7/10 |
-| **Evidência** | Oracle: "This land enters tapped. {T}: Add {C}. Whenever this land or another land you control enters, if you control seven or more lands with different names, create a 2/2 black Zombie." NÃO contém "search your library", "extra turn", "rather than pay", nem está na lista curada de fastMana. |
-| **Risco de falso positivo** | 🔴 **Alto** — `manaloom_detected=1` no DB, mas o oracle NÃO corresponde a nenhuma das 5 heurísticas do `tagCardForBracket()`. A terra entra TAPPED e gera {C} — é o oposto de fast mana. |
+| **Evidência** | Oracle: "This land enters tapped. {T}: Add {C}. Whenever this land or another land you control enters, if you control seven or more lands with different names, create a 2/2 black Zombie." NÃO contém "search your library", "extra turn", "rather than pay", "without paying", nem está na lista curada de fastMana. |
+| **Risco de falso positivo** | 🔴 **Alto** — `manaloom_detected=1` no DB, mas o oracle NÃO corresponde a nenhuma das 5 heurísticas funcionais do `tagCardForBracket()`. A terra entra TAPPED e gera {C} — é o oposto de fast mana. |
 | **Possível regra futura** | **Corrigir `manaloom_detected=1 → 0`**. A heurística para detectar Field of the Dead como GC precisaria de categoria `value_engine` (landfall token generator), que ainda não existe. |
 
-**Diagnóstico:** Este é o gap mais perigoso: Field of the Dead tem `manaloom_detected=1` mas NENHUMA das 5 categorias de bracket o detecta. É um falso positivo que mascara um gap real no sistema. A terra gera tokens passivamente por landfall — é um `value_engine`, não `fast_mana`.
+**Diagnóstico:** Este é o gap mais perigoso: Field of the Dead tem `manaloom_detected=1` mas NENHUMA das 5 categorias funcionais de bracket o detecta. É um falso positivo que mascara um gap real no sistema. A terra gera tokens passivamente por landfall — é um `value_engine`, não `fast_mana`.
 
 ---
 
-### 🟡 Lacuna 5: Farewell — Categoria de Board Wipe
+### 🟡 Lacuna 5: Farewell — Categoria Errada
 
 | Campo | Valor |
 |:------|:------|
@@ -102,27 +108,45 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 | **Risco de falso positivo** | 🟢 Baixo — `value_engine` descreve geração de valor contínuo; Farewell é remoção pontual massiva. |
 | **Possível regra futura** | `if 'exile all' in oracle and 'choose one or more' in oracle → board_wipe` |
 
-**Diagnóstico:** Farewell é um board wipe, não um value engine. A categoria no DB contradiz o próprio diagnóstico do campo `notes` ("precisa categoria board_wipe"). É um resquício de inserção batch onde cartas foram agrupadas sob `value_engine` como categoria genérica para "não detectado".
+**Diagnóstico:** Farewell é um board wipe, não um value engine. A categoria no DB contradiz o próprio diagnóstico do campo `notes` ("precisa categoria board_wipe"). É um resquício de inserção batch.
 
 ---
 
-### 🟡 Lacuna 6: Fierce Guardianship — Heurística de Free Spell Faltando
+### 🆕 🔴 Lacuna 6: Underworld Breach — Falso Positivo de Detecção (NOVO)
+
+| Campo | Valor |
+|:------|:------|
+| **Carta** | Underworld Breach |
+| **Categoria atual** | `combo_piece` (correta) |
+| **Categoria sugerida** | `combo_piece` (manter) |
+| **Impacto** | 7/10 |
+| **Detectado pelo ML** | 🔴 **Falso positivo** — DB=1, Sim=0 |
+| **Evidência** | Oracle: "Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard." NENHUMA das 5 heurísticas funcionais de bracket o detecta: não está na lista `fastMana`, não tem `search your library`, não tem `extra turn`, não tem `rather than pay` ou `without paying`, e não está na lista `infiniteCombo` (Thassa's Oracle, Demonic Consultation, Tainted Pact apenas). |
+| **Risco de falso positivo** | 🔴 **Alto** — `manaloom_detected=1` mascara o fato de que o bracket system atual é cego para uma das peças de combo mais importantes do formato. |
+| **Possível regra futura** | Adicionar Underworld Breach à lista `_knownInfiniteComboPieces` no `edh_bracket_policy.dart`. Alternativa: heurística mais ampla para escape + graveyard recursion como `combo_piece`. |
+
+**Diagnóstico:** Underworld Breach tem `manaloom_detected=1` no DB mas SIMULAÇÃO CONFIRMA que nenhuma das 5 categorias funcionais de bracket o detecta. É o segundo falso positivo de detecção (junto com Field of the Dead). A carta é uma peça central do combo Breach+LED+Brain Freeze (cEDH) e deveria ser adicionada à lista `_knownInfiniteComboPieces`. **Este gap NÃO estava no relatório anterior (2026-06-01 #1).**
+
+---
+
+### 🆕 🟡 Lacuna 7: Fierce Guardianship — Falso Negativo (DB Desatualizado) (NOVO)
 
 | Campo | Valor |
 |:------|:------|
 | **Carta** | Fierce Guardianship |
 | **Categoria** | `free_interaction` (correta) |
 | **Impacto** | 6/10 |
-| **Detectado pelo ML** | ❌ Não (`manaloom_detected=0`) |
-| **Evidência** | Oracle: "If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell." A heurística atual busca `rather than pay` — Fierce Guardianship usa `without paying its mana cost` + `if you control a commander`. EDHREC: Kinnan (66.2%), Kraum/Tymna (88.4%). |
-| **Risco de falso positivo** | 🟡 Médio — `without paying its mana cost` aparece em muitas cartas que NÃO são free interaction (cascade, cheat-into-play). O contexto `if you control a commander` + `counter target` é necessário para restringir. |
-| **Possível regra futura** | `if 'without paying its mana cost' in oracle and 'if you control' in oracle and 'counter target' in oracle → free_interaction` |
+| **DB atual** | `manaloom_detected=0` |
+| **Código atual** | `manaloom_detected=1` (detecta) |
+| **Evidência** | Oracle: "If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell." O código Dart atual (`edh_bracket_policy.dart` linha 130) contém `if (o.contains('without paying'))` que DETECTA Fierce Guardianship como `freeInteraction`. O DB está desatualizado — foi preenchido antes desta heurística ser adicionada. |
+| **Risco de falso positivo** | 🟢 Baixo — é uma correção de DB, não de código. |
+| **Possível regra futura** | Re-simular `tagCardForBracket()` para Fierce Guardianship e atualizar `manaloom_detected=0 → 1`. |
 
-**Diagnóstico:** A heurística atual de `freeInteraction` só detecta o padrão `rather than pay` (Force of Will, Force of Negation). Fierce Guardianship usa `without paying` + condição de commander. É o free counterspell #2 mais jogado e está invisível ao bracket system.
+**Diagnóstico:** O relatório anterior (2026-06-01 #1) classificou Fierce Guardianship como "heurística faltando". O código Dart JÁ FOI ATUALIZADO com a heurística `without paying` (linha 130), mas o DB não foi re-simulado. A detecção atualizada reduziria os não-detectados de 29 → 28 e adicionaria +1 aos detectados (24 → 25). **Este é um gap de sincronização DB↔código, não de código.**
 
 ---
 
-### 🟡 Lacuna 7: Jeska's Will — Categoria Incompleta (Função Dual)
+### 🟡 Lacuna 8: Jeska's Will — Categoria Incompleta (Função Dual)
 
 | Campo | Valor |
 |:------|:------|
@@ -135,11 +159,11 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 | **Risco de falso positivo** | 🟢 Baixo — `fast_mana` é correto para o modo ritual, mas incompleto. A carta também é `card_advantage` quando usada no modo impulsive draw. |
 | **Possível regra futura** | Considerar sistema de tags múltiplas para GCs com funções duais (Jeska's Will, Smothering Tithe, The One Ring). |
 
-**Diagnóstico:** Jeska's Will é `fast_mana` + `card_advantage` simultaneamente. O impacto real da carta é maior do que `fast_mana` sozinho sugere porque também gera vantagem de cartas. A pontuação `impact=6` pode estar subestimada.
+**Diagnóstico:** Jeska's Will é `fast_mana` + `card_advantage` simultaneamente. O impacto real da carta é maior do que `fast_mana` sozinho sugere porque também gera vantagem de cartas.
 
 ---
 
-### 🟡 Lacuna 8: Gaea's Cradle — Fast Mana Land Não Detectado
+### 🟡 Lacuna 9: Gaea's Cradle — Fast Mana Land Não Detectado
 
 | Campo | Valor |
 |:------|:------|
@@ -155,7 +179,7 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 
 ---
 
-### 🟡 Lacuna 9: Serra's Sanctum — Fast Mana Land Não Detectado
+### 🟡 Lacuna 10: Serra's Sanctum — Fast Mana Land Não Detectado
 
 | Campo | Valor |
 |:------|:------|
@@ -165,11 +189,11 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 | **Detectado pelo ML** | ❌ Não (`manaloom_detected=0`) |
 | **Evidência** | Oracle: "{T}: Add {W} for each enchantment you control." Mesmo padrão de Gaea's Cradle, mas para encantamentos. Menos onipresente que Cradle, mas igualmente explosiva no deck certo (enchantress, shrines). |
 | **Risco de falso positivo** | 🟢 Baixo — mesmo padrão de Cradle. |
-| **Possível regra futura** | Mesma regra da Lacuna 8. |
+| **Possível regra futura** | Mesma regra da Lacuna 9. |
 
 ---
 
-### 🟡 Lacuna 10: Mishra's Workshop — Fast Mana Land Não Detectado
+### 🟡 Lacuna 11: Mishra's Workshop — Fast Mana Land Não Detectado
 
 | Campo | Valor |
 |:------|:------|
@@ -183,9 +207,23 @@ Embora todos os 53 Game Changers tenham `why_game_changer` e `notes` preenchidos
 
 ---
 
+### 🟡 Lacuna 12: Fierce Guardianship — Heurística de Detecção para Não-Detectados
+
+| Campo | Valor |
+|:------|:------|
+| **Carta** | Fierce Guardianship |
+| **Categoria** | `free_interaction` (correta) |
+| **Impacto** | 6/10 |
+| **Detectado pelo ML** | ⚠️ DB=0 mas código=1 (ver Lacuna 7) |
+| **Evidência** | Oracle: "If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell." A heurística `without paying` (linha 130 do código Dart) já cobre esta carta. O gap remanescente é a sincronização DB↔código. |
+| **Risco de falso positivo** | 🟢 Baixo — o código já está correto. |
+| **Possível regra futura** | Re-simular DB para sincronizar com código atual. |
+
+---
+
 ## Análise Cruzada: As 7 Categorias Faltantes no Bracket System
 
-O `edh_bracket_policy.dart` atual cobre apenas 5 categorias. Para fechar o gap de 29/53 GCs não detectados, são necessárias **7 novas categorias**:
+O `edh_bracket_policy.dart` atual cobre apenas 5 categorias + `gameChanger`. Para fechar o gap de 29/53 GCs não detectados, são necessárias **7 novas categorias funcionais**:
 
 | Categoria Faltante | GCs Afetados | Heurística Proposta |
 |:-------------------|:------------:|:--------------------|
@@ -194,8 +232,10 @@ O `edh_bracket_policy.dart` atual cobre apenas 5 categorias. Para fechar o gap d
 | `stax` | 7 (Drannith, Opposition, Grand Arbiter, Braids, Humility, Glacial Chasm, Narset) | "can't" + "opponent" + restriction text |
 | `value_engine` | 9 (Seedborn, Tergrid, Bolas's, Aura Shards, Biorhythm, Coalition, Notion Thief, Bowmasters, Tabernacle) | Continuous/compounding value generation |
 | `protection` | 1 (Teferi's Protection) | "protection from everything" / "phase out" |
-| `free_interaction_flex` | 1 (Fierce Guardianship) | "without paying" + "if you control" + counter |
+| `free_interaction_flex` | 1 (Fierce Guardianship) — **AGORA DETECTADO pelo código** | "without paying" + "if you control" + counter |
 | `fast_mana_land` | 3 (Cradle, Sanctum, Workshop) | Land + tap for variable or 3+ mana |
+
+**Nota:** `free_interaction_flex` (Fierce Guardianship) agora é detectado pelo código Dart via `without paying` (linha 130). O DB precisa ser re-simulado.
 
 ---
 
@@ -206,15 +246,18 @@ As seguintes correções de categoria são recomendadas (NÃO aplicadas automati
 | Carta | Categoria Atual | Categoria Corrigida | Motivo |
 |:------|:----------------|:--------------------|:-------|
 | Force of Will | `value_engine` | `free_interaction` | Free counterspell, não value engine |
-| Panoptic Mirror | `free_interaction` | `combo_piece` | Combo enabler, não interage com oponentes |
+| Panoptic Mirror | `free_interaction` | `combo_piece` | Combo enabler, não free interaction |
 | Opposition Agent | `fast_mana` | `stax` | Restringe oponentes, não gera mana |
 | Field of the Dead | `fast_mana` | `value_engine` | Token generator, não fast mana |
 | Farewell | `value_engine` | `board_wipe` | Board wipe, não value engine |
 
 **Correção de `manaloom_detected`:**
+
 | Carta | Atual | Corrigido | Motivo |
 |:------|:-----:|:---------:|:-------|
-| Field of the Dead | 1 | **0** | Nenhuma heurística de bracket o detecta; é falso positivo |
+| Field of the Dead | 1 | **0** | Nenhuma heurística funcional de bracket o detecta; é falso positivo |
+| 🆕 Underworld Breach | 1 | **0** | Nenhuma heurística funcional de bracket o detecta; é falso positivo. Deveria ser adicionado a `_knownInfiniteComboPieces`. |
+| 🆕 Fierce Guardianship | 0 | **1** | Código Dart JÁ detecta via `without paying` (linha 130). DB desatualizado. |
 
 ---
 
@@ -226,6 +269,8 @@ As seguintes correções de categoria são recomendadas (NÃO aplicadas automati
 | GCs com `why_game_changer` preenchido | 53/53 (100%) |
 | GCs com categoria correta | 48/53 (90.6%) |
 | GCs com categoria incorreta | 5/53 (9.4%) |
-| GCs com `manaloom_detected` incorreto | 1/53 (1.9%) |
-| GCs não detectados pelo bracket system | 29/53 (54.7%) |
-| Categorias de bracket faltando | 7 |
+| GCs com `manaloom_detected` incorreto | 3/53 (5.7%) — 🆕 era 1/53 (1.9%) no relatório anterior |
+| Falsos positivos (DB=1, código=0) | 2 (Field of the Dead, 🆕 Underworld Breach) |
+| Falsos negativos (DB=0, código=1) | 1 (🆕 Fierce Guardianship — DB desatualizado) |
+| GCs não detectados pelo bracket system | 29/53 (54.7%) → 28/53 (52.8%) após correção Fierce Guardianship |
+| Categorias de bracket faltando | 7 (6 após heurística `without paying` adicionada ao código) |
