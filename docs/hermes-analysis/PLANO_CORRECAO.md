@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-05-31 19:00 UTC
+> Data: 2026-06-01 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -26,7 +26,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `/ai/weakness-analysis`. Ha tambem excecoes intencionais em
    `edh_bracket_policy.dart` que devem virar policy versionada com
    fonte/teste dedicado.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-05-30 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-01 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-05-31 03:00 UTC. `LifeCounterScreen` segue como
    caminho legado sem chamada runtime em `app/lib`; `DeckCard` continua testado
@@ -551,10 +551,13 @@ presentes e sem chamador runtime confirmado.
     continua vazio ate haver contrato seguro;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-05-30 15:00 UTC: REVALIDADO.** A rodada local focada em
+- **Status 2026-06-01 15:00 UTC: REVALIDADO.** A rodada local focada em
   `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
   pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
-  por ser tabela interna do migrador.
+  por ser tabela interna do migrador. Uma varredura de `CREATE TABLE` versus
+  `FROM/JOIN/INSERT/UPDATE/DELETE` confirmou que nao apareceu novo candidato de
+  tabela persistida sem leitura alem dos itens ja listados; `ml_prompt_feedback`
+  tem apenas leitura de `COUNT(*)` operacional.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
     upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha

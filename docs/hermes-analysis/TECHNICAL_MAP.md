@@ -207,13 +207,14 @@ diretamente e usa raridade como proxy de impacto.
   `PerformanceService`. As anotacoes historicas de resolucao em outros SHAs nao
   foram aplicadas como evidencia para esta branch.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-05-30 15:00 UTC no checkout local `e601c43d`. `deck_matchups` e
+  em 2026-06-01 15:00 UTC no checkout local. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
   `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
   `/ai/ml-status`; `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   runtime confirmado, enquanto o produto le o agregado
-  `commander_reference_deck_analysis`.
+  `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao
+  encontrou novo candidato alem desses itens.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
