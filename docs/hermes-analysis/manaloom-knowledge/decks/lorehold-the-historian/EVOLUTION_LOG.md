@@ -1,3 +1,623 @@
+## [2026-06-01T04:46:07+00:00] Ciclo #20 -- Evolution Oracle (0 SWAPS -- MATURIDADE PERSISTENTE, PG Tutor Gap = -1.67, Colecao Esgotada, Deck Saudavel)
+
+### PASSO 0: Integridade do Pipeline (DB REAL verificado)
+
+**Pipeline Integrity:** Card hash `a440c497da4280d6769238737062b3dd` verificado contra `deck_cards WHERE deck_id=6` -- MATCH. Deck identico ao estado pos-C#17 (hash inalterado desde Execucao #12). Nenhuma discrepancia. Singleton check: 0 duplicatas. Deck legal.
+
+### PASSO 1: Sintese dos 4 Agentes (PG-ENHANCED)
+
+| Agente | Ultima Execucao | Dado Critico |
+|:-------|:---------------:|:-------------|
+| SCOUT #31 | 2026-06-01T04:28 | **0 insights.** EDHREC snapshot identico desde Scout #24 (7.851 decks, >24h inalterado). 123 candidatos avaliados -- nenhum atinge Necessidade >= 3 + Evidencia >= 3. Colecao esgotada. |
+| VALIDATOR v3.17 | 2026-06-01T04:40 | **PG Reference Profile revela 1 gap real:** tutor = -1.67 (deck=2, PG ideal=3.67). ritual_treasure = 10.0 EXATO. draw_value, interaction, big_spell acima do PG (baselines conservadores). **0 swaps recomendados.** SYNERGY_MAP 7.9/10. Destaque: card rulings da Scryfall (Approach+Flare nao e combo deterministico; Flare serve como PROTECAO, nao acelerador). |
+| MULLIGAN Exec#12 | 2026-06-01T04:42 | **Verificacao sem mudancas.** T3=11.3% CONFIRMADO. Deck identico -- simulacao nao re-executada. Mulligan 48.7%, Jogaveis 47.3%. |
+| BATTLE v8 | 2026-06-01T02:46 | Mirror WR 47.7%. 6-archetype 67.7% (todos >= 65%). 12-real 61.0%. Approach = 89.9% das vitorias. STABLE. |
+
+**Consenso unanime: 0 swaps. 3o ciclo consecutivo com 0 swaps desde C#17 (C#18, C#19, C#20). MATURIDADE PERSISTENTE CONFIRMADA.**
+
+---
+
+### PASSO 2: PG Reference Profile -- Analise Detalhada
+
+O PostgreSQL `commander_reference_deck_analysis` define o perfil ideal para Lorehold:
+
+| PG Role | Ideal | Deck Actual | Diff | Status |
+|:--------|:-----:|:-----------:|:----:|:------:|
+| lands | 32.00 | 35.0 | +3.0 | 🟡 ACIMA -- justificado (Boros sem fast mana) |
+| ramp (rocks) | 3.67 | 6.0 | +2.3 | 🟡 ACIMA -- deck acelerado |
+| **ritual_treasure** | **10.00** | **10.0** | **0.0** | **✅ PERFEITO** |
+| big_spell_payoff | 7.67 | 15.0 | +7.3 | 🟡 ACIMA -- deck de Big Spells e intencional |
+| miracle_topdeck | 4.33 | 6.0 | +1.7 | 🟡 ACIMA -- foco em topdeck manipulation |
+| interaction | 5.33 | 13.0 | +7.7 | 🟡 ACIMA -- PG baseline conservador |
+| protection | 3.67 | 6.0 | +2.3 | 🟡 ACIMA -- robusto para deck sem azul |
+| draw_value | 2.67 | 8.0 | +5.3 | 🟡 ACIMA -- PG baseline irrealista |
+| **tutor** | **3.67** | **2.0** | **-1.7** | **🔴 ABAIXO -- UNICO GAP** |
+| win_condition | 1.33 | 4.0 | +2.7 | 🟡 ACIMA -- redundancia saudavel |
+
+**Unico gap detectado pelo PG: tutor (-1.67).** Apenas Enlightened Tutor + Gamble vs PG ideal 3.67. Este gap nao pode ser fechado com a colecao atual (0 tutores adicionais disponiveis).
+
+**Destaque PG: ritual_treasure = 10.0 EXATO** -- o motor de treasure do deck esta perfeitamente calibrado contra o perfil ideal. Este e o eixo mais importante do deck (alimenta big spells gratuitos + copy engines) e acertar em cheio no PG ideal e uma validacao forte da estrategia de swaps dos ciclos anteriores.
+
+---
+
+### PASSO 3: Protocolo de 0 Swaps -- Rejection Table
+
+**Candidatos Avaliados (tabela de rejeicao):**
+
+| Carta (colecao) | CMC | Necessidade | Evidencia | Total | Por que NAO? |
+|:----------------|:---:|:-----------:|:---------:|:-----:|:------------|
+| **CMC <= 2** | | | | | |
+| Spiteful Banditry | 2 | 2 | 1 | 3 | Sidegrade vs Hexing Squelcher. 0% EDHREC em Lorehold. Nao preenche gap real. |
+| Reverberate | 2 | 2 | 2 | 4 | Redundante -- deck ja tem 7 copy engines. Trend -0.52 no EDHREC. |
+| Goblin Engineer | 2 | 1 | 0 | 1 | Tutor artefato-para-grave, nao-para-mao. Requer recursion para funcionar. Nao preenche o gap real de tutor (que e buscar Approach/wincons). |
+| **CMC 3+** (trocar CMC baixo por medio PIORA T3) | | | | | |
+| Seize the Spoils | 3 | 2 | 2 | 4 | CMC 3. Draw+discard+treasure num so card -- bom mas nao fecha gap. Draw ja esta em 8. Trocar CMC 2 por 3 = piora T3 em ~1pp. |
+| Guttersnipe | 3 | 2 | 2 | 4 | Criatura (nao trigger Lorehold). CMC 3. Dano AOE em cada spell -- efeito niche. |
+| Seething Song | 3 | 2 | 1 | 3 | Trend negativo (-0.49). Ja temos Jeska's Will que e superior. |
+| Treasonous Ogre | 4 | 2 | 1 | 3 | CMC 4, criatura. Combo deterministico com Approach+Flare (9 vida = 3RRR), mas 0% EDHREC. |
+| Ranger-Captain of Eos | 3 | 1 | 0 | 1 | Tutor de criatura CMC <= 1 -- nao fecha o gap de tutor de spells. 3 alvos no deck (Mother, Wayfarer, Channeler). |
+
+**Tres candidatos "especiais" avaliados para fechar o tutor gap:**
+
+| Carta | CMC | Analise |
+|:------|:---:|:--------|
+| Goblin Engineer | 2 | Tutor artefato → GRAVE. Para buscar Top/Scroll Rack precisaria de recursion (Mizzix). 2-card combo pra tutorar = nao e tutor real. Necessidade=1. |
+| Ranger-Captain of Eos | 3 | Tutor criatura CMC ≤ 1 → MAO. 3 alvos no deck. Mas o gap de tutor e sobre buscar Approach, Smothering Tithe, Double Vision -- nao criaturas. Necessidade=1. |
+| Sunforger | 3 | Tutor instant CMC ≤ 4 → CASTA gratis. Mas: equipa CMC 3, desequipa RW = 5 mana total pra buscar 1 instant. Muito lento. Necessidade=1. |
+
+**Nenhum candidato disponivel na colecao preenche o gap de tutor identificado pelo PG. A unica solucao e AQUISICAO.**
+
+---
+
+### PASSO 4: Gaps Estrategicos (Pos-C#20)
+
+| # | Gap | Severidade | PG Alignment | Status |
+|:-:|:-----|:----------:|:------------:|:-------|
+| 1 | **tutor = -1.67** | 🟡 MODERADO | 🔴 PG GAP | ATIVO. Apenas 2 tutores. Colecao nao tem solucao. **Aquisicao: Idyllic Tutor ($15-20).** |
+| 2 | T3 = 11.3% (<12%) | BAIXO | N/A | ZONA BALANCED. Sem urgencia defensiva. |
+| 3 | Colecao esgotada de CMC <= 3 com sinergia | BLOQUEANTE | N/A | 61 cartas RW-legais CMC <= 3 na colecao. NENHUMA com Nec >= 3 + Evid >= 3. |
+| 4 | Sem fast mana CMC 0-1 alem de Sol Ring | MODERADO | N/A | Chrome Mox, Mana Vault, Mox Diamond ausentes. Limite estrutural T3 ~47%. |
+| 5 | Approach = 89.9% das vitorias | TOLERAVEL | N/A | 6 camadas de stack protection. Alternativa Worldfire mitiga dependencia de Approach. |
+| 6 | ritual_treasure = 10.0 EXATO | -- | ✅ PERFEITO | Motor de treasure calibrado exatamente no PG ideal. |
+
+---
+
+### PASSO 5: Aquisicoes Recomendadas (Pos-C#20)
+
+| # | Carta | CMC | Funcao | Custo | Preenche Gap? |
+|:-:|:------|:---:|:-------|:-----:|:--------------|
+| 1 | **Idyllic Tutor** | 3 | Tutor de enchantment | $15-20 | **SIM -- fecha tutor gap (-1.67). Busca Approach, Smothering Tithe, Double Vision, Land Tax.** |
+| 2 | **Skullclamp** | 1 | Draw engine | $5-8 | Nao (draw ja esta +5.3 acima do PG). Mas e a melhor fonte de draw CMC 1 em Commander. |
+| 3 | **Underworld Breach** | 2 | Recursion | $15-20 | Nao (PG nao tem role de recursion). Mas e a melhor recursion vermelha do formato. |
+
+**Prioridade #1: Idyllic Tutor.** Unica carta que fecha o unico gap identificado pelo PG reference profile. Alem disso, busca Approach diretamente (wincon primaria), Smothering Tithe (motor de treasure), e Double Vision (copy engine). CMC 3 e aceitavel -- trocaria por Worldfire (CMC 9) ou Taunt from the Rampart (CMC 5), resultando em net DCMC negativo e melhorando T3.
+
+---
+
+### PASSO 6: Estrategia para Proximo Ciclo
+
+- **T3 = 11.3% < 12% → BALANCED.**
+- Deck SAUDAVEL: 27 swaps desde baseline, motor 4/4, copy 7/7, SYNERGY_MAP 7.9/10, Nivel 1 VAZIO.
+- **MATURIDADE PERSISTENTE: 3 ciclos consecutivos com 0 swaps (C#18, C#19, C#20).**
+- PG revela 1 gap real (tutor) -- sem solucao via colecao atual.
+- **Proximo upgrade REQUER AQUISICAO: Idyllic Tutor (CMC 3, $15-20).**
+- Se nenhuma nova aquisicao ocorrer, C#21 sera identico (0 swaps, MATURIDADE PERSISTENTE mantida).
+
+---
+
+**Ciclo #20 assinatura:** card_hash = `a440c497da4280d6769238737062b3dd`, 100 cards, 35 lands, T3 = 11.3%, PG tutor gap = -1.67, ritual_treasure = 10.0 EXATO, MATURIDADE PERSISTENTE (3o ciclo 0-swap).
+
+
+## [2026-06-01T04:12:12+00:00] Ciclo #19 -- Evolution Oracle (0 SWAPS -- BALANCED, Deck Saudavel, T3=11.3% Confirmado, Colecao Esgotada, MATURIDADE PERSISTENTE)
+
+### PASSO 0: Analise Estrategica (DB REAL -- verificado em 2026-06-01T04:12:12)
+
+**Pipeline Integrity:** Card hash `a440c497da4280d6769238737062b3dd` verificado contra `deck_cards WHERE deck_id=6` — MATCH. Nenhuma discrepancia entre DB e ultimo EVOLUTION_LOG (C#18). Deck identico ao estado pos-C#17. Singleton check: 0 duplicatas. Deck legal.
+
+#### 1. COMO ESTE DECK GANHA? (7+ paths -- EXCELENTE)
+
+**Win conditions deterministicas (2):**
+- **Approach + Flare de Duplication** (CMC 7 + criatura vermelha = ~10 mana): 2 casts NO MESMO TURNO = vitoria imediata. Combo deterministico.
+- **Approach + Top/Scroll Rack/Penance**: Cast, topdeck manipulation, 2o cast em 1-2 turnos.
+
+**Win conditions de combate (3):**
+- **Storm Herd (CMC 10) + Akroma's Will (CMC 4)**: 35-40 Pegasus com double strike, flying, indestrutivel = lethal na mesa inteira.
+- **Storm Herd + Boros Charm**: Double strike, 70+ flying damage.
+- **Surge to Victory (CMC 6) + Approach no grave + 3+ criaturas atacando**: Copias de Approach = vitoria garantida.
+
+**Win conditions de recursao (2):**
+- **Mizzix's Mastery overload (CMC 4+5RR = 7)**: Todos instants/sorceries do grave gratis. Com Double Vision/Bombardment = 2x cada.
+- **Worldfire + dano na stack** (CMC 9 + burn): Reset total + vitoria. Nao depende de Approach nem de grave.
+
+**Total: 7+ caminhos DIVERSOS.** Abordagem multi-eixo reduz vulnerabilidade a counterspell. Worldfire + dano e IMUNE a grave hate.
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa ROBUSTA)
+
+**Board wipes (4 -- premium, todos assimetricos com protecao):**
+- Blasphemous Act (CMC 9, custo real tipicamente {R}) + Boros Charm = so oponentes perdem criaturas
+- Austere Command (CMC 6) + Teferi's Protection = modular, protege artefatos/enchantments
+- Call Forth the Tempest (CMC 8) + Akroma's Will = wipe + dragoes + suas criaturas indestrutiveis
+- Volcanic Vision (CMC 7) = wipe + retorna spell do grave
+
+**Protecoes contra wipes (5):** Boros Charm, Teferi's Protection, Akroma's Will, Lightning Greaves, Mother of Runes.
+
+**Stack interaction (6 camadas anti-counterspell):**
+1. Grand Abolisher -- oponentes nao conjuram no seu turno
+2. Boseiju, Who Shelters All -- Channel: Approach nao-counteravel
+3. Cavern of Souls -- Lorehold nao-counteravel
+4. Flare de Duplication -- copia Approach em resposta ao counter
+5. Deflecting Swat -- redireciona counterspell
+6. Hexing Squelcher -- oponentes nao ativam habilidades
+
+**Balanco: 4 wipes vs 5 protecoes + 6 stack. EXCELENTE. Risco zero de auto-destruicao.**
+
+**BATTLE v8 (2026-06-01T02:46):** Mirror WR 47.7%. 6-archetype WR 67.7% (todos >= 65%). 12-real WR 61.0%. Approach = 89.9% das vitorias -- mas com 6 camadas de stack, e aceitavel.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw = 8 -- DENTRO DO PERFIL)
+
+**Draw REAL (8):** Esper Sentinel, Demand Answers, Thrill of Possibility, Victory Chimes, The One Ring, Valakut Awakening, Ashling (impulse draw escalavel com copy engines), Reforge the Soul.
+
+**Virtual draw:** Top, Scroll Rack, Penance (topdeck manipulation). Loot: Faithless Looting, Dragon's Rage Channeler, Monument to Endurance, Big Score, Unexpected Windfall.
+
+**Recursion (4):** Mizzix's Mastery, Arcane Bombardment, Restoration Seminar, Surge to Victory.
+
+**Tesouros (7+):** Big Score, Brass's Bounty, Hit the Mother Lode, Smothering Tithe, Storm-Kiln, Unexpected Windfall, Victory Chimes.
+
+#### 4. COMO ESTE DECK ACELERA? (14 ramp -- robusto, CMC medio 3.61)
+
+**14 fontes de ramp:** 4 artefatos (Sol Ring, Arcane Signet, Boros Signet, Talisman), 4 land ramp (Land Tax, Wayfarer, Archaeomancer's Map, Bender's Waterskin), 4 treasure (Big Score, Unexpected Windfall, Brass's Bounty, Hit the Mother Lode), 2 treasure continuo (Smothering Tithe, Storm-Kiln), 1 ritual (Jeska's Will).
+
+**CMC medio: 3.61.** Estavel desde C#17.
+
+**T1 ramp estrito:** Apenas Sol Ring (8.2% T1 em Exec#12).
+
+**Limite estrutural de jogaveis: ~47%.** Sem fast mana CMC 0-1 alem de Sol Ring.
+
+#### 5. QUAL O PLANO DE JOGO? (Robusto -- inalterado desde C#17)
+
+- **Fase 1 (T1-3):** Ramp + topdeck setup + protecao. Mother of Runes (CMC 1) protege pecas-chave. Demand Answers (CMC 2, instant) draw + preenche grave. Top/Scroll Rack/Penance preparam o Approach.
+- **Fase 2 (T4-6):** Lorehold (CMC 5) entra. Ashling (CMC 4) escala com cada cast/copy -- impulse draw + dano. Motor online (Double Vision, Bombardment, Dawning Archaic). Treasure generation.
+- **Fase 3 (T7+):** Plano A: Approach+Flare. Plano B: Storm Herd+Akroma's Will. Plano C: Mizzix overload. Plano D: Surge+Approach. Plano E: Worldfire+dano.
+- **Resiliencia:** Counterspell, Flare/Boseiju/Cavern/Grand Abolisher/Deflecting Swat/Hexing. Board wipe, Teferi's/Boros Charm/Akroma's Will. Grave hate, Worldfire e Approach nao dependem de grave.
+
+---
+
+### PASSO 1: Sintese dos Agentes (TODOS lidos -- DB REAL verificado)
+
+| Agente | Ultima Execucao | Dado Critico |
+|:-------|:---------------:|:-------------|
+| SCOUT #30 | 2026-06-01T03:55 | Colecao esgotada. 123 candidatos avaliados. Nenhum atinge Necessidade >= 3 + Evidencia >= 3. Seize the Spoils (Score 10, CMC 3, trend +1.23) e o unico com sinergia REAL, mas Necessidade=2 (draw ja esta em 8). MATURIDADE PERSISTENTE confirmada. |
+| VALIDATOR v3.16 | 2026-06-01T04:06 | **T3 = 11.3% CONFIRMADO.** SYNERGY_MAP 7.9/10. Nivel 1 VAZIO. Draw=8. v3.16 confirma todas as projecoes de v3.15 — T3 no centro do range projetado (10-13%). C#19 recomendado: BALANCED, 0 swaps. |
+| MULLIGAN Exec#12 | 2026-06-01T02:54 | **T3=11.3% (CONFIRMADO).** Mulligan 48.7%. Jogaveis 47.3%. Nao re-executado — 0 swaps em C#18 = deck identico. Re-executar reproduziria 11.3% com ruido de +-2.1pp. |
+| BATTLE v8 | 2026-06-01T02:46 | Mirror WR 47.7%. 6-archetype 67.7% (todos >= 65%). 12-real 61.0%. Approach=89.9%. Stalls 26%. STABLE. |
+
+**Consenso unanime: O deck esta SAUDAVEL. Todos os 4 agentes convergem para 0 swaps. T3 = 11.3% (BALANCED). Colecao esgotada. Nao ha gaps estruturais que possam ser resolvidos com a colecao atual. 0 swaps e o resultado correto pela 3a vez consecutiva (C#17-C#19, com C#17 aplicando 2 swaps genuinos e C#18-C#19 com 0).**
+
+---
+
+### PASSO 2: Gaps Estrategicos (Pos-C#19)
+
+| # | Gap | Severidade | Status Pos-C#19 |
+|:-:|:-----|:----------:|:----------------|
+| 1 | ~~Draw = 6~~ | ~~CRITICO~~ | RESOLVIDO (C#17). Draw=8, dentro do perfil. |
+| 2 | ~~Rise of the Eldrazi CMC 10~~ | ~~ALTO~~ | RESOLVIDO (C#17). Cortada. |
+| 3 | ~~Longshot sub-otimo~~ | ~~MODERADO~~ | RESOLVIDO (C#17). Substituida por Ashling. |
+| 4 | T3 = 11.3% (<12%) | BAIXO | ZONA BALANCED. Sem urgencia defensiva. |
+| 5 | Colecao esgotada de CMC <= 2 com sinergia | BLOQUEANTE | ATIVO. 36 cartas CMC <= 2 na colecao, NENHUMA com Nec>=3+Evid>=3. |
+| 6 | Sem fast mana CMC 0-1 alem de Sol Ring | MODERADO | Chrome Mox, Mana Vault ausentes. Limite estrutural T3 ~47%. |
+| 7 | Approach = 89.9% das vitorias | TOLERAVEL | 6 camadas de stack protection + Worldfire como alternativa. BATTLE mostra Control WR 69% -- counterspell nao esta anulando o deck. |
+| 8 | Worldfire anti-sinergico com recursao | MODERADO | Candidato a corte se surgir upgrade (Seize the Spoils CMC 3). Mas: wincon alternativa anti-grave hate e valiosa. |
+| 9 | Stalls 26% (BATTLE v8) | BAIXO | Limite max_turns=35. Nao e gap de deckbuilding. |
+| 10 | Ashling, Flare com EDHREC baixo (5-8%) | INFORMATIVO | Cartas novas/niche. Sinergia real com copy engines nao e capturada por EDHREC. |
+
+---
+
+### PASSO 3: Priorizar Swaps -- TABELA DE REJEICAO (C#19)
+
+**Criterio: Necessidade Estrategica (0-5) + Evidencia de Dados (0-5). Swap apenas se Total >= 6 com AMBAS >= 3.**
+
+**Contexto pos-C#18:** Deck com draw=8, T3=11.3% (BALANCED), CMC medio 3.61, SYNERGY_MAP 7.9/10. 27 swaps desde baseline. Nivel 1 VAZIO. 36 cartas CMC <= 2 na colecao (todas niche).
+
+#### Candidatos CMC <= 2 (DEFENSIVO -- mas T3 ja esta bom)
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------|
+| **Spiteful Banditry** | 2 | 3 | 2 | 5 | Board wipes → treasures (Score 9 SCOUT). MAS: substituiria Hexing Squelcher (stack #6). DCMC=0, sidegrade funcional — troca protecao de stack por ramp condicional. Hexing e 1 das 6 camadas anti-counterspell. |
+| Reverberate | 2 | 2 | 3 | 5 | Copy #8 redundante. Deck tem 7 copy engines. Sem substituto natural — Penance e CORE ENGINE. |
+| Surge of Salvation | 1 | 2 | 2 | 4 | Free com condicao (controla commander). Protecao one-shot. Mother of Runes e REPETIVEL. Sidegrade. |
+| Drannith Magistrate | 2 | 2 | 2 | 4 | Stax. Deck nao e stax. Criatura fragil sem protecao. |
+| Voice of Victory | 2 | 2 | 1 | 3 | Criatura CMC 2 fragil. Efeito niche. |
+| Tibalt's Trickery | 2 | 1 | 1 | 2 | Counter aleatorio. RW nao e cor de counter. |
+| Artist's Talent | 2 | 1 | 1 | 2 | Ja cortada C#5. Fastest-declining card. |
+| Oswald Fiddlebender | 2 | 1 | 1 | 2 | Ja cortado C#5. 0% EDHREC. |
+| Desperate Ritual | 2 | 1 | 1 | 2 | Ja cortado C#3. Ritual chain nao e o plano. |
+
+#### Candidatos CMC 3 (trocar CMC baixo por medio PIORA T3)
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------|
+| **Seize the Spoils** | 3 | 3 | 3 | 6 | Draw 2 + Treasure CMC 3. Substituiria Worldfire (CMC 9). DCMC=-6 seria DEFENSIVO, mas T3 ja esta em 11.3% (BALANCED). Draw=8 ja e suficiente. Trocar Worldfire por draw redundante CRIA gap — perde wincon anti-grave hate. Com 4 recursion engines (Mizzix/Bombardment/Seminar/Surge) vulneraveis a Rest in Peace, Worldfire e uma das 3 wincons imunes. |
+| Dualcaster Mage | 3 | 2 | 3 | 5 | Copy #8. Substituiria Bender's Waterskin (CMC 3, ramp). Sidegrade funcional. |
+| Seething Song | 3 | 2 | 2 | 4 | Ja cortado C#6. Ritual chain nao e o plano. |
+| Monastery Mentor | 3 | 2 | 2 | 4 | Token fragil sem ETB. Surge+Rite+Twinflame suprem tokens. |
+| Flawless Maneuver | 3 | 1 | 2 | 3 | FREE com commander. Mas deck ja tem 5+ protecoes. |
+| Ranger-Captain of Eos | 3 | 3 | 2 | 5 | Silence + tutor. Tutor busca CMC 1 — Mother of Runes e Sol Ring ja no deck. Sidegrade. |
+
+#### Candidatos CMC 4+ (piora T3 -- rejeitados automaticamente em BALANCED)
+
+| Carta | CMC | Total | Por que CONTINUA rejeitado |
+|:------|:---:|:-----:|:---------------------------|
+| Trouble in Pairs | 4 | 5 | Draw redundante. Ashling e The One Ring ja ocupam draw CMC 4. |
+| Solphim, Mayhem Dominus | 4 | 4 | Win-more. Dobra dano mas deck ja ganha sem ele. |
+| Insurrection | 8 | 4 | CMC 8. Ja foi cortada. Substituir Worldfire por Insurrection = sidegrade de CMC alto. |
+| Fiery Emancipation | 6 | 3 | Win-more. Triplica dano mas CMC 6. |
+| Mana Geyser | 5 | 3 | Ritual high-CMC. Deck ja tem 14 ramp. |
+
+---
+
+### PASSO 4: 0 SWAPS -- DECK SAUDAVEL, COLECAO ESGOTADA, MATURIDADE PERSISTENTE
+
+**0 swaps aplicados neste ciclo.**
+
+**Justificativa:** Dos 36 candidatos CMC <= 2 na colecao, NENHUM atinge simultaneamente Necessidade Estrategica >= 3 + Evidencia de Dados >= 3. O melhor candidato (Spiteful Banditry, Score 9 SCOUT, Total 5) e um sidegrade que troca stack interaction por ramp condicional — nao resolve nenhum gap sistemico e REDUZ protecao de stack de 6 para 5 camadas.
+
+**Seize the Spoils (Total 6) seria viavel** se draw fosse gap ou T3 > 12%. Mas draw=8 (dentro do perfil) e T3=11.3% (BALANCED). Trocar Worldfire por draw redundante PIORA o deck contra Rest in Peace/Leyline — remove uma das 3 wincons imunes a grave hate. Com 4 recursion engines vulneraveis a grave hate, Worldfire e um hedge estrategico valioso.
+
+**MATURIDADE PERSISTENTE — CONSOLIDADA:**
+- C#17: 2 swaps DEFENSIVO (quebrou 6-ciclo de estagnacao do deck fantasma)
+- C#18: 0 swaps BALANCED (1o ciclo limpo pos-correcao do pipeline)
+- C#19: 0 swaps BALANCED (2o ciclo limpo — CONFIRMACAO)
+- Proximo ciclo (C#20): se 0 swaps, MATURIDADE PERSISTENTE CONFIRMADA (3 ciclos limpos consecutivos)
+
+**Estado do deck:** 27 swaps desde baseline. 11 ciclos com swaps aplicados (C#1-C#7, C#9, C#10, C#17). 8 ciclos com 0 swaps (C#8, C#11-C#16, C#18-C#19). Motor 4/4 COMPLETO. Copy engines: 7 (Lorehold, Double Vision, Arcane Bombardment, Dawning Archaic, Flare, Twinflame, Ashling como CAST+COPY payoff). SYNERGY_MAP: 7.9/10. Nivel 1: VAZIO.
+
+---
+
+### Metricas Finais (Pos-Ciclo #19 -- Identico a Pos-C#18)
+
+| Metrica | Pos-C#18 | Pos-C#19 | Delta |
+|:--------|:--------:|:--------:|:-----:|
+| Total Cards | 100 | 100 | 0 |
+| Lands | 35 | 35 | 0 |
+| Commander | 1 | 1 | 0 |
+| CMC medio | 3.61 | 3.61 | 0 |
+| Ramp | 14 | 14 | 0 |
+| Draw (DB-tagged) | 8 | 8 | 0 |
+| Removal | 6 | 6 | 0 |
+| Board Wipe | 4 | 4 | 0 |
+| Protection | 6 | 6 | 0 |
+| Recursion | 4 | 4 | 0 |
+| Copy Engines | 7 | 7 | 0 |
+| Double-null | 4 | 4 | 0 |
+| **Swaps Totais** | **27** | **27** | **0** |
+| Card Hash | `a440c497...` | `a440c497...` | = |
+| Sem Play T3 | 11.3% (Exec#12) | 11.3% | 0 |
+| Nivel 1 | VAZIO | VAZIO | OK |
+| SYNERGY_MAP medio | 7.9/10 | 7.9/10 | 0 |
+
+### Timeline de T3 por Ciclo (atualizada com C#19)
+
+| Ciclo | Data | Swaps | Net DCMC | Estrategia | T3 | Fonte |
+|:-----:|:-----|:-----:|:--------:|:----------|:--:|:------|
+| #0 | baseline | -- | -- | -- | 3.3% | Exec#1 |
+| #1 | 2026-05-28 | 3 | +3 | AGGRESSIVE | 12.4% | Exec#3 |
+| #2 | 2026-05-28 | 3 | +4 | AGGRESSIVE | 16.5% | Exec#5 |
+| #3 | 2026-05-30 | 5 | -4 | DEFENSIVO | 16.4% | Exec#7 |
+| #4 | 2026-05-30 | 3 | -15 | DEFENSIVO | 12.0% | Exec#8 |
+| #5 | 2026-05-31 | 3 | +1 | BALANCED | 15.3% | Exec#9 |
+| #6 | 2026-05-31 | 2 | -2 | DEFENSIVO | ~13-14% | Estimado |
+| #7 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | ~14-15% | Estimado |
+| #8 | 2026-05-31 | 0 | 0 | (0 swaps) | ~14-15% | Estimado |
+| #9 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | 16.9% | Exec#10 |
+| #10 | 2026-05-31 | 2 | -2 | DEFENSIVO | 13.3% | Exec#11 |
+| #11 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #12 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #13 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #14 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #15 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #16 | 2026-06-01 | 0 | 0 | (0 swaps — deck fantasma) | 13.3% | Estavel |
+| --MUDANCAS NAO DOCUMENTADAS-- | -- | 3 cartas | +3 | Usuario | ~13-14% | NAO SIMULADO |
+| #17 | 2026-06-01 | 2 | -8 | DEFENSIVO | 11.3% | Exec#12 |
+| #18 | 2026-06-01 | 0 | 0 | BALANCED (0 swaps) | 11.3% | Exec#12 (identico) |
+| **#19** | **2026-06-01** | **0** | **0** | **BALANCED (0 swaps)** | **11.3%** | **Exec#12 (identico)** |
+
+*Ciclos #7/#8/#9 usaram T3=3.7% (free mulligan rate) erroneamente -- ver Pitfall #19.
+
+### MULLIGAN NAO PRECISA SER RE-EXECUTADO (0 swaps -- deck identico a Exec#12)
+
+A ultima simulacao (Exec#12, pos-C#17) mediu T3=11.3% com o card hash `a440c497...`. Como C#19 aplica ZERO swaps, o deck e identico — re-executar N=1000 reproduziria 11.3% com ruido de +-2.1pp.
+
+### Gaps Remanescentes (pos-C#19 — inalterados desde C#18)
+
+| Gap | Bloqueio | Solucao | Prazo |
+|:----|:---------|:--------|:------|
+| Colecao esgotada de CMC <= 2 | 36 cartas, 0 com Nec>=3+Evid>=3 | AQUISICAO: Skullclamp (CMC 1), Chrome Mox (CMC 0), Underworld Breach (CMC 2) | Curto |
+| Sem fast mana CMC 0-1 | Custo ($60-100) | Chrome Mox + Mana Vault | Medio |
+| Worldfire anti-sinergia | Candidato a corte | Seize the Spoils (CMC 3, ja na colecao). Aceitavel — manter por enquanto como wincon anti-grave hate. | Baixo |
+| Approach = 89.9% | Aceitavel com 6 camadas stack | Aceitar. BATTLE v8 mostra Control WR 69%. | N/A |
+| Stalls 26% (BATTLE) | Limite turno 35 | Aumentar max_turns para 45 no simulador | Medio |
+
+### Recomendacoes de Aquisicao (Prioridade — inalterada desde C#17)
+
+| # | Carta | CMC | Custo | Impacto | Substitui |
+|:-:|:------|:---:|:------|:--------|:----------|
+| 1 | **Skullclamp** | 1 | $5-8 | Draw engine com token makers. DCMC -1 vs Thrill. Tutoriavel com Urza's Saga + Enlightened Tutor. | Thrill of Possibility |
+| 2 | **Chrome Mox** | 0 | $60-80 | Fast mana T0. Aumenta teto de jogaveis 47% -> ~50%. | Bender's Waterskin |
+| 3 | **Mana Vault** | 1 | $40-60 | Fast mana T1. Reduz T3 ~1.5pp. | Lightning Greaves |
+| 4 | **Underworld Breach** | 2 | $10-15 | Recursion explosiva. Escape — funciona sob grave hate. | Faithless Looting |
+| 5 | **Seize the Spoils** | 3 | $1-2 | Draw + Treasure. Ja na colecao. Substituto natural para Worldfire. | Worldfire |
+
+### Licao do C#19: MATURIDADE PERSISTENTE AVANCA
+
+1. **Confirmacao C#18+C#19:** Dois ciclos limpos consecutivos (0 swaps cada) apos a correcao do pipeline (C#17). O v3.14 descobriu que C#11-C#16 operavam em deck fantasma. O padrao REAL de maturidade comeca em C#18. Se C#20 tambem tiver 0 swaps, MATURIDADE PERSISTENTE ABSOLUTA estara CONFIRMADA.
+
+2. **4 agentes, 1 conclusao:** SCOUT #30, VALIDATOR v3.16, MULLIGAN Exec#12, e BATTLE v8 convergem unanimemente para 0 swaps. Nao ha divergencia estrategica entre os agentes — todos reportam o mesmo estado saudavel.
+
+3. **O deck atingiu o teto da colecao.** 27 swaps desde baseline (11 ciclos com swaps, 8 ciclos com 0 swaps). Motor 4/4. Copy 7. Draw 8. T3=11.3% (BALANCED). SYNERGY_MAP 7.9/10. Nivel 1 VAZIO. Qualquer upgrade significativo requer AQUISICAO.
+
+4. **Seize the Spoils (Score 10, trend +1.23) e o candidato mais forte do scout** ha 3+ execucoes. Mas enquanto Worldfire for necessario como hedge anti-grave hate, o swap nao se justifica. A decisao de manter Worldfire e estrategica, nao estatistica — perder a 3a wincon imune a grave hate em um deck com 4 recursion engines seria um erro.
+
+5. **Skullclamp (CMC 1, $5-8) e o proximo upgrade REAL.** Com Storm Herd, Call Forth the Tempest, e Rite of the Dragoncaller gerando 10+ tokens, Skullclamp vira draw engine massivo. Substituiria Thrill of Possibility (CMC 2), reduzindo CMC medio e mantendo draw >= 8.
+
+---
+
+*Fim do relatorio C#19. Proximo agente: SCOUT (Execucao #31) — esperado 0 insights. Proximo ciclo: C#20 — se 0 swaps, MATURIDADE PERSISTENTE CONFIRMADA.*
+
+
+## [2026-06-01T03:01:52+00:00] Ciclo #18 -- Evolution Oracle (0 SWAPS -- BALANCED, Deck Saudavel, T3=11.3% Confirmado, Colecao Esgotada)
+
+### PASSO 0: Analise Estrategica (DB REAL -- verificado em 2026-06-01T03:01)
+
+#### 1. COMO ESTE DECK GANHA? (7+ paths -- EXCELENTE)
+
+**Win conditions deterministicas (2):**
+- **Approach + Flare de Duplication** (CMC 7 + criatura vermelha = ~10 mana): 2 casts NO MESMO TURNO = vitoria imediata. Combo deterministico.
+- **Approach + Top/Scroll Rack/Penance**: Cast, topdeck manipulation, 2o cast em 1-2 turnos.
+
+**Win conditions de combate (3):**
+- **Storm Herd (CMC 10) + Akroma's Will (CMC 4)**: 35-40 Pegasus com double strike, flying, indestrutivel = lethal na mesa inteira.
+- **Storm Herd + Boros Charm**: Double strike, 70+ flying damage.
+- **Surge to Victory (CMC 6) + Approach no grave + 3+ criaturas atacando**: Copias de Approach = vitoria garantida.
+
+**Win conditions de recursao (2):**
+- **Mizzix's Mastery overload (CMC 4+5RR = 7)**: Todos instants/sorceries do grave gratis. Com Double Vision/Bombardment = 2x cada.
+- **Worldfire + dano na stack** (CMC 9 + burn): Reset total + vitoria. Nao depende de Approach nem de grave.
+
+**Total: 7+ caminhos DIVERSOS.** Abordagem multi-eixo reduz vulnerabilidade a counterspell. Worldfire + dano e IMUNE a grave hate.
+
+#### 2. COMO ESTE DECK EVITA PERDER? (Defesa ROBUSTA)
+
+**Board wipes (4 -- premium, todos assimetricos com protecao):**
+- Blasphemous Act (CMC 9, custo real tipicamente {R}) + Boros Charm = so oponentes perdem criaturas
+- Austere Command (CMC 6) + Teferi's Protection = modular, protege artefatos/enchantments
+- Call Forth the Tempest (CMC 8) + Akroma's Will = wipe + dragoes + suas criaturas indestrutiveis
+- Volcanic Vision (CMC 7) = wipe + retorna spell do grave
+
+**Protecoes contra wipes (5):** Boros Charm, Teferi's Protection, Akroma's Will, Lightning Greaves, Mother of Runes.
+
+**Stack interaction (6 camadas anti-counterspell):**
+1. Grand Abolisher -- oponentes nao conjuram no seu turno
+2. Boseiju, Who Shelters All -- Channel: Approach nao-counteravel
+3. Cavern of Souls -- Lorehold nao-counteravel
+4. Flare de Duplication -- copia Approach em resposta ao counter
+5. Deflecting Swat -- redireciona counterspell
+6. Hexing Squelcher -- oponentes nao ativam habilidades
+
+**Balanco: 4 wipes vs 5 protecoes + 6 stack. EXCELENTE. Risco zero de auto-destruicao.**
+
+**BATTLE v8 (2026-06-01T02:46):** Mirror WR 47.7%. 6-archetype WR 67.7% (todos >= 65%). 12-real WR 61.0%. Approach = 89.9% das vitorias -- mas com 6 camadas de stack, e aceitavel.
+
+#### 3. COMO ESTE DECK GERA VANTAGEM? (Draw = 8 -- DENTRO DO PERFIL)
+
+**Draw REAL (8):** Esper Sentinel, Demand Answers, Thrill of Possibility, Victory Chimes, The One Ring, Valakut Awakening, Ashling (impulse draw escalavel com copy engines), Reforge the Soul.
+
+**Virtual draw:** Top, Scroll Rack, Penance (topdeck manipulation). Loot: Faithless Looting, Dragon's Rage Channeler, Monument to Endurance, Big Score, Unexpected Windfall.
+
+**Recursion (4):** Mizzix's Mastery, Arcane Bombardment, Restoration Seminar, Surge to Victory.
+
+**Tesouros (7+):** Big Score, Brass's Bounty, Hit the Mother Lode, Smothering Tithe, Storm-Kiln, Unexpected Windfall, Victory Chimes.
+
+#### 4. COMO ESTE DECK ACELERA? (14 ramp -- robusto, CMC medio 3.61)
+
+**14 fontes de ramp:** 4 artefatos (Sol Ring, Arcane Signet, Boros Signet, Talisman), 4 land ramp (Land Tax, Wayfarer, Archaeomancer's Map, Bender's Waterskin), 4 treasure (Big Score, Unexpected Windfall, Brass's Bounty, Hit the Mother Lode), 2 treasure continuo (Smothering Tithe, Storm-Kiln), 1 ritual (Jeska's Will).
+
+**CMC medio: 3.61.** Pos-C#17, caiu -0.14 vs pre-C#17.
+
+**T1 ramp estrito:** Apenas Sol Ring (8.2% T1 em Exec#12).
+
+**Limite estrutural de jogaveis: ~47%.** Sem fast mana CMC 0-1 alem de Sol Ring.
+
+#### 5. QUAL O PLANO DE JOGO? (Reforcado pos-C#17)
+
+- **Fase 1 (T1-3):** Ramp + topdeck setup + protecao. Mother of Runes (CMC 1) protege pecas-chave. Demand Answers (CMC 2, instant) draw + preenche grave. Top/Scroll Rack/Penance preparam o Approach.
+- **Fase 2 (T4-6):** Lorehold (CMC 5) entra. Ashling (CMC 4) escala com cada cast/copy -- impulse draw + dano. Motor online (Double Vision, Bombardment, Dawning Archaic). Treasure generation.
+- **Fase 3 (T7+):** Plano A: Approach+Flare. Plano B: Storm Herd+Akroma's Will. Plano C: Mizzix overload. Plano D: Surge+Approach. Plano E: Worldfire+dano.
+- **Resiliencia:** Counterspell, Flare/Boseiju/Cavern/Grand Abolisher/Deflecting Swat/Hexing. Board wipe, Teferi's/Boros Charm/Akroma's Will. Grave hate, Worldfire e Approach nao dependem de grave.
+
+---
+
+### PASSO 1: Sintese dos Agentes (TODOS lidos -- DB REAL verificado)
+
+| Agente | Ultima Execucao | Dado Critico |
+|:-------|:---------------:|:-------------|
+| SCOUT #29 | 2026-06-01T02:39 | Colecao esgotada. Ashling ja no deck (aplicada C#17). Spiteful Banditry (Score 8) unico candidato viavel, mas sidegrade vs Hexing Squelcher. MATURIDADE PERSISTENTE. |
+| VALIDATOR v3.15 | 2026-06-01T02:48 | SYNERGY_MAP 7.9/10. Draw=8. Nivel 1 VAZIO. T3 projetado 10-13%. C#18 BALANCED (0 swaps). Proximo upgrade: Skullclamp. |
+| MULLIGAN Exec#12 | 2026-06-01T02:54 | **T3=11.3% (CONFIRMADO).** -2.0pp vs Exec#11. Mulligan 48.7%. Jogaveis 47.3%. T3 ABAIXO de 12%, BALANCED. Limite estrutural ~47%. |
+| BATTLE v8 | 2026-06-01T02:46 | Mirror WR 47.7%. 6-archetype 67.7% (todos >=65%). 12-real 61.0%. Approach=89.9%. Stalls 26%. STABLE. |
+
+**Consenso: O deck esta SAUDAVEL. T3 = 11.3% confirma que o C#17 DEFENSIVO (DCMC=-8) funcionou -- T3 caiu 2.0pp, cruzando o limiar de 12% para baixo. Nao ha gaps estruturais que possam ser resolvidos com a colecao atual. 0 swaps e o resultado correto.**
+
+---
+
+### PASSO 2: Gaps Estrategicos (Pos-C#18)
+
+| # | Gap | Severidade | Status Pos-C#18 |
+|:-:|:-----|:----------:|:----------------|
+| 1 | ~~Draw = 6~~ | ~~CRITICO~~ | RESOLVIDO (C#17). Draw=8, dentro do perfil. |
+| 2 | ~~Rise of the Eldrazi CMC 10~~ | ~~ALTO~~ | RESOLVIDO (C#17). Cortada. |
+| 3 | ~~Longshot sub-otimo~~ | ~~MODERADO~~ | RESOLVIDO (C#17). Substituida por Ashling. |
+| 4 | T3 = 11.3% (<12%) | BAIXO | ZONA BALANCED. Sem urgencia defensiva. |
+| 5 | Colecao esgotada de CMC <= 2 com sinergia | BLOQUEANTE | ATIVO. 36 cartas CMC <= 2 na colecao, NENHUMA com Nec>=3+Evid>=3. |
+| 6 | Sem fast mana CMC 0-1 alem de Sol Ring | MODERADO | Chrome Mox, Mana Vault ausentes. Limite estrutural T3 ~47%. |
+| 7 | Approach = 89.9% das vitorias | TOLERAVEL | 6 camadas de stack protection + Worldfire como alternativa. BATTLE mostra Control WR 69% -- counterspell nao esta anulando o deck. |
+| 8 | Worldfire anti-sinergico com recursao | MODERADO | Candidato a corte se surgir upgrade (Seize the Spoils CMC 3). Mas: wincon alternativa anti-grave hate e valiosa. |
+| 9 | Stalls 26% (BATTLE v8) | BAIXO | Limite max_turns=35. Nao e gap de deckbuilding. |
+| 10 | Ashling, Flare com EDHREC baixo (5-7%) | INFORMATIVO | Cartas novas/niche. Sinergia real com copy engines nao e capturada por EDHREC. |
+
+---
+
+### PASSO 3: Priorizar Swaps -- TABELA DE REJEICAO (C#18)
+
+**Criterio: Necessidade Estrategica (0-5) + Evidencia de Dados (0-5). Swap apenas se Total >= 6 com AMBAS >= 3.**
+
+**Contexto pos-C#17:** Deck com draw=8, T3=11.3% (BALANCED), CMC medio 3.61, SYNERGY_MAP 7.9/10. 27 swaps desde baseline. Nivel 1 VAZIO. Colecao com 123 cartas RW-legal nao-deck, mas 36 cartas CMC <= 2 sao majoritariamente protecao niche ou criaturas sem sinergia.
+
+#### Candidatos CMC <= 2 (DEFENSIVO -- mas T3 ja esta bom)
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------|
+| **Spiteful Banditry** | 2 | 3 | 2 | 5 | Board wipes, treasures (Score 8 SCOUT). MAS: substituiria Hexing Squelcher (stack interaction #6). DCMC=0, sidegrade funcional -- troca protecao de stack por ramp condicional. Hexing e 1 das 6 camadas anti-counterspell. |
+| Reverberate | 2 | 2 | 3 | 5 | Copy #7 redundante. Deck tem 7 copy engines. Sem substituto natural -- Penance e CORE ENGINE. |
+| Surge of Salvation | 1 | 2 | 2 | 4 | Free com condicao (controla commander). Protecao one-shot. Mother of Runes e REPETIVEL. Sidegrade no mesmo slot. |
+| Drannith Magistrate | 2 | 2 | 2 | 4 | Stax. Deck nao e stax. Criatura fragil sem protecao. |
+| Voice of Victory | 2 | 2 | 1 | 3 | Criatura CMC 2 fragil. Efeito niche de desencantar. |
+| Tibalt's Trickery | 2 | 1 | 1 | 2 | Counter aleatorio. RW nao e cor de counter. |
+| Artist's Talent | 2 | 1 | 1 | 2 | Ja cortada C#5. Fastest-declining card. |
+| Oswald Fiddlebender | 2 | 1 | 1 | 2 | Ja cortado C#5. 0% EDHREC. |
+| Desperate Ritual | 2 | 1 | 1 | 2 | Ja cortado C#3. Ritual chain nao e o plano do deck. |
+
+#### Candidatos CMC 3 (trocar CMC baixo por medio PIORA T3)
+
+| Carta (colecao) | CMC | Nec. | Evid. | Total | Por que NAO |
+|:----------------|:---:|:----:|:-----:|:-----:|:------------|
+| **Seize the Spoils** | 3 | 3 | 3 | 6 | Draw 2 + Treasure CMC 3. Substituiria Worldfire (CMC 9). DCMC=-6 seria DEFENSIVO, mas T3 ja esta em 11.3% (BALANCED). Draw=8 ja e suficiente -- adicionar draw #9 e redundancia. Worldfire e wincon alternativa ANTI-GRAVE HATE. Trocar por draw redundante NAO resolve gap -- cria gap (perde wincon anti-grave). |
+| Dualcaster Mage | 3 | 2 | 3 | 5 | Copy #8. Substituiria Bender's Waterskin (CMC 3, ramp). Sidegrade funcional -- troca ramp por copy em deck que ja tem 7 copy engines e 14 ramp. |
+| Seething Song | 3 | 2 | 2 | 4 | Ja cortado C#6. Ritual chain nao e o plano. |
+| Monastery Mentor | 3 | 2 | 2 | 4 | Token fragil sem ETB. Surge+Rite+Twinflame ja suprem tokens. |
+| Flawless Maneuver | 3 | 1 | 2 | 3 | FREE com commander. Mas deck ja tem 5+ protecoes. |
+| Ranger-Captain of Eos | 3 | 3 | 2 | 5 | Silence + tutor. MAS: tutor so busca CMC 1 -- Mother of Runes e Sol Ring ja no deck. Sidegrade. |
+
+#### Candidatos CMC 4+ (piora T3 -- rejeitados automaticamente em BALANCED)
+
+| Carta | CMC | Total | Por que CONTINUA rejeitado |
+|:------|:---:|:-----:|:---------------------------|
+| Trouble in Pairs | 4 | 5 | Draw redundante. Ashling e The One Ring ja ocupam draw CMC 4. |
+| Solphim, Mayhem Dominus | 4 | 4 | Win-more. Dobra dano mas deck ja ganha sem ele. |
+| Insurrection | 8 | 4 | CMC 8. Deck acabou de CORTAR Rise CMC 10. Substituir Worldfire CMC 9 por Insurrection CMC 8 = sidegrade de CMC alto. |
+| Fiery Emancipation | 6 | 3 | Win-more. Triplica dano mas CMC 6. |
+| Mana Geyser | 5 | 3 | Ritual high-CMC. Deck ja tem 14 ramp. |
+
+---
+
+### PASSO 4: 0 SWAPS -- DECK SAUDAVEL, COLECAO ESGOTADA
+
+**0 swaps aplicados neste ciclo.**
+
+**Justificativa:** Dos 123 candidatos na colecao, 36 com CMC <= 2, NENHUM atinge simultaneamente Necessidade Estrategica >= 3 + Evidencia de Dados >= 3. O melhor candidato (Spiteful Banditry, Score 8 SCOUT, Total 5) e um sidegrade que troca stack interaction por ramp condicional -- nao resolve nenhum gap sistemico e REDUZ protecao de stack de 6 para 5 camadas.
+
+**Seize the Spoils (Total 6) seria viavel** se o deck ainda tivesse deficit de draw ou T3>12%. Mas draw=8 (dentro do perfil) e T3=11.3% (BALANCED). Trocar Worldfire (wincon anti-grave hate) por draw redundante PIORA o deck contra Rest in Peace/Leyline -- remove uma das 3 wincons imunes a grave hate.
+
+**Estado do deck:** 27 swaps desde baseline. 11 ciclos com swaps aplicados (C#1-C#7, C#9, C#10, C#17). 7 ciclos com 0 swaps (C#8, C#11-C#16, C#18). Motor 4/4 COMPLETO. Copy engines: 7 (Lorehold, Double Vision, Arcane Bombardment, Dawning Archaic, Flare, Twinflame, Ashling como CAST+COPY payoff). SYNERGY_MAP: 7.9/10. Nivel 1: VAZIO.
+
+---
+
+### Metricas Finais (Pos-Ciclo #18 -- Identico a Pos-C#17)
+
+| Metrica | Pos-C#17 | Pos-C#18 | Delta |
+|:--------|:--------:|:--------:|:-----:|
+| Total Cards | 100 | 100 | 0 |
+| Lands | 35 | 35 | 0 |
+| Commander | 1 | 1 | 0 |
+| CMC medio | 3.61 | 3.61 | 0 |
+| Ramp | 14 | 14 | 0 |
+| Draw (DB-tagged) | 8 | 8 | 0 |
+| Removal | 6 | 6 | 0 |
+| Board Wipe | 4 | 4 | 0 |
+| Protection | 6 | 6 | 0 |
+| Recursion | 4 | 4 | 0 |
+| Copy Engines | 7 | 7 | 0 |
+| Double-null | 4 | 4 | 0 |
+| **Swaps Totais** | **27** | **27** | **0** |
+| Card Hash | `a440c497da4280d6769238737062b3dd` | `a440c497da4280d6769238737062b3dd` | = |
+| Sem Play T3 | 11.3% (Exec#12) | 11.3% | 0 |
+| Nivel 1 | VAZIO | VAZIO | OK |
+| SYNERGY_MAP medio | 7.9/10 | 7.9/10 | 0 |
+
+### Timeline de T3 por Ciclo (atualizada com C#18)
+
+| Ciclo | Data | Swaps | Net DCMC | Estrategia | T3 | Fonte |
+|:-----:|:-----|:-----:|:--------:|:----------|:--:|:------|
+| #0 | baseline | -- | -- | -- | 3.3% | Exec#1 |
+| #1 | 2026-05-28 | 3 | +3 | AGGRESSIVE | 12.4% | Exec#3 |
+| #2 | 2026-05-28 | 3 | +4 | AGGRESSIVE | 16.5% | Exec#5 |
+| #3 | 2026-05-30 | 5 | -4 | DEFENSIVO | 16.4% | Exec#7 |
+| #4 | 2026-05-30 | 3 | -15 | DEFENSIVO | 12.0% | Exec#8 |
+| #5 | 2026-05-31 | 3 | +1 | BALANCED | 15.3% | Exec#9 |
+| #6 | 2026-05-31 | 2 | -2 | DEFENSIVO | ~13-14% | Estimado |
+| #7 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | ~14-15% | Estimado |
+| #8 | 2026-05-31 | 0 | 0 | (0 swaps) | ~14-15% | Estimado |
+| #9 | 2026-05-31 | 1 | +2 | AGGRESSIVE* | 16.9% | Exec#10 |
+| #10 | 2026-05-31 | 2 | -2 | DEFENSIVO | 13.3% | Exec#11 |
+| #11 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #12 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #13 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #14 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #15 | 2026-05-31 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| #16 | 2026-06-01 | 0 | 0 | (0 swaps) | 13.3% | Estavel |
+| --MUDANCAS NAO DOCUMENTADAS-- | -- | 3 cartas | +3 | Usuario | ~13-14% | NAO SIMULADO |
+| #17 | 2026-06-01 | 2 | -8 | DEFENSIVO | 11.3% | Exec#12 |
+| **#18** | **2026-06-01** | **0** | **0** | **BALANCED (0 swaps)** | **11.3%** | **Exec#12 (identico)** |
+
+*Ciclos #7/#8/#9 usaram T3=3.7% (free mulligan rate) erroneamente -- ver Pitfall #19.
+
+### MULLIGAN NAO PRECISA SER RE-EXECUTADO (0 swaps -- deck identico a Exec#12)
+
+A ultima simulacao (Exec#12, pos-C#17) mediu T3=11.3% com o card hash `a440c497...`. Como C#18 aplica ZERO swaps, o deck e identico -- re-executar N=1000 reproduziria 11.3% com ruido de +-2.1pp.
+
+### Gaps Remanescentes (pos-C#18)
+
+| Gap | Bloqueio | Solucao | Prazo |
+|:----|:---------|:--------|:------|
+| Colecao esgotada de CMC <= 2 | 36 cartas, 0 com Nec>=3+Evid>=3 | AQUISICAO: Skullclamp (CMC 1), Chrome Mox (CMC 0), Underworld Breach (CMC 2) | Curto |
+| Sem fast mana CMC 0-1 | Custo ($60-100) | Chrome Mox + Mana Vault | Medio |
+| Worldfire anti-sinergia | Candidato a corte | Seize the Spoils (CMC 3, ja na colecao) como substituto. Aceitavel -- manter por enquanto como wincon anti-grave hate. | Baixo |
+| Approach = 89.9% | Aceitavel com 6 camadas stack | Aceitar. BATTLE v8 mostra Control WR 69%. | N/A |
+| Stalls 26% (BATTLE) | Limite turno 35 | Aumentar max_turns para 45 no simulador | Medio |
+| Sem counterspell hard | Cor (RW) | Impossivel | N/A |
+| Ashling/Flare EDHREC baixo | Cartas novas/niche | Monitorar. Sinergia com copy engines e Approach nao e capturada por EDHREC. | Baixo |
+
+### Recomendacoes de Aquisicao (Prioridade -- inalterada desde C#17)
+
+| # | Carta | CMC | Custo | Impacto | Substitui |
+|:-:|:------|:---:|:------|:--------|:----------|
+| 1 | **Skullclamp** | 1 | $5-8 | Draw engine com token makers. DCMC -1 vs Thrill. Tutoriavel com Urza's Saga + Enlightened Tutor. | Thrill of Possibility |
+| 2 | **Chrome Mox** | 0 | $60-80 | Fast mana T0. Aumenta teto de jogaveis 47% -> ~50%. | Bender's Waterskin |
+| 3 | **Mana Vault** | 1 | $40-60 | Fast mana T1. Reduz T3 ~1.5pp. | Lightning Greaves |
+| 4 | **Underworld Breach** | 2 | $10-15 | Recursion explosiva. Escape -- funciona sob grave hate (exila do grave). | Faithless Looting |
+| 5 | **Seize the Spoils** | 3 | $1-2 | Draw + Treasure. Ja na colecao. Substituto natural para Worldfire. | Worldfire |
+
+### Licao do C#18: BALANCED com 0 Swaps e a Estrategia Correta
+
+1. **T3=11.3% confirmado:** O C#17 DEFENSIVO (DCMC=-8) foi o maior salto defensivo desde C#4 (-15). T3 caiu 2.0pp e cruzou o limiar de 12% para baixo. O deck entrou na zona BALANCED pela primeira vez desde C#4 (2026-05-30).
+
+2. **Colecao ESGOTADA:** 27 swaps desde baseline esgotaram todas as cartas CMC <= 2 com sinergia para Lorehold. 123 cartas RW-legal na colecao, 36 CMC <= 2, mas todas sao protecao niche, criaturas sem sinergia, ou cartas ja cortadas em ciclos anteriores.
+
+3. **0 swaps e VALIDO:** Forcar um swap sem Necessidade >= 3 PIORARIA o deck. Spiteful Banditry (melhor candidato) trocaria Hexing Squelcher por ramp condicional -- reduz stack protection de 6 para 5 camadas sem resolver nenhum gap real. Seize the Spoils removeria Worldfire (wincon anti-grave hate) por draw redundante.
+
+4. **O deck esta otimizado ao maximo com a colecao atual.** SYNERGY_MAP 7.9/10. Motor 4/4. Copy 7. Draw 8. T3 11.3%. Nivel 1 VAZIO. BATTLE WR 61-68%. Proximo upgrade REAL requer AQUISICAO.
+
+5. **Pipeline saudavel:** Card hash `a440c497da4280d6769238737062b3dd` verificado contra DB -- MATCH. Nao ha mudancas nao documentadas desde C#17. O protocolo de integridade (STEP 0 + hash verification) esta funcionando.
+
+---
+
+### Nota: Spiteful Banditry (Score 8 SCOUT) -- Monitoring para C#19
+
+O SCOUT #29 identificou Spiteful Banditry como o unico candidato na colecao com score >= 8 que nao e sidegrade completo. Converte board wipes em tesouros (4 wipes -> 10+ tesouros cada). Substituiria Hexing Squelcher (CMC 2, stack interaction).
+
+**Por que NAO neste ciclo:** DCMC=0 nao e urgente em BALANCED. Hexing e 1 das 6 camadas anti-counterspell -- remove-la reduz stack de 6 para 5. Com Approach = 89.9% das vitorias, stack protection e mais valiosa que ramp condicional de wipe.
+
+**Cenario para aplicar em C#19:** Se o usuario adquirir Skullclamp (CMC 1, $5-8), Thrill of Possibility (CMC 2) sai. Spiteful Banditry entraria no slot de Thrill -- DCMC=0, sem sacrificar stack protection. Aguardar aquisicao.
+
 ## [2026-06-01T02:15:55+00:00] Ciclo #17 -- Evolution Oracle (2 SWAPS -- DEFENSIVO, Pipeline Corrigido, 3 Cartas Fantasma Descobertas)
 
 ### 🚨 PIPELINE INTEGRITY: 7 Ciclos de Analise Baseada em Deck FANTASMA
