@@ -1,17 +1,30 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-05-31T04:2118Z (Incremento: restore test artifact + dead code cleanup — 2880a94c).
+> Atualizado em 2026-06-01T09:30:00Z (Incremento: semantic drift fix + dead code round 2 — 6af73d87).
 
 ## Estado atual
 
 - Branch observada: `master`
 - HEAD anterior: `d3cfaf3b` (Architecture: add resetForTesting/clear/reset to all singletons)
-- HEAD atual: **`2880a94c`** (Fix: restore test artifact referenced by external_commander_meta_candidate_support_test)
+- HEAD atual: **`6af73d87`** (P1: fix semantic drift — load card_function_tags in SQL queries).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
 
+
+## Novos commits nesta rodada (2026-06-01)
+
+### `6af73d87` — P1: fix semantic drift — optimize_request_support now loads card_function_tags in SQL queries (atual HEAD)
+- **2 arquivos** (`optimization_functional_roles.dart`, `optimize_request_support.dart`)
+- **Tipo: CODE/FIX** — Corrige drift semantico: o pipeline de optimize nao carregava `card_function_tags` nas queries SQL, causando divergencia entre a analise de deck (que carrega) e o optimize (que nao carregava). `classifyOptimizationFunctionalRole` agora recebe `functionalTags` via adapter F1, resolvendo a discrepancia.
+- **Impacto:** Cartas double-null (Scroll Rack, Penance) agora tem seus functional_tags persistidos consultados pelo optimize, reduzindo classificacoes incorretas.
+
+### `23cfc061` — Dead code round 2: remove E2E scripts, QA dir, Python scorecard; archive 9 historical .md files
+- **18 arquivos**, **4.172 linhas removidas**
+- **Tipo: CODE/HIGIENE** — Remove scripts de E2E optimization, diretorio QA, Python scorecard. Arquiva 9 relatorios historicos em `archive_docs/root/`. Segunda rodada de limpeza apos o cleanup inicial (8cab6400).
+
+---
 
 ## Novos commits nesta rodada (2026-05-31)
 ### `d3cfaf3b` — Architecture: add resetForTesting/clear/reset to all singletons (atual HEAD)

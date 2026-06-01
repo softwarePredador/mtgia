@@ -1,7 +1,7 @@
 # Implementation Tasks — ManaLoom
 
 > Gerado por sintese: cruzamento do conhecimento MTG do Hermes x codigo atual.
-> Data: 2026-05-31 | Branch: origin/master | SHA: 23cfc061
+> Data: 2026-06-01 | Branch: origin/master | SHA: 6af73d87
 
 ## Resumo de Status
 
@@ -12,106 +12,85 @@
 | P1-c | P1 | Weakness-analysis usa heuristicas legacy (sem adapter F1) | ATIVO |
 | P1-d | P1 | Wincon detection fragil — battle_analyst + weakness-analysis usam hardcoded names | ATIVO |
 | P1-e | P1 | GoldfishSimulator nao calcula "Sem Play T3" — metrica critica ausente | ATIVO |
-| P1-f | P1 | optimize_request_support nao carrega card_function_tags — drift semantico confirmado | ATIVO (NOVO) |
+| P1-f | P1 | optimize_request_support nao carrega card_function_tags — drift semantico | **RESOLVIDO (6af73d87)** |
+| P1-g | P1 | card_rulings (76.991 rulings) nao integrado ao validator | **ATIVO (NOVO)** |
 | P2-a | P2 | _looksLikePayoff nao detecta payoffs de dano direto | RESOLVIDO (3fb17356) |
 | P2-b | P2 | Tags ninja/stax_disruption com 0% de acuracia no SQLite | ATIVO |
 | P2-c | P2 | Write-only tables: deck_matchups, deck_weakness_reports, ml_prompt_feedback | ATIVO |
 | P2-d | P2 | Double-null cards invisiveis ao classificador — risco de swap auto | ATIVO |
+| P2-e | P2 | Synergy-axis evaluation ausente do quality gate — so verifica role==role | **ATIVO (NOVO)** |
 | P3-a | P3 | CONTEXTO_PRODUTO_ATUAL.md desatualizado | RESOLVIDO (7ed5b863) |
 | P3-b | P3 | Weakness-analysis wincon detection fragil (oracle text) | ATIVO |
 | P3-c | P3 | manual-de-instrucao.md nao reflete F1/F3/bracket expansion | ATIVO |
 | P3-d | P3 | THEMES.md 19 temas nao validados vs EDHREC | ATIVO |
+| P3-e | P3 | MDFC duplicate detection ausente do deck validation | **ATIVO (NOVO)** |
 
 ---
 
-### [P1] optimize_request_support nao carrega card_function_tags — drift semantico confirmado
+### [P1] card_rulings (76.991 rulings) nao integrado ao validator — trocas sem validacao de regras
 
-**Conhecimento MTG:** O EDHREC e os dados funcionais persistidos (card_function_tags) representam a classificacao mais precisa da funcao real de cada carta — foi construida a partir de dados reais de uso (milhares de decks). Quando o optimize pipeline usa apenas semantic_tags_v2 (que e um modelo unico de role por carta) e nao carrega functional_tags persistidas, uma carta como "Scroll Rack" (que deveria ser engine) pode ser classificada como utility porque o v2 nao tem pattern para ela (double-null). Isso significa que cartas funcionais criticas sao tratadas como filler pelo optimize.
+**Conhecimento MTG:** O VALIDATOR_LOG v3.20 (Purpose Analyzer) usa ativamente a tabela `card_rulings` do PostgreSQL para verificar interacoes entre cartas. Exemplos criticos encontrados: "Lorehold + Miracle: card com Miracle DEVE ser revelado antes de entrar na mao — draw vs tutor: efeitos que colocam cartas na mao sem usar 'draw' NAO ativam Miracle", "Dualcaster Mage: copia na stack NAO e 'conjurada' — nao ativa Lorehold nem Bombardment", "Arcane Bombardment: se sair do campo, cartas exiladas PERMANECEM — nova copia nao acessa exilio anterior". Estas regras sao essenciais para validar swaps — trocar Dualcaster por uma carta que depende de "conjurar" muda radicalmente as sinergias.
 
 **Evidencia no codigo:**
-- `server/routes/ai/optimize/index.dart:2068-2099` — Carrega semantic_tags_v2 mas NAO carrega card_function_tags nas queries de deck_cards do deck original
-- `server/routes/ai/optimize/index.dart:3197-3213` — Repete o mesmo padrao para dados de adicoes (additions)
-- `server/lib/ai/optimize_request_support.dart:91-109` — Monta allCardData com semantic_tags_v2 mas sem functional_tags
-- `server/routes/decks/[id]/analysis/index.dart:80-96` — Em contraste, a rota de analise DECK carrega ambos card_function_tags E semantic_tags_v2 (padrao correto)
-- `server/lib/ai/functional_card_tags.dart:400-465` — O classificador ja prefere functional_tags persistidos quando existem
+- `server/lib/ai/optimization_validator.dart:28-86` — `validate()` tem 3 camadas (Monte Carlo, Analise Funcional, Critic IA) mas nenhuma consulta `card_rulings`
+- `server/lib/ai/optimization_quality_gate.dart:18-80` — `filterUnsafeOptimizeSwapsByCardData()` verifica role, CMC delta, land trim, structural recovery — mas nao verifica interacoes de regras
+- Nenhuma referencia a `card_rulings` em TODO o diretorio `server/lib/` (0 resultados)
+- Tabela existe no PostgreSQL com 76.991 rulings, mas e completamente write-only do ponto de vista do backend
 
-**Gap:** Existe um adapter unificado em functional_card_tags.dart que resolve roles por ordem: functional_tags persistidos -> semantic_tags_v2 -> fallback textual. Porem, o optimize pipeline NAO carrega functional_tags na query SQL, entao o classificador nao tem acesso a esses dados. O resultado: uma carta pode aparecer como engine na aba de analise (que carrega functional_tags) mas ser tratada como utility no optimize (que so carrega semantic_tags_v2). Isso e o "drift semantico" confirmado na auditoria de estrutura card-semantics (STRUCTURE_AUDIT.md, rodada card-semantics).
+**Gap:** O validator nao consegue detectar que uma troca proposta (ex: remover Dualcaster Mage para adicionar um payoff de "conjurar") quebra interacoes documentadas nas rulings oficiais. A Critic IA pode capturar parcialmente, mas rulings oficiais sao deterministicas.
 
 **Impacto:**
-1. Cartas double-null (Scroll Rack, Penance) sao classificadas como utility no optimize — candidatas a swap/remocao
-2. Cartas multi-funcao podem perder roles secundarios (ex: uma carta que e draw + engine na analise vira so engine no optimize/quality gate)
-3. O quality gate pode bloquear swaps validos ou permitir swaps perigosos porque o role_delta e calculado com base em dados incompletos
-4. O deck analysis mostra uma realidade e o optimize opera com outra — incoerencia sistemica
+1. Swaps que parecem bons (CMCs compativeis, roles preservados) podem quebrar sinergias documentadas
+2. Exemplo real: trocar Dualcaster Mage (copy na stack, nao-conjurada) por Primal Amulet (so conta spells CONJURADOS) — ambos sao "engine" mas interagem com o deck de forma OPOSTA
+3. A Critic IA (3a camada) e a unica protecao — e depende de prompt engineering, nao de dados deterministicos
+4. O quality gate aprovaria o swap porque removedRole=engine == addedRole=engine
 
 **Acao recomendada:**
-1. Adicionar card_function_tags nas queries SQL de optimize_request_support.dart e optimize/index.dart (tanto para deck original quanto para additions)
-2. Criar funcao resolveCardFunctionalRoles() que retorne roles multi-valor + primary_role, usando ordem: functional_tags persistidos -> semantic_tags_v2 -> fallback textual
-3. Manter compatibilidade serializando primary_role antigo enquanto o validator/gate calcula deltas multi-role
-4. Atualizar _classifySemanticV2FunctionalRole() para tambem consultar functional_tags quando disponivel
+1. Criar `CardRulingsService` que consulta `card_rulings` por nome de carta
+2. Adicionar 4a camada `_validateSwapRulings()` no `optimization_validator.dart`
+3. Para cada swap (removal → addition), verificar se ha rulings conflitantes com o commander ou com outras cartas do deck
+4. Foco inicial: verificar palavras-chave de interacao (cast vs copy, triggered ability vs activated ability, "whenever you cast" vs "whenever you copy")
+5. Retornar warning (nao block) quando rulings sugerem anti-sinergia — a Critic IA decide com contexto
 
 **Validacao:**
 ```bash
 cd server
-dart analyze lib/ai/optimization_functional_roles.dart lib/ai/functional_card_tags.dart routes/ai/optimize/index.dart
-dart test test/optimization_quality_gate_test.dart
-dart test test/functional_card_tags_test.dart
-```
-
----
-
-### [P1] GoldfishSimulator nao calcula "Sem Play T3" — metrica critica ausente
-
-**Conhecimento MTG:** A simulacao de mulligan do Lorehold (Execucoes #1-9) revelou que "Sem Play T3" (nenhum nao-terreno com CMC <= min(lands, 3) jogavel nos 3 primeiros turnos) e a metrica mais importante para consistencia de Fase 1. O deck Ciclo #1 tinha 3.3% -> Ciclo #2: 12.4% -> Ciclo #3: 16.4% -> Ciclo #4: 13.8% -> Ciclo #5: 15.3%. O quality gate DECIDE a estrategia de swap (AGGRESSIVE/BALANCED/DEFENSIVO) baseada neste valor: < 8% = agressivo, 8-12% = balanceado, > 12% = defensivo. Ciclo #6 e DEFENSIVO (T3 = 15.3%). Empiricamente, cada ciclo defensivo (Delta CMC -5 a -15) reduz T3 em 2-4pp.
-
-**Evidencia no codigo:**
-- `server/lib/ai/goldfish_simulator.dart:28-40` — GoldfishResult tem turn1PlayRate..turn4PlayRate mas NAO tem noPlayTurn3Rate ou similar
-- `server/lib/ai/goldfish_simulator.dart:158-191` — Loop de simulacao conta turn1Plays..turn4Plays mas nao verifica se ha spells CMC jogavel acumulado ate T3
-- `server/lib/ai/optimization_quality_gate.dart:346-353` — _criticalRolesForArchetype() NAO inclui consistencia de early-game como criterio
-- `server/lib/ai/optimization_validator.dart:100` — _runMonteCarloComparison usa GoldfishSimulator mas nao extrai metrica de "vazio de early game"
-
-**Gap:** O Dart GoldfishSimulator mede "can play on T3" (existe 1 carta CMC<=3 jogavel T3) mas nao mede "nothing to play through T3-5" (todas as cartas sao CMC alto demais early). A metrica Python sem_play_T3 = count(no nonland with CMC <= min(lands, 3)) / N e fundamentalmente diferente e mais util que turn3PlayRate.
-
-**Impacto:**
-1. O Ciclo #3 aplicou estrategia AGGRESSIVA errada por 1 ciclo completo (deveria ser DEFENSIVO)
-2. Decks com CMC inflado passam no quality gate sem alerta de early-game deficit
-3. Operator nao tem visibilidade da metrica mais importante para consistencia
-
-**Acao recomendada:**
-1. Adicionar noPlayT3Rate (e preferencialmente noPlayT4Rate, noPlayT5Rate) ao GoldfishResult
-2. No loop de simulacao (linha ~180), rastrear: minCastableCmc = min(nonland_cmc for nonland in cardsAvailable), verificar se minCastableCmc <= min(landsPlayed, 3) a cada turno, contar maos onde isso falha ate T3/T4/T5
-3. Expor no JSON de resultado do GoldfishSimulator
-4. Opcional: adicionar alerta no quality gate quando noPlayT3Rate > 0.12
-
-**Validacao:**
-```bash
-cd server
-dart analyze lib/ai/goldfish_simulator.dart
+dart analyze lib/ai/optimization_validator.dart
 dart test test/optimization_validator_test.dart
 ```
 
 ---
 
-### [P2] Double-null cards invisiveis ao classificador — risco de swap auto
+### [P2] Synergy-axis evaluation ausente do quality gate — so verifica rolePreserved
 
-**Conhecimento MTG:** A analise do Lorehold (Purpose Analyzer v3-v3.6) identificou 6 cartas double-null restantes: Scroll Rack, Penance, Grand Abolisher, Ruby Medallion, Pearl Medallion, Galadriel's Dismissa. Scroll Rack e Penance sao engines criticos (risco de corte = CRITICO). Pearl Medallion (25.2% EDHREC, trend -0.46) e cut candidato prioritario para Ciclo #6 DEFENSIVO.
+**Conhecimento MTG:** O SYNERGY_MAP (v3.8+, 7 eixos: Token/Pump, Board Wipes+Protection, Recursion, Explosive Mana, Combo Pieces, Stack Interaction, Resilience) classifica cada carta do deck em seu eixo estrategico. O quality gate atual verifica APENAS se `removedRole == addedRole` — mas duas cartas podem ter o mesmo role (ex: ambas "engine") e afetar eixos DIFERENTES. Exemplo real do Lorehold: trocar Dualcaster Mage (engine, eixo F: Stack Interaction) por Primal Amulet (engine, eixo D: Explosive Mana) preserva role mas reduz Stack Interaction de 5→4 (ja e o eixo mais fraco do deck, score 5/10).
 
 **Evidencia no codigo:**
-- `server/lib/ai/optimization_functional_roles.dart:55-125` — classifyOptimizationFunctionalRole() retorna artifact/enchantment/utility para estas cartas
-- `server/lib/ai/functional_card_tags.dart` — Multi-tag classifier tambem falha para Scroll Rack e Penance
+- `server/lib/ai/optimization_quality_gate.dart:55-56` — `final rolePreserved = removedRole == addedRole || (removedRole == 'utility' && addedRole == 'utility');`
+- `server/lib/ai/optimization_quality_gate.dart:58-60` — `final losingCriticalRole = criticalRoles.contains(removedRole) && !rolePreserved;`
+- Nao ha nenhuma verificacao de "eixo estrategico" ou "synergy group" — apenas role atomico
+- `server/lib/ai/optimization_functional_roles.dart:370-398` — As funcoes `_looksLikeWincon`, `_looksLikeEngine`, `_looksLikeComboPiece`, `_looksLikePayoff`, `_looksLikeEnabler` sao booleanas e nao capturam eixos
 
-**Gap:** Nao ha mecanismo de fallback para cartas que ambos classificadores falham. O quality gate trata essas cartas como utility sem funcao especifica, tornando-as candidatas a swap.
+**Gap:** O quality gate opera em granularidade de role atomico (1 carta = 1 role), mas a realidade estrategica opera em granularidade de eixo (varias cartas colaboram). Uma troca que remove 1 de 2 cartas de stack interaction e uma perda de 50% no eixo — mas o quality gate ve "engine → engine: aprovado".
 
 **Impacto:**
-1. Scroll Rack (CMC 2, topdeck engine): Risco CRITICO de swap auto — core do motor Lorehold
-2. Penance (CMC 3, topdeck + anti-removal): Risco CRITICO — miracle enabler
-3. Grand Abolisher (protection): Risco alto
-4. Ruby/Pearl Medallion (cost reduction): Risco medio — classificados como ramp mas sao cost-reduction
+1. Swaps que diluem eixos criticos passam no quality gate silenciosamente
+2. O deck Lorehold perdeu Flare of Duplication e Twinflame (Stack Interaction) em ciclos recentes — o quality gate nao alertou porque o role era preservado
+3. Stack Interaction (eixo F) caiu de 6/10 para 5/10 sem nenhum alerta do sistema
+4. O problema e especialmente grave em Boros (RW) que ja tem stack interaction naturalmente fraca
 
 **Acao recomendada:**
-1. Criar tabela protected_cards (card_name, reason, override_role) no PostgreSQL — whitelist manual
-2. Adicionar check no filterUnsafeOptimizeSwapsByCardData(): consultar protected_cards antes de permitir swap
-3. Adicionar tag cost_reduction ao classificador (diferente de ramp) para Medallions
-4. Adicionar oracle patterns para "Scroll Rack" (look at top N + rearrange) e "Penance" (return to top of library)
+1. Adicionar funcao `_classifySynergyAxis(String oracle)` que retorna um dos 7 eixos baseado em patterns de oracle text:
+   - TOKEN_PUMP: "create...token" + "double strike"/"gets +"
+   - WIPES_PROTECTION: board wipe patterns + "indestructible"/"hexproof"/"phase out"
+   - RECURSION: "return...from your graveyard" + "flashback"/"overload"
+   - EXPLOSIVE_MANA: "add {R}" + "treasure" + ritual patterns
+   - COMBO_PIECES: "you win the game" + deterministic patterns
+   - STACK_INTERACTION: "counter target" + "copy target" + "can't be countered"
+   - RESILIENCE: "prevent all damage" + "protection from" + fog patterns
+2. No quality gate, verificar se o swap remove a ultima carta de um eixo (count_before=1, count_after=0) → WARNING
+3. Nao precisa bloquear — apenas adicionar `droppedReasons` com "⚠️ Este swap remove a ultima carta do eixo Stack Interaction (score atual: 5/10)"
+4. A Critic IA usa esse warning para tomar decisao final
 
 **Validacao:**
 ```bash
@@ -122,27 +101,47 @@ dart test test/optimization_quality_gate_test.dart
 
 ---
 
-### [P3] THEMES.md 19 temas nao validados vs EDHREC
+### [P3] MDFC duplicate detection ausente do deck validation
 
-**Conhecimento MTG:** O THEMES.md contem 27 temas, dos quais apenas ~8 foram validados contra dados reais de EDHREC. Os seguintes temas estao marcados como "NAO VALIDADO": Spellslinger, Graveyard, Tokens, +1/+1 Counters, Voltron, Blink/Flicker, Wheels, Reanimator, Mill, Zombies, Knights, Merfolk, Humans, Stax/Prison, Combo (Proactive), Group Slug, Superfriends, Cascade.
+**Conhecimento MTG:** O VALIDATOR_LOG v3.20 descobriu que o deck Lorehold tem DUAS linhas no DB para a mesma carta fisica MDFC (Modal Double-Faced Card): `Valakut Awakening` (id=653, tag=draw) e `Valakut Awakening // Valakut Stoneforge` (id=350, tag=land). O `SUM(quantity)=100` conta a MESMA carta duas vezes. O deck real tem 99 cartas fisicas. Este e um problema recorrente documentado no skill `manaloom-commander-knowledge` (pitfall MDFC).
 
 **Evidencia no codigo:**
-- `docs/hermes-analysis/manaloom-knowledge/THEMES.md` — 19 temas marcados "NAO VALIDADO"
-- `server/lib/ai/theme_contextual_rules_service.dart` — Le theme_contextual_rules do PostgreSQL que alimenta o quality gate
+- `server/lib/ai/optimization_validator.dart` — O validator verifica total cards, lands, e singleton, mas NAO detecta MDFC duplicados
+- `server/lib/deck_rules_service.dart` — Validacao de deck (commander, singleton, color identity) sem MDFC awareness
+- Nenhum arquivo em `server/lib/` referencia "MDFC" ou "double-faced" ou "//"
 
-**Gap:** Os theme_contextual_rules no PostgreSQL contem ranges nao-validados para 19/27 temas. O quality gate compara decks contra ranges potencialmente errados.
+**Gap:** O sistema de validacao de deck nao reconhece que `Card Name` e `Card Name // Card Name` representam a MESMA carta fisica. Isso infla contagens (total cards, draw_count, land_count) e mascara a contagem real.
+
+**Impacto:**
+1. Deck reporta 100 cartas mas tem 99 fisicas — singleton check e misleading
+2. draw_count inflado em +1 (Valakut Awakening front-face conta como draw)
+3. O problema afeta QUALQUER deck com MDFC — nao e exclusivo do Lorehold
+4. Agentes downstream (Scout, Evolution Oracle) operam com metricas infladas
 
 **Acao recomendada:**
-1. Priorizar validacao de Spellslinger (archetype do Lorehold, deck ativo no pipeline)
-2. Reanimator e Graveyard sao os mais comuns na comunidade EDH — segunda prioridade
-3. Para cada tema: extrair metricas de EDHREC avg deck + commander profiles, comparar com THEMES.md
-4. Atualizar theme_contextual_rules no PostgreSQL com ranges corrigidos
+1. Adicionar funcao `_deduplicateMdfcCards(List<Map<String, dynamic>> cards)` que detecta pares `Name` + `Name // BackFace` e remove a linha front-face-only
+2. Integrar no fluxo de importacao de deck (antes de INSERT) e no validator
+3. Heuristica: se existe `card_name LIKE '% // %'` e tambem existe `card_name = substring before ' //'`, o front-face-only e duplicado
+4. Manter a linha MDFC completa (com `//`) que tem tag mais abrangente
 
-**Validacao:** Validacao manual contra EDHREC live data.
+**Validacao:**
+```bash
+cd server
+dart analyze lib/deck_rules_service.dart lib/ai/optimization_validator.dart
+dart test test/deck_rules_service_test.dart
+```
 
 ---
 
 ## Tasks Ja Ativos (mantidos de sintese anterior)
+
+### [P1] GoldfishSimulator nao calcula "Sem Play T3" — metrica critica ausente
+
+**Evidencia no codigo:**
+- `server/lib/ai/goldfish_simulator.dart:28-40` — GoldfishResult tem turn1PlayRate..turn4PlayRate mas NAO tem noPlayTurn3Rate
+- `server/lib/ai/goldfish_simulator.dart:158-191` — Loop de simulacao conta turn1Plays..turn4Plays mas nao verifica CMC maximo jogavel acumulado ate T3
+
+**Acao:** Adicionar `noPlayT3Rate` ao GoldfishResult. Rastrear: `minCastableCmc = min(nonland_cmc)`, verificar `minCastableCmc <= min(landsPlayed, 3)`. Expor no JSON.
 
 ### [P1] Weakness-analysis usa heuristicas legacy — sem adapter F1
 
@@ -150,38 +149,54 @@ dart test test/optimization_quality_gate_test.dart
 - `server/routes/ai/weakness-analysis/index.dart:114-170` — Conta ramp/draw/removal/wipes por oracle_text local
 - `server/routes/ai/weakness-analysis/index.dart:380-430` — Recomendacoes sao listas fixas de nomes
 
-**Acao:** Refatorar para usar resolveCardFunctionalRoles() + queries em card_function_tags
+**Acao:** Refatorar para usar `resolveCardFunctionalRoles()` + queries em `card_function_tags`.
 
 ### [P1] Wincon detection fragil — battle_analyst + weakness-analysis
 
 **Evidencia no codigo:**
-- `server/lib/ai/optimization_quality_gate.dart:346-353` — _criticalRolesForArchetype() NAO inclui wincon
+- `server/lib/ai/optimization_quality_gate.dart:346-353` — `_criticalRolesForArchetype()` NAO inclui wincon
 - `server/routes/ai/weakness-analysis/index.dart:400-420` — Patterns fixos
 
-**Acao:** Adicionar wincon aos roles criticos; refatorar para usar adapter F1
+**Acao:** Adicionar wincon aos roles criticos; refatorar para usar adapter F1.
+
+### [P2] Double-null cards invisiveis ao classificador — risco de swap auto
+
+**Evidencia no codigo:**
+- `server/lib/ai/optimization_functional_roles.dart:55-125` — `classifyOptimizationFunctionalRole()` retorna artifact/enchantment/utility para Scroll Rack, Penance, etc.
+- `server/lib/ai/functional_card_tags.dart` — Multi-tag classifier tambem falha
+
+**Update 2026-06-01:** Commit `6af73d87` (P1-f) carrega `card_function_tags` nas queries SQL do optimize — isso REDUZ mas nao ELIMINA o problema. Cartas que ambos classificadores falham (double-null) continuam invisiveis. Verificar se as 4 double-nulls restantes (Scroll Rack, Penance, Grand Abolisher, Taunt) tem `card_function_tags` populados no PostgreSQL.
 
 ### [P2] Write-only tables — deck_matchups, deck_weakness_reports, ml_prompt_feedback
 
-**Evidencia no codigo:**
-- `server/routes/ai/simulate-matchup/index.dart:360` — INSERT em deck_matchups
-- `server/routes/ai/weakness-analysis/index.dart:374` — INSERT em deck_weakness_reports
-- `server/lib/ml_knowledge_service.dart:251` — INSERT em ml_prompt_feedback
+**Acao:** Adicionar SELECT para cache ou documentar como audit logs com retention policy.
 
-**Acao:** Adicionar SELECT para cache ou documentar como audit logs com retention policy
+### [P2] Tags ninja/stax_disruption com 0% de acuracia no SQLite
+
+**Acao:** Investigar e corrigir heuristica de classificacao ou remover tags com 0% de precisao.
+
+### [P3] Weakness-analysis wincon detection fragil (oracle text)
+
+**Acao:** Refatorar deteccao de wincon para usar adapter F1 + card_function_tags.
 
 ### [P3] manual-de-instrucao.md desatualizado
 
-**Evidencia:** Nao menciona F1, F3, bracket expansion, card_deck_profiles, payoff expansion, singleton reset (d3cfaf3b), dead code cleanup (8cab6400, 23cfc061).
+**Evidencia:** Nao menciona F1, F3, bracket expansion, card_deck_profiles, payoff expansion, singleton reset (d3cfaf3b), dead code cleanup (8cab6400, 23cfc061), semantic drift fix (6af73d87).
 
 **Acao:** Atualizar com todos os commits desde a ultima atualizacao.
+
+### [P3] THEMES.md 19 temas nao validados vs EDHREC
+
+**Acao:** Validar temas prioritarios (Spellslinger, Reanimator, Graveyard) contra EDHREC live data.
 
 ---
 
 ## Tasks Resolvidos (referencia historica)
 
-| Task | Commit |
-|:-----|:-------|
-| BracketCategory enum (boardWipe, cardAdvantage, stax, protection, valueEngine) | ae886b11 |
-| card_deck_profiles integration | d8b7b26b |
-| _looksLikePayoff damage payoffs | 3fb17356 |
-| CONTEXTO_PRODUTO_ATUAL.md update | 7ed5b863 |
+| Task | Commit | Data |
+|:-----|:-------|:-----|
+| BracketCategory enum (boardWipe, cardAdvantage, stax, protection, valueEngine) | ae886b11 | 2026-05-31 |
+| card_deck_profiles integration | d8b7b26b | 2026-05-31 |
+| _looksLikePayoff damage payoffs | 3fb17356 | 2026-05-31 |
+| CONTEXTO_PRODUTO_ATUAL.md update | 7ed5b863 | 2026-05-31 |
+| optimize_request_support semantic drift fix (card_function_tags) | **6af73d87** | 2026-05-31 |
