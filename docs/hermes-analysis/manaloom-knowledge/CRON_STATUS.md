@@ -171,55 +171,55 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
-> Última atualização: **2026-05-30T14:42Z**
+> Última atualização: **2026-06-01T14:45:01Z**
+> Relatório completo: `TAG_ACCURACY_REPORT.md`
 
 ### Resumo Geral
 
 | Métrica | Valor |
 |:--------|:-----:|
-| **Precisão total** | **83.3%** (378/454 classificações corretas) |
-| Tags avaliadas | 29 |
-| Tags com 100% | 14 |
-| Tags com < 50% | 7 |
+| **Tags no sistema** | 22 |
+| **Tags com 100% de precisão** | 15 (68%) |
+| **Tags abaixo de 85%** | 7 (32%) |
+| **Pior precisão** | payoff (35.5%) |
+| **Cartas double-null** | 29 (7.4% das não-terreno) |
+| **Divergência single vs multi tag** | 84 cartas (21.5%) |
+| **Cartas sem multi-tags** | 77 (19.7%) |
+| **fp/fn tracking** | NÃO implementado (colunas zeradas) |
 
-### Tags com Precisão 100% (14)
+### Tags com Precisão 100% (15)
 
-`land` (87/87), `ramp` (53/53), `draw` (32/32), `removal` (30/30), `tutor` (6/6), `board_wipe` (3/3), `recursion` (3/3), `wipe` (1/1), `sacrifice_outlet` (1/1), `finisher` (2/2), `utility` (76/76), `creature` (22/22), `planeswalker` (2/2), `artifact` (2/2), `enchantment` (3/3)
+`ramp` (53/53), `draw` (32/32), `removal` (30/30), `land` (87/87), `utility` (76/76), `creature` (22/22), `tutor` (6/6), `board_wipe` (3/3), `recursion` (3/3), `enchantment` (3/3), `finisher` (2/2), `planeswalker` (2/2), `artifact` (2/2), `sacrifice_outlet` (1/1), `wipe` (1/1)
 
-### Tags com Precisão < 50% (7)
+### Tags com Precisão < 85% (7)
 
 | Tag | Precisão | Amostra | Problema |
 |:----|:--------:|:-------:|:---------|
-| `ninja` | 0.0% | 17/17 erradas | Tag muito específica -- classificador não reconhece ninja como função |
-| `ramp + combo_piece` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `recursion + wincon` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `ramp + payoff` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `payoff + removal` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `payoff + token_maker` | 0.0% | 1/1 errada | Tag composta rara -- amostra insuficiente |
-| `stax_disruption` | 0.0% | 3/3 erradas | Classificador não possui categoria stax |
+| `payoff` | 35.5% | 11/31 | Heurística captura só `whenever + create token` e `whenever you cast + copy` |
+| `combo_piece` | 50.0% | 1/2 | Amostra minúscula — heurística captura só counter removal + search/cast sem pagar |
+| `enabler` | 50.0% | 21/42 | Heurística captura só cost reduction — ignora Altars, haste, extra land drops |
+| `other` | 50.0% | 1/2 | Amostra minúscula — tag genérica sem critério claro |
+| `protection` | 69.2% | 9/13 | Não captura counterspells como proteção (Fierce Guardianship, Force of Will) |
+| `wincon` | 75.0% | 6/8 | Heurística captura "you win the game" literal — ignora Triumph, Craterhoof, Torment |
+| `engine` | 75.0% | 6/8 | Heurística exige "you may" opcional — ignora Rhystic, Smothering Tithe |
 
-### Tags com Precisão 50-75% (8)
+### Novas Descobertas (v2 — 2026-06-01)
 
-| Tag | Precisão | Amostra |
-|:----|:--------:|:-------:|
-| `payoff` | 35.5% | 11/31 |
-| `combo_piece` | 50.0% | 1/2 |
-| `enabler` | 50.0% | 21/42 |
-| `other` | 50.0% | 1/2 |
-| `protection` | 69.2% | 9/13 |
-| `wincon` | 75.0% | 6/8 |
-| `engine` | 75.0% | 6/8 |
+1. **29 Double-Null Cards (7.4%):** Cartas invisíveis a AMBOS os classificadores. Ex: Scroll Rack, Lim-Dûl's Vault, Grand Abolisher. Qualquer swap que remova um double-null pode ser destrutivo.
+2. **Divergência single vs multi tag (21.5%):** 84 cartas onde `functional_tag` ≠ `card_tags`. O Evolution Oracle usa `functional_tag` para métricas — classificação errada distorce thresholds.
+3. **77 cartas sem multi-tags (19.7%):** Oracle text ausente ou insuficiente. O classificador só funciona com oracle text completo.
+4. **fp/fn tracking zerado:** As colunas `false_positive` e `false_negative` do `tag_accuracy` nunca foram populadas. Só existe contagem agregada, sem rastreamento granular de erros.
 
-### Análise
+### Recomendações de Código
 
-**Pontos fortes:** Tags estruturais (`land`, `creature`, `artifact`, `enchantments`) e funções primárias (`ramp`, `draw`, `removal`, `tutor`) têm precisão perfeita.
+| Prioridade | Ação | Arquivo |
+|:----------:|:-----|:--------|
+| 🔴 | Ampliar heurísticas `_looksLike*` para payoff/enabler/engine/wincon | `server/lib/ai/optimization_functional_roles.dart` (L370-398) |
+| 🔴 | Adicionar `_looksLike*` ao Python `classify_card()` (hoje as omite) | `scripts/scryfall_classifier.py` (L155-221) |
+| 🟡 | Unificar single-tag com multi-tag como fallback | `optimization_functional_roles.dart` + `functional_card_tags.dart` |
+| 🟡 | Implementar tabela `tag_errors` para rastreamento granular de fp/fn | `scripts/knowledge_db.py` (L429-439) |
+| 🟢 | Preencher oracle text faltante (bulk fetch Scryfall) | `card_oracle_data` (453 rows; deck_cards tem mais) |
 
-**Pontos fracos:**
-1. **Tags compostas** têm amostra mínima (1 caso cada) e 0% de precisão
-2. **`stax_disruption` (0/3):** Classificador não possui categoria dedicada para stax
-3. **`ninja` (0/17):** Tag muito específica de tribo -- classificador funcional não captura tribos
-4. **`payoff` (35.5%):** Tag ambígua -- classificador confunde payoff com wincon ou engine
-5. **`enabler` (50.0%):** Fronteira difícil -- distinção entre enabler e engine é sutil |
 
 ---
 
