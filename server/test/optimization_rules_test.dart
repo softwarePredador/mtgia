@@ -2,6 +2,7 @@ import 'package:test/test.dart';
 
 import '../lib/color_identity.dart';
 import '../lib/ai/optimization_validator.dart';
+import '../lib/deck_rules_service.dart';
 
 /// Testes das regras de Magic: The Gathering aplicadas ao sistema de otimização.
 ///
@@ -60,8 +61,7 @@ String? _validateCommanderDeckSize(List<Map<String, dynamic>> cards,
 }
 
 /// Verifica se o balance de remoções/adições está correto (igual)
-bool _isOptimizationBalanced(
-        List<String> removals, List<String> additions) =>
+bool _isOptimizationBalanced(List<String> removals, List<String> additions) =>
     removals.length == additions.length;
 
 /// Gera N cartas com data fields mínimos
@@ -84,7 +84,8 @@ List<Map<String, dynamic>> _makeCards(int count,
           });
 }
 
-List<Map<String, dynamic>> _makeBasicLands(int count, {String name = 'Island'}) {
+List<Map<String, dynamic>> _makeBasicLands(int count,
+    {String name = 'Island'}) {
   return List.generate(
       count,
       (i) => {
@@ -128,7 +129,8 @@ void main() {
         expect(msg!.toLowerCase(), contains('100'));
       });
 
-      test('TC003: Deck com 101 cartas deve falhar validação (não-estrita)', () {
+      test('TC003: Deck com 101 cartas deve falhar validação (não-estrita)',
+          () {
         final cards = _makeCards(100, quantity: 1)
           ..add({'name': 'Commander', 'quantity': 1, 'is_commander': true});
         // total = 101
@@ -137,7 +139,9 @@ void main() {
         expect(msg!.toLowerCase(), contains('exceder'));
       });
 
-      test('TC004: Otimização deve manter balance — removals.length == additions.length', () {
+      test(
+          'TC004: Otimização deve manter balance — removals.length == additions.length',
+          () {
         final removals = ['Card A', 'Card B', 'Card C'];
         final additions = ['New A', 'New B', 'New C'];
         expect(_isOptimizationBalanced(removals, additions), isTrue);
@@ -185,9 +189,9 @@ void main() {
         expect(_isBasicLandName('snow-covered forest'), isTrue);
       });
 
-      test('TC011: Snow-Covered Island é tratado como básico pelo type_line', () {
-        expect(
-            _isBasicLandTypeLine('Basic Snow Land — Island'), isTrue);
+      test('TC011: Snow-Covered Island é tratado como básico pelo type_line',
+          () {
+        expect(_isBasicLandTypeLine('Basic Snow Land — Island'), isTrue);
         expect(_isBasicLandTypeLine('basic snow land — forest'), isTrue);
       });
 
@@ -200,6 +204,23 @@ void main() {
         expect(_isBasicLandTypeLine('Land — Forest Plains'), isFalse);
         expect(_isBasicLandTypeLine('Legendary Land'), isFalse);
         expect(_isBasicLandName('Command Tower'), isFalse);
+      });
+
+      test('TC013b: MDFC/split front face shares the same physical copy key',
+          () {
+        expect(
+          normalizePhysicalCardCopyName(
+              'Valakut Awakening // Valakut Stoneforge'),
+          equals('valakut awakening'),
+        );
+        expect(
+          normalizePhysicalCardCopyName('Valakut Awakening'),
+          equals('valakut awakening'),
+        );
+        expect(
+          normalizePhysicalCardCopyName('  Fire  //  Ice  '),
+          equals('fire'),
+        );
       });
     });
 
@@ -286,9 +307,15 @@ void main() {
         // Simula filtro de identidade de cor
         final commanderIdentity = normalizeColorIdentity(['U']);
         final proposedAdditions = [
-          {'name': 'Lightning Bolt', 'color_identity': ['R']},
+          {
+            'name': 'Lightning Bolt',
+            'color_identity': ['R']
+          },
           {'name': 'Sol Ring', 'color_identity': <String>[]},
-          {'name': 'Counterspell', 'color_identity': ['U']},
+          {
+            'name': 'Counterspell',
+            'color_identity': ['U']
+          },
         ];
         final allowed = proposedAdditions.where((c) {
           final identity = (c['color_identity'] as List).cast<String>();
@@ -299,8 +326,7 @@ void main() {
         }).toList();
 
         expect(allowed.length, equals(2)); // Sol Ring + Counterspell
-        expect(
-            allowed.any((c) => c['name'] == 'Lightning Bolt'), isFalse);
+        expect(allowed.any((c) => c['name'] == 'Lightning Bolt'), isFalse);
       });
     });
 
@@ -336,16 +362,21 @@ void main() {
       });
 
       test('TC024: Partner genérico permite dois commanders', () {
-        const oracle1 = 'Partner\n(You can have two commanders if both have partner.)';
-        const oracle2 = 'Partner\n(You can have two commanders if both have partner.)';
-        final hasPartner1 = RegExp(r'\bpartner\b').hasMatch(oracle1.toLowerCase());
-        final hasPartner2 = RegExp(r'\bpartner\b').hasMatch(oracle2.toLowerCase());
+        const oracle1 =
+            'Partner\n(You can have two commanders if both have partner.)';
+        const oracle2 =
+            'Partner\n(You can have two commanders if both have partner.)';
+        final hasPartner1 =
+            RegExp(r'\bpartner\b').hasMatch(oracle1.toLowerCase());
+        final hasPartner2 =
+            RegExp(r'\bpartner\b').hasMatch(oracle2.toLowerCase());
         expect(hasPartner1 && hasPartner2, isTrue);
       });
 
       test('TC025: "Partner with" sem o par correto é inválido', () {
         const oracle1 = 'Partner with Tana, the Bloodsower';
-        final match = RegExp(r'partner with ([^(]+)').firstMatch(oracle1.toLowerCase());
+        final match =
+            RegExp(r'partner with ([^(]+)').firstMatch(oracle1.toLowerCase());
         final partnerName = match?.group(1)?.trim();
         expect(partnerName, equals('tana, the bloodsower'));
         // Verifica que cmd2 NÃO é o par correto (caso inválido)
@@ -356,9 +387,12 @@ void main() {
         expect(cmd2NameCorrect.toLowerCase().contains(partnerName), isTrue);
       });
 
-      test('TC026: "Friends forever" permite dois commanders do Doctor Who', () {
-        const oracle1 = 'Friends forever\n(You can have two commanders if both have friends forever.)';
-        const oracle2 = 'Friends forever\n(You can have two commanders if both have friends forever.)';
+      test('TC026: "Friends forever" permite dois commanders do Doctor Who',
+          () {
+        const oracle1 =
+            'Friends forever\n(You can have two commanders if both have friends forever.)';
+        const oracle2 =
+            'Friends forever\n(You can have two commanders if both have friends forever.)';
         expect(oracle1.toLowerCase().contains('friends forever'), isTrue);
         expect(oracle2.toLowerCase().contains('friends forever'), isTrue);
       });
@@ -400,13 +434,15 @@ void main() {
   group('Brawl Format Rules', () {
     test('TC031: Deck com exatamente 60 cartas é válido (strict)', () {
       final cards = _makeCards(60, quantity: 1);
-      final total = cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+      final total =
+          cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
       expect(total, equals(60));
     });
 
     test('TC032: Deck com 61 cartas viola máximo', () {
       final cards = _makeCards(61, quantity: 1);
-      final total = cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+      final total =
+          cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
       expect(total > 60, isTrue);
     });
 
@@ -471,7 +507,8 @@ void main() {
       const status = 'restricted';
       const quantity = 1;
       final valid = !(status == 'restricted' && quantity > 1);
-      expect(valid, isTrue, reason: '$name deve ser permitido com 1 cópia (restricted)');
+      expect(valid, isTrue,
+          reason: '$name deve ser permitido com 1 cópia (restricted)');
     });
   });
 
@@ -488,7 +525,8 @@ void main() {
     // Testa _classifyFunctionalRole indiretamente via validate()
     // (usando decks sintéticos onde as trocas são conhecidas)
 
-    test('TC042: rolePreserved=true quando troca removal por removal', () async {
+    test('TC042: rolePreserved=true quando troca removal por removal',
+        () async {
       // Remoção → Remoção: papel preservado
       final original = [
         {
@@ -508,7 +546,8 @@ void main() {
           'name': 'Swan Song',
           'type_line': 'Instant',
           'mana_cost': '{U}',
-          'oracle_text': 'Counter target enchantment, instant, or sorcery spell.',
+          'oracle_text':
+              'Counter target enchantment, instant, or sorcery spell.',
           'cmc': 1,
           'quantity': 1,
           'colors': ['U'],
@@ -533,7 +572,8 @@ void main() {
       expect(swap.verdict, equals('upgrade')); // CMC menor = upgrade
     });
 
-    test('TC043: rolePreserved=false quando troca removal por ramp (bug fix)', () async {
+    test('TC043: rolePreserved=false quando troca removal por ramp (bug fix)',
+        () async {
       // Este teste verifica o bug corrigido:
       // Antes: qualquer carta 'utility' tornava rolePreserved=true
       // Depois: apenas quando ambos têm a MESMA role ou ambos são 'utility'
@@ -583,7 +623,8 @@ void main() {
       expect(['tradeoff', 'questionável'], contains(swap.verdict));
     });
 
-    test('TC044: Damage removal (Lightning Bolt) classificado como removal', () async {
+    test('TC044: Damage removal (Lightning Bolt) classificado como removal',
+        () async {
       // Lightning Bolt agora deve ser 'removal' (fix aplicado)
       final original = [
         {
@@ -623,7 +664,8 @@ void main() {
 
       final swap = report.functional.swaps.first;
       expect(swap.removedRole, equals('removal'),
-          reason: 'Lightning Bolt deve ser classificado como removal (damage-based)');
+          reason:
+              'Lightning Bolt deve ser classificado como removal (damage-based)');
       expect(swap.addedRole, equals('removal'),
           reason: 'Shock deve ser classificado como removal (damage-based)');
       expect(swap.rolePreserved, isTrue);
@@ -684,7 +726,8 @@ void main() {
           'name': 'Brainstorm',
           'type_line': 'Instant',
           'mana_cost': '{U}',
-          'oracle_text': 'Draw 3 cards, then put 2 cards from your hand on top of your library.',
+          'oracle_text':
+              'Draw 3 cards, then put 2 cards from your hand on top of your library.',
           'cmc': 1,
           'quantity': 1,
           'colors': ['U'],
@@ -697,7 +740,8 @@ void main() {
           'name': 'Ponder',
           'type_line': 'Sorcery',
           'mana_cost': '{U}',
-          'oracle_text': 'Look at the top 3 cards of your library, then put them back in any order.',
+          'oracle_text':
+              'Look at the top 3 cards of your library, then put them back in any order.',
           'cmc': 1,
           'quantity': 1,
           'colors': ['U'],
@@ -722,13 +766,15 @@ void main() {
       expect(swap.rolePreserved, isTrue);
     });
 
-    test('TC047: Tutor classificado corretamente e rastreado no roleDelta', () async {
+    test('TC047: Tutor classificado corretamente e rastreado no roleDelta',
+        () async {
       final original = [
         {
           'name': 'Demonic Tutor',
           'type_line': 'Sorcery',
           'mana_cost': '{1}{B}',
-          'oracle_text': 'Search your library for a card and put that card into your hand.',
+          'oracle_text':
+              'Search your library for a card and put that card into your hand.',
           'cmc': 2,
           'quantity': 1,
           'colors': ['B'],
@@ -791,7 +837,8 @@ void main() {
           'name': 'Arcane Signet',
           'type_line': 'Artifact',
           'mana_cost': '{2}',
-          'oracle_text': '{T}: Add one mana of any color in your commander\'s color identity.',
+          'oracle_text':
+              '{T}: Add one mana of any color in your commander\'s color identity.',
           'cmc': 2,
           'quantity': 1,
           'colors': <String>[],
@@ -815,7 +862,8 @@ void main() {
       expect(swap.rolePreserved, isTrue);
     });
 
-    test('TC049: Report JSON é serializável e tem campos obrigatórios', () async {
+    test('TC049: Report JSON é serializável e tem campos obrigatórios',
+        () async {
       final deck = [
         ..._makeBasicLands(36),
         ..._makeCards(64, typeLine: 'Instant', manaCost: '{3}'),
@@ -840,7 +888,8 @@ void main() {
       expect(json.containsKey('critic_ai'), isFalse);
     });
 
-    test('TC050: roleDelta inclui wipe, tutor e protection (novos campos)', () async {
+    test('TC050: roleDelta inclui wipe, tutor e protection (novos campos)',
+        () async {
       final deck = [
         ..._makeBasicLands(36),
         ..._makeCards(64, typeLine: 'Instant', manaCost: '{3}'),
@@ -893,7 +942,8 @@ void main() {
       expect(report.score, lessThanOrEqualTo(70));
     });
 
-    test('TC052: Deck mais consistente pós-otimização deve ter score maior', () async {
+    test('TC052: Deck mais consistente pós-otimização deve ter score maior',
+        () async {
       final validator = OptimizationValidator();
       // Deck original: poucas terras (ruim)
       final originalDeck = [
@@ -921,4 +971,3 @@ void main() {
     });
   });
 }
-

@@ -3,6 +3,17 @@ import 'package:postgres/postgres.dart';
 import 'basic_land_utils.dart' as basic_lands;
 import 'color_identity.dart';
 
+/// Normaliza nomes para regra de cópia física.
+///
+/// Cartas split/MDFC podem chegar como nome completo ("Face A // Face B") ou
+/// só pela face frontal ("Face A"). Para limite de cópias, ambas representam a
+/// mesma carta física e precisam compartilhar a mesma chave.
+String normalizePhysicalCardCopyName(String name) {
+  final collapsed = name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  final splitParts = collapsed.split(RegExp(r'\s*//\s*'));
+  return splitParts.first.trim();
+}
+
 class DeckRulesService {
   DeckRulesService(this._session);
 
@@ -22,8 +33,9 @@ class DeckRulesService {
     final cardsData = await _loadCardsData(cardIds);
     final legalities = await _loadLegalities(cardIds, normalizedFormat);
 
-    // Regras gerais: limite de cópias por NOME (para suportar múltiplas edições)
-    final copiesByName = <String, Map<String, dynamic>>{};
+    // Regras gerais: limite de cópias por carta física.
+    // Isso cobre múltiplas edições e nomes MDFC/split representados por face.
+    final copiesByName = <String, _CopyCounter>{};
     for (final item in cards) {
       final cardId = item['card_id'] as String?;
       if (cardId == null || cardId.isEmpty) continue;
@@ -41,15 +53,13 @@ class DeckRulesService {
       final isBasicLand = _isBasicLandTypeLine(typeLine);
       if (isBasicLand) continue;
 
-      final key = info.name.trim().toLowerCase();
+      final key = normalizePhysicalCardCopyName(info.name);
       final existing = copiesByName[key];
       if (existing == null) {
-        copiesByName[key] = {'name': info.name.trim(), 'qty': quantity};
+        copiesByName[key] = _CopyCounter(info.name.trim(), quantity);
       } else {
-        copiesByName[key] = {
-          'name': existing['name'] as String,
-          'qty': (existing['qty'] as int) + quantity,
-        };
+        existing.quantity += quantity;
+        existing.sourceNames.add(info.name.trim());
       }
     }
 
@@ -61,12 +71,16 @@ class DeckRulesService {
         '[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
     for (final entry in copiesByName.entries) {
       final value = entry.value;
-      final name = value['name'] as String? ?? entry.key;
-      final qty = value['qty'] as int? ?? 0;
+      final name = value.displayName;
+      final qty = value.quantity;
       print('[DEBUG]   "$name" = $qty cópias (commander ignorado)');
       if (qty > limit) {
+        final hasMultipleNames = value.sourceNames.length > 1;
+        final sourceNames = value.sourceNames.join('" / "');
         throw DeckRulesException(
-          'Regra violada: "$name" excede o limite de $limit cópia(s) para o formato $normalizedFormat.',
+          hasMultipleNames
+              ? 'Regra violada: "$sourceNames" contam como a mesma carta física e excedem o limite de $limit cópia(s) para o formato $normalizedFormat.'
+              : 'Regra violada: "$name" excede o limite de $limit cópia(s) para o formato $normalizedFormat.',
           cardName: name,
         );
       }
@@ -240,7 +254,7 @@ class DeckRulesService {
         );
       }
 
-      commanderNameSet.add(info.name.trim().toLowerCase());
+      commanderNameSet.add(normalizePhysicalCardCopyName(info.name));
       commanderIdentitySet.addAll(_resolvedIdentity(info));
     }
 
@@ -252,7 +266,7 @@ class DeckRulesService {
       final isCommander = item['is_commander'] as bool? ?? false;
 
       if (!isCommander &&
-          commanderNameSet.contains(info.name.trim().toLowerCase())) {
+          commanderNameSet.contains(normalizePhysicalCardCopyName(info.name))) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" já está selecionada como comandante e não pode entrar no deck principal.',
           cardName: info.name,
@@ -477,6 +491,16 @@ class DeckRulesException implements Exception {
   final String? cardName;
   @override
   String toString() => message;
+}
+
+class _CopyCounter {
+  _CopyCounter(String displayName, this.quantity)
+      : displayName = displayName,
+        sourceNames = {displayName};
+
+  final String displayName;
+  int quantity;
+  final Set<String> sourceNames;
 }
 
 class _CardData {

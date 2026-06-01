@@ -624,6 +624,7 @@ GoldfishResult _goldfish({
     turn2PlayRate: turn2PlayRate,
     turn3PlayRate: 0.9,
     turn4PlayRate: 0.95,
+    noPlayTurn3Rate: 0.1,
     avgCmc: 3.0,
     landCount: 36,
     cmcDistribution: const {1: 10, 2: 12, 3: 8},
