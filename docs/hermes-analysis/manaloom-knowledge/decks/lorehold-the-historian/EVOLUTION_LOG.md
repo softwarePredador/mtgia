@@ -1,3 +1,89 @@
+## [2026-06-01T11:37:47+00:00] Wincon Diversity Oracle — STEALTH GAP Confirmed
+
+### Integridade do Pipeline
+
+- **DB Hash:** `30d00347764fc2a215edb4e668994871` — inalterado desde v3.19
+- **Cartas no deck:** 100 (86 rows, 35 lands)
+- **Estado:** PRE-C#23 (swaps C#23 recomendados mas NAO aplicados)
+
+### Analise de Diversidade de Wincon
+
+| Categoria | Requisito | Carta no Deck | Score | Status |
+|:----------|:----------|:--------------|:-----:|:------:|
+| **RAPIDA** | speed >= 6 | Approach of the Second Sun | speed=6 | ✅ COBERTA |
+| **RESILIENTE** | resilience >= 7 | Worldfire | res=7 | ✅ COBERTA |
+| **STEALTH** | stealth >= 7 | — nenhuma — | — | ❌ VAZIA |
+
+**Stealth gap:** O deck nao tem wincon com stealth >= 7. O mais proximo e Mizzix's Mastery (stealth=6) e Rite of the Dragoncaller (stealth=6).
+
+### Tabela de Scoring — Todos os Wincons no Deck
+
+| Carta | Speed | Res | Stealth | Total | Tag Atual | Funcao Real |
+|:------|:-----:|:---:|:-------:|:-----:|:----------|:------------|
+| Mizzix's Mastery | 4 | 6 | 6 | 16 | recursion | Wincon-enabler (flashback em massa) |
+| Rite of the Dragoncaller | 5 | 4 | 6 | 15 | spellslinger | Wincon (dragons por spell) |
+| Worldfire | 2 | 7 | 5 | 14 | wincon | Wincon (reset + kill) |
+| Apex of Power | 4 | 4 | 5 | 13 | wincon | Wincon (exile 7, cast free) |
+| Call Forth the Tempest | 4 | 3 | 5 | 12 | board_wipe | Wincon-enabler (dano + cascade) |
+| Approach of the Second Sun | 6 | 5 | 1 | 12 | wincon | Wincon (2x cast = vitória) |
+| Storm Herd | 3 | 3 | 3 | 9 | token_maker | Wincon (pegasus tokens) |
+
+### 🚨 Descoberta Critica: Twinflame e Flare of Duplication PERDIDOS
+
+Duas cartas critical para o deck foram **perdidas durante o periodo de hash-fake (C#17-C#22)**:
+
+| Carta | CMC | Adicionada em | Status Atual | Na Colecao? | Impacto |
+|:------|:---:|:-------------:|:-------------|:-----------:|:--------|
+| **Twinflame** | 2 | Ciclo #10 | ❌ FORA do deck | ✅ Sim (1x) | Combo Dualcaster+Twinflame = stealth win |
+| **Flare of Duplication** | 3 | Ciclo #10 | ❌ FORA do deck | ✅ Sim (1x) | Combo Approach+Flare = vitória mesmo turno |
+
+Ambas cartas DEVERIAM estar no deck desde Ciclo #10 (2026-05-31). O deck atual (PRE-C#23)
+foi reconstruido a partir de um estado anterior que nao as incluia. **Este e o pipeline
+integrity gap mais grave ja detectado** — cartas aplicadas em 2026-05-31 foram revertidas
+silenciosamente e nenhum agente detectou por 22+ ciclos.
+
+**Com estas duas cartas no deck:**
+- **STEALTH gap seria parcialmente coberto** pelo combo Dualcaster+Twinflame (instant-speed, 2 cartas, ninguem espera em Boros)
+- **Approach speed aumentaria** com Flare of Duplication (Approach T1 → Flare T2 copy → vitória)
+- **Copy engines subiriam de 5 → 7** (Lorehold, Double Vision, Arcane Bombardment, Mizzix's Mastery, Dawning Archaic, +Twinflame, +Flare)
+
+### Solucoes na Colecao para STEALTH Gap
+
+Alem de Twinflame e Flare (que DEVEM ser re-adicionadas), a colecao tem:
+
+| Carta | CMC | Speed | Res | Stealth | Total | Na Colecao? | Viabilidade |
+|:------|:---:|:-----:|:---:|:-------:|:-----:|:-----------:|:------------|
+| **Guttersnipe** | 3 | 5 | 2 | **8** | 15 | ✅ 1x | ⚠️ Precisa protecao |
+
+**Guttersnipe viability analysis:**
+- resilience=2 e fragil — morre pra qualquer remocao
+- MAS o deck tem **9 cartas de protecao**: Mother of Runes, Lightning Greaves, Grand Abolisher, Boros Charm, Flawless Maneuver, Teferi's Protection, Deflecting Swat, Akroma's Will, Hexing Squelcher
+- Com 30+ instants/sorceries no deck, Guttersnipe converte cada spell em 2 dano direto
+- Com copy engines: 1 spell = 3 copias (Lorehold + Double Vision + Arcane Bombardment) = 8 dano por spell
+- **Veredito:** Guttersnipe e VIABLE apesar de resilience=2 porque o deck tem a protecao necessaria. Prioridade MEDIA — abaixo de re-adicionar Twinflame e Flare.
+
+### Recomendacoes
+
+**Prioridade #1 (CRITICA): Re-adicionar Twinflame (CMC 2) e Flare of Duplication (CMC 3)**
+- Estas cartas DEVERIAM estar no deck desde Ciclo #10
+- Foram perdidas durante o hash-fake pipeline (C#17-C#22)
+- **Custo de oportunidade:** Cada ciclo que passa sem estas cartas = deck com 2 slots de filler
+- **O que cortar:** Storm Herd (CMC 10, total=9 — wincon mais fraco) e Call Forth the Tempest (CMC 8, redundante com Volcanic Vision + Blasphemous Act)
+
+**Prioridade #2 (MEDIA): Considerar Guttersnipe (CMC 3) para cobertura STEALTH completa**
+- So recomendar se a colecao tiver slots sobrando apos Prioridade #1
+- Corte candidato: Storm Herd (CMC 10, total=9) — wincon mais fraco do deck
+- Com protecao existente (Mother of Runes + Greaves), Guttersnipe sobrevive o suficiente
+
+**Nota para o Evolution Oracle:** O pipeline integrity gap que causou a perda de Twinflame e Flare
+e GRAVISSIMO. Estas cartas foram aplicadas em Ciclo #10, documentadas no EVOLUTION_LOG C#10,
+e depois REVERTIDAS silenciosamente. O hash verification (adicionado em v3.14) NAO detectou
+porque o hash fake `a440c497...` foi copiado de agente para agente sem recomputacao contra o DB.
+**O C#23 ja recomendou re-adiciona-las mas os swaps NAO FORAM APLICADOS.** Executar os swaps do C#23 IMEDIATAMENTE.
+
+---
+
+
 ## [2026-06-01T09:22:17+00:00] Oracle Wincon Diversity — Analise de Categorias & Scoring
 
 ### PASSO 0: Pipeline Integrity Check
