@@ -1,19 +1,27 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-01T16:30:00Z (Incremento: strategic functional role heuristics hardening — d470bfe0).
+> Atualizado em 2026-06-01T18:45:00Z (Incremento: Fix production route helper startup — 592443e0).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `798317af` (Harden deck rules and goldfish curve checks)
-- HEAD atual: **`d470bfe0`** (Harden strategic functional role heuristics).
+- HEAD anterior: `d470bfe0` (Harden strategic functional role heuristics)
+- HEAD atual: **`592443e0`** (Fix production route helper startup).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **indisponivel** (`/health` retornou HTTP 502 em 2026-06-01T16:30Z — outage de infraestrutura)
 
 
 ## Novos commits nesta rodada (2026-06-01)
+
+### `592443e0` — Fix production route helper startup (hotfix)
+
+- **3 arquivos**, **+16/-17 linhas**
+- **Tipo: CODE/HOTFIX** — Move helpers de `routes/ai/optimize/` para `lib/ai/` para corrigir startup de produção
+- Arquivos: `optimize_route_internal.dart`, `optimize_response_support.dart` → `lib/ai/`
+- **Avaliação Hermes**: Sem risco de regressão. Nenhum outro arquivo importava dos paths antigos. Export contract preservado via `index.dart`. Docs canônicos referenciam por nome (sem path), sem drift. Nenhum teste afetado.
+- **Verificação**: `git grep` nos paths antigos → zero referências externas. Imports internos atualizados corretamente.
 
 ### `d470bfe0` — Harden strategic functional role heuristics (atual HEAD)
 - **2 arquivos** (`optimization_functional_roles.dart`, `optimization_quality_gate_test.dart`)
