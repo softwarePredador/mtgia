@@ -155,7 +155,8 @@ def looks_like_ramp(oracle: str, type_line: str) -> bool:
 def classify_card(card_data: dict) -> str:
     """Replica classifyOptimizationFunctionalRole() do Dart.
     Returns one of: land, draw, removal, wipe, ramp, tutor, protection,
-    creature, artifact, enchantment, planeswalker, utility.
+    creature, artifact, enchantment, planeswalker, utility, or strategic roles
+    such as wincon, combo_piece, engine, payoff, and enabler.
     """
     name = card_data.get("name", "?")
     type_line = (card_data.get("type_line") or "").lower()
@@ -172,6 +173,18 @@ def classify_card(card_data: dict) -> str:
         return "land"
     if any(name_lower.startswith(b) for b in basic_lands):
         return "land"
+
+    inferred_tags = {
+        entry["tag"] for entry in infer_functional_card_tags(
+            name=name,
+            type_line=type_line,
+            oracle_text=oracle,
+            cmc=cmc,
+        )
+    }
+    primary_role = _select_primary_role(inferred_tags, type_line)
+    if primary_role:
+        return primary_role
 
     # draw
     if "draw" in oracle or "look at the top" in oracle:
@@ -451,11 +464,22 @@ def _looks_like_wincon(oracle: str) -> bool:
             "double your life total" in oracle)
 
 
+def _looks_like_wincon_for_name(oracle: str, normalized_name: str) -> bool:
+    return "thassa's oracle" in normalized_name or _looks_like_wincon(oracle)
+
+
 def _looks_like_combo_piece(oracle: str) -> bool:
     """Replica _looksLikeComboPiece() do Dart (linha 868)."""
     return ("copy target activated or triggered ability" in oracle or
             ("untap" in oracle and "add " in oracle) or
             "infinite" in oracle)
+
+
+def _looks_like_combo_piece_for_name(oracle: str, normalized_name: str) -> bool:
+    return ("isochron scepter" in normalized_name or
+            "dramatic reversal" in normalized_name or
+            "thassa's oracle" in normalized_name or
+            _looks_like_combo_piece(oracle))
 
 
 def _looks_like_engine(oracle: str) -> bool:
@@ -471,26 +495,79 @@ def _looks_like_engine(oracle: str) -> bool:
     return False
 
 
-def _looks_like_payoff(oracle: str) -> bool:
+def _looks_like_payoff(oracle: str, normalized_name: str = "") -> bool:
     """Replica _looksLikePayoff() do Dart (linha 887)."""
-    if "for each" in oracle:
+    if normalized_name == "blood artist":
         return True
-    if "whenever" in oracle and any(t in oracle for t in [
-        "creature dies", "you cast", "artifact enters",
-        "enchantment enters", "you sacrifice",
-    ]):
+    is_cost_reduction = bool(re.search(r'\bcosts?\s+\{[^}]+\}\s+less', oracle))
+    is_draw_scaling = "draw a card for each" in oracle or "draw cards equal to" in oracle
+    if "for each" in oracle and not is_cost_reduction and not is_draw_scaling:
         return True
+    payoff_patterns = [
+        "creature dies", "creature enters", "you cast", "artifact enters",
+        "enchantment enters", "you sacrifice", "create token",
+        "create a token",
+    ]
+    if "token" in oracle:
+        payoff_patterns.append("create")
+    if "whenever" in oracle and any(t in oracle for t in payoff_patterns):
+        return True
+    if "whenever" in oracle and "deals" in oracle and "damage" in oracle:
+        return any(t in oracle for t in ["each opponent", "any target", "target opponent"])
     return False
 
 
-def _looks_like_enabler(oracle: str) -> bool:
+def _looks_like_enabler(oracle: str, normalized_name: str = "") -> bool:
     """Replica _looksLikeEnabler() do Dart (linha 898)."""
-    return ("costs {" in oracle and "less to cast" in oracle or
+    return ("greaves" in normalized_name or
+            "boots" in normalized_name or
+            "costs {" in oracle and "less to cast" in oracle or
             "you may play an additional land" in oracle or
             "haste" in oracle or
             "mill" in oracle or
             "sacrifice another" in oracle or
-            "search your library" in oracle)
+            ("search your library" in oracle and not looks_like_land_search(oracle)))
+
+
+def _select_primary_role(tags: set[str], type_line: str = "") -> Optional[str]:
+    if not tags:
+        return None
+    role_map = {
+        "board_wipe": "wipe",
+        "loot": "draw",
+        "ritual": "ramp",
+        "exile_value": "draw",
+        "token_maker": "creature",
+        "aristocrat_payoff": "engine",
+        "spellslinger": "engine",
+        "artifact_synergy": "engine",
+        "enchantment_synergy": "engine",
+        "graveyard_synergy": "engine",
+        "sacrifice_outlet": "engine",
+        "lifegain": "utility",
+        "drain": "wincon",
+        "etb": "utility",
+        "blink": "protection",
+        "big_spell": "wincon",
+    }
+    for tag in [
+        "board_wipe", "wincon", "combo_piece", "engine", "payoff",
+        "draw", "removal", "ramp", "tutor", "protection", "recursion",
+        "token_maker", "enabler", "land", "creature", "artifact",
+        "enchantment", "planeswalker",
+    ]:
+        if tag in tags:
+            return role_map.get(tag, tag)
+    type_lower = type_line.lower()
+    if "creature" in type_lower:
+        return "creature"
+    if "artifact" in type_lower:
+        return "artifact"
+    if "enchantment" in type_lower:
+        return "enchantment"
+    if "planeswalker" in type_lower:
+        return "planeswalker"
+    return "utility"
 
 
 def infer_functional_card_tags(
@@ -600,19 +677,19 @@ def infer_functional_card_tags(
     if _looks_like_exile_value(oracle):
         add("exile_value", 0.84, "exile_play_or_cast_value_text")
 
-    if _looks_like_wincon(oracle):
+    if _looks_like_wincon_for_name(oracle, normalized_name):
         add("wincon", 0.78, "explicit_win_or_finisher_text")
 
-    if _looks_like_combo_piece(oracle):
+    if _looks_like_combo_piece_for_name(oracle, normalized_name):
         add("combo_piece", 0.72, "combo_pattern_text_or_known_name")
 
     if _looks_like_engine(oracle):
         add("engine", 0.70, "repeatable_value_engine_text")
 
-    if _looks_like_payoff(oracle):
+    if _looks_like_payoff(oracle, normalized_name):
         add("payoff", 0.72, "payoff_trigger_or_scaling_text")
 
-    if _looks_like_enabler(oracle):
+    if _looks_like_enabler(oracle, normalized_name):
         add("enabler", 0.70, "plan_enabler_or_setup_text")
 
     # Sort by confidence desc, then tag name asc (mirroring Dart sort)

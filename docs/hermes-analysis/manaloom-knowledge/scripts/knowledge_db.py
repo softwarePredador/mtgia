@@ -266,6 +266,18 @@ def cmd_create():
     print(f"Tables ({len(tables)}): {', '.join(tables)}")
 
 
+def _tag_accuracy_deltas(analysis):
+    """Return (correct, false_positive, false_negative) for one tag judgment."""
+    expected = (analysis.get("expected_tag") or "").strip().lower()
+    observed = (analysis.get("mana_loom_tag") or "").strip().lower()
+    tag_match = 1 if analysis.get("tag_match", 1) else 0
+    if tag_match:
+        return 1, 0, 0
+    false_positive = 1 if observed and observed != expected else 0
+    false_negative = 1 if expected and observed != expected else 0
+    return 0, false_positive, false_negative
+
+
 def cmd_stats():
     conn = get_conn()
     stats = {}
@@ -428,15 +440,24 @@ def cmd_insert_deck():
 
             expected = analysis.get("expected_tag")
             if expected:
-                tag_match = 1 if analysis.get("tag_match", 1) else 0
+                tag_match, false_positive, false_negative = _tag_accuracy_deltas(analysis)
                 conn.execute("""
-                    INSERT INTO tag_accuracy (tag_name, correct_count, total_count, last_updated)
-                    VALUES (?, ?, 1, ?)
+                    INSERT INTO tag_accuracy (
+                        tag_name, correct_count, total_count,
+                        false_positive, false_negative, last_updated
+                    )
+                    VALUES (?, ?, 1, ?, ?, ?)
                     ON CONFLICT(tag_name) DO UPDATE SET
                         correct_count = correct_count + ?,
                         total_count = total_count + 1,
+                        false_positive = false_positive + ?,
+                        false_negative = false_negative + ?,
                         last_updated = excluded.last_updated
-                """, (expected, tag_match, now, tag_match))
+                """, (
+                    expected.strip().lower(), tag_match, false_positive,
+                    false_negative, now, tag_match, false_positive,
+                    false_negative,
+                ))
 
     for insight in data.get("insights", []):
         conn.execute("""
