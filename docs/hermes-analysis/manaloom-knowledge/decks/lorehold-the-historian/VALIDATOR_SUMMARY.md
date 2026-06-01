@@ -1,72 +1,73 @@
-# Lorehold Spellslinger — Resumo Executivo
+# Lorehold Spellslinger — Executive Summary (v3.19 + C#23)
 
-> **Atualizado:** 2026-06-01T02:15:55+00:00 (Evolution Oracle Ciclo #17)
-> **Fonte:** knowledge.db deck_id=6 — DB REAL (pos-C#17)
-> **Estado:** BOM — Draw gap corrigido, pior carta removida, Ashling engine adicionada
+> **Data:** 2026-06-01T08:23Z | **Hash:** `30d00347764fc2a215edb4e668994871`
+> **Status:** 🚨 DECK MUDOU desde v3.17. Pipeline integrity quebrado por 5 ciclos.
+> **Ciclo atual:** C#23 — 2 SWAPS DEFENSIVOS RECOMENDADOS
 
-## Metricas Principais (pos-C#17)
+## PG Reference Profile Comparison
 
-| Metrica | Valor | Perfil | Status |
-|:--------|:-----:|:------:|:------:|
-| Lands | 35 | 36-38 | OK (MDFCs compensam) |
-| Ramp | 14 | 10-13 | +1 |
-| **Draw (DB-tagged)** | **8** | **8-12** | **✅ CORRIGIDO (+2 vs pre-C#17)** |
-| Removal | 6 | 4-6 | OK |
-| Board Wipe | 4 | 3-5 | OK |
-| Protection | 4+2 | 3-4 | OK |
-| Recursion | 4 | 2-5 | OK |
-| Wincon | 7+ paths | 4+ | EXCELENTE |
-| Copy Engines | 6 | -- | EXCELENTE |
-| **CMC medio** | **3.61** | ~4.1 | **MELHOROU (-0.14)** |
+| PG Role | Ideal | Actual | Diff | Status |
+|:--------|:-----:|:------:|:----:|:------:|
+| lands | 32.00 | 35.0 | +3.0 | 🟡 |
+| ramp | 3.67 | 7.0 | +3.3 | 🟡 |
+| ritual_treasure | 10.00 | 12.0 | +2.0 | 🟡 |
+| big_spell_payoff | 7.67 | 17.0 | +9.3 | 🟡 |
+| miracle_topdeck | 4.33 | 7.0 | +2.7 | 🟡 |
+| interaction | 5.33 | 9.0 | +3.7 | 🟡 |
+| protection | 3.67 | 8.0 | +4.3 | 🟡 |
+| draw_value | 2.67 | 8.0 | +5.3 | 🟡 |
+| **tutor** | **3.67** | **2.0** | **-1.7** | **🔴 UNICO GAP** |
+| win_condition | 1.33 | 5.0 | +3.7 | 🟡 |
+| board_wipe | 2.00 | 5.0 | +3.0 | 🟡 |
+| recursion | 3.33 | 3.0 | -0.3 | ✅ |
+| exile_value | 3.67 | 2.0 | -1.7 | 🟡 |
+| spellslinger | 3.67 | 7.0 | +3.3 | 🟡 |
 
-## Health Indicators (pos-C#17)
+## SYNERGY_MAP 7 Eixos
 
-| Indicador | Valor | Status |
-|:----------|:-----:|:------:|
-| Motor | 4/4 | ✅ COMPLETO |
-| **Sem Play T3** | **~10-12% (projetado)** | **🟡 PENDENTE SIMULACAO** |
-| Double-nulls | 4 (0 cortaveis) | ✅ OK |
-| **Nivel 1** | **1 (Worldfire)** | **🟡 Reduzido (Rise cortada)** |
-| SYNERGY_MAP medio | 7.9/10 | ✅ EXCELENTE |
-| Wipes/Protection ratio | 0.8:1 | ✅ EXCELENTE |
+| Eixo | Score |
+|:-----|:-----:|
+| A) Token + Pump | 7/10 |
+| B) Wipes + Protection | 8/10 |
+| C) Recursion | 7/10 |
+| D) Explosive Mana | 9/10 |
+| E) Combo Pieces | 8/10 |
+| F) Stack Interaction | 5/10 |
+| G) Resilience | 8/10 |
+| **MEDIA** | **7.4/10** |
 
-## Ciclo #17 — Swaps Aplicados (DEFENSIVO, Net DCMC = -8)
+## Mudancas vs C#17
 
-### Swap 1: Rise of the Eldrazi (CMC 10, <5% EDHREC) → Demand Answers (CMC 2, draw)
-- **DCMC = -8.** Pior carta do deck removida. Demand Answers: instant CMC 2 — draw 2 discard 1 OU sac artifact → draw 3. Preenche grave, ajuda T3.
-- Draw sobe de 6 → 7 com esta carta.
+- **8 cartas removidas:** Ashling, Austere Command, Demand Answers, Flare of Duplication, Surge to Victory, Thrill of Possibility, Twinflame, Weathered Wayfarer
+- **5 cartas adicionadas:** Dualcaster Mage, Fellwar Stone, Flawless Maneuver, Primal Amulet, Valakut Awakening
+- **Manabase refeita:** 8 fetches + utility lands (Ancient Tomb, Boseiju, Cavern, Kor Haven)
+- **T3 piorou: 11.3% → 13.3%** (Exec#13, N=1000, seed=42)
 
-### Swap 2: Longshot, Rebel Bowman (CMC 4, ping 1/turno) → Ashling, Flame Dancer (CMC 4, impulse draw + dano)
-- **DCMC = 0.** Ashling escala com 6 copy engines: 3-4 triggers/spell = 3-4 impulse draws + 6-8 dano distribuido.
-- Draw sobe de 7 → 8 com esta carta. Dentro do perfil pela primeira vez desde as mudancas nao documentadas.
+## C#23 Swaps Recomendados (DEFENSIVO, net ΔCMC = -16)
 
-## 🔴 Pipeline Integrity — Corrigido
+| # | OUT | CMC | IN | CMC | ΔCMC |
+|:-:|:-----|:---:|:----|:---:|:----:|
+| 1 | Apex of Power | 10 | Demand Answers | 2 | -8 |
+| 2 | Storm Herd | 10 | Thrill of Possibility | 2 | -8 |
+| **Total** | | | | | **-16** |
 
-O EVOLUTION_LOG C#14-C#16 operava sobre deck FANTASMA (Insurrection, Wedding Ring, Fated Clash). O DB real ja continha Worldfire, Rise of the Eldrazi, Mother of Runes desde mudancas do usuario nao documentadas. O VALIDATOR v3.14 descobriu a discrepancia. C#17 e o primeiro ciclo a operar sobre o DB REAL verificado.
+**T3 projetado pos-C#23: ~9-10%** (BALANCED).
 
-**Hash detection implementado:**
-- Card hash pre-mudancas nao documentadas: `84bc87988d4ba64919f68b565f46482b`
-- Card hash pos-C#17: `a440c497da4280d6769238737062b3dd`
+## Gaps Prioritarios
 
-## Top 3 GAPS (pos-C#17)
+1. **🔴 tutor -1.7** — Aquisicao: Idyllic Tutor ($15-20). Unico gap real.
+2. **🟡 exile_value -1.7** — Capstone + Dance cobrem. Monitorar.
+3. **🟡 stack interaction 5/10** — Flare perdida. Dualcaster ajuda.
+4. **🟢 Valakut duplicado** — Corrigir DB (2 rows MDFC).
 
-1. **T3 precisa ser re-simulado:** Mulligan Tester deve rodar com N=1000, seed=42. Net DCMC=-8 projeta T3 ~10-12%.
+## Checklist
 
-2. **Worldfire (CMC 9) anti-sinergico com recursao:** Exila cemiterio, anulando Mizzix/Bombardment/Surge. Candidato a corte no proximo ciclo. Seize the Spoils (CMC 3, draw + Treasure) na colecao como substituto.
-
-3. **Skullclamp (CMC 1, $5-8):** Prioridade #1 de aquisicao. Draw engine com token makers. Substituiria Worldfire (DCMC -8).
-
-## Historico de Ciclos
-
-| Ciclo | Swaps | Net DCMC | T3 |
-|:-----:|:-----:|:--------:|:--:|
-| #1-#10 | 25 | — | 13.3% (Exec#11) |
-| #11-#16 | 0 (Oracle) | 0 | — |
-| Nao documentado | 3 | +3 | ~13-14% (estimado) |
-| **#17** | **2** | **-8** | **~10-12% (projetado)** |
-
-**Total: 27 swaps em 11 ciclos com swaps + 6 ciclos sem swaps + 3 mudancas nao documentadas.**
-
----
-
-*Resumo atualizado por Evolution Oracle Ciclo #17 — 2026-06-01T02:15+00:00*
+| Item | Status |
+|:-----|:------:|
+| 100 cartas | ✅ |
+| 35 lands | ✅ |
+| Motor 4/4 | ✅ |
+| Copy engines 7 | ✅ |
+| **T3 Sem Play** | **13.3% → 🔴 DEFENSIVO** |
+| **Estrategia C#23** | **DEFENSIVO (2 swaps)** |
+| Pipeline Integrity | 🚨 Quebrado 5 ciclos — Corrigido C#23 |
