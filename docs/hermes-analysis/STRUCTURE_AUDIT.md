@@ -1,7 +1,167 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-01 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-01 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre modulos `server/lib` <-> `server/routes` <-> `app/lib` — revalidacao 2026-06-01 23:00 UTC
+
+Escopo desta rodada: somente coerencia entre camadas app-facing do Flutter,
+rotas Dart Frog e helpers de `server/lib`. Nao foi executada auditoria ampla de
+classes sem uso, funcoes sem chamada, imports/ciclos, tabelas PostgreSQL ou
+duplicacao fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `rg` esta disponivel neste shell local em `/opt/homebrew/bin/rg`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual nao entende contrato entre app,
+rota e helper. Ele tambem voltou a reescrever uma parte gerada do Markdown e a
+duplicar rodadas manuais antigas; essa escrita automatica foi descartada antes
+dos achados manuais abaixo. Os achados desta rodada foram derivados de leitura
+direta de codigo e `rg`.
+
+### Metodo manual focado
+
+- `rg -n "optimizeDeck|rebuildDeck|fetchOptimizationOptions|ai/optimize|ai/archetypes|ai/rebuild|optimize/jobs|deck_id|deckId" app/lib/features/decks app/lib/features/cards app/lib/core`.
+- `rg -n "loadOptimizeDeckContext|deck_id|userId|user_id|FROM decks|JOIN deck_cards|optimize/jobs|OptimizeJob|ai/archetypes|ai/rebuild" server/routes/ai server/lib/ai server/lib`.
+- `rg -n "functional_tags|semantic_tags_v2|classifyOptimizationFunctionalRole|summarizeFunctionalTagsForDeck|loadOptimizeDeckContext|card_function_tags|card_semantic_tags_v2" server/routes/decks server/routes/ai server/lib/ai app/lib/features/decks`.
+- `rg -n "weakness-analysis|simulate-matchup|ai/simulate|simulate" app/lib server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- `nl -ba` + `sed` foram usados para confirmar as linhas citadas.
+
+### Achados revalidados
+
+#### P1 — `POST /ai/optimize` continua incoerente com o contrato app-facing de deck do usuario
+
+- **Fluxo app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
+  monta payload com `deck_id`, `archetype`, `bracket`, `keep_theme` e
+  `intensity`; `:56` envia `POST /ai/optimize`.
+- **Rota:** `server/routes/ai/optimize/index.dart:401`-`:405` tenta ler
+  `userId` do contexto autenticado, mas `:549`-`:558` chama
+  `optimize_request.loadOptimizeDeckContext(...)` sem passar `userId`.
+- **Helper:** `server/lib/ai/optimize_request_support.dart:53`-`:62` nao aceita
+  `userId`; `:66`-`:72` busca `SELECT name, format FROM decks WHERE id = @id`;
+  `:107`-`:110` e `:131`-`:134` carregam cartas por `WHERE dc.deck_id = @id`.
+- **Por que e incoerente:** o app opera sobre um deck selecionado do usuario
+  autenticado, mas a rota/helper carregam o deck e as cartas sem escopo de dono.
+  O usuario autenticado que obtiver um UUID de outro deck pode potencialmente
+  disparar analise/otimizacao sobre esse deck.
+- **Controle positivo:** `POST /ai/rebuild` faz o gate correto em
+  `server/routes/ai/rebuild/index.dart:61`-`:78` com
+  `WHERE d.id = @deckId AND d.user_id = @userId` antes de carregar cartas.
+  `GET /decks/:id/analysis` tambem escopa por dono em
+  `server/routes/decks/[id]/analysis/index.dart:22`-`:26`.
+- **O que valida:** alterar `loadOptimizeDeckContext` para receber `userId` e
+  consultar `decks` com `id + user_id`, ou documentar e testar uma regra
+  explicita de deck publico/compartilhado antes de carregar cartas.
+- **O que falsifica:** teste de rota provando que um usuario autenticado recebe
+  404/403 ao chamar `/ai/optimize` com `deck_id` de outro usuario.
+
+#### P1 — `POST /ai/archetypes` e chamado pelo app, mas a rota ignora ownership
+
+- **Fluxo app:** `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`
+  chama `POST /ai/archetypes` com `{'deck_id': deckId}` para buscar opcoes de
+  otimizacao.
+- **Rota:** `server/routes/ai/archetypes/index.dart:27`-`:32` le `deck_id`,
+  mas nao le `context.read<String>()`; `:39`-`:42` executa
+  `SELECT name, format FROM decks WHERE id = @id`; `:54`-`:61` carrega cartas
+  por `WHERE dc.deck_id = @id`.
+- **Por que e incoerente:** o endpoint e consumido como passo do fluxo de deck
+  privado do app, mas a rota nao usa o usuario autenticado para filtrar o deck.
+  Isso deixa o mesmo risco de leitura indireta de nome/formato/comandante/cartas
+  que o optimize.
+- **O que valida:** escopar a query inicial por `decks.id + decks.user_id` ou
+  criar uma permissao publica explicita para decks compartilhados, com teste
+  owner versus non-owner.
+- **O que falsifica:** prova de rota/app mostrando que `/ai/archetypes` esta
+  protegido por outro middleware/helper que injeta e aplica ownership antes das
+  queries citadas.
+
+#### P1/P2 — Polling de optimize aceita jobs sem dono no endpoint app-facing
+
+- **Fluxo app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:190`-`:194`
+  faz polling em `GET /ai/optimize/jobs/$jobId`; `:196`-`:240` trata
+  `completed`, `failed` e progresso como estados normais do app.
+- **Rota:** `server/routes/ai/optimize/jobs/[id].dart:26`-`:28` le `userId` e
+  carrega o job, mas `:39` bloqueia apenas quando
+  `job.userId != null && job.userId != userId`.
+- **Store:** `server/lib/ai/optimize_job.dart:25`-`:30` permite `String? userId`;
+  `:37`-`:42` cria `OptimizeJob` com owner nullable; `:49`-`:56` persiste
+  `user_id` tambem nullable.
+- **Por que e incoerente:** o polling e app-facing e autenticado, mas qualquer
+  job salvo com `user_id = NULL` fica legivel por qualquer usuario que conheca o
+  `job_id`. A criacao normal em `/ai/optimize` passa `userId`, mas o contrato da
+  store/rota ainda permite o estado ownerless.
+- **O que valida:** tornar `userId` obrigatorio para jobs de optimize criados
+  por endpoints app-facing e retornar 404 para `job.userId == null`, salvo
+  excecao interna documentada e separada.
+- **O que falsifica:** teste provando que nao ha nenhum caminho runtime capaz de
+  criar `ai_optimize_jobs.user_id IS NULL` e migracao/constraint impedindo esse
+  estado.
+
+#### P1/P2 — Deck analysis e optimize ainda usam fontes semanticas diferentes para papeis funcionais
+
+- **Fluxo app:** `app/lib/features/decks/providers/deck_provider_support_fetch.dart:135`-`:140`
+  chama `GET /decks/:id/analysis`; `app/lib/features/decks/models/deck_analysis.dart:14`-`:23`
+  parseia `functional_tags`; `app/lib/features/decks/widgets/deck_analysis_tab.dart:94`-`:99`
+  agenda o fetch automatico da analise funcional.
+- **Rota de analysis:** `server/routes/decks/[id]/analysis/index.dart:34`-`:65`
+  prepara leitura de `card_semantic_tags_v2`; `:91`-`:96` seleciona
+  `card_function_tags` e `semantic_tags_v2`; `:279` e `:430` retornam
+  `summarizeFunctionalTagsForDeck(cards)` como `functional_tags`.
+- **Helper de analysis:** `server/lib/ai/functional_card_tags.dart:432`-`:465`
+  prefere `card['functional_tags']` persistido antes de cair para semantic v2
+  ou heuristica.
+- **Optimize:** `server/lib/ai/optimize_request_support.dart:86`-`:106`
+  seleciona apenas `semantic_tags_v2`; `:186`-`:198` monta `allCardData` sem
+  `functional_tags`. A rota de optimize tambem monta `additionsData` em
+  `server/routes/ai/optimize/index.dart:2063`-`:2099` com `semantic_tags_v2`,
+  mas sem `functional_tags`; `_semanticV2SelectSql` em `:3197`-`:3213` so
+  consulta `card_semantic_tags_v2`.
+- **Classificador de optimize:** `server/lib/ai/optimization_functional_roles.dart:55`-`:58`
+  usa apenas `semantic_tags_v2` como fonte persistida antes de heuristicas.
+- **Por que e incoerente:** a aba de analise apresenta papeis funcionais vindos
+  de `card_function_tags` quando disponiveis, mas optimize/validator/quality
+  gate tomam decisoes com outro input. A mesma carta pode aparecer como
+  essencial na analise e ser tratada como outro papel no gate de troca.
+- **O que valida:** passar `functional_tags` pelo contexto de optimize e usar um
+  adapter unico de papel funcional que preserve multi-role e exponha
+  `primary_role`; adicionar teste com uma carta onde `card_function_tags` e
+  `semantic_tags_v2` divergem.
+- **O que falsifica:** contrato e testes afirmando que analysis e optimize devem
+  usar fontes semanticas diferentes, com UX explicando essa diferenca.
+
+### Itens verificados e nao promovidos
+
+- `POST /ai/rebuild` nao foi promovido como achado de ownership porque a rota
+  faz gate `deck_id + user_id` antes de carregar cartas
+  (`server/routes/ai/rebuild/index.dart:61`-`:78`).
+- `GET /decks/:id/analysis` tambem nao foi promovido como achado de ownership
+  porque a rota escopa por `deck_id + user_id`
+  (`server/routes/decks/[id]/analysis/index.dart:22`-`:26`).
+- `/ai/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` continuam
+  experimentais/not-proven no mapa de contratos e nao tiveram consumidor atual
+  em `app/lib` encontrado por `rg`; por isso nao foram tratados como drift
+  app-facing nesta rodada.
 
 ## Rodada focada: Duplicated or similar logic — revalidacao 2026-06-01 19:00 UTC
 
