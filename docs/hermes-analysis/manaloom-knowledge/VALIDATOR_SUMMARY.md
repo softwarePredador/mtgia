@@ -1,71 +1,71 @@
-# VALIDATOR SUMMARY — Lorehold Spellslinger
+# Lorehold Spellslinger — Executive Summary
 
-> **Ultima atualizacao:** 2026-06-01T11:27:33+00:00
-> **Versao:** Purpose Analyzer v3.21 (re-confirmation)
-> **Card hash:** `30d00347764fc2a215edb4e668994871`
-> **Status:** ✅ DECK ESTAVEL — Nenhuma mudanca desde v3.19
+> **Versao:** v3.22 (2026-06-01T20:52:33+00:00)
+> **Status:** ✅ DECK ESTAVEL — 4a re-confirmacao consecutiva sem mudancas
+> **DB Hash:** `30d00347764fc2a215edb4e668994871` — inalterado desde v3.19 (2026-06-01T07:59)
+> **T3 Sem Play:** 13.3% (Exec#13) — zona DEFENSIVO
 
-## Deck Snapshot
+## Estado Atual
 
-| Metrica | Valor | PG Ideal | Status |
-|:--------|:-----:|:--------:|:------:|
-| Cards | 100 (86 rows) | — | ✅ |
-| Lands | 35 | 32 | 🟡 +3 |
-| CMC medio | 3.61 | — | — |
-| Ramp (rocks) | 7 | 3.67 | 🟡 +3.3 |
-| Ritual/Treasure | 12 | 10 | 🟡 +2.0 |
-| Draw | 8 | 2.67 | 🟡 +5.3 |
-| Interaction | 9 | 5.33 | 🟡 +3.7 |
-| Protection | 8 | 3.67 | 🟡 +4.3 |
-| **Tutor** | **2** | **3.67** | 🔴 **-1.67** |
-| Win Condition | 5 | 1.33 | 🟡 +3.7 |
-| Recursion | 3 | 3.33 | ✅ IDEAL |
+| Metrica | Valor | Status |
+|:--------|:-----:|:------:|
+| Cartas | 100 (86 rows) | ✅ |
+| Lands | 35 | 🟡 +3 vs PG (ideal=32) |
+| Ramp rocks | 7 | 🟡 +3.33 vs PG (ideal=3.67) |
+| Ritual/Treasure | 7 | 🔵 -3 vs PG (ideal=10) |
+| Protection | 9 | 🔴 +5.33 vs PG (ideal=3.67) |
+| Draw | 5 real | 🟡 +2.33 vs PG (ideal=2.67) |
+| Tutor | 2 | 🔵 -1.67 vs PG (ideal=3.67) |
+| Wincon | 5 | 🟡 +3.67 vs PG (ideal=1.33) |
+| Motor | 4/4 | ✅ COMPLETO |
+| Copy Engines | 4 | ⚠️ 7 seriam ideal |
+| Double-nulls | 4 | ✅ Estavel |
+| MDFC duplicate | 1 | ⚠️ Valakut id=653 |
 
-## SYNERGY_MAP (via v3.19)
+## SYNERGY_MAP
 
-| Eixo | Score |
-|:-----|:-----:|
-| A) Token Makers + Pump | 7/10 |
-| B) Board Wipes + Protection | 8/10 |
-| C) Recursion Chains | 7/10 |
-| D) Explosive Mana | 9/10 |
-| E) Combo Pieces | 8/10 |
-| F) Stack Interaction | 5/10 |
-| G) Resilience | 8/10 |
-| **Media** | **7.4/10** |
+| Eixo | Score | Mudanca |
+|:-----|:-----:|:--------|
+| A — Token + Pump | 7/10 | — |
+| B — Wipes + Protection | 8/10 | — |
+| C — Recursion | 8/10 | — |
+| D — Explosive Mana | 7/10 | — |
+| E — Combo Pieces | 6/10 | ⚠️ -3 (Twinflame/Flare missing) |
+| F — Stack Interaction | 6/10 | — |
+| G — Resilience | 7/10 | — |
+| **TOTAL** | **7.0/10** | ⚠️ vs 7.4/10 ideal |
 
-## T3 Sem Play
+## 🔴 CRITICAL: Twinflame + Flare of Duplication
 
-| Execucao | Data | T3 | Estrategia |
-|:---------|:-----|:--:|:----------|
-| Exec #13 | 2026-06-01 | 13.3% | 🔴 DEFENSIVO (>12%) |
+Duas cartas aplicadas no Ciclo #10 foram perdidas durante o periodo de hash-fake (C#17-C#22). Ambas estao na colecao e DEVEM ser re-adicionadas:
 
-## Double-Nulls: 4
+| Carta | CMC | Funcao | Na Colecao |
+|:------|:---:|:-------|:----------:|
+| Twinflame | 2 | Copy + combo Dualcaster | ✅ 1x |
+| Flare of Duplication | 3 | Copy + combo Approach | ✅ 1x |
 
-- Scroll Rack (CMC 2, 🔴 CRITICAL — core engine)
-- Penance (CMC 3, 🔴 CRITICAL — miracle enabler)
-- Grand Abolisher (CMC 2, 🟡 HIGH — declining trend)
-- Taunt from the Rampart (CMC 5, 🟢 LOW — 35.2% EDHREC)
+## EDHREC Trends (7893 decks)
 
-## Gaps Ativos
+| Carta | % | Trend | Status |
+|:------|:--:|:-----:|:------:|
+| Restoration Seminar | 38.0% | +9.33 ⬆️ | Rising confirmado |
+| Improvisation Capstone | 49.2% | +7.88 ⬆️ | Rising confirmado |
+| The Dawning Archaic | 24.1% | +5.27 ⬆️ | Rising confirmado |
+| Call Forth the Tempest | 65.2% | -0.60 ⬇️ | NOVO declinio |
+| Esper Sentinel | 32.4% | -0.67 ⬇️ | 7+ ciclos em queda |
+| Primal Amulet | 30.3% | -0.40 ⬇️ | NOVO declinio |
 
-| # | Gap | Severidade | Acao |
-|:-:|:-----|:----------:|:-----|
-| 1 | Tutor -1.67 | 🔴 | Aquisicao Idyllic Tutor ($15-20) |
-| 2 | C#23 nao aplicado | 🔴 | Evolution Oracle: aplicar Apex→Demand, Storm Herd→Thrill |
-| 3 | T3 13.3% (>12%) | 🔴 | C#23 swaps (DCMC -16) corrigem |
-| 4 | Stack interaction 5/10 | 🟡 | Aceitar (Boros). Flare opcional. |
+## Recomendacoes
 
-## C#23 Swaps Pendentes
+1. **IMEDIATO:** Re-adicionar Twinflame + Flare of Duplication (restaurar estado Ciclo #10)
+2. **Curto prazo:** Corrigir MDFC duplicate Valakut Awakening id=653
+3. **Aquisicao:** Skullclamp (CMC 1, $5-8) para draw + melhorar T3
+4. **Monitorar:** Esper Sentinel, Primal Amulet — candidatos a corte se declinio continuar
 
-| OUT | CMC | IN | CMC | DCMC |
-|:----|:---:|:--|:---:|:----:|
-| Apex of Power | 10 | Demand Answers | 2 | -8 |
-| Storm Herd | 10 | Thrill of Possibility | 2 | -8 |
-| **NET** | | | | **-16** |
+## Historico de Ciclos
 
-## Proximo Passo
-
-1. **Aplicar C#23 swaps** — urgente, T3 > 12%
-2. **Adquirir Idyllic Tutor** — fecha unico gap metrico real
-3. **Corrigir Valakut duplicado** — remove id=653
+| Ciclo | Swaps | DCMC | T3 Apos | Estrategia |
+|:------|:-----:|:----:|:-------:|:----------:|
+| C#11 | 0 | 0 | 13.3% | MATURIDADE |
+| C#12-C#22 | 0 | 0 | — | Hash-fake period |
+| C#23 | 0 (proposto) | — | 13.3% | NAO APLICADO |
