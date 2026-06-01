@@ -431,6 +431,68 @@ void main() {
       }
     });
 
+    test('keeps strategic heuristic roles aligned with multi-tag classifier',
+        () {
+      final samples = {
+        'Blood Artist': [
+          'Creature — Vampire',
+          'Whenever Blood Artist or another creature dies, target player loses 1 life and you gain 1 life.',
+          {'payoff'},
+          'payoff',
+        ],
+        'Impact Tremors': [
+          'Enchantment',
+          'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
+          {'payoff'},
+          'payoff',
+        ],
+        'Lightning Greaves': [
+          'Artifact — Equipment',
+          'Equipped creature has haste and shroud. Equip {0}.',
+          {'protection'},
+          'protection',
+        ],
+        'Demonic Tutor': [
+          'Sorcery',
+          'Search your library for a card, put that card into your hand, then shuffle.',
+          {'tutor'},
+          'tutor',
+        ],
+        'Isochron Scepter': [
+          'Artifact',
+          'Imprint — When Isochron Scepter enters the battlefield, you may exile an instant card with mana value 2 or less from your hand. You may copy the exiled card. If you do, you may cast the copy without paying its mana cost.',
+          {'combo_piece'},
+          'combo_piece',
+        ],
+        'Aetherflux Reservoir': [
+          'Artifact',
+          'Whenever you cast a spell, you gain 1 life for each spell you\'ve cast this turn. Pay 50 life: Aetherflux Reservoir deals 50 damage to any target.',
+          {'wincon'},
+          'wincon',
+        ],
+      };
+
+      for (final entry in samples.entries) {
+        final values = entry.value;
+        final card = {
+          'name': entry.key,
+          'type_line': values[0] as String,
+          'oracle_text': values[1] as String,
+        };
+
+        expect(
+          optimizationFunctionalRolesForCard(card),
+          containsAll(values[2] as Set<String>),
+          reason: entry.key,
+        );
+        expect(
+          classifyOptimizationFunctionalRole(card),
+          equals(values[3]),
+          reason: entry.key,
+        );
+      }
+    });
+
     test('treats all is dust as wipe and blocks wipe to creature downgrade',
         () {
       final originalDeck = [
