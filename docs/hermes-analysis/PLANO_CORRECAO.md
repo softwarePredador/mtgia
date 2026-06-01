@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-01 15:00 UTC
+> Data: 2026-06-01 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -9,7 +9,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao de 2026-05-31 19:00 UTC. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos), alem de duplicacoes menores em trust, logs sociais, condicao de carta e CMC/tipo.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao de 2026-06-01 19:00 UTC. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos), alem de duplicacoes menores em trust, logs sociais/follow, condicao de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REABERTO no checkout local
    `df8291d7`**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
@@ -115,7 +115,7 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-05-31 19:00 UTC: REVALIDADO/ABERTO nesta branch.**
+- **Status 2026-06-01 19:00 UTC: REVALIDADO/ABERTO nesta branch.**
 - **Evidência**:
   - `resolveOptimizeArchetype` existe em
     `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
@@ -146,7 +146,10 @@ Histórico do problema:
     `server/routes/trades/[id]/status.dart:260`-`:284`,
     `server/routes/trades/[id]/respond.dart:154`-`:178`,
     `server/routes/trades/[id]/messages.dart:228`-`:252` e
-    `server/routes/conversations/[id]/messages.dart:247`-`:271`, apesar de
+    `server/routes/conversations/[id]/messages.dart:247`-`:271`; a rodada de
+    2026-06-01 tambem confirmou `_requestId` em
+    `server/routes/trades/index.dart:330`-`:336` e
+    `server/routes/users/[id]/follow/index.dart:97`-`:103`, apesar de
     `server/lib/request_trace.dart:48`-`:57` ja expor wrappers de trace.
   - Condicoes `NM/LP/MP/HP/DMG` estao espalhadas entre mutacoes de deck,
     binder e marketplace; algumas rotas normalizam invalido para `NM`

@@ -1,7 +1,179 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-01 15:00 UTC
-> Rotacao: `postgresql-tables-not-used`
+> Atualizacao local Codex: 2026-06-01 19:00 UTC
+> Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Duplicated or similar logic — revalidacao 2026-06-01 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi executada auditoria ampla de classes sem uso, funcoes sem chamada,
+imports/ciclos, tabelas PostgreSQL ou coerencia entre camadas fora deste foco.
+
+### Setup executado
+
+- `pwd` e `git rev-parse --show-toplevel` confirmaram o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido sem saida.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `rg` esta disponivel neste shell local em `/opt/homebrew/bin/rg`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual lista nomes duplicados e
+colisoes por regex, mas mistura wrappers legitimos, SQL, nomes comuns e
+duplicacao real. A execucao voltou a anexar blocos historicos duplicados no
+Markdown; essa escrita automatica foi descartada antes dos achados manuais
+abaixo.
+
+### Metodo manual focado
+
+- `rg -n "resolveOptimizeArchetype|looksLikeComboPiece|looksLikeEngine|looksLikePayoff|looksLikeEnabler|looksLikeWincon|isBasicLandName|_isBasicLandName|_trustStatsSql|_buildTrustInsight|_requestId|_logInvalidPayload|getMainType|calculateCmc" server/lib server/routes app/lib`.
+- `rg -n "String _requestId\\(|void _logInvalidPayload\\(" server/routes server/lib`.
+- `rg -n "String resolveOptimizeArchetype\\(|bool _looksLikeWincon\\(|bool _isBasicLandName\\(|Map<String, dynamic> _buildTrustInsight\\(|String _trustStatsSql\\(|int calculateCmc\\(|String getMainType\\(" server/lib server/routes`.
+- `rg -n "const allowedConditions|allowedConditions|_validConditions|NM|LP|MP|HP|DMG" server/routes/decks server/routes/binder server/routes/community/marketplace server/lib app/lib`.
+- `nl -ba` + `sed` foram usados para confirmar as linhas citadas.
+
+### Achados revalidados
+
+#### P1 — `resolveOptimizeArchetype` continua com duas semanticas runtime
+
+- **Duplicacao:** `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
+  `server/lib/ai/optimize_runtime_support.dart:3369`-`:3389` definem
+  `resolveOptimizeArchetype`.
+- **Evidencia de drift:** a versao de deck state aceita
+  `requestedArchetype` nullable, trata `general` e `tempo` como genericos e
+  retorna `detected` quando `requested` esta vazio. A versao de optimize exige
+  string, trata `unknown` como vazio, usa `goodstuff` como generico e so aceita
+  detected especifico em `aggro/control/combo/stax/tribal`.
+- **Consumo runtime divergente:** `server/lib/ai/optimize_request_support.dart:289`
+  e `:294` usam a versao de optimize; `server/lib/ai/rebuild_guided_service.dart:171`
+  usa a versao de deck state.
+- **O que valida:** helper unico com testes para `null`, vazio, `unknown`,
+  `general`, `tempo`, `goodstuff`, `midrange` e detected especifico.
+- **O que falsifica:** contrato documentado e testado dizendo que optimize e
+  rebuild devem resolver arquetipos por regras diferentes.
+
+#### P1 — Heuristicas de roles semanticos altos seguem duplicadas e divergentes
+
+- **Duplicacao:** `server/lib/ai/functional_card_tags.dart:859`-`:907` define
+  `_looksLikeWincon`, `_looksLikeComboPiece`, `_looksLikeEngine`,
+  `_looksLikePayoff` e `_looksLikeEnabler`; `server/lib/ai/optimization_functional_roles.dart:370`-`:397`
+  define os mesmos conceitos para o optimize.
+- **Evidencia de drift:** `functional_card_tags.dart` recebe nome normalizado e
+  usa nomes conhecidos (`Thassa's Oracle`, `Isochron Scepter`,
+  `Dramatic Reversal`, `Blood Artist`, `Greaves`, `Boots`) junto de
+  `oracle_text`; `optimization_functional_roles.dart` nao recebe nome da carta e
+  usa outro conjunto de padroes textuais para um unico role primario.
+- **Por que e duplicacao relevante:** deck analysis, candidate quality,
+  validator e optimize podem classificar a mesma carta com papeis diferentes.
+- **O que valida:** adapter compartilhado que aceite nome, `oracle_text`,
+  `type_line`, `functional_tags` e `semantic_tags_v2`, preservando multi-role e
+  expondo `primary_role` explicitamente.
+- **O que falsifica:** prova de que essas heuristicas rodam em dominios isolados
+  sem comparacao ou decisao cruzada.
+
+#### P2 — Basic lands/snow basics ainda tem quatro variantes incompatíveis
+
+- **Duplicacao:** `server/lib/ai/optimize_runtime_support.dart:4184`-`:4197`,
+  `server/lib/generated_deck_validation_service.dart:752`-`:763`,
+  `server/lib/meta/meta_deck_reference_support.dart:890`-`:903` e
+  `server/routes/ai/commander-reference/index.dart:621`-`:628`.
+- **Evidencia de drift:** optimize faz match exato para `snow-covered ...`;
+  generated validation aceita `startsWith('snow-covered ...')`; meta reference
+  procura `snow covered ...` sem hifen; commander-reference nao inclui snow
+  basics.
+- **Por que e duplicacao relevante:** snow basics podem ser ignoradas ou
+  contadas de forma diferente em optimize, validacao de deck gerado, meta
+  reference e commander-reference.
+- **O que valida:** helper unico de terrenos basicos/snow basics reutilizado
+  nesses fluxos, com testes de hifen, sem hifen, whitespace e sufixos.
+- **O que falsifica:** regra intencional diferente por fluxo, com teste e
+  justificativa de produto.
+
+#### P2 — Trust social repete SQL e serializer entre trades e marketplace
+
+- **Duplicacao:** `server/routes/trades/index.dart:557`-`:635` e
+  `server/routes/trades/[id]/index.dart:260`-`:338` duplicam
+  `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
+  `_buildTrustInsight`. `server/routes/community/marketplace/index.dart:131`-`:166`
+  repete os LATERALs inline e `:316`-`:348` repete o serializer.
+- **Evidencia de drift:** os shapes de resposta ainda parecem equivalentes
+  (`completed_trades`, tempos medios, `is_new_account`,
+  `profile_incomplete`, `has_insufficient_history`), mas marketplace nao
+  reutiliza os helpers das rotas de trades.
+- **O que valida:** extrair SQL/serializer de trust para helper compartilhado
+  com testes de listagem, detalhe e marketplace.
+- **O que falsifica:** contratos diferentes por superficie, documentados e
+  testados separadamente.
+
+#### P2 — Request-id/log de payload invalido duplicado em rotas sociais
+
+- **Duplicacao:** `_requestId` aparece em
+  `server/routes/trades/index.dart:330`-`:336`,
+  `server/routes/trades/[id]/status.dart:260`-`:266`,
+  `server/routes/trades/[id]/respond.dart:154`-`:160`,
+  `server/routes/trades/[id]/messages.dart:228`-`:234`,
+  `server/routes/conversations/[id]/messages.dart:247`-`:253` e
+  `server/routes/users/[id]/follow/index.dart:97`-`:103`.
+- **Duplicacao adjacente:** `_logInvalidPayload` repete o mesmo formato de
+  log social em `server/routes/trades/index.dart:338`-`:351`,
+  `server/routes/trades/[id]/status.dart:268`-`:283`,
+  `server/routes/trades/[id]/respond.dart:162`-`:177`,
+  `server/routes/trades/[id]/messages.dart:236`-`:251` e
+  `server/routes/conversations/[id]/messages.dart:255`-`:270`.
+- **Evidencia de helper existente:** `server/lib/request_trace.dart:48`-`:57`
+  ja expoe `getRequestTrace` e `tryGetRequestId`, mas as rotas mantem fallback
+  local para header `x-request-id`/`n/a`.
+- **Por que e duplicacao relevante:** qualquer mudanca no formato de trace ou
+  sanitizacao de log precisa ser replicada em seis rotas.
+- **O que valida:** helper compartilhado para request id opcional e log de
+  payload invalido com endpoint/recurso parametrizados.
+- **O que falsifica:** decisao documentada de manter mensagens e fallback
+  locais por rota, com testes de observabilidade.
+
+#### P2/P3 — CMC/tipo e condicao de carta continuam com normalizadores locais
+
+- **Duplicacao CMC/tipo:** `getMainType` e `calculateCmc` aparecem em
+  `server/routes/decks/[id]/index.dart:405`-`:435` e
+  `server/routes/community/decks/[id].dart:91`-`:116`; ha variante de CMC em
+  `server/routes/decks/[id]/simulate/index.dart:171`-`:185`.
+- **Duplicacao de condicao:** sets `NM/LP/MP/HP/DMG` aparecem em
+  `server/routes/community/marketplace/index.dart:39`,
+  `server/routes/binder/index.dart:276`-`:279`,
+  `server/routes/binder/[id]/index.dart:341`-`:344`,
+  `server/routes/decks/[id]/index.dart:520`-`:523`,
+  `server/routes/decks/[id]/cards/index.dart:400`-`:403`,
+  `server/routes/decks/[id]/cards/set/index.dart:245`-`:248` e no app em
+  `app/lib/features/decks/models/deck_card_item.dart:5`-`:9`.
+- **Evidencia de drift:** decks normalizam condicao invalida para `NM`; binder
+  rejeita com `400`; marketplace valida filtro por allow-list propria.
+- **O que valida:** helpers/DTOs compartilhados por dominio ou contrato
+  explicitando quando normalizar versus rejeitar.
+- **O que falsifica:** testes garantindo que as diferencas de comportamento por
+  endpoint sao intencionais.
+
+### Itens verificados e nao promovidos
+
+- `server/routes/ai/optimize/index.dart:56` tambem define
+  `resolveOptimizeArchetype`, mas e wrapper fino que delega para
+  `optimize_support.resolveOptimizeArchetype` em `:60`-`:63`; nao foi tratado
+  como duplicacao funcional nova.
+- A busca de condicoes no app encontrou tambem labels e widgets de UI; eles
+  foram usados apenas como evidencia de contrato exposto, nao como bug por si.
 
 ## Rodada focada: PostgreSQL tables not used — revalidacao 2026-06-01 15:00 UTC
 
