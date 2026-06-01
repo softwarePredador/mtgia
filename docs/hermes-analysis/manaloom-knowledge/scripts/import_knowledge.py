@@ -12,13 +12,7 @@ import sys
 
 # Ensure we can import from the scripts directory
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from db_helper import run_sql, DB_PARAMS
-
-DB_PARAMS['host'] = '143.198.230.247'
-DB_PARAMS['port'] = '5433'
-DB_PARAMS['dbname'] = 'halder'
-DB_PARAMS['user'] = 'postgres'
-DB_PARAMS['password'] = 'c2abeef5e66f21b0ce86'
+from db_helper import run_sql
 
 def parse_markdown_table(table_text):
     """Parse uma tabela markdown e retorna lista de dicts"""

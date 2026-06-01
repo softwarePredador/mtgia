@@ -1,14 +1,44 @@
-"""DB helper using psycopg2 directly (no psql subprocess needed)."""
+"""DB helper using psycopg2 directly (no psql subprocess needed).
+
+Connection details must come from DATABASE_URL in the runtime environment.
+Do not hardcode or print credentials in Hermes artifacts.
+"""
 import os
 import psycopg2
+from urllib.parse import quote, urlparse
 
-DB_PARAMS = {
-    'host': '143.198.230.247',
-    'port': '5433',
-    'dbname': 'halder',
-    'user': 'postgres',
-    'password': 'c2abeef5e66f21b0ce86'
-}
+DB_PARAMS = {}
+
+
+def get_database_url():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return database_url
+
+    required = ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASS"]
+    missing = [name for name in required if not os.environ.get(name)]
+    if missing:
+        raise RuntimeError(
+            "DATABASE_URL is not set and DB_* config is incomplete: "
+            + ", ".join(missing)
+        )
+
+    host = os.environ["DB_HOST"]
+    port = os.environ.get("DB_PORT", "5432")
+    dbname = quote(os.environ["DB_NAME"], safe="")
+    user = quote(os.environ["DB_USER"], safe="")
+    password = quote(os.environ["DB_PASS"], safe="")
+    return f"postgres://{user}:{password}@{host}:{port}/{dbname}"
+
+
+def sanitized_database_target():
+    database_url = get_database_url()
+    parsed = urlparse(database_url)
+    return f"{parsed.hostname}:{parsed.port or 5432}/{parsed.path.lstrip('/')}"
+
+
+def connect():
+    return psycopg2.connect(get_database_url())
 
 
 def run_sql(sql, fetch=False):
@@ -21,13 +51,7 @@ def run_sql(sql, fetch=False):
     sql_stripped = sql.strip()
     is_select = sql_stripped.upper().startswith("SELECT")
     try:
-        conn = psycopg2.connect(
-            host=DB_PARAMS['host'],
-            port=DB_PARAMS['port'],
-            dbname=DB_PARAMS['dbname'],
-            user=DB_PARAMS['user'],
-            password=DB_PARAMS['password']
-        )
+        conn = connect()
         conn.autocommit = True
         cur = conn.cursor()
         cur.execute(sql)

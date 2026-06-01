@@ -3,10 +3,7 @@
 import os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from db_helper import run_sql, DB_PARAMS
-
-DB = {'host': DB_PARAMS['host'], 'port': DB_PARAMS['port'], 'dbname': DB_PARAMS['dbname'],
-      'user': DB_PARAMS['user'], 'password': DB_PARAMS['password']}
+from db_helper import run_sql
 
 def esc(s):
     return s.replace("'", "''") if s else ''

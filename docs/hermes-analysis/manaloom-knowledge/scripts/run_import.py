@@ -16,16 +16,10 @@ sys.path.insert(0, SCRIPT_DIR)
 import psycopg2
 import psycopg2.extras
 
-DB_PARAMS = {
-    'host': '143.198.230.247',
-    'port': 5433,
-    'dbname': 'halder',
-    'user': 'postgres',
-    'password': 'c2abeef5e66f21b0ce86',
-}
+from db_helper import connect, sanitized_database_target
 
 def get_conn():
-    return psycopg2.connect(**DB_PARAMS)
+    return connect()
 
 def run_sql(conn, sql, params=None, fetch=False):
     with conn.cursor() as cur:
@@ -251,6 +245,7 @@ def _insert_card(conn, card, commander, tag, func, importance, reason, source):
 
 def main():
     print("=== Importando conhecimento Hermes → PostgreSQL ===\n")
+    print(f"Target PostgreSQL: {sanitized_database_target()}")
     conn = get_conn()
     conn.autocommit = True
 
