@@ -1,21 +1,34 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-01T10:00:00Z (Incremento: goldfish curve + deck rules hardening — 798317af).
+> Atualizado em 2026-06-01T16:30:00Z (Incremento: strategic functional role heuristics hardening — d470bfe0).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `d3cfaf3b` (Architecture: add resetForTesting/clear/reset to all singletons)
-- HEAD atual: **`798317af`** (Harden deck rules and goldfish curve checks).
+- HEAD anterior: `798317af` (Harden deck rules and goldfish curve checks)
+- HEAD atual: **`d470bfe0`** (Harden strategic functional role heuristics).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
+- SHA publicado confirmado em producao: **indisponivel** (`/health` retornou HTTP 502 em 2026-06-01T16:30Z — outage de infraestrutura)
 
 
 ## Novos commits nesta rodada (2026-06-01)
 
-### `6af73d87` — P1: fix semantic drift — optimize_request_support now loads card_function_tags in SQL queries (atual HEAD)
+### `d470bfe0` — Harden strategic functional role heuristics (atual HEAD)
+- **2 arquivos** (`optimization_functional_roles.dart`, `optimization_quality_gate_test.dart`)
+- **Tipo: CODE/FEATURE** — Hardening das heuristicas de classificacao de papeis funcionais estrategicos:
+  1. **Name-aware heuristics**: `_looksLikeWincon`, `_looksLikeComboPiece`, `_looksLikePayoff`, `_looksLikeEnabler` agora recebem `name` como parametro adicional, permitindo hardchecks por nome (Thassa's Oracle, Blood Artist, Isochron Scepter, Dramatic Reversal, Lightning Greaves, Swiftfoot Boots).
+  2. **Nova funcao `_looksLikeSelfMillSetup`**: detecta self-mill (mill, surveil, dredge) excluindo mill ofensivo (target opponent/player).
+  3. **`_looksLikePayoff` reescrito**: regex para exclusao de cost reduction, distingue draw-scaling de payoff, detecta padroes "for each", inclui triggers de creature dies/enters/cast.
+  4. **`_looksLikeEnabler` expandido**: greaves/boots, cost reduction com sintaxe de chaves, extra land, haste enablers, sacrifice outlets, library search (nao-land).
+  5. **`_looksLikeWincon` expandido**: "each opponent loses", "damage equal to"+"opponent", "double your life total".
+  6. **`_looksLikeComboPiece` expandido**: "copy target activated or triggered ability", "infinite".
+- **Impacto:** Classificacao de papeis mais precisa para cartas de borda (Blood Artist→payoff, Isochron Scepter→combo_piece, Lightning Greaves→protection). Reduz falsos positivos em cost-reduction texts.
+- **Validacao:** `dart analyze` — No issues found. `dart test` 599/599 PASS. Novo teste parametrizado `keeps strategic heuristic roles aligned with multi-tag classifier` com 6 amostras.
+- **Risco de contrato:** Nenhum — mudancas internas as heuristicas; APIs publicas mantem a mesma assinatura. Adicao do parametro `name` nas funcoes privadas sem impacto externo.
+
+### `6af73d87` — P1: fix semantic drift — optimize_request_support now loads card_function_tags in SQL queries
 - **2 arquivos** (`optimization_functional_roles.dart`, `optimize_request_support.dart`)
 - **Tipo: CODE/FIX** — Corrige drift semantico: o pipeline de optimize nao carregava `card_function_tags` nas queries SQL, causando divergencia entre a analise de deck (que carrega) e o optimize (que nao carregava). `classifyOptimizationFunctionalRole` agora recebe `functionalTags` via adapter F1, resolvendo a discrepancia.
 - **Impacto:** Cartas double-null (Scroll Rack, Penance) agora tem seus functional_tags persistidos consultados pelo optimize, reduzindo classificacoes incorretas.
