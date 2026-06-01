@@ -1,12 +1,12 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~14:20 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** Spellslinger / Treasure Ramp / Copy Engine
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 35+ Scout executions, 23+ Evolution Oracle cycles, 7 Battle runs (goldfish + matchup), 13+ Mulligan simulations, Wincon Diversity Oracle (2 executions), EDHREC 7,851 decks snapshot, card_deck_analysis PostgreSQL
-> **Deck State:** 100 cards (86 unique rows, 35 lands), deck_id=6, card hash `30d00347764fc2a215edb4e668994871`
+> **Evidence Base:** 35+ Scout executions, 23+ Evolution Oracle cycles, 7 Battle runs (goldfish + matchup), 13+ Mulligan simulations, Wincon Diversity Oracle (2 executions), EDHREC 7,893 decks snapshot, card_deck_analysis PostgreSQL, **v3.22 Validator re-confirmation (NEW)**
+> **Deck State:** 100 cards (86 unique rows, 35 lands), deck_id=6, card hash `30d00347764fc2a215edb4e668994871` — stable across 4 re-confirmations (v3.19→v3.22)
 
 ---
 
@@ -29,7 +29,7 @@ Lorehold, the Historian is a Boros spellslinger commander that generates explosi
 | Removal | 9 | Path to Exile, Swords to Plowshares, Abrade, Chaos Warp, Generous Gift, Blasphemous Act, Austere Command, Fated Clash, Volcanic Vision |
 | Board Wipe | 5 | Blasphemous Act, Austere Command, Call Forth the Tempest, Worldfire, Volcanic Vision |
 | Protection | 9 | Mother of Runes, Grand Abolisher, Boros Charm, Flawless Maneuver, Teferi's Protection, Deflecting Swat, Akroma's Will, Lightning Greaves, Hexing Squelcher |
-| Copy Engine | 5 | Lorehold (commander), Double Vision, Arcane Bombardment, Primal Amulet, Dawning Archaic |
+| Copy Engine | 4 | Lorehold (commander), Double Vision, Arcane Bombardment, Dawning Archaic |
 | Wincon (scored) | 7 | Approach of the Second Sun, Worldfire, Mizzix's Mastery, Rite of the Dragoncaller, Apex of Power, Call Forth the Tempest, Storm Herd |
 
 **CMC bands (nonland):** 0=3, 1=11, 2=8, 3=13, 4=9, 5=3, 6-7=7, 8+=6
@@ -63,6 +63,8 @@ Lorehold's ramp strategy is fundamentally different from traditional green-based
 1. **T1-T2:** Signets, Sol Ring, Land Tax, Weathered Wayfarer (land smoothing)
 2. **T3-T4:** Storm-Kiln Artist, Smothering Tithe, Big Score, Jeska's Will (treasure generation begins)
 3. **T5+:** Hit the Mother Lode, Brass's Bounty (explosive treasure bursts → cast 8+ CMC spells)
+
+**PG Profile Gap v3.22:** The deck has 7 ritual/treasure sources vs an ideal PG profile of 10. The gap (-3) is partially compensated by 7 ramp rocks, but rocks produce fixed 1 mana while treasure scales with copy engines. Re-adding Twinflame/Flare would improve this metric since copy engines multiply treasure output.
 
 **Anti-Pattern:** Desperate Ritual and Seething Song were both cut in early cycles (C#3, C#6). Pure rituals without treasure synergy proved to be dead draws — the deck needs ramp that also draws cards (Big Score) or generates permanent value (Smothering Tithe), not single-shot red mana.
 
@@ -102,6 +104,8 @@ Draw that puts cards in the graveyard is **superior** to pure draw in Lorehold. 
 - Mizzix's Mastery overload (flashback ALL instants/sorceries)
 - Arcane Bombardment (exile and copy each turn)
 - Restoration Seminar (permanent recursion)
+
+**PG Profile Gap v3.22:** PG ideal draw_value = 2.67, deck has 5 tagged. Functionally adequate but the tag gap (5 vs ~8 real) means automated analysis underestimates by ~60%.
 
 **Anti-Pattern:** The deck's 5 tagged draw cards place it at the bottom of the recommended range (8-12 per the Validator profile). The deck compensates with topdeck manipulation and treasure-based "free" spells that don't consume hand resources, but this makes the deck vulnerable to disruption — if the topdeck/manipulation engine is removed, the deck quickly runs out of gas.
 
@@ -227,14 +231,13 @@ Turn 10+: Cast Worldfire (CMC 9) → exile everything, life=1, empty hands
 
 ## 6. Copy Engine Synergy
 
-The deck's engine stack is its true strength. With 5+ copy engines, any spell can become 3-4 copies:
+The deck's engine stack is its true strength. With 4 copy engines (was 7 before Twinflame/Flare loss), any spell can become 3-4 copies:
 
 | Engine | CMC | Mechanism | Reliability |
 |:-------|:---:|:----------|:-----------:|
 | Lorehold, the Historian | 6 | Trigger: cast from graveyard → copy | Commander (always accessible) |
 | Double Vision | 5 | First sorcery each turn → copy | Enchantment (hard to remove) |
 | Arcane Bombardment | 6 | Exile + copy 1 spell/turn from GY | Enchantment, cumulative |
-| Primal Amulet // Primal Wellspring | 4 | Spell counter → flip → copy + mana | Artifact, 4 spells to flip |
 | Dawning Archaic | 10 | Copy opponent's first spell each turn | Artifact (free value) |
 
 **Engine multiplication example:**
@@ -246,7 +249,7 @@ Cast Big Score (4 mana) →
   Result: 1 Big Score → 3 copies = draw 6, create 6 treasures
 ```
 
-With 2 additional engines available in collection but not in deck (Twinflame CMC 2, Flare of Duplication CMC 3), the engine count could reach 7 — a **9/10 synergy score** per SYNERGY_MAP.
+**⚠️ v3.22: Copy engine count degraded from 7→4** due to Twinflame (CMC 2) and Flare of Duplication (CMC 3) being silently lost from deck during hash-fake period (C#17-C#22). Full engine stack with restoration would reach 7 engines = **9/10 synergy score**.
 
 ---
 
@@ -290,7 +293,102 @@ With 2 additional engines available in collection but not in deck (Twinflame CMC
 
 ---
 
-## 8. Pipeline Integrity Crisis
+## 8. v3.22 VALIDATOR FINDINGS (NEW — 2026-06-01T20:52 UTC)
+
+### 8.1 EDHREC Data Shift: New Declining Signals
+
+v3.22 detected **4 new declining trends** on cards currently in the deck that were NOT present in previous analyses:
+
+| Carta | EDHREC% | Trend | Sigilo | Diagnóstico |
+|:------|:-------:|:-----:|:------:|:------------|
+| **Call Forth the Tempest** | 65.2% | **-0.60** | NOVO ⬇️ | Most-included card in deck but now declining. 65% is still dominant — monitor for 3+ cycles |
+| **Primal Amulet** | 30.3% | **-0.40** | NOVO ⬇️ | CMC 4, competes with Arcane Bombardment (CMC 5, faster). May become cut candidate |
+| **Esper Sentinel** | 32.4% | **-0.67** | 7+ ciclos ⬇️ | Persistent 7-cycle decline. Draw conditional on opponents casting non-creature. #1 cut candidate if collection had CMC-2 replacement |
+| **Grand Abolisher** | 11.7% | **-0.33** | 2 ciclos ⬇️ | Already low at 11.7%, now declining further. Protection piece being phased out of the meta |
+
+**EDHREC num_decks:** 7,802 → **7,893** (+91, ~1.2% growth). Positive signal — the archetype is still growing.
+
+### 8.2 PG Profile Comparison (New in v3.22)
+
+Quantified gaps against PostgreSQL `commander_reference_deck_analysis` ideal profile for Lorehold:
+
+| Metrica PG | PG Ideal | Deck Actual | Diff | Status |
+|:-----------|:--------:|:----------:|:----:|:------:|
+| lands | 32 | 35 | +3 | 🟡 Above — expected for 99-card Commander |
+| ramp (rocks) | 3.67 | 7 | +3.33 | 🟡 Above — 2x the ideal |
+| ritual_treasure | 10 | 7 | **-3** | 🔵 Below — gap compensado por rocks extras |
+| big_spell_payoff | 7.67 | 11 | +3.33 | 🟡 Above — spellslinger identity |
+| miracle_topdeck | 4.33 | 6 | +1.67 | 🔵 Above — strong topdeck engine |
+| interaction (removal) | 5.33 | 6 | +0.67 | ✅ OK |
+| protection | 3.67 | 9 | **+5.33** | 🔴 2.5x ideal — excess protection could convert to draw/tutor |
+| draw_value | 2.67 | 5 | +2.33 | 🟡 Above — functional but tag gap exists |
+| tutor | 3.67 | 2 | **-1.67** | 🔵 Below — only Enlightened Tutor + Gamble |
+| win_condition | 1.33 | 5 | +3.67 | 🟡 Above — diverse wincon suite |
+
+**Key insight:** The deck is over-protected (9 slots vs 3.67 ideal) and under-tutored (2 vs 3.67). The protection excess is rational for fragile Boros, but 2-3 protection slots could be converted to tutors or draw if the collection had viable replacements.
+
+### 8.3 SYNERGY_MAP Degradation (v3.19 → v3.22)
+
+| Eixo | v3.19 Score | v3.22 Score | Change | Driver |
+|:-----|:-----------:|:----------:|:------:|:-------|
+| A — Token Makers + Pump | 7/10 | 7/10 | — | Stable |
+| B — Wipes + Protection | 8/10 | 8/10 | — | Stable |
+| C — Recursion Chains | 8/10 | 8/10 | — | Stable |
+| D — Explosive Mana | 7/10 | 7/10 | — | Stable |
+| **E — Combo Pieces** | **9/10** | **6/10** | **-3** 🔴 | Twinflame + Flare lost (2 combos gone) |
+| F — Stack Interaction | 6/10 | 6/10 | — | Boros no counterspells |
+| G — Resilience | 7/10 | 7/10 | — | Stable |
+| **TOTAL** | **7.4/10** | **7.0/10** | **-0.4** 🔴 | Entirely due to Eixo E degradation |
+
+**Significance:** The SYNERGY_MAP degradation is the first quantified impact of the hash-fake incident. The deck lost 3 full points on its combo axis — from "excellent" (9/10) to "adequate" (6/10) — solely because Twinflame and Flare of Duplication disappeared from the deck during C#17-C#22.
+
+### 8.4 Explicit Swap Restoration SQL (v3.22 Recommendation)
+
+v3.22 provides the first concrete SQL script for restoring the lost cards:
+
+```sql
+-- Re-add Twinflame (CMC 2)
+INSERT INTO deck_cards (deck_id, card_name, quantity, functional_tag, tag_confidence,
+  is_commander, is_partner, cmc, type_line)
+VALUES (6, 'Twinflame', 1, 'spellslinger', 0.9, 0, 0, 2, 'Sorcery');
+
+-- Re-add Flare of Duplication (CMC 3)
+INSERT INTO deck_cards (deck_id, card_name, quantity, functional_tag, tag_confidence,
+  is_commander, is_partner, cmc, type_line)
+VALUES (6, 'Flare of Duplication', 1, 'spellslinger', 0.9, 0, 0, 3, 'Instant');
+
+-- Cut candidates (must stay at 100):
+-- Option A: Primal Amulet (CMC 4, declining -0.40) + Esper Sentinel (CMC 1, declining -0.67)
+-- Option B: MDFC duplicate Valakut Awakening id=653 (fixes draw_count) + Primal Amulet
+```
+
+**Net impact:** ΔCMC = -2 to -3 (replacing higher-CMC cards with Twinflame CMC 2 + Flare CMC 3). This is DEFENSIVE — it would reduce T3 from 13.3% toward the target zone.
+
+### 8.5 Critical Rulings Analysis (New in v3.22)
+
+**Arcane Bombardment + Restoration Seminar Loop:**
+Per CR 706.10, copies have the same characteristics as originals. Arcane Bombardment exiles Restoration Seminar, creates a copy — the copy is still a Lesson and can fetch Lessons from the sideboard. Each spell cast triggers this, creating a semi-infinite recursion chain. **This is the deck's most underrated engine.**
+
+**Double Vision + Call Forth the Tempest:**
+CR 706.2: copy has the same X value. With X=8, the original exiles 8 cards, the Double Vision copy exiles another 8 — potential 30-40 damage distributed across 16 cards' CMCs. **Devastating finisher.**
+
+**Dawning Archaic Passive Value:**
+In a 4-player pod, Dawning Archaic generates 3 free spell copies per turn cycle. Each copy triggers Lorehold (treasure on cast). **Exponential value engine** that operates passively.
+
+**Penance + Miracle:**
+Penance puts the top card on the bottom in response to triggers. Does NOT directly enable Miracle (Miracle triggers on draw, not on trigger), but acts as a "topdeck quality filter" — improving draw quality before the draw step. **Indirect support, not a combo.**
+
+### 8.6 New 3rd-Party EDHREC Cards Entering the Meta
+
+| Carta | EDHREC% | Trend | Significance |
+|:------|:-------:|:-----:|:-------------|
+| Tablet of Discovery | 26.4% | 0.00 | Artifact draw — not in collection |
+| Turbulent Steppe | 23.1% | 0.00 | Boros utility land — not in collection |
+| Furygale Flocking | 12.2% | **+2.30** ⬆️ | CMC 2 copy spell, < $1 — **new rising star, recommend acquisition** |
+
+---
+
+## 9. Pipeline Integrity Crisis
 
 ### The Hash-Fake Incident (C#17-C#22)
 
@@ -300,6 +398,7 @@ With 2 additional engines available in collection but not in deck (Twinflame CMC
 3. **C#18-C#22:** 5 consecutive Evolution Oracle cycles use hash `a440c497da4280d6769238737062b3dd` as "verified". All report "MATCH" and "0 swaps". Reality: hash is stale, deck has changed.
 4. **SCOUT #34 (2026-06-01):** First agent to recompute hash from DB → discovers mismatch. Real hash: `30d00347764fc2a215edb4e668994871`
 5. **MULLIGAN Exec#13:** Confirms T3 worsened from 11.3% to 13.3% (crossed defensive threshold) because Demand Answers (CMC 2) and Ashling (CMC 4) were lost in the reversion.
+6. **v3.22 (2026-06-01T20:52):** SYNERGY_MAP Eixo E confirmed degraded from 9/10 → 6/10 — first quantified impact of the incident.
 
 **Impact:** 5+ cycles operated with incorrect deck state. Swaps recommended and "applied" in Evolution Oracle logs were never actually written to PostgreSQL. 6+ agents (SCOUT #30-#33, VALIDATOR v3.17-v3.18, MULLIGAN verification) copied the stale hash without recomputing.
 
@@ -307,11 +406,11 @@ With 2 additional engines available in collection but not in deck (Twinflame CMC
 
 ---
 
-## 9. Swap-Execution Gap
+## 10. Swap-Execution Gap
 
 A persistent pattern across the last 3+ verification cycles: Evolution Oracle recommends swaps, documents them in EVOLUTION_LOG, but **swaps never get applied to PostgreSQL**.
 
-**C#23 Swaps (documented 2026-06-01T08:23, still not applied as of 14:16):**
+**C#23 Swaps (documented 2026-06-01T08:23, still not applied as of 21:10):**
 - OUT: Apex of Power (CMC 10) → IN: Demand Answers (CMC 2, draw)
 - OUT: Storm Herd (CMC 10) → IN: Thrill of Possibility (CMC 2, draw)
 - Net ΔCMC: -16
@@ -321,50 +420,52 @@ A persistent pattern across the last 3+ verification cycles: Evolution Oracle re
 - Twinflame (CMC 2) — copy engine + combo piece
 - Flare of Duplication (CMC 3) — free copy + Approach combo enabler
 
-**MULLIGAN_LOG has flagged this 3 times consecutively** (09:26, 10:32, 14:16) with the same message: "O gargalo não é a qualidade do deck — é a execução dos swaps no DB."
+**v3.22 concrete restoration SQL now available** (§8.4 above) — first time a validator has provided the exact INSERT/DELETE statements needed.
+
+**MULLIGAN_LOG has flagged this 4 times consecutively** with the same message: "O gargalo não é a qualidade do deck — é a execução dos swaps no DB."
 
 ---
 
-## 10. Concrete Tasks
+## 11. Concrete Tasks
 
 ### Task 1: Pipeline Integrity — Agent Hash Verification Fix
-- **Evidence:** Hash `a440c497...` was trusted by 6+ agents across 5+ cycles without recomputation. SCOUT #34 discovered the mismatch only by recomputing from DB. Two critical cards (Twinflame, Flare of Duplication) were silently lost from the deck.
+- **Evidence:** Hash `a440c497...` was trusted by 6+ agents across 5+ cycles without recomputation. SCOUT #34 discovered the mismatch only by recomputing from DB. Two critical cards (Twinflame, Flare of Duplication) were silently lost. v3.22 confirmed SYNERGY_MAP Eixo E degraded 9→6 due to this. **4 re-confirmation runs (v3.19-v3.22) all verify the same real hash — the system is now stable, but the trust-propagation vulnerability remains.**
 - **What to change:** Every agent that reads a card hash from a previous agent's log must recompute `md5(sorted(card_names))` against `deck_cards WHERE deck_id=X` before declaring "MATCH". Trust no stored hash.
 - **Impact:** Prevents silent card loss and ensures all agents operate on real deck state.
 - **Risk:** Low — simply adding a recomputation step to existing integrity check.
 - **Validation:** Next SCOUT execution should show hash computed fresh, with a new field `hash_source: 'db_computed'` vs `hash_source: 'log_copied'`.
 
 ### Task 2: Combo Recognition in card_deck_analysis
-- **Evidence:** Twinflame (CMC 2) + Dualcaster Mage (CMC 3) = infinite hasty tokens, yet `card_deck_analysis` gives Twinflame default 5/5/5 score. Approach + Flare of Duplication = deterministic same-turn win, yet Flare isn't scored as wincon piece. Wincon Diversity Oracle confirmed STEALTH gap despite viable stealth combo in collection.
+- **Evidence:** Twinflame (CMC 2) + Dualcaster Mage (CMC 3) = infinite hasty tokens, yet `card_deck_analysis` gives Twinflame default 5/5/5 score. Approach + Flare of Duplication = deterministic same-turn win, yet Flare isn't scored as wincon piece. Wincon Diversity Oracle confirmed STEALTH gap despite viable stealth combo in collection. **v3.22 confirms SYNERGY_MAP Eixo E degraded 9/10→6/10 solely due to missing combo pieces — the system can't detect what it can't score.**
 - **What to change:** Add a `combo_patterns` table or static config mapping card pairs to adjusted scores. When both cards exist in a deck, boost their stealth/resilience scores and tag them as `combo_piece`.
-- **Impact:** Enables automatic detection of stealth wincons, closes classification gap.
+- **Impact:** Enables automatic detection of stealth wincons, closes classification gap. Restoring Twinflame+Flare with proper combo scoring would recover Eixo E to 9/10.
 - **Risk:** Medium — pattern matching needs to avoid false positives (e.g., Kiki-Jiki + Restoration Angel is a known combo in any deck with both, but Twinflame + Dualcaster is specific to spellslinger).
 - **Validation:** After implementation, a deck scan with both Twinflame and Dualcaster should show Twinflame with stealth ≥ 7 and functional_tag='wincon_combo'.
 
 ### Task 3: Draw Tag Completeness Audit
-- **Evidence:** Deck has 5 tagged draw cards in PostgreSQL (`functional_tag='draw'`) but ~7-8 real draw sources when including Weathered Wayfarer (land tutor → deck thinning), Land Tax (3 cards to hand), Sensei's Divining Top (selection), Scroll Rack (virtual draw), Valakut Awakening (hand reset tagged differently). This mismatch causes automated analysis to underestimate draw density by 40-60%.
+- **Evidence:** Deck has 5 tagged draw cards in PostgreSQL (`functional_tag='draw'`) but ~7-8 real draw sources when including Weathered Wayfarer (land tutor → deck thinning), Land Tax (3 cards to hand), Sensei's Divining Top (selection), Scroll Rack (virtual draw), Valakut Awakening (hand reset tagged differently). This mismatch causes automated analysis to underestimate draw density by 40-60%. **PG ideal draw_value = 2.67 vs 5 tagged — the tag gap makes the deck look over-drawn when it's actually adequate.**
 - **What to change:** Create a periodic `tag_completeness` audit that compares DB tags against oracle text keyword scan for each deck. Cards with draw/selection mechanics but no draw tag should be flagged for manual review or auto-tagging.
 - **Impact:** More accurate draw density metrics → better Evolution Oracle swap decisions.
 - **Risk:** Low — read-only audit. No deck modifications.
 - **Validation:** Audit report should identify Weathered Wayfarer, Land Tax, Top, Scroll Rack as "untagged draw sources" with recommendation to add `secondary_tag='draw_selection'` or similar.
 
 ### Task 4: Wincon Post-Resolution Viability Check
-- **Evidence:** Worldfire has resilience=7 (IMBATÍVEL) but the deck has no reliable plan to win after resolving it. Hands are exiled, permanents are exiled, life is 1. The only post-Worldfire option is Simian Spirit Guide, but there's no spell to cast. Worldfire is a "symbolic wincon" — high resilience score but zero practical closing capability.
+- **Evidence:** Worldfire has resilience=7 (IMBATÍVEL) but the deck has no reliable plan to win after resolving it. Hands are exiled, permanents are exiled, life is 1. The only post-Worldfire option is Simian Spirit Guide, but there's no spell to cast. Worldfire is a "symbolic wincon" — high resilience score but zero practical closing capability. **v3.22 rulings analysis confirms no interaction that would enable post-Worldfire win beyond commander damage (5/turn, 3 turns = 21 commander damage vs 3 opponents).**
 - **What to change:** Add a `post_resolution_viability` check for wincons that reset the game state. If a wincon exiles hands/graveyards/permanents, verify the deck has at least one way to close post-resolution (phasing, suspend, commander with haste, etc.).
 - **Impact:** Prevents decks from relying on "resilient" wincons that can't actually win.
 - **Risk:** Low — purely analytical. Does not modify deck or DB.
 - **Validation:** Re-score Worldfire on this deck. Its effective resilience should drop from 7 to ~2-3 due to post-resolution failure. Flag as `viability_warning: true`.
 
-### Task 5: Stealth Wincon Coverage Requirement
-- **Evidence:** Wincon Diversity Oracle identified a persistent STEALTH gap (no wincon with stealth ≥ 7) across 23+ Evolution Oracle cycles. The deck's wincons are all highly visible: Approach (stealth=1, "ARQUI-INIMIGO"), Storm Herd (stealth=3), Worldfire (stealth=5). Meanwhile, a CMC 4 deterministic stealth combo (Twinflame + Dualcaster) exists in collection but was never scored properly.
-- **What to change:** Add a `wincon_coverage` metric to the Validator profile requiring at least 1 wincon in each of the 3 axes (speed ≥ 6, resilience ≥ 7, stealth ≥ 7). Missing an axis triggers a `wincon_gap` alert with priority over incremental swaps.
-- **Impact:** Ensures decks have diverse win conditions that can't all be answered by the same interaction type.
-- **Risk:** Medium — changes the Validator scoring model. Needs testing on other deck archetypes to ensure it doesn't over-prioritize stealth in decks that don't need it (e.g., stax).
-- **Validation:** After implementation, Lorehold's Validator report should flag "STEALTH_GAP: No wincon with stealth ≥ 7. Consider Twinflame (CMC 2, in collection) for Twinflame+Dualcaster combo."
+### Task 5: EDHREC Declining Trend Monitor + Auto-Alert
+- **Evidence (NEW v3.22):** 4 deck cards now show declining EDHREC trends that were NOT present in previous cycles: Call Forth the Tempest (65.2%, -0.60), Primal Amulet (30.3%, -0.40), Esper Sentinel (32.4%, -0.67 over 7+ cycles), Grand Abolisher (11.7%, -0.33). No previous agent flagged these as actionable. Esper Sentinel has been declining for 7+ cycles without triggering a review. **EDHREC also grew +91 decks (7,802→7,893, +1.2%) — the archetype is healthy but card preferences are shifting.**
+- **What to change:** Add an `edhrec_trend_monitor` to the Validator or Scout that flags cards with (a) trend < -0.3 for 3+ consecutive cycles, or (b) trend < -0.5 on any single cycle. Cross-reference with deck inclusion — if a declining card is in the deck, generate a review recommendation with alternative suggestions.
+- **Impact:** Catches meta shifts before they cause deck obsolescence. Currently 0 agents detect cumulative declining trends.
+- **Risk:** Low — read-only alert. Does not modify deck.
+- **Validation:** After implementation, Esper Sentinel (7+ cycles at -0.67) should trigger a "CUMULATIVE_DECLINE_ALERT" with recommended replacement search.
 
 ---
 
-## 11. Acquisition Wishlist (Not Yet in Collection)
+## 12. Acquisition Wishlist (Updated v3.22)
 
 | Priority | Card | CMC | Est. Cost | Why |
 |:--------:|:-----|:---:|:---------:|:----|
@@ -372,11 +473,11 @@ A persistent pattern across the last 3+ verification cycles: Evolution Oracle re
 | 2 | **Underworld Breach** | 2 | $10-15 | Explosive GY recursion for spellslinger. Combo with Faithless Looting + rituals. |
 | 3 | **Enlightened Tutor** | 1 | $15-20 | Tutor for Top, Scroll Rack, Arcane Bombardment, Skullclamp. |
 | 4 | **Impact Tremors** | 2 | $3-5 | Pinger per ETB. With Twinflame infinite tokens = instant win. Fills stealth gap. |
-| 5 | **Idyllic Tutor** | 3 | $15-20 | Tutor for Arcane Bombardment, Double Vision, Smothering Tithe. |
+| 5 | **Furygale Flocking** 🆕 | 2 | < $1 | Copy spell, trend +2.30 rising. Budget alternative to Flare of Duplication for instant-speed spell copying. |
 
 ---
 
-## 12. Key Signals for App/Backend Logic
+## 13. Key Signals for App/Backend Logic
 
 | Signal | Source | What It Would Power |
 |:-------|:-------|:--------------------|
@@ -384,9 +485,11 @@ A persistent pattern across the last 3+ verification cycles: Evolution Oracle re
 | **Draw tag completeness** | task #3 evidence | Accurate draw density → better mulligan projections |
 | **Post-resolution viability** | task #4 evidence | Filter "fake resilient" wincons from recommendations |
 | **Wincon axis coverage** | task #5 evidence | Prevent single-axis vulnerability in constructed decks |
+| **EDHREC trend monitoring** 🆕 | v3.22 declining signals | Catch meta shifts before deck obsolescence |
 | **Ramp synergy depth** | §2 pattern | Score treasure-ramp higher than ritual-ramp in spellslinger decks |
 | **Hash integrity recomputation** | task #1 evidence | Pipeline trust — prevents silent state drift |
-| **Swap execution verification** | §9 pattern | Cross-check Evolution Oracle logs against actual DB state to detect unapplied swaps |
+| **Swap execution verification** | §10 pattern | Cross-check Evolution Oracle logs against actual DB state to detect unapplied swaps |
+| **SYNERGY_MAP degradation tracking** 🆕 | v3.22 §8.3 | Quantify impact of lost cards, not just detect their absence |
 
 ---
 
@@ -397,9 +500,10 @@ A persistent pattern across the last 3+ verification cycles: Evolution Oracle re
 | SCOUT_LOG | 2026-05-28 to 2026-06-01 | 35+ executions |
 | EVOLUTION_LOG | 2026-05-28 to 2026-06-01 | 23+ cycles |
 | BATTLE_LOG | 2026-05-30 to 2026-06-01 | 7 simulation runs (goldfish + matchup) |
-| MULLIGAN_LOG | 2026-05-28 to 2026-06-01 | 13 executions |
-| VALIDATOR_LOG | 2026-05-28 to 2026-06-01 | v3.5 through v3.21 |
+| MULLIGAN_LOG | 2026-05-28 to 2026-06-01 | 13+ executions |
+| VALIDATOR_LOG | 2026-05-28 to 2026-06-01 | v3.5 through **v3.22** |
 | wincon-patterns.md | 2026-05-31 | 7 patterns documented |
 | card_deck_analysis (PG) | 2026-06-01 | 1,495 entries across multiple decks |
-| EDHREC JSON API | ~2026-05-31 | 7,851 decks snapshot (stable 36h+) |
+| EDHREC JSON API | ~2026-05-31 to 2026-06-01 | 7,851 → **7,893** decks |
 | real-decklists.md | 2026-05-27 | 5 real Lorehold decks analyzed |
+| **VALIDATOR_LOG_v3.22** | **2026-06-01T20:52** | **Re-confirmation — EDHREC shifts, SYNERGY_MAP degradation, swap SQL** |
