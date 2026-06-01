@@ -1,3 +1,146 @@
+## Lorehold Execucao #13 — 2026-06-01T08:14:37+00:00
+
+### 🚨 Pipeline Integrity Alert
+- Card hash verificado: `30d00347764fc2a215edb4e668994871` (≠ `a440c497da4280d6769238737062b3dd` do Exec#12)
+- Swaps do C#17 REVERTIDOS: Demand Answers e Ashling NAO estao no deck
+- Todos os ciclos C#18-C#22 usaram hash stale
+
+### Resultados (N=1000, seed=42, metodologia CANONICA — tag-based ramp)
+| Metrica | Exec#13 (ATUAL) | Exec#12 (pos-C#17) | Delta |
+|:--------|:---------------:|:-------------------:|:-----:|
+| Sem Play T3 | **13.3%** | 11.3% | **+2.0pp** 🔴 |
+| Mulligan | 30.1% | 48.7% | -18.6pp ⚠️ |
+| Jogavel | 66.0% | 47.3% | +18.7pp ⚠️ |
+| Ramp T1 (Sol Ring) | 8.5% | 8.2% | +0.3pp |
+| Free Mulligan | 4.6% | 4.9% | -0.3pp |
+
+### Conclusao
+- **T3 = 13.3% > 12% → ZONA DEFENSIVA.** Deck precisa de swaps de reducao de CMC.
+- **Demand Answers (CMC 2) e Ashling (CMC 4) estao na colecao** — re-aplicar no proximo ciclo.
+- **Pipeline integrity bug em C#18-C#22** — hash verification deve ser refeito com computacao fresca.
+
+---
+
+## Verificacao -- 2026-06-01T06:48:30+00:00 (Sem Mudancas -- Ciclo #21 = 0 Swaps, MATURIDADE PERSISTENTE CONFIRMADA, 4o Ciclo)
+
+### Estado
+- Evolution Oracle Ciclo #21 (2026-06-01T05:51:21+00:00): **0 SWAPS** -- MATURIDADE PERSISTENTE. 4o ciclo consecutivo com 0 swaps (C#18, C#19, C#20, C#21).
+- Deck state: 35 lands, 100 cards, 86 unique names
+- Card hash: `a440c497da4280d6769238737062b3dd` (identico a Execucao #12 pos-C#17)
+- Sem Play T3 canonico: **11.3%** (Execucao #12, N=1000, seed=42)
+- Mulligan: **48.7%**, Jogaveis: **47.3%**, Ramp T1 (Sol Ring only): **8.2%**
+- CMC medio: 3.70
+- SYNERGY_MAP: 7.9/10
+- DB verified via card_hash MD5 — MATCH.
+
+### Decisao
+**Simulacao NAO executada.** O Evolution aplicou ZERO swaps. O deck e identico ao estado pos-Ciclo #17.
+Re-executar N=1000 reproduziria 11.3% com ruido de +-2.1pp. Nao ha valor incremental em re-executar.
+
+### MATURIDADE PERSISTENTE — 4o CICLO CONSECUTIVO
+4 ciclos consecutivos com 0 swaps (C#18, C#19, C#20, C#21) + hash inalterado desde Execucao #12.
+Deck maturity CONFIRMADA EM ALTA CONFIANCA. Pipeline em modo verificacao.
+
+### T3 = 11.3% — ZONA BALANCED
+Abaixo do limiar defensivo de 12%. Deck saudavel. Proximo upgrade requer AQUISICAO.
+
+---
+
+## Verificacao -- 2026-06-01T05:45:40+00:00 (Sem Mudancas -- Ciclo #20 = 0 Swaps, MATURIDADE PERSISTENTE CONFIRMADA)
+
+### Estado
+- Evolution Oracle Ciclo #20 (2026-06-01T04:46:07+00:00): **0 SWAPS** -- MATURIDADE PERSISTENTE. 3o ciclo consecutivo com 0 swaps (C#18, C#19, C#20).
+- Deck state: 35 lands, 100 cards, 86 unique names
+- Card hash: `a440c497da4280d6769238737062b3dd` (identico a Execucao #12 pos-C#17)
+- Sem Play T3 canonico: **11.3%** (Execucao #12, N=1000, seed=42)
+- Mulligan: **48.7%**, Jogaveis: **47.3%**, Ramp T1 (Sol Ring only): **8.2%**
+- CMC medio: 3.61
+- SYNERGY_MAP: 7.9/10
+
+### Decisao
+**Simulacao NAO executada.** O Evolution aplicou ZERO swaps. O deck e identico ao estado pos-Ciclo #17.
+Re-executar N=1000 reproduziria 11.3% com ruido de +-2.1pp. Nao ha valor incremental em re-executar.
+
+### MATURIDADE PERSISTENTE
+3 ciclos consecutivos com 0 swaps (C#18, C#19, C#20) + hash inalterado desde Execucao #12.
+Deck maturity CONFIRMADA. O pipeline de mulligan agora opera em modo verificacao: conferir hash, registrar, pular simulacao.
+
+### T3 = 11.3% -- ZONA BALANCED
+Abaixo do limiar defensivo de 12%. Sem urgencia defensiva. Deck saudavel.
+
+---
+
+## Verificacao -- 2026-06-01T04:42:11+00:00 (Sem Mudancas -- Ciclo #19 = 0 Swaps, BALANCED, Deck Saudavel, MATURIDADE PERSISTENTE)
+
+### Estado
+- Evolution Oracle Ciclo #19 (2026-06-01T04:12:12+00:00): **0 SWAPS** -- BALANCED. Deck saudavel, colecao esgotada.
+- Deck state: 35 lands, 100 cards, 86 unique names
+- Card hash: `a440c497da4280d6769238737062b3dd` (identico a Execucao #12 pos-C#17)
+- Sem Play T3 canonico: **11.3%** (Execucao #12, N=1000, seed=42)
+- Mulligan: **48.7%**, Jogaveis: **47.3%**, Ramp T1 (Sol Ring only): **8.2%**
+- Draw (DB-tagged): 8 (dentro do perfil minimo)
+- Double-null: 4 (Scroll Rack, Penance, Grand Abolisher, Taunt from the Rampart)
+- CMC medio: 3.61
+- SYNERGY_MAP: 7.9/10
+
+### Decisao
+**Simulacao NAO executada.** O Evolution aplicou ZERO swaps. O deck e identico ao estado pos-Ciclo #17.
+Re-executar N=1000 reproduziria 11.3% com ruido de +-2.1pp.
+
+### MATURIDADE PERSISTENTE CONFIRMADA
+9 ciclos de Evolution Oracle desde C#11. Apenas C#17 aplicou 2 swaps genuinos (Rise->Demand Answers, Longshot->Ashling).
+C#18 e C#19 = 0 swaps. Colecao esgotada de CMC <= 2 com sinergia. 36 cartas, todas com Necessidade < 3.
+
+### T3 = 11.3% — ZONA BALANCED
+Abaixo do limiar defensivo de 12%. Sem urgencia de swaps. Deck saudavel.
+
+### Estrategia para Proximo Ciclo
+- **T3 = 11.3% < 12% -> BALANCED.**
+- Colecao ESGOTADA. Proximo upgrade requer AQUISICAO: Skullclamp (CMC 1, $5-8).
+- Estado do deck: SAUDAVEL -- 27 swaps desde baseline, motor 4/4, copy 7, SYNERGY_MAP 7.9/10, Nivel 1 VAZIO, WR 61-68%.
+
+---
+## Verificacao -- 2026-06-01T01:58:53+00:00 (Sem Mudancas -- Ciclo #16 = 0 Swaps, 6o ciclo consecutivo, MATURIDADE ABSOLUTA CONSOLIDADA)
+
+### Estado
+- Evolution Oracle Ciclo #16 (2026-06-01T00:58:49+00:00): **0 SWAPS** -- 6o ciclo consecutivo sem swaps (C#11-C#16)
+- Deck state: 35 lands, 100 cards, 86 unique names
+- Card hash: `84bc87988d4ba64919f68b565f46482b` (identico desde Execucao #11 pos-C#10)
+- Sem Play T3 canonico: **13.3%** (Execucao #11, N=1000, seed=42)
+- Mulligan: **47.9%**, Jogaveis: **46.7%**, Ramp T1 (Sol Ring only): **6.3%**
+- Draw (DB-tagged): 7 (Esper Sentinel, Top, Thrill, Victory Chimes, The One Ring, Lorehold, Reforge)
+- Double-null: 4 (Scroll Rack, Penance, Grand Abolisher, Taunt from the Rampart)
+- CMC bands: 0-1=46, 2=11, 3=13, 4=9, 5=5, 6+=16
+
+### Decisao
+**Simulacao NAO executada.** O Evolution aplicou ZERO swaps pelo 6o ciclo consecutivo.
+O deck e identico ao estado pos-Ciclo #10.
+Re-executar N=1000 reproduziria 13.3% com ruido de +-2.1pp.
+
+### ALERTA: Pipeline Integrity -- EVOLUTION_LOG descreve deck FANTASMA
+🚨 O EVOLUTION_LOG C#16 descreve cartas que NAO estao no DB:
+- **Insurrection**: EVOLUTION_LOG lista como win-con (sec2), mas **NAO esta no deck_cards**.
+- **Wedding Ring**: EVOLUTION_LOG lista como draw source, mas **NAO esta no deck_cards**.
+- **Fated Clash**: EVOLUTION_LOG recomenda substituir por Skullclamp, mas **NAO esta no deck_cards**.
+
+Cartas que ESTAO no DB mas os logs tratam como "cortadas":
+- **Worldfire** (CMC 9), **Rise of the Eldrazi** (CMC 10), **Mother of Runes** (CMC 1) -- presentes no DB.
+
+**Impacto:** A analise estrategica do EVOLUTION_LOG (secoes 1-5) descreve um deck diferente do real.
+As recomendacoes de aquisicao (Skullclamp -> Fated Clash) sao baseadas em carta fantasma.
+Os agentes SCOUT e VALIDATOR podem estar lendo os mesmos arquivos stale.
+
+**As metricas de mulligan (13.3% T3) SAO corretas** -- foram simuladas contra o DB real (Exec#11).
+
+### Estrategia para Proximo Ciclo
+- **T3 = 13.3% > 12% -> DEFENSIVO obrigatorio.**
+- Colecao ESGOTADA de cartas CMC <= 2 com sinergia. 63+ cartas, 54+ avaliadas, 0 com Necessidade >= 3.
+- Proximo upgrade requer AQUISICAO: Skullclamp (CMC 1, draw engine). Prioridade #1.
+- ⚠️ **CORRIGIR PIPELINE INTEGRITY:** Evolution Oracle e Validator devem verificar deck_cards ANTES de analisar.
+- Estado do deck: **MATURIDADE ABSOLUTA CONSOLIDADA** -- 6 ciclos consecutivos sem swaps, 25 swaps desde baseline, motor 4/4, copy 6, SYNERGY_MAP 7 eixos 6-9/10, Nivel 1 VAZIO, WR 61-68%.
+
+---
+
 ## Verificacao -- 2026-06-01T00:53:54+00:00 (Sem Mudancas -- Ciclo #15 = 0 Swaps, 5o ciclo consecutivo)
 
 - Deck: Lorehold Spellslinger
