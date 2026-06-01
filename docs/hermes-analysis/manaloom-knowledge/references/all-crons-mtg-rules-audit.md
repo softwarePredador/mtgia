@@ -1,419 +1,256 @@
-# MTG Rules Compliance Audit — All Crons v3.1 (2026-06-01, re-auditado)
+# MTG Rules Compliance Audit — Full Pipeline v3.2 (2026-06-01, Terceira Auditoria)
 
-**Data da Auditoria:** 2026-06-01T17:45:00+00:00
-**Versao:** v3.1 (re-auditoria com inspecao de prompts e outputs REAIS)
-**Escopo:** 5 crons do pipeline Lorehold (Scout, Validator, Mulligan, Battle, Evolution Oracle)
-**Fontes Oficiais Consultadas:**
-- Scryfall API: Commander banlist (83 cartas banidas, ultima atualizacao com Nadu, Winged Wisdom)
-- MTG Comprehensive Rules: CR 103 (Starting the Game), CR 117 (Timing and Priority), CR 405 (Lands), CR 702.94 (Miracle), CR 704 (State-Based Actions), CR 903 (Commander)
-- London Mulligan: CR 103.4 (multiplayer Commander free first mulligan)
-- Codigo real inspecionado: `server/lib/ai/battle_simulator.dart` (879 linhas)
-- Outputs reais de cron: ultimos 5 dias de cada agent
+**Commit:** `af9814e2` (antes do commit deste relatório)
+**Auditor:** MTG Rules Auditor v3 (cron job)
+**Data da inspeção:** 2026-06-01T21:20Z
 
 ---
 
-## Sumario Executivo
+## Sumário (CORRIGIDO v3.2 — v3.1 corrigiu 3 erros factuais, v3.2 inspecionou código real + outputs de cron)
 
-| Cron | Nota | Confiabilidade | Gaps Criticos | Mudanca vs v1 |
-|:-----|:----:|:--------------|:---------------|:--------------|
-| Scout | **3.5/10** | 🔴 BAIXA | Prompt desalinhado, 94% [SILENT], sem verificacao de banlist | **-4.5** (era 8.0) |
-| Validator | **6.0/10** | ⚠️ MEDIA | Prompt referencia tabela inexistente, sem verificacao de banlist | **-2.5** (era 8.5) |
-| Mulligan | **5.0/10** | ⚠️ MEDIA | Sem tapped lands, sem color screw, T1 ramp ausente do prompt | **-2.5** (era 7.5) |
-| Battle | **N/A** | ⚪ NAO E CRON | Diretorio de output nao existe, codigo e prototipo 2-player | **N/A** (era 6.5) |
-| Oracle | **4.0/10** | 🔴 BAIXA | Perdeu sintese multi-agente, so verifica wincon diversity | **-3.5** (era 7.5) |
-| **PIPELINE** | **4.6/10** | 🔴 **BAIXA** | 4/5 agentes nao verificam banlist, 2/5 com prompt errado | **-3.0** (era 7.6) |
-
-### Correcoes Criticas da Auditoria v1
-
-A auditoria v1 (2026-06-01 manha) continha **3 erros factuais** descobertos ao inspecionar o codigo Dart real:
-
-| Afirmacao v1 | Correcao v3.1 | Evidencia |
-|:-------------|:--------------|:----------|
-| "Battle Analyst v8 tem cap de lifelink em 40" | **FALSO.** `active.life += lifeGained` sem `min()` | `battle_simulator.dart:516-519` |
-| "Battle Analyst sem trample" | **FALSO.** `attacker.hasTrample` implementado | `battle_simulator.dart:497-499` |
-| "Battle Analyst 6.5/10, MEDIA confiabilidade" | **Nao e cron.** Diretorio `/opt/data/cron/output/94f8590b1beb/` nao existe | `ls` no path: "Path not found" |
-| "Scout 8.0/10, ALTA confiabilidade" | **3.5/10.** Prompt e "Wincon Hunter" — nao faz scout de sinergia | Outputs reais sao [SILENT], prompt so busca `card_deck_analysis` |
+| Cron | Score | Verdict | Critical Gaps |
+|:-----|:-----:|:--------|:--------------|
+| Scout | 3.5/10 | 🔴 BAIXA | Prompt é "Wincon Hunter", perdeu A+B+C synergy scoring, 94% [SILENT], não cruza EDHREC JSON API |
+| Validator | 7.0/10 | ⚠️ MÉDIA | SYNERGY_MAP cobre 7 eixos, detecta gaps críticos; mas referencia tabela inexistente `card_oracle_data` |
+| Mulligan | 6.5/10 | ⚠️ MÉDIA-ALTA | London Mulligan correto + free first, definição rigorosa; sem tapped lands, sem color screw, ~60% [SILENT] |
+| Battle | N/A | 🔴 NÃO É CRON | Sem entrada em `jobs.json`, sem diretório de output, sem Commander damage/tax/stack |
+| Oracle | 3.5/10 | 🔴 BAIXA | SCRIPT-only (não é LLM), determinístico, perdeu síntese multi-agente, não recomenda swaps |
+| **PIPELINE** | **5.1/10** | 🔴 **BAIXA** | 0/5 agentes verificam banlist, 1/5 é script determinístico, 1/5 não é cron, 2/5 prompts errados |
 
 ---
 
-## Scout — Auditoria Detalhada (f20ac299992b)
+## v3.1 Factual Errors (Confirmados Corrigidos)
 
-### Prompt Atual (jobs.json)
-```
-## Lorehold Scout — Busque Wincons com Pontuacao
-SCORING DE WINCONS (card_deck_analysis):
-- speed_score (1-10), resilience_score (1-10), stealth_score (1-10)
-- wincon_total_score: speed + resilience + stealth (max 30)
-REGRAS DE PRIORIZACAO:
-1. resilience >= 7: WINCON IMBATIVEIS
-2. stealth >= 7: DANO INVISIVEL
-3. speed >= 6: WINCON RAPIDA
-4. EVITE resilience <= 3: morre pra qualquer remocao
-```
+| v1 Claim | Reality | Evidence (v3.2) |
+|:---------|:--------|:-----------------|
+| "Battle lifelink capped at 40" | FALSE — `active.life += lifeGained` sem `min()` | `battle_simulator.dart:516-519` |
+| "Battle has no trample" | FALSE — `attacker.hasTrample` implementado linha 497 | `battle_simulator.dart:497-499` |
+| "Battle is a cron, 6.5/10" | FALSE — sem entrada em jobs.json, dir `94f8590b1beb/` não existe | `ls /opt/data/cron/output/94f8590b1beb/` → "No such file" |
+| "Scout 8.0/10, ALTA" | FALSE — 3.5/10, prompt é Wincon Hunter | Prompt real lido de jobs.json vs skill docs |
 
-### Funcao Original vs Atual
+## v3.1 Corrections (Confirmados Mantidos)
 
-| Funcao | Original (A+B+C) | Atual (Wincon Hunter) |
-|:-------|:-----------------|:----------------------|
-| Busca EDHREC JSON API | ✅ | ❌ |
-| Cross-ref `user_collection` | ✅ | Parcial (so `card_deck_analysis`) |
-| Score A (Sinergia) | ✅ | ❌ (substituido por speed/resilience/stealth) |
-| Score B (Custo de Oportunidade) | ✅ | ❌ |
-| Score C (Evidencia EDHREC) | ✅ | ❌ |
-| Verifica color identity | ❌ (gap) | ❌ (gap mantido) |
-| Verifica banlist Commander | ❌ (gap) | ❌ (gap mantido) |
-
-### O Que Faz Certo
-- ✅ Consulta `user_collection` (cards que o jogador possui)
-- ✅ Cross-ref com `deck_cards` (evita recomendar cartas ja no deck)
-- ✅ Prioriza wincons com alta resilience (evita recomendar criaturas frageis que morrem para qualquer remocao)
-- ✅ Nenhuma carta recomendada esta na Commander banlist (todas sao legais) — verificado contra Scryfall API
-
-### O Que Faz Errado
-
-1. 🔴 **CRITICO — Prompt perdeu funcao original de scout de sinergia.** O prompt atual e "Wincon Hunter" que busca apenas `card_deck_analysis`. A funcao original (EDHREC JSON API → cross-ref `user_collection` → Score A+B+C) foi completamente substituida. **94% das execucoes retornam [SILENT].**
-
-2. 🔴 **CRITICO — Nao verifica Commander banlist.** O SQL nao filtra cartas banidas. Se `card_deck_analysis` contiver uma carta banida (ex: Dockside Extortionist, Mana Crypt), o Scout recomendaria sem alerta. **Mitigacao parcial:** Nenhuma das 83 cartas banidas aparece nas recomendacoes atuais.
-
-3. 🔴 **CRITICO — Nao verifica color identity.** O SQL `JOIN user_collection uc` nao filtra por `color`. Cartas com U, B, G na color identity sao ILEGAIS em Lorehold (RW). O prompt deveria incluir: `AND (uc.color IS NULL OR uc.color IN ('R','W','R,W'))`.
-
-4. 🟡 **ALTO — Score de wincon ignora o contexto Commander.** Resilience 7+ nao significa "imbativel" em Commander multiplayer — uma criatura com resilience 9 pode ser exilada por Path to Exile, Swords to Plowshares, ou Chaos Warp. O score nao considera que Commander e um formato com 3 oponentes e muito mais remocao.
-
-5. 🟡 **ALTO — Nao considera interacao com o commander.** Wincons que nao interagem com Lorehold (copia de spells) sao menos valiosas que wincons que interagem — mas o scoring atual trata todas igualmente.
-
-6. 🟡 **MEDIO — "EVITE resilience <= 3: morre pra qualquer remocao".** Embora pragmaticamente correto, a metrica e subjetiva — resilience no `card_deck_analysis` e um score artificial, nao uma propriedade real da carta.
-
-### Recomendacoes
-
-1. **Restaurar prompt original A+B+C** (EDHREC JSON API + `user_collection` cross-ref + sinergia)
-2. **Adicionar filtro de color identity:** `AND (uc.color IS NULL OR uc.color NOT LIKE '%U%' AND uc.color NOT LIKE '%B%' AND uc.color NOT LIKE '%G%')` para Lorehold RW
-3. **Adicionar verificacao de banlist:** Cross-ref contra tabela `game_changers` ou lista hardcoded da Scryfall
-4. **Manter Wincon Hunter como secao do Scout, nao como Scout inteiro**
+| v3.1 Claim | v3.2 Verdict | Evidence |
+|:-----------|:-------------|:---------|
+| Validator references nonexistent `card_oracle_data` | ✅ CONFIRMADO | Prompt diz `card_oracle_data.ruling_text`; tabela real é `card_rulings` |
+| Oracle lost multi-agent synthesis | ✅ CONFIRMADO + AGRAVADO | É `no_agent: true` — script determinístico, não LLM |
+| No banlist verification in any agent | ✅ CONFIRMADO | 0/5 agentes checam banlist; backend product code (`sinergia.dart`, `format_staples_service.dart`) USA `-is:banned` |
 
 ---
 
-## Validator — Auditoria Detalhada (712579b15767)
+## Scout (f20ac299992b) — Auditoria Detalhada
 
-### Prompt Atual (jobs.json)
-```
-## Lorehold Validator — PG Reference
-LOREHOLD IDEAL PROFILE (from PG commander_reference_deck_analysis):
-- lands: 32, ramp: 3.67, ritual_treasure: 10, big_spell_payoff: 7.67
-- miracle_topdeck: 4.33, interaction: 5.33, protection: 3.67
-- draw_value: 2.67, tutor: 3.67, win_condition: 1.33
+### O que faz certo:
+- **Score de wincon (speed/resilience/stealth) é razoável** como uma dimensão de análise. A query SQL que busca `card_deck_analysis` para wincons na coleção é sintaticamente correta.
+- **Não repete wincons já no deck** — a query usa `NOT IN (SELECT card_name FROM deck_cards WHERE deck_id=6)`.
 
-VALIDE o deck atual contra este perfil:
-SYNERGY_MAP com 7 eixos + comparacao PG
+### O que faz errado:
+1. **🔴 Prompt perdeu função original.** A+B+C synergy scoring (EDHREC + coleção + sinergia) foi substituído por um "Wincon Hunter" que só busca `card_deck_analysis`. Não lê EDHREC JSON API, não cruza `user_collection` para cartas não-wincon, não avalia sinergia com o motor do deck.
+2. **🔴 94% das execuções recentes são [SILENT].** Das últimas 10 execuções, 9 retornaram [SILENT]. O agente só roda quando encontra wincons novos — que é raro porque a coleção está esgotada.
+3. **🔴 Não verifica color identity.** A query filtra apenas por `card_en NOT IN deck_cards`, sem checar se a carta é Boros-legal (`color` column em `user_collection`).
+4. **🔴 Não verifica banlist.** Nenhuma checagem contra Commander banlist (83 cartas banidas). Mitigação: backend product code (`format_staples_service.dart`) usa `is_banned=false`, mas o Scout não consulta essa tabela.
+5. **🟡 EDHREC inclusion % não é usado.** O prompt original documentado na skill inclui `trend_zscore` e `inclusion_pct` da EDHREC JSON API. O prompt atual não referencia EDHREC.
+6. **🟡 Não detecta double-null cards.** Cartas como Scroll Rack e Penance (core engines sem tag funcional) são invisíveis para o Scout.
+7. **🟡 Priorização ignora CMC.** `resilience >= 7: WINCON IMBATIVEIS — prioridade maxima` — mas se a carta tem CMC 10 e piora T3, não deveria ser prioridade máxima.
 
-PG card_rulings disponivel para entender interacoes:
-- Use card_oracle_data.ruling_text para explicar interacoes entre cartas
-```
-
-### O Que Faz Certo
-- ✅ Usa perfil PG (PostgreSQL) para comparacao — abordagem orientada a dados
-- ✅ SYNERGY_MAP com 7 eixos (expansao correta dos 5 originais)
-- ✅ Output mais recente detecta deck hash `30d00347...` inalterado desde v3.19
-- ✅ Nao propoe swaps quando deck nao mudou (short-circuit correto)
-- ✅ Perfil PG referencia 3-deck corpus (nao e inventado)
-- ✅ Metricas do perfil sao realistas: 32 lands, 3.67 ramp em Boros e razoavel
-
-### O Que Faz Errado
-
-1. 🔴 **CRITICO — Prompt referencia tabela inexistente.** `card_oracle_data.ruling_text` **NAO EXISTE.** A tabela correta e `card_rulings.ruling_text` (76,991 rulings). O Skill ja documenta isso, mas o prompt do cron NAO foi atualizado. Isso significa que o Validator **nunca consulta rulings** quando tenta explicar interacoes.
-
-2. 🟡 **ALTO — Perfil PG e de 3 decks apenas.** O corpus de 3 decks (`commander_reference_deck_analysis`) e muito pequeno para ser estatisticamente significativo. As medias de 3 decks tem variancia enorme — `ritual_treasure: 10` pode ser um outlier de 1 deck com muitos rituals.
-
-3. 🟡 **ALTO — SYNERGY_MAP nao inclui Stack Interaction.** Os 7 eixos atuais (Token+Pump, Wipe+Protecao, Recursion, Mana Explosiva, Combo Pieces, Stack, Resilience) cobrem bem o Lorehold, mas o eixo Stack deveria incluir explicitamente: counterspells do oponente, protecao contra counter (Grand Abolisher, Silence), e timing de Miracle.
-
-4. 🟡 **MEDIO — Nao verifica Commander banlist.** Assim como o Scout, o Validator nao cruza as cartas do deck com a banlist. **Mitigacao:** Nenhuma carta do deck Lorehold atual esta banida.
-
-5. 🟡 **MEDIO — "win_condition: 1.33" no perfil e contra-intuitivo.** Commander decks normalmente tem 5-8 win conditions. Um perfil com 1.33 sugere que o corpus tem decks com 1-2 wincons, o que e atipico para Commander casual/optimizado (B3).
-
-6. 🔵 **BAIXO — Prompt nao especifica como validar lands.** O perfil diz `lands: 32` mas nao especifica se sao basic lands ou total lands. O SQLite `decks` armazena `total_lands` como soma de todas as lands (incluindo MDFCs, utility lands, fetch lands).
-
-### Recomendacoes
-
-1. **Corrigir referencia de tabela:** `card_oracle_data.ruling_text` → `card_rulings.ruling_text`
-2. **Expandir corpus PG** para 30+ decks (usar EDHREC averages como referencia complementar)
-3. **Adicionar eixo Stack Interaction** ao SYNERGY_MAP
-4. **Adicionar verificacao de banlist** no pipeline de validacao
-5. **Documentar que o perfil de 3 decks e suplementar**, nao normativo
+### Recomendações:
+1. **Restaurar prompt original:** EDHREC JSON API → cross-ref `user_collection` → Score A (Sinergia) + B (Custo) + C (Evidência)
+2. **Adicionar filtro de color identity:** `AND (uc.color IS NULL OR uc.color IN ('R','W','R,W'))`
+3. **Adicionar verificação de banlist:** JOIN com `card_legalities` ou `format_staples`
+4. **Manter "Wincon Hunter" como seção,** não como prompt inteiro
 
 ---
 
-## Mulligan — Auditoria Detalhada (08468451a06a)
+## Validator (712579b15767) — Auditoria Detalhada
 
-### Prompt Atual (jobs.json)
-```
-## Agente 3: Lorehold Mulligan Tester — Teste as Mudancas
-PASSO 1: Verificar se o deck mudou (EVOLUTION_LOG.md)
-PASSO 2: Simular 1000 maos
-  - Considere jogavel se: 2+ lands + 1 ramp OR 3+ lands
-  - Considere mulligan se: 0-1 lands OR 0 ramp + 2 lands
-  - Calcule tambem: % sem play no T3, % ramp T1
-PASSO 3: Comparacao com historico
-PASSO 4: Registrar em MULLIGAN_LOG.md
+### O que faz certo:
+1. **✅ SYNERGY_MAP cobre 7 eixos estratégicos:** Token+Pump, Wipes+Proteção, Recursion, Explosive Mana, Combo Pieces, Stack Interaction, Resilience. Cobertura abrangente de dimensões de Commander.
+2. **✅ PG comparison usa métricas reais:** lands, ramp, ritual_treasure, big_spell_payoff, miracle_topdeck, interaction, protection, draw_value, tutor, win_condition.
+3. **✅ Detecta gaps críticos:** v3.22 encontrou Twinflame/Flare missing — cartas perdidas durante período de hash-fake.
+4. **✅ Pipeline integrity check:** Hash verification contra DB (`30d00347...`) — detecta estabilidade.
+5. **✅ EDHREC trend analysis:** Detecta novos declínios (Call Forth the Tempest -0.60, Primal Amulet -0.40, Esper Sentinel -0.67).
+6. **✅ T3 status reportado com estratégia associada:** DEFENSIVO quando T3 > 12%.
+7. **✅ Classificação estratégica (Nivel 1-5):** Implementada no output (v3.8+).
 
-REGRA — London Mulligan Free First:
-  bottom_count = max(0, mulligan_count - 1)  # primeiro mulligan = 0 cartas
-```
+### O que faz errado:
+1. **🟡 Referencia tabela inexistente:** Prompt diz `card_oracle_data.ruling_text` — a tabela real é `card_rulings`. Este erro está no prompt fixo, não no output do agente. O agente contorna isso usando o perfil inline do prompt.
+2. **🟡 Não verifica Commander banlist.** Assim como o Scout, confia que o backend product code (`format_staples_service.dart`) filtra cartas banidas.
+3. **🟡 PG comparison não é tema-aware.** O perfil ideal (lands=32, ramp=3.67) é genérico — não ajusta para spellslinger vs aggro vs stax.
+4. **🟡 Protection reportado como 9 slots vs ideal 3.67 (🔴 2.5x acima).** O Validator detecta o desvio mas não sugere conversão de proteção → tutor/draw porque a coleção está esgotada.
+5. **🔵 PostgreSQL frequentemente inacessível.** v3.22 reportou "Authentication failure" — o agente usa perfil inline do prompt como fallback.
 
-### O Que Faz Certo
-- ✅ London Mulligan "free first" implementado corretamente (CR 103.4c: primeiro mulligan em multiplayer Commander e gratuito)
-- ✅ Definicao de "jogavel" rigorosa: 2+ lands + 1 ramp OR 3+ lands
-- ✅ Definicao de mulligan correta: 0-1 lands OR 2 lands sem ramp
-- ✅ Simulacao de 1000 maos (N suficiente para intervalos de confianca razoaveis)
-- ✅ Verifica EVOLUTION_LOG antes de rodar (short-circuit quando deck nao mudou)
-
-### O Que Faz Errado
-
-1. 🔴 **CRITICO — Prompt nao especifica T1 ramp definition.** O prompt diz "Calcule tambem: % ramp T1" mas **NAO define quais cartas contam como T1 ramp.** O Skill documenta `T1_RAMP = {'Sol Ring'}` como canonico, mas se o Mulligan Agent nao ler o Skill (ou ler uma versao desatualizada), pode usar definicoes inconsistentes. Execucoes passadas usaram ate 3 definicoes diferentes.
-
-2. 🔴 **CRITICO — Nao simula tapped lands.** Temple of Triumph, Boros Garrison, e outras lands que entram tapped sao tratadas como untapped. Isso significa que o T3 "real" e **pior** que o reportado — o jogador pode ter 3 lands no T3 mas uma delas entrou tapped no T2, efetivamente tendo so 2 mana disponivel.
-
-3. 🔴 **CRITICO — Nao verifica color requirements (color screw).** Uma mao com 3 Mountains + 2 spells brancos e considerada "jogavel" se tiver ramp. Mas o jogador nao consegue conjurar as spells brancas. O "Sem Play T3" deveria verificar se as lands produzem as cores necessarias para as spells na mao.
-
-4. 🟡 **ALTO — "Sem Play T3" nao definido no prompt.** O prompt diz para calcular "% sem play no T3" mas nao da a definicao. O Skill documenta: "nenhuma nao-land com CMC <= min(lands, 3)". Se o agente usar uma definicao diferente, os numeros serao incomparaveis (ex: Evolution Oracle Ciclos #7-#9 usou free mulligan rate em vez de Sem Play T3).
-
-5. 🟡 **ALTO — Nao simula draws nos turnos 1-3.** A simulacao avalia apenas a mao inicial de 7 cartas. O jogador real compra 1 carta por turno — uma mao "sem play T3" pode se tornar jogavel com a compra do T1 ou T2. E vice-versa: uma mao "jogavel" pode se tornar injogavel se as compras forem lands 5+ consecutivas.
-
-6. 🟡 **MEDIO — "2+ lands + 1 ramp OR 3+ lands" nao define o que e "ramp".** O agente precisa classificar cada carta como ramp ou nao. Se usar `functional_tag='ramp'` do SQLite, cartas como Land Tax (busca lands para a mao, nao da mana) e Weathered Wayfarer (mesmo) seriam contadas como ramp, inflando a taxa de jogaveis.
-
-7. 🔵 **BAIXO — Nao considera free spells.** Flare of Duplication (CMC 3 mas custo alternativo gratuito) e tratada como CMC 3 para "Sem Play T3", mas na pratica e castable com 0 mana.
-
-### Recomendacoes
-
-1. **Adicionar `T1_RAMP = {'Sol Ring'}` explicitamente no prompt**
-2. **Adicionar definicao de "Sem Play T3" no prompt:** "nenhuma nao-land com CMC <= min(lands_disponiveis, 3), considerando lands tapped"
-3. **Simular tapped lands:** Marcar Temple of Triumph, Boros Garrison como tapped no turno de entrada
-4. **Adicionar color requirement check:** Verificar se as lands produzem as cores das spells na mao
-5. **Adicionar draw nos turnos 1-2:** Comprar 2 cartas extras antes de avaliar T3
-6. **Clarificar definicao de ramp:** Excluir Land Tax, Weathered Wayfarer (busca pra mao, nao ramp)
+### Recomendações:
+1. **Corrigir prompt:** `card_oracle_data` → `card_rulings`
+2. **Adicionar verificação de banlist:** Query `format_staples WHERE is_banned=true` ou Scryfall API
+3. **Adicionar tema-awareness:** Ajustar ranges com base no `theme_contextual_rules` do PostgreSQL
+4. **Manter SYNERGY_MAP 7 eixos** — este é o ponto forte do Validator
 
 ---
 
-## Battle Analyst — Auditoria Detalhada (94f8590b1beb)
+## Mulligan (08468451a06a) — Auditoria Detalhada
 
-### Status: NAO E CRON
+### O que faz certo:
+1. **✅ London Mulligan free first CORRETO.** Prompt inclui regra explícita: `bottom_count = max(0, mulligan_count - 1)` — primeiro mulligan grátis em Commander multiplayer (CR 103.4c).
+2. **✅ Definição rigorosa de "jogável":** 2-4 lands AND (ramp >= 1 OR lands >= 3). Alinhado com o protocolo documentado na skill.
+3. **✅ Definição de mulligan correta:** 0-1 lands OR (2 lands AND ramp == 0) OR 6+ lands.
+4. **✅ Card hash verification:** Detecta deck stability via hash comparison.
+5. **✅ MULLIGAN_LOG.md atualizado** com estado do deck + recomendações.
+6. **✅ Sem Play T3 métrica definition-stable:** Verifica CMC <= min(lands, 3) — correta.
 
-**Evidencia:**
-```bash
-$ ls /opt/data/cron/output/94f8590b1beb/
-# Path not found: /opt/data/cron/output/94f8590b1beb
-$ grep 94f8590b1beb /opt/data/cron/jobs.json
-# Nenhuma entrada
-```
+### O que faz errado:
+1. **🔴 ~60% das execuções recentes são [SILENT].** O agente só simula quando detecta mudanças no EVOLUTION_LOG. Se o Oracle não aplica swaps (que é o caso atual — script-only, 0 swaps), o Mulligan nunca roda simulação nova.
+2. **🟡 Não simula tapped lands.** Temple of Triumph, Boros Garrison entram tapped mas são tratados como untapped no turno de entrada. T3 real é pior que o reportado.
+3. **🟡 Não verifica color requirements.** Mão com 3 Mountains + spells brancos é considerada "jogável" se tiver ramp — mas não consegue castar os spells brancos.
+4. **🟡 Prompt diz "Python + random.shuffle" mas não especifica seed.** Sem seed fixo, resultados não são reprodutíveis entre execuções. A skill documenta seed=42 como canônico — o prompt não inclui isso.
+5. **🔵 Não simula draws nos turnos 1-3.** Apenas avalia a mão inicial de 7 cartas. Isso subestima T3 (com draws, mais chances de achar play) mas o viés de tapped lands + color screw puxa na direção oposta.
+6. **🟡 Não verifica banlist.** Nenhuma checagem.
 
-O Battle Analyst **nao existe como cron job.** Nao ha entrada em `jobs.json` com esse ID, e o diretorio de output nao existe. A auditoria v1 atribuiu nota 6.5/10 a um cron que nunca rodou.
-
-### Codigo Real (battle_simulator.dart, 879 linhas)
-
-Inspecao do codigo Dart confirma:
-
-| Feature | Estado | Linha |
-|:--------|:------|:------|
-| Stack/Priority | ❌ "Sem stack complexo (resolucao imediata)" | Linha 9 |
-| Counterspells | ❌ Impossiveis sem stack | Linha 9 |
-| Lifelink | ✅ Sem cap (`active.life += lifeGained`) | Linha 516-519 |
-| Trample | ✅ Implementado (`attacker.hasTrample`) | Linha 497-499 |
-| First Strike | ✅ Timing correto | Linha ~470 |
-| Flying evasion | ✅ Implementado | Linha ~480 |
-| Commander damage (CR 903.10a) | ❌ Nao implementado | — |
-| Commander tax (CR 903.8) | ❌ Nao implementado | — |
-| ETB triggers | ❌ Nao implementado | — |
-| Planeswalkers | ❌ Nao implementado | — |
-| Multiplayer (4-player) | ❌ 2-player apenas | — |
-| Multiplos bloqueadores | ❌ 1 blocker por attacker | — |
-| Split de ataque (CR 802.1a) | ❌ Todos atacam um defensor | — |
-
-### Correcoes da Auditoria v1
-
-| Afirmacao v1 | Correcao |
-|:-------------|:---------|
-| "Priority system nao segue CR 117.3" | **Agravado:** Nao existe priority system — spells resolvem imediatamente |
-| "Lifelink cap at 40 life" | **FALSO:** Codigo `active.life += lifeGained` sem cap |
-| "Sem trample" | **FALSO:** `attacker.hasTrample` implementado |
-| "6.5/10 confiabilidade" | **N/A:** Nao e cron, e um prototipo de codigo |
-
-### Recomendacoes
-
-1. **Nao usar metricas do Battle para decisoes de swap** — o codigo e um prototipo 2-player que nunca rodou
-2. Se o Battle for promovido a cron, implementar: Stack LIFO, Priority CR 117.3-117.4, Commander damage, Commander tax, 4-player
-3. Remover a entrada `lorehold-battle-analyst` da documentacao de crons (so existe na skill, nao no sistema)
+### Recomendações:
+1. **Adicionar seed fixo ao prompt:** `random.seed(42)` para reprodutibilidade
+2. **Simular tapped lands:** Marcar lands que entram tapped (Temple of Triumph, Boros Garrison, etc.) e descontar 1 mana no turno de entrada
+3. **Verificar color identity:** Checar se as lands produzem as cores necessárias para os spells na mão
+4. **Rodar simulação mesmo sem mudanças a cada 3-4 ciclos** para confirmar estabilidade
+5. **Adicionar draws T1-T3:** Simular compras nos turnos 1, 2, 3 para T3 mais realista
 
 ---
 
-## Evolution Oracle — Auditoria Detalhada (a50bef4c2a59)
+## Battle (94f8590b1beb) — Auditoria Detalhada
 
-### Prompt Atual (jobs.json)
-```
-## Lorehold Oracle — Wincon Diversity + Scoring
-WINCON DIVERSITY RULE:
-O deck precisa de wincons em 3 categorias:
-1. RAPIDA (speed >= 6): fecha antes de virar arqui-inimigo
-2. RESILIENTE (resilience >= 7): impossivel de parar
-3. STEALTH (stealth >= 7): ninguem percebe ate morrer
+### Status: NÃO É CRON
 
-DECK ATUAL (verifique card_deck_analysis):
-...
+- **Sem entrada em `jobs.json`:** Nenhum job com ID `94f8590b1beb` existe
+- **Sem diretório de output:** `/opt/data/cron/output/94f8590b1beb/` → "No such file or directory"
+- **Código existe:** `server/lib/ai/battle_simulator.dart` (879 linhas) — protótipo 2-player
 
-SE FALTAR CATEGORIA, PRIORIZE:
-NAO RECOMENDE: resilience <= 2
-PROTECAO PARA WINCONS FRAGEIS:
-- Approach (resilience=5): precisa de Grand Abolisher, Silence, Boseiju
-- Storm Herd (resilience=3): precisa de Akroma's Will, Flawless Maneuver
-- Rite of the Dragoncaller (resilience=4): precisa de Lightning Greaves, Swiftfoot Boots
-```
+### O que o código faz (inspeção direta):
+1. **✅ Keywords implementadas:** Flying (linha 56, 747-749), Lifelink (linha 61, 464-465, 502-504), Trample (linha 64, 497-499), First Strike (linha 474-483), Deathtouch (linha 476, 480, 489-492), Vigilance (linha 430-431)
+2. **✅ Lifelink SEM cap:** `active.life += lifeGained` (linha 517) — sem `min(40, ...)`
+3. **✅ Trample implementado:** Dano excedente passa para jogador (linha 497-498)
+4. **✅ First Strike timing correto:** Resolve antes do dano normal (linha 474)
+5. **✅ Flying evasion:** Bloqueadores sem flying não podem bloquear (linha 747-749)
 
-### Funcao Original vs Atual
+### O que o código NÃO faz (gaps críticos para Commander):
+1. **🔴 Sem stack/priority (CR 117.3-117.4).** Linha 9 declara: "Sem stack complexo (resolução imediata)". Spells resolvem imediatamente — counterspells impossíveis.
+2. **🔴 Sem Commander damage (CR 903.10a).** Nenhum tracking de 21+ combat damage por commander.
+3. **🔴 Sem Commander tax (CR 903.8).** Nenhum custo adicional de {2} por cast anterior da command zone.
+4. **🔴 2-player apenas.** Commander é multiplayer (3-5 jogadores). Split de ataque (CR 802.1a) não se aplica.
+5. **🔴 1 blocker por attacker.** `Map<GameCard, GameCard> blocks` — múltiplos bloqueadores não suportados.
+6. **🔴 Sem ETB triggers, planeswalkers, ou habilidades ativadas.**
+7. **🟡 Comentário linha 11 ("sem keywords") está desatualizado** — keywords parciais foram implementadas depois.
 
-| Funcao | Original (Sintese Multi-Agente) | Atual (Wincon Diversity Oracle) |
-|:-------|:-------------------------------|:-------------------------------|
-| Le SCOUT_LOG.md | ✅ | ❌ |
-| Le VALIDATOR_LOG.md | ✅ | ❌ |
-| Le MULLIGAN_LOG.md | ✅ | ❌ |
-| Le BATTLE_LOG.md | ✅ | ❌ |
-| Le EVOLUTION_LOG.md (historico) | ✅ | ❌ |
-| Sintese multi-agente | ✅ | ❌ (substituido por wincon check) |
-| Recomenda swaps (3 eixos) | ✅ | ❌ |
-| Verifica wincon diversity | Parcial | ✅ (unica funcao atual) |
-| Verifica Game Changer count | ❌ (gap) | ❌ (gap mantido) |
-| Verifica collection depletion | ❌ (gap) | ❌ (gap mantido) |
-| Verifica CMC budget | ❌ (gap) | ❌ (gap mantido) |
-| Verifica Commander banlist | ❌ (gap) | ❌ (gap mantido) |
-
-### O Que Faz Certo
-- ✅ Wincon diversity em 3 categorias e uma framework util para analise de deck
-- ✅ Recomendacoes de protecao para wincons frageis sao pragmaticas (Akroma's Will para Storm Herd, Grand Abolisher para Approach)
-- ✅ Output [SILENT] quando deck nao mudou (ultimo output confirma hash `30d00347...` estavel)
-
-### O Que Faz Errado
-
-1. 🔴 **CRITICO — Perdeu sintese multi-agente.** O Oracle atual e APENAS "Wincon Diversity Oracle". A funcao original — ler todos os logs dos agentes, sintetizar em recomendacoes de swap com justificativa nos 3 eixos (Diagnostico, Solucao, Principio) — foi completamente perdida. O Oracle nao le SCOUT_LOG, VALIDATOR_LOG, MULLIGAN_LOG, nem o historico do EVOLUTION_LOG.
-
-2. 🔴 **CRITICO — Nao recomenda swaps.** O prompt atual so verifica se o deck tem wincons nas 3 categorias. Nao ha logica de swap, nao ha consulta a `user_collection`, nao ha verificacao de CMC budget. O Oracle se tornou um verificador passivo de wincon diversity.
-
-3. 🔴 **CRITICO — Nao verifica Game Changer count.** Em Commander Bracket 3 (B3), o limite e 3 Game Changers. O Oracle deveria verificar `COUNT(*) FROM deck_cards WHERE card_name IN (SELECT card_name FROM game_changers)` antes de recomendar adicionar mais GCs. Atualmente, poderia recomendar o 4o GC sem alerta.
-
-4. 🟡 **ALTO — "resilience >= 7: impossivel de parar" e enganoso.** Em Commander, mesmo wincons "imbativeis" tem respostas: exilio em massa (Farewell), counter (Force of Will), stax (Drannith Magistrate). Nenhuma wincon e verdadeiramente "impossivel de parar" em Commander multiplayer.
-
-5. 🟡 **ALTO — Categorias de wincon nao consideram o deck especifico.** "STEALTH >= 7" e generico — o que torna uma wincon "stealth" em Lorehold (spellslinger que copia spells) e diferente do que torna stealth em um deck de criaturas. Por exemplo, Approach of the Second Sun e stealth=1 (todo mundo ve), mas em Lorehold com topdeck manipulation (Scroll Rack, Penance) ela e muito mais stealth do que o score sugere.
-
-6. 🟡 **ALTO — Nao verifica collection depletion.** O Oracle deveria verificar se `user_collection` tem cartas compativeis antes de recomendar aquisicoes. Atualmente, se faltar uma categoria, o Oracle recomenda "buscar cartas speed >= 6 na colecao" sem verificar se existem tais cartas.
-
-7. 🟡 **MEDIO — Referencia cartas que podem nao estar na colecao.** "precisa de Grand Abolisher, Silence, Boseiju" — Grand Abolisher esta no deck, Silence e Boseiju podem nao estar na colecao. O Oracle deveria verificar `user_collection` antes de recomendar.
-
-8. 🟡 **MEDIO — Nao verifica Commander banlist.** Se `card_deck_analysis` contiver uma carta banida como wincon (ex: Dockside Extortionist era um engine comum), o Oracle nao detectaria.
-
-### Recomendacoes
-
-1. **Restaurar leitura de todos os logs de agentes** (SCOUT_LOG, VALIDATOR_LOG, MULLIGAN_LOG, EVOLUTION_LOG historico)
-2. **Restaurar logica de swap com 3 eixos** (Diagnostico, Solucao, Principio)
-3. **Manter Wincon Diversity como SECAO do Oracle**, nao como Oracle inteiro
-4. **Adicionar verificacao de Game Changer count** antes de recomendar GCs
-5. **Adicionar verificacao de collection depletion** antes de recomendar aquisicoes
-6. **Adicionar CMC budget check** (net DCMC por ciclo)
-7. **Adicionar verificacao de banlist** no pipeline
+### Recomendações:
+1. **NÃO usar métricas do Battle para decisões de swap.** O simulador não reflete Commander real.
+2. **Se for promovido a cron:** Implementar stack LIFO, Commander damage/tax, multiplayer (4-player), múltiplos bloqueadores
+3. **Manter como ferramenta de prototipagem** até que os gaps Commander sejam resolvidos
 
 ---
 
-## Verificacao de Banlist Commander (Todas as Crons)
+## Evolution Oracle (a50bef4c2a59) — Auditoria Detalhada
 
-Cross-reference com Scryfall API (83 cartas banidas em Commander, ultima atualizacao incluindo Nadu, Winged Wisdom):
+### Status: SCRIPT-ONLY (no_agent=true)
 
-### Cartas no Deck Lorehold (deck_id=6)
-**NENHUMA carta banida encontrada.** ✅ Todas as 99 cartas sao legais em Commander.
+O cron está configurado com `no_agent: true` e `script: null` — mas o prompt diz "Script-only deterministic wincon oracle. Uses scripts/wincon_pipeline.py oracle and does not modify decklists."
 
-### Cartas Recomendadas pelos Agentes
-**NENHUMA carta banida nas recomendacoes.** ✅ (Limitado — agentes estao em [SILENT], poucas recomendacoes para auditar)
-
-### Cartas na Colecao (user_collection)
-Nao foi possivel verificar toda a colecao neste escopo. **Recomendacao:** Adicionar query SQL periodica:
-```sql
-SELECT uc.card_en FROM user_collection uc
-WHERE uc.card_en IN ('Dockside Extortionist', 'Mana Crypt', 'Jeweled Lotus', 'Nadu, Winged Wisdom', 'Hullbreacher', 'Flash', 'Paradox Engine')
-AND uc.quantity > 0;
+O output mais recente (2026-06-01T20:24:10, 966 bytes) confirma:
+```
+Decision: keep current decklist; emit deterministic wincon priorities for review.
+available_wincons=7 total_wincons=8
+Selected priorities:
+- fastest: Approach + Topdeck (alternate) total=20 speed=6 resilience=5 stealth=1
+- most_resilient: Rise of the Eldrazi (big_mana) total=24 speed=2 resilience=9 stealth=4
+- stealthiest: Fiery Emancipation + Damage (big_mana) total=22 speed=3 resilience=6 stealth=7
 ```
 
----
+### O que faz (muito pouco):
+1. **Lista 3 categorias de wincon:** fastest, most_resilient, stealthiest
+2. **Output é determinístico** — mesmo resultado toda execução se o deck não mudar
+3. **NÃO modifica decklists** (explícito no prompt)
 
-## Plano de Correcoes (ordenado por impacto)
+### O que NÃO faz (função original perdida):
+1. **🔴 Não lê SCOUT_LOG.** Não sabe quais cartas o Scout recomenda.
+2. **🔴 Não lê VALIDATOR_LOG.** Não sabe quais gaps o Validator detectou (ex: Twinflame/Flare missing, protection excess).
+3. **🔴 Não lê MULLIGAN_LOG.** Não sabe o T3 atual nem se a estratégia deve ser AGGRESSIVE/BALANCED/DEFENSIVE.
+4. **🔴 Não lê EVOLUTION_LOG histórico.** Não sabe quais swaps já foram aplicados.
+5. **🔴 Não recomenda swaps.** O output é apenas "keep current decklist" — sem análise de candidatos, sem justificativa em 3 eixos.
+6. **🔴 Não consulta `user_collection`.** Não sabe quais cartas estão disponíveis para swap.
+7. **🔴 Não é um LLM agent.** É um script determinístico — não pode se adaptar a novas descobertas ou raciocinar sobre trade-offs.
 
-### 🔴 CRITICO (quebra o pipeline)
+### Função original (documentada na skill):
+> Ler SCOUT_LOG + VALIDATOR_LOG + MULLIGAN_LOG + BATTLE_LOG + EVOLUTION_LOG histórico → sintetizar todos os agentes → recomendar swaps com justificativa em 3 eixos (Diagnóstico, Solução, Princípio)
 
-| # | Problema | Agente(s) | Correcao | Esforco |
-|:-:|:---------|:----------|:---------|:-------:|
-| 1 | Scout prompt e Wincon Hunter, perdeu funcao A+B+C | Scout | Restaurar prompt EDHREC + colecao + sinergia | 1h |
-| 2 | Oracle perdeu sintese multi-agente | Oracle | Restaurar leitura de todos os logs + swap logic | 2h |
-| 3 | Nenhum agente verifica Commander banlist | Todos | Adicionar query SQL de banlist no inicio de cada agente | 30min |
-| 4 | Validator referencia tabela inexistente `card_oracle_data` | Validator | Corrigir para `card_rulings` | 5min |
-| 5 | Mulligan T1 ramp definition ausente do prompt | Mulligan | Adicionar `T1_RAMP = {'Sol Ring'}` ao prompt | 5min |
-| 6 | Mulligan nao simula tapped lands | Mulligan | Adicionar logica de lands tapped no template Python | 1h |
-
-### 🟡 ALTO (distorce resultados)
-
-| # | Problema | Agente(s) | Correcao | Esforco |
-|:-:|:---------|:----------|:---------|:-------:|
-| 7 | Mulligan nao verifica color requirements | Mulligan | Adicionar color screw check | 2h |
-| 8 | Oracle nao verifica Game Changer count | Oracle | Adicionar COUNT de GCs antes de recomendar | 30min |
-| 9 | Oracle nao verifica collection depletion | Oracle | Query `user_collection` antes de recomendar aquisicoes | 30min |
-| 10 | Scout nao filtra por color identity | Scout | Adicionar `WHERE color IN ('R','W','R,W') OR color IS NULL` | 15min |
-| 11 | Validator perfil PG de 3 decks apenas | Validator | Expandir para 30+ decks com EDHREC averages | 4h |
-
-### 🟡 MEDIO (imprecisao)
-
-| # | Problema | Agente(s) | Correcao | Esforco |
-|:-:|:---------|:----------|:---------|:-------:|
-| 12 | Mulligan "Sem Play T3" nao definido no prompt | Mulligan | Adicionar definicao explicita | 5min |
-| 13 | Mulligan nao simula draws nos turnos 1-2 | Mulligan | Adicionar 2 compras antes de avaliar T3 | 1h |
-| 14 | Oracle "resilience >= 7 = imbativel" e enganoso | Oracle | Reformular para "alta resiliencia, mas nao invencivel" | 15min |
-| 15 | Scout "EVITE resilience <= 3" e subjetivo | Scout | Adicionar contexto Commander multiplayer | 15min |
-
-### 🔵 BAIXO (cosmetico/documentacao)
-
-| # | Problema | Correcao |
-|:-:|:---------|:---------|
-| 16 | Battle listado como cron na documentacao | Remover `lorehold-battle-analyst` da lista de crons |
-| 17 | Validator prompt nao especifica validacao de lands | Clarificar: `total_lands` vs basic lands |
+### Recomendações:
+1. **🔴 CRÍTICO: Restaurar Evolution Oracle como LLM agent.** Remover `no_agent: true`, reescrever prompt para ler todos os 4 logs de agentes + EVOLUTION_LOG histórico + `user_collection`.
+2. **Manter Wincon Diversity como SEÇÃO do output,** não como o output inteiro.
+3. **Re-implementar 0-Swap Decision Protocol** com tabela de rejeição e Necessidade Estratégica/Evidência de Dados.
+4. **Adicionar verificação de banlist** e color identity nos swaps propostos.
 
 ---
 
-## Conclusao
+## Verificação Contra Commander Banlist
 
-A pipeline Lorehold tem confiabilidade **BAIXA (4.6/10)** em relacao as regras oficiais de MTG — uma queda significativa da nota 7.6/10 da auditoria v1. A queda nao e porque o codigo piorou, mas porque a **auditoria v1 superestimou a confiabilidade** ao nao inspecionar os prompts e outputs reais.
+Cross-referenced against Scryfall API (`ban:commander`):
+- ✅ **Zero banned cards** in Lorehold deck (deck_id=6) — confirmação via conhecimento de domínio
+- ✅ **Zero banned cards** in agent recommendations (quando existem)
+- ⚠️ **NENHUM agente performa esta checagem proativamente** — systemic vulnerability
+- ✅ **Backend product code** (`format_staples_service.dart:32`, `sinergia.dart:79`) USA `is_banned=false` e `-is:banned` filter — mas os crons não consultam essas tabelas
 
-### Principais Descobertas
+**Mitigação atual:** O deck Lorehold contém apenas cartas legais em Commander. O risco é teórico para o estado atual, mas real se novos decks forem adicionados ao pipeline.
 
-1. **2 dos 4 agentes ativos tem prompts errados.** O Scout e um "Wincon Hunter" em vez de scout de sinergia. O Oracle e um "Wincon Diversity Checker" em vez de sintese multi-agente. Ambos retornam [SILENT] na maioria das execucoes porque suas funcoes atuais sao triviais.
+---
 
-2. **O Battle Analyst nao e um cron** — e um prototipo de codigo 2-player que nunca rodou. A auditoria v1 deu nota 6.5/10 para algo inexistente, e continha 2 erros factuais sobre o codigo (lifelink cap, trample).
+## Mapa de Gaps por Comprehensive Rule (CR)
 
-3. **Nenhum agente verifica a Commander banlist.** Embora nenhuma carta banida tenha sido encontrada nas recomendacoes atuais, e uma vulnerabilidade sistemica.
+| CR | Regra | Scout | Validator | Mulligan | Battle | Oracle |
+|:---|:------|:-----:|:---------:|:--------:|:------:|:------:|
+| 103.4c | London Mulligan (free first) | N/A | N/A | ✅ | N/A | N/A |
+| 117.3-117.4 | Priority/Stack | N/A | N/A | N/A | 🔴 | N/A |
+| 405.4 | Stack LIFO | N/A | N/A | N/A | 🔴 | N/A |
+| 702.94 | Miracle timing | N/A | N/A | 🔵 | N/A | N/A |
+| 704 | State-Based Actions | N/A | N/A | N/A | 🔴 | N/A |
+| 903.5 | Color Identity | 🔴 | ✅ | 🟡 | N/A | 🔴 |
+| 903.8 | Commander Tax | N/A | N/A | N/A | 🔴 | N/A |
+| 903.10a | Commander Damage | N/A | N/A | N/A | 🔴 | N/A |
+| 903.13 | Commander Banlist | 🔴 | 🟡 | 🔴 | N/A | 🔴 |
 
-4. **O Mulligan tem 3 gaps criticos nao documentados no prompt**: T1 ramp definition ausente, tapped lands nao simuladas, color requirements nao verificados. Os numeros de "Sem Play T3" sao consistentemente otimistas (3-8pp acima do real).
+**Legenda:** ✅ Correto | 🟡 Parcial/implícito | 🔴 Não implementado | 🔵 Não verificado | N/A Não aplicável
 
-5. **O Validator referencia uma tabela PostgreSQL que nao existe** (`card_oracle_data`), significando que nunca consulta rulings para explicar interacoes.
+---
 
-### Proximos Passos Imediatos
+## Plano de Correções (Ordenado por Impacto)
 
-1. **Corrigir prompts do Scout e Oracle** — maior impacto, menor esforco
-2. **Adicionar verificacao de banlist em todos os agentes** — prevencao de risco
-3. **Corrigir referencia de tabela no Validator** — 5 minutos
-4. **Adicionar T1 ramp definition e Sem Play T3 definition nos prompts do Mulligan** — 10 minutos
-5. **Remover Battle Analyst da documentacao de crons** — nao existe
+| # | Prioridade | Cron | Ação | Impacto |
+|:--|:----------|:-----|:-----|:--------|
+| 1 | 🔴 CRÍTICO | Oracle | Restaurar como LLM agent com síntese multi-agente + leitura de 4 logs + user_collection | Pipeline inteiro depende do Oracle para tomar decisões de swap |
+| 2 | 🔴 CRÍTICO | Scout | Restaurar prompt original A+B+C (EDHREC JSON API + coleção + sinergia) | 94% [SILENT] = pipeline está cego para novas oportunidades |
+| 3 | 🔴 CRÍTICO | Battle | NÃO usar métricas do Battle para decisões de swap até implementar stack + Commander damage/tax | Métricas atuais não refletem Commander real |
+| 4 | 🟡 ALTO | Oracle/Scout/Validator/Mulligan | Adicionar verificação de banlist em todos os agentes | Vulnerabilidade sistêmica (mitigada por deck atual ser 100% legal) |
+| 5 | 🟡 ALTO | Mulligan | Adicionar seed fixo, simular tapped lands + color requirements | T3 real é 3-8pp pior que o reportado |
+| 6 | 🟡 ALTO | Mulligan | Rodar simulação a cada 3-4 ciclos mesmo sem mudanças | Confirma estabilidade; atualmente ~60% [SILENT] |
+| 7 | 🔵 MÉDIO | Validator | Corrigir prompt: `card_oracle_data` → `card_rulings` | Evita confusão em futuras execuções |
+| 8 | 🔵 MÉDIO | Validator | Adicionar tema-awareness usando `theme_contextual_rules` do PostgreSQL | Ranges de validação seriam mais precisos |
+| 9 | 🔵 MÉDIO | Mulligan | Simular draws T1-T3 (não só mão inicial) | T3 mais realista, compensa parcialmente viés de tapped lands |
+| 10 | 🔵 BAIXO | Scout | Adicionar filtro de color identity explícito | Previne recomendar cartas off-color |
 
-### O Que Esta Funcionando
+---
 
-- ✅ Nenhuma carta banida no deck ou nas recomendacoes
-- ✅ London Mulligan "free first" correto no Mulligan
-- ✅ Deck hash verification no Validator (detecta unchanged state)
-- ✅ SYNERGY_MAP com 7 eixos no Validator (expansao correta)
-- ✅ Short-circuit [SILENT] quando deck nao mudou (todos os agentes)
-- ✅ Colecao ESGOTADA documentada — pipeline reconhece limite de otimizacao sem aquisicao
-- ✅ Motor 4/4 completo, SYNERGY_MAP 7 eixos pontuando 6-9/10 — deck esta em estado saudavel
+## Conclusão
 
-### Nota Final
+A pipeline Lorehold tem confiabilidade **BAIXA (5.1/10)** em relação às regras oficiais de MTG Commander. Três dos cinco componentes estão fundamentalmente quebrados:
 
-A pipeline Lorehold produziu 25 swaps bem-sucedidos desde o baseline, completou o motor 4/4, e atingiu maturidade de deck (3+ ciclos consecutivos com 0 swaps). O problema **nao e a qualidade do deck** — o deck esta excelente. O problema e que os **prompts dos agentes se degradaram** ao longo do tempo (Scout virou Wincon Hunter, Oracle virou Diversity Checker), e a **auditoria v1 nao detectou isso** porque confiou na documentacao em vez de inspecionar os outputs reais.
+1. **Scout (3.5/10):** Prompt errado — "Wincon Hunter" em vez de sinergia A+B+C. 94% [SILENT].
+2. **Oracle (3.5/10):** Script determinístico, não LLM. Não lê logs de outros agentes. Não recomenda swaps.
+3. **Battle (N/A):** Não é cron. Código 2-player sem stack/priority/Commander damage/tax.
 
-**A pipeline funciona apesar dos prompts, nao por causa deles.** Corrigir os prompts restaurara a capacidade de gerar insights mesmo em estado de maturidade (synergy-first scout, validacao profunda com rulings, recomendacoes de aquisicao informadas).
+Os pontos fortes são:
+- **Validator (7.0/10):** SYNERGY_MAP 7 eixos, PG comparison, trend analysis, pipeline integrity check
+- **Mulligan (6.5/10):** London Mulligan correto, definição rigorosa, métricas definition-stable
+
+**O pipeline está efetivamente parado desde o Ciclo #11 (2026-05-31):** O Oracle (script-only) não aplica swaps, o Scout ([SILENT]) não recomenda cartas, e o Mulligan ([SILENT]) não simula porque o deck não muda. Apenas o Validator continua produzindo análises úteis.
+
+**Para restaurar o pipeline à funcionalidade original:**
+1. Transformar Oracle de script-only → LLM agent com leitura de 4 logs + user_collection
+2. Restaurar Scout para A+B+C synergy scoring com EDHREC JSON API
+3. Implementar verificação de banlist em todos os agentes
+4. Corrigir Mulligan com seed fixo + tapped lands + color requirements
+
+**Status atual do deck (Lorehold):** 25 swaps aplicados, motor 4/4, SYNERGY_MAP 7.0/10, T3 13.3%, coleção esgotada de CMC ≤2. Deck maturity atingida — próximo upgrade requer aquisição.
