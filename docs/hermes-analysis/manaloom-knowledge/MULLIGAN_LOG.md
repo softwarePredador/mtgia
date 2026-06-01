@@ -1,3 +1,12 @@
+## Verificacao -- 2026-06-01T00:53:54+00:00 (Sem Mudancas -- Ciclo #15 = 0 Swaps, 5o ciclo consecutivo)
+
+- Deck: Lorehold Spellslinger
+- Sem Play T3: **13.3%** (estavel, confirmado Execucoes #11 e #12)
+- Mulligan: **47.9%**, Jogaveis: **46.7%**, Ramp T1 (Sol Ring only): **6.3%**
+- 5o ciclo consecutivo sem swaps (C#11-C#15). MATURIDADE ABSOLUTA CONSOLIDADA.
+- Proximo upgrade requer AQUISICAO: Skullclamp (CMC 1).
+
+---
 ## Verificacao — 2026-05-31T23:44:02+00:00 (Sem Mudancas — Ciclo #14 = 0 Swaps, 4o Ciclo Consecutivo)
 
 - **Simulacao executada (N=1000, seed=42).** Evolution Oracle Ciclo #14 rodou as 21:18 mas aplicou 0 swaps (C#11, C#12, C#13, C#14 = 4 ciclos consecutivos sem swaps).

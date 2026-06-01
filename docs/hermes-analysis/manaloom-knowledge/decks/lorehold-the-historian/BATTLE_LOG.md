@@ -442,3 +442,24 @@ Opponents: 12 (real)
 | Krenko, Mob Boss (real) | 52.0% | 26 | 19 | 5 | 10.5 | approach=21, elimination=5 |
 
 **Overall WR: 61.0%** (366W/203L/31S)
+
+## [2026-06-01T00:00:03Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=35 R=14 X=11 CMC=3.69 Instants=16
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Lorehold, the Historian (real) | 50.0% | 25 | 24 | 1 | 9.9 | approach=20, elimination=5 |
+| Lorehold, the Historian (real) | 52.0% | 26 | 23 | 1 | 9.4 | approach=23, elimination=3 |
+| Lorehold, the Historian (real) | 38.0% | 19 | 31 | 0 | 9.8 | approach=17, elimination=2 |
+| Lorehold, the Historian (real) | 48.0% | 24 | 25 | 1 | 9.2 | elimination=4, approach=20 |
+| Lorehold, the Historian (real) | 44.0% | 22 | 28 | 0 | 10.6 | approach=19, elimination=3 |
+| Lorehold, the Historian (real) | 54.0% | 27 | 23 | 0 | 10.4 | approach=22, elimination=5 |
+| Lorehold, the Historian (real) | 42.0% | 21 | 29 | 0 | 9.4 | approach=16, elimination=5 |
+| Lorehold, the Historian (real) | 44.0% | 22 | 28 | 0 | 9.8 | approach=19, elimination=3 |
+| Lorehold, the Historian (real) | 48.0% | 24 | 24 | 2 | 11.4 | approach=19, elimination=5 |
+| Lorehold, the Historian (real) | 38.0% | 19 | 31 | 0 | 10.4 | approach=16, elimination=3 |
+| Lorehold, the Historian (real) | 50.0% | 25 | 25 | 0 | 10.4 | approach=17, elimination=8 |
+| Lorehold, the Historian (real) | 48.0% | 24 | 26 | 0 | 10.5 | approach=20, elimination=4 |
+
+**Overall WR: 46.3%** (278W/317L/5S)

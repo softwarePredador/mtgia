@@ -1,3 +1,149 @@
+## [2026-06-01T00:51:30+00:00] Execucao #26 — Maturidade Persistente Confirmada (Angulo: Free Spells + Ritual Chain)
+
+> **Data:** 2026-06-01
+> **Fonte EDHREC:** 7.851 decks (JSON API, identico aos Scouts #24, #25 — snapshot inalterado ha 12h+)
+> **Deck state:** Pos-Ciclo #15 (25 swaps desde baseline). Motor 4/4, Copy 6/6, T3=13.3% (Exec#11). MATURIDADE PERSISTENTE (5 ciclos: C#11-C#15 com 0 swaps).
+> **Missao:** Buscar cartas com sinergia de free-spell e ritual chain — angulos que os Scouts #24 e #25 nao cobriram a fundo.
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Synergy-First v26)
+> **Resultado:** Nenhuma descoberta nova. Deck em MATURIDADE PERSISTENTE.
+
+---
+
+### Validacao de Estado
+
+| Verificacao | Resultado |
+|:------------|:----------|
+| EDHREC num_decks | 7.851 (identico ao #25) |
+| Novas cartas EDHREC (newcards) | Mesmas 5: Capstone +8.13, Seminar +9.16, Dawning Archaic +5.27, Tablet +0.00, Turbulent Steppe +0.00 |
+| Rising stars confirmadas | Seminar 37.9%, Capstone 49.0%, Dawning Archaic 24.0% — todas no deck |
+| Declining cards (deck) | Esper Sentinel -0.54, Flare of Duplication -0.72, Gamble -0.50, The One Ring -0.31 |
+| Deck state | 86 rows, 100 cards (SUM quantity). Inalterado desde C#15. |
+| Collection RW-legal nao-deck | 123 cartas (identico ao #25) |
+| Nivel 1 (filler) | VAZIO — todas as 65 cartas nao-terra tem funcao essencial |
+
+### Angulo Explorado: Free Spells & Ritual Chain
+
+Os Scouts #23 (stack interaction), #24 (cast+copy triggers, spell->token), e #25 (verificacao de maturidade) cobriram amplamente o espaco de sinergia. Esta execucao explora um quarto angulo: **free spells** (cartas que podem ser conjuradas sem pagar mana) e **ritual chain** (sequencias de rituais que geram mana explosiva).
+
+#### Candidatos Free-Spell (custo alternativo)
+
+| Carta | CMC | Custo Real | Sinergia | Por que NAO |
+|:------|:---:|:-----------|:---------|:------------|
+| **Flare of Fortitude** | 4 | FREE (sac creature) | Protecao em massa instantanea | Deck tem so 12 criaturas; sacrificar Storm-Kiln ou Lorehold e pior que pagar 4 |
+| **Bolt Bend** | 4 | R (com Lorehold 6/6) | Redirect + protecao de stack | Funcao coberta por Deflecting Swat (CMC 3, mais flexivel) e Teferi's (protecao total) |
+| **Desperate Ritual** | 2 | 1R | Gera RRR; splice onto Arcane | Ja foi cortado no Ciclo #3 (Desperate Ritual + 2 cartas). Retornar pioraria T3 sem necessidade — deck ja tem Jeska's Will, Big Score, Smothering Tithe, 4 signets. |
+| **Seething Song** | 3 | 2R | Gera RRRRR; instant para Bombardment | Ja foi cortado no Ciclo #6 (Seething Song → Abrade). Ritual chain nao e o plano do deck — o motor usa treasure, nao ritual. |
+| **Simian Spirit Guide** | 3 | FREE (exile da mao) | Gera R de graca | Criatura sem impacto; so gera 1 mana; piora consistencia de mao |
+| **Treasonous Ogre** | 4 | 3R | 3 vida = R; pode gerar 10+ mana em um turno | CMC 4 criatura fragil sem ETB; deck nao precisa de mana explosiva adicional (motor 4/4 ja supre) |
+
+#### Candidatos Ritual Chain (sequencia de mana)
+
+| Carta | CMC | Sinergia | Por que NAO |
+|:------|:---:|:---------|:------------|
+| **Rousing Refrain** | 5 | Suspend 3 → RRRRR; retorna com mais mana a cada ciclo | Lento (suspend 3 turnos); inconsistente; nao interage com Bombardment/Mastery (suspend nao e cast) |
+| **Mana Geyser** | 5 | Gera R por cada tapped land dos oponentes | CMC 5 sorcery; sem filler para substituir; deck ja tem 8+ fontes de treasure |
+| **Rain of Riches** | 5 | Cast from exile = treasure + cascade | Sinergia REAL com Improvisation Capstone + Dance with Calamity. MAS: CMC 5 enchantment sem impacto imediato. Efeito "win-more." |
+
+#### Candidatos com Sinergia de Dano
+
+| Carta | CMC | Sinergia | Por que NAO |
+|:------|:---:|:---------|:------------|
+| **Fiery Emancipation** | 6 | TRIPLA todo dano. Blasphemous Act = 39 de dano por criatura. Call Forth the Tempest = triplo dano. | CMC 6, 0% EDHREC. "Win-more" — se voce ja resolveu Call Forth, ja esta ganhando. Substituir uma carta funcional por um multiplicador de dano PIORA a consistencia. |
+| **Solphim, Mayhem Dominus** | 4 | Dobra dano nao-combat. Mais barato que Fiery Emancipation. | CMC 4 criatura fragil (3/3 indestrutivel mas poe -1/-1 em criaturas). 0% EDHREC. Mesmo problema: win-more. |
+
+### Sinergias Existentes (7 Eixos — SYNERGY_MAP v3.11)
+
+| Eixo | Score | Funcao |
+|:-----|:-----:|:-------|
+| A) Token Makers + Pump | 7/10 | Twinflame, Rite, Surge to Victory, Storm Herd, Call Forth, Akroma's Will, Boros Charm |
+| B) Board Wipes + Protection | 8/10 | Austere Command, Blasphemous Act, Fated Clash, Volcanic Vision, Teferi's, Boros Charm, Deflecting Swat |
+| C) Recursion Chains | 8/10 | Faithless Looting → Mizzix's Mastery overload; Bombardment + Restoration Seminar loop; Volcanic Vision → topdeck |
+| D) Explosive Mana | 7/10 | 8+ treasure sources (Storm-Kiln, Smothering Tithe, Big Score, Unexpected Windfall, Brass's Bounty, Hit the Mother Lode) + 4 signets + Jeska's Will |
+| E) Combo Pieces | 9/10 | Approach+Top, Approach+Flare (mesmo turno), Insurrection alpha strike, Twinflame+Surge chain |
+| F) Stack Interaction | 6/10 | Deflecting Swat, Grand Abolisher, Hexing Squelcher, Boros Charm (indestrutivel), Flare of Duplication (counter-copy) |
+| G) Resilience | 8/10 | Teferi's Protection, Boros Charm, Lightning Greaves, Penance (protege do removal), Restoration Seminar (recursion redundante) |
+
+### Top 3 Candidatos (Score A+B+C) — Todos Bloqueados
+
+| # | Carta | Score | CMC | Por que Bloqueado |
+|:--|:------|:-----:|:---:|:------------------|
+| 1 | **Reverberate** | 9 | 2 | Copy #7 redundante. Sem substituto natural — Penance e CORE ENGINE (miracle enabler). Substituir Penance quebra Approach+Top. |
+| 2 | **Bolt Bend** | 8 | R* | Protecao #6 redundante. Deflecting Swat ja cobre redirect com mais flexibilidade. Funcionalmente CMC 1 so com Lorehold em campo. |
+| 3 | **Flare of Fortitude** | 7 | FREE* | Protecao #7 redundante. Requer sacrificar criatura — deck so tem 12 criaturas, sacrificar Storm-Kiln ou Lorehold e contraprodutivo. |
+
+*\*Custo funcional com condicao atendida*
+
+### Conclusao
+
+**Colecao esgotada para sinergias novas.** Vinte e seis execucoes de scout (Scouts #1-#26) exploraram 4 angulos distintos de sinergia:
+- #1-#22: EDHREC-first + synergy discovery
+- #23: Stack interaction (Reverberate, Flawless Maneuver, Tibalt's Trickery)
+- #24: Cast+copy triggers, spell→token, ritual chain
+- #25: Verificacao de maturidade (no-change confirmado)
+- #26: **Free spells & ritual chain** (este)
+
+**Todos os candidatos com score >= 8 foram identificados e rejeitados em scouts anteriores.** Nenhuma carta na colecao cria sinergia INEDITA que justifique substituir uma das 65 cartas funcionais do deck.
+
+**MATURIDADE PERSISTENTE: 5 ciclos de Evolution Oracle (C#11-C#15) com 0 swaps.** O deck esta otimizado ao maximo com a colecao atual.
+
+**Proximo upgrade requer AQUISICAO:**
+| Prioridade | Carta | CMC | Custo Est. | Funcao |
+|:----------:|:------|:---:|:----------:|:-------|
+| 1 | **Skullclamp** | 1 | $5-8 | Draw engine com token makers (Twinflame, Storm Herd, Rite, Call Forth) |
+| 2 | **Enlightened Tutor** | 1 | $15-20 | Tutor para Top/Scroll Rack/Bombardment — ja no deck |
+| 3 | **Underworld Breach** | 2 | $10-15 | Recursion explosiva para spellslinger — sinergia com Faithless Looting + rituals |
+
+---
+
+## [2026-06-01T00:13:51+00:00] Execucao #25 — Verificacao de Maturidade (No-Change)
+
+> **Data:** 2026-06-01
+> **Fonte EDHREC:** 7.851 decks (JSON API, identico ao Scout #24 — snapshot inalterado)
+> **Deck state:** Pos-Ciclo #15 (25 swaps desde baseline). Motor 4/4, Copy 6/6, T3=13.3% (Exec#11). MATURIDADE PERSISTENTE (5 ciclos: C#11-C#15 com 0 swaps).
+> **Missao:** Buscar cartas que CRIAM sinergias INEDITAS — angulos que os Scouts #23 e #24 nao cobriram.
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Synergy-First v25)
+> **Resultado:** [SILENT] — Nenhuma descoberta nova. Deck em MATURIDADE PERSISTENTE.
+
+---
+
+### Validacao de Estado
+
+| Verificacao | Resultado |
+|:------------|:----------|
+| EDHREC num_decks | 7.851 (identico ao #24) |
+| Novas cartas EDHREC (newcards) | Mesmas 5: Capstone, Seminar, Tablet, Dawning Archaic, Turbulent Steppe |
+| Trends (rising) | Mesmos 3: Seminar +9.16, Capstone +8.13, Dawning Archaic +5.27 |
+| Trends (declining) | Mesmo padrao: Farewell -0.95, Artist's Talent -0.72, Esper Sentinel -0.54 |
+| Deck state | 86 rows, 100 cards (SUM quantity). Inalterado desde C#15. |
+| Collection RW-legal nao-deck | 123 cartas (identico ao #24) |
+| Nivel 1 (filler) | VAZIO — todas as 65 cartas nao-terra tem funcao essencial |
+
+### Candidatos Score >= 8: NENHUM NOVO
+
+Todos os candidatos com score >= 8 ja foram identificados e rejeitados em scouts anteriores:
+
+| Carta | Score Max | Ultimo Scout | Motivo da Rejeicao |
+|:------|:---------:|:-------------|:--------------------|
+| Seething Song | 10 | #24 | Sem filler CMC 3 para substituir |
+| Invoke Calamity | 9 | #24 | CMC 5 piora T3; Mizzix's Mastery ja supre |
+| Ashling, Flame Dancer | 9 | #24 | CMC 4 creature sem ETB; Longshot e unico removal a distancia |
+| Voice of Victory | 9 | #24 | CMC 2 creature fragil; efeito niche |
+| Spiteful Banditry | 8 | #24 | "Once each turn" limita; ja reavaliado |
+| Manaform Hellkite | 8 | #24 | CMC 4 creature; token dragon e lento |
+| Reverberate | 11 | #23 | Sem substituto natural (Penance e engine core) |
+| Flawless Maneuver | 10 | #23 | Sem substituto (Taunt e goad unico) |
+| Xorn | 9 | #22 | Win-more; deck ja tem 8+ fontes de treasure |
+| Monastery Mentor | 7 | Multiplos | CMC 3 creature sem ETB |
+| Tablet of Discovery | 9 | C#11 | Redundante com Top+Scroll Rack+Penance |
+
+### Conclusao
+
+**Colecao esgotada para sinergias novas.** O deck atingiu MATURIDADE PERSISTENTE — 5 ciclos consecutivos de Evolution Oracle (C#11-C#15) com 0 swaps. Vinte e cinco execucoes de scout exploraram todos os angulos de sinergia. O EDHREC esta estavel ha mais de 8 horas. Nenhuma mudanca na colecao.
+
+**Proximo upgrade requer AQUISICAO:** Skullclamp (CMC 1, $5-8) — prioridade #1.
+
+---
+
 ## [2026-05-31T23:30:34+00:00] Execucao #24 — Alem da Maturidade: Angulos Ineditos que o Scout #23 Nao Explorou
 
 > **Data:** 2026-05-31
