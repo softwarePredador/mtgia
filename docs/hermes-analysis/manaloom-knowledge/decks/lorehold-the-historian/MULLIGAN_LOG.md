@@ -1,3 +1,57 @@
+## Verificacao -- 2026-06-01T14:16:37+00:00 (Sem Mudancas -- Deck Inalterado desde Exec#13, T3=13.3% Estavel, Wincon Diversity Oracle Rodou Sem Swaps)
+
+### Estado do Deck
+- **Card hash:** `30d00347764fc2a215edb4e668994871` — identico a Execucao #13
+- **Deck:** 100 cartas (86 rows, 35 lands), nao mudou desde 2026-06-01T08:14
+- **C#23 swaps:** Apex of Power (CMC 10) e Storm Herd (CMC 10) AINDA no deck
+- **Demand Answers (CMC 2) e Thrill of Possibility (CMC 2):** AINDA fora do deck
+- **Twinflame (CMC 2) e Flare of Duplication (CMC 3):** AINDA fora do deck (perdidos desde C#10)
+
+### Evolution Rodou Mas Nao Aplicou Swaps
+
+O **Wincon Diversity Oracle** rodou as 2026-06-01T11:37:47 — analise de diversidade de wincons:
+- **STEALTH gap confirmado:** Nenhum wincon com stealth >= 7 no deck
+- **Twinflame + Flare of Duplication perdidos:** Cartas aplicadas no Ciclo #10 foram revertidas silenciosamente durante o periodo de hash-fake (C#17-C#22)
+- **Recomendacao CRITICA:** Re-adicionar Twinflame (CMC 2) + Flare of Duplication (CMC 3) imediatamente
+- **Guttersnipe (CMC 3, stealth=8):** Viabilidade MEDIA — na colecao, mas requer protecao
+
+**Nenhum swap foi aplicado** — apenas analise. O deck permanece identico a Exec#13.
+
+### Metricas (Execucao #13 — ainda validas, deck inalterado)
+
+| Metrica | Exec#13 (ATUAL) | Limiar |
+|:--------|:---------------:|:------:|
+| **Sem Play T3** | **13.3%** | > 12% = DEFENSIVO |
+| Mulligan | 30.1% | — |
+| Jogavel | 66.0% | — |
+| Ramp T1 (Sol Ring) | 8.5% | — |
+| Free Mulligan | 4.6% | — |
+
+### Alerta: 3 Cartas Perdidas (C#10 + C#23)
+
+O deck deveria ter +3 cartas que estao na colecao mas NAO no deck:
+
+| Carta | CMC | Adicionada em | Perdida em | Funcao | Na Colecao? |
+|:------|:---:|:-------------:|:----------:|:-------|:-----------:|
+| Demand Answers | 2 | C#23 (proposto) | Nunca aplicado | Draw CMC 2 | ✅ |
+| Thrill of Possibility | 2 | C#23 (proposto) | Nunca aplicado | Draw CMC 2 | ✅ |
+| Twinflame | 2 | C#10 | Hash-fake (C#17) | Copy + Combo | ✅ |
+| Flare of Duplication | 3 | C#10 | Hash-fake (C#17) | Copy + Combo | ✅ |
+
+Com estas 4 cartas, o deck ganharia:
+- +2 draw CMC 2 (Demand + Thrill) → T3 projetado ~9-10%
+- +2 copy engines (Twinflame + Flare) → 7 copy engines total
+- Combo Approach+Flare = vitoria mesmo turno
+- Combo Dualcaster+Twinflame = stealth win
+
+### O Que Essa Metrica Significa (Licao)
+
+**T3=13.3% e estavel ha 5+ verificacoes.** O deck esta preso em estado sub-otimo porque as swaps recomendadas (C#23 e agora Wincon Diversity Oracle) sao documentadas mas NAO executadas. O MULLIGAN_LOG ja registrou este alerta 3 vezes consecutivas (2026-06-01T09:26, T10:32, e agora). **O gargalo nao e a qualidade do deck — e a execucao dos swaps no DB.**
+
+**Recomendacao:** O proximo Evolution Oracle (C#24 ou o Wincon Diversity Oracle aplicando suas proprias recomendacoes) deve executar os swaps COMO PRIMEIRO PASSO, verificando `deck_cards` antes e depois.
+
+---
+
 ## Verificacao -- 2026-06-01T09:26:05+00:00 (Sem Mudancas -- Deck Inalterado desde Exec#13, T3=13.3% Estavel, C#23 Swaps Documentados Mas NAO Aplicados)
 
 ### Estado do Deck
