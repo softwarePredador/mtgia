@@ -379,17 +379,87 @@ def run_builder(conn: sqlite3.Connection) -> None:
     print("No decklist is modified by this cron; it only emits candidates for Oracle review.")
 
 
+def run_oracle(conn: sqlite3.Connection) -> None:
+    ensure_schema(conn)
+    rows = list(
+        conn.execute(
+            """
+            SELECT wincon_name, wincon_type, total_score, speed_score, resilience_score,
+                   stealth_score, available, cards_required, weaknesses, protection_needed
+            FROM wincon_catalog
+            WHERE tested = 1
+            ORDER BY available DESC, total_score DESC, id ASC
+            """
+        )
+    )
+    if not rows:
+        log_run(conn, "wincon-oracle-script", "silent", 0, error="No tested wincons")
+        conn.commit()
+        print("[SILENT]")
+        return
+
+    available_rows = [row for row in rows if row["available"] == 1]
+    if not available_rows:
+        log_run(conn, "wincon-oracle-script", "ok", 1, error="No fully available wincons")
+        conn.commit()
+        print("# Wincon Oracle Script")
+        print("No fully available wincon package is present. Keep deck unchanged.")
+        return
+
+    best_speed = max(available_rows, key=lambda row: (row["speed_score"], row["total_score"]))
+    best_resilience = max(available_rows, key=lambda row: (row["resilience_score"], row["total_score"]))
+    best_stealth = max(available_rows, key=lambda row: (row["stealth_score"], row["total_score"]))
+    selected = []
+    seen = set()
+    for label, row in [
+        ("fastest", best_speed),
+        ("most_resilient", best_resilience),
+        ("stealthiest", best_stealth),
+    ]:
+        if row["wincon_name"] in seen:
+            continue
+        selected.append((label, row))
+        seen.add(row["wincon_name"])
+
+    unavailable_high_score = [row for row in rows if row["available"] == 0 and row["total_score"] >= 24]
+    log_run(conn, "wincon-oracle-script", "ok", len(selected), len(unavailable_high_score))
+    conn.commit()
+
+    print("# Wincon Oracle Script")
+    print("Decision: keep current decklist; emit deterministic wincon priorities for review.")
+    print(f"available_wincons={len(available_rows)} total_wincons={len(rows)}")
+    print("Selected priorities:")
+    for label, row in selected:
+        try:
+            cards = ", ".join(json.loads(row["cards_required"] or "[]"))
+        except json.JSONDecodeError:
+            cards = row["cards_required"] or ""
+        print(
+            f"- {label}: {row['wincon_name']} ({row['wincon_type']}) "
+            f"total={row['total_score']} speed={row['speed_score']} "
+            f"resilience={row['resilience_score']} stealth={row['stealth_score']}"
+        )
+        print(f"  cards={cards}")
+        print(f"  protection={row['protection_needed']}")
+    if unavailable_high_score:
+        print("Unavailable high-score packages to avoid recommending as immediate swaps:")
+        for row in unavailable_high_score:
+            print(f"- {row['wincon_name']}: total={row['total_score']} available={row['available']}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=["hunter", "tester", "builder"])
+    parser.add_argument("mode", choices=["hunter", "tester", "builder", "oracle"])
     args = parser.parse_args()
     with connect() as conn:
         if args.mode == "hunter":
             run_hunter(conn)
         elif args.mode == "tester":
             run_tester(conn)
-        else:
+        elif args.mode == "builder":
             run_builder(conn)
+        else:
+            run_oracle(conn)
     return 0
 
 
