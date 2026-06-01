@@ -23,9 +23,9 @@ import '../../../lib/logger.dart';
 import '../../../lib/edh_bracket_policy.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
-import 'optimize_route_internal.dart';
-import 'optimize_response_support.dart';
-export 'optimize_response_support.dart';
+import '../../../lib/ai/optimize_route_internal.dart';
+import '../../../lib/ai/optimize_response_support.dart';
+export '../../../lib/ai/optimize_response_support.dart';
 
 int _optimizeRequestCount = 0;
 int _emptySuggestionFallbackTriggeredCount = 0;
@@ -3071,5 +3071,4 @@ Future<Response> onRequest(RequestContext context) async {
     return internalServerError('Failed to optimize deck', details: e);
   }
 }
-
 

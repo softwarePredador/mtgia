@@ -1,20 +1,20 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
-import '../../../lib/ai/optimize_complete_support.dart' as optimize_complete;
-import '../../../lib/ai/optimize_analysis_support.dart' as optimize_analysis;
-import '../../../lib/ai/optimize_job.dart';
-import '../../../lib/ai/optimize_runtime_support.dart';
-import '../../../lib/ai/optimize_stage_telemetry.dart';
-import '../../../lib/ai/optimization_validator.dart';
-import '../../../lib/ai/otimizacao.dart';
-import '../../../lib/ai/optimize_state_support.dart' as optimize_state;
-import '../../../lib/ai_generate_internal_url_support.dart';
-import '../../../lib/internal_ai_request_token.dart';
-import '../../../lib/logger.dart';
+import 'optimize_complete_support.dart' as optimize_complete;
+import 'optimize_analysis_support.dart' as optimize_analysis;
+import 'optimize_job.dart';
+import 'optimize_runtime_support.dart';
+import 'optimize_stage_telemetry.dart';
+import 'optimization_validator.dart';
+import 'otimizacao.dart';
+import 'optimize_state_support.dart' as optimize_state;
+import '../ai_generate_internal_url_support.dart';
+import '../internal_ai_request_token.dart';
+import '../logger.dart';
 Future<void> processOptimizeModeAsync({
   required Pool pool,
   required String jobId,

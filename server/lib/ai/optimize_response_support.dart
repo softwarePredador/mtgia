@@ -1,5 +1,5 @@
 import 'package:dart_frog/dart_frog.dart';
-import '../../../lib/ai/optimization_functional_roles.dart';
+import 'optimization_functional_roles.dart';
 
 // ============================================================================
 // Optimize Response Builders
