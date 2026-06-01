@@ -1,6 +1,74 @@
 # ManaLoom Cron Status
 
 > Relatório gerencial de todos os crons do projeto.
+> Atualização manual segura por OpenCode após ajustes de governança.
+> Última atualização: **2026-06-01T16:46:31Z** (opencode-operational-adjustment)
+
+## Resumo Atual
+
+| Métrica | Valor |
+|:--|:--:|
+| Total de crons | **23** |
+| Habilitados | **20/23** |
+| Pausados | **3/23** |
+| Crons ativos em `opencode-go/deepseek-v4-pro` | **18** |
+| Crons script-only ativos | **1** |
+| Crons ativos sem provider explícito | **1** |
+| OpenRouter ativo | **0** |
+| `knowledge.db` journal mode | **WAL** |
+| Backup antes do ajuste | `/opt/data/cron/jobs.json.bak.opencode_adjust_20260601164002` |
+
+## Ajustes Aplicados
+
+- `manaloom-master-watchdog` reativado (script-only, estava OK).
+- `manaloom-hermes-weekly-parallel-audit` migrado para `opencode-go/deepseek-v4-pro` e reativado.
+- `manaloom-code-structure-auditor` semanal migrado para `opencode-go/deepseek-v4-pro` e reativado.
+- `manaloom-code-structure-auditor` de 3h mantido pausado como duplicado do semanal.
+- `manaloom-manager-watchdog` mantido pausado: `superseded_by_report_only_cron_governor`.
+- `manaloom-knowledge-import` mantido pausado: `blocked_until_secret_safe_import_flow_exists`.
+- Frequências alinhadas com a política de governança para reduzir risco de rate limit.
+- Pipeline `wincon-*` escalonado para evitar execução simultânea.
+- `knowledge.db` colocado em WAL para reduzir risco de lock entre crons.
+
+## Schedules Ajustados
+
+| Cron | Novo schedule |
+|:--|:--:|
+| `lorehold-deck-scout` | every 180m |
+| `lorehold-deck-validator` | every 180m |
+| `lorehold-mulligan-analyst` | every 180m |
+| `lorehold-evolution-oracle` | every 240m |
+| `manaloom-knowledge-synthesis` | every 240m |
+| `manaloom-hermes-normal-audit` | every 360m |
+| `manaloom-tag-accuracy-reporter` | every 1440m |
+| `manaloom-mana-base-validator` | every 360m |
+| `manaloom-cron-governor-report` | every 720m |
+| `lorehold-wincon-hunter` | every 360m |
+| `lorehold-wincon-tester` | every 360m |
+| `lorehold-wincon-builder` | every 360m |
+| `lorehold-deckbuilding-methodology` | every 360m |
+
+## Crons Pausados Intencionalmente
+
+| Cron | Motivo |
+|:--|:--|
+| `manaloom-manager-watchdog` | Substituído pelo `manaloom-cron-governor-report`; não reativar sem nova decisão. |
+| `manaloom-knowledge-import` | Bloqueado até existir fluxo de import seguro para segredos/PostgreSQL. |
+| `manaloom-code-structure-auditor` (3h, `bb03201b8911`) | Duplicado; manter pausado enquanto o semanal estiver ativo. |
+
+## Pendências Seguras
+
+- Aparar `docs/hermes-analysis/STRUCTURE_AUDIT.md`, que está grande demais, em alteração documental separada.
+- Decidir se o `cron-governor-report` deve manter este `CRON_STATUS.md` daqui para frente.
+- Revisar próximo ciclo dos `wincon-*`; se voltarem com plano/código em vez de resultado executado, endurecer prompts ou consolidar pipeline.
+
+---
+
+## Histórico Anterior
+
+# ManaLoom Cron Status
+
+> Relatório gerencial de todos os crons do projeto.
 > Atualizado automaticamente pelo cron `manaloom-manager-watchdog`.
 > Última atualização: **2026-05-31T07:13:03Z** (manaloom-manager-watchdog)
 
