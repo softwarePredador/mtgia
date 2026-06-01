@@ -18,7 +18,7 @@ import psycopg2.extras
 
 from db_helper import connect, sanitized_database_target
 
-DRY_RUN = os.environ.get("MANALOOM_IMPORT_DRY_RUN") == "1"
+DRY_RUN = os.environ.get("MANALOOM_IMPORT_APPLY") != "1"
 
 def get_conn():
     return connect()
