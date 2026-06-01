@@ -18,10 +18,14 @@ import psycopg2.extras
 
 from db_helper import connect, sanitized_database_target
 
+DRY_RUN = os.environ.get("MANALOOM_IMPORT_DRY_RUN") == "1"
+
 def get_conn():
     return connect()
 
 def run_sql(conn, sql, params=None, fetch=False):
+    if DRY_RUN and not fetch and not sql.lstrip().upper().startswith("SELECT"):
+        return 0
     with conn.cursor() as cur:
         cur.execute(sql, params)
         if fetch:
@@ -246,6 +250,8 @@ def _insert_card(conn, card, commander, tag, func, importance, reason, source):
 def main():
     print("=== Importando conhecimento Hermes → PostgreSQL ===\n")
     print(f"Target PostgreSQL: {sanitized_database_target()}")
+    if DRY_RUN:
+        print("Mode: DRY RUN - write statements are skipped")
     conn = get_conn()
     conn.autocommit = True
 
