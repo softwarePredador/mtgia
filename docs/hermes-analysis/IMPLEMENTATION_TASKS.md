@@ -1,7 +1,7 @@
 # Implementation Tasks — ManaLoom
 
 > Gerado por sintese: cruzamento do conhecimento MTG do Hermes x codigo atual.
-> Data: 2026-06-01 | Branch: origin/master | SHA: 6af73d87
+> Data: 2026-06-01 | Branch: origin/master | SHA: 798317af
 
 ## Resumo de Status
 
@@ -11,7 +11,7 @@
 | P1-b | P1 | card_deck_profiles nao consultado pelo optimize | RESOLVIDO (d8b7b26b) |
 | P1-c | P1 | Weakness-analysis usa heuristicas legacy (sem adapter F1) | ATIVO |
 | P1-d | P1 | Wincon detection fragil — battle_analyst + weakness-analysis usam hardcoded names | ATIVO |
-| P1-e | P1 | GoldfishSimulator nao calcula "Sem Play T3" — metrica critica ausente | ATIVO |
+| P1-e | P1 | GoldfishSimulator nao calcula "Sem Play T3" — metrica critica ausente | **RESOLVIDO (798317af)** |
 | P1-f | P1 | optimize_request_support nao carrega card_function_tags — drift semantico | **RESOLVIDO (6af73d87)** |
 | P1-g | P1 | card_rulings (76.991 rulings) nao integrado ao validator | **ATIVO (NOVO)** |
 | P2-a | P2 | _looksLikePayoff nao detecta payoffs de dano direto | RESOLVIDO (3fb17356) |
@@ -135,13 +135,17 @@ dart test test/deck_rules_service_test.dart
 
 ## Tasks Ja Ativos (mantidos de sintese anterior)
 
-### [P1] GoldfishSimulator nao calcula "Sem Play T3" — metrica critica ausente
+### [P1] ~~GoldfishSimulator nao calcula "Sem Play T3"~~ → RESOLVIDO (798317af)
 
-**Evidencia no codigo:**
-- `server/lib/ai/goldfish_simulator.dart:28-40` — GoldfishResult tem turn1PlayRate..turn4PlayRate mas NAO tem noPlayTurn3Rate
-- `server/lib/ai/goldfish_simulator.dart:158-191` — Loop de simulacao conta turn1Plays..turn4Plays mas nao verifica CMC maximo jogavel acumulado ate T3
+**Commit:** `798317af` — Harden deck rules and goldfish curve checks
 
-**Acao:** Adicionar `noPlayT3Rate` ao GoldfishResult. Rastrear: `minCastableCmc = min(nonland_cmc)`, verificar `minCastableCmc <= min(landsPlayed, 3)`. Expor no JSON.
+**O que foi implementado:**
+- Campo `noPlayTurn3Rate` adicionado ao `GoldfishResult`
+- Rastreamento: `noPlayTurn3Hands` incrementado quando `!_canPlayOnTurn(cardsAvailable, 3, ...)` 
+- Recomendacao quando >12%: sugere ramp, compra ou interacao barata
+- Exposicao no JSON: `no_play_turn_3`
+- Teste novo: `test/optimization_rules_test.dart` — TC013b valida `normalizePhysicalCardCopyName` para MDFC/split
+- Abordagem difere da sugestao original (`minCastableCmc`) — usa o metodo existente `_canPlayOnTurn` que e mais robusto (verifica cores + custo)
 
 ### [P1] Weakness-analysis usa heuristicas legacy — sem adapter F1
 
@@ -200,3 +204,4 @@ dart test test/deck_rules_service_test.dart
 | _looksLikePayoff damage payoffs | 3fb17356 | 2026-05-31 |
 | CONTEXTO_PRODUTO_ATUAL.md update | 7ed5b863 | 2026-05-31 |
 | optimize_request_support semantic drift fix (card_function_tags) | **6af73d87** | 2026-05-31 |
+| GoldfishSimulator noPlayTurn3Rate + MDFC copy normalization | **798317af** | 2026-06-01 |

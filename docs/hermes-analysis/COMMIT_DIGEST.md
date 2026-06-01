@@ -1,13 +1,13 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-01T09:30:00Z (Incremento: semantic drift fix + dead code round 2 — 6af73d87).
+> Atualizado em 2026-06-01T10:00:00Z (Incremento: goldfish curve + deck rules hardening — 798317af).
 
 ## Estado atual
 
 - Branch observada: `master`
 - HEAD anterior: `d3cfaf3b` (Architecture: add resetForTesting/clear/reset to all singletons)
-- HEAD atual: **`6af73d87`** (P1: fix semantic drift — load card_function_tags in SQL queries).
+- HEAD atual: **`798317af`** (Harden deck rules and goldfish curve checks).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
 - SHA publicado confirmado em producao: **`c98153d655b3660cb69e0ae6d019df6f07dc7967`** (`/health`, 2026-05-27T18:25Z)
@@ -19,6 +19,15 @@
 - **2 arquivos** (`optimization_functional_roles.dart`, `optimize_request_support.dart`)
 - **Tipo: CODE/FIX** — Corrige drift semantico: o pipeline de optimize nao carregava `card_function_tags` nas queries SQL, causando divergencia entre a analise de deck (que carrega) e o optimize (que nao carregava). `classifyOptimizationFunctionalRole` agora recebe `functionalTags` via adapter F1, resolvendo a discrepancia.
 - **Impacto:** Cartas double-null (Scroll Rack, Penance) agora tem seus functional_tags persistidos consultados pelo optimize, reduzindo classificacoes incorretas.
+
+### `798317af` — Harden deck rules and goldfish curve checks (atual HEAD)
+- **5 arquivos** (`goldfish_simulator.dart`, `deck_rules_service.dart`, `goldfish_simulator_test.dart`, `optimization_quality_gate_test.dart`, `optimization_rules_test.dart`)
+- **Tipo: CODE/FEATURE** — Duas melhorias de hardening:
+  1. **Goldfish Simulator**: Adiciona `noPlayTurn3Rate` — mede a taxa de maos sem jogada ate o turno 3. Nova recomendacao quando >12% sugere ramp/compra/interacao barata. Campo `no_play_turn_3` adicionado ao JSON de saida.
+  2. **Deck Rules Service**: Adiciona `normalizePhysicalCardCopyName()` — normaliza nomes MDFC/split (`"Face A // Face B"` → `"face a"`) para que cartas da mesma carta fisica compartilhem a mesma chave no limite de copias. Nova classe `_CopyCounter` substitui `Map<String, Map>`.
+- **Impacto:** Resolve P1-e (GoldfishSimulator sem noPlayT3). Endurece validacao de limite de copias para MDFC — nomes split agora contam como a mesma carta fisica.
+- **Validacao:** `dart test` 82/82 PASS (15 goldfish + 15 quality_gate + 38 optimization_rules + 14 goldfish_simulator). Novo teste TC013b para `normalizePhysicalCardCopyName`. Teste `reports no-play turn 3 risk` para metrica nova.
+- **Risco de contrato:** `no_play_turn_3` e aditivo no JSON — nao quebra consumidores existentes. `normalizePhysicalCardCopyName` e funcao publica exportada mas sem chamadores externos conhecidos.
 
 ### `23cfc061` — Dead code round 2: remove E2E scripts, QA dir, Python scorecard; archive 9 historical .md files
 - **18 arquivos**, **4.172 linhas removidas**
