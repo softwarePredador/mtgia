@@ -1,3 +1,24 @@
+## Execucao #14 -- 2026-06-02T18:51:59+00:00 (🚨 DECK REESTRUTURADO — Spellslinger → cEDH Storm, T3=8.9%, -4.4pp)
+
+**Card hash anterior (Exec#13):** `30d00347764fc2a215edb4e668994871`
+**Card hash ATUAL (DB):** `f2241d994743e8142396c0f846917fde`
+**MATCH: ❌ FALSE — Deck completamente reestruturado.**
+
+Deck transformado de Spellslinger Big-Mana (35 lands, treasure/copy engine) para cEDH Storm/Combo (33 lands, fast mana + combo deterministico). 19+ cartas adicionadas (Mana Vault, Mox Amber, Aetherflux Reservoir, Silence, Pyroblast, Drannith Magistrate, Past in Flames, Twinflame, etc). Motor Lorehold original (Treasure → Big Spell → Copy) desmantelado.
+
+| Metrica | Exec#13 (PRE) | Exec#14 (ATUAL) | Delta |
+|:--------|:-------------:|:---------------:|:-----:|
+| **Sem Play T3** | **13.3%** | **8.9%** | **-4.4pp** 🟢 |
+| Mulligan | 30.1% | 16.0% | -14.1pp 🟢 |
+| Jogavel | 66.0% | 84.0% | +18.0pp 🟢 |
+| Ramp T1 (Sol Ring) | 8.5% | 6.3% | -2.2pp 🟡 |
+
+**T3 < 12% → ZONA BALANCED/AGGRESSIVA.** Nonland CMC medio caiu de 3.61 para 3.0. 16 cartas de fast mana (DB so reconhece 6 como tag='ramp' — gap de classificacao). 33 lands com 16 ramp e mais consistente que 35 lands com 10 ramp.
+
+**Proximo ciclo:** O baseline mudou. Comparar contra este estado (Exec#14), nao contra historico pre-reestruturacao. Storm Herd (CMC 10) e Rise of the Eldrazi (CMC 12) sao outliers — candidatos a corte.
+
+---
+
 ## Verificacao -- 2026-06-01T14:16:37+00:00 (Sem Mudancas -- Deck Inalterado, T3=13.3% Estavel, Wincon Diversity Oracle Rodou Sem Swaps)
 
 **Card hash:** `30d00347764fc2a215edb4e668994871` — identico a Exec#13 desde 2026-06-01T08:14.

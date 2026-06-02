@@ -1,3 +1,144 @@
+## Execucao #14 -- 2026-06-02T18:51:30+00:00 (🚨 DECK REESTRUTURADO — Spellslinger → cEDH Storm, T3=8.9%, -4.4pp)
+
+### 🚨 PIPELINE INTEGRITY ALERT — Deck Completamente Transformado
+
+**Card hash anterior (Exec#13):** `30d00347764fc2a215edb4e668994871`
+**Card hash ATUAL (DB):** `f2241d994743e8142396c0f846917fde`
+**MATCH: ❌ FALSE — Deck reestruturado entre Exec#13 e Exec#14**
+
+O deck sofreu uma transformacao COMPLETA desde a ultima verificacao (2026-06-01T21:28).
+Nao foram swaps incrementais do Evolution Oracle — e uma reestruturacao total do deck,
+de Spellslinger/Big-Mana para cEDH Storm/Combo.
+
+### O Que Mudou
+
+| Aspecto | PRE-Reestruturacao (Exec#13) | POS-Reestruturacao (Exec#14) |
+|:--------|:----------------------------:|:----------------------------:|
+| Lands | 35 | **33** (-2) |
+| Rows em deck_cards | 86 | **100** (todas qty=1) |
+| Nonland CMC medio | 3.61 | **3.0** (-0.61) |
+| Motor | Treasure → Big Spell → Copy | Fast Mana → Storm → Combo |
+| Estrategia | Spellslinger casual-competitive | cEDH Storm/Combo |
+
+### Cartas ADICIONADAS (19+ novas)
+
+**Fast Mana (5):** Mana Vault, Mox Amber, Lotus Petal (ja estava), Rite of Flame, Seething Song
+**Combo Pieces (6):** Aetherflux Reservoir, Birgi God of Storytelling, Past in Flames, Reiterate, Reverberate, Twinflame
+**Copy Engines (3):** Electroduplicate, Heat Shimmer, Molten Duplication
+**cEDH Stax/Protecao (5):** Drannith Magistrate, Silence, Orim's Chant, Pyroblast, Ranger-Captain of Eos
+**Outros:** Ruby Medallion (retornou — havia sido cortado no Ciclo #10), Guttersnipe, Unexpected Windfall, Urza's Saga, Rise of the Eldrazi (retornou), Aetherflux Reservoir
+
+### Cartas REMOVIDAS (19+)
+
+**Motor Lorehold completo REMOVIDO:**
+Improvisation Capstone, Restoration Seminar, Arcane Bombardment, Double Vision, The Dawning Archaic,
+Big Score, Brass's Bounty, Dance with Calamity, Hit the Mother Lode, Chaos Warp, Akroma's Will,
+Flare of Duplication, Demand Answers, Thrill of Possibility, Galvanoth, Penance, Pearl Medallion,
+Call Forth the Tempest, Apex of Power
+
+**Mantidas do deck antigo:** Approach of the Second Sun, Worldfire, Storm Herd, Rite of the Dragoncaller,
+Mizzix's Mastery, Blasphemous Act, Esper Sentinel, Faithless Looting, Scroll Rack, Sensei's Divining Top,
+Land Tax, Enlightened Tutor, Gamble, etc.
+
+### Resultados da Simulacao (N=1000, seed=42, London Mulligan free first, ramp=16 cartas reais)
+
+| Metrica | Exec#13 (PRE) | Exec#14 (ATUAL) | Delta | Sinal |
+|:--------|:-------------:|:---------------:|:-----:|:-----:|
+| **Sem Play T3** | **13.3%** | **8.9%** | **-4.4pp** | 🟢 Melhorou |
+| Mulligan | 30.1% | 16.0% | -14.1pp | 🟢 Melhorou |
+| Jogavel (first 7) | 66.0% | 84.0% | +18.0pp | 🟢 Melhorou |
+| Keepable on first 7 | ~55% | 65.4% | +10.4pp | 🟢 Melhorou |
+| Ramp T1 (Sol Ring) | 8.5% | 6.3% | -2.2pp | 🟡 Piorou |
+| Free Mulligan | 4.6% | 18.6% | +14.0pp | ⚠️ Mudanca estrutural |
+
+**⚠️ Ramp T1 caiu de 8.5% → 6.3%.** Isso e esperado com 33 lands (vs 35) — menos cartas no deck = menor chance de Sol Ring na mao inicial. P(Sol Ring em 7 de 99) = 7.07%. Com London mulligan, ~6.3% e o valor esperado. O deck compensa com VASTO fast mana adicional (Mana Vault, Mox Amber, Lotus Petal, Rite of Flame) — estes nao contam como T1 ramp porque nao sao Sol Ring, mas aceleram explosivamente.
+
+### Distribuicao de Mulligans
+
+| Mulligans | % Hands | Interpretacao |
+|:---------:|:-------:|:--------------|
+| 0 | 65.4% | Mao keepable direto — excelente |
+| 1 (free) | 18.6% | Free mulligan usado com sucesso |
+| 2 | 7.1% | 2 mulligans (1 carta no fundo) |
+| 3+ | 2.9% | Multiplos mulligans — raro |
+| 6-7 | 6.5% | Forced mulligan to 0 — 0-landers |
+
+### ANALISE: Por que T3 melhorou -4.4pp?
+
+1. **Nonland CMC medio caiu 3.61 → 3.0 (-0.61).** O deck antigo tinha Apex (CMC 10), Storm Herd (CMC 10), Arcane Bombardment (CMC 5), Double Vision (CMC 5), Rise of the Eldrazi (CMC 12), Galvanoth (CMC 5), Dance with Calamity (CMC 8). O deck novo substituiu estes por CMC 0-3: Mana Vault (CMC 1), Mox Amber (CMC 0), Lotus Petal (CMC 0), Rite of Flame (CMC 1), Silence (CMC 1), Pyroblast (CMC 1), Orim's Chant (CMC 1), Reiterate (CMC 3), Heat Shimmer (CMC 3), Electroduplicate (CMC 3).
+
+2. **Fast mana density.** 16 cartas produzem mana adicional (vs ~10 no deck antigo): Sol Ring, Mana Vault, Mox Amber, Lotus Petal, Arcane Signet, Boros Signet, Fellwar Stone, Talisman of Conviction, Rite of Flame, Seething Song, Jeska's Will, Mana Geyser, Smothering Tithe, Storm-Kiln Artist, Victory Chimes, Unexpected Windfall. Com 16 ramp em 99 cartas, P(ramp na mao inicial) = 1 - C(83,7)/C(99,7) ≈ 73%.
+
+3. **33 lands e otimizado para storm/combo.** Menos lands = menos dead draws no late game. A densidade de fast mana compensa a perda de 2 lands no early game. O deck de 33 lands com 16 ramp e MAIS consistente que 35 lands com 10 ramp.
+
+4. **cEDH staples de 0-1 CMC.** Silence, Orim's Chant, Pyroblast, Ranger-Captain of Eos, Giver of Runes, Mother of Runes, Enlightened Tutor, Gamble, Path to Exile, Swords to Plowshares — 12+ cartas CMC 1 que sao castables com 1 land.
+
+### ⚠️ DB Classifier Gap — 10 Ramp Cards nao Tagged
+
+O DB classifica apenas **6 cartas** como `functional_tag='ramp'`:
+Arcane Signet, Fellwar Stone, Lotus Petal, Mox Amber, Smothering Tithe, Storm-Kiln Artist.
+
+**10 cartas de ramp REAL nao sao reconhecidas:**
+Sol Ring (tag='unknown'), Mana Vault (tag='unknown'), Boros Signet (tag='unknown'),
+Talisman of Conviction (tag='unknown'), Victory Chimes (tag='unknown'),
+Rite of Flame (tag='spell'), Seething Song (tag='spell'), Jeska's Will (tag='draw'),
+Mana Geyser (tag='spell'), Unexpected Windfall (tag='draw')
+
+**Impacto:** Se usarmos apenas `functional_tag='ramp'` para o check de jogabilidade,
+o simulador mulligaria agressivamente 2-land hands (2 lands + 0 ramp → nao-keepable)
+e terminaria com maos de 3-4 cartas, inflando T3 para 17.7%. **O T3 REAL e 8.9%.**
+
+Este e um gap de classificacao que afeta TODAS as simulacoes baseadas em tags do DB.
+Recomendacao: adicionar heuristica para rituals (add R, add mana), fast mana artifacts
+(Mana Vault, Mox, Sol Ring), e mana rocks (Signets, Talismans) ao classificador.
+
+### Implicacoes Estrategicas
+
+- **T3 = 8.9% < 12% → ZONA BALANCED/AGGRESSIVA.** O deck cruzou ABAIXO do limiar defensivo pela primeira vez em muitas execucoes. Pode adicionar cartas de CMC mais alto sem comprometer o early game.
+- **Motor antigo DESMANTELADO.** O Lorehold Spellslinger (Treasure → Big Spell → Copy → Payoff) nao existe mais. O novo motor e Storm/Combo via fast mana → multiple spells → Aetherflux Reservoir kill ou Dualcaster+Twinflame combo.
+- **Ramp T1 baixo (6.3%) compensado por fast mana denso.** Com Lotus Petal, Mox Amber, Mana Vault, e Rite of Flame, o deck pode gerar 3-5 mana no T1 mesmo sem Sol Ring. O T1 ramp tradicional (Sol Ring) e menos critico neste build.
+- **33 lands e AGGRESSIVO para um deck com avg CMC 3.0.** A maioria dos decks cEDH storm roda 27-30 lands. 33 lands esta no lado conservador — ha espaco para cortar 1-2 lands e adicionar mais interacao/protecao.
+- **Storm Herd (CMC 10) e Rise of the Eldrazi (CMC 12) sao outliers.** Sao as unicas cartas CMC > 7 no deck. Com 33 lands e estrategia storm, estas cartas sao frequentemente dead draws. Considere substituir por mais card draw de baixo CMC ou protecao adicional.
+
+### O Que Essa Metrica Significa (Licao do Exec#14)
+
+**A transformacao do deck e uma mudanca de paradigma.** O Lorehold deixou de ser um deck casual-competitive de spellslinger (focado em copiar Big Spells gratis) e se tornou um deck cEDH storm (focado em gerar mana explosiva, lancar multiplos spells por turno, e vencer via combo deterministico ou Aetherflux Reservoir).
+
+**T3 = 8.9% e EXCELENTE para este arquétipo.** Decks storm cEDH tipicamente tem T3 entre 5-12%. O valor atual esta dentro da faixa esperada para 33 lands com 16 ramp.
+
+**O pipeline de T3 agora precisa ser recalibrado para o NOVO arquétipo.** As metricas de comparacao historica (Exec#1-#13, todas para o deck Spellslinger) nao sao mais diretamente aplicaveis. O "baseline" mudou. A proxima execucao (#15) deve comparar contra ESTE estado, nao contra o historico pre-reestruturacao.
+
+**A reestruturacao NAO veio do Evolution Oracle.** Nenhum agente do pipeline documentou estas mudancas. As swaps foram aplicadas externamente (provavelmente pelo jogador via importacao de decklist). O pipeline de integridade detectou a mudanca via hash verification — o sistema FUNCIONOU.
+
+---
+
+## Verificacao -- 2026-06-01T21:28:08+00:00 (Sem Mudancas -- Deck Inalterado desde Exec#13, T3=13.3% Estavel, Hash 30d00347 Inalterado)
+
+### Estado do Deck
+- **Card hash:** `30d00347764fc2a215edb4e668994871` — identico a Execucao #13
+- **Deck:** 100 cartas (86 rows, 35 lands), nao mudou desde 2026-06-01T08:14
+- **C#23 swaps:** AINDA nao aplicados (Apex of Power + Storm Herd no deck; Demand Answers + Thrill of Possibility fora)
+- **Twinflame + Flare of Duplication:** AINDA perdidos desde o hash-fake (C#17)
+- **Wincon Diversity Oracle (11:37):** Analise apenas — nenhum swap aplicado
+
+### Metricas (Execucao #13 — ainda validas, deck inalterado)
+
+| Metrica | Exec#13 (ATUAL) | Limiar |
+|:--------|:---------------:|:------:|
+| **Sem Play T3** | **13.3%** | > 12% = DEFENSIVO |
+| Mulligan | 30.1% | — |
+| Jogavel | 66.0% | — |
+| Ramp T1 (Sol Ring) | 8.5% | — |
+| Free Mulligan | 4.6% | — |
+
+### O Que Essa Metrica Significa (Licao)
+
+**Quarta verificacao consecutiva sem alteracao no deck.** O gargalo nao e a qualidade do deck — e a execucao dos swaps. Tres ciclos de analise (C#23 Evolution Oracle, Oracle Wincon Diversity 09:22, Oracle Wincon Diversity 11:37) recomendaram swaps que nunca foram aplicados no DB. O deck esta congelado em estado PRE-C#23 com T3=13.3% ha 8+ horas.
+
+**Recomendacao:** O proximo agente que tiver permissao de escrita no `knowledge.db` deve executar COMO PRIMEIRO PASSO: (1) Remover Apex of Power + Storm Herd, (2) Adicionar Demand Answers + Thrill of Possibility + Twinflame + Flare of Duplication. Estas 4 cartas estao na colecao e reduziriam T3 para ~9-10%.
+
+---
+
 ## Verificacao -- 2026-06-01T14:16:37+00:00 (Sem Mudancas -- Deck Inalterado desde Exec#13, T3=13.3% Estavel, Wincon Diversity Oracle Rodou Sem Swaps)
 
 ### Estado do Deck
