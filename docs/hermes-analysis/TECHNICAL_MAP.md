@@ -212,7 +212,7 @@ diretamente e usa raridade como proxy de impacto.
   (`init`, observer de tela e `traceAsync` em smoke) foi separada como controle
   positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-01 15:00 UTC no checkout local. `deck_matchups` e
+  em 2026-06-02 15:00 UTC no checkout local. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
   `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
   `/ai/ml-status`; `commander_reference_decks` e
