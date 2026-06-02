@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-01 23:00 UTC
+> Data: 2026-06-02 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -18,7 +18,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    esta presente nesta branch de memoria.
 5. **P1 — Ownership em rotas deck/AI**: **REVALIDADO no checkout local em 2026-06-01 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild` e `GET /decks/:id/analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-05-31 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
+   2026-06-02 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
    `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`,
    `commander_reference_generate_fallback_support.dart`,
@@ -34,7 +34,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
    nao tem import nem chamada para `enter()`/`exit()`.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
-   2026-06-01 23:00 UTC. Deck analysis prefere `card_function_tags`, mas
+   2026-06-02 05:30 UTC. Deck analysis prefere `card_function_tags`, mas
    optimize/validator/quality gate carregam apenas `semantic_tags_v2` e
    heuristica; alem disso, `semantic_tags_v2` multi-tag e colapsado em um unico
    role. O fallback de baixa confianca de semantic v2 para heuristica foi
@@ -182,7 +182,7 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
-- **Status 2026-05-31 05:30 UTC: REVALIDADO/ABERTO.** A revalidacao local nao
+- **Status 2026-06-02 05:30 UTC: REVALIDADO/ABERTO.** A revalidacao local nao
   encontrou `server/lib/ai/commander_fallback_policy.dart`; o unico arquivo
   `*policy*` em `server/lib` e `server/lib/edh_bracket_policy.dart`. Portanto a
   anotacao historica de resolucao em `origin/master@65f30387` nao deve ser
@@ -206,14 +206,15 @@ Histórico do problema:
   - `server/lib/ai/rebuild_guided_service.dart:1226`-`:1231` classifica ramp por
     `signet`/`sol ring`/`talisman`, e `:1331`-`:1338`, `:1404`-`:1411` aplicam
     penalidade/prioridade a utility lands especificas por nome.
-  - `server/routes/decks/[id]/recommendations/index.dart:262`-`:268` recomenda
-    `Command Tower` diretamente quando `landCount < 34`, e `_findStaples` em
-    `:408`-`:438` trata raridade `rare/mythic` como proxy de alto impacto sem
-    role semantico.
-  - `server/routes/ai/weakness-analysis/index.dart:206`-`:285` retorna listas
-    fixas de nomes para ramp, draw, removal, wipes e protecao, apos calcular
-    contagens por heuristica local que nao carrega `card_function_tags` nem
-    `semantic_tags_v2` (`:41`-`:59`, `:114`-`:162`).
+  - `server/routes/decks/[id]/recommendations/index.dart:110`-`:130` calcula
+    buckets por `oracle_text` local; `:262`-`:268` recomenda `Command Tower`
+    diretamente quando `landCount < 34`; `_findStaples` em `:408`-`:438` trata
+    raridade `rare/mythic` como proxy de alto impacto sem role semantico.
+  - `server/routes/ai/weakness-analysis/index.dart:41`-`:60` nao carrega
+    `card_function_tags`, `semantic_tags_v2` nem `card_role_scores`; `:114`-`:163`
+    recalcula utilidade por heuristicas locais e dois nomes de protecao, e
+    `:206`-`:285` retorna listas fixas de nomes para ramp, draw, removal, wipes
+    e protecao.
   - `server/lib/edh_bracket_policy.dart:134`-`:142` usa listas por nome para
     combos infinitos e Game Changers; este caso e excecao intencional de regra
     externa, mas ainda precisa de fonte/versionamento/teste dedicado.
@@ -242,7 +243,7 @@ Histórico do problema:
 
 ### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
 
-- **Status 2026-05-31 05:30 UTC: REVALIDADO/ABERTO.**
+- **Status 2026-06-02 05:30 UTC: REVALIDADO/ABERTO.**
 - **Evidência**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
     `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
