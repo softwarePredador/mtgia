@@ -1,3 +1,252 @@
+## [2026-06-02T21:42:21+00:00] Execucao #37 — 🔄 Deck Reconstruido Novamente: Wincons do Scout #36 Aplicados + Deck Saturado
+
+> **Data:** 2026-06-02
+> **Missao:** Auditoria de wincons com scorecard + verificacao de integridade do pipeline
+> **Deck state:** Card hash: `f2241d994743e8142396c0f846917fde` — 🚨 HASH DIVERGENTE do Scout #36 (era `0b4913e79ec97b3ce05e0fe26531cd44`)
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Wincon-Focused v37)
+
+---
+
+### 🚨 STEP 0: PIPELINE INTEGRITY — Deck Alterado Desde Scout #36
+
+**Card hash atual:** `f2241d994743e8142396c0f846917fde`
+**Scout #36 hash:** `0b4913e79ec97b3ce05e0fe26531cd44`
+**Veredito:** 🚨 HASH DIVERGENTE — O deck foi alterado novamente.
+
+**Mudancas detectadas:** 98 → 100 cartas. As recomendacoes do Scout #36 foram **aplicadas**:
+7 wincons do spellslinger original foram RE-ADICIONADOS ao deck.
+
+| Status | Cartas |
+|:-------|:-------|
+| ✅ No deck (Scout #36) | Twinflame, Dualcaster Mage, Rise of the Eldrazi, Storm Herd |
+| 🆕 Adicionados desde #36 | **Guttersnipe, Mizzix's Mastery, Rite of the Dragoncaller, Fiery Emancipation, Aetherflux Reservoir, Worldfire, Approach of the Second Sun, Molten Duplication** |
+| 📦 Fora do deck | Trouble in Pairs, Perch Protection, Apex of Power, Call Forth the Tempest |
+
+---
+
+### 📊 WINCONS NO DECK ATUAL — Scorecard via card_deck_analysis
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Guttersnipe** | 3 | 19 | 7 | 5 | 8 | 🟡 **INVISIVEL (ST=8)** — 2 dano/spell. Com 30+ spells. Fragil (R=5) |
+| **Mizzix's Mastery** | 4 | 17 | 6 | 7 | 6 | 🔴 **IMBATIVEL (R=7)** — Overload exila grave, copia tudo gratis |
+| **Twinflame** | 2 | 16 | 7 | 5 | 5 | 🟢 Combo com Dualcaster = criaturas infinitas |
+| **Rite of the Dragoncaller** | 6 | 16 | 5 | 5 | 7 | 🟡 **INVISIVEL (ST=7)** — Dragon 5/5 por spell |
+| **Dualcaster Mage** | 3 | 16 | 7 | 5 | 5 | 🟢 Combo deterministico com Twinflame |
+| **Rise of the Eldrazi** | 12 | 15 | 2 | 9 | 4 | 🔴 **IMBATIVEL (R=9)** — Aniquilador 4 + turno extra |
+| **Fiery Emancipation** | 6 | 15 | 6 | 5 | 4 | 🟢 Triplica dano. Storm Herd + Fiery = letal |
+| **Aetherflux Reservoir** | 4 | 15 | 6 | 5 | 4 | 🟢 Storm payoff. 50+ vida = removal laser |
+| **Worldfire** | 9 | 14 | 2 | 7 | 5 | 🔴 **IMBATIVEL (R=7)** — Com Teferi = vitoria |
+| **Approach of the Second Sun** | 7 | 12 | 6 | 5 | 1 | 🟢 **RAPIDA (S=6)** — ARQUI-INIMIGO (ST=1) |
+| **Storm Herd** | 10 | 11 | 3 | 5 | 4 | 🟡 Precisa de Akroma/Fiery no mesmo turno |
+
+**Total: 11 wincons scored no deck.** O deck esta **saturado** de condicoes de vitoria.
+
+---
+
+### 🏆 WINCONS NA COLECAO (NAO NO DECK) — Scorecard Completo
+
+Apenas **4 cartas** com score > 0 permanecem na colecao fora do deck.
+
+#### 🟢 RAPIDAS (speed >= 6) — Fecha Antes de Morrer
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Trouble in Pairs** | 4 | 16 | 7 | 5 | 4 | ⚠️ **MISCLASSIFIED** — Draw engine, nao wincon. Draw massivo vs decks com draw |
+| **Perch Protection** | 6 | 16 | 7 | 5 | 4 | ⚠️ **MISCLASSIFIED** — Fog + extra turn + gift. Protection, nao wincon |
+
+#### 🔴 FRAGEIS (resilience <= 3) — EVITE
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Call Forth the Tempest** | 8 | 12 | 4 | 3 | 5 | 🔴 **FRAGIL (R=3)** — 65.2% EDHREC mas trend -0.60. CMC 8 |
+
+#### ⚪ OUTROS (sem categoria de prioridade)
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Apex of Power** | 10 | 13 | 4 | 4 | 5 | CMC 10 heavy. Exilia top 7, mana gratis |
+
+---
+
+### 📋 ANALISE DE PRIORIZACAO
+
+**NENHUM candidato atinge os thresholds de priorizacao:**
+- 🔴 IMBATIVEIS (R>=7): **0 candidatos**
+- 🟡 INVISIVEIS (ST>=7): **0 candidatos**
+- 🟢 RAPIDAS (S>=6): 2 candidatos, mas AMBOS sao **misclassified** (Trouble in Pairs = draw engine, Perch Protection = fog/protection)
+- 🔴 FRAGEIS (R<=3): 1 candidato (Call Forth the Tempest) — EVITAR
+
+**Conclusao:** O deck esta **saturado de wincons** (11 scored + Akroma's Will como enabler).
+Todas as recomendacoes do Scout #36 foram aplicadas. Nao ha novos candidatos fortes
+na colecao. O collection pool de wincons para Lorehold foi esgotado.
+
+---
+
+### ⚠️ ALERTAS
+
+1. **Deck saturado de wincons** — 11 condicoes de vitoria + Akroma's Will. Meta cEDH
+   tipicamente usa 3-5 wincons + tutores. Este deck tem densidade excessiva de wincons
+   (11/100 cartas = 11%), o que reduz slots para interacao/ramp/draw.
+2. **Misclassification no card_deck_analysis** — Trouble in Pairs e Perch Protection
+   nao sao wincons. Sao draw engine e protection, respectivamente. O score=16 e artificial.
+3. **Sem novos candidatos** — A colecao foi completamente vasculhada. Nao ha mais wincons
+   com score > 0 disponiveis que nao estejam no deck.
+4. **Hash divergente** — O deck foi alterado externamente. Pipeline logs anteriores
+   (EVOLUTION_LOG, VALIDATOR_LOG) estao stale.
+
+---
+
+### 📊 RESUMO
+
+| Metrica | Valor |
+|:--------|:------|
+| Wincons no deck (scored) | 11 |
+| Wincons no deck (total incluindo Akroma) | 12 |
+| IMBATIVEIS disponiveis na colecao | 0 |
+| INVISIVEIS disponiveis na colecao | 0 |
+| RAPIDAS disponiveis na colecao | 2 (misclassified) |
+| FRAGEIS (evitar) | 1 (Call Forth the Tempest) |
+| Slots livres | 0 (100/100) |
+| **Recomendacao** | **NENHUM SWAP — deck saturado de wincons** |
+
+---
+
+## [2026-06-02T18:33:43+00:00] Execucao #36 — 🚨 ALERTA DE INTEGRIDADE: Deck Reconstruido (cEDH) + Wincon Scorecard
+
+> **Data:** 2026-06-02
+> **Missao:** Auditoria de wincons com scorecard + verificacao de integridade do pipeline
+> **Deck state:** Card hash: `0b4913e79ec97b3ce05e0fe26531cd44` — 🚨 HASH DIVERGENTE do ultimo SCOUT_LOG (era `30d00347...`)
+> **Analista:** Hermes Agent — Lorehold Deep Scout (Wincon-Focused v36)
+
+---
+
+### 🚨 STEP 0: PIPELINE INTEGRITY CRISIS — Deck Totalmente Reconstruido
+
+**Card hash atual:** `0b4913e79ec97b3ce05e0fe26531cd44`
+**Ultimo hash conhecido (SCOUT #35):** `30d00347764fc2a215edb4e668994871`
+**Veredito:** 🚨 HASH DIVERGENTE — O deck foi completamente alterado.
+
+**TODOS os 25+ swaps dos ciclos #1-#11 foram desfeitos.** O deck agora e uma build cEDH-adjacent
+com fast mana, tutor pesado, e protection suite. NENHUM dos motores/engines do pipeline spellslinger
+esta presente (Mizzix's Mastery, Arcane Bombardment, Double Vision, Dance with Calamity,
+Improvisation Capstone, Hit the Mother Lode, Storm-Kiln Artist, etc. — TODOS AUSENTES).
+
+**Comparacao de estruturas:**
+
+| Componente | Build Anterior (SCOUT #35) | Build Atual |
+|:-----------|:--------------------------|:------------|
+| Mana base | 35 lands, ramp variado | Fast mana package (Crypt, Vault, Mox, Petal, SSG, Rite of Flame) |
+| Tutores | 2-3 (Enlightened, Gamble) | 8 (Enlightened, Mystical, Gamble, Imperial, Recruiter, Stoneforge, Ranger-Captain, Saga) |
+| Protection | 4-5 slots | 9 slots (Silence, Orim's Chant, Abolisher, Pyroblast, REB, Flawless, Teferi, Swat, Mom) |
+| Wincons | 7+ (Mizzix, Rite, Worldfire, Apex, Approach, Call Forth, Storm Herd) | 4 (Rise, Storm Herd, Akroma's Will, Twinflame+Dualcaster) |
+| Draw engines | 5 (Esper, Wheel, One Ring, Top, Faithless) | 9 (esper, wheel, one ring, top, faithless, scroll rack, library, DRC, reunion) |
+| Total cards | 100 | 98 (FALTAM 2!) |
+| Commander | Lorehold, the Historian | Lorehold, the Historian |
+
+---
+
+### 📊 WINCONS NO DECK ATUAL — Scorecard via card_deck_analysis
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Twinflame + Dualcaster Mage** | 2+3 | 16 | 7 | 5 | 5 | 🟢 **COMBO** — Combo deterministico de 2 cartas. Criaturas infinitas com haste. |
+| **Rise of the Eldrazi** | 10 | 15 | 2 | 9 | 4 | 🔴 **IMBATIVEL (R=9)** — Aniquilador 4 + turno extra. Tutoravel. |
+| **Storm Herd** | 10 | 11 | 3 | 5 | 4 | 🟡 CMC 10 — Gera N pegasus 1/1. Precisa de Akroma's Will no mesmo turno. |
+| **Akroma's Will** | 4 | 0* | 5 | 5 | 5 | 🟢 **ENABLER** — Score=0 e default (sem avaliacao manual). Da haste/vigilancia/protecao massivo. |
+
+> *Cards com score=0 (5/5/5 default) nao receberam avaliacao manual de wincon no `card_deck_analysis`.
+
+**Analise estrutural:**
+- O deck TEM combo deterministico (Twinflame + Dualcaster)
+- Tem 8 tutores para encontrar o combo (incluindo Mystical Tutor, Enlightened, Gamble, Imperial, Recruiter)
+- Rise of the Eldrazi e um plano B solido (resilience 9, tutoravel)
+- Storm Herd e fragil (CMC 10, precisa de Akroma)
+- **GAP:** Nao tem Approach of the Second Sun, Mizzix's Mastery, Worldfire, Rite of the Dragoncaller — todos na colecao
+
+---
+
+### 🏆 WINCONS NA COLECAO (NAO NO DECK) — Scorecard Completo
+
+#### 🔴 IMBATIVEIS (resilience >= 7) — Prioridade Maxima
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Worldfire** | 9 | 14 | 2 | 7 | 5 | 🔴 **RESET TOTAL** — Com Teferi's Protection na stack = vitoria. Ja no deck tem Teferi! |
+
+#### 🟡 INVISIVEIS (stealth >= 7) — Dano Invisivel
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Guttersnipe** | 3 | 19 | 7 | 5 | 8 | 🟡 **INVISIVEL (ST=8)** — 2 dano por spell. Com 40 spells no deck = 80 dano. Mas fragil (R=5). |
+| **Rite of the Dragoncaller** | 6 | 16 | 5 | 5 | 7 | 🟡 **DRAGONS** — Gera dragon 5/5 por spell. Com Akroma's Will no deck = letal. |
+
+#### 🟢 RAPIDAS (speed >= 6) — Fecha Antes de Morrer
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Perch Protection** | 6 | 16 | 7 | 5 | 4 | 🟢 **GIFT** — Fog + extra turn + gift. Versatil. |
+| **Trouble in Pairs** | 4 | 16 | 7 | 5 | 4 | 🟢 **DRAW-AS-WINCON** — Draw massivo vs decks com draw. Boros usa como motor. |
+| **Fiery Emancipation** | 6 | 15 | 6 | 5 | 4 | 🟢 **TRIPLO DANO** — Storm Herd (X pegasus) + Fiery = 3X dano. Com Akroma = letal. |
+| **Approach of the Second Sun** | 7 | 12 | 6 | 5 | 1 | 🟢 **ARQUI-INIMIGO (ST=1)** — 63.8% EDHREC. Precisa de Flare de Duplication (NA COLECAO!) pra combo mesmo turno. |
+
+#### 🔴 FRAGEIS (resilience <= 3) — EVITE
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Call Forth the Tempest** | 8 | 12 | 4 | 3 | 5 | 🔴 **FRAGIL (R=3)** — 65.2% EDHREC mas trend -0.60. CMC 8. Morre facil. |
+
+---
+
+### 📋 ANALISE DE PRIORIZACAO PARA ESTA BUILD
+
+A build atual e **cEDH-adjacent**: fast mana + tutor denso + protection. Wincons sao encontrados via tutor,
+nao densidade. A prioridade e:
+
+1. **Adicionar Worldfire** — Com Teferi's Protection ja no deck, Worldfire e combo IMBATIVEL (R=7).
+   CMC 9 viavel com o fast mana package (Mana Crypt + Sol Ring + Mana Vault = 6 mana turn 1).
+   
+2. **Adicionar Approach of the Second Sun** — ARQUI-INIMIGO (63.8% EDHREC). O deck tem Mystical Tutor
+   e Enlightened Tutor para buscar. Precisa de Flare of Duplication (NA COLECAO) para combo mesmo turno.
+   
+3. **Adicionar Rite of the Dragoncaller** — Com Akroma's Will ja no deck, os dragons ganham haste/protecao.
+   CMC 6 viavel com fast mana.
+
+4. **Adicionar Fiery Emancipation** — Triplica dano de Storm Herd e de qualquer combatente. CMC 6.
+
+5. **Guttersnipe** — Score mais alto (19) mas fragil (R=5). Em meta cEDH com muito removal, morre antes
+   de gerar valor suficiente. Prioridade menor.
+
+**Colecao disponivel para TODOS os acima:** ✅ quantity > 0. Todas as cartas listadas estao na colecao.
+
+---
+
+### ⚠️ ALERTAS
+
+1. **FALTAM 2 CARTAS** — Deck tem 98 cartas (precisa de 100). Adicionar 2 wincons resolve.
+2. **type_line = NULL em todas as cartas** — O deck_cards nao tem type_line preenchido.
+   Impossivel verificar se tem land/creature/instant/sorcery. Classificador funcional cego.
+3. **Hash divergente** — Pipeline spellslinger anterior foi completamente substituido.
+   Todos os logs (EVOLUTION_LOG, VALIDATOR_LOG, MULLIGAN_LOG) estao stale.
+4. **Motor spellslinger AUSENTE** — 0/4 componentes do motor. Esta build nao e mais spellslinger.
+   E um deck de combo + protecao com sub-tema de big spell.
+
+---
+
+### 📊 RESUMO
+
+| Metrica | Valor |
+|:--------|:------|
+| Wincons no deck | 4 (Twinflame+Dualcaster, Rise, Storm Herd, Akroma) |
+| IMBATIVEIS disponiveis na colecao | 1 (Worldfire) |
+| INVISIVEIS disponiveis na colecao | 2 (Guttersnipe, Rite of the Dragoncaller) |
+| RAPIDAS disponiveis na colecao | 4 (Perch Protection, Trouble in Pairs, Fiery Emancipation, Approach) |
+| FRAGEIS (evitar) | 1 (Call Forth the Tempest) |
+| Slots livres | 2 (deck com 98/100 cartas) |
+| **Recomendacao TOP** | **Worldfire** (R=7, combo com Teferi) + **Approach of the Second Sun** (S=6, arqui-inimigo) |
+
+---
+
 ## [2026-06-01T09:48:47+00:00] Execucao #35 — Wincon Audit: Scorecard via card_deck_analysis (Foco Exclusivo em Condicoes de Vitoria)
 
 > **Data:** 2026-06-01
