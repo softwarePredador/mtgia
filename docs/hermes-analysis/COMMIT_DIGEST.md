@@ -1,17 +1,58 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-01T18:45:00Z (Incremento: Fix production route helper startup — 592443e0).
+> Atualizado em 2026-06-02T19:00:00Z (Incremento: Resolve learning pipeline backlog — e754c0ec).
 
 ## Estado atual
 
 - Branch observada: `master`
 - HEAD anterior: `d470bfe0` (Harden strategic functional role heuristics)
-- HEAD atual: **`592443e0`** (Fix production route helper startup).
+- HEAD atual: **`e754c0ec`** (Resolve learning pipeline backlog).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **indisponivel** (`/health` retornou HTTP 502 em 2026-06-01T16:30Z — outage de infraestrutura)
+- SHA publicado confirmado em producao: **`e754c0ec`** (`/health` retornou HTTP 200 em 2026-06-02T18:53Z — producao operacional).
 
+
+
+## Novos commits nesta rodada (2026-06-02)
+
+### `e754c0ec` — Resolve learning pipeline backlog (HEAD)
+
+- **9 arquivos**, **+316/-45 linhas**
+- **Tipo: CODE/FEATURE** — Resolve backlog do pipeline de aprendizado:
+  1. Nova rota `POST /ai/simulate-matchup` (505 linhas) — simula matchup entre dois decks com ArchetypeCountersService. Body: `my_deck_id`, `opponent_deck_id`, `simulations`. Retorna `my_deck`, `opponent_deck`, `simulation`, `analysis`, `recommendations`, `win_rate`, `stats`.
+  2. Weakness-analysis integra análises avançadas F3 (diversidade de wincon, removal-to-threat ratio, qualidade de draw, viabilidade pós-wipe) via `deck_advanced_analysis.dart`.
+  3. Weakness-analysis integra detecção de combos reais (Commander Spellbook) — combos completos + near-miss opportunities.
+  4. Sync_combos agora materializa `combo_piece` em `card_function_tags` com fonte `commander_spellbook_combo_v1` e confiança 0.960.
+  5. Ajustes em `optimize_runtime_support.dart`, `optimize_filler_loader_support.dart`, `candidate_quality_data_support.dart`, `functional_card_tags.dart`.
+- **Avaliação Hermes**: Cobertura de testes sólida (619/619 Dart tests com JWT_SECRET). `verifySwapIntegrity` definido mas nunca chamado — ver task P1 abaixo. Warnings de Flutter analyze são pré-existentes em arquivos de teste. 45 falhas em Flutter tests são network-dependent (backend não disponível no container) — padrão conhecido.
+- **Verificação**: `dart analyze lib/` — No issues found. `dart test` com JWT_SECRET — 619/619 PASS. Health endpoint confirma `git_sha: e754c0ec` em produção.
+
+### `92c72325` — Document learning cron schedule
+
+- **6 arquivos**, **+316 linhas**
+- **Tipo: DOCS/OPS** — Documentação e scripts de cron para o pipeline de aprendizado:
+  1. `MANALOOM_CRONS_E_PENDENCIAS.md` (126 linhas) — documento único com crons do aprendizado e backlog de pendências de lógica.
+  2. Scripts de cron: `cron_snapshot_edhrec.sh`, `cron_snapshot_price_history.sh`, `cron_sync_combos.sh`, `cron_sync_rulings.sh`, `cron_sync_staples.sh`.
+  3. Crontab recomendado consolidado com ordenação intencional (preços → snapshot preço → EDHREC).
+- **Avaliação Hermes**: Sem risco de regressão. Scripts de cron seguem padrão existente (`*.sh` wrappers). Documento classifica corretamente crons manuais vs automatizados.
+
+### `8b93d8f8` — Add data intelligence pipelines for deck analysis
+
+- **17 arquivos**, **+2419/-31 linhas**
+- **Tipo: CODE/FEATURE** — Infraestrutura de data intelligence para análise de decks:
+  1. **Commander Spellbook Service** (`commander_spellbook_service.dart`, 222 linhas) — busca combos conhecidos do Commander Spellbook (bulk JSON), detecta combos completos e near-misses no deck.
+  2. **Deck Advanced Analysis** (`deck_advanced_analysis.dart`, 606 linhas) — 4 análises avançadas: (a) win-condition diversity (speed/resilience/stealth axes), (b) removal-to-threat ratio, (c) draw tag completeness (repeatable vs burst vs cantrip vs conditional), (d) post-resolution viability (recuperação pós board wipe).
+  3. **EDHREC Trend Service** (`edhrec_trend_service.dart`, 208 linhas) — série temporal de inclusion rate para detecção de tendências rising/falling/stable.
+  4. **Optimize Swap Integrity** (`optimize_swap_integrity.dart`, 163 linhas) — SHA-256 hash canônico dos swaps (remove/add) vinculado ao deck_signature. Gerado no optimize, anexado ao response body.
+  5. Novas rotas: `GET /cards/:id/rulings` (88 linhas), `POST /decks/:id/recommendations` (44 linhas).
+  6. Scripts de sync: `sync_combos.dart` (337 linhas), `sync_rulings.dart` (198 linhas), `snapshot_edhrec.dart` (149 linhas).
+  7. Migrations v015-v017: tabelas `card_combos`, `combo_cards`, `card_rulings`, `edhrec_card_snapshots`.
+  8. Quality gate agora prefere functional_tags persistidos sobre re-derivação heurística (P1.a resolvido).
+- **Avaliação Hermes**: Adições significativas e bem estruturadas. `verifySwapIntegrity` definido mas sem call-sites — integridade de swaps é unilateral (hash gerado, nunca verificado). Ver task P1 abaixo. Novas rotas não documentadas em API_CONTRACTS_AND_DATA_MAP.md. Sem testes para o módulo de swap integrity.
+- **Verificação**: `dart analyze lib/` — No issues found. 619/619 Dart tests passam com JWT_SECRET. Novas migrations incluem `down` reversível.
+
+---
 
 ## Novos commits nesta rodada (2026-06-01)
 
