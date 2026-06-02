@@ -7,6 +7,7 @@ import 'functional_card_tags.dart';
 import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
 import 'commander_fallback_policy.dart';
+import 'optimization_functional_roles.dart';
 import 'optimize_filler_loader_support.dart';
 export 'optimize_filler_loader_support.dart';
 
@@ -650,6 +651,10 @@ int commanderFillerQualityScore(Map<String, dynamic> candidate) {
     name: name,
     typeLine: typeLine,
     oracleText: oracleText,
+    functionalTags: candidate['functional_tags'],
+    semanticTagsV2: candidate['semantic_tags_v2'],
+    manaCost: candidate['mana_cost']?.toString(),
+    cmc: candidate['cmc'],
   );
   final metaDeckCount = (candidate['meta_deck_count'] as num?)?.toInt() ?? 0;
   final usageCount = (candidate['usage_count'] as num?)?.toInt() ?? 0;
@@ -746,7 +751,26 @@ String inferFunctionalRole({
   required String name,
   required String typeLine,
   required String oracleText,
+  Object? functionalTags,
+  Object? semanticTagsV2,
+  String? manaCost,
+  Object? cmc,
 }) {
+  if (functionalTags != null || semanticTagsV2 != null) {
+    final resolved = resolveCardFunctionalRoles(
+      functionalTags: functionalTags,
+      semanticTagsV2: semanticTagsV2,
+      oracleText: oracleText,
+      typeLine: typeLine,
+      name: name,
+      manaCost: manaCost,
+      cmc: cmc,
+    );
+    if (resolved.isNotEmpty && resolved.source != 'heuristic') {
+      return _legacyOptimizeRoleForResolvedRoles(resolved.roles);
+    }
+  }
+
   final n = name.toLowerCase();
   final t = typeLine.toLowerCase();
   final o = oracleText.toLowerCase();
@@ -788,6 +812,48 @@ String inferFunctionalRole({
   }
 
   if (t.contains('creature')) return 'engine';
+  return 'utility';
+}
+
+String inferFunctionalRoleForCard(Map<String, dynamic> card) {
+  return inferFunctionalRole(
+    name: (card['name'] as String?) ?? '',
+    typeLine: (card['type_line'] as String?) ?? '',
+    oracleText: (card['oracle_text'] as String?) ?? '',
+    functionalTags: card['functional_tags'],
+    semanticTagsV2: card['semantic_tags_v2'],
+    manaCost: card['mana_cost']?.toString(),
+    cmc: card['cmc'],
+  );
+}
+
+String _legacyOptimizeRoleForResolvedRoles(Set<String> roles) {
+  if (roles.contains('ramp') || roles.contains('ritual')) return 'ramp';
+  if (roles.contains('draw') ||
+      roles.contains('loot') ||
+      roles.contains('exile_value')) return 'draw';
+  if (roles.contains('removal') ||
+      roles.contains('wipe') ||
+      roles.contains('board_wipe')) return 'removal';
+  if (roles.contains('interaction') ||
+      roles.contains('counterspell') ||
+      roles.contains('protection')) return 'interaction';
+  if (roles.contains('wincon') ||
+      roles.contains('combo_piece') ||
+      roles.contains('alt_win')) return 'wincon';
+  if (roles.contains('engine') ||
+      roles.contains('payoff') ||
+      roles.contains('enabler') ||
+      roles.contains('etb') ||
+      roles.contains('blink') ||
+      roles.contains('token_maker') ||
+      roles.contains('sacrifice_outlet') ||
+      roles.contains('graveyard_synergy') ||
+      roles.contains('artifact_synergy') ||
+      roles.contains('enchantment_synergy') ||
+      roles.contains('spellslinger') ||
+      roles.contains('aristocrat_payoff') ||
+      roles.contains('creature')) return 'engine';
   return 'utility';
 }
 
@@ -1411,11 +1477,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         continue;
       }
 
-      final role = inferFunctionalRole(
-        name: (card['name'] as String?) ?? '',
-        typeLine: (card['type_line'] as String?) ?? '',
-        oracleText: (card['oracle_text'] as String?) ?? '',
-      );
+      final role = inferFunctionalRoleForCard(card);
       currentRoleCounts[role] = (currentRoleCounts[role] ?? 0) + qty;
     }
 
@@ -1433,11 +1495,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       final isLand = typeLine.toLowerCase().contains('land');
       if (isLand) continue;
 
-      final role = inferFunctionalRole(
-        name: name,
-        typeLine: typeLine,
-        oracleText: (card['oracle_text'] as String?) ?? '',
-      );
+      final role = inferFunctionalRoleForCard(card);
       final currentRole = currentRoleCounts[role] ?? 0;
       final targetRole = roleTargets[role] ?? 0;
       final surplus = (currentRole - targetRole).clamp(0, 99);
@@ -1550,11 +1608,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
         if (cmc < 6) continue;
 
-        final role = inferFunctionalRole(
-          name: name,
-          typeLine: typeLine,
-          oracleText: (card['oracle_text'] as String?) ?? '',
-        );
+        final role = inferFunctionalRoleForCard(card);
         if (criticalRoles.contains(role)) continue;
 
         final preferredPenalty = preferredNames.contains(lower) ? 220 : 0;

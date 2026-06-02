@@ -5,10 +5,52 @@ import 'package:test/test.dart';
 import '../lib/edh_bracket_policy.dart';
 import '../lib/ai/aggressive_candidate_meta_signal_support.dart';
 import '../lib/ai/commander_fallback_policy.dart';
+import '../lib/ai/functional_card_tags.dart';
 import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
 void main() {
+  group('inferFunctionalRoleForCard', () {
+    test('uses persisted functional tags before legacy text heuristics', () {
+      final role = inferFunctionalRoleForCard({
+        'name': 'Silent Value Piece',
+        'type_line': 'Creature',
+        'oracle_text': 'Whenever this attacks, gain 1 life.',
+        'functional_tags': const [
+          {'tag': 'board_wipe', 'confidence': 0.92, 'source': 'test'},
+        ],
+      });
+
+      expect(role, equals('removal'));
+    });
+
+    test('real combo tag maps to wincon while heuristic tag stays low confidence',
+        () {
+      final tags = inferFunctionalCardTags(
+        name: 'Dramatic Reversal',
+        typeLine: 'Instant',
+        oracleText: 'Untap all nonland permanents you control.',
+      );
+      final heuristicCombo = tags.firstWhere((t) => t.tag == 'combo_piece');
+      expect(heuristicCombo.confidence, lessThan(0.65));
+
+      final role = inferFunctionalRoleForCard({
+        'name': 'Dramatic Reversal',
+        'type_line': 'Instant',
+        'oracle_text': 'Untap all nonland permanents you control.',
+        'functional_tags': const [
+          {
+            'tag': 'combo_piece',
+            'confidence': 0.96,
+            'source': 'commander_spellbook_combo_v1',
+          },
+        ],
+      });
+
+      expect(role, equals('wincon'));
+    });
+  });
+
   group('resolveOptimizeIntensity', () {
     test('omitted intensity remains backward-compatible focused default', () {
       final config = resolveOptimizeIntensity(null);

@@ -321,7 +321,10 @@ List<FunctionalCardTag> inferFunctionalCardTags({
   }
 
   if (_looksLikeComboPiece(oracle, normalizedName)) {
-    add('combo_piece', 0.72, 'combo_pattern_text_or_known_name');
+    // Heurística propositalmente abaixo do limiar operacional (0.65):
+    // combo_piece de alta confiança vem de card_function_tags persistido pelo
+    // Commander Spellbook (sync_combos.dart), reduzindo falso positivo textual.
+    add('combo_piece', 0.60, 'combo_pattern_text_or_known_name');
   }
 
   if (_looksLikeEngine(oracle)) {

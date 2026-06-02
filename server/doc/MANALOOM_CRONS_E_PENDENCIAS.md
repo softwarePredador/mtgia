@@ -77,7 +77,7 @@ mudam sinais de scoring e devem passar por revisão. Recomenda-se rodar
 Itens identificados na auditoria de completude das lógicas/APIs. Apenas
 documentados aqui; implementação pendente de priorização.
 
-### P-A. Reconciliar combo heurístico <-> tabela real `card_combos`
+### P-A. Reconciliar combo heurístico <-> tabela real `card_combos` — RESOLVIDO
 - **Onde:** `lib/ai/optimization_functional_roles.dart` (`_knownComboPieceNames`,
   `_looksLikeComboPiece` -> papel `combo_piece`); `lib/ai/functional_card_tags.dart`
   (tag `combo_piece` heurística, confiança 0.72); `lib/ai/deck_advanced_analysis.dart`
@@ -85,25 +85,29 @@ documentados aqui; implementação pendente de priorização.
 - **Problema:** a detecção heurística de `combo_piece` roda em paralelo à fonte
   real (`card_combos`/`combo_cards`, via `CommanderSpellbookService.findDeckCombos`,
   já usada em weakness-analysis). Heurística pode gerar falsos positivos/negativos.
-- **Proposta:** elevar confiança quando a carta aparece em `combo_cards`;
-  rebaixar `combo_piece` heurístico quando não houver combo real conhecido.
-- **Risco:** toca scoring -> exige teste de regressão (similar ao contraste P1.a).
+- **Implementado:** `sync_combos.dart` materializa `combo_piece` em
+  `card_function_tags` com fonte `commander_spellbook_combo_v1` e confiança 0.960
+  para cartas presentes em `combo_cards`; os sinais heurísticos de `combo_piece`
+  foram rebaixados para confiança 0.60 (abaixo do limiar operacional 0.65).
 
-### P-B. Substituir `inferFunctionalRole` (heurístico, role único) por tags persistidas
+### P-B. Substituir `inferFunctionalRole` (heurístico, role único) por tags persistidas — RESOLVIDO
 - **Onde:** engine determinístico do optimize usa `inferFunctionalRole`
   (heurístico, devolve 1 papel) em vez do resolver multi-tag
   `resolveCardFunctionalRoles` (functional_tags -> semantic_v2 -> heurística).
-- **Problema:** inconsistência com o restante do pipeline (validator/gate já
-  usam a fonte única após P1.a/P1.b).
-- **Risco:** mudança de scoring no caminho determinístico; validar com os
-  testes de optimize e amostras reais antes de ativar.
+- **Implementado:** `inferFunctionalRole` agora aceita `functionalTags` e
+  `semanticTagsV2`, delega a `resolveCardFunctionalRoles` quando existe sinal
+  persistido/semantic e mapeia para o vocabulário legado do scoring
+  (`ramp/draw/removal/interaction/wincon/engine/utility`). Os call sites com o
+  mapa completo da carta usam `inferFunctionalRoleForCard`.
 
-### P-C. Tabelas write-only sem consumidor (anti-órfã)
-Escritas mas nunca lidas — ou dar consumidor, ou descontinuar:
-- `commander_reference_decks`
-- `deck_matchups`
-- `deck_weakness_reports`
-- `ml_prompt_feedback`
+### P-C. Tabelas write-only sem consumidor (anti-órfã) — RESOLVIDO/PARCIALMENTE RECLASSIFICADO
+- `deck_weakness_reports`: agora consumida em `/ai/weakness-analysis` via bloco
+  `history` (resumo por severidade + 10 relatórios recentes).
+- `deck_matchups`: agora consumida em `/ai/simulate-matchup` via bloco
+  `stored_matchup.previous` antes do novo upsert.
+- `ml_prompt_feedback`: já era consumida em `/ai/ml-status` (`feedback_records`).
+- `commander_reference_decks`: reclassificada como não órfã; é consumida pelo
+  corpus/analysis (`commander_reference_deck_analysis`) e guidance de commander.
 
 ### P-D. Fases 4-7 (lacunas de lógica restantes)
 - Definição ainda aberta. `PLANO_CORRECAO.md` não existe mais no repo; o único

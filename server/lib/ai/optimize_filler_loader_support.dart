@@ -472,11 +472,7 @@ Map<String, int> buildSlotNeedsForDeck({
     if (typeLine.contains('land')) continue;
 
     final qty = (c['quantity'] as int?) ?? 1;
-    final role = inferFunctionalRole(
-      name: (c['name'] as String?) ?? '',
-      typeLine: (c['type_line'] as String?) ?? '',
-      oracleText: (c['oracle_text'] as String?) ?? '',
-    );
+    final role = inferFunctionalRoleForCard(c);
     current[role] = (current[role] ?? 0) + qty;
     nonLandTotal += qty;
   }
@@ -525,13 +521,7 @@ Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
 
   final scored = candidates.map((c) {
     final name = (c['name'] as String?) ?? '';
-    final typeLine = (c['type_line'] as String?) ?? '';
-    final oracle = (c['oracle_text'] as String?) ?? '';
-    final role = inferFunctionalRole(
-      name: name,
-      typeLine: typeLine,
-      oracleText: oracle,
-    );
+    final role = inferFunctionalRoleForCard(c);
 
     final primaryNeed = slotNeeds[role] ?? 0;
     final utilityNeed = slotNeeds['utility'] ?? 0;

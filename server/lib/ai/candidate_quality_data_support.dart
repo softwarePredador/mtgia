@@ -443,7 +443,9 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
       normalizedName.contains('thassa') && normalizedName.contains('oracle') ||
       normalizedName.contains('dramatic reversal') ||
       normalizedName.contains('isochron scepter')) {
-    add('combo_piece', 0.74, 'combo_pattern_text_or_known_name');
+    // Baixa confiança: a fonte real de combo_piece é card_function_tags
+    // persistida pelo sync do Commander Spellbook.
+    add('combo_piece', 0.60, 'combo_pattern_text_or_known_name');
   }
 
   if (oracle.contains('graveyard') ||

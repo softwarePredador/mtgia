@@ -10,6 +10,8 @@ import 'package:postgres/postgres.dart';
 import '../lib/ai/commander_spellbook_service.dart';
 import '../lib/database.dart';
 
+const _comboFunctionTagSource = 'commander_spellbook_combo_v1';
+
 /// Sincroniza a base de combos do Commander Spellbook.
 ///
 /// Baixa o bulk `variants.json` (~500MB) para um arquivo temporário (streaming,
@@ -77,6 +79,7 @@ Future<void> main(List<String> args) async {
     print('   válidos=${combos.length}, ignorados=$skipped');
 
     await _upsertCombos(pool, combos);
+    await _syncComboFunctionTags(pool);
 
     final total = await _count(pool, 'card_combos');
     print('✅ Sync concluído. card_combos=$total');
@@ -302,6 +305,78 @@ Future<void> _ensureCombosTables(Pool pool) async {
       'Tabelas card_combos/combo_cards ausentes. '
       'Rode `dart run bin/migrate.dart` antes do sync.',
     );
+  }
+}
+
+Future<void> _syncComboFunctionTags(Pool pool) async {
+  final hasTags = await _hasTable(pool, 'card_function_tags');
+  if (!hasTags) {
+    print('⚠️  card_function_tags ausente; combo_piece persistido não atualizado.');
+    return;
+  }
+
+  print('🏷️  Reconciliando combo_piece com combo_cards...');
+  await pool.runTx((tx) async {
+    await tx.execute(
+      Sql.named('''
+        DELETE FROM card_function_tags cft
+        WHERE cft.source = @source
+          AND NOT EXISTS (
+            SELECT 1
+            FROM cards c
+            JOIN combo_cards cc ON cc.oracle_id = c.scryfall_id::text
+            WHERE c.id = cft.card_id
+          )
+      '''),
+      parameters: {'source': _comboFunctionTagSource},
+    );
+
+    await tx.execute(
+      Sql.named('''
+        INSERT INTO card_function_tags (
+          card_id, card_name, tag, confidence, source, evidence, updated_at
+        )
+        SELECT
+          c.id,
+          c.name,
+          'combo_piece',
+          0.960,
+          @source,
+          'present_in_commander_spellbook_combos:' || COUNT(DISTINCT cc.combo_id)::text,
+          CURRENT_TIMESTAMP
+        FROM cards c
+        JOIN combo_cards cc ON cc.oracle_id = c.scryfall_id::text
+        GROUP BY c.id, c.name
+        ON CONFLICT (card_id, tag, source) DO UPDATE SET
+          card_name = EXCLUDED.card_name,
+          confidence = EXCLUDED.confidence,
+          evidence = EXCLUDED.evidence,
+          updated_at = CURRENT_TIMESTAMP
+      '''),
+      parameters: {'source': _comboFunctionTagSource},
+    );
+  });
+
+  final tagged = await pool.execute(
+    Sql.named('''
+      SELECT COUNT(*)::int
+      FROM card_function_tags
+      WHERE source = @source AND tag = 'combo_piece'
+    '''),
+    parameters: {'source': _comboFunctionTagSource},
+  );
+  print('   combo_piece persistido: ${tagged.first[0]} cartas');
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  try {
+    final result = await pool.execute(
+      Sql.named('SELECT to_regclass(@name) IS NOT NULL'),
+      parameters: {'name': tableName},
+    );
+    return result.isNotEmpty && result.first[0] == true;
+  } catch (_) {
+    return false;
   }
 }
 

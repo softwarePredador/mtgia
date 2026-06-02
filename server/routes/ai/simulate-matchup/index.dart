@@ -379,6 +379,11 @@ Future<Response> _analyzeMatchup({
 
   final winRate = wins / simulationCount;
   final avgTurns = totalTurns / simulationCount;
+  final previousMatchup = await _loadStoredMatchup(
+    pool,
+    myDeck['id'] as String,
+    opponentDeck['id'] as String,
+  );
 
   // Salvar resultado no banco
   try {
@@ -422,6 +427,13 @@ Future<Response> _analyzeMatchup({
       'win_rate_numeric': winRate,
       'average_game_length': avgTurns.toStringAsFixed(1),
     },
+    'stored_matchup': {
+      'previous': previousMatchup,
+      'current': {
+        'win_rate_numeric': winRate,
+        'notes': 'Auto-generated: ${advantages.join(", ")}',
+      },
+    },
     'analysis': {
       'base_win_chance': myScore,
       'advantages': advantages,
@@ -433,6 +445,38 @@ Future<Response> _analyzeMatchup({
     },
     'matchup_verdict': _getMatchupVerdict(winRate),
   });
+}
+
+Future<Map<String, dynamic>?> _loadStoredMatchup(
+  Pool pool,
+  String deckId,
+  String opponentDeckId,
+) async {
+  try {
+    final rows = await pool.execute(
+      Sql.named('''
+        SELECT win_rate, notes, updated_at
+        FROM deck_matchups
+        WHERE deck_id = CAST(@deck_id AS uuid)
+          AND opponent_deck_id = CAST(@opponent_deck_id AS uuid)
+        LIMIT 1
+      '''),
+      parameters: {
+        'deck_id': deckId,
+        'opponent_deck_id': opponentDeckId,
+      },
+    );
+    if (rows.isEmpty) return null;
+    final m = rows.first.toColumnMap();
+    return {
+      'win_rate_numeric': (m['win_rate'] as num?)?.toDouble(),
+      'notes': m['notes'],
+      'updated_at': m['updated_at']?.toString(),
+    };
+  } catch (e) {
+    print('[simulate-matchup] stored matchup unavailable: $e');
+    return null;
+  }
 }
 
 /// Retorna modificador de win rate baseado em matchup de arquétipos

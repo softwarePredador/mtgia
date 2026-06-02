@@ -503,6 +503,8 @@ Future<Response> onRequest(RequestContext context) async {
       print('Aviso: Não foi possível salvar relatório de fraquezas: $e');
     }
 
+    final weaknessHistory = await _loadWeaknessHistory(pool, deckId);
+
     // 8. Retornar análise completa
     return Response.json(body: {
       'deck_id': deckId,
@@ -554,9 +556,64 @@ Future<Response> onRequest(RequestContext context) async {
         'draw_completeness': drawCompleteness.data,
         'post_resolution_viability': postResolution.data,
       },
+      'history': weaknessHistory,
     });
   } catch (e, stack) {
     print('Erro em weakness-analysis: $e\n$stack');
     return internalServerError('Failed to analyze deck weaknesses');
+  }
+}
+
+Future<Map<String, dynamic>> _loadWeaknessHistory(
+  Pool pool,
+  String deckId,
+) async {
+  try {
+    final summaryRows = await pool.execute(
+      Sql.named('''
+        SELECT severity, COUNT(*)::int AS count
+        FROM deck_weakness_reports
+        WHERE deck_id = CAST(@deck_id AS uuid)
+        GROUP BY severity
+      '''),
+      parameters: {'deck_id': deckId},
+    );
+    final bySeverity = <String, int>{};
+    for (final row in summaryRows) {
+      final m = row.toColumnMap();
+      bySeverity[(m['severity'] as String?) ?? 'unknown'] =
+          (m['count'] as int?) ?? 0;
+    }
+
+    final recentRows = await pool.execute(
+      Sql.named('''
+        SELECT weakness_type, severity, description, addressed, created_at
+        FROM deck_weakness_reports
+        WHERE deck_id = CAST(@deck_id AS uuid)
+        ORDER BY created_at DESC
+        LIMIT 10
+      '''),
+      parameters: {'deck_id': deckId},
+    );
+
+    return {
+      'stored_reports': bySeverity.values.fold<int>(0, (a, b) => a + b),
+      'by_severity': bySeverity,
+      'recent': recentRows
+          .map((row) {
+            final m = row.toColumnMap();
+            return {
+              'type': m['weakness_type'],
+              'severity': m['severity'],
+              'description': m['description'],
+              'addressed': m['addressed'],
+              'created_at': m['created_at']?.toString(),
+            };
+          })
+          .toList(),
+    };
+  } catch (e) {
+    print('[weakness-analysis] weakness history unavailable: $e');
+    return const {'stored_reports': 0, 'by_severity': {}, 'recent': []};
   }
 }
