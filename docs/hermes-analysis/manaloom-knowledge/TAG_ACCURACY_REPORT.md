@@ -1,14 +1,32 @@
-# Tag Accuracy Report — 2026-06-01
+# Tag Accuracy Report — 2026-06-02
 
-**Generated:** 2026-06-01T14:41:27+00:00
-**Source:** `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` → `tag_accuracy`
-**Schema:** 22 tags, 7 columns (id, tag_name, correct_count, total_count, false_positive, false_negative, last_updated)
-**Data period:** 2026-05-26 to 2026-05-27 (seeded from deck analysis imports)
-**Status:** First report (no prior baseline)
+**Generated:** 2026-06-02T18:45:00+00:00
+**Source:** `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` → `tag_accuracy`, `deck_cards`, `card_tags`, `discrepancies`
+**Previous report:** 2026-06-01
+**Schema:** 22 tags in `tag_accuracy` (unchanged since 2026-05-27)
 
 ---
 
-## 1. Precisão Por Tag
+## 1. Mudanças desde o Último Relatório (2026-06-01 → 2026-06-02)
+
+| Métrica | 2026-06-01 | 2026-06-02 | Delta |
+|:--------|:----------:|:----------:|:-----:|
+| `tag_accuracy` rows | 22 | 22 | 0 |
+| `tag_accuracy` data updated | 2026-05-27 | **2026-05-27** | **Nenhuma** |
+| Discrepancies | 20 | **21** | **+1** |
+| `deck_cards` total | ~460 | **543** | **+83** |
+| Decks | ~6 | **7** | **+1** |
+| Double-null cards | 29 (7.4%) | **25 (4.6%)** | -4 |
+| Single vs multi divergence | 84 (21.5%) | **36 (6.6%)** | -48 |
+| No multi-tag cards | 77 (19.7%) | **124 (22.8%)** | +47 |
+| `functional_tag = 'unknown'` | 0 | **20** | **+20** 🔴 |
+| `functional_tag IS NULL` | 32 | **32** | 0 |
+
+> **Conclusão:** A tabela `tag_accuracy` **não foi atualizada** desde o último relatório. Porém houve uma mudança significativa nos dados subjacentes: um novo deck foi importado em bulk com **20 cartas não classificadas** (`functional_tag='unknown'`, CMC=NULL). Este é um sinal de alerta que merece documentação.
+
+---
+
+## 2. Precisão Por Tag (INALTERADO desde 2026-05-27)
 
 | Tag | Correto | Total | Precisão | fp | fn | Risk |
 |:----|:------:|:-----:|:--------:|:--:|:--:|:-----|
@@ -35,194 +53,154 @@
 | sacrifice_outlet | 1 | 1 | 100.0% 🟢 | 0 | 0 | Baixo |
 | wipe | 1 | 1 | 100.0% 🟢 | 0 | 0 | Baixo |
 
-*`combo_piece` e `other` têm amostras muito pequenas (n=2) — baixa confiança estatística.
+*Tags com total ≤ 2 têm baixa confiança estatística.
+
+**Distribuição Bimodal (INALTERADA):**
+- 15 tags a 100% — tags mecânicas bem definidas
+- 7 tags abaixo de 85% — tags estratégicas/contextuais
+- 0 tags no intervalo 85-99%
 
 ---
 
-## 2. Análise: Tags Abaixo de 85%
+## 3. 🔴 NOVO: Bulk Import Corruption — 20 Cartas Não Classificadas
 
-### 2.1 Distribuição Bimodal
+**Descoberto em:** 2026-06-02
 
-Os dados mostram uma **distribuição bimodal** clara:
-- **15 tags a 100%** — tags mecânicas bem definidas (ramp, draw, removal, land, creature...)
-- **7 tags abaixo de 85%** — tags estratégicas/contextuais (payoff, enabler, engine, wincon, combo_piece, protection)
-- **NENHUMA tag no intervalo 85-99%** — a classificação ou é exata, ou é fraca
+Um novo deck ("Lorehold Best-of Learned No Premium Mox 2026-06-02") foi importado em bulk com **20 cartas** (20% do deck) que:
 
-Isto indica que o sistema tem **dois perfis de classificador**: um determinístico e preciso para tags mecânicas, e um heurístico e impreciso para tags estratégicas.
+- Têm `functional_tag = 'unknown'` (string, NÃO null — a query de double-null não as detecta)
+- Têm `CMC = NULL` ou `CMC = 0.0`
+- Têm `type_line = NULL` ou vazio
+- Têm **zero** entradas em `card_tags`
 
-### 2.2 Root Cause: Heurísticas Estreitas
+**Isso é o padrão "Classifier NEVER Ran" documentado na skill** (`Pitfall: Bulk Import Data Corruption`). O classificador NÃO foi executado nestas cartas — elas foram inseridas cruas, sem análise de oracle text, sem atribuição de tags.
 
-As funções heurísticas para os tags estratégicos são **extremamente estreitas** — capturam apenas um subconjunto minúsculo do que o tag realmente significa:
+### Cartas Afetadas
 
-| Tag | Heurística (Dart `_looksLike*`) | O que NÃO captura |
-|:----|:--------------------------------|:------------------|
-| **payoff** | `whenever + create token` OU `whenever you cast + copy/scry` | Aristocratas (Blood Artist, Zulaport Cutthroat), drain, "for each creature" pumps, ETB scaling |
-| **enabler** | `cost less to cast` OU `spells cost...less` | Ashnod's Altar, Phyrexian Altar, haste enablers, extra land drops, mill engines, sacrifice outlets |
-| **engine** | `at beginning of your upkeep + you may` OU `whenever + you may + draw/create/add` | Rhystic Study, Smothering Tithe, Esper Sentinel, Mystic Remora, triggered value sem "you may" |
-| **wincon** | `you win the game` OU `opponent loses the game` | Triumph of the Hordes, Craterhoof Behemoth, Torment of Hailfire, Approach of the Second Sun (Dart-only) |
-| **combo_piece** | `remove counter from among` OU `search + may cast without paying` | Basalt Monolith, Kiki-Jiki combos, Dramatic Reversal, infinite mana outlets |
-| **protection** | `hexproof/indestructible/shroud/ward/phase out/protection from` | Counterspells como proteção (Fierce Guardianship, Force of Will), blink como proteção, Mother of Runes |
+| Carta | CMC no DB | type_line | Problema |
+|:------|:---------:|:----------|:---------|
+| Electroduplicate | NULL | NULL | Sem oracle, sem tipo, sem CMC |
+| Heat Shimmer | NULL | NULL | Sem oracle, sem tipo, sem CMC |
+| Past in Flames | NULL | NULL | Sem oracle, sem tipo, sem CMC |
+| Reiterate | NULL | NULL | Sem oracle, sem tipo, sem CMC |
+| Birgi, God of Storytelling | 0.0 | "" | CMC errado, sem tipo |
+| Boros Charm | 0.0 | "" | CMC errado, sem tipo |
+| Flawless Maneuver | 0.0 | "" | CMC errado, sem tipo |
+| Lightning Greaves | 0.0 | "" | CMC errado, sem tipo |
+| Mana Vault | 0.0 | "" | CMC errado, sem tipo |
+| Orim's Chant | 0.0 | "" | CMC errado, sem tipo |
+| Pyroblast | 0.0 | "" | CMC errado, sem tipo |
+| Reforge the Soul | 0.0 | "" | CMC errado, sem tipo |
+| Reverberate | 0.0 | "" | CMC errado, sem tipo |
+| Valakut Awakening | 0.0 | "" | CMC errado, sem tipo |
+| Victory Chimes | 0.0 | "" | CMC errado, sem tipo |
+| Sol Ring | 1.0 | Artifact | Tem tipo mas 'unknown' |
+| Boros Signet | 2.0 | Artifact | Tem tipo mas 'unknown' |
+| Ruby Medallion | 2.0 | Artifact | Tem tipo mas 'unknown' |
+| Scroll Rack | 2.0 | Artifact | Tem tipo mas 'unknown' |
+| Talisman of Conviction | 2.0 | Artifact | Tem tipo mas 'unknown' |
 
-### 2.3 Impacto no Pipeline
+**Impacto:** Este deck é **completamente invisível** para qualquer pipeline de análise que use `functional_tag` ou `card_tags`. O Evolution Oracle não pode propor swaps. O Mulligan Analyst não pode classificar ramp/draw. O Validator não pode calcular métricas.
 
-Tags de baixa precisão afetam diretamente o Evolution Oracle:
-- **payoff a 35.5%**: 20 das 31 cartas com esse tag são classificadas incorretamente. O Oracle pode remover payoff pieces pensando que são filler.
-- **enabler a 50%**: 21 enablers invisíveis ao classificador. O Oracle pode cortar peças de suporte sem saber.
-- **protection a 69.2%**: 4 proteções não detectadas. Fierce Guardianship e Force of Will são classificadas como `removal` em vez de `protection`.
-
----
-
-## 3. Sinais que Precisam Virar Teste
-
-### 3.1 Gap: false_positive / false_negative = 0
-
-As colunas `false_positive` e `false_negative` existem no schema mas **NUNCA foram populadas** — estão zeradas em todas as 22 tags. O script `knowledge_db.py` só registra `tag_match` (0 ou 1) e atualiza `correct_count` e `total_count`. Não há como saber QUAIS cartas específicas foram classificadas errado — só o agregado.
-
-**Sinal:** Precisamos de um mecanismo de rastreamento de erros individuais, não só contagem agregada.
-
-### 3.2 Gap: 29 Double-Null Cards
-
-29 cartas (7.4% das cartas não-terreno) são completamente invisíveis a AMBOS os classificadores:
-- `functional_tag IS NULL` (single-tag não retornou nada)
-- `card_tags` tem ZERO entradas (multi-tag também não retornou nada)
-
-Exemplos críticos: **Scroll Rack** (engine de topdeck), **Lim-Dûl's Vault** (tutor), **Grand Abolisher** (proteção proativa), **Tetsuko Umezawa** (enabler de evasão).
-
-**Sinal:** Qualquer ciclo de swap que proponha remover um double-null pode estar removendo uma peça essencial. O Lorehold pipeline já documenta este problema — agora é visível globalmente.
-
-### 3.3 Gap: functional_tag vs card_tags Divergência (21.5%)
-
-84 cartas (21.5% das cartas não-terreno) têm `functional_tag` que NÃO aparece nos `card_tags`:
-- Single-tag diz `creature`, multi-tag diz `enabler`, `protection` ou `token_maker`
-- Single-tag diz `wipe`, multi-tag diz `board_wipe, enabler, payoff`
-- Single-tag diz `utility`, multi-tag diz `big_spell` ou `token_maker`
-
-**Sinal:** O single-tag classifier (usado para `functional_tag` no deck_cards) e o multi-tag (usado para `card_tags`) discordam em 1 a cada 5 cartas. O `functional_tag` é o que o Evolution Oracle usa para calcular métrica de deck (ramp_count, draw_count, etc.) — uma classificação errada distorce os thresholds de ciclo.
-
-### 3.4 Gap: 77 Cartas Sem Multi-Tags (19.7%)
-
-77 cartas não-terreno não têm NENHUMA entrada em `card_tags`. Destas, 48 também têm `functional_tag = 'creature'` ou `'enchantment'` — são criaturas com oracle text vazio ou minimal (stax pieces como Drannith Magistrate, Ethersworn Canonist, Aven Mindcensor).
-
-**Sinal:** O multi-tag classifier não está rodando em ~20% das cartas. Ou o oracle text está faltando, ou a função retorna lista vazia para certos padrões.
+**Ação recomendada:** Rodar o classificador (`classify_card()` ou equivalente) neste deck antes de qualquer análise. O script de importação (`scripts/import_lorehold_decks.py`) precisa ser corrigido para executar classificação pós-import.
 
 ---
 
-## 4. Recomendações de Código
+## 4. Mudanças nos Sinais de Erro
 
-### 4.1 Ampliar Heurísticas Estratégicas (Alta Prioridade)
+### 4.1 Nova Discrepância: Blade Historian (#21)
 
-**Arquivo:** `server/lib/ai/optimization_functional_roles.dart` (linhas 370-398)
-**Arquivo:** `server/lib/ai/functional_card_tags.dart` (linhas 859-907)
-**Arquivo:** `docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_classifier.py` (linhas 155-221)
+| Campo | Valor |
+|:------|:------|
+| Card | Blade Historian |
+| ML Tag | creature |
+| Expected | combat_payoff |
+| Motivo | Single-tag creature não captura que é payoff de dano/clock |
+| Impacto | medium |
+| Resolvida? | Não |
+| Data | 2026-05-27 (já existia, só não estava listada no relatório de 2026-06-01) |
 
-**Ação:** Expandir as funções `_looksLikeWincon`, `_looksLikeEngine`, `_looksLikeComboPiece`, `_looksLikePayoff`, `_looksLikeEnabler` com padrões adicionais:
+> Esta discrepância já existia desde 2026-05-27 mas não foi incluída nas 20 listadas no relatório anterior. Detectada agora na re-varredura completa da tabela `discrepancies`.
 
-```dart
-// _looksLikeWincon — adicionar:
-oracle.contains('each opponent loses') && oracle.contains('life') ||
-oracle.contains('double') && oracle.contains('damage') ||
-oracle.contains('deals damage equal to') && oracle.contains('power') ||
+### 4.2 Divergência Single vs Multi-Tag: 84 → 36
 
-// _looksLikeEngine — adicionar:
-oracle.contains('whenever') && oracle.contains('draw a card') && !oracle.contains('you may') ||
-oracle.contains('whenever an opponent') && oracle.contains('you may draw') ||
+A divergência caiu de **84 (21.5%)** para **36 (6.6%)**. Esta métrica é instável porque:
 
-// _looksLikeEnabler — adicionar:
-oracle.contains('sacrifice a creature') && oracle.contains('add') ||
-oracle.contains('creatures you control have haste') ||
-oracle.contains('you may play an additional land') ||
-```
+1. O novo deck tem 20 cartas com `functional_tag='unknown'` que NÃO participam do cálculo (query filtra `WHERE functional_tag IS NOT NULL`)
+2. O denominador aumentou (+83 cartas no total)
+3. Sem baseline por deck, não é possível isolar a divergência real vs artefato estatístico
 
-**Nota:** O Python `classify_card()` (scryfall_classifier.py) sequer tem as chamadas para `_looksLikeWincon/Engine/ComboPiece/Payoff/Enabler` — o single-tag classifier Python é uma versão truncada. Isso significa que as análises Python (validators, scouts) usam um classificador mais limitado que o Dart.
+**Recomendação:** Esta métrica deve ser calculada por deck, não globalmente, para ser interpretável.
 
-### 4.2 Unificar Single-Tag e Multi-Tag (Média Prioridade)
+### 4.3 No Multi-Tag: 77 → 124
 
-**Problema:** Dois classificadores independentes produzem tags diferentes para 21.5% das cartas.
+Aumento de **47 cartas** sem multi-tags. Praticamente todo vindo do novo deck (20 cartas sem classificação) + novas cartas em decks existentes sem oracle text. Cartas sem multi-tag são um problema porque o Evolution Oracle perde o contexto multi-dimensional que o `card_tags` fornece.
 
-**Arquivos envolvidos:**
-- `server/lib/ai/optimization_functional_roles.dart` → `classifyOptimizationFunctionalRole()` (single-tag)
-- `server/lib/ai/functional_card_tags.dart` → `inferFunctionalCardTags()` (multi-tag)
-- `docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_classifier.py` → `classify_card()` e `infer_functional_card_tags()`
+### 4.4 Double-Null: 29 → 25
 
-**Recomendação:** O single-tag classifier (`classifyOptimizationFunctionalRole`) deveria usar o multi-tag como fallback, não uma heurística independente. Quando `_classifySemanticV2FunctionalRole()` retorna null, o código atual roda heurísticas manuais (linhas 113-117 do optimization_functional_roles.dart). Em vez disso, deveria chamar `inferFunctionalCardTags()` e usar o tag de maior confidence.
-
-```dart
-// optimization_functional_roles.dart — sugerido:
-if (semanticRole != null) return semanticRole;
-// Fallback: usar multi-tag com confidence mínima
-final multiTags = inferFunctionalCardTags(name: name, ...);
-if (multiTags.isNotEmpty && multiTags.first.confidence >= 0.75) {
-  return multiTags.first.tag;
-}
-// Só então rodar heurísticas manuais
-```
-
-### 4.3 Popular false_positive / false_negative (Média Prioridade)
-
-**Arquivo:** `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py` (linha 429-439)
-
-O código atual só registra `tag_match` booleano. Para popular `false_positive` e `false_negative`, precisamos de:
-
-1. **false_positive**: Quando o sistema atribui um tag que o revisor humano considera INCORRETO. Exemplo: Force of Will → `removal` (false positive para removal, deveria ser `protection`).
-2. **false_negative**: Quando o sistema NÃO atribui um tag que o revisor humano considera CORRETO. Exemplo: Basalt Monolith → sem tag `combo_piece` (false negative para combo_piece).
-
-**Schema update sugerido:** Adicionar tabela `tag_errors` com `card_name, assigned_tag, expected_tag, error_type (fp/fn), reviewed_by, reviewed_at` para rastreamento granular.
-
-### 4.4 Fechar o Gap Oracle Text (Baixa Prioridade)
-
-**Problema:** 77 cartas (19.7%) sem multi-tags — muitas são criaturas com oracle text vazio.
-
-**Verificação:** `card_oracle_data` tem 453 linhas, mas `deck_cards` pode ter mais. O classificador depende de oracle text para funcionar. Cartas sem oracle text no banco recebem apenas o type-based fallback.
-
-**Ação:** Rodar um bulk fetch da Scryfall API para preencher oracle text de todas as cartas em `deck_cards` que não têm entrada em `card_oracle_data`.
+Redução de 4 cartas double-null. As 25 restantes são todas de decks EDHREC Average (Dimir Ninja, Aesi, Kinnan, Default) — **nenhuma** é do Lorehold ativo. Isso indica que o Lorehold pipeline (Evolution Oracle, Scout) está mantendo seu deck limpo enquanto os decks de referência acumulam double-nulls.
 
 ---
 
-## 5. Dados de Suporte (Discrepancies Table)
+## 5. Recomendações de Código (Atualizadas)
 
-A tabela `discrepancies` (20 entradas) documenta casos específicos onde o tag ManaLoom diverge do esperado:
+### 5.1 🔴 CORRIGIR Bulk Import — Classificador NÃO Executado (NOVA)
 
-| Carta | ML Tag | Expected | Impacto |
-|:------|:-------|:---------|:--------|
-| Basalt Monolith | ramp | combo_piece | HIGH — subestima a carta |
-| Blood Artist | removal | payoff | HIGH — ignora wincon |
-| Underworld Breach | recursion | recursion + wincon | HIGH — missing wincon tag |
-| Temporal Trespass | big_spell | wincon | HIGH — classificado como fardo |
-| Shadow of Mortality | creature | wincon | HIGH — nunca jogada como criatura |
-| Pitiless Plunderer | ramp | ramp + combo_piece | MEDIUM — dual function |
-| Gaea's Cradle | land | ramp | MEDIUM — perde contexto |
-| Fierce Guardianship | removal | protection | MEDIUM — counter = proteção |
-| Mayhem Devil | removal | payoff + removal | MEDIUM — dual function |
-| Thrasios (no 99) | engine | wincon | MEDIUM — outlet de mana |
-| Dark Ritual | ritual | ramp | MEDIUM — ritual = ramp em Yuriko |
-| Korvold | draw | engine | HIGH — sistema não tem tag engine |
-| Mystic Remora | draw | stax_light | MEDIUM — missing stax tag |
-| Commandeer | removal | protection | LOW — counter como proteção |
+**Arquivo provável:** `docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py`
 
-**Padrão:** O classificador frequentemente erra em:
-1. **Dual-function cards** — o sistema retorna 1 tag, mas a carta tem 2 funções igualmente importantes
-2. **Context-dependent cards** — a função da carta muda conforme o deck (counter = proteção em cEDH)
-3. **Cards que não são jogados normalmente** — Shadow of Mortality e Temporal Trespass nunca são CAST em Yuriko
+O script de importação não executa o classificador após inserir as cartas. 20 cartas entraram com `functional_tag='unknown'`, CMC NULL, type_line NULL.
+
+**Ação:**
+1. Adicionar `classify_card()` ao pipeline de importação
+2. Ou criar script `reclassify_deck.py` que roda o classificador em todas as cartas de um deck
+3. Validar pós-import: `SELECT COUNT(*) FROM deck_cards WHERE deck_id = ? AND (functional_tag = 'unknown' OR cmc IS NULL)` — se > 0, ABORTAR
+
+### 5.2 🔴 Ampliar Heurísticas Estratégicas (REITERADA)
+
+**Status:** Não implementada.
+**Arquivos:** `server/lib/ai/optimization_functional_roles.dart` (L370-398), `functional_card_tags.dart` (L859-907), `scryfall_classifier.py` (L155-221)
+
+Heurísticas `_looksLike*` continuam demasiado estreitas. Payoff a 35.5% e enabler a 50% são inaceitáveis para decisões de swap automatizadas.
+
+### 5.3 🟡 Unificar Single-Tag e Multi-Tag (REITERADA)
+
+**Status:** Não implementada. Divergência entre os dois classificadores persiste.
+
+### 5.4 🟡 Popular false_positive / false_negative (REITERADA)
+
+**Status:** Colunas `false_positive` e `false_negative` continuam zeradas em todas as 22 tags. Sem rastreamento granular de erros.
+
+### 5.5 🟢 Adicionar `combat_payoff` como Tag (NOVA — Blade Historian)
+
+O padrão "creatures you control have double strike" (e similares como "creatures you control get +X/+X") é payoff de combate, não type-based creature. Sugerir novo tag `combat_payoff` ou expandir `payoff` para incluir combat keywords.
 
 ---
 
 ## 6. Sumário Executivo
 
-| Métrica | Valor |
-|:--------|:-----|
-| Tags no sistema | 22 |
-| Tags com 100% de precisão | 15 (68%) |
-| Tags abaixo de 85% | 7 (32%) |
-| Pior precisão | **payoff (35.5%)** |
-| Cartas double-null | 29 (7.4% das não-terreno) |
-| Divergência single vs multi tag | 84 cartas (21.5%) |
-| Cartas sem multi-tags | 77 (19.7%) |
-| fp/fn tracking implementado | NÃO (colunas zeradas) |
-| Discrepâncias documentadas | 20 |
+| Métrica | Valor | Mudança |
+|:--------|:-----|:--------|
+| Tags no sistema | 22 | 0 |
+| Tags com 100% de precisão | 15 (68%) | 0 |
+| Tags abaixo de 85% | 7 (32%) | 0 |
+| Pior precisão | **payoff (35.5%)** | 0 |
+| Cartas double-null | 25 (4.6%) | -4 |
+| Divergência single vs multi tag | 36 (6.6%) | -48* |
+| Cartas sem multi-tags | 124 (22.8%) | +47 |
+| Cartas 'unknown' (classificador não rodou) | **20** 🔴 | **+20** |
+| fp/fn tracking implementado | NÃO | 0 |
+| Discrepâncias documentadas | 21 | +1 |
+| Novos decks | 1 | +1 |
 
-**Ações recomendadas (ordem de prioridade):**
-1. 🔴 Ampliar heurísticas `_looksLike*` para payoff/enabler/engine/wincon — as funções atuais são demasiado estreitas
-2. 🔴 Adicionar chamadas `_looksLike*` no Python `classify_card()` que hoje as omite
-3. 🟡 Unificar single-tag e multi-tag — eliminar a divergência de 21.5%
-4. 🟡 Implementar rastreamento granular de fp/fn com tabela `tag_errors`
-5. 🟢 Preencher oracle text faltante para reduzir double-nulls e no-multi-tag
+*\* Mudança na divergência é parcialmente artefato do novo deck com tags 'unknown'*
+
+### Conclusão
+
+**`tag_accuracy` ESTAGNADO há 6 dias.** Os mesmos 22 registros desde 2026-05-27 — nenhuma atualização de precisão, nenhum novo dado de fp/fn. O pipeline de tagging não está evoluindo.
+
+**Achado crítico:** Importação em bulk de 20 cartas sem classificação no deck "Lorehold Best-of Learned No Premium Mox 2026-06-02". Nenhum agente do pipeline (Scout, Validator, Mulligan, Evolution Oracle) consegue analisar este deck. O script de importação precisa ser corrigido.
+
+**Top 3 ações:**
+1. 🔴 Rodar classificador no novo deck Lorehold (20 cartas 'unknown')
+2. 🔴 Corrigir script de importação para executar classificação pós-insert
+3. 🟡 Atualizar `tag_accuracy` com dados dos decks existentes

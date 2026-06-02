@@ -238,54 +238,55 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
-> Última atualização: **2026-06-01T14:45:01Z**
+> Última atualização: **2026-06-02T18:45:00Z**
 > Relatório completo: `TAG_ACCURACY_REPORT.md`
 
 ### Resumo Geral
 
-| Métrica | Valor |
-|:--------|:-----:|
-| **Tags no sistema** | 22 |
-| **Tags com 100% de precisão** | 15 (68%) |
-| **Tags abaixo de 85%** | 7 (32%) |
-| **Pior precisão** | payoff (35.5%) |
-| **Cartas double-null** | 29 (7.4% das não-terreno) |
-| **Divergência single vs multi tag** | 84 cartas (21.5%) |
-| **Cartas sem multi-tags** | 77 (19.7%) |
-| **fp/fn tracking** | NÃO implementado (colunas zeradas) |
+| Métrica | 2026-06-01 | 2026-06-02 | Delta |
+|:--------|:----------:|:----------:|:-----:|
+| **Tags no sistema** | 22 | 22 | 0 |
+| **Tags com 100% de precisão** | 15 (68%) | 15 (68%) | 0 |
+| **Tags abaixo de 85%** | 7 (32%) | 7 (32%) | 0 |
+| **Pior precisão** | payoff (35.5%) | payoff (35.5%) | 0 |
+| **Cartas double-null** | 29 (7.4%) | 25 (4.6%) | -4 |
+| **Cartas 'unknown' (classif. não rodou)** | 0 | **20** 🔴 | **+20** |
+| **Divergência single vs multi tag** | 84 (21.5%) | 36 (6.6%)* | -48 |
+| **Cartas sem multi-tags** | 77 (19.7%) | 124 (22.8%) | +47 |
+| **fp/fn tracking** | NÃO implementado | NÃO implementado | 0 |
+| **Discrepâncias documentadas** | 20 | 21 | +1 |
 
-### Tags com Precisão 100% (15)
+*\* Divergência single/multi instável — ver relatório completo.*
 
-`ramp` (53/53), `draw` (32/32), `removal` (30/30), `land` (87/87), `utility` (76/76), `creature` (22/22), `tutor` (6/6), `board_wipe` (3/3), `recursion` (3/3), `enchantment` (3/3), `finisher` (2/2), `planeswalker` (2/2), `artifact` (2/2), `sacrifice_outlet` (1/1), `wipe` (1/1)
+### `tag_accuracy` ESTAGNADO (6 dias sem atualização)
 
-### Tags com Precisão < 85% (7)
+A tabela `tag_accuracy` contém os mesmos 22 registros desde 2026-05-27. Nenhuma
+atualização de precisão, nenhum novo dado de fp/fn. O pipeline de tagging não está
+evoluindo.
 
-| Tag | Precisão | Amostra | Problema |
-|:----|:--------:|:-------:|:---------|
-| `payoff` | 35.5% | 11/31 | Heurística captura só `whenever + create token` e `whenever you cast + copy` |
-| `combo_piece` | 50.0% | 1/2 | Amostra minúscula — heurística captura só counter removal + search/cast sem pagar |
-| `enabler` | 50.0% | 21/42 | Heurística captura só cost reduction — ignora Altars, haste, extra land drops |
-| `other` | 50.0% | 1/2 | Amostra minúscula — tag genérica sem critério claro |
-| `protection` | 69.2% | 9/13 | Não captura counterspells como proteção (Fierce Guardianship, Force of Will) |
-| `wincon` | 75.0% | 6/8 | Heurística captura "you win the game" literal — ignora Triumph, Craterhoof, Torment |
-| `engine` | 75.0% | 6/8 | Heurística exige "you may" opcional — ignora Rhystic, Smothering Tithe |
+### 🔴 Novo: Bulk Import Corruption — 20 Cartas Não Classificadas
 
-### Novas Descobertas (v2 — 2026-06-01)
+Novo deck "Lorehold Best-of Learned No Premium Mox 2026-06-02" (100 cartas) importado
+com **20 cartas** (20%) com `functional_tag='unknown'`, `CMC=NULL`, `type_line=NULL`.
+O classificador NÃO foi executado — é o padrão "Classifier NEVER Ran" documentado na
+skill (`Pitfall: Bulk Import Data Corruption`).
 
-1. **29 Double-Null Cards (7.4%):** Cartas invisíveis a AMBOS os classificadores. Ex: Scroll Rack, Lim-Dûl's Vault, Grand Abolisher. Qualquer swap que remova um double-null pode ser destrutivo.
-2. **Divergência single vs multi tag (21.5%):** 84 cartas onde `functional_tag` ≠ `card_tags`. O Evolution Oracle usa `functional_tag` para métricas — classificação errada distorce thresholds.
-3. **77 cartas sem multi-tags (19.7%):** Oracle text ausente ou insuficiente. O classificador só funciona com oracle text completo.
-4. **fp/fn tracking zerado:** As colunas `false_positive` e `false_negative` do `tag_accuracy` nunca foram populadas. Só existe contagem agregada, sem rastreamento granular de erros.
+Cartas afetadas incluem staples como Sol Ring, Mana Vault, Scroll Rack, Boros Charm,
+Lightning Greaves, Birgi, Past in Flames, Reiterate. Nenhum agente do pipeline
+(Scout, Validator, Mulligan, Oracle) consegue analisar este deck.
 
-### Recomendações de Código
+**Ação:** Rodar classificador no deck + corrigir script de importação (`scripts/import_lorehold_decks.py`).
+
+### Recomendações de Código (Atualizadas)
 
 | Prioridade | Ação | Arquivo |
 |:----------:|:-----|:--------|
+| 🔴 | **NOVO:** Corrigir bulk import — executar classificador pós-insert | `scripts/import_lorehold_decks.py` |
 | 🔴 | Ampliar heurísticas `_looksLike*` para payoff/enabler/engine/wincon | `server/lib/ai/optimization_functional_roles.dart` (L370-398) |
 | 🔴 | Adicionar `_looksLike*` ao Python `classify_card()` (hoje as omite) | `scripts/scryfall_classifier.py` (L155-221) |
 | 🟡 | Unificar single-tag com multi-tag como fallback | `optimization_functional_roles.dart` + `functional_card_tags.dart` |
 | 🟡 | Implementar tabela `tag_errors` para rastreamento granular de fp/fn | `scripts/knowledge_db.py` (L429-439) |
-| 🟢 | Preencher oracle text faltante (bulk fetch Scryfall) | `card_oracle_data` (453 rows; deck_cards tem mais) |
+| 🟢 | Adicionar `combat_payoff` como tag (Blade Historian) | `optimization_functional_roles.dart` |
 
 
 ---
