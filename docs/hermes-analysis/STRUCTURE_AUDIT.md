@@ -1,7 +1,117 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-02 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-02 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies — revalidacao 2026-06-02 11:00 UTC
+
+Escopo desta rodada: somente imports locais quebrados e dependencias circulares
+em Dart. Nao foi feita auditoria ampla de classes nao usadas, funcoes sem
+chamador, tabelas PostgreSQL, duplicacao ou coerencia entre `server/lib`,
+`server/routes` e `app/lib` fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `eecb2f95`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor base cobre `server/lib` e
+`server/routes`, mas nao cobre `app/lib` nem `server/bin`. Por isso o resultado
+`Imports quebrados: 0` e valido apenas para o recorte textual do script; os
+achados abaixo foram revalidados por resolucao manual/automatizada de imports
+locais a partir do arquivo origem e por `dart analyze` no backend.
+
+### Validacao complementar
+
+- Resolver focado em imports Dart locais (`app/lib`, `server/lib`,
+  `server/routes`, `server/bin`) encontrou **3 imports quebrados** e **1 SCC**
+  com mais de um arquivo.
+- `dart analyze` em `server/`: **falhou** com `uri_does_not_exist` para
+  `bin/local_test_server.dart:3`.
+- `flutter analyze --no-pub --no-fatal-infos` em `app/`: **nao conclusivo**
+  para imports do app porque este checkout nao possui resolucao de dependencias
+  Flutter; o analyzer reportou milhares de `uri_does_not_exist` para pacotes
+  externos e para `package:manaloom/...` antes de isolar os imports relativos.
+
+### Achados revalidados
+
+#### P1 — Entry point local do backend importa artefato Dart Frog ausente
+
+- **Import quebrado:** `server/bin/local_test_server.dart:3` importa
+  `../.dart_frog/server.dart`.
+- **Alvo resolvido:** `server/.dart_frog/server.dart`.
+- **Evidencia:** `ls server/.dart_frog` retornou `No such file or directory`.
+  `dart analyze` em `server/` falhou com:
+  `Target of URI doesn't exist: '../.dart_frog/server.dart'`.
+- **Por que parece quebrado:** o arquivo gerado pelo Dart Frog nao existe no
+  checkout atual, mas o import e estatico e participa do analyzer.
+- **O que valida:** gerar/restaurar `server/.dart_frog/server.dart` antes do
+  analyze, ou alterar/remover o entry point para nao importar artefato ausente
+  em clone limpo.
+- **O que falsifica:** `dart analyze` verde em `server/` com
+  `server/.dart_frog/server.dart` presente ou com outro entry point valido.
+
+#### P1 — Dois imports relativos do app escapam de `app/lib`
+
+- **Import quebrado:** `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
+  importa `../../../../core/utils/mana_helper.dart`.
+- **Alvo resolvido:** `app/core/utils/mana_helper.dart`.
+- **Arquivo existente esperado:** `app/lib/core/utils/mana_helper.dart`.
+- **Por que parece quebrado:** a partir de
+  `app/lib/features/decks/widgets/`, quatro `..` sobem ate `app/`, nao ate
+  `app/lib/`. O import equivalente dentro de `app/lib` deveria permanecer sob
+  `app/lib/core`.
+- **Import quebrado:** `app/lib/features/home/life_counter_screen.dart:7`
+  importa `../../../core/theme/app_theme.dart`.
+- **Alvo resolvido:** `app/core/theme/app_theme.dart`.
+- **Arquivo existente esperado:** `app/lib/core/theme/app_theme.dart`.
+- **Por que parece quebrado:** a partir de `app/lib/features/home/`, tres `..`
+  tambem sobem ate `app/`. O alvo real esta em `app/lib/core/theme`.
+- **O que valida:** corrigir os imports relativos para alvos sob `app/lib/core`
+  ou converter para `package:manaloom/core/...`, depois rodar analyzer do app
+  com dependencias resolvidas.
+- **O que falsifica:** existencia de `app/core/...` como fonte real desses
+  imports ou analyzer Flutter verde no app com estes imports inalterados.
+
+#### P2 — Ciclo direto entre detalhe de deck publico e perfil de usuario
+
+- **Arquivos no SCC:** `app/lib/features/community/screens/community_deck_detail_screen.dart`
+  e `app/lib/features/social/screens/user_profile_screen.dart`.
+- **Evidencia de import A -> B:** `community_deck_detail_screen.dart:8`
+  importa `../../social/screens/user_profile_screen.dart`.
+- **Evidencia de uso A -> B:** `community_deck_detail_screen.dart:213`
+  instancia `UserProfileScreen` no `Navigator.push`.
+- **Evidencia de import B -> A:** `user_profile_screen.dart:7` importa
+  `../../community/screens/community_deck_detail_screen.dart`.
+- **Evidencia de uso B -> A:** `user_profile_screen.dart:469` instancia
+  `CommunityDeckDetailScreen` no `Navigator.push`.
+- **Por que parece circular:** as duas telas conhecem e instanciam uma a outra
+  diretamente, criando ciclo de import entre features `community` e `social`.
+- **Impacto:** aumenta acoplamento entre features e dificulta extrair, testar ou
+  trocar navegacao por rotas nomeadas/go_router sem carregar a tela vizinha.
+- **O que valida:** mover a navegacao cruzada para rotas nomeadas, callbacks ou
+  um adapter compartilhado de navegacao, removendo pelo menos um dos imports.
+- **O que falsifica:** grafo de imports sem SCC apos a mudanca ou evidencia de
+  que uma das referencias e removida/isolada sem afetar navegacao.
 
 ## Rodada focada: Functions not called — revalidacao 2026-06-02 07:00 UTC
 

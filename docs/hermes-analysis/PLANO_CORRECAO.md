@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-02 05:30 UTC
+> Data: 2026-06-02 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -10,12 +10,11 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao de 2026-06-01 19:00 UTC. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos), alem de duplicacoes menores em trust, logs sociais/follow, condicao de carta e CMC/tipo.
-4. **P1 — Entry point local quebrado**: **REABERTO no checkout local
-   `df8291d7`**. `server/bin/local_test_server.dart:3` ainda importa
+4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
+   `eecb2f95` em 2026-06-02 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
-   nao existe neste checkout, e `dart analyze` do backend falha com
-   `uri_does_not_exist`. A resolucao historica em `origin/master@a830f9f3` nao
-   esta presente nesta branch de memoria.
+   nao existe neste checkout, e `dart analyze` em `server/` falha com
+   `uri_does_not_exist`.
 5. **P1 — Ownership em rotas deck/AI**: **REVALIDADO no checkout local em 2026-06-01 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild` e `GET /decks/:id/analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-02 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
@@ -59,8 +58,8 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     metrics/debug de `PerformanceService`. A observabilidade automatica do
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
-13. **P1/P2 — Imports quebrados e ciclo app**: **REABERTO no checkout local
-    `df8291d7` (2026-05-30 11:00 UTC).** `deck_analysis_tab.dart:5` e
+13. **P1/P2 — Imports quebrados e ciclo app**: **REVALIDADO/ABERTO no checkout
+    local `eecb2f95` (2026-06-02 11:00 UTC).** `deck_analysis_tab.dart:5` e
     `life_counter_screen.dart:7` ainda usam imports relativos que saem de
     `app/lib` e resolvem para `app/core/...`, enquanto os arquivos existentes
     estao em `app/lib/core/...`. O ciclo direto entre
@@ -348,40 +347,32 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
-- **Status 2026-05-29: RESOLVIDO em `origin/master@a830f9f3`.**
-  `server/bin/local_test_server.dart` deixou de importar o artefato gerado
-  `../.dart_frog/server.dart` no topo do arquivo. O wrapper agora checa
-  `.dart_frog/server.dart` em runtime, emite erro claro se o artefato nao
-  existir, executa `dart run .dart_frog/server.dart` com `PORT` e encerra o
-  processo filho em `SIGINT`/`SIGTERM`.
+- **Status 2026-06-02 11:00 UTC: REVALIDADO/ABERTO no checkout local
+  `eecb2f95`.** A resolucao historica citada para `origin/master@a830f9f3` nao
+  esta presente nesta branch de memoria.
 - **Evidência**:
   - `dart analyze` em `server/` falhou com:
     - `bin/local_test_server.dart:3:8 - Target of URI doesn't exist: '../.dart_frog/server.dart'`
+  - `server/bin/local_test_server.dart:3` importa `../.dart_frog/server.dart`
+    estaticamente.
+  - `server/.dart_frog/server.dart` nao existe neste checkout.
 - **Impacto**: bloqueia validação estrutural automatizada e reduz confiança em checks rápidos do backend.
 - **Ação recomendada**:
   1. decidir se `bin/local_test_server.dart` exige geração prévia obrigatória de `.dart_frog/server.dart`;
   2. documentar ou automatizar esse passo no fluxo local;
   3. se o arquivo não for mais usado, substituir por entry point resiliente ou removê-lo.
 - **Validação**:
-  - `dart analyze bin/local_test_server.dart`: PASS.
-  - `PORT=18082 dart run bin/local_test_server.dart` com
-    `.dart_frog/server.dart` presente respondeu `/health`.
-  - `SIGTERM` no wrapper encerrou o listener filho; porta `18082` ficou livre.
-  - `dart analyze bin lib routes test`: PASS.
-  - `dart test` em `server/`: 612 testes PASS.
-  - smoke Hermes pos-push para `a830f9f30b8bd106431e3bef6fd40211f4b46a86`: PASS.
+  - `dart analyze` em `server/` deixa de falhar por
+    `../.dart_frog/server.dart`.
+  - Se o wrapper continuar existindo, `PORT=18082 dart run bin/local_test_server.dart`
+    deve emitir erro operacional claro quando `.dart_frog/server.dart` nao
+    existir, ou iniciar o servidor quando o artefato estiver presente.
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-05-29: RESOLVIDO para app em `origin/master@640f4ab4` e para
-entrypoint local backend em `origin/master@a830f9f3`.**
-
-- `deck_analysis_tab.dart` e `life_counter_screen.dart` foram migrados para
-  imports `package:manaloom/...`.
-- Validado com `flutter analyze` focado e `flutter analyze lib test`.
-- `server/bin/local_test_server.dart` nao importa mais o arquivo gerado em
-  tempo de analyze; em runtime ele exige `.dart_frog/server.dart` com mensagem
-  explicita.
+**Status 2026-06-02 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`eecb2f95`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
+`origin/master@a830f9f3` nao estao refletidas nesta branch de memoria.
 
 - **Evidência**:
   - `app/lib/features/decks/widgets/deck_analysis_tab.dart:5` importa
@@ -415,13 +406,10 @@ entrypoint local backend em `origin/master@a830f9f3`.**
 
 ### P2 — Quebrar o ciclo direto entre `CommunityDeckDetailScreen` e `UserProfileScreen`
 
-**Status 2026-05-29: RESOLVIDO em `origin/master@640f4ab4`.**
-
-- `CommunityDeckDetailScreen` navega para `/community/user/:userId` via
-  `GoRouter`.
-- `UserProfileScreen` navega para `/community/decks/:deckId` via `GoRouter`.
-- `app/lib/main.dart` registra a rota `/community/decks/:deckId`.
-- Grafo local de imports em `app/lib`: `SCCS 0`.
+**Status 2026-06-02 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`eecb2f95`.** A resolucao historica citada para `origin/master@640f4ab4` nao
+esta refletida nesta branch de memoria; o grafo local focado ainda encontrou 1
+SCC com esses dois arquivos.
 
 - **Evidência**:
   - `app/lib/features/community/screens/community_deck_detail_screen.dart:8`
