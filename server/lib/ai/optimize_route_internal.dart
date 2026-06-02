@@ -158,9 +158,27 @@ Future<String> semanticV2SelectSql(Pool pool) async {
                          'wincon', cstv2.wincon,
                          'combo_piece', cstv2.combo_piece
                        ))
-                       FROM card_semantic_tags_v2 cstv2
+                        FROM card_semantic_tags_v2 cstv2
                        WHERE cstv2.card_id = cards.id
                      ) AS semantic_tags_v2''';
+}
+
+Future<String> functionalTagsSelectSql(Pool pool) async {
+  final exists = await hasOptimizeTable(pool, 'card_function_tags');
+  if (!exists) return "'[]'::jsonb AS functional_tags";
+  return '''
+                     COALESCE(
+                       (SELECT jsonb_agg(jsonb_build_object(
+                         'tag', cft.tag,
+                         'confidence', cft.confidence,
+                         'evidence', cft.evidence,
+                         'source', cft.source
+                       ) ORDER BY cft.confidence DESC, cft.tag)
+                       FROM card_function_tags cft
+                       WHERE cft.card_id = cards.id
+                       ),
+                       '[]'::jsonb
+                     ) AS functional_tags''';
 }
 
 Future<bool> hasOptimizeTable(Pool pool, String tableName) async {

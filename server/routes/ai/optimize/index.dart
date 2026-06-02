@@ -15,6 +15,7 @@ import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
+import '../../../lib/ai/optimize_swap_integrity.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
@@ -810,6 +811,18 @@ Future<Response> onRequest(RequestContext context) async {
       );
       responseBody['timings'] ??= telemetry.snapshot();
       responseBody['stage_telemetry'] ??= responseBody['timings'];
+
+      // Integridade dos swaps: liga o conjunto remove/add ao estado do deck
+      // (deck_signature) via SHA-256, para o caminho de aplicação verificar
+      // adulteração ou drift de deck antes de mutar deck_cards.
+      if (responseBody['swap_integrity'] == null) {
+        final integrity = buildSwapIntegrityForResponse(
+          deckId: deckId,
+          deckSignature: deckSignature,
+          responseBody: responseBody,
+        );
+        if (integrity != null) responseBody['swap_integrity'] = integrity;
+      }
 
       await recordOptimizeAnalysisOutcome(
         pool: pool,
@@ -2084,6 +2097,7 @@ Future<Response> onRequest(RequestContext context) async {
             return (v?['name'] as String?) ?? n;
           }).toList();
           final semanticV2Select = await semanticV2SelectSql(pool);
+          final functionalTagsSelect = await functionalTagsSelectSql(pool);
           final additionsDataResult = await pool.execute(
             Sql.named('''
               SELECT DISTINCT ON (LOWER(name))
@@ -2100,7 +2114,8 @@ Future<Response> onRequest(RequestContext context) async {
                        0
                      ) as cmc,
                      oracle_text,
-                     $semanticV2Select
+                     $semanticV2Select,
+                     $functionalTagsSelect
               FROM cards 
               WHERE LOWER(name) = ANY(@names)
               ORDER BY LOWER(name), name
@@ -2120,6 +2135,7 @@ Future<Response> onRequest(RequestContext context) async {
                     'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
                     'oracle_text': (row[5] as String?) ?? '',
                     'semantic_tags_v2': row.length > 6 ? row[6] : null,
+                    'functional_tags': row.length > 7 ? row[7] : null,
                   })
               .toList();
 

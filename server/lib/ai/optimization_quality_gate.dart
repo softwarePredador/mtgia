@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimization_validator.dart';
@@ -162,16 +164,29 @@ Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
   final oracleText = (card['oracle_text'] as String?) ?? '';
 
   if (semanticRoles.isEmpty) {
-    for (final tag in inferFunctionalCardTags(
-      name: (card['name'] as String?) ?? '',
-      typeLine: typeLine,
-      oracleText: oracleText,
-      manaCost: card['mana_cost'] as String?,
-      cmc: card['cmc'],
-    )) {
-      if (tag.confidence < 0.65) continue;
-      final role = _gateRoleForFunctionalTag(tag.tag);
-      if (role != null) inferredRoles.add(role);
+    // Prefere os functional_tags PERSISTIDOS (card_function_tags) — fonte de
+    // maior qualidade do que re-derivar heuristicamente. Só cai para o
+    // inferFunctionalCardTags se a carta não tem tags persistidas (P1.a).
+    final persisted = _persistedFunctionalTagsForGate(card);
+    if (persisted.isNotEmpty) {
+      for (final entry in persisted) {
+        if (entry.confidence < 0.65) continue;
+        final role = _gateRoleForFunctionalTag(entry.tag);
+        if (role != null) inferredRoles.add(role);
+      }
+    }
+    if (inferredRoles.isEmpty) {
+      for (final tag in inferFunctionalCardTags(
+        name: (card['name'] as String?) ?? '',
+        typeLine: typeLine,
+        oracleText: oracleText,
+        manaCost: card['mana_cost'] as String?,
+        cmc: card['cmc'],
+      )) {
+        if (tag.confidence < 0.65) continue;
+        final role = _gateRoleForFunctionalTag(tag.tag);
+        if (role != null) inferredRoles.add(role);
+      }
     }
   }
 
@@ -181,6 +196,37 @@ Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
   }
   if (typeLine.toLowerCase().contains('land')) roles.add('land');
   return roles;
+}
+
+typedef _PersistedFunctionalTag = ({String tag, double confidence});
+
+/// Lê os functional_tags PERSISTIDOS (card_function_tags) do mapa da carta,
+/// já decodificados (jsonb -> List/Map) ou em string JSON.
+List<_PersistedFunctionalTag> _persistedFunctionalTagsForGate(
+    Map<String, dynamic> card) {
+  var raw = card['functional_tags'];
+  if (raw is String) {
+    if (raw.trim().isEmpty) return const [];
+    try {
+      raw = jsonDecode(raw);
+    } catch (_) {
+      return const [];
+    }
+  }
+  if (raw is! Iterable) return const [];
+  final out = <_PersistedFunctionalTag>[];
+  for (final item in raw) {
+    if (item is Map) {
+      final tag = item['tag']?.toString().trim().toLowerCase();
+      if (tag == null || tag.isEmpty) continue;
+      final conf = (item['confidence'] as num?)?.toDouble() ?? 1.0;
+      out.add((tag: tag, confidence: conf));
+    } else if (item is String) {
+      final tag = item.trim().toLowerCase();
+      if (tag.isNotEmpty) out.add((tag: tag, confidence: 1.0));
+    }
+  }
+  return out;
 }
 
 String? _gateRoleForFunctionalTag(String tag) {

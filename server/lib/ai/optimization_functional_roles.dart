@@ -316,9 +316,25 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
 
 Set<String> optimizationFunctionalRolesForCard(Map<String, dynamic> card,
     {bool semanticOnly = false}) {
-  final semanticRoles = _parseSemanticV2Roles(card['semantic_tags_v2']).toSet();
-  if (semanticRoles.isNotEmpty) return semanticRoles;
-  if (semanticOnly) return const <String>{};
+  if (semanticOnly) {
+    return _parseSemanticV2Roles(card['semantic_tags_v2']).toSet();
+  }
+  // Delega à fonte única (resolveCardFunctionalRoles), que respeita a
+  // precedência documentada: functional_tags (persistido, multi-tag) →
+  // semantic_tags_v2 → heurística. Antes este wrapper só expandia
+  // semantic_tags_v2 e colapsava os functional_tags persistidos no
+  // primaryRole — esse era o drift do pipeline semântico (P1.b).
+  final resolved = resolveCardFunctionalRoles(
+    functionalTags: card['functional_tags'],
+    semanticTagsV2: card['semantic_tags_v2'],
+    oracleText: (card['oracle_text'] as String?) ?? '',
+    typeLine: (card['type_line'] as String?) ?? '',
+    name: card['name']?.toString() ?? '',
+    manaCost: card['mana_cost']?.toString(),
+    cmc: card['cmc'],
+  );
+  if (resolved.isNotEmpty) return resolved.roles.toSet();
+  // Último recurso: nunca devolver vazio para não quebrar interseções de role.
   return {classifyOptimizationFunctionalRole(card)};
 }
 

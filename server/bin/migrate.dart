@@ -369,6 +369,107 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS ai_generate_jobs CASCADE;
     ''',
   ),
+  Migration(
+    version: '015',
+    name: 'create_card_combos',
+    up: '''
+      CREATE TABLE IF NOT EXISTS card_combos (
+        id TEXT PRIMARY KEY,
+        source TEXT NOT NULL DEFAULT 'commander_spellbook',
+        status TEXT NOT NULL DEFAULT 'OK',
+        color_identity TEXT NOT NULL DEFAULT '',
+        mana_needed TEXT,
+        prerequisites TEXT,
+        description TEXT,
+        produces TEXT[] NOT NULL DEFAULT '{}',
+        card_oracle_ids TEXT[] NOT NULL DEFAULT '{}',
+        card_names TEXT[] NOT NULL DEFAULT '{}',
+        card_count INTEGER NOT NULL DEFAULT 0,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_card_combos_oracle_ids
+      ON card_combos USING gin (card_oracle_ids);
+      CREATE INDEX IF NOT EXISTS idx_card_combos_identity
+      ON card_combos (color_identity);
+      CREATE INDEX IF NOT EXISTS idx_card_combos_card_count
+      ON card_combos (card_count);
+
+      CREATE TABLE IF NOT EXISTS combo_cards (
+        combo_id TEXT NOT NULL REFERENCES card_combos(id) ON DELETE CASCADE,
+        oracle_id TEXT NOT NULL,
+        card_name TEXT NOT NULL,
+        must_be_commander BOOLEAN NOT NULL DEFAULT false,
+        PRIMARY KEY (combo_id, oracle_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_combo_cards_oracle
+      ON combo_cards (oracle_id);
+      CREATE INDEX IF NOT EXISTS idx_combo_cards_name_lower
+      ON combo_cards (LOWER(card_name));
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS combo_cards CASCADE;
+      DROP INDEX IF EXISTS idx_card_combos_card_count;
+      DROP INDEX IF EXISTS idx_card_combos_identity;
+      DROP INDEX IF EXISTS idx_card_combos_oracle_ids;
+      DROP TABLE IF EXISTS card_combos CASCADE;
+    ''',
+  ),
+  Migration(
+    version: '016',
+    name: 'create_card_rulings',
+    up: '''
+      ALTER TABLE IF EXISTS card_rulings RENAME TO card_rulings_legacy;
+      CREATE TABLE IF NOT EXISTS card_rulings (
+        id BIGSERIAL PRIMARY KEY,
+        oracle_id TEXT NOT NULL,
+        source TEXT NOT NULL DEFAULT 'mtgjson',
+        published_at DATE,
+        comment TEXT NOT NULL,
+        comment_hash TEXT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS uniq_card_rulings_oracle_hash
+      ON card_rulings (oracle_id, comment_hash);
+      CREATE INDEX IF NOT EXISTS idx_card_rulings_oracle
+      ON card_rulings (oracle_id);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_card_rulings_oracle;
+      DROP INDEX IF EXISTS uniq_card_rulings_oracle_hash;
+      DROP TABLE IF EXISTS card_rulings CASCADE;
+      ALTER TABLE IF EXISTS card_rulings_legacy RENAME TO card_rulings;
+    ''',
+  ),
+  Migration(
+    version: '017',
+    name: 'create_edhrec_card_snapshots',
+    up: '''
+      CREATE TABLE IF NOT EXISTS edhrec_card_snapshots (
+        id BIGSERIAL PRIMARY KEY,
+        commander_slug TEXT NOT NULL,
+        commander_name TEXT NOT NULL,
+        card_name TEXT NOT NULL,
+        inclusion DOUBLE PRECISION NOT NULL DEFAULT 0,
+        synergy DOUBLE PRECISION NOT NULL DEFAULT 0,
+        num_decks INTEGER NOT NULL DEFAULT 0,
+        category TEXT NOT NULL DEFAULT '',
+        snapshot_date DATE NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS uniq_edhrec_snapshot
+      ON edhrec_card_snapshots (commander_slug, card_name, snapshot_date);
+      CREATE INDEX IF NOT EXISTS idx_edhrec_snapshot_commander
+      ON edhrec_card_snapshots (commander_slug, snapshot_date);
+      CREATE INDEX IF NOT EXISTS idx_edhrec_snapshot_card_lower
+      ON edhrec_card_snapshots (LOWER(card_name));
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_edhrec_snapshot_card_lower;
+      DROP INDEX IF EXISTS idx_edhrec_snapshot_commander;
+      DROP INDEX IF EXISTS uniq_edhrec_snapshot;
+      DROP TABLE IF EXISTS edhrec_card_snapshots CASCADE;
+    ''',
+  ),
 ];
 
 class Migration {

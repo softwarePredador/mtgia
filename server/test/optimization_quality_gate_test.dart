@@ -73,6 +73,61 @@ void main() {
       expect(result.droppedReasons, hasLength(2));
     });
 
+    test('uses persisted functional_tags to protect critical roles (P1.a)', () {
+      // Carta com oracle_text neutro (heurística NÃO detecta board wipe),
+      // mas com functional_tags persistidos = board_wipe.
+      final wipeWithTags = _card(
+        name: 'Silent Sweep',
+        typeLine: 'Sorcery',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Gain 2 life.',
+        functionalTags: const [
+          {'tag': 'board_wipe', 'confidence': 0.9, 'source': 'persisted'},
+        ],
+      );
+      // Mesma carta SEM tags persistidos (controle do experimento).
+      final wipeNoTags = _card(
+        name: 'Silent Sweep',
+        typeLine: 'Sorcery',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Gain 2 life.',
+      );
+      final blandCreature = _card(
+        name: 'Plain Bear',
+        typeLine: 'Creature — Bear',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Vigilance.',
+      );
+
+      // Com tags persistidos: o gate enxerga o papel "wipe" (crítico em
+      // control) e bloqueia a troca que o perderia.
+      final withTags = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Silent Sweep'],
+        additions: const ['Plain Bear'],
+        originalDeck: [wipeWithTags],
+        additionsData: [blandCreature],
+        archetype: 'control',
+      );
+      expect(withTags.removals, isEmpty);
+      expect(withTags.droppedReasons, hasLength(1));
+
+      // Sem tags persistidos: a heurística não reconhece o wipe no texto
+      // neutro, então a troca passa — provando que a proteção veio dos
+      // functional_tags persistidos, não da re-derivação heurística.
+      final withoutTags = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Silent Sweep'],
+        additions: const ['Plain Bear'],
+        originalDeck: [wipeNoTags],
+        additionsData: [blandCreature],
+        archetype: 'control',
+      );
+      expect(withoutTags.removals, equals(const ['Silent Sweep']));
+      expect(withoutTags.droppedReasons, isEmpty);
+    });
+
     test('can reduce aggressive requested scope without false success', () {
       final originalDeck = [
         for (var i = 0; i < 12; i++)
@@ -661,6 +716,7 @@ Map<String, dynamic> _card({
   required double cmc,
   required String oracleText,
   int quantity = 1,
+  List<Map<String, dynamic>>? functionalTags,
 }) {
   return {
     'name': name,
@@ -669,6 +725,7 @@ Map<String, dynamic> _card({
     'cmc': cmc,
     'oracle_text': oracleText,
     'quantity': quantity,
+    if (functionalTags != null) 'functional_tags': functionalTags,
   };
 }
 

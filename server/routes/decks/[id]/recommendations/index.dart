@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
 import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/openai_runtime_config.dart';
+import '../../../../lib/ai/edhrec_trend_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.post) {
@@ -71,6 +72,7 @@ Future<Response> _generateRecommendations(
     final deckCards = <Map<String, dynamic>>[];
     final deckCardNames = <String>{};
     final deckColors = <String>{};
+    final commanderNames = <String>[];
     int totalCards = 0;
     int landCount = 0;
     int creatureCount = 0;
@@ -95,6 +97,7 @@ Future<Response> _generateRecommendations(
       deckColors.addAll(colors);
       deckCardNames.add(name.toLowerCase());
       totalCards += quantity;
+      if (isCommander) commanderNames.add(name);
 
       deckCards.add({
         'name': name,
@@ -346,6 +349,46 @@ Future<Response> _generateRecommendations(
       }
     }
 
+    // ─── Tendências EDHREC (snapshots) ────────────────────────
+    //    Cartas em ALTA (rising) para o(s) commander(s) que ainda não estão
+    //    no deck viram recomendações com contexto de tendência.
+    final trendingCards = <Map<String, dynamic>>[];
+    if (commanderNames.isNotEmpty) {
+      final trendService = EdhrecTrendService(pool);
+      final seen = <String>{};
+      for (final commander in commanderNames) {
+        try {
+          final trends = await trendService.getCardTrends(commander);
+          for (final t in trends) {
+            if (t.direction != TrendDirection.rising) continue;
+            final lower = t.cardName.toLowerCase();
+            if (deckCardNames.contains(lower)) continue;
+            if (!seen.add(lower)) continue;
+            trendingCards.add({
+              ...t.toJson(),
+              'commander': commander,
+            });
+            if (trendingCards.length >= 8) break;
+          }
+        } catch (e) {
+          print('[WARN] EDHREC trends error for "$commander": $e');
+        }
+        if (trendingCards.length >= 8) break;
+      }
+
+      // Promove as 2 maiores altas a recomendações de adição.
+      for (final t in trendingCards.take(2)) {
+        final name = t['card_name'] as String;
+        if (addRecommendations.any((r) => r['card_name'] == name)) continue;
+        final pct = ((t['delta_inclusion'] as num) * 100).toStringAsFixed(1);
+        addRecommendations.add({
+          'card_name': name,
+          'reason':
+              'Em alta no EDHREC para ${t['commander']} (+$pct% de inclusão recente)',
+        });
+      }
+    }
+
     // ─── Montar resposta ──────────────────────────────────────
     final analysis = StringBuffer();
     analysis.write('Deck "$deckName" ($format) — Arquétipo: $archetype. ');
@@ -376,6 +419,7 @@ Future<Response> _generateRecommendations(
         'average_cmc': avgCMC.toStringAsFixed(2),
       },
       'colors': deckColors.toList(),
+      'trending': trendingCards,
       'source': 'heuristic',
       'message':
           'Análise baseada em heurísticas — configure OPENAI_API_KEY para IA generativa.',

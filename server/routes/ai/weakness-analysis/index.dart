@@ -3,6 +3,8 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
+import '../../../lib/ai/commander_spellbook_service.dart';
+import '../../../lib/ai/deck_advanced_analysis.dart';
 
 /// Endpoint para análise de fraquezas do deck
 ///
@@ -59,7 +61,8 @@ Future<Response> onRequest(RequestContext context) async {
                    END
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
-               ) as cmc
+               ) as cmc,
+               c.scryfall_id::text as oracle_id
         FROM deck_cards dc 
         JOIN cards c ON c.id = dc.card_id 
         WHERE dc.deck_id = @id
@@ -69,6 +72,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     final cards = <Map<String, dynamic>>[];
     final deckColors = <String>{};
+    final deckOracleIds = <String>{};
 
     int totalCards = 0;
     int landCount = 0;
@@ -90,8 +94,10 @@ Future<Response> onRequest(RequestContext context) async {
       final colors = (row[4] as List?)?.cast<String>() ?? [];
       final quantity = row[5] as int;
       final cmc = (row[6] as num?)?.toDouble() ?? 0;
+      final oracleId = (row[7] as String?) ?? '';
 
       deckColors.addAll(colors);
+      if (oracleId.isNotEmpty) deckOracleIds.add(oracleId);
       totalCards += quantity;
 
       cards.add({
@@ -353,20 +359,90 @@ Future<Response> onRequest(RequestContext context) async {
         winConditionCount += (card['quantity'] as int);
       }
     }
-    if (winConditionCount < 2) {
+
+    // Detectar combos reais (Commander Spellbook) presentes/próximos no deck.
+    // Combos completos contam como caminhos de vitória adicionais; combos a 1
+    // carta viram oportunidades acionáveis.
+    DeckCombosResult comboResult =
+        const DeckCombosResult(complete: [], nearMisses: []);
+    try {
+      comboResult = await CommanderSpellbookService().findDeckCombos(
+        pool: pool,
+        deckOracleIds: deckOracleIds,
+        commanderColorIdentity: deckColors,
+      );
+    } catch (e) {
+      print('[weakness-analysis] combo detection falhou: $e');
+    }
+
+    final completeCombos = comboResult.complete;
+    final nearMissCombos = comboResult.nearMisses;
+
+    // Combos completos são caminhos de vitória legítimos.
+    final effectiveWinConditions = winConditionCount + completeCombos.length;
+
+    if (nearMissCombos.isNotEmpty) {
+      final top = nearMissCombos.take(5).toList();
+      final missingCardSuggestions = <String>[];
+      for (final m in top) {
+        if (m.missingCardNames.isNotEmpty) {
+          missingCardSuggestions.add(m.missingCardNames.first);
+        }
+      }
+      weaknesses.add({
+        'type': 'combo_opportunity',
+        'severity': 'low',
+        'description':
+            'Deck está a 1 carta de completar ${nearMissCombos.length} combo(s) conhecido(s). '
+                'Adicionar a peça que falta pode criar um caminho de vitória direto.',
+        'recommendations': missingCardSuggestions.isNotEmpty
+            ? missingCardSuggestions
+            : ['Revisar combos próximos na seção "combos"'],
+        'current_value': completeCombos.length,
+        'recommended_value': completeCombos.length + 1,
+      });
+    }
+
+    if (effectiveWinConditions < 2) {
       weaknesses.add({
         'type': 'insufficient_win_conditions',
-        'severity': winConditionCount == 0 ? 'critical' : 'high',
+        'severity': effectiveWinConditions == 0 ? 'critical' : 'high',
         'description':
-            'Deck tem apenas $winConditionCount condições de vitória claras. Recomendado: 2-3 caminhos distintos para vencer.',
+            'Deck tem apenas $effectiveWinConditions condições de vitória claras. Recomendado: 2-3 caminhos distintos para vencer.',
         'recommendations': [
           'Adicionar finalizadores que fechem o jogo',
           'Considerar combos de 2-3 cartas',
           'Incluir dano direto ou drain effects'
         ],
-        'current_value': winConditionCount,
+        'current_value': effectiveWinConditions,
         'recommended_value': 3,
       });
+    }
+
+    // ── Análises avançadas (F3): diversidade de wincon, removal-to-threat,
+    //    qualidade de draw e viabilidade pós board wipe. ──────────────────
+    final winconDiversity = analyzeWinconDiversity(
+      cards,
+      completeCombos: completeCombos.length,
+      isCommander: isCommander,
+    );
+    final removalToThreat = analyzeRemovalToThreatRatio(
+      cards,
+      isCommander: isCommander,
+    );
+    final drawCompleteness = analyzeDrawCompleteness(cards);
+    final postResolution = analyzePostResolutionViability(
+      cards,
+      isCommander: isCommander,
+    );
+
+    for (final analysis in [
+      winconDiversity,
+      removalToThreat,
+      drawCompleteness,
+      postResolution,
+    ]) {
+      if (analysis.weakness != null) weaknesses.add(analysis.weakness!);
     }
 
     // Verificar se o deck tem interação no turno dos oponentes (instant-speed)
@@ -449,8 +525,35 @@ Future<Response> onRequest(RequestContext context) async {
       'weakness_count': weaknesses.length,
       'critical_count':
           weaknesses.where((w) => w['severity'] == 'critical').length,
+      'combos': {
+        'complete_count': completeCombos.length,
+        'near_miss_count': nearMissCombos.length,
+        'complete': completeCombos
+            .map((m) => {
+                  'id': m.combo.id,
+                  'cards': m.combo.cardNames,
+                  'produces': m.combo.produces,
+                  'color_identity': m.combo.colorIdentity,
+                })
+            .toList(),
+        'near_misses': nearMissCombos
+            .map((m) => {
+                  'id': m.combo.id,
+                  'cards': m.combo.cardNames,
+                  'missing': m.missingCardNames,
+                  'produces': m.combo.produces,
+                  'color_identity': m.combo.colorIdentity,
+                })
+            .toList(),
+      },
       'hate_cards_for_archetype': hateCards,
       'colors': deckColors.toList(),
+      'advanced': {
+        'wincon_diversity': winconDiversity.data,
+        'removal_to_threat': removalToThreat.data,
+        'draw_completeness': drawCompleteness.data,
+        'post_resolution_viability': postResolution.data,
+      },
     });
   } catch (e, stack) {
     print('Erro em weakness-analysis: $e\n$stack');
