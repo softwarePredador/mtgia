@@ -205,36 +205,40 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> Ultima atualizacao: **2026-06-01T20:18:31Z**
+> Ultima atualizacao: **2026-06-02T21:25:31Z**
 
 **Decks analisados:** 8
-**Criterios:** Lands vs perfil EDHREC, Ramp/Draw/Remocao vs ranges do perfil
+**Criterios:** Lands vs perfil EDHREC (via tags `functional_tag='land'`), Ramp/Draw/Remocao vs ranges do perfil
 
 ### Resumo Geral
 
-| # | Deck | Total Cards | Status | Lands SQLite | Lands Perfil | Observacao |
+| # | Deck | Total Cards | Status | Lands (tags) | Lands Perfil | Observacao |
 |---|------|:-----------:|:------:|:------------:|:------------:|------------|
-| 1 | Kinnan, Bonder Prodigy | 13/100 | ⚪ INCOMPLETE | -- | 29-34 | Apenas 13 cartas inseridas (seed cEDH) |
-| 2 | EDHREC Average - Dimir Ninja Topdeck Tempo | 99/100 | 🟡 BLUE | 35 | 30-34 | 99/100 cards (1 short); Lands BLUE(d=1); interaction BLUE(d=1) |
-| 3 | EDHREC Average Default (Korvold) | 11/100 | ⚪ INCOMPLETE | -- | 34-37 | Apenas 11 cartas inseridas |
-| 4 | EDHREC Average Default (Teysa) | 80/100 | 🟡 WARN* | 15 | 35-37 | *Parcial: aggregate EDHREC (80 cards). Corpus artifact, nao deck real. lands CRIT(d=20), ramp CRIT(d=4) |
-| 5 | Aesi EDHREC Average Default | 100/100 | 🟡 WARN | 40 | 39-43 | Lands OK. ramp_extra_lands sub-role CRIT(d=10,INFO). supplemental_draw WARN(d=3). protection WARN(d=3). finishers WARN(d=3) |
-| 6 | Lorehold Spellslinger | 100/100 | ✅ OK | 35 | -- | Sem perfil de referencia EDHREC |
-| 7 | EDHREC Average - Boros Combat Trigger Humans | 100/100 | 🟡 WARN | 34 | 31-35 | Lands OK. protection=10 vs 5-8 (WARN d=2) |
-| 9 | Atraxa EDHREC Average (41k decks) | 100/100 | 🟡 WARN | 36 | 35-38 | Lands OK. finishers=1 vs 4-7 (WARN d=3). ramp_fixing BLUE(d=1). interaction BLUE(d=1). counter_payoffs BLUE(d=1) |
+| 1 | Kinnan, Bonder Prodigy | 13/100 | ⚪ INCOMPLETE | -- | -- | Apenas 13 cartas inseridas (seed parcial) |
+| 2 | EDHREC Average Deck - Dimir Ninja Topdeck Tempo | 99/100 | 🔵 BLUE* | 31 | 30-34 | interaction=9 vs [10-16] (BLUE d=1) |
+| 3 | EDHREC Average Default | 11/100 | ⚪ INCOMPLETE | -- | -- | Apenas 11 cartas inseridas (seed parcial) |
+| 4 | EDHREC Average Default | 80/100 | 🟡 WARN* | 15 | 35-37 | lands=15 vs [35-37] (WARN* d=20); ramp=15 vs [9-11] (WARN* d=4); board_wipes=1 vs [2-4] (BLUE d=1); recursion=3 vs [4-7] (BLUE d=1) |
+| 5 | Aesi EDHREC Average Default | 100/100 | 🟡 WARN* | 40 | 39-43 | protection=7 vs [2-4] (WARN d=3); finishers=0 vs [3-5] (WARN d=3) |
+| 6 | Lorehold Best-of Learned No Premium Mox 2026-06-02 | 100/100 | ⚠️ NO PROFILE* | 33 | -- | Sem perfil EDHREC. 🔴 23 cartas classifier corrompido (bulk import) |
+| 7 | EDHREC Average Default — Boros Combat Trigger Humans | 100/100 | 🟡 WARN* | 34 | 31-35 | protection=10 vs [5-8] (WARN d=2) |
+| 9 | Atraxa, Praetors' Voice — EDHREC Average (41k decks) | 100/100 | 🟡 WARN* | 36 | 35-38 | interaction=7 vs [8-13] (BLUE d=1); finishers=1 vs [4-7] (WARN d=3) |
 
-*Legenda: ✅ OK | 🟡 BLUE (d=1) | 🟡 WARN (d=2-3) | 🔴 CRIT (d>=4) | ⚪ INCOMPLETE (<50 cards)*
+*Legenda: ✅ OK | 🔵 BLUE (d=1) | 🟡 WARN (d=2-3) | 🔴 CRIT (d>=4) | ⚪ INCOMPLETE (<50 cards) | ℹ️ INFO (sub-role sem coluna DB)*
+*\* = EDHREC aggregate parcial — metricas podem ser corpus artifacts, nao decks reais*
 
 ### Notas de Interpretacao
 
-1. **Decks INCOMPLETE (<50 cards):** Kinnan (#1) e Korvold (#3) sao seeds parciais -- metricas nao acionaveis.
-2. **Teysa WARN*:** 80-card aggregate EDHREC, nao deck real. Lands=15 vs 35-37 e corpus artifact. Nao sinalizar CRIT individual nos papeis.
-3. **Sub-roles:** `ramp_extra_lands`, `evasive_enablers`, `ninjas`, etc. nao tem coluna no DB — valor INFO, nao CRIT acionavel.
-4. **Atraxa (#9):** finishers=1 vs [4-7] (WARN d=3) — natureza "goodstuff" de Atraxa, finishers menos definidos.
-5. **Tendencia vs validacao anterior (2026-06-01T13:53Z):** Sem mudancas estruturais. Mesmos INCOMPLETE/WARNs. Nenhum CRIT novo em decks reais.
-6. **Aesi (#5):** ramp_extra_lands=28 vs [14-18] e sub-role INFO — mapeia para ramp_count agregado sem distincao de subtipo.
-7. **Lorehold (#6):** Deck saudavel, 100 cards, sem perfil EDHREC — validacao por mulligan e SCOUT separadamente.
-8. **Yuriko (#2):** 99/100 cards — 1 short. Lands BLUE(d=1), interaction BLUE(d=1). Diferenca trivial.
+1. **Decks INCOMPLETE (<50 cards):** Kinnan (#1, 13 cards) e Korvold (#3, 11 cards) sao seeds parciais — metricas nao acionaveis.
+2. **🔴 Deck #6 mudou:** 'Lorehold Spellslinger' → 'Lorehold Best-of Learned No Premium Mox 2026-06-02'. 23/100 cartas (23%) com `functional_tag='unknown'`, `CMC=NULL` — classificador NAO foi executado (bulk import corruption). Metricas de ramp/draw/removal do deck estao subestimadas (ramp_count=6, draw_count=6). Deck NAO deve ser usado para recomendacoes de swap ate que o classificador rode. Staples afetados: Sol Ring, Mana Vault, Boros Charm, Lightning Greaves, Scroll Rack, Past in Flames.
+3. **Teysa (#4):** 80-card aggregate EDHREC, nao deck real. `total_lands=35` (coluna `decks`) vs `actual_lands=15` (tags) — discrepancia de 20 lands. Perfil espera 35-37 lands, mas so 15 cartas tem tag='land'. Corpus artifact — lands CRIT(d=20) e ramp CRIT(d=4) sao falsos positivos do aggregate incompleto.
+4. **Aesi (#5):** `ramp_extra_lands=28 vs [14-18]` → INFO(d=10) — sub-role, mapeia para `ramp_count` agregado sem distincao de subtipo. `protection=7 vs [2-4]` → WARN(d=3) — deck EDHREC aggregate, protecao inflada e comum em aggregates. `finishers=0 vs [3-5]` → WARN(d=3) — ausencia de finishers em aggregate e esperado (comunidade prioriza valor).
+5. **Winota (#7):** `protection=10 vs [5-8]` → WARN(d=2). Deck EDHREC aggregate — protecao acima do perfil mas dentro da variacao esperada de aggregates.
+6. **Atraxa (#9):** `finishers=1 vs [4-7]` → WARN(d=3). Natureza 'goodstuff' de Atraxa — finishers menos definidos em aggregates. `interaction=7 vs [8-13]` → BLUE(d=1) — marginal.
+7. **Yuriko (#2):** `interaction=9 vs [10-16]` → BLUE(d=1). 99/100 cards (1 short). Diferenca trivial.
+8. **Mudancas vs validacao anterior (2026-06-01T20:18Z):** (a) 🔴 Deck #6 foi completamente substituido — mudanca mais significativa. (b) Teysa #4: `total_lands` coluna atualizada de 15→35 (mas tags continuam 15). (c) Demais decks (#1,#2,#3,#5,#7,#9) sem mudancas estruturais nos dados. Nenhum CRIT novo em decks reais nao-agregados.
+
+---
+*Validacao gerada por manaloom-mana-base-validator em 2026-06-02T21:25:31Z*
 
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
