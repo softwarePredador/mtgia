@@ -1,7 +1,175 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-02 05:30 UTC
-> Rotacao: `local-manaloom-card-semantics-audit`
+> Atualizacao local Codex: 2026-06-02 07:00 UTC
+> Rotacao: `functions-not-called`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Functions not called — revalidacao 2026-06-02 07:00 UTC
+
+Escopo desta rodada: somente funcoes/metodos publicos ou wrappers expostos sem
+chamador runtime confirmado. Nao foi feita auditoria ampla de classes, imports,
+tabelas PostgreSQL, duplicacao ou coerencia entre modulos fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `1600cd01`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 167.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 85.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual nao compila codigo nem constroi
+grafo de chamadas; ele tambem reescreve um bloco gerado amplo que nao pertence
+ao foco desta rodada. Essa reescrita automatica foi descartada, e os achados
+abaixo foram revalidados por `rg`/leitura direta.
+
+### Metodo manual focado
+
+- `rg -n "sync_cards_utils|\\bextractCardRow\\b|\\bextractSetCardRow\\b|\\bparseSinceDays\\b|\\bextractOracleIds\\b|\\bextractLegalities\\b" server app --glob '*.dart'`.
+- `rg -n "\\bgetRequestTrace\\b|\\btryGetRequestId\\b|context\\.read<RequestTrace>\\(\\)" server app --glob '*.dart'`.
+- `rg -n "\\bnormalizedCommanderReferenceCandidate\\b|\\bbuildLoreholdReferenceCardStatsFromProfile\\b|\\bextractMtgTop8FormatCodeFromSourceUrl\\b" server app --glob '*.dart'`.
+- `rg -n "\\bbuildCandidateQualitySamplePoolSql\\b|\\bsummarizeAggressiveOptimizeUtilitySamples\\b|\\brecordFeedback\\b|\\bMLKnowledgeService\\b" server app --glob '*.dart'`.
+- `rg -n "\\bPerformanceService\\b|\\bstartTrace\\b|\\bstopTrace\\b|\\baddMetric\\b|\\baddAttribute\\b|\\bprintLocalStats\\b|\\bgetLocalStats\\b" app/lib app/test app/integration_test --glob '*.dart'`.
+
+### Achados revalidados
+
+#### P1 — `sync_cards_utils.dart` segue test-only enquanto o CLI real duplica a logica
+
+- **Funcoes:** `extractCardRow`, `getNewSetCodesSinceFromData`,
+  `parseSinceDays`, `extractSetCardRow`, `extractOracleIds` e
+  `extractLegalities` em `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`,
+  `:116`, `:161` e `:172`.
+- **Evidencia de ausencia runtime:** busca por `sync_cards_utils` em Dart
+  encontrou apenas `server/test/sync_cards_test.dart:3` importando o arquivo e
+  exercitando esses helpers. `server/bin/sync_cards.dart:9`-`:10` importa
+  `database.dart` e `mtg_data_integrity_support.dart`, mas nao importa
+  `sync_cards_utils.dart`.
+- **Controle positivo:** o CLI operacional mantem copias privadas/inline:
+  `_parseSinceDays` em `server/bin/sync_cards.dart:376`-`:384`,
+  `_getNewSetCodesSinceFromData` em `:413`-`:429`,
+  montagem incremental inline em `:604`-`:663` e `_extractCardRow` em
+  `:680`-`:735`.
+- **Por que parece nao chamada:** os testes validam a biblioteca publica, mas o
+  caminho que sincroniza MTGJSON no produto nao usa essa biblioteca.
+- **O que valida:** importar `sync_cards_utils.dart` no CLI real e remover as
+  copias privadas/inline, ou declarar/remover o arquivo como harness legado.
+- **O que falsifica:** `rg "sync_cards_utils" server/bin server/lib server/routes`
+  encontrar import runtime real.
+
+#### P2 — Wrappers de `RequestTrace` continuam sem consumidor direto
+
+- **Funcoes:** `getRequestTrace` e `tryGetRequestId` em
+  `server/lib/request_trace.dart:48` e `:51`.
+- **Evidencia de ausencia:** `getRequestTrace` aparece somente na propria
+  definicao e dentro de `tryGetRequestId`; `tryGetRequestId` aparece somente na
+  propria definicao.
+- **Controle positivo:** consumidores reais acessam `RequestTrace` diretamente,
+  por exemplo `server/lib/auth_middleware.dart:57`,
+  `server/lib/observability.dart:225`, `server/routes/trades/index.dart:332`,
+  `server/routes/trades/[id]/messages.dart:230`,
+  `server/routes/users/[id]/follow/index.dart:99` e
+  `server/routes/conversations/[id]/messages.dart:249`.
+- **Por que parece nao chamada:** a API publica promete fallback seguro, mas as
+  rotas usam leituras diretas ou wrappers privados locais.
+- **O que valida:** substituir os reads diretos pelos wrappers quando o fallback
+  for desejado, ou remover os wrappers se a leitura direta for o contrato.
+- **O que falsifica:** chamada runtime a `getRequestTrace(context)` ou
+  `tryGetRequestId(context)` fora de `request_trace.dart`.
+
+#### P2 — Wrappers especificos de Commander Reference/MTGTop8 seguem test-only
+
+- **Funcoes:**
+  - `normalizedCommanderReferenceCandidate` em
+    `server/lib/ai/commander_reference_profile_support.dart:49`.
+  - `buildLoreholdReferenceCardStatsFromProfile` em
+    `server/lib/ai/commander_reference_card_stats_support.dart:257`.
+  - `extractMtgTop8FormatCodeFromSourceUrl` em
+    `server/lib/meta/mtgtop8_meta_support.dart:139`.
+- **Evidencia de ausencia:** `normalizedCommanderReferenceCandidate` aparece
+  apenas na propria definicao; `buildLoreholdReferenceCardStatsFromProfile`
+  aparece apenas na propria definicao e em
+  `server/test/commander_reference_card_stats_support_test.dart:13`;
+  `extractMtgTop8FormatCodeFromSourceUrl` aparece apenas na propria definicao e
+  em `server/test/mtgtop8_meta_support_test.dart:147`.
+- **Controle positivo:** o runtime usa os caminhos genericos/vizinhos:
+  `buildCommanderReferenceCardStatsFromProfile` e chamado dentro do proprio
+  modulo em `server/lib/ai/commander_reference_card_stats_support.dart:368`, e
+  `server/bin/repair_mtgtop8_meta_history.dart:59` usa
+  `extractMtgTop8EventIdFromSourceUrl`, mas nao o helper de format code.
+- **Por que parece nao chamada:** os wrappers ficaram como conveniencias
+  especificas de teste enquanto o produto usa a funcao generica ou outro campo.
+- **O que valida:** ligar os wrappers a runners/rotas reais ou remover os
+  wrappers especificos e ajustar testes para o helper generico.
+- **O que falsifica:** chamada runtime nova aos tres simbolos fora de `server/test`.
+
+#### P2 — Helpers de sample/diagnostic de optimize permanecem test-only
+
+- **Funcoes:** `buildCandidateQualitySamplePoolSql` em
+  `server/lib/ai/candidate_quality_data_support.dart:631` e
+  `summarizeAggressiveOptimizeUtilitySamples` em
+  `server/lib/ai/optimize_runtime_support.dart:3326`.
+- **Evidencia de ausencia:** busca focada encontrou
+  `buildCandidateQualitySamplePoolSql` somente na definicao e em
+  `server/test/candidate_quality_data_support_test.dart:123`; encontrou
+  `summarizeAggressiveOptimizeUtilitySamples` somente na definicao e em
+  `server/test/optimize_runtime_support_test.dart:169`.
+- **Por que parece nao chamada:** os testes validam SQL/resumo de amostras, mas
+  nenhum runner, rota ou service runtime consome esses helpers nesta branch.
+- **O que valida:** runner operacional chamar os helpers ao construir pool ou
+  resumo de amostras agressivas.
+- **O que falsifica:** chamada runtime em `server/bin`, `server/lib` ou
+  `server/routes` fora das suites de teste.
+
+#### P2 — `MLKnowledgeService.recordFeedback` ainda nao alimenta `ml_prompt_feedback`
+
+- **Funcao:** `recordFeedback` em `server/lib/ml_knowledge_service.dart:251`.
+- **Evidencia de ausencia:** busca por `recordFeedback(` encontrou somente a
+  propria definicao. `MLKnowledgeService` e instanciado em
+  `server/lib/ai/otimizacao.dart:33`, e esse fluxo chama
+  `getContextForDeck`/`generatePromptContext` em `:167` e `:173`, mas nao chama
+  `recordFeedback`.
+- **Por que parece nao chamada:** o insert em `ml_prompt_feedback` existe em
+  `server/lib/ml_knowledge_service.dart:262`-`:284`, mas nenhuma rota, job ou
+  app action aciona essa escrita.
+- **O que valida:** rota/app/job de feedback chamar `recordFeedback` com teste
+  de contrato e consumo posterior do feedback.
+- **O que falsifica:** chamada runtime a `recordFeedback(...)` fora do service.
+
+#### P3 — API manual de metricas do `PerformanceService` segue sem uso app-facing
+
+- **Funcoes:** `startTrace`, `stopTrace`, `addMetric`, `addAttribute`,
+  `getLocalStats` e `printLocalStats` em
+  `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`, `:210`,
+  `:220` e `:248`.
+- **Evidencia de ausencia:** busca em `app/lib`, `app/test` e
+  `app/integration_test` encontrou esses nomes apenas nas definicoes; excecao:
+  `getLocalStats` e chamado internamente por `printLocalStats`.
+- **Controle positivo:** a observabilidade viva usa `PerformanceService.instance.init()`
+  em `app/lib/main.dart:121`; `PerformanceNavigatorObserver` chama
+  `startScreenTrace`/`stopScreenTrace` em
+  `app/lib/core/services/performance_service.dart:295`, `:307`, `:334` e
+  `:339`; `traceAsync` aparece no smoke de observabilidade em
+  `app/integration_test/release_observability_smoke_test.dart:51`.
+- **Por que parece nao chamada:** a parte automatica do service esta viva, mas a
+  API manual/custom metrics/debug nao tem consumidor app-facing confirmado.
+- **O que valida:** usar esses metodos em fluxos app reais ou simplificar o
+  service para `init`, observer e `traceAsync`.
+- **O que falsifica:** chamada app-facing aos metodos manuais em `app/lib`.
 
 ## Rodada focada: Card semantics audit — revalidacao 2026-06-02 05:30 UTC
 

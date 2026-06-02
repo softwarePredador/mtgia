@@ -50,13 +50,15 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-05-31 07:00 UTC como **ABERTO neste checkout**.
+    2026-06-02 07:00 UTC como **ABERTO neste checkout `1600cd01`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma logica.
     Tambem seguem sem chamador runtime confirmado wrappers/helpers em request
     trace, Commander Reference, MTGTop8, candidate quality, optimize utility
-    samples, `MLKnowledgeService.recordFeedback` e a API manual de metricas de
-    `PerformanceService`.
+    samples, `MLKnowledgeService.recordFeedback` e a API manual/custom
+    metrics/debug de `PerformanceService`. A observabilidade automatica do
+    `PerformanceService` foi separada como controle positivo (`init`,
+    observer de tela e `traceAsync` em smoke), nao como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app**: **REABERTO no checkout local
     `df8291d7` (2026-05-30 11:00 UTC).** `deck_analysis_tab.dart:5` e
     `life_counter_screen.dart:7` ainda usam imports relativos que saem de
@@ -448,8 +450,8 @@ entrypoint local backend em `origin/master@a830f9f3`.**
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-05-30 07:00 UTC:** **REABERTO no checkout local
-`codex/hermes-analysis-docs@af3d8575`**. As anotacoes historicas de resolucao em
+**Status 2026-06-02 07:00 UTC:** **REABERTO no checkout local
+`codex/hermes-analysis-docs@1600cd01`**. As anotacoes historicas de resolucao em
 outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
 presentes e sem chamador runtime confirmado.
 
@@ -460,7 +462,7 @@ presentes e sem chamador runtime confirmado.
     runtime ou rotas. `server/bin/sync_cards.dart:9`-`:10` importa apenas
     `database.dart` e `mtg_data_integrity_support.dart`, e ainda possui
     `_parseSinceDays` em `:376`-`:384`, montagem incremental inline em
-    `:604`-`:663`, `_extractCardRow` em `:679` e coleta de oracle IDs/legalidade
+    `:604`-`:663`, `_extractCardRow` em `:680` e coleta de oracle IDs/legalidade
     inline em `:806`-`:839`.
   - `server/lib/request_trace.dart:48` e `:51` definem
     `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
@@ -485,9 +487,10 @@ presentes e sem chamador runtime confirmado.
     e definicao.
   - `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
     `:210`, `:220` e `:248` expõem traces/metricas/debug manuais sem chamador
-    em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init` e
-    `PerformanceNavigatorObserver`, e `traceAsync` aparece somente no smoke de
-    observabilidade.
+    em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init` em
+    `app/lib/main.dart:121`, `PerformanceNavigatorObserver` chama
+    `startScreenTrace`/`stopScreenTrace` em `performance_service.dart:295`,
+    `:307`, `:334` e `:339`, e `traceAsync` aparece no smoke de observabilidade.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
   porque o teste cobre uma copia que nao participa do CLI operacional.

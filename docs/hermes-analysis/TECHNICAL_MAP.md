@@ -195,18 +195,19 @@ diretamente e usa raridade como proxy de impacto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-05-31 07:00 UTC como aberto no checkout local. `server/lib/sync_cards_utils.dart`
-  segue importado apenas por teste, enquanto `server/bin/sync_cards.dart` mantem
-  copias privadas/inline de parse/extracao. Tambem seguem sem chamador runtime
-  confirmado `getRequestTrace`/`tryGetRequestId`,
-  `normalizedCommanderReferenceCandidate`,
+  2026-06-02 07:00 UTC como aberto no checkout local `1600cd01`.
+  `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
+  `server/bin/sync_cards.dart` mantem copias privadas/inline de parse/extracao.
+  Tambem seguem sem chamador runtime confirmado `getRequestTrace`/
+  `tryGetRequestId`, `normalizedCommanderReferenceCandidate`,
   `buildLoreholdReferenceCardStatsFromProfile`,
   `extractMtgTop8FormatCodeFromSourceUrl`,
   `buildCandidateQualitySamplePoolSql`,
   `summarizeAggressiveOptimizeUtilitySamples`,
-  `MLKnowledgeService.recordFeedback` e a API manual de metricas de
-  `PerformanceService`. As anotacoes historicas de resolucao em outros SHAs nao
-  foram aplicadas como evidencia para esta branch.
+  `MLKnowledgeService.recordFeedback` e a API manual/custom metrics/debug de
+  `PerformanceService`. A parte automatica do `PerformanceService`
+  (`init`, observer de tela e `traceAsync` em smoke) foi separada como controle
+  positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-01 15:00 UTC no checkout local. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
