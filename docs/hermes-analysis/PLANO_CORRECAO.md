@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-02 19:00 UTC
+> Data: 2026-06-02 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -15,7 +15,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze` em `server/` falha com
    `uri_does_not_exist`.
-5. **P1 — Ownership em rotas deck/AI**: **REVALIDADO no checkout local em 2026-06-01 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild` e `GET /decks/:id/analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck.
+5. **P1 — Ownership em rotas deck/AI**: **REVALIDADO no checkout local `69b0c42b` em 2026-06-02 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e `POST /decks/:id/pricing` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations` e `/decks/:id/simulate` seguem sem consumidor app atual, mas devem ganhar owner-scope ou contrato publico antes de promocao.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-02 05:30 UTC. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
@@ -500,11 +500,13 @@ presentes e sem chamador runtime confirmado.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
-- **Status 2026-05-29 23:05 UTC:** REABERTO no checkout local `b071080e`.
-  Defense-in-depth de `GET /decks/:id/simulate` permanece citado
-  historicamente como resolvido em `origin/master@a466adb6`, mas a coerencia
-  app-facing de `/ai/optimize`, `/ai/archetypes` e jobs async nao esta
-  resolvida nesta branch.
+- **Status 2026-06-02 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `69b0c42b`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
+  jobs async nao esta resolvida nesta branch. `POST /ai/rebuild`,
+  `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e
+  `POST /decks/:id/pricing` foram usados como controles positivos de owner gate.
+  `/decks/:id/recommendations` e `/decks/:id/simulate` nao tem consumidor app
+  atual, mas continuam sem contrato de owner antes de eventual promocao.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`; a
@@ -521,6 +523,12 @@ presentes e sem chamador runtime confirmado.
     `server/lib/ai/optimize_job.dart:25`-`:30`, e
     `server/routes/ai/optimize/jobs/[id].dart:39`-`:47` so bloqueia quando o
     job tem owner diferente; job nulo continua legivel.
+  - `server/routes/decks/[id]/recommendations/index.dart:24`-`:27` busca deck
+    por `id` e `:39`-`:58` busca cartas por `deckId`; a rota esta documentada
+    como experimental/not proven em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+    e nao tem chamada atual em `app/lib`.
+  - `server/routes/decks/[id]/simulate/index.dart:13`-`:25` carrega cartas por
+    `deckId` sem owner; busca focada em `app/lib` nao encontrou consumidor.
 - **Impacto**: usuario autenticado pode potencialmente disparar analise/opcoes
   ou leitura de job para recursos sem owner-scope se obtiver IDs validos. Alem
   disso, a memoria tecnica anterior registrava um estado resolvido que nao bate
@@ -531,7 +539,9 @@ presentes e sem chamador runtime confirmado.
   2. aplicar o mesmo owner-scope em `/ai/archetypes`;
   3. tornar `OptimizeJobStore.create` owner-obrigatorio para jobs app-facing e
      retornar 404 quando `job.userId == null || job.userId != userId`;
-  4. exigir teste owner vs non-owner quando qualquer rota nova aceitar
+  4. decidir se `/decks/:id/recommendations` e `/decks/:id/simulate` serao
+     removidas, owner-scoped ou publicas somente para `is_public=true`;
+  5. exigir teste owner vs non-owner quando qualquer rota nova aceitar
      `deck_id`.
 - **Validação**:
   - teste de `POST /ai/optimize` com deck de outro usuario retorna 404;
@@ -540,8 +550,8 @@ presentes e sem chamador runtime confirmado.
     `decks` por `id + user_id`;
   - source mostra polling de optimize bloqueando `job.userId == null` ou owner
     diferente;
-  - source mostra simulate lendo cartas via `deck_cards` + `decks` filtrado por
-    owner;
+  - source mostra recommendations/simulate lendo cartas via `deck_cards` +
+    `decks` filtrado por owner, ou docs/testes marcando contrato publico;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
     continua vazio ate haver contrato seguro;
 
