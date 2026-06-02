@@ -1,17 +1,21 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-02 ~18:30 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-02 ~19:00 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
-> **Archetype:** Spellslinger / Treasure Ramp / Copy Engine
+> **Archetype:** ⚠️ TRANSITIONED — Spellslinger / Treasure Ramp / Copy Engine → **Turbo-Combo cEDH Storm**
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 35+ Scout executions, 23+ Evolution Oracle cycles, 17+ Battle runs (goldfish + matchup + interactive), 13+ Mulligan simulations, Wincon Diversity Oracle (2 executions), EDHREC 7,893 decks snapshot, card_deck_analysis PostgreSQL, v3.22 Validator re-confirmation, **🆕 Lorehold Corpus Import (17+ decks → best-of-learned), Battle Analyst v8 interactive runs (12 opposite commanders, June 1-2)**
-> **Deck State:** 100 cards (86 unique rows, 35 lands), deck_id=6, card hash `30d00347764fc2a215edb4e668994871` — stable across 4 re-confirmations (v3.19→v3.22)
-> **🆕 Learned Candidate:** learned_deck_id=81, score=136.5 (cEDH build: 20 lands, 11 wincons, 6 tutors, 8 copy engines)
+> **Evidence Base:** 36 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 14 Mulligan simulations, Wincon Diversity Oracle (2 executions), EDHREC 7,893 decks snapshot, card_deck_analysis PostgreSQL, v3.22→v3.23 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs (12 opposite commanders, June 1-2), **🆕 Deck Reconstruction (2026-06-02 ~18:30Z), Active Deck Promotion (learned→active), Mulligan Exec#14 (post-reconstruction)**
+> **🚨 Deck State:** **RECONSTRUCTED** — deck_id=6 completely replaced. Card hash: `f2241d994743e8142396c0f846917fde` (was `30d00347764fc2a215edb4e668994871`). 100 cards (100 rows/qty=1), 33 lands, 6 tutors, 11 wincons, 0/4 spellslinger motor components remaining.
+> **🆕 Active Promoted Build:** "Lorehold Best-of Learned No Premium Mox 2026-06-02" — source: learned_deck_id=82 (best-of-learned minus Chrome Mox/Mox Diamond/Mox Opal, +Fellwar Stone/Lightning Greaves/Victory Chimes)
 
 ---
 
-## 1. Archetype Overview
+## ⚠️ IMPORTANT — Sections §1–§7 BELOW describe the PRE-RECONSTRUCTION deck (spellslinger, hash `30d00347...`). See §15 for the current cEDH Storm deck state.
+
+---
+
+## 1. Archetype Overview (HISTORICAL — Pre-Reconstruction)
 
 ```
 Treasure Ramp → Big Spell Free → Lorehold Copy → Treasure Payoff
@@ -607,20 +611,213 @@ This divergence is appropriate for the different power levels (cEDH vs bracket 3
 
 ---
 
+## 15. 🆕 DECK RECONSTRUCTION — Spellslinger → cEDH Storm (2026-06-02 ~18:30Z)
+
+### 15.1 Timeline of Events
+
+| Timestamp (UTC) | Event | Hash | Agent |
+|:----------------|:------|:-----|:------|
+| 2026-06-02 ~17:56 | Best-of-learned candidate (learned_deck_id=81, score 136.5) generated from 17+ imported decks | — | `import_lorehold_decks.py` |
+| 2026-06-02 ~18:30 | Deck reconstruction detected — hash diverges from `30d00347...` to `0b4913e7...` | `0b4913e79ec97b3ce05e0fe26531cd44` | SCOUT #36 |
+| 2026-06-02 18:34 | "No Premium Mox" candidate (learned_deck_id=82) generated — Chrome Mox/Mox Diamond/Mox Opal removed, +Fellwar Stone/Lightning Greaves/Victory Chimes | — | Manual/script |
+| 2026-06-02 18:38 | **Active deck promotion** — learned_deck_82 → deck_id=6, name "Lorehold Best-of Learned No Premium Mox 2026-06-02" | — | `import_lorehold_decks.py` (promote_bestof) |
+| 2026-06-02 18:43 | VALIDATOR v3.23 confirms reconstruction, new hash `f2241d99...`, 20 cards without tags | `f2241d994743e8142396c0f846917fde` | VALIDATOR v3.23 |
+| 2026-06-02 18:51 | MULLIGAN Exec#14 confirms T3=8.9% (was 13.3%), mulligan rate 16.0% (was 30.1%) | `f2241d99...` | MULLIGAN Exec#14 |
+
+**Key insight:** The reconstruction was NOT driven by Evolution Oracle or any pipeline agent. It was an external decklist import that completely replaced the active deck. ALL 25+ swaps from cycles #1-#11 were undone. The pipeline integrity detection (hash verification) caught the change — the system worked as designed.
+
+### 15.2 What Changed — Side-by-Side Comparison
+
+| Dimension | PRE-Reconstruction (Spellslinger) | POST-Reconstruction (cEDH Storm) | Delta |
+|:----------|:---------------------------------:|:---------------------------------:|:-----:|
+| Card hash | `30d00347764fc2a215edb4e668994871` | `f2241d994743e8142396c0f846917fde` | Changed |
+| Lands | 35 (86 rows) | 33 (100 rows/qty=1) | -2 |
+| Basic lands | ~8 | **2** (Ancient Den + Great Furnace!) | -6 ⚠️ |
+| Nonland CMC avg | 3.61 | ~3.0 | -0.61 |
+| Ramp (actual) | 16 | 16 (but different composition) | — |
+| Ramp (DB-tagged) | 7 | **6** (10 untagged!) | -1 tagged ⚠️ |
+| Draw (actual) | ~8 | ~8 | — |
+| Removal | 9 | **3** (Path, Swords, Generous Gift) | -6 🔴 |
+| Board Wipes | 5 | **1** (Blasphemous Act) | -4 |
+| Protection | 9 | ~10 (including Silence, Orim's Chant, Pyroblast) | +1 |
+| Stax | 0 | **3** (Silence, Orim's Chant, Drannith) | +3 |
+| Tutors | 2 | **6** (Enlightened, Mystical, Gamble, Imperial, Recruiter, Ranger-Captain) | +4 |
+| Wincons | 7 | **11** (+Aetherflux, Fiery, Guttersnipe, Birgi, Past in Flames, Reiterate combo, Rise) | +4 |
+| Copy Engines | 4 (Double Vision, Arcane Bombardment, Mizzix, Dawning) | 5 (Mizzix, Twinflame, Heat Shimmer, Molten Dup, Electroduplicate) | +1 |
+| Fast Mana | 1 (Sol Ring) | **6** (Sol Ring, Mana Vault, Mox Amber, Lotus Petal, Rite of Flame, Seething Song) | +5 |
+| T3 (no play) | 13.3% | **8.9%** | **-4.4pp 🟢** |
+| Mulligan rate | 30.1% | **16.0%** | **-14.1pp 🟢** |
+
+### 15.3 Cards ADDED (19+ new)
+
+| Category | Cards |
+|:---------|:------|
+| Fast Mana | Mana Vault, Mox Amber, Rite of Flame, Seething Song (Lotus Petal already present) |
+| Combo Pieces | Aetherflux Reservoir, Birgi God of Storytelling, Past in Flames, Reiterate, Reverberate, Twinflame |
+| Copy Engines (combo-oriented) | Electroduplicate, Heat Shimmer, Molten Duplication |
+| cEDH Stax/Protection | Drannith Magistrate, Silence, Orim's Chant, Pyroblast, Ranger-Captain of Eos |
+| Additional | Ruby Medallion (returned), Guttersnipe, Unexpected Windfall, Urza's Saga, Rise of the Eldrazi (returned) |
+
+### 15.4 Cards REMOVED (19+) — Spellslinger Motor Dismantled
+
+| Category | Cards Removed |
+|:---------|:-------------|
+| Spellslinger Engine | Double Vision, Arcane Bombardment, The Dawning Archaic, Improvisation Capstone |
+| Treasure Ramp | Big Score, Brass's Bounty, Hit the Mother Lode |
+| Board Wipes | Austere Command, Call Forth the Tempest, Fated Clash, Volcanic Vision |
+| Draw (big) | Dance with Calamity |
+| Protection (combat) | Akroma's Will, Flawless Maneuver (swapped) |
+| Other | Galvanoth, Penance, Pearl Medallion, Restoration Seminar, Apex of Power, Demand Answers, Thrill of Possibility |
+
+### 15.5 Archetype Transplant — What Survived
+
+**Kept from old deck (bridge cards):**
+- Core wincons: Approach of the Second Sun, Worldfire, Storm Herd, Rite of the Dragoncaller, Mizzix's Mastery
+- Spot removal: Path to Exile, Swords to Plowshares, Generous Gift
+- Wipe: Blasphemous Act (only surviving board wipe)
+- Draw: Esper Sentinel, Faithless Looting, Scroll Rack, Sensei's Divining Top, Land Tax
+- Tutors: Enlightened Tutor, Gamble
+- Misc: Storm-Kiln Artist, Smothering Tithe, Boros Charm, Deflecting Swat, Teferi's Protection, Grand Abolisher, Mother of Runes
+
+**New motor:** Fast Mana → Storm → Aetherflux kill OR Dualcaster+Twinflame infinite OR Approach with tutors
+**Lost motor:** Treasure Ramp → Big Spell Free → Lorehold Copy → Treasure Payoff
+
+### 15.6 SYNERGY_MAP v3.23 (Post-Reconstruction)
+
+| Eixo | v3.22 (Pre) | v3.23 (Post) | Change |
+|:-----|:-----------:|:------------:|:------:|
+| A — Token Makers + Pump | 7/10 | 5/10 | **-2** (Akroma's Will removed, Storm Herd isolated) |
+| B — Wipes + Protection | 8/10 | 7/10 | -1 (fewer wipes, more stax) |
+| C — Recursion Chains | 8/10 | 8/10 | Stable |
+| D — Explosive Mana | 7/10 | 8/10 | **+1** (fast mana package) |
+| E — Combo Pieces | 6/10 | **9/10** | **+3** 🔴 (Twinflame+Dualcaster+Reiterate+Past in Flames+Aetherflux) |
+| F — Stack Interaction | 6/10 | 5/10 | -1 (Silence not counted as stack?) |
+| G — Resilience | 7/10 | 6/10 | -1 (fewer board wipes/protection) |
+| **TOTAL** | **7.0/10** | **6.9/10** | -0.1 |
+
+**Key insight:** The SYNERGY_MAP total barely changed (-0.1), but the composition shifted dramatically — Combo Pieces surged from 6→9 while Token Makers cratered 7→5. The deck pivoted from a balanced spellslinger to a combo-dense storm build.
+
+---
+
+## 16. 🆕 POST-RECONSTRUCTION PERFORMANCE
+
+### 16.1 Mulligan Exec#14 (N=1000, seed=42)
+
+| Metrica | Exec#13 (Pre) | Exec#14 (Post) | Delta | Signal |
+|:--------|:-------------:|:---------------:|:-----:|:------:|
+| **Sem Play T3** | **13.3%** | **8.9%** | **-4.4pp** | 🟢 Massive improvement |
+| Mulligan rate | 30.1% | 16.0% | -14.1pp | 🟢 Almost halved |
+| Jogável (first 7) | 66.0% | 84.0% | +18.0pp | 🟢 Excellent |
+| Keepable (first 7) | ~55% | 65.4% | +10.4pp | 🟢 |
+| Ramp T1 (Sol Ring) | 8.5% | 6.3% | -2.2pp | 🟡 Expected with 33 lands |
+| Free Mulligan used | 4.6% | 18.6% | +14.0pp | ⚠️ Structural change |
+
+**Mulligan distribution (post-reconstruction):**
+- 0 mulligans: 65.4% (keepable straight)
+- 1 (free): 18.6% (free mulligan used successfully)
+- 2: 7.1% (1 card to bottom)
+- 3+: 2.9% (rare)
+- 6-7: 6.5% (forced to 0 — 0-landers)
+
+**Why T3 improved by -4.4pp:**
+1. Nonland CMC dropped 3.61 → 3.0 (-0.61) — eliminated CMC 8-12 cards (Apex, Storm Herd pre-cut, Rise)
+2. Fast mana density: 16 real ramp in 99 → P(ramp in opener) ≈ 73%
+3. cEDH staples at CMC 0-1: Silence, Orim's Chant, Pyroblast, Ranger-Captain, Giver, Mother, Gamble, Enlightened — 12+ cards castable with 1 land
+
+### 16.2 DB Classifier Gap — 10 Ramp Cards Untagged
+
+Only **6 cards** have `functional_tag='ramp'` in PostgreSQL:
+Arcane Signet, Fellwar Stone, Lotus Petal, Mox Amber, Smothering Tithe, Storm-Kiln Artist.
+
+**10 real ramp cards NOT recognized:**
+Sol Ring (tag='unknown'), Mana Vault (tag='unknown'), Boros Signet (tag='unknown'), Talisman of Conviction (tag='unknown'), Victory Chimes (tag='unknown'), Rite of Flame (tag='spell'), Seething Song (tag='spell'), Jeska's Will (tag='draw'), Mana Geyser (tag='spell'), Unexpected Windfall (tag='draw').
+
+**Impact:** The DB-tag-based mulligan simulator would treat 2-land + Sol Ring hands as non-keepable (because Sol Ring = tag='unknown'), inflating T3 from 8.9% → ~17.7%. This is a false-negative classification affecting ALL tag-based simulations.
+
+### 16.3 VALIDATOR v3.23 Critical Findings
+
+1. **20 cards without functional tags** — tags are critical for the mulligan simulator and Evolution Oracle
+2. **Only 3 removal cards** (vs PG ideal 5.33) — severe removal shortage. In 4-player pods, drawing any removal is 3/99 chance
+3. **Only 2 basic lands** (Ancient Den, Great Furnace) — these are artifact lands, not basics! Zero actual basic Plains/Mountains. Critical vulnerability to: Path to Exile (opponent can't search), Blood Moon (all nonbasics become Mountains), Back to Basics, Ruination, Wave of Vitriol
+4. **Storm Herd (CMC 10) and Rise of the Eldrazi (CMC 12) are outliers** — only cards above CMC 7 in an otherwise CMC 2-4 deck. Frequently dead draws.
+5. **Akroma's Will removed** — was enabler for Storm Herd and Rise win lines. Without it, both wincons are unreliable.
+
+---
+
+## 17. 🆕 UPDATED CONCRETE TASKS
+
+### Task 1: DB Functional Tag Audit and Repair (CRITICAL)
+- **Evidence:** MULLIGAN Exec#14 identified 10 ramp cards not tagged as 'ramp' by the classifier, causing T3 inflation from 8.9% → 17.7%. VALIDATOR v3.23 confirms 20 cards without functional tags. Sol Ring, the most-played card in Commander, is tagged 'unknown'.
+- **What to change:** Create a `tag_repair.py` script that cross-references `deck_cards` with known card roles (Sol Ring=ramp, Mana Vault=ramp, Boros Signet=ramp, etc.) and updates `functional_tag` for commonly misclassified cards. Add ritual detection heuristic: if oracle_text contains `{R}{R}{R}` and `add` → tag as 'ramp'.
+- **Impact:** Fixes ALL tag-dependent agents (Mulligan Simulator, Evolution Oracle, Scout, Validator). The 10-ramp-card gap means every agent is working with corrupted draw/ramp/density data.
+- **Risk:** Low — only updates `functional_tag` column in SQLite `knowledge.db`. Does not modify product or PostgreSQL.
+- **Validation:** After repair, re-run MULLIGAN with tag-based ramp detection — T3 should match the actual 8.9% (not 17.7%).
+
+### Task 2: Basic Land Crisis — Deck Structural Validation
+- **Evidence:** The active deck (deck_id=6) has only 2 lands with the "Basic" supertype: Ancient Den (Artifact Land — NOT basic) and Great Furnace (Artifact Land — NOT basic). Zero actual basic Plains or Mountains. This means: (a) Path to Exile on opponent creatures gives them no land, (b) Blood Moon turns all 33 lands into Mountains with no basics to fetch, (c) the deck folds to nonbasic land hate.
+- **What to change:** Add basic land detection to the Validator. A Commander deck should have ≥3 basic lands unless it's a 5-color cEDH build with full ABUR duals. Emit a HARD WARNING when basic_count < 3. For this specific deck, recommend replacing 2-3 nonbasics with Plains/Mountains.
+- **Impact:** Prevents structural land vulnerabilities from going undetected. Currently the Validator (v3.23) reports "Lands: 33 ✅ OK" without noticing zero basics.
+- **Risk:** Low — validator logic only. Does not modify the deck.
+- **Validation:** Run validator on the current deck — it should flag "0 basic lands" as a critical structural issue.
+
+### Task 3: Removal Density Emergency
+- **Evidence:** The active deck has only 3 removal cards (Path to Exile, Swords to Plowshares, Generous Gift) — 3/99 cards. In a 4-player pod where any opponent can become the archenemy, drawing any interaction requires 3 draws from 99. PG ideal profile for Lorehold: 5.33 removal. The spellslinger deck had 9.
+- **What to change:** Add removal density scoring to the Evolution Oracle. When removal_count < (opponent_count × 2), flag as "EMERGENCY — insufficient interaction." The Oracle should prioritize adding removal over other swap types when below threshold.
+- **Impact:** Prevents decks from reaching "battle-cruiser" state where they can't interact with opponents. This deck will lose to any resolved Kinnan, Korvold, or Winota.
+- **Risk:** Low — recommendation layer only. Does not auto-apply swaps.
+- **Validation:** Evolution Oracle on the current deck should emit a priority-1 recommendation to add removal before suggesting any other swaps.
+
+### Task 4: Post-Reconstruction Pipeline Reset
+- **Evidence:** Mulligan Exec#14 explicitly states: "O pipeline de T3 agora precisa ser recalibrado para o NOVO arquétipo." The Evolution Oracle has 23 cycles of history for the spellslinger deck — none of its historical swap recommendations apply to the storm build. The SYNERGY_MAP baselines need reset. The Validator's PG profile comparisons are based on the old spellslinger ideal, not a cEDH storm ideal.
+- **What to change:** Create a `pipeline_reset.md` document that: (a) archives the pre-reconstruction history as historical reference, (b) establishes new baselines for T3 (8.9%), SYNERGY_MAP (6.9/10), and archetype profile, (c) identifies which pipeline agents need new reference data for cEDH storm archetype. Flag agents that will produce incorrect recommendations until reset.
+- **Impact:** Prevents agents from making decisions based on stale historical data from a different archetype.
+- **Risk:** Medium — if the deck is reconstructed again, the reset will need to happen again. Add hash-change detection that auto-triggers pipeline reset.
+- **Validation:** After reset, the Evolution Oracle should not reference any pre-reconstruction cycle data.
+
+### Task 5: Wincon Outlier Detection — Storm Herd + Rise of the Eldrazi
+- **Evidence:** In a deck with 33 lands, CMC 3.0 average, and storm combo strategy, Storm Herd (CMC 10) and Rise of the Eldrazi (CMC 12) are the only cards above CMC 7. MULLIGAN Exec#14 flags them as "frequentemente dead draws." Without Akroma's Will (removed in reconstruction), Storm Herd's pegasus tokens lack haste and can't attack until next turn. Rise of the Eldrazi at CMC 12 requires 12 mana in a 33-land deck.
+- **What to change:** Add CMC outlier detection to the Wincon Diversity Oracle. When a wincon's CMC exceeds (avg_nonland_cmc × 2), flag as "DEAD DRAW RISK." For the current deck, recommend replacing both with lower-CMC alternatives from the collection (Fiery Emancipation is already in deck, Approach is already in deck). Possible replacements: Comet Storm (CMC X+R, instant), Walking Ballista (CMC X, with Aetherflux), or additional draw/tutor.
+- **Impact:** Removes the highest-CMC dead-weight from an otherwise optimized low-curve storm deck.
+- **Risk:** Low — recommendation only. These 2 cards are the only CMC > 7 cards identified.
+- **Validation:** Wincon Oracle should score Storm Herd (CMC 10) and Rise of the Eldrazi (CMC 12) below Approach (CMC 7) and Aetherflux Reservoir (CMC 4) for this specific deck configuration.
+
+---
+
+## 18. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Functional tag completeness audit** | MULLIGAN Exec#14 (§16.2) | Detect and repair misclassified cards (Sol Ring as 'unknown') that corrupt all tag-dependent metrics |
+| **Basic land count validation** | VALIDATOR v3.23 (§16.3) | Catch decks with 0 basic lands before they hit production |
+| **Removal density threshold** | VALIDATOR v3.23 (§16.3) | Alert when interaction density drops below (opponents × 2) for multiplayer Commander |
+| **CMC outlier scoring** | MULLIGAN Exec#14 (§17, Task 5) | Flag wincons/recurring cards whose CMC exceeds 2× deck average as dead-draw risk |
+| **Pipeline hash-change auto-reset** | SCOUT #36 + MULLIGAN Exec#14 (§15.1) | When deck hash changes due to external import, auto-trigger pipeline baseline reset |
+| **Power-level-aware swap recommendations** | §14.4 (previous cycle) | Prevent recommending cEDH cards into bracket-3 decks (still valid despite reconstruction) |
+| **DB-tag vs actual-role gap scoring** | MULLIGAN Exec#14 (§16.2) | Quantify the false-negative rate in classifier tags to calibrate agent confidence |
+
+---
+
 ## Appendix: Data Sources
 
 | Source | Date Range | Records |
 |:-------|:-----------|:-------|
-| SCOUT_LOG | 2026-05-28 to 2026-06-01 | 35+ executions |
-| EVOLUTION_LOG | 2026-05-28 to 2026-06-01 | 23+ cycles |
-| BATTLE_LOG | 2026-05-30 to **2026-06-02** | 17+ simulation runs (goldfish + matchup + interactive) |
-| MULLIGAN_LOG | 2026-05-28 to 2026-06-01 | 13+ executions |
-| VALIDATOR_LOG | 2026-05-28 to 2026-06-01 | v3.5 through **v3.22** |
+| SCOUT_LOG | 2026-05-28 to **2026-06-02** | **36** executions (including #36 post-reconstruction) |
+| EVOLUTION_LOG | 2026-05-28 to 2026-06-01 | 23+ cycles (all pre-reconstruction spellslinger) |
+| BATTLE_LOG | 2026-05-30 to **2026-06-02** | 18+ simulation runs (goldfish + matchup + interactive, all pre-reconstruction configs) |
+| MULLIGAN_LOG | 2026-05-28 to **2026-06-02** | **14** executions (Exec#14 = post-reconstruction T3=8.9%) |
+| VALIDATOR_LOG | 2026-05-28 to **2026-06-02** | v3.5 through **v3.23** (post-reconstruction) |
+| VALIDATOR_SUMMARY | **2026-06-02T18:43** | **v3.23** — post-reconstruction hash `f2241d99...` |
 | wincon-patterns.md | 2026-05-31 | 7 patterns documented |
 | card_deck_analysis (PG) | 2026-06-01 | 1,495 entries across multiple decks |
 | EDHREC JSON API | ~2026-05-31 to 2026-06-01 | 7,851 → **7,893** decks |
 | real-decklists.md | 2026-05-27 | 5 real Lorehold decks analyzed |
-| **VALIDATOR_LOG_v3.22** | **2026-06-01T20:52** | **Re-confirmation — EDHREC shifts, SYNERGY_MAP degradation, swap SQL** |
-| **🆕 LOREHOLD_BEST_OF_LEARNED.md** | **2026-06-02T17:56** | **Best-of candidate from 17+ imported decks (score 136.5)** |
-| **🆕 import_queue/lorehold/** | **2026-06-02** | **23 community-submitted Lorehold decklists** |
-| **🆕 knowledge.db (lorehold_import_runs)** | **2026-06-02** | **17+ imported decks with role inference, wincon scoring** |
+| VALIDATOR_LOG_v3.22 | 2026-06-01T20:52 | Re-confirmation — EDHREC shifts, SYNERGY_MAP degradation, swap SQL |
+| LOREHOLD_BEST_OF_LEARNED.md | 2026-06-02T17:56 | Best-of candidate from 17+ imported decks (score 136.5, learned_deck_id=81) |
+| LOREHOLD_BEST_OF_LEARNED_NO_MOX_CARD_RATIONALE.md | 2026-06-02T18:34 | Rationale for 100-card "No Premium Mox" build (learned_deck_id=82) |
+| LOREHOLD_ACTIVE_DECK_PROMOTION.md | **2026-06-02T18:38** | **🆕 Active deck promotion — learned_deck_82 → deck_id=6** |
+| import_queue/lorehold/ | 2026-06-02 | 23 community-submitted Lorehold decklists |
+| knowledge.db (lorehold_import_runs) | 2026-06-02 | 17+ imported decks with role inference, wincon scoring |
+
+---
+
+> **Next Cron Cycle:** Continue monitoring the cEDH Storm build. Primary concerns: (1) 0 basic lands vulnerability, (2) only 3 removal cards, (3) DB tag audit needed, (4) CMC outlier dead-weight (Storm Herd CMC 10 + Rise CMC 12). Watch for VALIDATOR v3.24 with corrected DB data.
