@@ -1,3 +1,125 @@
+## [2026-06-03T21:42:43+00:00] Execucao #38 -- Deck Alterado: Akroma's Will -> Longshot + Surge to Victory | Wincon Pool Inalterado
+
+> **Data:** 2026-06-03
+> **Missao:** Auditoria de wincons com scorecard + verificacao de integridade
+> **Deck state:** Card hash: `8b9c643c84825a4436d33b7f1616fa5f` -- HASH DIVERGENTE do Scout #37 (era `f2241d994743e8142396c0f846917fde`)
+> **Analista:** Hermes Agent -- Lorehold Deep Scout (Wincon-Focused v38)
+
+---
+
+### STEP 0: PIPELINE INTEGRITY -- Deck Alterado Desde Scout #37
+
+**Card hash atual:** `8b9c643c84825a4436d33b7f1616fa5f`
+**Scout #37 hash:** `f2241d994743e8142396c0f846917fde`
+**Veredito:** HASH DIVERGENTE -- O deck foi alterado novamente (4a vez consecutiva).
+
+**Mudancas detectadas (Scout #37 -> Atual):**
+
+| Status | Cartas |
+|:-------|:-------|
+| X Removida | **Akroma's Will** (estava no deck no Scout #37 como enabler) |
+| + Adicionada | **Longshot, Rebel Bowman** (CMC 4, wincon -- dano = power total de criaturas) |
+| + Adicionada | **Surge to Victory** (CMC 6, wincon -- exila topo, buffa board com power da carta exilada) |
+| + Mantidos | Todos os 10 wincons do Scout #37 + Dualcaster Mage + Twinflame + Rite of the Dragoncaller |
+
+**Resumo:** Akroma's Will foi substituido por 2 novos wincons. Total: 100 cartas.
+
+---
+
+### WINCONS NO DECK ATUAL -- Scorecard via card_deck_analysis
+
+**Pitfall ativo:** Todos os scores em `card_deck_analysis` referenciam `deck_id` deletados (16-82).
+Os scores foram computados para decks spellslinger e podem nao refletir o contexto atual cEDH turbo-combo.
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| V **Guttersnipe** | 3 | 19 | 7 | 5 | 8 | INVISIVEL (ST=8) -- 2 dano/spell. Com 30+ spells. Fragil (R=5) |
+| V **Mizzix's Mastery** | 4 | 17 | 6 | 7 | 6 | IMBATIVEL (R=7) -- Overload exila grave, copia tudo gratis |
+| V **Twinflame** | 2 | 16 | 7 | 5 | 5 | Combo com Dualcaster = criaturas infinitas (tag=combo, nao wincon) |
+| V **Rite of the Dragoncaller** | 6 | 16 | 5 | 5 | 7 | INVISIVEL (ST=7) -- Dragon 5/5 por spell (tag=spellslinger, nao wincon) |
+| V **Dualcaster Mage** | 3 | 16 | 7 | 5 | 5 | Combo deterministico com Twinflame (tag=combo, nao wincon) |
+| V **Rise of the Eldrazi** | 12 | 15 | 2 | 9 | 4 | IMBATIVEL (R=9) -- Aniquilador 4 + turno extra |
+| V **Fiery Emancipation** | 6 | 15 | 6 | 5 | 4 | Triplica dano. Storm Herd + Fiery = letal |
+| V **Aetherflux Reservoir** | 4 | 15 | 6 | 5 | 4 | Storm payoff. 50+ vida = removal laser |
+| V **Worldfire** | 9 | 14 | 2 | 7 | 5 | IMBATIVEL (R=7) -- Reset total. Legal (commander) |
+| V **Approach of the Second Sun** | 7 | 12 | 6 | 5 | 1 | RAPIDA (S=6) -- ARQUI-INIMIGO (ST=1) |
+| V **Storm Herd** | 10 | 11 | 3 | 5 | 4 | Precisa de Fiery/Akroma no mesmo turno |
+| + **Longshot, Rebel Bowman** | 4 | N/A | N/A | N/A | N/A | Sem score -- dano = total power, comba com Storm Herd |
+| + **Surge to Victory** | 6 | N/A | N/A | N/A | N/A | Sem score -- exila topo, buffa board, potencial OTK |
+
+**Total: 13 wincons/game-enders no deck** (10 wincon-tagged + Rite + Twinflame/Dualcaster combo + Surge). O deck esta **supersaturado** de condicoes de vitoria.
+
+---
+
+### WINCONS NA COLECAO (NAO NO DECK) -- Scorecard Completo
+
+Apenas **4 cartas** com score > 0 permanecem na colecao fora do deck. **Inalterado desde Scout #37.**
+
+#### RAPIDAS (speed >= 6) -- Ambas Misclassified
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Trouble in Pairs** | 4 | 16 | 7 | 5 | 4 | MISCLASSIFIED -- Draw engine, nao wincon. Dispara quando oponentes compram 2+ cartas |
+| **Perch Protection** | 6 | 16 | 7 | 5 | 4 | MISCLASSIFIED -- Fog + extra turn + gift. Protection, nao wincon |
+
+#### FRAGEIS (resilience <= 3) -- EVITE
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Call Forth the Tempest** | 8 | 12 | 4 | 3 | 5 | FRAGIL (R=3) -- EDHREC trend -0.60. CMC 8. Sem protecao |
+
+#### OUTROS (sem categoria de prioridade)
+
+| Carta | CMC | Score | S | R | ST | Diagnostico |
+|:------|:---:|:-----:|:-:|:-:|:-:|:------------|
+| **Apex of Power** | 10 | 13 | 4 | 4 | 5 | CMC 10 heavy. Exilia top 7, mana gratis. Nao justifica slot em deck supersaturado |
+
+---
+
+### ANALISE DE PRIORIZACAO
+
+**NENHUM candidato atinge os thresholds de priorizacao (inalterado desde Scout #37):**
+- IMBATIVEIS (R>=7): **0 candidatos**
+- INVISIVEIS (ST>=7): **0 candidatos**
+- RAPIDAS (S>=6): 2 candidatos, AMBOS **misclassified** (Trouble in Pairs = draw, Perch Protection = fog)
+- FRAGEIS (R<=3): 1 candidato (Call Forth the Tempest) -- EVITAR
+
+**Conclusao:** O deck esta **supersaturado de wincons** (13 condicoes de vitoria para 100 cartas).
+Meta cEDH tipicamente usa 3-5 wincons + tutores. Densidade atual: 13%.
+Nao ha wincons novos na colecao. Nao ha recomendacoes de swap.
+
+---
+
+### ALERTAS
+
+1. **Deck supersaturado de wincons** -- 13 condicoes de vitoria (10 tagged + 3 combos/enablers).
+   Isso reduz slots para interacao/ramp/draw/stax. Meta cEDH usa 3-5 wincons.
+2. **Misclassification continua** -- Trouble in Pairs e Perch Protection ainda aparecem como
+   wincons no card_deck_analysis. Sao draw engine e protection, respectivamente.
+3. **Card_deck_analysis referencia deck_ids deletados** -- todos os scores vem de decks que
+   nao existem mais (ids 16-82). Scores podem nao refletir o contexto cEDH atual.
+4. **Akroma's Will removido** -- era o melhor finisher de combate do deck. Surge to Victory
+   e Longshot preenchem parcialmente o vacuo, mas Surge depende de carta exilada aleatoria.
+5. **Hash divergente pela 4a vez consecutiva** -- o deck continua sendo alterado externamente.
+   Pipeline logs (EVOLUTION_LOG, VALIDATOR_LOG, MULLIGAN_LOG) seguem stale.
+6. **Banlist check:** Nenhuma carta banida no deck (commander). Worldfire e Mana Vault confirmados legais.
+
+---
+
+### RESUMO
+
+| Metrica | Valor |
+|:--------|:------|
+| Wincons no deck (wincon-tagged) | 10 |
+| Wincons + game-enders (total) | 13 |
+| IMBATIVEIS disponiveis na colecao | 0 |
+| INVISIVEIS disponiveis na colecao | 0 |
+| RAPIDAS disponiveis na colecao | 2 (misclassified) |
+| FRAGEIS (evitar) | 1 (Call Forth the Tempest) |
+| Slots livres | 0 (100/100) |
+| Hash atual | `8b9c643c84825a4436d33b7f1616fa5f` |
+| **Recomendacao** | **NENHUM SWAP -- deck supersaturado de wincons** |
+
 ## [2026-06-02T21:42:21+00:00] Execucao #37 — 🔄 Deck Reconstruido Novamente: Wincons do Scout #36 Aplicados + Deck Saturado
 
 > **Data:** 2026-06-02

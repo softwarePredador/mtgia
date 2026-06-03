@@ -1,41 +1,54 @@
 # Lorehold Validator Summary
-**Last run:** 2026-06-02T22:00:00+00:00
+**Last run:** 2026-06-03T23:00:00+00:00 (v3.25)
 **Deck:** Lorehold Best-of Learned No Premium Mox 2026-06-02
-**Version:** v3.24 (corrupted-import-crisis)
-**Card Hash:** `f2241d994743e8142396c0f846917fde`
+**Status:** HASH CHANGED — Deck modified since v3.24
 
-## 🚨 Critical Alerts
-- 🔴 **Worldfire is BANNED** in Commander — must be removed immediately
-- 🔴 **20 cards have tag='unknown'** — classifier was never run on this deck
-- 🔴 **DB metrics are garbage** — this analysis uses manual MTG card knowledge
+---
 
-## Deck Identity
-**Archetype:** cEDH Turbo-Combo (Dualcaster Mage + copy spells)
-**Lands:** 33 | **Avg CMC (non-land):** 2.94 | **Fast mana sources:** 12
+## Quick Status v3.25
 
-## SYNERGY_MAP Scores
-| Eixo | Score |
-|:-----|:-----:|
-| Combo Pieces | 9/10 🟢 |
-| Explosive Mana | 8/10 🟢 |
-| Recursion Chains | 7/10 🟢 |
-| Resilience | 7/10 🟢 |
-| Stack Interaction | 6/10 🟡 |
-| Wipes + Proteção | 5/10 🟡 |
-| Token + Pump | 3/10 🔴 |
+| Metric | Value | vs PG Profile |
+|:-------|:-----:|:-------------|
+| Total Cards | 99 + cmd | ✅ |
+| Lands | 31 | 🔵 -1 |
+| Ramp | 19 | 🔴 +15.33 |
+| Draw | 9 | 🔴 +6.33 |
+| Removal | 3 | 🟡 -2.33 |
+| Tutors | 5 | 🔵 +1.33 |
+| Board Wipes | 1 | ⚠️ |
+| Protection | 10 | 🔴 +6.33 |
+| Wincons | 10 | 🔴 +8.67 |
+| Game Changers | 11 | 🔴 Bracket 4 |
+| Banned Cards | 0 | ✅ |
+| Unknown Tags | 3 | ✅ (85% melhor) |
+| Double-Nulls | 0 | ✅ |
 
-## Top 5 Recommendations
-1. 🔴 Remove Worldfire (BANNED) → replace with Underworld Breach (CMC 2)
-2. 🟡 Consolidate win cons (9→4: cut Guttersnipe, Dragoncaller, Storm Herd, Rise)
-3. 🟡 Add Underworld Breach (CMC 2, recursion engine — #1 priority after banlist fix)
-4. 🟡 Cut excess protection (8→5 slots)
-5. 🟢 Add cheap card advantage (Mystic Remora, Archivist of Oghma)
+## SYNERGY_MAP (7 axes)
+- **A) Token Makers + Pump:** 4/10
+- **B) Board Wipes + Protection:** 6/10
+- **C) Recursion Chains:** 5/10
+- **D) Explosive Mana:** 9/10
+- **E) Combo Pieces:** 8/10
+- **F) Stack Interaction:** 7/10
+- **G) Resilience:** 6/10
 
-## PG Profile Comparison
-⚠️ PG profile is for spellslinger archetype — NOT applicable to this combo deck.
-Differences are ARCHETYPE differences, not deficiencies.
+## Motor: 5/5 ✅ (cEDH Fast Mana → Tutor → Combo → Protection)
 
-## Pipeline Status
-- Classifier: NOT RUN (20 cards unknown) — NEEDS RECLASSIFICATION
-- Banlist: VIOLATED (Worldfire) — NEEDS REMOVAL
-- DB metrics: STALE/CORRUPTED — DO NOT TRUST
+## Key Corrections from v3.24
+- Worldfire: ❌ BANNED → ✅ LEGAL (v3.24 usou memória de modelo, não PG)
+- Classifier: 20 unknown → 3 unknown (85% resolved)
+- Ramp tags: 6 → 19 (classifier fix)
+
+## Top Issues
+1. 🔴 11 Game Changers → Bracket 4 (not Bracket 3)
+2. 🟡 Only 1 board wipe (Blasphemous Act)
+3. 🟢 3 unknown tags remain
+
+## Top Swaps
+1. Rite of the Dragoncaller → Underworld Breach (ΔCMC -4)
+2. Storm Herd → Dockside Extortionist (ΔCMC -8)
+3. Rite of the Dragoncaller → Skullclamp (ΔCMC -5)
+
+---
+
+*Full report: decks/lorehold-the-historian/VALIDATOR_LOG_v3.25.md*

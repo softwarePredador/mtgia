@@ -1,3 +1,11 @@
+## Execucao #15 -- 2026-06-03T21:47:00+00:00 (Lorehold cEDH Storm -- T3=1.6%, -7.3pp, DB Classifier Corrigido)
+
+**Card hash:** `8b9c643c84825a4436d33b7f1616fa5f` — diferente do Exec#14 (f2241d99...).
+**Deck:** 100 cartas, 33 lands (31 tagged), cEDH Storm/Combo. DB ramp classification corrigido de 6 para 19 cartas.
+**Metricas (N=1000, seed=42):** T3=1.6%, Mulligan nao-free=15.3%, Playable=97.9%, Ramp T1 (Sol Ring)=7.0%, Ramp T1 (fast mana)=49.7%.
+
+---
+
 ## Verificacao -- 2026-06-02T21:56:33+00:00 (Sem Mudancas — T3=8.9% Estavel, Lorehold cEDH Storm)
 
 **Card hash:** `f2241d994743e8142396c0f846917fde` — identico a Exec#14.
