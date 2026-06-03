@@ -30,6 +30,25 @@ GET /ai/commander-learning?commander=Lorehold,%20the%20Historian
 - Fonte runtime: `commander_learned_decks` no PG.
 - O app usa este endpoint no atalho `Usar deck aprendido do comandante`.
 
+Validacao publica apos deploy do commit `a763f15b22dca25d6277dc9cb1d4603e800e2e73`:
+```json
+{
+  "endpoint_status": 200,
+  "available": true,
+  "promoted_source_ref": "learned_deck:82",
+  "recommended_source": "promoted_learned_deck_pg",
+  "total_cards_including_commander": 100,
+  "main_quantity": 99,
+  "banned_count": 0,
+  "unknown_legality_count": 0,
+  "invalid_count": 0,
+  "validation_is_valid": true,
+  "premium_mox_present": [],
+  "contains_worldfire": true,
+  "contains_lorehold_commander": true
+}
+```
+
 ## Rotina Idempotente Hermes -> PG
 ```text
 dart run bin/commander_learned_deck.dart --input-json=<path> --dry-run
