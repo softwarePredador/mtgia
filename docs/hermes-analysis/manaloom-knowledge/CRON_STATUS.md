@@ -242,55 +242,62 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
-> Última atualização: **2026-06-02T18:45:00Z**
+> Última atualização: **2026-06-03T06:00:00Z**
 > Relatório completo: `TAG_ACCURACY_REPORT.md`
 
 ### Resumo Geral
 
-| Métrica | 2026-06-01 | 2026-06-02 | Delta |
+| Métrica | 2026-06-02 | 2026-06-03 | Delta |
 |:--------|:----------:|:----------:|:-----:|
 | **Tags no sistema** | 22 | 22 | 0 |
 | **Tags com 100% de precisão** | 15 (68%) | 15 (68%) | 0 |
 | **Tags abaixo de 85%** | 7 (32%) | 7 (32%) | 0 |
 | **Pior precisão** | payoff (35.5%) | payoff (35.5%) | 0 |
-| **Cartas double-null** | 29 (7.4%) | 25 (4.6%) | -4 |
-| **Cartas 'unknown' (classif. não rodou)** | 0 | **20** 🔴 | **+20** |
-| **Divergência single vs multi tag** | 84 (21.5%) | 36 (6.6%)* | -48 |
-| **Cartas sem multi-tags** | 77 (19.7%) | 124 (22.8%) | +47 |
+| **Novas tags sem `tag_accuracy`** | 0 | **4** 🟡 | **+4** |
+| **Cartas double-null** | 25 (4.6%) | 25 (4.6%) | 0 |
+| **Cartas 'unknown' (classif. não rodou)** | **20** 🔴 | 3 🟡 | **-17** |
+| **Cartas com CMC inválido (deck 6)** | ~15 | **36** 🔴 | **+~21** |
+| **Divergência single vs multi tag** | 36 (6.6%) | 36 (6.6%) | 0 |
+| **Cartas sem multi-tags** | 124 (22.8%) | 128 (23.6%) | +4 |
 | **fp/fn tracking** | NÃO implementado | NÃO implementado | 0 |
-| **Discrepâncias documentadas** | 20 | 21 | +1 |
+| **Discrepâncias documentadas** | 21 | 21 | 0 |
 
-*\* Divergência single/multi instável — ver relatório completo.*
-
-### `tag_accuracy` ESTAGNADO (6 dias sem atualização)
+### `tag_accuracy` ESTAGNADO (7 dias sem atualização) 🔴
 
 A tabela `tag_accuracy` contém os mesmos 22 registros desde 2026-05-27. Nenhuma
 atualização de precisão, nenhum novo dado de fp/fn. O pipeline de tagging não está
-evoluindo.
+evoluindo. **7 dias de estagnação é sinal de pipeline quebrado.**
 
-### 🔴 Novo: Bulk Import Corruption — 20 Cartas Não Classificadas
+### ✅ Bulk Import — 17/20 Cartas Reclassificadas (Progresso Parcial)
 
-Novo deck "Lorehold Best-of Learned No Premium Mox 2026-06-02" (100 cartas) importado
-com **20 cartas** (20%) com `functional_tag='unknown'`, `CMC=NULL`, `type_line=NULL`.
-O classificador NÃO foi executado — é o padrão "Classifier NEVER Ran" documentado na
-skill (`Pitfall: Bulk Import Data Corruption`).
+Das 20 cartas com `functional_tag='unknown'` no deck 6, **17 foram reclassificadas**
+com tags apropriadas (`ramp`, `draw`, `protection`, `removal`, `combo`, `wincon`,
+`stax`, `spellslinger`, `tutor`). Restam **3 cartas 'unknown'**: Inventors' Fair,
+Prismatic Vista, Reforge the Soul — todas com CMC=3.0 (errado).
 
-Cartas afetadas incluem staples como Sol Ring, Mana Vault, Scroll Rack, Boros Charm,
-Lightning Greaves, Birgi, Past in Flames, Reiterate. Nenhum agente do pipeline
-(Scout, Validator, Mulligan, Oracle) consegue analisar este deck.
+### 🔴 CMC Corruption Ampliada — 36 Cartas com CMC Inválido
 
-**Ação:** Rodar classificador no deck + corrigir script de importação (`scripts/import_lorehold_decks.py`).
+A reclassificação corrigiu `functional_tag` mas **piorou** a situação de CMC:
+**36 cartas no deck 6** (36%) têm `CMC IS NULL OR CMC = 0.0`. O deck é
+completamente inanalisável para curva de mana, mulligan ou CMC médio.
+
+### 🟡 4 Tags Novas Sem Métrica de Precisão
+
+`stax`, `combo`, `commander`, `spellslinger` existem como valores de `functional_tag`
+no banco mas não têm entrada em `tag_accuracy`. Suas precisões são desconhecidas.
 
 ### Recomendações de Código (Atualizadas)
 
 | Prioridade | Ação | Arquivo |
 |:----------:|:-----|:--------|
-| 🔴 | **NOVO:** Corrigir bulk import — executar classificador pós-insert | `scripts/import_lorehold_decks.py` |
+| 🔴 | **NOVO:** Corrigir CMCs do deck 6 — 36 cartas com CMC inválido | `scripts/reclassify_deck.py` ou `import_lorehold_decks.py` |
+| 🔴 | **NOVO:** Adicionar `stax`, `combo`, `commander`, `spellslinger` ao `tag_accuracy` | `scripts/knowledge_db.py` |
+| 🔴 | **NOVO:** Rodar atualização do `tag_accuracy` — estagnado 7 dias | Pipeline `tag_accuracy` update |
+| 🔴 | Corrigir bulk import — executar classificador pós-insert | `scripts/import_lorehold_decks.py` |
 | 🔴 | Ampliar heurísticas `_looksLike*` para payoff/enabler/engine/wincon | `server/lib/ai/optimization_functional_roles.dart` (L370-398) |
 | 🔴 | Adicionar `_looksLike*` ao Python `classify_card()` (hoje as omite) | `scripts/scryfall_classifier.py` (L155-221) |
 | 🟡 | Unificar single-tag com multi-tag como fallback | `optimization_functional_roles.dart` + `functional_card_tags.dart` |
-| 🟡 | Implementar tabela `tag_errors` para rastreamento granular de fp/fn | `scripts/knowledge_db.py` (L429-439) |
-| 🟢 | Adicionar `combat_payoff` como tag (Blade Historian) | `optimization_functional_roles.dart` |
+| 🟡 | Implementar tabela `tag_errors` para rastreamento granular de fp/fn | `scripts/knowledge_db.py` |
 
 
 ---
