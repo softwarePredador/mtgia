@@ -140,16 +140,19 @@ mtgia/
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclo local fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO no checkout local `eecb2f95` em 2026-06-02 11:00 UTC.** O auditor
+  **REVALIDADO/ABERTO no checkout local `4795a07b` em 2026-06-03 11:00 UTC.** O auditor
   base reporta `Imports quebrados: 0`, mas cobre apenas `server/lib` e
-  `server/routes`. A triagem focada em `app/lib` + `server/bin` encontrou
+  `server/routes`. A triagem focada em 420 arquivos Dart de `app/lib`,
+  `server/lib`, `server/routes` e `server/bin` encontrou somente estes 3 imports
+  locais quebrados:
   `deck_analysis_tab.dart:5` resolvendo para `app/core/utils/mana_helper.dart`,
   `life_counter_screen.dart:7` resolvendo para `app/core/theme/app_theme.dart`,
   `server/bin/local_test_server.dart:3` importando o artefato ausente
   `server/.dart_frog/server.dart` (`dart analyze` do backend falha com
-  `uri_does_not_exist`), e um SCC de 2 arquivos entre
-  `CommunityDeckDetailScreen` e `UserProfileScreen`. `flutter analyze --no-pub`
-  do app foi nao conclusivo neste checkout porque dependencias Flutter e
+  `uri_does_not_exist`). A mesma varredura achou 1 SCC de 2 arquivos entre
+  `CommunityDeckDetailScreen` e `UserProfileScreen`, e nenhum outro ciclo local.
+  `flutter analyze --no-pub` do app foi nao conclusivo neste checkout porque
+  `app/.dart_tool/package_config.json` esta ausente e dependencias Flutter /
   `package:manaloom/...` nao estavam resolvidas.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1 — Ownership app-facing de IA/deck revalidado no checkout local**: a rodada de coerencia de 2026-06-02 23:00 UTC (`69b0c42b`) confirmou o drift entre app, rotas e support. `POST /ai/optimize` e chamado pelo app com `deck_id`, mas `server/routes/ai/optimize/index.dart` nao passa `userId` para `loadOptimizeDeckContext`, e `server/lib/ai/optimize_request_support.dart` consulta `decks`/`deck_cards` somente por `id`. `POST /ai/archetypes` tambem e chamado pelo app, mas a rota busca `SELECT name, format FROM decks WHERE id = @id` e cartas por `dc.deck_id = @id`, sem owner-scope. `GET /ai/optimize/jobs/:id` ainda aceita jobs com `user_id = NULL` porque so bloqueia quando `job.userId != null && job.userId != userId`. Corrigir antes de tratar esses endpoints como owner-safe; `POST /ai/rebuild`, `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e `POST /decks/:id/pricing` foram verificados como controles positivos porque buscam `decks` com `id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations` e `/decks/:id/simulate` nao tem consumidor app atual, mas seguem sem owner-scope e precisam de contrato antes de promocao.

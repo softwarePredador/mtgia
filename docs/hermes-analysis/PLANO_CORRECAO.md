@@ -11,7 +11,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-02 19:00 UTC. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
-   `eecb2f95` em 2026-06-02 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
+   `4795a07b` em 2026-06-03 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze` em `server/` falha com
    `uri_does_not_exist`.
@@ -59,12 +59,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app**: **REVALIDADO/ABERTO no checkout
-    local `eecb2f95` (2026-06-02 11:00 UTC).** `deck_analysis_tab.dart:5` e
+    local `4795a07b` (2026-06-03 11:00 UTC).** `deck_analysis_tab.dart:5` e
     `life_counter_screen.dart:7` ainda usam imports relativos que saem de
     `app/lib` e resolvem para `app/core/...`, enquanto os arquivos existentes
-    estao em `app/lib/core/...`. O ciclo direto entre
-    `CommunityDeckDetailScreen` e `UserProfileScreen` tambem permanece: cada
-    tela importa e instancia a outra por `Navigator.push`.
+    estao em `app/lib/core/...`. `server/bin/local_test_server.dart:3` ainda
+    depende do artefato ausente `server/.dart_frog/server.dart`. A varredura SCC
+    encontrou somente um ciclo local: `CommunityDeckDetailScreen` e
+    `UserProfileScreen` importam e instanciam uma a outra por `Navigator.push`.
 
 ## Achados priorizados
 
@@ -352,8 +353,8 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
-- **Status 2026-06-02 11:00 UTC: REVALIDADO/ABERTO no checkout local
-  `eecb2f95`.** A resolucao historica citada para `origin/master@a830f9f3` nao
+- **Status 2026-06-03 11:00 UTC: REVALIDADO/ABERTO no checkout local
+  `4795a07b`.** A resolucao historica citada para `origin/master@a830f9f3` nao
   esta presente nesta branch de memoria.
 - **Evidência**:
   - `dart analyze` em `server/` falhou com:
@@ -375,8 +376,8 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-06-02 11:00 UTC: REVALIDADO/ABERTO no checkout local
-`eecb2f95`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
+**Status 2026-06-03 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`4795a07b`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
 `origin/master@a830f9f3` nao estao refletidas nesta branch de memoria.
 
 - **Evidência**:
