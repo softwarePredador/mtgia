@@ -17,9 +17,20 @@ GET /ai/commander-reference?commander=Lorehold,%20the%20Historian&learning=1&inc
 2. Feito: validar `/health` em producao e confirmar o `git_sha` esperado.
 3. Feito: validar o endpoint alvo em producao.
 4. Em andamento: integrar no app/UI o bloco `commander_learning.recommended_deck`.
-5. Criar rotina idempotente Hermes -> PG para novos decks aprendidos.
-6. Adicionar teste especifico da rota garantindo que `commander_learned_decks` ativo tem prioridade sobre fallback deterministico.
+5. Feito: criar rotina idempotente Hermes -> PG para novos decks aprendidos.
+6. Feito: adicionar teste especifico da rota garantindo que `commander_learned_decks` ativo tem prioridade sobre fallback deterministico.
 7. Avaliar endpoint dedicado `/ai/commander-learning` se o payload da rota atual ficar pesado.
+
+## Rotina Idempotente Hermes -> PG
+```text
+dart run bin/commander_learned_deck.dart --input-json=<path> --dry-run
+dart run bin/commander_learned_deck.dart --input-json=<path> --apply
+```
+
+- Chave idempotente: `source_system + source_ref`.
+- Payload bruto Hermes com `id`, `commander`, `deck_name`, `card_list` e metadados e aceito.
+- `--apply` cria/atualiza `commander_learned_decks` e, por padrao, desativa outros decks ativos do mesmo comandante.
+- `--keep-other-active` preserva outros ativos quando necessario.
 
 ## Validacao Publica Executada
 Resumo sanitizado com usuario QA descartavel autenticado:
