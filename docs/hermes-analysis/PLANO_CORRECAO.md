@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-02 23:00 UTC
+> Data: 2026-06-03 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -27,7 +27,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    fonte/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-02 15:00 UTC. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-02 03:00 UTC. `LifeCounterScreen` segue
+   na rotacao local Codex de 2026-06-03 03:00 UTC. `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
    `DeckCard` continua testado mas sem import/chamada na listagem real;
    `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
@@ -612,13 +612,15 @@ presentes e sem chamador runtime confirmado.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-02 03:00 UTC: REVALIDADO.**
+- **Status 2026-06-03 03:00 UTC: REVALIDADO.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
-    `LifeCounterScreen`, mas `app/lib/main.dart:281`-`:283` usa
+    `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:283` usa
     `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
     `LifeCounterScreen(` apenas no construtor da propria classe.
-    `app/test/README.md:149` declara que o caminho oficial do contador nao e
+    `app/test/README.md:137` declara que a suite e legada de paridade historica
+    e que o caminho vivo segue em `LotusLifeCounterScreen`; `:149` declara que
+    o caminho oficial do contador nao e
     mais `LifeCounterScreen`; os testes
     `app/test/features/home/life_counter_screen_test.dart:9` e
     `app/test/features/home/life_counter_clone_proof_test.dart:10` importam a
@@ -641,6 +643,10 @@ presentes e sem chamador runtime confirmado.
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
     `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
     `app/lib`, `app/test` ou `app/integration_test`.
+  - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
+    `DeckProgressIndicator` seguem ativos; `PerformanceNavigatorObserver`,
+    `AppObservabilityNavigatorObserver` e `CardRecognitionService` foram
+    descartados como candidatos porque tem chamadas em `app/lib`.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
