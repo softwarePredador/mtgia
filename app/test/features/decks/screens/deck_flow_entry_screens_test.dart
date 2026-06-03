@@ -19,6 +19,19 @@ void main() {
     expect(find.text('Commander'), findsNothing);
   });
 
+  testWidgets(
+    'DeckGenerateScreen mostra atalho de deck aprendido em Commander',
+    (tester) async {
+      await tester.pumpWidget(wrap(const DeckGenerateScreen()));
+
+      expect(
+        find.byKey(const Key('deck-generate-learned-deck-button')),
+        findsOneWidget,
+      );
+      expect(find.text('Usar deck aprendido do comandante'), findsOneWidget);
+    },
+  );
+
   testWidgets('DeckImportScreen aplica o formato inicial vindo do fluxo', (
     tester,
   ) async {

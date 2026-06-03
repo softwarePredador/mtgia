@@ -26,6 +26,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   String _selectedFormat = 'Commander';
   bool _isGenerating = false;
+  bool _isLoadingLearnedDeck = false;
   Map<String, dynamic>? _generatedDeck;
   GenerateDeckCancellation? _generateCancellation;
   String _generationProgressMessage = 'Enviando pedido para a IA...';
@@ -179,6 +180,89 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
       }
+    }
+  }
+
+  Future<void> _loadLearnedCommanderDeck() async {
+    final commanderName = _selectedCommanderName();
+    if (commanderName == null || commanderName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe o comandante para buscar o deck aprendido.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoadingLearnedDeck = true;
+      _generatedDeck = null;
+      _generationProgressMessage = 'Buscando deck aprendido...';
+      _generationProgressStep = 1;
+    });
+
+    try {
+      final result = await context
+          .read<DeckProvider>()
+          .fetchCommanderLearningDeck(commanderName: commanderName);
+      if (!mounted) return;
+
+      final learning =
+          (result['commander_learning'] as Map?)?.cast<String, dynamic>() ??
+          const <String, dynamic>{};
+      final recommendedDeck =
+          (learning['recommended_deck'] as Map?)?.cast<String, dynamic>() ??
+          const <String, dynamic>{};
+      final cards = (recommendedDeck['cards'] as List?) ?? const [];
+      final commander = recommendedDeck['commander'];
+      if (recommendedDeck.isEmpty || cards.isEmpty) {
+        throw Exception('Nenhum deck aprendido ativo foi encontrado.');
+      }
+
+      final deckName = recommendedDeck['deck_name']?.toString().trim();
+      setState(() {
+        _deckNameController.text =
+            deckName == null || deckName.isEmpty ? 'Deck Aprendido' : deckName;
+        _generatedDeck = {
+          'generated_deck': {'commander': commander, 'cards': cards},
+          'validation':
+              recommendedDeck['validation'] ??
+              recommendedDeck['legality'] ??
+              const {'is_valid': true},
+          'diagnostics': {
+            'source': 'commander_learning',
+            'promoted_deck': learning['promoted_deck'],
+            'readiness': learning['readiness'],
+          },
+          'warnings': const {'invalid_cards': []},
+        };
+        _isLoadingLearnedDeck = false;
+        _generationProgressStep = 4;
+        _generationProgressMessage = 'Deck aprendido pronto para revisar.';
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = _previewKey.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingLearnedDeck = false;
+      });
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckGenerate,
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -469,7 +553,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             // Generate Button (CTA primeiro, para não ficar "abaixo do fold")
             ElevatedButton.icon(
               key: const Key('deck-generate-submit-button'),
-              onPressed: _isGenerating ? null : _generateDeck,
+              onPressed:
+                  _isGenerating || _isLoadingLearnedDeck ? null : _generateDeck,
               icon:
                   _isGenerating
                       ? const SizedBox(
@@ -491,8 +576,31 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
             ),
+            if (_usesCommanderField) ...[
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                key: const Key('deck-generate-learned-deck-button'),
+                onPressed:
+                    _isGenerating || _isLoadingLearnedDeck
+                        ? null
+                        : _loadLearnedCommanderDeck,
+                icon:
+                    _isLoadingLearnedDeck
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.school_outlined),
+                label: Text(
+                  _isLoadingLearnedDeck
+                      ? 'Buscando deck aprendido...'
+                      : 'Usar deck aprendido do comandante',
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
-            if (_isGenerating) ...[
+            if (_isGenerating || _isLoadingLearnedDeck) ...[
               _GenerateProgressPanel(
                 currentStep: _generationProgressStep,
                 message: _generationProgressMessage,

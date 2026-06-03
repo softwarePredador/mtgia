@@ -775,6 +775,36 @@ class DeckProvider extends ChangeNotifier {
     pollInterval: pollInterval,
   );
 
+  Future<Map<String, dynamic>> fetchCommanderLearningDeck({
+    required String commanderName,
+  }) async {
+    final commander = commanderName.trim();
+    if (commander.isEmpty) {
+      throw Exception('Informe um comandante para buscar o deck aprendido.');
+    }
+
+    final endpoint =
+        Uri(
+          path: '/ai/commander-reference',
+          queryParameters: {
+            'commander': commander,
+            'learning': '1',
+            'include_deck': '1',
+          },
+        ).toString();
+    final response = await _apiClient.get(endpoint);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        'Falha ao buscar deck aprendido (${response.statusCode}).',
+      );
+    }
+
+    final data = response.data;
+    if (data is Map<String, dynamic>) return data;
+    if (data is Map) return data.cast<String, dynamic>();
+    throw Exception('Resposta inválida ao buscar deck aprendido.');
+  }
+
   Future<DeckDetails> _ensureDeckLoadedForOptimization(String deckId) async {
     final deck = await _ensureDeckLoadedForMutation(deckId);
     if (deck == null) {
