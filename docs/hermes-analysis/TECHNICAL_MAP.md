@@ -199,7 +199,7 @@ diretamente e usa raridade como proxy de impacto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-02 07:00 UTC como aberto no checkout local `1600cd01`.
+  2026-06-03 07:00 UTC como aberto no checkout local `0d55a920`.
   `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
   `server/bin/sync_cards.dart` mantem copias privadas/inline de parse/extracao.
   Tambem seguem sem chamador runtime confirmado `getRequestTrace`/

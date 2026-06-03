@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-03 05:30 UTC
+> Data: 2026-06-03 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -49,7 +49,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-02 07:00 UTC como **ABERTO neste checkout `1600cd01`**.
+    2026-06-03 07:00 UTC como **ABERTO neste checkout `0d55a920`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma logica.
     Tambem seguem sem chamador runtime confirmado wrappers/helpers em request
@@ -443,8 +443,8 @@ SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-02 07:00 UTC:** **REABERTO no checkout local
-`codex/hermes-analysis-docs@1600cd01`**. As anotacoes historicas de resolucao em
+**Status 2026-06-03 07:00 UTC:** **REABERTO no checkout local
+`codex/hermes-analysis-docs@0d55a920`**. As anotacoes historicas de resolucao em
 outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
 presentes e sem chamador runtime confirmado.
 
@@ -456,7 +456,7 @@ presentes e sem chamador runtime confirmado.
     `database.dart` e `mtg_data_integrity_support.dart`, e ainda possui
     `_parseSinceDays` em `:376`-`:384`, montagem incremental inline em
     `:604`-`:663`, `_extractCardRow` em `:680` e coleta de oracle IDs/legalidade
-    inline em `:806`-`:839`.
+    inline em `:807`-`:837`.
   - `server/lib/request_trace.dart:48` e `:51` definem
     `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
     `context.read<RequestTrace>()` diretamente, por exemplo
