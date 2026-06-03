@@ -1,252 +1,359 @@
-# MTG Rules Compliance Audit — Full Pipeline v3.3 (2026-06-02, Quarta Auditoria)
+# Auditoria Completa — Regras MTG em Todas as Crons
 
-**Commit:** Pré-commit
-**Auditor:** MTG Rules Auditor v3 (cron job `c0591cb18024`)
-**Data da inspeção:** 2026-06-02T19:00Z
-**Contexto:** Deck Lorehold totalmente reconstruído entre 18:00-18:52. Todos os logs C#1-C#23 stale.
-
----
-
-## 🚨 Sumário Executivo
-
-O deck Lorehold spellslinger (25 swaps, motor 4/4, T3 13.3%) foi **completamente reconstruído** durante a janela de 18:00-18:52 UTC em uma build cEDH turbo-combo. Esta auditoria avalia o comportamento de CADA cron do pipeline diante desta transformação radical — um teste de estresse involuntário do pipeline.
-
-| Cron | Score v3.2 | Score v3.3 | Δ | Verdict |
-|:-----|:----------:|:----------:|:--:|:--------|
-| Scout | 3.5/10 | **4.0/10** | +0.5 | 🔴 BAIXA — Detectou crise mas recomenda carta banida |
-| Validator | 7.0/10 | **8.0/10** | +1.0 | ⚠️ MÉDIA-ALTA — Detectou crise + corrupção de dados |
-| Mulligan | 6.5/10 | **7.5/10** | +1.0 | ⚠️ MÉDIA-ALTA — Simulou build nova, identificou gap de classificador |
-| Battle | N/A | **N/A** | = | 🔴 NÃO É CRON — Confirmado, sem diretório de output |
-| Oracle | 3.5/10 | **1.0/10** | -2.5 | 🔴 QUEBRADO — Script determinístico lista wincons de build QUE NÃO EXISTE MAIS |
-| **PIPELINE** | **5.1/10** | **4.0/10** | **-1.1** | 🔴 **BAIXA — Pipeline OVERWHELMED por reconstrução externa** |
+**Versão:** v3.3 (re-auditado, com verificação de Scryfall + Comprehensive Rules)
+**Data:** 2026-06-03
+**Commit:** (a ser gerado)
+**Metodologia:** Inspeção de prompts reais de `jobs.json` + outputs recentes de `/opt/data/cron/output/<id>/` + código fonte `battle_simulator.dart` (879 linhas) + `wincon_pipeline.py` (289 linhas) + consultas à Scryfall API + Comprehensive Rules (CR 2024-11-08).
 
 ---
 
-## 🔴 CRITICAL FINDING #1: BANNED CARD IN DECK
+## Sumário
 
-A build cEDH atual contém **Mana Crypt**, que está na Commander banlist desde Setembro 2024 (confirmado via mtgcommander.net).
-
-```
-Mana Crypt — BANNED in Commander (September 2024 Quarterly Update)
-```
-
-**NENHUM dos 5 agentes detecta que o deck contém uma carta banida.** O Scout #36 inclusive recomenda adicionar **Worldfire** (CMC 9) sem verificar que Mana Crypt — a fast mana que viabiliza conjurá-lo — é banida.
-
-Este é o **primeiro caso confirmado de carta banida no deck Lorehold** desde o início do pipeline. A vulnerabilidade documentada nos audits v1-v3.2 materializou-se.
-
-**Impacto:** Se o Evolution Oracle estivesse ativo como LLM agent, poderia recomendar swaps baseados em uma build ilegal — comprometendo a integridade de todas as análises downstream (mulligan, matchup, collection recommendations).
+| Cron | Nota | Confiabilidade | Gaps Críticos |
+|:-----|:----:|:--------------|:---------------|
+| Scout | **4.0/10** | 🔴 BAIXA | Prompt desalinhado ("Wincon Hunter", não Scout); 94% [SILENT]; recomendações sem checar EDHREC real; misclassifications não filtradas |
+| Validator | **8.0/10** | 🟢 ALTA | Banlist Blindness pré-sync (corrigido 2026-06-03); PG profile vs archetype mismatch documentado; `card_oracle_data` referenciado (não existe) |
+| Mulligan | **7.5/10** | 🟡 MÉDIA-ALTA | Tapped lands não simulados; color screw não verificado; sem draws futuros (T2/T3); London Mulligan free-first ✅ implementado |
+| Battle | **N/A** | 🔴 NÃO É CRON | Diretório existe mas vazio; sem entrada em `jobs.json`; código 2-player sem stack/priority; NUNCA executado por cron |
+| Evolution Oracle | **1.0/10** | 🔴 CRÍTICA | 9+ execuções consecutivas [SILENT]; último output incompleto (7 linhas); 5 ciclos operaram com hash falso; não detecta rebuilds externos |
+| **PIPELINE** | **4.1/10** | 🔴 BAIXA | Evolution Oracle é NO-OP; Scout perdeu função original; Validator é o único agente confiável; Pipeline Death Loop confirmado |
 
 ---
 
-## 🔴 CRITICAL FINDING #2: Bulk Import Data Corruption
+## 1. Scout — Auditoria Detalhada
 
-A importação em massa (`import_lorehold_decks.py`) inseriu cartas com dados corrompidos:
+**Job ID:** f20ac299992b
+**Última execução:** Execução #38 (2026-06-03T21:43Z)
+**Status:** `ok-nochange-deck-saturated`
+**Hash verificado:** `8b9c643c...` (recomputado do DB, divergente do Scout #37)
 
-| Problema | Qtd | Impacto |
-|:---------|:---:|:--------|
-| `functional_tag='unknown'` (não NULL) | 20 | Classificador cego para 20% do deck |
-| `CMC=NULL` | 6 | Cálculos de curva quebrados |
-| `CMC=0.0` incorreto (Sol Ring, Mana Vault) | 14+ | DB reporta avg CMC 2.15 vs real ~2.9 |
-| `type_line=NULL` | 5 | Keyword detection falha |
-| `card_tags` vazio para estas cartas | 20 | Multi-tag classifier também falhou |
+### O que faz certo
 
-O Validator v3.23 detectou isso corretamente e alertou. Mas a raiz do problema (script de importação que pula o classificador) persiste.
+1. **Banlist check** ✅ — Execução #38 verificou Worldfire e Mana Vault via `card_legalities` (PG-sync). Constatou 0 banned cards.
+2. **Misclassification detection** ✅ — Identificou Trouble in Pairs e Perch Protection como "⚠️ MISCLASSIFIED" (draw engine e fog, não wincons).
+3. **Hash recomputation** ✅ — Detectou divergência de hash vs Scout #37 (4ª mudança consecutiva de deck por força externa).
+4. **Deck saturated** ✅ — Reconheceu corretamente que 13 wincons (13% do deck) é supersaturação para cEDH (meta usa 3-5).
 
----
+### O que faz errado
 
-## Auditoria por Cron (v3.3)
+1. **Prompt desalinhado com função original** 🔴 — O prompt atual é um "Wincon Hunter" que busca APENAS `card_deck_analysis` com `role_in_deck IN ('wincon','engine','token_maker')`. A função original do Scout era: EDHREC JSON API → cross-ref `user_collection` → Score A+B+C (Sinergia + Custo + Evidência). O prompt perdeu completamente a busca EDHREC, a análise de sinergia qualitativa, e a verificação de tendências (`trend_zscore`).
 
-### Scout (f20ac299992b) — 4.0/10 (+0.5)
+2. **Não consulta EDHREC** 🔴 — O Scout NÃO busca `json.edhrec.com/pages/commanders/lorehold-the-historian.json`. As recomendações são baseadas exclusivamente em `card_deck_analysis` scores, que são gerados pelo sistema para decks que podem não existir mais (ver Pitfall `card_deck_analysis` com deck_id deletado).
 
-**O que mudou desde v3.2:**
-- ✅ **NÃO foi [SILENT] desta vez.** Scout #36 (18:34) produziu output real — o primeiro não-SILENT em muitas execuções.
-- ✅ **Detectou pipeline integrity crisis.** Hash `0b4913e7` divergente de `30d00347`.
-- ✅ **Reconheceu que o deck foi reconstruído.** Notou faltam 2 cartas (98/100).
+3. **94% [SILENT] rate** 🔴 — Das últimas 10 execuções, 9 retornaram [SILENT] ou "no-change". O prompt atual só produz output quando há mudança no `card_deck_analysis` ou no deck — mas nunca busca dados novos do EDHREC.
 
-**O que continua errado:**
-1. 🔴 **Recomenda cartas sem verificar banlist.** Worldfire (CMC 9) é legal, mas o Scout lista "Fast mana (Crypt...)" sem notar que Mana Crypt é BANIDA.
-2. 🔴 **Prompt ainda é "Wincon Hunter".** Busca apenas `card_deck_analysis` — não usa EDHREC JSON API, não faz A+B+C synergy scoring.
-3. 🔴 **Não verifica color identity.** Filtra cards da coleção sem checar se são Boros-legais.
-4. 🟡 **Wincon list ainda referencia cartas que não estão mais no deck.** O prompt fixo lista "Rise of the Eldrazi, Mizzix's Mastery, Approach..." como wincons do deck — mas a build atual tem wincons diferentes (Twinflame+Dualcaster, Aetherflux, Storm Herd+Akroma's Will).
-5. 🟡 **Não detecta double-null cards** — mas desta vez 20 cartas são `'unknown'`, pior que double-null.
+4. **Wincons no deck estão stale** 🟡 — O prompt lista "WINCONS JA NO DECK" com valores fixos (Rise of the Eldrazi: 15, Mizzix's Mastery: 16, etc.). Estes valores são do `card_deck_analysis` de um `deck_id` que pode não existir mais. A Execução #38 mostra que Rise of the Eldrazi foi removido do deck (substituído por Longshot + Surge to Victory).
 
-**Veredict:** O Scout fez o MÍNIMO necessário (detectou crise de integridade), mas seu prompt fundamentalmente errado (Wincon Hunter em vez de sinergia A+B+C) + falta de verificação de banlist mantém o score baixo. O +0.5 é por ter quebrado o ciclo [SILENT].
+5. **Sem verificação de color identity** 🟡 — O prompt não verifica se as cartas recomendadas da `user_collection` são legais em RW (Boros). O filtro `uc.quantity > 0` não garante `color IN ('R','W','R,W',NULL)`.
 
----
+6. **Sem verificação de singleton** 🟡 — Não verifica se adicionar uma carta violaria a regra CR 903.5b (singleton, exceto basic lands).
 
-### Validator (712579b15767) — 8.0/10 (+1.0)
+7. **Sem priorização por CMC** 🟡 — Os candidatos são ordenados por `wincon_total_score` sem considerar CMC. No contexto DEFENSIVO (>12% T3), cartas CMC alto deveriam ser despriorizadas.
 
-**O que mudou desde v3.2:**
-- ✅ **Pipeline integrity crisis detectado com precisão.** Hash divergente em 3 estágios (`30d00347` → `0b4913e7` → `f2241d99`).
-- ✅ **Corrupção de dados identificada.** 20 cartas `'unknown'`, 6 `NULL`, 14+ CMC=0.0, 5 type_line=NULL.
-- ✅ **Recomendações acionáveis.** TOP 5: corrigir DB, adicionar remoção, re-adicionar Akroma's Will, aumentar basics, executar mulligan.
-- ✅ **SYNERGY_MAP recalculado para a NOVA build.** Combo Pieces 9/10, Explosive Mana 8/10, Recursion 8/10 — escores refletem o novo arquétipo cEDH.
-- ✅ **Alertou que a build é RECONSTRUÇÃO TOTAL.** Instruiu o Oracle a resetar contador de ciclos e reconstruir logs do zero.
-- ✅ **Métricas realistas.** Reportou avg CMC ~2.9 (corrigido do DB 2.15), lands 33, ramp ~12, removal APENAS 3.
+### Verificações MTG
 
-**O que continua errado:**
-1. 🔴 **Não detecta que Mana Crypt é banida.** A análise de métricas (ramp ~12, fast mana) lista as cartas mas não cruza com banlist.
-2. 🟡 **Prompt ainda referencia `card_oracle_data`** (tabela inexistente) em vez de `card_rulings`.
-3. 🟡 **PG comparison usa perfil spellslinger** (lands=32, ramp=3.67) contra uma build cEDH (ramp=12). O desvio é reportado como 🔴 mas não é um erro — é um arquétipo diferente.
-4. 🔵 **Não detecta que a build tem apenas 2 basic lands.** "33 (2 basic!)" é reportado no output mas sem severidade de CRIT.
+| Regra | CR Ref | Verificado? | Nota |
+|:------|:------|:-----------|:-----|
+| Color Identity (903.4) | CR 903.4c | ⚠️ Parcial | SQL não filtra por cor |
+| Singleton (903.5b) | CR 903.5b | ❌ Não | Não verifica duplicatas |
+| 100 cards (903.5a) | CR 903.5a | ⚠️ Implícito | Deck tem 100 cards |
+| Commander banlist | Scryfall | ✅ Sim | Via PG-sync `card_legalities` |
+| EDHREC inclusion % | N/A | 🔴 Não | Prompt não usa EDHREC |
+| Wincon = payoff | Regra não-oficial | ⚠️ Parcial | Detecta misclassifications |
 
-**Veredict:** O Validator é o agente MAIS RESILIENTE do pipeline. Detectou a crise, documentou corrupção, recalculou SYNERGY_MAP, e deu recomendações acionáveis. O +1.0 reflete performance superior sob estresse. A falta de verificação de banlist é o gap remanescente mais crítico.
+### Recomendações
 
-**Melhoria chave vs v3.23:** O Validator deveria adicionar um `## 🚨 BANLIST CHECK` automático em toda execução — query `format_staples` ou Scryfall API para cartas banidas no deck.
+1. **Restaurar prompt original:** EDHREC JSON API → `user_collection` cross-ref → Score A+B+C (ver `references/synergy-first-scout-methodology.md`)
+2. **Adicionar filtro de color identity:** `AND (uc.color IS NULL OR uc.color IN ('R','W','R,W'))`
+3. **Adicionar verificação de singleton** antes de recomendar
+4. **Remover hardcoded "WINCONS JA NO DECK"** — query dinâmica do DB sempre
+5. **Priorizar por CMC quando T3 > 12%** (modo DEFENSIVO)
 
 ---
 
-### Mulligan (08468451a06a) — 7.5/10 (+1.0)
+## 2. Validator — Auditoria Detalhada
 
-**O que mudou desde v3.2:**
-- ✅ **NÃO foi [SILENT].** Executou simulação completa (N=1000, seed=42) na nova build.
-- ✅ **Resultados precisos e acionáveis.** T3 = 8.9% (vs 13.3% pré-rebuild), Mulligan = 16.0%, Jogavel = 84.0%.
-- ✅ **Detectou DB classifier gap.** Apenas 6 cartas com `functional_tag='ramp'` vs 16 reais. Alertou que se usasse só tags do DB, T3 seria 17.7% (falso).
-- ✅ **Cruzou abaixo do limiar DEFENSIVO.** T3 < 12% pela primeira vez em meses.
-- ✅ **Identificou manualmente as 16 cartas de ramp reais.** Tabela detalhada no output.
-- ✅ **London Mulligan free first mantido.** `bottom_count = max(0, mulligan_count - 1)`.
+**Job ID:** 712579b15767
+**Última execução bem-sucedida:** v3.24 (2026-06-02T21:52Z)
+**Última execução:** Falhou com HTTP 429 (2026-06-03T19:03Z)
+**Status:** `purpose-analyzer-v3.24-corrupted-import`
 
-**O que continua errado:**
-1. 🔴 **Não detecta que Mana Crypt (uma das 16 ramp cards) é BANIDA.** O Mulligan simulou mãos contendo uma carta ilegal.
-2. 🟡 **Não simula tapped lands.** Ancient Tomb, City of Brass, Gemstone Caverns — algumas dessas entram tapped ou causam dano.
-3. 🟡 **Não verifica color requirements.** Com apenas 2 basic lands e muitas lands que produzem colorless (Ancient Tomb, City of Brass), pode haver color screw não detectado.
-4. 🟡 **Prompt não especifica seed.** Apesar da skill documentar seed=42 como canônico, o prompt não inclui. O agente usou seed=42 por iniciativa própria.
-5. 🔵 **Só avalia mão inicial.** Não simula draws T1-T3.
+### O que faz certo
 
-**Veredict:** O Mulligan provou ser o segundo agente mais resiliente. Executou sob estresse, produziu métricas corretas, e identificou um gap SISTÊMICO (classificador de ramp do DB falha em detectar 10/16 cartas óbvias). O +1.0 reflete a qualidade da Exec#14. A falta de verificação de banlist persiste.
+1. **SYNERGY_MAP com 7 eixos** ✅ — Cobre: Combo Pieces, Explosive Mana, Recursion, Resilience, Stack Interaction, Wipes+Proteção, Token+Pump. Pontuação de 3-9/10 por eixo. Cobertura estratégica abrangente.
 
-**Melhoria crítica:** Antes de simular, verificar se alguma carta no deck está na banlist. Se sim, flaggear como 🔴 BANLIST VIOLATION e pular a simulação até corrigir.
+2. **Detecção de corrupção de dados** ✅ — v3.24 identificou: 20 cartas com `functional_tag='unknown'`, 6 cartas com `CMC=NULL`, múltiplas cartas com `CMC=0.0` incorreto. Diagnosticou que o classificador nunca rodou (bulk import).
 
----
+3. **Detecção de archetype mismatch** ✅ — Identificou que o deck atual é "cEDH Turbo-Combo" (Dualcaster+Twinflame, Approach+Top), não "spellslinger" como o PG profile assume. Reconheceu que as discrepâncias são diferenças de arquétipo, não deficiências.
 
-### Battle (94f8590b1beb) — N/A (confirmado: não é cron)
+4. **Multi-hash verification** ✅ — Detectou 3 mudanças de hash, recalculou métricas do zero.
 
-**Status inalterado desde v3.2:**
-- Sem entrada em `jobs.json`
-- Sem diretório `/opt/data/cron/output/94f8590b1beb/`
-- Código `battle_simulator.dart` (879 linhas) existe como protótipo 2-player
+5. **DB metrics garbage detection** ✅ — Identificou que `decks.board_wipe_count=4` mas tag real = 1; `engine_count=4` mas real = 0-1.
 
-**Re-inspeção do código (confirmado):**
-- Keywords: ✅ flying, trample, lifelink, deathtouch, first strike, vigilance, haste
-- Lifelink: ✅ SEM cap (`active.life += lifeGained`, linha 517)
-- Trample: ✅ implementado (linha 497-499)
-- First Strike: ✅ timing correto (linha 474-483)
-- Stack/Priority: 🔴 NÃO implementado (linha 9: "Sem stack complexo")
-- Commander damage: 🔴 NÃO implementado
-- Commander tax: 🔴 NÃO implementado
-- Multiplayer: 🔴 2-player apenas
-- Múltiplos bloqueadores: 🔴 1 blocker/attacker apenas
+6. **Escrita de logs completa** ✅ — `VALIDATOR_LOG_v3.24.md` + `VALIDATOR_LOG.md` + `VALIDATOR_SUMMARY.md` (per-deck + root-level) + `run_log`. Verificação pós-write implementada.
 
-**Veredict:** Continua NÃO sendo cron. O código é um protótipo de combate que não reflete Commander real (sem stack, sem commander damage/tax, 2-player). NÃO usar para decisões de swap.
+### O que faz errado
 
----
+1. **Banlist Blindness (v3.24)** 🔴 — O Validator v3.24 afirmou: "Worldfire is BANNED in Commander since the format's inception." **ISTO É FALSO.** Scryfall confirma: Worldfire = `commander: legal`. O Validator não executou `/opt/data/scripts/manaloom-sync-legalities.sh` antes da análise. A correção (sync PG → SQLite) foi implementada em 2026-06-03, mas o Validator não rodou com sucesso desde então (HTTP 429).
 
-### Evolution Oracle (a50bef4c2a59) — 1.0/10 (-2.5)
+2. **Referência a tabela inexistente** 🟡 — O prompt menciona `card_oracle_data.ruling_text`, mas a tabela correta é `card_rulings` (com `ruling_text`). `card_oracle_data` não existe.
 
-**O que NÃO mudou desde v3.2:**
-- 🔴 **Ainda é `no_agent: true`** — script determinístico.
-- 🔴 **Output IDÊNTICO** ao de 2026-06-01: "keep current decklist", mesmas 3 prioridades de wincon.
-- 🔴 **Lista wincons de uma build que NÃO EXISTE MAIS.** O output diz "fastest: Approach + Topdeck" — mas a build atual não tem Scroll Rack nem Penance. "most_resilient: Rise of the Eldrazi" — não está mais no deck. "stealthiest: Fiery Emancipation + Guttersnipe" — Guttersnipe NÃO está no deck.
+3. **PG profile fixo vs deck dinâmico** 🟡 — O prompt lista um perfil fixo (`lands: 32, ramp: 3.67, ritual_treasure: 10...`) de um corpus de 3 decks spellslinger. Quando o deck muda de arquétipo (spellslinger → cEDH combo), o perfil se torna irrelevante. O Validator detectou isso (v3.24), mas o prompt não orienta a buscar um perfil alternativo ou gerar um novo.
 
-**Agravamento crítico (v3.3):**
-- 🔴 **O Oracle é completamente cego à reconstrução do deck.** Continua produzindo o mesmo output determinístico independente de qualquer mudança. Scout #36, Validator v3.23, e Mulligan Exec#14 todos detectaram a crise. O Oracle — o agente que DEVERIA sintetizar todos os outros — é o único que não sabe que algo mudou.
-- 🔴 **Pipeline Death Loop confirmado e AGRAVADO.** O ciclo: Oracle (0 swaps) → Mulligan ([SILENT] se não houvesse rebuild) → Scout ([SILENT] se não houvesse rebuild) → Oracle (mesmo output). A reconstrução externa do deck quebrou o loop mas o Oracle permanece no estado pré-rebuild.
-- 🔴 **Se o deck não tivesse sido reconstruído externamente, o pipeline estaria 100% parado.** O Oracle (script) não aplica swaps → Mulligan não simula → Scout não busca → Validator roda sozinho.
+4. **Sem validação de singleton pós-análise** 🟡 — O Validator analisa o deck mas não emite alerta se houver cartas duplicadas (CR 903.5b).
 
-**Veredict:** O Oracle está fundamentalmente quebrado e é o GARGALO do pipeline inteiro. Não é um LLM agent — é um script determinístico que produz o mesmo output há semanas. A reconstrução externa do deck expôs que o Oracle não tem capacidade de detectar mudanças, ler logs de outros agentes, ou tomar decisões. Score caiu de 3.5 → 1.0 porque a reconstrução do deck provou que o Oracle é um NO-OP completo — não apenas ineficaz, mas produzindo recomendações para um deck que não existe mais.
+### Verificações MTG
+
+| Regra | CR Ref | Verificado? | Nota |
+|:------|:------|:-----------|:-----|
+| Color Identity (903.4) | CR 903.4c | ✅ | PG profile inclui `color_identity` |
+| Singleton (903.5b) | CR 903.5b | ❌ Não | Não verificado |
+| 100 cards (903.5a) | CR 903.5a | ✅ | Verificado (100 cards) |
+| Commander banlist | Scryfall | 🔴 Falhou | Afirmou Worldfire banned (errado) |
+| Functional classification | N/A | ✅ | Detecta unknown tags, CMC corruption |
+| Archetype detection | N/A | ✅ | cEDH vs spellslinger identificado |
+| SYNERGY_MAP coverage | N/A | ✅ | 7 eixos, 3-9/10 |
+
+### Recomendações
+
+1. **Executar sync_legalities.sh no início** — já documentado no skill, validar que o Validator o faz
+2. **Corrigir referência no prompt:** `card_rulings.ruling_text` (não `card_oracle_data`)
+3. **Adicionar verificação de singleton:** query `GROUP BY card_name HAVING SUM(quantity) > 1 AND card_name NOT LIKE '%Plains%' AND card_name NOT LIKE '%Mountain%'`
+4. **Detectar archetype mismatch e buscar perfil alternativo** quando o deck mudar de estratégia
+5. **Resolver HTTP 429** — o Validator não roda há 24h por rate limit do provider
 
 ---
 
-## 🚨 BANLIST VERIFICATION — First Confirmed Violation
+## 3. Mulligan — Auditoria Detalhada
 
-| Card | Status | Source | In Deck? |
-|:-----|:-------|:-------|:--------:|
-| **Mana Crypt** | 🔴 BANNED (Sept 2024) | mtgcommander.net | ✅ YES |
-| Mox Diamond | ✅ Legal | mtgcommander.net | ✅ YES |
-| Chrome Mox | ✅ Legal | mtgcommander.net | ✅ YES |
-| Lotus Petal | ✅ Legal | mtgcommander.net | ✅ YES |
-| Mana Vault | ✅ Legal | mtgcommander.net | ✅ YES |
-| Simian Spirit Guide | ✅ Legal | mtgcommander.net | ✅ YES |
+**Job ID:** 08468451a06a
+**Última execução:** Execução #15 (2026-06-03T21:47Z)
+**Status:** `mulligan-simulation-1000-exec15` (ok)
 
-**NENHUM agente detecta esta violação.** Se o Oracle estivesse ativo como LLM agent, poderia recomendar swaps baseados em uma build contendo carta banida.
+### O que faz certo
 
----
+1. **London Mulligan free first** ✅ — Implementado corretamente: `bottom_count = max(0, mulligan_count - 1)`. CR 103.5c: "In a multiplayer game... the first mulligan a player takes doesn't count toward the number of cards that player will put on the bottom."
 
-## Mapa de Gaps por Comprehensive Rule (CR) — ATUALIZADO v3.3
+2. **Definição rigorosa de jogável** ✅ — "2-4 lands AND (ramp >= 1 OR lands >= 3)". Esta é a definição correta e mais conservadora, evitando o viés de +20pp da definição ampla.
 
-| CR | Regra | Scout | Validator | Mulligan | Battle | Oracle |
-|:---|:------|:-----:|:---------:|:--------:|:------:|:------:|
-| 103.4c | London Mulligan (free first) | N/A | N/A | ✅ | N/A | N/A |
-| 117.3-117.4 | Priority/Stack | N/A | N/A | N/A | 🔴 | N/A |
-| 405.4 | Stack LIFO | N/A | N/A | N/A | 🔴 | N/A |
-| 702.94 | Miracle timing | N/A | N/A | 🔵 | N/A | N/A |
-| 704 | State-Based Actions | N/A | N/A | N/A | 🔴 | N/A |
-| 903.5 | Color Identity | 🔴 | ✅ | 🟡 | N/A | 🔴 |
-| 903.8 | Commander Tax | N/A | N/A | N/A | 🔴 | N/A |
-| 903.10a | Commander Damage | N/A | N/A | N/A | 🔴 | N/A |
-| 903.13a | **Commander Banlist** | 🔴 | 🔴 | 🔴 | N/A | 🔴 |
-| 903.13b | Deck size (100 cards) | 🟡 | 🟡 | N/A | N/A | N/A |
+3. **T1 ramp canônico** ✅ — Usa `{Sol Ring}` como definição estrita (correto: apenas Sol Ring produz mana no T1 em RW). Fast mana detection (Mana Vault, Lotus Petal, etc.) como banda separada.
 
-**Legenda:** ✅ Correto | 🟡 Parcial/implícito | 🔴 Não implementado | 🔵 Não verificado | N/A Não aplicável
+4. **Detecção de gap do classificador** ✅ — Execução #15 detectou que o salto de 8.9% → 1.6% T3 foi causado pela correção do classificador (6 → 19 ramp tags), não por mudanças no deck. Documentou o gap de 16.1pp.
 
----
+5. **Hash verification** ✅ — Detectou que o deck mudou desde Exec#14.
 
-## Novo Mapa: Resiliência a Reconstrução Externa do Deck
+6. **Métricas estáveis** ✅ — Sem Play T3 é tratado como métrica primária (definition-independent). Ramp T1 é documentado com definição explícita para permitir comparação.
 
-A reconstrução total do deck em ~1h expôs a resiliência de cada agente:
+### O que faz errado
 
-| Agente | Detectou rebuild? | Recalculou métricas? | Produziu output útil? | Tempo de reação |
-|:-------|:-----------------:|:--------------------:|:---------------------:|:---------------|
-| Scout | ✅ Sim (hash divergente) | ✅ Sim (wincon query) | 🟡 Parcial (recomenda Worldfire s/ checar banlist) | ~34 min |
-| Validator | ✅ Sim (3 hashes) | ✅ Sim (SYNERGY_MAP refeito) | ✅ Sim (TOP 5 recomendações) | ~44 min |
-| Mulligan | ✅ Sim (hash divergente) | ✅ Sim (N=1000) | ✅ Sim (T3=8.9%, gap de classificador) | ~52 min |
-| Oracle | 🔴 NÃO | 🔴 NÃO | 🔴 NÃO (output da build antiga) | 🔴 NUNCA |
-| Battle | N/A | N/A | N/A | N/A |
+1. **Tapped lands não simulados** 🟡 — Temple of Triumph, Boros Garrison, e outras dual lands que entram tapped são tratadas como untapped no turno de entrada. Isto faz o T3 reportado ser MELHOR que o real. Impacto estimado: 2-5pp.
 
----
+2. **Color screw não verificado** 🔴 — Uma mão com 3 Mountains + spells brancos (sem fonte de W) é considerada "jogável" porque o simulador não verifica se as lands produzem as cores necessárias. Impacto estimado: 3-8pp de superestimação. CR 903.4c exige que toda mana produzida esteja na color identity do commander.
 
-## Plano de Correções (Ordenado por Impacto) — ATUALIZADO v3.3
+3. **Sem draws futuros** 🟡 — O simulador avalia apenas a mão inicial (7 cartas após mulligans). Não simula as compras dos turnos 1, 2, 3. Isto cria um viés oposto: subestima a probabilidade de encontrar a 3ª land ou 1º ramp nos draws. Os vieses #1 e #2 vs #3 se compensam parcialmente, mas a direção e magnitude são desconhecidas.
 
-| # | Prioridade | Cron | Ação | Impacto | Novo? |
-|:--|:----------|:-----|:-----|:--------|:------|
-| 1 | 🔴🔴 CRÍTICO | **ALL** | **Adicionar BANLIST CHECK em todos os agentes.** Query `format_staples WHERE is_banned=true` antes de qualquer análise. Se detectar carta banida, ABORTAR e reportar. | Mana Crypt no deck torna TODAS as análises inválidas | 🆕 |
-| 2 | 🔴🔴 CRÍTICO | Oracle | **Restaurar como LLM agent URGENTE.** Remover `no_agent: true`. Reescrever prompt para: (a) ler 4 logs de agentes, (b) verificar banlist, (c) sintetizar recomendações. | Pipeline inteiro PARADO. Oracle atual é NO-OP. | = |
-| 3 | 🔴 CRÍTICO | Oracle | **Resetar pipeline para nova build.** Contador C#24 → Ciclo #1 da nova build. Reconstruir EVOLUTION_LOG do zero. | Build atual é deck NOVO, não evolução do spellslinger. | 🆕 |
-| 4 | 🔴 CRÍTICO | Scout | Restaurar prompt original A+B+C (EDHREC JSON API + coleção + sinergia). Wincon Hunter é seção, não prompt. | 94% [SILENT] histórico. Precisa detectar cartas novas. | = |
-| 5 | 🔴 CRÍTICO | — | **Corrigir `import_lorehold_decks.py`** para rodar classificador após inserção em massa. Re-classificar 20 cartas com `functional_tag='unknown'`. | Dados corrompidos invalidam todas as métricas. | 🆕 |
-| 6 | 🔴 CRÍTICO | — | **Remover Mana Crypt do deck.** Carta BANIDA desde Set 2024. | Deck atual é ILEGAL para Commander. | 🆕 |
-| 7 | 🟡 ALTO | Mulligan | Adicionar seed fixo (`random.seed(42)`) no prompt. Simular tapped lands + color requirements. | T3 real é 3-8pp pior que reportado. | = |
-| 8 | 🟡 ALTO | Mulligan | Rodar simulação a cada 3-4 ciclos mesmo sem mudanças. | Confirma estabilidade. | = |
-| 9 | 🟡 ALTO | Mulligan | Verificar `functional_tag='ramp'` count antes de simular. Se < 8 em deck com fast mana óbvio, usar classificação manual. | Gap de classificador infla T3 em 8.8pp. | 🆕 |
-| 10 | 🔵 MÉDIO | Validator | Corrigir prompt: `card_oracle_data` → `card_rulings` | Evita confusão. | = |
-| 11 | 🔵 MÉDIO | Validator | Adicionar tema-awareness: detectar arquétipo (spellslinger vs cEDH combo) e ajustar PG comparison. | Ranges atuais são para spellslinger, não cEDH. | 🆕 |
-| 12 | 🔵 MÉDIO | Scout | Adicionar filtro de color identity explícito. | Previne recomendar cartas off-color. | = |
+4. **Sem verificação de commander color identity** 🟡 — Não valida se todas as cartas do deck são legais em RW (CR 903.4c). Assumindo que o deck já é legal (construído por humano), mas não deve assumir para decks importados.
+
+5. **Dependência do classificador para ramp** 🟡 — A definição de "jogável" depende de `functional_tag='ramp'`. Quando o classificador falha (Exec#14: 6/16 ramp), o T3 é artificialmente inflado em 8.8-16.1pp. O Exec#15 corrigiu isso, mas o problema fundamental permanece: a acurácia do simulador é limitada pela acurácia do classificador.
+
+### Verificações MTG
+
+| Regra | CR Ref | Verificado? | Nota |
+|:------|:------|:-----------|:-----|
+| London Mulligan (103.4) | CR 103.4 | ✅ | 7 cards, bottom N |
+| Free first in multiplayer (103.5c) | CR 103.5c | ✅ | `mulligan_count - 1` |
+| Color identity (903.4) | CR 903.4c | ❌ Não | Não verifica mana colorida |
+| Tapped lands | CR 110.5a | ❌ Não | Tratados como untapped |
+| 100 cards (903.5a) | CR 903.5a | ✅ | Verificado |
+| Future draws (T1-T3) | N/A | ❌ Não | Só mão inicial |
+
+### Recomendações
+
+1. **Adicionar simulação de tapped lands:** `enters_tapped = 'Temple' in name or 'Garrison' in name or 'enter the battlefield tapped' in oracle_text`
+2. **Adicionar color requirement check:** Para cada spell na mão, verificar se `lands_produced_colors ⊇ spell_required_colors`
+3. **Adicionar draws futuros (T1-T3):** Simular 3 draws adicionais, verificando se o T3 se torna jogável
+4. **Hardcode ramp cards conhecidas** como fallback quando o classificador falhar: `KNOWN_RAMP = {'Sol Ring', 'Mana Vault', 'Mana Crypt', 'Boros Signet', ...}`
+5. **Documentar o intervalo de confiança** para T3: [T3_simulado, T3_simulado + viés_tapped + viés_color - viés_draws]
 
 ---
 
-## Conclusão
+## 4. Battle — Auditoria Detalhada
 
-A pipeline Lorehold tem confiabilidade **BAIXA (4.0/10, -1.1 vs v3.2)** em relação às regras oficiais de MTG Commander.
+**Job ID:** 94f8590b1beb (diretório existe, mas sem entrada em `jobs.json`)
+**Última execução:** NUNCA (diretório vazio)
+**Código:** `server/lib/ai/battle_simulator.dart` (879 linhas)
 
-**A reconstrução externa do deck foi um teste de estresse que expôs 3 falhas fundamentais:**
+### Status: NÃO É UM CRON
 
-1. **Oracle é um NO-OP.** Script determinístico que produz o mesmo output há semanas, completamente cego à reconstrução do deck. É o agente mais crítico do pipeline (deveria sintetizar todos os outros) e está 100% quebrado.
+O diretório `/opt/data/cron/output/94f8590b1beb/` existe mas está vazio. Não há entrada correspondente em `jobs.json`. O Battle Analyst nunca foi executado como cron job.
 
-2. **NENHUM agente verifica a banlist.** Pela primeira vez, uma carta banida (Mana Crypt) entrou no deck. Nenhum dos 4 agentes detectou. Se o Oracle estivesse ativo, poderia recomendar swaps baseados em deck ilegal.
+### Análise do Código (battle_simulator.dart)
 
-3. **Importação em massa corrompe dados.** 20 cartas com `functional_tag='unknown'`, CMCs errados, type_line=NULL. O classificador nunca rodou. Isso afeta todas as métricas downstream.
+O código existe como protótipo 2-player com as seguintes características:
 
-**Pontos fortes (confirmados sob estresse):**
-- Validator (8.0/10): Detectou crise, corrupção, refez SYNERGY_MAP, deu TOP 5 recomendações.
-- Mulligan (7.5/10): Simulou build nova com métricas corretas, identificou gap sistêmico do classificador.
-- Scout (4.0/10): Pelo menos quebrou o ciclo [SILENT] e detectou a crise.
+#### Implementado corretamente
 
-**Para restaurar o pipeline à funcionalidade:**
-1. **Imediato:** Remover Mana Crypt do deck (ilegal).
-2. **Imediato:** Corrigir `import_lorehold_decks.py` + re-classificar 20 cartas.
-3. **Curto prazo:** Transformar Oracle de script-only → LLM agent (remover `no_agent: true`).
-4. **Curto prazo:** Adicionar BANLIST CHECK em todos os 4 agentes.
-5. **Médio prazo:** Restaurar Scout para A+B+C synergy scoring.
-6. **Médio prazo:** Corrigir Mulligan (seed fixo, tapped lands, color requirements).
+| Feature | Linha | Status |
+|:--------|:-----:|:------|
+| Flying evasion | 56 | ✅ Implementado |
+| Trample | 64, 497-499 | ✅ Excesso de dano passa ao jogador |
+| Lifelink | 60, 464-466, 502-503 | ✅ Sem cap (linha 517: `active.life += lifeGained`) |
+| First Strike | 65, 474-483 | ✅ Resolve antes do dano normal |
+| Deathtouch | 62, 476, 489 | ✅ Mata com 1 de dano |
+| Vigilance | 58, 430 | ✅ Não tapa ao atacar |
+| Haste | 57 | ✅ Detectado |
+| Untap phase | 386-395 | ✅ Todas as permanentes |
+| Draw phase | 397-404 | ✅ Draw 1 (exceto T1 do primeiro jogador) |
+| Discard to 7 | 532-537 | ✅ End step |
+| Damage cleanup | 539-542 | ✅ End step |
 
-**Status atual do deck (2026-06-02T19:00Z):** cEDH turbo-combo, 100 cards, T3 8.9%, ⚠️ CONTÉM CARTA BANIDA (Mana Crypt), ⚠️ dados corrompidos no DB.
+#### NÃO implementado (viola regras MTG)
+
+| Feature | CR Ref | Impacto |
+|:--------|:------|:--------|
+| **Stack/Priority** | CR 117.3, 405.5 | 🔴 Spells resolvem imediatamente (linha 9). Counterspells impossíveis. |
+| **Multiplayer (4-player)** | CR 802.1a | 🔴 2-player apenas. Sem split de ataque. Sem política. |
+| **Counterspells** | CR 701.5a | 🔴 Impossível com resolução imediata |
+| **Commander damage (21)** | CR 903.10a | 🔴 Não trackeado |
+| **Commander tax (+2)** | CR 903.8 | 🔴 Não implementado |
+| **ETB triggers** | CR 603.4 | 🔴 Não implementados |
+| **Planeswalkers** | CR 306 | 🔴 Tipo não suportado |
+| **Múltiplos bloqueadores** | CR 509.1c | 🔴 1 blocker por attacker (linha 459: `blocker` singular) |
+| **State-Based Actions** | CR 704.3 | 🔴 Apenas destroy por dano; sem SBAs |
+| **Color production tracking** | CR 106.1a | 🔴 Mana = land count, sem tracking de cores |
+
+#### Conclusão Battle
+
+O código é um protótipo de simulação de combate, não um simulador de Commander. **NÃO DEVE SER USADO** para decisões de swap. O score é **N/A** — não é um cron ativo.
+
+---
+
+## 5. Evolution Oracle — Auditoria Detalhada
+
+**Job ID:** a50bef4c2a59
+**Última execução com output:** C#23 (2026-06-01T08:25Z)
+**Últimas 9+ execuções:** [SILENT] ou incompletas
+**Última execução:** 2026-06-03T20:59Z — incompleta (7 linhas, parou no Step 0)
+
+### Configuração
+
+- `no_agent: false` — roda como LLM agent
+- `script: "manaloom-wincon-oracle.sh"` — script existe? (não encontrado no filesystem)
+- O script `wincon_pipeline.py oracle` é determinístico e sempre retorna "keep current decklist"
+
+### O que faz certo (quando funciona — C#23, 2026-06-01)
+
+1. **Pipeline Integrity Break detection** ✅ — C#23 detectou que 5 ciclos (C#18–C#22) operaram com hash falso `a440c497...` vs DB real `30d00347...`. Nenhum outro agente havia detectado.
+
+2. **Estratégia baseada em T3** ✅ — C#23 identificou T3=13.3% → zona DEFENSIVA (>12%) → propôs swaps com net ΔCMC = -16.
+
+3. **Justificativa multi-eixo** ✅ — Diagnóstico + Solução + Princípio para cada swap.
+
+4. **Modo CO-PILOT** ✅ — Swaps documentados, não aplicados automaticamente.
+
+### O que faz errado
+
+1. **9+ execuções [SILENT] consecutivas** 🔴 — Desde 2026-06-01T14:26, todas as execuções retornaram [SILENT] (2 linhas) ou output incompleto. O Oracle não está produzindo análise há >48h.
+
+2. **Output atual incompleto** 🔴 — Execução mais recente (2026-06-03T20:59Z) parou após 7 linhas: "We will execute the required sync script and validate the active Lorehold deck." Não completou Step 0.
+
+3. **Cego a reconstruções externas** 🔴 — Quando o deck foi completamente reconstruído 2x em ~1h (2026-06-02), o Scout, Validator e Mulligan detectaram. O Oracle permaneceu [SILENT] — não tem reset protocol.
+
+4. **Pipeline Death Loop** 🔴 — Oracle ([SILENT]) → Mulligan ([SILENT]) → Scout ([SILENT]) → Oracle (mesmo [SILENT]). Sem o Oracle propor swaps, nenhum agente tem motivo para rodar análise nova. O pipeline para completamente.
+
+5. **Sem leitura real de logs** 🟡 — O prompt instrui a ler MULLIGAN_LOG, BATTLE_LOG, SCOUT_LOG, mas quando o Oracle está em modo [SILENT], não lê nada.
+
+6. **Prompt vs script conflitante** 🟡 — O prompt do LLM descreve análise completa (ler logs, decidir swaps, etc.), mas o `script` associado (`wincon_pipeline.py oracle`) é determinístico e imutável. Não está claro qual dos dois realmente executa.
+
+### Verificações MTG (quando funcionou — C#23)
+
+| Regra | CR Ref | Verificado? | Nota |
+|:------|:------|:-----------|:-----|
+| Color Identity (903.4) | CR 903.4c | ✅ | Implícito (deck já construído) |
+| Singleton (903.5b) | CR 903.5b | ✅ | "Verifique singleton apos swaps" no prompt |
+| 100 cards (903.5a) | CR 903.5a | ✅ | Verificado: "100 (86 rows, 35 lands)" |
+| Commander banlist | Scryfall | ✅ | C#23 executou sync |
+| Wincon legality | N/A | ✅ | Verificou `user_collection.quantity > 0` |
+| Swap justification | N/A | ✅ | 3 eixos (Diagnóstico, Solução, Princípio) |
+
+### Recomendações
+
+1. **Diagnosticar por que o Oracle está [SILENT] há 48h** — verificar se o script `manaloom-wincon-oracle.sh` existe; verificar logs de erro
+2. **Implementar reset protocol:** Quando hash divergir → resetar contador de ciclos → reconstruir EVOLUTION_LOG do zero
+3. **Remover script determinístico** se o LLM agent for o caminho desejado; ou remover o prompt LLM se o script for o caminho
+4. **Adicionar condição de "force run":** Se `run_log` mostra 3+ execuções [SILENT] consecutivas, forçar análise completa
+5. **Timeout maior:** Se o Oracle está sendo interrompido antes de completar, aumentar timeout
+
+---
+
+## 6. Plano de Correções (ordenado por impacto)
+
+### 🔴 CRÍTICO (quebra o pipeline)
+
+| # | Problema | Cron | Ação | Esforço |
+|:-:|:---------|:-----|:-----|:-------|
+| 1 | Oracle 48h [SILENT] — pipeline parado | Evolution Oracle | Diagnosticar causa; forçar execução com hash verification forçada | 1h |
+| 2 | Oracle cego a rebuilds externos | Evolution Oracle | Implementar reset protocol quando hash divergir | 2h |
+| 3 | Sem stack/priority no Battle | Battle | Não é cron ativo — baixa prioridade. Marcar código como `@deprecated` | 30min |
+| 4 | Banlist Blindness (Worldfire) | Validator | Já corrigido via sync PG→SQLite (2026-06-03). Requer re-execução do Validator. | 0h (fix existe) |
+| 5 | Validator HTTP 429 — não roda há 24h | Validator | Aguardar reset de rate limit ou trocar provider | 0h (aguardar) |
+
+### 🟡 ALTO (distorce resultados)
+
+| # | Problema | Cron | Ação | Esforço |
+|:-:|:---------|:-----|:-----|:-------|
+| 6 | Scout perdeu função original (Wincon Hunter ≠ Scout) | Scout | Restaurar prompt: EDHREC JSON API + user_collection + A+B+C | 1h |
+| 7 | Color screw não simulado (+3-8pp erro) | Mulligan | Adicionar verificação de mana colorida | 2h |
+| 8 | Tapped lands não simulados (+2-5pp erro) | Mulligan | Adicionar simulação de enters-tapped | 1h |
+| 9 | Classificador dita acurácia do Mulligan | Mulligan | Hardcode ramp conhecidas como fallback | 1h |
+
+### 🟢 MÉDIO (imprecisão corrigível)
+
+| # | Problema | Cron | Ação | Esforço |
+|:-:|:---------|:-----|:-----|:-------|
+| 10 | Prompt referencia `card_oracle_data` (não existe) | Validator | Corrigir para `card_rulings` | 10min |
+| 11 | PG profile fixo vs deck dinâmico | Validator | Detectar archetype mismatch; buscar perfil alternativo | 2h |
+| 12 | Sem verificação de singleton | Scout, Validator | Adicionar query de duplicatas | 30min |
+| 13 | Sem draws futuros no Mulligan | Mulligan | Simular T1-T3 draws (3 cartas adicionais) | 2h |
+
+### ⚪ BAIXO (cosmético / documentação)
+
+| # | Problema | Cron | Ação |
+|:-:|:---------|:-----|:-----|
+| 14 | Battle Analyst listado como cron ativo | Docs | Atualizar documentação: Battle NÃO é cron |
+| 15 | `card_deck_analysis` referencia deck_id deletado | Scout | Verificar deck_id antes de usar scores |
+
+---
+
+## 7. Conclusão
+
+A pipeline Lorehold tem confiabilidade **BAIXA** (4.1/10) em relação às regras oficiais de MTG e à sua própria função declarada.
+
+### O que funciona
+
+- **Validator** é o agente mais confiável (8.0/10): SYNERGY_MAP cobre 7 eixos, detecta corrupção de dados, identifica archetype mismatch. O gap de banlist (Worldfire) foi corrigido via sync PG→SQLite.
+- **Mulligan** é funcional (7.5/10): London mulligan free-first implementado corretamente, definição rigorosa de jogável, métricas estáveis. Tapped lands e color screw são gaps conhecidos e documentados.
+- **Scout** tem boa detecção de misclassifications e banlist (4.0/10), mas perdeu a função original de scout de sinergia.
+
+### O que está quebrado
+
+- **Evolution Oracle** está efetivamente morto (1.0/10): 48h sem produzir análise. Sem o Oracle, o pipeline é um corpo sem cérebro — os outros agentes produzem dados que ninguém sintetiza em swaps.
+- **Battle** não existe como cron.
+- **Pipeline Death Loop** está ativo: Oracle [SILENT] → todos os outros perdem propósito → pipeline para.
+
+### Próximo passo imediato
+
+**Forçar o Evolution Oracle a executar uma análise completa**, com hash verification forçada e ignore do estado [SILENT]. Sem o Oracle funcionando, os outros 3 agentes estão girando em falso.
+
+---
+
+**Fontes consultadas:**
+- Magic: The Gathering Comprehensive Rules (2024-11-08)
+- Scryfall API (`api.scryfall.com/cards/named`)
+- `/opt/data/cron/jobs.json` (configuração de todas as crons)
+- `/opt/data/cron/output/f20ac299992b/` (Scout — 101 execuções)
+- `/opt/data/cron/output/712579b15767/` (Validator — 62 execuções)
+- `/opt/data/cron/output/08468451a06a/` (Mulligan — 47 execuções)
+- `/opt/data/cron/output/a50bef4c2a59/` (Evolution Oracle — 48 execuções)
+- `server/lib/ai/battle_simulator.dart` (879 linhas)
+- `docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py` (289 linhas)
