@@ -9,6 +9,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
+import '../../../lib/ai/commander_reference_helpers.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai/commander_reference_readiness_support.dart';
 import '../../../lib/ai/edhrec_service.dart';
@@ -458,7 +459,7 @@ Future<Map<String, dynamic>?> _buildCommanderLearningPayload({
         'confidence': normalizeCommanderReferenceConfidence(
           profile['confidence'],
         ),
-        'source_count': _intValue(profile['source_count']),
+        'source_count': intValue(profile['source_count']),
         'themes': _themeNames(profile).take(8).toList(growable: false),
         'role_targets': profile['role_targets'],
       },
@@ -528,19 +529,19 @@ Future<Map<String, dynamic>?> _loadPromotedCommanderLearnedDeck({
       'source_url': row[5]?.toString(),
       'archetype': row[6]?.toString(),
       'card_list': row[7]?.toString() ?? '',
-      'card_count': _intValue(row[8]),
+      'card_count': intValue(row[8]),
       'score': _doubleValue(row[9]),
       'wincon_primary': row[10]?.toString(),
       'wincon_backup': row[11]?.toString(),
       'legal_status': row[12]?.toString(),
       'notes': row[13]?.toString(),
-      'metadata': _jsonObject(row[14]),
+      'metadata': jsonObject(row[14]),
       'is_active': row[15] == true,
       'promoted_at': row[16]?.toString(),
       'updated_at': row[17]?.toString(),
     };
   } catch (error) {
-    if (_isUndefinedLearnedDeckTableError(error)) return null;
+    if (isUndefinedLearnedDeckTableError(error)) return null;
     rethrow;
   }
 }
@@ -583,7 +584,7 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
           normalizedCommander)
       .toList(growable: false);
 
-  final metadataByName = await _loadCardMetadataByName(
+  final metadataByName = await loadCardMetadataByName(
     pool: pool,
     names: deckEntries.map((card) => card['name']?.toString() ?? ''),
   );
@@ -600,7 +601,7 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
     final isCommander = normalized == normalizedCommander;
     return {
       'name': name,
-      'quantity': _intValue(card['quantity']).clamp(1, 99),
+      'quantity': intValue(card['quantity']).clamp(1, 99),
       'is_commander': isCommander,
       if (metadata?['id'] != null) 'card_id': metadata!['id'],
       if (metadata?['name'] != null && metadata!['name'] != name)
@@ -626,13 +627,13 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
     PostgresGeneratedDeckRepository(pool, preferredFormat: 'commander'),
   ).validate(
     format: 'commander',
-    cards: _canonicalValidationCards(mainCards, metadataByName),
+    cards: canonicalValidationCards(mainCards, metadataByName),
     commanderName: commanderName,
   );
   final mainDecklist = decklist
       .where((card) => card['is_commander'] != true)
       .toList(growable: false);
-  final legality = _summarizeCommanderLegalities(
+  final legality = summarizeLegalities(
     decklist,
     validation.validationSummary(),
   );
@@ -651,11 +652,11 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
     },
     'total_cards_including_commander': decklist.fold<int>(
       0,
-      (sum, card) => sum + _intValue(card['quantity']),
+      (sum, card) => sum + intValue(card['quantity']),
     ),
     'main_quantity': mainDecklist.fold<int>(
       0,
-      (sum, card) => sum + _intValue(card['quantity']),
+      (sum, card) => sum + intValue(card['quantity']),
     ),
     'decklist': decklist,
     'cards': mainDecklist,
@@ -704,7 +705,7 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
           .toList(growable: false) ??
       const <Map<String, dynamic>>[];
 
-  final metadataByName = await _loadCardMetadataByName(
+  final metadataByName = await loadCardMetadataByName(
     pool: pool,
     names: [
       if (commanderName != null && commanderName.isNotEmpty) commanderName,
@@ -723,7 +724,7 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
     final corpusRole = corpusRoleByName[normalized];
     return {
       'name': name,
-      'quantity': _intValue(card['quantity']).clamp(1, 99),
+      'quantity': intValue(card['quantity']).clamp(1, 99),
       if (metadata?['id'] != null) 'card_id': metadata!['id'],
       if (metadata?['name'] != null && metadata!['name'] != name)
         'canonical_name': metadata['name'],
@@ -744,10 +745,10 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
     PostgresGeneratedDeckRepository(pool, preferredFormat: 'commander'),
   ).validate(
     format: 'commander',
-    cards: _canonicalValidationCards(cards, metadataByName),
+    cards: canonicalValidationCards(cards, metadataByName),
     commanderName: commanderName,
   );
-  final legality = _summarizeCommanderLegalities(
+  final legality = summarizeLegalities(
     enrichedCards,
     validation.validationSummary(),
   );
@@ -763,98 +764,13 @@ Future<Map<String, dynamic>> _buildReferenceLearningDeck({
     },
     'total_cards_including_commander': 1 +
         enrichedCards.fold<int>(
-            0, (sum, card) => sum + _intValue(card['quantity'])),
+            0, (sum, card) => sum + intValue(card['quantity'])),
     'main_quantity': enrichedCards.fold<int>(
-        0, (sum, card) => sum + _intValue(card['quantity'])),
+        0, (sum, card) => sum + intValue(card['quantity'])),
     'cards': enrichedCards,
     'legality': legality,
     'validation': validation.validationSummary(),
   };
-}
-
-Future<Map<String, Map<String, dynamic>>> _loadCardMetadataByName({
-  required Pool pool,
-  required Iterable<String> names,
-}) async {
-  final normalizedNames =
-      names.map((name) => name.trim()).where((name) => name.isNotEmpty).toSet();
-  if (normalizedNames.isEmpty) return const {};
-
-  final result = await pool.execute(
-    Sql.named('''
-      WITH input_names AS (
-        SELECT unnest(@names::text[]) AS input_name
-      )
-      SELECT DISTINCT ON (input_names.input_name)
-        input_names.input_name,
-        c.id::text,
-        c.name,
-        c.type_line,
-        c.image_url,
-        cl.status
-      FROM input_names
-      JOIN cards c
-        ON LOWER(c.name) = input_names.input_name
-        OR LOWER(SPLIT_PART(c.name, ' // ', 1)) = input_names.input_name
-        OR LOWER(REPLACE(c.name, ' // ', '/')) = input_names.input_name
-      LEFT JOIN card_legalities cl
-        ON cl.card_id = c.id
-       AND cl.format = 'commander'
-      ORDER BY input_names.input_name,
-        CASE
-          WHEN cl.status = 'legal' THEN 0
-          WHEN cl.status = 'restricted' THEN 1
-          WHEN cl.status IS NULL THEN 2
-          ELSE 3
-        END,
-        c.id::text
-    '''),
-    parameters: {
-      'names': TypedValue(
-        Type.textArray,
-        normalizedNames.map((name) => name.toLowerCase()).toList(),
-      ),
-    },
-  );
-
-  return {
-    for (final row in result) ..._metadataAliasesFromRow(row),
-  };
-}
-
-Map<String, Map<String, dynamic>> _metadataAliasesFromRow(ResultRow row) {
-  final inputName = row[0]?.toString() ?? '';
-  final canonicalName = row[2]?.toString() ?? '';
-  final metadata = {
-    'id': row[1]?.toString(),
-    'name': canonicalName,
-    'type_line': row[3]?.toString(),
-    'image_url': row[4]?.toString(),
-    'commander_legal_status': row[5]?.toString(),
-  };
-  return {
-    if (inputName.trim().isNotEmpty)
-      normalizeCommanderReferenceCardName(inputName): metadata,
-    if (canonicalName.trim().isNotEmpty)
-      normalizeCommanderReferenceCardName(canonicalName): metadata,
-  };
-}
-
-List<Map<String, dynamic>> _canonicalValidationCards(
-  List<Map<String, dynamic>> cards,
-  Map<String, Map<String, dynamic>> metadataByName,
-) {
-  return cards.map((card) {
-    final name = card['name']?.toString().trim() ?? '';
-    final metadata = metadataByName[normalizeCommanderReferenceCardName(name)];
-    final canonicalName = metadata?['name']?.toString().trim();
-    return {
-      'name': canonicalName != null && canonicalName.isNotEmpty
-          ? canonicalName
-          : name,
-      'quantity': _intValue(card['quantity']).clamp(1, 99),
-    };
-  }).toList(growable: false);
 }
 
 Map<String, String> _corpusRoleByName(
@@ -865,28 +781,6 @@ Map<String, String> _corpusRoleByName(
     for (final card in corpus.topCards)
       normalizeCommanderReferenceCardName(card['card_name']?.toString() ?? ''):
           card['role']?.toString() ?? 'reference_corpus_card',
-  };
-}
-
-Map<String, dynamic> _summarizeCommanderLegalities(
-  List<Map<String, dynamic>> cards,
-  Map<String, dynamic> validation,
-) {
-  final banned = <String>[];
-  final unknown = <String>[];
-  for (final card in cards) {
-    final name = card['name']?.toString() ?? '';
-    final status = card['commander_legal_status']?.toString().toLowerCase();
-    if (status == 'banned') banned.add(name);
-    if (status == null || status.isEmpty) unknown.add(name);
-  }
-  return {
-    'format': 'commander',
-    'is_valid': validation['is_valid'] == true,
-    'banned_cards': banned,
-    'unknown_legality_cards': unknown,
-    'invalid_cards': validation['invalid_cards'] ?? const <String>[],
-    'errors': validation['errors'] ?? const <String>[],
   };
 }
 
@@ -990,35 +884,10 @@ List<String> _themeNames(Map<String, dynamic> profile) {
       .toList(growable: false);
 }
 
-int _intValue(Object? value) {
-  if (value is int) return value;
-  if (value is num) return value.round();
-  return int.tryParse(value?.toString() ?? '') ?? 0;
-}
-
 double _doubleValue(Object? value) {
   if (value is double) return value;
   if (value is num) return value.toDouble();
   return double.tryParse(value?.toString() ?? '') ?? 0;
-}
-
-Map<String, dynamic> _jsonObject(Object? value) {
-  if (value is Map<String, dynamic>) return Map<String, dynamic>.from(value);
-  if (value is Map) return value.cast<String, dynamic>();
-  if (value is String && value.trim().isNotEmpty) {
-    final decoded = jsonDecode(value);
-    if (decoded is Map<String, dynamic>) return decoded;
-    if (decoded is Map) return decoded.cast<String, dynamic>();
-  }
-  return const <String, dynamic>{};
-}
-
-bool _isUndefinedLearnedDeckTableError(Object error) {
-  final text = error.toString().toLowerCase();
-  return text.contains('commander_learned_decks') &&
-      (text.contains('does not exist') ||
-          text.contains('undefined_table') ||
-          text.contains('42p01'));
 }
 
 Future<void> _ensureCommanderProfileCacheTable(Pool pool) async {

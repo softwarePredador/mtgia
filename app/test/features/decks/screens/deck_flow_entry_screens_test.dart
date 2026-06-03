@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_generate_screen.dart';
@@ -8,6 +9,8 @@ import 'package:provider/provider.dart';
 
 class _FakeApiClient extends ApiClient {
   final getCalls = <String>[];
+  final postCalls = <String>[];
+  final List<Map<String, dynamic>> postBodies = [];
 
   @override
   Future<ApiResponse> get(String endpoint) async {
@@ -58,10 +61,45 @@ class _FakeApiClient extends ApiClient {
     }
     throw UnimplementedError('No GET handler for $endpoint');
   }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    postCalls.add(endpoint);
+    postBodies.add(body);
+    if (endpoint == '/cards/resolve/batch') {
+      final names = (body['names'] as List?)?.cast<String>() ?? [];
+      final data =
+          names
+              .map(
+                (name) => {
+                  'input_name': name,
+                  'card_id': 'resolved-${name.hashCode}',
+                },
+              )
+              .toList();
+      return ApiResponse(200, {
+        'data': data,
+        'unresolved': <String>[],
+        'ambiguous': <String>[],
+      });
+    }
+    if (endpoint == '/decks') {
+      return ApiResponse(201, {
+        'id': 'deck-saved-1',
+        'name': body['name'],
+        'format': body['format'],
+      });
+    }
+    throw UnimplementedError('No POST handler for $endpoint');
+  }
 }
 
 void main() {
-  Widget wrap(Widget child, {DeckProvider? deckProvider}) {
+  Widget wrapSimple(Widget child, {DeckProvider? deckProvider}) {
     final app = MaterialApp(home: child);
     if (deckProvider == null) return app;
     return ChangeNotifierProvider<DeckProvider>.value(
@@ -70,11 +108,30 @@ void main() {
     );
   }
 
+  Widget wrapWithRouter(DeckProvider deckProvider) {
+    return MaterialApp.router(
+      routerConfig: GoRouter(
+        initialLocation: '/generate',
+        routes: [
+          GoRoute(
+            path: '/generate',
+            builder:
+                (_, __) => ChangeNotifierProvider<DeckProvider>.value(
+                  value: deckProvider,
+                  child: const DeckGenerateScreen(),
+                ),
+          ),
+          GoRoute(path: '/decks', builder: (_, __) => const SizedBox.shrink()),
+        ],
+      ),
+    );
+  }
+
   testWidgets('DeckGenerateScreen aplica o formato inicial vindo do fluxo', (
     tester,
   ) async {
     await tester.pumpWidget(
-      wrap(const DeckGenerateScreen(initialFormat: 'modern')),
+      wrapSimple(const DeckGenerateScreen(initialFormat: 'modern')),
     );
 
     expect(find.text('Modern'), findsOneWidget);
@@ -86,7 +143,7 @@ void main() {
     (tester) async {
       final apiClient = _FakeApiClient();
       await tester.pumpWidget(
-        wrap(
+        wrapSimple(
           const DeckGenerateScreen(),
           deckProvider: DeckProvider(apiClient: apiClient),
         ),
@@ -139,10 +196,66 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      wrap(const DeckImportScreen(initialFormat: 'pauper')),
+      wrapSimple(const DeckImportScreen(initialFormat: 'pauper')),
     );
 
     expect(find.text('Pauper'), findsOneWidget);
     expect(find.text('Commander'), findsNothing);
   });
+
+  testWidgets(
+    'DeckGenerateScreen save learned deck POSTs 99 main + 1 commander',
+    (tester) async {
+      final apiClient = _FakeApiClient();
+      await tester.pumpWidget(
+        wrapWithRouter(DeckProvider(apiClient: apiClient)),
+      );
+      await tester.pump();
+
+      await tester.enterText(
+        find.byKey(const Key('deck-generate-commander-field')),
+        'Lorehold, the Historian',
+      );
+      await tester.pump();
+
+      final learnedDeckButton = find.byKey(
+        const Key('deck-generate-learned-deck-button'),
+      );
+      await tester.ensureVisible(learnedDeckButton);
+      await tester.tap(learnedDeckButton);
+      await tester.pumpAndSettle();
+
+      final saveButton = find.byKey(const Key('deck-generate-save-button'));
+      await tester.ensureVisible(saveButton);
+      await tester.tap(saveButton);
+      await tester.pumpAndSettle();
+
+      final resolveCall = apiClient.postCalls.any(
+        (call) => call == '/cards/resolve/batch',
+      );
+      expect(resolveCall, isTrue);
+
+      final deckCall = apiClient.postCalls.any((call) => call == '/decks');
+      expect(deckCall, isTrue);
+
+      for (final body in apiClient.postBodies) {
+        if (body.containsKey('cards')) {
+          final cards = body['cards'] as List;
+          final commanders = cards.where(
+            (c) => c is Map && c['is_commander'] == true,
+          );
+          final main = cards.where(
+            (c) => c is Map && c['is_commander'] != true,
+          );
+          expect(commanders.length, 1);
+          expect(commanders.first['card_id'], isNotNull);
+          expect(commanders.first['card_id'], isNotEmpty);
+          expect(main.length, 1);
+          expect(main.first['card_id'], isNotNull);
+          expect(main.first['card_id'], isNotEmpty);
+          expect(body['format'], 'commander');
+        }
+      }
+    },
+  );
 }
