@@ -1,20 +1,71 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-02T19:00:00Z (Incremento: Resolve learning pipeline backlog — e754c0ec).
+> Atualizado em 2026-06-03T19:02Z (Incremento: Commander Learning - fb91fdca).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `d470bfe0` (Harden strategic functional role heuristics)
-- HEAD atual: **`e754c0ec`** (Resolve learning pipeline backlog).
+- HEAD anterior: `e754c0ec` (Resolve learning pipeline backlog)
+- HEAD atual: **`fb91fdca`** (Add Lorehold learned deck runtime proof).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`e754c0ec`** (`/health` retornou HTTP 200 em 2026-06-02T18:53Z — producao operacional).
+- SHA publicado confirmado em producao: **`fb91fdca`** (`/health` retornou HTTP 200 em 2026-06-03T19:02Z — producao operacional).
+- Local `master`: 46 commits atrasado (`3f7d784f`) — precisa de `git pull origin master`
 
 
 
-## Novos commits nesta rodada (2026-06-02)
+## Novos commits nesta rodada (2026-06-03)
+
+
+### `fb91fdca` — Add Lorehold learned deck runtime proof (HEAD)
+
+- **14 arquivos**, **+2676/-5 linhas**
+- **Tipo: CODE/FEATURE** — Infraestrutura completa de Commander Learned Decks:
+  1. Nova tabela `commander_learned_decks` (database_setup.sql) - UUID PK, unique(source_system, source_ref), is_active flag.
+  2. Nova rota dedicada `GET /ai/commander-learning` (461 linhas) - lista decks ativos ou busca por comandante. Fallback gracioso quando tabela nao existe.
+  3. Rota `/ai/commander-reference` expandida para 684 linhas - integra promocao de learned deck com fallback deterministico.
+  4. `commander_learned_deck_support.dart` (358 linhas) - parsing, upsert, PG queries.
+  5. `bin/commander_learned_deck.dart` (140 linhas) - CLI de import com dry-run/apply modes.
+  6. App-side +307 linhas: novo botao "Usar deck aprendido do comandante" com preview, helper text e loading state.
+  7. Integration test: `commander_learned_deck_runtime_test.dart` (230 linhas).
+- **Avaliacao Hermes**: Feature completa, 619/619 server tests PASS + 3 novos. `dart analyze lib/` - No issues found.
+  Sem flag de feature — sempre ativo. Comportamento silencioso em falha de rede (catch silencioso).
+- **Verificacao**: Health endpoint confirma `git_sha: fb91fdca` em producao.
+
+### `5c7111f2` — Refine commander learning deck UX
+
+- **Tipo: CODE/FEATURE** — Refinamentos de UX no fluxo de deck aprendido:
+  1. Botao com helper text contextual, progress panel compartilhado, Learned Deck Preview com chips.
+  2. Scroll-to-result apos carregamento (`Scrollable.ensureVisible`).
+  3. Tratamento de erro via `FriendlyErrorMapper` padrao do app.
+- **Avaliacao Hermes**: UX refinamentos solidos. Sem regressao.
+
+### `213a4e22` — Document commander learning endpoint validation
+
+- **Tipo: DOCS** — 3 novos docs: COMMANDER_LEARNING_API.md, EXECUTION_TRACKER.md, NEXT_STEPS.md.
+
+### `a763f15b` — Add commander learning endpoint
+
+- **Tipo: CODE/FEATURE** — Rota `GET /ai/commander-learning` com fallback gracioso (tabela inexistente retorna vazio).
+
+### `06bb644e` — Add commander learned deck import routine
+
+- **Tipo: CODE/FEATURE** — CLI `bin/commander_learned_deck.dart` importa decks Hermes para PG.
+
+### `9daff606` — Add learned commander deck shortcut
+
+- **Tipo: CODE/FEATURE** — Atalho de UI na tela de geracao de deck.
+
+### `052f0fd4` — Document commander learning rollout steps
+
+- **Tipo: DOCS** — Documento de rollout steps.
+
+### `4cf90e57` — Expose promoted commander learning decks
+
+- **Tipo: CODE/FEATURE** — Commander-reference prioriza deck promovido sobre fallback deterministico.
+
+---
 
 ### `e754c0ec` — Resolve learning pipeline backlog (HEAD)
 
