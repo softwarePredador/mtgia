@@ -245,6 +245,35 @@ ON external_commander_meta_candidates (commander_name);
 CREATE INDEX IF NOT EXISTS idx_external_commander_meta_color_identity
 ON external_commander_meta_candidates USING GIN (color_identity);
 
+-- 9.2. Decks aprendidos/promovidos por pipelines externos (Hermes/ManaLoom)
+-- Fonte runtime do backend para expor listas aprendidas sem depender do Hermes.
+CREATE TABLE IF NOT EXISTS commander_learned_decks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    commander_name TEXT NOT NULL,
+    commander_name_normalized TEXT NOT NULL,
+    deck_name TEXT NOT NULL,
+    source_system TEXT NOT NULL,
+    source_ref TEXT NOT NULL,
+    source_url TEXT,
+    archetype TEXT,
+    card_list TEXT NOT NULL,
+    card_count INTEGER NOT NULL,
+    score NUMERIC,
+    wincon_primary TEXT,
+    wincon_backup TEXT,
+    legal_status TEXT,
+    notes TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    promoted_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_system, source_ref)
+);
+
+CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
+ON commander_learned_decks (commander_name_normalized, is_active, promoted_at DESC, updated_at DESC);
+
 -- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
 -- Armazena as cartas mais populares de cada formato, atualizada semanalmente
 -- Para evitar hardcoded staples e manter dados sempre atualizados
