@@ -6,6 +6,7 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/main.dart' as app;
 
 import 'runtime_test_helpers.dart';
+import 'visual_capture_helpers.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -96,7 +97,23 @@ void main() {
         find.byKey(const Key('deck-generate-learned-deck-button')),
         findsNothing,
       );
+      final generateSubmitButton = find.byKey(
+        const Key('deck-generate-submit-button'),
+      );
+      await tester.scrollUntilVisible(
+        generateSubmitButton,
+        220,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await captureVisualProof(
+        binding,
+        tester,
+        '01_no_commander_no_learned_button',
+      );
 
+      await tester.ensureVisible(
+        find.byKey(const Key('deck-generate-commander-field')),
+      );
       await tester.enterText(
         find.byKey(const Key('deck-generate-commander-field')),
         commanderName,
@@ -115,8 +132,13 @@ void main() {
       expect(find.text('Usar deck aprendido do comandante'), findsOneWidget);
       expect(find.textContaining('Hermes learned_deck:82'), findsOneWidget);
       expect(find.textContaining('commander_legal'), findsOneWidget);
-
       await tester.ensureVisible(learnedDeckButton);
+      await captureVisualProof(
+        binding,
+        tester,
+        '02_commander_learned_button_visible',
+      );
+
       await tester.tap(learnedDeckButton);
       await tester.pump();
 
@@ -141,6 +163,7 @@ void main() {
       for (final cardName in blockedPremiumCards) {
         expect(find.textContaining(cardName), findsNothing);
       }
+      await captureVisualProof(binding, tester, '03_hermes_preview');
 
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final deckName = 'Runtime Lorehold Learned $unique';
@@ -183,6 +206,7 @@ void main() {
         attempts: 120,
         step: const Duration(milliseconds: 500),
       );
+      await captureVisualProof(binding, tester, '04_saved_deck_details');
 
       final detailResponse = await api.get('/decks/$createdDeckId');
       expect(detailResponse.statusCode, 200);
