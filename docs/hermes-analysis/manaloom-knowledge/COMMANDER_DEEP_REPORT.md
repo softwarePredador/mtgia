@@ -1,13 +1,13 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-02 ~19:00 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-03 ~06:30 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
-> **Archetype:** ⚠️ TRANSITIONED — Spellslinger / Treasure Ramp / Copy Engine → **Turbo-Combo cEDH Storm**
+> **Archetype:** 🔴 **RECLASSIFIED** — cEDH Turbo-Combo (Dualcaster Mage + copy spells), NOT spellslinger
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 36 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 14 Mulligan simulations, Wincon Diversity Oracle (2 executions), EDHREC 7,893 decks snapshot, card_deck_analysis PostgreSQL, v3.22→v3.23 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs (12 opposite commanders, June 1-2), **🆕 Deck Reconstruction (2026-06-02 ~18:30Z), Active Deck Promotion (learned→active), Mulligan Exec#14 (post-reconstruction)**
-> **🚨 Deck State:** **RECONSTRUCTED** — deck_id=6 completely replaced. Card hash: `f2241d994743e8142396c0f846917fde` (was `30d00347764fc2a215edb4e668994871`). 100 cards (100 rows/qty=1), 33 lands, 6 tutors, 11 wincons, 0/4 spellslinger motor components remaining.
-> **🆕 Active Promoted Build:** "Lorehold Best-of Learned No Premium Mox 2026-06-02" — source: learned_deck_id=82 (best-of-learned minus Chrome Mox/Mox Diamond/Mox Opal, +Fellwar Stone/Lightning Greaves/Victory Chimes)
+> **Evidence Base:** 37 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 14 Mulligan simulations, Wincon Diversity Oracle (2 executions), EDHREC 7,893 decks snapshot, card_deck_analysis PostgreSQL, v3.22→v3.23→**v3.24** Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, Mulligan Exec#14, **🆕 Validator v3.24 Manual Classification (100 cards), TAG_ACCURACY_REPORT 2026-06-03**
+> **🚨 Deck State:** **ACTIVE cEDH STORM** — deck_id=6, card hash: `f2241d994743e8142396c0f846917fde`. 100 cards, 33 lands, 12 fast mana, 6 tutors, 6 copy engines, 9 wincons, 3 Silence/stax, 5 removal, 8 protection. **🔴 Worldfire is BANNED — must be removed.**
+> **🆕 Active Promoted Build:** "Lorehold Best-of Learned No Premium Mox 2026-06-02" — source: learned_deck_id=82. **⚠️ Classifier never ran on this deck — 20 cards tag='unknown', 36 cards CMC=NULL/0.0.**
 
 ---
 
@@ -801,12 +801,13 @@ Sol Ring (tag='unknown'), Mana Vault (tag='unknown'), Boros Signet (tag='unknown
 
 | Source | Date Range | Records |
 |:-------|:-----------|:-------|
-| SCOUT_LOG | 2026-05-28 to **2026-06-02** | **36** executions (including #36 post-reconstruction) |
-| EVOLUTION_LOG | 2026-05-28 to 2026-06-01 | 23+ cycles (all pre-reconstruction spellslinger) |
-| BATTLE_LOG | 2026-05-30 to **2026-06-02** | 18+ simulation runs (goldfish + matchup + interactive, all pre-reconstruction configs) |
-| MULLIGAN_LOG | 2026-05-28 to **2026-06-02** | **14** executions (Exec#14 = post-reconstruction T3=8.9%) |
-| VALIDATOR_LOG | 2026-05-28 to **2026-06-02** | v3.5 through **v3.23** (post-reconstruction) |
-| VALIDATOR_SUMMARY | **2026-06-02T18:43** | **v3.23** — post-reconstruction hash `f2241d99...` |
+|| SCOUT_LOG | 2026-05-28 to **2026-06-02** | **37** executions (including #36 post-reconstruction, #37 wincon saturation) |
+|| EVOLUTION_LOG | 2026-05-28 to 2026-06-01 | 23+ cycles (all pre-reconstruction spellslinger) |
+|| BATTLE_LOG | 2026-05-30 to **2026-06-02** | 18+ simulation runs (goldfish + matchup + interactive) |
+|| MULLIGAN_LOG | 2026-05-28 to **2026-06-02** | **14** executions (Exec#14 = post-reconstruction T3=8.9%) |
+|| VALIDATOR_LOG | 2026-05-28 to **2026-06-02** | v3.5 through **v3.24** (manual classification, banlist detection) |
+|| VALIDATOR_SUMMARY | **2026-06-02T22:00** | **v3.24** — banlist violation, tag crisis, PG mismatch |
+|| TAG_ACCURACY_REPORT | **2026-06-03T06:00** | Partial recovery (17/20 unknown→3), CMC corruption worsened (15→36), 4 new tags |
 | wincon-patterns.md | 2026-05-31 | 7 patterns documented |
 | card_deck_analysis (PG) | 2026-06-01 | 1,495 entries across multiple decks |
 | EDHREC JSON API | ~2026-05-31 to 2026-06-01 | 7,851 → **7,893** decks |
@@ -821,3 +822,207 @@ Sol Ring (tag='unknown'), Mana Vault (tag='unknown'), Boros Signet (tag='unknown
 ---
 
 > **Next Cron Cycle:** Continue monitoring the cEDH Storm build. Primary concerns: (1) 0 basic lands vulnerability, (2) only 3 removal cards, (3) DB tag audit needed, (4) CMC outlier dead-weight (Storm Herd CMC 10 + Rise CMC 12). Watch for VALIDATOR v3.24 with corrected DB data.
+
+---
+
+## 19. 🆕 VALIDATOR v3.24 — CRITICAL FINDINGS (2026-06-02T22:00 UTC)
+
+### 19.1 🚨 BANLIST VIOLATION — Worldfire
+
+**Worldfire** está oficialmente BANIDO em Commander desde o início do formato. Esta carta NÃO pode estar no deck ativo (deck_id=6).
+
+```
+Worldfire — 6RRR (CMC 9)
+Sorcery
+Each player's life total becomes 1. Exile all permanents,
+all cards in all hands, and all cards in all graveyards.
+```
+
+**Ação imediata necessária:** Remover Worldfire. O deck tem 99 cartas legais + comandante após remoção. Substituição recomendada: **Underworld Breach** (CMC 2, recursion engine — já está na wishlist §12).
+
+**Impacto no pipeline:** Worldfire foi importado via bulk import (`import_lorehold_decks.py`) sem verificação de banlist. Nenhum agente do pipeline (Scout, Evolution Oracle, Validator v3.22-v3.23) detectou a violação. O sistema de verificação de legalidade simplesmente não existe no pipeline de importação.
+
+### 19.2 🔴 CRISE DE CLASSIFICAÇÃO — 20 Cartas com `functional_tag='unknown'`
+
+O deck (id=6, 100 cartas) foi importado pelo `import_lorehold_decks.py` mas o classificador (`classify_card()` / `infer_functional_card_tags()`) **NUNCA EXECUTOU** para este deck. 20 cartas têm `functional_tag='unknown'` (string literal, não NULL):
+
+**Cartas afetadas:** Birgi, Boros Charm, Boros Signet, Electroduplicate, Flawless Maneuver, Heat Shimmer, Lightning Greaves, Mana Vault, Orim's Chant, Past in Flames, Pyroblast, Reforge the Soul, Reiterate, Reverberate, Ruby Medallion, Scroll Rack, Sol Ring, Talisman of Conviction, Valakut Awakening, Victory Chimes.
+
+**Impacto:** Todas as métricas do DB (ramp_count, draw_count, avg_cmc, mulligan simulation) são **inúteis** para este deck. O DB diz 6 ramp — o real são 12. O DB diz 9 wincons com CMC 2.94 — mas 6 cartas têm CMC=NULL e foram ignoradas no cálculo.
+
+**Além disso, 6 cartas têm CMC=NULL:** Aetherflux Reservoir, Electroduplicate, Fiery Emancipation, Hall of Heliod's Generosity, Heat Shimmer, Past in Flames, Reiterate.
+
+### 19.3 RECUPERAÇÃO PARCIAL — TAG_ACCURACY_REPORT 2026-06-03
+
+Conforme o `TAG_ACCURACY_REPORT.md` de 2026-06-03T06:00:
+
+| Métrica | Antes (v3.24) | Depois (2026-06-03) | Delta |
+|:--------|:-------------:|:--------------------:|:-----:|
+| Cartas `tag='unknown'` | 20 | **3** | **-17** ✅ |
+| CMC NULL ou 0.0 (deck 6) | ~15 | **36** | **+21** 🔴 |
+| Novas tags não registradas | — | **4** (stax, combo, commander, spellslinger) | +4 🟡 |
+| `tag_accuracy` last_updated | 2026-05-27 | 2026-05-27 | **7 dias sem update** |
+
+**Interpretação:** 17 das 20 cartas foram reclassificadas — progresso operacional. Porém:
+- A reclassificação **piorou a corrupção de CMC** (NULL/0.0 aumentou de ~15 → 36)
+- **4 novos tipos de tag** (`stax`, `combo`, `commander`, `spellslinger`) não existem na tabela `tag_accuracy` — suas precisões são desconhecidas
+- Nenhuma entrada em `tag_accuracy` foi atualizada há 7 dias — o sistema de auto-avaliação de tags está **estagnado**
+
+### 19.4 RECLASSIFICAÇÃO MANUAL COMPLETA (100 Cartas)
+
+Devido à crise de tags, o Validator v3.24 realizou classificação manual baseada em conhecimento real de cartas MTG. Resultado:
+
+| Função Real | DB Tagged | Real (Manual) | Delta |
+|:------------|:---------:|:-------------:|:-----:|
+| Lands | 33 | 33 | — |
+| Fast Mana / Ramp | 6 | **12** | **+6** 🔴 |
+| Rituals / Treasure | 5 | 5 | — |
+| Draw / Selection | 9 | 9 | — |
+| Tutors | 3 | **6** | **+3** 🔴 |
+| Protection | 5 | **8** | **+3** 🔴 |
+| Stax / Silence | 0 | **3** | **+3** 🔴 |
+| Removal / Wipe | 3 | **5** | **+2** 🔴 |
+| Copy / Twin Spells | 4 | **6** | **+2** 🔴 |
+| Wincons | 9 | 9 (1 BANNED) | — |
+| Recursion / Engine | 2 | **3** | +1 |
+
+**Conclusão:** O DB subestima ramp em 50%, tutors em 50%, protection em 37%, e ignora completamente stax/silence. Qualquer agente que use `functional_tag` para tomada de decisão (Mulligan Simulator, Evolution Oracle, Scout, Validator) está operando com dados **sistematicamente incorretos**.
+
+### 19.5 PERFIL PG INCOMPATÍVEL — Arquétipo Diferente
+
+O perfil PostgreSQL `commander_reference_deck_analysis` para Lorehold assume o arquétipo **spellslinger big-spells** (miracle_topdeck=4.33, ritual_treasure=10, big_spell_payoff=7.67).
+
+O deck ativo é **cEDH turbo-combo** — as assinaturas `ritual_treasure=10` e `miracle_topdeck=4.33` do perfil PG indicam um deck que gera tesouros e manipula o topo para milagres. Este deck não faz nada disso. O deck faz: fast mana → tutor → Dualcaster+Twinflame = WIN.
+
+**Comparação contra perfil PG (inválido):**
+
+| PG Role | Ideal (spellslinger) | Actual (combo) | Status |
+|:--------|:--------------------:|:--------------:|:------:|
+| lands | 32.0 | 33 | ~OK |
+| ramp (rocks) | 3.67 | 12 | 🔴 3.3× above |
+| ritual_treasure | 10.0 | 5 | 🔴 Below — wrong archetype |
+| miracle_topdeck | 4.33 | 0 | 🔴 Missing — wrong archetype |
+| draw_value | 2.67 | 9 | 🔴 3.4× above |
+| tutor | 3.67 | 6 | Above |
+| win_condition | 1.33 | 9 | 🔴 6.8× above |
+| protection | 3.67 | 8 | 🔴 2.2× above |
+
+**Diagnóstico:** O perfil PG NÃO é adequado para validar este deck. É um arquétipo diferente. O Validator deve selecionar o perfil com base no arquétipo real do deck, não apenas no nome do comandante.
+
+### 19.6 SYNERGY_MAP v3.24 — Recalculado com Classificação Manual
+
+| Eixo | v3.23 (DB tags) | v3.24 (manual) | Change | Driver |
+|:-----|:----------------:|:--------------:|:------:|:-------|
+| A) Token + Pump | 5/10 | **3/10** | -2 | Sem pump, sem haste em massa |
+| B) Wipes + Proteção | 7/10 | **5/10** | -2 | 1 wipe para 8 proteções (razão invertida) |
+| C) Recursion Chains | 8/10 | 7/10 | -1 | Sem Underworld Breach (peça mais broken) |
+| D) Explosive Mana | 8/10 | 8/10 | — | 6 rocks + 2 0-CMC + 5 rituais + Sol land |
+| E) Combo Pieces | 9/10 | **9/10** | — | Dualcaster+Twinflame+Heat Shimmer determinísticos |
+| F) Stack Interaction | 5/10 | **6/10** | +1 | 3 Silence + Pyroblast + 8 proteções |
+| G) Resilience | 6/10 | 7/10 | +1 | Mizzix + Past in Flames + Hall of Heliod |
+| **MÉDIA** | **6.9/10** | **6.4/10** | -0.5 | Correção para baixo com dados reais |
+
+**Key insight:** A correção manual revelou que os scores baseados em DB tags estavam **inflados**. O combo Eixo E permanece excelente (9/10 — o coração do deck), mas Token+Pump caiu de 5→3 (DB dizia que Storm Herd + Rite of the Dragoncaller eram suficiente, mas sem pump/haste não são).
+
+---
+
+## 20. 🆕 SCOUT #37 — WINCON SATURATION (2026-06-02T21:42 UTC)
+
+### 20.1 Deck Alterado Novamente
+
+**Card hash:** `f2241d994743e8142396c0f846917fde` — confirmado como o estado ativo.
+**Mudanças desde Scout #36:** 7 wincons do spellslinger original foram RE-ADICIONADOS (Guttersnipe, Mizzix's Mastery, Rite of the Dragoncaller, Fiery Emancipation, Aetherflux Reservoir, Worldfire, Approach of the Second Sun, Molten Duplication). Cartas removidas: Trouble in Pairs, Perch Protection, Apex of Power, Call Forth the Tempest.
+
+### 20.2 Deck Saturado de Wincons
+
+**11 wincons scored no deck.** O deck está **saturado** — mais condições de vitória do que consegue usar.
+
+| Carta | CMC | Score | Diagnóstico |
+|:------|:---:|:-----:|:------------|
+| Guttersnipe | 3 | 19 | 🟡 INVISÍVEL (ST=8) — frágil (R=5), 2 dano/spell |
+| Mizzix's Mastery | 4 | 17 | 🔴 IMBATÍVEL (R=7) — overload exila grave, cópia tudo grátis |
+| Twinflame | 2 | 16 | 🟢 Combo com Dualcaster = infinito |
+| Rite of the Dragoncaller | 6 | 16 | 🟡 INVISÍVEL (ST=7) — Dragon 5/5 por spell |
+| Dualcaster Mage | 3 | 16 | 🟢 Combo determinístico |
+| Rise of the Eldrazi | 12 | 15 | 🔴 IMBATÍVEL (R=9) — Aniquilador 4 + turno extra |
+| Fiery Emancipation | 6 | 15 | 🟢 Triplica dano |
+| Aetherflux Reservoir | 4 | 15 | 🟢 Storm payoff |
+| **🔴 Worldfire** | **9** | **14** | **BANNED** — REMOVER |
+| Approach of the Second Sun | 7 | 12 | 🟢 RÁPIDA (S=6) |
+| Storm Herd | 10 | 11 | 🟡 Precisa de Akroma/Fiery no mesmo turno |
+
+### 20.3 NENHUM Candidato de Swap Atinge Thresholds
+
+| Categoria | Threshold | Candidatos | Status |
+|:----------|:---------:|:-----------|:------|
+| IMBATÍVEIS (R≥7) | resilience ≥ 7 | 0 | VAZIO |
+| INVISÍVEIS (ST≥7) | stealth ≥ 7 | 0 | VAZIO |
+| RÁPIDAS (S≥6) | speed ≥ 6 | 2 | AMBOS misclassified |
+| FRÁGEIS (R≤3) | resilience ≤ 3 | 1 (Call Forth the Tempest) | EVITAR |
+
+**2 cartas misclassified como wincons:**
+- **Trouble in Pairs** (CMC 4, score 16, S=7) — é draw engine, não wincon
+- **Perch Protection** (CMC 6, score 16, S=7) — é fog + extra turn + gift, não wincon
+
+**Conclusão do Scout #37:** O deck está saturado de wincons. Coleção esgotada de candidatos que atendam thresholds. O pipeline atingiu **saturação de otimização** para este deck — não há mais o que recomendar até que novas cartas entrem na coleção ou o meta mude.
+
+---
+
+## 21. 🆕 UPDATED CONCRETE TASKS (2026-06-03)
+
+### Task 1: 🔴 CRITICAL — Banlist Validation in Import Pipeline
+
+- **Evidence:** Worldfire (CMC 9, banned in Commander) was imported via `import_lorehold_decks.py` into the active deck (deck_id=6). Neither the import script nor any pipeline agent (Scout, Evolution Oracle, Validator v3.22-v3.24) detected the banlist violation. The card is still in the active deck as of 2026-06-03. Worldfire appears in the wincon scorecard (score=14, res=7) and the Validator v3.24 flagged it as BANNED.
+- **What to change:** Add a `check_commander_banlist()` function to the deck import pipeline that, after card parsing but before insertion into `deck_cards`, queries the Commander banlist (from Scryfall API or a local `commander_banlist.json`) and rejects banned cards with an error. The function should also be callable as a standalone validator against any existing deck.
+- **Impact:** Prevents banned cards from ever entering active decks. Currently, any deck imported from external sources can contain banned cards silently. This is a data integrity blocker — the system cannot claim to validate Commander decks if it doesn't check the banlist.
+- **Risk:** Low — read-only validation at import time. Does not modify existing decks. Scryfall API is rate-limited (10 req/sec) but banlist is small (~50 cards) and can be cached locally.
+- **Validation:** Run `check_commander_banlist()` on deck_id=6 — it should return `[Worldfire]` as the banned card. After removal of Worldfire, the function should return `[]` for deck_id=6.
+
+### Task 2: Tag Accuracy Schema Update — Register 4 New Tags
+
+- **Evidence:** TAG_ACCURACY_REPORT (2026-06-03) documents that the reclassification of 17/20 unknown cards introduced 4 new functional tag values (`stax`, `combo`, `commander`, `spellslinger`) that do NOT exist in the `tag_accuracy` table. The `tag_accuracy` table has not been updated in 7 days (last: 2026-05-27). Without entries in `tag_accuracy`, the system cannot track precision or false-positive rates for these tags, making them invisible to quality monitoring.
+- **What to change:** Add rows to `tag_accuracy` for the 4 new tags: `{tag: 'stax', correct: 3, total: 3, precision: 1.0}`, `{tag: 'combo', ...}`, `{tag: 'commander', ...}`, `{tag: 'spellslinger', ...}`. Initialize with manual audit counts from the Validator v3.24 manual classification. Update `last_updated` to current timestamp.
+- **Impact:** Completes the tag accuracy monitoring surface. Without this, 4 functional categories are flying blind — the system can't detect drift in stax/combo classification quality.
+- **Risk:** Low — SQL UPDATE on `tag_accuracy` table in SQLite `knowledge.db`. Does not modify product or PostgreSQL.
+- **Validation:** After update, `SELECT COUNT(*) FROM tag_accuracy` should return 26 (was 22). `SELECT tag, precision FROM tag_accuracy WHERE tag IN ('stax', 'combo', 'commander', 'spellslinger')` should return 4 rows with precision ≥ 0.5.
+
+### Task 3: CMC Integrity Repair for deck_id=6
+
+- **Evidence:** TAG_ACCURACY_REPORT documents that CMC corruption in deck_id=6 **worsened** from ~15 cards to **36 cards** with CMC=NULL or CMC=0.0. Cards affected include Aetherflux Reservoir (real CMC=4, DB=NULL), Electroduplicate (real CMC=3, DB=NULL), Fiery Emancipation (real CMC=6, DB=NULL), and 33 others. The reclassification operation that fixed 17 unknown tags appears to have set CMC=NULL for many cards. This corrupts avg_cmc calculation, mulligan simulation, and curve analysis for ALL agents.
+- **What to change:** Create a `repair_cmc.py` script that: (a) queries all `deck_cards WHERE deck_id=6 AND (cmc IS NULL OR cmc = 0.0)`, (b) cross-references each card name against a CMC reference table (from PostgreSQL `cards` table or a local `card_cmc_reference.json`), (c) updates the `cmc` column with the correct value. For cards not found in the reference, log the card name for manual review.
+- **Impact:** Restores data integrity for the most heavily analyzed deck in the system. All downstream agents (Mulligan, Evolution Oracle, Scout, Validator) depend on correct CMC values.
+- **Risk:** Medium — modifies `deck_cards` table in SQLite. Must ensure the reference data is correct (use PostgreSQL `cards` table as source of truth, which has 33,795 cards with verified CMC).
+- **Validation:** After repair, `SELECT COUNT(*) FROM deck_cards WHERE deck_id=6 AND (cmc IS NULL OR cmc = 0.0)` should return 0. `SELECT AVG(cmc) FROM deck_cards WHERE deck_id=6 AND is_commander=0` should return approximately 2.94 (the manually computed average).
+
+### Task 4: Archetype-Aware PG Profile Matching
+
+- **Evidence:** Validator v3.24 demonstrated that the PG profile for Lorehold (`commander_reference_deck_analysis`) is built for a **spellslinger big-spells** archetype (miracle_topdeck=4.33, ritual_treasure=10), but the active deck is a **cEDH turbo-combo** archetype. The PG comparison output (§19.5) shows massive deltas (+6.8× in win_condition, +3.3× in ramp rocks, -10 in ritual_treasure) that are ARCHETYPE differences, not deficiencies. The Validator currently applies the first matching profile without checking archetype alignment.
+- **What to change:** Add archetype detection logic to the Validator's PG profile selection. When comparing a deck against its PG profile: (a) compute the deck's archetype signature (combo_density, stax_density, fast_mana_count, wincon_count, avg_cmc), (b) compare against PG profile's expected archetype signature, (c) if correlation < 0.5, emit a warning "PG profile may be for a different archetype — deltas are not deficiencies" and skip quantitative gap scoring. Optionally, search `commander_reference_deck_analysis` for profiles with similar archetype signatures.
+- **Impact:** Prevents false-positive "deficiency" reports when the deck simply plays a different archetype than the profile expects. This affects deck scoring, swap recommendations, and Validator reports.
+- **Risk:** Low — read-only analysis. Does not modify PostgreSQL or the deck.
+- **Validation:** Run Validator on deck_id=6 with archetype detection active. It should emit: "⚠️ Archetype mismatch: deck is cEDH Turbo-Combo (combo_density=0.09, stax_density=0.03), PG profile expects Spellslinger Big-Spells (miracle_topdeck=4.33, ritual_treasure=10.0). Quantitative gap scoring SKIPPED."
+
+### Task 5: Wincon Saturation Detection in Evolution Oracle
+
+- **Evidence:** Scout #37 found the active deck has **11 wincons scored** (via `card_deck_analysis`), but the deck realistically only needs 4-5 wincons to function (2 combos + 1 fast + 1 resilient). The deck is saturated — additional wincons are dead weight. The Evolution Oracle currently only recommends ADDING wincons when coverage gaps exist; it never recommends REMOVING excess wincons. Scout #37 concluded "nenhum candidato atinge thresholds" because all viable cards were already in the deck, but failed to recognize that the deck has TOO MANY wincons and could free 5-6 slots for draw/removal/tutors.
+- **What to change:** Add a `wincon_saturation_check` to the Evolution Oracle. After computing wincon coverage (RÁPIDA, RESILIENTE, STEALTH), if total scored wincons > 7 AND all 3 coverage axes are satisfied, recommend consolidating: identify the 4-5 highest-scoring wincons that maintain axis coverage, and mark the remaining as "EXCESS — cut candidates." The freed slots should be prioritized for draw (if <8) or removal (if <5).
+- **Impact:** Prevents decks from bloating with wincons at the expense of core functions. For the Lorehold active deck, this would free 5-6 slots — the single largest optimization remaining.
+- **Risk:** Low — recommendation layer only. Does not auto-apply cuts. The Oracle should present consolidation candidates ranked by lowest (Speed + Resilience + Stealth) score.
+- **Validation:** Run Evolution Oracle on deck_id=6 with wincon saturation active. It should emit: "⚠️ Wincon saturation: 11 scored (threshold: 7). Consolidation candidates: Storm Herd (score=11, CMC=10), Rise of the Eldrazi (score=15, CMC=12), Guttersnipe (score=19, fragile R=5), Rite of the Dragoncaller (score=16, CMC=6). Recommended keep: Approach (speed), Twinflame+Dualcaster (combo/stealth), Aetherflux (storm payoff), Mizzix's Mastery (resilience)."
+
+---
+
+## 22. 🆕 UPDATED KEY SIGNALS FOR APP/BACKEND LOGIC
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Banlist import guard** | v3.24 §19.1, Task 1 | Reject banned cards at import boundary — prevents data corruption before it reaches agents |
+| **Tag accuracy schema expansion** | TAG_ACCURACY_REPORT, Task 2 | Track precision of new tag types introduced by reclassification — prevents blind spots in quality monitoring |
+| **CMC integrity repair** | TAG_ACCURACY_REPORT, Task 3 | Cross-reference CMC from PostgreSQL source of truth — single script fixes all NULL/0.0 corruption |
+| **Archetype-aware profile matching** | v3.24 §19.5, Task 4 | Validator selects correct PG profile by archetype signature, not just commander name — eliminates false deficiency reports |
+| **Wincon saturation detection** | Scout #37 §20.2, Task 5 | Evolution Oracle recommends CUTTING excess wincons when saturation threshold is exceeded — frees slots for draw/removal |
+| **Functional tag completeness audit** | v3.24 §19.2 | Detect decks where `functional_tag` coverage < 70% and trigger classifier execution — current gap: 20% unknown |
+| **Tag accuracy stagnation alert** | TAG_ACCURACY_REPORT §1 | Alert when `tag_accuracy.last_updated > 3 days` — signals classifier pipeline is stalled |
+| **CMC corruption escalation detection** | TAG_ACCURACY_REPORT §1 | Monitor CMC=NULL count change between reports — catch reclassification side-effects (15→36 escalation) |
+| **Pipeline saturation detection** | Scout #37 §20.3 | When all viable swap candidates are below threshold AND wincons are saturated, signal "deck optimization complete" to prevent wasted cycles |
+| **Import classifier execution check** | v3.24 §19.2 | After bulk import, verify that `classify_card()` ran on ALL imported cards — if tag='unknown' detected, trigger classifier |
