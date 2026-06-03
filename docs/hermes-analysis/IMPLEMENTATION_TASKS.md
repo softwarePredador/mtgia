@@ -1,13 +1,18 @@
 # Implementation Tasks — ManaLoom
 
 > Gerado por sintese: cruzamento do conhecimento MTG do Hermes x codigo atual.
-> Data: 2026-06-02T19:20:00+00:00 | Branch: origin/master | SHA: `e754c0ec` | Analysis branch: codex/hermes-analysis-docs
-> Ultima sintese anterior: 2026-06-01T19:19:14+00:00 (SHA 2891aa53) | Novas tasks: P1-l, P1-m, P1-n, P2-k, P2-l
+> Data: 2026-06-03T20:23:21+00:00 | Branch: origin/master | SHA: `fb91fdca` | Analysis branch: codex/hermes-analysis-docs
+> Ultima sintese anterior: 2026-06-02T19:20:00+00:00 (SHA e754c0ec) | Novas tasks: P1-o, P2-m, P2-n, P2-o, P3-f
 
 ## Resumo de Status
 
 | # | Prioridade | Titulo | Status |
 |:--|:-----------|:-------|:-------|
+| **P1-o** | **P1** | **Commander Learning: _roleSummary() le metadata estagnado do JSONB** | **NOVO** |
+| **P2-m** | **P2** | **card_list ILIKE full-table scan em meta_decks (commander-reference)** | **NOVO** |
+| **P2-n** | **P2** | **sync_log table tem zero consumidores Dart** | **NOVO** |
+| **P2-o** | **P2** | **archetypeToTheme() fallback cria nomes de temas inexistentes no PG** | **NOVO** |
+| **P3-f** | **P3** | **Commander Learning: sem trigger de reclassificacao pos-import** | **NOVO** |
 | P1-a | P1 | BracketCategory enum nao detecta Game Changers | RESOLVIDO (ae886b11) |
 | P1-b | P1 | card_deck_profiles nao consultado pelo optimize | RESOLVIDO (d8b7b26b) |
 | P1-c | P1 | Weakness-analysis usa heuristicas legacy (sem adapter F1) | ATIVO |
@@ -19,9 +24,9 @@
 | P1-i | P1 | Dart single-tag _looksLike* mais estreitas que multi-tag | ATIVO |
 | P1-j | P1 | Pipeline Integrity: validator sem hash verification | ATIVO |
 | P1-k | P1 | resolveOptimizeArchetype duplicado com semantica divergente | ATIVO |
-| **P1-l** | **P1** | **verifySwapIntegrity (163 linhas) com zero call-sites — verif. inerte** | **NOVO** |
-| **P1-m** | **P1** | **Bulk import bypassa classificadores — 20 tags 'unknown', 0 card_tags** | **NOVO** |
-| **P1-n** | **P1** | **Ritual/fast-mana misclassified — 7/13 fontes ramp com tag errada** | **NOVO** |
+| P1-l | P1 | verifySwapIntegrity (163 linhas) com zero call-sites | ATIVO |
+| P1-m | P1 | Bulk import bypassa classificadores | ATIVO |
+| P1-n | P1 | Ritual/fast-mana misclassified | ATIVO |
 | P2-a | P2 | _looksLikePayoff nao detecta payoffs de dano direto | RESOLVIDO (3fb17356) |
 | P2-b | P2 | Tags ninja/stax_disruption com 0% de acuracia | ATIVO |
 | P2-c | P2 | Write-only tables | ATIVO |
@@ -31,9 +36,9 @@
 | P2-g | P2 | 77 cartas sem oracle text | ATIVO |
 | P2-h | P2 | card_deck_analysis (wincon scores) — 0 refs no Dart | ATIVO |
 | P2-i | P2 | Evolution Oracle swap scripts lack post-exec verification | ATIVO |
-| P2-j | P2 | Basic land detection: 4 variantes incompatíveis | ATIVO |
-| **P2-k** | **P2** | **archetypeToTheme() cobre apenas 12 patterns — misclassifica** | **NOVO** |
-| **P2-l** | **P2** | **GoldfishSimulator nao simula tapped lands — T3 superestimado** | **NOVO** |
+| P2-j | P2 | Basic land detection: 4 variantes incompatíveis | PARCIAL (shared basic_land_utils.dart em master) |
+| P2-k | P2 | archetypeToTheme() cobre apenas 12 patterns | ATIVO |
+| P2-l | P2 | GoldfishSimulator nao simula tapped lands | ATIVO |
 | P3-a | P3 | CONTEXTO_PRODUTO_ATUAL.md desatualizado | RESOLVIDO (7ed5b863) |
 | P3-b | P3 | Weakness-analysis wincon detection fragil | ATIVO |
 | P3-c | P3 | manual-de-instrucao.md desatualizado | ATIVO |
@@ -42,199 +47,151 @@
 
 ---
 
-### [P1] verifySwapIntegrity infrastructure exists but has zero call-sites
+### [P1] Commander Learning: _roleSummary() reads stale metadata from JSONB
 
-**Conhecimento MTG:** O SCOUT_LOG #35 (2026-06-01) descobriu que Flare of Duplication e Twinflame estao AUSENTES do deck apesar de documentadas como adicionadas no Ciclo #10. O sistema gerou os swaps, documentou a aplicacao, mas os swaps NUNCA OCORRERAM. Nenhum agente detectou por 13+ ciclos.
+**Conhecimento MTG:** O VALIDATOR_LOG v3.23 (2026-06-02) e a skill documentam o pitfall "decks Table Columns Can Be Stale vs deck_cards Tags". Metricas estruturais armazenadas em colunas podem divergir por dias das tags reais.
 
 **Evidencia no codigo:**
-- `server/lib/ai/optimize_swap_integrity.dart` — 163 linhas com `computeSwapIntegrity()` (linha 84), `verifySwapIntegrity()` (linha 112), classe `SwapIntegrity`
-- `rg "optimize_swap_integrity" server/lib/ --glob '*.dart'` → 0 resultados — NENHUM import
-- `rg "computeSwapIntegrity|verifySwapIntegrity" server/lib/ --glob '*.dart'` → 0 resultados — NENHUM call-site
-- COMMIT_DIGEST (e754c0ec): "`verifySwapIntegrity` definido mas nunca chamado"
+- `server/routes/ai/commander-learning/index.dart:283-301` — `_roleSummary()` le `total_lands`, `ramp_count`, etc. do campo `metadata` JSONB importado. Esses valores sao computados UMA VEZ no momento do import (`bin/commander_learned_deck.dart`) e NUNCA recalculados.
+- `server/routes/ai/commander-reference/index.dart:443-449` — mesmo padrao em `_buildCommanderLearningPayload()`.
 
-**Gap:** 163 linhas de codigo morto. Infraestrutura de verificacao de integridade de swaps existe mas e completamente inerte — o hash SHA-256 nunca e computado durante optimize e nunca verificado apos aplicacao.
+**Gap:** Se o classificador atualizar tags de 'unknown' para 'ramp' apos o import, o `role_summary` continua mostrando os numeros antigos. O endpoint `/ai/commander-learning` expoe metricas potencialmente estagnadas.
 
-**Impacto:**
-1. Codigo que deveria prevenir o incidente Flare/Twinflame nunca e executado
-2. Swaps que falham silenciosamente (INSERT rejeitado, constraint violation) nunca sao detectados
-3. Evolution Oracle confia cegamente que seus swaps foram aplicados
+**Impacto:** UI mostra metricas incorretas; decisoes de otimizacao baseadas em role_summary podem ser erradas.
 
-**Risco:** P1 — quebra silenciosa do pipeline.
+**Risco:** P1 — dados estagnados expostos na API publica.
 
 **Acao recomendada:**
-1. Adicionar import de `optimize_swap_integrity.dart` no fluxo de optimize
-2. Chamar `computeSwapIntegrity()` durante optimize e incluir no response body
-3. Adicionar endpoint ou verificacao `verifySwapIntegrity()` no Evolution Oracle
+1. Adicionar funcao `_recomputeRoleSummary(pool, cardList)` que consulta `card_function_tags`
+2. Usar no endpoint em vez de confiar no metadata JSONB
+3. Alternativa: endpoint `POST /ai/commander-learning/refresh` para recalcular
 
 **Validacao:**
 ```bash
 cd server
-dart analyze lib/ai/optimize_swap_integrity.dart lib/ai/optimize_runtime_support.dart
-dart test test/optimize_swap_integrity_test.dart
+dart analyze routes/ai/commander-learning/index.dart
+dart test test/commander_learned_deck_support_test.dart
 ```
 
 ---
 
-### [P1] Bulk import bypasses ALL classifiers — 20 'unknown' tags, 0/100 card_tags, no post-import health check
+### [P2] card_list ILIKE full-table scan on meta_decks in commander-reference
 
-**Conhecimento MTG:** SCOUT_LOG #36 (2026-06-02T18:33:43) emitiu alerta de integridade: deck Lorehold reconstruido como cEDH. Purpose Analyzer v3.23 confirmou `alert-pipeline-integrity-crisis`. A skill documenta pitfall "Bulk Import Data Corruption — Classifier NEVER Ran": cards importados recebem `functional_tag='unknown'`, CMC=NULL, type_line=NULL, zero `card_tags`.
-
-**Evidencia no codigo:**
-- Nao ha post-import health check em nenhum arquivo Dart (`rg "bulk.import|post.import|health.check" server/lib/ --glob '*.dart'` → 0 resultados)
-- Fluxo de import em Python (`scripts/import_*.py`) nao chama `classify_card()` ou `infer_functional_card_tags()`
-- Query double-null (`WHERE functional_tag IS NULL`) nao pega 'unknown' (string, nao NULL)
-
-**Evidencia no banco (SQLite, deck_id=6, 2026-06-02T19:20Z):**
-- 20/100 cartas com `functional_tag='unknown'`
-- 0/100 cartas com entradas em `card_tags` (multi-tag classifier NUNCA rodou)
-- 7/100 cartas com `cmc=NULL`, 6/100 com `type_line=NULL`
-- Hash atual: `f2241d994743e8142396c0f846917fde` (deck ja mudou 3x desde SCOUT #35)
-
-**Gap:** Quando um deck e importado em massa, o classificador nunca roda. Metricas `ramp_count=6` (real: ~13), `draw_count=6` (real: ~9-10). Otimizador opera com dados corrompidos.
-
-**Impacto:**
-1. Optimization engine recomenda swaps baseados em metricas falsas
-2. Mulligan simulator usa `functional_tag='ramp'` para keepability — 8.8pp de erro
-3. Double-null query nao detecta as 20 cartas 'unknown'
-4. Evolution Oracle pode cortar cartas essenciais achando que sao fillers
-
-**Risco:** P1 — dados corrompidos no pipeline principal.
-
-**Acao recomendada:**
-1. Adicionar `_runPostImportHealthCheck(String deckId)` que detecta 'unknown' tags, NULL CMC, zero card_tags
-2. Corrigir query double-null: `WHERE (dc.functional_tag IS NULL OR dc.functional_tag = 'unknown') AND ct.deck_card_id IS NULL`
-3. Modificar scripts Python de import para chamar classificador apos INSERT
-4. Executar correcao imediata no deck atual: re-classificar todas as 100 cartas
-
-**Validacao:**
-```bash
-python3 -c "
-import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
-c = conn.cursor()
-c.execute("SELECT COUNT(*) FROM deck_cards WHERE deck_id=6 AND functional_tag='unknown'")
-assert c.fetchone()[0] == 0, 'Ainda ha cartas unknown!'
-c.execute('SELECT COUNT(DISTINCT dc.id) FROM deck_cards dc JOIN card_tags ct ON ct.deck_card_id = dc.id WHERE dc.deck_id=6')
-assert c.fetchone()[0] >= 85, 'Multi-tag nao rodou!'
-print('OK')
-"
-```
-
----
-
-### [P1] Ritual and fast-mana cards misclassified — 7 of 13 real ramp sources have wrong tag
-
-**Conhecimento MTG:** Em cEDH, fast mana inclui rituais (Rite of Flame, Seething Song, Jeska's Will) e rocks (Mana Vault, Arcane Signet). O SCOUT_LOG #36 identificou que o deck tem fast mana package mas DB reporta `ramp_count=6`.
+**Conhecimento MTG:** O endpoint `commander-reference` consulta `meta_decks` (650+ linhas, crescente) para construir perfis de referencia. A query usa `card_list ILIKE` em coluna TEXT/JSON sem indice.
 
 **Evidencia no codigo:**
-- `optimization_functional_roles.dart:55-125` — `classifyOptimizationFunctionalRole()` so retorna 'ramp' para fetch-lands e ramp spells com 'search.*library.*land'. NAO detecta rituais (add {R}{R}{R}) nem rocks ({T}: Add).
-- `scryfall_classifier.py:155-221` — `classify_card()`: mesmo problema.
-
-**Evidencia no banco (SQLite, deck_id=6):**
-
-| Card | Real Function | DB Tag | CMC |
-|:-----|:--------------|:-------|:---:|
-| Sol Ring | fast mana | **unknown** | 1 |
-| Mana Vault | fast mana | **unknown** | - |
-| Rite of Flame | ritual | **spell** | 1 |
-| Seething Song | ritual | **spell** | 3 |
-| Jeska's Will | ritual | **draw** | 3 |
-| Mana Geyser | ritual | **spell** | 5 |
-| Boros Signet | rock | **unknown** | 2 |
-
-7/13 fontes de mana acelerada com tag errada. Apenas 6 corretas.
-
-**Gap:** Classificador nao reconhece rituais nem mana rocks como 'ramp'. So busca de terrenos e mana dorks sao detectados. Em decks cEDH, causa subestimacao massiva (6 reportado vs 13 real — 54% de erro).
-
-**Impacto:**
-1. Otimizador acha que deck tem pouca ramp e recomenda adicionar mais
-2. Mulligan simulator faz mulligan agressivo em maos com ritual/rock nao-detectado
-3. Evolution Oracle pode trocar ritual (CMC 1-3) por ramp spell de fetch (CMC 2-4) achando que esta adicionando ramp
-
-**Risco:** P1 — metricas estruturais corrompidas afetam todo o pipeline.
-
-**Acao recomendada:**
-1. Expandir `_looksLikeRamp()` com padroes para:
-   - Rituais: oracle contem "add {R}" ou "add {W}" seguido de quantidade
-   - Rocks: type_line contem 'artifact' + oracle contem '{T}: Add'
-   - Treasure generators: oracle contem "create.*treasure token"
-2. Re-executar classificador no deck atual apos correcao
-
-**Validacao:**
-```bash
-cd server
-dart analyze lib/ai/optimization_functional_roles.dart
-dart test test/optimization_functional_roles_test.dart
-# Testes: Rite of Flame, Seething Song, Jeska's Will → tag 'ramp'
-```
-
----
-
-### [P2] archetypeToTheme() covers only 12 patterns — order-dependent matching causes misclassification
-
-**Conhecimento MTG:** SCOUT_LOG #36 detectou deck Lorehold reconstruido como "cEDH-adjacent: fast mana + tutor denso + protection". Tema correto seria `cedh_combo`, mas `archetypeToTheme()` pode retornar 'spellslinger' por causa da ordem dos ifs.
-
-**Evidencia no codigo:**
-- `theme_contextual_rules_service.dart:54-68` — `archetypeToTheme()`:
-  ```dart
-  if (a.contains('spellslinger') || a.contains('spells')) return 'spellslinger'; // PRIMEIRO
-  // ...
-  if (a.contains('combo') || a.contains('cedh')) return 'cedh_combo';           // PENULTIMO
+- `server/routes/ai/commander-reference/index.dart:96` (master):
+  ```sql
+  OR card_list ILIKE @commanderPattern  -- FULL TABLE SCAN
   ```
-  "cEDH Boros Spellslinger" → match no primeiro if → retorna 'spellslinger' (ERRADO)
+- `card_list` e TEXT/JSON — ILIKE nao pode usar indices B-tree.
 
-**Gap:** Genericos (spellslinger, token) sao verificados ANTES de especificos (cedh, combo). Apenas 12 padroes — THEMES.md tem 42 temas.
+**Gap:** Cada request faz scan sequencial em todas as linhas. Latencia cresce O(n) com o corpus.
 
-**Impacto:**
-1. Deck cEDH classificado como 'spellslinger' — recebe regras de validacao erradas
-2. Fallback `a.replaceAll(' ', '_')` cria nomes de tema inexistentes no PG → zero regras
+**Impacto:** Performance degradation com crescimento de dados; pode exceder timeouts.
 
-**Risco:** P2 — servico de validacao tematica retorna regras erradas.
+**Risco:** P2 — performance.
 
 **Acao recomendada:**
-1. Reordenar ifs: cedh/combo primeiro, spellslinger/token depois
-2. Substituir cadeia de ifs por map lookup para todos os 42 temas
+1. Adicionar coluna `commander_search_text` com GIN trigram index
+2. Ou extrair commander names para `TEXT[]` com GIN index
+3. Quick win: garantir que LIMIT seja aplicado antes do ILIKE (subquery)
 
 **Validacao:**
 ```bash
 cd server
-dart analyze lib/ai/theme_contextual_rules_service.dart
-dart test test/theme_contextual_rules_service_test.dart
-# "cEDH Boros Spellslinger" → 'cedh_combo' (nao 'spellslinger')
+dart test test/commander_reference_route_test.dart
 ```
 
 ---
 
-### [P2] GoldfishSimulator doesn't simulate tapped lands — T3 playable rate overestimated by 3-8pp
+### [P2] sync_log table has zero Dart consumers
 
-**Conhecimento MTG:** A skill documenta: "The mulligan simulation treats ALL lands as untapped on the turn they enter. Tapped lands (Temple of Triumph, Boros Garrison) are not simulated → T3 real is worse than reported by 3-8pp."
+**Conhecimento MTG:** Saber QUANDO cada fonte de dados foi sincronizada e critico para diagnosticar dados estagnados (Scryfall, EDHREC, Commander Spellbook).
 
 **Evidencia no codigo:**
-- `goldfish_simulator.dart` — `_canPlayOnTurn()` (linha ~174): verifica `landsPlayed >= turn` mas NAO verifica se a land entra tapped
-- `rg "tapped|enters the battlefield tapped" goldfish_simulator.dart` → 0 resultados
-- `optimization_validator.dart:37` usa `GoldfishSimulator` diretamente
+- `server/database_setup.sql` — cria `sync_log` (source, status, records_synced, timestamps)
+- `grep -rn "sync_log" server/lib/ server/routes/ --include="*.dart"` → **0 resultados**
+- Scripts Python escrevem mas nenhum codigo Dart le
 
-**Gap:** Simulador assume que toda land entra desvirada. Temple of Triumph T1 → so desvira T2. Boros Garrison T2 → so desvira T3. O validator toma decisoes estrategicas baseadas em T3 inflado.
+**Gap:** Tabela write-only sem visibilidade operacional. Falhas de sync sao invisiveis.
 
-**Impacto:**
-1. T3 reportado 13% → real 16-18% → Evolution Oracle usa estrategia BALANCED quando deveria usar DEFENSIVE
-2. Decks budget/casual com muitas tapped lands sao os mais afetados
+**Impacto:** Operadores nao sabem quando dados foram atualizados; sem alertas.
 
-**Risco:** P2 — validator superestima consistencia, levando a estrategias menos conservadoras.
+**Risco:** P2 — visibilidade operacional zero.
 
 **Acao recomendada:**
-1. Adicionar `_isTappedLand(card)` que detecta "enters the battlefield tapped" no oracle
-2. Modificar `_canPlayOnTurn()` para rastrear quais lands entram tapped
-3. Como fallback: se >20% tapped lands, aplicar fator de correcao de -3-5pp no T3
+1. Adicionar `GET /health/sync-status` ou integrar no `/health` existente
+2. Alertar quando `completed_at > 24h` para sources criticos
 
 **Validacao:**
 ```bash
 cd server
-dart analyze lib/ai/goldfish_simulator.dart lib/ai/optimization_validator.dart
-dart test test/goldfish_simulator_test.dart
-# Deck com 4 tapped lands → T3 playable < deck com 4 basics
+dart test test/health_endpoint_test.dart
 ```
 
 ---
+
+### [P2] archetypeToTheme() fallback silently creates theme names with zero PG rules
+
+**Conhecimento MTG:** THEMES.md tem 42 temas; `theme_contextual_rules` PG tem 27 regras. O fallback `a.replaceAll(' ', '_')` cria nomes como `'artifact_combo'` que nao existem no PG → `getRulesForArchetype()` retorna `[]` → validacao tematica e silenciosamente DESLIGADA.
+
+**Evidencia no codigo:**
+- `server/lib/ai/theme_contextual_rules_service.dart:67`:
+  ```dart
+  return a.replaceAll(' ', '_');  // FALLBACK: nome invalido
+  ```
+- `validateDeck()` retorna `hasCriticalViolation: false` quando `rules.isEmpty` — sem warning.
+
+**Gap:** Arquetipos nao mapeados passam na validacao sem NENHUMA verificacao tematica. Operador nao sabe que a validacao foi pulada.
+
+**Impacto:** Validacao tematica silenciosamente ineficaz para arquetipos nao mapeados.
+
+**Risco:** P2 — validacao silenciosamente desligada.
+
+**Acao recomendada:**
+1. Adicionar warning quando `rules.isEmpty`: `theme_fallback_used: true`
+2. Mapear fallback para tema conhecido mais proximo (ex: `artifact_combo` → `artifacts`)
+3. Logar `No theme rules found for archetype: X` no server
+
+**Validacao:**
+```bash
+cd server
+dart test test/theme_contextual_rules_service_test.dart
+```
+
+---
+
+### [P3] Commander Learning: no post-import reclassification trigger
+
+**Conhecimento MTG:** O VALIDATOR_LOG v3.23 descobriu que importacao em massa produz `functional_tag='unknown'` e zero `card_tags`. A skill documenta "Bulk Import Data Corruption — Classifier NEVER Ran".
+
+**Evidencia no codigo:**
+- `server/bin/commander_learned_deck.dart` — importa deck, nao chama classificador
+- `_roleSummary()` le metadata do import — se tags estao erradas, metadata tambem
+- Endpoint `/ai/commander-learning` nao tem `?refresh=true`
+
+**Gap:** Deck importado com tags ruins permanece com metricas erradas indefinidamente.
+
+**Impacto:** Dados de baixa qualidade persistem; sem mecanismo de correcao automatica.
+
+**Risco:** P3 — qualidade pos-import sem correcao. (Limitado a decks aprendidos, nao ao pipeline principal.)
+
+**Acao recomendada:**
+1. Adicionar `?refresh=true` ao endpoint para re-classificar cartas
+2. No `bin/commander_learned_deck.dart`, rodar classificador apos INSERT
+3. Health check: warning se >10% das cartas com `functional_tag='unknown'`
+
+**Validacao:**
+```bash
+cd server
+dart run bin/commander_learned_deck.dart --input-json=test.json --apply
+# Verificar: metadata.ramp_count > 0
+```
+
+---
+
+## Tasks Ja Ativos (mantidos de sintese anterior)
 
 ## Tasks Ja Ativos (mantidos de sintese anterior)
 
