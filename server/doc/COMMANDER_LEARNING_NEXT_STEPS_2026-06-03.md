@@ -19,7 +19,16 @@ GET /ai/commander-reference?commander=Lorehold,%20the%20Historian&learning=1&inc
 4. Em andamento: integrar no app/UI o bloco `commander_learning.recommended_deck`.
 5. Feito: criar rotina idempotente Hermes -> PG para novos decks aprendidos.
 6. Feito: adicionar teste especifico da rota garantindo que `commander_learned_decks` ativo tem prioridade sobre fallback deterministico.
-7. Avaliar endpoint dedicado `/ai/commander-learning` se o payload da rota atual ficar pesado.
+7. Feito: endpoint dedicado `/ai/commander-learning` criado para payload direto de deck aprendido.
+
+## Endpoint Dedicado
+```text
+GET /ai/commander-learning?commander=Lorehold,%20the%20Historian
+```
+
+- Retorna `available`, `promoted_deck` e `recommended_deck` diretamente.
+- Fonte runtime: `commander_learned_decks` no PG.
+- O app usa este endpoint no atalho `Usar deck aprendido do comandante`.
 
 ## Rotina Idempotente Hermes -> PG
 ```text

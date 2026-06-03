@@ -785,12 +785,8 @@ class DeckProvider extends ChangeNotifier {
 
     final endpoint =
         Uri(
-          path: '/ai/commander-reference',
-          queryParameters: {
-            'commander': commander,
-            'learning': '1',
-            'include_deck': '1',
-          },
+          path: '/ai/commander-learning',
+          queryParameters: {'commander': commander},
         ).toString();
     final response = await _apiClient.get(endpoint);
     if (response.statusCode < 200 || response.statusCode >= 300) {

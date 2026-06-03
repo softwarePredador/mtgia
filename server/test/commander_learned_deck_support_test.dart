@@ -40,5 +40,15 @@ void main() {
       expect(promotedIndex, lessThan(fallbackIndex));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
     });
+
+    test('dedicated route exposes promoted learned deck payload', () {
+      final route =
+          File('routes/ai/commander-learning/index.dart').readAsStringSync();
+
+      expect(route, contains('commander_learned_decks'));
+      expect(route, contains("'source': 'pg_commander_learned_decks'"));
+      expect(route, contains("'recommended_deck': recommendedDeck"));
+      expect(route, contains("'source': 'promoted_learned_deck_pg'"));
+    });
   });
 }

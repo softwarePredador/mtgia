@@ -209,7 +209,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
       final learning =
           (result['commander_learning'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
+          result;
       final recommendedDeck =
           (learning['recommended_deck'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{};
