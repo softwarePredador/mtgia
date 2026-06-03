@@ -1,0 +1,8 @@
+=== Dry Run Lorehold Sample ===
+Source: manual-test
+Archetype: spellslinger
+1 Sol Ring
+1 Mountain
+1 Approach of the Second Sun
+1 Swords to Plowshares
+1 Faithless Looting

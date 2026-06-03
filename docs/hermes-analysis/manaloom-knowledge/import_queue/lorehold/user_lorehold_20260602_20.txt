@@ -1,0 +1,96 @@
+=== User Lorehold Deck 2026-06-02 #20 ===
+Source: user-import
+Archetype: tokens-go-wide-big-spells
+
+1 Lorehold, the Historian
+1 Alpha Brawl
+1 Anointed Procession
+1 Apex of Power
+1 Approach of the Second Sun
+1 Arcane Signet
+1 Arid Mesa
+1 Avacyn, Angel of Hope
+1 Aziza, Mage Tower Captain
+1 Battlefield Forge
+1 Beacon of Immortality
+1 Bloodstained Mire
+1 Boros Charm
+1 Boros Garrison
+1 Bottle-Cap Blast
+1 Brass's Bounty
+1 Burn Down the House
+1 Call Forth the Tempest
+1 Caught Red-Handed
+1 Chandra's Flame Wave
+1 Chandra, Flame's Fury
+1 Chrome Mox
+1 Conqueror's Pledge
+1 Deploy to the Front
+1 Devils' Playground
+1 Dragonstorm
+1 Elegant Parlor
+1 Elspeth, Storm Slayer
+1 Emeria's Call
+1 Everything Comes to Dust
+1 Exalted Sunborn
+1 Feudkiller's Verdict
+1 Fire Nation Attacks
+1 Flame Wave
+1 Flooded Strand
+1 Flurry of Horns
+1 Furycalm Snarl
+1 Furygale Flocking
+1 Geosurge
+1 Ghostly Prison
+1 Gideon's Phalanx
+1 Glittering Massif
+1 Goblin Rally
+1 Goblin Scouts
+1 Goldwardens' Gambit
+1 Great Hall of the Citadel
+1 Grim Monolith
+1 Guildless Commons
+1 Heroes Remembered
+1 Hit the Mother Lode
+1 Imperial Oath
+1 Improvisation Capstone
+1 Increasing Devotion
+1 Insurrection
+1 Invincible Hymn
+1 Jeska's Will
+1 Kirol, History Buff
+1 Land Tax
+1 Lightning Bolt
+1 Lorehold Campus
+1 Mana Vault
+1 Marsh Flats
+1 Mass Calcify
+1 Mica, Reader of Ruins
+1 Mogg Infestation
+1 Mondrak, Glory Dominus
+1 Mother of Runes
+5 Mountain
+1 Mox Diamond
+1 Mystic Forge
+1 Needleverge Pathway
+1 Ojer Taq, Deepest Foundation
+1 Path to Exile
+5 Plains
+1 Plateau
+1 Radiant Summit
+1 Rain of Salt
+1 Rise of the Eldrazi
+1 Sacred Foundry
+1 Scalding Tarn
+1 Sensei's Divining Top
+1 Skittering Invasion
+1 Smothering Tithe
+1 Sol Ring
+1 Storm Herd
+1 Storm of Souls
+1 Swords to Plowshares
+1 The Crystal's Chosen
+1 The Dawning Archaic
+1 Volcanic Awakening
+1 Windswept Heath
+1 Wooded Foothills

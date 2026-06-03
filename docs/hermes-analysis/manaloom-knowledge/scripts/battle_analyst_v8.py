@@ -97,6 +97,7 @@ KNOWN_CARDS = {
     "Abrade": {"effect": "remove_artifact_or_3dmg", "instant": True},
     "Generous Gift": {"effect": "remove_permanent", "instant": True},
     "Deflecting Swat": {"effect": "redirect_removal", "instant": True},
+    "Dragon's Approach": {"effect": "dragons_approach", "damage": 3},
     "Dance with Calamity": {"effect": "exile_value", "miracle": True},
     "Reforge the Soul": {"effect": "draw_cards", "count": 7, "miracle": "1R"},
 }
@@ -680,7 +681,16 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 stack.push(c, player, eff)
                 played += 1
 
-    # Resolve stack
+    
+    # ── ESPER SENTINEL TRIGGER (noncreature spell cast) ──
+    for opp in opponents:
+        for c in opp.battlefield:
+            if isinstance(c, dict) and c.get("effect") == "draw_engine" and c.get("trigger") == "opponent_spell":
+                # Opponent may pay 1. 50% chance they don't
+                if random.random() < 0.5:
+                    opp.draw(1, rng)  # Esper owner draws
+
+# Resolve stack
     while not stack.empty():
         priority_round(player, all_players, stack, turn, rng)
 
@@ -858,6 +868,72 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.indestructible = True
         player.graveyard.append(card)
 
+    elif effect == "ripple_engine":
+        # Thrumming Stone — gives all spells ripple 4
+        player.battlefield.append(effect_data)
+        player.copy_engines += 1  # reuse copy counter for ripple tracking
+
+    elif effect == "dragons_approach":
+        # Dragon's Approach — 3 damage to each opponent per copy
+        # Count copies in graveyard for bonus damage
+        grave_copies = sum(1 for c in player.graveyard if isinstance(c, dict) and c.get("name") == "Dragon's Approach")
+        total_damage = 3 + grave_copies  # +3 per copy in grave
+        for opp in opponents:
+            if opp.is_alive():
+                opp.life -= total_damage
+        
+        # Ripple: after casting, reveal top 4 and cast matching spells for free
+        has_ripple = any(isinstance(c, dict) and c.get("effect") == "ripple_engine" for c in player.battlefield)
+        if has_ripple and player.library:
+            ripple_count = min(4, len(player.library))
+            extra_casts = 0
+            for i in range(ripple_count):
+                if i >= len(player.library): break
+                c = player.library[i]
+                if isinstance(c, dict) and c.get("name") == "Dragon's Approach":
+                    extra_casts += 1
+                    # Cast it for free — deal damage again
+                    for opp in opponents:
+                        if opp.is_alive():
+                            opp.life -= total_damage
+                    # Remove from library
+                    player.library.pop(i)
+            if extra_casts > 0:
+                print(f"  [RIPPLE] Cast {extra_casts} extra Dragon's Approach!")
+        
+        player.graveyard.append(card)
+
+    elif effect == "combo" and card.get("name") == "Dualcaster Mage":
+        # Dualcaster enters, check if Twinflame is on the stack or was just cast
+        # If another creature exists on board, the combo can fire
+        creatures = [c for c in player.battlefield if isinstance(c, dict) and c.get("effect") == "creature"]
+        if creatures:
+            # Check if Twinflame is in graveyard (was just used) OR in hand
+            twinflame_used = any(c.get("name") == "Twinflame" for c in player.graveyard)
+            twinflame_hand = any(c.get("name") == "Twinflame" for c in player.hand)
+            if twinflame_used or twinflame_hand:
+                # COMBO FIRES! Infinite hasty 2/2 tokens
+                # Create enough tokens to kill all opponents
+                total_opp_life = sum(o.life for o in opponents if o.is_alive())
+                tokens_needed = max(1, total_opp_life // 2)  # 2/2 tokens
+                for _ in range(min(tokens_needed, 50)):  # cap at 50 tokens
+                    player.battlefield.append({
+                        "name": "Dualcaster Token", "cmc": 0, "tag": "token",
+                        "effect": "creature", "power": 2, "toughness": 2,
+                        "haste": True, "summoning_sick": False,
+                    })
+                # Attack with all tokens immediately
+                total_power = tokens_needed * 2
+                alive_opps = [o for o in opponents if o.is_alive()]
+                if alive_opps:
+                    dmg_each = total_power // len(alive_opps)
+                    for opp in alive_opps:
+                        opp.life -= dmg_each
+                print(f"  [COMBO] Dualcaster+Twinflame = {tokens_needed} hasty 2/2s! {total_power} total damage")
+        
+        player.battlefield.append(dict(card))
+        card["summoning_sick"] = False  # haste from combo
+
 def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     creatures = attacker.untapped_creatures()
     if not creatures: return
@@ -1032,6 +1108,16 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
     if check_sbas(all_players): return
 
+    # ── TRIGGER: Smothering Tithe on opponent draws (during draw step above) ──
+    for opp in opponents:
+        if opp.is_alive():
+            for c in opp.battlefield:
+                if isinstance(c, dict) and c.get("effect") == "ramp_engine" and c.get("trigger") == "opponent_draw":
+                    c["counter"] = c.get("counter", 0) + 1
+                    # Creates a Treasure token (simplified as +1 treasure)
+                    opp.treasures += 1
+
+
     # ── COMBAT ──
     if turn > 1:
         combat_phase_v8(player, opponents, all_players, turn, rng, stack)
@@ -1042,10 +1128,23 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     cast_spells_v8(player, opponents, all_players, turn, "postcombat_main", stack, rng)
     if check_sbas(all_players): return
 
-    # ── END STEP (v8.3: 1 extra draw per engine, capped at 3) ──
+
+    # ── END STEP (v8.3) ──
     for c in player.battlefield:
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and not c.get("burden"):
             player.draw(1, rng)
+    
+    # ── OPPONENT END STEP INTERACTION (NEW) ──
+    # All opponents can cast instants on this player's end step
+    for opp in opponents:
+        if not opp.is_alive(): continue
+        instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.available_mana() >= c["cmc"]]
+        for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
+            if opp.available_mana() >= c["cmc"]:
+                opp.hand.remove(c)
+                opp.mana_pool.spend(c["cmc"])
+                apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
+
 
     # ── CLEANUP ──
     while len(player.hand) > 7:

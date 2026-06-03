@@ -1,0 +1,99 @@
+=== User Lorehold Deck 2026-06-02 #6 ===
+Source: user-import
+Archetype: storm-burn-pinger-ritual
+
+1 Lorehold, the Historian
+1 Ancient Tomb
+1 Arcane Signet
+1 Arid Mesa
+1 Ashling, Flame Dancer
+1 Backdraft Hellkite
+1 Battlefield Forge
+1 Bender's Waterskin
+1 Big Score
+1 Birgi, God of Storytelling
+1 Bloodstained Mire
+1 Boltwave
+1 Cavern of Souls
+1 City of Brass
+1 Command Tower
+1 Coruscation Mage
+1 Decaying Time Loop
+1 Delayed Blast Fireball
+1 Desperate Ritual
+1 Dragon's Rage Channeler
+1 Electro, Assaulting Battery
+1 Emergence Zone
+1 Esper Sentinel
+1 Fiery Confluence
+1 Fiery Inscription
+1 Firebrand Archer
+1 Flashback
+1 Flooded Strand
+1 Fomori Vault
+1 Gemstone Caverns
+1 Glint-Horn Buccaneer
+1 Grab the Prize
+1 Guttersnipe
+1 Heartwarming Redemption
+1 Inspired Tinkering
+1 Jeska's Will
+1 Kessig Flamebreather
+1 Lens of Clarity
+1 Library of Leng
+1 Longshot, Rebel Bowman
+1 Magmakin Artillerist
+1 Mana Confluence
+1 Marsh Flats
+1 Mechanized Warfare
+1 Monument to Endurance
+6 Mountain
+1 Nykthos, Shrine to Nyx
+1 Ojer Axonil, Deepest Might
+1 Open the Omenpaths
+1 Past in Flames
+1 Path of the Pyromancer
+1 Pirate's Pillage
+1 Plains
+1 Plateau
+1 Powerbalance
+1 Primal Amulet
+1 Prismatic Vista
+1 Psychosis Crawler
+1 Pyretic Ritual
+1 Razorkin Needlehead
+1 Reforge the Soul
+1 Rite of Flame
+1 Ruby Medallion
+1 Ruinous Rampage
+1 Runaway Steam-Kin
+1 Sacred Foundry
+1 Scalding Tarn
+1 Seething Song
+1 Seize the Spoils
+1 Semblance Anvil
+1 Sensei's Divining Top
+1 Shattered Perception
+1 Sizzle
+1 Slagstorm
+1 Snort
+1 Sol Ring
+1 Solphim, Mayhem Dominus
+1 Spectator Seating
+1 Spiked Corridor // Torture Pit
+1 Storm-Kiln Artist
+1 Strike It Rich
+1 Sunbaked Canyon
+1 Sunbillow Verge
+1 Sundown Pass
+1 Tablet of Discovery
+1 Talisman of Conviction
+1 Thunderdrum Soloist
+1 Torbran, Thane of Red Fell
+1 Unexpected Windfall
+1 Valakut Awakening
+1 Valakut, the Molten Pinnacle
+1 Wheel of Fortune
+1 Will of the Jeskai
+1 Windswept Heath
+1 Wooded Foothills

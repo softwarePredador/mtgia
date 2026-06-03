@@ -1,467 +1,289 @@
 #!/usr/bin/env python3
-"""Deterministic Lorehold wincon pipeline for Hermes cron jobs.
+"""Lorehold wincon pipeline.
 
-The agent prompts were producing reports that did not match knowledge.db. This
-script keeps the cron outputs tied to actual SQLite writes and schema checks.
+Modes:
+  hunter  - discover/catalog wincons from approved local/PG sources
+  tester  - validate availability against current Lorehold deck + collection
+  builder - emit candidate wincon packages; never changes decklists
+  oracle  - review-only deterministic priority report
+
+No mode modifies a decklist. PostgreSQL is optional and must be configured via
+environment variables; no credentials are stored in this script.
 """
 
 from __future__ import annotations
 
-import argparse
-import json
+import os
 import sqlite3
-from datetime import datetime, timezone
+import subprocess
+import sys
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = ROOT / "scripts" / "knowledge.db"
-DECK_ID = 6
-COMMANDER = "Lorehold, the Historian"
-
-
-SEED_WINCONS = [
-    {
-        "wincon_name": "Approach + Topdeck",
-        "wincon_type": "alternate",
-        "cards_required": ["Approach of the Second Sun", "Scroll Rack", "Penance"],
-        "speed_score": 6,
-        "resilience_score": 5,
-        "stealth_score": 1,
-        "consistency_score": 8,
-        "mana_required": 14,
-        "turns_to_win": 8,
-        "how_it_wins": "Cast Approach once, manipulate topdeck, cast it again.",
-        "weaknesses": "Telegraphed after first cast; vulnerable to counters and exile.",
-        "protection_needed": "Grand Abolisher, Silence, Boros Charm",
-    },
-    {
-        "wincon_name": "Storm Herd + Akroma's Will",
-        "wincon_type": "token",
-        "cards_required": ["Storm Herd", "Akroma's Will"],
-        "speed_score": 3,
-        "resilience_score": 6,
-        "stealth_score": 3,
-        "consistency_score": 7,
-        "mana_required": 14,
-        "turns_to_win": 10,
-        "how_it_wins": "Create Pegasus army, then give evasion/protection for lethal combat.",
-        "weaknesses": "High mana requirement; weak without life total and combat step.",
-        "protection_needed": "Akroma's Will, Teferi's Protection, anti-wipe effects",
-    },
-    {
-        "wincon_name": "Mizzix's Mastery Overload",
-        "wincon_type": "spellslinger",
-        "cards_required": ["Mizzix's Mastery", "Faithless Looting"],
-        "speed_score": 4,
-        "resilience_score": 6,
-        "stealth_score": 6,
-        "consistency_score": 6,
-        "mana_required": 8,
-        "turns_to_win": 9,
-        "how_it_wins": "Overload Mastery with a stocked graveyard to recast payoff spells.",
-        "weaknesses": "Graveyard hate and counterspells stop the line.",
-        "protection_needed": "Grand Abolisher, Silence, graveyard protection",
-    },
-    {
-        "wincon_name": "Worldfire + Floating Mana",
-        "wincon_type": "reset",
-        "cards_required": ["Worldfire"],
-        "speed_score": 2,
-        "resilience_score": 7,
-        "stealth_score": 5,
-        "consistency_score": 5,
-        "mana_required": 9,
-        "turns_to_win": 11,
-        "how_it_wins": "Resolve Worldfire with floating mana or delayed damage source.",
-        "weaknesses": "Extremely expensive; table-hostile; requires precise sequencing.",
-        "protection_needed": "Counter protection and mana burst",
-    },
-    {
-        "wincon_name": "Rite of Dragoncaller",
-        "wincon_type": "spellslinger",
-        "cards_required": ["Rite of the Dragoncaller"],
-        "speed_score": 5,
-        "resilience_score": 4,
-        "stealth_score": 6,
-        "consistency_score": 7,
-        "mana_required": 5,
-        "turns_to_win": 8,
-        "how_it_wins": "Turn repeated spells into Dragon tokens and pressure the table.",
-        "weaknesses": "Permanent-based engine; folds to removal before payoff turn.",
-        "protection_needed": "Lightning Greaves, Swiftfoot Boots, Boros Charm",
-    },
-    {
-        "wincon_name": "Rise of the Eldrazi",
-        "wincon_type": "big_mana",
-        "cards_required": ["Rise of the Eldrazi"],
-        "speed_score": 2,
-        "resilience_score": 9,
-        "stealth_score": 4,
-        "consistency_score": 9,
-        "mana_required": 12,
-        "turns_to_win": 11,
-        "how_it_wins": "Resolve a hard-to-answer haymaker and chain the extra turn/card draw swing.",
-        "weaknesses": "Requires large mana burst and can be stranded in hand.",
-        "protection_needed": "Ramp density and counter protection",
-    },
-    {
-        "wincon_name": "Fiery Emancipation + Damage",
-        "wincon_type": "big_mana",
-        "cards_required": ["Fiery Emancipation", "Guttersnipe"],
-        "speed_score": 3,
-        "resilience_score": 6,
-        "stealth_score": 7,
-        "consistency_score": 6,
-        "mana_required": 9,
-        "turns_to_win": 9,
-        "how_it_wins": "Multiply incidental spell damage into lethal table damage.",
-        "weaknesses": "Expensive enchantment plus fragile damage source.",
-        "protection_needed": "Creature protection and enchantment protection",
-    },
-    {
-        "wincon_name": "Underworld Breach Combo",
-        "wincon_type": "combo",
-        "cards_required": ["Underworld Breach", "Lion's Eye Diamond", "Brain Freeze"],
-        "speed_score": 8,
-        "resilience_score": 8,
-        "stealth_score": 7,
-        "consistency_score": 4,
-        "mana_required": 3,
-        "turns_to_win": 3,
-        "how_it_wins": "Loop Breach resources into deterministic storm/mill lethal.",
-        "weaknesses": "Requires off-plan cEDH pieces and loses to graveyard hate.",
-        "protection_needed": "Silence effects and graveyard protection",
-    },
-]
+DB = Path('/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+LOREHOLD_DECK_ID = 6
 
 
 def connect() -> sqlite3.Connection:
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    return conn
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    return con
 
 
-def ensure_schema(conn: sqlite3.Connection) -> None:
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS wincon_catalog (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            wincon_name TEXT,
-            wincon_type TEXT,
-            cards_required TEXT,
-            speed_score INTEGER,
-            resilience_score INTEGER,
-            stealth_score INTEGER,
-            consistency_score INTEGER,
-            total_score INTEGER,
-            mana_required INTEGER,
-            turns_to_win INTEGER,
-            how_it_wins TEXT,
-            weaknesses TEXT,
-            protection_needed TEXT,
-            tested INTEGER DEFAULT 0,
-            available REAL DEFAULT 0,
-            win_rate REAL,
-            discovered_at TEXT DEFAULT (datetime('now'))
-        )
-        """
-    )
-    cols = {row[1] for row in conn.execute("PRAGMA table_info(wincon_catalog)")}
-    required = {
-        "wincon_name",
-        "wincon_type",
-        "cards_required",
-        "speed_score",
-        "resilience_score",
-        "stealth_score",
-        "consistency_score",
-        "total_score",
-        "mana_required",
-        "turns_to_win",
-        "how_it_wins",
-        "weaknesses",
-        "protection_needed",
-        "tested",
-        "available",
-    }
-    missing = sorted(required - cols)
-    if missing:
-        raise RuntimeError(f"wincon_catalog missing required columns: {', '.join(missing)}")
-    conn.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS idx_wincon_catalog_name ON wincon_catalog(wincon_name)"
-    )
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS run_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            run_date TEXT,
-            source_used TEXT,
-            commander_analyzed TEXT,
-            decks_analyzed INTEGER,
-            insights_found INTEGER,
-            discrepancies_found INTEGER,
-            status TEXT,
-            duration_seconds INTEGER,
-            error_message TEXT
-        )
-        """
-    )
-
-
-def card_names(conn: sqlite3.Connection, table: str, column: str, where: str = "") -> set[str]:
+def pg(sql_q: str) -> list[list[str]]:
+    password = os.environ.get('PGPASSWORD')
+    if not password:
+        return []
+    host = os.environ.get('PGHOST', '143.198.230.247')
+    port = os.environ.get('PGPORT', '5433')
+    user = os.environ.get('PGUSER', 'postgres')
+    dbname = os.environ.get('PGDATABASE', 'halder')
     try:
-        sql = f"SELECT {column} FROM {table} {where}"
-        return {row[0].strip().lower() for row in conn.execute(sql) if row[0]}
-    except sqlite3.Error:
-        return set()
+        r = subprocess.run(
+            ['psql', '-h', host, '-p', port, '-U', user, '-d', dbname, '-t', '-A', '-F', '|', '-c', sql_q],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            env=os.environ.copy(),
+        )
+        if r.returncode != 0:
+            print('PG source skipped: psql returned non-zero status')
+            return []
+        return [line.split('|') for line in r.stdout.strip().split('\n') if line.strip()]
+    except Exception as e:
+        print(f'PG source skipped: {e}')
+        return []
 
 
-def availability(cards: list[str], collection: set[str], deck: set[str]) -> float:
-    if not cards:
-        return 0.0
-    owned = sum(1 for card in cards if card.lower() in collection or card.lower() in deck)
-    if owned == len(cards):
-        return 1.0
-    if owned:
-        return 0.5
-    return 0.0
+def ensure_table(con: sqlite3.Connection) -> None:
+    con.execute('''CREATE TABLE IF NOT EXISTS wincon_catalog (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        wincon_name TEXT,
+        wincon_type TEXT,
+        cards_required TEXT,
+        speed_score INTEGER DEFAULT 5,
+        resilience_score INTEGER DEFAULT 5,
+        stealth_score INTEGER DEFAULT 5,
+        consistency_score INTEGER DEFAULT 5,
+        total_score INTEGER DEFAULT 0,
+        mana_required INTEGER,
+        turns_to_win INTEGER,
+        how_it_wins TEXT,
+        weaknesses TEXT,
+        protection_needed TEXT,
+        tested INTEGER DEFAULT 0,
+        available INTEGER DEFAULT 0,
+        win_rate REAL,
+        discovered_at TEXT DEFAULT (datetime('now'))
+    )''')
 
 
-def log_run(conn: sqlite3.Connection, source: str, status: str, insights: int, discrepancies: int = 0, error: str | None = None) -> None:
-    conn.execute(
-        """
-        INSERT INTO run_log (
-            run_date, source_used, commander_analyzed, decks_analyzed,
-            insights_found, discrepancies_found, status, duration_seconds, error_message
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            datetime.now(timezone.utc).isoformat(),
-            source,
-            COMMANDER,
-            1,
-            insights,
-            discrepancies,
-            status,
-            0,
-            error,
-        ),
-    )
+def lorehold_enriched_deck_count(con: sqlite3.Connection) -> int:
+    return con.execute('''
+        SELECT COUNT(DISTINCT ld.id)
+        FROM learned_decks ld
+        JOIN card_deck_analysis cda ON cda.deck_id = ld.id
+        WHERE lower(ld.commander) LIKE '%lorehold%'
+          AND cda.enriched = 1
+    ''').fetchone()[0]
 
 
-def run_hunter(conn: sqlite3.Connection) -> None:
-    ensure_schema(conn)
-    before = conn.execute("SELECT COUNT(*) FROM wincon_catalog").fetchone()[0]
+def score_for_card(con: sqlite3.Connection, name: str) -> tuple[int, int, int, int]:
+    row = con.execute('''
+        SELECT AVG(speed_score), AVG(resilience_score), AVG(stealth_score), AVG(wincon_total_score)
+        FROM card_deck_analysis cda
+        JOIN learned_decks ld ON ld.id = cda.deck_id
+        WHERE lower(ld.commander) LIKE '%lorehold%'
+          AND cda.enriched = 1
+          AND cda.role_in_deck = 'wincon'
+          AND lower(cda.card_name) = lower(?)
+    ''', (name,)).fetchone()
+    speed = int(round(row[0] or 5))
+    resilience = int(round(row[1] or 5))
+    stealth = int(round(row[2] or 5))
+    total = int(round(row[3] or (speed + resilience + stealth)))
+    if total <= 0:
+        total = speed + resilience + stealth
+    return speed, resilience, stealth, total
+
+
+def upsert_wincon(con: sqlite3.Connection, name: str, wincon_type: str, cards_required: str, how_it_wins: str,
+                  speed: int = 5, resilience: int = 5, stealth: int = 5, total: int = 15) -> bool:
+    existing = con.execute('SELECT id FROM wincon_catalog WHERE lower(wincon_name)=lower(?)', (name,)).fetchone()
+    if existing:
+        con.execute('''UPDATE wincon_catalog
+            SET wincon_type=?, cards_required=?, how_it_wins=?, speed_score=?, resilience_score=?,
+                stealth_score=?, consistency_score=?, total_score=?
+            WHERE id=?''',
+            (wincon_type, cards_required, how_it_wins, speed, resilience, stealth, 5, total, existing['id']))
+        return False
+    con.execute('''INSERT INTO wincon_catalog
+        (wincon_name, wincon_type, cards_required, how_it_wins, speed_score, resilience_score,
+         stealth_score, consistency_score, total_score)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 5, ?)''',
+        (name, wincon_type, cards_required, how_it_wins, speed, resilience, stealth, total))
+    return True
+
+
+def hunter() -> None:
+    con = connect()
+    ensure_table(con)
+    print('# Wincon Hunter Script')
+    before = con.execute('SELECT COUNT(*) FROM wincon_catalog').fetchone()[0]
     inserted = 0
     updated = 0
-    for seed in SEED_WINCONS:
-        total = seed["speed_score"] + seed["resilience_score"] + seed["stealth_score"] + seed["consistency_score"]
-        cards_json = json.dumps(seed["cards_required"], ensure_ascii=True)
-        existing = conn.execute(
-            "SELECT id FROM wincon_catalog WHERE wincon_name = ?", (seed["wincon_name"],)
-        ).fetchone()
-        params = (
-            seed["wincon_name"],
-            seed["wincon_type"],
-            cards_json,
-            seed["speed_score"],
-            seed["resilience_score"],
-            seed["stealth_score"],
-            seed["consistency_score"],
-            total,
-            seed["mana_required"],
-            seed["turns_to_win"],
-            seed["how_it_wins"],
-            seed["weaknesses"],
-            seed["protection_needed"],
-        )
-        if existing:
-            conn.execute(
-                """
-                UPDATE wincon_catalog
-                SET wincon_type=?, cards_required=?, speed_score=?, resilience_score=?,
-                    stealth_score=?, consistency_score=?, total_score=?, mana_required=?,
-                    turns_to_win=?, how_it_wins=?, weaknesses=?, protection_needed=?
-                WHERE wincon_name=?
-                """,
-                params[1:] + (seed["wincon_name"],),
-            )
-            updated += 1
-        else:
-            conn.execute(
-                """
-                INSERT INTO wincon_catalog (
-                    wincon_name, wincon_type, cards_required, speed_score,
-                    resilience_score, stealth_score, consistency_score, total_score,
-                    mana_required, turns_to_win, how_it_wins, weaknesses, protection_needed
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                params,
-            )
+
+    pg_rows = pg("SELECT card_name, score FROM card_role_scores WHERE role='wincon' AND bracket_scope='any' ORDER BY score DESC LIMIT 100")
+    for row in pg_rows[:50]:
+        if len(row) < 2:
+            continue
+        name = row[0].strip()
+        try:
+            total = max(1, int(float(row[1]) * 3))
+        except Exception:
+            total = 15
+        if upsert_wincon(con, name, 'wincon', name, f'PG wincon score={row[1]}', 5, 5, 5, total):
             inserted += 1
-    after = conn.execute("SELECT COUNT(*) FROM wincon_catalog").fetchone()[0]
-    log_run(conn, "wincon-hunter-script", "ok", inserted + updated)
-    conn.commit()
-    print("# Wincon Hunter Script")
-    print(f"before={before} after={after} inserted={inserted} updated={updated}")
-    print("source=deterministic seed + current SQLite schema")
+        else:
+            updated += 1
+
+    deck_count = lorehold_enriched_deck_count(con)
+    threshold = 3 if deck_count >= 10 else 2
+    rows = con.execute('''
+        SELECT cda.card_name, COUNT(DISTINCT cda.deck_id) AS cnt
+        FROM card_deck_analysis cda
+        JOIN learned_decks ld ON ld.id = cda.deck_id
+        WHERE cda.role_in_deck = 'wincon'
+          AND cda.enriched = 1
+          AND lower(ld.commander) LIKE '%lorehold%'
+        GROUP BY cda.card_name
+        HAVING cnt >= ?
+        ORDER BY cnt DESC, cda.card_name
+        LIMIT 50
+    ''', (threshold,)).fetchall()
+    for row in rows:
+        name = row['card_name']
+        cnt = row['cnt']
+        speed, resilience, stealth, total = score_for_card(con, name)
+        msg = f'Used in {cnt}/{deck_count} enriched Lorehold decks'
+        if upsert_wincon(con, name, 'spellslinger', name, msg, speed, resilience, stealth, total):
+            inserted += 1
+        else:
+            updated += 1
+
+    con.commit()
+    after = con.execute('SELECT COUNT(*) FROM wincon_catalog').fetchone()[0]
+    print(f'before={before} after={after} inserted={inserted} updated={updated} lorehold_enriched_decks={deck_count} threshold={threshold}')
+    con.close()
 
 
-def run_tester(conn: sqlite3.Connection) -> None:
-    ensure_schema(conn)
-    collection = card_names(conn, "user_collection", "card_en", "WHERE quantity > 0")
-    deck = card_names(conn, "deck_cards", "card_name", f"WHERE deck_id={DECK_ID}")
-    rows = list(conn.execute("SELECT * FROM wincon_catalog ORDER BY total_score DESC, id ASC"))
+def parse_cards_required(cards_req: str) -> list[str]:
+    return [cn.strip().strip('[]"\' ') for cn in (cards_req or '').split(',') if cn.strip().strip('[]"\' ')]
+
+
+def tester() -> None:
+    con = connect()
+    ensure_table(con)
+    rows = con.execute('SELECT id, wincon_name, cards_required, total_score FROM wincon_catalog').fetchall()
+    tested = 0
     changed = 0
     for row in rows:
-        try:
-            cards = json.loads(row["cards_required"] or "[]")
-        except json.JSONDecodeError:
-            cards = []
-        avail = availability(cards, collection, deck)
-        if row["tested"] != 1 or row["available"] != avail:
-            conn.execute(
-                "UPDATE wincon_catalog SET tested=1, available=? WHERE id=?",
-                (avail, row["id"]),
-            )
+        missing = []
+        for cn in parse_cards_required(row['cards_required']):
+            col = con.execute('SELECT quantity FROM user_collection WHERE lower(card_en)=lower(?)', (cn,)).fetchone()
+            in_deck = con.execute('SELECT COUNT(*) FROM deck_cards WHERE deck_id=? AND lower(card_name)=lower(?)', (LOREHOLD_DECK_ID, cn)).fetchone()[0]
+            if not ((col and col['quantity'] > 0) or in_deck > 0):
+                missing.append(cn)
+        card_count = max(1, len(parse_cards_required(row['cards_required'])))
+        avail = 1 if not missing else (0.5 if len(missing) < card_count else 0)
+        old = con.execute('SELECT tested, available, weaknesses FROM wincon_catalog WHERE id=?', (row['id'],)).fetchone()
+        weaknesses = f'Missing: {", ".join(missing)}' if missing else None
+        if old['tested'] != 1 or old['available'] != avail or old['weaknesses'] != weaknesses:
             changed += 1
-    log_run(conn, "wincon-tester-script", "ok", changed)
-    conn.commit()
-    print("# Wincon Tester Script")
-    print(f"tested={len(rows)} changed={changed}")
-    print("availability: 1=owned/deck, 0.5=partial, 0=missing")
-    for row in conn.execute(
-        "SELECT wincon_name, total_score, tested, available FROM wincon_catalog ORDER BY total_score DESC, id ASC LIMIT 8"
-    ):
+        con.execute('UPDATE wincon_catalog SET tested=1, available=?, weaknesses=? WHERE id=?', (avail, weaknesses, row['id']))
+        tested += 1
+    con.commit()
+    print('# Wincon Tester Script')
+    print(f'tested={tested} changed={changed} availability: 1=owned/deck, 0.5=partial, 0=missing')
+    for row in con.execute('SELECT wincon_name,total_score,tested,available FROM wincon_catalog ORDER BY total_score DESC, wincon_name LIMIT 12'):
         print(f"- {row['wincon_name']}: score={row['total_score']} tested={row['tested']} available={row['available']}")
+    con.close()
 
 
-def run_builder(conn: sqlite3.Connection) -> None:
-    ensure_schema(conn)
-    rows = list(
-        conn.execute(
-            """
-            SELECT wincon_name, wincon_type, total_score, speed_score, resilience_score,
-                   stealth_score, available, cards_required
-            FROM wincon_catalog
-            WHERE tested = 1
-            ORDER BY available DESC, total_score DESC, resilience_score DESC, id ASC
-            LIMIT 5
-            """
-        )
-    )
-    if not rows:
-        log_run(conn, "wincon-builder-script", "silent", 0, error="No tested wincons")
-        conn.commit()
-        print("[SILENT]")
-        return
-    best_speed = max(rows, key=lambda row: (row["speed_score"], row["available"], row["total_score"]))
-    best_resilience = max(rows, key=lambda row: (row["resilience_score"], row["available"], row["total_score"]))
-    best_stealth = max(rows, key=lambda row: (row["stealth_score"], row["available"], row["total_score"]))
+def selected_packages(con: sqlite3.Connection) -> list[sqlite3.Row]:
+    fast = con.execute('''SELECT * FROM wincon_catalog WHERE available >= 1 AND speed_score >= 5 AND total_score > 0
+        ORDER BY total_score DESC LIMIT 3''').fetchall()
+    resilient = con.execute('''SELECT * FROM wincon_catalog WHERE available >= 1 AND resilience_score >= 6 AND total_score > 0
+        ORDER BY total_score DESC LIMIT 3''').fetchall()
+    stealth = con.execute('''SELECT * FROM wincon_catalog WHERE available >= 0.5 AND stealth_score >= 5 AND total_score > 0
+        ORDER BY total_score DESC LIMIT 3''').fetchall()
     selected = []
     seen = set()
-    for row in [best_speed, best_resilience, best_stealth]:
-        if row["wincon_name"] not in seen:
-            selected.append(row)
-            seen.add(row["wincon_name"])
-    log_run(conn, "wincon-builder-script", "ok", len(selected))
-    conn.commit()
-    print("# Wincon Builder Script")
-    print("Selected package candidates:")
+    for group in [fast, resilient, stealth]:
+        for row in group:
+            if row['wincon_name'] not in seen:
+                selected.append(row)
+                seen.add(row['wincon_name'])
+                break
+    return selected
+
+
+def builder() -> None:
+    con = connect()
+    ensure_table(con)
+    selected = selected_packages(con)
+    print('# Wincon Builder Script')
+    print('Selected package candidates:')
     for row in selected:
-        print(
-            f"- {row['wincon_name']} ({row['wincon_type']}): total={row['total_score']} "
-            f"speed={row['speed_score']} resilience={row['resilience_score']} "
-            f"stealth={row['stealth_score']} available={row['available']}"
-        )
-    print("No decklist is modified by this cron; it only emits candidates for Oracle review.")
+        print(f"- {row['wincon_name']} ({row['wincon_type']}): total={row['total_score']} speed={row['speed_score']} resilience={row['resilience_score']} stealth={row['stealth_score']} available={row['available']}")
+    if not selected:
+        print('- none: run hunter/tester first or add imported Lorehold decks with enriched wincon roles')
+    print('No decklist is modified by this cron; it only emits candidates for Oracle review.')
+    con.close()
 
 
-def run_oracle(conn: sqlite3.Connection) -> None:
-    ensure_schema(conn)
-    rows = list(
-        conn.execute(
-            """
-            SELECT wincon_name, wincon_type, total_score, speed_score, resilience_score,
-                   stealth_score, available, cards_required, weaknesses, protection_needed
-            FROM wincon_catalog
-            WHERE tested = 1
-            ORDER BY available DESC, total_score DESC, id ASC
-            """
-        )
-    )
-    if not rows:
-        log_run(conn, "wincon-oracle-script", "silent", 0, error="No tested wincons")
-        conn.commit()
-        print("[SILENT]")
-        return
-
-    available_rows = [row for row in rows if row["available"] == 1]
-    if not available_rows:
-        log_run(conn, "wincon-oracle-script", "ok", 1, error="No fully available wincons")
-        conn.commit()
-        print("# Wincon Oracle Script")
-        print("No fully available wincon package is present. Keep deck unchanged.")
-        return
-
-    best_speed = max(available_rows, key=lambda row: (row["speed_score"], row["total_score"]))
-    best_resilience = max(available_rows, key=lambda row: (row["resilience_score"], row["total_score"]))
-    best_stealth = max(available_rows, key=lambda row: (row["stealth_score"], row["total_score"]))
-    selected = []
-    seen = set()
-    for label, row in [
-        ("fastest", best_speed),
-        ("most_resilient", best_resilience),
-        ("stealthiest", best_stealth),
-    ]:
-        if row["wincon_name"] in seen:
-            continue
-        selected.append((label, row))
-        seen.add(row["wincon_name"])
-
-    unavailable_high_score = [row for row in rows if row["available"] == 0 and row["total_score"] >= 24]
-    log_run(conn, "wincon-oracle-script", "ok", len(selected), len(unavailable_high_score))
-    conn.commit()
-
-    print("# Wincon Oracle Script")
-    print("Decision: keep current decklist; emit deterministic wincon priorities for review.")
-    print(f"available_wincons={len(available_rows)} total_wincons={len(rows)}")
-    print("Selected priorities:")
-    for label, row in selected:
-        try:
-            cards = ", ".join(json.loads(row["cards_required"] or "[]"))
-        except json.JSONDecodeError:
-            cards = row["cards_required"] or ""
-        print(
-            f"- {label}: {row['wincon_name']} ({row['wincon_type']}) "
-            f"total={row['total_score']} speed={row['speed_score']} "
-            f"resilience={row['resilience_score']} stealth={row['stealth_score']}"
-        )
-        print(f"  cards={cards}")
-        print(f"  protection={row['protection_needed']}")
-    if unavailable_high_score:
-        print("Unavailable high-score packages to avoid recommending as immediate swaps:")
-        for row in unavailable_high_score:
+def oracle() -> None:
+    con = connect()
+    ensure_table(con)
+    selected = selected_packages(con)
+    total = con.execute('SELECT COUNT(*) FROM wincon_catalog').fetchone()[0]
+    available = con.execute('SELECT COUNT(*) FROM wincon_catalog WHERE available >= 1').fetchone()[0]
+    print('# Wincon Oracle Script')
+    print('Decision: keep current decklist; emit deterministic wincon priorities for review.')
+    print(f'available_wincons={available} total_wincons={total}')
+    print('Selected priorities:')
+    labels = ['fastest', 'most_resilient', 'stealthiest']
+    for label, row in zip(labels, selected):
+        print(f"- {label}: {row['wincon_name']} ({row['wincon_type']}) total={row['total_score']} speed={row['speed_score']} resilience={row['resilience_score']} stealth={row['stealth_score']}")
+        print(f"  cards={row['cards_required']}")
+        if row['protection_needed']:
+            print(f"  protection={row['protection_needed']}")
+    unavailable = con.execute('''SELECT wincon_name,total_score,available FROM wincon_catalog
+        WHERE available < 1 AND total_score > 0 ORDER BY total_score DESC LIMIT 5''').fetchall()
+    if unavailable:
+        print('Unavailable high-score packages to avoid recommending as immediate swaps:')
+        for row in unavailable:
             print(f"- {row['wincon_name']}: total={row['total_score']} available={row['available']}")
+    con.close()
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=["hunter", "tester", "builder", "oracle"])
-    args = parser.parse_args()
-    with connect() as conn:
-        if args.mode == "hunter":
-            run_hunter(conn)
-        elif args.mode == "tester":
-            run_tester(conn)
-        elif args.mode == "builder":
-            run_builder(conn)
-        else:
-            run_oracle(conn)
-    return 0
+def main() -> None:
+    mode = sys.argv[1] if len(sys.argv) > 1 else 'all'
+    if mode == 'hunter':
+        hunter()
+    elif mode == 'tester':
+        tester()
+    elif mode == 'builder':
+        builder()
+    elif mode == 'oracle':
+        oracle()
+    elif mode == 'all':
+        hunter()
+        tester()
+        builder()
+    else:
+        raise SystemExit('Usage: wincon_pipeline.py [hunter|tester|builder|oracle|all]')
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__ == '__main__':
+    main()
