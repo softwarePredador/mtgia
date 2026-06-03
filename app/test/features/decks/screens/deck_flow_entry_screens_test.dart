@@ -131,7 +131,7 @@ void main() {
       );
       expect(find.text('Score: 136.5'), findsOneWidget);
       expect(find.text('Legalidade: commander_legal'), findsOneWidget);
-      expect(find.text('Confianca: high'), findsOneWidget);
+      expect(find.text('Confiança: high'), findsOneWidget);
     },
   );
 

@@ -999,7 +999,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
           ],
           Text(
-            'Deck principal (${cardsList.length} linhas)',
+            'Deck principal ($totalMain cartas, ${cardsList.length} linhas)',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.secondary,
@@ -1053,7 +1053,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       'Origem: ${sourceSystem.toUpperCase()}${sourceRef == null ? '' : ' $sourceRef'}',
       if (score != null) 'Score: $score',
       if (legalStatus != null) 'Legalidade: $legalStatus',
-      if (confidence != null) 'Confianca: $confidence',
+      if (confidence != null) 'Confiança: $confidence',
     ];
   }
 }
