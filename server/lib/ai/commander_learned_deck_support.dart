@@ -39,6 +39,7 @@ class CommanderLearnedDeckInput {
     this.notes,
     this.metadata = const <String, dynamic>{},
     this.promotedAt,
+    this.updatedAt,
   });
 
   final String commanderName;
@@ -57,6 +58,7 @@ class CommanderLearnedDeckInput {
   final Map<String, dynamic> metadata;
   final bool isActive;
   final DateTime? promotedAt;
+  final DateTime? updatedAt;
 
   String get commanderNameNormalized =>
       normalizeCommanderReferenceName(commanderName);
@@ -81,6 +83,7 @@ class CommanderLearnedDeckInput {
         'metadata': metadata,
         'is_active': isActive,
         if (promotedAt != null) 'promoted_at': promotedAt!.toIso8601String(),
+        if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
         'cards': cards.map((card) => card.toJson()).toList(growable: false),
       };
 }

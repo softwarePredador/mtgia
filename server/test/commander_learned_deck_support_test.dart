@@ -47,8 +47,15 @@ void main() {
 
       expect(route, contains('commander_learned_decks'));
       expect(route, contains("'source': 'pg_commander_learned_decks'"));
+      expect(
+          route,
+          contains(
+              "'commanders': activeDecks.map(_promotedDeckSummary).toList()"));
       expect(route, contains("'recommended_deck': recommendedDeck"));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
+      expect(route, contains("'source_confidence': _sourceConfidence"));
+      expect(route, contains("'win_conditions': _winConditions"));
+      expect(route, contains("'role_summary': _roleSummary"));
     });
   });
 }

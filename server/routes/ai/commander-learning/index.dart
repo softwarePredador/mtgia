@@ -13,12 +13,19 @@ Future<Response> onRequest(RequestContext context) async {
 
   final commander =
       (context.request.uri.queryParameters['commander'] ?? '').trim();
-  if (commander.isEmpty) {
-    return badRequest('Query parameter commander is required.');
-  }
 
   try {
     final pool = context.read<Pool>();
+    if (commander.isEmpty) {
+      final activeDecks = await _loadActiveLearnedDecks(pool);
+      return Response.json(body: {
+        'available': activeDecks.isNotEmpty,
+        'source': 'pg_commander_learned_decks',
+        'count': activeDecks.length,
+        'commanders': activeDecks.map(_promotedDeckSummary).toList(),
+      });
+    }
+
     final learnedDeck = await _loadActiveLearnedDeck(
       pool: pool,
       commanderName: commander,
@@ -74,7 +81,8 @@ Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck({
           notes,
           metadata,
           is_active,
-          promoted_at
+          promoted_at,
+          updated_at
         FROM commander_learned_decks
         WHERE commander_name_normalized = @commander
           AND is_active = TRUE
@@ -87,28 +95,73 @@ Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck({
     );
     if (result.isEmpty) return null;
     final row = result.first;
-    return CommanderLearnedDeckInput(
-      commanderName: row[0]?.toString() ?? commanderName,
-      deckName: row[1]?.toString() ?? commanderName,
-      sourceSystem: row[2]?.toString() ?? 'unknown',
-      sourceRef: row[3]?.toString() ?? 'unknown',
-      sourceUrl: row[4]?.toString(),
-      archetype: row[5]?.toString(),
-      cardList: row[6]?.toString() ?? '',
-      cardCount: _intValue(row[7]),
-      score: _nullableDouble(row[8]),
-      winconPrimary: row[9]?.toString(),
-      winconBackup: row[10]?.toString(),
-      legalStatus: row[11]?.toString(),
-      notes: row[12]?.toString(),
-      metadata: _jsonObject(row[13]),
-      isActive: row[14] == true,
-      promotedAt: _dateTimeValue(row[15]),
-    );
+    return _learnedDeckFromRow(row, fallbackCommanderName: commanderName);
   } catch (error) {
     if (_isUndefinedLearnedDeckTableError(error)) return null;
     rethrow;
   }
+}
+
+Future<List<CommanderLearnedDeckInput>> _loadActiveLearnedDecks(
+  Pool pool,
+) async {
+  try {
+    final result = await pool.execute('''
+      SELECT
+        commander_name,
+        deck_name,
+        source_system,
+        source_ref,
+        source_url,
+        archetype,
+        card_list,
+        card_count,
+        score,
+        wincon_primary,
+        wincon_backup,
+        legal_status,
+        notes,
+        metadata,
+        is_active,
+        promoted_at,
+        updated_at
+      FROM commander_learned_decks
+      WHERE is_active = TRUE
+      ORDER BY commander_name ASC, promoted_at DESC NULLS LAST, updated_at DESC
+    ''');
+    return result
+        .map((row) => _learnedDeckFromRow(row))
+        .toList(growable: false);
+  } catch (error) {
+    if (_isUndefinedLearnedDeckTableError(error)) return const [];
+    rethrow;
+  }
+}
+
+CommanderLearnedDeckInput _learnedDeckFromRow(
+  ResultRow row, {
+  String fallbackCommanderName = '',
+}) {
+  final commanderName = row[0]?.toString() ?? fallbackCommanderName;
+  return CommanderLearnedDeckInput(
+    commanderName: commanderName,
+    deckName: row[1]?.toString() ?? commanderName,
+    sourceSystem: row[2]?.toString() ?? 'unknown',
+    sourceRef: row[3]?.toString() ?? 'unknown',
+    sourceUrl: row[4]?.toString(),
+    archetype: row[5]?.toString(),
+    cardList: row[6]?.toString() ?? '',
+    cardCount: _intValue(row[7]),
+    score: _nullableDouble(row[8]),
+    winconPrimary: row[9]?.toString(),
+    winconBackup: row[10]?.toString(),
+    legalStatus: row[11]?.toString(),
+    notes: row[12]?.toString(),
+    metadata: _jsonObject(row[13]),
+    isActive: row[14] == true,
+    promotedAt: _dateTimeValue(row[15]),
+    updatedAt: _dateTimeValue(row[16]),
+  );
 }
 
 Future<Map<String, dynamic>> _buildRecommendedDeck({
@@ -153,6 +206,8 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
   final mainDecklist = decklist
       .where((card) => card['is_commander'] != true)
       .toList(growable: false);
+  final validationSummary = validation.validationSummary();
+  final legality = _summarizeLegalities(decklist, validationSummary);
 
   return {
     'source': 'promoted_learned_deck_pg',
@@ -161,6 +216,14 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
     'deck_name': learnedDeck.deckName,
     'archetype': learnedDeck.archetype,
     'score': learnedDeck.score,
+    'source_confidence': _sourceConfidence(
+      learnedDeck: learnedDeck,
+      legality: legality,
+      validation: validationSummary,
+    ),
+    'last_synced_at': learnedDeck.updatedAt?.toIso8601String(),
+    'win_conditions': _winConditions(learnedDeck),
+    'role_summary': _roleSummary(learnedDeck),
     'commander': {
       'name': commanderName,
       'commander_legal_status': metadataByName[normalizedCommander]
@@ -176,8 +239,8 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
     ),
     'decklist': decklist,
     'cards': mainDecklist,
-    'legality': _summarizeLegalities(decklist, validation.validationSummary()),
-    'validation': validation.validationSummary(),
+    'legality': legality,
+    'validation': validationSummary,
     'metadata': learnedDeck.metadata,
   };
 }
@@ -193,8 +256,70 @@ Map<String, dynamic> _promotedDeckSummary(CommanderLearnedDeckInput deck) => {
       'score': deck.score,
       'legal_status': deck.legalStatus,
       'promoted_at': deck.promotedAt?.toIso8601String(),
+      'last_synced_at': deck.updatedAt?.toIso8601String(),
+      'win_conditions': _winConditions(deck),
+      'role_summary': _roleSummary(deck),
       'metadata': deck.metadata,
     };
+
+List<Map<String, dynamic>> _winConditions(CommanderLearnedDeckInput deck) {
+  final wincons = <Map<String, dynamic>>[];
+  final primary = deck.winconPrimary?.trim();
+  if (primary != null && primary.isNotEmpty) {
+    wincons.add({'name': primary, 'priority': 'primary'});
+  }
+  final backup = deck.winconBackup?.trim();
+  if (backup != null && backup.isNotEmpty) {
+    final parts = backup.split(RegExp(r'\s*;\s*'));
+    for (final part in parts) {
+      final name = part.trim();
+      if (name.isEmpty) continue;
+      wincons.add({'name': name, 'priority': 'backup'});
+    }
+  }
+  return wincons;
+}
+
+Map<String, int> _roleSummary(CommanderLearnedDeckInput deck) {
+  final metadata = deck.metadata;
+  final keys = {
+    'lands': 'total_lands',
+    'ramp': 'ramp_count',
+    'draw': 'draw_count',
+    'removal': 'removal_count',
+    'tutor': 'tutor_count',
+    'board_wipe': 'board_wipe_count',
+    'protection': 'protection_count',
+    'recursion': 'recursion_count',
+    'wincon': 'wincon_count',
+    'engine': 'engine_count',
+  };
+  return {
+    for (final entry in keys.entries)
+      if (_intValue(metadata[entry.value]) > 0)
+        entry.key: _intValue(metadata[entry.value]),
+  };
+}
+
+String _sourceConfidence({
+  required CommanderLearnedDeckInput learnedDeck,
+  required Map<String, dynamic> legality,
+  required Map<String, dynamic> validation,
+}) {
+  final legalStatus = learnedDeck.legalStatus?.trim().toLowerCase() ?? '';
+  final explicitlyLegal =
+      legalStatus == 'legal' || legalStatus == 'commander_legal';
+  final isValid = validation['is_valid'] == true;
+  final banned = legality['banned_cards'];
+  final unknown = legality['unknown_legality_cards'];
+  final noBanned = banned is List && banned.isEmpty;
+  final noUnknown = unknown is List && unknown.isEmpty;
+  if (isValid && noBanned && noUnknown && explicitlyLegal) {
+    return 'high';
+  }
+  if (isValid && noBanned) return 'medium';
+  return 'low';
+}
 
 Future<Map<String, Map<String, dynamic>>> _loadCardMetadataByName({
   required Pool pool,

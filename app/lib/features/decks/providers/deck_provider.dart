@@ -801,6 +801,29 @@ class DeckProvider extends ChangeNotifier {
     throw Exception('Resposta inválida ao buscar deck aprendido.');
   }
 
+  Future<List<Map<String, dynamic>>> fetchCommanderLearningDecks() async {
+    final response = await _apiClient.get('/ai/commander-learning');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        'Falha ao listar decks aprendidos (${response.statusCode}).',
+      );
+    }
+
+    final data = response.data;
+    final map =
+        data is Map<String, dynamic>
+            ? data
+            : data is Map
+            ? data.cast<String, dynamic>()
+            : null;
+    final commanders = map?['commanders'];
+    if (commanders is! List) return const <Map<String, dynamic>>[];
+    return commanders
+        .whereType<Map>()
+        .map((item) => item.cast<String, dynamic>())
+        .toList(growable: false);
+  }
+
   Future<DeckDetails> _ensureDeckLoadedForOptimization(String deckId) async {
     final deck = await _ensureDeckLoadedForMutation(deckId);
     if (deck == null) {

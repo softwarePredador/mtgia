@@ -28,6 +28,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   bool _isGenerating = false;
   bool _isLoadingLearnedDeck = false;
   Map<String, dynamic>? _generatedDeck;
+  final Map<String, Map<String, dynamic>> _learnedDecksByCommander = {};
   GenerateDeckCancellation? _generateCancellation;
   String _generationProgressMessage = 'Enviando pedido para a IA...';
   int _generationProgressStep = 0;
@@ -36,6 +37,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   void initState() {
     super.initState();
     _selectedFormat = _normalizeFormat(widget.initialFormat) ?? _selectedFormat;
+    _commanderController.addListener(_handleCommanderChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadLearnedDeckAvailability();
+    });
   }
 
   String? _normalizeFormat(String? format) {
@@ -56,6 +61,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   bool get _usesCommanderField {
     final normalized = _selectedFormat.trim().toLowerCase();
     return normalized == 'commander' || normalized == 'brawl';
+  }
+
+  Map<String, dynamic>? get _selectedLearnedDeckSummary {
+    final commander = _selectedCommanderName();
+    if (commander == null || commander.isEmpty) return null;
+    return _learnedDecksByCommander[_normalizeCommanderLookup(commander)];
   }
 
   String? _selectedCommanderName() {
@@ -87,11 +98,57 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   @override
   void dispose() {
     _generateCancellation?.cancel();
+    _commanderController.removeListener(_handleCommanderChanged);
     _promptController.dispose();
     _commanderController.dispose();
     _deckNameController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handleCommanderChanged() {
+    if (!mounted || !_usesCommanderField) return;
+    setState(() {});
+  }
+
+  String _normalizeCommanderLookup(String value) {
+    return value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  String _learnedDeckButtonHelperText(Map<String, dynamic> deck) {
+    final sourceRef = deck['source_ref']?.toString().trim();
+    final score = deck['score'];
+    final legalStatus = deck['legal_status']?.toString().trim();
+    final parts = <String>[
+      if (sourceRef != null && sourceRef.isNotEmpty) 'Hermes $sourceRef',
+      if (score != null) 'score $score',
+      if (legalStatus != null && legalStatus.isNotEmpty) legalStatus,
+    ];
+    return parts.isEmpty
+        ? 'Deck aprendido disponível para este comandante.'
+        : 'Deck aprendido disponível: ${parts.join(' | ')}.';
+  }
+
+  Future<void> _loadLearnedDeckAvailability() async {
+    try {
+      final decks =
+          await context.read<DeckProvider>().fetchCommanderLearningDecks();
+      if (!mounted) return;
+      setState(() {
+        _learnedDecksByCommander
+          ..clear()
+          ..addEntries(
+            decks
+                .map((deck) {
+                  final commander = deck['commander']?.toString().trim() ?? '';
+                  return MapEntry(_normalizeCommanderLookup(commander), deck);
+                })
+                .where((entry) => entry.key.isNotEmpty),
+          );
+      });
+    } catch (_) {
+      return;
+    }
   }
 
   Future<void> _generateDeck() async {
@@ -232,6 +289,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           'diagnostics': {
             'source': 'commander_learning',
             'promoted_deck': learning['promoted_deck'],
+            'recommended_deck': recommendedDeck,
             'readiness': learning['readiness'],
           },
           'warnings': const {'invalid_cards': []},
@@ -576,7 +634,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
             ),
-            if (_usesCommanderField) ...[
+            if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 key: const Key('deck-generate-learned-deck-button'),
@@ -596,6 +654,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   _isLoadingLearnedDeck
                       ? 'Buscando deck aprendido...'
                       : 'Usar deck aprendido do comandante',
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _learnedDeckButtonHelperText(_selectedLearnedDeckSummary!),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ],
@@ -757,6 +822,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final warnings = _generatedDeck!['warnings'];
     final isMock = _generatedDeck!['is_mock'] == true;
     final validation = _generatedDeck!['validation'];
+    final diagnostics = _generatedDeck!['diagnostics'];
+    final learnedDeckPreview = _learnedDeckPreviewParts(diagnostics);
 
     final invalidCards =
         warnings is Map && warnings['invalid_cards'] is List
@@ -799,6 +866,46 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ],
           ),
           const SizedBox(height: 16),
+          if (learnedDeckPreview.isNotEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color: AppTheme.frost400.withValues(alpha: 0.35),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Deck aprendido Hermes',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.frost400,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children:
+                        learnedDeckPreview
+                            .map(
+                              (part) => Chip(
+                                label: Text(part),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           if (!isValid && validationErrors.isNotEmpty) ...[
             Container(
               width: double.infinity,
@@ -911,6 +1018,43 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         ],
       ),
     );
+  }
+
+  List<String> _learnedDeckPreviewParts(dynamic diagnostics) {
+    if (diagnostics is! Map || diagnostics['source'] != 'commander_learning') {
+      return const <String>[];
+    }
+    final promotedDeck =
+        (diagnostics['promoted_deck'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+    final recommendedDeck =
+        (diagnostics['recommended_deck'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+
+    String? textValue(Map<String, dynamic> map, String key) {
+      final value = map[key]?.toString().trim();
+      return value == null || value.isEmpty ? null : value;
+    }
+
+    final sourceSystem =
+        textValue(promotedDeck, 'source_system') ??
+        textValue(recommendedDeck, 'source_system') ??
+        'hermes';
+    final sourceRef =
+        textValue(promotedDeck, 'source_ref') ??
+        textValue(recommendedDeck, 'source_ref');
+    final score = promotedDeck['score'] ?? recommendedDeck['score'];
+    final legalStatus =
+        textValue(promotedDeck, 'legal_status') ??
+        textValue(recommendedDeck, 'legal_status');
+    final confidence = textValue(recommendedDeck, 'source_confidence');
+
+    return <String>[
+      'Origem: ${sourceSystem.toUpperCase()}${sourceRef == null ? '' : ' $sourceRef'}',
+      if (score != null) 'Score: $score',
+      if (legalStatus != null) 'Legalidade: $legalStatus',
+      if (confidence != null) 'Confianca: $confidence',
+    ];
   }
 }
 

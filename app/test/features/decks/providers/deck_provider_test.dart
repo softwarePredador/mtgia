@@ -350,6 +350,35 @@ void main() {
     };
 
     test(
+      'fetchCommanderLearningDecks lists active learned commanders',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/ai/commander-learning':
+                () => ApiResponse(200, {
+                  'available': true,
+                  'count': 1,
+                  'commanders': const [
+                    {
+                      'commander': 'Lorehold, the Historian',
+                      'source_ref': 'learned_deck:82',
+                    },
+                  ],
+                }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        final decks = await provider.fetchCommanderLearningDecks();
+
+        expect(apiClient.getCalls, equals(['/ai/commander-learning']));
+        expect(decks, hasLength(1));
+        expect(decks.first['commander'], equals('Lorehold, the Historian'));
+        expect(decks.first['source_ref'], equals('learned_deck:82'));
+      },
+    );
+
+    test(
       'generateDeck uses async by default and completes via polling',
       () async {
         var pollCount = 0;
