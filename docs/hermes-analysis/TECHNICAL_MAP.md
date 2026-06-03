@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-02.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-03.
 
 ## Estrutura do repositorio
 
@@ -158,8 +158,8 @@ mtgia/
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
-- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado novamente em 2026-06-02 05:30 UTC. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas, mas optimize/validator/quality gate carregam apenas `semantic_tags_v2` e heuristica por `oracle_text`/`type_line`. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao e bonus por nome. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam legacy/experimentais ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
-- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-02 classificou como permitidos exemplos de UI/import, comentarios de contrato, alias localizado e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed/corpus, o fallback Lorehold de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve ganhar fonte/versionamento/teste dedicado.
+- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado novamente em 2026-06-03 05:30 UTC no checkout `9a41032b`. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas. O contexto de optimize e o validator/role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags` persistidos nesse caminho; candidate quality tem uso parcial de `card_function_tags` em SQL de sinais. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao e bonus por nome. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam legacy/experimentais ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-03 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases/localized import e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed/profile versionado, o perfil Lorehold de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 ## Pipeline semantico de cartas
 
@@ -175,10 +175,11 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-02 05:30 UTC: deck analysis segue mais
+Estado atual revalidado em 2026-06-03 05:30 UTC: deck analysis segue mais
 proximo do fluxo desejado porque usa `card_function_tags` e
-`semantic_tags_v2`; optimize/validator/quality gate ainda nao carregam
-`card_function_tags` e reduzem v2 a um role unico. Candidate quality usa
+`semantic_tags_v2`; o contexto de optimize e o validator/role delta ainda nao
+threadam `card_function_tags` persistidos e reduzem v2 a um role unico.
+Candidate quality tem uso parcial de `card_function_tags`, mas tambem usa
 normalizacao propria e bonus por nome. Weakness analysis e recommendations
 continuam fora do adapter compartilhado: a primeira recalcula buckets
 localmente e retorna nomes fixos; a segunda recomenda `Command Tower`
