@@ -1,3 +1,42 @@
+## Execucao #16 -- 2026-06-04T07:13:39+00:00 (NO-CHANGE — Hash identico a Exec#15, T3 estavel em 1.6%)
+
+### PIPELINE INTEGRITY — Hash Inalterado
+
+**Card hash atual (DB):** `8b9c643c84825a4436d33b7f1616fa5f`
+**Card hash Exec#15:** `8b9c643c84825a4436d33b7f1616fa5f`
+**MATCH: True — Deck NAO mudou desde 2026-06-03T21:47**
+
+O Evolution Oracle nao rodou desde 2026-06-01 (ultimo status: SILENT).
+Pipeline permanece em Death Loop — nenhum agente produz analise nova.
+
+### Metricas Estaveis (da Exec#15, 2026-06-03)
+
+| Metrica | Valor | Status |
+|:--------|:-----:|:------|
+| **Sem Play T3** | **1.6%** | Excelente |
+| Mulligan (nao-free) | 15.3% | Estavel |
+| Playable final hand | 97.9% | Excelente |
+| Ramp T1 (Sol Ring) | 7.0% | Estavel |
+| Hands to 0 cards | 2.1% | Baixo |
+| Lands reais | 33 | Estavel |
+| DB ramp tagged | 19 | Corrigido |
+
+### Por que Sem Mudanca
+
+- Deck hash identico desde Exec#15 (2026-06-03T21:47)
+- Evolution Oracle ultimo run: 2026-06-01 (SILENT, sem swaps aplicados)
+- Pipeline Death Loop: Oracle parado ha >72h, demais agentes SILENT
+- Classificador de ramp corrigido (6->19) mantem T3 em 1.6%
+
+### O Que Essa Metrica Significa
+
+Sem Play T3 = 1.6% significa que em 98.4% das maos, o deck tem jogada nos turnos 1-3.
+Este e o melhor T3 ja registrado para Lorehold (baseline 3.3%, pico 16.9% no Ciclo #9).
+A correcao do classificador de ramp (Exec#15) eliminou o vies de -8.8pp que inflava T3.
+O deck atual (33 lands, 19 ramp, 8 fast mana 0-1 CMC) e extremamente consistente no early game.
+
+---
+
 ## Execucao #15 -- 2026-06-03T21:47:00+00:00 (DECK MUDOU -- T3=1.6%, -7.3pp vs Exec#14, DB Classifier Corrigido)
 
 ### PIPELINE INTEGRITY -- Hash Mudou Desde Exec#14
