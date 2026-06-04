@@ -1,19 +1,21 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~12:00 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~17:20 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
-> **Archetype:** 🔴 **CONFIRMED** — cEDH Fast-Mana Copy-Combo (Bracket 4), NOT spellslinger
+> **Archetype:** 🔴 **CONFIRMED** — cEDH Stax-Protected Combo (Bracket 4), NOT spellslinger
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 15 Mulligan simulations, v3.22→v3.23→v3.24→v3.25 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated), **5th consecutive hash change (2026-06-04)**
-> **🚨 Deck State:** **ACTIVE cEDH STORM** — deck_id=6, card hash: `763c3e0ffad4b05e871d5d08b38393fd` (changed from `8b9c643c...`). 100 cards, 31 lands tagged (including **Mountain + Plains basics** — critical vulnerability resolved), 19 ramp, 9 draw, 10 protection, 10 wincons, 6 tutors, 5 combo pieces, 3 removal, 1 board wipe. **11 Game Changers → Bracket 4.**
-> **✅ Worldfire is LEGAL** (v3.24 error corrected — banlist check now queries `card_legalities`, not model memory). **0 banned cards.**
-> **✅ Classifier resolved:** 20 unknown tags → 3 (85% reduction). Ramp: 6 tagged → 19 tagged. T3: 8.9% → 1.6% (-7.3pp from tag correction alone).
-> **🟢 Basic Land Crisis RESOLVED:** Mountain and Plains basics now present (was 0 actual basics). 2 artifact lands (Ancient Den, Great Furnace) remain but are no longer the only pseudo-basics.
+> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 16 Mulligan simulations, v3.22→v3.23→v3.24→v3.25 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated), **6th consecutive hash change (2026-06-04 ~17:20 UTC)** — STRATEGIC PIVOT to stax-protected combo
+> **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, card hash: `7b0b3fa845db029428d6aaa6d6915b09` (6th consecutive divergence). 100 cards, 31 lands tagged (2 basics: Mountain + Plains), 19 ramp, 9 draw, 10 protection, 10 wincons, 5 tutors, 3 combo pieces, 3 spell engines, 3 removal, 1 stax (Drannith Magistrate), 1 board wipe. **11 Game Changers → Bracket 4.** 3 unknown tags.
+> **✅ Worldfire is LEGAL** (banlist check queries `card_legalities`). **0 banned cards.**
+> **✅ CMC corruption RESOLVED:** 0 NULL CMC values (was 36 in prior report). All CMC=0.0 cards are legitimate (31 lands + 4 Moxen + Lotus Petal = 36).
+> **✅ Classifier resolved:** 20 unknown tags → 3 (85% reduction). Ramp: 6 tagged → 19 tagged. T3: 1.6% (Exec#15, stale — needs revalidation on new hash).
+> **🟢 Basic Land Crisis RESOLVED:** Mountain and Plains basics present (2). Artifact lands (Ancient Den, Great Furnace) were removed in this pivot — only true basics remain.
+> **🆕 Strategic Pivot to Stax:** +Drannith Magistrate (stax), +Pyroblast, +Silence, +Orim's Chant (stack protection), +Esper Sentinel, +The One Ring, +Wheel of Fortune, +Scroll Rack (draw upgrade), +Past in Flames, +Reiterate, +Reverberate (spell engines), +Heat Shimmer (combo piece), +Giver of Runes (protection). Removed: Akroma's Will, Lightning Greaves, Hexing Squelcher, Big Score, Windfall, Weathered Wayfarer, Dance with Calamity, Dragon's Rage Channeler, Double Vision, Arcane Bombardment, Dawning Archaic, Ancient Den, Great Furnace.
 
 ---
 
-## ⚠️ IMPORTANT — Sections §1–§7 BELOW describe the PRE-RECONSTRUCTION deck (spellslinger, hash `30d00347...`). See §15 for the current cEDH Storm deck state.
+## ⚠️ IMPORTANT — Sections §1–§7 BELOW describe the PRE-RECONSTRUCTION deck (spellslinger, hash `30d00347...`). §8–§14 describe the first cEDH reconstruction. §15–§27 describe the fast-mana copy-combo era. §28–§30 document the Basic Land Crisis and 5th hash change. **§31–§33 document the 6th hash change — STRATEGIC PIVOT to cEDH stax-protected combo.**
 
 ---
 
@@ -1374,4 +1376,156 @@ Confirmed changes vs v3.25 state:
 
 ---
 
-> **Next Cron Cycle:** Continue monitoring the cEDH Storm build. **Critical concerns:** (1) Wincon desaturation — 13 wincons wasting 5-6 slots, (2) Only 3 removal in 4-player format, (3) 5th hash change — deck unstable, pipeline chasing moving target, (4) Basic land crisis resolved (2 basics) but Validator threshold ≥3 not met, (5) 36 CMC=NULL cards still corrupting analyses, (6) Deck mutation audit trail needed — 5 changes in 48h with zero traceability. Priority: Task 4 (wincon desaturation) to free removal slots; Tasks 1-2 (pipeline lock + auto-revalidation) to stop instability.
+## 31. 🆕 6TH CONSECUTIVE HASH CHANGE — STRATEGIC PIVOT TO STAX-PROTECTED COMBO (2026-06-04 ~17:20 UTC)
+
+### 31.1 Hash Divergence #6 Detected
+
+**Card hash changed:** `763c3e0ffad4b05e871d5d08b38393fd` (5th change, basic land fix) → `7b0b3fa845db029428d6aaa6d6915b09` (current)
+
+This is the **6th consecutive hash divergence** — the most significant card-level change since the 2026-06-02 reconstruction. Unlike the 5th change (which was a 2-card basic land fix), this change involves **14+ in/out substitutions** — a genuine strategic pivot.
+
+| # | When | Hash (last 4) | Scope | Pipeline Coverage |
+|---|------|---------------|-------|-------------------|
+| 1 | Jun 2 | 3000...→f224... | Reconstruction (lands+ramp) | v3.22-3.23 |
+| 2 | Jun 3 | f224...→8b9c... | DB re-sync (classifier fix) | v3.24-3.25, Scout #37-38, Mulligan #14-15 |
+| 3 | Jun 3 | 8b9c...→? | 2 wincons added (Longshot, Surge) | Scout #38 |
+| 4 | Jun 4 | ?→8b9c... (revert) | Akroma's Will restored? | Unclear |
+| 5 | Jun 4 ~12Z | 8b9c...→763c... | +Mountain, +Plains basics | None |
+| **6** | **Jun 4 ~17Z** | **763c...→7b0b...** | **14+ swaps, stax pivot** | **None — this report** |
+
+### 31.2 What Changed — Strategic Pivot to cEDH Stax
+
+This is NOT a small edit. The deck shed its spellslinger-copy identity and adopted a **stax-protected deterministic combo** shell:
+
+#### Cards ADDED (+14)
+
+| Card | Tag | CMC | Strategic Role |
+|:-----|:----|:---:|:---------------|
+| **Drannith Magistrate** | stax | 2 | Locks opponents out of commanders. cEDH staple. |
+| **Pyroblast** | protection | 1 | 1-mana stack interaction. Counters blue spells, destroys blue permanents. |
+| **Silence** | protection | 1 | Opponents can't cast this turn. Protects combo turn. |
+| **Orim's Chant** | protection | 1 | Same as Silence + can fog attackers. |
+| **Giver of Runes** | protection | 1 | 1-drop protection for commander/key creature. |
+| **Esper Sentinel** | draw | 1 | Rhystic-lite. Opponents pay 1 per noncreature spell or you draw. |
+| **Scroll Rack** | draw | 2 | Card selection. cEDH staple with fetchlands. |
+| **The One Ring** | draw | 4 | Protection + card draw engine. Game Changer. |
+| **Wheel of Fortune** | draw | 3 | 7-card refill. Game Changer. |
+| **Monument to Endurance** | draw | 3 | Draw smoothing, lifegain synergy. |
+| **Past in Flames** | engine | 4 | Flashback all instants/sorceries. Combo enabler. |
+| **Reiterate** | engine | 3 | Buyback copy spell. Infinite mana combo outlet. |
+| **Reverberate** | engine | 2 | 2-mana copy any spell. |
+| **Heat Shimmer** | combo | 3 | Backup Twinflame. Dualcaster+Heat Shimmer = hasty tokens. |
+
+#### Cards REMOVED (−14+)
+
+| Card | Old Tag | Reason for Removal |
+|:-----|:--------|:-------------------|
+| Akroma's Will | protection | 4 CMC — too expensive for combo protection. Replaced by 1-CMC stack interaction. |
+| Lightning Greaves | protection | Equipment — slow. Replaced by 1-CMC creature protection. |
+| Hexing Squelcher | protection | Niche artifact. Replaced by Silence/Orim's Chant. |
+| Big Score | draw | 4 CMC treasure+draw. Replaced by Wheel of Fortune + The One Ring. |
+| Windfall | draw | Symmetrical — helps opponents. Replaced by Esper Sentinel (asymmetrical). |
+| Weathered Wayfarer | draw | Too slow for cEDH. Replaced by Scroll Rack + fetchland engine. |
+| Dance with Calamity | draw | 8 CMC — uncastable in cEDH. |
+| Dragon's Rage Channeler | draw | Surveil too slow. Replaced by Monument to Endurance. |
+| Double Vision | copy engine | 5 CMC enchantment — too slow. Replaced by Past in Flames. |
+| Arcane Bombardment | copy engine | 4 CMC, random — unreliable. |
+| Dawning Archaic | copy engine | 5 CMC — too expensive. Replaced by Reiterate+Reverberate. |
+| Ancient Den | land | Artifact land — vulnerability to Null Rod/Collector Ouphe. |
+| Great Furnace | land | Same as Ancient Den. |
+| *Land Tax* | ramp | **KEPT** — sole survivor of old utility suite. |
+
+### 31.3 Strategic Assessment
+
+This is the **first pivot that makes strategic sense** — the deck is converging toward a proper cEDH build:
+
+1. **Stack protection suite:** Pyroblast + Silence + Orim's Chant + Grand Abolisher + Deflecting Swat + Teferi's Protection + Boros Charm + Flawless Maneuver = **8 stack/protection pieces**, all at CMC ≤3. This is cEDH-grade.
+
+2. **Draw engine upgrade:** Esper Sentinel (Rhystic-lite) + The One Ring + Wheel of Fortune + Scroll Rack replaces clunky CMC 4-8 draw spells. Card advantage is now asymmetrical and cost-efficient.
+
+3. **Stax element:** Drannith Magistrate is a genuine cEDH stax piece. It single-handedly shuts down opposing commanders and can be tutored by Imperial Recruiter/Recruiter of the Guard.
+
+4. **Spell recursion engine:** Past in Flames + Reiterate + Reverberate forms a deterministic loop engine. With enough mana (which the 5 Moxen + Sol Ring + Mana Vault + Jeska's Will provide), the deck can combo off from the graveyard.
+
+5. **Artifact lands removed:** Ancient Den and Great Furnace were liabilities against artifact hate. Their removal closes a vulnerability window.
+
+### 31.4 Remaining Structural Issues (Unchanged by Pivot)
+
+| Issue | Status | Detail |
+|:------|:------:|:-------|
+| Wincon supersaturation | 🔴 10 wincons | No change. 5+ slots wasted. |
+| Removal density | 🔴 3 removal | Still Path + Swords + Generous Gift only. |
+| Board wipe count | 🟡 1 wipe | Only Blasphemous Act. |
+| Basic land count | 🟢 2 basics | Mountain + Plains present. |
+| CMC corruption | 🟢 **RESOLVED** | 0 NULL CMCs. All 36 CMC=0.0 are legitimate. |
+| Unknown tags | 🟡 3 unknown | Inventors' Fair, Prismatic Vista, Reforge the Soul. |
+| Pipeline staleness | 🔴 ALL stale | No Scout/Validator/Mulligan/Battle for this hash. |
+
+### 31.5 CMC Corruption Resolution — Confirmed
+
+The prior report documented 36 "CMC=NULL or CMC=0.0" cards as corruption. Direct DB query on 2026-06-04 ~17:20 UTC confirms:
+
+- **CMC NULL: 0** (none)
+- **CMC 0.0: 36** — all legitimate: 31 lands + Chrome Mox + Mox Amber + Mox Diamond + Mox Opal + Lotus Petal
+
+The corruption flagged in previous reports was a **false alarm** — previous queries combined NULL and 0.0 without separating legitimate 0-CMC cards (lands, Moxen, Lotus Petal). Current query validates: all 36 cards with CMC=0.0 have `type_line` containing "Land" or are Moxen/Lotus Petal with true CMC=0.
+
+**Task 5 from §29 (CMC Integrity Repair) is CANCELLED.** No repair needed.
+
+---
+
+## 32. 🆕 UPDATED CONCRETE TASKS (2026-06-04 ~17:20 UTC — max 5)
+
+### Task 1: Pipeline Lock — Prevent External Deck Modification Without Audit (RECONFIRMED, ELEVATED)
+- **Evidence:** 6 hash changes in ~72 hours (June 2-4), all external. This latest pivot (14+ cards) made a strategically sound transformation — but zero pipeline agents know about it. Scout #38, Validator v3.25, and Mulligan Exec#15-16 all analyzed hash `8b9c643c...` which is 3 hashes stale. The system has no idea the deck now plays Drannith Magistrate, Pyroblast, Silence, Orim's Chant, or The One Ring.
+- **What to change:** Add `deck_card_mutations` audit table logging every INSERT/UPDATE/DELETE with source (`import_script`, `evolution_oracle`, `manual_sqlite`, etc.), card_name, old/new values, timestamp. Add write-gate: modifications without Evolution Oracle `applied=true` entry emit "EXTERNAL MODIFICATION" alert. **Priority escalated from Medium to HIGH** — with 6 modifications, the pipeline is permanently stale.
+- **Impact:** Makes deck evolution traceable. Stops pipeline from chasing a moving target. Enables root cause analysis of undocumented changes.
+- **Risk:** Medium — adds write-gate. Must allow legitimate operations (promotions, imports, direct DB edits for emergency fixes with documentation).
+- **Validation:** Any undocumented `deck_cards` change should trigger: "⚠️ EXTERNAL MODIFICATION: deck_id=6, source=unknown, delta=14 cards."
+
+### Task 2: Hash-Change Auto-Reset with Full Agent Revalidation (RECONFIRMED, ELEVATED)
+- **Evidence:** The 6th hash change was detected ONLY by this cron job's manual check. No pipeline agent has analyzed hashes #4, #5, or #6. T3=1.6% (Exec#15, hash `8b9c643c...`) is now 3 hashes and ~20 card changes stale. The deck's win rate vs 12 opponents (71.7% from Battle Analyst v8 on hash `8b9c643c...`) is now unreliable — with stax pieces added, the win rate likely improved but we don't know by how much.
+- **What to change:** Auto-trigger the full analysis chain on hash change: (1) Scout delta detection with full card diff, (2) auto-trigger Validator + Mulligan if delta > 2 cards, (3) mark prior analysis as `stale=true`, (4) reset T3/battle baselines for new deck state, (5) rate-limit to 1 full revalidation per 30 min.
+- **Impact:** Eliminates analysis lag. Current analysis lag is >48h and >3 hashes. Makes the pipeline self-healing.
+- **Risk:** Medium — needs rate limiting to prevent loops during rapid modifications. Must archive stale baselines rather than delete them.
+- **Validation:** Hash change → within 5 min: Scout delta report → Validator re-run → Mulligan re-run with new T3 → Battle Analyst re-run with new WR.
+
+### Task 3: Stax-Aware Archetype Detection (🆕 — from Strategic Pivot)
+- **Evidence:** The deck pivoted from "copy-combo" to "stax-protected combo" with Drannith Magistrate added and artifact lands removed. Yet the Evolution Oracle (last run Jun 1, SILENT) still treats this as a spellslinger deck. The Validator's SYNERGY_MAP scores and PG profile are built for spellslinger. None of the pipeline agents recognize stax as a strategic dimension. If they did, they would: (a) score Drannith Magistrate as a P0 include, (b) recommend more stax pieces (Rule of Law, Deafening Silence, Thorn of Amethyst), (c) deprioritize spell-copy engines (which were all removed anyway).
+- **What to change:** Add `detect_stax_presence()` to deck state analysis. When `COUNT(functional_tag='stax') >= 1` AND `COUNT(functional_tag='protection') >= 6`, classify as "stax-protected" archetype variant. Apply different swap heuristics: prioritize asymmetrical stax (Rule of Law over Wrath of God), prioritize instant-speed protection over sorcery-speed.
+- **Impact:** The pipeline can learn that stax is a valid Boros cEDH strategy. Currently all agents are blind to this dimension.
+- **Risk:** Low — adds a detection heuristic. Does not modify existing scoring. Just adds awareness.
+- **Validation:** Validator on current deck → archetype output includes "stax-protected" variant. Oracle swap recommendations include Rule of Law, Aven Mindcensor, or Ethersworn Canonist.
+
+### Task 4: Wincon Desaturation + Removal Priority (CARRIED FORWARD — unchanged by pivot)
+- **Evidence:** Scout #38: 10 tagged wincons + 3 combos = 13 conditions in 100-card deck. cEDH meta uses 3-5. Only 3 removal for 4-player pods. The stax pivot did not touch wincons at all — the problem persists. In fact, the pivot freed protection slots (Silence/Orim's/Pyroblast are also pseudo-removal on the stack) but the removal count remains 3.
+- **What to change:** Evolution Oracle: when wincons > 7 and all 3 coverage axes (FAST/RESILIENT/STEALTH) are satisfied, rank wincons by (Score/CMC) ratio and recommend cutting the bottom N. Freed slots priority: removal (+3), board wipe (+1), stax (+1). In the new stax context, recommend asymmetrical stax pieces (Deafening Silence, Aven Mindcensor) as secondary priority.
+- **Impact:** Frees 5-6 slots. Largest remaining optimization independent of strategic alignment.
+- **Risk:** Low — recommendation only.
+- **Validation:** Oracle output should now consider stax context: cut Storm Herd, Rise of the Eldrazi, Guttersnipe, Rite of the Dragoncaller. Recommend +Chaos Warp, +Abrade, +Wear/Tear, +Deafening Silence (stax synergy), +Rule of Law.
+
+### Task 5: Deck Stability Score — Pause Oracle When Too Volatile
+- **Evidence:** 6 modifications in 72 hours. Deck is being modified faster than any agent can analyze. Evolution Oracle's last run was Jun 1 (SILENT) — before all 6 hash changes. The deck it analyzed (hash `30d00347...`) doesn't exist anymore. Running the Oracle on the current deck would be meaningful, but running it while the deck changes every few hours is counterproductive.
+- **What to change:** Compute `deck_stability_score = 1.0 / (1 + modifications_in_last_72h)`. When score < 0.25 (>3 modifications in 72h), emit "DECK UNSTABLE — Oracle paused, recommendations unreliable." When score improves (no modifications for 24h), auto-resume Oracle. Combine with Task 1's audit trail to distinguish "learning-driven evolution" (good) from "external tampering" (block).
+- **Impact:** Prevents Oracle from generating recommendations that are obsolete by the time they're applied. Currently the Oracle's entire cycle history (C#1-C#23) applies to deck states that no longer exist.
+- **Risk:** Low — adds a gate, doesn't remove functionality.
+- **Validation:** Current deck → `stability_score < 0.25` → Oracle paused until deck stable for 24h.
+
+---
+
+## 33. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-04 ~17:20 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Stax presence detection** | §31.2, Task 3 | Auto-detect stax archetype variant from functional tags — enables different swap heuristics |
+| **Deck volatility → Oracle pause** | §31.5, Task 5 | Auto-pause Evolution Oracle when deck is modified >3x in 72h — prevents stale recommendations |
+| **Pipeline staleness metric** | §31.1 | Measure "hours since last pipeline analysis matched current hash" — alert when >12h |
+| **CMC integrity auto-verification** | §31.5 | Distinguish NULL from legitimate 0.0 CMC (lands, Moxen, Lotus Petal) — prevent false corruption alarms |
+| **Strategic pivot detection** | §31.3 | Auto-detect when >8 cards change in a single diff — trigger full reanalysis, not incremental |
+| **Stack interaction density** | §31.3 | Count instant-speed protection + counterspells + silence effects — metric for cEDH readiness |
+| **Wincon-to-interaction ratio** | §31.4 | Alert when wincons > interaction pieces (10 vs 3) — structural imbalance signal |
+| **Artifact land vulnerability** | §31.2 | Detect artifact lands (type_line=Land + Artifact) — flag as Null Rod/Collector Ouphe vulnerability |
+
+---
+
+> **Next Cron Cycle:** Continue monitoring the cEDH Stax-Combo build. **Critical concerns:** (1) Pipeline LOCK needed — 6 changes in 72h with zero audit trail, (2) All pipeline agents STALE — Scout, Validator, Mulligan, Battle, and Oracle haven't analyzed hashes #4-6, (3) Wincon desaturation still P0 — 13 wincons wasting 5-6 slots despite strategic improvement, (4) 3 removal in 4-player format still critical, (5) Stax pivot is strategically sound but invisible to pipeline — agents need stax awareness, (6) CMC corruption confirmed RESOLVED (false alarm — all 36 CMC=0.0 are legitimate). **Priority order:** Task 1 (audit trail) to stop undocumented changes → Task 2 (auto-revalidation) to get pipeline current → Task 5 (stability gate) to prevent Oracle from chasing a moving target → Task 3 (stax detection) to make agents aware of new archetype → Task 4 (wincon desaturation) to free slots now that strategic alignment is improving.
