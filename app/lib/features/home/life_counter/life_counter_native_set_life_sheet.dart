@@ -108,10 +108,11 @@ class _LifeCounterNativeSetLifeSheetState
       playerIndex: _targetPlayerIndex,
       life: int.tryParse(displayValue) ?? 0,
     );
-    final playerStatusSummary = LifeCounterTabletopEngine.playerBoardSummary(
-      previewSession,
-      playerIndex: _targetPlayerIndex,
-    ).statusSummary;
+    final playerStatusSummary =
+        LifeCounterTabletopEngine.playerBoardSummary(
+          previewSession,
+          playerIndex: _targetPlayerIndex,
+        ).statusSummary;
 
     return SafeArea(
       child: Padding(
@@ -339,7 +340,7 @@ class _LifeCounterNativeSetLifeSheetState
                               buttonKey: const Key(
                                 'life-counter-native-set-life-backspace',
                               ),
-                              label: '<',
+                              label: 'DEL',
                               onTap: _backspace,
                             ),
                           ],
@@ -424,34 +425,48 @@ class _SetLifeKeypadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 70,
-      height: 70,
-      child: FilledButton.tonal(
-        key: buttonKey,
-        onPressed: onTap,
-        style: FilledButton.styleFrom(
-          backgroundColor:
-              destructive
-                  ? const Color(0x33FF2C77)
-                  : AppTheme.surfaceElevated,
-          foregroundColor:
-              destructive ? const Color(0xFFFF5E9A) : AppTheme.textPrimary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color:
+    final semanticLabel =
+        destructive
+            ? 'Limpar valor'
+            : label == 'DEL'
+            ? 'Apagar ultimo digito'
+            : 'Adicionar digito $label';
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: SizedBox(
+          width: 70,
+          height: 70,
+          child: FilledButton.tonal(
+            key: buttonKey,
+            onPressed: onTap,
+            style: FilledButton.styleFrom(
+              backgroundColor:
                   destructive
-                      ? const Color(0x66FF2C77)
-                      : AppTheme.outlineMuted,
+                      ? const Color(0x33FF2C77)
+                      : AppTheme.surfaceElevated,
+              foregroundColor:
+                  destructive ? const Color(0xFFFF5E9A) : AppTheme.textPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color:
+                      destructive
+                          ? const Color(0x66FF2C77)
+                          : AppTheme.outlineMuted,
+                ),
+              ),
             ),
-          ),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: AppTheme.fontXxl,
-            fontWeight: FontWeight.w900,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: label == 'DEL' ? AppTheme.fontMd : AppTheme.fontXxl,
+                fontWeight: FontWeight.w900,
+                letterSpacing: label == 'DEL' ? 1.1 : 0,
+              ),
+            ),
           ),
         ),
       ),

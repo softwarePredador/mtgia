@@ -57,7 +57,7 @@ enum _PlayerSpecialState { none, deckedOut, answerLeft }
 /// - Veneno / Poison counters (10 = derrota)
 /// - Dano de Comandante por oponente (21 = derrota)
 /// - Energy e Experience counters
-/// - HistÃ³rico com undo
+/// - Histórico com undo
 class LifeCounterScreen extends StatefulWidget {
   final Random? randomOverride;
   final bool initialHubExpanded;
@@ -592,7 +592,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       });
     }
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar configuraÃ§Ãµes',
+      barrierLabel: 'Fechar configurações',
       builder:
           (ctx) => _SettingsSheet(
             twoPlayerStartingLife: _startingLifeTwoPlayer,
@@ -614,7 +614,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       });
     }
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar seleÃ§Ã£o de jogadores',
+      barrierLabel: 'Fechar seleção de jogadores',
       builder:
           (ctx) => _PlayersOverlay(
             selectedPlayerCount: _playerCount,
@@ -628,7 +628,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 
   void _showHistoryDialog() {
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar histÃ³rico',
+      barrierLabel: 'Fechar histórico',
       builder:
           (ctx) => _HistoryOverlay(
             lastTableEvent: _lastTableEvent,
@@ -1490,13 +1490,20 @@ class _HubToolsFrame extends StatelessWidget {
               ),
             );
           },
-          child: Material(
-            key: const Key('life-counter-hub-tools'),
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(radius),
-              onTap: onTap,
-              child: SizedBox(width: frameSize, height: frameSize),
+          child: Semantics(
+            button: true,
+            label: 'Abrir ferramentas da mesa',
+            child: Tooltip(
+              message: 'Ferramentas da mesa',
+              child: Material(
+                key: const Key('life-counter-hub-tools'),
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(radius),
+                  onTap: onTap,
+                  child: SizedBox(width: frameSize, height: frameSize),
+                ),
+              ),
             ),
           ),
         ),
@@ -1522,96 +1529,107 @@ class _HubMedallion extends StatelessWidget {
     final ringSize = outerSize * 0.86;
     final iconSize = (isExpanded ? 28 : 23) * scaleFactor;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        key: const Key('life-counter-hub-toggle'),
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          opacity: isExpanded ? 1 : 0.92,
-          child: SizedBox(
-            width: outerSize,
-            height: outerSize,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: outerSize * 1.26,
-                  height: outerSize * 1.26,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(
-                          0xFF9CE9FF,
-                        ).withValues(alpha: isExpanded ? 0.2 : 0.11),
-                        blurRadius: isExpanded ? 24 : 14,
-                        spreadRadius: isExpanded ? 2 : 0,
+    return Semantics(
+      button: true,
+      label:
+          isExpanded ? 'Fechar controles da mesa' : 'Abrir controles da mesa',
+      child: Tooltip(
+        message:
+            isExpanded ? 'Fechar controles da mesa' : 'Abrir controles da mesa',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: const Key('life-counter-hub-toggle'),
+            borderRadius: BorderRadius.circular(999),
+            onTap: onTap,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              opacity: isExpanded ? 1 : 0.92,
+              child: SizedBox(
+                width: outerSize,
+                height: outerSize,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: outerSize * 1.26,
+                      height: outerSize * 1.26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF9CE9FF,
+                            ).withValues(alpha: isExpanded ? 0.2 : 0.11),
+                            blurRadius: isExpanded ? 24 : 14,
+                            spreadRadius: isExpanded ? 2 : 0,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  width: outerSize,
-                  height: outerSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: isExpanded ? 0.32 : 0.2,
-                      ),
-                      width: 1.2,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        blurRadius: isExpanded ? 20 : 14,
-                        spreadRadius: 1.5 * scaleFactor,
-                        offset: Offset(0, 8 * scaleFactor),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      width: outerSize,
+                      height: outerSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(
+                            alpha: isExpanded ? 0.32 : 0.2,
+                          ),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.24),
+                            blurRadius: isExpanded ? 20 : 14,
+                            spreadRadius: 1.5 * scaleFactor,
+                            offset: Offset(0, 8 * scaleFactor),
+                          ),
+                          BoxShadow(
+                            color: const Color(
+                              0xFFFFE69A,
+                            ).withValues(alpha: isExpanded ? 0.08 : 0.04),
+                            blurRadius: isExpanded ? 12 : 8,
+                          ),
+                        ],
                       ),
-                      BoxShadow(
-                        color: const Color(
-                          0xFFFFE69A,
-                        ).withValues(alpha: isExpanded ? 0.08 : 0.04),
-                        blurRadius: isExpanded ? 12 : 8,
+                      child: CustomPaint(
+                        painter: _HubMedallionPainter(
+                          progress: isExpanded ? 1 : 0,
+                        ),
+                        child: SizedBox(width: outerSize, height: outerSize),
                       ),
-                    ],
-                  ),
-                  child: CustomPaint(
-                    painter: _HubMedallionPainter(progress: isExpanded ? 1 : 0),
-                    child: SizedBox(width: outerSize, height: outerSize),
-                  ),
-                ),
-                Container(
-                  width: ringSize,
-                  height: ringSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: isExpanded ? 0.3 : 0.2,
-                      ),
-                      width: 1.1,
                     ),
-                  ),
-                ),
-                Icon(
-                  isExpanded ? Icons.close_rounded : Icons.menu_rounded,
-                  color: const Color(0xFF0D1117),
-                  size: iconSize,
-                  shadows: [
-                    Shadow(
-                      color: Colors.white.withValues(alpha: 0.36),
-                      blurRadius: 6,
+                    Container(
+                      width: ringSize,
+                      height: ringSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(
+                            alpha: isExpanded ? 0.3 : 0.2,
+                          ),
+                          width: 1.1,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.close_rounded : Icons.menu_rounded,
+                      color: const Color(0xFF0D1117),
+                      size: iconSize,
+                      shadows: [
+                        Shadow(
+                          color: Colors.white.withValues(alpha: 0.36),
+                          blurRadius: 6,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -1756,50 +1774,60 @@ class _HubPetalAction extends StatelessWidget {
     final topTint = Color.lerp(color, Colors.white, 0.2) ?? color;
     final bottomTint = Color.lerp(color, Colors.black, 0.12) ?? color;
 
-    return Material(
-      key: buttonKey,
-      color: const Color.fromARGB(0, 0, 0, 0),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          width: 102 * scaleFactor,
-          height: 40 * scaleFactor,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                topTint.withValues(alpha: visualOpacity),
-                bottomTint.withValues(alpha: visualOpacity),
-              ],
-            ),
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          key: buttonKey,
+          color: const Color.fromARGB(0, 0, 0, 0),
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.2 * visualOpacity),
-              width: 0.9,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.1 * visualOpacity),
-                blurRadius: 3 * scaleFactor,
-                offset: Offset.zero,
+            onTap: onTap,
+            child: Ink(
+              width: 102 * scaleFactor,
+              height: 40 * scaleFactor,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    topTint.withValues(alpha: visualOpacity),
+                    bottomTint.withValues(alpha: visualOpacity),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.black.withValues(alpha: 0.2 * visualOpacity),
+                  width: 0.9,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.1 * visualOpacity),
+                    blurRadius: 3 * scaleFactor,
+                    offset: Offset.zero,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12 * scaleFactor),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: Colors.black.withValues(alpha: 0.9 * visualOpacity),
-                    fontSize: 13.4 * scaleFactor,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.1,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12 * scaleFactor),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: Colors.black.withValues(
+                          alpha: 0.9 * visualOpacity,
+                        ),
+                        fontSize: 13.4 * scaleFactor,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -1917,21 +1945,28 @@ class _TableOverlayFrame extends StatelessWidget {
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(999),
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Ink(
-                          width: 48,
-                          height: 48,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFF2C77),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close_rounded,
-                            color: Colors.white,
+                    child: Semantics(
+                      button: true,
+                      label: 'Fechar painel',
+                      child: Tooltip(
+                        message: 'Fechar painel',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(999),
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Ink(
+                              width: 48,
+                              height: 48,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFF2C77),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -1981,29 +2016,38 @@ class _PlayerLayoutPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: previewKey,
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(28),
-        child: Ink(
-          width: 176,
-          height: 72,
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFF2C77) : Colors.transparent,
+    final semanticLabel = 'Selecionar layout para $playerCount jogadores';
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: previewKey,
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color:
-                  selected
-                      ? const Color(0xFFFF2C77)
-                      : Colors.white.withValues(alpha: 0.9),
-              width: 2,
+            child: Ink(
+              width: 176,
+              height: 72,
+              decoration: BoxDecoration(
+                color: selected ? const Color(0xFFFF2C77) : Colors.transparent,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color:
+                      selected
+                          ? const Color(0xFFFF2C77)
+                          : Colors.white.withValues(alpha: 0.9),
+                  width: 2,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: _PlayerLayoutGlyph(playerCount: playerCount),
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: _PlayerLayoutGlyph(playerCount: playerCount),
           ),
         ),
       ),
@@ -2380,29 +2424,36 @@ class _CardSearchSuggestionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: chipKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.22),
+    return Semantics(
+      button: true,
+      label: 'Buscar $label',
+      child: Tooltip(
+        message: 'Buscar $label',
+        child: Material(
+          key: chipKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.94),
-              width: 1.5,
-            ),
-          ),
-          child: Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.86),
-              fontSize: AppTheme.fontXs,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
+            onTap: onTap,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.22),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  width: 1.5,
+                ),
+              ),
+              child: Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.86),
+                  fontSize: AppTheme.fontXs,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
             ),
           ),
         ),
@@ -2419,82 +2470,90 @@ class _CardSearchResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: tileKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
-          );
-        },
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.24),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.94),
-              width: 1.3,
+    final cardName = card.name;
+    return Semantics(
+      button: true,
+      label: 'Abrir detalhes de $cardName',
+      child: Tooltip(
+        message: 'Abrir $cardName',
+        child: Material(
+          key: tileKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
+              );
+            },
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  width: 1.3,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.style_rounded,
+                      color: Colors.white.withValues(alpha: 0.72),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.96),
+                            fontSize: AppTheme.fontMd,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          [
+                            if (card.typeLine.trim().isNotEmpty) card.typeLine,
+                            if (card.setCode.trim().isNotEmpty)
+                              card.setCode.toUpperCase(),
+                          ].join('  •  '),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.62),
+                            fontSize: AppTheme.fontSm,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Icon(
+                    Icons.open_in_new_rounded,
+                    color: Colors.white.withValues(alpha: 0.72),
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 38,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.style_rounded,
-                  color: Colors.white.withValues(alpha: 0.72),
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.96),
-                        fontSize: AppTheme.fontMd,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      [
-                        if (card.typeLine.trim().isNotEmpty) card.typeLine,
-                        if (card.setCode.trim().isNotEmpty)
-                          card.setCode.toUpperCase(),
-                      ].join('  â€¢  '),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.62),
-                        fontSize: AppTheme.fontSm,
-                        fontWeight: FontWeight.w600,
-                        height: 1.25,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Icon(
-                Icons.open_in_new_rounded,
-                color: Colors.white.withValues(alpha: 0.72),
-                size: 18,
-              ),
-            ],
           ),
         ),
       ),
@@ -2577,40 +2636,47 @@ class _BottomRailPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: pillKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-          decoration: BoxDecoration(
-            color: Colors.black,
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          key: pillKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+            onTap: onTap,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 15, color: Colors.white),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: AppTheme.fontSm,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.55,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 15, color: Colors.white),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.55,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -2742,7 +2808,7 @@ Path _scaledHexagonPath(Size size, double scale) {
 // ---------------------------------------------------------------------------
 
 /// Painel de um jogador individual com vida, indicadores de poison/commander,
-/// e botÃ£o para abrir contadores extras.
+/// e botão para abrir contadores extras.
 class _PlayerPanel extends StatefulWidget {
   final int panelIndex;
   final String label;
@@ -3205,68 +3271,76 @@ class _PlayerPanelState extends State<_PlayerPanel> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  InkWell(
-                    key: Key('life-counter-life-core-${widget.panelIndex}'),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                    onTap: widget.onOpenSetLife,
-                    onLongPress: () {
-                      setState(() {
-                        _showLifeActions = !_showLifeActions;
-                      });
-                    },
-                    child: SizedBox(
-                      width: _coreStageWidth,
-                      height: _coreStageHeight,
-                      child: Center(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 360),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
-                          transitionBuilder: (child, animation) {
-                            final fade = CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOut,
-                            );
-                            final scale = Tween<double>(
-                              begin: 0.82,
-                              end: 1,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutBack,
+                  Semantics(
+                    button: true,
+                    label:
+                        'Abrir ajuste de vida de ${widget.label}. Toque longo para mostrar acoes rapidas.',
+                    child: Tooltip(
+                      message: 'Ajustar vida de ${widget.label}',
+                      child: InkWell(
+                        key: Key('life-counter-life-core-${widget.panelIndex}'),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                        onTap: widget.onOpenSetLife,
+                        onLongPress: () {
+                          setState(() {
+                            _showLifeActions = !_showLifeActions;
+                          });
+                        },
+                        child: SizedBox(
+                          width: _coreStageWidth,
+                          height: _coreStageHeight,
+                          child: Center(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 360),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              transitionBuilder: (child, animation) {
+                                final fade = CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOut,
+                                );
+                                final scale = Tween<double>(
+                                  begin: 0.82,
+                                  end: 1,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeOutBack,
+                                  ),
+                                );
+                                final slide = Tween<Offset>(
+                                  begin: const Offset(0, 0.05),
+                                  end: Offset.zero,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                );
+                                return FadeTransition(
+                                  opacity: fade,
+                                  child: SlideTransition(
+                                    position: slide,
+                                    child: ScaleTransition(
+                                      scale: scale,
+                                      child: child,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _buildLifeCoreContent(
+                                isDefeated: isDefeated,
+                                isDeckedOut: isDeckedOut,
+                                hasAnswerLeft: hasAnswerLeft,
+                                isCommanderLethal: isCommanderLethal,
+                                isPoisonLethal: isPoisonLethal,
+                                hasHighRoll: hasHighRoll,
+                                dominantValueColor: dominantValueColor,
+                                supportingColor: supportingColor,
+                                eventLabel: eventLabel,
+                                eventValue: eventValue,
                               ),
-                            );
-                            final slide = Tween<Offset>(
-                              begin: const Offset(0, 0.05),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutCubic,
-                              ),
-                            );
-                            return FadeTransition(
-                              opacity: fade,
-                              child: SlideTransition(
-                                position: slide,
-                                child: ScaleTransition(
-                                  scale: scale,
-                                  child: child,
-                                ),
-                              ),
-                            );
-                          },
-                          child: _buildLifeCoreContent(
-                            isDefeated: isDefeated,
-                            isDeckedOut: isDeckedOut,
-                            hasAnswerLeft: hasAnswerLeft,
-                            isCommanderLethal: isCommanderLethal,
-                            isPoisonLethal: isPoisonLethal,
-                            hasHighRoll: hasHighRoll,
-                            dominantValueColor: dominantValueColor,
-                            supportingColor: supportingColor,
-                            eventLabel: eventLabel,
-                            eventValue: eventValue,
+                            ),
                           ),
                         ),
                       ),
@@ -3422,10 +3496,14 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   children: [
                     SizedBox(
                       width: sideWidth,
-                      child: InkWell(
-                        key: widget.decrementZoneKey,
-                        onTap: widget.onDecrement,
-                        child: const SizedBox.expand(),
+                      child: Semantics(
+                        button: true,
+                        label: 'Diminuir vida de ${widget.label}',
+                        child: InkWell(
+                          key: widget.decrementZoneKey,
+                          onTap: widget.onDecrement,
+                          child: const SizedBox.expand(),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -3434,10 +3512,14 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                     ),
                     SizedBox(
                       width: sideWidth,
-                      child: InkWell(
-                        key: widget.incrementZoneKey,
-                        onTap: widget.onIncrement,
-                        child: const SizedBox.expand(),
+                      child: Semantics(
+                        button: true,
+                        label: 'Aumentar vida de ${widget.label}',
+                        child: InkWell(
+                          key: widget.incrementZoneKey,
+                          onTap: widget.onIncrement,
+                          child: const SizedBox.expand(),
+                        ),
                       ),
                     ),
                   ],
@@ -3650,63 +3732,70 @@ class _PlayerInlineAction extends StatelessWidget {
     final accent = destructive ? AppTheme.error : AppTheme.textPrimary;
     final isDenseCompact = compact && dense;
 
-    return Material(
-      key: actionKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        onTap: onTap,
-        child: Ink(
-          padding: EdgeInsets.symmetric(
-            horizontal:
-                isDenseCompact
-                    ? 8
-                    : compact
-                    ? 10
-                    : 12,
-            vertical:
-                isDenseCompact
-                    ? 6
-                    : compact
-                    ? 8
-                    : 9,
-          ),
-          decoration: BoxDecoration(
-            color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          key: actionKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-            border: Border.all(
-              color: accent.withValues(alpha: destructive ? 0.3 : 0.18),
-              width: 0.8,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size:
+            onTap: onTap,
+            child: Ink(
+              padding: EdgeInsets.symmetric(
+                horizontal:
                     isDenseCompact
-                        ? 12
+                        ? 8
                         : compact
-                        ? 14
-                        : 16,
-                color: accent,
+                        ? 10
+                        : 12,
+                vertical:
+                    isDenseCompact
+                        ? 6
+                        : compact
+                        ? 8
+                        : 9,
               ),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: accent,
-                  fontSize:
-                      isDenseCompact
-                          ? AppTheme.fontXs - 1
-                          : compact
-                          ? AppTheme.fontXs
-                          : AppTheme.fontSm,
-                  fontWeight: FontWeight.w800,
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+                borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                border: Border.all(
+                  color: accent.withValues(alpha: destructive ? 0.3 : 0.18),
+                  width: 0.8,
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size:
+                        isDenseCompact
+                            ? 12
+                            : compact
+                            ? 14
+                            : 16,
+                    color: accent,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: accent,
+                      fontSize:
+                          isDenseCompact
+                              ? AppTheme.fontXs - 1
+                              : compact
+                              ? AppTheme.fontXs
+                              : AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -4926,79 +5015,86 @@ class _DiceActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = accent ?? Colors.white;
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
-        onTap: onTap,
-        child: Ink(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: emphasized ? 18 : 16,
-            vertical: emphasized ? 18 : 14,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: emphasized ? 0.56 : 0.32),
+    return Semantics(
+      button: true,
+      label: '$label, $detail',
+      child: Tooltip(
+        message: '$label: $detail',
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
-            border: Border.all(color: borderColor, width: 2),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: emphasized ? 26 : 22,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: emphasized ? 0.8 : 0.5,
-                        height: 1,
+            onTap: onTap,
+            child: Ink(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: emphasized ? 18 : 16,
+                vertical: emphasized ? 18 : 14,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: emphasized ? 0.56 : 0.32),
+                borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
+                border: Border.all(color: borderColor, width: 2),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: emphasized ? 26 : 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: emphasized ? 0.8 : 0.5,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          detail,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.68),
+                            fontSize: AppTheme.fontXs,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.7,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: borderColor.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: borderColor.withValues(alpha: 0.7),
+                        width: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      detail,
+                    child: Text(
+                      emphasized ? 'RUN' : 'GO',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.68),
+                        color: borderColor,
                         fontSize: AppTheme.fontXs,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.7,
-                        height: 1.2,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: borderColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: borderColor.withValues(alpha: 0.7),
-                    width: 1.2,
                   ),
-                ),
-                child: Text(
-                  emphasized ? 'RUN' : 'GO',
-                  style: TextStyle(
-                    color: borderColor,
-                    fontSize: AppTheme.fontXs,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.8,
-                  ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -5136,9 +5232,13 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(color: Colors.black.withValues(alpha: 0.74)),
+              child: Semantics(
+                button: true,
+                label: 'Fechar ajuste de vida',
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(color: Colors.black.withValues(alpha: 0.74)),
+                ),
               ),
             ),
             Center(
@@ -5222,7 +5322,7 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                             buttonKey: const Key(
                               'life-counter-set-life-backspace',
                             ),
-                            label: 'âŒ«',
+                            label: 'DEL',
                             onTap: _backspace,
                           ),
                         ],
@@ -5289,37 +5389,50 @@ class _SetLifeKeypadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(22),
-        onTap: onTap,
-        child: Ink(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            color: const Color(0xFF454257),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
+    final semanticLabel =
+        destructive
+            ? 'Limpar valor'
+            : label == 'DEL'
+            ? 'Apagar ultimo digito'
+            : 'Adicionar digito $label';
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: onTap,
+            child: Ink(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: const Color(0xFF454257),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color:
-                    destructive
-                        ? const Color(0xFFFF2C77)
-                        : Colors.white.withValues(alpha: 0.96),
-                fontSize: label == 'âŒ«' ? 22 : 30,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.4,
+              child: Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color:
+                        destructive
+                            ? const Color(0xFFFF2C77)
+                            : Colors.white.withValues(alpha: 0.96),
+                    fontSize: label == 'DEL' ? 17 : 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: label == 'DEL' ? 1.2 : 0.4,
+                  ),
+                ),
               ),
             ),
           ),
@@ -5392,9 +5505,13 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(color: Colors.black.withValues(alpha: 0.76)),
+              child: Semantics(
+                button: true,
+                label: 'Fechar ajuste de vida',
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(color: Colors.black.withValues(alpha: 0.76)),
+                ),
               ),
             ),
             Center(
@@ -5612,41 +5729,56 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          width: 62,
-          height: 62,
-          decoration: BoxDecoration(
-            color: const Color(0xFF171717),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: destructive ? 0.06 : 0.08),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+    final semanticLabel =
+        destructive
+            ? 'Limpar valor'
+            : label == 'DEL'
+            ? 'Apagar ultimo digito'
+            : 'Adicionar digito $label';
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(999),
+            onTap: onTap,
+            child: Ink(
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(
+                color: const Color(0xFF171717),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withValues(
+                    alpha: destructive ? 0.06 : 0.08,
+                  ),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color:
-                    destructive
-                        ? const Color(0xFFFF2C77)
-                        : Colors.white.withValues(alpha: 0.96),
-                fontSize: label == 'DEL' ? 17 : 30,
-                fontWeight: FontWeight.w900,
-                letterSpacing: label == 'DEL' ? 1.2 : 0.4,
+              child: Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color:
+                        destructive
+                            ? const Color(0xFFFF2C77)
+                            : Colors.white.withValues(alpha: 0.96),
+                    fontSize: label == 'DEL' ? 17 : 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: label == 'DEL' ? 1.2 : 0.4,
+                  ),
+                ),
               ),
             ),
           ),
@@ -5856,7 +5988,7 @@ class _CountersOverlayState extends State<_CountersOverlay> {
             valueKey: const Key('life-counter-poison-value'),
             icon: Icons.coronavirus,
             label: 'TOXIC',
-            sublabel: _poison >= 10 ? 'â˜  LETAL (â‰¥10)' : '10 = derrota',
+            sublabel: _poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
             value: _poison,
             color: AppTheme.success,
             isLethal: _poison >= 10,
@@ -5900,7 +6032,7 @@ class _CountersOverlayState extends State<_CountersOverlay> {
               child: _CounterRow(
                 icon: Icons.shield,
                 label: 'De ${widget.playerLabels[sourceIdx]}',
-                sublabel: dmg >= 21 ? 'â˜  LETAL (â‰¥21)' : null,
+                sublabel: dmg >= 21 ? '☠ LETAL (≥21)' : null,
                 value: dmg,
                 color: widget.playerColors[sourceIdx],
                 isLethal: dmg >= 21,
@@ -6286,26 +6418,40 @@ class _RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        key: buttonKey,
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color:
-                enabled
-                    ? color.withValues(alpha: 0.15)
-                    : AppTheme.outlineMuted.withValues(alpha: 0.3),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: enabled ? color : AppTheme.textHint,
+    final semanticLabel =
+        icon == Icons.add
+            ? 'Aumentar valor'
+            : icon == Icons.remove
+            ? 'Diminuir valor'
+            : 'Acao do contador';
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: buttonKey,
+            borderRadius: BorderRadius.circular(20),
+            onTap: onTap,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    enabled
+                        ? color.withValues(alpha: 0.15)
+                        : AppTheme.outlineMuted.withValues(alpha: 0.3),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: enabled ? color : AppTheme.textHint,
+              ),
+            ),
           ),
         ),
       ),
@@ -6317,7 +6463,7 @@ class _RoundButton extends StatelessWidget {
 // Settings Overlay
 // ---------------------------------------------------------------------------
 
-/// Overlay de mesa para configurar nÃºmero de jogadores e vida inicial.
+/// Overlay de mesa para configurar número de jogadores e vida inicial.
 class _SettingsSheet extends StatelessWidget {
   final int twoPlayerStartingLife;
   final int multiPlayerStartingLife;
@@ -6457,31 +6603,40 @@ class _StartingLifePresetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Ink(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFFC81E) : Colors.transparent,
+    final semanticLabel = 'Selecionar vida inicial $life';
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: selected ? const Color(0xFFFFC81E) : Colors.white,
-              width: 2,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              '$life',
-              style: TextStyle(
-                color: selected ? Colors.black : Colors.white,
-                fontSize: AppTheme.fontLg,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -0.4,
+            onTap: onTap,
+            child: Ink(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: selected ? const Color(0xFFFFC81E) : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: selected ? const Color(0xFFFFC81E) : Colors.white,
+                  width: 2,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  '$life',
+                  style: TextStyle(
+                    color: selected ? Colors.black : Colors.white,
+                    fontSize: AppTheme.fontLg,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.4,
+                  ),
+                ),
               ),
             ),
           ),

@@ -199,6 +199,11 @@ void main() {
 
       expect(find.text('Player Appearance'), findsOneWidget);
 
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-appearance-preset-2')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.ensureVisible(
         find.byKey(const Key('life-counter-native-player-appearance-preset-2')),
       );

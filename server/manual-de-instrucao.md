@@ -18028,3 +18028,19 @@ correções operacionais aplicadas no servidor:
 
 Relatório completo:
 `server/doc/HERMES_AWS_OPERATIONAL_AUDIT_2026-06-04.md`.
+
+## 2026-06-04 — Life Counter accessibility/layout pass
+
+Passe focado no Life Counter reduziu achados objetivos de UX estática sem
+redesenhar a mesa:
+
+- `interactive_without_semantics_hint` no Life Counter caiu para zero;
+- teclado de vida usa `DEL` em vez de texto corrompido;
+- overlays de card search, set life e player appearance receberam
+  `Semantics`/`Tooltip`;
+- textos corrompidos user-facing foram corrigidos;
+- prova viva passou no iPhone 15 Pro Max Simulator para base visual, card
+  search, set life e player appearance.
+
+Relatório:
+`server/doc/LIFE_COUNTER_ACCESSIBILITY_LAYOUT_PASS_2026-06-04.md`.
