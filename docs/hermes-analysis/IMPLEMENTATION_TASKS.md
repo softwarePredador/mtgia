@@ -1,163 +1,160 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
 
-> **Gerado:** 2026-06-04T04:00Z por ManaLoom Knowledge Synthesis (Cron)
+> **Gerado:** 2026-06-04T11:00Z por ManaLoom Knowledge Synthesis (Cron)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** d2ca5234
-> **Metodo:** 5 novos gaps priorizados entre conhecimento MTG (audits + SQLite) e codigo Dart
-> **Base de conhecimento:** Pipeline Audit v3.4 + Structure Audit (classes-not-used) + Inspecao de codigo
+> **HEAD:** 22787279
+> **Metodo:** Cruzamento do conhecimento MTG (Validator v3.25, Scout #38, CRON_STATUS, GAME_CHANGERS, Domain Skill) com codigo Dart
+> **Base de conhecimento:** Purpose Analyzer v3.25 + Scout Exec#38 + Pipeline Audit v3.6 + Domain Skill Gaps 4/12/15/17
 
 ---
 
-### [P1] Battle Simulator: Implementar regras fundamentais de Commander (stack, multiplayer, commander damage, tax, ETB)
+### [P1] `buildRoleTargetProfile`: Substituir hardcoded archetype targets por PG `commander_reference_profiles` + `theme_contextual_rules`
 
-**Conhecimento MTG:** CR 117.3 (stack/priority — cada jogador deve passar prioridade em sequencia antes da resolucao), CR 802.1a (multiplayer 4-player), CR 903.10a (commander damage 21 — derrota por dano de comandante), CR 903.8 (commander tax +{2} por cada vez que foi conjurado da command zone), CR 603.4 (ETB triggers — habilidades disparadas ao entrar no campo). O Pipeline Audit v3.4 confirma: "O codigo e um prototipo de combate, nao um simulador de Commander."
+**Conhecimento MTG:** O pipeline Hermes (Purpose Analyzer v3.25) documenta que decks podem mudar de arquetipo (ex: spellslinger -> cEDH fast-mana-combo). O PG tem 48+ `commander_reference_profiles` com `role_targets` (min/max por role como lands 33-35, ramp 8-12, draw 6-10, etc.) e 27 `theme_contextual_rules` com faixas por funcao por tema. O Domain Skill (Gap 4) documenta que o validator deve usar ranges especificos por tema, nao genericos.
 
-**Evidencia no codigo:** `server/lib/ai/battle_simulator.dart:3-13` — A docstring admite as simplificacoes: "Sem stack complexo (resolucao imediata)". `battle_simulator.dart:233` — `class BattleSimulator` implementa apenas 2 jogadores (`active` vs `opponent`). Nao ha codigo para: stack/priority, 4-player, commander damage tracking, commander tax, ETB triggers, planeswalkers (CR 306), ou State-Based Actions alem de destroy por dano (CR 704.3). O codigo implementa keywords (flying, trample, lifelink) corretamente nas linhas 56-67 e phases (untap/draw/discard), mas sem stack e multiplayer, nao e um simulador de Commander.
+**Evidencia no codigo:** `server/lib/ai/optimize_runtime_support.dart:763-793` — `buildRoleTargetProfile(String targetArchetype)` usa apenas 3 arquetipos hardcoded (aggro, control, combo) com valores estaticos (`ramp: 10, draw: 10, removal: 8, interaction: 6, engine: 8, wincon: 4, utility: 8`). A funcao nunca consulta PG `commander_reference_profiles` nem `theme_contextual_rules`. O `optimize_runtime_support.dart:3820-3846` ja tem `loadCommanderReferenceProfileFromCache()` que carrega `profile_json` do PG — mas `buildRoleTargetProfile()` NAO a chama.
 
-**Gap:** O simulador nao consegue modelar uma partida real de Commander. Counterspells sao impossiveis (sem stack). O combate de comandante e irrelevante (sem commander damage). Politics e threat assessment nao existem (2-player). Qualquer decisao de swap baseada em simulacao de batalha seria invalida.
+**Gap:** O optimize pipeline usa targets genericos que nao refletem o comandante especifico nem o tema do deck. Um deck cEDH Lorehold (ramp=19, draw=9, wincon=10) e avaliado contra targets de "combo generico" (ramp=11, draw=12, wincon=5) em vez dos ranges do perfil PG especifico. O filler loader (`loadOptimizeFillerCandidateStubs`, linha 2775-2848) usa `buildRoleTargetProfile` para calcular `surplus` (line 2831) — targets errados produzem recomendacoes de corte erradas.
 
-**Impacto:** `🔴 P1` — Se o Evolution Oracle ou qualquer agente usar `BattleSimulator` para validar swaps, as recomendacoes serao incorretas. O codigo existe (879 linhas) mas nao serve ao proposito declarado. O diretorio de cron foi removido (`/opt/data/cron/output/94f8590b1beb/` nao existe), mas o codigo permanece referenciado nos prompts de outros agentes.
+**Impacto:** `P1` — O optimize recomenda cortes baseados em targets incorretos. No caso Lorehold cEDH, targets genericos de "combo" dizem ramp=11 (deck tem 19 surplus=8), sugerindo cortar 8 fontes de ramp que sao ESSENCIAIS para o funcionamento cEDH. Os targets do perfil PG especifico evitariam esse falso positivo.
 
 **Acao recomendada:**
-1. **Curto prazo:** Marcar `battle_simulator.dart` como `@deprecated` e adicionar docstring: "Prototipo 2-player — nao usar para decisoes de Commander. Migrar para `goldfish_simulator.dart` para analise de consistencia."
-2. **Longo prazo:** Implementar simulador multiplayer com stack/priority (CR 117.3-117.4), 4-player support (CR 802.1a), commander damage tracking, commander tax, ETB triggers, e State-Based Actions completos.
-3. Remover referencias a `BATTLE_LOG.md` dos prompts do Evolution Oracle e Mulligan.
+1. `buildRoleTargetProfile()` deve aceitar `commanderName` como parametro
+2. Chamar `loadCommanderReferenceProfileFromCache()` para carregar `role_targets` do perfil PG
+3. Fallback para `theme_contextual_rules` (ja carregadas via `ThemeContextualRulesService`) se perfil nao existir
+4. Manter os valores hardcoded APENAS como ultimo fallback
+5. Atualizar `buildSlotNeedsForDeck()` (line 795) para passar `commanderName`
 
 **Validacao:**
 ```bash
-cd server && dart analyze lib/ai/battle_simulator.dart
-cd server && dart test test/ai/battle_simulator_test.dart
+cd server && dart analyze lib/ai/optimize_runtime_support.dart
+cd server && dart test test/ai/optimize_runtime_support_test.dart
 ```
 
 ---
 
-### [P1] Goldfish Simulator: Adicionar simulacao de tapped lands e definicao rigorosa de keepable
+### [P1] `ThemeContextualRulesService.validateDeck()`: Adicionar deteccao de archetype mismatch antes da validacao
 
-**Conhecimento MTG:** CR 110.5a (permanentes entram tapped a menos que o efeito diga o contrario). Cartas como Boros Garrison, Temple of Triumph, e Path of Ancestry entram tapped e NAO produzem mana no turno em que entram. O Pipeline Audit v3.4 estima que ignorar tapped lands superestima a consistencia em +2-5pp. O conhecimento do pipeline define keepable como: "2-4 lands AND (ramp >= 1 OR lands >= 3)". A definicao atual do codigo (2-5 lands, sem considerar ramp) e muito permissiva.
+**Conhecimento MTG:** O Purpose Analyzer v3.25 documenta que quando um deck e reconstruido para um arquetipo diferente (spellslinger -> cEDH fast-mana-combo), TODAS as metricas ficam fora do range do perfil PG original. Reportar 10/10 CRITs e enganoso — o problema nao e o deck, e o mismatch de arquetipo. O Domain Skill (Gap 4) recomenda: "Validator deve detectar mudanca de arquetipo (comparar `decks.archetype` contra os temas do perfil PG) e reportar como `ARCHETYPE MISMATCH` ao inves de CRITs individuais."
 
-**Evidencia no codigo:** `server/lib/ai/goldfish_simulator.dart:340-354` — `_playLandIfPossible()` trata TODOS os terrenos como untapped. Nao ha verificacao de oracle_text para "enters tapped". `goldfish_simulator.dart:131,156` — Definicao de keepable: `if (landsInHand >= 2 && landsInHand <= 5) keepableHands++`. Esta definicao NAO considera ramp/mana rocks. `optimization_validator.dart:168-171` — O `_simulateLondonMulligan` ja melhorou com `effectiveLands` mas ainda ignora tapped lands e usa `handSize <= 5` como always-keep.
+**Evidencia no codigo:** `server/lib/ai/optimization_validator.dart:52-64` — `ThemeContextualRulesService.validateDeck()` e chamado sem verificacao previa de compatibilidade de arquetipo. `server/lib/ai/theme_contextual_rules_service.dart:50-108` — O servico carrega regras por `theme` mas nao compara o `theme` do deck contra o `theme` esperado pelo perfil PG. O `loadCommanderReferenceProfileFromCache()` em `optimize_runtime_support.dart:3820` carrega `profile_json` que contem `themes` — mas ninguem compara esses temas com o `archetype` atual do deck.
 
-**Gap:** Dois simuladores no mesmo codebase com definicoes diferentes de keepable. O `GoldfishSimulator` superestima a jogabilidade. O `_simulateLondonMulligan` e melhor mas ainda ignora tapped lands. A diferenca de ~20pp na taxa de keepable afeta diretamente as recomendacoes de swap e o quality gate.
+**Gap:** Quando o deck Lorehold foi reconstruido de spellslinger para cEDH combo, `themeService?.validateDeck(archetype: archetype, ...)` recebeu `archetype='fast-mana-copy-combo-big-spells-no-premium-mox'` mas validou contra regras do tema `spellslinger` (porque o perfil PG e spellslinger). O sistema nao tem codigo que diga: "este deck nao e mais spellslinger, o perfil nao se aplica."
 
-**Impacto:** `🔴 P1` — O quality gate (`optimization_quality_gate.dart:412-415`) usa `monteCarlo.consistencyScore` e `monteCarlo.keepableRate` para decidir se um swap e seguro. Com keepable superestimado, swaps que pioram a consistencia real podem ser aprovados.
+**Impacto:** `P1` — O validator produz CRITs em massa que enterram problemas reais. No caso v3.25, 10/10 metricas mostraram CRIT. O operador nao consegue distinguir "deck quebrado" de "deck de arquetipo diferente". Isso desperdica atencao e reduz confianca no validator.
 
 **Acao recomendada:**
-1. Unificar a definicao de keepable em ambos os simuladores: "2-4 lands AND (ramp >= 1 OR lands >= 3)"
-2. Adicionar deteccao de "enters tapped" via oracle_text: `.contains('enters the battlefield tapped')`
-3. No `_playLandIfPossible()`, se `entersTapped == true`, NAO adicionar mana sources ate o PROXIMO turno
-4. Remover `handSize <= 5` como always-keep no `_simulateLondonMulligan`
+1. `ThemeContextualRulesService.validateDeck()` deve aceitar `profileThemes` como parametro opcional
+2. Antes de validar, comparar `deckArchetype` contra `profileThemes`: se overlap < 50%, retornar `ThemeValidationResult(theme: 'mismatch', hasCriticalViolation: false)` com flag `archetypeMismatch: true`
+3. No `optimization_validator.dart`, se `themeValidation.archetypeMismatch == true`, reportar como `ARCHETYPE MISMATCH` em vez de CRITs individuais
+4. Adicionar campo `archetypeMismatch` ao `ThemeValidationResult`
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/theme_contextual_rules_service.dart
+cd server && dart analyze lib/ai/optimization_validator.dart
+cd server && dart test test/ai/optimization_validator_test.dart
+```
+
+---
+
+### [P2] `inferFunctionalRole()` (3o classificador): Consultar `card_function_tags` persistidas antes de heuristicas
+
+**Conhecimento MTG:** O ManaLoom tem 3 classificadores diferentes no mesmo codebase: `inferFunctionalCardTags()` (multi-tag, 29 heuristicas), `classifyOptimizationFunctionalRole()` (single-tag, quality gate), e `inferFunctionalRole()` (single-tag, filler loader). O Domain Skill (Gap 6) documenta que o classificador tem "duplo nulo" — 10%+ de cartas invisiveis a ambos os classificadores. A resolucao do classificador (v3.25) melhorou tags no DB (ramp 6->19), mas o codigo Dart ainda nao consulta esses dados persistidos. O Logic Coherence Audit (2026-05-29) identificou drift entre `functional_card_tags.dart` e `optimization_functional_roles.dart` (P1 pendente).
+
+**Evidencia no codigo:** `server/lib/ai/optimize_runtime_support.dart:2133-2200` — `inferFunctionalRole()` e um TERCEIRO classificador, separado dos outros dois. Ele usa APENAS heuristicas de oracle text (ramp via `add {`, draw via `draw a card`, removal via `destroy target`, interaction via `counter target`, wincon via `you win the game`). NENHUMA consulta a `card_function_tags` (PG) ou `card_tags` (SQLite). NENHUM uso de `semantic_tags_v2`.
+
+**Gap:** `inferFunctionalRole()` e chamado pelo filler loader (`loadOptimizeFillerCandidateStubs`, linha 2802-2807) para classificar TODAS as cartas do deck durante a deteccao de fillers. Cards como Smothering Tithe (treasure ramp) sao classificados como `utility` porque nao contem `add {` nem `draw a card` — caem no fallback da linha 2199. Cards como Aetherflux Reservoir (wincon, "pay 50 life") nao sao detectados como wincon porque nao contem "you win the game".
+
+**Impacto:** `P2` — O filler loader identifica cards para remocao baseado em classificacao incorreta. Cards classificados como `utility` quando sao na verdade `ramp` ou `wincon` podem ser erroneamente sugeridos para corte pelo optimize.
+
+**Acao recomendada:**
+1. `inferFunctionalRole()` deve aceitar parametro opcional `Map<String, dynamic>? cardData` com dados completos da carta
+2. Primeiro verificar `cardData['functional_tag']` (do SQLite `deck_cards`) — se disponivel, usar como fonte primaria
+3. Segundo, verificar `cardData['semantic_tags_v2']` (como `classifyOptimizationFunctionalRole` ja faz)
+4. Terceiro, cair para heuristicas de oracle text (fallback atual)
+5. Alternativa: unificar os 3 classificadores em uma unica funcao `classifyCardRole()` com prioridade explicita
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimize_runtime_support.dart
+cd server && dart test test/ai/optimize_runtime_support_test.dart
+```
+
+---
+
+### [P2] `card_deck_profiles` (PG, 1299 perfis): Integrar ao backend — tabela nunca lida
+
+**Conhecimento MTG:** O pipeline Python importa analises de deck para a tabela PG `card_deck_profiles` (1299 perfis de carta por deck, com campos: `card_name`, `role_in_deck`, `importance_level`, `wincon_total_score`, `speed_score`, `resilience_score`, `stealth_score`). O Scout (#38) usa esses scores para priorizar wincons (RAPIDAS S>=6, IMBATIVEIS R>=7, INVISIVEIS ST>=7). O Domain Skill documenta que `card_deck_profiles` "NOT yet read by backend".
+
+**Evidencia no codigo:** `rg "card_deck_profile" server/lib` -> **ZERO resultados**. A tabela existe no PG com 1299 linhas, e populada pelo script Python `scripts/import_card_profiles.py`, mas NENHUM arquivo Dart faz query nela. O `AggressiveCandidateQualitySignal` (optimize_runtime_support.dart:2433-2479) tem campos `roleScore`, `synergyScore`, `functionConfidence` — mas todos sao populados de outras fontes (card_role_scores, commander_card_synergy), nao de `card_deck_profiles`.
+
+**Gap:** 1299 perfis de carta analisados pelo pipeline Python (com scores de wincon, engine, importancia estrategica) estao disponiveis no PG mas sao completamente ignorados pelo backend Dart. O optimize pipeline nao sabe, por exemplo, que Guttersnipe tem `wincon_total_score=19, stealth_score=8` (INVISIVEL) ou que Mizzix's Mastery tem `resilience_score=7` (IMBATIVEL).
+
+**Impacto:** `P2` — O optimize pipeline perde a capacidade de distinguir wincons "invisiveis" (stealth alto) de wincons "frageis" (resilience baixa). O quality gate nao pode aplicar regras como "nao cortar INVISIVEIS (ST>=7)" ou "priorizar IMBATIVEIS (R>=7)".
+
+**Acao recomendada:**
+1. Criar `card_deck_profiles_service.dart` com query que carrega perfis por `deck_id`
+2. Integrar ao `AggressiveCandidateQualitySignal` como campos opcionais: `winconSpeed`, `winconResilience`, `winconStealth`
+3. No `_scoreAggressiveCandidateQualityPair()` (line 2501), adicionar bonus: `stealth >= 7` -> +15, `resilience >= 7` -> +15
+4. No quality gate, adicionar regra: nao cortar cartas com `importance_level >= 4`
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/card_deck_profiles_service.dart
+cd server && dart test test/ai/candidate_quality_test.dart
+```
+
+---
+
+### [P2] `GoldfishSimulator`: Adicionar verificacao de ramp/mana rocks na definicao de keepable
+
+**Conhecimento MTG:** O pipeline de simulacao de mulligan (Execucoes #4-#15) define mao "jogavel" como: **"2-4 lands AND (ramp >= 1 OR lands >= 3)"**. Esta definicao rigorosa reconhece que maos com 2 lands e SEM ramp sao efetivamente nao-jogaveis (~22% das maos em um deck de 35 lands). A diferenca entre a definicao permissiva (2-5 lands, sem ramp) e a rigorosa e de ~20pp na taxa de keepable, afetando diretamente as recomendacoes de swap. O Domain Skill documenta a metodologia completa.
+
+**Evidencia no codigo:** `server/lib/ai/goldfish_simulator.dart:131,156` — A definicao atual e puramente baseada em lands: `if (landsInHand >= 2 && landsInHand <= 5) keepableHands++`. Nao ha NENHUMA verificacao de ramp, mana rocks, ou aceleracao. `server/lib/ai/goldfish_simulator.dart:340-354` — `_playLandIfPossible()` nao rastreia se a terra entra tapped.
+
+**Gap:** O `GoldfishSimulator` superestima a taxa de keepable em ~20pp (2-5 lands = ~71% vs rigoroso = ~50%). O `consistencyScore` (line 32-39) pesa `keepableRate` como 40% do score total — keepable errado produz consistencyScore errado. O quality gate (`optimization_quality_gate.dart:412-415`) usa `monteCarlo.consistencyScore` para aprovar/rejeitar swaps.
+
+**Impacto:** `P2` — Swaps que pioram a consistencia real podem ser aprovados porque o consistencyScore esta inflado. Exemplo: trocar um mana rock CMC 2 por uma carta CMC 4 sem ramp. O GoldfishSimulator atual diria que a mao ainda e "keepable" (2-5 lands), mas na definicao rigorosa a mao com 2 lands e sem ramp NAO e keepable — e remover o mana rock torna essa situacao mais provavel.
+
+**Acao recomendada:**
+1. Adicionar `_isManaSource()` helper que verifica se uma carta produz mana (ramp, rock, ritual)
+2. Alterar keepable para: `landsInHand >= 2 && landsInHand <= 4 && (rampCount >= 1 || landsInHand >= 3)`
+3. `rampCount` = contar cartas na mao que sao fontes de mana (via `_isManaSource()`)
+4. Manter flood em `landsInHand >= 6` e screw em `landsInHand <= 1`
 
 **Validacao:**
 ```bash
 cd server && dart analyze lib/ai/goldfish_simulator.dart
-cd server && dart analyze lib/ai/optimization_validator.dart
 cd server && dart test test/ai/goldfish_simulator_test.dart
 ```
 
 ---
 
-### [P1] `/ai/optimize` + `/ai/archetypes`: Adicionar owner-scope nas queries de deck
-
-**Conhecimento MTG:** N/A (seguranca de produto). O contrato mobile (`server/doc/API_CONTRACTS_AND_DATA_MAP.md`) estabelece que decks sao privados por usuario. O Structure Audit (module-coherence, 2026-06-03) identificou 3 endpoints que bypassam ownership.
-
-**Evidencia no codigo:**
-- `server/routes/ai/optimize/index.dart:401-406` — Le `userId` mas captura excecao e seta `null`
-- `server/lib/ai/optimize_request_support.dart:53-62` — `loadOptimizeDeckContext()` nao aceita parametro `userId`; query linha 66 busca deck por `WHERE id = @id` sem filtro de owner
-- `server/routes/ai/archetypes/index.dart:27-47` — NUNCA le `userId` do contexto; query linha 40: `WHERE id = @id` sem owner
-- `server/routes/ai/optimize/jobs/[id].dart:39` — So bloqueia se `job.userId != null` (ownerless jobs sao legiveis por qualquer usuario)
-- `server/lib/ai/optimize_job.dart:25-30` — `create()` aceita `String? userId` nullable
-
-**Gap:** Qualquer usuario autenticado pode analisar/otimizar qualquer deck do sistema. O campo `user_id` existe na tabela `decks` mas nao e usado nas queries de optimize/archetypes.
-
-**Impacto:** `🔴 P1` — Vulnerabilidade de seguranca. Um usuario malicioso pode analisar decks privados de outros usuarios, iniciar otimizacao em decks alheios, e ler resultados de otimizacao via polling.
-
-**Acao recomendada:**
-1. `optimize/index.dart`: Tornar `userId` obrigatorio (nao capturar excecao). Retornar 401 se ausente.
-2. `optimize_request_support.dart:53`: Adicionar parametro `required String userId`
-3. Query de deck: `WHERE id = @id AND user_id = @userId`
-4. `archetypes/index.dart:27`: Ler `userId` e filtrar query
-5. `optimize_job.dart:29`: Tornar `userId` obrigatorio
-6. `jobs/[id].dart:39`: Simplificar para `if (job.userId != userId) return 404;`
-
-**Validacao:**
-```bash
-cd server && dart analyze lib/ai/optimize_request_support.dart
-cd server && dart test test/routes/ai/optimize_test.dart
-# Testar: usuario A tenta otimizar deck do usuario B → 404
-```
-
----
-
-### [P2] Activation Funnel: Sincronizar `_allowedEvents` entre App e Backend
-
-**Conhecimento MTG:** N/A (sincronizacao app-backend). O Structure Audit (module-coherence, 2026-06-03) identificou que o app envia um evento que o backend rejeita silenciosamente.
-
-**Evidencia no codigo:**
-- `app/lib/features/decks/providers/deck_provider.dart:605-607` — App envia `'deck_rebuild_created'`
-- `app/lib/core/services/activation_funnel_service.dart:17-26` — Envia POST com `event_name: 'deck_rebuild_created'`; erro capturado silenciosamente
-- `server/routes/users/me/activation-events/index.dart:10-18` — `_allowedEvents` NAO inclui `deck_rebuild_created`; endpoint retorna 400
-- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` — Evento marcado como "not proven"
-
-**Gap:** Toda vez que um usuario cria um rebuild de deck, o app dispara um evento de telemetria que o backend rejeita com 400. O erro e silenciosamente engolido pelo app. O evento nunca e registrado no banco `activation_funnel_events`, distorcendo as metricas de funil de ativacao.
-
-**Impacto:** `🟡 P2` — Nao quebra funcionalidade (erro e silencioso), mas a metrica de rebuilds no funil de ativacao e ZERO, subestimando o engajamento com a feature de rebuild.
-
-**Acao recomendada:**
-1. Adicionar `'deck_rebuild_created'` ao `_allowedEvents` no backend
-2. Atualizar `API_CONTRACTS_AND_DATA_MAP.md` para marcar o evento como `verified`
-3. Auditar outros eventos do app que possam estar na mesma situacao
-
-**Validacao:**
-```bash
-cd server && dart analyze routes/users/me/activation-events/index.dart
-cd server && dart test test/routes/users/activation_events_test.dart
-# Enviar POST com event_name='deck_rebuild_created' → 201 created
-```
-
----
-
-### [P2] Candidate Quality: Adicionar `edhrec_trend_zscore` como fator de scoring
-
-**Conhecimento MTG:** O pipeline Hermes (Scout, Validator, Evolution Oracle) usa `trend_zscore` do EDHREC para avaliar se uma carta esta subindo ou caindo no meta. Exemplos: Esper Sentinel (`trend_zscore: -0.67`, 6 ciclos de queda), Primal Amulet (`-0.40`). O `manaloom-commander-knowledge` skill recomenda: "Declining trend scan — cards with trend_zscore < -0.3 and inclusion > 15% are priority cut candidates." O EDHREC JSON API fornece `trend_zscore` para cada carta.
-
-**Evidencia no codigo:** `server/lib/ai/candidate_quality_data_support.dart` — NENHUMA tabela ou coluna para `edhrec_trend_zscore`. O `CandidateQualityData` (definido em `optimize_runtime_support.dart`) nao tem campo `trendZscore`. O PG tem `card_meta_insights` com `usage_count` mas nao `trend_zscore`.
-
-**Gap:** O sistema avalia qualidade de carta usando apenas dados estaticos (meta_deck_count, role scores), ignorando a DIRECAO do meta. Uma carta com 30% EDHREC mas tendencia de queda ha 6 ciclos e tratada igual a uma carta com 30% e tendencia de alta explosiva.
-
-**Impacto:** `🟡 P2` — O optimize pode recomendar cartas em declinio no meta com a mesma prioridade que cartas em ascensao. Nao quebra o sistema, mas reduz a qualidade das recomendacoes.
-
-**Acao recomendada:**
-1. Adicionar coluna `edhrec_trend_zscore NUMERIC(5,2)` a tabela PG `card_deck_profiles`
-2. Popular com dados do EDHREC JSON API (`cardview.trend_zscore`)
-3. Adicionar `double? edhrecTrendZscore` ao `CandidateQualityData`
-4. No scoring: `trend_zscore > 2.0` = +10%, `trend_zscore > 5.0` = +20%, `trend_zscore < -0.3 AND inclusion > 15%` = -15%
-
-**Validacao:**
-```bash
-cd server && dart analyze lib/ai/candidate_quality_data_support.dart
-cd server && dart analyze lib/ai/optimize_runtime_support.dart
-```
-
----
-
-## Resumo de Tasks Novas (2026-06-04)
+## Resumo de Tasks Novas (2026-06-04 @ 22787279)
 
 | # | Prioridade | Task | Origem |
 |:-:|:----------|:-----|:-------|
-| 1 | 🔴 P1 | Battle Simulator: Commander multiplayer rules (stack, 4-player, commander dmg, tax, ETB) | Pipeline Audit v3.4 |
-| 2 | 🔴 P1 | Goldfish Simulator: Tapped lands + rigorous keepable definition | Pipeline Audit v3.4 + Pipeline Knowledge |
-| 3 | 🔴 P1 | Optimize/Archetypes: Owner-scoped deck queries | Structure Audit (module-coherence) |
-| 4 | 🟡 P2 | Activation Funnel: Sync `_allowedEvents` app-backend | Structure Audit (module-coherence) |
-| 5 | 🟡 P2 | Candidate Quality: Add `edhrec_trend_zscore` scoring | Pipeline Knowledge (Scout/Validator methodology) |
+| 1 | P1 | `buildRoleTargetProfile`: Usar PG `commander_reference_profiles` + `theme_contextual_rules` em vez de hardcoded | Validator v3.25 (archetype mismatch) |
+| 2 | P1 | `ThemeContextualRulesService.validateDeck()`: Detectar archetype mismatch antes da validacao | Validator v3.25 + Domain Skill Gap 4 |
+| 3 | P2 | `inferFunctionalRole()`: Consultar `card_function_tags` persistidas antes de heuristicas | Domain Skill Gap 6 + Logic Coherence Audit |
+| 4 | P2 | `card_deck_profiles` (1299 perfis PG): Integrar ao backend (tabela nunca lida) | Scout #38 + Domain Skill |
+| 5 | P2 | `GoldfishSimulator`: Adicionar ramp/mana rocks na definicao de keepable | Pipeline Mulligan (Execucoes #4-#15) + Domain Skill Gap 9 |
 
-## Tasks Anteriores (ainda pendentes da execucao 2026-06-04 @ 498eb1a8)
+## Tasks Anteriores (ainda pendentes das execucoes 2026-06-04 @ d2ca5234 e @ 498eb1a8)
 
 | # | Prioridade | Task |
 |:-:|:----------|:-----|
-| 1 | 🔴 P1 | Bracket Policy: Adicionar 5 categorias mecanicas ao `BracketCategory` enum |
-| 2 | 🔴 P1 | `classifyOptimizationFunctionalRole`: Usar `functional_tags` persistidas como fonte primaria |
-| 3 | 🔴 P1 | Quality Gate: Integrar `theme_contextual_rules` nas decisoes de swap |
-| 4 | 🟡 P2 | Candidate Quality: Adicionar `edhrec_inclusion_pct` como metrica |
-| 5 | 🟡 P2 | Deck Import: Re-classificar automaticamente cartas com `functional_tag='unknown'` |
+| 1 | P1 | Bracket Policy: Adicionar 7 categorias ao `BracketCategory` enum (29/53 GCs nao detectados) |
+| 2 | P1 | `classifyOptimizationFunctionalRole`: Usar `functional_tags` persistidas como fonte primaria |
+| 3 | P1 | Quality Gate: Integrar `theme_contextual_rules` nas decisoes de swap |
+| 4 | P2 | Candidate Quality: Adicionar `edhrec_inclusion_pct` como metrica |
+| 5 | P2 | Candidate Quality: Adicionar `edhrec_trend_zscore` como fator de scoring |
+| 6 | P2 | Deck Import: Re-classificar automaticamente cartas com `functional_tag='unknown'` |
+| 7 | P1 | Battle Simulator: Implementar regras Commander (stack, multiplayer, etc.) |
+| 8 | P1 | Goldfish Simulator: Tapped lands (complementa Task #5 nova) |
+| 9 | P1 | Optimize/Archetypes: Owner-scoped deck queries |
+| 10 | P2 | Activation Funnel: Sync `_allowedEvents` app-backend |
 
-> **Nota:** Task #4 anterior (edhrec_inclusion_pct) e Task #5 nova (edhrec_trend_zscore) sao complementares — ambas populam `card_deck_profiles` com dados do EDHREC. Podem ser implementadas juntas.
+> **Nota:** Tasks #5 nova (keepable com ramp) e #8 pendente (tapped lands) sao complementares — ambas melhoram o `GoldfishSimulator`. Implementar juntas.
+> **Nota:** Tasks #4 nova (card_deck_profiles) e #4/#5 pendentes (edhrec_inclusion_pct + trend_zscore) sao complementares — todas populam e leem `card_deck_profiles` com dados do EDHREC.
