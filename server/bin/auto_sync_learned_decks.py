@@ -15,6 +15,7 @@ SYNC_PROJECT_DIR = os.environ.get(
     "MTGIA_SYNC_HOME",
     "/opt/data/workspace/mtgia-sync",
 )
+DART_BIN = "/opt/data/tools/flutter/bin/dart"
 SQLITE_DB = os.environ.get(
     "HERMES_KNOWLEDGE_DB",
     os.path.join(PROJECT_DIR, "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"),
@@ -94,7 +95,7 @@ def main():
 
         # Apply
         app = subprocess.run(
-            ["dart", "run", "bin/commander_learned_deck.dart",
+            [DART_BIN, "run", "bin/commander_learned_deck.dart",
              f"--input-json={json_path}", "--apply",
              f"--artifact-dir={ARTIFACT_DIR}"],
             capture_output=True, text=True, timeout=60,

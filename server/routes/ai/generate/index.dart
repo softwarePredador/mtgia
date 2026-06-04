@@ -14,6 +14,7 @@ import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
+import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
@@ -100,6 +101,18 @@ Future<Response> onRequest(RequestContext context) async {
         'Commander reference profile/card stats unavailable; continuing legacy generate path. '
         'error=$error',
       );
+    }
+
+    var usageHotCardsPrompt = '';
+    if (requestedCommanderName != null && requestedCommanderName.isNotEmpty) {
+      try {
+        final hotCards = await loadUsageHotCards(
+          pool: pool,
+          commanderName: requestedCommanderName,
+          limit: 12,
+        );
+        usageHotCardsPrompt = buildUsageHotCardsPrompt(hotCards);
+      } catch (_) {}
     }
     timings['reference_profile_ms'] =
         referenceProfileStopwatch.elapsedMilliseconds;
@@ -358,6 +371,7 @@ Deck construction guidelines:
             buildCommanderReferenceDeckCorpusPrompt(
               referenceDeckCorpusGuidance,
             ),
+            if (usageHotCardsPrompt.isNotEmpty) usageHotCardsPrompt,
           ].where((line) => line.trim().isNotEmpty).join('\n')
         : archetypeReferenceStats.isNotEmpty
             ? buildCommanderReferenceArchetypeStatsPrompt(

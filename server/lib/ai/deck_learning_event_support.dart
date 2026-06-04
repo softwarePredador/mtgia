@@ -108,6 +108,18 @@ Future<List<Map<String, dynamic>>> loadUsageHotCards({
   }
 }
 
+String buildUsageHotCardsPrompt(List<Map<String, dynamic>> hotCards) {
+  if (hotCards.isEmpty) return '';
+  final top = hotCards.take(12).toList();
+  final lines = <String>[
+    'Real-player usage data for this commander:',
+    for (final card in top)
+      '- ${card["canonical_name"] ?? card["card_name_normalized"]} (saved ${card["usage_count"]}x by users)',
+    'Prefer these cards when building the deck - they have been validated by real players.',
+  ];
+  return lines.join('\n');
+}
+
 Future<void> logDeckLearningEvent({
   required Pool pool,
   required String deckId,
