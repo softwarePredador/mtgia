@@ -350,11 +350,11 @@ def render_report(
     counters: Counter[str],
     files_count: int,
     include_life_counter: bool,
+    include_git_status: bool,
 ) -> str:
     now = datetime.now(timezone.utc).isoformat()
     branch = run(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     sha = run(["git", "rev-parse", "--short", "HEAD"])
-    status = run(["git", "status", "--short", "--branch"])
     by_severity = Counter(signal.severity for signal in signals)
     grouped = signals_by_surface(config, signals)
 
@@ -468,14 +468,12 @@ def render_report(
                 ]
             )
 
+    if include_git_status:
+        status = run(["git", "status", "--short", "--branch"])
+        lines.extend(["## Git status", "", "```text", status, "```", ""])
+
     lines.extend(
         [
-            "## Git status",
-            "",
-            "```text",
-            status,
-            "```",
-            "",
             f"VISUAL_PREMIUM_QA_RESULT: signals={len(signals)} P1={by_severity['P1']} P2={by_severity['P2']} visual_pass=false",
             "",
         ]
@@ -491,6 +489,11 @@ def parse_args() -> argparse.Namespace:
         "--include-life-counter",
         action="store_true",
         help="Include Life Counter/Lotus surfaces in the premium signal scan.",
+    )
+    parser.add_argument(
+        "--include-git-status",
+        action="store_true",
+        help="Append current git status to the report for ad-hoc local diagnostics.",
     )
     return parser.parse_args()
 
@@ -523,6 +526,7 @@ def main() -> int:
         counters,
         len(files),
         include_life_counter=args.include_life_counter,
+        include_git_status=args.include_git_status,
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(report)

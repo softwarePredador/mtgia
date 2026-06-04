@@ -13,6 +13,8 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
+import 'visual_capture_helpers.dart';
+
 Future<void> _pumpUntilUiSnapshotAvailable(
   WidgetTester tester,
   LotusUiSnapshotStore uiSnapshotStore,
@@ -115,7 +117,7 @@ Future<Map<String, dynamic>> _readPlayerAppearanceState(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'applies solid player appearance live from color-card takeover on the WebView path',
@@ -208,6 +210,13 @@ void main() {
         find.byKey(const Key('life-counter-native-player-appearance-preset-2')),
       );
       await tester.pumpAndSettle();
+
+      await captureVisualProof(
+        binding,
+        tester,
+        'life_counter_player_appearance_presets',
+      );
+
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-appearance-preset-2')),
       );

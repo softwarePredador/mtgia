@@ -14,6 +14,8 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
+import 'visual_capture_helpers.dart';
+
 Future<void> _pumpUntilUiSnapshotAvailable(
   WidgetTester tester,
   LotusUiSnapshotStore uiSnapshotStore,
@@ -105,7 +107,7 @@ Future<Map<String, dynamic>> _readSetLifeLiveState(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('applies direct set life live on the WebView path', (
     tester,
@@ -202,6 +204,8 @@ void main() {
       find.byKey(const Key('life-counter-native-set-life-digit-5')),
     );
     await tester.pumpAndSettle();
+
+    await captureVisualProof(binding, tester, 'life_counter_set_life_sheet_35');
 
     await tester.tap(
       find.byKey(const Key('life-counter-native-set-life-apply')),

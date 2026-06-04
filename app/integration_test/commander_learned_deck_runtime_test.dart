@@ -39,6 +39,26 @@ void main() {
         .map((card) => card.cast<String, dynamic>());
   }
 
+  Future<Map<String, dynamic>> waitForDeckByName(
+    ApiClient api,
+    String deckName,
+  ) async {
+    for (var attempt = 0; attempt < 30; attempt += 1) {
+      final deckListResponse = await api.get('/decks');
+      expect(deckListResponse.statusCode, 200);
+      final deckRows =
+          (deckListResponse.data as List)
+              .whereType<Map>()
+              .map((deck) => deck.cast<String, dynamic>())
+              .toList();
+      for (final deck in deckRows) {
+        if (deck['name']?.toString() == deckName) return deck;
+      }
+      await Future<void>.delayed(const Duration(seconds: 1));
+    }
+    throw StateError('Deck "$deckName" was not visible after save polling.');
+  }
+
   testWidgets(
     'localized iPhone runtime: Lorehold learned deck button, preview and saved deck',
     (tester) async {
@@ -188,12 +208,7 @@ void main() {
         step: const Duration(seconds: 1),
       );
 
-      final deckListResponse = await api.get('/decks');
-      expect(deckListResponse.statusCode, 200);
-      final deckRows = (deckListResponse.data as List).cast<Map>();
-      final createdDeck = deckRows.firstWhere(
-        (deck) => deck['name']?.toString() == deckName,
-      );
+      final createdDeck = await waitForDeckByName(api, deckName);
       createdDeckId = createdDeck['id']?.toString();
       expect(createdDeckId, isNotNull);
 
@@ -204,6 +219,12 @@ void main() {
         tester,
         find.text('Detalhes do Deck'),
         attempts: 120,
+        step: const Duration(milliseconds: 500),
+      );
+      await pumpUntilFound(
+        tester,
+        find.textContaining('Lorehold'),
+        attempts: 180,
         step: const Duration(milliseconds: 500),
       );
       await captureVisualProof(binding, tester, '04_saved_deck_details');

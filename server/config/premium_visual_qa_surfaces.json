@@ -15,7 +15,8 @@
   ],
   "capture_commands": {
     "non_life_counter": "cd app && flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check",
-    "life_counter": "cd app && flutter test integration_test/life_counter_lotus_visual_capture_smoke_test.dart integration_test/life_counter_native_card_search_smoke_test.dart integration_test/life_counter_set_life_live_smoke_test.dart integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check"
+    "life_counter": "cd app && flutter test integration_test/life_counter_lotus_visual_capture_smoke_test.dart integration_test/life_counter_native_card_search_smoke_test.dart integration_test/life_counter_set_life_live_smoke_test.dart integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check",
+    "commander_learned_deck": "cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check"
   },
   "surfaces": [
     {
@@ -59,7 +60,7 @@
         "app/lib/features/decks/widgets/deck_details_actions.dart",
         "app/lib/features/decks/widgets/deck_details_dialogs.dart"
       ],
-      "captures": ["04b_deck_details"],
+      "captures": ["04b_deck_details", "04_saved_deck_details"],
       "focus": ["tabs coerentes", "cards de metricas", "legibilidade de analise", "CTA otimizar/adicionar", "graficos sem ruido visual"]
     },
     {
@@ -72,7 +73,7 @@
         "app/lib/features/decks/widgets/deck_optimize_dialogs.dart",
         "app/lib/features/decks/widgets/deck_optimize_sheet_widgets.dart"
       ],
-      "captures": ["04a_create_deck_dialog", "04c_deck_import", "05_generate", "06_generate_preview"],
+      "captures": ["04a_create_deck_dialog", "04c_deck_import", "05_generate", "06_generate_preview", "01_no_commander_no_learned_button", "02_commander_learned_button_visible", "03_hermes_preview"],
       "focus": ["forms premium", "hierarquia de preview", "botoes primario/secundario", "empty/error states", "sem texto cru de backend"]
     },
     {
@@ -142,7 +143,7 @@
         "app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart",
         "app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart"
       ],
-      "captures": ["life_counter_lotus", "life_counter_card_search", "life_counter_set_life", "life_counter_player_appearance"],
+      "captures": ["commander_damage_overlay", "turn_tracker_hint_overlay", "life_counter_card_search_sheet", "life_counter_set_life_sheet_35", "life_counter_player_appearance_presets"],
       "focus": ["linguagem tabletop propria", "contadores legiveis por jogador", "overlays/settings", "cores separaveis", "touch targets em mesa"]
     }
   ]
