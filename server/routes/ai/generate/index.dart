@@ -697,6 +697,17 @@ $metaContext
         ),
     };
 
+    // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
+    if (format.toLowerCase() == 'commander' && validation.isValid) {
+      unawaited(
+        logGeneratedDeckForLearning(
+          pool: pool,
+          responseBody: responseBody,
+          source: 'ai_generated',
+        ),
+      );
+    }
+
     if (validation.invalidCards.isNotEmpty || validation.warnings.isNotEmpty) {
       responseBody['warnings'] = {
         'invalid_cards': validation.invalidCards,

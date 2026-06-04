@@ -120,6 +120,63 @@ String buildUsageHotCardsPrompt(List<Map<String, dynamic>> hotCards) {
   return lines.join('\n');
 }
 
+Future<void> logGeneratedDeckForLearning({
+  required Pool pool,
+  required Map<String, dynamic> responseBody,
+  String source = 'ai_generated',
+}) async {
+  try {
+    final generatedDeck = responseBody['generated_deck'];
+    if (generatedDeck is! Map) return;
+
+    final commander = generatedDeck['commander'];
+    final commanderName = commander is Map
+        ? commander['name']?.toString()
+        : commander?.toString();
+    final cards = (generatedDeck['cards'] as List?)
+            ?.whereType<Map>()
+            .map((c) => c.cast<String, dynamic>())
+            .toList() ??
+        const <Map<String, dynamic>>[];
+
+    if (commanderName == null || commanderName.isEmpty) return;
+    if (cards.isEmpty) return;
+
+    final cardCount = cards.fold<int>(0, (sum, c) {
+      final qty = c['quantity'];
+      final parsed = qty is int ? qty : int.tryParse(qty?.toString() ?? '') ?? 1;
+      return sum + parsed;
+    }) + (commanderName.isNotEmpty ? 1 : 0);
+
+    final eventData = <String, dynamic>{
+      'generation_mode': source,
+      'cards': cards
+          .map((c) => {
+                'name': c['name']?.toString() ?? '',
+                'quantity': c['quantity'],
+              })
+          .take(200)
+          .toList(),
+    };
+
+    await pool.execute(
+      Sql.named('''
+        INSERT INTO deck_learning_events (
+          deck_id, commander_name, format, card_count, source, event_data
+        ) VALUES (
+          gen_random_uuid(), @commanderName, 'commander', @cardCount, @source, @eventData::jsonb
+        )
+      '''),
+      parameters: {
+        'commanderName': commanderName,
+        'cardCount': cardCount,
+        'source': source,
+        'eventData': jsonEncode(eventData),
+      },
+    );
+  } catch (_) {}
+}
+
 Future<void> logDeckLearningEvent({
   required Pool pool,
   required String deckId,
