@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Gerado em UTC: `2026-06-04T15:53:09.671772+00:00`
+- Gerado em UTC: `2026-06-04T17:02:13.749273+00:00`
 - Branch: `master`
-- SHA: `f19ac7f`
+- SHA: `f732438`
 - Scan repo: `/opt/data/workspace/mtgia-sync`
 - Memory/report repo: `/opt/data/workspace/mtgia`
 - Escopo: `app/lib/features/**/*.dart`, `app/lib/core/**/*.dart`
@@ -14,12 +14,12 @@
 
 ## Sumario
 
-`findings=215 P0=0 P1=0 P2=215`
+`findings=193 P0=0 P1=0 P2=193`
 
 ### Contagem por regra
 
-- `interactive_without_semantics_hint`: 80
 - `hardcoded_color`: 80
+- `interactive_without_semantics_hint`: 58
 - `possible_small_touch_target`: 51
 - `material_color_direct`: 3
 - `network_image_no_cache_abstraction`: 1
@@ -86,7 +86,7 @@
 
 #### P2-009 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart:926`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart:933`
 - Trecho: `color: Color(0x33000000),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
@@ -107,42 +107,42 @@
 
 #### P2-012 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:128`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:129`
 - Trecho: `color: Color(0x66000000),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-013 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:398`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:399`
 - Trecho: `? const Color(0xFFFF7A9C)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-014 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:403`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:404`
 - Trecho: `? const Color(0x66FF2C77)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-015 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:436`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:448`
 - Trecho: `? const Color(0x33FF2C77)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-016 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:439`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:451`
 - Trecho: `destructive ? const Color(0xFFFF5E9A) : AppTheme.textPrimary,`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-017 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:445`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:457`
 - Trecho: `? const Color(0x66FF2C77)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
@@ -247,336 +247,336 @@
 
 #### P2-032 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1605`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:1621`
 - Trecho: `color: const Color(0xFF0D1117),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-033 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1640`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:1658`
 - Trecho: `colors: [Color(0xFF04070E), Color(0xFF121A2B)],`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-034 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1649`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:1667`
 - Trecho: `colors: [Color(0xFFEAFDFF), Color(0xFFB9D7FF)],`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-035 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1661`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:1679`
 - Trecho: `colors: [Color(0xFFFDF4FF), Color(0xFFD7EDFF)],`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-036 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1929`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:1962`
 - Trecho: `color: Color(0xFFFF2C77),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-037 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1994`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2036`
 - Trecho: `color: selected ? const Color(0xFFFF2C77) : Colors.transparent,`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-038 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1999`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2041`
 - Trecho: `? const Color(0xFFFF2C77)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-039 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2288`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2332`
 - Trecho: `color: Color(0xFF40B9FF),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-040 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2522`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2581`
 - Trecho: `color: const Color(0xFFF7F4EC),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-041 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2994`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3060`
 - Trecho: `? const Color(0xFF4A3A12)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-042 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2996`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3062`
 - Trecho: `? const Color(0xFF1D1D1D)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-043 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2998`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3064`
 - Trecho: `? const Color(0xFF5B3A6C)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-044 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3000`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3066`
 - Trecho: `? const Color(0xFF341217)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-045 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3002`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3068`
 - Trecho: `? const Color(0xFF122A18)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-046 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3364`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3438`
 - Trecho: `? const Color(0xFF2F2407)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-047 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3366`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3440`
 - Trecho: `? const Color(0xFF121212)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-048 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3368`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3442`
 - Trecho: `? const Color(0xFF1D1025)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-049 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3370`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3444`
 - Trecho: `? const Color(0xFF2B090F)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-050 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3371`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3445`
 - Trecho: `: const Color(0xFF0C2414),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-051 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3374`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3448`
 - Trecho: `? const Color(0xFFFFD36A)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-052 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3376`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3450`
 - Trecho: `? const Color(0xFFEDEDED)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-053 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3378`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3452`
 - Trecho: `? const Color(0xFFFF5AA9)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-054 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3380`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3454`
 - Trecho: `? const Color(0xFFFF5B61)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-055 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3381`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3455`
 - Trecho: `: const Color(0xFF6BFF8D),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-056 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3745`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3834`
 - Trecho: `accent: const Color(0xFF6BFF8D),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-057 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3764`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3853`
 - Trecho: `: const Color(0xFFFFB3A8),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-058 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4089`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4178`
 - Trecho: `Color(0xFFFF9CD1),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-059 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4090`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4179`
 - Trecho: `Color(0xFFFFF5A3),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-060 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4091`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4180`
 - Trecho: `Color(0xFFB7FFBE),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-061 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4092`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4181`
 - Trecho: `Color(0xFFB5C8FF),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-062 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4099`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4188`
 - Trecho: `colors: [Color(0xFFFFC55A), Color(0xFFFFE596), Color(0xFFFFB764)],`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-063 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4396`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4485`
 - Trecho: `Color(0xFFFF4C7D),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-064 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4397`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4486`
 - Trecho: `Color(0xFF4A5BFF),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-065 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4398`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4487`
 - Trecho: `Color(0xFFFFC552),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-066 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4399`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4488`
 - Trecho: `Color(0xFF5BDF79),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-067 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4400`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4489`
 - Trecho: `Color(0xFFFFFFFF),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-068 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4720`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4809`
 - Trecho: `accent: const Color(0xFF40B9FF),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-069 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4848`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:4937`
 - Trecho: `accent: const Color(0xFF40B9FF),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-070 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5240`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5340`
 - Trecho: `color: Color(0xFFFF2C77),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-071 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5302`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5413`
 - Trecho: `color: const Color(0xFF454257),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-072 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5318`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5429`
 - Trecho: `? const Color(0xFFFF2C77)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-073 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5560`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5677`
 - Trecho: `color: Color(0xFFFF2C77),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-074 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5625`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5753`
 - Trecho: `color: const Color(0xFF171717),`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-075 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5645`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5775`
 - Trecho: `? const Color(0xFFFF2C77)`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-076 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6470`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:6623`
 - Trecho: `color: selected ? const Color(0xFFFFC81E) : Colors.transparent,`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-077 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6473`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:6626`
 - Trecho: `color: selected ? const Color(0xFFFFC81E) : Colors.white,`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-078 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6520`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:6675`
 - Trecho: `color: selected ? const Color(0xFF1C78FF) : Colors.white,`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
 
 #### P2-079 hardcoded_color
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6523`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:6678`
 - Trecho: `color: selected ? const Color(0xFF1C78FF) : Colors.transparent,`
 - Impacto: Cores diretas dificultam consistencia visual, tema e contraste.
 - Sugestao: Trocar por token/AppTheme ou justificar excecao local.
@@ -856,677 +856,523 @@
 
 #### P2-119 interactive_without_semantics_hint
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart:305`
+- Evidencia: `app/lib/features/messages/screens/message_inbox_screen.dart:124`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
 #### P2-120 interactive_without_semantics_hint
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart:341`
+- Evidencia: `app/lib/features/notifications/screens/notification_screen.dart:172`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
 #### P2-121 interactive_without_semantics_hint
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart:908`
-- Trecho: `return InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-122 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1496`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-123 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1527`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-124 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1762`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-125 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1922`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-126 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1987`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-127 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2386`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-128 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2425`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-129 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2583`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-130 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3208`
-- Trecho: `InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-131 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3425`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-132 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3437`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-133 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3656`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-134 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4932`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-135 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5139`
-- Trecho: `child: GestureDetector(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-136 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5295`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-137 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5395`
-- Trecho: `child: GestureDetector(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-138 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5618`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-139 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6291`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-140 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6463`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-141 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/messages/screens/message_inbox_screen.dart:124`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-142 interactive_without_semantics_hint
-
-- Evidencia: `app/lib/features/notifications/screens/notification_screen.dart:172`
-- Trecho: `child: InkWell(`
-- Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
-- Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
-
-#### P2-143 interactive_without_semantics_hint
-
 - Evidencia: `app/lib/features/profile/profile_screen.dart:295`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-144 interactive_without_semantics_hint
+#### P2-122 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/screens/card_scanner_screen.dart:663`
 - Trecho: `GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-145 interactive_without_semantics_hint
+#### P2-123 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:92`
 - Trecho: `return GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-146 interactive_without_semantics_hint
+#### P2-124 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:243`
 - Trecho: `GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-147 interactive_without_semantics_hint
+#### P2-125 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:302`
 - Trecho: `GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-148 interactive_without_semantics_hint
+#### P2-126 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:401`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-149 interactive_without_semantics_hint
+#### P2-127 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:416`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-150 interactive_without_semantics_hint
+#### P2-128 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:550`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-151 interactive_without_semantics_hint
+#### P2-129 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/social/screens/user_profile_screen.dart:393`
 - Trecho: `return GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-152 interactive_without_semantics_hint
+#### P2-130 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/social/screens/user_profile_screen.dart:466`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-153 interactive_without_semantics_hint
+#### P2-131 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/social/screens/user_profile_screen.dart:1207`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-154 interactive_without_semantics_hint
+#### P2-132 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/social/screens/user_search_screen.dart:193`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-155 interactive_without_semantics_hint
+#### P2-133 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:772`
 - Trecho: `return GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-156 interactive_without_semantics_hint
+#### P2-134 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:959`
 - Trecho: `InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-157 interactive_without_semantics_hint
+#### P2-135 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:989`
 - Trecho: `InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-158 interactive_without_semantics_hint
+#### P2-136 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:1012`
 - Trecho: `InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-159 interactive_without_semantics_hint
+#### P2-137 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:1086`
 - Trecho: `return GestureDetector(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-160 interactive_without_semantics_hint
+#### P2-138 interactive_without_semantics_hint
 
 - Evidencia: `app/lib/features/trades/screens/trade_inbox_screen.dart:291`
 - Trecho: `child: InkWell(`
 - Impacto: Elemento interativo custom pode ficar pouco claro para leitor de tela.
 - Sugestao: Adicionar Semantics/Tooltip quando a acao nao estiver descrita por texto visivel.
 
-#### P2-161 material_color_direct
+#### P2-139 material_color_direct
 
 - Evidencia: `app/lib/features/scanner/screens/card_scanner_screen.dart:548`
 - Trecho: `color: Colors.white70,`
 - Impacto: Uso direto de Colors pode furar o design system.
 - Sugestao: Preferir AppTheme/tokens semanticos para cor de UI.
 
-#### P2-162 material_color_direct
+#### P2-140 material_color_direct
 
 - Evidencia: `app/lib/features/scanner/screens/card_scanner_screen.dart:691`
 - Trecho: `color: Colors.black87,`
 - Impacto: Uso direto de Colors pode furar o design system.
 - Sugestao: Preferir AppTheme/tokens semanticos para cor de UI.
 
-#### P2-163 material_color_direct
+#### P2-141 material_color_direct
 
 - Evidencia: `app/lib/features/scanner/screens/card_scanner_screen.dart:722`
 - Trecho: `color: Colors.white54,`
 - Impacto: Uso direto de Colors pode furar o design system.
 - Sugestao: Preferir AppTheme/tokens semanticos para cor de UI.
 
-#### P2-164 network_image_no_cache_abstraction
+#### P2-142 network_image_no_cache_abstraction
 
 - Evidencia: `app/lib/features/home/home_screen.dart:677`
 - Trecho: `return Image.network(`
 - Impacto: Imagens remotas repetidas podem prejudicar scroll/performance.
 - Sugestao: Avaliar componente centralizado com cache, placeholder e error state.
 
-#### P2-165 possible_small_touch_target
+#### P2-143 possible_small_touch_target
 
 - Evidencia: `app/lib/features/auth/screens/login_screen.dart:212`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-166 possible_small_touch_target
+#### P2-144 possible_small_touch_target
 
 - Evidencia: `app/lib/features/auth/screens/register_screen.dart:300`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-167 possible_small_touch_target
+#### P2-145 possible_small_touch_target
 
 - Evidencia: `app/lib/features/binder/screens/binder_screen.dart:1493`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-168 possible_small_touch_target
+#### P2-146 possible_small_touch_target
 
 - Evidencia: `app/lib/features/binder/screens/marketplace_screen.dart:498`
 - Trecho: `GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-169 possible_small_touch_target
+#### P2-147 possible_small_touch_target
 
 - Evidencia: `app/lib/features/binder/widgets/binder_item_editor.dart:618`
 - Trecho: `child: GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-170 possible_small_touch_target
+#### P2-148 possible_small_touch_target
 
 - Evidencia: `app/lib/features/binder/widgets/binder_item_editor.dart:665`
 - Trecho: `child: GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-171 possible_small_touch_target
+#### P2-149 possible_small_touch_target
 
 - Evidencia: `app/lib/features/binder/widgets/binder_item_editor.dart:1005`
 - Trecho: `return InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-172 possible_small_touch_target
+#### P2-150 possible_small_touch_target
 
 - Evidencia: `app/lib/features/cards/screens/card_search_screen.dart:328`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-173 possible_small_touch_target
+#### P2-151 possible_small_touch_target
 
 - Evidencia: `app/lib/features/cards/screens/card_search_screen.dart:1232`
 - Trecho: `return InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-174 possible_small_touch_target
+#### P2-152 possible_small_touch_target
 
 - Evidencia: `app/lib/features/community/screens/community_deck_detail_screen.dart:205`
 - Trecho: `child: GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-175 possible_small_touch_target
+#### P2-153 possible_small_touch_target
 
 - Evidencia: `app/lib/features/community/screens/community_screen.dart:969`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-176 possible_small_touch_target
+#### P2-154 possible_small_touch_target
 
 - Evidencia: `app/lib/features/community/screens/community_screen.dart:1110`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-177 possible_small_touch_target
+#### P2-155 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/screens/deck_list_screen.dart:487`
 - Trecho: `InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-178 possible_small_touch_target
+#### P2-156 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/screens/deck_list_screen.dart:957`
 - Trecho: `return InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-179 possible_small_touch_target
+#### P2-157 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/widgets/deck_details_overview_tab.dart:448`
 - Trecho: `(card) => InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-180 possible_small_touch_target
+#### P2-158 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/widgets/deck_details_overview_tab.dart:1188`
 - Trecho: `InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-181 possible_small_touch_target
+#### P2-159 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/widgets/deck_details_overview_tab.dart:1369`
 - Trecho: `InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-182 possible_small_touch_target
+#### P2-160 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/widgets/deck_optimize_sheet_widgets.dart:103`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-183 possible_small_touch_target
+#### P2-161 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/widgets/deck_optimize_sheet_widgets.dart:1140`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-184 possible_small_touch_target
+#### P2-162 possible_small_touch_target
 
 - Evidencia: `app/lib/features/decks/widgets/deck_progress_indicator.dart:129`
 - Trecho: `return InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-185 possible_small_touch_target
+#### P2-163 possible_small_touch_target
 
 - Evidencia: `app/lib/features/home/home_screen.dart:422`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-186 possible_small_touch_target
+#### P2-164 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart:341`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart:354`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-187 possible_small_touch_target
+#### P2-165 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart:908`
-- Trecho: `return InkWell(`
-- Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
-- Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
-
-#### P2-188 possible_small_touch_target
-
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1762`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart:915`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-189 possible_small_touch_target
+#### P2-166 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:1987`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:1786`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-190 possible_small_touch_target
+#### P2-167 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2386`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2029`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-191 possible_small_touch_target
+#### P2-168 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2425`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2435`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-192 possible_small_touch_target
+#### P2-169 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:2583`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2482`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-193 possible_small_touch_target
+#### P2-170 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3437`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2647`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-194 possible_small_touch_target
+#### P2-171 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:3656`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3518`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-195 possible_small_touch_target
+#### P2-172 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:4932`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:3743`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-196 possible_small_touch_target
+#### P2-173 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5139`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5026`
+- Trecho: `child: InkWell(`
+- Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
+- Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
+
+#### P2-174 possible_small_touch_target
+
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5238`
 - Trecho: `child: GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-197 possible_small_touch_target
+#### P2-175 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:5618`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:5746`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-198 possible_small_touch_target
+#### P2-176 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6291`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:6435`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-199 possible_small_touch_target
+#### P2-177 possible_small_touch_target
 
-- Evidencia: `app/lib/features/home/life_counter_screen.dart:6463`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:6616`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-200 possible_small_touch_target
+#### P2-178 possible_small_touch_target
 
 - Evidencia: `app/lib/features/messages/screens/message_inbox_screen.dart:124`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-201 possible_small_touch_target
+#### P2-179 possible_small_touch_target
 
 - Evidencia: `app/lib/features/notifications/screens/notification_screen.dart:172`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-202 possible_small_touch_target
+#### P2-180 possible_small_touch_target
 
 - Evidencia: `app/lib/features/profile/profile_screen.dart:295`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-203 possible_small_touch_target
+#### P2-181 possible_small_touch_target
 
 - Evidencia: `app/lib/features/scanner/screens/card_scanner_screen.dart:663`
 - Trecho: `GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-204 possible_small_touch_target
+#### P2-182 possible_small_touch_target
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:243`
 - Trecho: `GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-205 possible_small_touch_target
+#### P2-183 possible_small_touch_target
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:401`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-206 possible_small_touch_target
+#### P2-184 possible_small_touch_target
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:416`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-207 possible_small_touch_target
+#### P2-185 possible_small_touch_target
 
 - Evidencia: `app/lib/features/scanner/widgets/scanned_card_preview.dart:550`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-208 possible_small_touch_target
+#### P2-186 possible_small_touch_target
 
 - Evidencia: `app/lib/features/social/screens/user_profile_screen.dart:393`
 - Trecho: `return GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-209 possible_small_touch_target
+#### P2-187 possible_small_touch_target
 
 - Evidencia: `app/lib/features/social/screens/user_profile_screen.dart:466`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-210 possible_small_touch_target
+#### P2-188 possible_small_touch_target
 
 - Evidencia: `app/lib/features/social/screens/user_profile_screen.dart:1207`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-211 possible_small_touch_target
+#### P2-189 possible_small_touch_target
 
 - Evidencia: `app/lib/features/social/screens/user_search_screen.dart:193`
 - Trecho: `child: InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-212 possible_small_touch_target
+#### P2-190 possible_small_touch_target
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:772`
 - Trecho: `return GestureDetector(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-213 possible_small_touch_target
+#### P2-191 possible_small_touch_target
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:989`
 - Trecho: `InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-214 possible_small_touch_target
+#### P2-192 possible_small_touch_target
 
 - Evidencia: `app/lib/features/trades/screens/create_trade_screen.dart:1012`
 - Trecho: `InkWell(`
 - Impacto: Heuristica encontrou dimensao menor que 48 dentro de bloco tocavel.
 - Sugestao: Validar visualmente; elevar para P1 apenas se o alvo real ficar abaixo de 48x48.
 
-#### P2-215 possible_small_touch_target
+#### P2-193 possible_small_touch_target
 
 - Evidencia: `app/lib/features/trades/screens/trade_inbox_screen.dart:291`
 - Trecho: `child: InkWell(`
@@ -1549,7 +1395,8 @@
 
 ```text
 ## codex/hermes-analysis-docs...origin/codex/hermes-analysis-docs
- M docs/hermes-analysis/FLUTTER_UI_AUDIT.md
+ M docs/hermes-analysis/manaloom-knowledge/scripts/__pycache__/db_helper.cpython-313.pyc
+ M docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db
 ```
 
-UI_AUDIT_RESULT: findings=215 P0=0 P1=0 P2=215
+UI_AUDIT_RESULT: findings=193 P0=0 P1=0 P2=193
