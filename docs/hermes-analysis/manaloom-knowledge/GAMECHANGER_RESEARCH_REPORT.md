@@ -1,13 +1,15 @@
 # Game Changer Research Report — Lacunas e Recomendações
 
+<!-- DB_HASH: f3dc2786f88e7ef04e179207bc2c0d66 -->
 > Gerado automaticamente pelo cron `manaloom-gamechanger-research`.
 > Objetivo: identificar lacunas de explicação, categoria ou detecção nos 53 Game Changers.
 > Este relatório é **read-only** — não altera DB nem produto.
 
-**Data:** 2026-06-02 (execução #3)
+**Data:** 2026-06-04 (execução #4 — reconfirmação, sem mudanças vs #3)
 **Fonte:** `scripts/knowledge.db` (53/53 GCs preenchidos com `why_game_changer`)
-**Detectados pelo ManaLoom:** 24/53 (45%) — **sem mudança no total, mas 3 cartas mudaram de categoria**
+**Detectados pelo ManaLoom:** 24/53 (45%) — **sem mudança desde execução #2**
 **Não detectados:** 29/53 (55%) → 26 efetivamente não-detectados + 2 falsos positivos + 1 falso negativo
+**Hash DB:** `f3dc2786f88e7ef04e179207bc2c0d66` (idêntico à execução #3)
 
 ---
 
