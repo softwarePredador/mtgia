@@ -1,14 +1,15 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~06:00 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~12:00 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** 🔴 **CONFIRMED** — cEDH Fast-Mana Copy-Combo (Bracket 4), NOT spellslinger
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 15 Mulligan simulations, v3.22→v3.23→v3.24→**v3.25** Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, **Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated)**
-> **🚨 Deck State:** **ACTIVE cEDH STORM** — deck_id=6, card hash: `8b9c643c84825a4436d33b7f1616fa5f` (changed from `f2241d99...`). 100 cards, 31 lands tagged, 19 ramp (classifier corrected), 9 draw, 10 protection, 10 wincons, 6 tutors, 5 combo pieces, 3 removal, 1 board wipe. **11 Game Changers → Bracket 4.**
+> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 15 Mulligan simulations, v3.22→v3.23→v3.24→v3.25 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated), **5th consecutive hash change (2026-06-04)**
+> **🚨 Deck State:** **ACTIVE cEDH STORM** — deck_id=6, card hash: `763c3e0ffad4b05e871d5d08b38393fd` (changed from `8b9c643c...`). 100 cards, 31 lands tagged (including **Mountain + Plains basics** — critical vulnerability resolved), 19 ramp, 9 draw, 10 protection, 10 wincons, 6 tutors, 5 combo pieces, 3 removal, 1 board wipe. **11 Game Changers → Bracket 4.**
 > **✅ Worldfire is LEGAL** (v3.24 error corrected — banlist check now queries `card_legalities`, not model memory). **0 banned cards.**
 > **✅ Classifier resolved:** 20 unknown tags → 3 (85% reduction). Ramp: 6 tagged → 19 tagged. T3: 8.9% → 1.6% (-7.3pp from tag correction alone).
+> **🟢 Basic Land Crisis RESOLVED:** Mountain and Plains basics now present (was 0 actual basics). 2 artifact lands (Ancient Den, Great Furnace) remain but are no longer the only pseudo-basics.
 
 ---
 
@@ -1286,4 +1287,91 @@ With T3=1.6% and 97.9% playable hands, the deck has achieved **early-game maturi
 
 ---
 
-> **Next Cron Cycle:** Continue monitoring the cEDH Storm build. **Critical concerns:** (1) Wincon desaturation — 13 wincons wasting 5-6 slots, (2) Only 3 removal cards in 4-player format, (3) 36 CMC=NULL cards corrupting all analyses, (4) 4th consecutive hash change — deck unstable. Watch for MULLIGAN Exec#16 to confirm T3 stability post-classifier-correction. Priority: implement Task 1 (wincon desaturation) to free slots for removal and board wipes.
+## 28. 🆕 5TH CONSECUTIVE HASH CHANGE — BASIC LAND CRISIS RESOLVED (2026-06-04 ~12:00 UTC)
+
+### 28.1 Deck Modified Again — 5th Consecutive Divergence
+
+**Card hash changed:** `8b9c643c84825a4436d33b7f1616fa5f` (Scout #38 / Validator v3.25) → `763c3e0ffad4b05e871d5d08b38393fd` (current)
+
+This is the **5th consecutive hash divergence** detected (Scout #36→#37→#38→now). The deck continues to be modified externally without pipeline agent documentation. No Scout #39, Validator v3.26, or MULLIGAN Exec#16 has analyzed the new state.
+
+### 28.2 🟢 Basic Land Crisis RESOLVED
+
+The deck now contains **Mountain** and **Plains** basics — the first actual basic lands since the 2026-06-02 reconstruction. v3.23 had flagged 0 actual basics as a critical structural vulnerability (only Ancient Den + Great Furnace, which are artifact lands, not basics).
+
+**Current basics:** Mountain (1), Plains (1) = 2. **Still below the ≥3 threshold** recommended for Commander. However, for cEDH bracket 4 with fast mana and 33 lands total, 2 basics is acceptable — games end before nonbasic hate becomes lethal.
+
+**Land breakdown (33 total):** 31 tagged lands (2 basics + 2 artifact lands + 27 nonbasics) + 2 unknown-lands (Inventors' Fair, Prismatic Vista).
+
+### 28.3 What Changed — Confirmed Deltas
+
+Confirmed changes vs v3.25 state:
+- **+Mountain, +Plains** — basics added, fixes critical vulnerability
+- **Unknown removals** — 2 cards removed to maintain 100-card total (likely nonbasic lands)
+- **Deck hash changed** — MD5 confirmed via SQLite query
+
+### 28.4 Deck Instability Pattern
+
+5 modifications in ~48 hours (June 2-4), all external — not driven by Evolution Oracle. This:
+1. Invalidates pipeline baselines (T3=1.6% from Exec#15 is now stale)
+2. Prevents agents from completing analysis cycles
+3. Makes swap recommendations unreliable (target changes mid-cycle)
+
+**Root cause:** Deck is modified through `import_lorehold_decks.py` promotions or direct SQLite edits, bypassing the Evolution Oracle → application pipeline.
+
+---
+
+## 29. 🆕 UPDATED CONCRETE TASKS (2026-06-04 ~12:00 UTC — max 5)
+
+### Task 1: Pipeline Lock — Prevent External Deck Modification Without Audit
+- **Evidence:** 5 hash changes in 48 hours, zero Evolution Oracle swap applications. Deck modified externally without traceability. Basic land fix came from external edit, not pipeline-driven learning.
+- **What to change:** Add `deck_card_mutations` audit table logging every INSERT/UPDATE/DELETE with source, card_name, old/new values, timestamp. Add write-gate: modifications without Evolution Oracle `applied=true` entry emit "EXTERNAL MODIFICATION" alert.
+- **Impact:** Makes deck evolution traceable. Stops pipeline from chasing a moving target.
+- **Risk:** Medium — adds write-gate. Must allow legitimate operations (promotions, imports).
+- **Validation:** Any undocumented `deck_cards` change should trigger alert: "⚠️ EXTERNAL MODIFICATION: deck_id=6. Source: unknown."
+
+### Task 2: Hash-Change Auto-Triggered Revalidation
+- **Evidence:** The 5th hash change was detected by this cron job's manual check, not by any pipeline agent. No Scout/Validator/Mulligan triggered for the new state. Analysis lag = unknown (could be hours).
+- **What to change:** Auto-trigger Scout (delta detection) → if delta > 2 cards → auto-trigger Validator + Mulligan when hash changes detected. Rate-limit to 1 trigger per 30 min.
+- **Impact:** Eliminates analysis lag. Ensures agents always operate on current deck state.
+- **Risk:** Medium — needs rate limiting to prevent loops during rapid modifications.
+- **Validation:** Hash change → within 5 min: Scout delta report → Validator re-run → Mulligan re-run with updated T3.
+
+### Task 3: Basic Land Count Validation (≥3 for Commander)
+- **Evidence:** v3.23 flagged 0 basics as critical. Now resolved (2 basics). Validator's land check only verifies `land_count`, not basic vs nonbasic. Threshold of ≥3 still not met.
+- **What to change:** Add `basic_land_count` to Validator using Scryfall `type_line` to distinguish artifact lands from true basics. Emit WARNING when `basic_count < 3` for bracket ≤3, or `basic_count < 1` for bracket 4+.
+- **Impact:** Prevents recurrence of 0-basic vulnerability. Currently, Validator is blind to basic vs nonbasic.
+- **Risk:** Low — read-only validation.
+- **Validation:** Validator on current deck → "⚠️ Basic lands: 2 (threshold: 3 for bracket ≤3). Bracket 4 mitigates risk."
+
+### Task 4: Wincon Desaturation + Removal Priority (Frees 5-6 Slots)
+- **Evidence:** (Carried forward) Scout #38: 13 wincons in 100-card deck. cEDH meta uses 3-5. Only 3 removal for 4-player pods. Unchanged by basic land fix.
+- **What to change:** Evolution Oracle: when wincons > 7 and axes covered → recommend cutting lowest ratio (Score/CMC) wincons. Freed slots priority: removal (+3), board wipe (+1), draw/stax (+1-2).
+- **Impact:** Frees slots for core interaction. Largest remaining optimization.
+- **Risk:** Low — recommendation only.
+- **Validation:** Oracle output: cut Storm Herd (CMC=10), Rise of the Eldrazi (CMC=12), Guttersnipe (R=5), Rite of the Dragoncaller, Longshot, Surge to Victory. Keep: Approach, Twinflame+Dualcaster, Aetherflux, Mizzix's Mastery, Worldfire.
+
+### Task 5: CMC Integrity Repair — Fix 36 NULL/0.0 CMC Cards
+- **Evidence:** (Carried forward) TAG_ACCURACY_REPORT: 36 cards in deck_id=6 with CMC=NULL or 0.0. The reclassification that fixed unknown tags introduced CMC corruption. Affects avg_cmc, curve analysis, mulligan simulation.
+- **What to change:** `repair_cmc.py` — cross-reference `deck_cards` CMC against PostgreSQL `cards` table (33,795 cards verified). Update corrupted CMCs. Fix false 0.0 values (artifact lands, Moxen should be 0.0 but spells should not).
+- **Impact:** Restores data integrity for all downstream agents. 36% corrupted data is unacceptable.
+- **Risk:** Medium — modifies deck_cards. Must verify reference data correctness.
+- **Validation:** After repair, `SELECT COUNT(*) FROM deck_cards WHERE deck_id=6 AND (cmc IS NULL OR cmc = 0.0)` ≤ 7 (only the 5 Moxen + 2 artifact lands with true CMC=0).
+
+---
+
+## 30. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-04 ~12:00 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Deck mutation audit trail** | §28.1, Task 1 | Trace every deck modification — eliminate "hash changed but unknown why" |
+| **Hash-change auto-revalidation** | §28.1, Task 2 | Auto-execute Scout/Validator/Mulligan on hash change — eliminate analysis lag |
+| **External modification detection** | §28.4, Task 1 | Flag deck changes that bypass Evolution Oracle pipeline |
+| **Basic land count validation** | §28.2, Task 3 | Distinguish artifact lands from true basics — prevent 0-basic vulnerability |
+| **System didn't learn from fix** | §28.2 | Basic land fix was external, not pipeline-driven — the system can't replicate this learning |
+| **Deck instability rate** | §28.4 | If >3 modifications/48h, pause Evolution Oracle until deck stabilizes |
+
+
+---
+
+> **Next Cron Cycle:** Continue monitoring the cEDH Storm build. **Critical concerns:** (1) Wincon desaturation — 13 wincons wasting 5-6 slots, (2) Only 3 removal in 4-player format, (3) 5th hash change — deck unstable, pipeline chasing moving target, (4) Basic land crisis resolved (2 basics) but Validator threshold ≥3 not met, (5) 36 CMC=NULL cards still corrupting analyses, (6) Deck mutation audit trail needed — 5 changes in 48h with zero traceability. Priority: Task 4 (wincon desaturation) to free removal slots; Tasks 1-2 (pipeline lock + auto-revalidation) to stop instability.
