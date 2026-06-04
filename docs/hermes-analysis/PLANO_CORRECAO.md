@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-04 15:00 UTC
+> Data: 2026-06-04 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -15,7 +15,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze` em `server/` falha com
    `uri_does_not_exist`.
-5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `534f5672` em 2026-06-03 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e `POST /decks/:id/pricing` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations` e `/decks/:id/simulate` seguem sem consumidor app atual, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
+5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `5243686c` em 2026-06-04 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations`, `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual nesta busca, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-04 05:30 UTC no checkout `08637d2c`. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
@@ -533,13 +533,14 @@ presentes e sem chamador runtime confirmado.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-03 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `534f5672`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
+- **Status 2026-06-04 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `5243686c`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
   jobs async nao esta resolvida nesta branch. `POST /ai/rebuild`,
-  `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e
-  `POST /decks/:id/pricing` foram usados como controles positivos de owner gate.
-  `/decks/:id/recommendations` e `/decks/:id/simulate` nao tem consumidor app
-  atual, mas continuam sem contrato de owner antes de eventual promocao. A
+  `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram usados como
+  controles positivos de owner gate. `/decks/:id/recommendations`,
+  `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao
+  tem consumidor app atual na busca focada, mas continuam sem contrato de owner
+  antes de eventual promocao. A
   rodada tambem confirmou incoerencia de activation telemetry:
   `deck_rebuild_created` e emitido pelo app, rejeitado pela allow-list backend e
   ausente da doc app-facing atual.
