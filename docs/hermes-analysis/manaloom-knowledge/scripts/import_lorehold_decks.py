@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 """Import pasted Lorehold decklists into knowledge.db.
 
 Default mode is dry-run. Use --apply to write.
@@ -29,7 +30,7 @@ from pathlib import Path
 
 
 DB = Path('/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
-COMMANDER = 'Lorehold, the Historian'
+COMMANDER = os.environ.get("HERMES_IMPORT_COMMANDER", "Lorehold, the Historian")
 
 
 @dataclass
