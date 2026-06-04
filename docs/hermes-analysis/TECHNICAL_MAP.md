@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -214,7 +214,7 @@ impacto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-03 07:00 UTC como aberto no checkout local `0d55a920`.
+  2026-06-04 07:00 UTC como aberto no checkout local `6cdda72f`.
   `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
   `server/bin/sync_cards.dart` mantem copias privadas/inline de parse/extracao.
   Tambem seguem sem chamador runtime confirmado `getRequestTrace`/
@@ -224,7 +224,10 @@ impacto.
   `buildCandidateQualitySamplePoolSql`,
   `summarizeAggressiveOptimizeUtilitySamples`,
   `MLKnowledgeService.recordFeedback` e a API manual/custom metrics/debug de
-  `PerformanceService`. A parte automatica do `PerformanceService`
+  `PerformanceService`. A rodada tambem marcou como P3 conveniencias publicas
+  sem chamador em EDHREC/cache (`getTopByCategory`, `calculateFitScore`,
+  `cleanupCache`, `isHighSynergy`, `EndpointCache.clearExpired`). A parte
+  automatica do `PerformanceService`
   (`init`, observer de tela e `traceAsync` em smoke) foi separada como controle
   positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado

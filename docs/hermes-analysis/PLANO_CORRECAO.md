@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-04 05:30 UTC
+> Data: 2026-06-04 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -54,13 +54,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-03 07:00 UTC como **ABERTO neste checkout `0d55a920`**.
+    2026-06-04 07:00 UTC como **ABERTO neste checkout `6cdda72f`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma logica.
     Tambem seguem sem chamador runtime confirmado wrappers/helpers em request
     trace, Commander Reference, MTGTop8, candidate quality, optimize utility
     samples, `MLKnowledgeService.recordFeedback` e a API manual/custom
-    metrics/debug de `PerformanceService`. A observabilidade automatica do
+    metrics/debug de `PerformanceService`. A revalidacao tambem acrescentou como
+    P3 conveniencias publicas sem chamador confirmado em EDHREC/cache
+    (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
+    `EndpointCache.clearExpired`). A observabilidade automatica do
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app**: **REVALIDADO/ABERTO no checkout
@@ -454,8 +457,8 @@ SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-03 07:00 UTC:** **REABERTO no checkout local
-`codex/hermes-analysis-docs@0d55a920`**. As anotacoes historicas de resolucao em
+**Status 2026-06-04 07:00 UTC:** **REABERTO no checkout local
+`codex/hermes-analysis-docs@6cdda72f`**. As anotacoes historicas de resolucao em
 outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
 presentes e sem chamador runtime confirmado.
 
@@ -465,9 +468,9 @@ presentes e sem chamador runtime confirmado.
     `grep` nao encontrou import desse arquivo em `server/bin`, `server/lib`
     runtime ou rotas. `server/bin/sync_cards.dart:9`-`:10` importa apenas
     `database.dart` e `mtg_data_integrity_support.dart`, e ainda possui
-    `_parseSinceDays` em `:376`-`:384`, montagem incremental inline em
-    `:604`-`:663`, `_extractCardRow` em `:680` e coleta de oracle IDs/legalidade
-    inline em `:807`-`:837`.
+    `_parseSinceDays` em `:376`, `_getNewSetCodesSinceFromData` em `:413`,
+    chamada de `_extractCardRow` em `:554`, definicao de `_extractCardRow` em
+    `:680` e coleta de oracle IDs/legalidade inline em `:807`-`:837`.
   - `server/lib/request_trace.dart:48` e `:51` definem
     `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
     `context.read<RequestTrace>()` diretamente, por exemplo
@@ -495,6 +498,13 @@ presentes e sem chamador runtime confirmado.
     `app/lib/main.dart:121`, `PerformanceNavigatorObserver` chama
     `startScreenTrace`/`stopScreenTrace` em `performance_service.dart:295`,
     `:307`, `:334` e `:339`, e `traceAsync` aparece no smoke de observabilidade.
+  - `server/lib/ai/edhrec_service.dart:333`, `:355`, `:363` e `:399` expõem
+    `getTopByCategory`, `calculateFitScore`, `cleanupCache` e `isHighSynergy`
+    sem chamador confirmado. Controle positivo: `getHighSynergyCards` e chamado
+    em `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`.
+  - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
+    sem chamada confirmada; `EndpointCache.instance.get/set` seguem vivos em
+    rotas de cards, sets, archetypes e generate performance support.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
   porque o teste cobre uma copia que nao participa do CLI operacional.
@@ -506,7 +516,9 @@ presentes e sem chamador runtime confirmado.
   3. manter `PerformanceService` como API publica apenas se houver plano de
      observabilidade mobile/manual traces; caso contrario, simplificar para
      `init` + observer + `traceAsync`;
-  4. continuar usando busca de chamadores como guardrail antes de adicionar
+  4. transformar conveniencias EDHREC/cache sem consumidor em private/remover,
+     ou ligar a rotina real com teste;
+  5. continuar usando busca de chamadores como guardrail antes de adicionar
      novos helpers publicos.
 - **Validação**:
   - `grep -RIn "sync_cards_utils" server` encontra o binario ativo, ou o arquivo
