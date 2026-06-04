@@ -1,17 +1,19 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~17:20 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~22:00 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** 🔴 **CONFIRMED** — cEDH Stax-Protected Combo (Bracket 4), NOT spellslinger
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 16 Mulligan simulations, v3.22→v3.23→v3.24→v3.25 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated), **6th consecutive hash change (2026-06-04 ~17:20 UTC)** — STRATEGIC PIVOT to stax-protected combo
-> **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, card hash: `7b0b3fa845db029428d6aaa6d6915b09` (6th consecutive divergence). 100 cards, 31 lands tagged (2 basics: Mountain + Plains), 19 ramp, 9 draw, 10 protection, 10 wincons, 5 tutors, 3 combo pieces, 3 spell engines, 3 removal, 1 stax (Drannith Magistrate), 1 board wipe. **11 Game Changers → Bracket 4.** 3 unknown tags.
+> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 16 Mulligan simulations, v3.22→v3.23→v3.24→v3.25 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated), **6th consecutive hash change (2026-06-04 ~17:20 UTC)** — STRATEGIC PIVOT to stax-protected combo, **7th hash change (2026-06-04 ~21:00 UTC)** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation Report (20:30Z)**
+> **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, card hash: `32cc0305aa8956f270f45ee3b8a12730` (7th consecutive divergence). 100 cards, 31 lands tagged (2 basics: Mountain + Plains), 19 ramp, 9 draw, 10 protection, 10 wincons, 5 tutors, 3 combo pieces, 3 spell engines, 3 removal, 1 stax (Drannith Magistrate), 1 board wipe. **11 Game Changers → Bracket 4.** 3 unknown tags.
+> **🚨 Lorehold Pipeline DECOMMISSIONED:** All 5 Lorehold crons (Scout, Validator, Mulligan, Battle, Oracle) removed from `jobs.json`. Commander Knowledge Deep is the ONLY cron monitoring the deck.
+> **🔴 Pipeline State:** ALL agents STALE — 3-4+ hashes behind current state. Multi-Commander Evolution is active (replacement pipeline) but not yet analyzing Lorehold.
 > **✅ Worldfire is LEGAL** (banlist check queries `card_legalities`). **0 banned cards.**
-> **✅ CMC corruption RESOLVED:** 0 NULL CMC values (was 36 in prior report). All CMC=0.0 cards are legitimate (31 lands + 4 Moxen + Lotus Petal = 36).
+> **✅ CMC corruption RESOLVED:** 0 NULL CMC values. All CMC=0.0 cards are legitimate (31 lands + 5 Moxen = 36).
 > **✅ Classifier resolved:** 20 unknown tags → 3 (85% reduction). Ramp: 6 tagged → 19 tagged. T3: 1.6% (Exec#15, stale — needs revalidation on new hash).
-> **🟢 Basic Land Crisis RESOLVED:** Mountain and Plains basics present (2). Artifact lands (Ancient Den, Great Furnace) were removed in this pivot — only true basics remain.
-> **🆕 Strategic Pivot to Stax:** +Drannith Magistrate (stax), +Pyroblast, +Silence, +Orim's Chant (stack protection), +Esper Sentinel, +The One Ring, +Wheel of Fortune, +Scroll Rack (draw upgrade), +Past in Flames, +Reiterate, +Reverberate (spell engines), +Heat Shimmer (combo piece), +Giver of Runes (protection). Removed: Akroma's Will, Lightning Greaves, Hexing Squelcher, Big Score, Windfall, Weathered Wayfarer, Dance with Calamity, Dragon's Rage Channeler, Double Vision, Arcane Bombardment, Dawning Archaic, Ancient Den, Great Furnace.
+> **⚠️ Artifact Lands Re-Added:** Ancient Den and Great Furnace are BACK in the 7th hash. Previously removed in the 6th pivot. Increases vulnerability to Null Rod / Collector Ouphe / artifact hate.
+> **🆕 Strategic Pivot to Stax (6th hash):** +Drannith Magistrate (stax), +Pyroblast, +Silence, +Orim's Chant (stack protection), +Esper Sentinel, +The One Ring, +Wheel of Fortune, +Scroll Rack (draw upgrade), +Past in Flames, +Reiterate, +Reverberate (spell engines), +Heat Shimmer (combo piece), +Giver of Runes (protection). Removed: Akroma's Will, Lightning Greaves, Hexing Squelcher, Big Score, Windfall, Weathered Wayfarer, Dance with Calamity, Dragon's Rage Channeler, Double Vision, Arcane Bombardment, Dawning Archaic, Ancient Den, Great Furnace.
 
 ---
 
@@ -1528,4 +1530,198 @@ The corruption flagged in previous reports was a **false alarm** — previous qu
 
 ---
 
-> **Next Cron Cycle:** Continue monitoring the cEDH Stax-Combo build. **Critical concerns:** (1) Pipeline LOCK needed — 6 changes in 72h with zero audit trail, (2) All pipeline agents STALE — Scout, Validator, Mulligan, Battle, and Oracle haven't analyzed hashes #4-6, (3) Wincon desaturation still P0 — 13 wincons wasting 5-6 slots despite strategic improvement, (4) 3 removal in 4-player format still critical, (5) Stax pivot is strategically sound but invisible to pipeline — agents need stax awareness, (6) CMC corruption confirmed RESOLVED (false alarm — all 36 CMC=0.0 are legitimate). **Priority order:** Task 1 (audit trail) to stop undocumented changes → Task 2 (auto-revalidation) to get pipeline current → Task 5 (stability gate) to prevent Oracle from chasing a moving target → Task 3 (stax detection) to make agents aware of new archetype → Task 4 (wincon desaturation) to free slots now that strategic alignment is improving.
+## 34. 🆕 7TH CONSECUTIVE HASH CHANGE — ARTIFACT LANDS RE-ADDED (2026-06-04 ~21:00 UTC)
+
+### 34.1 Hash Divergence #7 Detected
+
+**Card hash changed:** `7b0b3fa845db029428d6aaa6d6915b09` (6th change, stax pivot) → `32cc0305aa8956f270f45ee3b8a12730` (current)
+
+This is the **7th consecutive hash divergence** — the deck continues to be modified externally without pipeline agent documentation. Unlike the 6th change (14+ cards, strategic pivot), this change is **metadata-level**: the card composition and tag distribution are identical to the 6th hash state.
+
+| # | When | Hash (last 4) | Scope | Pipeline Coverage |
+|---|------|---------------|-------|-------------------|
+| 7 | **Jun 4 ~21Z** | **7b0b...→32cc...** | **Artifact lands re-added, CMC/tag corrections** | **None — this report** |
+
+### 34.2 What Changed — Card-Level Deltas vs 6th Hash
+
+The tag distribution is **identical** to the 6th hash state:
+- land: 31, ramp: 19, wincon: 10, protection: 10, draw: 9, tutor: 5, unknown: 3, removal: 3, engine: 3, combo: 3, stax: 1, spellslinger: 1, commander: 1, board_wipe: 1
+
+However, direct card inspection reveals:
+
+#### Artifact Lands RE-ADDED (previously removed in 6th pivot)
+| Card | Tag | Note |
+|:-----|:----|:-----|
+| **Ancient Den** | land | Artifact Land — was removed in 6th hash, now BACK |
+| **Great Furnace** | land | Artifact Land — was removed in 6th hash, now BACK |
+
+The 6th hash report (§31.2) explicitly documented these as removed: "Artifact lands removed: Ancient Den and Great Furnace were liabilities against artifact hate. Their removal closes a vulnerability window." Their re-addition re-opens vulnerability to Null Rod, Collector Ouphe, and other artifact hate.
+
+#### Lands Potentially Removed (to maintain 100-card count)
+With Ancient Den and Great Furnace re-added, 2 other lands must have been removed. No new lands were detected with different names — if removed lands are non-basic, they may have been swap-neutral (e.g., one filter land for another). Further investigation requires delta against the 6th hash card list.
+
+### 34.3 CMC Integrity Confirmed
+
+Direct DB query confirms:
+- CMC NULL: **0** (zero cards with corrupted CMC)
+- CMC 0.0: **36** — all legitimate: 31 lands + Chrome Mox + Mox Amber + Mox Diamond + Mox Opal + Lotus Petal
+- Inventors' Fair and Prismatic Vista still show CMC=3.0 (incorrect for lands, but tagged 'unknown' — not affecting functional analysis)
+
+The CMC corruption alarm from previous reports (§29 Task 5) is definitively **CANCELLED**. All corruption was a query-side false alarm combining NULL and legitimate 0.0 values.
+
+### 34.4 Game Changer Count
+
+**11 Game Changers** confirmed: Ancient Tomb, Chrome Mox, Mox Diamond, Mox Opal, Mana Vault, The One Ring, Urza's Saga, Enlightened Tutor, Gamble, Drannith Magistrate, Gemstone Caverns.
+
+→ **Bracket 4 (cEDH).** Maximum for Bracket 3 is 3 GCs. Deck remains pubstomp-level against Bracket 3 tables.
+
+### 34.5 Deck Instability — 7 Modifications in ~72 Hours
+
+The deck has been modified 7 times in ~72 hours (June 2-4), all external — not driven by Evolution Oracle:
+1. Jun 2: Reconstruction (lands+ramp)
+2. Jun 3: DB re-sync (classifier fix)
+3. Jun 3: 2 wincons added (Longshot, Surge)
+4. Jun 4: Akroma's Will restored?
+5. Jun 4 ~12Z: +Mountain, +Plains basics
+6. Jun 4 ~17Z: 14+ swaps, stax pivot
+7. Jun 4 ~21Z: Artifact lands re-added
+
+**Stability score:** 1.0 / (1 + 7) = **0.125** (Critical: deck is extremely unstable).
+
+---
+
+## 35. 🆕 LOREHOLD PIPELINE DECOMMISSIONED — ALL 5 CRONS REMOVED
+
+### 35.1 Discovery Source
+
+The **All-Crons MTG Rules Audit v3.8** (2026-06-04T18:30Z, commit `47518102`) revealed:
+
+> **Pipeline Lorehold: 🔴 DESCOMISSIONADO — 5/5 crons removidos**
+
+All 5 Lorehold-specific pipeline crons have been removed from `jobs.json`:
+
+| Cron | Job ID | Status |
+|:-----|:------|:-------|
+| Lorehold Deck Scout | `f20ac299992b` | 🔴 DECOMMISSIONED |
+| Lorehold Deck Validator | `712579b15767` | 🔴 DECOMMISSIONED |
+| Lorehold Mulligan Analyst | `08468451a06a` | 🔴 DECOMMISSIONED |
+| Lorehold Battle Analyst | `94f8590b1beb` | 🔴 DECOMMISSIONED |
+| Lorehold Evolution Oracle | `a50bef4c2a59` | 🔴 DECOMMISSIONED |
+
+### 35.2 Impact on Pipeline Coverage
+
+| Agent | Last Hash Analyzed | Current Hash | Lag | Status |
+|-------|-------------------|--------------|-----|--------|
+| Scout | `8b9c643c...` (#38, Jun 3) | `32cc0305...` | 4 hashes behind | 🔴 DECOMMISSIONED |
+| Validator | `8b9c643c...` (v3.25, Jun 3) | `32cc0305...` | 4 hashes behind | 🔴 DECOMMISSIONED |
+| Mulligan | `8b9c643c...` (#16, Jun 4 07Z) | `32cc0305...` | 4 hashes behind | 🔴 DECOMMISSIONED |
+| Battle | `8b9c643c...` (v8, Jun 2) | `32cc0305...` | 5+ hashes behind | 🔴 DECOMMISSIONED |
+| Oracle | `30d00347...` (C#23, Jun 1) | `32cc0305...` | 6+ hashes behind | 🔴 SILENT (72h+) |
+
+**Commander Knowledge Deep** (this cron) is the **ONLY** active agent still monitoring the Lorehold deck. No automated mulligan simulations, wincon audits, or evolution swap recommendations have been generated for hashes #4-#7.
+
+### 35.3 Replacement Pipeline: Multi-Commander Evolution
+
+A new cron `Multi-Commander Evolution` (`93a8ad77b251`) has been created as the replacement pipeline. It produced its **first execution** on 2026-06-04T16:42Z, analyzing **Winota, Joiner of Forces** with 3 swap proposals (ΔCMC = -5, DEFENSIVE strategy). The cron is designed to analyze any commander, not just Lorehold.
+
+**Gaps in the new pipeline:**
+- No banlist verification in prompt
+- No singleton check or `card_count >= 100` validation
+- The `wincon_catalog` referenced in prompt doesn't exist in SQLite schema
+- Lorehold has not been analyzed by this cron yet
+
+### 35.4 Pipeline Score: 4.5/10 🔴
+
+Per the All-Crons MTG Rules Audit v3.8, the overall pipeline health score is **4.5/10** (down from 5.0 in v3.7), dragged down by:
+- 2 new crons broken (auto-sync-learned-decks: PermissionError, pull-learning-events: PostgreSQL UUID cast error)
+- 5 Lorehold crons decommissioned
+- Multi-Commander Evolution only partially operational
+
+---
+
+## 36. 🆕 MANA BASE VALIDATION REPORT — External Confirmation (2026-06-04T20:30Z)
+
+### 36.1 Lorehold Deck Confirmed
+
+The **Mana Base Validator** cron (`444aa9510c2c`) produced a fresh validation report at 20:30Z, confirming the current deck state:
+
+| Metric | Value | vs PG Profile |
+|:-------|:-----:|:-------------|
+| Deck ID | #6 "Lorehold Best-of Learned No Premium Mox 2026-06-02" | — |
+| Cards | 100/100 | ✅ Complete |
+| Lands (tags) | 31 | NO PROFILE available |
+| Ramp | 19 | — |
+| Draw | 9 | — |
+| Protection | 10 | — |
+| Wincon | 10 | — |
+| Unknown tags | 3 | Inventors' Fair, Prismatic Vista, Reforge the Soul |
+
+**Key finding:** The report notes **"NO PROFILE"** — no EDHREC reference profile exists for Lorehold in `commander_reference_profile_anchor30_batch_*_2026-05-12/profiles/`. This confirms the Validator's earlier finding (§19.5) that the PG profile is for a different archetype (spellslinger). The gap persists — no archetype-appropriate profile exists for cEDH stax-combo Lorehold.
+
+### 36.2 Cross-Validation with Other Decks
+
+The Mana Base Validator analyzed 8 decks total, with Lorehold being the only one with "NO PROFILE." Other decks (Winota, Yuriko, Aesi, Atraxa) all had matching EDHREC profiles. This highlights that Lorehold is an edge case — a custom-built cEDH deck without community aggregate data.
+
+### 36.3 Remaining Gaps
+
+- **3 unknown tags**: Inventors' Fair (CMC=3.0, Land), Prismatic Vista (CMC=3.0, Land), Reforge the Soul (CMC=3.0, Sorcery wheel+Miracle). The land tags are incorrect (should be CMC=0, tag='land').
+- **Artifact lands vulnerability**: Ancient Den + Great Furnace present — vulnerable to artifact hate.
+- **Removal density**: Only 3 removal for 4-player pods — ratio 0.375 (threshold: 1.0).
+
+---
+
+## 37. 🆕 UPDATED CONCRETE TASKS (2026-06-04 ~22:00 UTC — max 5)
+
+### Task 1: 🔴 CRITICAL — Resolve Git Push Failure (Infrastructure)
+- **Evidence:** The repo is **5 commits ahead** of origin (`03e09d30`, `6a828c6a`, `47518102`, `001a9977`, `9a780244`). The All-Crons MTG Rules Audit v3.8 explicitly documented: "Push failed: No git credentials available in cron environment." The Commander Knowledge Deep report updates and other critical documentation are local only — invisible to other agents and the team. No automated push works from the cron environment.
+- **What to change:** Configure git credentials in the cron environment (SSH key or PAT). Alternatively, add a `push_with_retry()` wrapper in the cron scripts that attempts HTTPS push with stored credentials. As a fallback, add a health check: if `git rev-list --count origin/codex/hermes-analysis-docs..HEAD > 3`, emit an alert to the cron governor.
+- **Impact:** All documentation and analysis from this and other crons becomes visible. The 5 unpushed commits include: commander deep knowledge update, 5 implementation tasks, MTG rules audit, UI audit, and mana base validation report.
+- **Risk:** Low — infrastructure change. Credentials must be stored securely (not in version control).
+- **Validation:** After fix, `git push origin codex/hermes-analysis-docs` should succeed. `git status` should show "up to date with origin."
+
+### Task 2: Pipeline Resurrection — Re-Enable At Least 1 Lorehold Agent
+- **Evidence:** All 5 Lorehold crons are DECOMMISSIONED. The deck has 7 hash changes with zero automated analysis on hashes #4-#7. T3=1.6% (Exec#15) is 4 hashes stale. SYNERGY_MAP v3.25 is 4 hashes stale. Wincon saturation (13 conditions) is unmonitored. The Multi-Commander Evolution cron exists but has not analyzed Lorehold yet. Commander Knowledge Deep is doing manual detection but has no simulation/validation capability.
+- **What to change:** Re-enable at minimum the **Mulligan Analyst** and **Validator** crons for Lorehold. If those crons cannot be restored, add Lorehold analysis to the Multi-Commander Evolution cron's rotation. The goal is to get current T3 (revalidate with 19 ramp tags), current SYNERGY_MAP, and wincon audit on the 7th hash.
+- **Impact:** Restores automated monitoring of the most-analyzed deck in the system. Without this, all Lorehold metrics are frozen at hash `8b9c643c...` (Jun 3).
+- **Risk:** Medium — re-enabling crons may conflict with the Multi-Commander Evolution cron if both try to modify the same deck. Coordinate via the cron governor.
+- **Validation:** After restoration, at least 1 agent produces output with the current hash `32cc0305...`.
+
+### Task 3: Wincon Desaturation + Removal Priority (CARRIED FORWARD — P0 unchanged)
+- **Evidence:** The deck has 10 tagged wincons + 3 combo pieces = 13 game-ending conditions (13% of deck). cEDH meta uses 3-5 wincons + tutors. The deck has 6+ tutors that can find any combo piece. Only 3 removal cards for 4-player pods (ratio 0.375, threshold 1.0). Mana Base Validator confirms: 31 lands, 19 ramp, 10 wincons, 10 protection — but only 3 removal. The deck is structurally inverted (more wincons than interaction).
+- **What to change:** Implement `wincon_desaturation()` logic. When `scored_wincons > 7` AND all 3 coverage axes (FAST/RESILIENT/STEALTH) are satisfied, rank wincons by (Score/CMC) ratio and recommend cutting bottom N. Freed slots priority: removal (+3), board wipe (+1), stax (+1). For this deck: keep Approach (fast), Twinflame+Dualcaster (combo/stealth), Aetherflux Reservoir (storm payoff), Mizzix's Mastery (resilience), Worldfire (resilience/7). Cut candidates: Storm Herd (CMC=10, score=11), Rise of the Eldrazi (CMC=12), Guttersnipe (R=5 fragile), Longshot (no score), Surge to Victory (random exile).
+- **Impact:** Frees 5-6 slots for core interaction. Largest remaining optimization. The Mana Base Validator indirectly confirms this by showing 10 protection vs 3 removal — the deck can protect itself but can't stop opponents.
+- **Risk:** Low — recommendation only. Does not auto-apply cuts.
+- **Validation:** Wincon audit on current hash should yield: "⚠️ Wincon supersaturation: 13 total. Consolidation: cut 5-6, prioritize removal additions."
+
+### Task 4: Artifact Land Vulnerability Detection
+- **Evidence:** The 7th hash change re-added Ancient Den and Great Furnace — artifact lands that were explicitly removed in the 6th pivot because they are liabilities against Null Rod, Collector Ouphe, Stony Silence, and other artifact hate. The deck runs 36 artifacts (5 Moxen, Sol Ring, Mana Vault, Arcane Signet, Boros Signet, Talisman of Conviction, etc.) making it doubly vulnerable to artifact hate. No pipeline agent detects this vulnerability.
+- **What to change:** Add `detect_artifact_land_vulnerability()` to the Validator. When `COUNT(type_line LIKE '%Artifact Land%') >= 2` AND `COUNT(functional_tag='ramp' AND type_line LIKE '%Artifact%') >= 5`, emit a WARNING: "High artifact density + artifact lands — vulnerable to Null Rod effects. Consider replacing artifact lands with basic or non-artifact utility lands." For this deck, recommend replacing Ancient Den + Great Furnace with 2 basic Plains (bringing basic count to 1 Mountain + 3 Plains = 4, above the ≥3 threshold).
+- **Impact:** Prevents deck from folding to common cEDH sideboard hate. Currently, a single Null Rod shuts off 11 mana sources (5 Moxen + Sol Ring + Mana Vault + 2 Signets + Talisman + Arcane Signet + 2 artifact lands).
+- **Risk:** Low — read-only detection. Does not modify the deck.
+- **Validation:** Validator on current deck should emit: "⚠️ Artifact land vulnerability: 2 artifact lands + 9 artifact ramp sources. Null Rod would disable 11 mana sources."
+
+### Task 5: Multi-Commander Evolution — Add Lorehold to Rotation
+- **Evidence:** The Multi-Commander Evolution cron (`93a8ad77b251`) successfully analyzed Winota (3 swaps, ΔCMC=-5). The cron is designed to analyze ANY commander but has only executed once. Lorehold has 7 hash changes with zero automated swap recommendations since Jun 1. The Multi-Commander Evolution is the designated replacement for the decommissioned Lorehold pipeline but hasn't been pointed at Lorehold yet.
+- **What to change:** Add Lorehold (deck_id=6) to the Multi-Commander Evolution's analysis queue. The cron should: (a) read current deck state from knowledge.db, (b) compare against available collection, (c) propose swaps based on cEDH stax-combo archetype heuristics (not spellslinger), (d) validate against banlist, singleton, and card_count=100. If the prompt doesn't support Lorehold-specific analysis, extend it with the knowledge from this report (wincon supersaturation, removal emergency, artifact land vulnerability).
+- **Impact:** Restores automated swap recommendations for the system's primary test deck. Without this, the deck will continue to be modified externally without any agent-guided optimization.
+- **Risk:** Medium — the Multi-Commander Evolution cron is new and has only 1 execution. Bugs may surface. Coordinate with Task 2 to avoid conflicts.
+- **Validation:** Multi-Commander Evolution produces an analysis for deck_id=6 with current hash `32cc0305...`, identifying at minimum: wincon supersaturation, removal emergency, and artifact land vulnerability.
+
+---
+
+## 38. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-04 ~22:00 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Pipeline decommissioning detection** | §35, All-Crons Audit v3.8 | Alert when crons are removed without replacement — prevents silent monitoring gaps |
+| **Artifact land vulnerability** | §34.2, Task 4 | Detect artifact lands in artifact-heavy decks — warn about Null Rod / Collector Ouphe vulnerability |
+| **Multi-Commander rotation** | §35.3, Task 5 | New pipeline that can analyze any commander — needs Lorehold in rotation |
+| **Git push health check** | §37, Task 1 | Detect when repo is >3 commits ahead of origin — alert on push failure |
+| **Deck stability metric** | §34.5 | `1.0 / (1 + modifications_in_72h)` — gate Oracle/swap recommendations on deck stability |
+| **Mana Base profile coverage** | §36.1 | Detect commanders without EDHREC reference profiles — flag as "custom build, no community baseline" |
+| **Wincon-to-interaction ratio** | §36.3, Task 3 | Alert when wincons > interaction pieces (10 vs 3) — structural imbalance |
+| **Cross-cron knowledge transfer** | §35-36 | When Lorehold pipeline dies, Commander Knowledge Deep + Mana Base Validator become the sole sources of truth — amplify their output |
+
+---
+
+> **Next Cron Cycle:** Continue monitoring the cEDH Stax-Combo build. **Critical concerns (updated):** (1) 🆕 Git push FAILURE — 5 commits unpushed, all documentation local only. (2) 🆕 Lorehold pipeline DECOMMISSIONED — all 5 crons removed. Zero automated analysis on hashes #4-#7. (3) 🆕 Multi-Commander Evolution operational but not yet analyzing Lorehold. (4) Wincon supersaturation persists — 13 conditions wasting 5-6 slots. (5) Removal emergency persists — 3 interaction pieces for 4-player pods. (6) Artifact lands re-added (7th hash) — Ancient Den + Great Furnace vulnerability. (7) 🆕 Mana Base Validator confirms deck state but notes "NO PROFILE" — no EDHREC reference exists. **Priority order:** Task 1 (git push resolution — infrastructure blocker) → Task 2 (re-enable at least 1 Lorehold agent) → Task 5 (add Lorehold to Multi-Commander Evolution rotation) → Task 3 (wincon desaturation) → Task 4 (artifact land vulnerability detection).
