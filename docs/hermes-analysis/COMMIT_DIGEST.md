@@ -1,24 +1,46 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-03T19:02Z (Incremento: Commander Learning - fb91fdca).
+> Atualizado em 2026-06-04T00:23Z (Incremento: Learned Deck Scripts + Visual Proof - d693b9fb).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `e754c0ec` (Resolve learning pipeline backlog)
-- HEAD atual: **`fb91fdca`** (Add Lorehold learned deck runtime proof).
+- HEAD anterior: `fb91fdca` (Add Lorehold learned deck runtime proof).
+- HEAD atual: **`d693b9fb`** (Capture Lorehold learned deck visual proof).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`fb91fdca`** (`/health` retornou HTTP 200 em 2026-06-03T19:02Z — producao operacional).
+- SHA publicado confirmado em producao: **`d693b9fb`** (`/health` retornou HTTP 200 em 2026-06-04T00:23Z — producao operacional).
 - Local `master`: 46 commits atrasado (`3f7d784f`) — precisa de `git pull origin master`
 
 
 
-## Novos commits nesta rodada (2026-06-03)
+## Novos commits nesta rodada (2026-06-04)
 
 
-### `fb91fdca` — Add Lorehold learned deck runtime proof (HEAD)
+### `d693b9fb` — Capture Lorehold learned deck visual proof (HEAD)
+
+- **1 arquivo**, **+25/-1 linhas**
+- **Tipo: CODE/TEST** — Adiciona capturas visuais ao teste de runtime do Lorehold learned deck:
+  1. 4 chamadas de `captureVisualProof` em pontos-chave do fluxo (no commander, learned button visivel, hermes preview, saved deck details).
+  2. Scroll e garantia de visibilidade antes de cada captura.
+- **Avaliacao Hermes**: Teste de integracao ampliado com prova visual. Sem mudanca de logica. Baixo risco.
+- **Verificacao**: Health endpoint confirma `git_sha: d693b9fb` em producao.
+
+### `5fc16e7d` — Add Hermes learned deck export/sync scripts, extract shared backend helpers, add save widget test
+
+- **8 arquivos**, **+628/-313 linhas**
+- **Tipo: CODE/REFACTOR** — Refatoracao e novos scripts de operacao:
+  1. `server/lib/ai/commander_reference_helpers.dart` (NOVO, 151 linhas) — Extrai helpers compartilhados (`jsonObject`, `intValue`, `summarizeLegalities`, `loadCardMetadataByName`, `canonicalValidationCards`, etc.) que estavam duplicados entre `commander-learning/index.dart` e `commander-reference/index.dart`.
+  2. `server/routes/ai/commander-learning/index.dart` (-168 linhas) — Remove helpers privados, usa `commander_reference_helpers.dart`.
+  3. `server/routes/ai/commander-reference/index.dart` (-165 linhas) — Mesma refatoracao, remove tambem `_summarizeCommanderLegalities` e `_intValue`/`_jsonObject` privados.
+  4. `server/bin/export_hermes_learned_deck.py` (NOVO, 223 linhas) — Script Python para exportar learned decks do banco.
+  5. `server/bin/sync_hermes_learned_deck.sh` (NOVO, 78 linhas) — Script shell para sincronizar learned decks.
+  6. `app/test/features/decks/screens/deck_flow_entry_screens_test.dart` (+121 linhas) — Novo teste widget `DeckGenerateScreen save learned deck POSTs 99 main + 1 commander`. Refatora testes existentes com wrappers `wrapSimple`/`wrapWithRouter`.
+- **Avaliacao Hermes**: Refatoracao limpa — reduziu ~333 linhas duplicadas extraindo shared helpers. Nenhum risco de regressao detectado. `dart analyze lib/` — No issues found. `dart test` — 599/599 PASS. `flutter analyze --no-pub --no-fatal-infos` — No issues found.
+- **Risco**: Scripts Python/Shell (`export_hermes_learned_deck.py`, `sync_hermes_learned_deck.sh`) sao novos e nao tem testes dedicados. Operam contra o banco de producao com queries de leitura — risco operacional baixo, mas devem ser monitorados na primeira execucao.
+
+### `fb91fdca` — Add Lorehold learned deck runtime proof
 
 - **14 arquivos**, **+2676/-5 linhas**
 - **Tipo: CODE/FEATURE** — Infraestrutura completa de Commander Learned Decks:

@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-03.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04.
 
 ## Estrutura do repositorio
 
@@ -57,7 +57,7 @@ mtgia/
 │   │   ├── goldfish_simulator.dart
 │   │   ├── optimization_validator.dart
 │   │   ├── rebuild_guided_service.dart
-│   │   ├── commander_reference_*.dart (6 arquivos)
+│   │   ├── commander_reference_*.dart (7 arquivos, incluindo commander_reference_helpers.dart)
 │   │   └── ...
 │   └── pubspec.yaml
 │
@@ -124,9 +124,9 @@ mtgia/
 
 ## Qualidade e validacao
 
-- `flutter analyze --no-pub --no-fatal-infos`: VERDE (2026-05-27)
-- `dart test`: VERDE, 599 tests (backend, 2026-05-27)
-- `dart analyze` do backend no checkout local `df8291d7` em 2026-05-30:
+- `flutter analyze --no-pub --no-fatal-infos`: VERDE, No issues found (2026-06-04)
+- `dart test`: VERDE, 599 tests PASS (backend, 2026-06-04)
+- `dart analyze lib/`: No issues found (2026-06-04)
   **VERMELHO** por `server/bin/local_test_server.dart:3` importar
   `../.dart_frog/server.dart`, artefato ausente em clone limpo nesta branch.
   A resolucao historica em `origin/master@a830f9f3` nao esta refletida aqui.

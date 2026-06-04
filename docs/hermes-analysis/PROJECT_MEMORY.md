@@ -10,8 +10,8 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Master HEAD: fb91fdca (2026-06-03, Add Lorehold learned deck runtime proof)
-- Backend tests: 619+ (2026-06-03), modularizacao F0-F3 em progresso
+- Master HEAD: d693b9fb (2026-06-03, Capture Lorehold learned deck visual proof)
+- Backend tests: 599 (2026-06-04), `dart analyze lib/` — No issues found
 
 ## Branch de analise
 
