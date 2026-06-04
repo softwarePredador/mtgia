@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 14:10 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 15:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -238,18 +238,19 @@ impacto.
   (`init`, observer de tela e `traceAsync` em smoke) foi separada como controle
   positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-03 15:00 UTC no checkout local `0ecce9f6`. `deck_matchups` e
+  em 2026-06-04 15:00 UTC no checkout local `92281194`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
   `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
   `/ai/ml-status`; `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   runtime confirmado, enquanto o produto le o agregado
   `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao
-  encontrou novo candidato alem desses itens; `battle_simulations`,
-  `format_staples`, `archetype_counters`, `archetype_patterns`,
-  `synergy_packages`, `activation_funnel_events` e `ai_user_preferences` foram
-  separados como controles positivos por terem leitores runtime ou runners
-  dedicados confirmados.
+  encontrou novo candidato alem desses itens; `commander_reference_deck_analysis`
+  e as tabelas de candidate quality/jobs/cache/telemetry foram separadas como
+  controles positivos por terem leitores runtime, writes e/ou runners dedicados
+  confirmados. `deck_learning_events` e `commander_card_usage` aparecem somente
+  em docs historicos neste checkout, nao em `server/database_setup.sql` nem no
+  codigo Dart runtime.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

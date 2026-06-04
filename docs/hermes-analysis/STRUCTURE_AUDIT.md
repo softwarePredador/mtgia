@@ -1,7 +1,170 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-04 11:00 UTC
-> Rotacao: `broken-imports-and-circular-dependencies`
+> Atualizacao local Codex: 2026-06-04 15:00 UTC
+> Rotacao: `postgresql-tables-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: PostgreSQL tables not used — revalidacao 2026-06-04 15:00 UTC
+
+Escopo desta rodada: somente tabelas PostgreSQL sem consumidor claro,
+write-only ou com consumo parcial. Nao foi feita auditoria ampla de classes,
+funcoes, imports/ciclos, duplicacao ou coerencia entre modulos fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `92281194`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 170.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 100.
+- Imports quebrados: 1.
+
+Limitacao para esta rotacao: o auditor e textual, cobre `server/lib` e
+`server/routes` para o inventario principal, e lista tabelas referenciadas sem
+distinguir consumidor produtivo, escrita, CTE, tabela temporaria ou tabela raw de
+lineage. A execucao tambem reescreve `STRUCTURE_AUDIT.md` com inventario amplo
+fora do foco; essa alteracao gerada foi descartada para preservar o historico
+manual, mantendo abaixo somente achados focados e validados.
+
+### Metodo manual focado
+
+- `rg` direto para as tabelas candidatas historicas em `server/lib`,
+  `server/routes`, `server/bin`, `server/test`, `server/database_setup.sql` e
+  `app/lib`.
+- Varredura auxiliar de operacoes SQL (`CREATE TABLE`, `INSERT INTO`, `FROM`,
+  `JOIN`, `UPDATE`, `DELETE FROM`) em `server/lib`, `server/routes` e
+  `server/bin`, seguida de triagem manual para separar tabelas reais de CTEs,
+  temp tables, aliases e comentarios.
+- Consulta ao contrato app-facing em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  para validar se a tabela aparece como dependency declarada sem consumidor
+  correspondente.
+
+### Achados revalidados
+
+#### P2 — `deck_matchups` continua write-only no produto atual
+
+- **Tabela:** `deck_matchups`.
+- **DDL encontrado:** `server/database_setup.sql:162`.
+- **Escrita encontrada:** `server/routes/ai/simulate-matchup/index.dart:360`
+  faz `INSERT INTO deck_matchups (...) ON CONFLICT (...) DO UPDATE`.
+- **Leitura encontrada:** nenhuma ocorrencia de `SELECT ... FROM deck_matchups`,
+  `JOIN deck_matchups`, `UPDATE deck_matchups` ou `DELETE FROM deck_matchups`
+  em `server/lib`, `server/routes`, `server/bin`, `server/test` ou `app/lib`;
+  `server/bin/update_schema.dart:16` apenas derruba a tabela em script legado e
+  `server/bin/verify_schema.dart:78` so verifica schema esperado.
+- **Por que parece nao usada:** a rota calcula `winRate`/analise em memoria e
+  retorna a resposta imediatamente; os campos persistidos
+  `deck_matchups.win_rate` e `deck_matchups.notes` nao alimentam cache,
+  historico, ranking, UI ou nova simulacao.
+- **O que valida:** criar consumidor real de `deck_matchups`, por exemplo
+  historico/cached matchup, dashboard ou reuso na simulacao, com contrato e
+  teste.
+- **O que falsifica:** encontrar `SELECT`/`JOIN` real sobre `deck_matchups` em
+  rota/lib/job consumido pelo produto ou por rotina operacional documentada.
+
+#### P2 — `deck_weakness_reports` acumula registros sem fluxo de leitura ou resolucao
+
+- **Tabela:** `deck_weakness_reports`.
+- **DDL encontrado:** `server/database_setup.sql:363` e migration redundante em
+  `server/bin/migrate_create_missing_tables.dart:97`.
+- **Escrita encontrada:** `server/routes/ai/weakness-analysis/index.dart:374`
+  faz `INSERT INTO deck_weakness_reports (...) ON CONFLICT DO NOTHING`.
+- **Leitura encontrada:** nenhuma ocorrencia de `SELECT ... FROM
+  deck_weakness_reports`, `JOIN deck_weakness_reports`, `UPDATE
+  deck_weakness_reports` ou `DELETE FROM deck_weakness_reports` em `server/lib`,
+  `server/routes`, `server/bin`, `server/test` ou `app/lib`; as demais
+  ocorrencias sao indices/schema em `database_setup.sql`, migration e
+  `verify_schema`.
+- **Por que parece nao usada:** a rota retorna as fraquezas calculadas na propria
+  chamada, mas a tabela persistida nao e consultada depois para historico,
+  deduplicacao, status de resolucao, trends ou feedback de melhoria.
+- **O que valida:** endpoint/job que leia reports por deck, marque resolucao ou
+  use a serie historica para melhorar recomendacoes.
+- **O que falsifica:** consumidor runtime/documentado lendo
+  `deck_weakness_reports` fora da chamada que insere.
+
+#### P3 — `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional
+
+- **Tabela:** `ml_prompt_feedback`.
+- **DDL encontrado:** `server/bin/migrate_ml_knowledge.dart:159`.
+- **Escrita potencial:** `server/lib/ml_knowledge_service.dart:251` define
+  `recordFeedback(...)` e `:264` faz `INSERT INTO ml_prompt_feedback (...)`.
+- **Evidencia de ausencia de chamador:** busca por `recordFeedback(` em
+  `server` e `app` encontrou somente a propria definicao; nao ha rota/app/job
+  chamando o helper.
+- **Leitura encontrada:** `server/routes/ai/ml-status/index.dart:98` executa
+  apenas `SELECT COUNT(*)::int as c FROM ml_prompt_feedback`.
+- **Por que e uso insuficiente:** a tabela tem intencao de feedback de usuario
+  para refinar prompts, mas nesta branch nao ha ingestao real nem consumo do
+  conteudo; o status conta linhas se elas existirem, sem fechar loop de produto.
+- **O que valida:** rota/app/job de feedback chamar `recordFeedback` e outro
+  fluxo consumir esse feedback para prompt/modelo, com teste de contrato.
+- **O que falsifica:** chamada runtime nova a `recordFeedback(...)` ou query que
+  use `cards_accepted`, `cards_rejected`, `effectiveness_score` ou
+  `user_comment`.
+
+#### P3 — Raw corpus de Commander Reference e persistido, mas o produto le somente o agregado
+
+- **Tabelas:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **DDL encontrado:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1177`
+  e `:1200`.
+- **Escritas encontradas:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1245`
+  insere em `commander_reference_decks`; `:1329` apaga cards antigos por
+  `source_deck_key`; `:1345` insere em `commander_reference_deck_cards`.
+- **Leitura encontrada:** nenhuma ocorrencia de `FROM/JOIN
+  commander_reference_decks` ou `FROM/JOIN commander_reference_deck_cards` em
+  `server/lib`, `server/routes`, `server/bin`, `server/test` ou `app/lib`. O
+  caminho consumido pelo produto le `commander_reference_deck_analysis` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:389`.
+- **Por que e consumo parcial, nao necessariamente lixo:** as raw tables podem
+  ser lineage/audit do corpus, e o agregado `commander_reference_deck_analysis`
+  tem escrita em `:1394` e leitura real em `:389`. O problema e que o contrato
+  atual (`server/doc/API_CONTRACTS_AND_DATA_MAP.md:167`) lista as raw tables como
+  fonte de `POST /ai/generate`, apesar de o runtime desta branch consumir apenas
+  o agregado.
+- **O que valida:** documentar as raw tables como lineage/audit com politica de
+  retencao, ou adicionar job/rota que leia raw decks/cards para reprocessamento,
+  debug ou explicabilidade.
+- **O que falsifica:** `SELECT`/`JOIN` real sobre as tabelas raw em rota/lib/job
+  runtime, ou ajuste contratual que deixe claro que o app-facing path depende
+  somente de `commander_reference_deck_analysis`.
+
+### Controles positivos e candidatos descartados
+
+- A varredura auxiliar de operacoes SQL confirmou leitores runtime ou runners
+  dedicados para as tabelas candidatas historicamente ruidosas:
+  `battle_simulations`, `format_staples`, `archetype_counters`,
+  `archetype_patterns`, `synergy_packages`, `activation_funnel_events`,
+  `ai_user_preferences`, `card_function_tags`, `card_role_scores`,
+  `card_semantic_tags_v2`, `commander_card_synergy`,
+  `optimize_rejection_penalties`, `optimization_analysis_logs`,
+  `ai_optimize_cache`, `ai_optimize_jobs` e `ai_generate_jobs`.
+- `commander_reference_deck_analysis` foi descartada como nao usada porque tem
+  escrita em `server/lib/ai/commander_reference_deck_corpus_support.dart:1394`
+  e leitura real em `:389`.
+- `deck_learning_events` e `commander_card_usage` aparecem em docs historicos,
+  mas nao aparecem em `server/database_setup.sql`, `server/lib`,
+  `server/routes` ou `server/bin` neste checkout; nao foram promovidas como
+  tabelas PostgreSQL atuais desta branch.
+- A varredura regex produz falsos positivos para CTEs, tabelas temporarias,
+  aliases e comentarios (`SET`, `UNIQUE`, `tmp_*`, `filtered_sets`, `latest`,
+  etc.); esses itens nao foram tratados como tabelas PostgreSQL de produto.
+
 
 ## Rodada focada: Broken imports and circular dependencies — revalidacao 2026-06-04 11:00 UTC
 

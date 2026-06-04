@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-04 11:00 UTC
+> Data: 2026-06-04 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -27,7 +27,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `commander_reference_generate_fallback_support.dart` foi classificada como
    allowed-with-caution se permanecer declarada/versionada como seed de fallback,
    nao como regra global de utilidade.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-03 15:00 UTC no checkout `0ecce9f6`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-04 15:00 UTC no checkout `92281194`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-04 03:00 UTC. `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
