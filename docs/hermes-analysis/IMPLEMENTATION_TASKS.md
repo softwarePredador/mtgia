@@ -1,10 +1,188 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
-
-> **Gerado:** 2026-06-04T17:30Z por ManaLoom Knowledge Synthesis (Cron)
+> **Gerado:** 2026-06-04T22:00Z por ManaLoom Knowledge Synthesis (Cron #7)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** 03e09d30
-> **Metodo:** Cruzamento do conhecimento MTG (Domain Skill v3.7, Gap 17, Scout #29, GAME_CHANGERS #5, Logic Coherence Audit, MANA_BASE_VALIDATION) com codigo Dart
-> **Base de conhecimento:** Domain Skill Gaps 6/9/17 + Scout Exec#29 + Pipeline Audit v3.7 + Game Changer Research #5 + Logic Coherence Audit + Master commits 70e170f0..e8b610fc
+> **HEAD:** 54480471
+> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Skill v3.8, VALIDATOR_LOG v3.23, MANA_BASE_VALIDATION 2026-06-04, THEMES.md, STRUCTURE_AUDIT PostgreSQL, GAME_CHANGERS.md) com codigo Dart (edh_bracket_policy, optimization_quality_gate, deck_rules_service, functional_card_tags, optimization_functional_roles, card_validation_service, optimize_runtime_support)
+> **Base de conhecimento:** VALIDATOR_LOG v3.23 (CMC corruption) + MANA_BASE_VALIDATION_REPORT (per-commander land ranges) + tag_accuracy 8-day stagnation + Commander Knowledge Skill §Lorehold cEDH pivot + THEMES.md (per-theme role targets) + STRUCTURE_AUDIT (write-only tables)
+> **Novas tasks nesta execução:** 4 (2×P1, 2×P2) — CMC integrity, combo archetype rules, tag accuracy auto-healing, commander land ranges
+
+---
+
+### [P1] Deck Import: Validar CMC das cartas importadas contra a tabela `cards` do PostgreSQL — previne corrupção de dados que afeta toda a pipeline de análise
+
+**Conhecimento MTG:** O VALIDATOR_LOG v3.23 (2026-06-02) documenta corrupção massiva de CMC na importação do deck Lorehold: 14+ cartas com `CMC=0.0` (Sol Ring, Mana Vault, Boros Signet, Orim's Chant, etc.) e 6 cartas com `CMC=NULL` (Aetherflux Reservoir, Past in Flames, Electroduplicate, etc.). A CMC média reportada de 2.15 é subestimada — a CMC real do deck está ~2.8-3.0. Todos os cálculos downstream (curva de mana, Mulligan Simulation T3, GoldfishSimulator keepable, quality gate ΔCMC) são afetados.
+
+**Evidencia no código:**
+- `server/lib/deck_rules_service.dart:412-447` — `_loadCardsData()` consulta `id, name, type_line, oracle_text, colors, color_identity, mana_cost` da tabela `cards` do PG, mas **não consulta `cmc`**. A classe `_CardData` (linhas 484-502) não tem campo `cmc`.
+- `server/lib/card_validation_service.dart:67-80` — `_findCard()` consulta apenas `id, name`. Sem validação de CMC.
+- `server/lib/ai/optimization_quality_gate.dart:459-465` — `_getCmc()` retorna `0` silenciosamente quando `cmc` é `null` ou inválido, propagando dados corrompidos para o quality gate.
+- `rg "cmc" server/lib/deck_rules_service.dart server/lib/card_validation_service.dart` → **ZERO resultados**. Nenhum serviço de validação verifica CMC.
+
+**Gap:** Quando um deck é importado (via script Python ou API), os valores de CMC nas cartas não são validados contra a tabela `cards` do PostgreSQL (fonte autoritativa com 33.795 cartas). Cartas com CMC=0.0 ou CMC=NULL são aceitas sem warning, corrompendo todos os cálculos downstream: GoldfishSimulator (keepable/T3 rate inflado), quality gate (ΔCMC errado), filler loader (curva de mana errada), e mana base validator.
+
+**Impacto:** `P1` — Dados corrompidos em cadeia. Swaps podem ser aprovados/rejeitados baseados em ΔCMC errado. O Mulligan Simulation reporta T3 inflado (mascara color screw). A análise de curva de mana mostra valores incorretos para o usuário. O problema é silencioso — não há logs, warnings, ou alertas.
+
+**Risco:** P1 — Corrupção de dados se propaga para todas as camadas de análise sem detecção. Afeta diretamente a confiabilidade do optimize pipeline e da exibição de métricas para o usuário.
+
+**Ação recomendada:**
+1. Adicionar campo `final double? cmc` à classe `_CardData` em `deck_rules_service.dart:484-502`
+2. Adicionar `cmc` ao SELECT em `_loadCardsData()` (linha 415): `SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc`
+3. Em `_getCmc()` (optimization_quality_gate.dart:459-465), adicionar `developer.log` warning quando CMC é null/zero para cartas não-land:
+   ```dart
+   if (cmc == null || (cmc is num && cmc == 0)) {
+     developer.log('WARNING: card has null/zero CMC', name: card['name']);
+   }
+   ```
+4. Criar `validateCardCmc()` em `card_validation_service.dart` que compara o CMC importado contra o CMC do PG e retorna warning se diferir
+5. No script Python de importação (`auto_sync_learned_decks.py`), sempre consultar `cards.cmc` do PG e usar esse valor como autoritativo
+
+**Validação:**
+```bash
+cd server && dart analyze lib/deck_rules_service.dart
+cd server && dart analyze lib/card_validation_service.dart
+cd server && dart analyze lib/ai/optimization_quality_gate.dart
+cd server && dart test test/deck_rules_service_test.dart
+```
+
+---
+
+### [P1] Quality Gate: Adicionar regras específicas para o arquétipo 'combo' em `_criticalRolesForArchetype` e `_looksLikeOffThemeRoleSwap`
+
+**Conhecimento MTG:** O deck Lorehold sofreu pivot de spellslinger para cEDH stax-combo (documentado em VALIDATOR_LOG v3.23 e Commander Knowledge Deep #34-38). Decks combo têm papéis críticos diferentes de aggro/midrange/control: tutores, engines, wincons e proteção são essenciais; remoção e ramp são secundários. O Domain Skill documenta que decks combo priorizam velocidade e consistência do combo sobre interação com o board.
+
+**Evidencia no código:**
+- `server/lib/ai/optimization_quality_gate.dart:346-353` — `_criticalRolesForArchetype()` tem casos para 'aggro', 'control', 'midrange', e default `{'removal', 'ramp'}`. **Não há caso para 'combo'**. Quando o deck é classificado como combo, cai no default que trata remoção e ramp como críticos — errado para combo.
+- `server/lib/ai/optimization_quality_gate.dart:355-382` — `_looksLikeOffThemeRoleSwap()` tem casos para 'aggro', 'control', 'midrange', e **sem default explícito** (retorna `false`). Swaps off-theme em decks combo nunca são detectados.
+- `server/lib/ai/optimization_quality_gate.dart:170-176` — `_recommendedLandCountForArchetype()` retorna 33 lands para combo (correto para cEDH combo).
+- `server/lib/ai/optimization_quality_gate.dart:232-244` — `_isStructuralRecoveryUpgrade()` tem casos para 'control', 'midrange', 'aggro', e default. 'combo' cai no default que é razoável, mas não otimizado.
+
+**Gap:** Decks combo (incluindo cEDH stax-combo, turbo-naus, etc.) são avaliados contra papéis críticos genéricos (`removal`, `ramp`). Na realidade, decks combo precisam de: `tutor` (encontrar peças), `engine` (gerar valor), `wincon` (finalizar), `protection` (proteger o combo). O quality gate atual bloquearia um swap que troca remoção por tutor em deck combo (porque perde `removal` que é marcado como crítico), quando na verdade esse swap MELHORA o deck combo.
+
+**Impacto:** `P1` — Swaps corretos para decks combo são bloqueados; swaps incorretos podem ser aprovados. Com o pivot do deck Lorehold para cEDH combo, este gap é empiricamente relevante AGORA (não é teórico). O optimize pipeline pode recomendar cortar tutores/engines por achar que remoção é mais importante.
+
+**Risco:** P1 — Decisões incorretas do quality gate para um arquétipo inteiro (combo). Afeta todos os decks classificados como combo, não apenas Lorehold.
+
+**Ação recomendada:**
+1. Adicionar caso 'combo' em `_criticalRolesForArchetype`:
+   ```dart
+   'combo' => {'tutor', 'engine', 'wincon', 'protection'},
+   ```
+2. Adicionar caso 'combo' em `_looksLikeOffThemeRoleSwap`:
+   ```dart
+   if (normalized == 'combo' &&
+       {'tutor', 'engine', 'wincon', 'protection'}.contains(removedRole) &&
+       !{'tutor', 'engine', 'wincon', 'protection', 'ramp', 'draw'}.contains(addedRole)) {
+     return true;
+   }
+   ```
+3. Adicionar caso 'combo' em `_isStructuralRecoveryUpgrade` para permitir swaps land→tutor/engine/wincon em recuperação estrutural
+4. Atualizar `_recommendedLandCountForArchetype` para diferenciar 'combo' (33 lands, ok) de 'cEDH' (27-30 lands) — manter 33 como fallback seguro
+
+**Validação:**
+```bash
+cd server && dart analyze lib/ai/optimization_quality_gate.dart
+cd server && dart test test/ai/optimization_quality_gate_test.dart
+```
+
+---
+
+### [P2] Tag Accuracy Auto-Healing: Backend deve ler `tag_accuracy` do SQLite e disparar reavaliação de tags com baixa precisão
+
+**Conhecimento MTG:** A tabela `tag_accuracy` no SQLite (`knowledge.db`) coleta métricas de qualidade da classificação funcional de cartas desde 2026-05-26. Dados atuais (2026-06-04):
+- `last_updated` máximo = `2026-05-27T17:44:36Z` — **8+ dias sem atualizações**
+- `payoff`: 11/31 corretos = **35.5% precisão** (worse tag)
+- `enabler`: 21/42 corretos = **50% precisão**
+- `wincon`: 6/8 corretos = 75%
+- `protection`: 9/13 corretos = 69%
+- `false_positive` e `false_negative` = **ZERO para TODAS as 22 linhas** (nunca foram preenchidos)
+- **18 tags distintas** sem entrada em `tag_accuracy` (45% da taxonomia de 40 tags efetivas não monitorada)
+
+O Commander Knowledge Skill documenta este congelamento desde 2026-06-04 como "8-Day Stagnation".
+
+**Evidencia no código:**
+- `rg "tag_accuracy" server/lib/ server/routes/` → **ZERO resultados**. Nenhum arquivo Dart lê ou escreve na tabela `tag_accuracy`.
+- `server/lib/ai/functional_card_tags.dart:432-465` — `summarizeFunctionalTagsForDeck()` classifica cartas mas nunca verifica `tag_accuracy` para saber se a tag aplicada tem baixa precisão histórica.
+- `server/lib/ai/optimization_functional_roles.dart:55-124` — `classifyOptimizationFunctionalRole()` aplica tags sem consultar qualidade histórica.
+- `server/lib/ai/optimize_runtime_support.dart:2133-2200` — `inferFunctionalRole()` idem.
+
+**Gap:** O sistema coleta dados de qualidade de classificação (`tag_accuracy`) mas nunca age sobre eles. Tags com 35.5% de precisão continuam sendo aplicadas sem warning. O pipeline de classificação não tem ciclo de feedback: classifica → mede qualidade → reavalia tags ruins → melhora. A qualidade da classificação está efetivamente congelada desde 27 de Maio.
+
+**Impacto:** `P2` — Classificação de cartas não melhora com o tempo. Cartas mal classificadas (35.5% de precisão em `payoff`) geram recomendações de swap incorretas, análises de deck imprecisas, e métricas de role (ramp/draw/removal) erradas para o usuário.
+
+**Risco:** P2 — Melhoria de qualidade. O sistema funciona sem isso, mas a precisão da classificação estagna. Afeta indiretamente a confiabilidade das recomendações de swap.
+
+**Ação recomendada:**
+1. Criar `tag_accuracy_service.dart` que:
+   - Lê `tag_accuracy` do SQLite (`knowledge.db`) para encontrar tags com `correct_count/total_count < 0.70`
+   - Para cada tag de baixa precisão, identifica cartas no PG `card_function_tags` ou SQLite `deck_cards` que têm essa tag
+   - Dispara re-classificação dessas cartas usando `inferFunctionalCardTags()` com heurísticas atualizadas
+   - Atualiza `tag_accuracy` com novos `correct_count`, `total_count`, `false_positive`, `false_negative`
+   - Atualiza `last_updated` timestamp
+2. Integrar ao cron `manaloom-tag-accuracy-reporter` ou criar endpoint `POST /api/tag-accuracy/re-evaluate`
+3. (Futuro P3) Adicionar coluna `auto_re_evaluated_at` para tracking
+
+**Validação:**
+```bash
+cd server && dart analyze lib/ai/tag_accuracy_service.dart
+# Verificar que tag_accuracy.last_updated avançou após execução
+python3 -c "
+import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+rows = conn.execute('SELECT tag_name, correct_count, total_count, last_updated FROM tag_accuracy WHERE total_count > 0 ORDER BY CAST(correct_count AS REAL)/total_count ASC LIMIT 5').fetchall()
+for r in rows: print(r)
+"
+```
+
+---
+
+### [P2] Quality Gate: Substituir `_recommendedLandCountForArchetype` hardcoded por consulta ao PG `commander_reference_profiles`
+
+**Conhecimento MTG:** O MANA_BASE_VALIDATION_REPORT (2026-06-04) compara decks contra perfis EDHREC com ranges de lands por comandante:
+- Aesi, Tyrant of Gyre Strait: lands **39-43** (landfall commander)
+- Korvold, Fae-Cursed King: lands **34-37**
+- Winota, Joiner of Forces: lands **31-35** (aggro)
+- Atraxa, Praetors' Voice: lands **35-38**
+
+O THEMES.md documenta que landfall precisa de 15-20 ramp + 39-43 lands, enquanto cEDH combo precisa de 27-33. O valor genérico de 35 lands mascara necessidades reais de decks específicos.
+
+**Evidencia no código:**
+- `server/lib/ai/optimization_quality_gate.dart:170-176` — `_recommendedLandCountForArchetype()` retorna valores hardcoded: aggro=34, combo=33, control=37, default=35.
+- `server/lib/ai/optimization_quality_gate.dart:178-200` — `_computeLandTrimContext()` usa `_recommendedLandCountForArchetype` para calcular `excessLands`. Se o valor recomendado está errado, o `landTrimUpgrade` (linha 84-88) aprova/rejeita swaps incorretamente.
+- `server/lib/ai/optimize_runtime_support.dart:3820-3846` — `loadCommanderReferenceProfileFromCache()` **já existe** e carrega `profile_json` com `role_targets` incluindo `lands: {min, max}`. Mas `_recommendedLandCountForArchetype()` **não a chama**.
+
+**Gap:** Um deck Aesi com 40 lands (dentro do range ideal de 39-43) seria tratado pelo quality gate como tendo `excessLands = 40 - 35 = 5` (usando o default 35). O gate poderia aprovar swaps que removem lands de um deck que PRECISA de mais lands. Similarmente, um deck Winota com 31 lands (dentro do range 31-35) seria tratado como `excessLands = 31 - 35 = -4` (déficit), potencialmente bloqueando swaps spell→land que o deck precisa.
+
+**Impacto:** `P2` — O quality gate toma decisões de land trim baseadas em valores genéricos que não refletem o comandante específico. Decks landfall são penalizados; decks aggro são tratados como se precisassem de mais lands. O `landTrimUpgrade` (uma das poucas exceções que permitem land→spell swaps) é aplicado incorretamente.
+
+**Risco:** P2 — Melhoria de precisão. O sistema funciona com os valores genéricos, mas produz falsos positivos/negativos para comandantes com necessidades de land atípicas.
+
+**Ação recomendada:**
+1. `_computeLandTrimContext()` deve aceitar parâmetro opcional `String? commanderName`
+2. Se `commanderName` for fornecido, chamar `loadCommanderReferenceProfileFromCache()` para obter `role_targets.lands` (min/max)
+3. Usar `(min + max) ~/ 2` como `recommendedLandCount` quando disponível
+4. Fallback para `_recommendedLandCountForArchetype()` hardcoded quando perfil não existir
+5. Atualizar callers: `filterUnsafeOptimizeSwapsByCardData` precisa receber `commanderName` (ou extraí-lo dos commanders do deck)
+
+**Validação:**
+```bash
+cd server && dart analyze lib/ai/optimization_quality_gate.dart
+cd server && dart analyze lib/ai/optimize_runtime_support.dart
+cd server && dart test test/ai/optimization_quality_gate_test.dart
+```
+
+---
+
+## Resumo de Tasks Novas (2026-06-04 @ 54480471 — Cron #7)
+
+| # | Prioridade | Task | Origem |
+|:-:|:----------|:-----|:-------|
+| 1 | P1 | Deck Import: Validar CMC contra PG `cards` e adicionar warning em `_getCmc()` | VALIDATOR_LOG v3.23 (CMC corruption) |
+| 2 | P1 | Quality Gate: Adicionar regras para arquétipo 'combo' em `_criticalRolesForArchetype` | Lorehold cEDH pivot + Commander Knowledge |
+| 3 | P2 | Tag Accuracy Auto-Healing: Backend lê `tag_accuracy` do SQLite e dispara reavaliação | tag_accuracy frozen 8+ days (SQLite data) |
+| 4 | P2 | Quality Gate: Usar PG `commander_reference_profiles` para land ranges em vez de hardcoded | MANA_BASE_VALIDATION_REPORT (per-commander lands) |
+
+> **Nota:** Tasks #1 e #4 são complementares — ambas abordam a qualidade dos dados (CMC integrity na importação, land ranges no quality gate).
+> **Nota:** Task #2 é empiricamente validada pelo pivot do Lorehold para cEDH combo (não é teórico).
+> **Nota:** Task #3 aborda o congelamento do pipeline de qualidade de classificação (8+ dias sem atualizações em `tag_accuracy`).
 
 ---
 
