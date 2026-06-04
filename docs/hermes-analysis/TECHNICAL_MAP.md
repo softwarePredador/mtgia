@@ -164,6 +164,16 @@ mtgia/
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado novamente em 2026-06-03 05:30 UTC no checkout `9a41032b`. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas. O contexto de optimize e o validator/role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags` persistidos nesse caminho; candidate quality tem uso parcial de `card_function_tags` em SQL de sinais. `semantic_tags_v2` tambem e colapsado em um role unico no optimize, enquanto candidate quality usa outro mapa de normalizacao e bonus por nome. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam legacy/experimentais ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
 - **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-03 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases/localized import e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed/profile versionado, o perfil Lorehold de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
+- **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado em
+  2026-06-04 03:00 UTC no checkout local `1c082553`. `LifeCounterScreen` segue
+  legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
+  `DeckCard` e `DeckProgressChip` nao tem uso runtime confirmado nas listagens;
+  `LotusPresentationMode` nao e importado/chamado pelo Lotus; e
+  `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface` aparecem somente no
+  proprio `auth_visual_shell.dart`. Controles positivos descartaram
+  `LotusLifeCounterScreen`, `DeckProgressIndicator`, observers, scanner classes
+  com chamadores e candidatos backend com chamadas em rotas/services/bin/tests.
+
 ## Pipeline semantico de cartas
 
 Fluxo desejado para qualquer decisao de utilidade no core de decks:

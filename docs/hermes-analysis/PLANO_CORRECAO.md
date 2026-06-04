@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-03 19:00 UTC
+> Data: 2026-06-04 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -27,11 +27,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    fonte/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-03 15:00 UTC no checkout `0ecce9f6`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-03 03:00 UTC. `LifeCounterScreen` segue
+   na rotacao local Codex de 2026-06-04 03:00 UTC. `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
    `DeckCard` continua testado mas sem import/chamada na listagem real;
    `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
-   nao tem import nem chamada para `enter()`/`exit()`.
+   nao tem import nem chamada para `enter()`/`exit()`; `AuthVisualShell`,
+   `AuthBrandHeader` e `AuthFormSurface` aparecem somente no proprio arquivo
+   `auth_visual_shell.dart`.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
    2026-06-03 05:30 UTC no checkout `9a41032b`. Deck analysis prefere
    `card_function_tags`; o contexto de optimize e o validator/role delta carregam
@@ -642,22 +644,16 @@ presentes e sem chamador runtime confirmado.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-03 03:00 UTC: REVALIDADO.**
+- **Status 2026-06-04 03:00 UTC: REVALIDADO/ABERTO.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:283` usa
     `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
-    `LifeCounterScreen(` apenas no construtor da propria classe.
-    `app/test/README.md:137` declara que a suite e legada de paridade historica
-    e que o caminho vivo segue em `LotusLifeCounterScreen`; `:149` declara que
-    o caminho oficial do contador nao e
-    mais `LifeCounterScreen`; os testes
-    `app/test/features/home/life_counter_screen_test.dart:9` e
-    `app/test/features/home/life_counter_clone_proof_test.dart:10` importam a
-    tela legada e instanciam `LifeCounterScreen` em
-    `life_counter_screen_test.dart:36` e
-    `life_counter_clone_proof_test.dart:277`-`:280`, mas nao provam chamada no
-    runtime roteado.
+    `LifeCounterScreen(` apenas no construtor da propria classe. Os testes
+    `app/test/features/home/life_counter_screen_test.dart:1`-`:2` e
+    `app/test/features/home/life_counter_clone_proof_test.dart:1`-`:2`
+    declaram que sao suites legadas e que a cobertura viva mira
+    `LotusLifeCounterScreen`; ambos ainda importam e instanciam a tela legada.
   - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
     busca por import de `deck_card.dart` em `app/lib` nao retornou ocorrencias,
     e a busca por `DeckCard(` em `app/lib` encontrou somente o construtor.
@@ -665,7 +661,8 @@ presentes e sem chamador runtime confirmado.
     `app/test/features/decks/widgets/deck_card_test.dart:4`/`:9` e
     `app/test/features/decks/widgets/deck_card_overflow_test.dart:4`/`:47`.
     As listagens reais usam widgets privados/locais como `_RecentDeckCard`,
-    `_CommunityDeckCard`, `_FollowingDeckCard` e `_DeckGalleryCard`.
+    `_CommunityDeckCard`, `_FollowingDeckCard`, `_DeckGalleryCard` e
+    `_EmptyDeckCard`.
   - `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` define
     `DeckProgressChip`, sem ocorrencias alem do construtor em `app/lib`,
     `app/test` e `app/integration_test`. `DeckProgressIndicator` no mesmo
@@ -673,23 +670,28 @@ presentes e sem chamador runtime confirmado.
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
     `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
     `app/lib`, `app/test` ou `app/integration_test`.
+  - `app/lib/features/auth/widgets/auth_visual_shell.dart:5`, `:105` e `:196`
+    definem `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface`; busca por
+    esses simbolos e por `auth_visual_shell.dart` em arquivos Dart encontrou
+    apenas definicoes/construtores no proprio arquivo.
   - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
     `DeckProgressIndicator` seguem ativos; `PerformanceNavigatorObserver`,
-    `AppObservabilityNavigatorObserver` e `CardRecognitionService` foram
-    descartados como candidatos porque tem chamadas em `app/lib`.
+    `AppObservabilityNavigatorObserver`, classes do scanner com chamadores reais
+    e candidatos backend como `PushNotificationService`, `DistributedRateLimiter`,
+    `MarketMoversCache`, `MatchupAnalyzer` e `SynergyEngine` foram descartados.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
 - **Ação recomendada**:
   1. decidir se `LifeCounterScreen` e fixture/harness legado ou deve ser removido
      em favor do Lotus runtime;
-  2. remover `DeckCard`, `DeckProgressChip` e `LotusPresentationMode` se nao
-     houver plano imediato de reconectar essas classes;
+  2. remover ou reconectar `DeckCard`, `DeckProgressChip`, `LotusPresentationMode`
+     e o shell auth (`AuthVisualShell`/`AuthBrandHeader`/`AuthFormSurface`);
   3. atualizar/remover testes que hoje exercitam widgets fora do runtime real.
 - **Validação**:
-  - `grep -RIn --include='*.dart' '\bLifeCounterScreen\b\|\bDeckCard\b\|\bDeckProgressChip\b\|\bLotusPresentationMode\b' app/lib app/test app/integration_test`
+  - `rg -n '\b(LifeCounterScreen|DeckCard|DeckProgressChip|LotusPresentationMode|AuthVisualShell|AuthBrandHeader|AuthFormSurface)\b|auth_visual_shell\.dart' app/lib app/test app/integration_test --glob '*.dart'`
     mostra apenas classes intencionalmente mantidas;
-  - `flutter analyze --no-pub --no-fatal-infos` e suites focadas de decks/life
+  - `flutter analyze --no-pub --no-fatal-infos` e suites focadas de decks/auth/life
     counter seguem verdes apos remocao ou reconexao.
 
 ## Sequência sugerida
