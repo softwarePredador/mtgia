@@ -17973,3 +17973,22 @@ Retenção recomendada: DELETE > 90 dias para evitar acúmulo sem consumidor.
 - Bracket expansion: 5 novas categorias (boardWipe, cardAdvantage, stax, protection, valueEngine) — 53/53 GCs detectados
 - `card_deck_profiles` (670 perfis) integrado ao `filterUnsafeOptimizeSwapsByCardData`
 - `_looksLikePayoff` expandido para detectar payoffs de dano direto (Impact Tremors, Guttersnipe)
+
+## 2026-06-04 — Hermes AWS operational audit
+
+Hermes AWS foi validado como camada residente de auditoria/aprendizado, com
+correções operacionais aplicadas no servidor:
+
+- `jobs.json` voltou a ser legível pelo usuário `hermes`;
+- crontab externo ao Hermes foi desativado;
+- jobs centrais do learning loop passaram a ser recorrentes:
+  `pull-learning-events` 30m, `auto-sync-learned-decks` 120m,
+  `auto-promote-learned` 360m;
+- scripts remotos de auto-sync/auto-promote foram alinhados ao `master`
+  `70e170f0`;
+- `mtgia-sync` foi atualizado para executar o importador strict atual;
+- product-code drift acidental na branch de memória foi revertido e preservado
+  como patch em `docs/hermes-analysis/ops-audits`.
+
+Relatório completo:
+`server/doc/HERMES_AWS_OPERATIONAL_AUDIT_2026-06-04.md`.
