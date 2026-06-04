@@ -69,6 +69,8 @@ Verifique somente os arquivos recebidos neste batch:
 - Padding/margin inconsistente entre telas similares.
 - Fonte/tamanho divergente do padrao premium ManaLoom.
 - Card, borda, sombra ou background fora do padrao Meus Decks/Home.
+- Botao, tab, chip ou input com cor/texto de Material default.
+- Proporcao ou hierarquia de card/modal suspeita quando inferivel pelo codigo.
 
 ### C. Estados
 - Loading, erro, vazio ou disabled ausente.
@@ -86,6 +88,11 @@ Verifique somente os arquivos recebidos neste batch:
 ### F. Acessibilidade
 - Contraste suspeito.
 - Elemento interativo custom sem Semantics/Tooltip.
+
+### G. Limite do auditor
+- Nao declarar PASS visual sem screenshot do iPhone Simulator.
+- Se o problema depender de proporcao, seam de imagem, poluicao visual ou cor
+  renderizada, registrar como "precisa de prova viva".
 
 Saida obrigatoria por finding:
 - [P0/P1/P2] arquivo:linha - descricao - sugestao

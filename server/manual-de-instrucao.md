@@ -3,6 +3,50 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-04 — Gate premium de validacao visual
+
+Motivo:
+
+- A auditoria UI estatica/Hermes encontrava cores diretas, touch targets e
+  problemas objetivos, mas nao validava no nivel exigido por produto: proporcao
+  real dos cards, planos de fundo, seams de imagem, tipografia, cor de texto em
+  botoes/tabs, poluicao visual e coerencia com `Meus Decks`.
+- Para evitar falso `PASS`, qualquer decisao visual app-facing passa a exigir
+  gate estatico premium + prova viva no iPhone Simulator.
+
+Patch aplicado:
+
+- Criado `server/config/premium_visual_qa_surfaces.json` com matriz de telas,
+  arquivos, capturas obrigatorias e foco de revisao.
+- Criado `server/bin/premium_visual_audit.py` e wrapper
+  `server/bin/premium_visual_audit.sh`.
+- Criado `docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md`.
+- Baseline atual gerada em
+  `docs/qa/manaloom_premium_visual_audit_latest.md`.
+
+Comando:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+python3 server/bin/premium_visual_audit.py \
+  --include-life-counter \
+  --output docs/qa/manaloom_premium_visual_audit_latest.md
+```
+
+Resultado baseline:
+
+- `VISUAL_PREMIUM_QA_RESULT: signals=304 P1=0 P2=304 visual_pass=false`.
+- `visual_pass=false` e intencional: proporcao, background, legibilidade real,
+  poluicao visual e fidelidade ao mockup so podem ser aprovadas apos revisar
+  screenshots do iPhone Simulator.
+
+Regra operacional:
+
+- Sem screenshot revisado, usar no maximo `PASS_STATIC_ONLY` ou
+  `PASS_WITH_RISKS`, nunca `PASS` visual.
+- O gate premium aponta onde revisar; a correcao so deve ser feita quando o
+  screenshot confirmar drift real ou quando o sinal for claramente indevido.
+
 ## 2026-06-04 — Hermes UI audit cron endurecida
 
 Motivo:

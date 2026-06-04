@@ -1,0 +1,149 @@
+{
+  "schema_version": "manaloom_premium_visual_qa_surfaces_v1_2026_06_04",
+  "baseline_documents": [
+    "docs/MANALOOM_VISUAL_EXECUTION_BASE_2026-04-19.md",
+    "docs/qa/manaloom_layout_uniformity_audit_iphone15_2026-05-22.md",
+    "app/doc/UI_TEST_SURFACE_MAP.md"
+  ],
+  "baseline_rules": [
+    "Obsidian/slate surfaces; no loose bright/default Material surfaces.",
+    "Brass is the primary action color; Frost is support/informational only.",
+    "Cards use the same family as Meus Decks: dark surface, soft radius, restrained border/shadow, clear hierarchy.",
+    "Display typography is reserved for brand/headers/deck identity; dense utility UI uses the app UI font.",
+    "Buttons, tabs, chips, sheets and bottom navigation must use AppTheme tokens and consistent active/disabled states.",
+    "No screen gets a visual pass from static analysis alone; iPhone Simulator screenshots are required for app-facing changes."
+  ],
+  "capture_commands": {
+    "non_life_counter": "cd app && flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check",
+    "life_counter": "cd app && flutter test integration_test/life_counter_lotus_visual_capture_smoke_test.dart integration_test/life_counter_native_card_search_smoke_test.dart integration_test/life_counter_set_life_live_smoke_test.dart integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart -d <IPHONE_SIMULATOR_UDID> --dart-define=API_BASE_URL=<API_BASE_URL> --dart-define=PUBLIC_API_BASE_URL=<PUBLIC_API_BASE_URL> --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check"
+  },
+  "surfaces": [
+    {
+      "id": "auth",
+      "label": "Splash/Login/Cadastro",
+      "files": [
+        "app/lib/features/auth/screens/splash_screen.dart",
+        "app/lib/features/auth/screens/login_screen.dart",
+        "app/lib/features/auth/screens/register_screen.dart",
+        "app/lib/features/auth/widgets/auth_visual_shell.dart"
+      ],
+      "captures": ["00_splash", "01_login", "02_register_filled"],
+      "focus": ["logo nova", "splash/login coerentes", "CTA brass", "campos sem Material default", "contraste em labels e placeholders"]
+    },
+    {
+      "id": "home",
+      "label": "Home",
+      "files": ["app/lib/features/home/home_screen.dart"],
+      "captures": ["03_home"],
+      "focus": ["hero art sem seam/transparencia indevida", "card hero proporcional", "quick actions consistentes", "recent decks com cards da familia Meus Decks"]
+    },
+    {
+      "id": "decks",
+      "label": "Meus Decks",
+      "files": [
+        "app/lib/features/decks/screens/deck_list_screen.dart",
+        "app/lib/features/decks/widgets/deck_card.dart",
+        "app/lib/features/decks/widgets/deck_ui_components.dart"
+      ],
+      "captures": ["04_decks"],
+      "focus": ["baseline visual", "grid/cards ricos", "badges legiveis", "filtros/tabs ativos", "FAB/menus alinhados"]
+    },
+    {
+      "id": "deck_details",
+      "label": "Detalhes do Deck",
+      "files": [
+        "app/lib/features/decks/screens/deck_details_screen.dart",
+        "app/lib/features/decks/widgets/deck_details_overview_tab.dart",
+        "app/lib/features/decks/widgets/deck_analysis_tab.dart",
+        "app/lib/features/decks/widgets/deck_details_aux_widgets.dart",
+        "app/lib/features/decks/widgets/deck_details_actions.dart",
+        "app/lib/features/decks/widgets/deck_details_dialogs.dart"
+      ],
+      "captures": ["04b_deck_details"],
+      "focus": ["tabs coerentes", "cards de metricas", "legibilidade de analise", "CTA otimizar/adicionar", "graficos sem ruido visual"]
+    },
+    {
+      "id": "deck_create_generate_import",
+      "label": "Criar/Gerar/Importar Deck",
+      "files": [
+        "app/lib/features/decks/screens/deck_generate_screen.dart",
+        "app/lib/features/decks/screens/deck_import_screen.dart",
+        "app/lib/features/decks/widgets/deck_import_list_dialog.dart",
+        "app/lib/features/decks/widgets/deck_optimize_dialogs.dart",
+        "app/lib/features/decks/widgets/deck_optimize_sheet_widgets.dart"
+      ],
+      "captures": ["04a_create_deck_dialog", "04c_deck_import", "05_generate", "06_generate_preview"],
+      "focus": ["forms premium", "hierarquia de preview", "botoes primario/secundario", "empty/error states", "sem texto cru de backend"]
+    },
+    {
+      "id": "card_search",
+      "label": "Busca/Detalhe/Adicionar Carta",
+      "files": [
+        "app/lib/features/cards/screens/card_search_screen.dart",
+        "app/lib/features/cards/screens/card_detail_screen.dart",
+        "app/lib/features/cards/widgets/card_edition_metadata.dart",
+        "app/lib/features/decks/widgets/deck_add_cards_menu.dart",
+        "app/lib/features/decks/widgets/deck_card_edit_dialog.dart"
+      ],
+      "captures": ["sets_search_01_cards_results", "sets_search_02_card_detail", "card_add_commander_choice_modal"],
+      "focus": ["resultado identico ao mockup aprovado", "modal comandante guiado", "quantidade alinhada", "texto de botoes", "badges/sets legiveis"]
+    },
+    {
+      "id": "collection_binder_market",
+      "label": "Colecao/Fichario/Marketplace",
+      "files": [
+        "app/lib/features/collection/screens/collection_screen.dart",
+        "app/lib/features/collection/screens/sets_catalog_screen.dart",
+        "app/lib/features/collection/screens/set_cards_screen.dart",
+        "app/lib/features/collection/screens/latest_set_collection_screen.dart",
+        "app/lib/features/binder/screens/binder_screen.dart",
+        "app/lib/features/binder/screens/marketplace_screen.dart",
+        "app/lib/features/binder/widgets/binder_item_editor.dart"
+      ],
+      "captures": ["08_collection", "collection_01_binder", "collection_02_marketplace", "collection_04_sets_catalog", "sets_search_04_set_detail"],
+      "focus": ["menus nao deslocados", "tabs e filtros alinhados", "cards/empty states", "editor modal", "marketplace sem default colors"]
+    },
+    {
+      "id": "trades_messages_notifications",
+      "label": "Trades/Mensagens/Notificacoes",
+      "files": [
+        "app/lib/features/trades/screens/trade_inbox_screen.dart",
+        "app/lib/features/trades/screens/create_trade_screen.dart",
+        "app/lib/features/trades/screens/trade_detail_screen.dart",
+        "app/lib/features/messages/screens/message_inbox_screen.dart",
+        "app/lib/features/messages/screens/chat_screen.dart",
+        "app/lib/features/notifications/screens/notification_screen.dart"
+      ],
+      "captures": ["market_trade_05_trade_list", "market_trade_08_trade_chat", "messages_01_inbox", "messages_02_conversation", "market_trade_11_notifications"],
+      "focus": ["status chips", "linhas de conversa", "unread badges", "CTA/context menus", "empty/loading/error states"]
+    },
+    {
+      "id": "community_profile",
+      "label": "Comunidade/Perfil",
+      "files": [
+        "app/lib/features/community/screens/community_screen.dart",
+        "app/lib/features/community/screens/community_deck_detail_screen.dart",
+        "app/lib/features/social/screens/user_profile_screen.dart",
+        "app/lib/features/profile/profile_screen.dart"
+      ],
+      "captures": ["07_community", "09_profile", "profile_community_02_user_profile", "profile_community_05_community_deck_detail"],
+      "focus": ["feed/cards", "perfil proprio e publico", "badges sociais", "botoes seguir/editar", "hierarquia de texto"]
+    },
+    {
+      "id": "life_counter",
+      "label": "Life Counter/Lotus",
+      "files": [
+        "app/lib/features/home/life_counter_screen.dart",
+        "app/lib/features/home/lotus_life_counter_screen.dart",
+        "app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart",
+        "app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart"
+      ],
+      "captures": ["life_counter_lotus", "life_counter_card_search", "life_counter_set_life", "life_counter_player_appearance"],
+      "focus": ["linguagem tabletop propria", "contadores legiveis por jogador", "overlays/settings", "cores separaveis", "touch targets em mesa"]
+    }
+  ]
+}
