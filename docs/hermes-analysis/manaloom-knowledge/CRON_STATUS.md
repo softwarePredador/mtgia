@@ -205,7 +205,7 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> Ultima atualizacao: **2026-06-04T00:36:32Z**
+> Ultima atualizacao: **2026-06-04T14:21:31Z**
 
 **Decks analisados:** 8
 **Criterios:** Lands/Ramp/Draw/Remocao vs ranges do perfil EDHREC (metricas baseadas em tags `functional_tag` de `deck_cards`, nao colunas `decks`)
@@ -248,7 +248,7 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 9. **✅ Melhoria no Deck #6 (Lorehold):** 23 cartas "unknown" → 3 cartas "unknown". O classificador foi executado parcialmente, reclassificando 20/23 cartas com tags apropriadas. Restam 3 cartas com `functional_tag='unknown'` e CMC invalido (Inventors' Fair, Prismatic Vista, Reforge the Soul).
 
 ---
-*Validacao gerada por manaloom-mana-base-validator em 2026-06-04T00:36:32Z*
+*Validacao gerada por manaloom-mana-base-validator em 2026-06-04T14:21:31Z*
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
 > Última atualização: **2026-06-03T06:00:00Z**
