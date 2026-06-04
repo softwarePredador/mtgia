@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-04 07:00 UTC
+> Data: 2026-06-04 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -66,14 +66,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `EndpointCache.clearExpired`). A observabilidade automatica do
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
-13. **P1/P2 — Imports quebrados e ciclo app**: **REVALIDADO/ABERTO no checkout
-    local `4795a07b` (2026-06-03 11:00 UTC).** `deck_analysis_tab.dart:5` e
-    `life_counter_screen.dart:7` ainda usam imports relativos que saem de
-    `app/lib` e resolvem para `app/core/...`, enquanto os arquivos existentes
-    estao em `app/lib/core/...`. `server/bin/local_test_server.dart:3` ainda
-    depende do artefato ausente `server/.dart_frog/server.dart`. A varredura SCC
-    encontrou somente um ciclo local: `CommunityDeckDetailScreen` e
-    `UserProfileScreen` importam e instanciam uma a outra por `Navigator.push`.
+13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
+    checkout local `aa6d3216` (2026-06-04 11:00 UTC).** O auditor base agora
+    reporta 1 import quebrado dentro de seu recorte:
+    `server/routes/ai/commander-learning/index.dart:4` importa o support ausente
+    `server/lib/ai/commander_learned_deck_support.dart`, e `dart analyze`
+    confirma `uri_does_not_exist` com cascata em `CommanderLearnedDeckInput`.
+    A varredura local ampliada encontrou somente 4 imports locais quebrados em
+    424 arquivos: esse `commander-learning`, `deck_analysis_tab.dart:5` e
+    `life_counter_screen.dart:7` usando imports relativos que saem de `app/lib`
+    para `app/core/...`, e `server/bin/local_test_server.dart:3` dependendo do
+    artefato ausente `server/.dart_frog/server.dart`. A varredura SCC encontrou
+    somente um ciclo local: `CommunityDeckDetailScreen` e `UserProfileScreen`
+    importam e instanciam uma a outra por `Navigator.push`.
 
 ## Achados priorizados
 
