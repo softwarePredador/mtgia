@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-04 — Gate seguro para loop Hermes -> App
+
+Motivo:
+
+- O Hermes passou a produzir learned decks consumidos pelo app via
+  `/ai/commander-learning`, mas a publicacao automatica precisava ser separada do
+  aprendizado continuo.
+- Eventos salvos pelo app/backend usavam contagem por linha em vez de quantidade
+  total e podiam registrar o proprio comandante como hot card.
+
+Patch aplicado:
+
+- `deck_learning_events.card_count` agora usa quantidade real e registra
+  `cards_quantity_total`, `commander_quantity` e `main_quantity`.
+- Decks salvos com `card_id` agora resolvem nomes antes de gravar evento de
+  aprendizado.
+- `commander_card_usage` filtra comandante e duplicatas antes de alimentar prompts.
+- `commander_learned_deck.dart` ganhou gate Commander 100/99+1; `--apply` e
+  `--dry-run --strict` falham quando o payload nao passa.
+- `auto_promote_learned_decks.py` exige card list parseada com 100 cartas, 1
+  comandante e 99 main por padrao.
+- `auto_sync_learned_decks.py` virou dry-run estrito por default; publicar no PG
+  exige `--apply` ou `HERMES_AUTO_SYNC_APPLY=1`.
+- Auditoria consolidada em
+  `server/doc/HERMES_APP_LEARNING_SYNC_AUDIT_2026-06-04.md`.
+
+Validacao:
+
+- `dart analyze lib/ai/deck_learning_event_support.dart lib/ai/commander_learned_deck_support.dart routes/decks/index.dart bin/commander_learned_deck.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart`;
+- `dart test test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart -r expanded`;
+- `python3 -m py_compile` nos scripts Hermes de pull/promote/sync/export.
+
+Riscos restantes:
+
+- O loop e autoaprendivel para melhorar prompt e sinais, mas nao deve ser
+  auto-publicavel sem scorecard/runtime por comandante novo.
+- O Hermes segue sem prova visual iOS; qualquer fluxo app-facing novo precisa
+  continuar validado localmente no iPhone Simulator.
+
 ## 2026-05-28 — Politica versionada para fallbacks Commander optimize/complete
 
 Motivo:

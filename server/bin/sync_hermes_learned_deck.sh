@@ -15,7 +15,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SQLITE_DB="/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+SQLITE_DB="${HERMES_KNOWLEDGE_DB:-/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db}"
 EXPORT_SCRIPT="${SCRIPT_DIR}/export_hermes_learned_deck.py"
 ARTIFACT_DIR="${SCRIPT_DIR}/../test/artifacts/hermes_sync"
 TIMESTAMP="$(date -u +%Y%m%d_%H%M%S)"
@@ -67,12 +67,12 @@ print(f\"score: {data.get('score')}\")
 echo ""
 if $APPLY; then
     echo "=== Importing to PG (--apply) ==="
-    dart run bin/commander_learned_deck.dart --input-json="$EXPORT_JSON" --apply --artifact-dir="$ARTIFACT_DIR"
+    dart run bin/commander_learned_deck.dart --input-json="$EXPORT_JSON" --apply --strict --artifact-dir="$ARTIFACT_DIR"
     echo "{}" > "$SUMMARY_JSON"
     echo "Sync complete. Artifacts: $ARTIFACT_DIR"
 else
     echo "=== Dry-run only (use --apply to import to PG) ==="
-    dart run bin/commander_learned_deck.dart --input-json="$EXPORT_JSON" --dry-run --artifact-dir="$ARTIFACT_DIR"
+    dart run bin/commander_learned_deck.dart --input-json="$EXPORT_JSON" --dry-run --strict --artifact-dir="$ARTIFACT_DIR"
     echo "{}" > "$SUMMARY_JSON"
     echo "Dry-run complete. Artifacts: $ARTIFACT_DIR"
 fi

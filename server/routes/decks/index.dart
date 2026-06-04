@@ -414,53 +414,13 @@ Future<Response> _createDeck(RequestContext context) async {
       return deckMap;
     });
 
-    // Fire-and-forget: loga deck criado pro Hermes aprender
-    final commanderCard = cards.firstWhere(
-      (c) => c is Map && c['is_commander'] == true,
-      orElse: () => const {},
-    );
-    final commanderName =
-        commanderCard is Map ? commanderCard['name']?.toString() : null;
-
-    if (commanderName != null && commanderName.isNotEmpty) {
-      unawaited(
-        ensureCommanderCardUsageTable(conn).then(
-          (_) => upsertCommanderCardUsage(
-            pool: conn,
-            commanderName: commanderName,
-            cards: cards
-                .whereType<Map>()
-                .where((c) => c['name'] != null)
-                .cast<Map<String, dynamic>>()
-                .toList(),
-          ),
-        ),
-      );
-    }
-
-    unawaited(
-      ensureDeckLearningEventsTable(conn).then(
-        (_) => logDeckLearningEvent(
-          pool: conn,
-          deckId: newDeck['id'].toString(),
-          commanderName: commanderName,
-          format: format,
-          cardCount: cards.length,
-          source: 'user_created',
-          eventData: {
-            'deck_name': name,
-            'cards': cards
-                .whereType<Map>()
-                .map((c) => {
-                      'name': c['name']?.toString() ?? c['card_id']?.toString(),
-                      'quantity': c['quantity'],
-                      'is_commander': c['is_commander'] == true,
-                    })
-                .toList(),
-          },
-        ),
-      ),
-    );
+    unawaited(_logDeckCreateLearning(
+      pool: conn,
+      deckId: newDeck['id'].toString(),
+      deckName: name,
+      format: format,
+      rawCards: cards,
+    ));
 
     return Response.json(body: newDeck);
   } on DeckRulesException catch (e) {
@@ -477,4 +437,97 @@ Future<Response> _createDeck(RequestContext context) async {
     );
     return internalServerError('Failed to create deck');
   }
+}
+
+Future<void> _logDeckCreateLearning({
+  required Pool pool,
+  required String deckId,
+  required String deckName,
+  required String format,
+  required List<dynamic> rawCards,
+}) async {
+  try {
+    final learningCards = await _resolveLearningCardsForEvents(pool, rawCards);
+    final commanderCard = learningCards.firstWhere(
+      (card) => card['is_commander'] == true,
+      orElse: () => const <String, dynamic>{},
+    );
+    final commanderName = commanderCard['name']?.toString();
+    final cardQuantityTotal = learningCardQuantityTotal(learningCards);
+    final commanderQuantity = learningCards
+        .where((card) => card['is_commander'] == true)
+        .fold<int>(0, (sum, card) => sum + learningCardQuantityTotal([card]));
+
+    if (commanderName != null && commanderName.isNotEmpty) {
+      await ensureCommanderCardUsageTable(pool);
+      await upsertCommanderCardUsage(
+        pool: pool,
+        commanderName: commanderName,
+        cards: learningCards,
+      );
+    }
+
+    await ensureDeckLearningEventsTable(pool);
+    await logDeckLearningEvent(
+      pool: pool,
+      deckId: deckId,
+      commanderName: commanderName,
+      format: format,
+      cardCount: cardQuantityTotal,
+      source: 'user_created',
+      eventData: {
+        'deck_name': deckName,
+        'cards_quantity_total': cardQuantityTotal,
+        'commander_quantity': commanderQuantity,
+        'main_quantity': cardQuantityTotal - commanderQuantity,
+        'cards': learningCards
+            .map((card) => {
+                  'name':
+                      card['name']?.toString() ?? card['card_id']?.toString(),
+                  'quantity': card['quantity'],
+                  'is_commander': card['is_commander'] == true,
+                })
+            .toList(),
+      },
+    );
+  } catch (error) {
+    Log.e('⚠️ Falha ao registrar aprendizado do deck $deckId: $error');
+  }
+}
+
+Future<List<Map<String, dynamic>>> _resolveLearningCardsForEvents(
+  Pool pool,
+  List<dynamic> rawCards,
+) async {
+  final cards = <Map<String, dynamic>>[];
+  for (final rawCard in rawCards) {
+    if (rawCard is! Map) continue;
+    final card = <String, dynamic>{
+      'quantity': rawCard['quantity'],
+      'is_commander': rawCard['is_commander'] == true,
+    };
+    final rawName = rawCard['name']?.toString().trim();
+    if (rawName != null && rawName.isNotEmpty) {
+      card['name'] = rawName;
+      cards.add(card);
+      continue;
+    }
+    final cardId = rawCard['card_id']?.toString().trim();
+    if (cardId == null || cardId.isEmpty) {
+      cards.add(card);
+      continue;
+    }
+    card['card_id'] = cardId;
+    try {
+      final result = await pool.execute(
+        Sql.named('SELECT name FROM cards WHERE id = @cardId::uuid LIMIT 1'),
+        parameters: {'cardId': cardId},
+      );
+      if (result.isNotEmpty) {
+        card['name'] = result.first[0]?.toString();
+      }
+    } catch (_) {}
+    cards.add(card);
+  }
+  return cards;
 }

@@ -47,7 +47,10 @@ Future<void> upsertCommanderCardUsage({
   required List<Map<String, dynamic>> cards,
 }) async {
   final normalizedCommander = normalizeCommanderReferenceName(commanderName);
-  for (final card in cards) {
+  for (final card in learningUsageCardsForCommander(
+    commanderName: commanderName,
+    cards: cards,
+  )) {
     final cardName = card['name']?.toString().trim() ?? '';
     if (cardName.isEmpty) continue;
     try {
@@ -72,6 +75,36 @@ Future<void> upsertCommanderCardUsage({
   }
 }
 
+List<Map<String, dynamic>> learningUsageCardsForCommander({
+  required String commanderName,
+  required Iterable<Map<String, dynamic>> cards,
+}) {
+  final normalizedCommander = normalizeCommanderReferenceName(commanderName);
+  final seen = <String>{};
+  final result = <Map<String, dynamic>>[];
+  for (final card in cards) {
+    if (card['is_commander'] == true) continue;
+    final cardName = card['name']?.toString().trim() ?? '';
+    if (cardName.isEmpty) continue;
+    final normalizedCard = normalizeCommanderReferenceName(cardName);
+    if (normalizedCard.isEmpty || normalizedCard == normalizedCommander) {
+      continue;
+    }
+    if (!seen.add(normalizedCard)) continue;
+    result.add(card);
+  }
+  return result;
+}
+
+int learningCardQuantityTotal(Iterable<Object?> cards) {
+  var total = 0;
+  for (final card in cards) {
+    if (card is! Map) continue;
+    total += _quantityValue(card['quantity']);
+  }
+  return total;
+}
+
 Future<List<Map<String, dynamic>>> loadUsageHotCards({
   required Pool pool,
   required String commanderName,
@@ -84,8 +117,9 @@ Future<List<Map<String, dynamic>>> loadUsageHotCards({
         SELECT ccu.card_name_normalized, c.name AS canonical_name,
                ccu.usage_count, ccu.last_used_at
         FROM commander_card_usage ccu
-        LEFT JOIN cards c ON LOWER(SPLIT_PART(c.name, ' // ', 1)) = ccu.card_name_normalized
+        JOIN cards c ON LOWER(SPLIT_PART(c.name, ' // ', 1)) = ccu.card_name_normalized
         WHERE ccu.commander_name_normalized = @commander
+          AND ccu.card_name_normalized <> @commander
         ORDER BY ccu.usage_count DESC
         LIMIT @limit
       '''),
@@ -115,7 +149,7 @@ String buildUsageHotCardsPrompt(List<Map<String, dynamic>> hotCards) {
     'Real-player usage data for this commander:',
     for (final card in top)
       '- ${card["canonical_name"] ?? card["card_name_normalized"]} (saved ${card["usage_count"]}x by users)',
-    'Prefer these cards when building the deck - they have been validated by real players.',
+    'Prefer these cards only when legal, on-color, and structurally appropriate for the deck.',
   ];
   return lines.join('\n');
 }
@@ -143,10 +177,9 @@ Future<void> logGeneratedDeckForLearning({
     if (cards.isEmpty) return;
 
     final cardCount = cards.fold<int>(0, (sum, c) {
-      final qty = c['quantity'];
-      final parsed = qty is int ? qty : int.tryParse(qty?.toString() ?? '') ?? 1;
-      return sum + parsed;
-    }) + (commanderName.isNotEmpty ? 1 : 0);
+          return sum + _quantityValue(c['quantity']);
+        }) +
+        (commanderName.isNotEmpty ? 1 : 0);
 
     final eventData = <String, dynamic>{
       'generation_mode': source,
@@ -207,4 +240,14 @@ Future<void> logDeckLearningEvent({
   } catch (_) {
     // Non-blocking: falha no log não quebra criação do deck
   }
+}
+
+int _quantityValue(Object? value) {
+  if (value is int) return value > 0 ? value : 1;
+  if (value is num) {
+    final rounded = value.round();
+    return rounded > 0 ? rounded : 1;
+  }
+  final parsed = int.tryParse(value?.toString() ?? '');
+  return parsed != null && parsed > 0 ? parsed : 1;
 }

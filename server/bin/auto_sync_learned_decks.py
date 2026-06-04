@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Auto-sync: detecta decks aprendidos promovidos no Hermes SQLite e importa no PG.
-Regras: Lorehold → PULA; qualquer outro → export JSON e dart --apply.
+Default seguro: dry-run estrito. Use --apply ou HERMES_AUTO_SYNC_APPLY=1 para mutar PG.
+Regras: Lorehold -> PULA; qualquer outro -> export JSON e importador Commander 100/99+1.
 """
 
-import json, os, sqlite3, subprocess, sys
+import argparse, os, sqlite3, subprocess, sys
 from datetime import datetime, timezone
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,9 +21,14 @@ SQLITE_DB = os.environ.get(
     "HERMES_KNOWLEDGE_DB",
     os.path.join(PROJECT_DIR, "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"),
 )
-EXPORT_SCRIPT = os.path.join(
-    PROJECT_DIR, "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
-)
+EXPORT_SCRIPT_CANDIDATES = [
+    os.environ.get("HERMES_EXPORT_SCRIPT"),
+    os.path.join(PROJECT_DIR, "server/bin/export_hermes_learned_deck.py"),
+    os.path.join(
+        PROJECT_DIR,
+        "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+    ),
+]
 ARTIFACT_DIR = os.path.join(SCRIPT_DIR, "../test/artifacts/hermes_auto_sync")
 TRACKING_FILE = os.path.join(ARTIFACT_DIR, "synced_learned_ids.txt")
 SERVER_DIR = os.path.join(SYNC_PROJECT_DIR, "server")
@@ -33,8 +39,21 @@ if not os.path.exists(TRACKING_FILE):
     open(TRACKING_FILE, "w").close()
 
 
-def main():
+def _export_script_path():
+    for candidate in EXPORT_SCRIPT_CANDIDATES:
+        if candidate and os.path.exists(candidate):
+            return candidate
+    raise FileNotFoundError("export_hermes_learned_deck.py nao encontrado")
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Auto-sync Hermes learned decks")
+    parser.add_argument("--apply", action="store_true", help="Aplica no PG")
+    args = parser.parse_args(argv)
+    apply = args.apply or os.environ.get("HERMES_AUTO_SYNC_APPLY") == "1"
+    export_script = _export_script_path()
     print("=== Auto-sync find_promoted ===")
+    print(f"mode={'apply' if apply else 'dry_run'} export_script={export_script}")
 
     # Pull latest sync copy
     if os.path.isdir(SYNC_PROJECT_DIR):
@@ -63,20 +82,18 @@ def main():
             if line.isdigit():
                 synced_ids.add(int(line))
 
-    synced, skipped, failed = 0, 0, 0
+    applied, dry_run_ok, already_synced, skipped, failed = 0, 0, 0, 0, 0
 
     for deck_id, commander, deck_name, card_count, promoted_at in rows:
         # Lorehold — freio manual de Mox
         if "lorehold" in commander.lower():
-            if deck_id not in synced_ids:
-                print(f'SKIP Lorehold (manual review): learned_id={deck_id} "{deck_name}"')
-                synced_ids.add(deck_id)
+            print(f'SKIP Lorehold (manual review): learned_id={deck_id} "{deck_name}"')
             skipped += 1
             continue
 
         # Ja sincronizado
         if deck_id in synced_ids:
-            synced += 1
+            already_synced += 1
             continue
 
         print(f'SYNC commander={commander} learned_id={deck_id} "{deck_name}"')
@@ -84,7 +101,7 @@ def main():
 
         # Export
         exp = subprocess.run(
-            [sys.executable, EXPORT_SCRIPT, "--db", SQLITE_DB,
+            [sys.executable, export_script, "--db", SQLITE_DB,
              "--learned-id", str(deck_id), "--out", json_path],
             capture_output=True, text=True, timeout=30,
         )
@@ -93,10 +110,10 @@ def main():
             failed += 1
             continue
 
-        # Apply
+        mode_arg = "--apply" if apply else "--dry-run"
         app = subprocess.run(
             [DART_BIN, "run", "bin/commander_learned_deck.dart",
-             f"--input-json={json_path}", "--apply",
+             f"--input-json={json_path}", mode_arg, "--strict",
              f"--artifact-dir={ARTIFACT_DIR}"],
             capture_output=True, text=True, timeout=60,
             cwd=SERVER_DIR,
@@ -106,16 +123,23 @@ def main():
             failed += 1
             continue
 
-        synced_ids.add(deck_id)
-        synced += 1
-        print("  OK")
+        if apply:
+            synced_ids.add(deck_id)
+            applied += 1
+            print("  APPLY_OK")
+        else:
+            dry_run_ok += 1
+            print("  DRY_RUN_OK")
 
     # Persiste tracking
     with open(TRACKING_FILE, "w") as f:
         for sid in sorted(synced_ids):
             f.write(f"{sid}\n")
 
-    print(f"\nTOTALS synced={synced} skipped={skipped} failed={failed}")
+    print(
+        f"\nTOTALS applied={applied} dry_run_ok={dry_run_ok} "
+        f"already_synced={already_synced} skipped={skipped} failed={failed}"
+    )
     return 1 if failed else 0
 
 

@@ -2,7 +2,8 @@
 """Auto-promove learned decks de alta qualidade que ainda nao estao promovidos.
 
 Criterios minimos:
-  - card_count >= 90
+  - card_count == 100 por padrao
+  - card_list parseado soma 100, com 1 comandante e 99 main
   - Commander nao-Lorehold (Lorehold e revisao manual)
   - Ainda nao promovido (nao existe em deck_promotions)
   - Tem deck alvo correspondente na tabela decks (mesmo commander)
@@ -10,7 +11,7 @@ Criterios minimos:
 Seguro para rodar em cron: idempotente (checa deck_promotions antes de inserir).
 """
 
-import os, sqlite3, sys
+import os, re, sqlite3, sys
 from datetime import datetime, timezone
 
 SQLITE_DB = os.environ.get(
@@ -18,7 +19,46 @@ SQLITE_DB = os.environ.get(
     "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
 )
 
-MIN_CARD_COUNT = 90
+REQUIRE_EXACT_100 = os.environ.get("HERMES_AUTO_PROMOTE_ALLOW_INCOMPLETE") != "1"
+MIN_CARD_COUNT = 100 if REQUIRE_EXACT_100 else 90
+
+
+def _normalize_name(name):
+    return (name or "").strip().lower().replace("’", "'").replace("‘", "'")
+
+
+def _parse_card_list(card_list_text):
+    cards = []
+    for raw_line in (card_list_text or "").splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        match = re.match(r"^(\d+)\s+(.+)$", line)
+        if match:
+            cards.append((int(match.group(1)), match.group(2).strip()))
+        else:
+            cards.append((1, line))
+    return cards
+
+
+def _commander_gate(commander, card_count, card_list):
+    cards = _parse_card_list(card_list)
+    parsed_total = sum(qty for qty, _ in cards)
+    commander_normalized = _normalize_name(commander)
+    commander_qty = sum(
+        qty for qty, name in cards if _normalize_name(name) == commander_normalized
+    )
+    main_qty = parsed_total - commander_qty
+    blockers = []
+    if REQUIRE_EXACT_100 and card_count != 100:
+        blockers.append(f"declared_card_count={card_count}")
+    if REQUIRE_EXACT_100 and parsed_total != 100:
+        blockers.append(f"parsed_card_count={parsed_total}")
+    if REQUIRE_EXACT_100 and commander_qty != 1:
+        blockers.append(f"commander_qty={commander_qty}")
+    if REQUIRE_EXACT_100 and main_qty != 99:
+        blockers.append(f"main_qty={main_qty}")
+    return blockers
 
 
 def main():
@@ -27,6 +67,7 @@ def main():
 
     candidates = db.execute("""
         SELECT ld.id as learned_id, ld.commander, ld.deck_name, ld.card_count,
+               ld.card_list,
                ld.wincon_primary, d.id as deck_id, d.deck_name as target_name,
                d.total_cards as target_cards
         FROM learned_decks ld
@@ -51,10 +92,15 @@ def main():
     promoted = 0
 
     seen_cmd = set()
-    for learned_id, commander, deck_name, card_count, wincon, deck_id, target_name, target_cards in candidates:
+    for learned_id, commander, deck_name, card_count, card_list, wincon, deck_id, target_name, target_cards in candidates:
         if commander in seen_cmd:
             continue
         seen_cmd.add(commander)
+
+        blockers = _commander_gate(commander, card_count, card_list)
+        if blockers:
+            print(f"SKIP {commander}: commander_gate_failed {'; '.join(blockers)}")
+            continue
 
         # Verifica se ja foi promovido
         already = db.execute(

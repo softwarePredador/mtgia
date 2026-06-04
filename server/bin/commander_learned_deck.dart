@@ -19,6 +19,7 @@ Future<void> main(List<String> args) async {
 
   final apply = args.contains('--apply');
   final dryRun = args.contains('--dry-run') || !apply;
+  final strict = args.contains('--strict') || apply;
   if (apply && args.contains('--dry-run')) {
     throw ArgumentError('Use apenas um modo: --dry-run ou --apply.');
   }
@@ -31,6 +32,13 @@ Future<void> main(List<String> args) async {
 
   final payload = _readJsonObject(inputPath);
   final input = parseCommanderLearnedDeckInput(payload);
+  final validation = validateCommanderLearnedDeckInput(input);
+  if (strict && !validation.ok) {
+    throw StateError(
+      'Commander learned deck falhou no gate de importacao: '
+      '${validation.blockers.join(' | ')}',
+    );
+  }
   final startedAt = DateTime.now().toUtc();
 
   final database = Database();
@@ -63,6 +71,7 @@ Future<void> main(List<String> args) async {
         0,
         (sum, card) => sum + card.quantity,
       ),
+      'validation': validation.toJson(),
       'is_active': input.isActive,
       'deactivate_other_active': deactivateOtherActive,
       'metadata': input.metadata,
@@ -121,6 +130,7 @@ Usage:
   dart run bin/commander_learned_deck.dart --input-json=<path> --apply
 
 Options:
+  --strict                 Falha tambem em dry-run se nao for Commander 100/99+1.
   --keep-other-active      Nao desativa outros decks ativos do mesmo comandante.
   --artifact-dir=<path>    Diretorio para resumo sanitizado.
 

@@ -27,6 +27,46 @@ void main() {
       expect(input.isActive, isTrue);
     });
 
+    test('validates Commander 100-card learned deck gate', () {
+      final main = List.generate(99, (index) => '1 Learned Card $index');
+      final input = parseCommanderLearnedDeckInput({
+        'id': 82,
+        'commander': 'Lorehold, the Historian',
+        'card_list': ['1 Lorehold, the Historian', ...main].join('\n'),
+        'card_count': 100,
+      });
+
+      final validation = validateCommanderLearnedDeckInput(input);
+
+      expect(validation.ok, isTrue);
+      expect(validation.parsedCardCount, equals(100));
+      expect(validation.commanderQuantity, equals(1));
+      expect(validation.mainQuantity, equals(99));
+      expect(validation.blockers, isEmpty);
+    });
+
+    test('blocks learned deck import when count or commander slot is invalid',
+        () {
+      final input = parseCommanderLearnedDeckInput({
+        'id': 83,
+        'commander': 'Lorehold, the Historian',
+        'card_list': '1 Sol Ring\n1 Mountain',
+        'card_count': 100,
+      });
+
+      final validation = validateCommanderLearnedDeckInput(input);
+
+      expect(validation.ok, isFalse);
+      expect(
+        validation.blockers.join('\n'),
+        contains('card_count declarado (100) difere do total parseado (2)'),
+      );
+      expect(
+        validation.blockers.join('\n'),
+        contains('exatamente 1 comandante'),
+      );
+    });
+
     test('route prefers promoted learned deck before deterministic fallback',
         () {
       final route =

@@ -88,6 +88,36 @@ class CommanderLearnedDeckInput {
       };
 }
 
+class CommanderLearnedDeckValidationResult {
+  const CommanderLearnedDeckValidationResult({
+    required this.parsedCardCount,
+    required this.declaredCardCount,
+    required this.commanderQuantity,
+    required this.mainQuantity,
+    required this.blockers,
+    required this.warnings,
+  });
+
+  final int parsedCardCount;
+  final int declaredCardCount;
+  final int commanderQuantity;
+  final int mainQuantity;
+  final List<String> blockers;
+  final List<String> warnings;
+
+  bool get ok => blockers.isEmpty;
+
+  Map<String, dynamic> toJson() => {
+        'ok': ok,
+        'parsed_card_count': parsedCardCount,
+        'declared_card_count': declaredCardCount,
+        'commander_quantity': commanderQuantity,
+        'main_quantity': mainQuantity,
+        'blockers': blockers,
+        'warnings': warnings,
+      };
+}
+
 CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
   Map<String, dynamic> payload,
 ) {
@@ -145,6 +175,61 @@ CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
     metadata: metadata,
     isActive: _boolValue(payload['is_active'], defaultValue: true),
     promotedAt: _dateTimeValue(payload['promoted_at']),
+  );
+}
+
+CommanderLearnedDeckValidationResult validateCommanderLearnedDeckInput(
+  CommanderLearnedDeckInput input,
+) {
+  final blockers = <String>[];
+  final warnings = <String>[];
+  final cards = input.cards;
+  final normalizedCommander = input.commanderNameNormalized;
+  var parsedCardCount = 0;
+  var commanderQuantity = 0;
+  for (final card in cards) {
+    if (card.quantity <= 0) {
+      blockers.add('card_list contem quantidade nao positiva: ${card.name}');
+      continue;
+    }
+    parsedCardCount += card.quantity;
+    if (normalizeCommanderReferenceName(card.name) == normalizedCommander) {
+      commanderQuantity += card.quantity;
+    }
+  }
+  final mainQuantity = parsedCardCount - commanderQuantity;
+  if (input.cardCount != parsedCardCount) {
+    blockers.add(
+      'card_count declarado (${input.cardCount}) difere do total parseado ($parsedCardCount).',
+    );
+  }
+  if (parsedCardCount != 100) {
+    blockers.add(
+        'deck Commander aprendido precisa ter 100 cartas; recebeu $parsedCardCount.');
+  }
+  if (commanderQuantity != 1) {
+    blockers.add(
+      'deck Commander aprendido precisa conter exatamente 1 comandante; recebeu $commanderQuantity.',
+    );
+  }
+  if (mainQuantity != 99) {
+    blockers
+        .add('deck principal precisa ter 99 cartas; recebeu $mainQuantity.');
+  }
+  final legalStatus = input.legalStatus?.trim().toLowerCase();
+  if (legalStatus != null &&
+      legalStatus.isNotEmpty &&
+      legalStatus != 'commander_legal') {
+    warnings.add(
+        'legal_status nao confirmado como commander_legal: ${input.legalStatus}.');
+  }
+  return CommanderLearnedDeckValidationResult(
+    parsedCardCount: parsedCardCount,
+    declaredCardCount: input.cardCount,
+    commanderQuantity: commanderQuantity,
+    mainQuantity: mainQuantity,
+    blockers: blockers,
+    warnings: warnings,
   );
 }
 
