@@ -15,7 +15,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze` em `server/` falha com
    `uri_does_not_exist`.
-5. **P1 — Ownership em rotas deck/AI**: **REVALIDADO no checkout local `69b0c42b` em 2026-06-02 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e `POST /decks/:id/pricing` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations` e `/decks/:id/simulate` seguem sem consumidor app atual, mas devem ganhar owner-scope ou contrato publico antes de promocao.
+5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `534f5672` em 2026-06-03 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e `POST /decks/:id/pricing` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations` e `/decks/:id/simulate` seguem sem consumidor app atual, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-03 05:30 UTC no checkout `9a41032b`. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
@@ -506,14 +506,17 @@ presentes e sem chamador runtime confirmado.
     quality continuam verdes;
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
-### P1 — Alinhar ownership entre `app/lib`, rotas e helpers de deck/AI
-- **Status 2026-06-02 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `69b0c42b`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
+### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers
+- **Status 2026-06-03 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `534f5672`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
   jobs async nao esta resolvida nesta branch. `POST /ai/rebuild`,
   `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis` e
   `POST /decks/:id/pricing` foram usados como controles positivos de owner gate.
   `/decks/:id/recommendations` e `/decks/:id/simulate` nao tem consumidor app
-  atual, mas continuam sem contrato de owner antes de eventual promocao.
+  atual, mas continuam sem contrato de owner antes de eventual promocao. A
+  rodada tambem confirmou incoerencia de activation telemetry:
+  `deck_rebuild_created` e emitido pelo app, rejeitado pela allow-list backend e
+  ausente da doc app-facing atual.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`; a
@@ -536,10 +539,21 @@ presentes e sem chamador runtime confirmado.
     e nao tem chamada atual em `app/lib`.
   - `server/routes/decks/[id]/simulate/index.dart:13`-`:25` carrega cartas por
     `deckId` sem owner; busca focada em `app/lib` nao encontrou consumidor.
+  - `app/lib/features/decks/providers/deck_provider.dart:605`-`:607` emite
+    `_trackActivationEvent('deck_rebuild_created', deckId: draftDeckId)`.
+    `app/lib/core/services/activation_funnel_service.dart:17`-`:23` envia o
+    evento para `POST /users/me/activation-events`, mas o catch em `:24`-`:26`
+    engole falhas. A rota aceita somente `_allowedEvents` em
+    `server/routes/users/me/activation-events/index.dart:10`-`:18`, sem
+    `deck_rebuild_created`, e rejeita fora da lista em `:46`-`:48`.
+    `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` ainda chama o endpoint de
+    `internal` com consumidor `not proven`, embora haja chamadas reais em
+    `app/lib`.
 - **Impacto**: usuario autenticado pode potencialmente disparar analise/opcoes
   ou leitura de job para recursos sem owner-scope se obtiver IDs validos. Alem
   disso, a memoria tecnica anterior registrava um estado resolvido que nao bate
-  com o codigo local.
+  com o codigo local. No caso de activation, o fluxo de rebuild guiado perde
+  telemetria silenciosamente, o que mascara funil/metricas de produto.
 - **Ação recomendada**:
   1. adicionar `userId` obrigatorio a `loadOptimizeDeckContext` e filtrar
      `decks`/`deck_cards` por dono;
@@ -548,7 +562,10 @@ presentes e sem chamador runtime confirmado.
      retornar 404 quando `job.userId == null || job.userId != userId`;
   4. decidir se `/decks/:id/recommendations` e `/decks/:id/simulate` serao
      removidas, owner-scoped ou publicas somente para `is_public=true`;
-  5. exigir teste owner vs non-owner quando qualquer rota nova aceitar
+  5. adicionar `deck_rebuild_created` a `_allowedEvents` com teste, ou remover a
+     emissao app se rebuild nao deve entrar no funil; atualizar
+     `API_CONTRACTS_AND_DATA_MAP.md` para listar consumidores reais do endpoint;
+  6. exigir teste owner vs non-owner quando qualquer rota nova aceitar
      `deck_id`.
 - **Validação**:
   - teste de `POST /ai/optimize` com deck de outro usuario retorna 404;
@@ -559,6 +576,8 @@ presentes e sem chamador runtime confirmado.
     diferente;
   - source mostra recommendations/simulate lendo cartas via `deck_cards` +
     `decks` filtrado por owner, ou docs/testes marcando contrato publico;
+  - teste de activation aceita ou elimina `deck_rebuild_created`, e a doc deixa
+    de chamar consumidores app reais de `not proven`;
   - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
     continua vazio ate haver contrato seguro;
 
