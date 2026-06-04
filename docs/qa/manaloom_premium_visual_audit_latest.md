@@ -8,9 +8,9 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 
 ## Metadata
 
-- Gerado em UTC: `2026-06-04T17:28:25.480923+00:00`
+- Gerado em UTC: `2026-06-04T17:58:44.993132+00:00`
 - Branch: `master`
-- SHA: `f7324381`
+- SHA: `e8b610fc`
 - Config: `server/config/premium_visual_qa_surfaces.json`
 - Arquivos auditados: `49`
 - Life Counter incluido: `True`
@@ -2528,15 +2528,6 @@ cd app && flutter test integration_test/life_counter_lotus_visual_capture_smoke_
 
 ```text
 ## master...origin/master
- M docs/README.md
- M server/bin/ui_audit_pipeline.py
- M server/manual-de-instrucao.md
-?? docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md
-?? docs/qa/manaloom_premium_visual_audit_latest.md
-?? server/bin/__pycache__/
-?? server/bin/premium_visual_audit.py
-?? server/bin/premium_visual_audit.sh
-?? server/config/
 ```
 
 VISUAL_PREMIUM_QA_RESULT: signals=304 P1=0 P2=304 visual_pass=false
