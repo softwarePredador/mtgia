@@ -292,6 +292,20 @@ CREATE TABLE IF NOT EXISTS deck_learning_events (
 CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
 ON deck_learning_events (synced_to_hermes, created_at);
 
+-- 9.2. Contador de uso real de cartas por comandante (App usage feedback)
+-- Alimentado a cada deck salvo. Usado pelo generate/reference pra priorizar
+-- cartas com alta adocao real alem das fontes externas (EDHREC, etc).
+CREATE TABLE IF NOT EXISTS commander_card_usage (
+    commander_name_normalized TEXT NOT NULL,
+    card_name_normalized TEXT NOT NULL,
+    usage_count INTEGER NOT NULL DEFAULT 1,
+    last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (commander_name_normalized, card_name_normalized)
+);
+
+CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
+ON commander_card_usage (commander_name_normalized, usage_count DESC);
+
 -- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
 -- Armazena as cartas mais populares de cada formato, atualizada semanalmente
 -- Para evitar hardcoded staples e manter dados sempre atualizados

@@ -421,6 +421,23 @@ Future<Response> _createDeck(RequestContext context) async {
     );
     final commanderName =
         commanderCard is Map ? commanderCard['name']?.toString() : null;
+
+    if (commanderName != null && commanderName.isNotEmpty) {
+      unawaited(
+        ensureCommanderCardUsageTable(conn).then(
+          (_) => upsertCommanderCardUsage(
+            pool: conn,
+            commanderName: commanderName,
+            cards: cards
+                .whereType<Map>()
+                .where((c) => c['name'] != null)
+                .cast<Map<String, dynamic>>()
+                .toList(),
+          ),
+        ),
+      );
+    }
+
     unawaited(
       ensureDeckLearningEventsTable(conn).then(
         (_) => logDeckLearningEvent(

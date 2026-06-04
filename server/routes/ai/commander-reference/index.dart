@@ -12,6 +12,7 @@ import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_reference_helpers.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai/commander_reference_readiness_support.dart';
+import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/generated_deck_validation_service.dart';
@@ -479,7 +480,28 @@ Future<Map<String, dynamic>?> _buildCommanderLearningPayload({
       'deck_note':
           'Pass learning=1&include_deck=1 to include the deterministic reference decklist.',
     if (learningDeck != null) 'recommended_deck': learningDeck,
+    'usage': await _loadUsageStatsSafe(pool: pool, commanderName: commander),
   };
+}
+
+Future<Map<String, dynamic>> _loadUsageStatsSafe({
+  required Pool pool,
+  required String commanderName,
+}) async {
+  try {
+    final hotCards = await loadUsageHotCards(
+      pool: pool,
+      commanderName: commanderName,
+      limit: 20,
+    );
+    return {
+      'available': true,
+      'hot_cards': hotCards,
+      'total_users': hotCards.fold<int>(0, (sum, c) => sum + intValue(c['usage_count'])),
+    };
+  } catch (_) {
+    return {'available': false, 'hot_cards': const <Map<String, dynamic>>[]};
+  }
 }
 
 Future<Map<String, dynamic>?> _loadPromotedCommanderLearnedDeck({
