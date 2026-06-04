@@ -1,6 +1,6 @@
 # Hermes Analysis: Open Risks
 
-> Riscos abertos do ManaLoom. Atualizado em 2026-05-29T20:15Z (E2E logic audit).
+> Riscos abertos do ManaLoom. Atualizado em 2026-06-04T14:10Z (Commander Learning Loop audit).
 > Este arquivo nao substitui os documentos canonicos; resume a leitura operacional atual.
 
 ## P0 — Bloqueante
@@ -207,6 +207,28 @@ Price history pode ser vazio para cartas sem dados. A UI precisa tolerar estados
 ### Legacy shapes na API
 - `GET /decks` retorna array JSON bruto (vs `{data, page, limit, total}` das rotas novas)
 - `GET /ready` deprecado em favor de `/health/ready`
+
+### Novas tabelas PG sem documentacao em API_CONTRACTS_AND_DATA_MAP.md
+As tabelas `deck_learning_events` e `commander_card_usage` foram adicionadas
+em `database_setup.sql` (commits b7866616, 4d822f44) mas nao estao documentadas
+em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A rota `commander-reference`
+agora retorna campo `usage` no payload de aprendizado, e `generate` injeta
+hot cards no prompt — ambos sem contrato documentado.
+
+Impacto: consumidores do app nao conhecem a forma exata do novo campo `usage`.
+
+Recomendacao: documentar as tabelas e o campo `usage` no contrato.
+
+### Hardcoded paths em scripts Python do server/bin/
+Scripts como `auto_sync_learned_decks.py` e `auto_promote_learned_decks.py`
+hardcodam `PROJECT_DIR = "/opt/data/workspace/mtgia"` e
+`SYNC_PROJECT_DIR = "/opt/data/workspace/mtgia-sync"`. Existem env vars
+`MTGIA_HOME` e `MTGIA_SYNC_HOME` como fallback, mas os defaults sao
+especificos do ambiente de producao atual.
+
+Impacto: scripts quebram se o repositorio for clonado em outro path.
+
+Recomendacao: usar apenas env vars ou deteccao automatica do diretorio do script.
 
 ## Riscos Resolvidos (para referencia)
 

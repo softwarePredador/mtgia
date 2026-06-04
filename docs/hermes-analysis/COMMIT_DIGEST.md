@@ -1,31 +1,105 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-04T00:23Z (Incremento: Learned Deck Scripts + Visual Proof - d693b9fb).
+> Atualizado em 2026-06-04T14:10Z (Incremento: Commander Learning Loop — 7 commits, 70e170f0).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `fb91fdca` (Add Lorehold learned deck runtime proof).
-- HEAD atual: **`d693b9fb`** (Capture Lorehold learned deck visual proof).
+- HEAD anterior: `d693b9fb` (Capture Lorehold learned deck visual proof).
+- HEAD atual: **`70e170f0`** (Harden Hermes learned deck sync).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`d693b9fb`** (`/health` retornou HTTP 200 em 2026-06-04T00:23Z — producao operacional).
+- SHA publicado confirmado em producao: **`70e170f0`** (`/health` retornou HTTP 200 em 2026-06-04T14:04Z — producao operacional).
 - Local `master`: 46 commits atrasado (`3f7d784f`) — precisa de `git pull origin master`
 
 
 
-## Novos commits nesta rodada (2026-06-04)
+## Novos commits nesta rodada (2026-06-04 14:10Z)
 
 
-### `d693b9fb` — Capture Lorehold learned deck visual proof (HEAD)
+
+### `70e170f0` — Harden Hermes learned deck sync (HEAD)
+
+- **12 arquivos**, **+551/-93 linhas**
+- **Tipo: CODE/TEST/DOCS** — Hardening do pipeline de learned decks Hermes→App:
+  1. `auto_promote_learned_decks.py`: gate Commander 100/99+1 expandido, dry-run estrito
+  2. `auto_sync_learned_decks.py`: dry-run por default, `--apply` / `HERMES_AUTO_SYNC_APPLY=1` para mutar PG
+  3. `commander_learned_deck_support.dart`: novo modulo com modelo de dados + validacao 100/99+1
+  4. `deck_learning_event_support.dart`: expandido com `loadUsageHotCards()`, `buildUsageHotCardsPrompt()`
+  5. `commander_learned_deck.dart`: gate Commander 100/99+1; `--apply` e `--dry-run --strict` falham quando payload nao passa
+  6. `sync_hermes_learned_deck.sh`: ajustado para usar caminhos deterministicos
+  7. `routes/decks/index.dart`: resolucao de nomes por `card_id`, contagem real de quantidade
+  8. Auditoria consolidada em `HERMES_APP_LEARNING_SYNC_AUDIT_2026-06-04.md`
+- **Avaliacao Hermes**: Hardening de seguranca: dry-run default, validacao de estrutura, resolucao de nomes. Sem regressao. Baixo risco.
+- **Verificacao**: Health endpoint confirma `git_sha: 70e170f0` em producao.
+
+### `0f0a40d2` — Add five commander learned deck runtime proof
+
+- **1 arquivo**, **+145/-0 linhas**
+- **Tipo: TEST** — Teste de runtime `commander_learned_deck_availability_runtime_test.dart` com 145 linhas cobrindo 5 comandantes.
+- **Avaliacao Hermes**: Cobertura de teste ampliada. Baixo risco.
+- **Verificacao**: `dart test`: 599 passed (incluindo novos testes de learned deck).
+
+### `5439c76c` — Log AI-generated decks for learning, add auto-promotion pipeline, 5 commanders in PG
+
+- **3 arquivos**, **+162/-0 linhas**
+- **Tipo: CODE** — Pipeline de auto-promocao de learned decks:
+  1. `auto_promote_learned_decks.py` (94 linhas): criterios minimos (100 cartas, 1+99, nao-Lorehold, idempotente)
+  2. `deck_learning_event_support.dart`: `logGeneratedDeckForLearning()` + `ensureCommanderCardUsageTable()`
+  3. `routes/ai/generate/index.dart`: fire-and-forget `logGeneratedDeckForLearning()` em decks Commander validos
+- **Avaliacao Hermes**: Expansao do loop de aprendizado para decks gerados por IA. Fire-and-forget evita bloqueio. Baixo risco.
+- **Verificacao**: Health endpoint operacional.
+
+### `f7d8f180` — Connect usage hot cards to generate prompt, fix auto-sync dart path, expand to 3 commanders
+
+- **3 arquivos**, **+28/-1 linhas**
+- **Tipo: CODE** — Conexao dos hot cards com prompt de geracao:
+  1. `deck_learning_event_support.dart`: `loadUsageHotCards()` + `buildUsageHotCardsPrompt()`
+  2. `routes/ai/generate/index.dart`: carrega hot cards e injeta no prompt como "Real-player usage data"
+  3. `auto_sync_learned_decks.py`: ajuste de caminho do binario Dart
+- **Avaliacao Hermes**: Fecha o loop: dados reais de uso alimentam prompts de geracao. Fallback seguro (array vazio em erros). Baixo risco.
+- **Verificacao**: `dart analyze`: No issues found.
+
+### `4d822f44` — Add commander_card_usage real-user feedback loop for deck generation
+
+- **4 arquivos**, **+138/-0 linhas**
+- **Tipo: CODE/DB** — Tabela `commander_card_usage` + logica de upsert:
+  1. `deck_learning_event_support.dart`: `upsertCommanderCardUsage()`, `learningUsageCardsForCommander()`, `ensureCommanderCardUsageTable()`
+  2. `database_setup.sql`: nova tabela `commander_card_usage` (PK: commander+card, usage_count, last_used_at)
+  3. `routes/ai/commander-reference/index.dart`: `_loadUsageStatsSafe()` retorna `usage.hot_cards` no payload de aprendizado
+  4. `routes/decks/index.dart`: upsert de uso a cada deck salvo
+- **Avaliacao Hermes**: Tabela de feedback real de uso. Filtra comandante e duplicatas. Fallback seguro. Baixo risco.
+- **Verificacao**: `dart test`: 599 passed.
+
+### `b7866616` — Close learning loop: App deck saves flow to Hermes via PG deck_learning_events
+
+- **5 arquivos**, **+304/-0 linhas**
+- **Tipo: CODE/DB** — Tabela `deck_learning_events` + scripts de pull:
+  1. `deck_learning_event_support.dart` (56 linhas): `ensureDeckLearningEventsTable()`, `logDeckLearningEvent()`
+  2. `database_setup.sql`: nova tabela `deck_learning_events` (deck_id, commander, format, card_count, source, event_data JSONB, synced_to_hermes)
+  3. `pull_learning_events.py` (194 linhas): puxa eventos nao-sincronizados do PG para processamento Hermes
+  4. `pull_learning_events.sh`: wrapper shell
+  5. `routes/decks/index.dart`: `_logDeckCreateLearning()` com `_resolveLearningCardsForEvents()`
+- **Avaliacao Hermes**: Loop fechado: App→PG→Hermes. Fire-and-forget (`unawaited`) evita bloqueio no create deck. Baixo risco.
+- **Verificacao**: Health endpoint operacional.
+
+### `e66322e3` — Add Hermes auto-sync learned decks with Lorehold manual-review bypass
+
+- **2 arquivos**, **+128/-0 linhas**
+- **Tipo: CODE** — Scripts de auto-sync:
+  1. `auto_sync_learned_decks.py` (122 linhas): detecta decks promovidos no SQLite Hermes, exporta JSON, importa no PG via `commander_learned_deck.dart`
+  2. `auto_sync_learned_decks.sh`: wrapper shell
+- **Avaliacao Hermes**: Fundacao do pipeline auto-sync. Lorehold e bypassado (revisao manual). Baixo risco.
+- **Verificacao**: `dart analyze`: No issues found.
+### `d693b9fb` — Capture Lorehold learned deck visual proof
 
 - **1 arquivo**, **+25/-1 linhas**
 - **Tipo: CODE/TEST** — Adiciona capturas visuais ao teste de runtime do Lorehold learned deck:
   1. 4 chamadas de `captureVisualProof` em pontos-chave do fluxo (no commander, learned button visivel, hermes preview, saved deck details).
   2. Scroll e garantia de visibilidade antes de cada captura.
 - **Avaliacao Hermes**: Teste de integracao ampliado com prova visual. Sem mudanca de logica. Baixo risco.
-- **Verificacao**: Health endpoint confirma `git_sha: d693b9fb` em producao.
+- **Verificacao**: Health endpoint confirmou `git_sha: d693b9fb` em producao na rodada anterior.
 
 ### `5fc16e7d` — Add Hermes learned deck export/sync scripts, extract shared backend helpers, add save widget test
 

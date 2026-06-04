@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 14:10 UTC.
 
 ## Estrutura do repositorio
 
@@ -37,7 +37,8 @@ mtgia/
 │   │   │   ├── explain/          # Explicacao de cartas
 │   │   │   ├── archetypes/       # Opcoes de arquétipo
 │   │   │   ├── simulate/         # Simulacao de partidas
-│   │   │   ├── commander-reference/
+│   │   │   ├── commander-learning/       # Decks aprendidos pelo Hermes (NOVO)
+│   │   ├── commander-reference/
 │   │   │   └── ml-status/
 │   │   ├── import/*              # Importacao de listas
 │   │   ├── cards/*               # Busca, resolucao, printings
@@ -58,6 +59,8 @@ mtgia/
 │   │   ├── optimization_validator.dart
 │   │   ├── rebuild_guided_service.dart
 │   │   ├── commander_reference_*.dart (7 arquivos, incluindo commander_reference_helpers.dart)
+│   │   ├── deck_learning_event_support.dart   # Loop de aprendizado App→Hermes (NOVO)
+│   │   ├── commander_learned_deck_support.dart # Modelo/validacao de learned decks (NOVO)
 │   │   └── ...
 │   └── pubspec.yaml
 │
