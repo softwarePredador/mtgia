@@ -274,6 +274,24 @@ CREATE TABLE IF NOT EXISTS commander_learned_decks (
 CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
 ON commander_learned_decks (commander_name_normalized, is_active, promoted_at DESC, updated_at DESC);
 
+-- 9.1. Eventos de aprendizado para loop Hermes (App -> Hermes)
+-- Registra decks criados/salvos no app para o Hermes consumir e aprender.
+CREATE TABLE IF NOT EXISTS deck_learning_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID NOT NULL,
+    commander_name TEXT,
+    format TEXT NOT NULL,
+    card_count INTEGER NOT NULL DEFAULT 0,
+    source TEXT NOT NULL DEFAULT 'user_created',
+    event_data JSONB DEFAULT '{}'::jsonb,
+    synced_to_hermes BOOLEAN NOT NULL DEFAULT FALSE,
+    synced_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
+ON deck_learning_events (synced_to_hermes, created_at);
+
 -- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
 -- Armazena as cartas mais populares de cada formato, atualizada semanalmente
 -- Para evitar hardcoded staples e manter dados sempre atualizados

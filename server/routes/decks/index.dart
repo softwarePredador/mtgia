@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
@@ -7,6 +9,7 @@ import '../../lib/http_responses.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
 import '../../lib/scryfall_image_url.dart';
+import '../../lib/ai/deck_learning_event_support.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   // Este arquivo vai lidar com diferentes métodos HTTP para a rota /decks
@@ -410,6 +413,37 @@ Future<Response> _createDeck(RequestContext context) async {
 
       return deckMap;
     });
+
+    // Fire-and-forget: loga deck criado pro Hermes aprender
+    final commanderCard = cards.firstWhere(
+      (c) => c is Map && c['is_commander'] == true,
+      orElse: () => const {},
+    );
+    final commanderName =
+        commanderCard is Map ? commanderCard['name']?.toString() : null;
+    unawaited(
+      ensureDeckLearningEventsTable(conn).then(
+        (_) => logDeckLearningEvent(
+          pool: conn,
+          deckId: newDeck['id'].toString(),
+          commanderName: commanderName,
+          format: format,
+          cardCount: cards.length,
+          source: 'user_created',
+          eventData: {
+            'deck_name': name,
+            'cards': cards
+                .whereType<Map>()
+                .map((c) => {
+                      'name': c['name']?.toString() ?? c['card_id']?.toString(),
+                      'quantity': c['quantity'],
+                      'is_commander': c['is_commander'] == true,
+                    })
+                .toList(),
+          },
+        ),
+      ),
+    );
 
     return Response.json(body: newDeck);
   } on DeckRulesException catch (e) {
