@@ -57,6 +57,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                 prefixIcon: const Icon(Icons.search, color: AppTheme.brass400),
                 suffixIcon: IconButton(
                   key: const Key('user-search-clear-button'),
+                  tooltip: 'Limpar busca',
                   icon: const Icon(
                     Icons.clear,
                     color: AppTheme.textSecondary,

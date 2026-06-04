@@ -35,6 +35,7 @@ class CardDetailScreen extends StatelessWidget {
               ),
             ),
             leading: IconButton(
+              tooltip: 'Voltar',
               icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
               onPressed: () => Navigator.of(context).pop(),
             ),

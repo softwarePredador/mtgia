@@ -401,6 +401,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       appBar: AppBar(
         title: const Text('Importar Lista'),
         leading: IconButton(
+          tooltip: 'Voltar para decks',
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/decks'),
         ),

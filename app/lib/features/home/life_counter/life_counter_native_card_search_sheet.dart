@@ -172,6 +172,7 @@ class _LifeCounterNativeCardSearchSheetState
                                               key: const Key(
                                                 'life-counter-native-card-search-clear',
                                               ),
+                                              tooltip: 'Limpar busca',
                                               onPressed: () {
                                                 _controller.clear();
                                                 provider.clearSearch();

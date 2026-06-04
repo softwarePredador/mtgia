@@ -1104,6 +1104,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             const SizedBox(width: 8),
             IconButton(
               key: const ValueKey('trade-message-send-button'),
+              tooltip: 'Enviar mensagem',
               onPressed: sendCurrentMessage,
               icon: const Icon(Icons.send, color: AppTheme.brass400),
             ),

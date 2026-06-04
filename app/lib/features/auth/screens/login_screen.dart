@@ -133,6 +133,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
+                        tooltip:
+                            _obscurePassword
+                                ? 'Mostrar senha'
+                                : 'Ocultar senha',
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility_outlined

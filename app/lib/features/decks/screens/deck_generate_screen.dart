@@ -495,6 +495,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       appBar: AppBar(
         title: const Text('Gerador de Decks'),
         leading: IconButton(
+          tooltip: 'Voltar para decks',
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/decks'),
         ),

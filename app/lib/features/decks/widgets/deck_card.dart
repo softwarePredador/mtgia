@@ -232,6 +232,7 @@ class DeckCard extends StatelessWidget {
 
                           // ── Menu button ──
                           IconButton(
+                            tooltip: 'Abrir menu do deck',
                             icon: const Icon(Icons.more_vert, size: 20),
                             onPressed: () => _showDeckMenu(context),
                             color: AppTheme.textHint,

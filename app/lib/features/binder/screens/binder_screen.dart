@@ -1145,6 +1145,7 @@ class _SearchFilterBar extends StatelessWidget {
                 color: AppTheme.textSecondary,
               ),
               suffixIcon: IconButton(
+                tooltip: 'Limpar busca',
                 icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
                 onPressed: () {
                   searchController.clear();

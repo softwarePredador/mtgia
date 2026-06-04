@@ -97,6 +97,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                 color: AppTheme.textSecondary,
               ),
               suffixIcon: IconButton(
+                tooltip: 'Limpar busca',
                 icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
                 onPressed: () {
                   _searchController.clear();

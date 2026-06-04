@@ -193,6 +193,7 @@ class _ExploreTabState extends State<_ExploreTab>
                   ),
                   suffixIcon: IconButton(
                     key: const Key('community-explore-search-clear-button'),
+                    tooltip: 'Limpar busca',
                     icon: const Icon(
                       Icons.clear,
                       color: AppTheme.textSecondary,
@@ -611,6 +612,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
               ),
               suffixIcon: IconButton(
                 key: const Key('community-users-search-clear-button'),
+                tooltip: 'Limpar busca',
                 icon: const Icon(
                   Icons.clear,
                   color: AppTheme.textSecondary,

@@ -3,6 +3,42 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-04 — Hermes UI audit cron endurecida
+
+Motivo:
+
+- O `UI_AUDIT` remoto estava util como radar, mas precisava ficar versionado,
+  menos ruidoso e sem avancar estado quando o Hermes falhasse ou devolvesse
+  resposta incompleta.
+- A cron remota tambem estava usando scripts root-owned e um relatorio sem
+  permissao de escrita para o usuario `hermes`.
+
+Patch aplicado:
+
+- `flutter_ui_static_auditor.py` e wrapper `.sh` foram versionados em
+  `server/bin/`.
+- `ui_audit_pipeline.py` passou a exigir marcador `UI_AUDIT_BATCH_RESULT` antes
+  de atualizar estado e agora escreve o relatorio pelo proprio script.
+- O auditor estatico separa repo de scan (`mtgia-sync`/master) do repo de
+  memoria (`codex/hermes-analysis-docs`).
+- Cron `manaloom-flutter-ui-auditor` no Hermes foi ajustada para `every 180m`.
+- Ownership remoto de scripts e `docs/hermes-analysis` foi corrigido para
+  `hermes:hermes`.
+- Tooltips foram adicionados em acoes claras de UI para zerar o P1 objetivo de
+  `icon_button_missing_tooltip`.
+
+Validacao:
+
+- `python3 -m py_compile server/bin/ui_audit_pipeline.py server/bin/flutter_ui_static_auditor.py`;
+- auditor local com `UI_STATIC_REPORT_FILE=/tmp/...` retornou
+  `UI_AUDIT_RESULT: findings=215 P0=0 P1=0 P2=215`;
+- scripts sincronizados e executados manualmente no Hermes.
+
+Risco restante:
+
+- O auditor UI e estatico. P2 de cor/touch target precisa de prova visual no
+  iPhone Simulator antes de virar correcao obrigatoria.
+
 ## 2026-06-04 — Gate seguro para loop Hermes -> App
 
 Motivo:

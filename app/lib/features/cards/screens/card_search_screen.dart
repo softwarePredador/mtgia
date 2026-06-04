@@ -299,6 +299,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                   _searchController.text.isEmpty
                       ? null
                       : IconButton(
+                        tooltip: 'Limpar busca',
                         padding: EdgeInsets.zero,
                         visualDensity: VisualDensity.compact,
                         icon: const Icon(Icons.close_rounded, size: 16),

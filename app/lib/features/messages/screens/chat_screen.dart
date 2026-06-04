@@ -251,6 +251,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   builder: (context, provider, _) {
                     return IconButton(
                       key: const Key('chat-message-send-button'),
+                      tooltip: 'Enviar mensagem',
                       onPressed: provider.isSending ? null : _sendMessage,
                       icon:
                           provider.isSending

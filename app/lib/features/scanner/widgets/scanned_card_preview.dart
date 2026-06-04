@@ -698,6 +698,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
                 borderSide: BorderSide.none,
               ),
               suffixIcon: IconButton(
+                tooltip: 'Buscar carta manualmente',
                 icon: const Icon(Icons.search, color: AppTheme.primarySoft),
                 onPressed: () => widget.onManualSearch(_searchController.text),
               ),

@@ -361,9 +361,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     bool tieBreaker = false,
   }) {
     HapticFeedback.mediumImpact();
-    final activePlayers = participants ?? {
-      for (int i = 0; i < _playerCount; i++) i,
-    };
+    final activePlayers =
+        participants ?? {for (int i = 0; i < _playerCount; i++) i};
     final results = <int, int>{
       for (final player in activePlayers) player: _random.nextInt(20) + 1,
     };
@@ -524,7 +523,9 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       _experience = List<int>.of(session.experience);
       _commanderCasts = List<int>.of(session.commanderCasts);
       _playerSpecialStates =
-          session.playerSpecialStates.map(_decodePersistedSpecialState).toList();
+          session.playerSpecialStates
+              .map(_decodePersistedSpecialState)
+              .toList();
       _lastPlayerRolls = List<int?>.of(session.lastPlayerRolls);
       _lastHighRolls = List<int?>.of(session.lastHighRolls);
       _highRollWinners = _deriveHighRollWinners(_lastHighRolls);
@@ -556,10 +557,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           curve: Curves.easeOutCubic,
           reverseCurve: Curves.easeInCubic,
         );
-        final scale = Tween<double>(
-          begin: 0.94,
-          end: 1,
-        ).animate(
+        final scale = Tween<double>(begin: 0.94, end: 1).animate(
           CurvedAnimation(
             parent: animation,
             curve: Curves.easeOutCubic,
@@ -580,10 +578,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           opacity: opacity,
           child: SlideTransition(
             position: slide,
-            child: ScaleTransition(
-              scale: scale,
-              child: child,
-            ),
+            child: ScaleTransition(scale: scale, child: child),
           ),
         );
       },
@@ -598,7 +593,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     }
     _showTableOverlayDialog(
       barrierLabel: 'Fechar configuraÃ§Ãµes',
-        builder:
+      builder:
           (ctx) => _SettingsSheet(
             twoPlayerStartingLife: _startingLifeTwoPlayer,
             multiPlayerStartingLife: _startingLifeMultiPlayer,
@@ -908,9 +903,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                   child: const AbsorbPointer(
                     absorbing: true,
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color(0xA6000000),
-                      ),
+                      decoration: BoxDecoration(color: Color(0xA6000000)),
                     ),
                   ),
                 ),
@@ -990,7 +983,9 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   Widget _buildTwoPlayers() {
     return Column(
       children: [
-        Expanded(child: _buildPlayerSlot(0, quarterTurns: _quarterTurnsForSeat(0))),
+        Expanded(
+          child: _buildPlayerSlot(0, quarterTurns: _quarterTurnsForSeat(0)),
+        ),
         const SizedBox(height: _tableGutter),
         Expanded(child: _buildPlayerSlot(1)),
       ],
@@ -1223,10 +1218,12 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         poison: _poison[playerIndex],
         commanderTax: _commanderCasts[playerIndex] * 2,
         commanderDamageTotal: _totalCommanderDamage(playerIndex),
-        commanderDamageLeadSourceLabel:
-            _commanderDamageLeadSourceLabel(playerIndex),
-        commanderDamageLeadSourceValue:
-            _commanderDamageLeadSourceValue(playerIndex),
+        commanderDamageLeadSourceLabel: _commanderDamageLeadSourceLabel(
+          playerIndex,
+        ),
+        commanderDamageLeadSourceValue: _commanderDamageLeadSourceValue(
+          playerIndex,
+        ),
         lastPlayerRoll: _lastPlayerRolls[playerIndex],
         highRollValue: _lastHighRolls[playerIndex],
         specialState: _playerSpecialStates[playerIndex],
@@ -1357,7 +1354,6 @@ class _TableControlHub extends StatelessWidget {
         offset: Offset(84 * scaleFactor, 0),
         rotation: pi / 2,
       ),
-    
     ];
 
     final hubSize = (isExpanded ? 256 : 68) * scaleFactor;
@@ -1549,9 +1545,9 @@ class _HubMedallion extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF9CE9FF).withValues(
-                          alpha: isExpanded ? 0.2 : 0.11,
-                        ),
+                        color: const Color(
+                          0xFF9CE9FF,
+                        ).withValues(alpha: isExpanded ? 0.2 : 0.11),
                         blurRadius: isExpanded ? 24 : 14,
                         spreadRadius: isExpanded ? 2 : 0,
                       ),
@@ -1566,7 +1562,9 @@ class _HubMedallion extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: isExpanded ? 0.32 : 0.2),
+                      color: Colors.white.withValues(
+                        alpha: isExpanded ? 0.32 : 0.2,
+                      ),
                       width: 1.2,
                     ),
                     boxShadow: [
@@ -1577,21 +1575,16 @@ class _HubMedallion extends StatelessWidget {
                         offset: Offset(0, 8 * scaleFactor),
                       ),
                       BoxShadow(
-                        color: const Color(0xFFFFE69A).withValues(
-                          alpha: isExpanded ? 0.08 : 0.04,
-                        ),
+                        color: const Color(
+                          0xFFFFE69A,
+                        ).withValues(alpha: isExpanded ? 0.08 : 0.04),
                         blurRadius: isExpanded ? 12 : 8,
                       ),
                     ],
                   ),
                   child: CustomPaint(
-                    painter: _HubMedallionPainter(
-                      progress: isExpanded ? 1 : 0,
-                    ),
-                    child: SizedBox(
-                      width: outerSize,
-                      height: outerSize,
-                    ),
+                    painter: _HubMedallionPainter(progress: isExpanded ? 1 : 0),
+                    child: SizedBox(width: outerSize, height: outerSize),
                   ),
                 ),
                 Container(
@@ -1600,7 +1593,9 @@ class _HubMedallion extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: isExpanded ? 0.3 : 0.2),
+                      color: Colors.white.withValues(
+                        alpha: isExpanded ? 0.3 : 0.2,
+                      ),
                       width: 1.1,
                     ),
                   ),
@@ -1642,10 +1637,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF04070E),
-              Color(0xFF121A2B),
-            ],
+            colors: [Color(0xFF04070E), Color(0xFF121A2B)],
           ).createShader(Offset.zero & size)
           ..isAntiAlias = true;
 
@@ -1654,10 +1646,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFEAFDFF),
-              Color(0xFFB9D7FF),
-            ],
+            colors: [Color(0xFFEAFDFF), Color(0xFFB9D7FF)],
           ).createShader(Offset.zero & size)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.4
@@ -1669,10 +1658,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFDF4FF),
-              Color(0xFFD7EDFF),
-            ],
+            colors: [Color(0xFFFDF4FF), Color(0xFFD7EDFF)],
           ).createShader(Offset.zero & size)
           ..isAntiAlias = true;
 
@@ -1684,23 +1670,27 @@ class _HubMedallionPainter extends CustomPainter {
           ..strokeJoin = StrokeJoin.round
           ..isAntiAlias = true;
 
-            final ringStroke =
-            Paint()
-              ..color = const Color(0xFFE5FCFF).withValues(alpha: 0.56 + (0.2 * progress))
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.1
-              ..strokeJoin = StrokeJoin.round
-              ..isAntiAlias = true;
+    final ringStroke =
+        Paint()
+          ..color = const Color(
+            0xFFE5FCFF,
+          ).withValues(alpha: 0.56 + (0.2 * progress))
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true;
 
     final glow =
         Paint()
-              ..color = const Color(0xFF97EEFF).withValues(alpha: 0.12 + (0.05 * progress))
+          ..color = const Color(
+            0xFF97EEFF,
+          ).withValues(alpha: 0.12 + (0.05 * progress))
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
 
     canvas.drawPath(shellPath.shift(const Offset(0, 2)), glow);
     canvas.drawPath(shellPath, shellFill);
     canvas.drawPath(shellPath, shellStroke);
-            canvas.drawPath(ringPath, ringStroke);
+    canvas.drawPath(ringPath, ringStroke);
     canvas.drawPath(corePath, coreFill);
     canvas.drawPath(corePath, coreStroke);
 
@@ -1709,15 +1699,14 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.white.withValues(alpha: 0.18),
-              Colors.transparent,
-            ],
-          ).createShader(Rect.fromCenter(
-            center: center.translate(0, -size.height * 0.16),
-            width: size.width * 0.42,
-            height: size.height * 0.24,
-          ))
+            colors: [Colors.white.withValues(alpha: 0.18), Colors.transparent],
+          ).createShader(
+            Rect.fromCenter(
+              center: center.translate(0, -size.height * 0.16),
+              width: size.width * 0.42,
+              height: size.height * 0.24,
+            ),
+          )
           ..isAntiAlias = true;
 
     canvas.save();
@@ -1884,7 +1873,10 @@ class _TableOverlayFrame extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: width, maxHeight: maxHeight),
+              constraints: BoxConstraints(
+                maxWidth: width,
+                maxHeight: maxHeight,
+              ),
               child: Stack(
                 children: [
                   Container(
@@ -1918,11 +1910,7 @@ class _TableOverlayFrame extends StatelessWidget {
                           ),
                         ],
                         const SizedBox(height: 18),
-                        Flexible(
-                          child: SingleChildScrollView(
-                            child: child,
-                          ),
-                        ),
+                        Flexible(child: SingleChildScrollView(child: child)),
                       ],
                     ),
                   ),
@@ -2055,13 +2043,12 @@ class _PlayerLayoutGlyph extends StatelessWidget {
     if (playerCount == 3) {
       return Column(
         children: [
-          Expanded(child: Row(children: [tile(color: tileAlt), tile(color: tileAlt)])),
+          Expanded(
+            child: Row(children: [tile(color: tileAlt), tile(color: tileAlt)]),
+          ),
           Expanded(
             child: Row(
-              children: [
-                tile(color: tileAlt),
-                Expanded(child: Container()),
-              ],
+              children: [tile(color: tileAlt), Expanded(child: Container())],
             ),
           ),
         ],
@@ -2268,6 +2255,7 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                                   key: const Key(
                                     'life-counter-card-search-clear',
                                   ),
+                                  tooltip: 'Limpar busca',
                                   onPressed: () {
                                     _controller.clear();
                                     provider.clearSearch();
@@ -2352,9 +2340,11 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                       Column(
                         key: const Key('life-counter-card-search-results'),
                         children: [
-                          for (int i = 0;
-                              i < provider.searchResults.length && i < 8;
-                              i++)
+                          for (
+                            int i = 0;
+                            i < provider.searchResults.length && i < 8;
+                            i++
+                          )
                             Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: _CardSearchResultTile(
@@ -2425,10 +2415,7 @@ class _CardSearchResultTile extends StatelessWidget {
   final Key tileKey;
   final DeckCardItem card;
 
-  const _CardSearchResultTile({
-    required this.tileKey,
-    required this.card,
-  });
+  const _CardSearchResultTile({required this.tileKey, required this.card});
 
   @override
   Widget build(BuildContext context) {
@@ -2439,9 +2426,7 @@ class _CardSearchResultTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => CardDetailScreen(card: card),
-            ),
+            MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
           );
         },
         child: Ink(
@@ -2850,37 +2835,81 @@ class _PlayerPanelState extends State<_PlayerPanel> {
 
   bool get _isDenseCompact => widget.compact && widget.dense;
 
-  double get _coreStageWidth => _isDenseCompact ? 132 : widget.compact ? 156 : 214;
-  double get _coreStageHeight => _isDenseCompact ? 108 : widget.compact ? 126 : 176;
+  double get _coreStageWidth =>
+      _isDenseCompact
+          ? 132
+          : widget.compact
+          ? 156
+          : 214;
+  double get _coreStageHeight =>
+      _isDenseCompact
+          ? 108
+          : widget.compact
+          ? 126
+          : 176;
 
   Alignment get _normalCoreAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.04 : widget.compact ? 0.05 : 0.035)
+            ? (_isDenseCompact
+                ? 0.04
+                : widget.compact
+                ? 0.05
+                : 0.035)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.04 : widget.compact ? -0.05 : -0.035)
+            ? (_isDenseCompact
+                ? -0.04
+                : widget.compact
+                ? -0.05
+                : -0.035)
             : 0.0;
-    final vertical = _isDenseCompact ? -0.04 : widget.compact ? -0.055 : -0.038;
+    final vertical =
+        _isDenseCompact
+            ? -0.04
+            : widget.compact
+            ? -0.055
+            : -0.038;
     return Alignment(horizontal, vertical);
   }
 
   Alignment get _actionsCoreAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.022 : widget.compact ? 0.03 : 0.02)
+            ? (_isDenseCompact
+                ? 0.022
+                : widget.compact
+                ? 0.03
+                : 0.02)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.022 : widget.compact ? -0.03 : -0.02)
+            ? (_isDenseCompact
+                ? -0.022
+                : widget.compact
+                ? -0.03
+                : -0.02)
             : 0.0;
-    final vertical = _isDenseCompact ? -0.018 : widget.compact ? -0.03 : -0.02;
+    final vertical =
+        _isDenseCompact
+            ? -0.018
+            : widget.compact
+            ? -0.03
+            : -0.02;
     return Alignment(horizontal, vertical);
   }
 
   Alignment get _eventTakeoverAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.014 : widget.compact ? 0.02 : 0.015)
+            ? (_isDenseCompact
+                ? 0.014
+                : widget.compact
+                ? 0.02
+                : 0.015)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.014 : widget.compact ? -0.02 : -0.015)
+            ? (_isDenseCompact
+                ? -0.014
+                : widget.compact
+                ? -0.02
+                : -0.015)
             : 0.0;
     return Alignment(horizontal, 0.0);
   }
@@ -2888,29 +2917,43 @@ class _PlayerPanelState extends State<_PlayerPanel> {
   Alignment get _specialTakeoverAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.008 : widget.compact ? 0.012 : 0.008)
+            ? (_isDenseCompact
+                ? 0.008
+                : widget.compact
+                ? 0.012
+                : 0.008)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.008 : widget.compact ? -0.012 : -0.008)
+            ? (_isDenseCompact
+                ? -0.008
+                : widget.compact
+                ? -0.012
+                : -0.008)
             : 0.0;
     return Alignment(horizontal, 0.0);
   }
 
   Alignment _screenSpaceQuickAdjustAlignment(bool isPlus) {
-    final base = _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
-    final lateral = _isDenseCompact ? 0.68 : widget.compact ? 0.74 : 0.8;
-    return Alignment(
-      base.x + (isPlus ? lateral : -lateral),
-      base.y,
-    );
+    final base =
+        _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
+    final lateral =
+        _isDenseCompact
+            ? 0.68
+            : widget.compact
+            ? 0.74
+            : 0.8;
+    return Alignment(base.x + (isPlus ? lateral : -lateral), base.y);
   }
 
   Alignment _screenSpaceStepIndicatorAlignment(bool isPlus) {
-    final base = _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
-    final lateral = _isDenseCompact ? 0.42 : widget.compact ? 0.46 : 0.52;
-    return Alignment(
-      base.x + (isPlus ? lateral : -lateral),
-      base.y,
-    );
+    final base =
+        _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
+    final lateral =
+        _isDenseCompact
+            ? 0.42
+            : widget.compact
+            ? 0.46
+            : 0.52;
+    return Alignment(base.x + (isPlus ? lateral : -lateral), base.y);
   }
 
   @override
@@ -3063,9 +3106,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         },
       ),
       _PlayerInlineAction(
-        actionKey: Key(
-          'life-counter-player-toggle-dead-${widget.panelIndex}',
-        ),
+        actionKey: Key('life-counter-player-toggle-dead-${widget.panelIndex}'),
         icon:
             hasPanelTakeoverState
                 ? Icons.favorite_rounded
@@ -3100,9 +3141,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         ),
       if (!hasPanelTakeoverState)
         _PlayerInlineAction(
-          actionKey: Key(
-            'life-counter-player-mark-left-${widget.panelIndex}',
-          ),
+          actionKey: Key('life-counter-player-mark-left-${widget.panelIndex}'),
           icon: Icons.exit_to_app_rounded,
           label: 'LEFT',
           compact: widget.compact,
@@ -3130,10 +3169,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         color: baseColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color:
-              isCommanderLethal
-                  ? AppTheme.error
-                  : Colors.black,
+          color: isCommanderLethal ? AppTheme.error : Colors.black,
           width: isCommanderLethal ? 3 : 3,
         ),
         boxShadow: const [],
@@ -3372,13 +3408,15 @@ class _PlayerPanelState extends State<_PlayerPanel> {
           Positioned.fill(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final centerGap =
-                    (_coreStageWidth + (_isDenseCompact ? 34 : widget.compact ? 40 : 54))
-                        .clamp(120.0, constraints.maxWidth);
-                final sideWidth = ((constraints.maxWidth - centerGap) / 2).clamp(
-                  0.0,
-                  constraints.maxWidth,
-                );
+                final centerGap = (_coreStageWidth +
+                        (_isDenseCompact
+                            ? 34
+                            : widget.compact
+                            ? 40
+                            : 54))
+                    .clamp(120.0, constraints.maxWidth);
+                final sideWidth = ((constraints.maxWidth - centerGap) / 2)
+                    .clamp(0.0, constraints.maxWidth);
 
                 return Row(
                   children: [
@@ -3418,7 +3456,12 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   key: Key('life-counter-step-minus-${widget.panelIndex}'),
                   style: TextStyle(
                     color: supportingColor,
-                    fontSize: _isDenseCompact ? 20 : widget.compact ? 24 : 28,
+                    fontSize:
+                        _isDenseCompact
+                            ? 20
+                            : widget.compact
+                            ? 24
+                            : 28,
                     fontWeight: FontWeight.w800,
                     height: 1,
                   ),
@@ -3436,7 +3479,12 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   key: Key('life-counter-step-plus-${widget.panelIndex}'),
                   style: TextStyle(
                     color: supportingColor,
-                    fontSize: _isDenseCompact ? 20 : widget.compact ? 24 : 28,
+                    fontSize:
+                        _isDenseCompact
+                            ? 20
+                            : widget.compact
+                            ? 24
+                            : 28,
                     fontWeight: FontWeight.w800,
                     height: 1,
                   ),
@@ -3496,13 +3544,11 @@ class _PlayerPanelState extends State<_PlayerPanel> {
     required String? eventLabel,
     required String? eventValue,
   }) {
-    if (
-      isDefeated ||
-      isDeckedOut ||
-      hasAnswerLeft ||
-      isCommanderLethal ||
-      isPoisonLethal
-    ) {
+    if (isDefeated ||
+        isDeckedOut ||
+        hasAnswerLeft ||
+        isCommanderLethal ||
+        isPoisonLethal) {
       return SizedBox(
         key: ValueKey(
           'life-core-special-${widget.panelIndex}-$isDefeated-$isDeckedOut-$hasAnswerLeft-$isCommanderLethal-$isPoisonLethal',
@@ -3559,11 +3605,20 @@ class _PlayerPanelState extends State<_PlayerPanel> {
           style: TextStyle(
             fontFamily: _tableDisplayFontFamily,
             color: dominantValueColor,
-            fontSize: _isDenseCompact ? 104 : widget.compact ? 126 : 184,
+            fontSize:
+                _isDenseCompact
+                    ? 104
+                    : widget.compact
+                    ? 126
+                    : 184,
             fontWeight: FontWeight.w900,
             height: 0.88,
             letterSpacing:
-                _isDenseCompact ? -2.4 : widget.compact ? -3.1 : -3.8,
+                _isDenseCompact
+                    ? -2.4
+                    : widget.compact
+                    ? -3.1
+                    : -3.8,
           ),
         ),
       ),
@@ -3603,8 +3658,18 @@ class _PlayerInlineAction extends StatelessWidget {
         onTap: onTap,
         child: Ink(
           padding: EdgeInsets.symmetric(
-            horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
-            vertical: isDenseCompact ? 6 : compact ? 8 : 9,
+            horizontal:
+                isDenseCompact
+                    ? 8
+                    : compact
+                    ? 10
+                    : 12,
+            vertical:
+                isDenseCompact
+                    ? 6
+                    : compact
+                    ? 8
+                    : 9,
           ),
           decoration: BoxDecoration(
             color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
@@ -3617,7 +3682,16 @@ class _PlayerInlineAction extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: isDenseCompact ? 12 : compact ? 14 : 16, color: accent),
+              Icon(
+                icon,
+                size:
+                    isDenseCompact
+                        ? 12
+                        : compact
+                        ? 14
+                        : 16,
+                color: accent,
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -3740,8 +3814,18 @@ class _PlayerCounterConsoleStat extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
-          vertical: isDenseCompact ? 4 : compact ? 5 : 6,
+          horizontal:
+              isDenseCompact
+                  ? 8
+                  : compact
+                  ? 10
+                  : 12,
+          vertical:
+              isDenseCompact
+                  ? 4
+                  : compact
+                  ? 5
+                  : 6,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -3805,8 +3889,18 @@ class _LifeQuickAdjustButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDenseCompact = compact && dense;
     return SizedBox(
-      width: isDenseCompact ? 56 : compact ? 68 : 82,
-      height: isDenseCompact ? 30 : compact ? 38 : 42,
+      width:
+          isDenseCompact
+              ? 56
+              : compact
+              ? 68
+              : 82,
+      height:
+          isDenseCompact
+              ? 30
+              : compact
+              ? 38
+              : 42,
       child: Semantics(
         label: semanticLabel ?? label,
         button: true,
@@ -3828,7 +3922,12 @@ class _LifeQuickAdjustButton extends StatelessWidget {
                     label,
                     style: TextStyle(
                       color: color,
-                      fontSize: isDenseCompact ? 18 : compact ? 22 : 24,
+                      fontSize:
+                          isDenseCompact
+                              ? 18
+                              : compact
+                              ? 22
+                              : 24,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -3890,8 +3989,18 @@ class _PanelTakeoverOverlay extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: accent.withValues(alpha: 0.22 * value),
-                  blurRadius: isDenseCompact ? 16 : compact ? 22 : 32,
-                  spreadRadius: isDenseCompact ? 0.6 : compact ? 1 : 2,
+                  blurRadius:
+                      isDenseCompact
+                          ? 16
+                          : compact
+                          ? 22
+                          : 32,
+                  spreadRadius:
+                      isDenseCompact
+                          ? 0.6
+                          : compact
+                          ? 1
+                          : 2,
                 ),
               ],
             ),
@@ -3909,7 +4018,12 @@ class _PanelTakeoverOverlay extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.98),
-                          fontSize: isDenseCompact ? 26 : compact ? 34 : 44,
+                          fontSize:
+                              isDenseCompact
+                                  ? 26
+                                  : compact
+                                  ? 34
+                                  : 44,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.8,
                           height: 0.95,
@@ -3982,11 +4096,7 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
             ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFFC55A),
-                Color(0xFFFFE596),
-                Color(0xFFFFB764),
-              ],
+              colors: [Color(0xFFFFC55A), Color(0xFFFFE596), Color(0xFFFFB764)],
             )
             : LinearGradient(
               begin: Alignment.topLeft,
@@ -4058,12 +4168,15 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                if (isWinner)
-                  ..._buildConfetti(progress),
-                if (isTie)
-                  ..._buildTieMarkers(progress),
+                if (isWinner) ..._buildConfetti(progress),
+                if (isTie) ..._buildTieMarkers(progress),
                 Positioned(
-                  top: isDenseCompact ? 8 : compact ? 12 : 16,
+                  top:
+                      isDenseCompact
+                          ? 8
+                          : compact
+                          ? 12
+                          : 16,
                   left: 0,
                   right: 0,
                   child: Transform.translate(
@@ -4073,8 +4186,18 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                       child: Center(
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
-                            vertical: isDenseCompact ? 4 : compact ? 5 : 6,
+                            horizontal:
+                                isDenseCompact
+                                    ? 8
+                                    : compact
+                                    ? 10
+                                    : 12,
+                            vertical:
+                                isDenseCompact
+                                    ? 4
+                                    : compact
+                                    ? 5
+                                    : 6,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(
@@ -4115,8 +4238,18 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                     scale: 0.88 + (0.12 * progress),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: isDenseCompact ? 8 : compact ? 10 : 14,
-                        vertical: isDenseCompact ? 12 : compact ? 18 : 24,
+                        horizontal:
+                            isDenseCompact
+                                ? 8
+                                : compact
+                                ? 10
+                                : 14,
+                        vertical:
+                            isDenseCompact
+                                ? 12
+                                : compact
+                                ? 18
+                                : 24,
                       ),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
@@ -4136,8 +4269,18 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                               ? 0.18 * progress
                                               : 0.06 * progress,
                                     ),
-                                    blurRadius: isDenseCompact ? 22 : compact ? 34 : 46,
-                                    spreadRadius: isDenseCompact ? 1 : compact ? 2 : 3,
+                                    blurRadius:
+                                        isDenseCompact
+                                            ? 22
+                                            : compact
+                                            ? 34
+                                            : 46,
+                                    spreadRadius:
+                                        isDenseCompact
+                                            ? 1
+                                            : compact
+                                            ? 2
+                                            : 3,
                                   ),
                                 ],
                               ),
@@ -4152,11 +4295,20 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: _tableDisplayFontFamily,
                                     color: valueColor,
-                                    fontSize: isDenseCompact ? 128 : compact ? 168 : 246,
+                                    fontSize:
+                                        isDenseCompact
+                                            ? 128
+                                            : compact
+                                            ? 168
+                                            : 246,
                                     fontWeight: FontWeight.w900,
                                     height: 0.78,
                                     letterSpacing:
-                                        isDenseCompact ? -2.6 : compact ? -3.2 : -4.0,
+                                        isDenseCompact
+                                            ? -2.6
+                                            : compact
+                                            ? -3.2
+                                            : -4.0,
                                   ),
                                 ),
                               ),
@@ -4164,7 +4316,12 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                             if (resultLabel != null)
                               Padding(
                                 padding: EdgeInsets.only(
-                                  top: isDenseCompact ? 0 : compact ? 2 : 6,
+                                  top:
+                                      isDenseCompact
+                                          ? 0
+                                          : compact
+                                          ? 2
+                                          : 6,
                                 ),
                                 child: Transform.translate(
                                   offset: Offset(0, 8 * (1 - progress)),
@@ -4173,15 +4330,25 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
                                         horizontal:
-                                            isDenseCompact ? 8 : compact ? 10 : 14,
+                                            isDenseCompact
+                                                ? 8
+                                                : compact
+                                                ? 10
+                                                : 14,
                                         vertical:
-                                            isDenseCompact ? 4 : compact ? 5 : 6,
+                                            isDenseCompact
+                                                ? 4
+                                                : compact
+                                                ? 5
+                                                : 6,
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withValues(
                                           alpha: isTie ? 0.82 : 0.76,
                                         ),
-                                        borderRadius: BorderRadius.circular(999),
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
                                         border: Border.all(
                                           color: Colors.white.withValues(
                                             alpha: isTie ? 0.14 : 0.18,
@@ -4809,7 +4976,10 @@ class _DiceActionRow extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: borderColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(999),
@@ -4968,9 +5138,7 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
             Positioned.fill(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.74),
-                ),
+                child: Container(color: Colors.black.withValues(alpha: 0.74)),
               ),
             ),
             Center(
@@ -5031,7 +5199,9 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                             '9',
                           ])
                             _SetLifeKeypadButton(
-                              buttonKey: Key('life-counter-set-life-digit-$digit'),
+                              buttonKey: Key(
+                                'life-counter-set-life-digit-$digit',
+                              ),
                               label: digit,
                               onTap: () => _appendDigit(digit),
                             ),
@@ -5042,12 +5212,16 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                             destructive: true,
                           ),
                           _SetLifeKeypadButton(
-                            buttonKey: const Key('life-counter-set-life-digit-0'),
+                            buttonKey: const Key(
+                              'life-counter-set-life-digit-0',
+                            ),
                             label: '0',
                             onTap: () => _appendDigit('0'),
                           ),
                           _SetLifeKeypadButton(
-                            buttonKey: const Key('life-counter-set-life-backspace'),
+                            buttonKey: const Key(
+                              'life-counter-set-life-backspace',
+                            ),
                             label: 'âŒ«',
                             onTap: _backspace,
                           ),
@@ -5220,9 +5394,7 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
             Positioned.fill(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.76),
-                ),
+                child: Container(color: Colors.black.withValues(alpha: 0.76)),
               ),
             ),
             Center(
@@ -5677,9 +5849,7 @@ class _CountersOverlayState extends State<_CountersOverlay> {
         key: const Key('life-counter-counters-sheet'),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _OverlaySectionHeading(
-            widget.playerLabel.toUpperCase(),
-          ),
+          _OverlaySectionHeading(widget.playerLabel.toUpperCase()),
           const SizedBox(height: 12),
           _CounterRow(
             rowKey: const Key('life-counter-poison-row'),
@@ -5696,9 +5866,7 @@ class _CountersOverlayState extends State<_CountersOverlay> {
           const SizedBox(height: 12),
           _CounterRow(
             rowKey: const Key('life-counter-commander-casts-row'),
-            sublabelKey: const Key(
-              'life-counter-commander-casts-sublabel',
-            ),
+            sublabelKey: const Key('life-counter-commander-casts-sublabel'),
             valueKey: const Key('life-counter-commander-casts-value'),
             icon: Icons.local_fire_department_outlined,
             label: 'CAST TAX',
@@ -5830,10 +5998,7 @@ class _CommanderDamageQuickOverlayState
                 'life-counter-quick-commander-damage-lethal-summary',
               ),
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: AppTheme.error.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(18),
@@ -6095,11 +6260,7 @@ class _CounterRow extends StatelessWidget {
             ),
           ),
           // Plus button
-          _RoundButton(
-            icon: Icons.add,
-            color: color,
-            onTap: onIncrement,
-          ),
+          _RoundButton(icon: Icons.add, color: color, onTap: onIncrement),
         ],
       ),
     );
@@ -6363,7 +6524,11 @@ class _SettingsToggleRow extends StatelessWidget {
           ),
           child:
               selected
-                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
+                  ? const Icon(
+                    Icons.check_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  )
                   : null,
         ),
         const SizedBox(width: 12),

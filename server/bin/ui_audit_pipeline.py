@@ -1,213 +1,326 @@
 #!/usr/bin/env python3
-"""Pipeline de auditoria UI/UX screen por screen.
+"""Incremental Flutter UI/UX audit pipeline for Hermes.
 
-Cada execucao:
-1. Indexa todos os arquivos de tela/widget do app
-2. Pega os proximos N que ainda nao foram auditados no ciclo atual
-3. Gera um prompt focado nesses arquivos
-4. Executa hermes LLM com o prompt
-5. Apenda findings ao relatorio
-6. Se ciclo completo, gera sumario e reinicia
-
-Estado salvo em: docs/hermes-analysis/.ui_audit_state.json
-Relatorio em:  docs/hermes-analysis/FLUTTER_UI_AUDIT.md
+This is the LLM-backed companion to the deterministic static UI auditor. Each
+run sends a small batch of screen/widget files to Hermes, appends Hermes'
+response to the memory report, and advances state only when the response ends
+with a valid UI_AUDIT_BATCH_RESULT marker.
 """
 
-import json, os, subprocess, sys
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-APP_DIR = os.environ.get(
-    "MTGIA_APP_DIR",
-    "/opt/data/workspace/mtgia-sync/app/lib",
+
+def _discover_repo() -> Path:
+    candidates = [Path.cwd(), Path(__file__).resolve()]
+    for candidate in candidates:
+        for parent in [candidate, *candidate.parents]:
+            if (parent / ".git").exists() and (parent / "app/lib").exists():
+                return parent
+    return Path("/opt/data/workspace/mtgia")
+
+
+REPO_DIR = Path(os.environ.get("MTGIA_REPO", str(_discover_repo())))
+SYNC_REPO_DIR = Path(
+    os.environ.get("MTGIA_SYNC_REPO", "/opt/data/workspace/mtgia-sync")
 )
-REPORT_FILE = "/opt/data/workspace/mtgia/docs/hermes-analysis/FLUTTER_UI_AUDIT.md"
-STATE_FILE = "/opt/data/workspace/mtgia/docs/hermes-analysis/.ui_audit_state.json"
-HERMES_BIN = "/opt/hermes/.venv/bin/hermes"
+APP_DIR = Path(os.environ.get("MTGIA_APP_DIR", str(SYNC_REPO_DIR / "app/lib")))
+REPORT_FILE = Path(
+    os.environ.get(
+        "UI_AUDIT_REPORT_FILE",
+        str(REPO_DIR / "docs/hermes-analysis/FLUTTER_UI_AUDIT.md"),
+    )
+)
+STATE_FILE = Path(
+    os.environ.get(
+        "UI_AUDIT_STATE_FILE",
+        str(REPO_DIR / "docs/hermes-analysis/.ui_audit_state.json"),
+    )
+)
+HERMES_BIN = Path(os.environ.get("HERMES_BIN", "/opt/hermes/.venv/bin/hermes"))
 BATCH_SIZE = int(os.environ.get("UI_AUDIT_BATCH", "2"))
+MAX_FILE_CHARS = int(os.environ.get("UI_AUDIT_MAX_FILE_CHARS", "5000"))
+HERMES_TIMEOUT_SECONDS = int(os.environ.get("UI_AUDIT_TIMEOUT_SECONDS", "600"))
+RESULT_RE = re.compile(
+    r"UI_AUDIT_BATCH_RESULT:\s*audited=(?P<audited>\d+)\s+"
+    r"findings=(?P<findings>\d+)\s+P0=(?P<p0>\d+)\s+"
+    r"P1=(?P<p1>\d+)\s+P2=(?P<p2>\d+)"
+)
 
-CHECKLIST = """## Checklist por Tela
+CHECKLIST = """## Checklist por tela
 
-Para cada arquivo, verifique:
+Verifique somente os arquivos recebidos neste batch:
 
-### A. Strings e Copy
-- Textos placeholder genericos ("Lorem ipsum", "TODO", "Teste")
-- Frases que parecem geradas por IA (muito longas, impessoais, genericas)
-- Falta de tratamento de plural/singular
-- Labels truncadas em telas pequenas
+### A. Strings e copy
+- Placeholder generico, TODO, lorem ipsum, teste ou copy improvisada.
+- Texto muito longo, impessoal ou gerado por IA.
+- Plural/singular incorreto.
+- Texto sem overflow/truncamento seguro.
 
-### B. Design System
-- Cores hardcoded (Color(0xFF...) em vez de AppTheme.xxx)
-- Padding/margin diferentes entre telas similares
-- Tamanhos de fonte fora do design system
-- Overflow de texto (TextOverflow nao configurado)
+### B. Design system
+- Cor hardcoded fora de tokens/AppTheme.
+- Padding/margin inconsistente entre telas similares.
+- Fonte/tamanho divergente do padrao premium ManaLoom.
+- Card, borda, sombra ou background fora do padrao Meus Decks/Home.
 
 ### C. Estados
-- Falta de estado de loading
-- Falta de estado de erro
-- Falta de estado empty (sem dados)
-- Falta de estado desabilitado em botoes
+- Loading, erro, vazio ou disabled ausente.
+- Falha visual com rede lenta ou imagem remota quebrada.
 
-### D. Icones e Semantica
-- Icones sem contexto ou significado claro
-- Falta de tooltip/semanticLabel em botoes so com icone
-- Touch targets < 48x48
+### D. Icones e semantica
+- IconButton sem tooltip.
+- Botao so com icone sem semanticLabel quando o significado nao e obvio.
+- Touch target possivelmente menor que 48x48.
 
-### E. Mock/Dados Hardcoded
-- JSON fixo que deveria vir do backend
-- Imagens placeholder com path local
-- Flag isMock sempre true
+### E. Dados mock/hardcoded
+- Fixture, lista fixa ou path local que pode vazar para producao.
+- Diferenciar compatibilidade com contrato backend de mock indevido.
 
 ### F. Acessibilidade
-- Falta de Semantics widget em elementos interativos
-- Contraste de cores potencialmente baixo
-- Textos sem contraste suficiente com o fundo
+- Contraste suspeito.
+- Elemento interativo custom sem Semantics/Tooltip.
 
-### SAIDA por Arquivo
-Para cada arquivo, liste findings individuais neste formato:
-- [P0/P1/P2] arquivo:linha — descricao — sugestao de correcao
-Onde: P0=bloqueia release, P1=importante corrigir, P2=cosmetico/melhoria
+Saida obrigatoria por finding:
+- [P0/P1/P2] arquivo:linha - descricao - sugestao
+
+P0 bloqueia release, P1 deve entrar no backlog imediato, P2 e melhoria/cosmetico.
 """
 
 
-def find_screen_files():
-    """Encontra todos os arquivos de screen/widget no app."""
-    files = []
-    for root, _, filenames in os.walk(APP_DIR):
-        for f in filenames:
-            if f.endswith(".dart"):
-                path = os.path.join(root, f)
-                # Foca em screens e widgets principais, ignora testes e providers
-                rel = path.replace(APP_DIR + "/", "")
-                if "screen" in rel.lower() or "widget" in rel.lower() or "page" in rel.lower():
-                    files.append(path)
-                elif "view" in rel.lower():
-                    files.append(path)
+def run(cmd: list[str], cwd: Path, timeout: int = 30) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        cmd,
+        cwd=cwd,
+        text=True,
+        capture_output=True,
+        timeout=timeout,
+    )
+
+
+def rel(path: Path) -> str:
+    try:
+        return str(path.relative_to(APP_DIR))
+    except ValueError:
+        return str(path)
+
+
+def find_screen_files() -> list[Path]:
+    files: list[Path] = []
+    if not APP_DIR.exists():
+        return files
+    for path in APP_DIR.rglob("*.dart"):
+        relative = rel(path)
+        lower = relative.lower()
+        if path.name.endswith(".g.dart"):
+            continue
+        if any(token in lower for token in ("screen", "widget", "page", "view")):
+            files.append(path)
     return sorted(files)
 
 
-def load_state():
-    if os.path.exists(STATE_FILE):
+def load_state() -> dict:
+    if STATE_FILE.exists():
         try:
-            return json.load(open(STATE_FILE))
+            state = json.loads(STATE_FILE.read_text())
+            if isinstance(state, dict):
+                return {
+                    "audited": state.get("audited", {}),
+                    "cycle": state.get("cycle", 1),
+                    "last_run": state.get("last_run"),
+                }
         except Exception:
             pass
     return {"audited": {}, "cycle": 1, "last_run": None}
 
 
-def save_state(state):
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-    json.dump(state, open(STATE_FILE, "w"), indent=2)
+def save_state(state: dict) -> None:
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    STATE_FILE.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
 
 
-def main():
-    print("=== Flutter UI Audit Pipeline ===")
+def append_report(text: str) -> None:
+    REPORT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with REPORT_FILE.open("a") as report:
+        report.write(text.rstrip())
+        report.write("\n")
 
-    # Pull latest sync workspace
-    sync_dir = os.path.dirname(os.path.dirname(APP_DIR))
-    if os.path.isdir(os.path.join(sync_dir, ".git")):
-        subprocess.run(
-            ["git", "-C", sync_dir, "pull", "--ff-only", "origin", "master"],
-            capture_output=True, timeout=30,
-        )
-        print(f"Sync workspace atualizado: {sync_dir}")
 
-    all_files = find_screen_files()
-    state = load_state()
+def sync_master_workspace() -> None:
+    if not (SYNC_REPO_DIR / ".git").exists():
+        return
+    result = run(
+        ["git", "pull", "--ff-only", "origin", "master"],
+        cwd=SYNC_REPO_DIR,
+        timeout=45,
+    )
+    if result.returncode == 0:
+        print(f"Sync workspace updated: {SYNC_REPO_DIR}")
+    else:
+        print((result.stderr or result.stdout or "").strip())
 
-    # Filtra nao auditados no ciclo atual
-    pending = [f for f in all_files if f not in state["audited"]]
-    if not pending:
-        # Ciclo completo: gera sumario e reseta
-        print("CICLO COMPLETO — gerando sumario e reiniciando")
-        total = len(all_files)
-        findings_p0 = sum(1 for v in state["audited"].values() if v.get("p0", 0) > 0)
-        findings_p1 = sum(1 for v in state["audited"].values() if v.get("p1", 0) > 0)
-        findings_p2 = sum(1 for v in state["audited"].values() if v.get("p2", 0) > 0)
 
-        with open(REPORT_FILE, "a") as f:
-            f.write(f"\n---\n## Resumo Ciclo {state['cycle']}\n\n")
-            f.write(f"Total de telas: {total}\n")
-            f.write(f"Findings P0: {findings_p0}\n")
-            f.write(f"Findings P1: {findings_p1}\n")
-            f.write(f"Findings P2: {findings_p2}\n")
-            f.write(f"Concluido em: {datetime.now(timezone.utc).isoformat()}\n")
-            f.write(f"\nProximo ciclo: {state['cycle'] + 1}\n")
-            f.write("\n---\n\n")
+def render_cycle_summary(state: dict, total_files: int) -> None:
+    audited = state.get("audited", {})
+    p0 = sum(int(v.get("p0", 0)) for v in audited.values())
+    p1 = sum(int(v.get("p1", 0)) for v in audited.values())
+    p2 = sum(int(v.get("p2", 0)) for v in audited.values())
+    now = datetime.now(timezone.utc).isoformat()
+    append_report(
+        f"""
+---
+## Resumo ciclo {state.get('cycle', 1)}
 
-        state = {"audited": {}, "cycle": state["cycle"] + 1, "last_run": None}
-        save_state(state)
-        return 0
+- Total de arquivos UI: `{total_files}`
+- Findings P0: `{p0}`
+- Findings P1: `{p1}`
+- Findings P2: `{p2}`
+- Concluido em UTC: `{now}`
+- Proximo ciclo: `{int(state.get('cycle', 1)) + 1}`
 
-    batch = pending[:BATCH_SIZE]
-    print(f"Arquivos pendentes: {len(pending)}, auditando batch de {len(batch)}")
-    for b in batch:
-        rel = b.replace(APP_DIR + "/", "")
-        print(f"  {rel}")
+---
+"""
+    )
 
-    # Constroi texto com os arquivos (truncados se muito grandes)
-    file_contents = []
+
+def build_prompt(batch: list[Path], cycle: int) -> str:
+    file_contents: list[str] = []
     for path in batch:
-        rel = path.replace(APP_DIR + "/", "")
+        relative = rel(path)
         try:
-            content = open(path).read()
-            if len(content) > 4000:
-                content = content[:3000] + "\n... (truncado, +" + str(len(content) - 3000) + " bytes)"
-            file_contents.append(f"### Arquivo: {rel}\n```dart\n{content}\n```\n")
-        except Exception as e:
-            file_contents.append(f"### Arquivo: {rel}\nERRO LEITURA: {e}\n")
+            content = path.read_text(errors="replace")
+            if len(content) > MAX_FILE_CHARS:
+                content = (
+                    content[:MAX_FILE_CHARS]
+                    + f"\n... (truncado, +{len(content) - MAX_FILE_CHARS} chars)"
+                )
+            file_contents.append(
+                f"### Arquivo: {relative}\n```dart\n{content}\n```\n"
+            )
+        except Exception as exc:
+            file_contents.append(f"### Arquivo: {relative}\nERRO LEITURA: {exc}\n")
 
-    prompt = f"""## Flutter UI/UX Audit — Ciclo {state['cycle']} — Batch {len(batch)} arquivos
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+    return f"""## Flutter UI/UX Audit - Ciclo {cycle} - {now} UTC
 
-Workdir: /opt/data/workspace/mtgia
-NAO editar produto, codigo ou master.
-NAO commitar.
+Workdir informativo: {REPO_DIR}
+Nao edite arquivos.
+Nao commite.
+Retorne somente a auditoria solicitada.
 
 {CHECKLIST}
 
-### ARQUIVOS PARA AUDITAR NESTE CICLO
+### Arquivos para auditar neste batch
 
 {''.join(file_contents)}
 
-### INSTRUCOES
-1. Analise CADA arquivo individualmente contra o checklist acima.
-2. Liste findings no formato: [P0/P1/P2] arquivo:linha — descricao — sugestao
-3. Apenda seus findings ao final de {REPORT_FILE} com header "## Ciclo {state['cycle']} — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}"
-4. Se nao houver findings, registre "Nenhum finding — OK".
-
-Sempre termine com: UI_AUDIT_BATCH_RESULT: audited={len(batch)} findings=N P0=X P1=Y P2=Z
+### Instrucoes finais
+1. Analise cada arquivo individualmente.
+2. Liste apenas findings com evidencia concreta no codigo recebido.
+3. Se nao houver findings, escreva `Nenhum finding - OK`.
+4. Nao invente telas, screenshots ou validacao em simulator.
+5. Termine obrigatoriamente com:
+UI_AUDIT_BATCH_RESULT: audited={len(batch)} findings=N P0=X P1=Y P2=Z
 """
 
-    # Executa hermes
-    print("Executando Hermes LLM...")
+
+def run_hermes(prompt: str) -> tuple[int, str]:
+    if not HERMES_BIN.exists():
+        return 127, f"Hermes binary not found: {HERMES_BIN}"
     result = subprocess.run(
-        [HERMES_BIN, "--accept-hooks", "-z", prompt],
-        capture_output=True, text=True, timeout=600,
-        cwd="/opt/data/workspace/mtgia",
-        env={**os.environ, "OPENCODE_GO_API_KEY": os.environ.get("OPENCODE_GO_API_KEY", "")},
+        [str(HERMES_BIN), "--accept-hooks", "-z", prompt],
+        cwd=REPO_DIR,
+        text=True,
+        capture_output=True,
+        timeout=HERMES_TIMEOUT_SECONDS,
+        env={
+            **os.environ,
+            "OPENCODE_GO_API_KEY": os.environ.get("OPENCODE_GO_API_KEY", ""),
+        },
     )
+    return result.returncode, (result.stdout or "") + (result.stderr or "")
 
-    output = result.stdout + result.stderr
-    print(output[-500:] if len(output) > 500 else output)
 
-    # Atualiza estado
-    now = datetime.now(timezone.utc).isoformat()
+def parse_result(output: str) -> dict[str, int] | None:
+    matches = list(RESULT_RE.finditer(output))
+    if not matches:
+        return None
+    match = matches[-1]
+    return {key: int(value) for key, value in match.groupdict().items()}
+
+
+def main() -> int:
+    print("=== Flutter UI Audit Pipeline ===")
+    sync_master_workspace()
+
+    files = find_screen_files()
+    state = load_state()
+    audited: dict = state.setdefault("audited", {})
+    pending = [path for path in files if rel(path) not in audited]
+
+    if not pending:
+        print("Cycle complete; writing summary and resetting state.")
+        render_cycle_summary(state, len(files))
+        save_state({"audited": {}, "cycle": int(state.get("cycle", 1)) + 1, "last_run": None})
+        return 0
+
+    batch = pending[:BATCH_SIZE]
+    print(f"Pending files: {len(pending)}; auditing batch: {len(batch)}")
     for path in batch:
-        rel = path.replace(APP_DIR + "/", "")
-        p0 = output.count("[P0]") if path == batch[0] else 0  # estimativa simples
-        state["audited"][path] = {
-            "file": rel,
+        print(f"  {rel(path)}")
+
+    code, output = run_hermes(build_prompt(batch, int(state.get("cycle", 1))))
+    print(output[-1000:] if len(output) > 1000 else output)
+    parsed = parse_result(output)
+    if code != 0 or parsed is None or parsed["audited"] != len(batch):
+        append_report(
+            f"""
+---
+## Falha UI audit ciclo {state.get('cycle', 1)} - {datetime.now(timezone.utc).isoformat()}
+
+- Return code: `{code}`
+- Batch esperado: `{len(batch)}`
+- Resultado parseado: `{parsed}`
+
+```text
+{output[-4000:]}
+```
+"""
+        )
+        print("UI audit failed or missing result marker; state not advanced.")
+        return 1
+
+    header = (
+        f"\n---\n## Ciclo {state.get('cycle', 1)} - "
+        f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC\n\n"
+    )
+    append_report(header + output)
+
+    now = datetime.now(timezone.utc).isoformat()
+    # Store aggregate counts on the first file and mark the rest as audited. This
+    # avoids fragile per-file parsing while preserving cycle progress.
+    for index, path in enumerate(batch):
+        audited[rel(path)] = {
             "audited_at": now,
-            "p0": 1 if "[P0] " + rel in output else 0,
-            "p1": 1 if "[P1] " + rel in output else 0,
-            "p2": 1 if "[P2] " + rel in output else 0,
+            "findings": parsed["findings"] if index == 0 else 0,
+            "p0": parsed["p0"] if index == 0 else 0,
+            "p1": parsed["p1"] if index == 0 else 0,
+            "p2": parsed["p2"] if index == 0 else 0,
         }
     state["last_run"] = now
     save_state(state)
-
-    print(f"\nEstado atualizado: {len(state['audited'])}/{len(all_files)} auditados no ciclo {state['cycle']}")
+    print(
+        f"State updated: {len(audited)}/{len(files)} files audited "
+        f"in cycle {state.get('cycle', 1)}"
+    )
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

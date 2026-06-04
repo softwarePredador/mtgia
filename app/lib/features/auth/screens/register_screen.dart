@@ -87,6 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       maxWidth: 500,
       leading: IconButton(
         key: const Key('register-back-button'),
+        tooltip: 'Voltar para login',
         style: IconButton.styleFrom(
           backgroundColor: AppTheme.surfaceSlate.withValues(alpha: 0.78),
           foregroundColor: AppTheme.textPrimary,
@@ -177,6 +178,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
+                        tooltip:
+                            _obscurePassword
+                                ? 'Mostrar senha'
+                                : 'Ocultar senha',
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility_outlined
@@ -216,6 +221,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
+                        tooltip:
+                            _obscureConfirmPassword
+                                ? 'Mostrar confirmação de senha'
+                                : 'Ocultar confirmação de senha',
                         icon: Icon(
                           _obscureConfirmPassword
                               ? Icons.visibility_outlined
