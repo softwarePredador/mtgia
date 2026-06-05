@@ -1,10 +1,158 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
-> **Gerado:** 2026-06-05 por ManaLoom Knowledge Synthesis (Cron #9)
+> **Gerado:** 2026-06-05 por ManaLoom Knowledge Synthesis (Cron #10)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** 12e1da45
-> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Deep S42-43, Gamechanger Research Exec #7-#9, MANA_BASE_VALIDATION_REPORT 2026-06-05, SCOUT_LOG, VALIDATOR_LOG, STRUCTURE_AUDIT functions-not-called + card-semantics + duplicated-logic + postgresql-tables-not-used) com codigo Dart (edh_bracket_policy, card_validation_service, deck_rules_service, functional_card_tags, optimization_functional_roles, optimization_quality_gate, optimize_runtime_support, goldfish_simulator, ml_knowledge_service, candidate_quality_data_support)
-> **Base de conhecimento:** STRUCTURE_AUDIT 2026-06-05 (divergent semantic heuristics between classifiers P1, _isBasicLandName 4-way duplication P2, ml_prompt_feedback write-only P2, deck_weakness_reports write-only P3) + Commander Knowledge Skill (Mana Base Validator Exec #2 batch_c limitation) + MTG Domain Skill (card functional roles, basic land rules)
-> **Novas tasks nesta execucao:** 5 (1xP1, 3xP2, 1xP3) — Unify semantic heuristics between classifiers, centralize _isBasicLandName, connect MLKnowledgeService.recordFeedback, expand _run_validation.py to batch_c, add consumer for deck_weakness_reports
+> **HEAD:** 3f7266d6
+> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Deep S43-45 data integrity crisis + Atraxa/Winota analysis, TAG_ACCURACY_REPORT 2026-06-05 fork detection + CMC corruption spread, MANA_BASE_VALIDATION_REPORT 2026-06-05, Winota Evolution Analysis 2026-06-05) com codigo Dart (optimization_quality_gate, optimization_functional_roles, functional_card_tags, candidate_quality_data_support, goldfish_simulator, deck_rules_service, card_validation_service)
+> **Base de conhecimento:** Commander Deep Report S44 (promotion migration failure — 4/4 decks incomplete), TAG_ACCURACY_REPORT (tag system fork — 5 orphaned tags + 12 new fine tags + CMC=0.0 spread to 142 cards), Commander Deep Report S44.3 (Atraxa split archetype), S44.4 (Winota stax density 14/100)
+> **Novas tasks nesta execucao:** 5 (2xP1, 3xP2) — Deck promotion card migration verification, CMC batch correction + prevention hardening, tag accuracy fine-tag tracking, stax archetype detection in quality gate, split archetype detection heuristic
+
+### [P1] Deck Promotion: Adicionar verificacao de migracao de cartas pos-promocao — `deck_promotions` registra sucesso mas `deck_cards` fica vazio (4/4 decks promovidos quebrados)
+
+**Conhecimento MTG:** O Commander Knowledge Deep Report S44 (2026-06-05) documenta uma crise de integridade de dados: o Multi-Commander Evolution promoveu 4 decks em 24 minutos (2026-06-04), mas NENHUM teve as cartas migradas completamente:
+- Winota: claim=100, actual=85 (-15)
+- Atraxa: claim=100, actual=91 (-9)  
+- Kinnan: claim=100, actual=13 (-87)
+- Korvold: claim=90, actual=11 (-79)
+
+O processo de promocao criou registros em `deck_promotions` com `new_card_count` correto, mas a migracao de `learned_decks.card_list` para `deck_cards` falhou SILENCIOSAMENTE. O Multi-Commander Evolution acredita que os decks estao completos (le `deck_promotions`), mas a pipeline de analise trabalha com `deck_cards` — que estao quase vazios.
+
+**Evidencia no codigo:**
+- `rg "deck_promotion|auto_promote" server/lib/` → ZERO resultados. Promocao e inteiramente Python.
+- `server/lib/ai/commander_fallback_policy.dart` — Nao verifica se deck promovido tem cartas.
+- O validator e quality gate consultam `deck_cards` sem verificar `deck_promotions.migration_verified`.
+
+**Gap:** Promocao em 2 etapas (criar registro + migrar cartas). Etapa 2 falha sem que etapa 1 saiba.
+**Impacto:** P1 — 4/8 decks inuteis. Pipeline opera sobre dados fantasmas.
+**Risco:** P1 — Dados fantasmas se propagam para toda a pipeline.
+
+**Acao recomendada:**
+1. Adicionar `migration_verified BOOLEAN DEFAULT 0` a `deck_promotions`
+2. No `auto_promote_learned_decks.py`: verificar `COUNT(*)` pos-migracao vs `new_card_count`
+3. `commander_fallback_policy.dart`: verificar `migration_verified=1` antes de usar dados
+4. Health check no cron watchdog para promotions nao verificadas
+
+**Validacao:**
+```bash
+python3 -c "import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'); [print(f'promo_id={r[0]}: claimed={r[1]}, actual={r[2]}') for r in conn.execute('SELECT dp.id, dp.new_card_count, (SELECT COUNT(*) FROM deck_cards dc WHERE dc.deck_id = dp.target_deck_id) as actual FROM deck_promotions dp').fetchall()]"
+```
+
+---
+
+### [P1] CMC Correction: Script de correcao em lote para 142 cartas com CMC=0.0 + hardening do `_getCmc()` com warning ativo
+
+**Conhecimento MTG:** O TAG_ACCURACY_REPORT (2026-06-05) documenta que 142 cartas (26.2%) tem CMC=0.0. A corrupcao se espalhou de 1 deck para TODOS os 7. Cartas como Sol Ring (CMC=1), Mana Vault (1), Boros Signet (2), Aetherflux Reservoir (4) estao com CMC=0.0. Atraxa (deck 9, 100 cartas) importada com 29 CMCs invalidos.
+
+**Evidencia no codigo:**
+- `server/lib/ai/optimization_quality_gate.dart:459-465` — `_getCmc()` retorna 0 silenciosamente.
+- `server/lib/deck_rules_service.dart:412-447` — `_loadCardsData()` nao consulta `cmc`.
+
+**Gap:** Importacao Python nao consulta `cards.cmc` do PG. `_getCmc()` aceita 0 sem warning.
+**Impacto:** P1 — GoldfishSimulator, quality gate, e mulligan usam CMC corrompido.
+**Risco:** P1 — Bug replicavel. Toda nova importacao herda o problema.
+
+**Acao recomendada:**
+1. Script `scripts/fix_cmc_batch.py`: atualizar `deck_cards.cmc` a partir do PG `cards.cmc`
+2. Adicionar `cmc` ao SELECT em `_loadCardsData()`
+3. Warning em `_getCmc()` para CMC null/zero em cartas nao-land
+4. Script de importacao: sempre usar PG `cards.cmc` como autoritativo
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_quality_gate.dart && dart analyze lib/deck_rules_service.dart
+```
+
+---
+
+### [P2] Tag Accuracy: Adicionar tracking de precisao para as 12 novas tags finas — 45% da taxonomia sem cobertura
+
+**Conhecimento MTG:** TAG_ACCURACY_REPORT documenta fork no sistema de tags: 12 novas tags finas (token_maker, big_spell, aristocrat_payoff, etc.) sem entrada em `tag_accuracy`. 5 tags legadas orfas (0 cartas). `tag_accuracy` congelado desde 2026-05-27 (9 dias).
+
+**Evidencia no codigo:**
+- `functional_card_tags.dart:38-54` — `deckAnalysisMainFunctionalBuckets` INCLUI tags finas.
+- `candidate_quality_data_support.dart:343-365` — Mapeia fine→legacy via switch-case.
+- MAS: `rg "tag_accuracy" server/lib/` → ZERO resultados.
+
+**Gap:** 12 tags operam sem metricas de qualidade. Sistema de auto-healing nao pode funcionar sem saber quais tags monitorar.
+**Impacto:** P2 — Precisao das novas tags e desconhecida.
+**Risco:** P2 — Fork de tags pode crescer descontroladamente.
+
+**Acao recomendada:**
+1. Atualizar `tag_accuracy_reporter.py` para detectar novas tags e criar entradas em `tag_accuracy`
+2. Validacao cruzada com PG `card_function_tags` como fonte de verdade
+
+**Validacao:**
+```bash
+python3 -c "import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'); new = conn.execute('SELECT DISTINCT dc.functional_tag FROM deck_cards dc WHERE dc.functional_tag NOT IN (SELECT tag_name FROM tag_accuracy) AND dc.functional_tag IS NOT NULL AND dc.functional_tag != \"unknown\"').fetchall(); print(f'Untracked tags: {len(new)} (target: 0)')"
+```
+
+---
+
+### [P2] Quality Gate: Adicionar deteccao de densidade de stax como atributo estrutural — Winota 14 stax pieces
+
+**Conhecimento MTG:** Commander Deep Report S44.4: Winota tem 14 stax pieces (~16.5% das nao-lands). Domain Skill Gap 3: stax e uma das 7 categorias GC faltando. Quality gate trata Winota como "aggro" generico.
+
+**Evidencia no codigo:**
+- `optimization_quality_gate.dart:346-353` — `_criticalRolesForArchetype()` sem case 'stax'.
+- `functional_card_tags.dart:16-36` — `_taggableRoleNames` NAO inclui 'stax'.
+- `theme_contextual_rules_service.dart` — NAO tem tema 'stax' ou 'hatebears'.
+
+**Gap:** Quality gate cego a stax. Swaps que removem stax pieces nao sao bloqueados.
+**Impacto:** P2 — Pipeline pode cortar stax pieces de Winota.
+**Risco:** P2 — Afeta decks com stax density > 10%.
+
+**Acao recomendada:**
+1. Adicionar 'stax' ao `_taggableRoleNames`
+2. Heuristica de deteccao: oracle text com "can't" + "opponent"
+3. `_criticalRolesForArchetype`: case 'stax' → {'stax', 'creature', 'protection', 'ramp'}
+4. Metrica `staxDensity` e flag `heavyStax` quando > 0.15
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_quality_gate.dart && dart analyze lib/ai/functional_card_tags.dart
+```
+
+---
+
+### [P2] Optimization Validator: Adicionar deteccao de split archetype — Atraxa 3 sub-arquetipos (infect + superfriends + counters)
+
+**Conhecimento MTG:** Commander Deep Report S44.3: Atraxa tem 3 sub-arquetipos competindo: infect (~8), superfriends (~6), counters (~10). 0 board wipes, 3 protection em bracket 4.
+
+**Evidencia no codigo:**
+- `optimization_validator.dart:28-86` — Sem deteccao de split archetype.
+- `optimization_functional_roles.dart:55-124` — Classifica cartas individualmente, sem visao de cluster.
+- `theme_contextual_rules_service.dart` — Nao detecta multiplos sub-temas.
+
+**Gap:** Validator avalia metricas mas nao a coerencia estrategica. Deck pode ter metricas perfeitas mas ser injogavel por split archetype.
+**Impacto:** P2 — Falso positivo "deck saudavel". Swaps podem piorar o split.
+**Risco:** P2 — Afeta qualquer deck goodstuff com multiplos mini-temas.
+
+**Acao recomendada:**
+1. `_detectArchetypeFocus()` no validator: agrupar por functional_tag fino, detectar clusters >=5 cartas
+2. `ValidationReport.archetypeFocus` com `isSplitArchetype` flag
+3. Quality gate: se split, priorizar swaps que consolidam
+4. Alerta "Deck has N competing sub-archetypes"
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_validator.dart && dart test test/ai/optimization_validator_test.dart
+```
+
+## Resumo de Tasks Novas (2026-06-05 @ 3f7266d6 — Cron #10)
+
+| # | Prioridade | Task | Origem |
+|:-:|:----------|:-----|:-------|
+| 1 | P1 | Deck Promotion: Adicionar verificacao de migracao de cartas pos-promocao | Commander Deep Report S44 (4/4 promotions failed) |
+| 2 | P1 | CMC Batch Correction: Script para corrigir 142 cartas + hardening `_getCmc()` | TAG_ACCURACY_REPORT (CMC=0.0 spread to 26.2%) |
+| 3 | P2 | Tag Accuracy: Adicionar tracking para 12 novas tags finas (45% sem cobertura) | TAG_ACCURACY_REPORT (tag system fork) |
+| 4 | P2 | Quality Gate: Adicionar deteccao de densidade de stax como atributo estrutural | Commander Deep Report S44.4 (Winota 14 stax) |
+| 5 | P2 | Optimization Validator: Adicionar deteccao de split archetype (Atraxa 3 sub-arquetipos) | Commander Deep Report S44.3 (Atraxa infect+superfriends+counters) |
+
+> **Nota:** Tasks #1 e #2 sao correcoes de integridade de dados — a base de conhecimento esta corrompida (promotions sem cartas, CMCs zerados). Estas tasks DESBLOQUEIAM as tasks de analise (Atraxa, Winota) que dependem de dados completos.
+> **Nota:** Task #3 complementa a task P2 pendente "Tag Accuracy Auto-Healing" (Cron #7) — enquanto aquela foca em melhorar precisao de tags existentes, esta garante que as NOVAS tags tambem sejam monitoradas.
+> **Nota:** Tasks #4 e #5 abordam gaps de classificacao de arquetipo — o quality gate atual so reconhece aggro/control/midrange/combo. Stax e split archetype sao dimensoes novas que o sistema precisa entender.
+
+---
+
 
 ### [P1] Deck Import: Adicionar validacao de completude — verificar que o numero de cartas importadas corresponde ao total esperado (previne pipeline operando sobre decks fantasmas)
 
