@@ -116,17 +116,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   }
 
   String _learnedDeckButtonHelperText(Map<String, dynamic> deck) {
-    final sourceRef = deck['source_ref']?.toString().trim();
-    final score = deck['score'];
     final legalStatus = deck['legal_status']?.toString().trim();
-    final parts = <String>[
-      if (sourceRef != null && sourceRef.isNotEmpty) 'Hermes $sourceRef',
-      if (score != null) 'score $score',
-      if (legalStatus != null && legalStatus.isNotEmpty) legalStatus,
-    ];
-    return parts.isEmpty
-        ? 'Deck aprendido disponível para este comandante.'
-        : 'Deck aprendido disponível: ${parts.join(' | ')}.';
+    final legalLabel =
+        legalStatus == 'commander_legal' ? 'legal para Commander' : legalStatus;
+    return legalLabel == null || legalLabel.isEmpty
+        ? 'Deck aprendido disponível: curado pelo Hermes para este comandante.'
+        : 'Deck aprendido disponível: curado pelo Hermes • $legalLabel.';
   }
 
   Future<void> _loadLearnedDeckAvailability() async {
@@ -636,32 +631,16 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             ),
             if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                key: const Key('deck-generate-learned-deck-button'),
+              const SizedBox(height: 12),
+              _LearnedDeckCallout(
+                calloutKey: const Key('deck-generate-learned-deck-button'),
                 onPressed:
                     _isGenerating || _isLoadingLearnedDeck
                         ? null
                         : _loadLearnedCommanderDeck,
-                icon:
-                    _isLoadingLearnedDeck
-                        ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.school_outlined),
-                label: Text(
-                  _isLoadingLearnedDeck
-                      ? 'Buscando deck aprendido...'
-                      : 'Usar deck aprendido do comandante',
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _learnedDeckButtonHelperText(_selectedLearnedDeckSummary!),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary,
+                loading: _isLoadingLearnedDeck,
+                helperText: _learnedDeckButtonHelperText(
+                  _selectedLearnedDeckSummary!,
                 ),
               ),
             ],
@@ -676,43 +655,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
             if (_generatedDeck == null) ...[
               // Example Prompts
-              Text(
-                'Ou escolha um exemplo:',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children:
-                    _examplePrompts.map((example) {
-                      return ActionChip(
-                        label: Text(
-                          example,
-                          style: const TextStyle(
-                            fontSize: AppTheme.fontSm,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _promptController.text = example;
-                          });
-                        },
-                        backgroundColor:
-                            theme.colorScheme.surfaceContainerHighest,
-                      );
-                    }).toList(),
+              _ExamplePromptList(
+                prompts: _examplePrompts,
+                onSelected: (example) {
+                  setState(() {
+                    _promptController.text = example;
+                  });
+                },
               ),
               const SizedBox(height: 28),
             ],
 
             // Generated Deck Preview
             if (_generatedDeck != null) ...[
-              const Divider(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
               Row(
                 key: _previewKey,
                 children: [
@@ -734,7 +690,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   height: 1.35,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
               // Deck Name Input
               TextField(
@@ -841,11 +797,14 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: theme.colorScheme.outline),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+          width: 0.8,
+        ),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -861,53 +820,62 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 'Total: $totalCards cartas',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+                  color: AppTheme.brass400,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           if (learnedDeckPreview.isNotEmpty) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(
-                  color: AppTheme.frost400.withValues(alpha: 0.35),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Deck aprendido Hermes',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.frost400,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children:
-                        learnedDeckPreview
-                            .map(
-                              (part) => Chip(
-                                label: Text(part),
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            )
-                            .toList(),
-                  ),
-                ],
+            _LearnedDeckPreviewSummary(parts: learnedDeckPreview),
+            const SizedBox(height: 14),
+          ],
+          if (hasCommander) ...[
+            _PreviewSectionHeader(
+              label: 'Comandante',
+              color: AppTheme.frost400,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '1x $commanderName',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                height: 1.3,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
           ],
+          _PreviewSectionHeader(
+            label:
+                'Deck principal ($totalMain cartas, ${cardsList.length} linhas)',
+            color: AppTheme.frost400,
+          ),
+          const SizedBox(height: 8),
+          ...cardsList.take(18).map((card) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                '${parseQty(card['quantity'])}x ${card['name']}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textPrimary.withValues(alpha: 0.92),
+                  height: 1.25,
+                ),
+              ),
+            );
+          }),
+          if (cardsList.length > 18)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '+ ${cardsList.length - 18} linhas no deck principal',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
           if (!isValid && validationErrors.isNotEmpty) ...[
+            const SizedBox(height: 16),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -938,84 +906,49 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
           ],
           if (isMock || warnings is Map) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(color: theme.colorScheme.outline),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Avisos',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  if (isMock)
-                    const Text(
-                      'Este deck foi gerado em modo mock (sem OpenAI configurada).',
-                    ),
-                  if (warnings is Map) ...[
-                    if (warnings['message'] != null)
-                      Text(warnings['message'].toString()),
-                    if (warnings['messages'] is List)
-                      ...(warnings['messages'] as List).map(
-                        (m) => Text(m.toString()),
-                      ),
-                    if (invalidCards.isNotEmpty)
-                      Text(
-                        'Cartas removidas por não serem encontradas: '
-                        '${invalidCards.join(', ')}',
-                      ),
-                  ],
-                ],
-              ),
-            ),
             const SizedBox(height: 16),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated.withValues(alpha: 0.54),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Avisos',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (isMock)
+                      const Text(
+                        'Este deck foi gerado em modo mock (sem OpenAI configurada).',
+                      ),
+                    if (warnings is Map) ...[
+                      if (warnings['message'] != null)
+                        Text(warnings['message'].toString()),
+                      if (warnings['messages'] is List)
+                        ...(warnings['messages'] as List).map(
+                          (m) => Text(m.toString()),
+                        ),
+                      if (invalidCards.isNotEmpty)
+                        Text(
+                          'Cartas removidas por não serem encontradas: '
+                          '${invalidCards.join(', ')}',
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ],
-          if (hasCommander) ...[
-            Text(
-              'Comandante',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.secondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, left: 8),
-              child: Text(
-                '1x $commanderName',
-                style: theme.textTheme.bodyMedium,
-              ),
-            ),
-          ],
-          Text(
-            'Deck principal ($totalMain cartas, ${cardsList.length} linhas)',
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.secondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...cardsList.map((card) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 4, left: 8),
-              child: Text(
-                '${parseQty(card['quantity'])}x ${card['name']}',
-                style: theme.textTheme.bodyMedium,
-              ),
-            );
-          }),
         ],
       ),
     );
@@ -1056,6 +989,240 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       if (legalStatus != null) 'Legalidade: $legalStatus',
       if (confidence != null) 'Confiança: $confidence',
     ];
+  }
+}
+
+class _LearnedDeckCallout extends StatelessWidget {
+  final Key calloutKey;
+  final VoidCallback? onPressed;
+  final bool loading;
+  final String helperText;
+
+  const _LearnedDeckCallout({
+    required this.calloutKey,
+    required this.onPressed,
+    required this.loading,
+    required this.helperText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final enabled = onPressed != null;
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      child: InkWell(
+        key: calloutKey,
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 160),
+          opacity: enabled ? 1 : 0.58,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceSlate,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              border: Border.all(
+                color: AppTheme.brass400.withValues(alpha: 0.34),
+                width: 0.8,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppTheme.brass400.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                  child: Center(
+                    child:
+                        loading
+                            ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : const Icon(
+                              Icons.school_outlined,
+                              size: 17,
+                              color: AppTheme.brass400,
+                            ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loading
+                            ? 'Buscando deck aprendido...'
+                            : 'Usar deck aprendido do comandante',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: AppTheme.brass400,
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        helperText,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary.withValues(alpha: 0.84),
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExamplePromptList extends StatelessWidget {
+  final List<String> prompts;
+  final ValueChanged<String> onSelected;
+
+  const _ExamplePromptList({required this.prompts, required this.onSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ou escolha um ponto de partida',
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: AppTheme.textSecondary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...prompts.asMap().entries.map((entry) {
+          final index = entry.key;
+          final prompt = entry.value;
+          final isLast = index == prompts.length - 1;
+
+          return InkWell(
+            onTap: () => onSelected(prompt),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: index == 0 ? 2 : 8,
+                bottom: isLast ? 2 : 8,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.north_east_rounded,
+                    size: 14,
+                    color: AppTheme.frost400.withValues(alpha: 0.72),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      prompt,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.25,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+}
+
+class _LearnedDeckPreviewSummary extends StatelessWidget {
+  final List<String> parts;
+
+  const _LearnedDeckPreviewSummary({required this.parts});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(left: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: AppTheme.frost400.withValues(alpha: 0.78),
+            width: 2,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Deck aprendido Hermes',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppTheme.frost400,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ...parts.map(
+            (part) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                part,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textPrimary.withValues(alpha: 0.88),
+                  height: 1.28,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PreviewSectionHeader extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _PreviewSectionHeader({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Text(
+      label,
+      style: theme.textTheme.titleSmall?.copyWith(
+        color: color,
+        fontWeight: FontWeight.w800,
+        height: 1.2,
+      ),
+    );
   }
 }
 

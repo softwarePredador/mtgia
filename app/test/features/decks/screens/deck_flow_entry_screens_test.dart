@@ -166,7 +166,8 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Usar deck aprendido do comandante'), findsOneWidget);
-      expect(find.textContaining('learned_deck:82'), findsOneWidget);
+      expect(find.textContaining('curado pelo Hermes'), findsOneWidget);
+      expect(find.textContaining('learned_deck:82'), findsNothing);
 
       final learnedDeckButton = find.byKey(
         const Key('deck-generate-learned-deck-button'),

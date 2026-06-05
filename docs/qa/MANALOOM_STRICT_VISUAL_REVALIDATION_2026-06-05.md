@@ -126,3 +126,99 @@ Passed in inspected screenshots:
 ## Release interpretation
 
 The reported visual regressions around Life Counter overlays and Set Life sheet are resolved in the live simulator proof. Do not treat this as permission to stop visual QA: for any app-facing layout change, run the static audit plus the relevant iPhone Simulator proof and manually inspect contact sheets before promotion.
+
+## Follow-up: Commander learned deck UX polish
+
+After reviewing the 2026-06-05 contact sheet, the Commander learned deck flow still showed visual pollution:
+
+- the learned-deck button mixed action copy with internal dataset/score/status details;
+- example prompts used repeated equal-weight filled blocks;
+- the preview nested cards/chips for related metadata, making origin, score, legality and confidence compete with the primary deck review task.
+
+Code updated:
+
+- `app/lib/features/decks/screens/deck_generate_screen.dart`
+- `app/test/features/decks/screens/deck_flow_entry_screens_test.dart`
+- `app/integration_test/commander_learned_deck_runtime_test.dart`
+- `app/integration_test/commander_learned_deck_availability_runtime_test.dart`
+
+Visual changes:
+
+- The learned-deck CTA now reads as one curated action card and no longer exposes `learned_deck`, score or raw status in the button area.
+- The button helper uses product language: `curado pelo Hermes` and `legal para Commander`.
+- Internal source/score/legalidade/confiança remain available in the preview only, where they serve auditability rather than first-action affordance.
+- Example prompts now render as a lightweight suggestion list instead of repeated same-weight chips.
+- The preview uses one main review panel, a left-accent learned-deck summary and a shortened main-deck sample instead of nested subcards and many chips.
+
+Additional validation:
+
+```bash
+cd app
+flutter analyze \
+  lib/features/decks/screens/deck_generate_screen.dart \
+  test/features/decks/screens/deck_flow_entry_screens_test.dart \
+  integration_test/commander_learned_deck_runtime_test.dart \
+  integration_test/commander_learned_deck_availability_runtime_test.dart \
+  --no-version-check
+```
+
+Result: `No issues found!`
+
+```bash
+cd app
+flutter test test/features/decks/screens/deck_flow_entry_screens_test.dart --no-version-check --reporter expanded
+```
+
+Result: `00:01 +4: All tests passed!`
+
+```bash
+cd app
+flutter test integration_test/commander_learned_deck_runtime_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:25 +1: All tests passed!`
+
+```bash
+cd app
+flutter test integration_test/commander_learned_deck_availability_runtime_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:19 +1: All tests passed!`
+
+```bash
+cd app
+flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:49 +1: All tests passed!`
+
+Extracted proof folder, ignored by Git:
+
+- `app/doc/runtime_flow_proofs_2026-06-05_commander_learned_polish_final_iphone15/`
+
+Manual visual result:
+
+- `02_commander_learned_button_visible`: button no longer displays raw `learned_deck`, score or `commander_legal`; the CTA reads as a single curated learned-deck action.
+- `03_hermes_preview`: preview keeps audit details but with fewer visual containers and no chip cluster.
+- `04_saved_deck_details`: save still creates Commander deck with 100 total, 99 main, 1 commander and no blocked premium Mox cards.

@@ -116,7 +116,8 @@ void main() {
           find.textContaining('Deck aprendido disponível:'),
           findsOneWidget,
         );
-        expect(find.textContaining('commander_legal'), findsOneWidget);
+        expect(find.textContaining('curado pelo Hermes'), findsOneWidget);
+        expect(find.textContaining('learned_deck:'), findsNothing);
         await tester.ensureVisible(learnedDeckButton);
         await captureVisualProof(binding, tester, screenshotNameFor(commander));
 

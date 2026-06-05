@@ -150,8 +150,9 @@ void main() {
         step: const Duration(milliseconds: 500),
       );
       expect(find.text('Usar deck aprendido do comandante'), findsOneWidget);
-      expect(find.textContaining('Hermes learned_deck:82'), findsOneWidget);
-      expect(find.textContaining('commander_legal'), findsOneWidget);
+      expect(find.textContaining('curado pelo Hermes'), findsOneWidget);
+      expect(find.textContaining('Hermes learned_deck:82'), findsNothing);
+      expect(find.textContaining('commander_legal'), findsNothing);
       await tester.ensureVisible(learnedDeckButton);
       await captureVisualProof(
         binding,
