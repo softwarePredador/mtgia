@@ -118,7 +118,7 @@ class _LifeCounterNativeSetLifeSheetState
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
         child: FractionallySizedBox(
-          heightFactor: 0.76,
+          heightFactor: 0.84,
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: AppTheme.backgroundAbyss,
@@ -173,15 +173,17 @@ class _LifeCounterNativeSetLifeSheetState
                   ),
                 ),
                 const Divider(height: 1, color: AppTheme.outlineMuted),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                  child: Column(
                     children: [
                       Center(
                         child: Text(
                           'PLAYER ${_targetPlayerIndex + 1}',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.28),
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.76,
+                            ),
                             fontSize: AppTheme.fontSm,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.6,
@@ -189,27 +191,65 @@ class _LifeCounterNativeSetLifeSheetState
                         ),
                       ),
                       const SizedBox(height: 8),
-                      SizedBox(
+                      DecoratedBox(
                         key: const Key('life-counter-native-set-life-display'),
-                        height: 72,
-                        child: Center(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              displayValue,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 72,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -3,
-                                height: 0.9,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
+                          ),
+                          border: Border.all(
+                            color: AppTheme.mythicGold.withValues(alpha: 0.32),
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppTheme.surfaceElevated,
+                              AppTheme.backgroundAbyss.withValues(alpha: 0.96),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.mythicGold.withValues(
+                                alpha: 0.12,
+                              ),
+                              blurRadius: 22,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: SizedBox(
+                          height: 94,
+                          child: Center(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                ),
+                                child: Text(
+                                  displayValue,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: 62,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -2,
+                                    height: 1,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                    children: [
                       Wrap(
                         alignment: WrapAlignment.center,
                         spacing: 10,
@@ -245,7 +285,7 @@ class _LifeCounterNativeSetLifeSheetState
                           ),
                         ],
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 14),
                       DecoratedBox(
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceElevated,
@@ -255,7 +295,7 @@ class _LifeCounterNativeSetLifeSheetState
                           border: Border.all(color: AppTheme.outlineMuted),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(14),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -295,13 +335,13 @@ class _LifeCounterNativeSetLifeSheetState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
                       SizedBox(
                         width: 250,
                         child: Wrap(
                           alignment: WrapAlignment.center,
-                          spacing: 14,
-                          runSpacing: 14,
+                          spacing: 12,
+                          runSpacing: 12,
                           children: [
                             for (final digit in const [
                               '1',
@@ -437,12 +477,14 @@ class _SetLifeKeypadButton extends StatelessWidget {
       child: Tooltip(
         message: semanticLabel,
         child: SizedBox(
-          width: 70,
-          height: 70,
+          width: 64,
+          height: 64,
           child: FilledButton.tonal(
             key: buttonKey,
             onPressed: onTap,
             style: FilledButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.zero,
               backgroundColor:
                   destructive
                       ? const Color(0x33FF2C77)
@@ -459,12 +501,16 @@ class _SetLifeKeypadButton extends StatelessWidget {
                 ),
               ),
             ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: label == 'DEL' ? AppTheme.fontMd : AppTheme.fontXxl,
-                fontWeight: FontWeight.w900,
-                letterSpacing: label == 'DEL' ? 1.1 : 0,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                softWrap: false,
+                style: TextStyle(
+                  fontSize: label == 'DEL' ? AppTheme.fontXs : AppTheme.fontXxl,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: label == 'DEL' ? 0.2 : 0,
+                ),
               ),
             ),
           ),

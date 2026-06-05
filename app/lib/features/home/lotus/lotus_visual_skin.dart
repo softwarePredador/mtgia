@@ -1482,7 +1482,8 @@ ${LotusDomSelectors.optionCard} h3 {
   display: flex !important;
   align-items: stretch !important;
   justify-content: center !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
 }
 
 .commander-damage-overlay .btn,
@@ -1492,11 +1493,21 @@ ${LotusDomSelectors.optionCard} h3 {
 .show-counters-hint-overlay .btn,
 .manaloom-show-counters-proof .btn {
   flex: 1 1 0 !important;
-  max-width: 180px !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 44px !important;
+  padding: 10px 12px !important;
   border-radius: 999px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  font-size: clamp(10px, 3vw, 13px) !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
   background:
     linear-gradient(
       180deg,

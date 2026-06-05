@@ -58,6 +58,19 @@ flutter test \
 
 Resultado final com capturas de sheets: `03:04 +5: All tests passed!`
 
+Follow-up 2026-06-05:
+
+- Corrigido overlay `commander_damage_overlay`: `RETURN TO GAME` agora fica em
+  uma linha, alinhado com `GOT IT!`.
+- Corrigido sheet `life_counter_set_life_sheet_35`: valor de vida fica fixo
+  fora do scroll, com contraste e altura suficientes; keypad e `DEL` ficam
+  legiveis.
+- Revalidado no iPhone Simulator:
+  `life_counter_lotus_visual_capture_smoke_test.dart` +
+  `life_counter_set_life_live_smoke_test.dart` -> `01:14 +3: All tests passed!`.
+- Revalidacao final isolada do set-life:
+  `life_counter_set_life_live_smoke_test.dart` -> `00:14 +1: All tests passed!`.
+
 ### Deck aprendido Hermes / Lorehold
 
 ```bash
