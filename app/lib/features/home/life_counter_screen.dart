@@ -1329,7 +1329,7 @@ class _TableControlHub extends StatelessWidget {
       _HubPetalSpec(
         key: Key('life-counter-hub-reset'),
         label: 'RESTART',
-        color: AppTheme.lifeDeckedOutAccent,
+        color: AppTheme.lifeCounterRestartYellow,
         offset: Offset(0, -84 * scaleFactor),
         rotation: 0,
       ),
@@ -1343,7 +1343,7 @@ class _TableControlHub extends StatelessWidget {
       _HubPetalSpec(
         key: Key('life-counter-hub-settings'),
         label: 'SETTINGS',
-        color: AppTheme.lifeDefeatedAccent,
+        color: AppTheme.lifeCounterSettingsPurple,
         offset: Offset(84 * scaleFactor, 0),
         rotation: pi / 2,
       ),
@@ -4167,22 +4167,13 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
             ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppTheme.lifeDefeatedAccent,
-                AppTheme.lifeDeckedOutAccent,
-                AppTheme.lifeCounterVictoryGreen,
-                AppTheme.primarySoft,
-              ],
+              colors: AppTheme.lifeCounterWinnerGradient,
             )
             : isTie
             ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppTheme.brass400,
-                AppTheme.lifeDeckedOutAccent,
-                AppTheme.warning,
-              ],
+              colors: AppTheme.lifeCounterTieGradient,
             )
             : LinearGradient(
               begin: Alignment.topLeft,

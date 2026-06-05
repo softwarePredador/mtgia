@@ -79,6 +79,8 @@ class AppTheme {
   static const Color lifeCounterVictoryGreen = Color(0xFF6BFF8D);
   static const Color lifeCounterIvory = Color(0xFFF7F4EC);
   static const Color lifeCounterHubIconDark = Color(0xFF0D1117);
+  static const Color lifeCounterRestartYellow = Color(0xFFFFE277);
+  static const Color lifeCounterSettingsPurple = Color(0xFFB9B4FF);
   static const Color lifeCounterSettingsSelected = Color(0xFFFFC81E);
   static const Color lifeCounterSettingsRadio = Color(0xFF1C78FF);
   static const Color lifeCounterNeutralChip = Color(0xFF454257);
