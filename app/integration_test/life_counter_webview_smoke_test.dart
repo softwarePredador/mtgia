@@ -49,12 +49,12 @@ Future<dynamic> _pumpUntilUiSnapshotFontsReady(
         snapshot.documentFontsStatus == 'loaded' &&
         snapshot.uiFontReady == true &&
         snapshot.displayFontReady == true &&
-        snapshot.uiFontFamily.contains('Manrope');
+        snapshot.uiFontFamily.contains('Inter');
     final timerFontsLoaded =
         !requireTimerFonts ||
         (snapshot != null &&
-            snapshot.gameTimerFontFamily.contains('Manrope') &&
-            snapshot.turnTrackerFontFamily.contains('Manrope'));
+            snapshot.gameTimerFontFamily.contains('Inter') &&
+            snapshot.turnTrackerFontFamily.contains('Inter'));
     if (fontsLoaded && timerFontsLoaded) {
       return snapshot;
     }
@@ -93,7 +93,9 @@ Future<Map<String, dynamic>> _runShellBridgeProbe(
     } catch (_) {}
   }
 
-  throw StateError('Shell probe not received (type=$type request_id=$requestId)');
+  throw StateError(
+    'Shell probe not received (type=$type request_id=$requestId)',
+  );
 }
 
 Future<Map<String, dynamic>> _readFontDiagnostics(
@@ -132,8 +134,8 @@ Future<Map<String, dynamic>> _readFontDiagnostics(
       first_name_present: !!firstName,
       first_name_font_family: nameStyle ? nameStyle.fontFamily || '' : '',
       manrope_ready: bodyStyle
-        ? (bodyStyle.fontFamily || '').includes('Manrope')
-        : (fontSet ? fontSet.check('16px "Manrope"') : false),
+        ? (bodyStyle.fontFamily || '').includes('Inter')
+        : (fontSet ? fontSet.check('16px "Inter"') : false),
       fraunces_ready: nameStyle
         ? (nameStyle.fontFamily || '').includes('Fraunces')
         : (fontSet ? fontSet.check('16px "Fraunces"') : false),
@@ -298,7 +300,7 @@ void main() {
     expect(uiSnapshot.screenWidth, closeTo(uiSnapshot.viewportWidth, 1));
     expect(uiSnapshot.screenHeight, closeTo(uiSnapshot.viewportHeight, 1));
     expect(uiSnapshot.visualSkinApplied, isTrue);
-    expect(uiSnapshot.uiFontFamily, contains('Manrope'));
+    expect(uiSnapshot.uiFontFamily, contains('Inter'));
     expect(uiSnapshot.documentFontsStatus, 'loaded');
     expect(uiSnapshot.uiFontReady, isTrue);
     expect(uiSnapshot.displayFontReady, isTrue);
@@ -321,7 +323,7 @@ void main() {
     expect(introDiagnostics['own_commander_hint_visible'], isFalse);
     expect(introDiagnostics['turn_tracker_hint_visible'], isFalse);
     expect(introDiagnostics['counters_hint_visible'], isFalse);
-    expect(firstFontDiagnostics['body_font_family'], contains('Manrope'));
+    expect(firstFontDiagnostics['body_font_family'], contains('Inter'));
     if (firstFontDiagnostics['first_name_present'] == true) {
       expect(
         firstFontDiagnostics['first_name_font_family'],
@@ -476,12 +478,12 @@ void main() {
       expect(uiSnapshot.viewportHeight, greaterThan(600));
       expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
       expect(uiSnapshot.visualSkinApplied, isTrue);
-      expect(uiSnapshot.uiFontFamily, contains('Manrope'));
+      expect(uiSnapshot.uiFontFamily, contains('Inter'));
       expect(uiSnapshot.documentFontsStatus, 'loaded');
       expect(uiSnapshot.uiFontReady, isTrue);
       expect(uiSnapshot.displayFontReady, isTrue);
-      expect(uiSnapshot.gameTimerFontFamily, contains('Manrope'));
-      expect(uiSnapshot.turnTrackerFontFamily, contains('Manrope'));
+      expect(uiSnapshot.gameTimerFontFamily, contains('Inter'));
+      expect(uiSnapshot.turnTrackerFontFamily, contains('Inter'));
       expect(uiSnapshot.gameTimerFontSize, inInclusiveRange(24, 40));
       expect(uiSnapshot.turnTrackerFontSize, inInclusiveRange(18, 28));
       expect(uiSnapshot.horizontalOverflowPx, lessThanOrEqualTo(1.5));

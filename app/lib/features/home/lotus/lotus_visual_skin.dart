@@ -10,8 +10,8 @@ abstract final class LotusVisualSkinStyleIds {
 String get lotusInjectedVisualSkinScript {
   final css = '''
 @font-face {
-  font-family: "Manrope";
-  src: url("fonts/Manrope.ttf") format("truetype");
+  font-family: "Inter";
+  src: url("fonts/Inter.ttf") format("truetype");
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
@@ -26,7 +26,7 @@ String get lotusInjectedVisualSkinScript {
 }
 
 :root {
-  --manaloom-ui-font: "Manrope", BlinkMacSystemFont, -apple-system, "Segoe UI",
+  --manaloom-ui-font: "Inter", BlinkMacSystemFont, -apple-system, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   --manaloom-display-font: "Fraunces", "Iowan Old Style", "Palatino Linotype",
     "Book Antiqua", Georgia, serif;
@@ -1675,7 +1675,7 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
 
   const fontSet = document.fonts;
   if (fontSet && typeof fontSet.load === 'function') {
-    fontSet.load('400 16px "Manrope"').catch(() => {});
+    fontSet.load('400 16px "Inter"').catch(() => {});
     fontSet.load('650 16px "Fraunces"').catch(() => {});
   }
 })();

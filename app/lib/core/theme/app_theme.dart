@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 /// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
 /// FONT SCALE:   fontMicro(8) / fontTiny(9) / fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
-  static const String uiFontFamily = 'Manrope';
+  static const String uiFontFamily = 'Inter';
   static const String displayFontFamily = 'Fraunces';
 
   // Explicit token to avoid using a hardcoded transparent color at call-sites.
@@ -243,19 +243,131 @@ class AppTheme {
       displayColor: textPrimary,
     );
 
-    TextStyle? display(TextStyle? s) =>
-        s?.copyWith(fontFamily: displayFontFamily);
+    TextStyle? ui(
+      TextStyle? s, {
+      double? fontSize,
+      FontWeight? fontWeight,
+      double? height,
+      double? letterSpacing,
+    }) => s?.copyWith(
+      fontFamily: uiFontFamily,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
+
+    TextStyle? display(
+      TextStyle? s, {
+      double? fontSize,
+      FontWeight? fontWeight,
+      double? height,
+      double? letterSpacing,
+    }) => s?.copyWith(
+      fontFamily: displayFontFamily,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
 
     return base.copyWith(
-      displayLarge: display(base.displayLarge),
-      displayMedium: display(base.displayMedium),
-      displaySmall: display(base.displaySmall),
-      headlineLarge: display(base.headlineLarge),
-      headlineMedium: display(base.headlineMedium),
-      headlineSmall: display(base.headlineSmall),
-      titleLarge: display(base.titleLarge),
-      titleMedium: display(base.titleMedium),
-      titleSmall: display(base.titleSmall),
+      displayLarge: display(
+        base.displayLarge,
+        fontWeight: FontWeight.w800,
+        height: 1.04,
+        letterSpacing: -0.6,
+      ),
+      displayMedium: display(
+        base.displayMedium,
+        fontWeight: FontWeight.w800,
+        height: 1.04,
+        letterSpacing: -0.4,
+      ),
+      displaySmall: display(
+        base.displaySmall,
+        fontWeight: FontWeight.w800,
+        height: 1.05,
+        letterSpacing: -0.3,
+      ),
+      headlineLarge: display(
+        base.headlineLarge,
+        fontSize: 30,
+        fontWeight: FontWeight.w800,
+        height: 1.08,
+        letterSpacing: -0.2,
+      ),
+      headlineMedium: display(
+        base.headlineMedium,
+        fontSize: 26,
+        fontWeight: FontWeight.w800,
+        height: 1.08,
+        letterSpacing: -0.15,
+      ),
+      headlineSmall: display(
+        base.headlineSmall,
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        height: 1.08,
+      ),
+      titleLarge: display(
+        base.titleLarge,
+        fontSize: fontXl,
+        fontWeight: FontWeight.w800,
+        height: 1.12,
+      ),
+      titleMedium: ui(
+        base.titleMedium,
+        fontSize: fontLg,
+        fontWeight: FontWeight.w700,
+        height: 1.22,
+        letterSpacing: -0.05,
+      ),
+      titleSmall: ui(
+        base.titleSmall,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+        height: 1.20,
+      ),
+      bodyLarge: ui(
+        base.bodyLarge,
+        fontSize: fontLg,
+        fontWeight: FontWeight.w500,
+        height: 1.38,
+      ),
+      bodyMedium: ui(
+        base.bodyMedium,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w500,
+        height: 1.36,
+      ),
+      bodySmall: ui(
+        base.bodySmall,
+        fontSize: fontSm,
+        fontWeight: FontWeight.w500,
+        height: 1.32,
+      ),
+      labelLarge: ui(
+        base.labelLarge,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+        height: 1.16,
+        letterSpacing: 0.05,
+      ),
+      labelMedium: ui(
+        base.labelMedium,
+        fontSize: fontSm,
+        fontWeight: FontWeight.w700,
+        height: 1.14,
+        letterSpacing: 0.05,
+      ),
+      labelSmall: ui(
+        base.labelSmall,
+        fontSize: fontXs,
+        fontWeight: FontWeight.w700,
+        height: 1.12,
+        letterSpacing: 0.08,
+      ),
     );
   }
 
@@ -338,6 +450,7 @@ class AppTheme {
       style: TextButton.styleFrom(
         foregroundColor: brass400,
         textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
           fontSize: fontMd,
           fontWeight: FontWeight.w700,
         ),
@@ -396,6 +509,7 @@ class AppTheme {
       backgroundColor: surfaceElevated,
       contentTextStyle: const TextStyle(
         color: textPrimary,
+        fontFamily: uiFontFamily,
         fontSize: fontMd,
         fontWeight: FontWeight.w500,
       ),
@@ -419,10 +533,12 @@ class AppTheme {
       selectedItemColor: brass500,
       unselectedItemColor: textSecondary,
       selectedLabelStyle: TextStyle(
+        fontFamily: uiFontFamily,
         fontSize: fontXs,
         fontWeight: FontWeight.w700,
       ),
       unselectedLabelStyle: TextStyle(
+        fontFamily: uiFontFamily,
         fontSize: fontXs,
         fontWeight: FontWeight.w500,
       ),
@@ -438,12 +554,17 @@ class AppTheme {
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(
+            fontFamily: uiFontFamily,
             fontSize: fontXs,
             fontWeight: FontWeight.w600,
             color: brass500,
           );
         }
-        return const TextStyle(fontSize: fontXs, color: textSecondary);
+        return const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontXs,
+          color: textSecondary,
+        );
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
@@ -456,14 +577,22 @@ class AppTheme {
       color: surfaceElevated,
       surfaceTintColor: transparent,
       elevation: 0,
-      textStyle: const TextStyle(color: textPrimary, fontSize: fontMd),
+      textStyle: const TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusMd),
         side: const BorderSide(color: outlineMuted, width: 0.5),
       ),
     ),
     dropdownMenuTheme: DropdownMenuThemeData(
-      textStyle: const TextStyle(color: textPrimary, fontSize: fontMd),
+      textStyle: const TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceSlate,
@@ -513,10 +642,15 @@ class AppTheme {
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       titleTextStyle: TextStyle(
         color: textPrimary,
+        fontFamily: uiFontFamily,
         fontSize: fontMd,
         fontWeight: FontWeight.w700,
       ),
-      subtitleTextStyle: TextStyle(color: textSecondary, fontSize: fontSm),
+      subtitleTextStyle: TextStyle(
+        color: textSecondary,
+        fontFamily: uiFontFamily,
+        fontSize: fontSm,
+      ),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
@@ -565,7 +699,11 @@ class AppTheme {
           BorderSide(color: outlineMuted, width: 0.5),
         ),
         textStyle: const WidgetStatePropertyAll(
-          TextStyle(fontSize: fontSm, fontWeight: FontWeight.w700),
+          TextStyle(
+            fontFamily: uiFontFamily,
+            fontSize: fontSm,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusSm)),
@@ -575,7 +713,11 @@ class AppTheme {
     chipTheme: ChipThemeData(
       backgroundColor: surfaceSlate,
       selectedColor: brass400.withValues(alpha: 0.16),
-      labelStyle: const TextStyle(fontSize: fontSm, color: textPrimary),
+      labelStyle: const TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontSm,
+        color: textPrimary,
+      ),
       side: const BorderSide(color: outlineMuted, width: 0.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusXs),
@@ -587,7 +729,11 @@ class AppTheme {
         borderRadius: BorderRadius.circular(radiusSm),
         border: Border.all(color: outlineMuted, width: 0.5),
       ),
-      textStyle: const TextStyle(color: textPrimary, fontSize: fontSm),
+      textStyle: const TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontSm,
+      ),
     ),
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: brass400,
@@ -599,8 +745,13 @@ class AppTheme {
       indicatorColor: brass400,
       labelColor: brass400,
       unselectedLabelColor: textSecondary,
-      labelStyle: TextStyle(fontSize: fontMd, fontWeight: FontWeight.w700),
+      labelStyle: TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+      ),
       unselectedLabelStyle: TextStyle(
+        fontFamily: uiFontFamily,
         fontSize: fontMd,
         fontWeight: FontWeight.w600,
       ),

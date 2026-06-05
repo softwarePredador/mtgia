@@ -29,7 +29,10 @@ EXPORT_SCRIPT_CANDIDATES = [
         "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
     ),
 ]
-ARTIFACT_DIR = os.path.join(SCRIPT_DIR, "../test/artifacts/hermes_auto_sync")
+ARTIFACT_DIR = os.environ.get(
+    "HERMES_ARTIFACT_DIR",
+    "/opt/data/artifacts/hermes_auto_sync",
+)
 TRACKING_FILE = os.path.join(ARTIFACT_DIR, "synced_learned_ids.txt")
 SERVER_DIR = os.path.join(SYNC_PROJECT_DIR, "server")
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")

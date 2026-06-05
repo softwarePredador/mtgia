@@ -48,14 +48,14 @@ void main() {
     });
 
     test('uses ManaLoom typography and visual tokens', () {
-      expect(lotusInjectedVisualSkinScript, contains('Manrope'));
+      expect(lotusInjectedVisualSkinScript, contains('Inter'));
       expect(lotusInjectedVisualSkinScript, contains('Fraunces'));
       expect(lotusInjectedVisualSkinScript, contains('@font-face'));
-      expect(lotusInjectedVisualSkinScript, contains('fonts/Manrope.ttf'));
+      expect(lotusInjectedVisualSkinScript, contains('fonts/Inter.ttf'));
       expect(lotusInjectedVisualSkinScript, contains('fonts/Fraunces.ttf'));
       expect(
         lotusInjectedVisualSkinScript,
-        contains('fontSet.load(\'400 16px "Manrope"\')'),
+        contains('fontSet.load(\'400 16px "Inter"\')'),
       );
       expect(
         lotusInjectedVisualSkinScript,

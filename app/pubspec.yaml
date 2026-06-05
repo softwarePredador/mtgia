@@ -109,9 +109,9 @@ flutter:
       fonts:
         - asset: assets/fonts/Dosis.ttf
           weight: 700
-    - family: Manrope
+    - family: Inter
       fonts:
-        - asset: assets/lotus/fonts/Manrope.ttf
+        - asset: assets/lotus/fonts/Inter.ttf
     - family: Fraunces
       fonts:
         - asset: assets/lotus/fonts/Fraunces.ttf

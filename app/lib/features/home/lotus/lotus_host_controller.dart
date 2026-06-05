@@ -787,8 +787,7 @@ class LotusHostController implements LotusHost {
       }
 
       final requestId = DateTime.now().microsecondsSinceEpoch;
-      await webViewController.runJavaScript(
-        '''
+      await webViewController.runJavaScript('''
         (() => {
           try {
             const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
@@ -846,8 +845,8 @@ class LotusHostController implements LotusHost {
               ui_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
               document_fonts_status: fontSet ? fontSet.status || '' : 'unsupported',
               ui_font_ready: bodyStyle
-                ? (bodyStyle.fontFamily || '').includes('Manrope')
-                : (fontSet ? fontSet.check('16px "Manrope"') : false),
+                ? (bodyStyle.fontFamily || '').includes('Inter')
+                : (fontSet ? fontSet.check('16px "Inter"') : false),
               display_font_ready: firstPlayerNameStyle
                 ? (firstPlayerNameStyle.fontFamily || '').includes('Fraunces')
                 : (fontSet ? fontSet.check('16px "Fraunces"') : false),
@@ -942,8 +941,7 @@ class LotusHostController implements LotusHost {
             }));
           }
         })()
-      ''',
-      );
+      ''');
     } catch (error) {
       debugPrint('$lotusLogPrefix UI snapshot error: $error');
     }

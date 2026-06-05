@@ -11,8 +11,25 @@ import json, sqlite3, sys, os, re
 from datetime import datetime, timezone
 
 def parse_card_list(card_list_text):
+    """Parse card list: aceita formato '1 Card Name' ou JSON array."""
+    text = card_list_text.strip()
+    # Detecta JSON
+    if text.startswith("["):
+        try:
+            cards_json = json.loads(text)
+            cards = []
+            for item in cards_json:
+                name = item.get("name", "")
+                qty = item.get("quantity", 1)
+                if name:
+                    cards.append({"name": name, "quantity": qty})
+            return cards
+        except json.JSONDecodeError:
+            pass
+
+    # Formato padrao: '1 Card Name'
     cards = []
-    for line in card_list_text.strip().split("\n"):
+    for line in text.split("\n"):
         line = line.strip()
         if not line:
             continue
@@ -152,13 +169,18 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     score = compute_score(db, wincon_primary, wincon_backup)
     target_deck_id = row["target_deck_id"]
 
-    # Prefer decks table counts if available
+    # Converte card_list para formato '1 Nome' se vier como JSON
+    parsed_cards = parse_card_list(card_list)
+    normalized_card_list = "\n".join(
+        f"{c['quantity']} {c['name']}" for c in parsed_cards
+    )
+
+    # Metadata do deck alvo
     deck_row = db.execute(
         "SELECT total_lands, ramp_count, draw_count, removal_count, tutor_count, "
         "board_wipe_count, protection_count, recursion_count, wincon_count, engine_count "
         "FROM decks WHERE id = ?", (target_deck_id,)
     ).fetchone()
-
     if deck_row:
         metadata = {
             "total_lands": deck_row["total_lands"] or 0,
@@ -180,8 +202,8 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
         "source_ref": f"learned_deck:{learned_id_val}",
         "commander_name": commander,
         "deck_name": deck_name,
-        "card_list": card_list,
-        "card_count": card_count,
+        "card_list": normalized_card_list,
+        "card_count": len(parsed_cards),
         "is_active": True,
         "score": score,
         "wincon_primary": wincon_primary,

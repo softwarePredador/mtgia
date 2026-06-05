@@ -53,7 +53,7 @@ Widget _buildSubject() {
 Future<void> _loadGoldenFonts() async {
   await Future.wait([
     (FontLoader(AppTheme.uiFontFamily)
-      ..addFont(rootBundle.load('assets/lotus/fonts/Manrope.ttf'))).load(),
+      ..addFont(rootBundle.load('assets/lotus/fonts/Inter.ttf'))).load(),
     (FontLoader(AppTheme.displayFontFamily)
       ..addFont(rootBundle.load('assets/lotus/fonts/Fraunces.ttf'))).load(),
     (FontLoader('MaterialIcons')

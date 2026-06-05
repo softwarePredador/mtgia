@@ -125,9 +125,10 @@ def main():
 
     # Marca como sincronizado no PG
     event_ids = [str(e["id"]) for e in events]
+    placeholders = ",".join(["%s"] * len(event_ids))
     cur.execute(
-        "UPDATE deck_learning_events SET synced_to_hermes = TRUE, synced_at = NOW() WHERE id = ANY(%s)",
-        (event_ids,),
+        f"UPDATE deck_learning_events SET synced_to_hermes = TRUE, synced_at = NOW() WHERE id IN ({placeholders})",
+        tuple(event_ids),
     )
 
     print(f"\nTOTALS imported={imported}")
