@@ -222,3 +222,123 @@ Manual visual result:
 - `02_commander_learned_button_visible`: button no longer displays raw `learned_deck`, score or `commander_legal`; the CTA reads as a single curated learned-deck action.
 - `03_hermes_preview`: preview keeps audit details but with fewer visual containers and no chip cluster.
 - `04_saved_deck_details`: save still creates Commander deck with 100 total, 99 main, 1 commander and no blocked premium Mox cards.
+
+## Follow-up: Inter typography migration
+
+The app UI font was migrated from Manrope to Inter while preserving Fraunces for brand/display hierarchy only.
+
+Code updated:
+
+- `app/pubspec.yaml`
+- `app/assets/lotus/fonts/Inter.ttf`
+- `app/lib/core/theme/app_theme.dart`
+- `app/lib/features/home/lotus/lotus_visual_skin.dart`
+- `app/lib/features/home/lotus/lotus_host_controller.dart`
+- `app/lib/features/home/home_screen.dart`
+- `app/test/features/home/home_screen_test.dart`
+- `app/test/features/home/lotus_visual_skin_test.dart`
+- `app/test/features/home/lotus_ui_snapshot_test.dart`
+- `app/integration_test/life_counter_webview_smoke_test.dart`
+
+Typography decisions:
+
+- Inter is now the default UI font for body, labels, controls, chips, tabs, menus, snackbars, navigation and Lotus/WebView shell text.
+- Fraunces remains restricted to display/header surfaces: `display*`, `headline*` and `titleLarge`.
+- Dense utility surfaces use lower letter spacing and restrained weights to avoid Manrope-era over-bold UI after the Inter swap.
+- Home header now reserves fixed space for right-side actions and scales the brand row down before it can overlap icons.
+
+Validation:
+
+```bash
+cd app
+flutter analyze --no-pub \
+  lib/core/theme/app_theme.dart \
+  lib/features/home/lotus/lotus_visual_skin.dart \
+  lib/features/home/lotus/lotus_host_controller.dart \
+  test/features/home/lotus_visual_skin_test.dart \
+  test/features/home/home_screen_test.dart \
+  test/features/home/lotus_ui_snapshot_test.dart \
+  integration_test/life_counter_webview_smoke_test.dart \
+  --no-version-check
+```
+
+Result: `No issues found!`
+
+```bash
+cd app
+flutter test --no-pub test/features/home/lotus_visual_skin_test.dart --no-version-check --reporter expanded
+flutter test --no-pub test/features/home/lotus_ui_snapshot_test.dart --no-version-check --reporter expanded
+flutter test --no-pub test/features/home/home_screen_test.dart --no-version-check --reporter expanded
+flutter test --no-pub test/features/decks/screens/deck_flow_entry_screens_test.dart --no-version-check --reporter expanded
+```
+
+Results: `+3`, `+2`, `+3`, `+4`; all passed.
+
+```bash
+cd app
+flutter test --no-pub integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:50 +1: All tests passed!`
+
+```bash
+cd app
+flutter test --no-pub \
+  integration_test/life_counter_webview_smoke_test.dart \
+  integration_test/life_counter_lotus_visual_capture_smoke_test.dart \
+  integration_test/life_counter_set_life_live_smoke_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `02:29 +5: All tests passed!`
+
+```bash
+cd app
+flutter test --no-pub integration_test/commander_learned_deck_runtime_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:26 +1: All tests passed!`
+
+Static audit:
+
+```bash
+python3 server/bin/premium_visual_audit.py --include-life-counter --output docs/qa/manaloom_premium_visual_audit_latest.md
+```
+
+Result: `signals=301 P1=0 P2=301 visual_pass=false`.
+
+Extracted proof folder, ignored by Git:
+
+- `app/doc/runtime_flow_proofs_2026-06-05_inter_typography_iphone15/`
+
+Manual visual result:
+
+- `03_home`: ManaLoom brand no longer overlaps message/notification icons after the responsive header adjustment.
+- `commander_damage_overlay`: `RETURN TO GAME` and `GOT IT!` remain visible, aligned and not clipped with Inter.
+- `life_counter_set_life_sheet_35`: value `35`, keypad numbers, `DEL`, `Cancel` and `Set Life` remain visible.
+- `03_hermes_preview`: dense learned-deck text remains readable; long generated deck name is constrained inside the input row rather than overflowing the screen.
+- `01_login`, `02_register_filled`, `04a_create_deck_dialog`, `04b_deck_details`, `05_generate`, `07_community`, `08_collection`, `09_profile`: captured surfaces retain the same dark/brass/frost visual family after the font swap.
+
+Remaining risk:
+
+- Static audit still has P2 tokenization/style drift signals. No P1 visual blocker was found, but future layout changes must continue using iPhone Simulator proof plus manual screenshot review.

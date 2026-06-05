@@ -133,11 +133,10 @@ class _HomeHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return SizedBox(
       height: 48,
-      child: Stack(
-        alignment: Alignment.center,
+      child: Row(
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
+          SizedBox(
+            width: 48,
             child: IconButton(
               onPressed: () => context.go('/profile'),
               icon: const Icon(Icons.menu_rounded),
@@ -145,29 +144,39 @@ class _HomeHeader extends StatelessWidget {
               tooltip: 'Menu',
             ),
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.auto_awesome_rounded,
-                color: AppTheme.brass400,
-                size: 24,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'ManaLoom',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: AppTheme.brass400,
-                  fontWeight: FontWeight.w900,
-                  fontSize: AppTheme.fontDisplay - 6,
-                  letterSpacing: 0.4,
+          Expanded(
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.auto_awesome_rounded,
+                      color: AppTheme.brass400,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 7),
+                    Text(
+                      'ManaLoom',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: AppTheme.brass400,
+                        fontWeight: FontWeight.w900,
+                        fontSize: AppTheme.fontXl + 4,
+                        letterSpacing: 0.25,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-          const Align(
-            alignment: Alignment.centerRight,
-            child: ShellAppBarActions(),
+          const SizedBox(
+            width: 112,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: ShellAppBarActions(),
+            ),
           ),
         ],
       ),
@@ -465,9 +474,9 @@ class _QuickActionCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                       fontSize: AppTheme.fontXs,
-                      height: 1.02,
+                      height: 1.06,
                     ),
                   ),
                 ),
@@ -481,7 +490,7 @@ class _QuickActionCard extends StatelessWidget {
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: AppTheme.textSecondary,
                   fontSize: AppTheme.fontMicro - 0.5,
-                  height: 1.02,
+                  height: 1.08,
                 ),
               ),
             ],

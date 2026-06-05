@@ -8,9 +8,9 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 
 ## Metadata
 
-- Gerado em UTC: `2026-06-05T12:44:58.896729+00:00`
+- Gerado em UTC: `2026-06-05T13:27:04.536768+00:00`
 - Branch: `master`
-- SHA: `477a70c2`
+- SHA: `3238fe18`
 - Config: `server/config/premium_visual_qa_surfaces.json`
 - Arquivos auditados: `49`
 - Life Counter incluido: `True`
@@ -621,7 +621,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-066 border_without_theme_token
 
 - Surface: `home`
-- Evidencia: `app/lib/features/home/home_screen.dart:452`
+- Evidencia: `app/lib/features/home/home_screen.dart:461`
 - Trecho: `border: Border.all(`
 - Impacto: Borda sem token tende a variar cor/peso entre cards, filtros e modais.
 - Sugestao: Usar AppTheme.outlineMuted/brass/frost com opacidade consistente.
@@ -629,7 +629,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-067 border_without_theme_token
 
 - Surface: `home`
-- Evidencia: `app/lib/features/home/home_screen.dart:959`
+- Evidencia: `app/lib/features/home/home_screen.dart:968`
 - Trecho: `border: Border.all(color: data.color.withValues(alpha: 0.16)),`
 - Impacto: Borda sem token tende a variar cor/peso entre cards, filtros e modais.
 - Sugestao: Usar AppTheme.outlineMuted/brass/frost com opacidade consistente.
@@ -637,7 +637,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-068 possible_small_touch_or_visual_target
 
 - Surface: `home`
-- Evidencia: `app/lib/features/home/home_screen.dart:577`
+- Evidencia: `app/lib/features/home/home_screen.dart:586`
 - Trecho: `width: 28,`
 - Impacto: Alvo ou elemento visual menor que 48 pode ficar dificil de tocar ou parecer desalinhado.
 - Sugestao: Validar screenshot/touch target; elevar para bug se o alvo real ficar abaixo de 48x48.
@@ -645,7 +645,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-069 possible_small_touch_or_visual_target
 
 - Surface: `home`
-- Evidencia: `app/lib/features/home/home_screen.dart:578`
+- Evidencia: `app/lib/features/home/home_screen.dart:587`
 - Trecho: `height: 28,`
 - Impacto: Alvo ou elemento visual menor que 48 pode ficar dificil de tocar ou parecer desalinhado.
 - Sugestao: Validar screenshot/touch target; elevar para bug se o alvo real ficar abaixo de 48x48.
@@ -653,7 +653,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-070 radius_literal
 
 - Surface: `home`
-- Evidencia: `app/lib/features/home/home_screen.dart:316`
+- Evidencia: `app/lib/features/home/home_screen.dart:325`
 - Trecho: `borderRadius: BorderRadius.circular(999),`
 - Impacto: Raio literal pode deixar cards/modais fora da familia visual de Meus Decks.
 - Sugestao: Usar AppTheme.radiusXs/radiusSm/radiusMd/radiusLg/radiusXl.
@@ -661,7 +661,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-071 radius_literal
 
 - Surface: `home`
-- Evidencia: `app/lib/features/home/home_screen.dart:632`
+- Evidencia: `app/lib/features/home/home_screen.dart:641`
 - Trecho: `borderRadius: BorderRadius.circular(999),`
 - Impacto: Raio literal pode deixar cards/modais fora da familia visual de Meus Decks.
 - Sugestao: Usar AppTheme.radiusXs/radiusSm/radiusMd/radiusLg/radiusXl.
