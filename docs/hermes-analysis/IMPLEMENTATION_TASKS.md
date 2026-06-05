@@ -1,12 +1,197 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
-> **Gerado:** 2026-06-04T22:00Z por ManaLoom Knowledge Synthesis (Cron #7)
+> **Gerado:** 2026-06-05T06:00Z por ManaLoom Knowledge Synthesis (Cron #8)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** 54480471
-> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Skill v3.8, VALIDATOR_LOG v3.23, MANA_BASE_VALIDATION 2026-06-04, THEMES.md, STRUCTURE_AUDIT PostgreSQL, GAME_CHANGERS.md) com codigo Dart (edh_bracket_policy, optimization_quality_gate, deck_rules_service, functional_card_tags, optimization_functional_roles, card_validation_service, optimize_runtime_support)
-> **Base de conhecimento:** VALIDATOR_LOG v3.23 (CMC corruption) + MANA_BASE_VALIDATION_REPORT (per-commander land ranges) + tag_accuracy 8-day stagnation + Commander Knowledge Skill §Lorehold cEDH pivot + THEMES.md (per-theme role targets) + STRUCTURE_AUDIT (write-only tables)
-> **Novas tasks nesta execução:** 4 (2×P1, 2×P2) — CMC integrity, combo archetype rules, tag accuracy auto-healing, commander land ranges
+> **HEAD:** 94b620a6
+> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Deep S42-43, Gamechanger Research Exec #7-#9, MANA_BASE_VALIDATION_REPORT 2026-06-05, THEMES.md, STRUCTURE_AUDIT card-semantics) com codigo Dart (edh_bracket_policy, card_validation_service, deck_rules_service, functional_card_tags, optimization_quality_gate, commander_fallback_policy, optimize_runtime_support)
+> **Base de conhecimento:** Commander Knowledge Deep S42-43 (Multi-Commander Evolution 4 promotions, Korvold incomplete import, Krenko AI stub) + Gamechanger Research #7-#9 (Tergrid oracle_text resolved, 8 NULL prices persistent, structural hash unchanged) + MANA_BASE_VALIDATION_REPORT (Yuriko 21/84 untagged, CRITs potentialmente inflados) + THEMES.md (42 temas com metricas per-tema nao integradas ao codigo)
+> **Novas tasks nesta execucao:** 5 (2xP1, 3xP2) — Deck import completeness, Commander eligibility filter, GC oracle_text auto-heal, GC price_usd RL distinction, Mana base NULL tag reporting
+
+### [P1] Deck Import: Adicionar validacao de completude — verificar que o numero de cartas importadas corresponde ao total esperado (previne pipeline operando sobre decks fantasmas)
+
+**Conhecimento MTG:** O Commander Knowledge Deep S42-43 (2026-06-05) documenta que 3 dos 8 decks no SQLite estao gravemente incompletos:
+- Korvold, Fae-Cursed King: 11/100 cartas importadas (89 cartas faltando)
+- Kinnan, Bonder Prodigy: 13/100 cartas importadas (87 cartas faltando)
+- Teysa Karlov: 80/100 cartas (20 faltando, EDHREC aggregate parcial)
+
+Os decks Korvold e Kinnan sao funcionalmente INUTEIS para qualquer analise — tem apenas 11-13 cartas seed de um deck de 100. No entanto, o sistema os trata como decks validos: aparecem no MANA_BASE_VALIDATION_REPORT como "INCOMPLETE", sao consultados por crons, e o Multi-Commander Evolution precisou aprender a filtra-los manualmente. O Mana Base Validator reporta "INCOMPLETE (<50 cards)" mas isso e um diagnostico pos-falha — o sistema nao impede a importacao parcial e nao alerta no momento da importacao.
+
+**Evidencia no codigo:**
+- `server/lib/deck_rules_service.dart:412-447` — `_loadCardsData()` consulta cartas do PG mas **nao valida** se o numero de cartas retornadas corresponde ao `total_cards` esperado.
+- `server/lib/card_validation_service.dart:67-80` — `_findCard()` consulta apenas `id, name`. Sem validacao de completude.
+- `rg "total_cards|card_count|completeness|missing.*cards" server/lib/` — ZERO resultados para validacao de completude.
+- A importacao e feita via scripts Python (`auto_sync_learned_decks.py`) que inserem `deck_cards` mas nao verificam se `COUNT(*)` de cartas inseridas == `total_cards` do deck.
+
+**Gap:** Quando um deck e importado (via script Python ou API), nao ha verificacao de que TODAS as cartas foram inseridas com sucesso. Falhas parciais (ex: 11/100 cartas) sao aceitas silenciosamente. O sistema downstream (Mana Base Validator, Commander Knowledge Deep, Multi-Commander Evolution) herda dados incompletos e produz analises enganosas ou quebra.
+
+**Impacto:** `P1` — Decks fantasmas (Korvold 11/100, Kinnan 13/100) consomem recursos de todos os crons, produzem relatorios enganosos (MANA_BASE_VALIDATION_REPORT mostra "INCOMPLETE" sem explicar que e 89% vazio), e exigem workarounds manuais em cada cron (Multi-Commander Evolution precisou aprender a filtrar `total_cards < 90`).
+
+**Risco:** P1 — Dados incompletos se propagam para toda a pipeline de analise. Decks com 11% das cartas sao tratados como decks reais, desperdicando ciclos de cron e produzindo recomendacoes baseadas em dados fantasmas.
+
+**Acao recomendada:**
+1. No script de importacao Python (`auto_sync_learned_decks.py` ou equivalente): apos inserir `deck_cards`, executar `SELECT COUNT(*) FROM deck_cards WHERE deck_id = ?` e comparar com `total_cards` do deck. Se `COUNT(*) < total_cards * 0.9`, marcar o deck como `import_status='partial'` e logar warning.
+2. Em `card_validation_service.dart`: Adicionar metodo `validateDeckCompleteness(int deckId, int expectedCardCount)` que retorna `DeckCompletenessResult` com `importedCount`, `expectedCount`, `missingCards`.
+3. No `deck_rules_service.dart`: apos `_loadCardsData()`, verificar se `cards.length >= expectedTotal * 0.9`. Se nao, retornar erro ou warning.
+4. No endpoint de analise de deck (`server/routes/decks/[id]/analysis/`), verificar completude antes de executar Monte Carlo/analise funcional.
+5. Adicionar coluna `import_completeness` (0.0-1.0) a tabela `decks` para tracking.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/card_validation_service.dart
+cd server && dart analyze lib/deck_rules_service.dart
+cd server && dart test test/deck_rules_service_test.dart
+```
 
 ---
+
+### [P1] Commander Selection: Query both `decks` AND `learned_decks` tables — verificar `total_cards >= 90` em pelo menos uma tabela antes de selecionar comandante para otimizacao
+
+**Conhecimento MTG:** O Multi-Commander Evolution Pipeline (Execucao #1, 2026-06-04, documentado no Commander Knowledge Deep S42-43) descobriu empiricamente que comandantes podem ter dados parciais:
+- Korvold: 11/100 cards em `decks` (89% vazio)
+- Kinnan: 13/100 cards em `decks` (87% vazio)
+- Aesi, Teysa, Yuriko: tem decks parciais em `decks` mas NAO tem `learned_decks` completos (card_count < 90)
+
+Se o otimizador selecionar Korvold (11 cartas) para evolucao, o pipeline inteiro quebra: analise de wincon sobre 11 cartas, swap em deck fantasma, validacao contra dados incompletos. O Multi-Commander Evolution precisou aprender manualmente a filtrar `total_cards >= 90`. Mas esse filtro deveria estar no codigo, nao no prompt do cron.
+
+**Evidencia no codigo:**
+- `rg "total_cards|card_count|learned_deck" server/lib/ai/optimize_runtime_support.dart` — Referencias a `learned_deck` existem para `loadCommanderReferenceProfileFromCache()` (linha 3820), mas nao para filtrar comandantes elegiveis.
+- `rg "WHERE.*total_cards|WHERE.*card_count" server/lib/` — ZERO resultados com threshold de completude.
+- `server/lib/ai/commander_fallback_policy.dart` — Politica de fallback para comandantes desconhecidos, mas nao verifica se os dados do comandante sao completos.
+- O endpoint de optimize (`server/routes/ai/optimize/index.dart`) seleciona comandante baseado no deck do usuario, sem verificar se o deck esta completo.
+
+**Gap:** Quando o otimizador ou o pipeline de evolucao seleciona um comandante para analise, nao verifica se os dados disponiveis sao suficientes (>=90 cartas). Decks com 11-13 cartas passam pela selecao e produzem analises invalidas. O filtro `total_cards >= 90` existe apenas no prompt do cron (documentado no skill), nao no codigo.
+
+**Impacto:** `P1` — O optimize pipeline pode operar sobre dados incompletos, produzindo recomendacoes de swap baseadas em 11% do deck real. O Multi-Commander Evolution gastou uma execucao inteira aprendendo isso (e documentando o workaround). Sem o fix no codigo, qualquer novo cron ou endpoint que selecione comandantes repetira o mesmo erro.
+
+**Risco:** P1 — Recomendacoes de swap baseadas em decks fantasmas (Korvold 11 cartas, Kinnan 13 cartas). Afeta diretamente a confiabilidade do optimize pipeline para esses comandantes.
+
+**Acao recomendada:**
+1. Criar funcao `isCommanderEligibleForOptimization(String commanderName)` que:
+   - Consulta `decks` WHERE `total_cards >= 90`
+   - Consulta `learned_decks` WHERE `card_count >= 90`
+   - Retorna `true` se PELO MENOS UMA das duas tabelas tem dados completos
+2. Integrar ao `commander_fallback_policy.dart`: antes de aplicar fallback, verificar se os dados do comandante sao completos.
+3. No endpoint de optimize: antes de iniciar analise, verificar `isCommanderEligibleForOptimization()` e retornar erro 422 se nao for elegivel.
+4. Adicionar mensagem de erro informativa: "Commander X has insufficient data (Y/100 cards). Please import a complete decklist first."
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/commander_fallback_policy.dart
+cd server && dart test test/ai/commander_fallback_policy_test.dart
+```
+
+---
+
+### [P2] Game Changer Import: Auto-detectar `oracle_text=NULL` e disparar reimportacao via Scryfall fuzzy search com fallback para nomes MDFC sem `//`
+
+**Conhecimento MTG:** O Gamechanger Research Report (Exec #7-#9, 2026-06-04/05) documenta que Tergrid, God of Fright // Tergrid's Lantern ficou com `oracle_text=NULL` por multiplas execucoes consecutivas. A causa: o nome MDFC contem `//`, e o Scryfall fuzzy search (`/cards/named?fuzzy=...`) falha quando o nome inclui `//`. A solucao manual (reimportar via `fuzzy=Tergrid, God of Fright` sem `//`) funcionou, mas o sistema deveria auto-curar. As heuristicas de deteccao de GC (`tagCardForBracket()`) dependem de `oracle_text` para detectar tutores, free interaction, e infinite combos — com `oracle_text=NULL`, TODAS as heuristicas ficam cegas para a carta.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:91-145` — `tagCardForBracket()` usa `oracleText` para detectar `tutor` (linha 111: `o.contains('search your library')`), `extraTurns` (116), `freeInteraction` (121-132). Com `oracle_text=NULL`, `o` e string vazia -> nenhuma categoria detectada.
+- `server/lib/edh_bracket_policy.dart:140-143` — A deteccao por nome (`_gameChangerNames`) ainda funciona, mas a carta e marcada apenas como `gameChanger`, sem a categoria de impacto correta (ex: Tergrid deveria ser `stax`/`value_engine`).
+- O script `gc_hash_check.py` (linhas 82-90) detecta `oracle_text IS NULL` mas apenas reporta — nao corrige.
+- O script de importacao inicial (que popula `game_changers` no SQLite) deve lidar com falhas de fuzzy search para nomes MDFC.
+
+**Gap:** Cartas MDFC com `//` no nome falham na importacao do Scryfall (oracle_text=NULL) e permanecem nesse estado por multiplas execucoes. O `tagCardForBracket()` perde TODAS as heuristicas de deteccao para essas cartas. O sistema detecta o problema (`gc_hash_check.py` reporta NULLs) mas nao auto-corrige.
+
+**Impacto:** `P2` — 1 carta (Tergrid) foi afetada e ja corrigida manualmente. Mas o padrao pode se repetir para qualquer MDFC futuro adicionado a lista de Game Changers. A deteccao por nome ainda funciona, mas a categorizacao de impacto fica incompleta.
+
+**Risco:** P2 — Baixa frequencia (1/53 GCs afetado), mas alta severidade quando ocorre (todas as heuristicas cegas). A correcao e preventiva para futuras adicoes de MDFCs.
+
+**Acao recomendada:**
+1. No script de importacao de Game Changers (Python): ao detectar `oracle_text IS NULL` apos importacao, tentar fallback com fuzzy search sem `//`:
+   ```python
+   if '//' in card_name:
+       fallback_name = card_name.split('//')[0].strip()
+       # Refazer Scryfall fuzzy search com fallback_name
+   ```
+2. Adicionar ao `gc_hash_check.py`: ao detectar `oracle_text IS NULL`, imprimir instrucao de correcao (nao apenas reportar).
+3. No `tagCardForBracket()` Dart: adicionar warning via `developer.log` quando `oracleText` e vazio para uma carta que esta na lista de GCs (`_gameChangerNames`).
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+```
+
+---
+
+### [P2] Game Changer: Marcar `price_usd=NULL` de Reserved List explicitamente como `RESERVED_LIST` em vez de `NULL` — distingue "dado ausente" de "RL nao precifica"
+
+**Conhecimento MTG:** O Gamechanger Research Report (Exec #7-#9, 2026-06-04/05) documenta que 8 cartas Reserved List tem `price_usd=NULL` no SQLite: Glacial Chasm, Humility, Intuition, Lion's Eye Diamond, Mishra's Workshop, Mox Diamond, Survival of the Fittest, The Tabernacle at Pendrell Vale. A Scryfall API retorna `null` para precos de cartas Reserved List intencionalmente (politica da plataforma). Tratar esse NULL como "dado faltante" e enganoso — o dado NAO esta faltando, a fonte deliberadamente nao o fornece. O sistema atual nao distingue "importacao falhou" de "RL sem preco".
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart` — A lista `_gameChangerNames` nao tem campo de preco. O preco e consumido apenas para exibicao (nao afeta logica de bracket).
+- `scripts/gc_hash_check.py:93-97` — Detecta `price_usd IS NULL` mas nao distingue RL de falha de importacao.
+- `rg "price_usd|reserved_list|RESERVED_LIST" server/lib/` — ZERO resultados. O backend nao le `price_usd` da tabela `game_changers`.
+
+**Gap:** As 8 cartas RL com `price_usd=NULL` sao indistinguiveis de cartas onde a importacao de preco realmente falhou. Se uma carta nao-RL tiver `price_usd=NULL` por erro de rede/API, o sistema nao consegue diferenciar. O `gc_hash_check.py` reporta "NULL price_usd: 8" sem contexto, fazendo parecer que ha 8 falhas de importacao quando na verdade sao 0 falhas + 8 RL.
+
+**Impacto:** `P2` — Baixo impacto funcional (preco nao afeta logica de bracket). Mas alto impacto na confiabilidade dos relatorios: operadores veem "8 NULL prices" e assumem falha de importacao. A distincao RL vs erro real e importante para diagnosticar problemas de integridade de dados.
+
+**Risco:** P2 — Cosmetico/falso alarme. Nao afeta decisoes de swap ou bracket. Mas mascara falhas reais de importacao de preco para cartas nao-RL.
+
+**Acao recomendada:**
+1. Adicionar flag `is_reserved_list BOOLEAN DEFAULT 0` a tabela `game_changers` no SQLite.
+2. No script de importacao, verificar se a carta esta na Reserved List (via Scryfall `reserved=true` ou lista estatica) e setar `is_reserved_list=1`.
+3. No `gc_hash_check.py`, reportar `price_usd=NULL` separadamente para RL vs nao-RL.
+4. Opcional: preencher `price_usd` com valor `-1` para RL (sentinel value) em vez de NULL, para queries nao precisarem de `IS NULL OR is_reserved_list=1`.
+
+**Validacao:**
+```bash
+python3 -c "
+import sqlite3
+conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+rl = conn.execute('SELECT card_name FROM game_changers WHERE price_usd IS NULL AND is_reserved_list=1').fetchall()
+non_rl = conn.execute('SELECT card_name FROM game_changers WHERE price_usd IS NULL AND is_reserved_list=0').fetchall()
+print(f'RL sem preco: {len(rl)} (esperado: 8)')
+print(f'Nao-RL sem preco: {len(non_rl)} (esperado: 0)')
+"
+```
+
+---
+
+### [P2] Mana Base Validator: Reportar contagem de `functional_tag=NULL` separadamente nos relatorios para evitar CRITs inflados por cartas nao classificadas
+
+**Conhecimento MTG:** O MANA_BASE_VALIDATION_REPORT (2026-06-05) mostra que Yuriko tem `interaction=6 vs [10-16]` — CRIT d=4. Mas 21 das 84 cartas de Yuriko (25%) tem `functional_tag=NULL`. Cartas como Misdirection, Lim-Dul's Vault, e Commit // Memory podem ter funcao de interacao mas nao foram classificadas. O CRIT de interacao pode ser PARCIALMENTE INFLADO — parte do deficit de 4-10 cartas de interacao pode ser porque 21 cartas simplesmente nao tem tag, nao porque o deck realmente tem pouca interacao. O validador atual (MANA_BASE_VALIDATION_REPORT.md nota #4) reconhece isso em texto, mas a tabela de metricas mostra o CRIT sem contexto de untagged cards.
+
+**Evidencia no codigo:**
+- O script `_run_validation.py` executa `SUM(dc.quantity)` agrupado por `functional_tag`, mas **nao separa** a contagem de `functional_tag IS NULL`.
+- `MANA_BASE_VALIDATION_REPORT.md` linha 15-19 — A tabela mostra metricas (lands, ramp, draw, interaction, etc.) sem coluna "untagged". O campo "untagged" so aparece em notas de rodape textuais.
+- `server/lib/ai/functional_card_tags.dart:432-465` — `summarizeFunctionalTagsForDeck()` classifica cartas, mas cartas que caem no bucket `other` (sem tag) sao contadas como `otherRows`/`otherCopies` sem indicacao de que NAO foram classificadas.
+- `server/lib/ai/optimization_validator.dart:28-86` — O validator usa `FunctionalDeckSummary` que tem `otherRows` mas nao distingue "classificado como utility" de "nao classificado".
+
+**Gap:** Cartas sem `functional_tag` (NULL no SQLite) sao invisiveis nas metricas de role. O deficit aparente de uma role (ex: interaction=6 vs [10-16]) pode ser artificialmente inflado porque 25% das cartas nao tem tag. O operador ve "CRIT" e assume que o deck precisa de mais interacao, quando na verdade o problema pode ser que o classificador nao processou 21 cartas que SAO interacao.
+
+**Impacto:** `P2` — CRITs podem ser falsos positivos (deficit inflado por untagged cards). O operador toma decisoes baseadas em metricas incompletas. Yuriko e o pior caso (25% untagged), mas Lorehold tambem tem 3/100 untagged.
+
+**Risco:** P2 — Afeta a confiabilidade das metricas exibidas. Nao causa falhas funcionais (swaps nao sao bloqueados por isso), mas reduz a utilidade do relatorio para diagnostico humano.
+
+**Acao recomendada:**
+1. No script `_run_validation.py`: adicionar query separada para `SUM(dc.quantity) WHERE functional_tag IS NULL` por deck e incluir como coluna "untagged" na tabela de relatorio.
+2. No `MANA_BASE_VALIDATION_REPORT.md`: adicionar coluna "Untagged" a tabela de Resumo Geral.
+3. No status do deck: se `untagged >= 10% do total`, mostrar aviso de que metricas podem estar subestimadas.
+4. No `FunctionalDeckSummary` (Dart): distinguir `untaggedRows`/`untaggedCopies` de cartas classificadas como `utility`/`other`.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/functional_card_tags.dart
+```
+
+---
+
+## Resumo de Tasks Novas (2026-06-05 @ 94b620a6 — Cron #8)
+
+| # | Prioridade | Task | Origem |
+|:-:|:----------|:-----|:-------|
+| 1 | P1 | Deck Import: Validar completude (imported vs expected card count) | Commander Knowledge Deep S42-43 (Korvold 11/100, Kinnan 13/100) |
+| 2 | P1 | Commander Selection: Query both `decks` AND `learned_decks` for `total_cards >= 90` | Multi-Commander Evolution aprendizado empirico |
+| 3 | P2 | Game Changer Import: Auto-heal `oracle_text=NULL` via MDFC name fallback | Gamechanger Research #7-#9 (Tergrid resolvido, padrao preventivo) |
+| 4 | P2 | Game Changer: Marcar `price_usd=NULL` de Reserved List como `RESERVED_LIST` | Gamechanger Research #7-#9 (8 cartas RL) |
+| 5 | P2 | Mana Base Validator: Reportar `functional_tag=NULL` separadamente | MANA_BASE_VALIDATION_REPORT (Yuriko 25% untagged) |
+
+> **Nota:** Tasks #1 e #2 sao complementares — ambas abordam a protecao do pipeline contra dados incompletos (import completeness + commander eligibility).
+> **Nota:** Tasks #3 e #4 sao complementares — ambas melhoram a integridade dos dados de Game Changers (oracle_text MDFC + price_usd RL).
+> **Nota:** Task #5 complementa a task pendente P2 "Tag Accuracy Auto-Healing" — enquanto aquela foca em melhorar a precisao das tags, esta foca em reportar a AUSENCIA de tags.
+
 
 ### [P1] Deck Import: Validar CMC das cartas importadas contra a tabela `cards` do PostgreSQL — previne corrupção de dados que afeta toda a pipeline de análise
 
