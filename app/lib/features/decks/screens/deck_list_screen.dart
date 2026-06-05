@@ -484,31 +484,38 @@ class _DeckListScreenState extends State<DeckListScreen> {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(999),
-                            onTap:
-                                () => setState(() {
-                                  _deckFilter =
-                                      _deckFilter == 'todos'
-                                          ? 'commander'
-                                          : 'todos';
-                                }),
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: AppTheme.surfaceSlate,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppTheme.brass400.withValues(
-                                    alpha: 0.55,
+                          Semantics(
+                            button: true,
+                            label: 'Alternar filtro de decks',
+                            child: Tooltip(
+                              message: 'Alternar filtro de decks',
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(999),
+                                onTap:
+                                    () => setState(() {
+                                      _deckFilter =
+                                          _deckFilter == 'todos'
+                                              ? 'commander'
+                                              : 'todos';
+                                    }),
+                                child: Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.surfaceSlate,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppTheme.brass400.withValues(
+                                        alpha: 0.55,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.tune_rounded,
+                                    size: 17,
+                                    color: AppTheme.brass400,
                                   ),
                                 ),
-                              ),
-                              child: const Icon(
-                                Icons.tune_rounded,
-                                size: 17,
-                                color: AppTheme.brass400,
                               ),
                             ),
                           ),

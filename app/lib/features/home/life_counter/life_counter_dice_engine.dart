@@ -48,7 +48,8 @@ class LifeCounterDiceEngine {
       );
     }
 
-    final chosen = activePlayers[(random ?? Random()).nextInt(activePlayers.length)];
+    final chosen =
+        activePlayers[(random ?? Random()).nextInt(activePlayers.length)];
     return session.copyWith(
       firstPlayerIndex: chosen,
       lastTableEvent: 'Primeiro jogador: ${_playerLabel(chosen)}',

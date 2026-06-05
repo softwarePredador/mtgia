@@ -115,17 +115,14 @@ class LifeCounterSettings {
           this.clickableCommanderDamageCounters,
       keepZeroCountersOnPlayerCard:
           keepZeroCountersOnPlayerCard ?? this.keepZeroCountersOnPlayerCard,
-      saltyDefeatMessages:
-          saltyDefeatMessages ?? this.saltyDefeatMessages,
+      saltyDefeatMessages: saltyDefeatMessages ?? this.saltyDefeatMessages,
       cycleSaltyDefeatMessages:
           cycleSaltyDefeatMessages ?? this.cycleSaltyDefeatMessages,
       gameTimer: gameTimer ?? this.gameTimer,
-      gameTimerMainScreen:
-          gameTimerMainScreen ?? this.gameTimerMainScreen,
+      gameTimerMainScreen: gameTimerMainScreen ?? this.gameTimerMainScreen,
       showClockOnMainScreen:
           showClockOnMainScreen ?? this.showClockOnMainScreen,
-      randomPlayerColors:
-          randomPlayerColors ?? this.randomPlayerColors,
+      randomPlayerColors: randomPlayerColors ?? this.randomPlayerColors,
       preserveBackgroundImagesOnShuffle:
           preserveBackgroundImagesOnShuffle ??
           this.preserveBackgroundImagesOnShuffle,
@@ -135,13 +132,12 @@ class LifeCounterSettings {
       cleanLook: cleanLook ?? this.cleanLook,
       criticalDamageWarning:
           criticalDamageWarning ?? this.criticalDamageWarning,
-      customLongTapEnabled:
-          customLongTapEnabled ?? this.customLongTapEnabled,
-      customLongTapValue:
-          customLongTapValue ?? this.customLongTapValue,
-      whitelabelIcon: identical(whitelabelIcon, _unset)
-          ? this.whitelabelIcon
-          : whitelabelIcon as String?,
+      customLongTapEnabled: customLongTapEnabled ?? this.customLongTapEnabled,
+      customLongTapValue: customLongTapValue ?? this.customLongTapValue,
+      whitelabelIcon:
+          identical(whitelabelIcon, _unset)
+              ? this.whitelabelIcon
+              : whitelabelIcon as String?,
     );
   }
 

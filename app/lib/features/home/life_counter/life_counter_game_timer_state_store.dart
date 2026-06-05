@@ -9,8 +9,7 @@ class LifeCounterGameTimerStateStore {
   LifeCounterGameTimerStateStore({
     LifeCounterGameTimerStatePreferencesLoader? preferencesLoader,
     this.prefsKey = lifeCounterGameTimerStatePrefsKey,
-  }) : _preferencesLoader =
-           preferencesLoader ?? SharedPreferences.getInstance;
+  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
 
   final LifeCounterGameTimerStatePreferencesLoader _preferencesLoader;
   final String prefsKey;

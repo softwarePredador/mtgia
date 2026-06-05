@@ -292,18 +292,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         width: 2,
                                       ),
                                     ),
-                                    child: InkWell(
-                                      key: const Key(
-                                        'profile-avatar-edit-button',
-                                      ),
-                                      customBorder: const CircleBorder(),
-                                      onTap: () => _showAvatarDialog(context),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(6),
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          size: 16,
-                                          color: AppTheme.backgroundAbyss,
+                                    child: Semantics(
+                                      button: true,
+                                      label: 'Alterar foto de perfil',
+                                      child: Tooltip(
+                                        message: 'Alterar foto de perfil',
+                                        child: InkWell(
+                                          key: const Key(
+                                            'profile-avatar-edit-button',
+                                          ),
+                                          customBorder: const CircleBorder(),
+                                          onTap:
+                                              () => _showAvatarDialog(context),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(6),
+                                            child: Icon(
+                                              Icons.camera_alt,
+                                              size: 16,
+                                              color: AppTheme.backgroundAbyss,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),

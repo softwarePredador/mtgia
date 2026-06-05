@@ -7,10 +7,6 @@ import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeLotusHost implements LotusHost {
-  _FakeLotusHost({this.onShellMessageRequested});
-
-  final LotusShellMessageCallback? onShellMessageRequested;
-
   @override
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
 
@@ -57,7 +53,11 @@ Widget _buildScreen(_FakeLotusHost host) {
   );
 }
 
-Future<void> _pumpWithSize(WidgetTester tester, _FakeLotusHost host, Size size) async {
+Future<void> _pumpWithSize(
+  WidgetTester tester,
+  _FakeLotusHost host,
+  Size size,
+) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   await tester.pumpWidget(_buildScreen(host));
@@ -73,9 +73,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/shared_preferences'),
-      (MethodCall methodCall) async => null,
-    );
+          const MethodChannel('plugins.flutter.io/shared_preferences'),
+          (MethodCall methodCall) async => null,
+        );
   });
 
   group('LotusLifeCounterScreen overflow', () {

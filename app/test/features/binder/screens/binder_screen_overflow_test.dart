@@ -9,24 +9,34 @@ class _TestBinderProvider extends BinderProvider {
   final bool mockIsLoading;
   final String? mockErrorMessage;
 
-  @override bool get isLoading => mockIsLoading;
-  @override String? get statsError => mockErrorMessage;
-  @override Future<void> fetchStats() async {}
-  @override Future<void> fetchItems({bool reset = false}) async {}
+  @override
+  bool get isLoading => mockIsLoading;
+  String? get statsError => mockErrorMessage;
+  @override
+  Future<void> fetchStats() async {}
+  Future<void> fetchItems({bool reset = false}) async {}
 }
 
 Widget _buildScreen({bool isLoading = false, String? errorMessage}) {
   return MaterialApp(
     home: Scaffold(
       body: ChangeNotifierProvider<BinderProvider>(
-        create: (_) => _TestBinderProvider(mockIsLoading: isLoading, mockErrorMessage: errorMessage),
+        create:
+            (_) => _TestBinderProvider(
+              mockIsLoading: isLoading,
+              mockErrorMessage: errorMessage,
+            ),
         child: const BinderTabContent(),
       ),
     ),
   );
 }
 
-Future<void> _pumpWithSize(WidgetTester tester, Size size, Widget widget) async {
+Future<void> _pumpWithSize(
+  WidgetTester tester,
+  Size size,
+  Widget widget,
+) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   await tester.pumpWidget(widget);

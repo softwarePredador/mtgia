@@ -191,8 +191,7 @@ List<LifeCounterSettingsSection> buildLifeCounterSettingsCatalog(
           id: LifeCounterSettingFieldId.showCommanderDamageCounters,
           sectionId: LifeCounterSettingsSectionId.counters,
           label: 'Commander damage counters',
-          description:
-              'Render commander damage counters on player cards.',
+          description: 'Render commander damage counters on player cards.',
           value: settings.showCommanderDamageCounters,
         ),
         LifeCounterSettingEntry.toggle(

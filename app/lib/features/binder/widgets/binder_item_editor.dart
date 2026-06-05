@@ -1002,22 +1002,33 @@ class _QuantityButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: onTap != null ? AppTheme.brass400 : AppTheme.outlineMuted,
-          ),
+    final semanticLabel =
+        icon == Icons.remove ? 'Diminuir quantidade' : 'Aumentar quantidade';
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: onTap != null ? AppTheme.brass400 : AppTheme.outlineMuted,
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color:
+                    onTap != null ? AppTheme.brass400 : AppTheme.outlineMuted,
+              ),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: onTap != null ? AppTheme.brass400 : AppTheme.outlineMuted,
+            ),
+          ),
         ),
       ),
     );

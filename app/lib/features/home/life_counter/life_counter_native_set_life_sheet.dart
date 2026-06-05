@@ -126,7 +126,7 @@ class _LifeCounterNativeSetLifeSheetState
               border: Border.all(color: AppTheme.outlineMuted),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x66000000),
+                  color: AppTheme.overlayBlack40,
                   blurRadius: 28,
                   offset: Offset(0, 10),
                 ),
@@ -436,12 +436,12 @@ class _SetLifeQuickAdjustButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor:
             label.startsWith('-')
-                ? const Color(0xFFFF7A9C)
+                ? AppTheme.lifeCounterSetLifeDanger
                 : AppTheme.textPrimary,
         side: BorderSide(
           color:
               label.startsWith('-')
-                  ? const Color(0x66FF2C77)
+                  ? AppTheme.lifeCounterPinkSoft
                   : AppTheme.outlineMuted,
         ),
       ),
@@ -487,16 +487,18 @@ class _SetLifeKeypadButton extends StatelessWidget {
               padding: EdgeInsets.zero,
               backgroundColor:
                   destructive
-                      ? const Color(0x33FF2C77)
+                      ? AppTheme.lifeCounterPinkSubtle
                       : AppTheme.surfaceElevated,
               foregroundColor:
-                  destructive ? const Color(0xFFFF5E9A) : AppTheme.textPrimary,
+                  destructive
+                      ? AppTheme.lifeCounterPinkText
+                      : AppTheme.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
                   color:
                       destructive
-                          ? const Color(0x66FF2C77)
+                          ? AppTheme.lifeCounterPinkSoft
                           : AppTheme.outlineMuted,
                 ),
               ),

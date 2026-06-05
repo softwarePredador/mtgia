@@ -442,7 +442,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
               border: Border.all(color: AppTheme.outlineMuted),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x66000000),
+                  color: AppTheme.overlayBlack40,
                   blurRadius: 28,
                   offset: Offset(0, 10),
                 ),
@@ -930,7 +930,7 @@ class _BackgroundChip extends StatelessWidget {
                   selected
                       ? const [
                         BoxShadow(
-                          color: Color(0x33000000),
+                          color: AppTheme.overlayBlack20,
                           blurRadius: 12,
                           offset: Offset(0, 6),
                         ),

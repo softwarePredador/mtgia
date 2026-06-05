@@ -1462,15 +1462,28 @@ class _CotacoesTabState extends State<_CotacoesTab>
             ),
           ),
           const SizedBox(width: 8),
-          InkWell(
-            onTap: provider.isLoading ? null : () => provider.refresh(),
-            child: Icon(
-              Icons.refresh,
-              size: 20,
-              color:
-                  provider.isLoading
-                      ? AppTheme.outlineMuted
-                      : AppTheme.textSecondary,
+          Semantics(
+            button: true,
+            enabled: !provider.isLoading,
+            label: 'Atualizar cartas em movimento',
+            child: Tooltip(
+              message: 'Atualizar cartas em movimento',
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: provider.isLoading ? null : () => provider.refresh(),
+                  child: Icon(
+                    Icons.refresh,
+                    size: 20,
+                    color:
+                        provider.isLoading
+                            ? AppTheme.outlineMuted
+                            : AppTheme.textSecondary,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

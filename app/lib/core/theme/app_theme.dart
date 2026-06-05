@@ -53,6 +53,84 @@ class AppTheme {
   ); // mist-500 (hints/placeholders)
   static const Color outlineMuted = Color(0xFF2B3142); // slate-700
 
+  // ── Shared overlays ───────────────────────────────────────
+  static const Color overlayBlack20 = Color(0x33000000);
+  static const Color overlayBlack40 = Color(0x66000000);
+  static const Color overlayBlack65 = Color(0xA6000000);
+
+  // ── Life Counter / Tabletop tokens ────────────────────────
+  static const List<Color> lifeCounterPlayerColors = [
+    Color(0xFFFFB51E),
+    Color(0xFFFF0A5B),
+    Color(0xFFCF7AEF),
+    Color(0xFF4B57FF),
+    Color(0xFF44E063),
+    Color(0xFF40B9FF),
+  ];
+
+  static const Color lifeCounterYellow = Color(0xFFFFB51E);
+  static const Color lifeCounterPink = Color(0xFFFF2C77);
+  static const Color lifeCounterPinkText = Color(0xFFFF5E9A);
+  static const Color lifeCounterPinkSoft = Color(0x66FF2C77);
+  static const Color lifeCounterPinkSubtle = Color(0x33FF2C77);
+  static const Color lifeCounterSetLifeDanger = Color(0xFFFF7A9C);
+  static const Color lifeCounterBlue = Color(0xFF40B9FF);
+  static const Color lifeCounterGreen = Color(0xFF44E063);
+  static const Color lifeCounterVictoryGreen = Color(0xFF6BFF8D);
+  static const Color lifeCounterIvory = Color(0xFFF7F4EC);
+  static const Color lifeCounterHubIconDark = Color(0xFF0D1117);
+  static const Color lifeCounterSettingsSelected = Color(0xFFFFC81E);
+  static const Color lifeCounterSettingsRadio = Color(0xFF1C78FF);
+  static const Color lifeCounterNeutralChip = Color(0xFF454257);
+  static const Color lifeCounterSheetDark = Color(0xFF171717);
+
+  static const List<Color> lifeCounterHubShellGradient = [
+    Color(0xFF04070E),
+    Color(0xFF121A2B),
+  ];
+  static const List<Color> lifeCounterHubShellStrokeGradient = [
+    Color(0xFFEAFDFF),
+    Color(0xFFB9D7FF),
+  ];
+  static const List<Color> lifeCounterHubCoreGradient = [
+    Color(0xFFFDF4FF),
+    Color(0xFFD7EDFF),
+  ];
+  static const List<Color> lifeCounterWinnerGradient = [
+    Color(0xFFFF9CD1),
+    Color(0xFFFFF5A3),
+    Color(0xFFB7FFBE),
+    Color(0xFFB5C8FF),
+  ];
+  static const List<Color> lifeCounterTieGradient = [
+    Color(0xFFFFC55A),
+    Color(0xFFFFE596),
+    Color(0xFFFFB764),
+  ];
+  static const List<Color> lifeCounterConfettiColors = [
+    Color(0xFFFF4C7D),
+    Color(0xFF4A5BFF),
+    Color(0xFFFFC552),
+    Color(0xFF5BDF79),
+    Color(0xFFFFFFFF),
+  ];
+
+  static const Color lifeDeckedOutPanel = Color(0xFF4A3A12);
+  static const Color lifeAnswerLeftPanel = Color(0xFF1D1D1D);
+  static const Color lifeDefeatedPanel = Color(0xFF5B3A6C);
+  static const Color lifeCommanderLethalPanel = Color(0xFF341217);
+  static const Color lifePoisonLethalPanel = Color(0xFF122A18);
+  static const Color lifeDeckedOutTakeover = Color(0xFF2F2407);
+  static const Color lifeAnswerLeftTakeover = Color(0xFF121212);
+  static const Color lifeDefeatedTakeover = Color(0xFF1D1025);
+  static const Color lifeCommanderLethalTakeover = Color(0xFF2B090F);
+  static const Color lifePoisonLethalTakeover = Color(0xFF0C2414);
+  static const Color lifeDeckedOutAccent = Color(0xFFFFD36A);
+  static const Color lifeAnswerLeftAccent = Color(0xFFEDEDED);
+  static const Color lifeDefeatedAccent = Color(0xFFFF5AA9);
+  static const Color lifeCommanderLethalAccent = Color(0xFFFF5B61);
+  static const Color lifeLowTotalWarning = Color(0xFFFFB3A8);
+
   // ── Deprecated aliases (backward compat) ────────────────────
   @Deprecated('Use primarySoft instead')
   static const Color loomCyan = primarySoft;

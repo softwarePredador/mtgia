@@ -956,21 +956,35 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  InkWell(
-                    key: Key('create-trade-item-decrement-$keyPrefix-$index'),
-                    onTap:
-                        sel.quantity > 1
-                            ? () => onQtyChange(index, sel.quantity - 1)
-                            : null,
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Icon(
-                        Icons.remove,
-                        size: 16,
-                        color:
-                            sel.quantity > 1
-                                ? accentColor
-                                : AppTheme.textSecondary,
+                  Semantics(
+                    button: true,
+                    enabled: sel.quantity > 1,
+                    label: 'Diminuir quantidade da carta na troca',
+                    child: Tooltip(
+                      message: 'Diminuir quantidade',
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: InkWell(
+                          key: Key(
+                            'create-trade-item-decrement-$keyPrefix-$index',
+                          ),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
+                          onTap:
+                              sel.quantity > 1
+                                  ? () => onQtyChange(index, sel.quantity - 1)
+                                  : null,
+                          child: Icon(
+                            Icons.remove,
+                            size: 16,
+                            color:
+                                sel.quantity > 1
+                                    ? accentColor
+                                    : AppTheme.textSecondary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -986,21 +1000,35 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                       ),
                     ),
                   ),
-                  InkWell(
-                    key: Key('create-trade-item-increment-$keyPrefix-$index'),
-                    onTap:
-                        sel.quantity < item.quantity
-                            ? () => onQtyChange(index, sel.quantity + 1)
-                            : null,
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Icon(
-                        Icons.add,
-                        size: 16,
-                        color:
-                            sel.quantity < item.quantity
-                                ? accentColor
-                                : AppTheme.textSecondary,
+                  Semantics(
+                    button: true,
+                    enabled: sel.quantity < item.quantity,
+                    label: 'Aumentar quantidade da carta na troca',
+                    child: Tooltip(
+                      message: 'Aumentar quantidade',
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: InkWell(
+                          key: Key(
+                            'create-trade-item-increment-$keyPrefix-$index',
+                          ),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
+                          onTap:
+                              sel.quantity < item.quantity
+                                  ? () => onQtyChange(index, sel.quantity + 1)
+                                  : null,
+                          child: Icon(
+                            Icons.add,
+                            size: 16,
+                            color:
+                                sel.quantity < item.quantity
+                                    ? accentColor
+                                    : AppTheme.textSecondary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -1009,13 +1037,25 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             ),
             const SizedBox(width: 4),
             // Remove
-            InkWell(
-              key: Key('create-trade-item-remove-$keyPrefix-$index'),
-              onTap: () => onRemove(index),
-              child: const Icon(
-                Icons.close,
-                size: 18,
-                color: AppTheme.textSecondary,
+            Semantics(
+              button: true,
+              label: 'Remover carta da troca',
+              child: Tooltip(
+                message: 'Remover carta',
+                child: SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: InkWell(
+                    key: Key('create-trade-item-remove-$keyPrefix-$index'),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    onTap: () => onRemove(index),
+                    child: const Icon(
+                      Icons.close,
+                      size: 18,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

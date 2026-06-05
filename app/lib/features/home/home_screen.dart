@@ -6,6 +6,7 @@ import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/cached_card_image.dart';
 import 'life_counter_route.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
@@ -683,12 +684,7 @@ class _DeckArtwork extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = deck.commanderImageUrl;
     if (imageUrl != null && imageUrl.trim().isNotEmpty) {
-      return Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        alignment: Alignment.topCenter,
-        errorBuilder: (_, _, _) => _DeckFallback(deck: deck),
-      );
+      return CachedCardImage(imageUrl: imageUrl, fit: BoxFit.cover);
     }
     return _DeckFallback(deck: deck);
   }

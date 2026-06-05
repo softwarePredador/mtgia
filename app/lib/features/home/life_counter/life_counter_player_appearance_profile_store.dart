@@ -64,8 +64,7 @@ class LifeCounterPlayerAppearanceProfileStore {
   LifeCounterPlayerAppearanceProfileStore({
     LifeCounterAppearanceProfilesPreferencesLoader? preferencesLoader,
     this.prefsKey = lifeCounterPlayerAppearanceProfilesPrefsKey,
-  }) : _preferencesLoader =
-           preferencesLoader ?? SharedPreferences.getInstance;
+  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
 
   final LifeCounterAppearanceProfilesPreferencesLoader _preferencesLoader;
   final String prefsKey;

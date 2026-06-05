@@ -131,9 +131,11 @@ class LifeCounterTabletopEngine {
     required int targetPlayerIndex,
   }) {
     return <int>[
-      for (var sourcePlayerIndex = 0;
-          sourcePlayerIndex < session.playerCount;
-          sourcePlayerIndex += 1)
+      for (
+        var sourcePlayerIndex = 0;
+        sourcePlayerIndex < session.playerCount;
+        sourcePlayerIndex += 1
+      )
         if (sourcePlayerIndex != targetPlayerIndex &&
             isCommanderDamageSourceLethal(
               session,
@@ -240,7 +242,8 @@ class LifeCounterTabletopEngine {
       return const LifeCounterPlayerStatusSummary(
         kind: LifeCounterPlayerStatusKind.commanderDamageLethal,
         label: 'Commander damage lethal',
-        description: 'One commander source reached lethal damage for this player.',
+        description:
+            'One commander source reached lethal damage for this player.',
       );
     }
     if (isPlayerPoisonLethal(session, playerIndex: playerIndex)) {
@@ -392,20 +395,22 @@ class LifeCounterTabletopEngine {
     required LifeCounterSettings settings,
     bool preserveManualSpecialStates = true,
   }) {
-    return List<int>.generate(session.playerCount, (index) => index)
-        .fold<LifeCounterSession>(session, (current, playerIndex) {
-          if (preserveManualSpecialStates &&
-              current.playerSpecialStates[playerIndex] !=
-                  LifeCounterPlayerSpecialState.none) {
-            return current;
-          }
+    return List<int>.generate(
+      session.playerCount,
+      (index) => index,
+    ).fold<LifeCounterSession>(session, (current, playerIndex) {
+      if (preserveManualSpecialStates &&
+          current.playerSpecialStates[playerIndex] !=
+              LifeCounterPlayerSpecialState.none) {
+        return current;
+      }
 
-          return applyAutoKnockOutIfNeeded(
-            current,
-            playerIndex: playerIndex,
-            settings: settings,
-          );
-        });
+      return applyAutoKnockOutIfNeeded(
+        current,
+        playerIndex: playerIndex,
+        settings: settings,
+      );
+    });
   }
 
   static LifeCounterSession normalizeOwnedBoardSession(
@@ -473,8 +478,9 @@ class LifeCounterTabletopEngine {
     required bool secondCommander,
     required int delta,
   }) {
-    final current = session
-        .resolvedCommanderDamageDetails[targetPlayerIndex][sourcePlayerIndex];
+    final current =
+        session
+            .resolvedCommanderDamageDetails[targetPlayerIndex][sourcePlayerIndex];
     return writeCommanderDamageFromSource(
       session,
       targetPlayerIndex: targetPlayerIndex,
@@ -585,13 +591,18 @@ class LifeCounterTabletopEngine {
       case 'xp':
         return session.experience[playerIndex];
       case 'tax-1':
-        return session.resolvedCommanderCastDetails[playerIndex].commanderOneCasts *
+        return session
+                .resolvedCommanderCastDetails[playerIndex]
+                .commanderOneCasts *
             2;
       case 'tax-2':
-        return session.resolvedCommanderCastDetails[playerIndex].commanderTwoCasts *
+        return session
+                .resolvedCommanderCastDetails[playerIndex]
+                .commanderTwoCasts *
             2;
       default:
-        return session.resolvedPlayerExtraCounters[playerIndex][counterKey] ?? 0;
+        return session.resolvedPlayerExtraCounters[playerIndex][counterKey] ??
+            0;
     }
   }
 
@@ -633,8 +644,9 @@ class LifeCounterTabletopEngine {
                   commanderTwoCasts: casts,
                 );
         return session.copyWith(
-          commanderCasts:
-              details.map((entry) => entry.totalCasts).toList(growable: false),
+          commanderCasts: details
+              .map((entry) => entry.totalCasts)
+              .toList(growable: false),
           commanderCastDetails: details,
         );
       default:
@@ -715,10 +727,11 @@ class LifeCounterTabletopEngine {
     poison[playerIndex] = 0;
     specialStates[playerIndex] = LifeCounterPlayerSpecialState.none;
     commanderDamage[playerIndex] = List<int>.filled(session.playerCount, 0);
-    commanderDamageDetails[playerIndex] = List<LifeCounterCommanderDamageDetail>.filled(
-      session.playerCount,
-      LifeCounterCommanderDamageDetail.zero,
-    );
+    commanderDamageDetails[playerIndex] =
+        List<LifeCounterCommanderDamageDetail>.filled(
+          session.playerCount,
+          LifeCounterCommanderDamageDetail.zero,
+        );
 
     return session.copyWith(
       lives: lives,

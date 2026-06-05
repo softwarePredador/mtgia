@@ -1229,24 +1229,34 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      onTap: enabled ? onTap : null,
-      child: Container(
-        width: 30,
-        height: 30,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color:
-              enabled
-                  ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
-                  : AppTheme.surfaceSlate.withValues(alpha: 0.35),
+    final semanticLabel =
+        icon == Icons.remove ? 'Diminuir quantidade' : 'Aumentar quantidade';
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: InkWell(
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: enabled ? AppTheme.textPrimary : AppTheme.textHint,
+          onTap: enabled ? onTap : null,
+          child: Container(
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color:
+                  enabled
+                      ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
+                      : AppTheme.surfaceSlate.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: enabled ? AppTheme.textPrimary : AppTheme.textHint,
+            ),
+          ),
         ),
       ),
     );

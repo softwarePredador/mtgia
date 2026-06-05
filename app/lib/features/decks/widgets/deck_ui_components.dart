@@ -161,10 +161,14 @@ class DeckMetaChip extends StatelessWidget {
     );
 
     if (onTap == null) return content;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-      child: content,
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        child: content,
+      ),
     );
   }
 }

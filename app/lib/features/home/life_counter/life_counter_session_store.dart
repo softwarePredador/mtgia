@@ -8,8 +8,7 @@ class LifeCounterSessionStore {
   LifeCounterSessionStore({
     LifeCounterPreferencesLoader? preferencesLoader,
     this.prefsKey = legacyLifeCounterSessionPrefsKey,
-  }) : _preferencesLoader =
-           preferencesLoader ?? SharedPreferences.getInstance;
+  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
 
   final LifeCounterPreferencesLoader _preferencesLoader;
   final String prefsKey;

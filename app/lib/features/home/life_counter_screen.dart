@@ -104,14 +104,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   final List<_GameSnapshot> _history = [];
   static const int _maxHistory = 50;
 
-  static const _playerColors = [
-    Color(0xFFFFB51E),
-    Color(0xFFFF0A5B),
-    Color(0xFFCF7AEF),
-    Color(0xFF4B57FF),
-    Color(0xFF44E063),
-    Color(0xFF40B9FF),
-  ];
+  static const _playerColors = AppTheme.lifeCounterPlayerColors;
 
   static const _playerLabels = [
     'Jogador 1',
@@ -903,7 +896,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                   child: const AbsorbPointer(
                     absorbing: true,
                     child: DecoratedBox(
-                      decoration: BoxDecoration(color: Color(0xA6000000)),
+                      decoration: BoxDecoration(color: AppTheme.overlayBlack65),
                     ),
                   ),
                 ),
@@ -1329,28 +1322,28 @@ class _TableControlHub extends StatelessWidget {
       _HubPetalSpec(
         key: Key('life-counter-hub-players'),
         label: 'PLAYERS',
-        color: Color(0xFF44E063),
+        color: AppTheme.lifeCounterGreen,
         offset: Offset(-84 * scaleFactor, 0),
         rotation: -pi / 2,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-reset'),
         label: 'RESTART',
-        color: Color(0xFFFFE277),
+        color: AppTheme.lifeDeckedOutAccent,
         offset: Offset(0, -84 * scaleFactor),
         rotation: 0,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-quick-high-roll'),
         label: 'HIGH ROLL',
-        color: Color(0xFF40B9FF),
+        color: AppTheme.lifeCounterBlue,
         offset: Offset(0, 84 * scaleFactor),
         rotation: 0,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-settings'),
         label: 'SETTINGS',
-        color: Color(0xFFB9B4FF),
+        color: AppTheme.lifeDefeatedAccent,
         offset: Offset(84 * scaleFactor, 0),
         rotation: pi / 2,
       ),
@@ -1618,7 +1611,7 @@ class _HubMedallion extends StatelessWidget {
                     ),
                     Icon(
                       isExpanded ? Icons.close_rounded : Icons.menu_rounded,
-                      color: const Color(0xFF0D1117),
+                      color: AppTheme.lifeCounterHubIconDark,
                       size: iconSize,
                       shadows: [
                         Shadow(
@@ -1655,7 +1648,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF04070E), Color(0xFF121A2B)],
+            colors: AppTheme.lifeCounterHubShellGradient,
           ).createShader(Offset.zero & size)
           ..isAntiAlias = true;
 
@@ -1664,7 +1657,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFEAFDFF), Color(0xFFB9D7FF)],
+            colors: AppTheme.lifeCounterHubShellStrokeGradient,
           ).createShader(Offset.zero & size)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.4
@@ -1676,7 +1669,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFDF4FF), Color(0xFFD7EDFF)],
+            colors: AppTheme.lifeCounterHubCoreGradient,
           ).createShader(Offset.zero & size)
           ..isAntiAlias = true;
 
@@ -1959,7 +1952,7 @@ class _TableOverlayFrame extends StatelessWidget {
                               width: 48,
                               height: 48,
                               decoration: const BoxDecoration(
-                                color: Color(0xFFFF2C77),
+                                color: AppTheme.lifeCounterPink,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
@@ -2033,12 +2026,12 @@ class _PlayerLayoutPreview extends StatelessWidget {
               width: 176,
               height: 72,
               decoration: BoxDecoration(
-                color: selected ? const Color(0xFFFF2C77) : Colors.transparent,
+                color: selected ? AppTheme.lifeCounterPink : Colors.transparent,
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
                   color:
                       selected
-                          ? const Color(0xFFFF2C77)
+                          ? AppTheme.lifeCounterPink
                           : Colors.white.withValues(alpha: 0.9),
                   width: 2,
                 ),
@@ -2329,7 +2322,7 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
-                            color: Color(0xFF40B9FF),
+                            color: AppTheme.lifeCounterBlue,
                             width: 2,
                           ),
                         ),
@@ -2578,7 +2571,7 @@ class _TableBottomRail extends StatelessWidget {
       key: const Key('life-counter-bottom-rail'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F4EC),
+        color: AppTheme.lifeCounterIvory,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: Colors.black.withValues(alpha: 0.15),
@@ -3057,15 +3050,15 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             : null;
     final baseColor =
         isDeckedOut
-            ? const Color(0xFF4A3A12)
+            ? AppTheme.lifeDeckedOutPanel
             : hasAnswerLeft
-            ? const Color(0xFF1D1D1D)
+            ? AppTheme.lifeAnswerLeftPanel
             : isDefeated
-            ? const Color(0xFF5B3A6C)
+            ? AppTheme.lifeDefeatedPanel
             : isCommanderLethal
-            ? const Color(0xFF341217)
+            ? AppTheme.lifeCommanderLethalPanel
             : isPoisonLethal
-            ? const Color(0xFF122A18)
+            ? AppTheme.lifePoisonLethalPanel
             : widget.color;
     final highRollAccent =
         widget.isHighRollTie ? AppTheme.warning : AppTheme.primarySoft;
@@ -3435,24 +3428,24 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   contentAlignment: _specialTakeoverAlignment,
                   color:
                       isDeckedOut
-                          ? const Color(0xFF2F2407)
+                          ? AppTheme.lifeDeckedOutTakeover
                           : hasAnswerLeft
-                          ? const Color(0xFF121212)
+                          ? AppTheme.lifeAnswerLeftTakeover
                           : isDefeated
-                          ? const Color(0xFF1D1025)
+                          ? AppTheme.lifeDefeatedTakeover
                           : isCommanderLethal
-                          ? const Color(0xFF2B090F)
-                          : const Color(0xFF0C2414),
+                          ? AppTheme.lifeCommanderLethalTakeover
+                          : AppTheme.lifePoisonLethalTakeover,
                   accent:
                       isDeckedOut
-                          ? const Color(0xFFFFD36A)
+                          ? AppTheme.lifeDeckedOutAccent
                           : hasAnswerLeft
-                          ? const Color(0xFFEDEDED)
+                          ? AppTheme.lifeAnswerLeftAccent
                           : isDefeated
-                          ? const Color(0xFFFF5AA9)
+                          ? AppTheme.lifeDefeatedAccent
                           : isCommanderLethal
-                          ? const Color(0xFFFF5B61)
-                          : const Color(0xFF6BFF8D),
+                          ? AppTheme.lifeCommanderLethalAccent
+                          : AppTheme.lifeCounterVictoryGreen,
                   title:
                       isDeckedOut
                           ? 'DECKED OUT.'
@@ -3831,7 +3824,7 @@ class _PlayerCounterConsoleStrip extends StatelessWidget {
           value: '$poison',
           compact: compact,
           dense: dense,
-          accent: const Color(0xFF6BFF8D),
+          accent: AppTheme.lifeCounterVictoryGreen,
           isActive: poison > 0,
         ),
         _PlayerCounterConsoleStat(
@@ -3850,7 +3843,7 @@ class _PlayerCounterConsoleStrip extends StatelessWidget {
           accent:
               commanderDamageTotal >= 21
                   ? AppTheme.error
-                  : const Color(0xFFFFB3A8),
+                  : AppTheme.lifeLowTotalWarning,
           isActive: commanderDamageTotal > 0,
         ),
       ],
@@ -4175,17 +4168,21 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFFF9CD1),
-                Color(0xFFFFF5A3),
-                Color(0xFFB7FFBE),
-                Color(0xFFB5C8FF),
+                AppTheme.lifeDefeatedAccent,
+                AppTheme.lifeDeckedOutAccent,
+                AppTheme.lifeCounterVictoryGreen,
+                AppTheme.primarySoft,
               ],
             )
             : isTie
             ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFFFFC55A), Color(0xFFFFE596), Color(0xFFFFB764)],
+              colors: [
+                AppTheme.brass400,
+                AppTheme.lifeDeckedOutAccent,
+                AppTheme.warning,
+              ],
             )
             : LinearGradient(
               begin: Alignment.topLeft,
@@ -4482,11 +4479,11 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
 
   List<Widget> _buildConfetti(double progress) {
     const colors = [
-      Color(0xFFFF4C7D),
-      Color(0xFF4A5BFF),
-      Color(0xFFFFC552),
-      Color(0xFF5BDF79),
-      Color(0xFFFFFFFF),
+      AppTheme.lifeCounterPinkText,
+      AppTheme.lifeCounterSettingsRadio,
+      AppTheme.brass400,
+      AppTheme.lifeCounterVictoryGreen,
+      AppTheme.textPrimary,
     ];
     const positions = [
       (-0.78, -0.82, 18.0),
@@ -4806,7 +4803,7 @@ class _TableToolsSheetState extends State<_TableToolsSheet> {
                 _rollOffWinners.length > 1
                     ? 'REROLL TIED PLAYERS'
                     : 'ROLL EVERY PLAYER',
-            accent: const Color(0xFF40B9FF),
+            accent: AppTheme.lifeCounterBlue,
             emphasized: true,
             onTap: _runRollOff,
           ),
@@ -4934,7 +4931,7 @@ class _DiceOverlay extends StatelessWidget {
                 hasPendingHighRollTie
                     ? 'REROLL ONLY TIED PLAYERS'
                     : 'ROLL ALL PLAYERS',
-            accent: const Color(0xFF40B9FF),
+            accent: AppTheme.lifeCounterBlue,
             emphasized: true,
             onTap: () {
               onHighRoll();
@@ -5337,7 +5334,7 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                           child: const Text(
                             'CANCEL',
                             style: TextStyle(
-                              color: Color(0xFFFF2C77),
+                              color: AppTheme.lifeCounterPink,
                               fontSize: AppTheme.fontMd,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 0.8,
@@ -5410,7 +5407,7 @@ class _SetLifeKeypadButton extends StatelessWidget {
               width: 58,
               height: 58,
               decoration: BoxDecoration(
-                color: const Color(0xFF454257),
+                color: AppTheme.lifeCounterNeutralChip,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -5426,7 +5423,7 @@ class _SetLifeKeypadButton extends StatelessWidget {
                   style: TextStyle(
                     color:
                         destructive
-                            ? const Color(0xFFFF2C77)
+                            ? AppTheme.lifeCounterPink
                             : Colors.white.withValues(alpha: 0.96),
                     fontSize: label == 'DEL' ? 17 : 30,
                     fontWeight: FontWeight.w900,
@@ -5674,7 +5671,7 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                                   child: const Text(
                                     'CANCEL',
                                     style: TextStyle(
-                                      color: Color(0xFFFF2C77),
+                                      color: AppTheme.lifeCounterPink,
                                       fontSize: AppTheme.fontMd,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.8,
@@ -5750,7 +5747,7 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
               width: 62,
               height: 62,
               decoration: BoxDecoration(
-                color: const Color(0xFF171717),
+                color: AppTheme.lifeCounterSheetDark,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: Colors.white.withValues(
@@ -5772,7 +5769,7 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
                   style: TextStyle(
                     color:
                         destructive
-                            ? const Color(0xFFFF2C77)
+                            ? AppTheme.lifeCounterPink
                             : Colors.white.withValues(alpha: 0.96),
                     fontSize: label == 'DEL' ? 17 : 30,
                     fontWeight: FontWeight.w900,
@@ -6620,10 +6617,16 @@ class _StartingLifePresetButton extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: selected ? const Color(0xFFFFC81E) : Colors.transparent,
+                color:
+                    selected
+                        ? AppTheme.lifeCounterSettingsSelected
+                        : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: selected ? const Color(0xFFFFC81E) : Colors.white,
+                  color:
+                      selected
+                          ? AppTheme.lifeCounterSettingsSelected
+                          : Colors.white,
                   width: 2,
                 ),
               ),
@@ -6672,10 +6675,14 @@ class _SettingsToggleRow extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: selected ? const Color(0xFF1C78FF) : Colors.white,
+              color:
+                  selected ? AppTheme.lifeCounterSettingsRadio : Colors.white,
               width: 2.2,
             ),
-            color: selected ? const Color(0xFF1C78FF) : Colors.transparent,
+            color:
+                selected
+                    ? AppTheme.lifeCounterSettingsRadio
+                    : Colors.transparent,
           ),
           child:
               selected

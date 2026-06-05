@@ -134,15 +134,19 @@ class CardDetailScreen extends StatelessWidget {
       context: context,
       barrierColor: AppTheme.backgroundAbyss.withValues(alpha: 0.94),
       builder:
-          (_) => GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Dialog(
-              backgroundColor: AppTheme.transparent,
-              insetPadding: const EdgeInsets.all(16),
-              child: InteractiveViewer(
-                child: CachedCardImage(
-                  imageUrl: card.imageUrl,
-                  fit: BoxFit.contain,
+          (_) => Semantics(
+            button: true,
+            label: 'Fechar imagem da carta',
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Dialog(
+                backgroundColor: AppTheme.transparent,
+                insetPadding: const EdgeInsets.all(16),
+                child: InteractiveViewer(
+                  child: CachedCardImage(
+                    imageUrl: card.imageUrl,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),

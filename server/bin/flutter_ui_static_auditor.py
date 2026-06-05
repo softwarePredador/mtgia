@@ -112,6 +112,44 @@ def block(lines: list[str], start: int, max_lines: int = 28) -> str:
     return "\n".join(lines[start : min(len(lines), start + max_lines)])
 
 
+def call_block(lines: list[str], start: int, max_lines: int = 220) -> str:
+    depth = 0
+    started = False
+    collected: list[str] = []
+    for line in lines[start : min(len(lines), start + max_lines)]:
+        collected.append(line)
+        depth += line.count("(")
+        depth -= line.count(")")
+        if "(" in line:
+            started = True
+        if started and depth <= 0:
+            break
+    return "\n".join(collected)
+
+
+def has_visible_text_label(text: str) -> bool:
+    return bool(
+        re.search(r"\b(?:Text|SelectableText|RichText)\s*\(", text),
+    )
+
+
+def has_explicit_min_touch_target(text: str) -> bool:
+    min_dimension = re.search(
+        r"\b(width|height)\s*:\s*(?:4[8-9]|[5-9]\d|\d{3,})(?:\.0)?\b",
+        text,
+    )
+    min_constraint = re.search(
+        r"\b(minWidth|minHeight)\s*:\s*(?:4[8-9]|[5-9]\d|\d{3,})(?:\.0)?\b",
+        text,
+    )
+    material_min = "minimumSize:" in text and re.search(
+        r"Size\s*\(\s*(?:4[8-9]|[5-9]\d|\d{3,})(?:\.0)?\s*,\s*"
+        r"(?:4[8-9]|[5-9]\d|\d{3,})(?:\.0)?\s*\)",
+        text,
+    )
+    return bool(min_dimension or min_constraint or material_min)
+
+
 def is_theme_foundation(path: Path) -> bool:
     rpath = rel(path).lower()
     return "/theme/" in rpath or rpath.endswith("app_theme.dart")
@@ -256,12 +294,17 @@ def audit_file(path: Path, findings: list[Finding], counters: Counter[str]) -> N
                 )
 
         if re.search(r"\b(GestureDetector|InkWell)\s*\(", line):
-            nearby = "\n".join(lines[max(0, idx - 8) : min(len(lines), idx + 36)])
+            interactive_block = call_block(lines, idx - 1)
+            nearby = "\n".join(
+                lines[max(0, idx - 16) : min(len(lines), idx + 24)]
+            )
+            semantic_context = f"{nearby}\n{interactive_block}"
             has_semantics = (
-                "Semantics(" in nearby
-                or "Tooltip(" in nearby
-                or "semanticLabel" in nearby
-                or "tooltip:" in nearby
+                "Semantics(" in semantic_context
+                or "Tooltip(" in semantic_context
+                or "semanticLabel" in semantic_context
+                or "tooltip:" in semantic_context
+                or has_visible_text_label(interactive_block)
             )
             if not has_semantics:
                 add(
@@ -279,9 +322,18 @@ def audit_file(path: Path, findings: list[Finding], counters: Counter[str]) -> N
                 )
             small = re.search(
                 r"\b(width|height)\s*:\s*(?:[0-3]?\d|4[0-7])(?:\.0)?\b",
-                block(lines, idx - 1, 36),
+                interactive_block,
             )
-            if small:
+            touch_context = "\n".join(
+                lines[max(0, idx - 24) : min(len(lines), idx + 48)]
+            )
+            if (
+                small
+                and not has_explicit_min_touch_target(touch_context)
+                and not has_visible_text_label(interactive_block)
+                and "Semantics(" not in touch_context
+                and "Tooltip(" not in touch_context
+            ):
                 add(
                     findings,
                     counters,
