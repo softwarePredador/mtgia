@@ -1,0 +1,1606 @@
+{
+  "Academy Manufactor": {
+    "cmc": 3.0,
+    "effect": "ramp_engine"
+  },
+  "Academy Rector": {
+    "cmc": 4.0,
+    "effect": "tutor",
+    "target": "artifact_or_enchantment"
+  },
+  "Aetherflux Reservoir": {
+    "cmc": 3,
+    "effect": "finisher"
+  },
+  "All Is Dust": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Alpha Brawl": {
+    "cmc": 8.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Ancient Den": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Anim Pakal, Thousandth Moon": {
+    "cmc": 3.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Ankh of Mishra": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Apocalypse": {
+    "cmc": 5.0,
+    "effect": "board_wipe"
+  },
+  "Archaeomancer's Map": {
+    "cmc": 3,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Archangel's Light": {
+    "cmc": 8.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Arena Rector": {
+    "cmc": 4.0,
+    "effect": "creature",
+    "power": 4
+  },
+  "Armageddon": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Astral Drift": {
+    "cmc": 3,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Astral Slide": {
+    "cmc": 3.0,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Avacyn, Angel of Hope": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Aziza, Mage Tower Captain": {
+    "cmc": 2.0,
+    "effect": "copy_spell"
+  },
+  "Bazaar of Baghdad": {
+    "cmc": 0.0,
+    "count": 3,
+    "effect": "draw_cards"
+  },
+  "Beacon of Destruction": {
+    "cmc": 5.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Bearer of the Heavens": {
+    "cmc": 8.0,
+    "effect": "creature",
+    "power": 8
+  },
+  "Blacksmith's Skill": {
+    "cmc": 1.0,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Blessed Wind": {
+    "cmc": 9.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Blind Obedience": {
+    "cmc": 3,
+    "effect": "finisher"
+  },
+  "Blood Moon": {
+    "cmc": 3.0,
+    "effect": "draw_engine"
+  },
+  "Boltwave": {
+    "cmc": 1.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Boom // Bust": {
+    "cmc": 2.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Brainstone": {
+    "cmc": 1.0,
+    "count": 3,
+    "effect": "draw_cards"
+  },
+  "Browbeat": {
+    "cmc": 3.0,
+    "count": 3,
+    "effect": "draw_cards"
+  },
+  "Burning Prophet": {
+    "cmc": 2.0,
+    "effect": "topdeck_manipulation"
+  },
+  "Campus Renovation": {
+    "cmc": 5.0,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Cascading Cataracts": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Cataclysm": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Catastrophe": {
+    "cmc": 6.0,
+    "effect": "board_wipe"
+  },
+  "Caught Red-Handed": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Chain Lightning": {
+    "cmc": 1.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Chandra's Flame Wave": {
+    "cmc": 5.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Chandra's Ignition": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Chandra, Flame's Fury": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Chandra, Hope's Beacon": {
+    "cmc": 3,
+    "effect": "copy_spell"
+  },
+  "Chardalyn Dragon": {
+    "cmc": 6.0,
+    "effect": "creature",
+    "power": 6
+  },
+  "Cinder Storm": {
+    "cmc": 7.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Collision of Realms": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Combat Celebrant": {
+    "cmc": 3.0,
+    "effect": "creature",
+    "power": 3
+  },
+  "Command Tower": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Commander's Sphere": {
+    "cmc": 3,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Conch Horn": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Conduit Pylons": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Conspiracy Theorist": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Consulate Crackdown": {
+    "cmc": 5.0,
+    "effect": "board_wipe"
+  },
+  "Containment Construct": {
+    "cmc": 2.0,
+    "effect": "creature",
+    "power": 2
+  },
+  "Coruscation Mage": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Cosmos Elixir": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Crackle with Power": {
+    "cmc": 2.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Crucible of Worlds": {
+    "cmc": 3.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Crystal Ball": {
+    "cmc": 3.0,
+    "effect": "topdeck_manipulation"
+  },
+  "Crystal Grotto": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Darksteel Citadel": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Darksteel Forge": {
+    "cmc": 9.0,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Darksteel Ingot": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Darksteel Pendant": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Dawn's Truce": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Deafening Silence": {
+    "cmc": 1.0,
+    "effect": "draw_engine"
+  },
+  "Decree of Annihilation": {
+    "cmc": 3,
+    "effect": "board_wipe"
+  },
+  "Deploy to the Front": {
+    "cmc": 7.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Descent into Avernus": {
+    "cmc": 3.0,
+    "effect": "ramp_engine"
+  },
+  "Devastation": {
+    "cmc": 7.0,
+    "effect": "board_wipe"
+  },
+  "Devils' Playground": {
+    "cmc": 6.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Devout Invocation": {
+    "cmc": 7.0,
+    "effect": "token_maker",
+    "token_count": 5,
+    "token_power": "oracle"
+  },
+  "Dimensional Breach": {
+    "cmc": 7.0,
+    "effect": "board_wipe"
+  },
+  "Disenchant": {
+    "cmc": 2.0,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Disrupt Decorum": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Dragon Engine": {
+    "cmc": 3.0,
+    "effect": "creature",
+    "power": 3
+  },
+  "Dragon's Rage Channeler": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Dragonlord's Servant": {
+    "cmc": 2.0,
+    "effect": "creature",
+    "power": 2
+  },
+  "Dragonmaster Outcast": {
+    "cmc": 1.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Dragonspeaker Shaman": {
+    "cmc": 3.0,
+    "effect": "creature",
+    "power": 3
+  },
+  "Drannith Magistrate": {
+    "cmc": 2.0,
+    "effect": "silence_opponents"
+  },
+  "Electroduplicate": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": 1,
+    "token_power": 1
+  },
+  "Ember Shot": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "End the Festivities": {
+    "cmc": 1.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Ensnared by the Mara": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Erode": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Everybody Lives!": {
+    "cmc": 2.0,
+    "effect": "finisher",
+    "instant": true
+  },
+  "Exotic Orchard": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Explosive Revelation": {
+    "cmc": 5.0,
+    "effect": "topdeck_manipulation"
+  },
+  "Explosive Welcome": {
+    "cmc": 8.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Fabled Passage": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Felidar Guardian": {
+    "cmc": 4.0,
+    "effect": "creature",
+    "power": 4
+  },
+  "Fellwar Stone": {
+    "cmc": 2.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Feudkiller's Verdict": {
+    "cmc": 6.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Fiery Emancipation": {
+    "cmc": 6.0,
+    "effect": "finisher"
+  },
+  "Fiery Encore": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Fiery Temper": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Fire Nation Attacks": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Firebrand Archer": {
+    "cmc": 2.0,
+    "effect": "finisher"
+  },
+  "Flame Wave": {
+    "cmc": 7.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Flooded Strand": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Flurry of Horns": {
+    "cmc": 5.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Forbidden Orchard": {
+    "cmc": 3,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Fork": {
+    "cmc": 2.0,
+    "effect": "copy_spell",
+    "instant": true
+  },
+  "Gallifrey Falls // No More": {
+    "cmc": 3,
+    "effect": "board_wipe"
+  },
+  "Galvanoth": {
+    "cmc": 5.0,
+    "effect": "topdeck_manipulation"
+  },
+  "Geosurge": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Get Lost": {
+    "cmc": 2.0,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Ghostly Prison": {
+    "cmc": 3.0,
+    "effect": "draw_engine"
+  },
+  "Gideon's Phalanx": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Giver of Runes": {
+    "cmc": 1.0,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Glacial Chasm": {
+    "cmc": 3,
+    "effect": "counter",
+    "instant": true
+  },
+  "Glimpse the Impossible": {
+    "cmc": 3.0,
+    "effect": "token_maker",
+    "token_count": 5,
+    "token_power": "oracle"
+  },
+  "Global Ruin": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Goblin Engineer": {
+    "cmc": 3,
+    "effect": "tutor",
+    "target": "artifact_or_enchantment"
+  },
+  "Goblin Game": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Goblin Rally": {
+    "cmc": 5.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Goblin Scouts": {
+    "cmc": 5.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Goblin Welder": {
+    "cmc": 1.0,
+    "effect": "creature",
+    "power": 1
+  },
+  "Gods Willing": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Grapeshot": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Great Furnace": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Guan Yu's 1,000-Li March": {
+    "cmc": 6.0,
+    "effect": "board_wipe"
+  },
+  "Guttersnipe": {
+    "cmc": 3.0,
+    "effect": "finisher"
+  },
+  "Harness the Storm": {
+    "cmc": 3.0,
+    "count": 1,
+    "effect": "recursion"
+  },
+  "Heat Shimmer": {
+    "cmc": 3.0,
+    "effect": "token_maker",
+    "token_count": 1,
+    "token_power": 1
+  },
+  "Helm of Awakening": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Henge Guardian": {
+    "cmc": 5.0,
+    "effect": "creature",
+    "power": 5
+  },
+  "Hexing Squelcher": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Hidden Grotto": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Hidden Retreat": {
+    "cmc": 3.0,
+    "effect": "draw_engine"
+  },
+  "Hit the Mother Lode": {
+    "cmc": 7.0,
+    "effect": "ramp_engine"
+  },
+  "Hour of Devastation": {
+    "cmc": 5.0,
+    "effect": "board_wipe"
+  },
+  "Humility": {
+    "cmc": 4.0,
+    "effect": "draw_engine"
+  },
+  "Icatian Town": {
+    "cmc": 6.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Idyllic Tutor": {
+    "cmc": 3.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Illicit Auction": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Immolating Gyre": {
+    "cmc": 6.0,
+    "effect": "board_wipe"
+  },
+  "Impact Tremors": {
+    "cmc": 2.0,
+    "effect": "draw_engine"
+  },
+  "Impending Disaster": {
+    "cmc": 2.0,
+    "effect": "draw_engine"
+  },
+  "Imperial Oath": {
+    "cmc": 6.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Imperial Recruiter": {
+    "cmc": 3.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Imposing Grandeur": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Impulsivity": {
+    "cmc": 3,
+    "effect": "overload_recursion"
+  },
+  "Incite Rebellion": {
+    "cmc": 6.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Increasing Devotion": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Increasing Vengeance": {
+    "cmc": 3,
+    "effect": "copy_spell"
+  },
+  "Inescapable Blaze": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Inferno": {
+    "cmc": 7.0,
+    "effect": "board_wipe",
+    "instant": true
+  },
+  "Insult // Injury": {
+    "cmc": 3.0,
+    "effect": "finisher"
+  },
+  "Invincible Hymn": {
+    "cmc": 8.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Invoke Calamity": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "recursion",
+    "instant": true
+  },
+  "Invoke Justice": {
+    "cmc": 5.0,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Isengard Unleashed": {
+    "cmc": 3,
+    "effect": "finisher"
+  },
+  "Jokulhaups": {
+    "cmc": 6.0,
+    "effect": "board_wipe"
+  },
+  "Kaboom!": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Keldon Firebombers": {
+    "cmc": 5.0,
+    "effect": "creature",
+    "power": 5
+  },
+  "Kessig Flamebreather": {
+    "cmc": 2.0,
+    "effect": "finisher"
+  },
+  "Khorvath's Fury": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Kormus Bell": {
+    "cmc": 4.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Kuldotha Forgemaster": {
+    "cmc": 5.0,
+    "effect": "tutor",
+    "target": "artifact_or_enchantment"
+  },
+  "Land Tax": {
+    "cmc": 1.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Land's Edge": {
+    "cmc": 3.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Landbind Ritual": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Lapse of Certainty": {
+    "cmc": 3.0,
+    "effect": "counter",
+    "instant": true
+  },
+  "Lens of Clarity": {
+    "cmc": 1.0,
+    "effect": "topdeck_manipulation"
+  },
+  "Lightning Bolt": {
+    "cmc": 1.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Lightning Greaves": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Lightning Helix": {
+    "cmc": 2.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Lightning Rift": {
+    "cmc": 2.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Lion's Eye Diamond": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 3
+  },
+  "Lithomantic Barrage": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Locket of Yesterdays": {
+    "cmc": 1.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Loran's Escape": {
+    "cmc": 1.0,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Lotus Petal": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Magmaquake": {
+    "cmc": 2.0,
+    "effect": "board_wipe",
+    "instant": true
+  },
+  "Magus of the Wheel": {
+    "cmc": 3.0,
+    "count": 7,
+    "effect": "draw_cards"
+  },
+  "Mana Clash": {
+    "cmc": 1.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Mana Confluence": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Mana Geyser": {
+    "cmc": 5.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 7
+  },
+  "Mana Tithe": {
+    "cmc": 1.0,
+    "effect": "counter",
+    "instant": true
+  },
+  "March of Otherworldly Light": {
+    "cmc": 3,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 7
+  },
+  "Mass Calcify": {
+    "cmc": 7.0,
+    "effect": "board_wipe"
+  },
+  "Mazemind Tome": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Mechanized Warfare": {
+    "cmc": 3.0,
+    "effect": "draw_engine"
+  },
+  "Mindblaze": {
+    "cmc": 6.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Misty Rainforest": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Mogg Infestation": {
+    "cmc": 5.0,
+    "effect": "board_wipe"
+  },
+  "Molten Duplication": {
+    "cmc": 2.0,
+    "effect": "token_maker",
+    "token_count": 1,
+    "token_power": 1
+  },
+  "Monologue Tax": {
+    "cmc": 3.0,
+    "effect": "ramp_engine"
+  },
+  "Moonsilver Key": {
+    "cmc": 2.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Mother of Runes": {
+    "cmc": 1.0,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Mox Amber": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Mox Jasper": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Mox Opal": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Mystic Forge": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Needle Drop": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Nomads' Assembly": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": 5,
+    "token_power": "oracle"
+  },
+  "Obliterate": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Obsidian Fireheart": {
+    "cmc": 4.0,
+    "effect": "creature",
+    "power": 4
+  },
+  "Oswald Fiddlebender": {
+    "cmc": 2.0,
+    "effect": "tutor",
+    "target": "artifact_or_enchantment"
+  },
+  "Over the Top": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Palant\u00edr of Orthanc": {
+    "cmc": 3.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Parting Gust": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Past in Flames": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "recursion"
+  },
+  "Patron of the Arts": {
+    "cmc": 3.0,
+    "effect": "ramp_engine"
+  },
+  "Pearl Medallion": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Penance": {
+    "cmc": 3.0,
+    "effect": "draw_engine"
+  },
+  "Planar Birth": {
+    "cmc": 2.0,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Planetarium of Wan Shi Tong": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Plea for Guidance": {
+    "cmc": 6.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Polluted Delta": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Powerbalance": {
+    "cmc": 2.0,
+    "effect": "draw_engine",
+    "trigger": "opponent_spell"
+  },
+  "Price of Glory": {
+    "cmc": 3.0,
+    "effect": "draw_engine"
+  },
+  "Prismatic Vista": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Profound Journey": {
+    "cmc": 3,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Promise of Loyalty": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Punishing Fire": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Pyromancer's Goggles": {
+    "cmc": 5.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Ragavan, Nimble Pilferer": {
+    "cmc": 3,
+    "effect": "ramp_engine"
+  },
+  "Rain of Salt": {
+    "cmc": 6.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Ranger-Captain of Eos": {
+    "cmc": 3,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Ravages of War": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Razia's Purification": {
+    "cmc": 6.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Rebuff the Wicked": {
+    "cmc": 1.0,
+    "effect": "counter",
+    "instant": true
+  },
+  "Reckless Endeavor": {
+    "cmc": 7.0,
+    "effect": "ramp_engine"
+  },
+  "Reckless Handling": {
+    "cmc": 2.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Reconstruct History": {
+    "cmc": 3,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Recruiter of the Guard": {
+    "cmc": 3.0,
+    "effect": "tutor",
+    "target": "any"
+  },
+  "Reflecting Pool": {
+    "cmc": 0.0,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Rending Volley": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Replicating Ring": {
+    "cmc": 3,
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced": 1
+  },
+  "Restoration Seminar": {
+    "cmc": 3,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Reverberate": {
+    "cmc": 2.0,
+    "effect": "copy_spell",
+    "instant": true
+  },
+  "Reversal of Fortune": {
+    "cmc": 6.0,
+    "effect": "copy_spell"
+  },
+  "Reverse the Sands": {
+    "cmc": 8.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Revolutionist": {
+    "cmc": 3,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Righteous Fury": {
+    "cmc": 6.0,
+    "effect": "board_wipe"
+  },
+  "Rionya, Fire Dancer": {
+    "cmc": 5.0,
+    "effect": "creature",
+    "power": 5
+  },
+  "Rise of the Eldrazi": {
+    "cmc": 3,
+    "effect": "silence_opponents",
+    "uncounterable": true
+  },
+  "Rite of Flame": {
+    "cmc": 1.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Rite of Ruin": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Ruby Medallion": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Ruination": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Sacred Fire": {
+    "cmc": 3,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Scalding Tarn": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Scion of Ugin": {
+    "cmc": 6.0,
+    "effect": "creature",
+    "power": 6
+  },
+  "Scrambleverse": {
+    "cmc": 8.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Scrawling Crawler": {
+    "cmc": 3,
+    "effect": "draw_engine"
+  },
+  "Sculpting Steel": {
+    "cmc": 3.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Searing Flesh": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Searing Wind": {
+    "cmc": 9.0,
+    "effect": "remove_creature",
+    "instant": true
+  },
+  "Secret Rendezvous": {
+    "cmc": 3.0,
+    "count": 3,
+    "effect": "draw_cards"
+  },
+  "Sevinne's Reclamation": {
+    "cmc": 3,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Shelter": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Silence": {
+    "cmc": 1.0,
+    "effect": "silence_opponents",
+    "instant": true
+  },
+  "Simian Spirit Guide": {
+    "cmc": 3.0,
+    "effect": "creature",
+    "power": 3
+  },
+  "Single Combat": {
+    "cmc": 5.0,
+    "effect": "silence_opponents"
+  },
+  "Sizzle": {
+    "cmc": 3.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Skittering Invasion": {
+    "cmc": 7.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Skrelv's Hive": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Slash the Ranks": {
+    "cmc": 5.0,
+    "effect": "board_wipe"
+  },
+  "Smuggler's Share": {
+    "cmc": 3.0,
+    "effect": "ramp_engine"
+  },
+  "Sneak Attack": {
+    "cmc": 4.0,
+    "effect": "draw_engine"
+  },
+  "Solphim, Mayhem Dominus": {
+    "cmc": 3,
+    "effect": "finisher"
+  },
+  "Sorceress's Schemes": {
+    "cmc": 3,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Soulfire Eruption": {
+    "cmc": 9.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Soulscour": {
+    "cmc": 10.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Spiked Corridor // Torture Pit": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Spinerock Knoll": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Spiteful Banditry": {
+    "cmc": 3,
+    "effect": "board_wipe"
+  },
+  "Spiteful Repossession": {
+    "cmc": 5.0,
+    "effect": "ramp_engine"
+  },
+  "Squee, Goblin Nabob": {
+    "cmc": 3.0,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Star of Extinction": {
+    "cmc": 7.0,
+    "effect": "board_wipe"
+  },
+  "Starfall Invocation": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Static Prison": {
+    "cmc": 3,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Storm of Souls": {
+    "cmc": 6.0,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Strike It Rich": {
+    "cmc": 3,
+    "effect": "ramp_engine"
+  },
+  "Stroke of Midnight": {
+    "cmc": 3.0,
+    "effect": "token_maker",
+    "instant": true,
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Sudden Disappearance": {
+    "cmc": 6.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Sunbird's Invocation": {
+    "cmc": 6.0,
+    "effect": "draw_engine"
+  },
+  "Sundial of the Infinite": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Swiftfoot Boots": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Sword of Feast and Famine": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Tataru Taru": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Taunt from the Rampart": {
+    "cmc": 5.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Tectonic Break": {
+    "cmc": 2.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Tectonic Hazard": {
+    "cmc": 1.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Teeka's Dragon": {
+    "cmc": 9.0,
+    "effect": "creature",
+    "power": 9
+  },
+  "The Crystal's Chosen": {
+    "cmc": 7.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "The Grey Havens": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Thieves' Auction": {
+    "cmc": 7.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Thoughts of Ruin": {
+    "cmc": 4.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Thran Dynamo": {
+    "cmc": 4.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Thrilling Discovery": {
+    "cmc": 2.0,
+    "count": 3,
+    "effect": "draw_cards"
+  },
+  "Thrumming Stone": {
+    "cmc": 5.0,
+    "effect": "ripple_engine"
+  },
+  "Tibalt's Trickery": {
+    "cmc": 2.0,
+    "effect": "counter",
+    "instant": true
+  },
+  "Tithe": {
+    "cmc": 1.0,
+    "effect": "tutor",
+    "instant": true,
+    "target": "any"
+  },
+  "Tocasia's Welcome": {
+    "cmc": 3.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Torbran, Thane of Red Fell": {
+    "cmc": 4.0,
+    "effect": "creature",
+    "power": 4
+  },
+  "Twist Allegiance": {
+    "cmc": 7.0,
+    "effect": "steal_all_creatures"
+  },
+  "Ultima": {
+    "cmc": 5.0,
+    "effect": "board_wipe"
+  },
+  "Ultimate Magic: Holy": {
+    "cmc": 3,
+    "duration": 1,
+    "effect": "indestructible",
+    "instant": true
+  },
+  "Underworld Breach": {
+    "cmc": 3,
+    "count": 1,
+    "effect": "recursion"
+  },
+  "Unwinding Clock": {
+    "cmc": 4.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Urabrask's Forge": {
+    "cmc": 3.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Vandalblast": {
+    "cmc": 3,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Vexing Bauble": {
+    "cmc": 3,
+    "effect": "counter",
+    "instant": true
+  },
+  "Visions of Ruin": {
+    "cmc": 3,
+    "effect": "ramp_engine"
+  },
+  "Voice of Victory": {
+    "cmc": 3,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Volcanic Vision": {
+    "cmc": 7.0,
+    "count": 2,
+    "effect": "recursion"
+  },
+  "Voltaic Servant": {
+    "cmc": 2.0,
+    "effect": "creature",
+    "power": 2
+  },
+  "Wake of Destruction": {
+    "cmc": 6.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Warleader's Call": {
+    "cmc": 3,
+    "effect": "pump_all",
+    "instant": true
+  },
+  "Warp World": {
+    "cmc": 8.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Wear // Tear": {
+    "cmc": 3,
+    "effect": "remove_permanent",
+    "instant": true
+  },
+  "Wheel of Fortune": {
+    "cmc": 3.0,
+    "count": 7,
+    "effect": "draw_cards"
+  },
+  "Wheel of Misfortune": {
+    "cmc": 3.0,
+    "count": 7,
+    "effect": "draw_cards"
+  },
+  "Wildfire": {
+    "cmc": 6.0,
+    "effect": "board_wipe"
+  },
+  "Winds of Abandon": {
+    "cmc": 3,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Winds of Change": {
+    "cmc": 1.0,
+    "count": 1,
+    "effect": "draw_cards"
+  },
+  "Winter Orb": {
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "mana_produced": 1
+  },
+  "Worldfire": {
+    "cmc": 9.0,
+    "effect": "board_wipe"
+  },
+  "Wrath of God": {
+    "cmc": 4.0,
+    "effect": "board_wipe"
+  },
+  "Xorn": {
+    "cmc": 3.0,
+    "effect": "ramp_engine"
+  },
+  "Young Pyromancer": {
+    "cmc": 2.0,
+    "effect": "token_maker",
+    "token_count": "oracle",
+    "token_power": "oracle"
+  },
+  "Zhalfirin Void": {
+    "cmc": 3,
+    "effect": "topdeck_manipulation"
+  },
+  "Zo-Zu the Punisher": {
+    "cmc": 3.0,
+    "effect": "creature",
+    "power": 3
+  }
+}

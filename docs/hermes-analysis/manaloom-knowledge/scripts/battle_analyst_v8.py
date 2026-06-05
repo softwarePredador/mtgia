@@ -117,6 +117,18 @@ TAG_EFFECTS = {
     "loot": {"effect": "loot", "count": 1},
 }
 
+
+# ── KNOWN_CARDS Auto-Generator Loader (v8.4) ──
+# Loads generated entries from known_cards_generated.json (handcrafted takes priority)
+_gen_json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'known_cards_generated.json')
+if os.path.exists(_gen_json_path):
+    try:
+        with open(_gen_json_path) as _f:
+            _generated = json.load(_f)
+        for _name, _entry in _generated.items():
+            if _name not in KNOWN_CARDS:  # never override handcrafted
+                KNOWN_CARDS[_name] = _entry
+    except Exception: pass
 def get_card_effect(card):
     name = card.get("name", "")
     if name in KNOWN_CARDS:
