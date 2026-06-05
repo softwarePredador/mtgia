@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-05 19:00 UTC
+> Data: 2026-06-05 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -15,7 +15,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze` focado em `server/` falha com
    `uri_does_not_exist`.
-5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `5243686c` em 2026-06-04 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations`, `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual nesta busca, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
+5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `49939bb6` em 2026-06-05 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` tambem preservam jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. Deck analysis ja usa `functional_tags` app-facing, mas optimize ainda nao threada `card_function_tags` no contexto/validator, somente `semantic_tags_v2`. `/decks/:id/recommendations`, `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual nesta busca, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-05 05:30 UTC no checkout `b9ee4c80`. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
@@ -536,9 +536,9 @@ presentes e sem chamador runtime confirmado.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-04 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `5243686c`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
-  jobs async nao esta resolvida nesta branch. `POST /ai/rebuild`,
+- **Status 2026-06-05 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `49939bb6`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
+  jobs async de optimize/generate nao esta resolvida nesta branch. `POST /ai/rebuild`,
   `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram usados como
   controles positivos de owner gate. `/decks/:id/recommendations`,
   `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao
@@ -546,7 +546,9 @@ presentes e sem chamador runtime confirmado.
   antes de eventual promocao. A
   rodada tambem confirmou incoerencia de activation telemetry:
   `deck_rebuild_created` e emitido pelo app, rejeitado pela allow-list backend e
-  ausente da doc app-facing atual.
+  ausente da doc app-facing atual. Tambem foi revalidado que deck analysis
+  consome `functional_tags`, enquanto optimize ainda nao propaga
+  `card_function_tags` para o contexto/validator.
 - **Evidência**:
   - O app envia `POST /ai/optimize` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`; a
@@ -563,6 +565,17 @@ presentes e sem chamador runtime confirmado.
     `server/lib/ai/optimize_job.dart:25`-`:30`, e
     `server/routes/ai/optimize/jobs/[id].dart:39`-`:47` so bloqueia quando o
     job tem owner diferente; job nulo continua legivel.
+  - O app envia `POST /ai/generate` com `async: true` em
+    `app/lib/features/decks/providers/deck_provider_support_generation.dart:230`-`:236`
+    e faz polling pelo `poll_url` em `:379`. `server/routes/ai/generate/index.dart:786`-`:813`
+    cria jobs com `String? userId`; `server/lib/ai_generate_job.dart:12`-`:17`
+    aceita usuario nullable; `server/routes/ai/generate/jobs/[id].dart:16`-`:19`
+    so bloqueia quando o job tem owner diferente.
+  - `GET /decks/:id/analysis` seleciona `card_function_tags` e
+    `semantic_tags_v2`, e o app parseia `functional_tags`; em contraste,
+    `server/lib/ai/optimize_request_support.dart:86`-`:106` carrega apenas
+    `card_semantic_tags_v2`, e `:186`-`:198` monta `allCardData` sem
+    `functional_tags`.
   - `server/routes/decks/[id]/recommendations/index.dart:24`-`:27` busca deck
     por `id` e `:39`-`:58` busca cartas por `deckId`; a rota esta documentada
     como experimental/not proven em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
@@ -588,22 +601,27 @@ presentes e sem chamador runtime confirmado.
   1. adicionar `userId` obrigatorio a `loadOptimizeDeckContext` e filtrar
      `decks`/`deck_cards` por dono;
   2. aplicar o mesmo owner-scope em `/ai/archetypes`;
-  3. tornar `OptimizeJobStore.create` owner-obrigatorio para jobs app-facing e
-     retornar 404 quando `job.userId == null || job.userId != userId`;
+  3. tornar `OptimizeJobStore.create` e `AiGenerateJobStore.create`
+     owner-obrigatorios para jobs app-facing e retornar 404 quando
+     `job.userId == null || job.userId != userId`;
   4. decidir se `/decks/:id/recommendations` e `/decks/:id/simulate` serao
      removidas, owner-scoped ou publicas somente para `is_public=true`;
   5. adicionar `deck_rebuild_created` a `_allowedEvents` com teste, ou remover a
      emissao app se rebuild nao deve entrar no funil; atualizar
      `API_CONTRACTS_AND_DATA_MAP.md` para listar consumidores reais do endpoint;
-  6. exigir teste owner vs non-owner quando qualquer rota nova aceitar
+  6. threadar `card_function_tags` no contexto de optimize ou documentar/testar
+     que optimize ignora essa camada por design;
+  7. exigir teste owner vs non-owner quando qualquer rota nova aceitar
      `deck_id`.
 - **Validação**:
   - teste de `POST /ai/optimize` com deck de outro usuario retorna 404;
   - teste de `POST /ai/archetypes` com deck de outro usuario retorna 404;
   - source mostra `loadOptimizeDeckContext` com `userId` obrigatorio e query de
     `decks` por `id + user_id`;
-  - source mostra polling de optimize bloqueando `job.userId == null` ou owner
-    diferente;
+  - source mostra polling de optimize/generate bloqueando
+    `job.userId == null` ou owner diferente;
+  - source mostra `functional_tags` chegando ao adapter de optimize, ou testes
+    provam a divergencia intencional;
   - source mostra recommendations/simulate lendo cartas via `deck_cards` +
     `decks` filtrado por owner, ou docs/testes marcando contrato publico;
   - teste de activation aceita ou elimina `deck_rebuild_created`, e a doc deixa
