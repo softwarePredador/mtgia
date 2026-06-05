@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Gerado em UTC: `2026-06-04T21:10:42.428335+00:00`
+- Gerado em UTC: `2026-06-05T03:11:33.272049+00:00`
 - Branch: `master`
 - SHA: `75d41d4`
 - Scan repo: `/opt/data/workspace/mtgia-sync`
@@ -1395,10 +1395,11 @@
 ## Git status da memoria Hermes
 
 ```text
-## codex/hermes-analysis-docs...origin/codex/hermes-analysis-docs [ahead 7]
+## codex/hermes-analysis-docs...origin/codex/hermes-analysis-docs [ahead 12]
+ M docs/hermes-analysis/manaloom-knowledge/MANA_BASE_VALIDATION_REPORT.md
  M docs/hermes-analysis/manaloom-knowledge/scripts/__pycache__/db_helper.cpython-313.pyc
  M docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db
-?? docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py
+?? docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check_tmp.py
 ```
 
 UI_AUDIT_RESULT: findings=193 P0=0 P1=0 P2=193
