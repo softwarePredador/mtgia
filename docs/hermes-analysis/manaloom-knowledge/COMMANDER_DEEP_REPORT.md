@@ -1,18 +1,18 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-04 ~22:00 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-05 ~03:30 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** 🔴 **CONFIRMED** — cEDH Stax-Protected Combo (Bracket 4), NOT spellslinger
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs (goldfish + matchup + interactive), 16 Mulligan simulations, v3.22→v3.23→v3.24→v3.25 Validator, Lorehold Corpus Import (17+ decks), Battle Analyst v8 interactive runs, Deck Reconstruction, Active Deck Promotion, TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION, SYNERGY_MAP recalibrated), **6th consecutive hash change (2026-06-04 ~17:20 UTC)** — STRATEGIC PIVOT to stax-protected combo, **7th hash change (2026-06-04 ~21:00 UTC)** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation Report (20:30Z)**
-> **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, card hash: `32cc0305aa8956f270f45ee3b8a12730` (7th consecutive divergence). 100 cards, 31 lands tagged (2 basics: Mountain + Plains), 19 ramp, 9 draw, 10 protection, 10 wincons, 5 tutors, 3 combo pieces, 3 spell engines, 3 removal, 1 stax (Drannith Magistrate), 1 board wipe. **11 Game Changers → Bracket 4.** 3 unknown tags.
-> **🚨 Lorehold Pipeline DECOMMISSIONED:** All 5 Lorehold crons (Scout, Validator, Mulligan, Battle, Oracle) removed from `jobs.json`. Commander Knowledge Deep is the ONLY cron monitoring the deck.
-> **🔴 Pipeline State:** ALL agents STALE — 3-4+ hashes behind current state. Multi-Commander Evolution is active (replacement pipeline) but not yet analyzing Lorehold.
+> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs, 16 Mulligan simulations, v3.22→v3.25 Validator, Lorehold Corpus Import (17+ decks), TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION), **6th hash** — STRATEGIC PIVOT to stax-protected combo, **7th hash** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation (02:36Z Jun 5)**, **🆕 Knowledge Synthesis #7** (4 new code tasks), **🆕 Gamechanger Research #7** (2 new data gaps), **🆕 Cron Governance #4** (fleet confirmed unchanged)
+> **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, **current hash: `763c3e0ffad4b05e871d5d08b38393fd`** (⚠️ differs from previously reported `32cc0305...` — see §39.1). 100 cards, 31 lands tagged (2 basics: Mountain + Plains), 19 ramp, 9 draw, 10 protection, 10 wincons, 5 tutors, 3 combo pieces, 3 spell engines, 3 removal, 1 stax (Drannith Magistrate), 1 board wipe. **11 Game Changers → Bracket 4.** 3 unknown tags. Tag counts unchanged from 7th hash.
+> **🚨 Lorehold Pipeline DECOMMISSIONED:** All 5 Lorehold crons removed from `jobs.json`. Commander Knowledge Deep is the ONLY cron monitoring the deck. **Status unchanged since Jun 4.**
+> **🔴 Pipeline State:** ALL agents STALE — 5+ hashes behind current state (Mulligan Exec#15 predates 6th pivot). Multi-Commander Evolution active but has not analyzed Lorehold since initial Winota run.
 > **✅ Worldfire is LEGAL** (banlist check queries `card_legalities`). **0 banned cards.**
 > **✅ CMC corruption RESOLVED:** 0 NULL CMC values. All CMC=0.0 cards are legitimate (31 lands + 5 Moxen = 36).
-> **✅ Classifier resolved:** 20 unknown tags → 3 (85% reduction). Ramp: 6 tagged → 19 tagged. T3: 1.6% (Exec#15, stale — needs revalidation on new hash).
-> **⚠️ Artifact Lands Re-Added:** Ancient Den and Great Furnace are BACK in the 7th hash. Previously removed in the 6th pivot. Increases vulnerability to Null Rod / Collector Ouphe / artifact hate.
+> **✅ Classifier resolved:** 20 unknown tags → 3 (85% reduction). Ramp: 6 tagged → 19 tagged. T3: 1.6% (Exec#15, stale — needs revalidation on current hash).
+> **⚠️ Artifact Lands Present:** Ancient Den and Great Furnace remain. Vulnerability to Null Rod / Collector Ouphe persists.
 > **🆕 Strategic Pivot to Stax (6th hash):** +Drannith Magistrate (stax), +Pyroblast, +Silence, +Orim's Chant (stack protection), +Esper Sentinel, +The One Ring, +Wheel of Fortune, +Scroll Rack (draw upgrade), +Past in Flames, +Reiterate, +Reverberate (spell engines), +Heat Shimmer (combo piece), +Giver of Runes (protection). Removed: Akroma's Will, Lightning Greaves, Hexing Squelcher, Big Score, Windfall, Weathered Wayfarer, Dance with Calamity, Dragon's Rage Channeler, Double Vision, Arcane Bombardment, Dawning Archaic, Ancient Den, Great Furnace.
 
 ---
@@ -1709,19 +1709,129 @@ The Mana Base Validator analyzed 8 decks total, with Lorehold being the only one
 
 ---
 
-## 38. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-04 ~22:00 UTC)
+## 39. 🆕 FINDINGS SINCE 2026-06-04 ~22:00 UTC
 
-| Signal | Source | What It Would Power |
-|:-------|:-------|:--------------------|
-| **Pipeline decommissioning detection** | §35, All-Crons Audit v3.8 | Alert when crons are removed without replacement — prevents silent monitoring gaps |
-| **Artifact land vulnerability** | §34.2, Task 4 | Detect artifact lands in artifact-heavy decks — warn about Null Rod / Collector Ouphe vulnerability |
-| **Multi-Commander rotation** | §35.3, Task 5 | New pipeline that can analyze any commander — needs Lorehold in rotation |
-| **Git push health check** | §37, Task 1 | Detect when repo is >3 commits ahead of origin — alert on push failure |
-| **Deck stability metric** | §34.5 | `1.0 / (1 + modifications_in_72h)` — gate Oracle/swap recommendations on deck stability |
-| **Mana Base profile coverage** | §36.1 | Detect commanders without EDHREC reference profiles — flag as "custom build, no community baseline" |
-| **Wincon-to-interaction ratio** | §36.3, Task 3 | Alert when wincons > interaction pieces (10 vs 3) — structural imbalance |
-| **Cross-cron knowledge transfer** | §35-36 | When Lorehold pipeline dies, Commander Knowledge Deep + Mana Base Validator become the sole sources of truth — amplify their output |
+### 39.1 ⚠️ Hash Discrepancy — Reported vs Computed
+
+The hash from the previous report (`32cc0305aa8956f270f45ee3b8a12730`) does **not** match the hash computed from the current `knowledge.db` state (`763c3e0ffad4b05e871d5d08b38393fd`). The tag counts are identical (31 lands, 19 ramp, 9 draw, 10 protection, 10 wincon, 5 tutors, 3 combo, 3 removal, 3 engine, 1 stax, 1 board wipe, 3 unknown), suggesting either:
+
+- **A)** The previous hash was miscalculated (different normalization, ordering, or hash method)
+- **B)** The deck changed between the report writing and this cron execution — cards were swapped within the same functional categories
+
+**Neither scenario has been verified** because no agent has documented the full card list of the 7th hash and the Lorehold pipeline is decommissioned. The hash discrepancy goes undetected by all automated systems.
+
+**Signal for App/Backend Logic:**
+- Hash computation should be standardized in a shared utility function (`compute_deck_hash(deck_id)`) used by ALL agents
+- Any agent that references a hash should RECOMPUTE it from DB, never trust a previously stored hash
+- Hash mismatch between runs should trigger a `deck_modified` alert
+
+### 39.2 Knowledge Synthesis #7 — 4 New Code-Level Tasks
+
+The Knowledge Synthesis cron (2026-06-04T22:00Z) cross-referenced Lorehold patterns against `server/lib/` code and produced 4 new implementation tasks:
+
+| # | Priority | Task | Lorehold Pattern Origin |
+|:-:|:---------|:-----|:------------------------|
+| 1 | **P1** | Deck Import: Validate CMC against PG `cards` table | Validator v3.23 CMC corruption (14+ cards with CMC=0.0/NULL) — `_getCmc()` returns 0 silently, propagating corrupted data to quality gate and Mulligan simulations |
+| 2 | **P1** | Quality Gate: Add `'combo'` archetype rules to `_criticalRolesForArchetype` | cEDH pivot — combo decks need `{tutor, engine, wincon, protection}` as critical roles, not `{removal, ramp}`. Currently falls through to default case that treats removal/ramp as critical for ALL archetypes |
+| 3 | **P2** | Tag Accuracy Auto-Healing: Backend reads `tag_accuracy` from SQLite | 8+ day stagnation in tag quality metrics (`payoff`=35.5%, `enabler`=50%). 0 Dart references to `tag_accuracy` table |
+| 4 | **P2** | Quality Gate: Use PG `commander_reference_profiles` for per-commander land ranges | Mana Base Validator showing Aesi needs 39-43 lands but gate uses hardcoded 35 for all |
+
+**Full task details** in `docs/hermes-analysis/IMPLEMENTATION_TASKS.md`.
+
+**Signal for App/Backend Logic:**
+- `_criticalRolesForArchetype()` should have cases for ALL supported archetypes (`aggro`, `control`, `midrange`, `combo`, `spellslinger`, `stax`, `aristocrats`, `tempo`)
+- `_getCmc()` should emit `developer.log` warnings when CMC is null/zero for non-land cards
+- Per-commander land ranges should come from PG `commander_reference_profiles`, not hardcoded archetype buckets
+
+### 39.3 Gamechanger Research #7 — New Data Quality Gaps
+
+The Gamechanger Research cron (2026-06-04, execution #7) identified 2 new data quality gaps:
+
+| Gap | Detail | Impact |
+|:----|:-------|:-------|
+| **Tergrid, God of Fright** | `oracle_text=NULL` in the DB | Heuristics based on oracle text CANNOT detect this card at all. 0% detection rate. |
+| **8 GCs without `price_usd`** | 5 Reserved List + 3 others have NULL price | Price-based bracket heuristics fail for these cards |
+
+**Previous 10 gaps persist unchanged** (hash `36deb589...` — identical to exec #6).
+
+**Signal for App/Backend Logic:**
+- `tagCardForBracket()` should flag cards with `oracle_text=NULL` as `detection_blocked: true` instead of silently returning `det=0`
+- Price-dependent bracket heuristics need a `price_unavailable` fallback category
+
+### 39.4 Cron Governance #4 — Fleet State Confirmed Unchanged
+
+The Cron Governance Report (2026-06-04, 4th execution) confirmed:
+- Fleet: 18 crons active
+- **3 error crons persist:** `hermes-normal-audit`, `code-structure-auditor` (weekly), `logic-coherence-auditor`
+- Lorehold pipeline remains decommissioned (all 5 crons removed)
+- Multi-Commander Evolution has only 1 execution (Winota, 3 swaps)
+- No new analysis since Jun 3 for ANY commander
+
+**Signal for App/Backend Logic:**
+- When a pipeline is decommissioned, `cron-governor` should flag the affected deck as `unmonitored: true`
+- Multi-Commander Evolution should have a rotation schedule that ensures all active decks are analyzed at least every 72h
+
+### 39.5 Mana Base Validator Re-Run (Jun 5 02:36Z)
+
+The Mana Base Validator executed again with identical results to the Jun 4 20:30Z run. 8 decks analyzed, 0 changes detected. Lorehold (#6) still has "NO PROFILE" — no EDHREC reference exists for cEDH stax-combo Lorehold. 3 unknown tags persist: Inventors' Fair, Prismatic Vista, Reforge the Soul.
+
+**Stability indicator:** No external modifications to the deck detected between Jun 4 20:30Z and Jun 5 02:36Z. If the hash discrepancy (§39.1) is a computation artifact (not a real card change), the deck has been stable for ~30 hours.
 
 ---
 
-> **Next Cron Cycle:** Continue monitoring the cEDH Stax-Combo build. **Critical concerns (updated):** (1) 🆕 Git push FAILURE — 5 commits unpushed, all documentation local only. (2) 🆕 Lorehold pipeline DECOMMISSIONED — all 5 crons removed. Zero automated analysis on hashes #4-#7. (3) 🆕 Multi-Commander Evolution operational but not yet analyzing Lorehold. (4) Wincon supersaturation persists — 13 conditions wasting 5-6 slots. (5) Removal emergency persists — 3 interaction pieces for 4-player pods. (6) Artifact lands re-added (7th hash) — Ancient Den + Great Furnace vulnerability. (7) 🆕 Mana Base Validator confirms deck state but notes "NO PROFILE" — no EDHREC reference exists. **Priority order:** Task 1 (git push resolution — infrastructure blocker) → Task 2 (re-enable at least 1 Lorehold agent) → Task 5 (add Lorehold to Multi-Commander Evolution rotation) → Task 3 (wincon desaturation) → Task 4 (artifact land vulnerability detection).
+## 40. 🆕 UPDATED CONCRETE TASKS (2026-06-05 ~03:30 UTC — max 5)
+
+### Task 1: 🔴 CRITICAL — Hash Computation Standardization + Verification
+- **Evidence:** Hash computed from current DB (`763c3e0ffad4b05e871d5d08b38393fd`) differs from previously reported hash (`32cc0305aa8956f270f45ee3b8a12730`). Tag counts are identical (100 cards, same distribution). Either the previous hash was miscalculated or the deck changed without detection. No agent can determine which.
+- **What to change:** Create a shared hash utility (`compute_deck_card_hash(deck_id)`) that: (a) queries `card_name` from `deck_cards WHERE deck_id=X ORDER BY card_name`, (b) concatenates with a consistent delimiter, (c) computes MD5. All agents (Scout, Validator, Mulligan, Commander Knowledge Deep) must use this same utility. Add hash verification to Commander Knowledge Deep cron: recompute hash on every execution and alert if mismatch with stored hash.
+- **Impact:** Eliminates hash computation variance across agents. Prevents false "no change" signals when hash methods differ. Enables reliable change detection without a full card diff.
+- **Risk:** Low — read-only utility. Does not modify deck or code.
+- **Validation:** After implementation, `compute_deck_card_hash(6)` should return `763c3e0ffad4b05e871d5d08b38393fd` consistently across all agents.
+
+### Task 2: Knowledge Synthesis → Commander Deep Integration (CARRIED FORWARD — P0 unchanged)
+- **Evidence:** Knowledge Synthesis #7 produced 4 code-level tasks validated against `server/lib/` code. Two are P1: CMC integrity (Validator v3.23 evidence) and combo archetype rules (cEDH pivot evidence). These are direct consequences of Lorehold analysis patterns. The Commander Deep Report should track which of these tasks get implemented and re-validate the deck after implementation.
+- **What to change:** Add a `TASK_TRACKER.md` section in `docs/hermes-analysis/manaloom-knowledge/` that maps Knowledge Synthesis tasks → code changes → expected impact on Lorehold deck analysis. Track: (1) CMC validation → should catch 0 CMC artifacts and flag them, (2) Combo archetype → quality gate should stop recommending removal cuts for combo decks, (3) Tag accuracy → auto-healing should reduce `payoff` false positives (currently 35.5%).
+- **Impact:** Closes the loop between knowledge discovery and code implementation. Ensures Lorehold analysis improvements are measured.
+- **Risk:** Low — documentation and tracking only.
+- **Validation:** After CMC validation is implemented in `deck_import`, verify that importing the current Lorehold deck no longer produces CMC=0.0 for Sol Ring, Mana Vault, etc.
+
+### Task 3: Wincon Desaturation + Removal Priority (CARRIED FORWARD — P0 unchanged)
+- **Evidence:** Unchanged from previous report. 10 tagged wincons + 3 combo pieces = 13 game-ending conditions. Only 3 removal cards. Ratio 4.3:1 (wincons:removal) — structural imbalance.
+- **What to change:** Same as Task 3 from previous report. Implement `wincon_desaturation()` logic. When scored_wincons > 7 AND all 3 coverage axes are satisfied, rank by Score/CMC and recommend cutting bottom 5-6. Priority: +3 removal, +1 board wipe, +1 stax.
+- **Impact:** Frees 5-6 slots for core interaction. Largest remaining optimization.
+- **Risk:** Low — recommendation only.
+
+### Task 4: Artifact Land Vulnerability Detection (CARRIED FORWARD)
+- **Evidence:** Ancient Den and Great Furnace remain in the deck (confirmed by current hash). 11 artifact mana sources in total. Single Null Rod disables all.
+- **What to change:** Same as Task 4 from previous report. Add `detect_artifact_land_vulnerability()` to Validator. Replace artifact lands with basics.
+- **Impact:** Prevents deck folding to common cEDH sideboard hate.
+- **Risk:** Low — read-only detection.
+
+### Task 5: 🆕 Standardize Hash Computation Across All Agents
+- **Evidence:** Hash discrepancy (§39.1) suggests either computation variance or undetected deck change. Agents that don't recompute hash from source of truth propagate stale state.
+- **What to change:** Create a single `compute_deck_hash()` utility in `scripts/knowledge_db.py`. All Python agents (Scout, Validator, Mulligan, Oracle, Battle Analyst, Commander Knowledge Deep, Mana Base Validator) must import and use this utility. Add hash verification step: before any analysis, recompute hash and compare with last known hash. If mismatch AND tag counts unchanged → flag as `hash_discrepancy_possible_miscalculation`. If mismatch AND tag counts differ → flag as `deck_modified_undetected`.
+- **Impact:** Prevents silent propagation of stale hashes. Detects both computation errors and undetected deck changes.
+- **Risk:** Low — utility addition. Does not change analysis logic.
+- **Validation:** After implementation, all agents must report the same hash for deck_id=6: `763c3e0ffad4b05e871d5d08b38393fd`.
+
+---
+
+## 41. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-05 ~03:30 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Hash computation standardization** 🆕 | §39.1 | Single shared hash utility prevents cross-agent divergence and false "no change" signals |
+| **CMC validation on import** 🆕 | §39.2, Knowledge Synthesis #7 | `_getCmc()` should warn on null/zero CMC for non-lands — prevents downstream corruption |
+| **Combo archetype critical roles** 🆕 | §39.2, Knowledge Synthesis #7 | `_criticalRolesForArchetype` needs `'combo'` case with `{tutor, engine, wincon, protection}` |
+| **Tag accuracy auto-healing** 🆕 | §39.2, Knowledge Synthesis #7 | Backend reads `tag_accuracy` from SQLite and re-evaluates low-precision tags (payoff=35.5%) |
+| **Per-commander land ranges** 🆕 | §39.2, Knowledge Synthesis #7 | Use PG `commander_reference_profiles.role_targets.lands` instead of hardcoded archetype buckets |
+| **GC oracle_text=NULL detection** 🆕 | §39.3, Gamechanger Research #7 | `tagCardForBracket()` must handle missing oracle_text with `detection_blocked: true` |
+| **Pipeline decommissioning detection** | §35, All-Crons Audit v3.8 | Alert when crons are removed without replacement |
+| **Artifact land vulnerability** | §34.2, Task 4 | Detect artifact lands in artifact-heavy decks — warn about Null Rod vulnerability |
+| **Deck stability metric** | §34.5 | `1.0 / (1 + modifications_in_72h)` — gate recommendations on deck stability |
+| **Wincon-to-interaction ratio** | §36.3, Task 3 | Alert when wincons > interaction pieces — structural imbalance |
+| **Cross-cron knowledge transfer** | §35-36 | When Lorehold pipeline dies, Commander Knowledge Deep + Mana Base Validator become sole sources of truth |
+
+---
+
+> **Next Cron Cycle:** Continue monitoring the cEDH Stax-Combo build. **Critical concerns (updated 2026-06-05):** (1) 🆕 **Hash discrepancy** — reported `32cc0305...` does not match computed `763c3e0f...`. Need to determine if this is a computation error or undetected deck change. (2) 🆕 **Knowledge Synthesis #7** produced 4 P1/P2 code tasks derived from Lorehold patterns — CMC integrity and combo archetype rules are highest priority. (3) 🆕 **Gamechanger Research #7** found 2 new data gaps (Tergrid NULL oracle, 8 NULL prices). (4) Lorehold pipeline DECOMMISSIONED — 5 crons removed, zero automated analysis since Jun 3. (5) Multi-Commander Evolution still not analyzing Lorehold. (6) Wincon supersaturation persists — 13 conditions wasting 5-6 slots. (7) Removal emergency — 3 interaction pieces for 4-player pods. (8) Artifact land vulnerability — Ancient Den + Great Furnace still present. **Priority order:** Task 1 (hash standardization — quality infrastructure) → Task 2 (knowledge synthesis tracking) → Task 5 (deploy hash utility to all agents) → Task 3 (wincon desaturation) → Task 4 (artifact land vulnerability detection).
