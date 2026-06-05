@@ -8,9 +8,9 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 
 ## Metadata
 
-- Gerado em UTC: `2026-06-04T18:33:37.051910+00:00`
+- Gerado em UTC: `2026-06-05T12:04:04.241753+00:00`
 - Branch: `master`
-- SHA: `504f6e94`
+- SHA: `4af68ade`
 - Config: `server/config/premium_visual_qa_surfaces.json`
 - Arquivos auditados: `49`
 - Life Counter incluido: `True`
@@ -32,16 +32,16 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 
 ## Sumario de sinais
 
-`signals=304 P1=0 P2=304`
+`signals=303 P1=0 P2=303`
 
 ### Por regra
 
-- `material_color_direct`: 144 (mostrando 60)
+- `material_color_direct`: 142 (mostrando 60)
 - `radius_literal`: 78 (mostrando 60)
 - `hardcoded_color_literal`: 71 (mostrando 60)
 - `border_without_theme_token`: 50
 - `possible_small_touch_or_visual_target`: 29
-- `text_style_without_theme_token`: 22
+- `text_style_without_theme_token`: 21
 - `container_decoration_without_theme_token`: 15
 - `font_size_literal`: 6
 - `button_style_direct_color`: 2
@@ -59,7 +59,7 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 | Colecao/Fichario/Marketplace | `08_collection`, `collection_01_binder`, `collection_02_marketplace`, `collection_04_sets_catalog`, `sets_search_04_set_detail` | 8 | menus nao deslocados; tabs e filtros alinhados; cards/empty states; editor modal; marketplace sem default colors |
 | Trades/Mensagens/Notificacoes | `market_trade_05_trade_list`, `market_trade_08_trade_chat`, `messages_01_inbox`, `messages_02_conversation`, `market_trade_11_notifications` | 4 | status chips; linhas de conversa; unread badges; CTA/context menus; empty/loading/error states |
 | Comunidade/Perfil | `07_community`, `09_profile`, `profile_community_02_user_profile`, `profile_community_05_community_deck_detail` | 14 | feed/cards; perfil proprio e publico; badges sociais; botoes seguir/editar; hierarquia de texto |
-| Life Counter/Lotus | `commander_damage_overlay`, `turn_tracker_hint_overlay`, `life_counter_card_search_sheet`, `life_counter_set_life_sheet_35`, `life_counter_player_appearance_presets` | 227 | linguagem tabletop propria; contadores legiveis por jogador; overlays/settings; cores separaveis; touch targets em mesa |
+| Life Counter/Lotus | `commander_damage_overlay`, `turn_tracker_hint_overlay`, `life_counter_card_search_sheet`, `life_counter_set_life_sheet_35`, `life_counter_player_appearance_presets` | 226 | linguagem tabletop propria; contadores legiveis por jogador; overlays/settings; cores separaveis; touch targets em mesa |
 
 ## Comandos de prova viva obrigatoria
 
@@ -845,7 +845,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-094 button_style_direct_color
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:396`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:436`
 - Trecho: `style: OutlinedButton.styleFrom(`
 - Impacto: Botao do Life Counter com cor direta precisa de revisao de contraste e consistencia tabletop.
 - Sugestao: Centralizar em paleta do Life Counter ou justificar com screenshot.
@@ -853,7 +853,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-095 button_style_direct_color
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:445`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:485`
 - Trecho: `style: FilledButton.styleFrom(`
 - Impacto: Botao do Life Counter com cor direta precisa de revisao de contraste e consistencia tabletop.
 - Sugestao: Centralizar em paleta do Life Counter ou justificar com screenshot.
@@ -981,8 +981,8 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-111 font_size_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:203`
-- Trecho: `fontSize: 72,`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:235`
+- Trecho: `fontSize: 62,`
 - Impacto: Tamanho de fonte literal pode quebrar escala tipografica entre telas.
 - Sugestao: Trocar por AppTheme.fontMicro/fontXs/fontSm/fontMd/fontLg/fontXl/fontXxl/fontDisplay.
 
@@ -1077,7 +1077,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-123 hardcoded_color_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:399`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:439`
 - Trecho: `? const Color(0xFFFF7A9C)`
 - Impacto: Cor literal precisa ser revisada contra a paleta tabletop propria do Life Counter.
 - Sugestao: Centralizar a cor em token/paleta do Life Counter ou documentar excecao com prova visual.
@@ -1085,7 +1085,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-124 hardcoded_color_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:404`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:444`
 - Trecho: `? const Color(0x66FF2C77)`
 - Impacto: Cor literal precisa ser revisada contra a paleta tabletop propria do Life Counter.
 - Sugestao: Centralizar a cor em token/paleta do Life Counter ou documentar excecao com prova visual.
@@ -1093,7 +1093,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-125 hardcoded_color_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:448`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:490`
 - Trecho: `? const Color(0x33FF2C77)`
 - Impacto: Cor literal precisa ser revisada contra a paleta tabletop propria do Life Counter.
 - Sugestao: Centralizar a cor em token/paleta do Life Counter ou documentar excecao com prova visual.
@@ -1101,7 +1101,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-126 hardcoded_color_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:451`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:493`
 - Trecho: `destructive ? const Color(0xFFFF5E9A) : AppTheme.textPrimary,`
 - Impacto: Cor literal precisa ser revisada contra a paleta tabletop propria do Life Counter.
 - Sugestao: Centralizar a cor em token/paleta do Life Counter ou documentar excecao com prova visual.
@@ -1109,7 +1109,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-127 hardcoded_color_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:457`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:499`
 - Trecho: `? const Color(0x66FF2C77)`
 - Impacto: Cor literal precisa ser revisada contra a paleta tabletop propria do Life Counter.
 - Sugestao: Centralizar a cor em token/paleta do Life Counter ou documentar excecao com prova visual.
@@ -1589,28 +1589,12 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-187 material_color_direct
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:184`
-- Trecho: `color: Colors.white.withValues(alpha: 0.28),`
-- Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
-- Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
-
-#### P2-188 material_color_direct
-
-- Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:202`
-- Trecho: `color: Colors.white,`
-- Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
-- Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
-
-#### P2-189 material_color_direct
-
-- Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart:14`
 - Trecho: `backgroundColor: Colors.transparent,`
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-190 material_color_direct
+#### P2-188 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:551`
@@ -1618,7 +1602,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-191 material_color_direct
+#### P2-189 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:879`
@@ -1626,7 +1610,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-192 material_color_direct
+#### P2-190 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:888`
@@ -1634,7 +1618,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-193 material_color_direct
+#### P2-191 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1442`
@@ -1642,7 +1626,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-194 material_color_direct
+#### P2-192 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1500`
@@ -1650,7 +1634,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-195 material_color_direct
+#### P2-193 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1540`
@@ -1658,7 +1642,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-196 material_color_direct
+#### P2-194 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1579`
@@ -1666,7 +1650,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-197 material_color_direct
+#### P2-195 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1586`
@@ -1674,7 +1658,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-198 material_color_direct
+#### P2-196 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1612`
@@ -1682,7 +1666,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-199 material_color_direct
+#### P2-197 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1625`
@@ -1690,7 +1674,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-200 material_color_direct
+#### P2-198 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1685`
@@ -1698,7 +1682,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-201 material_color_direct
+#### P2-199 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1720`
@@ -1706,7 +1690,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-202 material_color_direct
+#### P2-200 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1744`
@@ -1714,7 +1698,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-203 material_color_direct
+#### P2-201 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1774`
@@ -1722,7 +1706,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-204 material_color_direct
+#### P2-202 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1775`
@@ -1730,7 +1714,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-205 material_color_direct
+#### P2-203 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1803`
@@ -1738,7 +1722,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-206 material_color_direct
+#### P2-204 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1808`
@@ -1746,7 +1730,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-207 material_color_direct
+#### P2-205 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1823`
@@ -1754,7 +1738,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-208 material_color_direct
+#### P2-206 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1897`
@@ -1762,7 +1746,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-209 material_color_direct
+#### P2-207 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1921`
@@ -1770,7 +1754,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-210 material_color_direct
+#### P2-208 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1932`
@@ -1778,7 +1762,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-211 material_color_direct
+#### P2-209 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1954`
@@ -1786,7 +1770,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-212 material_color_direct
+#### P2-210 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1967`
@@ -1794,7 +1778,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-213 material_color_direct
+#### P2-211 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1995`
@@ -1802,7 +1786,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-214 material_color_direct
+#### P2-212 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2028`
@@ -1810,7 +1794,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-215 material_color_direct
+#### P2-213 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2036`
@@ -1818,7 +1802,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-216 material_color_direct
+#### P2-214 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2042`
@@ -1826,7 +1810,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-217 material_color_direct
+#### P2-215 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2065`
@@ -1834,7 +1818,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-218 material_color_direct
+#### P2-216 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2068`
@@ -1842,7 +1826,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-219 material_color_direct
+#### P2-217 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2069`
@@ -1850,7 +1834,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-220 material_color_direct
+#### P2-218 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2178`
@@ -1858,7 +1842,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-221 material_color_direct
+#### P2-219 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2191`
@@ -1866,7 +1850,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-222 material_color_direct
+#### P2-220 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2213`
@@ -1874,7 +1858,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-223 material_color_direct
+#### P2-221 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2280`
@@ -1882,7 +1866,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-224 material_color_direct
+#### P2-222 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2287`
@@ -1890,7 +1874,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-225 material_color_direct
+#### P2-223 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2293`
@@ -1898,7 +1882,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-226 material_color_direct
+#### P2-224 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2310`
@@ -1906,7 +1890,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-227 material_color_direct
+#### P2-225 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2314`
@@ -1914,7 +1898,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-228 material_color_direct
+#### P2-226 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2318`
@@ -1922,7 +1906,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-229 material_color_direct
+#### P2-227 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2325`
@@ -1930,7 +1914,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-230 material_color_direct
+#### P2-228 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2434`
@@ -1938,7 +1922,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-231 material_color_direct
+#### P2-229 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2441`
@@ -1946,7 +1930,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-232 material_color_direct
+#### P2-230 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2444`
@@ -1954,7 +1938,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-233 material_color_direct
+#### P2-231 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2451`
@@ -1962,7 +1946,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-234 material_color_direct
+#### P2-232 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2481`
@@ -1970,7 +1954,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-235 material_color_direct
+#### P2-233 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2492`
@@ -1978,11 +1962,27 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
-#### P2-236 material_color_direct
+#### P2-234 material_color_direct
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2495`
 - Trecho: `color: Colors.white.withValues(alpha: 0.94),`
+- Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
+- Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
+
+#### P2-235 material_color_direct
+
+- Surface: `life_counter`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2505`
+- Trecho: `color: Colors.white.withValues(alpha: 0.06),`
+- Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
+- Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
+
+#### P2-236 material_color_direct
+
+- Surface: `life_counter`
+- Evidencia: `app/lib/features/home/life_counter_screen.dart:2510`
+- Trecho: `color: Colors.white.withValues(alpha: 0.72),`
 - Impacto: Uso direto de Colors.* no Life Counter precisa ser validado contra contraste e separacao dos jogadores.
 - Sugestao: Preferir paleta centralizada do Life Counter quando a cor fizer parte da mesa.
 
@@ -2133,7 +2133,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-255 radius_literal
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:453`
+- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:495`
 - Trecho: `borderRadius: BorderRadius.circular(20),`
 - Impacto: Raio literal pode deixar cards/modais fora da familia visual de Meus Decks.
 - Sugestao: Usar AppTheme.radiusXs/radiusSm/radiusMd/radiusLg/radiusXl.
@@ -2365,20 +2365,12 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 #### P2-284 text_style_without_theme_token
 
 - Surface: `life_counter`
-- Evidencia: `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart:201`
-- Trecho: `style: const TextStyle(`
-- Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
-- Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
-
-#### P2-285 text_style_without_theme_token
-
-- Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1822`
 - Trecho: `style: TextStyle(`
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-286 text_style_without_theme_token
+#### P2-285 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:1920`
@@ -2386,7 +2378,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-287 text_style_without_theme_token
+#### P2-286 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2190`
@@ -2394,7 +2386,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-288 text_style_without_theme_token
+#### P2-287 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2279`
@@ -2402,7 +2394,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-289 text_style_without_theme_token
+#### P2-288 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:2286`
@@ -2410,7 +2402,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-290 text_style_without_theme_token
+#### P2-289 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:3539`
@@ -2418,7 +2410,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-291 text_style_without_theme_token
+#### P2-290 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:3562`
@@ -2426,7 +2418,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-292 text_style_without_theme_token
+#### P2-291 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:3687`
@@ -2434,7 +2426,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-293 text_style_without_theme_token
+#### P2-292 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:4012`
@@ -2442,7 +2434,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-294 text_style_without_theme_token
+#### P2-293 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:4108`
@@ -2450,7 +2442,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-295 text_style_without_theme_token
+#### P2-294 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:4384`
@@ -2458,7 +2450,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-296 text_style_without_theme_token
+#### P2-295 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:5049`
@@ -2466,7 +2458,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-297 text_style_without_theme_token
+#### P2-296 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:5271`
@@ -2474,7 +2466,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-298 text_style_without_theme_token
+#### P2-297 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:5426`
@@ -2482,7 +2474,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-299 text_style_without_theme_token
+#### P2-298 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:5606`
@@ -2490,7 +2482,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-300 text_style_without_theme_token
+#### P2-299 text_style_without_theme_token
 
 - Surface: `life_counter`
 - Evidencia: `app/lib/features/home/life_counter_screen.dart:5772`
@@ -2498,7 +2490,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: TextStyle isolado facilita drift de tipografia, peso e cor.
 - Sugestao: Preferir Theme.of(context).textTheme + copyWith usando AppTheme quando necessario.
 
-#### P2-301 border_without_theme_token
+#### P2-300 border_without_theme_token
 
 - Surface: `trades_messages_notifications`
 - Evidencia: `app/lib/features/trades/screens/trade_detail_screen.dart:160`
@@ -2506,7 +2498,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Borda sem token tende a variar cor/peso entre cards, filtros e modais.
 - Sugestao: Usar AppTheme.outlineMuted/brass/frost com opacidade consistente.
 
-#### P2-302 border_without_theme_token
+#### P2-301 border_without_theme_token
 
 - Surface: `trades_messages_notifications`
 - Evidencia: `app/lib/features/trades/screens/trade_detail_screen.dart:312`
@@ -2514,7 +2506,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Borda sem token tende a variar cor/peso entre cards, filtros e modais.
 - Sugestao: Usar AppTheme.outlineMuted/brass/frost com opacidade consistente.
 
-#### P2-303 border_without_theme_token
+#### P2-302 border_without_theme_token
 
 - Surface: `trades_messages_notifications`
 - Evidencia: `app/lib/features/trades/screens/trade_detail_screen.dart:600`
@@ -2522,7 +2514,7 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Borda sem token tende a variar cor/peso entre cards, filtros e modais.
 - Sugestao: Usar AppTheme.outlineMuted/brass/frost com opacidade consistente.
 
-#### P2-304 possible_small_touch_or_visual_target
+#### P2-303 possible_small_touch_or_visual_target
 
 - Surface: `trades_messages_notifications`
 - Evidencia: `app/lib/features/messages/screens/chat_screen.dart:259`
@@ -2530,4 +2522,4 @@ cd app && flutter test integration_test/commander_learned_deck_runtime_test.dart
 - Impacto: Alvo ou elemento visual menor que 48 pode ficar dificil de tocar ou parecer desalinhado.
 - Sugestao: Validar screenshot/touch target; elevar para bug se o alvo real ficar abaixo de 48x48.
 
-VISUAL_PREMIUM_QA_RESULT: signals=304 P1=0 P2=304 visual_pass=false
+VISUAL_PREMIUM_QA_RESULT: signals=303 P1=0 P2=303 visual_pass=false

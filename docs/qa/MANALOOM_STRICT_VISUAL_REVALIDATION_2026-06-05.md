@@ -1,0 +1,128 @@
+# ManaLoom strict visual revalidation - 2026-06-05
+
+## Verdict
+
+`PASS_WITH_RISKS` for the live iPhone Simulator visual proof captured on 2026-06-05.
+
+The runtime checks passed and the extracted screenshots were manually inspected for the regression class reported by QA: wrapped/cut button text, hidden numeric values, misaligned tabs/menus, and unreadable modal controls.
+
+This is not a full static visual pass. `server/bin/premium_visual_audit.py` still reports P2 visual drift signals, so the static audit remains a backlog/gate companion rather than a release pass by itself.
+
+## Environment
+
+- Device: iPhone 15 Pro Max Simulator `DABB9D79-2FDB-4585-94DB-E31F1288EE74`
+- Backend: `https://evolution-cartinhas.8ktevp.easypanel.host`
+- Source SHA during static audit: `4af68ade`
+- Extracted proof folder, ignored by Git: `app/doc/runtime_flow_proofs_2026-06-05_strict_visual_revalidation_iphone15/`
+
+## Commands run
+
+```bash
+python3 server/bin/premium_visual_audit.py --include-life-counter --output docs/qa/manaloom_premium_visual_audit_latest.md
+```
+
+Result: `signals=303 P1=0 P2=303 visual_pass=false`.
+
+```bash
+cd app
+flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:49 +1: All tests passed!`
+
+```bash
+cd app
+flutter test \
+  integration_test/life_counter_lotus_visual_capture_smoke_test.dart \
+  integration_test/life_counter_native_card_search_smoke_test.dart \
+  integration_test/life_counter_set_life_live_smoke_test.dart \
+  integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `03:10 +5: All tests passed!`
+
+```bash
+cd app
+flutter test integration_test/commander_learned_deck_runtime_test.dart \
+  -d DABB9D79-2FDB-4585-94DB-E31F1288EE74 \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `00:24 +1: All tests passed!`
+
+## Captures produced
+
+Runtime screenshots extracted from logs:
+
+- Non-Life Counter: 14 screenshots
+- Life Counter: 5 screenshots
+- Commander learned deck: 4 screenshots
+- Contact sheets: `contact_sheet_non_life_counter.jpg`, `contact_sheet_life_counter.jpg`, `contact_sheet_commander_learned.jpg`
+
+Key captured screens:
+
+- `00_splash`
+- `01_login`
+- `02_register_filled`
+- `03_home`
+- `04_decks`
+- `04a_create_deck_dialog`
+- `04b_deck_details`
+- `04c_deck_import`
+- `05_generate`
+- `06_generate_preview_not_proven`
+- `07_community`
+- `08_collection`
+- `09_profile`
+- `commander_damage_overlay`
+- `turn_tracker_hint_overlay`
+- `life_counter_card_search_sheet`
+- `life_counter_set_life_sheet_35`
+- `life_counter_player_appearance_presets`
+- `01_no_commander_no_learned_button`
+- `02_commander_learned_button_visible`
+- `03_hermes_preview`
+- `04_saved_deck_details`
+
+## Manual visual checks
+
+Passed in inspected screenshots:
+
+- `commander_damage_overlay`: `RETURN TO GAME` is not wrapped, not clipped, and is horizontally aligned with `GOT IT!`.
+- `life_counter_set_life_sheet_35`: value `35` is fully visible, centered, and not hidden by the sheet header or scroll area.
+- `life_counter_set_life_sheet_35`: keypad digits and `DEL` are horizontal and legible.
+- `life_counter_set_life_sheet_35`: `Cancel` and `Set Life` are visible and not hidden by the bottom edge.
+- `life_counter_card_search_sheet`: search field, quick suggestions, and close action are legible in the sheet.
+- `life_counter_player_appearance_presets`: color presets, `Use`, `Cancel`, and `Apply` are visible.
+- `08_collection`: top menus/tabs are aligned across the screen and no longer appear shifted to the right.
+- `03_home`, `04_decks`, `04b_deck_details`, `07_community`, `09_profile`: captured surfaces retain the dark/brass/blue premium visual family.
+- Commander learned flow: button appears only after commander input, preview shows Hermes origin/score/legalidade/confidence, saved deck reports 100 total, 99 main, 1 commander, and no blocked premium Mox cards.
+
+## Remaining risks
+
+- Static audit still reports `303` P2 drift signals. These are not runtime failures, but they prove the codebase still has hardcoded visual values and non-tokenized styling to continue reducing.
+- `06_generate_preview_not_proven` remains a generic flow state label from the non-Life Counter smoke test. The dedicated Commander learned deck preview was proven separately in this run.
+- Screenshots prove the captured states only. Long scrollable surfaces can still contain below-the-fold visual issues and should keep using targeted capture tests when changing those areas.
+
+## Release interpretation
+
+The reported visual regressions around Life Counter overlays and Set Life sheet are resolved in the live simulator proof. Do not treat this as permission to stop visual QA: for any app-facing layout change, run the static audit plus the relevant iPhone Simulator proof and manually inspect contact sheets before promotion.
