@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-05 05:30 UTC
+> Data: 2026-06-05 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -55,7 +55,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-04 07:00 UTC como **ABERTO neste checkout `6cdda72f`**.
+    2026-06-05 07:00 UTC como **ABERTO neste checkout `1c1c34ca`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma logica.
     Tambem seguem sem chamador runtime confirmado wrappers/helpers em request

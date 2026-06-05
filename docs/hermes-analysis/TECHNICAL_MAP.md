@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-05 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-05 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -221,7 +221,7 @@ impacto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-04 07:00 UTC como aberto no checkout local `6cdda72f`.
+  2026-06-05 07:00 UTC como aberto no checkout local `1c1c34ca`.
   `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
   `server/bin/sync_cards.dart` mantem copias privadas/inline de parse/extracao.
   Tambem seguem sem chamador runtime confirmado `getRequestTrace`/
