@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-04 15:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-05 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -172,7 +172,7 @@ mtgia/
 - **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-04 classificou como permitidos exemplos de UI/import, comentarios de contrato, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, o fallback Lorehold de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado em
-  2026-06-04 03:00 UTC no checkout local `1c082553`. `LifeCounterScreen` segue
+  2026-06-05 03:00 UTC no checkout local `5fc3cafb`. `LifeCounterScreen` segue
   legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
   `DeckCard` e `DeckProgressChip` nao tem uso runtime confirmado nas listagens;
   `LotusPresentationMode` nao e importado/chamado pelo Lotus; e
