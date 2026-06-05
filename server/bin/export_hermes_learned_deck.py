@@ -43,6 +43,26 @@ def parse_card_list(card_list_text):
 def normalize_commander(name):
     return name.strip().lower().replace("\u2018", "'").replace("\u2019", "'").replace("  ", " ")
 
+def validate_commander_100(parsed_cards, commander, declared_card_count):
+    parsed_total = sum(int(c.get("quantity", 1) or 1) for c in parsed_cards)
+    commander_normalized = normalize_commander(commander)
+    commander_qty = sum(
+        int(c.get("quantity", 1) or 1)
+        for c in parsed_cards
+        if normalize_commander(c.get("name", "")) == commander_normalized
+    )
+    main_qty = parsed_total - commander_qty
+    blockers = []
+    if declared_card_count != 100:
+        blockers.append(f"declared_card_count={declared_card_count}")
+    if parsed_total != 100:
+        blockers.append(f"parsed_card_count={parsed_total}")
+    if commander_qty != 1:
+        blockers.append(f"commander_qty={commander_qty}")
+    if main_qty != 99:
+        blockers.append(f"main_qty={main_qty}")
+    return blockers
+
 def compute_score(wincon_catalog_db, wincon_primary, wincon_backup):
     if not wincon_primary:
         return None
@@ -171,6 +191,16 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
 
     # Converte card_list para formato '1 Nome' se vier como JSON
     parsed_cards = parse_card_list(card_list)
+    blockers = validate_commander_100(parsed_cards, commander, card_count)
+    allow_incomplete = os.environ.get("HERMES_EXPORT_ALLOW_INCOMPLETE") == "1"
+    if blockers and not allow_incomplete:
+        print(
+            "Learned deck incompleto nao exportado: "
+            + "; ".join(blockers),
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
     normalized_card_list = "\n".join(
         f"{c['quantity']} {c['name']}" for c in parsed_cards
     )
