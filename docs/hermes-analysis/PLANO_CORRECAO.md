@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-05 03:00 UTC
+> Data: 2026-06-05 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -17,7 +17,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `uri_does_not_exist`.
 5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `5243686c` em 2026-06-04 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations`, `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual nesta busca, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-04 05:30 UTC no checkout `08637d2c`. `commander_fallback_policy.dart` nao existe nesta
+   2026-06-05 05:30 UTC no checkout `b9ee4c80`. `commander_fallback_policy.dart` nao existe nesta
    branch, e ainda ha excecoes por nome em `functional_card_tags.dart`,
    `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`,
    `rebuild_guided_service.dart`, `/decks/:id/recommendations` e
@@ -38,7 +38,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `AuthBrandHeader` e `AuthFormSurface` aparecem somente no proprio arquivo
    `auth_visual_shell.dart`.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
-   2026-06-04 05:30 UTC no checkout `08637d2c`. Deck analysis prefere
+   2026-06-05 05:30 UTC no checkout `b9ee4c80`. Deck analysis prefere
    `card_function_tags`; o contexto de optimize e o validator/role delta carregam
    `semantic_tags_v2`, mas nao threadam `functional_tags` persistidos nesse
    caminho. Candidate quality tem uso parcial de `card_function_tags` em SQL de
@@ -199,7 +199,7 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
-- **Status 2026-06-04 05:30 UTC: REVALIDADO/ABERTO no checkout `08637d2c`.** A revalidacao local nao
+- **Status 2026-06-05 05:30 UTC: REVALIDADO/ABERTO no checkout `b9ee4c80`.** A revalidacao local nao
   encontrou `server/lib/ai/commander_fallback_policy.dart`; o unico arquivo
   `*policy*` em `server/lib` e `server/lib/edh_bracket_policy.dart`. Portanto a
   anotacao historica de resolucao em `origin/master@65f30387` nao deve ser
@@ -262,7 +262,7 @@ Histórico do problema:
 
 ### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
 
-- **Status 2026-06-04 05:30 UTC: REVALIDADO/ABERTO no checkout `08637d2c`.**
+- **Status 2026-06-05 05:30 UTC: REVALIDADO/ABERTO no checkout `b9ee4c80`.**
 - **Evidência**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
     `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;

@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-05 03:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-05 05:30 UTC.
 
 ## Estrutura do repositorio
 
@@ -168,8 +168,8 @@ mtgia/
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
-- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado novamente em 2026-06-04 05:30 UTC no checkout `08637d2c`. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas. O contexto de optimize e o validator/role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags` persistidos nesse caminho; candidate quality tem uso parcial de `card_function_tags` em SQL de sinais. O checkout atual nao contem `optimizationFunctionalRolesForCard`; o caminho vivo ainda e `classifyOptimizationFunctionalRole`, escalar, e `semantic_tags_v2` e colapsado em um role unico no optimize. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam legacy/experimentais ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
-- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-04 classificou como permitidos exemplos de UI/import, comentarios de contrato, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, o fallback Lorehold de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
+- **P1/P2 — Pipeline semantico de cartas parcialmente saneado, mas com drift local reaberto**: revalidado novamente em 2026-06-05 05:30 UTC no checkout `b9ee4c80`. Revalidacao historica em outro SHA citou prioridade `functional_tags_then_semantic_v2_then_heuristic`, preservacao multi-role no optimize e centralizacao em `commander_fallback_policy.dart`; no checkout local essa policy nao existe. Deck analysis carrega `card_function_tags` + `semantic_tags_v2` e `summarizeFunctionalTagsForDeck` prefere tags persistidas. O contexto de optimize e o validator/role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags` persistidos nesse caminho; candidate quality tem uso parcial de `card_function_tags` em SQL de sinais. O checkout atual nao contem `optimizationFunctionalRolesForCard`; o caminho vivo ainda e `classifyOptimizationFunctionalRole`, escalar, e `semantic_tags_v2` e colapsado em um role unico no optimize. `/decks/:id/recommendations` e `/ai/weakness-analysis` continuam legacy/experimentais ate reutilizarem a camada semantica compartilhada ou terem contrato interno explicito.
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-05 classificou como permitidos exemplos de UI/import, comentarios de contrato, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, o fallback Lorehold de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes ou weakness suggestions por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/decks/:id/recommendations`, `/ai/weakness-analysis`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado em
   2026-06-05 03:00 UTC no checkout local `5fc3cafb`. `LifeCounterScreen` segue
@@ -195,7 +195,7 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-04 05:30 UTC: deck analysis segue mais
+Estado atual revalidado em 2026-06-05 05:30 UTC no checkout `b9ee4c80`: deck analysis segue mais
 proximo do fluxo desejado porque usa `card_function_tags` e
 `semantic_tags_v2`; o contexto de optimize e o validator/role delta ainda nao
 threadam `card_function_tags` persistidos e reduzem v2 a um role unico. O
