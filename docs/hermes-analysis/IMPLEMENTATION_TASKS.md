@@ -1,10 +1,10 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
-> **Gerado:** 2026-06-05T06:00Z por ManaLoom Knowledge Synthesis (Cron #8)
+> **Gerado:** 2026-06-05 por ManaLoom Knowledge Synthesis (Cron #9)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** 94b620a6
-> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Deep S42-43, Gamechanger Research Exec #7-#9, MANA_BASE_VALIDATION_REPORT 2026-06-05, THEMES.md, STRUCTURE_AUDIT card-semantics) com codigo Dart (edh_bracket_policy, card_validation_service, deck_rules_service, functional_card_tags, optimization_quality_gate, commander_fallback_policy, optimize_runtime_support)
-> **Base de conhecimento:** Commander Knowledge Deep S42-43 (Multi-Commander Evolution 4 promotions, Korvold incomplete import, Krenko AI stub) + Gamechanger Research #7-#9 (Tergrid oracle_text resolved, 8 NULL prices persistent, structural hash unchanged) + MANA_BASE_VALIDATION_REPORT (Yuriko 21/84 untagged, CRITs potentialmente inflados) + THEMES.md (42 temas com metricas per-tema nao integradas ao codigo)
-> **Novas tasks nesta execucao:** 5 (2xP1, 3xP2) — Deck import completeness, Commander eligibility filter, GC oracle_text auto-heal, GC price_usd RL distinction, Mana base NULL tag reporting
+> **HEAD:** 12e1da45
+> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Deep S42-43, Gamechanger Research Exec #7-#9, MANA_BASE_VALIDATION_REPORT 2026-06-05, SCOUT_LOG, VALIDATOR_LOG, STRUCTURE_AUDIT functions-not-called + card-semantics + duplicated-logic + postgresql-tables-not-used) com codigo Dart (edh_bracket_policy, card_validation_service, deck_rules_service, functional_card_tags, optimization_functional_roles, optimization_quality_gate, optimize_runtime_support, goldfish_simulator, ml_knowledge_service, candidate_quality_data_support)
+> **Base de conhecimento:** STRUCTURE_AUDIT 2026-06-05 (divergent semantic heuristics between classifiers P1, _isBasicLandName 4-way duplication P2, ml_prompt_feedback write-only P2, deck_weakness_reports write-only P3) + Commander Knowledge Skill (Mana Base Validator Exec #2 batch_c limitation) + MTG Domain Skill (card functional roles, basic land rules)
+> **Novas tasks nesta execucao:** 5 (1xP1, 3xP2, 1xP3) — Unify semantic heuristics between classifiers, centralize _isBasicLandName, connect MLKnowledgeService.recordFeedback, expand _run_validation.py to batch_c, add consumer for deck_weakness_reports
 
 ### [P1] Deck Import: Adicionar validacao de completude — verificar que o numero de cartas importadas corresponde ao total esperado (previne pipeline operando sobre decks fantasmas)
 
@@ -192,6 +192,212 @@ cd server && dart analyze lib/ai/functional_card_tags.dart
 > **Nota:** Tasks #3 e #4 sao complementares — ambas melhoram a integridade dos dados de Game Changers (oracle_text MDFC + price_usd RL).
 > **Nota:** Task #5 complementa a task pendente P2 "Tag Accuracy Auto-Healing" — enquanto aquela foca em melhorar a precisao das tags, esta foca em reportar a AUSENCIA de tags.
 
+
+### [P1] Unificar implementações das heurísticas `_looksLikeWincon`/`_looksLikeComboPiece`/`_looksLikeEngine`/`_looksLikePayoff`/`_looksLikeEnabler` entre `functional_card_tags.dart` e `optimization_functional_roles.dart` — divergência causa classificações funcionais inconsistentes entre análise e otimização
+
+**Conhecimento MTG:** Cartas como Thassa's Oracle (wincon/combo), Blood Artist (aristocrat payoff), Isochron Scepter (combo piece), e Lightning Greaves (protection/enabler) têm papéis funcionais bem definidos no Commander. A classificação correta desses papéis é essencial para que o quality gate tome decisões corretas de swap — trocar um "wincon" por "engine" requer regras diferentes de trocar "utility" por "utility".
+
+**Evidencia no código:** Dois conjuntos de heurísticas semanticas com os MESMOS NOMES mas implementações DIFERENTES:
+
+1. `server/lib/ai/optimization_functional_roles.dart:370-398` — `_looksLikeWincon`, `_looksLikeEngine`, `_looksLikeComboPiece`, `_looksLikePayoff`, `_looksLikeEnabler` usam APENAS `oracle` text:
+   - `_looksLikeWincon`: verifica "you win the game", "opponent(s) lose(s) the game"
+   - `_looksLikeEngine`: verifica "at the beginning of your upkeep" + "you may", "whenever" + "you may" + "draw"/"create"/"add"
+   - `_looksLikeComboPiece`: verifica "remove"+"counter"+"from among", "search your library"+"may cast"+"without paying"
+   - `_looksLikePayoff`: verifica "whenever"+"create token", "whenever you cast"+"copy", "whenever you cast"+"scry"
+   - `_looksLikeEnabler`: verifica "instant and sorcery spells you cast cost", "cost less to cast"
+
+2. `server/lib/ai/functional_card_tags.dart:859-906` — mesmos nomes de função mas com assinatura DIFERENTE (`oracle, normalizedName`) e padrões MAIS ABRANGENTES:
+   - `_looksLikeWincon`: adicionalmente verifica `normalizedName` para Thassa's Oracle, "damage equal to"+"opponent", "double your life total"
+   - `_looksLikeEngine`: NÃO exige "you may" — qualquer "whenever"+"draw"/"create token"/"add {"/"put a +1/+1 counter" qualifica
+   - `_looksLikeComboPiece`: adicionalmente verifica `normalizedName` para Isochron Scepter, Dramatic Reversal, Thassa's Oracle; também "copy target activated or triggered ability", "untap"+"add", "infinite"
+   - `_looksLikePayoff`: adicionalmente verifica `normalizedName` para Blood Artist, "for each", "whenever"+"creature dies"/"you cast"/"artifact enters"/"enchantment enters"/"you sacrifice"
+   - `_looksLikeEnabler`: adicionalmente verifica `normalizedName` para greaves/boots, "haste", "mill", "sacrifice another", "search your library"
+
+**Drift concreto:** `classifyOptimizationFunctionalRole` (usado pelo quality gate em `optimization_quality_gate.dart:52-53`) chama a versão de `optimization_functional_roles.dart` que NÃO conhece cartas por nome. `summarizeFunctionalTagsForDeck` (usado para display/análise) chama a versão de `functional_card_tags.dart` que conhece. Resultado: uma mesma carta pode ser "wincon" na análise funcional mas "engine" no quality gate — ou vice-versa.
+
+**Exemplos de divergência provável:**
+- **Thassa's Oracle:** `functional_card_tags.dart` → `combo_piece` (via normalizedName). `optimization_functional_roles.dart` → NÃO detecta (oracle não contém "remove counter from among" nem "search...may cast...without paying")
+- **Blood Artist:** `functional_card_tags.dart` → `payoff` (via normalizedName). `optimization_functional_roles.dart` → NÃO detecta (oracle não contém "whenever create token" nem "whenever you cast copy/scry")
+- **Isochron Scepter:** `functional_card_tags.dart` → `combo_piece` (via normalizedName). `optimization_functional_roles.dart` → NÃO detecta
+- **Aetherflux Reservoir:** `functional_card_tags.dart` → `wincon` (via "loses the game" or "damage equal to"). `optimization_functional_roles.dart` → NÃO detecta (oracle não contém "you win the game" nem "opponent loses")
+
+**Gap:** O quality gate toma decisões de swap usando um classificador que é CEGO para cartas conhecidas que o classificador de análise funcional reconhece corretamente. Isso significa que o gate pode aprovar swaps que removem wincons/combo pieces (classificadas como "utility" pelo gate) ou bloquear swaps que adicionam payoffs/enablers essenciais.
+
+**Impacto:** `P1` — Decisões de swap baseadas em classificação funcional inconsistente. Cartas críticas como Thassa's Oracle, Blood Artist, e Isochron Scepter podem ser tratadas como "utility" pelo quality gate, permitindo sua remoção em swaps. O STRUCTURE_AUDIT (2026-06-05) classifica esta divergência como P1 com evidência de código em 6 locais.
+
+**Risco:** P1 — O quality gate e a análise funcional discordam sobre o papel de cartas sentinela. Swaps corretos podem ser bloqueados e incorretos aprovados porque a classificação usada para DECIDIR é diferente da usada para EXPLICAR.
+
+**Ação recomendada:**
+1. Extrair as 5 heurísticas para um módulo compartilhado `server/lib/ai/semantic_role_heuristics.dart` com assinatura unificada: `bool looksLike{Wincon,Engine,ComboPiece,Payoff,Enabler}(String oracle, [String? normalizedName])`
+2. Unificar os padrões: manter a versão mais abrangente de `functional_card_tags.dart` (com suporte a normalizedName) como implementação canônica
+3. Atualizar `optimization_functional_roles.dart:370-398` para importar e usar as funções do módulo compartilhado
+4. Atualizar `functional_card_tags.dart:859-906` para importar e usar as mesmas funções
+5. Adicionar testes cruzados com cartas sentinela (Thassa's Oracle, Blood Artist, Isochron Scepter, Aetherflux Reservoir, Lightning Greaves) para garantir classificação idêntica em ambos os pipelines
+
+**Validação:**
+```bash
+cd server && dart analyze lib/ai/semantic_role_heuristics.dart
+cd server && dart analyze lib/ai/optimization_functional_roles.dart
+cd server && dart analyze lib/ai/functional_card_tags.dart
+cd server && dart test test/ai/optimization_functional_roles_test.dart
+cd server && dart test test/ai/functional_card_tags_test.dart
+```
+
+---
+
+### [P2] Centralizar `_isBasicLandName` em utilitário único de domínio — 4 implementações com normalização diferente causam validação inconsistente de terrenos básicos
+
+**Conhecimento MTG:** Terrenos básicos (Plains, Island, Swamp, Mountain, Forest, Wastes, e suas variantes Snow-Covered) são fundamentais para as regras de deckbuilding do Commander: singleton não se aplica a eles, e a contagem correta afeta validação de legalidade, análise de mana base, e simulação de mulligan. Diferentes partes do sistema precisam concordar sobre o que constitui um "basic land" — especialmente as variantes Snow-Covered e Wastes.
+
+**Evidencia no código:** 4 implementações diferentes da mesma pergunta de domínio, com normalização divergente:
+
+1. `server/lib/ai/optimize_runtime_support.dart:4184-4197` — `isBasicLandName` público: compara nomes exatos com hífen para snow-covered lands (`snow-covered plains`). Expõe `isBasicLandName` como API pública (linha 285).
+
+2. `server/lib/generated_deck_validation_service.dart:752-764` — `_isBasicLandName` privado: usa `startsWith('snow-covered ')` com espaço, sem hífen. Aceita prefixo parcial — "snow covered plains" (com espaço duplo ou sem hífen) seria tratado como basic.
+
+3. `server/lib/meta/meta_deck_reference_support.dart:890-903` — `_isBasicLandName` privado: aceita snow lands com espaço normal (`snow covered plains`) em vez de hífen. Comportamento intermediário entre #1 e #2.
+
+4. `server/routes/ai/commander-reference/index.dart:621-629` — `_isBasicLandName` privado: reconhece APENAS as 6 basics não-snow (Plains, Island, Swamp, Mountain, Forest, Wastes). Snow-Covered lands NÃO são reconhecidas como básicas nesta rota.
+
+**Gap:** Um deck com Snow-Covered Plains pode ser validado como legal (singleton bypass) por `generated_deck_validation_service.dart` mas tratado como não-básico por `commander-reference/index.dart`. A análise de mana base em `optimize_runtime_support.dart` conta Snow-Covered Plains como básica, mas `meta_deck_reference_support.dart` pode normalizar o nome de forma diferente, causando mismatch em referências.
+
+**Impacto:** `P2` — Inconsistência entre validadores pode causar falsos positivos/negativos na validação de singleton (deck rejeitado como tendo 2 Snow-Covered Plains quando na verdade são 2 terrenos básicos permitidos), ou falso positivo de legalidade (deck aprovado com "duplicata" de Wastes que um validador conta como básica e outro não). 
+
+**Risco:** P2 — Afeta edge cases com Snow-Covered lands e Wastes. A maioria dos decks usa basics normais (não afetados pela divergência). Mas quando ocorre, o comportamento é inconsistente entre rotas.
+
+**Ação recomendada:**
+1. Criar `server/lib/domain/basic_land_utils.dart` com função canônica `bool isBasicLandName(String name)` que:
+   - Normaliza o nome (trim, lowercase)
+   - Verifica as 5 basic land types + Wastes
+   - Trata Snow-Covered variants com ambos os formatos (hífen e espaço)
+2. Atualizar os 4 call sites para importar e usar a função canônica
+3. Adicionar testes unitários cobrindo: nomes normais, Snow-Covered (com e sem hífen), Wastes, e casos negativos (non-basic lands com "forest" no nome como "Tropical Forest")
+
+**Validação:**
+```bash
+cd server && dart analyze lib/domain/basic_land_utils.dart
+cd server && dart test test/domain/basic_land_utils_test.dart
+cd server && dart test test/generated_deck_validation_service_test.dart
+```
+
+---
+
+### [P2] Conectar `MLKnowledgeService.recordFeedback` a um fluxo runtime — tabela `ml_prompt_feedback` existe mas nunca é alimentada, impedindo ciclo de aprendizado com qualidade de prompts
+
+**Conhecimento MTG:** O optimize pipeline gera prompts para IA que sugerem swaps de cartas. A qualidade desses prompts afeta diretamente a qualidade das recomendações. Sem um ciclo de feedback, o sistema não sabe se prompts anteriores produziram boas ou más recomendações — e não pode melhorar. O Domain Skill documenta que "o optimize pipeline não aprende com o uso real" (Gap 8).
+
+**Evidencia no código:**
+- `server/lib/ml_knowledge_service.dart:251-264` — `recordFeedback()` método que insere em `ml_prompt_feedback` com campos: `prompt_id`, `rating`, `comment`, `user_id`. Totalmente implementado mas sem caller.
+- `rg "recordFeedback\(" server/lib/ server/routes/ server/bin/` → **ZERO chamadas** fora da definição.
+- `rg "ml_prompt_feedback" server/lib/ server/routes/` → Apenas a definição da tabela (schema SQL) e o INSERT dentro de `recordFeedback`. Nenhum SELECT.
+- `server/routes/ai/optimize/index.dart` — A rota de optimize chama `MLKnowledgeService` para contexto (`getMLContext`) mas NUNCA chama `recordFeedback` após receber a resposta da IA.
+
+**Gap:** O feedback loop de qualidade de prompts está completamente quebrado. A tabela `ml_prompt_feedback` tem schema, tem método de escrita, mas não tem caller. Nenhum fluxo (app, rota, cron) registra se um prompt de optimize produziu boas recomendações. O sistema não pode aprender quais tipos de prompt funcionam melhor para diferentes comandantes/arquetipos.
+
+**Impacto:** `P2` — O optimize pipeline nunca melhora a qualidade dos prompts porque não coleta feedback. Sem dados em `ml_prompt_feedback`, qualquer futuro sistema de "prompt quality scoring" ou "prompt selection" não tem dados para treinar. A funcionalidade de `MLKnowledgeService.getPromptQualityMetrics` (se existir) operaria sobre tabela vazia.
+
+**Risco:** P2 — Sem feedback, o sistema não aprende. As mesmas estratégias de prompt (boas ou ruins) são repetidas indefinidamente. Afeta a qualidade de longo prazo das recomendações de swap.
+
+**Ação recomendada:**
+1. Adicionar chamada a `recordFeedback` no endpoint de optimize após processar a resposta da IA:
+   - Capturar o `prompt_id` usado (ou gerar um hash do prompt)
+   - Se a IA retornou swaps válidos → `rating >= 3`
+   - Se a IA retornou erro/alucinação → `rating <= 2`
+2. Adicionar endpoint `POST /api/optimize/feedback` para o app Flutter reportar feedback do usuário sobre recomendações (rating manual)
+3. Criar `getPromptQualityMetrics()` em `MLKnowledgeService` que agrega ratings por tipo de prompt/comandante para uso futuro
+4. (Futuro) Usar métricas de qualidade para selecionar templates de prompt que historicamente produziram melhores resultados
+
+**Validação:**
+```bash
+cd server && dart analyze lib/ml_knowledge_service.dart
+cd server && dart test test/ml_knowledge_service_test.dart
+# Verificar que ml_prompt_feedback tem rows após optimize:
+psql -h 143.198.230.247 -p 5433 -U postgres -d halder -c "SELECT COUNT(*) FROM ml_prompt_feedback"
+```
+
+---
+
+### [P2] Expandir `_run_validation.py` para buscar profiles batch_c — 8 comandantes sem cobertura de validação de mana base
+
+**Conhecimento MTG:** O Mana Base Validator compara decks contra perfis EDHREC com ranges ideais de lands, ramp, draw, etc. por comandante. O projeto tem 24 profiles JSON (8 batch_a + 8 batch_b + 8 batch_c), mas o script de validação só consulta 16 deles (batch_a + batch_b). Comandantes dos profiles batch_c — incluindo potenciais comandantes futuros no `knowledge.db` — ficam sem validação de mana base.
+
+**Evidencia no código:**
+- `docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py` — O script (criado 2026-06-04) carrega profiles de `batch_a` e `batch_b` apenas. A lógica de busca de profiles (aproximadamente linhas 30-60) percorre apenas estes dois diretórios.
+- `server/test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/profiles/` — 8 profiles JSON existem mas não são lidos.
+- O Commander Knowledge Skill (2026-06-05, Mana Base Validator Exec #2) documenta: "Só busca profiles em batch_a e batch_b (não batch_c)" e "Seção de notas (L258-272) é hardcoded — pode divergir dos dados reais".
+
+**Gap:** Se um deck para um comandante do batch_c for adicionado ao `knowledge.db` (ex: Krenko, Mob Boss; Muldrotha, the Gravetide; ou outro dos 8 profiles batch_c), o Mana Base Validator reportará "NO PROFILE" em vez de validar contra os ranges ideais. A seção de notas do relatório também é hardcoded — se novos decks forem adicionados, as notas não refletirão a realidade.
+
+**Impacto:** `P2` — Atualmente nenhum deck no `knowledge.db` corresponde a comandantes do batch_c (são Kinnan, Yuriko, Korvold, Teysa, Aesi, Winota, Atraxa, Lorehold — batch_a/batch_b). Mas o sistema não escala: qualquer novo deck de batch_c ficará sem validação. A seção de notas hardcoded também falseará o relatório quando novos decks aparecerem.
+
+**Risco:** P2 — Baixo impacto imediato (0 decks batch_c no DB), mas impede expansão futura. A nota hardcoded é um risk de integridade de relatório.
+
+**Ação recomendada:**
+1. Adicionar `batch_c` ao loop de busca de profiles em `_run_validation.py`:
+   ```python
+   profile_dirs = [
+       "server/test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/profiles/",
+       "server/test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/profiles/",
+       "server/test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/profiles/",
+   ]
+   ```
+2. Substituir seção de notas hardcoded (L258-272) por geração dinâmica baseada nos dados reais de cada deck
+3. Adicionar contagem de "profiles available vs profiles used" no output do script para transparência
+
+**Validação:**
+```bash
+cd /opt/data/workspace/mtgia && /opt/hermes/.venv/bin/python3 docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py
+# Verificar que o relatório gerado referencia 24 profiles (não 16)
+grep -c "profile" docs/hermes-analysis/manaloom-knowledge/MANA_BASE_VALIDATION_REPORT.md
+```
+
+---
+
+### [P3] Adicionar consumidor de leitura para `deck_weakness_reports` — dados persistidos nunca são lidos, anula benefício da persistência
+
+**Conhecimento MTG:** A análise de fraquezas de deck identifica gaps estruturais (falta de ramp, draw insuficiente, remoção escassa) que afetam a performance. Persistir essas análises permite tracking histórico: "esta fraqueza foi corrigida?" "o deck melhorou após swaps?" Sem leitura, a tabela é um write-only log sem valor.
+
+**Evidencia no código:**
+- `server/routes/ai/weakness-analysis/index.dart:374` — `INSERT INTO deck_weakness_reports (...) ON CONFLICT DO NOTHING` — única referência à tabela.
+- `rg "FROM deck_weakness_reports" server/lib/ server/routes/ server/bin/ app/` → **ZERO resultados**. Nenhum SELECT consulta a tabela.
+- O campo `addressed` existe no schema (`server/database_setup.sql:363`) para marcar fraquezas como resolvidas, mas não há fluxo de UPDATE porque ninguém lê a tabela para identificar o que precisa ser atualizado.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md:286` — marca o endpoint como "experimental/not proven".
+
+**Gap:** A rota `POST /ai/weakness-analysis` gasta recursos computacionais (análise de IA) para gerar um relatório de fraquezas, persiste o resultado... e nunca mais o consulta. O dado é efetivamente descartado após a resposta HTTP. O campo `addressed` (booleano) nunca é atualizado porque nenhum fluxo lê a tabela para verificar se fraquezas antigas foram corrigidas.
+
+**Impacto:** `P3` — Desperdício de armazenamento e processamento. As fraquezas identificadas não retroalimentam otimizações futuras (ex: "este deck já teve warning de ramp baixo 3 vezes — priorize adicionar ramp"). O optimize pipeline não sabe que o deck tem fraquezas históricas não resolvidas.
+
+**Risco:** P3 — Baixo impacto funcional (a análise é retornada na resposta HTTP em tempo real). Mas representa custo de armazenamento sem benefício e uma oportunidade perdida de melhorar recomendações com histórico.
+
+**Ação recomendada:**
+1. Criar endpoint `GET /api/decks/:id/weakness-history` que retorna fraquezas históricas com status `addressed`
+2. No optimize pipeline (`optimize_runtime_support.dart`), consultar fraquezas não-resolvidas para priorizar categorias de swap (ex: se `addressed=false` para "falta ramp", dar +5 bonus a candidatos de ramp)
+3. Após aplicar swaps, marcar fraquezas relacionadas como `addressed=true` se as métricas melhoraram
+4. (Opcional) Adicionar dashboard no app Flutter mostrando "fraquezas resolvidas vs pendentes"
+
+**Validação:**
+```bash
+cd server && dart analyze lib/ai/optimize_runtime_support.dart
+cd server && dart test test/ai/optimize_runtime_support_test.dart
+# Verificar que deck_weakness_reports é consultado:
+rg "deck_weakness_reports" server/lib/ server/routes/ --count
+```
+
+---
+
+## Resumo de Tasks Novas (2026-06-05 — Cron #9)
+
+| # | Prioridade | Task | Origem |
+|:-:|:----------|:-----|:-------|
+| 1 | P1 | Unificar heurísticas `_looksLike{Wincon,Engine,ComboPiece,Payoff,Enabler}` entre `functional_card_tags.dart` e `optimization_functional_roles.dart` | STRUCTURE_AUDIT 2026-06-05 (divergent heuristic implementations) |
+| 2 | P2 | Centralizar `_isBasicLandName` em utilitário único com normalização canônica | STRUCTURE_AUDIT 2026-06-05 (4 conflicting implementations) |
+| 3 | P2 | Conectar `MLKnowledgeService.recordFeedback` a fluxo runtime — tabela `ml_prompt_feedback` nunca alimentada | STRUCTURE_AUDIT 2026-06-05 (functions not called: recordFeedback) |
+| 4 | P2 | Expandir `_run_validation.py` para buscar profiles batch_c | Commander Knowledge Skill (Mana Base Validator Exec #2 limitations) |
+| 5 | P3 | Adicionar consumidor de leitura para `deck_weakness_reports` — tabela write-only | STRUCTURE_AUDIT 2026-05-28 (postgresql-tables-not-used) |
+
+> **Nota:** Task #1 complementa a tarefa pendente P1 "classifyOptimizationFunctionalRole: Usar functional_tags persistidas como fonte primária" (Cron #7) — enquanto aquela aborda a CADEIA DE PRIORIDADE de fontes, esta aborda a DIVERGÊNCIA NAS IMPLEMENTAÇÕES das heurísticas de fallback.
+> **Nota:** Task #3 complementa a tarefa pendente P2 "deck_learning_events: Fechar o loop de aprendizado" (Cron #7) — enquanto aquela foca em eventos de gameplay, esta foca em feedback de qualidade de prompts.
+> **Nota:** Task #2 resolve um problema de integridade de dados que afeta múltiplos validadores — centralizar evita que correções futuras sejam aplicadas em apenas um local.
 
 ### [P1] Deck Import: Validar CMC das cartas importadas contra a tabela `cards` do PostgreSQL — previne corrupção de dados que afeta toda a pipeline de análise
 
