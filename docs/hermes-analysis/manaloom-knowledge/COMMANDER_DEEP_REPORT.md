@@ -1835,3 +1835,113 @@ The Mana Base Validator executed again with identical results to the Jun 4 20:30
 ---
 
 > **Next Cron Cycle:** Continue monitoring the cEDH Stax-Combo build. **Critical concerns (updated 2026-06-05):** (1) 🆕 **Hash discrepancy** — reported `32cc0305...` does not match computed `763c3e0f...`. Need to determine if this is a computation error or undetected deck change. (2) 🆕 **Knowledge Synthesis #7** produced 4 P1/P2 code tasks derived from Lorehold patterns — CMC integrity and combo archetype rules are highest priority. (3) 🆕 **Gamechanger Research #7** found 2 new data gaps (Tergrid NULL oracle, 8 NULL prices). (4) Lorehold pipeline DECOMMISSIONED — 5 crons removed, zero automated analysis since Jun 3. (5) Multi-Commander Evolution still not analyzing Lorehold. (6) Wincon supersaturation persists — 13 conditions wasting 5-6 slots. (7) Removal emergency — 3 interaction pieces for 4-player pods. (8) Artifact land vulnerability — Ancient Den + Great Furnace still present. **Priority order:** Task 1 (hash standardization — quality infrastructure) → Task 2 (knowledge synthesis tracking) → Task 5 (deploy hash utility to all agents) → Task 3 (wincon desaturation) → Task 4 (artifact land vulnerability detection).
+
+---
+
+## 42. NEW FINDINGS SINCE 2026-06-05 ~03:30 UTC
+
+### 42.1 Multi-Commander Evolution — 4 Deck Promotions (Not 1)
+
+The Cron Governance #4 report stated "Multi-Commander Evolution has only 1 execution (Winota, 3 swaps)." This is **stale information.** The `deck_promotions` table in `knowledge.db` shows **4 promotions** executed on 2026-06-04 within a 24-minute window:
+
+| Promo ID | Deck | Previous Cards | New Cards | Promoted At |
+|:--------:|:-----|:--------------:|:---------:|:------------|
+| 2 | **Winota, Joiner of Forces** | 100 | 100 | 12:27:41 |
+| 3 | **Kinnan, Bonder Prodigy** | 13 | 100 | 12:27:41 |
+| 4 | **Atraxa, Praetors' Voice** | 100 | 100 | 12:51:24 |
+| 5 | **Korvold, Fae-Cursed King** | 11 | **90** WARNING | 12:51:24 |
+
+**Key findings:**
+- **4 commanders now have full 100-card deployment** via the Multi-Commander pipeline: Winota, Kinnan, Atraxa, and Korvold (partial)
+- **WARNING: Korvold promotion is incomplete:** Only 90 cards after promotion (should be 100). 10 cards are missing from the learned deck import
+- **Timing:** All 4 promotions happened in a single burst on Jun 4 afternoon, suggesting a batch execution, not individual cron runs
+- **Cron Governance staleness:** The report claiming "1 execution" was obsolete even at the time of writing
+
+### 42.2 Korvold — Incomplete Deck Import (90/100 Cards)
+
+The Korvold learned deck promoted to `deck_id=3` contains only 90 cards instead of 100. This mirrors the same data quality issue documented for Lorehold's incomplete deck states (§9). Possible causes:
+- Truncation during the `card_list` to `deck_cards` migration
+- Learned deck `id=7` (source for the promotion) may itself be incomplete
+- The Multi-Commander Evolution prompt may have generated fewer than 100 cards
+
+**Evidence:** `deck_promotions` row id=5 shows `previous_card_count: 11, new_card_count: 90`. The promotion notes confirm the wincon description but don't flag the card count gap.
+
+### 42.3 New Lorehold User Imports — 3 Duplicate Events (2026-06-04)
+
+Three `user_learning_events` for Lorehold were recorded on 2026-06-04 between 18:21-18:26 UTC:
+
+| Event ID | Deck ID | Source | Card Count | Hash |
+|:---------|:--------|:-------|:----------:|:-----|
+| `49489d05` | `528c877f` | user_created | 100 | `900169c7` |
+| `88d04788` | `3a37b894` | user_created | 100 | `900169c7` |
+| `2f330f35` | `fd1c158d` | user_created | 100 | `900169c7` |
+
+**All 3 events are identical** (same MD5 hash), representing a single deck imported 3 times. This deck matches **Learned Deck #82** ("Best-of Learned No Premium Mox") with only MDFC card name differences (e.g., "Birgi, God of Storytelling" vs "Birgi, God of Storytelling // Harnfel, Horn of Bounty").
+
+**Key differences from active deck (#6):**
+- No premium fast mana: Chrome Mox, Mox Diamond, Mox Opal replaced by Fellwar Stone, Victory Chimes, Lightning Greaves
+- Copy engine redundancy: Electroduplicate, Molten Duplication (active deck has Longshot, Surge to Victory instead)
+- Lightning Greaves for commander protection
+
+**Concern:** Triple import of the same deck within 5 minutes suggests either a retry loop in the import mechanism or a user repeatedly submitting the same deck. Neither scenario generates new knowledge — it's duplicate data.
+
+### 42.4 Krenko, Mob Boss — AI-Generated Stub (Not Real)
+
+Krenko was registered as a commander (id=10, 2026-06-05T02:43 UTC) with 1 learning event (`source=ai_generated`). The event contains only **25 cards** — insufficient for a Commander-legal deck. Examples: Goblin Guide, Goblin Sledder, Mogg War Marshal, Lightning Bolt, Shock. This is an AI-generated placeholder, not a real deck. **No real Krenko deck exists in the system.**
+
+### 42.5 Updated Fleet State
+
+The Multi-Commander Evolution pipeline is more active than reported:
+- **4 decks promoted** (not 1)
+- **Winota, Kinnan, Atraxa** have full 100-card learned deployments
+- **Korvold** has 90/100 cards (incomplete)
+- **Lorehold** remains the only deck with comprehensive analysis (1837-line report, 38 Scout executions, 23+ Evolution cycles)
+- **Krenko** exists only as an AI-generated stub (25 cards)
+
+**Signal for App/Backend Logic:**
+- `deck_promotions` should validate `new_card_count == 100` for Commander format before marking promotion as complete
+- Cron Governance should query `deck_promotions` table directly, not rely on execution logs alone
+- Import deduplication: events with identical card-list hashes within a 10-minute window should be coalesced
+
+---
+
+## 43. UPDATED CONCRETE TASKS (2026-06-05 ~06:00 UTC — max 5)
+
+### Task 1: Fix Cron Governance Staleness — Query deck_promotions Directly
+- **Evidence:** Cron Governance #4 reported "1 Multi-Commander Evolution execution" but `deck_promotions` shows 4 promotions on Jun 4. The cron is relying on execution logs, not the source of truth (promotions table).
+- **What to change:** Update Cron Governance to query `deck_promotions` table for actual promotion counts. Add a reconciliation step: compare execution log count vs promotion count, flag discrepancies.
+- **Impact:** Prevents reporting stale data. Detects batch executions that produce multiple promotions in a single cron run.
+- **Risk:** Low — read-only query change in the governance cron.
+- **Validation:** Next Cron Governance report should show 4 promotions (Winota, Kinnan, Atraxa, Korvold) instead of 1.
+
+### Task 2: Complete Korvold Deck Import (90 to 100 Cards)
+- **Evidence:** Deck promotion id=5 moved Korvold from 11 to 90 cards. 10 cards are missing. Learned deck `id=7` is the source; verify if the source data is complete.
+- **What to change:** (a) Verify learned deck id=7 has 100 cards in its `card_list`, (b) If yes, re-run the promotion to fill missing 10 cards, (c) If no, flag the learned deck as incomplete and regenerate from EDHREC.
+- **Impact:** Makes Korvold a viable test target alongside Winota/Kinnan/Atraxa. Closes the data quality gap.
+- **Risk:** Low — data repair only.
+- **Validation:** After fix, `deck_cards WHERE deck_id=3` should return 100 rows.
+
+### Task 3: Krenko — Generate Real Deck from EDHREC
+- **Evidence:** Krenko has a commander entry (id=10) and an AI-generated stub (25 cards), but no real deck. Krenko is the #2 most-built mono-red commander (EDHREC: 9,700+ decks). Having a real Krenko deck enables: aggro archetype testing, goblin tribal pattern extraction, bracket 4 mono-red analysis.
+- **What to change:** Run EDHREC import for Krenko, Mob Boss using the same pipeline that produced Winota (85 cards) / Teysa (80 cards) / Aesi (79 cards) EDHREC average decks. Produce a 100-card learned deck and promote it.
+- **Impact:** Adds the first mono-red aggro deck to the knowledge base. Enables archetype comparison across the full commander spectrum.
+- **Risk:** Low — follows existing import pipeline.
+- **Validation:** `SELECT COUNT(*) FROM deck_cards WHERE deck_id = (SELECT id FROM decks WHERE commander_id=10)` should return at least 80 cards.
+
+### Task 4: Import Deduplication for user_learning_events
+- **Evidence:** 3 identical Lorehold decks imported within 5 minutes (2026-06-04 18:21-18:26). All have the same MD5 hash. No deduplication logic exists in the import pipeline. These events bloat the `user_learning_events` table and the `learned_decks` table without adding new knowledge.
+- **What to change:** Add hash-based deduplication to the import handler: (a) compute MD5 of the imported card list, (b) check if a learned_deck with identical hash exists within the last 24h, (c) if yes, skip the import and increment a `duplicate_count` counter on the existing deck.
+- **Impact:** Prevents table bloat. Reduces noise in knowledge synthesis. Saves processing time on duplicate analysis.
+- **Risk:** Low — additive validation check. Does not reject legitimate re-imports after 24h.
+- **Validation:** Submit 3 identical decklists within 5 minutes; the 2nd and 3rd should be skipped with "duplicate" status.
+
+### Task 5: Multi-Commander Rotation — Add Lorehold to the Pipeline
+- **Evidence:** **CARRIED FORWARD** from previous report Task 5 (§40). Multi-Commander Evolution has promoted Winota, Kinnan, Atraxa, and Korvold — but NOT Lorehold (deck_id=6). Lorehold is the most-analyzed commander (1837-line report, 38 Scout executions) but receives ZERO automated swap recommendations since the Lorehold pipeline was decommissioned. Meanwhile, the deck continues to change (4 consecutive hash changes documented in Scout #34-38).
+- **What to change:** Add Lorehold to the Multi-Commander Evolution's analysis queue with cEDH stax-combo heuristics (NOT spellslinger). The prompt should incorporate the knowledge from this report: wincon supersaturation (13 wincons, cut to 7), removal emergency (3 interaction pieces, add 3), artifact land vulnerability (Ancient Den + Great Furnace).
+- **Impact:** Restores automated swap recommendations for the primary test deck. Bridges the gap between deep analysis (this report) and automated action.
+- **Risk:** Medium — the Multi-Commander Evolution prompt may need Lorehold-specific tuning to avoid reverting to spellslinger defaults.
+- **Validation:** Multi-Commander Evolution produces an analysis for deck_id=6 recommending: (a) cut 5-6 wincons, (b) add 2-3 removal pieces, (c) flag artifact lands as vulnerable.
+
+---
+
+> **Next Cron Cycle:** **New concerns (2026-06-05):** (1) NEW: **Cron Governance staleness** — reported 1 Multi-Commander Evolution execution, reality is 4 promotions (Winota, Kinnan, Atraxa, Korvold). Fix the data source. (2) NEW: **Korvold incomplete** — 90/100 cards. Complete the import. (3) NEW: **Krenko stub** — 25 AI-generated cards, not a real deck. Import from EDHREC. (4) NEW: **Import deduplication** — 3 identical Lorehold imports in 5 minutes. Add hash-based coalescing. (5) Lorehold pipeline DEAD — 4 deck changes since last automated analysis. Multi-Commander Evolution must pick up Lorehold. (6) Hash discrepancy resolved: current hash matches Scout #38 (Jun 3), confirming the previously-reported hash was a miscalculation. (7) Wincon supersaturation, removal emergency, and artifact land vulnerability persist unchanged. **Priority order:** Task 1 (fix cron governance) to Task 2 (complete Korvold) to Task 3 (import Krenko) to Task 4 (dedup imports) to Task 5 (add Lorehold to Multi-Commander rotation).
