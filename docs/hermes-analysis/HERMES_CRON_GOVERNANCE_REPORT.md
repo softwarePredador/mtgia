@@ -1,287 +1,323 @@
 # Hermes Cron Governance Report
 
-> Generated: 2026-06-04T00:15Z (approx)
-> Cron: manaloom-cron-governor-report (21fa86eb0d84) — third execution
-> Workdir: /opt/data/workspace/mtgia | Branch: codex/hermes-analysis-docs | HEAD: 42c6325c
+> Generated: 2026-06-05T02:09:36Z
+> Cron: manaloom-cron-governor-report (21fa86eb0d84) — fourth execution
+> Workdir: /opt/data/workspace/mtgia | Branch: codex/hermes-analysis-docs | HEAD: 28f16849
 
 ## Executive Summary
 
-**Fleet state: 22 crons total — 18 enabled (4 with errors), 4 paused (all intentional).**
+**Fleet state: 18 crons total — 17 enabled (3 with errors), 1 paused (intentional).**
 
-Since the last report (2026-06-01), the fleet contracted from 23 to 22 crons (removal of lorehold-battle-analyst and the code-structure-auditor 3h duplicate). The manaloom-knowledge-import cron was re-enabled but runs in DRY RUN mode (no actual PostgreSQL writes). All crons now use opencode-go/deepseek-v4-pro — the openrouter bifurcation is fully resolved.
+Since the last report (2026-06-04), the fleet contracted from 22 to 18 crons.
+**The entire Lorehold pipeline (8 crons) was removed:** lorehold-deck-scout,
+lorehold-deck-validator, lorehold-mulligan-analyst, lorehold-evolution-oracle,
+lorehold-deckbuilding-methodology, lorehold-wincon-hunter, lorehold-wincon-tester,
+lorehold-wincon-builder. **4 new script-based crons were added:** auto-sync-learned-decks,
+pull-learning-events, auto-promote-learned, flutter-ui-auditor.
 
-**New risk: opencode-go weekly quota hit.** On 2026-06-03 at ~18:14-18:22Z, three crons simultaneously failed with HTTP 429: Weekly usage limit reached. Resets in 4 days. This is a hard quota exhaustion on the deepseek-v4-pro workspace, not a transient rate limit. Crons running after 20:24Z succeeded, suggesting either quota reset or separate quota buckets. The 3 affected crons will retry on their next scheduled ticks (starting ~00:14Z June 4).
+The opencode-go weekly quota event from June 3 resolved naturally — all 3 affected
+crons are now OK. However, 2 of the 4 new script-based crons have **persistent code
+bugs** causing 100% failure rate (auto-sync-learned-decks: 5 consecutive failures,
+pull-learning-events: 19 consecutive failures). These are production-code bugs
+(PermissionError and PostgreSQL type mismatch), not rate limits.
 
-**CRON_STATUS.md is ~3 days stale** (last update 2026-06-01T16:46Z). No cron currently maintains it.
+**CRON_STATUS.md remains ~4 days stale** — flagged P0 in two previous reports, still unresolved.
 
-**Schedule compliance improved dramatically:** Most crons now align with governance policy. The major remaining outlier is lorehold-evolution-oracle at 60m (policy: 240m, 4x too fast).
+**STRUCTURE_AUDIT.md was trimmed** from 27,253 to 7,854 lines — R6 resolved.
 
 ---
 
 ## 1. Fleet Inventory
 
-### 1.1 Enabled Crons (18) — All opencode-go/deepseek-v4-pro
+### 1.1 Enabled Crons (17) — All OK except 3 script-based errors
 
-| ID | Name | Schedule | Last Run | Status |
-|:---|---:|:---|:---|:---:|
-| 757eefb8738b | manaloom-master-watchdog | every 30m | 2026-06-04T00:07Z | OK |
-| a50bef4c2a59 | lorehold-evolution-oracle | every 60m WARN | 2026-06-03T23:37Z | OK |
-| b2f5c21ce2d7 | manaloom-knowledge-import | every 120m | 2026-06-03T22:42Z | OK |
-| 712579b15767 | lorehold-deck-validator | every 180m | 2026-06-03T22:42Z | OK |
-| c0591cb18024 | mtg-rules-auditor | every 180m | 2026-06-03T22:35Z | OK |
-| de6fb777f5d1 | manaloom-logic-coherence-auditor | every 180m | 2026-06-03T22:28Z | OK |
-| 08468451a06a | lorehold-mulligan-analyst | every 180m | 2026-06-03T21:51Z | OK |
-| f20ac299992b | lorehold-deck-scout | every 180m | 2026-06-03T21:43Z | OK |
-| 7915cc2377a0 | manaloom-gamechanger-research | every 180m | 2026-06-03T21:36Z | OK |
-| 75eed994c103 | manaloom-commander-knowledge-deep | every 180m | 2026-06-03T21:33Z | OK |
-| b340374bc4e7 | manaloom-tag-accuracy-reporter | every 1440m | 2026-06-03T20:57Z | OK |
-| 10a59b3bdf4d | manaloom-knowledge-synthesis | every 240m | 2026-06-03T20:24Z | OK |
-| 4b2a79809aed | lorehold-deckbuilding-methodology | every 360m | 2026-06-03T18:22Z | ERROR |
-| 444aa9510c2c | manaloom-mana-base-validator | every 360m | 2026-06-03T18:18Z | ERROR |
-| 660397bb97e1 | manaloom-hermes-normal-audit | every 360m | 2026-06-03T18:14Z | ERROR |
-| 577a0a669714 | manaloom-code-structure-auditor | 0 6 * * 0 | 2026-05-31T06:37Z | OK |
-| aeaeb666d377 | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-05-31T12:00Z | ERROR |
-| 21fa86eb0d84 | manaloom-cron-governor-report | every 720m | 2026-06-01T15:36Z | OK |
+| ID | Name | Schedule | Last Run | Status | Provider |
+|:---|---:|:---|:---|:---:|:---|
+| 757eefb8738b | manaloom-master-watchdog | every 30m | 2026-06-05T01:36Z | OK | script |
+| 660397bb97e1 | manaloom-hermes-normal-audit | every 360m | 2026-06-04T20:21Z | OK | opencode-go/deepseek-v4-pro |
+| aeaeb666d377 | manaloom-hermes-weekly-parallel-audit | 0 12 * * 0 | 2026-06-04T14:15Z | OK | opencode-go/deepseek-v4-pro |
+| 75eed994c103 | manaloom-commander-knowledge-deep | every 180m | 2026-06-04T23:44Z | OK | opencode-go/deepseek-v4-pro |
+| 7915cc2377a0 | manaloom-gamechanger-research | every 180m | 2026-06-04T23:52Z | OK | opencode-go/deepseek-v4-pro |
+| b340374bc4e7 | manaloom-tag-accuracy-reporter | every 1440m | 2026-06-04T21:02Z | OK | opencode-go/deepseek-v4-pro |
+| 444aa9510c2c | manaloom-mana-base-validator | every 360m | 2026-06-04T20:31Z | OK | opencode-go/deepseek-v4-pro |
+| b2f5c21ce2d7 | manaloom-knowledge-import | every 120m | 2026-06-05T00:36Z | OK | opencode-go/deepseek-v4-pro |
+| 577a0a669714 | manaloom-code-structure-auditor | 0 6 * * 0 | 2026-05-31T06:37Z | OK | opencode-go/deepseek-v4-pro |
+| de6fb777f5d1 | manaloom-logic-coherence-auditor | every 180m | 2026-06-05T00:28Z | OK | opencode-go/deepseek-v4-pro |
+| 10a59b3bdf4d | manaloom-knowledge-synthesis | every 240m | 2026-06-04T22:25Z | OK | opencode-go/deepseek-v4-pro |
+| c0591cb18024 | mtg-rules-auditor | every 180m | 2026-06-05T00:35Z | OK | opencode-go/deepseek-v4-pro |
+| 21fa86eb0d84 | manaloom-cron-governor-report | every 720m | 2026-06-04T00:22Z | OK | opencode-go/deepseek-v4-pro |
+| 104fd03a2ea2 | manaloom-auto-promote-learned | every 360m | 2026-06-04T20:31Z | OK | script |
+| 7fcab928efd3 | manaloom-auto-sync-learned-decks | every 120m | 2026-06-05T00:36Z | **ERROR** | script |
+| 262dc49e1be1 | manaloom-pull-learning-events | every 30m | 2026-06-05T01:36Z | **ERROR** | script |
+| 93a8ad77b251 | manaloom-flutter-ui-auditor | every 360m | 2026-06-04T16:42Z | **ERROR** | none |
 
-All enabled crons have next_run_at in the future. The 3 batch-error crons retry at ~00:14-00:22Z June 4. Weekly-parallel-audit retries Sunday June 7.
+All enabled crons have next_run_at in the future.
 
-### 1.2 Paused Crons (4) — All Intentional
+### 1.2 Paused/Disabled Crons (1)
 
 | ID | Name | Reason | Last Status |
+|:---|---:|:---|:---|
+| 2d436c71bbf7 | manaloom-manager-watchdog | superseded_by_report_only_cron_governor | error (from May 31) |
+
+---
+
+## 2. Error Analysis — 3 Crons with last_status=error
+
+### 2.1 auto-sync-learned-decks (7fcab928efd3) — PermissionError
+
+**Error:** `PermissionError: [Errno 13] Permission denied: '/opt/data/scripts/../test/artifacts/hermes_auto_sync/synced_learned_ids.txt'`
+
+**Failure rate:** 5/5 runs (100%) since June 4 16:13Z. Consistent, non-transient.
+
+**Root cause:** The script at `/opt/data/scripts/auto_sync_learned_decks.py` line 135 tries to write a tracking file to a path under `/opt/data/scripts/../test/artifacts/hermes_auto_sync/`. The directory or file permissions prevent writing.
+
+**Risk:** Learned deck sync pipeline completely blocked. No learned decks are being promoted from Hermes to product.
+
+**Recommended action:** Fix file path permissions or redirect tracking file to a writable location (e.g., `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/`).
+
+**Safe to automate:** No — requires code change in `/opt/data/scripts/auto_sync_learned_decks.py`.
+
+### 2.2 pull-learning-events (262dc49e1be1) — PostgreSQL Type Mismatch
+
+**Error:** `psycopg2.errors.UndefinedFunction: operator does not exist: uuid = text`
+
+**Failure rate:** 19/19 runs (100%) since June 4 16:12Z. Every 30 minutes.
+
+**Root cause:** `/opt/data/scripts/pull_learning_events.py` line 128 passes text values to a UUID column (`id = ANY(%s)`) without explicit type casting. PostgreSQL rejects the implicit conversion.
+
+**Waste:** 48 failed runs/day (every 30m) with identical error. Extremely noisy.
+
+**Risk:** Learning events from PostgreSQL not being pulled into Hermes. Deck learning pipeline severed at ingest point.
+
+**Recommended action:** (1) Fix UUID casting in pull_learning_events.py (`id = ANY(%s::uuid[])`). (2) Consider slowing schedule to 120m — there's no value in failing every 30 minutes.
+
+**Safe to automate:** No — requires code change in `/opt/data/scripts/pull_learning_events.py`.
+
+### 2.3 flutter-ui-auditor (93a8ad77b251) — Output Valid, Status Error
+
+**Observation:** Despite `last_status=error`, the latest output (2026-06-04T16:42Z) is a complete, valid deck analysis with swap proposals for Winota. The output shows proper markdown formatting, EDHREC comparison, and collection-based swap recommendations.
+
+**Likely cause:** Tool-call limit or model response truncation flagged as error, but the core analysis completed successfully.
+
+**Risk:** Low — output is functional. Status flag may be a false positive.
+
+**Recommended action:** Monitor next run. If output remains valid, the error status may be cosmetic.
+
+---
+
+## 3. Fleet Changes Since Last Report — Major Contraction
+
+### 3.1 Removed Crons (8) — Entire Lorehold Learning Pipeline
+
+| ID | Name | Previous Status |
+|:---|---:|:---|
+| f20ac299992b | lorehold-deck-scout | OK |
+| 712579b15767 | lorehold-deck-validator | OK |
+| 08468451a06a | lorehold-mulligan-analyst | OK |
+| a50bef4c2a59 | lorehold-evolution-oracle | OK |
+| 4b2a79809aed | lorehold-deckbuilding-methodology | ERROR (429 quota) |
+| 11780da0894a | lorehold-wincon-hunter | Paused |
+| 8ea24b001c86 | lorehold-wincon-tester | Paused |
+| 8ede9aa84b4d | lorehold-wincon-builder | Paused |
+
+**Impact:** The entire Lorehold knowledge-learning pipeline is gone. This was the research lab for: deck scouting, deck validation, mulligan analysis, deck evolution, deckbuilding methodology, and wincon research. The promotion path from Lorehold learning → product logic (documented in HERMES_KNOWLEDGE_PIPELINE_GOVERNANCE.md) is now severed.
+
+**Undocumented:** Neither CRON_STATUS.md nor HERMES_KNOWLEDGE_PIPELINE_GOVERNANCE.md reflect this removal.
+
+### 3.2 Added Crons (4) — Script-Based Automation
+
+| ID | Name | Schedule | Status |
 |:---|---:|:---|:---:|
-| 2d436c71bbf7 | manaloom-manager-watchdog | superseded_by_report_only_cron_governor | error |
-| 11780da0894a | lorehold-wincon-hunter | Pipeline hardening needed | ok |
-| 8ea24b001c86 | lorehold-wincon-tester | Pipeline hardening needed | ok |
-| 8ede9aa84b4d | lorehold-wincon-builder | Pipeline hardening needed | ok |
+| 7fcab928efd3 | manaloom-auto-sync-learned-decks | every 120m | ERROR |
+| 262dc49e1be1 | manaloom-pull-learning-events | every 30m | ERROR |
+| 104fd03a2ea2 | manaloom-auto-promote-learned | every 360m | OK |
+| 93a8ad77b251 | manaloom-flutter-ui-auditor | every 360m | ERROR |
 
-All 4 pauses are intentional and architecturally sound.
-
----
-
-## 2. Error Analysis — 4 Crons with last_status=error
-
-### 2.1 Batch Error: opencode-go Weekly Quota Exhaustion (3 crons)
-
-On 2026-06-03 between 18:14Z and 18:22Z, three crons failed simultaneously:
-
-| Cron | ID | Failed At | Error |
-|:-----|:---|:---|:---|
-| manaloom-hermes-normal-audit | 660397bb97e1 | 18:14Z | HTTP 429: Weekly usage limit reached. Resets in 4 days. |
-| manaloom-mana-base-validator | 444aa9510c2c | 18:18Z | HTTP 429: Weekly usage limit reached. Resets in 4 days. |
-| lorehold-deckbuilding-methodology | 4b2a79809aed | 18:22Z | HTTP 429: Weekly usage limit reached. Resets in 4 days. |
-
-**Root cause:** opencode-go/deepseek-v4-pro workspace (wrk_01KT01X25BK8XMN65MH8SD1JYS) exhausted weekly quota. "Resets in 4 days" from June 3 = ~June 7.
-
-**Paradox:** 10 crons ran successfully AFTER 18:22Z (20:24Z through 00:07Z), all same provider/model. Suggests quota reset, different buckets, or lighter subsequent crons stayed under threshold.
-
-**Next retry:** hermes-normal-audit ~00:14Z, mana-base-validator ~00:18Z, deckbuilding-methodology ~00:22Z (all imminent).
-
-### 2.2 Isolated Error: weekly-parallel-audit
-
-| Cron | ID | Failed At | Error |
-|:-----|:---|:---|:---|
-| manaloom-hermes-weekly-parallel-audit | aeaeb666d377 | 2026-05-31T12:00Z | HTTP 429: free-models-per-day-stealth |
-
-Different 429 variant. Next retry: Sunday 2026-06-07T12:00Z. Do not trigger manually.
-
-### 2.3 Error Trend
-
-| Report Date | Enabled | OK | Error | Notes |
-|:---|:---:|:---:|:---:|:---|
-| 2026-06-01 (R1) | 17 | 17 | 0 | Post-migration clean |
-| 2026-06-01 (R2) | 17 | 17 | 0 | Sustained clean |
-| 2026-06-04 (R3) | 18 | 14 | 4 | Weekly quota wave |
+These appear to be replacement pipelines for the removed Lorehold crons, but 3/4 are erroring. Only auto-promote-learned works correctly.
 
 ---
 
-## 3. Provider / Model Distribution
+## 4. Provider / Model Distribution
 
 | Provider | Model | Count | Status |
 |:---|:---|---:|:---|
-| opencode-go | deepseek-v4-pro | 22 | 18 enabled (4 error, 14 OK), 4 paused |
+| opencode-go | deepseek-v4-pro | 14 | 13 OK, 1 disabled |
+| script (no_agent) | N/A | 3 | 1 OK, 2 ERROR |
+| none (agent, no provider) | N/A | 1 | 1 ERROR |
 
-**Single-provider risk:** 100% of fleet on one provider/model. Previous openrouter redundancy removed. All LLM crons stall if opencode-go has outage or quota exhaustion.
+**Single-provider risk persists:** 14/18 crons (all LLM-based) on single provider/model. No fallback. However, the June 3 weekly quota event resolved naturally — all 3 affected crons now OK.
+
+**Rate limit events since last report:** None. Zero 429 errors. The June 3 quota event was a one-time weekly exhaustion that self-resolved.
 
 ---
 
-## 4. Schedule Compliance vs Governance Policy
+## 5. Schedule Compliance vs Governance Policy
+
+With the Lorehold pipeline removed, most schedule violations are eliminated:
 
 | Cron | Policy | Actual | Compliance |
 |:-----|:---|:---|:---:|
-| lorehold-deck-scout | 180m | 180m | OK |
-| lorehold-deck-validator | 180m | 180m | OK |
-| lorehold-mulligan-analyst | 180m | 180m | OK |
-| lorehold-evolution-oracle | 240m | 60m | FAIL 4x |
-| manaloom-knowledge-synthesis | 240m | 240m | OK |
-| lorehold-deckbuilding-methodology | 360m | 360m | OK |
-| manaloom-hermes-normal-audit | 360m | 360m | OK |
-| manaloom-tag-accuracy-reporter | 1440m | 1440m | OK |
-| manaloom-mana-base-validator | 360m | 360m | OK |
-| manaloom-cron-governor-report | 720m | 720m | OK |
 | manaloom-commander-knowledge-deep | 240m | 180m | slightly fast |
 | manaloom-gamechanger-research | 120m | 180m | slower (safe) |
 | manaloom-logic-coherence-auditor | 120m | 180m | slower (safe) |
+| manaloom-knowledge-import | 120m | 120m | OK |
 | mtg-rules-auditor | not in policy | 180m | undocumented |
+| manaloom-pull-learning-events | N/A (new) | 30m | WASTEFUL — 48 fails/day |
 
-**Assessment:** 11/15 (73%) compliant, up from 5/17 (29%) in R2. Only clear violation: evolution-oracle at 4x policy (~24 calls/day).
-
----
-
-## 5. CRON_STATUS.md — Orphaned Dashboard (3 Days Stale)
-
-Last update: 2026-06-01T16:46:31Z (manual). No cron maintains it.
-
-Key discrepancies from reality:
-- Reports 23 crons (actual: 22), 20 enabled (actual: 18)
-- Reports lorehold-battle-analyst and code-structure-auditor 3h present (both removed)
-- Reports knowledge-import paused (actual: enabled, DRY RUN)
-- Reports rate limit recovery (actual: new quota event June 3)
-- Schedule table outdated (evolution-oracle listed as 240m, actual 60m)
-
-**Gap:** Flagged P0 in last report 3 days ago. Still unresolved.
+**Assessment:** 13/15 schedule-governed crons compliant (87%), up from 11/15 (73%). Only outlier: pull-learning-events at 30m with 100% failure rate.
 
 ---
 
-## 6. Worktree and Repository Risks
+## 6. CRON_STATUS.md — Orphaned Dashboard (~4 Days Stale)
+
+Last update: 2026-06-01T16:46:31Z. No cron maintains it.
+
+**Key discrepancies from reality:**
+- Reports **23 crons** (actual: **18**)
+- Reports **20 enabled** (actual: **17 enabled + 1 paused**)
+- Reports **3 paused** (actual: **1 disabled**)
+- Lists **8 crons that no longer exist** (entire Lorehold pipeline + wincon crons)
+- Lists **manager-watchdog as paused** (actual: disabled with error)
+- Lists **knowledge-import as paused** (actual: enabled + OK)
+- **Missing 4 new crons** (auto-sync-learned-decks, pull-learning-events, auto-promote-learned, flutter-ui-auditor)
+- Reports **rate limit recovery** (irrelevant — no 429s in current fleet)
+- Schedule table **entirely outdated** (lists removed crons, wrong frequencies)
+
+**Gap:** Flagged P0 in last two reports (June 1 and June 4). Now ~4 days stale. Still unresolved.
+
+---
+
+## 7. Worktree and Repository Risks
 
 | Risk | Status |
 |:-----|:------|
 | Shared branch contention (18 crons writing) | Active |
-| Worktree dirty artifacts | Clean |
-| STRUCTURE_AUDIT.md bloat (27,253 lines) | Critical — growing ~800/day |
+| Worktree dirty artifacts | **Dirty** — FLUTTER_UI_AUDIT.md, knowledge.db, __pycache__ |
+| STRUCTURE_AUDIT.md bloat | **RESOLVED** — trimmed from 27,253 to 7,854 lines |
 | SQLite concurrency | Resolved (WAL mode) |
-| Orphan output dir | Resolved |
-| Root-owned untracked files | Resolved |
+| Orphan output dir (cba438fd3a8b) | **NEW** — root-owned, not in jobs.json |
+| Root-owned untracked files | **NEW** — cba438fd3a8b output directory |
+| Git divergence | Ahead 10 of origin (merge pending) |
+
+**Dirty worktree details:**
+- `M docs/hermes-analysis/FLUTTER_UI_AUDIT.md` — uncommitted UI audit update from flutter-ui-auditor cron
+- `M docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` — SQLite modifications
+- `M docs/hermes-analysis/manaloom-knowledge/scripts/__pycache__/db_helper.cpython-313.pyc` — bytecode changes
+- `?? docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py` — untracked script
+
+These are cron artifacts from other crons operating on the shared branch, not product drift.
 
 ---
 
-## 5. CRON_STATUS.md — Orphaned Dashboard (3 Days Stale)
-
-Last update: 2026-06-01T16:46:31Z (manual). No cron maintains it.
-
-Key discrepancies from reality:
-- Reports 23 crons (actual: 22), 20 enabled (actual: 18)
-- Reports lorehold-battle-analyst and code-structure-auditor 3h present (both removed)
-- Reports knowledge-import paused (actual: enabled, DRY RUN)
-- Reports rate limit recovery (actual: new quota event June 3)
-- Schedule table outdated (evolution-oracle listed as 240m, actual 60m)
-
-**Gap:** Flagged P0 in last report 3 days ago. Still unresolved.
----
-
-## 6. Worktree and Repository Risks
-
-| Risk | Status |
-|:-----|:------|
-| Shared branch contention (18 crons writing) | Active |
-| Worktree dirty artifacts | Clean |
-| STRUCTURE_AUDIT.md bloat (27,253 lines) | Critical - growing ~800/day |
-| SQLite concurrency | Resolved (WAL mode) |
-| Orphan output dir | Resolved |
-| Root-owned untracked files | Resolved |
-
----
-
-## 7. Duplicate Work Assessment
+## 8. Duplicate Work Assessment
 
 | Pattern | Status |
 |:---|:---|
-| code-structure-auditor duplicate (weekly + 3h) | Resolved - 3h removed |
-| hermes-normal-audit vs weekly-parallel-audit | Low risk - normal at 360m, weekly on Sundays |
-| Wincon pipeline | N/A - all paused |
-| Knowledge synthesis + import | Gap - import DRY RUN, no PG writes |
-| commander-knowledge-deep vs mtg-rules-auditor | Medium - same skill, different crons |
+| code-structure-auditor duplicate | **Resolved** — only weekly remains |
+| hermes-normal-audit vs weekly-parallel-audit | Low risk — different scopes |
+| Wincon pipeline | **Resolved** — all removed |
+| Knowledge synthesis + import | **Gap** — import runs but learning pipeline removed |
+| commander-knowledge-deep vs mtg-rules-auditor | **Medium** — same skill, different crons |
+| pull-learning-events + auto-sync-learned-decks | **Overlap** — both handle learned deck sync, both erroring |
+
+**New concern:** auto-sync-learned-decks and auto-promote-learned may overlap in responsibility. Both handle the learned-deck pipeline but with different schedules and scripts.
+
 ---
 
-## 8. Learning Artifacts Actionable for Product Work
+## 9. Learning Artifacts Actionable for Product Work
 
 | Artifact | Relevance | Status |
 |:---|:---|:---|
-| Tag accuracy gaps (payoff 35.5%, 7 tags below 85%) | P1 - 4 code tasks, CMC corruption, 7-day stagnation | Stagnation since May 27 |
-| card_rulings in quality gates (77K rulings) | P1 - swap validation | Not integrated |
-| Synergy-axis awareness | P1 - optimizer role overlap only | Not implemented |
-| Mulligan percent as deck quality signal | P2 - UX metric | Not integrated |
-| Wincon diversity (fast/resilient/stealth) | P2 - deck scoring | Pipeline paused |
-| MDFC/split-name dedup | P2 - duplicate detection | Not implemented |
-| Game Changer 10 gaps | P1 - documented | Research ongoing |
+| Tag accuracy gaps (payoff 35.5%, 7 tags below 85%) | P1 — 4 code tasks, CMC corruption, 7-day stagnation | **Stagnation since May 27** |
+| card_rulings in quality gates (77K rulings) | P1 — swap validation | Not integrated |
+| Synergy-axis awareness | P1 — optimizer role overlap only | Not implemented |
+| MDFC/split-name dedup | P2 — duplicate detection | Not implemented |
+| Game Changer 10 gaps | P1 — documented | Research ongoing |
+| Learned deck swap proposals (from flutter-ui-auditor) | P2 — collection-based swaps | Output valid, pipeline errors |
+
+**Note:** With Lorehold pipeline removed, the promotion path for these learnings (HERMES_KNOWLEDGE_PIPELINE_GOVERNANCE.md §4) may need revision — the research crons that produced them no longer exist.
+
 ---
 
-## 9. Recommendations
+## 10. Recommendations
 
-### P0 - Critical Gaps
-
-| # | Action | Evidence | Safe to Automate? |
-|:---|:---|---|:---:|
-| R1 | Restore CRON_STATUS.md maintenance | Dashboard frozen 3 days. Flagged P0 in last report. | Yes - add to this reports output or create script-based cron. |
-| R2 | Investigate opencode-go weekly quota pattern | 3 crons 429 Weekly limit at 18:14-18:22Z, but 10 crons OK afterwards. Inconsistent. | No - manual investigation of workspace quota/billing. |
-
-### P1 - Fleet Health
+### P0 — Critical Gaps
 
 | # | Action | Evidence | Safe to Automate? |
 |:---|:---|---|:---:|
-| R3 | Slow lorehold-evolution-oracle to 240m | 60m (4x policy). ~24 calls/day. Major quota contributor. | Yes - PROPOSED ONLY. |
-| R4 | Resolve knowledge-import DRY RUN mode | 120m runs, no PG writes, card_deck_profiles frozen at 7710. | Investigate first - security concern may still apply. |
-| R5 | Monitor weekly-parallel-audit recovery | Failed May 31 429 on first post-migration run. Retry June 7. | Monitor - do not trigger manually. |
+| R1 | Restore CRON_STATUS.md maintenance | Dashboard frozen ~4 days. Reports 23 crons (actual: 18). Flagged P0 in 3 consecutive reports. | **PROPOSED:** Add CRON_STATUS.md update to this cron's output. |
+| R2 | Fix pull-learning-events UUID casting | 19 consecutive failures (100%). 48 wasted runs/day. PostgreSQL UUID vs text mismatch in `/opt/data/scripts/pull_learning_events.py:128`. | No — requires code fix in script. PROPOSED: add `::uuid[]` cast. |
+| R3 | Fix auto-sync-learned-decks permissions | 5 consecutive failures (100%). PermissionError writing tracking file. Learned deck sync completely blocked. | No — requires path/permission fix. |
 
-### P2 - Fleet Hygiene
+### P1 — Fleet Health
 
 | # | Action | Evidence | Safe to Automate? |
 |:---|:---|---|:---:|
-| R6 | Trim STRUCTURE_AUDIT.md | 27,253 lines, growing ~800/day. Blocks write tools. | Manual trim (keep last 3 rounds). |
-| R7 | Document mtg-rules-auditor in governance policy | Not in policy. Uses same skill as commander-knowledge-deep. | Yes - update governance doc. |
-| R8 | Evaluate single-provider risk | 100% of fleet on one provider. No fallback. | Strategic - consider 1-2 crons on alternate provider as canary. |
-| R9 | Update governance policy schedule table | Evolution-oracle still at wrong frequency in doc. | Yes. |
+| R4 | Slow pull-learning-events to 120m | Running every 30m with 100% failure rate is wasteful. Even after fix, 30m is too frequent for a learning-events pull. | **PROPOSED ONLY:** Update schedule to every 120m. |
+| R5 | Document Lorehold pipeline removal | 8 crons removed. Neither CRON_STATUS.md nor HERMES_KNOWLEDGE_PIPELINE_GOVERNANCE.md reflect this. | Yes — update docs. |
+| R6 | Review knowledge-import DRY RUN status | Enabled and running OK — but is it still DRY RUN mode? card_deck_profiles frozen at 7,710 since last report. | Investigate. |
 
-### P3 - Documentation
+### P2 — Fleet Hygiene
+
+| # | Action | Evidence | Safe to Automate? |
+|:---|:---|---|:---:|
+| R7 | Clean orphan output dir cba438fd3a8b | Root-owned, not in jobs.json. Leftover from removed cron. | Manual (root permissions needed). |
+| R8 | Investigate flutter-ui-auditor error status | Output is valid, status is error. May be false positive from tool-call limit. | Monitor next run. |
+| R9 | Update governance policy for new fleet | HERMES_KNOWLEDGE_PIPELINE_GOVERNANCE.md still lists Lorehold crons in frequency policy. | Yes — update doc. |
+| R10 | Commit dirty worktree artifacts | FLUTTER_UI_AUDIT.md, knowledge.db, __pycache__ changes from other crons. | Yes — stage and commit. |
+
+### P3 — Documentation
 
 | # | Action | Safe to Automate? |
 |:---|:---|---|
-| R10 | Document cron-governor-report scope boundary | Yes |
-| R11 | Recognize fleet reduction (23->22) in CRON_STATUS.md | Yes |
+| R11 | Update fleet-size tracking in references/fleet-size-changes.md | Yes |
+| R12 | Consider consolidating auto-sync + auto-promote scripts | Investigate overlap |
+
 ---
 
-## 10. Previous Recommendations - Status Tracking
+## 11. Previous Recommendations — Status Tracking
 
-| # | Recommendation (from R1/R2) | Status |
+| # | Recommendation (from R1/R2/R3) | Status |
 |:---|:---|:---|
-| R1 | Restore CRON_STATUS.md maintenance | STILL OPEN (3 days) |
-| R2 | Resolve knowledge-import blockage | CHANGED - enabled but DRY RUN |
-| R3 | Migrate weekly-parallel-audit to deepseek | DONE - errored on first run |
-| R4 | Migrate code-structure-auditor weekly | DONE - OK on May 31 |
-| R5 | Deprecate code-structure-auditor 3h | DONE - removed |
-| R6 | Align schedules with policy | PARTIALLY - 11/15 compliant |
-| R7 | Resume master-watchdog | DONE - running OK |
-| R8 | Stagger wincon pipeline | N/A - all paused |
-| R9 | Trim STRUCTURE_AUDIT.md | NOT DONE - grew 2,500 lines |
-| R10 | Enable SQLite WAL mode | DONE |
-| R11 | Clean orphan output dir | DONE |
+| R1 | Restore CRON_STATUS.md maintenance | **STILL OPEN (~4 days)** |
+| R2 | Investigate opencode-go weekly quota pattern | **RESOLVED** — event passed, crons OK |
+| R3 | Slow lorehold-evolution-oracle to 240m | **N/A** — cron removed |
+| R4 | Resolve knowledge-import DRY RUN mode | **PARTIALLY** — enabled but DRY RUN status unconfirmed |
+| R5 | Monitor weekly-parallel-audit recovery | **RESOLVED** — ran OK June 4 14:15Z |
+| R6 | Trim STRUCTURE_AUDIT.md | **DONE** — 27,253 → 7,854 lines |
+| R7 | Document mtg-rules-auditor in governance policy | **OPEN** |
+| R8 | Evaluate single-provider risk | **OPEN** — 14/18 crons on one provider |
+| R9 | Update governance policy schedule table | **N/A** — fleet changed, policy needs full rewrite |
 
-**Completion:** 5/11 done, 2 partially done, 2 open, 2 N/A.
+**Completion:** 3/9 done, 1 partially, 3 still open, 2 N/A.
+
 ---
 
-## 11. Cron-Governor-Report Self-Check
+## 12. Cron-Governor-Report Self-Check
 
 | Metric | Value |
 |:---|---|
 | Schedule | every 720m (12h) |
-| Last execution | 2026-06-01T15:36Z (~2.5 days ago) |
-| Expected next run | ~June 2 03:36Z (missed) |
-| Actual next_run_at | 2026-06-04T12:10Z |
-| Missed cycles | ~5 |
-| Current execution | 2026-06-04T00:15Z |
+| Last execution | 2026-06-04T00:22Z |
+| Current execution | 2026-06-05T02:09:36Z |
+| Gap between executions | ~26h |
+| Missed cycles | ~1 (expected ~June 4 12:22Z) |
 
-WARNING: ~69h gap between last_run_at and expected next_run. Investigation recommended.
----
-
-## 12. Current Git State
-
-- **Branch:** codex/hermes-analysis-docs - ahead 2 of origin.
-- **Worktree:** Clean.
-- **Recent commits:** 42c6325c Merge, 4c8a6a49 auto-commit, dbb5f430 structure audit, 534f5672 MTG rules v3.3, 9d740b4a commander knowledge.
-- **Output disk:** ~34MB.
+The gap between last and current execution (~26h) exceeds the 12h schedule. This may be scheduler drift or a missed tick. The next_run_at in jobs.json is 2026-06-05T14:04Z, suggesting the scheduler already corrected.
 
 ---
 
-*Report: manaloom-cron-governor-report (21fa86eb0d84) - third execution, 2026-06-04T00:15Z.*
-*Fleet: 22 crons (18 enabled, 4 paused) - 14 OK, 4 error (429 quota), 4 paused.*
-*Previous report: 2026-06-01T15:30Z. This report: 2026-06-04T00:15Z.*
+## 13. Current Git State
+
+- **Branch:** codex/hermes-analysis-docs — ahead 10 of origin (merge pending from remote diverge).
+- **Worktree:** Dirty (cron artifacts: FLUTTER_UI_AUDIT.md, knowledge.db, __pycache__).
+- **STRUCTURE_AUDIT.md:** 7,854 lines (healthy — was 27,253).
+- **Output disk:** 19 directories (1 orphan root-owned).
+- **COMMIT_DIGEST.md:** Updated to 75d41d40 (June 4), health endpoint confirms production.
+
+---
+
+*Report: manaloom-cron-governor-report (21fa86eb0d84) — fourth execution, 2026-06-05T02:09:36Z.*
+*Fleet: 18 crons (17 enabled, 1 paused) — 14 OK, 3 error (2 script bugs, 1 false positive), 1 paused.*
+*Previous report: 2026-06-04T00:15Z. This report: 2026-06-05T02:09:36Z.*
+*Change since last report: -4 fleet (22→18), Lorehold pipeline removed, 4 new scripts added.*
