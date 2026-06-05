@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-05 07:00 UTC
+> Data: 2026-06-05 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -11,9 +11,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3495 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-03 19:00 UTC. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
-   `4795a07b` em 2026-06-03 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
+   `61749fe2` em 2026-06-05 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
-   nao existe neste checkout, e `dart analyze` em `server/` falha com
+   nao existe neste checkout, e `dart analyze` focado em `server/` falha com
    `uri_does_not_exist`.
 5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `5243686c` em 2026-06-04 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` tambem preserva jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. `/decks/:id/recommendations`, `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual nesta busca, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
@@ -68,18 +68,20 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
-    checkout local `aa6d3216` (2026-06-04 11:00 UTC).** O auditor base agora
-    reporta 1 import quebrado dentro de seu recorte:
+    checkout local `61749fe2` (2026-06-05 11:00 UTC).** O auditor base continua
+    reportando 1 import quebrado dentro de seu recorte:
     `server/routes/ai/commander-learning/index.dart:4` importa o support ausente
     `server/lib/ai/commander_learned_deck_support.dart`, e `dart analyze`
-    confirma `uri_does_not_exist` com cascata em `CommanderLearnedDeckInput`.
-    A varredura local ampliada encontrou somente 4 imports locais quebrados em
+    focado confirma `uri_does_not_exist` com cascata em
+    `CommanderLearnedDeckInput`. A varredura local ampliada encontrou somente 4
+    imports locais quebrados em
     424 arquivos: esse `commander-learning`, `deck_analysis_tab.dart:5` e
     `life_counter_screen.dart:7` usando imports relativos que saem de `app/lib`
     para `app/core/...`, e `server/bin/local_test_server.dart:3` dependendo do
     artefato ausente `server/.dart_frog/server.dart`. A varredura SCC encontrou
     somente um ciclo local: `CommunityDeckDetailScreen` e `UserProfileScreen`
-    importam e instanciam uma a outra por `Navigator.push`.
+    importam e instanciam uma a outra por `Navigator.push`; nenhum ciclo local
+    backend foi encontrado.
 
 ## Achados priorizados
 

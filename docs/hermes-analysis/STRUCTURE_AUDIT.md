@@ -1,7 +1,159 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-05 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-05 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies — revalidacao 2026-06-05 11:00 UTC
+
+Escopo desta rodada: somente imports locais quebrados e ciclos de dependencia
+em Dart. Nao foi feita auditoria ampla de classes sem uso, funcoes sem chamada,
+tabelas PostgreSQL, duplicacao ou coerencia geral entre camadas fora deste
+foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `61749fe2`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 170.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 100.
+- Imports quebrados: 1.
+
+Limitacao para esta rotacao: o auditor textual cobre apenas `server/lib` e
+`server/routes`; nao analisa `app/lib`, `server/bin`, `app/test` ou
+`app/integration_test`, e tambem nao constroi grafo de ciclos. A execucao
+reescreve `STRUCTURE_AUDIT.md` em formato de inventario gerado; essa mutacao
+automatica foi descartada para preservar o historico manual, e somente os
+numeros acima mais a triagem focada abaixo foram incorporados.
+
+### Metodo manual focado
+
+- Resolvedor local de imports Dart executado sobre 424 arquivos em `app/lib`,
+  `server/lib`, `server/routes` e `server/bin`.
+- O resolvedor tratou imports relativos a partir do diretorio do arquivo origem
+  e reconheceu imports locais `package:server/...`, `package:manaloom/...` e o
+  alias historico `package:ai/...`.
+- Foi calculado grafo de imports locais e SCCs para detectar ciclos fortes no
+  mesmo recorte.
+- Validacao pontual com analyzer:
+  `cd server && dart analyze bin/local_test_server.dart routes/ai/commander-learning/index.dart`
+  confirmou os dois imports quebrados backend e a cascata de tipos ausentes.
+- `cd app && flutter analyze --no-pub --no-fatal-infos lib/features/decks/widgets/deck_analysis_tab.dart lib/features/home/life_counter_screen.dart`
+  foi nao conclusivo como analise geral porque `app/.dart_tool/package_config.json`
+  esta ausente e pacotes como Flutter/provider/fl_chart nao foram resolvidos;
+  ainda assim, a saida incluiu `uri_does_not_exist` para
+  `deck_analysis_tab.dart:5`.
+
+### Achados revalidados
+
+#### P1 — Rota `commander-learning` importa suporte inexistente
+
+- **Import quebrado:** `server/routes/ai/commander-learning/index.dart:4`
+  importa `../../../lib/ai/commander_learned_deck_support.dart`, resolvendo para
+  `server/lib/ai/commander_learned_deck_support.dart`.
+- **Evidencia:** `find server/lib/ai -maxdepth 1 -name '*learned*' -o -name '*learning*'`
+  nao encontrou arquivo correspondente neste checkout.
+- **Analyzer:** `dart analyze bin/local_test_server.dart routes/ai/commander-learning/index.dart`
+  reportou `uri_does_not_exist` em `routes/ai/commander-learning/index.dart:4`
+  e erros em cascata para `CommanderLearnedDeckInput` em `:61`, `:105`,
+  `:141`, `:146`, `:169`, `:248`, `:265`, `:283` e `:305`.
+- **Por que parece defeito real:** o endpoint depende do tipo e dos helpers do
+  support ausente para montar/validar learned decks, entao o arquivo nao e
+  analisavel neste checkout.
+- **O que valida:** restaurar/criar `server/lib/ai/commander_learned_deck_support.dart`
+  com `CommanderLearnedDeckInput` e rerodar o analyzer focado.
+- **O que falsifica:** remover a rota deste checkout ou alterar o import para
+  um support existente que defina exatamente os simbolos usados.
+
+#### P1 — `server/bin/local_test_server.dart` depende de artefato Dart Frog ausente
+
+- **Import quebrado:** `server/bin/local_test_server.dart:3` importa
+  `../.dart_frog/server.dart`, resolvendo para `server/.dart_frog/server.dart`.
+- **Evidencia:** `find server/.dart_frog -maxdepth 2 -type f` nao encontrou
+  arquivo gerado neste checkout.
+- **Analyzer:** o mesmo `dart analyze` focado reportou
+  `bin/local_test_server.dart:3:8 - Target of URI doesn't exist:
+  '../.dart_frog/server.dart'`.
+- **Por que parece defeito real:** o entrypoint local fica inutil em clone limpo
+  sem uma etapa previa que gere `.dart_frog/server.dart`.
+- **O que valida:** documentar/automatizar a geracao antes do wrapper ou trocar
+  o entrypoint para um caminho que exista no checkout.
+- **O que falsifica:** `.dart_frog/server.dart` passar a ser gerado antes da
+  analise/execucao local ou o wrapper ser removido por nao fazer parte do
+  contrato operacional.
+
+#### P1 — Dois imports relativos do app saem de `app/lib`
+
+- **Import quebrado:** `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
+  importa `../../../../core/utils/mana_helper.dart`, resolvendo para
+  `app/core/utils/mana_helper.dart`; o arquivo real fica em
+  `app/lib/core/utils/mana_helper.dart`.
+- **Import quebrado:** `app/lib/features/home/life_counter_screen.dart:7`
+  importa `../../../core/theme/app_theme.dart`, resolvendo para
+  `app/core/theme/app_theme.dart`; o arquivo real fica em
+  `app/lib/core/theme/app_theme.dart`.
+- **Evidencia:** a varredura de 424 arquivos apontou exatamente esses dois
+  imports app quebrados. No mesmo arquivo `deck_analysis_tab.dart`, o import
+  vizinho de theme em `:4` usa `../../../core/theme/app_theme.dart`, que resolve
+  corretamente para `app/lib/core/theme/app_theme.dart`.
+- **Analyzer:** `flutter analyze --no-pub` nao foi conclusivo por dependencias
+  ausentes (`app/.dart_tool/package_config.json` nao existe), mas a saida
+  incluiu `uri_does_not_exist` para
+  `lib/features/decks/widgets/deck_analysis_tab.dart:5`.
+- **Por que parece defeito real:** ambos os caminhos sobem um nivel alem de
+  `app/lib`, diferentemente dos imports core corretos em arquivos vizinhos.
+- **O que valida:** corrigir os relativos para caminhos dentro de `app/lib`
+  ou migrar para `package:manaloom/core/...`, depois rerodar analyzer com
+  dependencias resolvidas.
+- **O que falsifica:** existencia intencional de `app/core/...` versionado, o
+  que nao foi observado neste checkout.
+
+#### P2 — Ciclo direto permanece entre telas de comunidade e perfil social
+
+- **Arquivos no SCC:** `app/lib/features/community/screens/community_deck_detail_screen.dart`
+  e `app/lib/features/social/screens/user_profile_screen.dart`.
+- **Aresta 1:** `community_deck_detail_screen.dart:8` importa
+  `../../social/screens/user_profile_screen.dart`; em `:209`-`:216`, navega
+  para `UserProfileScreen`.
+- **Aresta 2:** `user_profile_screen.dart:7` importa
+  `../../community/screens/community_deck_detail_screen.dart`; em `:466`-`:470`,
+  navega para `CommunityDeckDetailScreen`.
+- **Evidencia do grafo:** a varredura SCC encontrou somente esse componente
+  fortemente conectado em `app/lib`, `server/lib`, `server/routes` e
+  `server/bin`; nenhum ciclo local foi encontrado no backend.
+- **Por que e risco:** Dart aceita ciclos em muitos casos, mas essas features
+  conhecem classes concretas uma da outra e ficam mais dificeis de separar,
+  testar isoladamente e reorganizar por rotas.
+- **O que valida:** mover a navegacao cruzada para uma camada de router/callback
+  ou extrair intents compartilhadas sem import concreto entre as telas.
+- **O que falsifica:** decisao documentada de manter esse acoplamento como
+  contrato intencional, com teste que cubra navegacao nos dois sentidos.
+
+### Resultado desta revalidacao
+
+- A varredura focada encontrou exatamente 4 imports locais quebrados no recorte
+  de 424 arquivos: `commander-learning`, `local_test_server.dart`,
+  `deck_analysis_tab.dart` e `life_counter_screen.dart`.
+- O auditor base apontou somente o import quebrado de `commander-learning`
+  porque seu recorte nao inclui `app/lib` nem `server/bin`.
+- O grafo focado encontrou exatamente 1 SCC local de dois arquivos:
+  `CommunityDeckDetailScreen` <-> `UserProfileScreen`.
+- Nao foi encontrado novo ciclo local no backend.
 
 ## Rodada focada: Functions not called — revalidacao 2026-06-05 07:00 UTC
 
