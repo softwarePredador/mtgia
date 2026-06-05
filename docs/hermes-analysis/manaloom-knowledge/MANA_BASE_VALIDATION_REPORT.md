@@ -1,6 +1,6 @@
 # Mana Base Validation Report
 
-> **Data:** 2026-06-05T02:36:49Z
+> **Data:** 2026-06-05T08:39:35Z
 > **Cron:** manaloom-mana-base-validator
 > **Decks analisados:** 8
 > **Fonte profiles:** commander_reference_profile_anchor30_batch_*_2026-05-12/profiles/*.json
@@ -40,4 +40,4 @@
 8. **Metodo:** Validacao usa `SUM(dc.quantity)` com `functional_tag` de `deck_cards`. Colunas da tabela `decks` (total_lands, ramp_count, draw_count, removal_count, etc.) estao stale e NAO sao usadas como fonte primaria. As diferencas entre esta validacao e as anteriores refletem consolidacao progressiva dos dados de tags.
 
 ---
-*Validacao gerada por manaloom-mana-base-validator em 2026-06-05T02:36:49Z*
+*Validacao gerada por manaloom-mana-base-validator em 2026-06-05T08:39:35Z*

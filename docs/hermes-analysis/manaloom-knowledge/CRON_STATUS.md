@@ -205,7 +205,7 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> **Data:** 2026-06-04T20:30:01Z
+> **Data:** 2026-06-05T08:39:35Z
 > **Cron:** manaloom-mana-base-validator
 > **Decks analisados:** 8
 > **Fonte profiles:** commander_reference_profile_anchor30_batch_*_2026-05-12/profiles/*.json
