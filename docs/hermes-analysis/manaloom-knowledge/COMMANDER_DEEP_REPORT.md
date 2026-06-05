@@ -1,6 +1,6 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-05 ~03:30 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-05 ~08:00 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** 🔴 **CONFIRMED** — cEDH Stax-Protected Combo (Bracket 4), NOT spellslinger
@@ -1945,3 +1945,205 @@ The Multi-Commander Evolution pipeline is more active than reported:
 ---
 
 > **Next Cron Cycle:** **New concerns (2026-06-05):** (1) NEW: **Cron Governance staleness** — reported 1 Multi-Commander Evolution execution, reality is 4 promotions (Winota, Kinnan, Atraxa, Korvold). Fix the data source. (2) NEW: **Korvold incomplete** — 90/100 cards. Complete the import. (3) NEW: **Krenko stub** — 25 AI-generated cards, not a real deck. Import from EDHREC. (4) NEW: **Import deduplication** — 3 identical Lorehold imports in 5 minutes. Add hash-based coalescing. (5) Lorehold pipeline DEAD — 4 deck changes since last automated analysis. Multi-Commander Evolution must pick up Lorehold. (6) Hash discrepancy resolved: current hash matches Scout #38 (Jun 3), confirming the previously-reported hash was a miscalculation. (7) Wincon supersaturation, removal emergency, and artifact land vulnerability persist unchanged. **Priority order:** Task 1 (fix cron governance) to Task 2 (complete Korvold) to Task 3 (import Krenko) to Task 4 (dedup imports) to Task 5 (add Lorehold to Multi-Commander rotation).
+
+---
+
+## 44. 🚨 DATA INTEGRITY CRISIS — Promotion Card Count Discrepancies (2026-06-05 ~08:00 UTC)
+
+### 44.1 The Gap: Claimed vs Actual Card Counts
+
+A cross-reference between `deck_promotions` (what the Multi-Commander Evolution claims it promoted) and `deck_cards` (what actually exists in the database) reveals **catastrophic data loss across ALL non-Lorehold promoted decks:**
+
+| Promo ID | Commander | Deck ID | Claimed | Actual | Gap | % Complete |
+|:--------:|:----------|:-------:|:-------:|:------:|:---:|:----------:|
+| 1 | **Lorehold, the Historian** | 6 | 100 | **100** | 0 | 100% ✅ |
+| 2 | **Winota, Joiner of Forces** | 7 | 100 | **85** | 15 | 85% 🔴 |
+| 4 | **Atraxa, Praetors' Voice** | 9 | 100 | **91** | 9 | 91% 🟡 |
+| 3 | **Kinnan, Bonder Prodigy** | 1 | 100 | **13** | 87 | 13% 🔴🔴 |
+| 5 | **Korvold, Fae-Cursed King** | 3 | 90 | **11** | 79 | 12% 🔴🔴 |
+
+**Key findings:**
+
+- **Lorehold is the ONLY promotion with complete data** (100/100 cards). Every other promoted deck lost cards during the migration.
+- **The previous report (§42.1) reported "Winota, Kinnan, Atraxa have full 100-card learned deployments." This was FALSE.** Only the `deck_promotions.new_card_count` column was checked, not the actual `deck_cards` table.
+- **Korvold's situation is worse than reported:** §42.2 flagged Korvold at 90/100 based on the promotion record. The actual `deck_cards` count is **11** (12% complete), not 90.
+- **Kinnan and Korvold are effectively unusable** — 13 and 11 cards are not decks, they're card-name stubs (Kinnan: Chrome Mox, Walking Ballista, Birds of Paradise, Sol Ring… Korvold: Sol Ring, Viscera Seer, Blood Artist, Demonic Tutor…). These are the most iconic cEDH staples but not a playable deck.
+- **Winota (85 cards) and Atraxa (91 cards) are partially usable** for archetype analysis, but still incomplete.
+- **Root cause:** The `deck_promotions` table records the promotion event and stores `new_card_count` from the learned deck's `card_count`, but the actual card migration (copying rows from `learned_decks.card_list` JSON → `deck_cards` table) failed silently for the majority of cards.
+
+### 44.2 Learned Deck Source Verification
+
+The source learned decks contain valid JSON card lists:
+
+| Learned ID | Commander | Stored card_count | JSON chars | Parsable? |
+|:----------:|:----------|:-----------------:|:----------:|:---------:|
+| 82 | Lorehold | 100 | ~10k | Yes (promoted successfully) |
+| 2 | Winota | 100 | 9,997 | Yes (structure valid, 85 migrated) |
+| 3 | Kinnan | 100 | ~10k | Yes (structure valid, 13 migrated) |
+| 5 | Atraxa | 100 | ~10k | Yes (structure valid, 91 migrated) |
+| 7 | Korvold | 90 | ~10k | Yes (structure valid, 11 migrated) |
+
+The source data exists. The migration process is the failure point — specifically the step that iterates over the JSON `card_list` and INSERTs rows into `deck_cards`.
+
+**This is the most severe data integrity finding since the Lorehold hash-fake pipeline era (§9–§13).**
+
+### 44.3 Atraxa, Praetors' Voice — Partial Deep Analysis (91/100 cards)
+
+Despite the 9-card gap, Atraxa has the most complete non-Lorehold deployment (91%). This enables a partial archetype analysis:
+
+**Archetype:** 🔴 **CONFIRMED** — Proliferate Midrange with Infect/Poison alt-wincon and Superfriends sub-theme. NOT pure tribal proliferate.
+
+**Deck Skeleton (91 cards visible):**
+
+| Category | Count | Key Cards |
+|:---------|:-----:|:----------|
+| Lands | 29 | 9 fetches (Flooded Strand, Polluted Delta, Misty Rainforest…), 3 triomes, 4 shocks, Command Tower, Karn's Bastion |
+| Ramp | 14 | Sol Ring, Arcane Signet, Fellwar Stone, Birds of Paradise, Farseek, Nature's Lore, Cultivate, Chromatic Lantern, Smothering Tithe, Astral Cornucopia, Everflowing Chalice |
+| Draw | 12 | Rhystic Study, Teferi Master of Time, Tezzeret's Gambit, Experimental Augury, Infectious Inquiry, Narset Parter of Veils, Tamiyo Field Researcher |
+| Removal | 7 | Path to Exile, Swords to Plowshares, Cyclonic Rift, Drown in Ichor, Infectious Bite, Vraska's Fall, Phyresis Outbreak |
+| Board Wipe | 0 | — NONE — |
+| Protection | 3 | Lightning Greaves, Teferi's Protection, Skrelv Defector Mite |
+| Infect Package | ~8 | Blighted Agent, Plague Stinger, Venerated Rotpriest, Bloated Contaminator, Ichor Rats, Skithiryx, Prologue to Phyresis, Infectious Bite |
+| Proliferate Engine | ~8 | Evolution Sage, Flux Channeler, Thrummingbird, Metastatic Evangel, Tekuthal, Inexorable Tide, Contagion Engine, Karn's Bastion |
+| Planeswalkers | 6 | Narset, Oko, Ajani Sleeper Agent, Tamiyo Field Researcher, Teferi Master of Time, Vraska Betrayal's Sting |
+| Counters Payoff | 4 | Doubling Season, Innkeeper's Talent, Vorinclex Monstrous Raider, Brokers Ascendancy |
+
+**CMC bands (nonland):** 0=2, 1=4, 2=14, 3=12, 4=9, 5=5, 6=4
+**Average CMC (nonland):** 3.12
+
+#### Ramp Patterns
+- **14 ramp pieces** — excellent for a 4-color commander. Atraxa can consistently hit T4.
+- **Proliferate-synergy ramp:** Astral Cornucopia and Everflowing Chalice scale with proliferate triggers (charge counters become additional mana).
+- **Land ramp:** Farseek + Nature's Lore + Cultivate — green-based land fetching for color fixing.
+- **Smothering Tithe:** The only Game Changer in the ramp suite. Generates treasure in 4-player pods.
+
+#### Draw Patterns
+- **12 draw sources** — Rhystic Study and Teferi carry the engine.
+- **Proliferate-synergy draw:** Tezzeret's Gambit (draw 2 + proliferate), Experimental Augury (look top 3 + proliferate) — both double as engine pieces.
+- **Gap:** No burst draw (no Windfall, no Necropotence). If Rhystic Study is removed, the draw engine collapses.
+- **Planeswalker-draw:** Teferi (loot per turn), Tamiyo (tap-to-draw), Narset (dig for non-creature).
+
+#### Removal Patterns
+- **7 interaction pieces, 0 board wipes** — critically below bracket 4 standards.
+- **Spot removal:** Path, Swords, Cyclonic Rift (the only mass-bounce), Drown in Ichor (proliferate + -4/-4), Infectious Bite (proliferate + fight).
+- **No sweepers:** No Damnation, no Toxic Deluge, no Farewell. The deck relies entirely on Cyclonic Rift for board reset.
+- **Anti-pattern:** Infect-focused removal (Drown in Ichor, Infectious Bite) is conditional — requires poison counters to be online.
+
+#### Wincon Patterns — The Split Identity Problem
+- **Primary (Infect):** Poison opponents to 10 counters via evasive infect creatures (Blighted Agent unblockable, Plague Stinger flying, Skithiryx haste+regenerate). Proliferate accelerates the clock.
+- **Secondary (Planeswalkers):** Ultimate planeswalkers after accumulating loyalty via proliferate. Vraska's ultimate (player loses if dealt combat damage by a creature) is a direct kill.
+- **Backup (Combat):** Atraxa commander damage (4/4 flying vigilance lifelink deathtouch — 4-turn clock unopposed).
+- **No deterministic combo:** Unlike Lorehold (Dualcaster+Twinflame), Atraxa has no A+B combo. All wincons are incremental and telegraphed.
+
+#### Anti-Patterns Observed
+
+1. **Split Identity (3 archetypes in 1 deck):** The deck tries to be +1/+1 counters, planeswalkers superfriends, AND infect/poison simultaneously. These sub-themes compete for the same proliferate triggers but dilute card slots. Evidence: 8 infect cards + 6 planeswalkers + 4 counter payoffs = 18 cards for 3 different win conditions.
+
+2. **Zero Board Wipes:** In a 4-player bracket 4 meta, having 0 board wipes is a structural weakness. Atraxa relies on Cyclonic Rift as the only mass-removal, which is often saved for an end-step win setup, not defensive use.
+
+3. **Protection Deficit:** Only 3 protection cards (Greaves, Teferi's Protection, Skrelv). Atraxa costs 4 mana in 4 colors — removing her once sets the deck back significantly. Skrelv only protects from one color. No counterspells except Counterspell itself (and Cyclonic Rift at overload).
+
+4. **Draw Fragility:** Rhystic Study is a removal magnet. If it's destroyed, the deck drops from 12 draw to ~8, with most remaining draw being proliferate-conditional (Tezzeret's Gambit) or planeswalker-dependent (Teferi, Tamiyo).
+
+5. **Proliferate Without Protection:** Evolution Sage, Flux Channeler, Thrummingbird, and Metastatic Evangel all need to survive a turn cycle to generate value. With only 3 protection cards, these engines are easily removed before they trigger.
+
+#### Atraxia Insights from DB (8 automated insights)
+
+The `knowledge.db` generated 8 insights for Atraxia (deck_id=9):
+
+| # | Category | Impact | Insight |
+|:--|:---------|:------:|:--------|
+| 42 | archetype | high | Mixes 3 archetypes (+1/+1 counters, planeswalkers, infect) — dilutes focus |
+| 43 | structure | medium | CMC 2.97 — value midrange, not aggressive |
+| 44 | balance | high | 7 removal + 0 wipes = below bracket 4 ideal |
+| 45 | structure | medium | 14 ramp — well-equipped for T4 Atraxa |
+| 46 | balance | high | 12 draw — Rhystic Study + Teferi carry, no redundancy |
+| 47 | strategy | high | Midrange goodstuff disguised as proliferate — no clear wincon |
+| 48 | optimization | medium | Infect (~8 cards) vs planeswalker (~6 cards) compete for same slots |
+| 49 | risk | high | Only 3 protection cards — Atraxa dies to single removal |
+
+### 44.4 Winota, Joiner of Forces — Partial Analysis (85/100 cards)
+
+**Archetype:** 🔴 **CONFIRMED** — Boros Aggro-Stax with Combat Triggers. Winota cheats Humans into play on attack.
+
+**Deck Skeleton (85 cards visible):**
+
+| Category | Count | Key Cards |
+|:---------|:-----:|:----------|
+| Lands | 34 | 11 confirmed (Arid Mesa, Sacred Foundry, Cavern of Souls…), ~23 basics assumed missing |
+| Ramp | ~8 | Sol Ring, Arcane Signet, Boros Signet, Talisman of Conviction, Chrome Mox, Lotus Petal, Simian Spirit Guide |
+| Draw | 3 | Esper Sentinel, Archivist of Oghma, Professional Face-Breaker |
+| Removal | 5 | Path to Exile, Swords to Plowshares, Abrade, Skyclave Apparition, Blasphemous Act |
+| Stax | **14** | Deafening Silence, Drannith Magistrate, Ethersworn Canonist, High Noon, Spirit of the Labyrinth, Thalia GoT, Archon of Emeria, Eidolon of Rhetoric, Magus of the Moon, Sanctum Prelate, Boromir, Aven Mindcensor, Phyrexian Revoker, Soulless Jailer |
+| Protection | 7 | Mother of Runes, Giver of Runes, Alseid, Boros Charm, Flare of Fortitude, Deflecting Swat, Silence, Red Elemental Blast |
+| Wincon-Enabler | 6 | Combat Celebrant, Legion Warboss, Goblin Rabblemaster, Loyal Apprentice, Rionya Fire Dancer, Alexios |
+| Wincon-Payoff | 4 | Blade Historian, Goldnight Commander, Angrath's Marauders, Lena Selfless Champion |
+
+**Stax Density:** 14 stax pieces in an 85-card visible pool (~16.5%) — the highest stax density in the ManaLoom knowledge base. This deck aims to slow opponents to a halt while building a board.
+
+**Draw Gap:** Only 3 draw sources. Esper Sentinel is a stax-draw hybrid. Archivist of Oghma is opponent-dependent. Professional Face-Breaker requires combat damage. This is a structural weakness reminiscent of Lorehold's early draw gap.
+
+**Wincon Pattern:** Winota triggers on attack → cheats Humans from top of library → Humans provide combat buffs (Blade Historian double strike, Goldnight Commander +1/+1 per ETB, Angrath's Marauders double damage). Combat Celebrant enables extra combat steps. The wincon is entirely combat-dependent with no non-combat backup.
+
+### 44.5 Signals for App/Backend Logic
+
+From the data integrity crisis and Atraxa/Winota analysis:
+
+| Signal | Source | Implementation |
+|:-------|:-------|:---------------|
+| **Promotion integrity validation** | §44.1 | After promotion, verify `COUNT(deck_cards WHERE deck_id=X) >= promotion.new_card_count * 0.9`. Flag promotions with <90% card migration as FAILED. |
+| **Split archetype detection** | §44.3, Atraxa insight #42 | Detect when a deck's tagged cards span >1 wincon archetype (infect + superfriends + counters). Flag as "unfocused" and suggest consolidation. |
+| **Board wipe deficit alert** | §44.3, Atraxa insight #44 | Alert when `board_wipe_count = 0 AND bracket >= 3`. Bracket 4 decks without sweepers are structurally vulnerable. |
+| **Stax density metric** | §44.4 | Winota's 14 stax pieces represent a new category. Detect `stax_count / (100 - land_count) > 0.15` as "heavy stax" archetype. |
+| **Draw-to-threat ratio** | §44.4 | Winota's 3 draw vs 14 stax + 5 removal = draw deficiency. Standard: draw should be ≥ interaction count for bracket 3+. |
+| **Promotion silent failure** | §44.1 | The promotion process created records but failed to migrate cards. Add a post-promotion consistency check that compares `deck_promotions.new_card_count` to actual `deck_cards` rows. |
+
+---
+
+## 45. NEW CONCRETE TASKS (2026-06-05 ~08:00 UTC — max 5)
+
+> **CRITICAL SHIFT:** All 5 tasks below are **P1 — blocking**. The data integrity crisis (§44) invalidates the Multi-Commander Evolution pipeline. The tasks from §43 are superseded in priority by the tasks below, though they remain valid for future cycles.
+
+### Task 1: Fix Deck Promotion — Re-migrate Cards from Learned Decks (P1)
+
+- **Evidence:** All 4 non-Lorehold promotions have massive card count gaps: Winota (85/100), Atraxa (91/100), Kinnan (13/100), Korvold (11/90). The source learned decks contain valid 100-card JSON that was not fully migrated to `deck_cards`.
+- **What to change:** (a) Audit the migration step in the promotion process — why does `deck_promotions` record success but `deck_cards` remain empty? (b) Re-run migration for Winota (deck_id=7) and Atraxa (deck_id=9) from their learned deck sources (id=2 and id=5). (c) For Kinnan (id=1) and Korvold (id=3), clear existing 13/11 stub cards and re-migrate fully.
+- **Impact:** Restores 4 promoted decks to full 100-card deployment. Unblocks Multi-Commander Evolution analysis for these commanders. Recovers ~340 lost card rows.
+- **Risk:** Low — learned deck JSON is intact. Migration is a re-run of existing logic.
+- **Validation:** `SELECT deck_id, COUNT(*) FROM deck_cards WHERE deck_id IN (1,3,7,9) GROUP BY deck_id` must return 100 for each (or 90 for Korvold).
+
+### Task 2: Add Promotion Integrity Check to Multi-Commander Evolution (P1)
+
+- **Evidence:** The promotion process created `deck_promotions` records with claimed card counts, but the actual card migration failed silently. No post-promotion validation existed. The previous report (§42) repeated the false claim that Winota/Kinnan/Atraxa had "full 100-card deployments" because only `deck_promotions.new_card_count` was checked.
+- **What to change:** Add a post-promotion consistency check: `IF COUNT(deck_cards WHERE deck_id=NEW.target_deck_id) < NEW.new_card_count * 0.9 THEN mark promotion as 'migration_failed' AND retry OR alert`. Update Cron Governance to include actual card counts alongside promotion counts.
+- **Impact:** Prevents silent data loss. Catches partial migrations immediately. Ensures Cron Governance reports accurate fleet state.
+- **Risk:** Low — additive validation check. Does not change promotion logic, only adds a gate.
+- **Validation:** After Task 1 completes, re-running the integrity check must pass for all 4 decks.
+
+### Task 3: Atraxa — Generate Wincon Consolidation Recommendation (P1)
+
+- **Evidence:** Atraxa's deck has 3 competing sub-archetypes (infect, planeswalkers, +1/+1 counters) documented in insight #42 and §44.3. The deck has 0 board wipes and only 3 protection cards (§44.3 anti-patterns #2, #3). These structural issues mirror Lorehold's wincon supersaturation problem (§36).
+- **What to change:** Run the Multi-Commander Evolution prompt against Atraxa (deck_id=9) with heuristics: (a) detect split archetype, (b) recommend consolidating to 1 primary + 1 backup wincon, (c) flag 0 board wipes as bracket 4 concern, (d) suggest +2 protection cards.
+- **Impact:** Produces the first automated swap recommendation for a non-Lorehold commander. Validates the Multi-Commander pipeline can generate useful analysis.
+- **Risk:** Medium — prompt must avoid recommending swaps before deck migration is complete (Task 1 must finish first).
+- **Validation:** Evolution output recommends: (a) cut 4-5 cards from the weakest sub-theme (counters), (b) add 2 board wipes, (c) add 1-2 protection spells.
+
+### Task 4: Winota — Fill Draw Gap (P1)
+
+- **Evidence:** Winota's 85 visible cards show only 3 draw sources (§44.4). This is structurally identical to Lorehold's early draw gap (§3) that was later resolved with Esper Sentinel + The One Ring + Wheel of Fortune + Scroll Rack. Winota already has Esper Sentinel but lacks burst draw.
+- **What to change:** After migration completes (Task 1), run EDHREC comparison for Winota's draw suite. The EDHREC average for Winota (12,840 decks) likely includes 5-7 draw cards. Identify and recommend 2-3 draw additions.
+- **Impact:** Makes Winota a viable test deck for aggro-stax archetype. Closes the structural draw gap.
+- **Risk:** Low — EDHREC-based recommendations, validated against 12k+ real decks.
+- **Validation:** Post-swap, Winota deck_cards should include at least 5 draw-tagged cards.
+
+### Task 5: Krenko — Import Real Deck from EDHREC (P1, CARRIED FORWARD from §43 Task 3)
+
+- **Evidence:** Unchanged from §43 Task 3. Krenko (commander_id=10) has an AI-generated stub of 25 cards. No real Krenko deck exists. Krenko is EDHREC's #2 mono-red commander (9,700+ decks). The data integrity crisis (§44) makes this task MORE urgent — Krenko would be the first mono-red deck in the knowledge base after the promotion data is repaired.
+- **What to change:** Same as §43 Task 3: Run EDHREC import for Krenko, Mob Boss. Produce a learned deck and promote it through the FIXED promotion pipeline (after Task 2).
+- **Impact:** Adds the first mono-red aggro deck. Enables archetype comparison: Lorehold (Boros combo), Winota (Boros stax-aggro), Atraxa (4-color midrange), Krenko (mono-red aggro).
+- **Risk:** Low — but must wait for Task 1+2 to fix the promotion pipeline first.
+- **Validation:** After promotion, `SELECT COUNT(*) FROM deck_cards WHERE deck_id = (SELECT id FROM decks WHERE commander_id=10)` must return ≥80 cards.
+
+---
+
+> **Priority Order (REVISED 2026-06-05 ~08:00 UTC):** Task 1 (fix promotion migration — unblocks everything) → Task 2 (add integrity check — prevents recurrence) → Task 3 (Atraxa wincon consolidation) → Task 4 (Winota draw gap) → Task 5 (Krenko import). **All tasks are P1 — the data integrity crisis (§44) invalidates the Multi-Commander Evolution pipeline until resolved.** §43 tasks (Cron Governance staleness, Korvold completion, import dedup, Lorehold rotation) remain valid but are blocked by Tasks 1-2.
