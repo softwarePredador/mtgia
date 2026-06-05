@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Gerado em UTC: `2026-06-04T17:02:13.749273+00:00`
+- Gerado em UTC: `2026-06-04T21:10:42.428335+00:00`
 - Branch: `master`
-- SHA: `f732438`
+- SHA: `75d41d4`
 - Scan repo: `/opt/data/workspace/mtgia-sync`
 - Memory/report repo: `/opt/data/workspace/mtgia`
 - Escopo: `app/lib/features/**/*.dart`, `app/lib/core/**/*.dart`
@@ -1389,14 +1389,16 @@
 
 ```text
 ## master...origin/master
+?? server/bin/__pycache__/
 ```
 
 ## Git status da memoria Hermes
 
 ```text
-## codex/hermes-analysis-docs...origin/codex/hermes-analysis-docs
+## codex/hermes-analysis-docs...origin/codex/hermes-analysis-docs [ahead 7]
  M docs/hermes-analysis/manaloom-knowledge/scripts/__pycache__/db_helper.cpython-313.pyc
  M docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db
+?? docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py
 ```
 
 UI_AUDIT_RESULT: findings=193 P0=0 P1=0 P2=193
