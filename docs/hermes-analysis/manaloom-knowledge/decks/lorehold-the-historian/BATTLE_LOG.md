@@ -1471,3 +1471,255 @@ Opponents: 12 (real)
 | The Jolly Balloon Man (real) | 90.0% | 45 | 3 | 2 | 7.7 | approach=41, elimination=4 |
 
 **Overall WR: 80.5%** (483W/100L/17S)
+
+## [2026-06-05T23:57:30Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.76 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 80.0% | 40 | 5 | 5 | 7.3 | approach=37, elimination=3 |
+| Lier, Disciple of the Drowned (real) | 78.0% | 39 | 7 | 4 | 7.5 | approach=34, elimination=5 |
+| Aragorn, King of Gondor (real) | 76.0% | 38 | 10 | 2 | 7.3 | approach=35, elimination=3 |
+| Tasigur, the Golden Fang (real) | 74.0% | 37 | 11 | 2 | 7.3 | elimination=2, approach=35 |
+| Cloud, Midgar Mercenary (real) | 76.0% | 38 | 11 | 1 | 7.6 | approach=34, elimination=4 |
+| Deadpool, Trading Card (real) | 72.0% | 36 | 8 | 6 | 7.3 | approach=32, elimination=4 |
+|  (real) | 80.0% | 40 | 8 | 2 | 7.1 | approach=36, elimination=4 |
+| Malcolm, Keen-Eyed Navigator (real) | 82.0% | 41 | 8 | 1 | 7.2 | approach=37, elimination=4 |
+| Slimefoot and Squee (real) | 78.0% | 39 | 7 | 4 | 7.1 | approach=34, elimination=5 |
+| Rograkh, Son of Rohgahh (real) | 78.0% | 39 | 9 | 2 | 7.0 | approach=36, elimination=3 |
+| Kenrith, the Returned King (real) | 82.0% | 41 | 7 | 2 | 7.5 | approach=37, elimination=4 |
+| The Jolly Balloon Man (real) | 70.0% | 35 | 12 | 3 | 7.2 | approach=33, elimination=2 |
+
+**Overall WR: 77.2%** (463W/103L/34S)
+
+## [2026-06-05T23:57:31Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.78 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 82.0% | 41 | 8 | 1 | 6.9 | approach=38, elimination=3 |
+| Lier, Disciple of the Drowned (real) | 74.0% | 37 | 10 | 3 | 7.5 | approach=24, elimination=13 |
+| Aragorn, King of Gondor (real) | 82.0% | 41 | 7 | 2 | 7.4 | approach=37, elimination=4 |
+| Tasigur, the Golden Fang (real) | 76.0% | 38 | 9 | 3 | 7.5 | elimination=6, approach=32 |
+| Cloud, Midgar Mercenary (real) | 88.0% | 44 | 5 | 1 | 7.5 | approach=37, elimination=7 |
+| Deadpool, Trading Card (real) | 82.0% | 41 | 7 | 2 | 7.1 | approach=36, elimination=5 |
+|  (real) | 80.0% | 40 | 9 | 1 | 7.4 | elimination=4, approach=36 |
+| Malcolm, Keen-Eyed Navigator (real) | 82.0% | 41 | 8 | 1 | 7.3 | approach=33, elimination=8 |
+| Slimefoot and Squee (real) | 80.0% | 40 | 7 | 3 | 7.2 | approach=33, elimination=7 |
+| Rograkh, Son of Rohgahh (real) | 90.0% | 45 | 5 | 0 | 7.0 | approach=37, elimination=8 |
+| Kenrith, the Returned King (real) | 88.0% | 44 | 4 | 2 | 7.7 | approach=36, elimination=8 |
+| The Jolly Balloon Man (real) | 78.0% | 39 | 8 | 3 | 7.5 | approach=32, elimination=7 |
+
+**Overall WR: 81.8%** (491W/87L/22S)
+
+## [2026-06-05T23:57:32Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.81 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 72.0% | 36 | 13 | 1 | 7.6 | approach=34, elimination=2 |
+| Lier, Disciple of the Drowned (real) | 78.0% | 39 | 8 | 3 | 7.3 | approach=35, elimination=4 |
+| Aragorn, King of Gondor (real) | 86.0% | 43 | 7 | 0 | 7.6 | approach=39, elimination=4 |
+| Tasigur, the Golden Fang (real) | 74.0% | 37 | 12 | 1 | 7.1 | approach=36, elimination=1 |
+| Cloud, Midgar Mercenary (real) | 86.0% | 43 | 5 | 2 | 7.4 | approach=40, elimination=3 |
+| Deadpool, Trading Card (real) | 78.0% | 39 | 10 | 1 | 7.8 | approach=37, elimination=2 |
+|  (real) | 74.0% | 37 | 9 | 4 | 7.8 | approach=36, elimination=1 |
+| Malcolm, Keen-Eyed Navigator (real) | 74.0% | 37 | 11 | 2 | 6.8 | approach=34, elimination=3 |
+| Slimefoot and Squee (real) | 78.0% | 39 | 10 | 1 | 7.2 | approach=37, elimination=2 |
+| Rograkh, Son of Rohgahh (real) | 90.0% | 45 | 4 | 1 | 7.7 | approach=38, elimination=7 |
+| Kenrith, the Returned King (real) | 78.0% | 39 | 8 | 3 | 7.8 | approach=35, elimination=4 |
+| The Jolly Balloon Man (real) | 78.0% | 39 | 10 | 1 | 7.7 | approach=32, elimination=7 |
+
+**Overall WR: 78.8%** (473W/107L/20S)
+
+## [2026-06-05T23:57:33Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.82 Instants=16
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 68.0% | 34 | 14 | 2 | 7.1 | approach=30, elimination=4 |
+| Lier, Disciple of the Drowned (real) | 68.0% | 34 | 11 | 5 | 7.4 | approach=30, elimination=4 |
+| Aragorn, King of Gondor (real) | 76.0% | 38 | 10 | 2 | 7.7 | approach=30, elimination=8 |
+| Tasigur, the Golden Fang (real) | 78.0% | 39 | 11 | 0 | 7.4 | approach=37, elimination=2 |
+| Cloud, Midgar Mercenary (real) | 78.0% | 39 | 9 | 2 | 7.8 | approach=35, elimination=4 |
+| Deadpool, Trading Card (real) | 76.0% | 38 | 9 | 3 | 7.0 | approach=34, elimination=4 |
+|  (real) | 76.0% | 38 | 11 | 1 | 6.9 | elimination=4, approach=34 |
+| Malcolm, Keen-Eyed Navigator (real) | 78.0% | 39 | 11 | 0 | 7.4 | elimination=4, approach=35 |
+| Slimefoot and Squee (real) | 80.0% | 40 | 9 | 1 | 7.5 | approach=38, elimination=2 |
+| Rograkh, Son of Rohgahh (real) | 66.0% | 33 | 11 | 6 | 7.2 | approach=31, elimination=2 |
+| Kenrith, the Returned King (real) | 74.0% | 37 | 11 | 2 | 7.3 | approach=34, elimination=3 |
+| The Jolly Balloon Man (real) | 82.0% | 41 | 7 | 2 | 7.7 | approach=37, elimination=4 |
+
+**Overall WR: 75.0%** (450W/124L/26S)
+
+## [2026-06-05T23:57:34Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.79 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 80.0% | 40 | 8 | 2 | 7.3 | approach=37, elimination=3 |
+| Lier, Disciple of the Drowned (real) | 80.0% | 40 | 8 | 2 | 7.8 | approach=35, elimination=5 |
+| Aragorn, King of Gondor (real) | 78.0% | 39 | 7 | 4 | 7.0 | elimination=5, approach=34 |
+| Tasigur, the Golden Fang (real) | 76.0% | 38 | 10 | 2 | 7.2 | approach=36, elimination=2 |
+| Cloud, Midgar Mercenary (real) | 74.0% | 37 | 10 | 3 | 7.8 | approach=33, elimination=4 |
+| Deadpool, Trading Card (real) | 70.0% | 35 | 12 | 3 | 7.5 | approach=32, elimination=3 |
+|  (real) | 82.0% | 41 | 6 | 3 | 7.5 | approach=34, elimination=7 |
+| Malcolm, Keen-Eyed Navigator (real) | 80.0% | 40 | 8 | 2 | 7.3 | elimination=3, approach=37 |
+| Slimefoot and Squee (real) | 74.0% | 37 | 10 | 3 | 7.2 | approach=31, elimination=6 |
+| Rograkh, Son of Rohgahh (real) | 78.0% | 39 | 8 | 3 | 7.1 | approach=37, elimination=2 |
+| Kenrith, the Returned King (real) | 74.0% | 37 | 8 | 5 | 8.4 | approach=29, elimination=8 |
+| The Jolly Balloon Man (real) | 90.0% | 45 | 2 | 3 | 7.4 | approach=39, elimination=6 |
+
+**Overall WR: 78.0%** (468W/97L/35S)
+
+## [2026-06-05T23:57:35Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.81 Instants=16
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 78.0% | 39 | 7 | 4 | 7.1 | approach=36, elimination=3 |
+| Lier, Disciple of the Drowned (real) | 78.0% | 39 | 9 | 2 | 7.6 | approach=35, elimination=4 |
+| Aragorn, King of Gondor (real) | 80.0% | 40 | 8 | 2 | 7.7 | approach=38, elimination=2 |
+| Tasigur, the Golden Fang (real) | 78.0% | 39 | 10 | 1 | 7.4 | approach=36, elimination=3 |
+| Cloud, Midgar Mercenary (real) | 78.0% | 39 | 8 | 3 | 7.8 | approach=36, elimination=3 |
+| Deadpool, Trading Card (real) | 84.0% | 42 | 5 | 3 | 7.3 | approach=37, elimination=5 |
+|  (real) | 88.0% | 44 | 4 | 2 | 7.3 | approach=43, elimination=1 |
+| Malcolm, Keen-Eyed Navigator (real) | 80.0% | 40 | 7 | 3 | 7.8 | approach=35, elimination=5 |
+| Slimefoot and Squee (real) | 74.0% | 37 | 10 | 3 | 8.1 | approach=30, elimination=7 |
+| Rograkh, Son of Rohgahh (real) | 70.0% | 35 | 11 | 4 | 7.4 | approach=33, elimination=2 |
+| Kenrith, the Returned King (real) | 76.0% | 38 | 10 | 2 | 7.8 | approach=34, elimination=4 |
+| The Jolly Balloon Man (real) | 84.0% | 42 | 3 | 5 | 7.4 | approach=41, elimination=1 |
+
+**Overall WR: 79.0%** (474W/92L/34S)
+
+## [2026-06-05T23:57:36Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.82 Instants=16
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 80.0% | 40 | 7 | 3 | 7.1 | approach=39, elimination=1 |
+| Lier, Disciple of the Drowned (real) | 82.0% | 41 | 6 | 3 | 7.4 | approach=35, elimination=6 |
+| Aragorn, King of Gondor (real) | 76.0% | 38 | 12 | 0 | 6.9 | approach=35, elimination=3 |
+| Tasigur, the Golden Fang (real) | 70.0% | 35 | 13 | 2 | 7.2 | approach=33, elimination=2 |
+| Cloud, Midgar Mercenary (real) | 80.0% | 40 | 7 | 3 | 7.2 | approach=37, elimination=3 |
+| Deadpool, Trading Card (real) | 80.0% | 40 | 10 | 0 | 7.9 | approach=37, elimination=3 |
+|  (real) | 82.0% | 41 | 7 | 2 | 7.4 | approach=38, elimination=3 |
+| Malcolm, Keen-Eyed Navigator (real) | 82.0% | 41 | 8 | 1 | 7.5 | approach=39, elimination=2 |
+| Slimefoot and Squee (real) | 82.0% | 41 | 8 | 1 | 7.4 | elimination=4, approach=37 |
+| Rograkh, Son of Rohgahh (real) | 76.0% | 38 | 8 | 4 | 7.4 | approach=36, elimination=2 |
+| Kenrith, the Returned King (real) | 74.0% | 37 | 13 | 0 | 7.6 | approach=28, elimination=9 |
+| The Jolly Balloon Man (real) | 80.0% | 40 | 8 | 2 | 7.8 | approach=36, elimination=4 |
+
+**Overall WR: 78.7%** (472W/107L/21S)
+
+## [2026-06-05T23:58:09Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.78 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 82.0% | 41 | 8 | 1 | 6.9 | approach=38, elimination=3 |
+| Lier, Disciple of the Drowned (real) | 74.0% | 37 | 10 | 3 | 7.5 | approach=24, elimination=13 |
+| Aragorn, King of Gondor (real) | 82.0% | 41 | 7 | 2 | 7.4 | approach=37, elimination=4 |
+| Tasigur, the Golden Fang (real) | 76.0% | 38 | 9 | 3 | 7.5 | elimination=6, approach=32 |
+| Cloud, Midgar Mercenary (real) | 88.0% | 44 | 5 | 1 | 7.5 | approach=37, elimination=7 |
+| Deadpool, Trading Card (real) | 82.0% | 41 | 7 | 2 | 7.1 | approach=36, elimination=5 |
+|  (real) | 80.0% | 40 | 9 | 1 | 7.4 | elimination=4, approach=36 |
+| Malcolm, Keen-Eyed Navigator (real) | 82.0% | 41 | 8 | 1 | 7.3 | approach=33, elimination=8 |
+| Slimefoot and Squee (real) | 80.0% | 40 | 7 | 3 | 7.2 | approach=33, elimination=7 |
+| Rograkh, Son of Rohgahh (real) | 90.0% | 45 | 5 | 0 | 7.0 | approach=37, elimination=8 |
+| Kenrith, the Returned King (real) | 88.0% | 44 | 4 | 2 | 7.7 | approach=36, elimination=8 |
+| The Jolly Balloon Man (real) | 78.0% | 39 | 8 | 3 | 7.5 | approach=32, elimination=7 |
+
+**Overall WR: 81.8%** (491W/87L/22S)
+
+## [2026-06-05T23:58:38Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=6 CMC=2.78 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 66.0% | 33 | 13 | 4 | 7.0 | elimination=5, approach=28 |
+| Lier, Disciple of the Drowned (real) | 66.0% | 33 | 11 | 6 | 7.2 | approach=28, elimination=5 |
+| Aragorn, King of Gondor (real) | 78.0% | 39 | 9 | 2 | 6.9 | approach=37, elimination=2 |
+| Tasigur, the Golden Fang (real) | 68.0% | 34 | 13 | 3 | 7.6 | elimination=4, approach=30 |
+| Cloud, Midgar Mercenary (real) | 80.0% | 40 | 9 | 1 | 7.2 | approach=36, elimination=4 |
+| Deadpool, Trading Card (real) | 80.0% | 40 | 9 | 1 | 7.0 | elimination=2, approach=38 |
+|  (real) | 78.0% | 39 | 7 | 4 | 7.2 | approach=33, elimination=6 |
+| Malcolm, Keen-Eyed Navigator (real) | 70.0% | 35 | 13 | 2 | 7.0 | approach=29, elimination=6 |
+| Slimefoot and Squee (real) | 74.0% | 37 | 10 | 3 | 7.4 | approach=35, elimination=2 |
+| Rograkh, Son of Rohgahh (real) | 76.0% | 38 | 10 | 2 | 7.4 | approach=33, elimination=5 |
+| Kenrith, the Returned King (real) | 80.0% | 40 | 8 | 2 | 7.2 | approach=35, elimination=5 |
+| The Jolly Balloon Man (real) | 70.0% | 35 | 13 | 2 | 7.3 | approach=30, elimination=5 |
+
+**Overall WR: 73.8%** (443W/125L/32S)
+
+## [2026-06-05T23:58:39Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.76 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 88.0% | 44 | 6 | 0 | 7.0 | approach=38, elimination=6 |
+| Lier, Disciple of the Drowned (real) | 82.0% | 41 | 6 | 3 | 7.4 | elimination=10, approach=31 |
+| Aragorn, King of Gondor (real) | 80.0% | 40 | 6 | 4 | 7.3 | elimination=12, approach=28 |
+| Tasigur, the Golden Fang (real) | 72.0% | 36 | 10 | 4 | 6.9 | approach=35, elimination=1 |
+| Cloud, Midgar Mercenary (real) | 82.0% | 41 | 8 | 1 | 7.5 | approach=36, elimination=5 |
+| Deadpool, Trading Card (real) | 82.0% | 41 | 6 | 3 | 6.8 | approach=37, elimination=4 |
+|  (real) | 74.0% | 37 | 11 | 2 | 7.4 | elimination=5, approach=32 |
+| Malcolm, Keen-Eyed Navigator (real) | 78.0% | 39 | 9 | 2 | 7.1 | approach=32, elimination=7 |
+| Slimefoot and Squee (real) | 74.0% | 37 | 8 | 5 | 7.2 | approach=28, elimination=9 |
+| Rograkh, Son of Rohgahh (real) | 90.0% | 45 | 5 | 0 | 7.1 | approach=39, elimination=6 |
+| Kenrith, the Returned King (real) | 76.0% | 38 | 8 | 4 | 7.3 | approach=32, elimination=6 |
+| The Jolly Balloon Man (real) | 82.0% | 41 | 7 | 2 | 6.9 | approach=34, elimination=7 |
+
+**Overall WR: 80.0%** (480W/90L/30S)
+
+## [2026-06-05T23:58:40Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.74 Instants=17
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 76.0% | 38 | 10 | 2 | 7.1 | approach=33, elimination=5 |
+| Lier, Disciple of the Drowned (real) | 80.0% | 40 | 8 | 2 | 7.4 | approach=30, elimination=10 |
+| Aragorn, King of Gondor (real) | 84.0% | 42 | 6 | 2 | 7.2 | approach=36, elimination=6 |
+| Tasigur, the Golden Fang (real) | 78.0% | 39 | 10 | 1 | 7.6 | approach=35, elimination=4 |
+| Cloud, Midgar Mercenary (real) | 78.0% | 39 | 7 | 4 | 7.5 | approach=31, elimination=8 |
+| Deadpool, Trading Card (real) | 82.0% | 41 | 7 | 2 | 7.3 | approach=32, elimination=9 |
+|  (real) | 82.0% | 41 | 6 | 3 | 7.2 | approach=37, elimination=4 |
+| Malcolm, Keen-Eyed Navigator (real) | 74.0% | 37 | 12 | 1 | 7.4 | approach=31, elimination=6 |
+| Slimefoot and Squee (real) | 78.0% | 39 | 11 | 0 | 7.4 | approach=35, elimination=4 |
+| Rograkh, Son of Rohgahh (real) | 78.0% | 39 | 10 | 1 | 7.4 | approach=34, elimination=5 |
+| Kenrith, the Returned King (real) | 76.0% | 38 | 11 | 1 | 7.6 | approach=30, elimination=8 |
+| The Jolly Balloon Man (real) | 80.0% | 40 | 9 | 1 | 7.2 | approach=37, elimination=3 |
+
+**Overall WR: 78.8%** (473W/107L/20S)
+
+## [2026-06-05T23:58:41Z] Battle Analyst v8 — Interactive Commander
+Games: 50 4-player | Deck: L=33 R=19 X=5 CMC=2.79 Instants=18
+Opponents: 12 (real)
+
+| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |
+|:---------|----:|-----:|-------:|-------:|------:|:--------|
+| Derevi, Empyrial Tactician (real) | 78.0% | 39 | 10 | 1 | 7.2 | approach=32, elimination=7 |
+| Lier, Disciple of the Drowned (real) | 80.0% | 40 | 9 | 1 | 7.5 | approach=27, elimination=13 |
+| Aragorn, King of Gondor (real) | 86.0% | 43 | 6 | 1 | 7.5 | approach=36, elimination=7 |
+| Tasigur, the Golden Fang (real) | 68.0% | 34 | 14 | 2 | 7.7 | elimination=5, approach=29 |
+| Cloud, Midgar Mercenary (real) | 78.0% | 39 | 8 | 3 | 7.8 | approach=33, elimination=6 |
+| Deadpool, Trading Card (real) | 84.0% | 42 | 7 | 1 | 7.3 | elimination=8, approach=34 |
+|  (real) | 88.0% | 44 | 3 | 3 | 7.5 | approach=35, elimination=9 |
+| Malcolm, Keen-Eyed Navigator (real) | 80.0% | 40 | 10 | 0 | 7.5 | elimination=9, approach=31 |
+| Slimefoot and Squee (real) | 84.0% | 42 | 6 | 2 | 7.0 | approach=35, elimination=7 |
+| Rograkh, Son of Rohgahh (real) | 88.0% | 44 | 5 | 1 | 7.1 | approach=39, elimination=5 |
+| Kenrith, the Returned King (real) | 86.0% | 43 | 5 | 2 | 7.6 | approach=35, elimination=8 |
+| The Jolly Balloon Man (real) | 76.0% | 38 | 11 | 1 | 7.7 | approach=31, elimination=7 |
+
+**Overall WR: 81.3%** (488W/94L/18S)
