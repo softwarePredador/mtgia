@@ -241,7 +241,7 @@ resposta explicitamente nao-produto.
   (`init`, observer de tela e `traceAsync` em smoke) foi separada como controle
   positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-04 15:00 UTC no checkout local `92281194`. `deck_matchups` e
+  em 2026-06-06 15:00 UTC no checkout local `bd5add18`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
   `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
   `/ai/ml-status`; `commander_reference_decks` e

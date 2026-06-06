@@ -28,7 +28,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    versionada com fonte/teste dedicado. Seeds Commander Reference seguem
    allowed-with-caution se permanecerem corpus/profile versionado, nao regra
    global de utilidade.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-04 15:00 UTC no checkout `92281194`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-06 15:00 UTC no checkout `bd5add18`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-06 03:00 UTC no checkout `fd4c2620`.
    `LifeCounterScreen` segue
@@ -637,7 +637,7 @@ presentes e sem chamador runtime confirmado.
     continua vazio ate haver contrato seguro;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-03 15:00 UTC: REVALIDADO no checkout `0ecce9f6`.** A rodada local focada em
+- **Status 2026-06-06 15:00 UTC: REVALIDADO no checkout `bd5add18`.** A rodada local focada em
   `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
   pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
   por ser tabela interna do migrador. Uma varredura de `CREATE TABLE` versus
