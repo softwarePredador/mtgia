@@ -243,7 +243,17 @@ class ManaPool:
     def total(self): return self.generic + self.white + self.blue + self.black + self.red + self.green + self.colorless
     def add_generic(self, n): self.generic += n
     def spend(self, amount):
-        self.generic = max(0, self.generic - amount)
+        if amount < 0 or amount > self.total():
+            return False
+        remaining = amount
+        for color in ("generic", "colorless", "white", "blue", "black", "red", "green"):
+            available = getattr(self, color)
+            used = min(available, remaining)
+            setattr(self, color, available - used)
+            remaining -= used
+            if remaining == 0:
+                break
+        return True
     def empty(self):
         self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = 0
 
@@ -291,14 +301,42 @@ class Player:
         self.eliminated = False
         self.win_reason = None
 
+    def refresh_mana_sources(self, turn=None):
+        """Untap mana sources once for this player's turn."""
+        self.mana_pool.empty()
+        lands = sum(
+            1
+            for c in self.battlefield
+            if c == "land" or (isinstance(c, dict) and c.get("effect") == "land")
+        )
+        ramp_mana = sum(
+            c.get("mana_produced", 1)
+            for c in self.battlefield
+            if isinstance(c, dict)
+            and c.get("effect") in ("ramp_permanent", "ramp_engine")
+        )
+        self.mana_pool.add_generic(lands + ramp_mana)
+        emit_replay_event(
+            "mana_refreshed",
+            player=self.name,
+            mana=self.available_mana(),
+            sources=lands + ramp_mana,
+            treasures=self.treasures,
+            turn=turn,
+        )
+
     def available_mana(self):
-        if self.mana_pool.total() == 0:
-            lands = sum(1 for c in self.battlefield if c == "land" or (isinstance(c, dict) and c.get("effect") == "land"))
-            ramp_mana = sum(c.get("mana_produced", 1) if isinstance(c, dict) else 1
-                            for c in self.battlefield
-                            if isinstance(c, dict) and c.get("effect") in ("ramp_permanent", "ramp_engine"))
-            self.mana_pool.add_generic(lands + ramp_mana + self.treasures)
-        return self.mana_pool.total()
+        return self.mana_pool.total() + self.treasures
+
+    def spend_mana(self, amount):
+        """Spend the current untapped-source budget, then Treasure tokens."""
+        if amount < 0 or amount > self.available_mana():
+            return False
+        from_pool = min(amount, self.mana_pool.total())
+        if from_pool and not self.mana_pool.spend(from_pool):
+            return False
+        self.treasures -= amount - from_pool
+        return True
 
     def is_alive(self): return self.life > 0
 
@@ -313,14 +351,45 @@ class Player:
                 and not c.get("tapped", False)]
 
     def has_counterspell(self):
-        """v8: Check if player has a counterspell available."""
-        return self.counters_available > 0
+        """Return whether a real counterspell in hand can currently be paid for."""
+        return bool(self.counterspell_cards(castable_only=True))
 
-    def use_counterspell(self):
-        if self.counters_available > 0:
-            self.counters_available -= 1
-            return True
-        return False
+    def counterspell_cards(self, castable_only=False):
+        counters = [
+            card
+            for card in self.hand
+            if get_card_effect(card).get("effect") == "counter"
+            or card.get("effect") == "counter"
+            or card.get("tag") == "counter"
+        ]
+        if castable_only:
+            counters = [
+                card for card in counters
+                if card.get("cmc", 0) <= self.available_mana()
+            ]
+        return counters
+
+    def use_counterspell(self, turn=None, target_card=None):
+        counters = self.counterspell_cards(castable_only=True)
+        if not counters:
+            self.counters_available = len(self.counterspell_cards())
+            return None
+        counter = min(counters, key=lambda card: card.get("cmc", 0))
+        cost = counter.get("cmc", 0)
+        if not self.spend_mana(cost):
+            return None
+        self.hand.remove(counter)
+        self.graveyard.append(counter)
+        self.counters_available = len(self.counterspell_cards())
+        emit_replay_event(
+            "spell_countered",
+            player=self.name,
+            counter=counter.get("name", "?"),
+            target=(target_card or {}).get("name", "?"),
+            cost=cost,
+            turn=turn,
+        )
+        return counter
 
 # ═══════════════════════════════════════════
 # STACK (v8)
@@ -355,6 +424,7 @@ class Stack:
             item = self.items.pop()
             if not item.countered:
                 return item
+            item.controller.graveyard.append(item.card)
         return None
     def top_is_threat(self):
         """Is the top spell threatening enough for opponents to counter?"""
@@ -439,6 +509,9 @@ def priority_round(active_player, all_players, stack, turn, rng):
     top_item = stack.items[-1] if stack.items else None
     if not top_item:
         return False
+    if top_item.countered:
+        stack.resolve_top()
+        return False
     score = threat_score(top_item.effect_data.get("effect", ""), top_item.card.get("name", ""),
                          top_item.controller, all_players, turn)
 
@@ -454,13 +527,13 @@ def priority_round(active_player, all_players, stack, turn, rng):
                     if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm"):
                         if player.available_mana() >= c["cmc"]:
                             player.hand.remove(c)
-                            player.mana_pool.spend(c["cmc"])
+                            player.spend_mana(c["cmc"])
                             apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
                             return True
         else:
             # v8.2: Smart counter decision based on threat score
-            if counter_worth(score, player, rng):
-                if player.use_counterspell():
+            if player != top_item.controller and counter_worth(score, player, rng):
+                if player.use_counterspell(turn, top_item.card):
                     stack.items[-1].countered = True
                     return True
 
@@ -474,49 +547,6 @@ def priority_round(active_player, all_players, stack, turn, rng):
             return True
         if check_sbas(all_players):
             return True
-    return False
-
-    # Turn order starting from active player
-    idx = all_players.index(active_player)
-    order = []
-    for i in range(len(all_players)):
-        order.append(all_players[(idx + i) % len(all_players)])
-
-    threat = stack.top_is_threat()
-
-    for player in order:
-        if not player.is_alive():
-            continue
-        if player.is_human:
-            # Lorehold: check if we have instant response
-            instants = [c for c in player.hand if is_instant(c) and player.available_mana() >= c["cmc"]]
-            if instants and threat:
-                # Use protection in response to threatening spell
-                for c in instants:
-                    eff = get_card_effect(c)
-                    if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm"):
-                        if player.available_mana() >= c["cmc"]:
-                            player.hand.remove(c)
-                            player.mana_pool.spend(c["cmc"])
-                            apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
-                            return True
-        else:
-            # Opponent AI: counter threatening spells if possible
-            if threat and player.has_counterspell():
-                if player.use_counterspell():
-                    stack.items[-1].countered = True
-                    return True
-
-    # No one responded — resolve top
-    item = stack.resolve_top()
-    if item:
-        controller = item.controller
-        opponents = [p for p in all_players if p != controller]
-        apply_effect_immediate(controller, opponents, item.card, turn, rng)
-        # Check SBAs after resolution
-        if check_sbas(all_players):
-            return True
-
     return False
 
 def threat_score(effect_name, card_name, controller, all_players, turn):
@@ -671,9 +701,9 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 cmd_copy["summoning_sick"] = not haste
                 cmd_copy["haste"] = haste
                 player.battlefield.append(cmd_copy)
-                player.mana_pool.spend(cost)
+                player.spend_mana(cost)
                 player.commander_tax += 2
-                mana -= cost
+                mana = player.available_mana()
 
     # 2. Ramp (main phase only)
     if is_main_phase:
@@ -681,16 +711,21 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
         for c in ramp_cards[:2]:
             if c in player.hand and c["cmc"] <= mana:
                 player.hand.remove(c)
-                mana -= c["cmc"]
+                player.spend_mana(c["cmc"])
                 eff = get_card_effect(c)
                 if eff.get("effect") == "ramp_ritual":
-                    mana += eff.get("mana_produced", 3)
+                    player.mana_pool.add_generic(eff.get("mana_produced", 3))
                     player.graveyard.append(c)
                 else:
                     player.battlefield.append(eff)
+                    player.mana_pool.add_generic(eff.get("mana_produced", 1))
+                mana = player.available_mana()
 
     # 3. Cast spells to stack
-    castable = [c for c in player.hand if c["cmc"] <= mana]
+    castable = [
+        c for c in player.hand
+        if c["cmc"] <= mana and get_card_effect(c).get("effect") != "counter"
+    ]
     # v8: Miracle check for Lorehold
     if player.is_human:
         lorehold_on_board = any(isinstance(c, dict) and c.get("name") == "Lorehold, the Historian" for c in player.battlefield)
@@ -712,7 +747,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
             c = wincons[0]
             if c in player.hand and c["cmc"] <= player.available_mana():
                 player.hand.remove(c)
-                player.mana_pool.spend(c["cmc"])
+                player.spend_mana(c["cmc"])
                 eff = get_card_effect(c)
                 stack.push(c, player, eff)
                 priority_round(player, all_players, stack, turn, rng)
@@ -734,7 +769,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
             if eff.get("effect") == "creature":
                 if not is_main_phase: continue  # creatures only in main phase
                 player.hand.remove(c)
-                player.mana_pool.spend(c["cmc"])
+                player.spend_mana(c["cmc"])
                 c_copy = dict(c)
                 c_copy["summoning_sick"] = True
                 c_copy["tapped"] = False
@@ -742,7 +777,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 played += 1
             else:
                 player.hand.remove(c)
-                player.mana_pool.spend(c["cmc"])
+                player.spend_mana(c["cmc"])
                 stack.push(c, player, eff)
                 played += 1
 
@@ -1038,7 +1073,7 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             c = rng.choice(removals)
             if c in opp.hand and opp.available_mana() >= c["cmc"]:
                 opp.hand.remove(c)
-                opp.mana_pool.spend(c["cmc"])
+                opp.spend_mana(c["cmc"])
                 # Remove one attacker
                 if attackers:
                     target = rng.choice(attackers)
@@ -1051,91 +1086,107 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
 
     if not attackers: return
 
-    # v8.1: Threat-based targeting
-    # If any opponent has approach_revealed, focus fire that player
-    archenemy = None
-    for opp in alive_defenders:
-        if attacker.name in opp.approach_revealed and opp.is_alive():
-            archenemy = opp
-            break
-    
-    if archenemy and attacker != archenemy:
-        target = archenemy  # FOCUS FIRE on Approach caster
-    elif attacker.is_human and attacker.threat_level > 30:
-        pass  # Lorehold is archenemy — opponents already focusing us
+    total_power = sum(a.get("power", 2) for a in attackers)
+    lethal_targets = [opp for opp in alive_defenders if opp.life <= total_power]
+    known_approach_casters = [
+        opp for opp in alive_defenders if opp.name in attacker.approach_revealed
+    ]
+
+    # Visible lethal is always the best attack. Known alternate-win threats follow.
+    if lethal_targets:
+        target = min(lethal_targets, key=lambda opp: opp.life)
+    elif known_approach_casters:
+        target = max(
+            known_approach_casters,
+            key=lambda opp: (opp.approach_count, opp.threat_level, -opp.life),
+        )
     elif attacker.strategy in ("aggro", "rush"):
         target = min(alive_defenders, key=lambda o: o.life)
     elif attacker.strategy == "control":
-        threat_targets = [o for o in alive_defenders if o.threat_level > 20]
-        target = threat_targets[0] if threat_targets else max(alive_defenders, key=lambda o: o.life)
+        target = max(
+            alive_defenders,
+            key=lambda opp: (
+                opp.threat_level,
+                sum(
+                    card.get("power", 0)
+                    for card in opp.battlefield
+                    if isinstance(card, dict) and card.get("effect") == "creature"
+                ),
+                -opp.life,
+            ),
+        )
     else:
         target = max(alive_defenders, key=lambda o: o.life)
 
-    # Declare blockers
-    blockers = []
+    # Only the attacked player can block, and each blocker is assigned once.
+    block_assignments = []
     for a in attackers:
-        for opp in opponents:
-            if opp.is_alive() and opp != attacker:
-                available = [c for c in opp.creatures_for_blocking() if c not in blockers]
-                if available and rng.random() < 0.5:
-                    bc = [c for c in available if not c.get("flying") or a.get("flying")]
-                    if bc:
-                        blockers.append(rng.choice(bc))
-                        break
-        if len(blockers) >= len(attackers): break
+        assigned = [blocker for _, blocker in block_assignments]
+        available = [
+            blocker
+            for blocker in target.creatures_for_blocking()
+            if blocker not in assigned
+            and (
+                not a.get("flying")
+                or blocker.get("flying")
+                or blocker.get("reach")
+            )
+        ]
+        if available and rng.random() < 0.5:
+            block_assignments.append((a, rng.choice(available)))
 
     emit_replay_event(
         "combat",
         attacker=attacker.name,
         target=target.name,
         attackers=len(attackers),
-        blockers=len(blockers),
-        total_power=sum(a.get("power", 2) for a in attackers),
+        blockers=len(block_assignments),
+        total_power=total_power,
         turn=turn,
     )
 
-    # ── FIRST STRIKE DAMAGE (v8: FIX — 1x per step, not 2x then 1x = 3x) ──
+    def stat(card, key, fallback):
+        try:
+            return int(card.get(key, fallback))
+        except (TypeError, ValueError):
+            return fallback
+
+    def deal_player_damage(creature):
+        damage = stat(creature, "power", 2)
+        target.life -= damage
+        if creature.get("lifelink"):
+            attacker.life = min(40, attacker.life + damage)
+        if creature.get("is_commander") and creature.get("owner") == attacker.name:
+            attacker.commander_damage[target.name] += damage
+
+    # First strike attackers deal once here. Only double strike attacks again later.
     first_strikers = [a for a in attackers if a.get("first_strike") or a.get("double_strike")]
-    if first_strikers:
-        for a in first_strikers:
-            a_pwr = a.get("power", 2)
-            blocked = False
-            for b in blockers[:]:
-                if b in target.battlefield:
-                    if a_pwr >= b.get("power", 2):
-                        target.battlefield.remove(b)
-                        target.graveyard.append(b)
-                        blockers.remove(b)
-                    blocked = True
-                    break
-            if not blocked:
-                target.life -= a_pwr
-                # v8: lifelink
-                if a.get("lifelink"):
-                    attacker.life = min(40, attacker.life + a_pwr)
-                if a.get("is_commander") and a.get("owner") == attacker.name:
-                    attacker.commander_damage[target.name] += a_pwr
+    for a in first_strikers:
+        blocker = next((b for assigned, b in block_assignments if assigned is a), None)
+        if blocker is None:
+            deal_player_damage(a)
+        elif blocker in target.battlefield and stat(a, "power", 2) >= stat(blocker, "toughness", stat(blocker, "power", 2)):
+            target.battlefield.remove(blocker)
+            target.graveyard.append(blocker)
 
-    blockers = [b for b in blockers if b in target.battlefield]
-
-    # ── REGULAR COMBAT DAMAGE ──
+    # Regular combat damage is simultaneous for each surviving attacker/blocker pair.
     for a in attackers:
-        a_pwr = a.get("power", 2)
-        blocked = False
-        for b in blockers[:]:
-            if b in target.battlefield:
-                if a_pwr >= b.get("power", 2):
-                    target.battlefield.remove(b)
-                    target.graveyard.append(b)
-                    blockers.remove(b)
-                blocked = True
-                break
-        if not blocked:
-            target.life -= a_pwr
-            if a.get("lifelink"):
-                attacker.life = min(40, attacker.life + a_pwr)
-            if a.get("is_commander") and a.get("owner") == attacker.name:
-                attacker.commander_damage[target.name] += a_pwr
+        if a.get("first_strike") and not a.get("double_strike"):
+            continue
+        blocker = next((b for assigned, b in block_assignments if assigned is a), None)
+        if blocker is None:
+            deal_player_damage(a)
+            continue
+        if blocker not in target.battlefield:
+            continue
+        attacker_dies = stat(blocker, "power", 2) >= stat(a, "toughness", stat(a, "power", 2))
+        blocker_dies = stat(a, "power", 2) >= stat(blocker, "toughness", stat(blocker, "power", 2))
+        if attacker_dies and a in attacker.battlefield:
+            attacker.battlefield.remove(a)
+            attacker.graveyard.append(a)
+        if blocker_dies and blocker in target.battlefield:
+            target.battlefield.remove(blocker)
+            target.graveyard.append(blocker)
 
     # Check for commander damage kill
     for name, dmg in attacker.commander_damage.items():
@@ -1155,7 +1206,6 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         hand=len(player.hand),
         board=len(player.battlefield),
     )
-    player.mana_pool.empty()
     player.lands_played_this_turn = 0
     player.indestructible = False
 
@@ -1167,6 +1217,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.phased_out = []
     player.life_cant_change = False
     player.protection_from_everything = False
+    player.refresh_mana_sources(turn)
 
     # ── UPKEEP (v8.3: The One Ring burden = draw 1 per turn if on board) ──
     for c in player.battlefield:
@@ -1192,7 +1243,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             mana = player.available_mana()
             if mana >= miracle_cost and lorehold_on_board:
                 player.hand.remove(last_drawn)
-                player.mana_pool.spend(miracle_cost)
+                player.spend_mana(miracle_cost)
                 stack.push(last_drawn, player, get_card_effect(last_drawn))
                 while not stack.empty():
                     priority_round(player, all_players, stack, turn, rng)
@@ -1204,6 +1255,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         player.hand.remove(lands_in_hand[0])
         player.battlefield.append("land")
         player.lands_played_this_turn += 1
+        player.mana_pool.add_generic(1)
     cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
     if game_winner(all_players):
         return
@@ -1247,7 +1299,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
             if opp.available_mana() >= c["cmc"]:
                 opp.hand.remove(c)
-                opp.mana_pool.spend(c["cmc"])
+                opp.spend_mana(c["cmc"])
                 apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
 
 

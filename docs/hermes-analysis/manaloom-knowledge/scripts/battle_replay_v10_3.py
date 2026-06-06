@@ -38,6 +38,16 @@ def main():
                         **data
                     )
                 )
+            elif event == "spell_countered":
+                replay.write(
+                    "  COUNTER {player}: {counter} countered {target} "
+                    "(cost={cost})\n".format(**data)
+                )
+            elif event == "mana_refreshed":
+                replay.write(
+                    "  MANA {player}: {mana} available "
+                    "({sources} sources, {treasures} treasures)\n".format(**data)
+                )
             elif event == "combat":
                 replay.write(
                     "  COMBAT {attacker} -> {target}: "
