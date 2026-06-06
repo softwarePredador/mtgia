@@ -29,14 +29,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    nao como regra global de utilidade.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-04 15:00 UTC no checkout `92281194`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-05 03:00 UTC no checkout `5fc3cafb`.
+   na rotacao local Codex de 2026-06-06 03:00 UTC no checkout `fd4c2620`.
    `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
    `DeckCard` continua testado mas sem import/chamada na listagem real;
    `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
    nao tem import nem chamada para `enter()`/`exit()`; `AuthVisualShell`,
    `AuthBrandHeader` e `AuthFormSurface` aparecem somente no proprio arquivo
-   `auth_visual_shell.dart`.
+   `auth_visual_shell.dart`. Controles positivos desta rodada descartaram
+   `LotusLifeCounterScreen` e `DeckProgressIndicator`; a varredura textual
+   ampla nao foi usada para acusar DTOs/helpers locais sem evidencia adicional.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
    2026-06-05 05:30 UTC no checkout `b9ee4c80`. Deck analysis prefere
    `card_function_tags`; o contexto de optimize e o validator/role delta carregam

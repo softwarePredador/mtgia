@@ -1,7 +1,168 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-05 23:00 UTC
-> Rotacao: `module-coherence-server-lib-routes-app-lib`
+> Atualizacao local Codex: 2026-06-06 03:00 UTC
+> Rotacao: `classes-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Classes not used - revalidacao 2026-06-06 03:00 UTC
+
+Escopo desta rodada: somente classes sem uso runtime confirmado. Nao foi feita
+auditoria ampla de funcoes sem chamada, imports/ciclos, tabelas PostgreSQL,
+duplicacao geral ou coerencia entre camadas fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `fd4c2620`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 170.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 100.
+- Imports quebrados: 1.
+
+Limitacao para esta rotacao: o auditor textual cobre apenas `server/lib` e
+`server/routes`. Ele inventaria classes, mas nao monta grafo de uso, nao cobre
+`app/lib` e nao distingue widget runtime de teste. A execucao reescreveu
+`STRUCTURE_AUDIT.md` em formato de inventario gerado; essa mutacao automatica
+foi descartada para preservar o historico manual, e somente os numeros acima e
+a triagem focada abaixo foram incorporados.
+
+### Metodo manual focado
+
+- `rg` para declaracoes, imports e chamadas de construtor dos candidatos
+  historicos de classes sem uso em `app/lib`, `app/test` e
+  `app/integration_test`.
+- Busca separada em `app/lib` para diferenciar uso runtime de uso test-only.
+- Varredura textual ampla de classes publicas em `app/lib`, `server/lib` e
+  `server/routes` usada somente como triagem auxiliar. Itens encontrados apenas
+  no proprio arquivo nao foram reportados sem leitura/grep adicional, porque
+  muitos sao DTOs ou classes auxiliares vivas dentro do mesmo arquivo.
+
+### Achados revalidados
+
+#### P1/P2 - `LifeCounterScreen` segue legado/test-only; rota viva usa Lotus
+
+- **Classe:** `app/lib/features/home/life_counter_screen.dart:61` declara
+  `LifeCounterScreen`, com construtor em `:66`.
+- **Busca runtime:** `rg -n "\bLifeCounterScreen\b" app/lib` retornou somente
+  o proprio `life_counter_screen.dart`; nao ha import ou builder runtime desse
+  widget em `app/lib`.
+- **Controle positivo:** `app/lib/main.dart:54` importa
+  `features/home/lotus_life_counter_screen.dart`, e a rota do contador em
+  `app/lib/main.dart:283` usa `const LotusLifeCounterScreen()`.
+- **Teste/documentacao:** `app/test/features/home/life_counter_screen_test.dart:9`
+  importa o arquivo legado e `:36` instancia `LifeCounterScreen`; tambem ha uso
+  test-only em `app/test/features/home/life_counter_clone_proof_test.dart:10`
+  e `:277`. `app/test/README.md:137` afirma que o caminho vivo segue em
+  `LotusLifeCounterScreen`, e `app/test/README.md:149` diz que o caminho oficial
+  nao e mais `LifeCounterScreen`.
+- **Por que parece sem uso runtime:** o unico ponto app-facing mapeado para o
+  contador e a rota de `main.dart`, que instancia Lotus; as referencias restantes
+  ao widget antigo estao em teste ou no proprio arquivo.
+- **O que valida:** remover a tela legada junto com os testes dependentes, ou
+  reclassifica-la explicitamente como fixture/benchmark test-only.
+- **O que falsifica:** uma rota, feature flag ou chamada em `app/lib` que
+  importe `life_counter_screen.dart` e instancie `LifeCounterScreen`.
+
+#### P2 - `DeckCard` continua sem uso na listagem runtime
+
+- **Classe:** `app/lib/features/decks/widgets/deck_card.dart:17` declara
+  `DeckCard`, com construtor em `:22`.
+- **Busca runtime:** `rg -n "\bDeckCard\b" app/lib` retornou somente a propria
+  definicao; nao ha import de `deck_card.dart` em `app/lib`.
+- **Test-only:** `app/test/features/decks/widgets/deck_card_test.dart:4`
+  importa `deck_card.dart` e `:9` instancia `DeckCard`;
+  `app/test/features/decks/widgets/deck_card_overflow_test.dart:4` importa o
+  mesmo arquivo e `:47` instancia `DeckCard`.
+- **Controle de listagem:** `app/lib/features/decks/screens/deck_list_screen.dart:1`-`:12`
+  importa tema, widgets genericos e modelos/providers, mas nao importa
+  `deck_card.dart`; a tela usa seus proprios widgets privados, como
+  `_EmptyDeckCard` em `app/lib/features/decks/screens/deck_list_screen.dart:1770`
+  e `:1823`.
+- **Por que parece sem uso runtime:** o componente publico existe com testes,
+  mas a listagem real nao o importa nem constroi.
+- **O que valida:** religar `DeckCard` na listagem real ou remover o widget e os
+  testes dedicados se a listagem atual substituiu o componente.
+- **O que falsifica:** import runtime de `features/decks/widgets/deck_card.dart`
+  e construcao de `DeckCard(...)` fora de teste.
+
+#### P2 - `DeckProgressChip` nao tem chamada de construtor
+
+- **Classe:** `app/lib/features/decks/widgets/deck_progress_indicator.dart:286`
+  declara `DeckProgressChip`, com construtor em `:292`.
+- **Busca:** `rg -n "DeckProgressChip\(" app/lib app/test app/integration_test`
+  retornou somente o construtor em `deck_progress_indicator.dart:292`.
+- **Controle positivo:** `DeckProgressIndicator` permanece vivo: declarado em
+  `app/lib/features/decks/widgets/deck_progress_indicator.dart:14` e chamado em
+  `app/lib/features/decks/widgets/deck_details_overview_tab.dart:328` e
+  `app/lib/features/decks/screens/deck_details_screen.dart:403`.
+- **Por que parece sem uso runtime:** o arquivo contem um indicador vivo, mas o
+  chip compacto exportado nao e instanciado por app nem testes.
+- **O que valida:** substituir usos locais por `DeckProgressChip` se ele ainda
+  for o componente compacto desejado, ou remover a classe se o design consolidou
+  em `DeckProgressIndicator`.
+- **O que falsifica:** qualquer chamada `DeckProgressChip(...)` em app/test ou
+  codigo runtime.
+
+#### P2 - `LotusPresentationMode` segue sem integracao com Lotus
+
+- **Classe:** `app/lib/features/home/lotus/lotus_presentation_mode.dart:4`
+  declara `LotusPresentationMode`.
+- **Metodos:** `enter()` em `app/lib/features/home/lotus/lotus_presentation_mode.dart:15`
+  e `exit()` em `:26`.
+- **Busca:** `rg` por `LotusPresentationMode`, `enter()` e `exit()` em
+  `app/lib/features/home`, `app/test/features/home` e `app/integration_test`
+  retornou somente a propria classe/metodos.
+- **Por que parece sem uso runtime:** a tela Lotus viva nao importa nem chama o
+  helper de presentation mode, entao o modo nunca e acionado.
+- **O que valida:** chamar `LotusPresentationMode.enter/exit` no ciclo de vida
+  da tela Lotus, com teste de plataforma/fallback, ou remover o helper.
+- **O que falsifica:** import e chamada real do helper em
+  `lotus_life_counter_screen.dart` ou modulo runtime equivalente.
+
+#### P2 - Shell visual de auth esta isolado e nao e usado por login/register
+
+- **Classes:** `app/lib/features/auth/widgets/auth_visual_shell.dart:5`
+  declara `AuthVisualShell`, `:105` declara `AuthBrandHeader` e `:196` declara
+  `AuthFormSurface`.
+- **Busca:** `rg -n "\bAuthVisualShell\(|\bAuthBrandHeader\(|\bAuthFormSurface\(" app/lib app/test app/integration_test`
+  retornou somente os construtores no proprio arquivo.
+- **Controles de telas:** `app/lib/features/auth/screens/login_screen.dart:1`-`:5`
+  e `app/lib/features/auth/screens/register_screen.dart:1`-`:5` importam
+  `app_theme.dart` e `auth_provider.dart`, mas nao importam
+  `auth_visual_shell.dart`.
+- **Por que parece sem uso runtime:** o shell visual foi criado como componente
+  publico, mas as telas de auth continuam montando seu proprio layout.
+- **O que valida:** migrar login/register/splash para o shell, ou remover o
+  arquivo se ele foi abandonado durante o polish visual.
+- **O que falsifica:** construcao real de `AuthVisualShell`, `AuthBrandHeader`
+  ou `AuthFormSurface` fora do proprio arquivo.
+
+### Controles positivos descartados
+
+- `LotusLifeCounterScreen` nao e classe sem uso: `app/lib/main.dart:283`
+  instancia o widget na rota do contador e ha cobertura extensa em testes e
+  integration tests.
+- `DeckProgressIndicator` nao e classe sem uso: alem da declaracao em
+  `deck_progress_indicator.dart`, ha chamadas runtime em
+  `deck_details_overview_tab.dart:328` e `deck_details_screen.dart:403`.
+- A varredura textual ampla encontrou varias classes publicas referenciadas
+  apenas no proprio arquivo, mas elas foram descartadas nesta rodada quando a
+  leitura indicou DTO/model/helper local vivo dentro do mesmo modulo. Sem uso
+  externo nao e evidencia suficiente de codigo morto para esses casos.
 
 ## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib` — revalidacao 2026-06-05 23:00 UTC
 
