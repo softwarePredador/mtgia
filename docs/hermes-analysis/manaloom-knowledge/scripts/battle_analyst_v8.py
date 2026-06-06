@@ -316,6 +316,19 @@ class StackItem:
         self.effect_data = effect_data
         self.countered = False
 
+
+def is_land(card):
+    """v10.2: Reliable land detection for PG-imported cards."""
+    if not isinstance(card, dict):
+        return card == "land" or str(card) == "land"
+    if card.get("effect") == "land": return True
+    if card.get("tag") == "land": return True
+    if card.get("role") == "land": return True
+    if "Land" in card.get("type_line", ""): return True
+    name = card.get("name", "")
+    if name in ("Plains","Island","Swamp","Mountain","Forest","Wastes"): return True
+    return False
+
 class Stack:
     def __init__(self): self.items = []
     def push(self, card, controller, effect_data):
@@ -344,7 +357,7 @@ def play_mulligan(player, rng):
     player.hand = player.draw(7, rng)
     keep = mulligan_decision(player.hand)
     mulligan_count = 0
-    while not keep and mulligan_count < 3:
+    while not keep[0] and mulligan_count < 3:  # v10.2 fix
         mulligan_count += 1
         player.library = player.hand + player.library
         player.hand = []
@@ -359,7 +372,7 @@ def play_mulligan(player, rng):
     return mulligan_count
 
 def mulligan_decision(hand):
-    lands = sum(1 for c in hand if c.get("tag") == "land" or c.get("effect") == "land" or "Land" in c.get("type_line", ""))
+    lands = sum(1 for c in hand if is_land(c))  # v10.2
     return (2 <= lands <= 5), 7
 
 def check_sbas(all_players):
@@ -478,8 +491,8 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
     # ── INSTANT WIN ──
     if effect_name == "approach":
         if controller.approach_count >= 1:
-            return 100  # 2nd cast = instant win, MUST counter
-        return 70  # 1st cast = strong threat, sets up win
+            return 100  # MUST counter (2nd cast = instant win)
+        return 85  # v10.2: was 70 — higher counter priority
 
     # ── MASSIVE BOARD IMPACT ──
     if effect_name == "board_wipe":
@@ -1112,7 +1125,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── PRECOMBAT MAIN ──
     total_mana = player.available_mana()
-    lands_in_hand = [c for c in player.hand if c.get("effect") == "land" or c.get("tag") == "land" or "Land" in c.get("type_line", "")]
+    lands_in_hand = [c for c in player.hand if is_land(c)]  # v10.2
     if lands_in_hand and player.lands_played_this_turn < player.max_lands_per_turn:
         player.hand.remove(lands_in_hand[0])
         player.battlefield.append("land")
@@ -1201,8 +1214,10 @@ def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list,
             play_turn_v8(player, others, all_players, turn, rng, stack)
             if not player.is_alive():
                 continue
-            if player.approach_count >= 2:
-                return ("win" if player.is_human else "loss"), turn, "approach"
+            # v10.2: check ANY player won via Approach
+            for p in all_players:
+                if p.approach_count >= 2:
+                    return ("win" if lorehold.approach_count >= 2 else "loss"), turn, "approach"
             if check_sbas(all_players):
                 break
 
@@ -1255,8 +1270,10 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
             play_turn_v8(player, others, all_players, turn, rng, stack)
             if not player.is_alive():
                 continue
-            if player.approach_count >= 2:
-                return ("win" if player.is_human else "loss"), turn, "approach"
+            # v10.2: check ANY player won via Approach
+            for p in all_players:
+                if p.approach_count >= 2:
+                    return ("win" if lorehold.approach_count >= 2 else "loss"), turn, "approach"
             if check_sbas(all_players):
                 break
 
@@ -1281,6 +1298,8 @@ def load_learned_opponents():
         conn.close()
         decks = []
         for row in rows:
+            if len(str(row['card_list'] or '')) < 500:
+                continue  # v10.2: skip junk
             try:
                 card_data = json.loads(row["card_list"]) if row["card_list"] else []
             except:

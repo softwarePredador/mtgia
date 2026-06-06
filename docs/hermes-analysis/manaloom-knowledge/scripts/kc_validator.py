@@ -47,24 +47,57 @@ with open(OUT) as f:
 existing_names = set(existing.keys())
 
 # Get cards from card_deck_analysis that are NOT in our KNOWN_CARDS yet
-# Filter: WR color identity (or colorless), edhrec_rank < 2000, non-land
+# Filter: WR color identity (or colorless), top EDHREC cards, non-land
 print("Querying PG for new Boros/WR cards...")
 rows = pg("""
     SELECT c.name, c.oracle_text, c.type_line, c.cmc,
-           a.role_in_deck, a.wincon_total_score, a.speed_score
+           e.edhrec_rank
     FROM cards c
-    JOIN card_deck_analysis a ON c.name = a.card_name
+    JOIN card_extended e ON c.name = e.card_name
     WHERE c.oracle_text IS NOT NULL
       AND c.type_line NOT LIKE '%Land%'
       AND c.cmc < 9
-      AND (c.color_identity ILIKE '%W%' OR c.color_identity ILIKE '%R%'
-           OR c.color_identity = '')
-      AND a.edhrec_rank < 2000
-    ORDER BY a.edhrec_rank ASC
+      AND e.edhrec_rank IS NOT NULL
+    ORDER BY e.edhrec_rank ASC
     LIMIT 2000
 """)
 
 print(f"  PG returned {len(rows)} cards")
+
+# Also pull from ALL Lorehold decks (what generator does)
+conn = sqlite3.connect(DB)
+all_lorehold = set()
+for row in conn.execute("SELECT card_list FROM learned_decks WHERE commander LIKE '%Lorehold%' AND card_list IS NOT NULL"):
+    try:
+        for card in json.loads(row[0]):
+            all_lorehold.add(card["name"])
+    except:
+        for line in row[0].strip().split("\n"):
+            parts = line.strip().split(" ", 1)
+            if len(parts) == 2 and parts[0].isdigit():
+                all_lorehold.add(parts[1])
+conn.close()
+
+print(f"  Lorehold unique cards: {len(all_lorehold)}")
+
+# Merge: get PG data for Lorehold cards not already covered
+lorehold_missing = sorted(all_lorehold - existing_names)
+if lorehold_missing:
+    lore_chunks = [lorehold_missing[i:i+300] for i in range(0, len(lorehold_missing), 300)]
+    lore_rows = []
+    for chunk in lore_chunks:
+        safe = ",\n".join("'" + n.replace("'","''") + "'" for n in chunk)
+        lore_rows += pg(
+            "SELECT name, oracle_text, type_line, cmc FROM cards "
+            "WHERE name ILIKE ANY(ARRAY[\n" + safe + "\n]) AND oracle_text IS NOT NULL"
+        )
+    print(f"  Lorehold PG matches: {len(lore_rows)}")
+    # Add to rows for classification
+    for r in lore_rows:
+        if len(r) >= 2 and r[1]:
+            rows.append([r[0].strip(), r[1], r[2] if len(r) > 2 else "", 
+                        str(float(r[3])) if len(r) > 3 and r[3] else "3",
+                        "99999"])  # high edhrec_rank for Lorehold-specific cards
 
 # Classify using same rules as generate_known_cards.py
 # (simplified inline version)

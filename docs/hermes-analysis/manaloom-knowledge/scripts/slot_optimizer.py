@@ -19,7 +19,7 @@ BATTLE = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scri
 KC_JSON = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json'
 LOCK_FILE = '/tmp/optimizer_v3.lock'
 
-GAMES_QUICK = 25   # Phase 1: per-candidate tests
+GAMES_QUICK = 10   # Phase 1: per-candidate tests (fast scan of 1856 cards)
 GAMES_FULL = 50    # Phase 2 & 3: confirmation tests
 
 # ── Lock ──
@@ -37,25 +37,32 @@ try:
     # ── Load deck ──
     deck = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6 AND is_commander=0").fetchall()
     cmdr = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6 AND is_commander=1").fetchone()
+    if not cmdr:
+        # Fallback: find by name and set flag
+        cmdr = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6 AND card_name='Lorehold, the Historian'").fetchone()
+        if cmdr:
+            conn.execute("UPDATE deck_cards SET is_commander=1 WHERE deck_id=6 AND card_name='Lorehold, the Historian'")
+            conn.commit()
+            cmdr = list(cmdr)
+            cmdr[5] = 1  # set is_commander flag
+            cmdr = tuple(cmdr)
+    all_cards = list(deck) + ([cmdr] if cmdr else [])
     deck_names = set(c[0] for c in deck)
     
     # ── Load KNOWN_CARDS ──
     with open(KC_JSON) as f:
         kc = json.load(f)
     
-    # ── Load all Lorehold candidates ──
-    all_lorehold = set()
-    for row in conn.execute("SELECT card_list FROM learned_decks WHERE commander LIKE '%Lorehold%' AND card_list IS NOT NULL"):
-        try:
-            for card in json.loads(row[0]):
-                all_lorehold.add(card["name"])
-        except:
-            for line in row[0].strip().split("\n"):
-                parts = line.strip().split(" ", 1)
-                if len(parts) == 2 and parts[0].isdigit():
-                    all_lorehold.add(parts[1])
-    
+    # ── Load ALL candidates from KNOWN_CARDS JSON (1955 entries) ──
     basics = {'Plains','Mountain','Island','Swamp','Forest','Wastes'}
+    candidates = []
+    for name, entry in sorted(kc.items()):
+        if name in deck_names or name in basics:
+            continue
+        eff = entry.get('effect', 'unknown')
+        if eff in ('creature', 'unknown'):
+            continue
+        candidates.append((name, entry))
     
     # ── EFFECT → CATEGORY MAPPING ──
     EFFECT_TO_CATEGORY = {
@@ -121,18 +128,12 @@ try:
     
     # Get all candidates with KNOWN_CARDS, not in deck
     candidates_by_cat = defaultdict(list)
-    for name in sorted(all_lorehold):
-        if name in deck_names or name in basics or name not in kc:
-            continue
-        entry = kc[name]
+    for name, entry in candidates:
         eff = entry.get('effect', 'unknown')
         cat = EFFECT_TO_CATEGORY.get(eff, 'unknown')
         if cat == 'unknown':
             continue
         cmc = entry.get('cmc', 3)
-        # Filter unplayable: CMC > 8, or land-like but too slow
-        if cmc > 8 and cat not in ('wincon',):
-            continue
         candidates_by_cat[cat].append((name, cmc, entry))
     
     for cat, cands in sorted(candidates_by_cat.items()):
@@ -236,7 +237,7 @@ try:
                     if mc: wins, losses, draws = int(mc.group(1)), int(mc.group(2)), int(mc.group(3))
                     break
             
-            delta = wr - 81.8  # fixed baseline
+            delta = wr - 75.0  # v9 baseline
             total_g = GAMES_QUICK * 12
             
             # Save
@@ -254,7 +255,7 @@ try:
             # RESTORE — always!
             conn.execute("DELETE FROM deck_cards WHERE deck_id=6 AND card_name=?", (name,))
             # Re-insert removed card from original deck data
-            restore = [(n, q, c, t, tl, ic) for n, q, c, t, tl, ic in deck + [cmdr] if n == remove_card]
+            restore = [(n, q, c, t, tl, ic) for n, q, c, t, tl, ic in all_cards if n == remove_card]
             if restore:
                 rn, rq, rc, rt, rtl, ric = restore[0]
                 conn.execute("INSERT OR REPLACE INTO deck_cards (deck_id,card_name,quantity,cmc,functional_tag,type_line,is_commander) VALUES (6,?,?,?,?,?,?)",
