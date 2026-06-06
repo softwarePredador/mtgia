@@ -1,23 +1,25 @@
 # Game Changer Research Report — Lacunas e Recomendações
 
-<!-- DB_HASH: 36deb589c5b7d9644eb36c94b43bf254 -->
+<!-- DB_HASH: f232206364f9cb96846041e19fe33929 -->
 > Gerado automaticamente pelo cron `manaloom-gamechanger-research`.
 > Objetivo: identificar lacunas de explicação, categoria ou detecção nos 53 Game Changers.
 > Este relatório é **read-only** — não altera DB nem produto.
 
-**Data:** 2026-06-04 (execução #7 — 1 nova lacuna de qualidade de dados)
+**Data:** 2026-06-06 (execução #8 — hash rotacionou, sem novas lacunas estruturais)
 **Fonte:** `scripts/knowledge.db` (53/53 GCs preenchidos com `why_game_changer`)
 **Detectados pelo ManaLoom:** 24/53 (45%) — **sem mudança desde execução #2**
 **Não detectados:** 29/53 (55%) → 26 efetivamente não-detectados + 1 falso positivo + 1 falso negativo (+ 1 Underworld Breach detectado via sim mas bracket='other')
-**Hash DB estrutural:** `36deb589c5b7d9644eb36c94b43bf254` (idêntico à execução #6 — sem mudança de métricas)
+**Hash DB estrutural:** `f232206364f9cb96846041e19fe33929` (rotacionou do hash anterior `36deb589c5b7d9644eb36c94b43bf254` — causa: Tergrid `oracle_text` mudou de SQL NULL para string vazia `''`, sem alteração de métricas de detecção)
 
 ---
 
 ## Resumo Executivo
 
-A sétima execução confirma que o hash estrutural permanece inalterado desde a execução #6 (`36deb589c5b7d9644eb36c94b43bf254`). As 10 lacunas de detecção/categorização persistem sem mudanças. **🆕 1 nova lacuna de qualidade de dados foi identificada:** Tergrid tem `oracle_text=NULL`, o que impede COMPLETAMENTE qualquer heurística baseada em texto de oracle de detectá-la. Esta é uma lacuna de completude de dados, não de lógica de detecção.
+A oitava execução registra rotação de hash estrutural (`36deb58...` → `f23220...`), causada exclusivamente pela mudança no campo `oracle_text` de Tergrid: de SQL `NULL` para string vazia (`''`). **Nenhuma métrica de detecção (`manaloom_detected`), categorização (`manaloom_bracket_category`, `impact_category`), ou distribuição estrutural foi alterada.** As 12 lacunas documentadas na execução #7 persistem integralmente. Nenhuma lacuna nova foi identificada.
 
-| Tipo de Lacuna | Execução #6 | Execução #7 | Mudança |
+🆕 **Nota sobre Tergrid:** A skill `manaloom-mtg-domain` (v2.4.1) afirma que Tergrid foi "RESOLVIDO (exec #8, 2026-06-04): `oracle_text` preenchido via reimportação Scryfall fuzzy search." **O DB atual contradiz esta afirmação:** `oracle_text` é string vazia (`''`), não texto de oracle funcional. A "resolução" apenas converteu NULL → `''`, sem popular o texto real. Tergrid permanece **invisível para heurísticas** baseadas em oracle.
+
+| Tipo de Lacuna | Execução #7 | Execução #8 | Mudança |
 |:---------------|:-----------:|:-----------:|:-------|
 | Categoria incorreta (erro de classificação) | 12 | 12 | — |
 | Falso positivo de detecção (`det=1` indevido) | 1 | 1 | — (Field of the Dead persiste) |
@@ -25,14 +27,12 @@ A sétima execução confirma que o hash estrutural permanece inalterado desde a
 | Colapso de categoria `other` com `det=1` | 16 | 16 | — (12 tutores + 2 combo + 2 value_engine) |
 | Schema dual (`impact_category` vs `bracket_category`) | 53 | 53 | — todas as 53 cartas têm divergência |
 | Heurística de código faltando | 3 | 3 | — (fast mana lands persistem) |
-| 🆕 GC com `oracle_text=NULL` | 0 | 1 | **NOVA** — Tergrid sem oracle (bloqueia heurísticas) |
-| 🆕 GCs sem `price_usd` | 0 | 8 | **NOVA** — 8 cartas sem preço (5 RL + 3 outras) |
-
-**Hash estrutural permanece `36deb589...`** — sem alterações em `manaloom_detected`, `manaloom_bracket_category`, ou `impact_category` desde a execução #6. As novidades são de completude de dados, não de lógica de detecção.
+| GC com `oracle_text` vazio | 1 (NULL) | 1 (`''`) | 🟡 Mudança cosmética: NULL → `''` (ainda não-funcional) |
+| GCs sem `price_usd` | 8 | 8 | — (todas RL cards) |
 
 ---
 
-## Lacunas Detectadas (Top 12 — Estado Atual, confirmado execução #7)
+## Lacunas Detectadas (Top 12 — Estado Atual, confirmado execução #8)
 
 ### Lacuna 1 (PERSISTE): 16 Cartas Detectadas com `bracket_category='other'` — Colapso de Categoria
 
@@ -45,7 +45,7 @@ A sétima execução confirma que o hash estrutural permanece inalterado desde a
 | **Risco de falso positivo** | 🔴 Alto — consumidores do DB (`bracket_category`) recebem `other` quando deveriam receber `tutor`, `infiniteCombo`, ou `freeInteraction` |
 | **Possível regra futura** | Re-popular `manaloom_bracket_category` baseado na heurística que gerou `det=1`: `search your library` → `tutor`, `rather than pay`/`without paying` → `freeInteraction`, `extra turn` → `extraTurns`, `infiniteCombo list` → `infiniteCombo`, `fastMana list` → `fastMana` |
 
-**Detalhamento dos 16 (confirmado execução #6):**
+**Detalhamento dos 16 (confirmado execução #8):**
 
 | Grupo | Cartas | Heurística de Detecção | Categoria Esperada |
 |:------|:-------|:----------------------|:-------------------|
@@ -171,7 +171,7 @@ A sétima execução confirma que o hash estrutural permanece inalterado desde a
 
 ### 🟡 Lacuna 10 (PERSISTE): `impact_category` com Erros de Classificação Funcional
 
-Cartas cujo `impact_category` não reflete sua função primária no formato (confirmado execução #6):
+Cartas cujo `impact_category` não reflete sua função primária no formato (confirmado execução #8):
 
 | Carta | `impact_category` atual | Categoria sugerida | Justificativa |
 |:------|:------------------------|:-------------------|:--------------|
@@ -183,24 +183,24 @@ Cartas cujo `impact_category` não reflete sua função primária no formato (co
 
 ---
 
-### 🆕 Lacuna 11 (NOVA — Execução #7): Tergrid — `oracle_text=NULL` Bloqueia Toda Heurística
+### 🆕🟡 Lacuna 11 (ATUALIZADA — Execução #8): Tergrid — `oracle_text` Vazio Bloqueia Toda Heurística
 
 | Campo | Valor |
 |:------|:------|
 | **Carta** | Tergrid, God of Fright // Tergrid's Lantern |
-| **Problema** | `oracle_text` está NULL no DB |
+| **Problema** | `oracle_text` é string vazia (`''`) — anteriormente era SQL `NULL` na execução #7 |
 | **Impacto** | 8/10 — NENHUMA heurística baseada em oracle pode detectar esta carta |
-| **DB** | `oracle_text=NULL`, `manaloom_detected=0`, `manaloom_bracket_category='other'` |
-| **Evidência** | Query `SELECT oracle_text FROM game_changers WHERE card_name LIKE '%Tergrid%'` retorna NULL. O `why_game_changer` está preenchido (1018 chars) e o `notes` também (394 chars), confirmando que a carta foi pesquisada. Mas sem `oracle_text`, Tergrid é **completamente invisível** para qualquer heurística funcional: `search your library`, `without paying`, `extra turn`, `fastMana list`, `_knownInfiniteComboPieces` — todas dependem de `oracle_text`. |
+| **DB** | `oracle_text=''`, `manaloom_detected=0`, `manaloom_bracket_category='other'` |
+| **Evidência** | Query `SELECT oracle_text, LENGTH(oracle_text) FROM game_changers WHERE card_name LIKE '%Tergrid%'` retorna `''` (len=0). O `why_game_changer` está preenchido (483 chars) e o `notes` também (394 chars), confirmando que a carta foi pesquisada. Mas sem `oracle_text`, Tergrid é **completamente invisível** para qualquer heurística funcional: `search your library`, `without paying`, `extra turn`, `fastMana list`, `_knownInfiniteComboPieces` — todas dependem de `oracle_text`. |
 | **Risco de falso positivo** | 🔴 **Alto** — A carta existe, é GC oficial, tem `why_game_changer` detalhado, mas o sistema NUNCA poderá detectá-la por heurística porque o campo mais fundamental está vazio. |
-| **Possível regra futura** | 1. Imediato: corrigir `oracle_text` via Scryfall API. Nome fuzzy: "Tergrid, God of Fright" (buscar o lado front da MDFC). Oracle real: front side = "Menace. Whenever an opponent sacrifices a nontoken permanent or discards a permanent card, you may put that card onto the battlefield under your control from that player's graveyard." + back side = "{T}: Target opponent loses 3 life unless they sacrifice a nonland permanent or discard a card. {3}{B}: Untap Tergrid's Lantern." 2. Adicionar à lista curada de GCs por nome (fallback para quando oracle falta). |
-| **Nota** | O `notes` já menciona: "EDHREC API indisponivel (slug mismatch)." Isso explica o `oracle_text` NULL — a busca no Scryfall pelo nome MDFC completo falhou. |
+| **Possível regra futura** | 1. Imediato: reimportar `oracle_text` real via Scryfall API. Buscar pelo nome fuzzy "Tergrid, God of Fright" (frente da MDFC, sem `//`). Oracle real: frente = "Menace. Whenever an opponent sacrifices a nontoken permanent or discards a permanent card, you may put that card onto the battlefield under your control from that player's graveyard." + verso = "{T}: Target opponent loses 3 life unless they sacrifice a nonland permanent or discard a card. {3}{B}: Untap Tergrid's Lantern." 2. Adicionar à lista curada de GCs por nome (fallback para quando oracle falta). |
+| **Nota** | O `notes` menciona: "EDHREC API indisponivel (slug mismatch)." Isso explica o `oracle_text` vazio — a busca no Scryfall pelo nome MDFC completo falhou. A skill `manaloom-mtg-domain` (v2.4.1) afirma que Tergrid foi "RESOLVIDO (exec #8, 2026-06-04)", mas o DB mostra `oracle_text=''` — a "resolução" apenas converteu NULL → `''` sem popular o texto real. |
 
-**Diagnóstico:** Esta é uma lacuna de **importação de dados**, não de lógica. O importador que popula `game_changers` provavelmente usou `scryfall.com/cards/named?fuzzy=Tergrid,+God+of+Fright+//+Tergrid's+Lantern` e o Scryfall não encontrou correspondência exata para o nome com `//`. O campo `oracle_text` ficou NULL como consequência. A carta tem `why_game_changer` (escrito manualmente ou via análise separada) mas sem o oracle que permite heurísticas automáticas.
+**Diagnóstico:** Esta é uma lacuna de **importação de dados**, não de lógica. A skill afirma resolução mas o DB contradiz. O campo passou de NULL para string vazia (mudança cosmética) sem ganho funcional. A reimportação via Scryfall precisa ser refeita corretamente, buscando pelo nome da face frontal ("Tergrid, God of Fright") sem o `//`.
 
 ---
 
-### 🆕 Lacuna 12 (NOVA — Execução #7): 8 Cartas com `price_usd=NULL` — Dados de Mercado Incompletos
+### 🟡 Lacuna 12 (PERSISTE): 8 Cartas com `price_usd=NULL` — Dados de Mercado Incompletos
 
 | Campo | Valor |
 |:------|:------|
@@ -231,7 +231,7 @@ O `edh_bracket_policy.dart` atual cobre apenas 5 categorias + `gameChanger`. Par
 
 ---
 
-## Distribuição de Categorias (Estado Atual)
+## Distribuição de Categorias (Estado Atual — Execução #8)
 
 ### `manaloom_bracket_category` (5 valores, 42 = `other`)
 - `other`: 42 (79%) — **incluindo 16 detectados com categoria colapsada**
@@ -253,7 +253,7 @@ O `edh_bracket_policy.dart` atual cobre apenas 5 categorias + `gameChanger`. Par
 
 ---
 
-## Métricas de Qualidade (Execução #7)
+## Métricas de Qualidade (Execução #8)
 
 | Métrica | Valor | Tendência |
 |:--------|:-----:|:----------|
@@ -264,8 +264,8 @@ O `edh_bracket_policy.dart` atual cobre apenas 5 categorias + `gameChanger`. Par
 | `bracket_category='other'` com `det=1` | 16/53 (30%) | → Colapso de categoria persiste |
 | `impact_category` com erro funcional | 5/53 (9%) | → 5 erros conhecidos persistem |
 | Categorias faltantes no código Dart | 7 | → Sem mudança |
-| 🆕 `oracle_text IS NULL` | 1/53 (2%) | **NOVA** — Tergrid sem oracle |
-| 🆕 `price_usd IS NULL` | 8/53 (15%) | **NOVA** — todas RL cards |
+| `oracle_text` vazio (NULL ou `''`) | 1/53 (2%) | 🟡 NULL → `''` (cosmético, ainda não-funcional) |
+| `price_usd IS NULL` | 8/53 (15%) | → Todas RL cards |
 
 ---
 
@@ -289,7 +289,9 @@ O `edh_bracket_policy.dart` atual cobre apenas 5 categorias + `gameChanger`. Par
 
 ## Conclusão
 
-**Execução #7:** Hash estrutural inalterado desde #6 (`36deb589c5b7d9644eb36c94b43bf254`). As 10 lacunas de detecção/categorização persistem sem alteração. **2 novas lacunas de completude de dados** foram identificadas: Tergrid com `oracle_text=NULL` (impede heuristicas) e 8 cartas com `price_usd=NULL` (todas Reserved List).
+**Execução #8:** Hash estrutural rotacionou (`36deb58...` → `f23220...`) devido à mudança cosmética no `oracle_text` de Tergrid (SQL NULL → string vazia `''`). **Nenhuma métrica de detecção ou categorização foi alterada.** As 12 lacunas documentadas na execução #7 persistem integralmente. Nenhuma lacuna nova foi identificada.
+
+🆕 **Falsa resolução detectada:** A skill `manaloom-mtg-domain` (v2.4.1) afirma que Tergrid foi "RESOLVIDO" com `oracle_text` preenchido, mas o DB contradiz — `oracle_text` permanece vazio (apenas mudou de NULL para `''`). A reimportação via Scryfall não populou o texto real.
 
 **Próximos passos recomendados (externos ao cron):**
 1. 🔴 Corrigir `det=1 → 0` e `bracket_category='fastMana' → 'other'` para Field of the Dead
@@ -297,7 +299,8 @@ O `edh_bracket_policy.dart` atual cobre apenas 5 categorias + `gameChanger`. Par
 3. Re-popular `manaloom_bracket_category` para os 16 detectados com `other` baseado na heurística que os detectou
 4. Adicionar Underworld Breach à lista `_knownInfiniteComboPieces`
 5. Corrigir 5 `impact_category` errados (Opposition Agent, Smothering Tithe, Farewell, Force of Will, Field of the Dead)
-6. 🆕 **Corrigir `oracle_text` de Tergrid** — reimportar via Scryfall API usando nome fuzzy sem `//`
-7. 🆕 **Distinguir `price_usd=NULL` como RESERVED_LIST** para as 8 cartas afetadas
+6. 🔴 **Reimportar `oracle_text` de Tergrid corretamente** — buscar Scryfall pelo nome da face frontal "Tergrid, God of Fright" (sem `//`). A "resolução" anterior só converteu NULL → `''`.
+7. Distinguir `price_usd=NULL` como `RESERVED_LIST` para as 8 cartas afetadas
+8. Atualizar skill `manaloom-mtg-domain` — remover afirmação de que Tergrid foi resolvido, já que `oracle_text` permanece vazio
 
-**O cron deve continuar em modo [SILENT] para execuções futuras enquanto o hash estrutural permanecer o mesmo.** Se o hash mudar, reexecutar análise completa. As lacunas 11 e 12 (dados) não afetam o hash estrutural e devem ser verificadas a cada execução independentemente do hash.
+**O cron deve continuar em modo [SILENT] para execuções futuras enquanto o hash estrutural permanecer o mesmo.** Se o hash mudar (por razões não-cosméticas), reexecutar análise completa.
