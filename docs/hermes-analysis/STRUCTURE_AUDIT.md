@@ -1,7 +1,195 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-06 15:00 UTC
-> Rotacao: `postgresql-tables-not-used`
+> Atualizacao local Codex: 2026-06-06 19:00 UTC
+> Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Duplicated or similar logic — revalidacao 2026-06-06 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi feita auditoria ampla de classes sem uso, funcoes sem chamada,
+imports/ciclos, tabelas PostgreSQL sem uso ou coerencia entre camadas fora
+deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `2f283904`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 170.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 100.
+- Imports quebrados: 1.
+
+Limitacao para esta rotacao: o auditor detecta duplicidade por nomes de funcoes
+publicas e texto, sem comparar corpo, sem entender funcoes privadas e sem
+classificar se duas copias divergiram por contrato intencional. A execucao
+tambem reescreve `STRUCTURE_AUDIT.md` quando o arquivo nao tem o marcador de
+merge esperado; essa mutacao automatica foi descartada para preservar o
+historico manual, e somente os numeros acima mais os achados focados abaixo
+foram incorporados.
+
+### Metodo manual focado
+
+- Revalidacao por `rg` dos candidatos historicos de duplicacao em
+  `server/lib`, `server/routes` e `app/lib`.
+- Leitura das faixas exatas dos helpers duplicados para separar wrappers finos,
+  duplicidade aceitavel e drift real.
+- Checagem de controles positivos: `server/routes/ai/optimize/index.dart`
+  ainda contem wrappers como `resolveOptimizeArchetype` em `:56`-`:61`, mas
+  delega para `optimize_support`, portanto nao foi contado como corpo duplicado
+  independente.
+
+### Achados revalidados
+
+#### P1 — `resolveOptimizeArchetype` segue duplicado com contratos diferentes
+
+- **Funcoes:** `resolveOptimizeArchetype` em
+  `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
+  `server/lib/ai/optimize_runtime_support.dart:3369`-`:3389`.
+- **Divergencia concreta:** a versao de `deck_state_analysis` aceita
+  `requestedArchetype` nullable, trata `general` e `tempo` como genericos e
+  retorna `detected` quando `requested` esta vazio. A versao de
+  `optimize_runtime_support` exige string, trata `unknown` como detected vazio,
+  considera `goodstuff` generico e so promove detected especifico para
+  `aggro/control/combo/stax/tribal`.
+- **Por que parece duplicacao de risco:** ambas respondem qual arquetipo efetivo
+  deve guiar optimize/rebuild, mas `optimize_request_support.dart:289`-`:294`
+  usa a versao de optimize enquanto `rebuild_guided_service.dart:171` usa a
+  versao de deck state.
+- **O que valida:** unificar em helper unico com testes para vazio/null,
+  `unknown`, `general`, `tempo`, `goodstuff` e detected especifico.
+- **O que falsifica:** contrato documentado e coberto mostrando que optimize e
+  rebuild devem divergir nesses casos.
+
+#### P1 — Heuristicas contextuais de roles existem em dois classificadores vivos
+
+- **Funcoes duplicadas:** `_looksLikeWincon`, `_looksLikeComboPiece`,
+  `_looksLikeEngine`, `_looksLikePayoff` e `_looksLikeEnabler` em
+  `server/lib/ai/functional_card_tags.dart:859`-`:906` e
+  `server/lib/ai/optimization_functional_roles.dart:370`-`:398`.
+- **Divergencia concreta:** `functional_card_tags.dart` mistura `oracle_text`
+  com nome normalizado (`blood artist`, `isochron scepter`,
+  `dramatic reversal`, `thassa's oracle`, `greaves`, `boots`) e tags multiplas;
+  `optimization_functional_roles.dart` usa outro conjunto de padroes de texto e
+  retorna role escalar para optimize.
+- **Por que parece duplicacao de risco:** deck analysis e optimize podem
+  classificar a mesma carta de forma diferente, especialmente em cartas
+  multi-role ou dependentes de nome conhecido.
+- **O que valida:** adapter unico que aceite nome, texto, tipo,
+  `functional_tags` persistidas e `semantic_tags_v2`, retornando roles
+  multiplos e `primary_role`.
+- **O que falsifica:** teste de contrato provando que as duas familias devem
+  responder perguntas diferentes e que essa diferenca e esperada pelo produto.
+
+#### P1/P2 — Terrenos basicos e snow basics continuam com quatro variantes
+
+- **Helpers:** `server/lib/ai/optimize_runtime_support.dart:4184`-`:4197`,
+  `server/lib/generated_deck_validation_service.dart:752`-`:763`,
+  `server/lib/meta/meta_deck_reference_support.dart:890`-`:903` e
+  `server/routes/ai/commander-reference/index.dart:621`-`:628`.
+- **Divergencia concreta:** optimize usa nomes com hifen (`snow-covered plains`);
+  generated deck validation aceita prefixo `startsWith('snow-covered ...')`;
+  meta reference usa nomes normalizados com espaco (`snow covered plains`);
+  commander-reference reconhece apenas basics nao snow.
+- **Por que parece duplicacao de risco:** validacao, optimize, meta reference e
+  Commander Reference podem divergir sobre a mesma carta basica/snow quando o
+  normalizador muda ou quando snow basics entram no corpus.
+- **O que valida:** helper compartilhado com normalizacao unica para hifen/espaco
+  e teste cobrindo `Wastes` e os cinco snow basics.
+- **O que falsifica:** evidencia de que Commander Reference deve excluir snow
+  basics por regra de dominio, com teste dedicado.
+
+#### P2 — Trust social e marketplace repetem SQL/serializer de reputacao
+
+- **Copias em trades:** `_trustStatsSql`, `_responseTimeSql`,
+  `_shippingTimeSql` e `_buildTrustInsight` em
+  `server/routes/trades/index.dart:557`-`:635` e
+  `server/routes/trades/[id]/index.dart:260`-`:338`.
+- **Copia em marketplace:** LATERALs inline equivalentes em
+  `server/routes/community/marketplace/index.dart:131`-`:166` e serializer
+  `_buildTrustInsight` em `:316`-`:348`.
+- **Por que parece duplicacao de risco:** listagem de trades, detalhe de trade e
+  marketplace expõem o mesmo shape `trust`, mas qualquer mudanca de sinal,
+  periodo, thresholds ou campos precisa ser copiada em tres lugares.
+- **O que valida:** helper SQL/serializer compartilhado com testes para os tres
+  consumidores manterem o mesmo shape.
+- **O que falsifica:** contrato app-facing demonstrando que marketplace deve
+  calcular trust de forma diferente de trades.
+
+#### P2 — Request id e log de payload invalido repetem o mesmo padrao social
+
+- **Helpers repetidos:** `_requestId` em
+  `server/routes/trades/index.dart:330`-`:336`,
+  `server/routes/trades/[id]/status.dart:260`-`:266`,
+  `server/routes/trades/[id]/respond.dart:154`-`:160`,
+  `server/routes/trades/[id]/messages.dart:228`-`:234`,
+  `server/routes/conversations/[id]/messages.dart:247`-`:252` e
+  `server/routes/users/[id]/follow/index.dart:97`-`:103`.
+- **Log duplicado:** `_logInvalidPayload` repete a leitura defensiva de `userId`
+  e o formato `[social_write] invalid_payload` nos mesmos handlers de trades e
+  conversations.
+- **Controle positivo:** `server/lib/request_trace.dart` ja expoe
+  `getRequestTrace` e `tryGetRequestId`, mas a rodada de funcoes sem chamada
+  confirmou que esses wrappers seguem sem consumidor runtime.
+- **O que valida:** adotar helper comum para request id e invalid-payload log,
+  mantendo endpoint/id como parametros.
+- **O que falsifica:** decisao de manter logs completamente locais por rota,
+  coberta por testes/snapshots de observabilidade.
+
+#### P2 — `condition` de carta tem allow-list repetida e comportamento divergente
+
+- **Deck mutations:** `server/routes/decks/[id]/cards/index.dart:398`-`:404`,
+  `server/routes/decks/[id]/cards/set/index.dart:245`-`:249` e
+  `server/routes/decks/[id]/index.dart:520`-`:524` normalizam valores invalidos
+  para `NM`.
+- **Binder mutations:** `server/routes/binder/index.dart:258`-`:280` e
+  `server/routes/binder/[id]/index.dart:339`-`:347` rejeitam valores invalidos
+  com 400.
+- **Marketplace filter:** `server/routes/community/marketplace/index.dart:39`-`:43`
+  aplica filtro apenas se a condicao estiver na allow-list, ignorando invalido.
+- **Por que parece duplicacao de risco:** a mesma taxonomia `NM/LP/MP/HP/DMG`
+  aparece em varios dominios, mas o contrato de erro/default muda por endpoint.
+- **O que valida:** policy/helper comum que separe `parse`, `defaultToNm`,
+  `rejectInvalid` e `ignoreInvalidFilter`.
+- **O que falsifica:** contrato atualizado provando que cada comportamento
+  divergente e intencional e testado.
+
+#### P2/P3 — Helpers de tipo principal e CMC continuam duplicados em rotas
+
+- **Copias:** `getMainType` e `calculateCmc` em
+  `server/routes/decks/[id]/index.dart:405`-`:435` e
+  `server/routes/community/decks/[id].dart:91`-`:117`; variante
+  `_calculateCmc` em `server/routes/decks/[id]/simulate/index.dart:171`-`:186`.
+- **Divergencia concreta:** as duas primeiras copias sao praticamente iguais; a
+  variante de simulate assume `String manaCost` nao nullable e compara `symbol`
+  com `X` sem `toUpperCase()`.
+- **O que valida:** helper compartilhado de mana/type com teste de simbolos
+  numericos, `X`, hibridos e custo vazio/null.
+- **O que falsifica:** migrar estes calculos para coluna persistida/servico
+  externo e remover os helpers locais.
+
+### Resultado desta revalidacao
+
+Os achados historicos de duplicacao/similaridade continuam abertos no checkout
+`2f283904`, sem novo cluster de maior prioridade confirmado. O risco pratico
+segue concentrado em duplicacoes que podem alterar decisao de IA/deck
+(`resolveOptimizeArchetype`, roles funcionais, basics/snow basics) e em
+duplicacoes app-facing que podem gerar resposta inconsistente por endpoint
+(`trust`, request/log, `condition`, CMC/tipo).
 
 ## Rodada focada: PostgreSQL tables not used — revalidacao 2026-06-06 15:00 UTC
 
