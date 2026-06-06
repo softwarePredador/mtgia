@@ -26,6 +26,19 @@ DB = "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/
 KNOWLEDGE_DIR = "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge"
 LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
 
+REPLAY_EVENT_HANDLER = None
+
+
+def emit_replay_event(event, **data):
+    """Emit optional structured replay events without affecting simulation."""
+    if REPLAY_EVENT_HANDLER is None:
+        return
+    try:
+        REPLAY_EVENT_HANDLER(event, data)
+    except Exception:
+        pass
+
+
 # ═══════════════════════════════════════════
 # DECK LOADING
 # ═══════════════════════════════════════════
@@ -275,6 +288,8 @@ class Player:
         self.counters_available = 0
         self.threat_level = 0  # v8.1: archenemy tracking
         self.approach_revealed = []  # v8.1: opponents who know approach was cast
+        self.eliminated = False
+        self.win_reason = None
 
     def available_mana(self):
         if self.mana_pool.total() == 0:
@@ -286,6 +301,8 @@ class Player:
         return self.mana_pool.total()
 
     def is_alive(self): return self.life > 0
+
+    def has_won(self): return self.win_reason is not None
 
     def untapped_creatures(self):
         return [c for c in self.battlefield if isinstance(c, dict) and c.get("effect") == "creature"
@@ -378,19 +395,36 @@ def mulligan_decision(hand):
 def check_sbas(all_players):
     """v8: State-Based Actions after each spell resolution."""
     for p in all_players:
-        if p.life <= 0:
-            return True  # player died
+        if p.life <= 0 and not p.eliminated:
+            p.eliminated = True
+            emit_replay_event("player_eliminated", player=p.name, reason="life_zero")
+            return True
+        if p.eliminated:
+            continue
         for name, dmg in p.commander_damage.items():
             if dmg >= 21:
                 # Find the player who took this damage and kill them
                 for op in all_players:
-                    if op.name == name:
+                    if op.name == name and not op.eliminated:
                         op.life = 0
+                        op.eliminated = True
+                        emit_replay_event(
+                            "player_eliminated",
+                            player=op.name,
+                            reason="commander_damage",
+                        )
                         return True
-        if not p.library and not p.hand:
+        if not p.library and not p.hand and not p.eliminated:
             p.life = 0
+            p.eliminated = True
+            emit_replay_event("player_eliminated", player=p.name, reason="deck_out")
             return True
     return False
+
+
+def game_winner(all_players):
+    return next((player for player in all_players if player.has_won()), None)
+
 
 def priority_round(active_player, all_players, stack, turn, rng):
     if stack.empty():
@@ -436,6 +470,8 @@ def priority_round(active_player, all_players, stack, turn, rng):
         controller = item.controller
         opponents = [p for p in all_players if p != controller]
         apply_effect_immediate(controller, opponents, item.card, turn, rng)
+        if game_winner(all_players):
+            return True
         if check_sbas(all_players):
             return True
     return False
@@ -680,8 +716,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 eff = get_card_effect(c)
                 stack.push(c, player, eff)
                 priority_round(player, all_players, stack, turn, rng)
+                if game_winner(all_players):
+                    return
                 while not stack.empty():
                     priority_round(player, all_players, stack, turn, rng)
+                    if game_winner(all_players):
+                        return
                 return
 
     # Other spells: 2 per phase max
@@ -718,11 +758,21 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
 # Resolve stack
     while not stack.empty():
         priority_round(player, all_players, stack, turn, rng)
+        if game_winner(all_players):
+            return
 
 def apply_effect_immediate(player, opponents, card, turn, rng):
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = get_card_effect(card)
     effect = effect_data.get("effect", "unknown")
+    emit_replay_event(
+        "spell_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        cmc=card.get("cmc", 0),
+        effect=effect,
+        turn=turn,
+    )
 
     if effect == "land": pass
     elif effect == "ramp_permanent": player.battlefield.append(effect_data)
@@ -801,6 +851,13 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             if player.name not in opp.approach_revealed:
                 opp.approach_revealed.append(player.name)
         if player.approach_count >= 2:
+            player.win_reason = "approach"
+            emit_replay_event(
+                "game_won",
+                player=player.name,
+                reason="approach",
+                turn=turn,
+            )
             player.graveyard.append(card)
             return
         if len(player.library) >= 7:
@@ -1027,6 +1084,16 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
                         break
         if len(blockers) >= len(attackers): break
 
+    emit_replay_event(
+        "combat",
+        attacker=attacker.name,
+        target=target.name,
+        attackers=len(attackers),
+        blockers=len(blockers),
+        total_power=sum(a.get("power", 2) for a in attackers),
+        turn=turn,
+    )
+
     # ── FIRST STRIKE DAMAGE (v8: FIX — 1x per step, not 2x then 1x = 3x) ──
     first_strikers = [a for a in attackers if a.get("first_strike") or a.get("double_strike")]
     if first_strikers:
@@ -1078,6 +1145,16 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
 
 def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     """v8: Full turn with priority windows between phases."""
+    if game_winner(all_players):
+        return
+    emit_replay_event(
+        "turn_start",
+        player=player.name,
+        turn=turn,
+        life=player.life,
+        hand=len(player.hand),
+        board=len(player.battlefield),
+    )
     player.mana_pool.empty()
     player.lands_played_this_turn = 0
     player.indestructible = False
@@ -1097,15 +1174,12 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             for _ in range(sum(1 for _ in player.battlefield if isinstance(_, dict) and _.get("effect") == "draw_engine")):
                 player.draw(1, rng)
 
-        # ── DRAW ──
-        player.draw(1, rng)
-        if not player.library and not player.hand:
-            player.life = 0; return
-
-        # v8.3: Track if Approach is in hand or was drawn
-        for c in player.hand:
-            if c.get("name") == "Approach of the Second Sun":
-                approach_found = True
+    # ── DRAW ──
+    player.draw(1, rng)
+    if not player.library and not player.hand:
+        player.life = 0
+        check_sbas(all_players)
+        return
 
     # v8: MIRACLE check
     if player.is_human and player.hand:
@@ -1131,6 +1205,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         player.battlefield.append("land")
         player.lands_played_this_turn += 1
     cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
+    if game_winner(all_players):
+        return
     if check_sbas(all_players): return
 
     # ── TRIGGER: Smothering Tithe on opponent draws (during draw step above) ──
@@ -1146,11 +1222,15 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # ── COMBAT ──
     if turn > 1:
         combat_phase_v8(player, opponents, all_players, turn, rng, stack)
+        if game_winner(all_players):
+            return
         if check_sbas(all_players): return
 
     # ── POSTCOMBAT MAIN ──
     total_mana = player.available_mana()
     cast_spells_v8(player, opponents, all_players, turn, "postcombat_main", stack, rng)
+    if game_winner(all_players):
+        return
     if check_sbas(all_players): return
 
 
@@ -1172,10 +1252,23 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
 
     # ── CLEANUP ──
+    discarded = 0
     while len(player.hand) > 7:
         worst = max(player.hand, key=lambda c: c.get("cmc", 0))
         player.hand.remove(worst)
         player.graveyard.append(worst)
+        discarded += 1
+
+    emit_replay_event(
+        "turn_end",
+        player=player.name,
+        turn=turn,
+        life=player.life,
+        hand=len(player.hand),
+        board=len(player.battlefield),
+        graveyard=len(player.graveyard),
+        discarded=discarded,
+    )
 
     # v8: SBA check at end of turn
     check_sbas(all_players)
@@ -1214,10 +1307,10 @@ def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list,
             play_turn_v8(player, others, all_players, turn, rng, stack)
             if not player.is_alive():
                 continue
-            # v10.2: check ANY player won via Approach
+            # Check any explicit alternate-win state.
             for p in all_players:
-                if p.approach_count >= 2:
-                    return ("win" if lorehold.approach_count >= 2 else "loss"), turn, "approach"
+                if p.has_won():
+                    return ("win" if p is lorehold else "loss"), turn, p.win_reason
             if check_sbas(all_players):
                 break
 
@@ -1270,10 +1363,10 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
             play_turn_v8(player, others, all_players, turn, rng, stack)
             if not player.is_alive():
                 continue
-            # v10.2: check ANY player won via Approach
+            # Check any explicit alternate-win state.
             for p in all_players:
-                if p.approach_count >= 2:
-                    return ("win" if lorehold.approach_count >= 2 else "loss"), turn, "approach"
+                if p.has_won():
+                    return ("win" if p is lorehold else "loss"), turn, p.win_reason
             if check_sbas(all_players):
                 break
 
