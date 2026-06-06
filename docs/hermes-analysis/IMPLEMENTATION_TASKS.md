@@ -5,8 +5,11 @@
 > **Metodo:** Cruzamento do conhecimento MTG (VALIDATOR_LOG 2026-06-02 — pipeline integrity crisis + CMC corruption, GAME_CHANGERS.md — 53 GCs com double-counting detectado, SCOUT_LOG — Lorehold maturity, TAG_ACCURACY — payoff 35% accuracy) com codigo Dart (edh_bracket_policy, optimization_quality_gate, optimization_functional_roles, goldfish_simulator)
 > **Base de conhecimento:** VALIDATOR_LOG (deck rebuild + 37 CMCs corrompidos + 20 unknown tags + only 3 removals), GAME_CHANGERS (53 GCs com 23 double-tagged), tag_accuracy (payoff 35%, enabler 50%), SCOUT_LOG (deck em maturidade persistente)
 > **Novas tasks nesta execucao:** 5 (1xP1, 4xP2) — Game Changer double-counting fix, payoff tag accuracy improvement, contextual enabler/payoff heuristics, goldfish CMC validation hardening, GC list sync mechanism
+> **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
 
 ### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
+
+**Status em 2026-06-06:** RESOLVIDO. `tagCardForBracket()` retorna exclusivamente `{BracketCategory.gameChanger}` para cartas da lista oficial antes de avaliar fast mana/tutor/free interaction/infinite combo. `countBracketCategories()` agora inicializa `gameChanger` e os testes focados cobrem a regressao.
 
 **Conhecimento MTG:** Os Game Changers oficiais sao uma categoria UNICA que consome slots do budget de GC. Uma carta como Mana Vault DEVE consumir APENAS o slot de `gameChanger`, nao o slot de `fastMana` tambem. O bracket system oficial (mtgcommander.net) define que Game Changers sao contados separadamente das outras categorias. O entendimento correto e: se uma carta e Game Changer, ela conta EXCLUSIVAMENTE contra o limite de Game Changers do bracket, independentemente de sua funcao mecanica (fast mana, tutor, etc.).
 

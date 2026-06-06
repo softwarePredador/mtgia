@@ -98,6 +98,12 @@ BracketTagResult tagCardForBracket({
   final t = typeLine.toLowerCase();
   final o = oracleText.toLowerCase();
 
+  // Game Changers oficiais consomem apenas o budget de Game Changer.
+  // Eles nao devem consumir tambem fast mana/tutor/free interaction/etc.
+  if (_gameChangerNames.contains(n)) {
+    return BracketTagResult({BracketCategory.gameChanger});
+  }
+
   if (_fastManaNames.contains(n)) {
     categories.add(BracketCategory.fastMana);
   }
@@ -119,7 +125,9 @@ BracketTagResult tagCardForBracket({
 
   // Free interaction / custo alternativo (heurística)
   final hasRather = o.contains('rather than pay');
-  final hasExile = o.contains('exile a') || o.contains('exile two') || o.contains('exile one');
+  final hasExile = o.contains('exile a') ||
+      o.contains('exile two') ||
+      o.contains('exile one');
   final hasPayLife = o.contains('pay') && o.contains('life') && hasRather;
   final hasPitch = hasRather && (hasExile || hasPayLife);
   if (hasPitch) {
@@ -137,11 +145,6 @@ BracketTagResult tagCardForBracket({
     categories.add(BracketCategory.infiniteCombo);
   }
 
-  // Game Changer: lista curada das 53 cartas oficiais
-  if (_gameChangerNames.contains(n)) {
-    categories.add(BracketCategory.gameChanger);
-  }
-
   return BracketTagResult(categories);
 }
 
@@ -154,6 +157,7 @@ Map<BracketCategory, int> countBracketCategories(
     BracketCategory.freeInteraction: 0,
     BracketCategory.extraTurns: 0,
     BracketCategory.infiniteCombo: 0,
+    BracketCategory.gameChanger: 0,
   };
 
   for (final c in cards) {
@@ -163,7 +167,8 @@ Map<BracketCategory, int> countBracketCategories(
     if (name.isEmpty) continue;
 
     final qty = (c['quantity'] as int?) ?? 1;
-    final tags = tagCardForBracket(name: name, typeLine: typeLine, oracleText: oracle);
+    final tags =
+        tagCardForBracket(name: name, typeLine: typeLine, oracleText: oracle);
     for (final cat in tags.categories) {
       counts[cat] = (counts[cat] ?? 0) + qty;
     }
@@ -198,7 +203,8 @@ BracketFilterDecision applyBracketPolicyToAdditions({
 
   final remaining = <BracketCategory, int>{};
   for (final entry in policy.maxCounts.entries) {
-    remaining[entry.key] = (entry.value - (counts[entry.key] ?? 0)).clamp(0, 999);
+    remaining[entry.key] =
+        (entry.value - (counts[entry.key] ?? 0)).clamp(0, 999);
   }
 
   final allowed = <String>[];
@@ -210,7 +216,8 @@ BracketFilterDecision applyBracketPolicyToAdditions({
     final oracle = (c['oracle_text'] as String?) ?? '';
     if (name.isEmpty) continue;
 
-    final tags = tagCardForBracket(name: name, typeLine: typeLine, oracleText: oracle);
+    final tags =
+        tagCardForBracket(name: name, typeLine: typeLine, oracleText: oracle);
     final categories = tags.categories.toList();
 
     var canAdd = true;
@@ -274,8 +281,6 @@ const _knownInfiniteComboPieces = <String>{
   'demonic consultation',
   'tainted pact',
 };
-
-
 
 const _gameChangerNames = <String>{
   'ad nauseam',

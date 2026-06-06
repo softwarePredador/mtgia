@@ -9,7 +9,7 @@ import '../../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   // Caso especial: /community/decks/following é capturado como id="following"
-  if (id == 'following') return _getFollowingFeed(context);
+  if (id == 'following') return getFollowingFeed(context);
 
   if (context.request.method == HttpMethod.get) {
     return _getPublicDeck(context, id);
@@ -294,7 +294,7 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
 /// GET /community/decks/following?page=1&limit=20
 /// Retorna decks públicos dos usuários que o autenticado segue.
 /// Requer JWT (Authorization header).
-Future<Response> _getFollowingFeed(RequestContext context) async {
+Future<Response> getFollowingFeed(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
   }
