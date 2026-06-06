@@ -1,8 +1,184 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
-> **Gerado:** 2026-06-05 por ManaLoom Knowledge Synthesis (Cron #10)
+> **Gerado:** 2026-06-06 por ManaLoom Knowledge Synthesis (Cron #11)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** 3f7266d6
-> **Metodo:** Cruzamento do conhecimento MTG (Commander Knowledge Deep S43-45 data integrity crisis + Atraxa/Winota analysis, TAG_ACCURACY_REPORT 2026-06-05 fork detection + CMC corruption spread, MANA_BASE_VALIDATION_REPORT 2026-06-05, Winota Evolution Analysis 2026-06-05) com codigo Dart (optimization_quality_gate, optimization_functional_roles, functional_card_tags, candidate_quality_data_support, goldfish_simulator, deck_rules_service, card_validation_service)
+> **HEAD:** 565b73af
+> **Metodo:** Cruzamento do conhecimento MTG (VALIDATOR_LOG 2026-06-02 — pipeline integrity crisis + CMC corruption, GAME_CHANGERS.md — 53 GCs com double-counting detectado, SCOUT_LOG — Lorehold maturity, TAG_ACCURACY — payoff 35% accuracy) com codigo Dart (edh_bracket_policy, optimization_quality_gate, optimization_functional_roles, goldfish_simulator)
+> **Base de conhecimento:** VALIDATOR_LOG (deck rebuild + 37 CMCs corrompidos + 20 unknown tags + only 3 removals), GAME_CHANGERS (53 GCs com 23 double-tagged), tag_accuracy (payoff 35%, enabler 50%), SCOUT_LOG (deck em maturidade persistente)
+> **Novas tasks nesta execucao:** 5 (1xP1, 4xP2) — Game Changer double-counting fix, payoff tag accuracy improvement, contextual enabler/payoff heuristics, goldfish CMC validation hardening, GC list sync mechanism
+
+### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
+
+**Conhecimento MTG:** Os Game Changers oficiais sao uma categoria UNICA que consome slots do budget de GC. Uma carta como Mana Vault DEVE consumir APENAS o slot de `gameChanger`, nao o slot de `fastMana` tambem. O bracket system oficial (mtgcommander.net) define que Game Changers sao contados separadamente das outras categorias. O entendimento correto e: se uma carta e Game Changer, ela conta EXCLUSIVAMENTE contra o limite de Game Changers do bracket, independentemente de sua funcao mecanica (fast mana, tutor, etc.).
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:101-103` — `_fastManaNames` check adiciona `fastMana`.
+- `server/lib/edh_bracket_policy.dart:111-113` — Oracle 'search your library' adiciona `tutor`.
+- `server/lib/edh_bracket_policy.dart:140-143` — `_gameChangerNames` check adiciona `gameChanger`.
+- O codigo nao tem EARLY RETURN apos detectar `gameChanger`. Os checks sao sequenciais e acumulativos — uma carta recebe TODAS as categorias que derem match.
+
+**Simulacao confirmada:** 23 das 53 cartas GCs (43%) sao double-tagged:
+- 6 fast mana GCs (Ancient Tomb, Chrome Mox, Grim Monolith, Lion's Eye Diamond, Mana Vault, Mox Diamond) → `fastMana` + `gameChanger`
+- 12 tutor GCs (Demonic Tutor, Vampiric, Mystical, Enlightened, Worldly, Gamble, Gifts Ungiven, Intuition, Imperial Seal, Crop Rotation, Natural Order, Survival) → `tutor` + `gameChanger`
+- 4 free interaction GCs (Force of Will, Fierce Guardianship, Bolas's Citadel, Panoptic Mirror) → `freeInteraction` + `gameChanger`
+- 1 infinite combo GC (Thassa's Oracle) → `infiniteCombo` + `gameChanger`
+
+**Impacto em bracket 3 (max 3 GCs):**
+- Um deck com 6 fast mana GCs seria BLOQUEADO (excede limite de 3 GCs), mesmo tendo budget de 6 fastMana.
+- Um deck com 3 tutor GCs (ex: Demonic + Vampiric + Mystical) consome TODOS os 3 slots de GC, deixando 0 slots para Rhystic Study, The One Ring, etc.
+- O budget de `tutor` (max 6) fica parcialmente consumido por cartas que NAO deveriam contar contra ele.
+
+**Gap:** `tagCardForBracket()` acumula categorias sem priorizar `gameChanger`. Se uma carta e Game Changer, nao deveria consumir budget de outras categorias — deveria consumir APENAS o slot de `gameChanger`.
+
+**Impacto:** P1 — Falsos bloqueios em adicao de cartas. 43% dos GCs sao bloqueados prematuramente. Um deck bracket 3 pode ser bloqueado de adicionar GCs validos porque o sistema consome budget duplo. A logica de bracket fica inconsistente com as regras oficiais.
+
+**Risco:** P1 — Afeta diretamente a experiencia do usuario: decks sao bloqueados de adicionar cartas que seriam legais no bracket. A deteccao por nome (`_gameChangerNames`) funciona, mas a logica de budget e quebrada pelo double-counting.
+
+**Acao recomendada:**
+1. Em `tagCardForBracket()`: se a carta esta em `_gameChangerNames`, retornar APENAS `{BracketCategory.gameChanger}` (early return antes dos outros checks).
+2. OU: apos todos os checks, se `categories.contains(BracketCategory.gameChanger)`, remover as outras categorias.
+3. Atualizar `applyBracketPolicyToAdditions()` para tratar GCs como categoria exclusiva.
+4. Adicionar teste unitario confirmando que Mana Vault retorna APENAS `gameChanger`.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+cd server && dart test test/edh_bracket_policy_test.dart
+```
+
+---
+
+### [P2] Payoff Tag Accuracy: Melhorar heuristica de classificacao — 35% de precisao (11/31) compromete quality gate
+
+**Conhecimento MTG:** Uma carta "payoff" e aquela que RECOMPENSA por seguir o tema do deck. Ex: em spellslinger, Guttersnipe e um payoff (causa dano por spell). Em aristocrats, Blood Artist e payoff (drena vida por sacrificio). Em tokens, Anointed Procession e payoff (dobra tokens). O conceito de payoff e ALTAMENTE contextual — depende do tema do deck, nao apenas do oracle text da carta. Classificar payoff corretamente requer entender o contexto do deck, nao apenas regex no oracle.
+
+**Evidencia no codigo:**
+- `server/lib/ai/functional_card_tags.dart:16-36` — `functionalCardTagsV1` inclui 'payoff' como tag valida.
+- `server/lib/ai/optimization_functional_roles.dart:55-124` — `classifyOptimizationFunctionalRole()` usa heuristica regex (oracle text + type line). Nao tem CONHECIMENTO DO TEMA do deck.
+- `tag_accuracy`: payoff = 11/31 correto (35%), fp=0, fn=0. Muito abaixo das outras tags (ramp=100%, draw=100%, removal=100%).
+
+**Gap:** O classificador regex atual acerta payoff apenas 35% das vezes. Isso significa que ~20 cartas classificadas como payoff estao ERRADAS. O quality gate (`filterUnsafeOptimizeSwapsByCardData`) usa `classifyOptimizationFunctionalRole` para decidir se swaps preservam papeis funcionais. Swaps envolvendo payoffs mal-classificados podem ser incorretamente bloqueados ou permitidos.
+
+**Impacto:** P2 — Quality gate toma decisoes baseadas em classificacao de payoff com 65% de erro. Swaps legitimas podem ser bloqueadas, swaps ruins podem passar.
+
+**Risco:** P2 — Afeta otimizacao de decks com muitos payoffs (spellslinger, aristocrats, tokens).
+
+**Acao recomendada:**
+1. Adicionar contexto de tema a `classifyOptimizationFunctionalRole()`: se o deck e 'spellslinger', cartas com "whenever you cast" sao payoff; se e 'aristocrats', cartas com "whenever a creature dies" sao payoff.
+2. Criar tabela `payoff_heuristics` mapeando tema → padroes de oracle text para payoff.
+3. Usar `theme_contextual_rules_service.dart` para informar a classificacao de payoff.
+4. Revalidar as 31 cartas classificadas como payoff contra o contexto tematico.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_functional_roles.dart
+cd server && dart test test/ai/functional_card_tags_test.dart
+```
+
+---
+
+### [P2] Classificador: Tags de baixa precisao `enabler` (50%) e `payoff` (35%) precisam de heuristica contextual — 63 tags incorretas
+
+**Conhecimento MTG:** `enabler` e `payoff` sao tags DEPENDENTES DE CONTEXTO. Nao podem ser classificadas por regex simples no oracle text. Exemplos:
+- Em tribal Elves, Llanowar Elves e um enabler (ramp) E payoff (elfo). A tag 'ramp' e correta, 'enabler' e contextual.
+- Em spellslinger, Past in Flames e enabler (recursao de spells). Mas em graveyard, e payoff.
+- Em artifacts, Krark-Clan Ironworks e enabler (sacrifice). Em aristocrats, e payoff.
+
+A tag_accuracy mostra `enabler` com 50% (21/42) e `payoff` com 35% (11/31). Juntas sao 73 cartas, das quais apenas ~32 estao corretas. 63 cartas estao potencialmente mal-classificadas.
+
+**Evidencia no codigo:**
+- `server/lib/ai/functional_card_tags.dart:7-36` — Define `functionalCardTagsV1` com 'enabler' e 'payoff'.
+- `server/lib/ai/optimization_functional_roles.dart:55-124` — Classificador regex sem contexto tematico.
+- `server/lib/ai/theme_contextual_rules_service.dart` — Servico de regras tematicas existe mas nao e integrado ao classificador de papeis funcionais.
+
+**Gap:** O classificador de papeis funcionais opera isoladamente, sem acesso ao tema do deck. Tags contextuais (enabler, payoff) requerem informacao do tema para precisao aceitavel.
+
+**Impacto:** P2 — 63 cartas mal-classificadas afetam quality gate, validacao funcional, e recomendacoes de swap.
+
+**Risco:** P2 — Afeta toda a pipeline de otimizacao para tags contextuais.
+
+**Acao recomendada:**
+1. `classifyOptimizationFunctionalRole()` deve receber parametro opcional `String? theme`.
+2. Criar `_classifyContextualRole()` que usa `theme` + oracle text para classificar enabler/payoff.
+3. Heuristicas por tema:
+   - spellslinger → payoff: "whenever you cast", "whenever you copy"; enabler: "flashback", "without paying"
+   - aristocrats → payoff: "whenever a creature dies"; enabler: "sacrifice"
+   - tokens → payoff: "create.*token.*instead", "whenever.*create.*token"; enabler: "populate"
+   - tribal → payoff: "other.*get +1/+1"; enabler: "{T}: add.*mana"
+4. Fallback: se tema nao definido, usar heuristica generica com confianca reduzida (confidence <= 0.5).
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_functional_roles.dart
+python3 -c "
+import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db');
+counts = conn.execute("SELECT functional_tag, COUNT(*) FROM deck_cards WHERE functional_tag IN ('enabler','payoff') AND deck_id=6 GROUP BY functional_tag").fetchall();
+print('Current enabler/payoff counts:', counts)
+"
+```
+
+---
+
+### [P2] Goldfish Simulator: Validar CMC antes de usar — `_getCmc()` retorna 0 para dados corrompidos sem distinguir lands de non-lands
+
+**Conhecimento MTG:** O VALIDATOR_LOG (2026-06-02) documenta que 37 cartas no deck_id=6 tem CMC=0.0 no DB, incluindo fast mana REAL (Chrome Mox real CMC=0, Mox Diamond real CMC=0, Lotus Petal real CMC=0) e cartas com CMC ERRADO (Mana Vault real CMC=1, Boros Signet real CMC=2, Mana Confluence real CMC=0 como land). O goldfish simulator usa CMC para calcular playabilidade de maos e curva de mana. Com CMC=0.0 para cartas que custam 1-2 mana, a simulacao subestima a dificuldade de jogar o deck.
+
+**Evidencia no codigo:**
+- `server/lib/ai/optimization_quality_gate.dart:459-465` — `_getCmc()` retorna 0 para null/0 sem distinguir land de non-land.
+- `server/lib/ai/goldfish_simulator.dart` — Usa `_getCmc()` para cada carta; CMC=0.0 significa "jogavel T1 sem custo".
+- `server/lib/ai/optimization_validator.dart:97-101` — Monte Carlo comparison usa goldfish com os mesmos dados corrompidos.
+
+**Gap:** Mesmo apos a correcao batch de CMC (task P1 do Cron #10), o `_getCmc()` nao valida se o valor e plausivel. Se o CMC batch falhar ou for parcial, o goldfish continua usando dados corrompidos silenciosamente. Nao ha distincao entre "CMC=0 porque e land" e "CMC=0 porque o dado esta corrompido".
+
+**Impacto:** P2 — Goldfish simulator produz metricas enganosas ("keepable T3" artificialmente alto, "mana screw" artificialmente baixo) para decks com CMCs corrompidos. A comparacao Monte Carlo "antes vs depois" do validator pode achar que um swap PIOROU o deck quando na verdade so mudou o CMC medio.
+
+**Risco:** P2 — Depende do sucesso da task P1 (CMC batch correction). Se a correcao for completa, este hardening e preventivo. Se for parcial, e necessario.
+
+**Acao recomendada:**
+1. `_getCmc()`: adicionar parametro `String typeLine` para distinguir lands.
+2. Para non-lands com CMC=0: logar warning `developer.log('Suspicious CMC=0 for non-land card: \$name')`.
+3. No goldfish simulator: se CMC=0 para non-land, usar CMC=3 como fallback conservador (nao subestimar custo real).
+4. Adicionar validacao `_validateDeckCmc()` que verifica se >5% das non-lands tem CMC=0 (indicando corrupcao).
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_quality_gate.dart
+cd server && dart analyze lib/ai/goldfish_simulator.dart
+```
+
+---
+
+### [P2] Game Changer List: Dart hardcoded `_gameChangerNames` vs SQLite autoritativo — risco de drift com futuras atualizacoes da lista oficial
+
+**Conhecimento MTG:** A lista de 53 Game Changers e mantida oficialmente pelo Commander Rules Committee (mtgcommander.net) e pela Wizards. O banco SQLite (`game_changers` table) tem a lista importada do Scryfall com campos `why_game_changer`, `impact_category`, `impact_level` — dados ricos que a pesquisa autonoma produziu. O Dart `_gameChangerNames` e uma lista hardcoded de 53 nomes. Se a lista oficial mudar (cartas adicionadas/removidas), o Dart fica desatualizado enquanto o SQLite pode ser re-importado.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:280-334` — `_gameChangerNames` e uma `const` Set de 53 strings.
+- `docs/hermes-analysis/manaloom-knowledge/GAME_CHANGERS.md:46-50` — SQLite tem 53 cartas com 14 colunas de metadados.
+- Diferenca detectada: Dart usa `'tergrid, god of fright'`, DB usa `'Tergrid, God of Fright // Tergrid\'s Lantern'`. Normalizacao de nome MDFC nao e consistente.
+
+**Gap:** Duas fontes de verdade (Dart hardcoded + SQLite importado). Se a lista oficial adicionar/remover cartas, apenas o SQLite seria atualizado (via re-importacao Scryfall). O Dart permaneceria stale ate re-compilacao. Alem disso, os metadados ricos do SQLite (why_game_changer, impact_category) nao sao usados pelo Dart.
+
+**Impacto:** P2 — Atualmente a lista esta sincronizada (53/53, apenas diferenca de nomenclatura MDFC). Mas nao ha mecanismo de sincronizacao automatica. Se o RC adicionar 5 novos GCs amanha, o SQLite pode ser atualizado mas o Dart continua com 53.
+
+**Risco:** P2 — Baixo no curto prazo (lista oficial e estavel), mas risco de drift a medio/longo prazo.
+
+**Acao recomendada:**
+1. Criar script `sync_game_changers_to_dart.py` que le o SQLite e gera o Set Dart como codigo.
+2. OU: mudar `tagCardForBracket()` para consultar o PG/SQLite em vez de usar lista hardcoded (requer acesso a DB em runtime).
+3. Documentar no `COMMIT_DIGEST.md` quando a lista oficial mudar.
+4. Health check no cron watchdog: comparar `COUNT(*)` de `game_changers` do SQLite com `_gameChangerNames.length` do Dart.
+
+**Validacao:**
+```bash
+python3 -c "
+import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db');
+db_count = conn.execute('SELECT COUNT(*) FROM game_changers').fetchone()[0];
+print(f'SQLite GC count: {db_count} (Dart: 53)')
+"
+```
+
+---
+
 > **Base de conhecimento:** Commander Deep Report S44 (promotion migration failure — 4/4 decks incomplete), TAG_ACCURACY_REPORT (tag system fork — 5 orphaned tags + 12 new fine tags + CMC=0.0 spread to 142 cards), Commander Deep Report S44.3 (Atraxa split archetype), S44.4 (Winota stax density 14/100)
 > **Novas tasks nesta execucao:** 5 (2xP1, 3xP2) — Deck promotion card migration verification, CMC batch correction + prevention hardening, tag accuracy fine-tag tracking, stax archetype detection in quality gate, split archetype detection heuristic
 
