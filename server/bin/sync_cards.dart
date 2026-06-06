@@ -35,7 +35,7 @@ const _batchSize = 500;
 const _dbBatchConcurrency = 24;
 
 /// Timeout e tentativas para downloads HTTP externos.
-const _httpTimeout = Duration(seconds: 45);
+const _httpTimeout = Duration(minutes: 3);
 const _httpMaxRetries = 3;
 
 Future<void> main(List<String> args) async {
@@ -77,6 +77,7 @@ Opcoes:
   try {
     await _ensureSyncStateTable(pool);
     await _ensureCardsColorIdentity(pool);
+    await _ensureCardsCombatMetadata(pool);
     await _ensureSetsTable(pool);
 
     // Baixa SetList.json UMA VEZ e reutiliza
@@ -234,6 +235,17 @@ Future<void> _ensureCardsColorIdentity(Pool pool) async {
       'ALTER TABLE cards ADD COLUMN IF NOT EXISTS color_identity TEXT[]'));
   await pool.execute(Sql.named(
       'CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)'));
+}
+
+Future<void> _ensureCardsCombatMetadata(Pool pool) async {
+  await pool.execute(
+      Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT'));
+  await pool.execute(
+      Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT'));
+  await pool.execute(
+      Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]'));
+  await pool.execute(Sql.named(
+      'CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords)'));
 }
 
 Future<void> _ensureSetsTable(Pool pool) async {
@@ -532,8 +544,9 @@ Future<int> _upsertCardsFromAtomic(
   final stmt = await session.prepare('''
     INSERT INTO cards (
       scryfall_id, name, mana_cost, type_line, oracle_text,
-      colors, color_identity, image_url, set_code, rarity
-    ) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10)
+      colors, color_identity, power, toughness, keywords,
+      image_url, set_code, rarity
+    ) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12, \$13)
     ON CONFLICT (scryfall_id) DO UPDATE SET
       name = EXCLUDED.name,
       mana_cost = EXCLUDED.mana_cost,
@@ -541,6 +554,9 @@ Future<int> _upsertCardsFromAtomic(
       oracle_text = EXCLUDED.oracle_text,
       colors = EXCLUDED.colors,
       color_identity = EXCLUDED.color_identity,
+      power = EXCLUDED.power,
+      toughness = EXCLUDED.toughness,
+      keywords = EXCLUDED.keywords,
       image_url = EXCLUDED.image_url,
       set_code = EXCLUDED.set_code,
       rarity = EXCLUDED.rarity
@@ -582,9 +598,10 @@ Future<int> _upsertCardsFromSet(
   final stmt = await session.prepare('''
     INSERT INTO cards (
       scryfall_id, name, mana_cost, type_line, oracle_text,
-      colors, color_identity, image_url, set_code, rarity,
+      colors, color_identity, power, toughness, keywords,
+      image_url, set_code, rarity,
       collector_number, foil
-    ) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12)
+    ) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12, \$13, \$14, \$15)
     ON CONFLICT (scryfall_id) DO UPDATE SET
       name = EXCLUDED.name,
       mana_cost = EXCLUDED.mana_cost,
@@ -592,6 +609,9 @@ Future<int> _upsertCardsFromSet(
       oracle_text = EXCLUDED.oracle_text,
       colors = EXCLUDED.colors,
       color_identity = EXCLUDED.color_identity,
+      power = EXCLUDED.power,
+      toughness = EXCLUDED.toughness,
+      keywords = EXCLUDED.keywords,
       image_url = EXCLUDED.image_url,
       set_code = EXCLUDED.set_code,
       rarity = EXCLUDED.rarity,
@@ -615,6 +635,9 @@ Future<int> _upsertCardsFromSet(
               const <String>[];
       final colorIdentity =
           (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
+              const <String>[];
+      final keywords =
+          (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
 
       // Use scryfallId for direct image URL (more reliable than name-based)
@@ -654,6 +677,9 @@ Future<int> _upsertCardsFromSet(
         card['text']?.toString(),
         colors,
         colorIdentity,
+        card['power']?.toString(),
+        card['toughness']?.toString(),
+        keywords,
         imageUrl,
         canonicalSetCode,
         card['rarity']?.toString(),
@@ -704,6 +730,9 @@ List<Object?>? _extractCardRow(String cardName, List<dynamic> printings) {
   final colorIdentity =
       (chosen['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
+  final keywords =
+      (chosen['keywords'] as List?)?.map((e) => e.toString()).toList() ??
+          const <String>[];
   final setCode = normalizeMtgSetCode(
     (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString(),
   );
@@ -732,6 +761,9 @@ List<Object?>? _extractCardRow(String cardName, List<dynamic> printings) {
     oracleText,
     colors,
     colorIdentity,
+    chosen['power']?.toString(),
+    chosen['toughness']?.toString(),
+    keywords,
     imageUrl,
     setCode,
     rarity,

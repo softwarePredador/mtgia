@@ -369,6 +369,22 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS ai_generate_jobs CASCADE;
     ''',
   ),
+  Migration(
+    version: '018',
+    name: 'add_card_combat_metadata',
+    up: '''
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT;
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT;
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
+      CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING gin (keywords);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_cards_keywords;
+      ALTER TABLE cards DROP COLUMN IF EXISTS keywords;
+      ALTER TABLE cards DROP COLUMN IF EXISTS toughness;
+      ALTER TABLE cards DROP COLUMN IF EXISTS power;
+    ''',
+  ),
 ];
 
 class Migration {

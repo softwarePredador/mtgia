@@ -44,6 +44,9 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE D
 	    oracle_text TEXT,
 	    colors TEXT[], -- Array de cores ex: {'W', 'U'}
 	    color_identity TEXT[], -- Identidade de cor (Commander), ex: {'W','U'}
+	    power TEXT, -- Poder impresso quando aplicavel; texto para suportar "*" e variaveis
+	    toughness TEXT, -- Resistencia impressa quando aplicavel; texto para suportar "*" e variaveis
+	    keywords TEXT[], -- Keywords oficiais do MTGJSON/Scryfall, ex: {'Flying','Trample'}
 	    image_url TEXT, -- URL da imagem na Scryfall
 	    set_code TEXT,
 	    rarity TEXT,
@@ -61,11 +64,15 @@ ALTER TABLE cards ADD COLUMN IF NOT EXISTS price DECIMAL(10,2);
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_updated_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS collector_number TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS foil BOOLEAN;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
 
 -- Índice para busca rápida por nome
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);
 -- Índice GIN para buscas por identidade (Commander/Brawl)
 CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity);
+CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords);
 
 -- 2.1. Tabela de Sets/Edições (para exibir nome e data da edição)
 -- Fonte: MTGJSON SetList.json

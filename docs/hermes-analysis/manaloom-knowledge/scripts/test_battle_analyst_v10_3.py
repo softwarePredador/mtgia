@@ -6,8 +6,10 @@ Run from this directory with:
 """
 
 import importlib.util
+import json
 import os
 import random
+import sqlite3
 from pathlib import Path
 
 
@@ -592,6 +594,66 @@ def test_double_strike_trample_deals_excess_in_both_steps():
     assert defender.life == -2
 
 
+def test_card_oracle_cache_enriches_battle_cards():
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute(
+        """
+        CREATE TABLE card_oracle_cache (
+            normalized_name TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            mana_cost TEXT,
+            colors_json TEXT,
+            color_identity_json TEXT,
+            type_line TEXT,
+            oracle_text TEXT,
+            cmc REAL,
+            power TEXT,
+            toughness TEXT,
+            keywords_json TEXT,
+            scryfall_id TEXT
+        )
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO card_oracle_cache (
+            normalized_name, name, mana_cost, colors_json, color_identity_json,
+            type_line, oracle_text, cmc, power, toughness, keywords_json, scryfall_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            "test trampler",
+            "Test Trampler",
+            "{3}{G}",
+            json.dumps(["G"]),
+            json.dumps(["G"]),
+            "Creature - Beast",
+            "Trample",
+            4,
+            "4",
+            "4",
+            json.dumps(["trample"]),
+            "00000000-0000-0000-0000-000000000000",
+        ),
+    )
+
+    cache = battle.load_card_oracle_cache(conn, ["Test Trampler"])
+    enriched = battle.enrich_card(
+        battle.merge_oracle_metadata(
+            {"name": "Test Trampler", "cmc": 0, "tag": "creature"},
+            cache,
+        )
+    )
+
+    assert enriched["mana_cost"] == "{3}{G}"
+    assert enriched["cmc"] == 4
+    assert enriched["power"] == 4
+    assert enriched["toughness"] == 4
+    assert enriched["trample"] is True
+    conn.close()
+
+
 if __name__ == "__main__":
     tests = [
         test_sba_only_reports_new_elimination,
@@ -617,6 +679,7 @@ if __name__ == "__main__":
         test_first_strike_blocker_kills_before_regular_damage,
         test_indestructible_blocker_survives_lethal_combat_damage,
         test_double_strike_trample_deals_excess_in_both_steps,
+        test_card_oracle_cache_enriches_battle_cards,
     ]
     for test in tests:
         test()

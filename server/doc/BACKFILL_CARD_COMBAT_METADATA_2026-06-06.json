@@ -1,0 +1,21 @@
+{
+  "dry_run": false,
+  "atomic_cards": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\server\\AtomicCards.json",
+  "rows_parsed": 34128,
+  "rows_with_power": 18892,
+  "rows_with_toughness": 18892,
+  "rows_with_keywords": 16620,
+  "rows_updated": 33524,
+  "coverage_before": {
+    "cards_total": 33795,
+    "power_known": 0,
+    "toughness_known": 0,
+    "keywords_known": 0
+  },
+  "coverage_after": {
+    "cards_total": 33795,
+    "power_known": 18537,
+    "toughness_known": 18537,
+    "keywords_known": 16271
+  }
+}

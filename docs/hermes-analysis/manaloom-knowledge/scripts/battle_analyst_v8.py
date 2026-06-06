@@ -149,6 +149,97 @@ def enrich_card(card):
     return enriched
 
 
+def normalize_card_name(name):
+    return re.sub(r"\s+", " ", str(name or "").strip().lower())
+
+
+def read_json_list(value):
+    if not value:
+        return []
+    if isinstance(value, list):
+        return value
+    try:
+        decoded = json.loads(value)
+    except Exception:
+        return []
+    if isinstance(decoded, list):
+        return decoded
+    return []
+
+
+def numeric_stat(value):
+    if value is None or value == "":
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def load_card_oracle_cache(conn, names):
+    """Load production card metadata previously synced into local SQLite."""
+    normalized_names = sorted({normalize_card_name(name) for name in names if name})
+    if not normalized_names:
+        return {}
+    table = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='card_oracle_cache'"
+    ).fetchone()
+    if not table:
+        return {}
+
+    cache = {}
+    for index in range(0, len(normalized_names), 500):
+        chunk = normalized_names[index:index + 500]
+        placeholders = ",".join("?" for _ in chunk)
+        rows = conn.execute(f"""
+            SELECT normalized_name, name, mana_cost, colors_json,
+                   color_identity_json, type_line, oracle_text, cmc, power,
+                   toughness, keywords_json, scryfall_id
+            FROM card_oracle_cache
+            WHERE normalized_name IN ({placeholders})
+        """, chunk).fetchall()
+        for row in rows:
+            cache[row["normalized_name"]] = {
+                "oracle_name": row["name"],
+                "mana_cost": row["mana_cost"],
+                "colors": read_json_list(row["colors_json"]),
+                "color_identity": read_json_list(row["color_identity_json"]),
+                "type_line": row["type_line"],
+                "oracle_text": row["oracle_text"],
+                "cmc": row["cmc"],
+                "power": numeric_stat(row["power"]),
+                "toughness": numeric_stat(row["toughness"]),
+                "keywords": read_json_list(row["keywords_json"]),
+                "scryfall_id": row["scryfall_id"],
+            }
+    return cache
+
+
+def merge_oracle_metadata(card, oracle_cache):
+    metadata = oracle_cache.get(normalize_card_name(card.get("name")))
+    if not metadata:
+        return card
+    enriched = dict(card)
+    for key in (
+        "mana_cost",
+        "type_line",
+        "oracle_text",
+        "cmc",
+        "power",
+        "toughness",
+        "scryfall_id",
+        "oracle_name",
+    ):
+        value = metadata.get(key)
+        if value is not None and value != "":
+            enriched[key] = value
+    for key in ("colors", "color_identity", "keywords"):
+        value = metadata.get(key)
+        if value:
+            enriched[key] = value
+    return enriched
+
+
 # ═══════════════════════════════════════════
 # DECK LOADING
 # ═══════════════════════════════════════════
@@ -162,19 +253,21 @@ def load_deck(deck_id=6):
                type_line, oracle_text, is_commander
         FROM deck_cards WHERE deck_id=?
     """, (deck_id,)).fetchall()
+    oracle_cache = load_card_oracle_cache(conn, [row["card_name"] for row in rows])
     conn.close()
     commander = None
     deck = []
     for row in rows:
         qty = row["quantity"] or 1
-        card = enrich_card({
+        card = merge_oracle_metadata({
             "name": row["card_name"],
             "cmc": float(row["cmc"] or 0),
             "tag": row["functional_tag"] or "unknown",
             "type_line": row["type_line"] or "",
             "oracle_text": row["oracle_text"] or "",
             "is_commander": bool(row["is_commander"]),
-        })
+        }, oracle_cache)
+        card = enrich_card(card)
         if card["is_commander"]: commander = card
         else:
             for _ in range(qty): deck.append(card)
@@ -1692,8 +1785,8 @@ def load_learned_opponents():
         conn = sqlite3.connect(DB)
         conn.row_factory = sqlite3.Row
         rows = conn.execute("SELECT * FROM learned_decks WHERE commander NOT LIKE '%Lorehold%' ORDER BY id DESC LIMIT 12").fetchall()
-        conn.close()
-        decks = []
+        decoded_rows = []
+        cache_names = []
         for row in rows:
             if len(str(row['card_list'] or '')) < 500:
                 continue  # v10.2: skip junk
@@ -1701,6 +1794,20 @@ def load_learned_opponents():
                 card_data = json.loads(row["card_list"]) if row["card_list"] else []
             except:
                 card_data = []
+            if not isinstance(card_data, list):
+                card_data = []
+            decoded_rows.append((row, card_data))
+            if row["commander"]:
+                cache_names.append(row["commander"])
+            cache_names.extend(
+                c.get("name")
+                for c in card_data
+                if isinstance(c, dict) and c.get("name")
+            )
+        oracle_cache = load_card_oracle_cache(conn, cache_names)
+        conn.close()
+        decks = []
+        for row, card_data in decoded_rows:
             deck = []
             for c in card_data:
                 if isinstance(c, dict):
@@ -1729,6 +1836,7 @@ def load_learned_opponents():
                         "type_line": tl,
                         "is_commander": c.get("is_commander", False),
                     })
+                    imported = merge_oracle_metadata(imported, oracle_cache)
                     deck.append(enrich_card(imported))
             while len(deck) < 99:
                 deck.append({"name": "Filler", "cmc": 3, "tag": "creature", "effect": "creature", "power": 2, "type_line": "Creature"})
