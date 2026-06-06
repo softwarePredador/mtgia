@@ -368,6 +368,52 @@ void main() {
       expect(role, equals('ramp'));
     });
 
+    test('uses theme context for payoff and enabler roles', () {
+      expect(
+        classifyOptimizationFunctionalRole(const {
+          'name': 'Guttersnipe',
+          'type_line': 'Creature — Goblin Shaman',
+          'oracle_text':
+              'Whenever you cast an instant or sorcery spell, this creature deals 2 damage to each opponent.',
+          'archetype': 'spellslinger',
+        }),
+        equals('payoff'),
+      );
+
+      expect(
+        classifyOptimizationFunctionalRole(const {
+          'name': 'Past in Flames',
+          'type_line': 'Sorcery',
+          'oracle_text':
+              'Each instant and sorcery card in your graveyard gains flashback until end of turn.',
+          'theme': 'spellslinger',
+        }),
+        equals('enabler'),
+      );
+
+      expect(
+        classifyOptimizationFunctionalRole(const {
+          'name': 'Blood Artist',
+          'type_line': 'Creature — Vampire',
+          'oracle_text':
+              'Whenever Blood Artist or another creature dies, target player loses 1 life and you gain 1 life.',
+          'deck_theme': 'aristocrats',
+        }),
+        equals('payoff'),
+      );
+
+      expect(
+        classifyOptimizationFunctionalRole(const {
+          'name': 'Anointed Procession',
+          'type_line': 'Enchantment',
+          'oracle_text':
+              'If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.',
+          'theme': 'tokens',
+        }),
+        equals('payoff'),
+      );
+    });
+
     test('treats all is dust as wipe and blocks wipe to creature downgrade',
         () {
       final originalDeck = [

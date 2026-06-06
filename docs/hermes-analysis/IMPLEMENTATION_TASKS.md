@@ -6,6 +6,7 @@
 > **Base de conhecimento:** VALIDATOR_LOG (deck rebuild + 37 CMCs corrompidos + 20 unknown tags + only 3 removals), GAME_CHANGERS (53 GCs com 23 double-tagged), tag_accuracy (payoff 35%, enabler 50%), SCOUT_LOG (deck em maturidade persistente)
 > **Novas tasks nesta execucao:** 5 (1xP1, 4xP2) — Game Changer double-counting fix, payoff tag accuracy improvement, contextual enabler/payoff heuristics, goldfish CMC validation hardening, GC list sync mechanism
 > **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
+> **Atualizacao Codex 2026-06-06:** P2 payoff/enabler contextual resolvido em `server/lib/ai/optimization_functional_roles.dart`; testes em `server/test/optimization_quality_gate_test.dart` cobrem spellslinger, aristocrats e tokens.
 
 ### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
 
@@ -52,6 +53,8 @@ cd server && dart test test/edh_bracket_policy_test.dart
 
 ### [P2] Payoff Tag Accuracy: Melhorar heuristica de classificacao — 35% de precisao (11/31) compromete quality gate
 
+**Status em 2026-06-06:** RESOLVIDO para o quality gate deterministico. `classifyOptimizationFunctionalRole()` agora aceita `theme` opcional e tambem le `theme`, `deck_theme` ou `archetype` no mapa da carta, aplicando regras contextuais antes do fallback generico de payoff/enabler.
+
 **Conhecimento MTG:** Uma carta "payoff" e aquela que RECOMPENSA por seguir o tema do deck. Ex: em spellslinger, Guttersnipe e um payoff (causa dano por spell). Em aristocrats, Blood Artist e payoff (drena vida por sacrificio). Em tokens, Anointed Procession e payoff (dobra tokens). O conceito de payoff e ALTAMENTE contextual — depende do tema do deck, nao apenas do oracle text da carta. Classificar payoff corretamente requer entender o contexto do deck, nao apenas regex no oracle.
 
 **Evidencia no codigo:**
@@ -80,6 +83,8 @@ cd server && dart test test/ai/functional_card_tags_test.dart
 ---
 
 ### [P2] Classificador: Tags de baixa precisao `enabler` (50%) e `payoff` (35%) precisam de heuristica contextual — 63 tags incorretas
+
+**Status em 2026-06-06:** RESOLVIDO para os temas principais do classificador usado pelo optimize/quality gate. Foram adicionadas regras contextuais para `spellslinger`, `aristocrats`, `tokens`, `tribal`, `graveyard`, `artifacts` e `enchantments`, preservando fallback quando nao ha tema.
 
 **Conhecimento MTG:** `enabler` e `payoff` sao tags DEPENDENTES DE CONTEXTO. Nao podem ser classificadas por regex simples no oracle text. Exemplos:
 - Em tribal Elves, Llanowar Elves e um enabler (ramp) E payoff (elfo). A tag 'ramp' e correta, 'enabler' e contextual.

@@ -52,11 +52,20 @@ bool looksLikeOptimizationLandSearchText(String oracleText) {
       oracle.contains('mountain card');
 }
 
-String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
+String classifyOptimizationFunctionalRole(
+  Map<String, dynamic> card, {
+  String? theme,
+}) {
   final semanticRole =
       _classifySemanticV2FunctionalRole(card['semantic_tags_v2']);
   if (semanticRole != null) return semanticRole;
 
+  final contextualTheme = _normalizeContextualTheme(
+    theme ??
+        card['theme']?.toString() ??
+        card['deck_theme']?.toString() ??
+        card['archetype']?.toString(),
+  );
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
 
@@ -108,15 +117,21 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
     return 'tutor';
   }
 
-    // High-level semantic tags (wincon, engine, combo_piece, payoff, enabler)
+  // High-level semantic tags (wincon, engine, combo_piece, payoff, enabler)
   // These are checked before type-based fallback to catch combo pieces
   if (_looksLikeWincon(oracle)) return 'wincon';
   if (_looksLikeEngine(oracle)) return 'engine';
   if (_looksLikeComboPiece(oracle)) return 'combo_piece';
+  final contextualRole = _classifyContextualRole(
+    theme: contextualTheme,
+    oracle: oracle,
+    typeLine: typeLine,
+  );
+  if (contextualRole != null) return contextualRole;
   if (_looksLikePayoff(oracle)) return 'payoff';
   if (_looksLikeEnabler(oracle)) return 'enabler';
 
-if (typeLine.contains('creature')) return 'creature';
+  if (typeLine.contains('creature')) return 'creature';
   if (typeLine.contains('artifact')) return 'artifact';
   if (typeLine.contains('enchantment')) return 'enchantment';
   if (typeLine.contains('planeswalker')) return 'planeswalker';
@@ -364,8 +379,152 @@ String _normalizeRoleCardName(String value) {
   return value.trim().toLowerCase();
 }
 
+String _normalizeContextualTheme(String? value) {
+  final normalized = value?.trim().toLowerCase().replaceAll('-', '_') ?? '';
+  if (normalized.isEmpty) return '';
+  if (normalized.contains('spellslinger') ||
+      normalized.contains('spell_slinger') ||
+      normalized.contains('instant') && normalized.contains('sorcery')) {
+    return 'spellslinger';
+  }
+  if (normalized.contains('aristocrat') || normalized.contains('sacrifice')) {
+    return 'aristocrats';
+  }
+  if (normalized.contains('token')) return 'tokens';
+  if (normalized.contains('artifact')) return 'artifacts';
+  if (normalized.contains('enchant')) return 'enchantments';
+  if (normalized.contains('tribal') ||
+      normalized.contains('goblin') ||
+      normalized.contains('elf') ||
+      normalized.contains('vampire') ||
+      normalized.contains('dragon')) {
+    return 'tribal';
+  }
+  if (normalized.contains('graveyard')) return 'graveyard';
+  return normalized;
+}
 
+String? _classifyContextualRole({
+  required String theme,
+  required String oracle,
+  required String typeLine,
+}) {
+  if (theme.isEmpty) return null;
 
+  switch (theme) {
+    case 'spellslinger':
+      if (_containsAny(oracle, const [
+        'whenever you cast an instant or sorcery',
+        'whenever you cast or copy an instant or sorcery',
+        'whenever you cast a noncreature spell',
+      ])) {
+        return 'payoff';
+      }
+      if (_containsAny(oracle, const [
+        'flashback',
+        'instant and sorcery spells you cast cost',
+        'copy target instant or sorcery',
+        'cast target instant or sorcery card',
+        'you may cast an instant or sorcery card',
+      ])) {
+        return 'enabler';
+      }
+      break;
+    case 'aristocrats':
+      if (_containsAny(oracle, const [
+        'whenever a creature dies',
+        'whenever another creature dies',
+        'or another creature dies',
+        'whenever you sacrifice',
+      ])) {
+        return 'payoff';
+      }
+      if (oracle.contains('sacrifice') ||
+          oracle.contains('create') && oracle.contains('token')) {
+        return 'enabler';
+      }
+      break;
+    case 'tokens':
+      if (_containsAny(oracle, const [
+        'would create one or more tokens',
+        'create twice that many',
+        'create that many plus',
+        'if one or more tokens would be created',
+        'tokens you control get',
+        'creature tokens you control get',
+      ])) {
+        return 'payoff';
+      }
+      if (oracle.contains('create') && oracle.contains('token')) {
+        return 'enabler';
+      }
+      break;
+    case 'tribal':
+      if (_containsAny(oracle, const [
+        'creatures you control get',
+        'other creatures you control get',
+        'whenever another',
+        'whenever one or more',
+      ])) {
+        return 'payoff';
+      }
+      if (oracle.contains('create') && oracle.contains('token') ||
+          typeLine.contains('creature') && oracle.contains('add {')) {
+        return 'enabler';
+      }
+      break;
+    case 'graveyard':
+      if (_containsAny(oracle, const [
+        'from your graveyard',
+        'whenever one or more cards leave your graveyard',
+        'whenever a creature card is put into your graveyard',
+      ])) {
+        return 'payoff';
+      }
+      if (_containsAny(oracle, const [
+        'mill',
+        'surveil',
+        'discard a card',
+        'put the top',
+      ])) {
+        return 'enabler';
+      }
+      break;
+    case 'artifacts':
+      if (_containsAny(oracle, const [
+        'whenever an artifact',
+        'artifacts you control get',
+      ])) {
+        return 'payoff';
+      }
+      if (oracle.contains('create') && oracle.contains('treasure') ||
+          oracle.contains('artifact spells you cast cost')) {
+        return 'enabler';
+      }
+      break;
+    case 'enchantments':
+      if (_containsAny(oracle, const [
+        'whenever you cast an enchantment',
+        'enchantments you control',
+      ])) {
+        return 'payoff';
+      }
+      if (oracle.contains('enchantment spells you cast cost') ||
+          oracle.contains('return target enchantment')) {
+        return 'enabler';
+      }
+      break;
+  }
+
+  return null;
+}
+
+bool _containsAny(String value, Iterable<String> needles) {
+  for (final needle in needles) {
+    if (value.contains(needle)) return true;
+  }
+  return false;
+}
 
 bool _looksLikeWincon(String oracle) {
   return oracle.contains('you win the game') ||
@@ -374,19 +533,29 @@ bool _looksLikeWincon(String oracle) {
 }
 
 bool _looksLikeEngine(String oracle) {
-  return (oracle.contains('at the beginning of your upkeep') && oracle.contains('you may')) ||
-      (oracle.contains('whenever') && oracle.contains('you may') &&
-       (oracle.contains('draw') || oracle.contains('create') || oracle.contains('add'))) ||
+  return (oracle.contains('at the beginning of your upkeep') &&
+          oracle.contains('you may')) ||
+      (oracle.contains('whenever') &&
+          oracle.contains('you may') &&
+          (oracle.contains('draw') ||
+              oracle.contains('create') ||
+              oracle.contains('add'))) ||
       (oracle.contains('your end step') && oracle.contains('you may'));
 }
 
 bool _looksLikeComboPiece(String oracle) {
-  return (oracle.contains('remove') && oracle.contains('counter') && oracle.contains('from among')) ||
-      (oracle.contains('search your library') && oracle.contains('may cast') && oracle.contains('without paying'));
+  return (oracle.contains('remove') &&
+          oracle.contains('counter') &&
+          oracle.contains('from among')) ||
+      (oracle.contains('search your library') &&
+          oracle.contains('may cast') &&
+          oracle.contains('without paying'));
 }
 
 bool _looksLikePayoff(String oracle) {
-  return (oracle.contains('whenever') && oracle.contains('create') && oracle.contains('token')) ||
+  return (oracle.contains('whenever') &&
+          oracle.contains('create') &&
+          oracle.contains('token')) ||
       (oracle.contains('whenever you cast') && oracle.contains('copy')) ||
       (oracle.contains('whenever you cast') && oracle.contains('scry'));
 }
@@ -394,5 +563,7 @@ bool _looksLikePayoff(String oracle) {
 bool _looksLikeEnabler(String oracle) {
   return oracle.contains('instant and sorcery spells you cast cost') ||
       oracle.contains('cost less to cast') ||
-      (oracle.contains('spells you cast') && oracle.contains('cost') && oracle.contains('less'));
+      (oracle.contains('spells you cast') &&
+          oracle.contains('cost') &&
+          oracle.contains('less'));
 }
