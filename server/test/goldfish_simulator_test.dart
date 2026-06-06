@@ -61,8 +61,18 @@ void main() {
       final cards = [
         ..._generateLands(35),
         {'name': 'Sol Ring', 'cmc': 1, 'type_line': 'Artifact', 'quantity': 1},
-        {'name': 'Arcane Signet', 'cmc': 2, 'type_line': 'Artifact', 'quantity': 1},
-        {'name': 'Commander', 'cmc': 5, 'type_line': 'Legendary Creature', 'quantity': 1},
+        {
+          'name': 'Arcane Signet',
+          'cmc': 2,
+          'type_line': 'Artifact',
+          'quantity': 1
+        },
+        {
+          'name': 'Commander',
+          'cmc': 5,
+          'type_line': 'Legendary Creature',
+          'quantity': 1
+        },
       ];
 
       final simulator = GoldfishSimulator(cards, simulations: 100);
@@ -74,10 +84,42 @@ void main() {
       expect(result.landCount, equals(35));
     });
 
+    test('does not treat corrupted non-land CMC as free', () {
+      final cards = [
+        ..._generateLands(35),
+        {
+          'name': 'Mana Vault',
+          'cmc': 0,
+          'mana_cost': '{1}',
+          'type_line': 'Artifact',
+          'quantity': 1,
+        },
+        {
+          'name': 'Unknown Spell',
+          'cmc': null,
+          'type_line': 'Sorcery',
+          'quantity': 1,
+        },
+      ];
+
+      final simulator = GoldfishSimulator(cards, simulations: 100);
+      final result = simulator.simulate();
+
+      expect(result.cmcDistribution[0], isNull);
+      expect(result.cmcDistribution[1], equals(1));
+      expect(result.cmcDistribution[10], equals(1));
+    });
+
     test('handles quantity correctly', () {
       final cards = [
         {'name': 'Island', 'type_line': 'Basic Land', 'quantity': 36},
-        {'name': 'Counterspell', 'cmc': 2, 'type_line': 'Instant', 'oracle_text': 'Counter spell', 'quantity': 4},
+        {
+          'name': 'Counterspell',
+          'cmc': 2,
+          'type_line': 'Instant',
+          'oracle_text': 'Counter spell',
+          'quantity': 4
+        },
       ];
 
       final simulator = GoldfishSimulator(cards, simulations: 100);
@@ -97,7 +139,10 @@ void main() {
       final result = simulator.simulate();
 
       expect(result.avgCmc, greaterThan(4.0));
-      expect(result.recommendations.any((r) => r.contains('CMC') || r.contains('lento')), isTrue);
+      expect(
+          result.recommendations
+              .any((r) => r.contains('CMC') || r.contains('lento')),
+          isTrue);
     });
 
     test('turn play rates increase with turns', () {
@@ -121,8 +166,10 @@ void main() {
         ..._generateSpells(64, avgCmc: 3),
       ];
 
-      final sim1 = GoldfishSimulator(cards, simulations: 100, random: Random(42));
-      final sim2 = GoldfishSimulator(cards, simulations: 100, random: Random(42));
+      final sim1 =
+          GoldfishSimulator(cards, simulations: 100, random: Random(42));
+      final sim2 =
+          GoldfishSimulator(cards, simulations: 100, random: Random(42));
 
       final result1 = sim1.simulate();
       final result2 = sim2.simulate();
@@ -245,42 +292,50 @@ void main() {
 // === Helper functions ===
 
 List<Map<String, dynamic>> _generateLands(int count) {
-  return List.generate(count, (i) => {
-    'name': 'Land $i',
-    'type_line': 'Basic Land',
-    'cmc': 0,
-    'quantity': 1,
-  });
+  return List.generate(
+      count,
+      (i) => {
+            'name': 'Land $i',
+            'type_line': 'Basic Land',
+            'cmc': 0,
+            'quantity': 1,
+          });
 }
 
 List<Map<String, dynamic>> _generateSpells(int count, {required int avgCmc}) {
-  return List.generate(count, (i) => {
-    'name': 'Spell $i',
-    'type_line': 'Instant',
-    'cmc': avgCmc,
-    'oracle_text': 'Do something.',
-    'quantity': 1,
-  });
+  return List.generate(
+      count,
+      (i) => {
+            'name': 'Spell $i',
+            'type_line': 'Instant',
+            'cmc': avgCmc,
+            'oracle_text': 'Do something.',
+            'quantity': 1,
+          });
 }
 
 List<Map<String, dynamic>> _generateCreatures(int count) {
-  return List.generate(count, (i) => {
-    'name': 'Creature $i',
-    'type_line': 'Creature — Human',
-    'cmc': 3,
-    'oracle_text': '',
-    'quantity': 1,
-  });
+  return List.generate(
+      count,
+      (i) => {
+            'name': 'Creature $i',
+            'type_line': 'Creature — Human',
+            'cmc': 3,
+            'oracle_text': '',
+            'quantity': 1,
+          });
 }
 
 List<Map<String, dynamic>> _generateCardsWithText(int count, String text) {
-  return List.generate(count, (i) => {
-    'name': 'Card $i',
-    'type_line': 'Instant',
-    'cmc': 3,
-    'oracle_text': text,
-    'quantity': 1,
-  });
+  return List.generate(
+      count,
+      (i) => {
+            'name': 'Card $i',
+            'type_line': 'Instant',
+            'cmc': 3,
+            'oracle_text': text,
+            'quantity': 1,
+          });
 }
 
 List<Map<String, dynamic>> _generateTypicalDeck() {

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
 import '../logger.dart';
 import '../openai_runtime_config.dart';
+import 'cmc_safety.dart';
 import 'goldfish_simulator.dart';
 import 'optimization_functional_roles.dart';
 import 'theme_contextual_rules_service.dart';
@@ -56,8 +57,8 @@ class OptimizationValidator {
           cards: originalDeck,
         );
         Log.i('ThemeValidation: ${themeValidation.theme}, '
-              '${themeValidation.checks.length} checks, '
-              'critical=${themeValidation.hasCriticalViolation}');
+            '${themeValidation.checks.length} checks, '
+            'critical=${themeValidation.hasCriticalViolation}');
       } catch (e) {
         Log.w('ThemeValidation error: $e');
       }
@@ -582,12 +583,15 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     // Adicionar warnings de validação temática
     if (themeValidation != null) {
       for (final check in themeValidation.checks) {
-        if (check.status != "ok" && (check.priority == 'essential' || check.priority == 'high')) {
+        if (check.status != "ok" &&
+            (check.priority == 'essential' || check.priority == 'high')) {
           if (check.status == 'below_min') {
-            warnings.add('Tema ${themeValidation.theme}: ${check.function} abaixo do mínimo '
+            warnings.add(
+                'Tema ${themeValidation.theme}: ${check.function} abaixo do mínimo '
                 '(${check.current}/${check.min}). ${check.description}');
           } else if (check.status == 'above_max') {
-            warnings.add('Tema ${themeValidation.theme}: ${check.function} acima do máximo '
+            warnings.add(
+                'Tema ${themeValidation.theme}: ${check.function} acima do máximo '
                 '(${check.current}/${check.max}). ${check.description}');
           }
         }
@@ -716,11 +720,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
   }
 
   int _getCmc(Map<String, dynamic> card) {
-    final cmc = card['cmc'];
-    if (cmc == null) return 0;
-    if (cmc is int) return cmc;
-    if (cmc is double) return cmc.toInt();
-    return int.tryParse(cmc.toString()) ?? 0;
+    return safeCmcForOptimization(card);
   }
 }
 

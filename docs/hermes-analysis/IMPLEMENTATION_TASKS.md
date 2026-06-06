@@ -7,6 +7,7 @@
 > **Novas tasks nesta execucao:** 5 (1xP1, 4xP2) — Game Changer double-counting fix, payoff tag accuracy improvement, contextual enabler/payoff heuristics, goldfish CMC validation hardening, GC list sync mechanism
 > **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
 > **Atualizacao Codex 2026-06-06:** P2 payoff/enabler contextual resolvido em `server/lib/ai/optimization_functional_roles.dart`; testes em `server/test/optimization_quality_gate_test.dart` cobrem spellslinger, aristocrats e tokens.
+> **Atualizacao Codex 2026-06-06:** P2 goldfish CMC hardening resolvido em `server/lib/ai/cmc_safety.dart`; `GoldfishSimulator`, `OptimizationValidator` e `OptimizationSwapGate` agora recuperam CMC pelo `mana_cost` quando o CMC bruto esta corrompido e tratam CMC desconhecido non-land como custo alto, nunca como carta gratis.
 
 ### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
 
@@ -127,6 +128,8 @@ print('Current enabler/payoff counts:', counts)
 ---
 
 ### [P2] Goldfish Simulator: Validar CMC antes de usar — `_getCmc()` retorna 0 para dados corrompidos sem distinguir lands de non-lands
+
+**Status em 2026-06-06:** RESOLVIDO para a camada de simulacao/validacao. A logica compartilhada `safeCmcForOptimization()` preserva lands e cartas reais de custo 0, corrige casos como `cmc=0` + `mana_cost={1}` para CMC 1, recalcula `cmc=null` ou invalido quando `mana_cost` existe, e usa fallback conservador alto para non-lands sem dado suficiente. Testes adicionados em `server/test/cmc_safety_test.dart` e `server/test/goldfish_simulator_test.dart`.
 
 **Conhecimento MTG:** O VALIDATOR_LOG (2026-06-02) documenta que 37 cartas no deck_id=6 tem CMC=0.0 no DB, incluindo fast mana REAL (Chrome Mox real CMC=0, Mox Diamond real CMC=0, Lotus Petal real CMC=0) e cartas com CMC ERRADO (Mana Vault real CMC=1, Boros Signet real CMC=2, Mana Confluence real CMC=0 como land). O goldfish simulator usa CMC para calcular playabilidade de maos e curva de mana. Com CMC=0.0 para cartas que custam 1-2 mana, a simulacao subestima a dificuldade de jogar o deck.
 

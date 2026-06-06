@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'cmc_safety.dart';
+
 /// Resultado da simulação Goldfish (jogar sozinho)
 class GoldfishResult {
   final int simulations;
@@ -246,11 +248,7 @@ class GoldfishSimulator {
 
   /// Obtém o CMC de uma carta
   int _getCmc(Map<String, dynamic> card) {
-    final cmc = card['cmc'];
-    if (cmc == null) return 0;
-    if (cmc is int) return cmc;
-    if (cmc is double) return cmc.toInt();
-    return int.tryParse(cmc.toString()) ?? 0;
+    return safeCmcForOptimization(card);
   }
 
   /// Extrai requisitos de mana colorida do mana_cost (ex: "{2}{U}{U}" → {U: 2})
@@ -562,11 +560,7 @@ class _DeckStats {
   }
 
   static int _getCmc(Map<String, dynamic> card) {
-    final cmc = card['cmc'];
-    if (cmc == null) return 0;
-    if (cmc is int) return cmc;
-    if (cmc is double) return cmc.toInt();
-    return int.tryParse(cmc.toString()) ?? 0;
+    return safeCmcForOptimization(card);
   }
 
   Map<String, dynamic> toJson() => {
