@@ -19,6 +19,13 @@ O battle ja passou da fase de bugs basicos. Existem testes cobrindo:
 - double strike + trample;
 - enriquecimento via `card_oracle_cache`.
 
+Validacao operacional em Hermes, 2026-06-06:
+
+- `sync_pg_card_metadata_to_hermes.py` aplicado no SQLite do container.
+- `card_oracle_cache` criado com 1269 aliases.
+- `master_optimizer_loop.py --preflight --report` aprovado no container.
+- Relatorio salvo em `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_hermes_20260606_234524.md`.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
