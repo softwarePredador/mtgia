@@ -139,7 +139,7 @@ try:
         
         priority = ['unknown', 'draw', 'ramp', 'removal', 'tutor', 'engine', 'spellslinger', 'protection']
         for tag in priority:
-            matches = [(n, c, _) for n, c, t in target_list if t == tag]
+            matches = [(n, c) for n, c, t in target_list if t == tag]
             if matches:
                 matches.sort(key=lambda x: -x[1])  # highest CMC first
                 return matches[0][0]

@@ -107,11 +107,6 @@
     "effect": "draw_engine",
     "trigger": "opponent_draw"
   },
-  "Arena Rector": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
-  },
   "Arid Mesa": {
     "cmc": 0,
     "effect": "land"
@@ -158,20 +153,10 @@
     "cmc": 1.0,
     "effect": "draw_engine"
   },
-  "Avacyn, Angel of Hope": {
-    "cmc": 8.0,
-    "effect": "creature",
-    "power": 8
-  },
   "Avatar's Wrath": {
     "cmc": 4.0,
     "effect": "silence_opponents",
     "instant": true
-  },
-  "Aven Mindcensor": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
   },
   "Aziza, Mage Tower Captain": {
     "cmc": 2.0,
@@ -221,11 +206,6 @@
     "effect": "finisher",
     "instant": true
   },
-  "Bearer of the Heavens": {
-    "cmc": 8.0,
-    "effect": "creature",
-    "power": 8
-  },
   "Bender's Waterskin": {
     "cmc": 3.0,
     "effect": "ramp_permanent",
@@ -258,11 +238,6 @@
   "Blood Moon": {
     "cmc": 3.0,
     "effect": "draw_engine"
-  },
-  "Bloodboil Sorcerer": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Bloodstained Mire": {
     "cmc": 0,
@@ -311,11 +286,6 @@
     "cmc": 1.0,
     "count": 3,
     "effect": "draw_cards"
-  },
-  "Brallin, Skyshark Rider": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Brilliant Wings": {
     "cmc": 2.0,
@@ -453,11 +423,6 @@
     "effect": "indestructible",
     "instant": true
   },
-  "Chardalyn Dragon": {
-    "cmc": 6.0,
-    "effect": "creature",
-    "power": 6
-  },
   "Chrome Mox": {
     "cmc": 0.0,
     "effect": "ramp_permanent",
@@ -492,11 +457,6 @@
     "effect": "ramp_permanent",
     "mana_produced": 1
   },
-  "Clockwork Dragon": {
-    "cmc": 7.0,
-    "effect": "creature",
-    "power": 7
-  },
   "Cloud Key": {
     "cmc": 3.0,
     "effect": "ramp_permanent",
@@ -511,11 +471,6 @@
     "cmc": 7.0,
     "count": 1,
     "effect": "draw_cards"
-  },
-  "Combat Celebrant": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
   },
   "Command Beacon": {
     "cmc": 0.0,
@@ -555,11 +510,6 @@
   "Consulate Crackdown": {
     "cmc": 5.0,
     "effect": "board_wipe"
-  },
-  "Containment Construct": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
   },
   "Cool but Rude": {
     "cmc": 2.0,
@@ -679,11 +629,6 @@
     "cmc": 10.0,
     "effect": "board_wipe"
   },
-  "Deep Gnome Terramancer": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
-  },
   "Deflecting Palm": {
     "cmc": 2.0,
     "duration": 1,
@@ -762,11 +707,6 @@
     "effect": "indestructible",
     "instant": true
   },
-  "Dragon Engine": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
-  },
   "Dragon Mage": {
     "cmc": 7.0,
     "count": 7,
@@ -786,26 +726,15 @@
     "cmc": 1.0,
     "effect": "topdeck_manipulation"
   },
-  "Dragonlord's Servant": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
-  },
   "Dragonmaster Outcast": {
     "cmc": 1.0,
     "effect": "token_maker",
     "token_count": 1,
     "token_power": 1
   },
-  "Dragonspeaker Shaman": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
-  },
   "Dragonstorm": {
     "cmc": 9.0,
-    "count": 1,
-    "effect": "draw_cards"
+    "effect": "finisher"
   },
   "Drannith Magistrate": {
     "cmc": 2.0,
@@ -954,11 +883,6 @@
     "cmc": 6.0,
     "effect": "board_wipe"
   },
-  "Fallaji Dragon Engine": {
-    "cmc": 8.0,
-    "effect": "creature",
-    "power": 8
-  },
   "Farewell": {
     "cmc": 6.0,
     "effect": "board_wipe"
@@ -975,11 +899,6 @@
   "Fated Firepower": {
     "cmc": 3.0,
     "effect": "draw_engine"
-  },
-  "Felidar Guardian": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Fellwar Stone": {
     "cmc": 2.0,
@@ -1007,8 +926,7 @@
   },
   "Fiery Encore": {
     "cmc": 5.0,
-    "count": 5,
-    "effect": "draw_cards"
+    "effect": "finisher"
   },
   "Fiery Inscription": {
     "cmc": 3.0,
@@ -1216,11 +1134,6 @@
     "token_count": 1,
     "token_power": 1
   },
-  "Goblin Welder": {
-    "cmc": 1.0,
-    "effect": "creature",
-    "power": 1
-  },
   "Gods Willing": {
     "cmc": 1.0,
     "duration": 1,
@@ -1236,11 +1149,6 @@
     "effect": "token_maker",
     "token_count": 5,
     "token_power": 3
-  },
-  "Goliath Daydreamer": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Grab the Prize": {
     "cmc": 2.0,
@@ -1317,16 +1225,6 @@
     "token_count": 1,
     "token_power": 1
   },
-  "Hellkite Charger": {
-    "cmc": 6.0,
-    "effect": "creature",
-    "power": 6
-  },
-  "Hellkite Igniter": {
-    "cmc": 7.0,
-    "effect": "creature",
-    "power": 7
-  },
   "Hellkite Tyrant": {
     "cmc": 6.0,
     "effect": "finisher"
@@ -1335,11 +1233,6 @@
     "cmc": 2.0,
     "effect": "ramp_permanent",
     "mana_produced": 1
-  },
-  "Henge Guardian": {
-    "cmc": 5.0,
-    "effect": "creature",
-    "power": 5
   },
   "Heroes Remembered": {
     "cmc": 9.0,
@@ -1484,11 +1377,6 @@
     "cmc": 3.0,
     "effect": "finisher"
   },
-  "Inti, Seneschal of the Sun": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
-  },
   "Into the Time Vortex": {
     "cmc": 5.0,
     "count": 1,
@@ -1565,11 +1453,6 @@
     "effect": "token_maker",
     "token_count": 1,
     "token_power": 1
-  },
-  "Knight of the White Orchid": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
   },
   "Knollspine Dragon": {
     "cmc": 7.0,
@@ -1726,11 +1609,6 @@
     "cmc": 0.0,
     "effect": "ramp_permanent",
     "mana_produced": 3
-  },
-  "Loyal Warhound": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
   },
   "Maelstrom of the Spirit Dragon": {
     "cmc": 0.0,
@@ -1964,11 +1842,6 @@
     "count": 7,
     "effect": "draw_cards"
   },
-  "Nogi, Draco-Zealot": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
-  },
   "Nomads' Assembly": {
     "cmc": 6.0,
     "effect": "token_maker",
@@ -1989,11 +1862,6 @@
     "cmc": 8.0,
     "effect": "silence_opponents",
     "uncounterable": true
-  },
-  "Obsidian Fireheart": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Open the Omenpaths": {
     "cmc": 3.0,
@@ -2140,11 +2008,6 @@
     "cmc": 5.0,
     "count": 1,
     "effect": "draw_cards"
-  },
-  "Protector of the Wastes": {
-    "cmc": 6.0,
-    "effect": "creature",
-    "power": 6
   },
   "Providence": {
     "cmc": 7.0,
@@ -2454,11 +2317,6 @@
     "count": 1,
     "effect": "draw_cards"
   },
-  "Scion of Ugin": {
-    "cmc": 6.0,
-    "effect": "creature",
-    "power": 6
-  },
   "Scourge of Valkas": {
     "cmc": 5.0,
     "effect": "remove_creature",
@@ -2527,11 +2385,6 @@
     "cmc": 2.0,
     "effect": "topdeck_manipulation"
   },
-  "Serra Ascendant": {
-    "cmc": 1.0,
-    "effect": "creature",
-    "power": 1
-  },
   "Sevinne's Reclamation": {
     "cmc": 3.0,
     "count": 2,
@@ -2557,11 +2410,6 @@
     "cmc": 1.0,
     "effect": "silence_opponents",
     "instant": true
-  },
-  "Silent Arbiter": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Simian Spirit Guide": {
     "cmc": 3.0,
@@ -2610,11 +2458,6 @@
     "cmc": 5.0,
     "effect": "board_wipe"
   },
-  "Slumbering Dragon": {
-    "cmc": 1.0,
-    "effect": "creature",
-    "power": 1
-  },
   "Smoldering Crater": {
     "cmc": 0.0,
     "count": 1,
@@ -2638,11 +2481,6 @@
     "effect": "token_maker",
     "token_count": 5,
     "token_power": 3
-  },
-  "Solitude": {
-    "cmc": 5.0,
-    "effect": "creature",
-    "power": 5
   },
   "Solphim, Mayhem Dominus": {
     "cmc": 4.0,
@@ -2734,11 +2572,6 @@
     "effect": "remove_permanent",
     "instant": true
   },
-  "Steel Hellkite": {
-    "cmc": 6.0,
-    "effect": "creature",
-    "power": 6
-  },
   "Stonespeaker Crystal": {
     "cmc": 4.0,
     "count": 1,
@@ -2818,11 +2651,6 @@
     "effect": "ramp_permanent",
     "mana_produced": 1
   },
-  "Sunscorch Regent": {
-    "cmc": 5.0,
-    "effect": "creature",
-    "power": 5
-  },
   "Sunscorched Divide": {
     "cmc": 0.0,
     "effect": "ramp_permanent",
@@ -2871,11 +2699,6 @@
     "count": 1,
     "effect": "draw_cards"
   },
-  "Teeka's Dragon": {
-    "cmc": 9.0,
-    "effect": "creature",
-    "power": 9
-  },
   "Temple of Triumph": {
     "cmc": 0.0,
     "effect": "topdeck_manipulation"
@@ -2889,11 +2712,6 @@
     "cmc": 6.0,
     "count": 1,
     "effect": "draw_cards"
-  },
-  "Terror of the Peaks": {
-    "cmc": 5.0,
-    "effect": "creature",
-    "power": 5
   },
   "Tezzeret, Cruel Captain": {
     "cmc": 3.0,
@@ -2923,11 +2741,6 @@
   "The Tabernacle at Pendrell Vale": {
     "cmc": 0,
     "effect": "land"
-  },
-  "The Walls of Ba Sing Se": {
-    "cmc": 8.0,
-    "effect": "creature",
-    "power": 8
   },
   "Thieves' Auction": {
     "cmc": 7.0,
@@ -2991,20 +2804,10 @@
     "effect": "ramp_permanent",
     "mana_produced": 1
   },
-  "Torbran, Thane of Red Fell": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
-  },
   "Tormenting Voice": {
     "cmc": 2.0,
     "count": 2,
     "effect": "draw_cards"
-  },
-  "Traxos, Scourge of Kroog": {
-    "cmc": 4.0,
-    "effect": "creature",
-    "power": 4
   },
   "Treasonous Ogre": {
     "cmc": 4.0,
@@ -3162,11 +2965,6 @@
     "count": 2,
     "effect": "recursion"
   },
-  "Voltaic Servant": {
-    "cmc": 2.0,
-    "effect": "creature",
-    "power": 2
-  },
   "Wake of Destruction": {
     "cmc": 6.0,
     "count": 1,
@@ -3210,11 +3008,6 @@
     "cmc": 3.0,
     "count": 1,
     "effect": "draw_cards"
-  },
-  "Werefox Bodyguard": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
   },
   "Wheel of Fate": {
     "cmc": 0.0,
@@ -3298,10 +3091,5 @@
   "Zhalfirin Void": {
     "cmc": 0.0,
     "effect": "topdeck_manipulation"
-  },
-  "Zo-Zu the Punisher": {
-    "cmc": 3.0,
-    "effect": "creature",
-    "power": 3
   }
 }
