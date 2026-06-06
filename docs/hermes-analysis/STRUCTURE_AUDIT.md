@@ -1,7 +1,68 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-06 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-06 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-06 11:00 UTC
+
+Escopo desta rodada: somente imports quebrados e dependencias circulares. Nao foi feita auditoria ampla de classes, funcoes sem chamada, tabelas PostgreSQL, duplicacao geral ou coerencia entre camadas fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio: `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `6364db29`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 170.
+- Classes encontradas: 167.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 100.
+- Imports quebrados: 1.
+
+Limitacao para esta rotacao: o auditor textual cobre apenas `server/lib` e `server/routes`, portanto nao enxerga imports quebrados em `app/lib` nem em `server/bin`, e tambem nao monta grafo/SCC para ciclos. A execucao reescreve `STRUCTURE_AUDIT.md` com inventario gerado; essa mutacao automatica foi descartada para preservar o historico manual, e somente os numeros acima mais os achados focados abaixo foram incorporados.
+
+### Metodo manual focado
+
+- Resolucao local de imports Dart em 424 arquivos de `app/lib`, `server/lib`, `server/routes` e `server/bin`.
+- Imports `dart:` e pacotes externos foram ignorados; `package:manaloom/...` foi resolvido para `app/lib`, `package:server/...` para `server/lib` e o alias historico `package:ai/...` para `server/lib/ai`.
+- Imports relativos foram resolvidos a partir do diretorio do arquivo Dart origem.
+- O mesmo grafo local foi usado para SCCs; foram reportados apenas componentes fortemente conexos com mais de um arquivo.
+- Validador complementar: `cd server && dart analyze routes/ai/commander-learning/index.dart bin/local_test_server.dart` confirmou os dois imports quebrados de backend. `cd app && flutter analyze --no-pub --no-fatal-infos lib/features/decks/widgets/deck_analysis_tab.dart lib/features/home/life_counter_screen.dart` nao foi conclusivo para o app porque `package:flutter`, `package:provider` e `package:fl_chart` nao resolvem neste checkout, mas a saida inclui os dois `uri_does_not_exist` locais abaixo.
+
+### Achados revalidados
+
+#### P1/P2 - Quatro imports locais quebrados permanecem no checkout atual
+
+- **Backend app-facing Commander Learning:** `server/routes/ai/commander-learning/index.dart:4` importa `../../../lib/ai/commander_learned_deck_support.dart`, resolvendo para `server/lib/ai/commander_learned_deck_support.dart`, arquivo ausente neste checkout. `dart analyze` focado confirma `uri_does_not_exist` e erros em cascata para `CommanderLearnedDeckInput` em `:61`, `:105`, `:141`, `:169`, `:248`, `:265`, `:283` e `:305`. Validacao: restaurar/criar o support esperado ou remover/desativar a rota ate o contrato existir; falsificacao: o arquivo passar a existir e o analyzer focado deixar de reportar `uri_does_not_exist`.
+- **Entry point local de teste:** `server/bin/local_test_server.dart:3` importa `../.dart_frog/server.dart`, resolvendo para `server/.dart_frog/server.dart`, artefato ausente em clone limpo desta branch. `dart analyze` focado confirma `uri_does_not_exist`. Validacao: gerar o artefato antes do analyze/uso, trocar para entrypoint suportado pelo Dart Frog, ou documentar o binario como dependente de build local; falsificacao: `server/.dart_frog/server.dart` existir no fluxo suportado ou o import deixar de ser estatico.
+- **App deck analysis:** `app/lib/features/decks/widgets/deck_analysis_tab.dart:5` importa `../../../../core/utils/mana_helper.dart`, resolvendo para `app/core/utils/mana_helper.dart`; o arquivo real existe em `app/lib/core/utils/mana_helper.dart`. A importacao vizinha `../../../core/theme/app_theme.dart` em `:4` mostra o nivel relativo esperado para sair de `features/decks/widgets` ate `app/lib/core`. Validacao: trocar para `../../../core/utils/mana_helper.dart` ou `package:manaloom/core/utils/mana_helper.dart`; falsificacao: criar intencionalmente `app/core/utils/mana_helper.dart`, o que seria incoerente com a estrutura atual.
+- **App life counter nativo:** `app/lib/features/home/life_counter_screen.dart:7` importa `../../../core/theme/app_theme.dart`, resolvendo para `app/core/theme/app_theme.dart`; o arquivo real existe em `app/lib/core/theme/app_theme.dart`. A partir de `features/home`, o caminho relativo correto teria dois `..` (`../../core/theme/app_theme.dart`) ou package import. Validacao: corrigir o caminho ou usar `package:manaloom/core/theme/app_theme.dart`; falsificacao: criar intencionalmente `app/core/theme/app_theme.dart`, tambem incoerente com a estrutura atual.
+
+A varredura ampliada nao encontrou outros imports locais quebrados nos 424 arquivos do recorte.
+
+#### P2 - Ciclo Flutter entre perfil publico e detalhe de deck publico segue presente
+
+- **Componente SCC:** `app/lib/features/community/screens/community_deck_detail_screen.dart` e `app/lib/features/social/screens/user_profile_screen.dart`.
+- **Aresta 1:** `community_deck_detail_screen.dart:8` importa `../../social/screens/user_profile_screen.dart` e instancia `UserProfileScreen` em `:213` para navegar do deck publico ao dono/perfil.
+- **Aresta 2:** `user_profile_screen.dart:7` importa `../../community/screens/community_deck_detail_screen.dart` e instancia `CommunityDeckDetailScreen` em `:469` para navegar do perfil ao deck publico.
+- **Por que e ciclo real:** o SCC do grafo local contem exatamente esses dois arquivos e nao depende de pacote externo nem de teste. Nao foi encontrado ciclo local backend.
+- **Impacto:** ciclo pequeno e funcionalmente compreensivel, mas aumenta acoplamento entre features `community` e `social`; qualquer inicializacao top-level futura nesses arquivos pode transformar uma navegacao legitima em problema de carregamento/testabilidade.
+- **O que valida:** extrair a navegacao para rotas nomeadas, callback/factory comum ou shell/router compartilhado, deixando `community` e `social` dependerem de uma camada comum em vez de uma da outra.
+- **O que falsifica:** SCC local zerado apos remover pelo menos uma das importacoes diretas, mantendo as navegacoes cobertas por teste/widget smoke.
+
+### Resultado desta revalidacao
+
+Os achados historicos de imports/ciclo foram revalidados no checkout `6364db29` sem novos candidatos no recorte. O risco mais alto continua sendo `server/routes/ai/commander-learning/index.dart`, porque o import ausente quebra a rota e o tipo `CommanderLearnedDeckInput` em cascata. O ciclo app e P2 por acoplamento, nao por falha de compilacao imediata.
+
 
 ## Rodada focada: Functions not called - revalidacao 2026-06-06 07:00 UTC
 

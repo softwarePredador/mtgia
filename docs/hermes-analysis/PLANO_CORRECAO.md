@@ -72,17 +72,18 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
-    checkout local `61749fe2` (2026-06-05 11:00 UTC).** O auditor base continua
+    checkout local `6364db29` (2026-06-06 11:00 UTC).** O auditor base continua
     reportando 1 import quebrado dentro de seu recorte:
     `server/routes/ai/commander-learning/index.dart:4` importa o support ausente
     `server/lib/ai/commander_learned_deck_support.dart`, e `dart analyze`
     focado confirma `uri_does_not_exist` com cascata em
-    `CommanderLearnedDeckInput`. A varredura local ampliada encontrou somente 4
-    imports locais quebrados em
-    424 arquivos: esse `commander-learning`, `deck_analysis_tab.dart:5` e
+    `CommanderLearnedDeckInput`; o mesmo analyze confirma
+    `server/bin/local_test_server.dart:3` apontando para o artefato ausente
+    `server/.dart_frog/server.dart`. A varredura local ampliada encontrou
+    somente 4 imports locais quebrados em 424 arquivos: esse
+    `commander-learning`, `deck_analysis_tab.dart:5` e
     `life_counter_screen.dart:7` usando imports relativos que saem de `app/lib`
-    para `app/core/...`, e `server/bin/local_test_server.dart:3` dependendo do
-    artefato ausente `server/.dart_frog/server.dart`. A varredura SCC encontrou
+    para `app/core/...`, e `local_test_server.dart:3`. A varredura SCC encontrou
     somente um ciclo local: `CommunityDeckDetailScreen` e `UserProfileScreen`
     importam e instanciam uma a outra por `Navigator.push`; nenhum ciclo local
     backend foi encontrado.
