@@ -326,6 +326,28 @@ void main() {
       expect(counts[BracketCategory.fastMana], equals(0));
     });
 
+    test('official game changer list stays complete and handles MDFC names',
+        () {
+      expect(officialGameChangerNamesForBracketPolicy, hasLength(53));
+      expect(
+        officialGameChangerNamesForBracketPolicy,
+        contains('tergrid, god of fright // tergrid\'s lantern'),
+      );
+
+      for (final name in const [
+        'Tergrid, God of Fright // Tergrid\'s Lantern',
+        'Tergrid, God of Fright',
+      ]) {
+        final tags = tagCardForBracket(
+          name: name,
+          typeLine: 'Legendary Creature — God',
+          oracleText: '',
+        );
+
+        expect(tags.categories, equals({BracketCategory.gameChanger}));
+      }
+    });
+
     test('blocks power additions above low bracket budgets', () {
       final decision = applyBracketPolicyToAdditions(
         bracket: 1,

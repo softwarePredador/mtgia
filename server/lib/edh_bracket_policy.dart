@@ -100,7 +100,7 @@ BracketTagResult tagCardForBracket({
 
   // Game Changers oficiais consomem apenas o budget de Game Changer.
   // Eles nao devem consumir tambem fast mana/tutor/free interaction/etc.
-  if (_gameChangerNames.contains(n)) {
+  if (_isOfficialGameChangerName(n)) {
     return BracketTagResult({BracketCategory.gameChanger});
   }
 
@@ -282,7 +282,8 @@ const _knownInfiniteComboPieces = <String>{
   'tainted pact',
 };
 
-const _gameChangerNames = <String>{
+// BEGIN GENERATED GAME CHANGERS
+const officialGameChangerNamesForBracketPolicy = <String>{
   'ad nauseam',
   'ancient tomb',
   'aura shards',
@@ -329,7 +330,7 @@ const _gameChangerNames = <String>{
   'smothering tithe',
   'survival of the fittest',
   'teferi\'s protection',
-  'tergrid, god of fright',
+  'tergrid, god of fright // tergrid\'s lantern',
   'thassa\'s oracle',
   'the one ring',
   'the tabernacle at pendrell vale',
@@ -337,3 +338,29 @@ const _gameChangerNames = <String>{
   'vampiric tutor',
   'worldly tutor',
 };
+// END GENERATED GAME CHANGERS
+
+const _gameChangerNames = officialGameChangerNamesForBracketPolicy;
+
+bool _isOfficialGameChangerName(String name) {
+  final variants = _normalizedBracketNameVariants(name);
+  for (final officialName in _gameChangerNames) {
+    final officialVariants = _normalizedBracketNameVariants(officialName);
+    if (variants.any(officialVariants.contains)) return true;
+  }
+  return false;
+}
+
+Set<String> _normalizedBracketNameVariants(String name) {
+  final normalized = name.toLowerCase().trim();
+  if (normalized.isEmpty) return const <String>{};
+
+  final variants = <String>{normalized};
+  final splitIndex = normalized.indexOf('//');
+  if (splitIndex != -1) {
+    final firstFace = normalized.substring(0, splitIndex).trim();
+    if (firstFace.isNotEmpty) variants.add(firstFace);
+  }
+
+  return variants;
+}

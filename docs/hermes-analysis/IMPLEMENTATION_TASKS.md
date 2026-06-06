@@ -8,6 +8,7 @@
 > **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
 > **Atualizacao Codex 2026-06-06:** P2 payoff/enabler contextual resolvido em `server/lib/ai/optimization_functional_roles.dart`; testes em `server/test/optimization_quality_gate_test.dart` cobrem spellslinger, aristocrats e tokens.
 > **Atualizacao Codex 2026-06-06:** P2 goldfish CMC hardening resolvido em `server/lib/ai/cmc_safety.dart`; `GoldfishSimulator`, `OptimizationValidator` e `OptimizationSwapGate` agora recuperam CMC pelo `mana_cost` quando o CMC bruto esta corrompido e tratam CMC desconhecido non-land como custo alto, nunca como carta gratis.
+> **Atualizacao Codex 2026-06-06:** P2 Game Changer drift guard resolvido com bloco Dart gerado a partir do SQLite, script `docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py --check` e teste cobrindo lista com 53 entradas + nome MDFC de Tergrid.
 
 ### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
 
@@ -159,6 +160,8 @@ cd server && dart analyze lib/ai/goldfish_simulator.dart
 ---
 
 ### [P2] Game Changer List: Dart hardcoded `_gameChangerNames` vs SQLite autoritativo — risco de drift com futuras atualizacoes da lista oficial
+
+**Status em 2026-06-06:** RESOLVIDO como guardrail local. A lista Dart agora e exposta como `officialGameChangerNamesForBracketPolicy`, fica dentro de um bloco gerado, e o script `sync_game_changers_to_dart.py` sincroniza/valida contra `scripts/knowledge.db`. A deteccao tambem normaliza MDFC para aceitar tanto o nome completo quanto a face principal, cobrindo `Tergrid, God of Fright // Tergrid's Lantern`.
 
 **Conhecimento MTG:** A lista de 53 Game Changers e mantida oficialmente pelo Commander Rules Committee (mtgcommander.net) e pela Wizards. O banco SQLite (`game_changers` table) tem a lista importada do Scryfall com campos `why_game_changer`, `impact_category`, `impact_level` — dados ricos que a pesquisa autonoma produziu. O Dart `_gameChangerNames` e uma lista hardcoded de 53 nomes. Se a lista oficial mudar (cartas adicionadas/removidas), o Dart fica desatualizado enquanto o SQLite pode ser re-importado.
 
