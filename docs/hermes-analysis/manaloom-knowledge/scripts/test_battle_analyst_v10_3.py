@@ -384,6 +384,214 @@ def test_player_does_not_counter_own_spell():
     assert active.available_mana() == 2
 
 
+def test_colored_mana_requires_the_correct_color():
+    active = player("Active")
+    active.mana_pool.add("white", 1)
+    active.mana_pool.add_generic(2)
+    white_spell = {"name": "White Spell", "cmc": 2, "mana_cost": "{1}{W}"}
+    blue_spell = {"name": "Blue Spell", "cmc": 2, "mana_cost": "{1}{U}"}
+
+    assert active.can_pay_card(white_spell) is True
+    assert active.can_pay_card(blue_spell) is False
+    assert active.spend_card_mana(white_spell) is True
+    assert active.available_mana() == 1
+
+
+def test_treasure_and_flexible_sources_pay_colored_costs():
+    active = player("Active")
+    active.mana_pool.add("wildcard", 1)
+    active.treasures = 1
+    spell = {"name": "Dimir Spell", "cmc": 2, "mana_cost": "{U}{B}"}
+
+    assert active.can_pay_card(spell) is True
+    assert active.spend_card_mana(spell) is True
+    assert active.available_mana() == 0
+    assert active.treasures == 0
+
+
+def test_basic_lands_refresh_as_colored_sources():
+    active = player("Active")
+    active.battlefield = [
+        {"name": "Plains", "effect": "land"},
+        {"name": "Island", "effect": "land"},
+    ]
+    active.refresh_mana_sources(turn=1)
+
+    assert active.mana_pool.white == 1
+    assert active.mana_pool.blue == 1
+    assert active.can_pay_card({"name": "Azorius", "cmc": 2, "mana_cost": "{W}{U}"})
+
+
+def test_multiple_blockers_can_gang_block():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 5
+    attacker.battlefield = [{
+        "name": "Large Attacker",
+        "effect": "creature",
+        "power": 6,
+        "toughness": 6,
+        "summoning_sick": False,
+        "tapped": False,
+    }]
+    defender.battlefield = [
+        {"name": "Blocker A", "effect": "creature", "power": 3, "toughness": 3},
+        {"name": "Blocker B", "effect": "creature", "power": 3, "toughness": 3},
+    ]
+
+    battle.combat_phase_v8(
+        attacker, [defender], [attacker, defender], 2, random.Random(11), battle.Stack()
+    )
+
+    combat = next(data for event, data in events if event == "combat")
+    assert combat["blockers"] == 2
+    assert combat["multi_blocks"] == 1
+    assert attacker.battlefield == []
+    assert defender.battlefield == []
+    assert defender.life == 5
+
+
+def test_trample_assigns_excess_damage_to_defender():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 5
+    attacker.battlefield = [{
+        "name": "Trampler",
+        "effect": "creature",
+        "power": 7,
+        "toughness": 7,
+        "trample": True,
+        "summoning_sick": False,
+        "tapped": False,
+    }]
+    defender.battlefield = [
+        {"name": "Small Blocker", "effect": "creature", "power": 2, "toughness": 2}
+    ]
+
+    battle.combat_phase_v8(
+        attacker, [defender], [attacker, defender], 2, random.Random(12), battle.Stack()
+    )
+
+    assert defender.life == 0
+    assert defender.battlefield == []
+    assert attacker.battlefield[0]["name"] == "Trampler"
+
+
+def test_deathtouch_assigns_one_lethal_damage_per_blocker():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 2
+    attacker.battlefield = [{
+        "name": "Deathtouch Attacker",
+        "effect": "creature",
+        "power": 2,
+        "toughness": 2,
+        "deathtouch": True,
+        "summoning_sick": False,
+        "tapped": False,
+    }]
+    defender.battlefield = [
+        {"name": "Blocker A", "effect": "creature", "power": 1, "toughness": 8},
+        {"name": "Blocker B", "effect": "creature", "power": 1, "toughness": 8},
+    ]
+
+    battle.combat_phase_v8(
+        attacker, [defender], [attacker, defender], 2, random.Random(13), battle.Stack()
+    )
+
+    assert defender.battlefield == []
+    assert attacker.battlefield == []
+    assert defender.life == 2
+
+
+def test_first_strike_blocker_kills_before_regular_damage():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 3
+    attacker.battlefield = [{
+        "name": "Regular Attacker",
+        "effect": "creature",
+        "power": 3,
+        "toughness": 3,
+        "summoning_sick": False,
+        "tapped": False,
+    }]
+    defender.battlefield = [{
+        "name": "First Strike Blocker",
+        "effect": "creature",
+        "power": 3,
+        "toughness": 3,
+        "first_strike": True,
+    }]
+
+    battle.combat_phase_v8(
+        attacker, [defender], [attacker, defender], 2, random.Random(14), battle.Stack()
+    )
+
+    assert attacker.battlefield == []
+    assert defender.battlefield[0]["name"] == "First Strike Blocker"
+    assert defender.life == 3
+
+
+def test_indestructible_blocker_survives_lethal_combat_damage():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 5
+    attacker.battlefield = [{
+        "name": "Large Attacker",
+        "effect": "creature",
+        "power": 5,
+        "toughness": 5,
+        "summoning_sick": False,
+        "tapped": False,
+    }]
+    defender.battlefield = [{
+        "name": "Indestructible Blocker",
+        "effect": "creature",
+        "power": 2,
+        "toughness": 2,
+        "indestructible": True,
+    }]
+
+    battle.combat_phase_v8(
+        attacker, [defender], [attacker, defender], 2, random.Random(15), battle.Stack()
+    )
+
+    assert defender.battlefield[0]["name"] == "Indestructible Blocker"
+    assert defender.life == 5
+
+
+def test_double_strike_trample_deals_excess_in_both_steps():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 4
+    attacker.battlefield = [{
+        "name": "Double Strike Trampler",
+        "effect": "creature",
+        "power": 4,
+        "toughness": 4,
+        "double_strike": True,
+        "trample": True,
+        "summoning_sick": False,
+        "tapped": False,
+    }]
+    defender.battlefield = [{
+        "name": "Small Blocker",
+        "effect": "creature",
+        "power": 1,
+        "toughness": 2,
+    }]
+
+    battle.combat_phase_v8(
+        attacker, [defender], [attacker, defender], 2, random.Random(16), battle.Stack()
+    )
+
+    assert defender.battlefield == []
+    assert defender.life == -2
+
+
 if __name__ == "__main__":
     tests = [
         test_sba_only_reports_new_elimination,
@@ -400,6 +608,15 @@ if __name__ == "__main__":
         test_combat_focuses_known_approach_caster,
         test_first_strike_does_not_deal_regular_damage_twice,
         test_player_does_not_counter_own_spell,
+        test_colored_mana_requires_the_correct_color,
+        test_treasure_and_flexible_sources_pay_colored_costs,
+        test_basic_lands_refresh_as_colored_sources,
+        test_multiple_blockers_can_gang_block,
+        test_trample_assigns_excess_damage_to_defender,
+        test_deathtouch_assigns_one_lethal_damage_per_blocker,
+        test_first_strike_blocker_kills_before_regular_damage,
+        test_indestructible_blocker_survives_lethal_combat_damage,
+        test_double_strike_trample_deals_excess_in_both_steps,
     ]
     for test in tests:
         test()

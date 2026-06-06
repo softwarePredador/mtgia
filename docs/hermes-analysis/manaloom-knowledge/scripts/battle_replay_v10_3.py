@@ -46,13 +46,17 @@ def main():
             elif event == "mana_refreshed":
                 replay.write(
                     "  MANA {player}: {mana} available "
-                    "({sources} sources, {treasures} treasures)\n".format(**data)
+                    "({sources} sources, {treasures} treasures, pool={mana_pool})\n".format(
+                        **{**data, "mana_pool": data.get("mana_pool", {})},
+                    )
                 )
             elif event == "combat":
                 replay.write(
                     "  COMBAT {attacker} -> {target}: "
                     "{attackers} attackers, {blockers} blockers, "
-                    "{total_power} power\n".format(**data)
+                    "{multi_blocks} gang blocks, {total_power} power\n".format(
+                        **{**data, "multi_blocks": data.get("multi_blocks", 0)},
+                    )
                 )
             elif event == "turn_end":
                 replay.write(

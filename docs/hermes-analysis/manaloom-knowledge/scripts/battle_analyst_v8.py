@@ -39,6 +39,116 @@ def emit_replay_event(event, **data):
         pass
 
 
+MANA_SYMBOL_TO_POOL = {
+    "W": "white",
+    "U": "blue",
+    "B": "black",
+    "R": "red",
+    "G": "green",
+    "C": "colorless",
+}
+
+BASIC_LAND_COLORS = {
+    "Plains": "white",
+    "Island": "blue",
+    "Swamp": "black",
+    "Mountain": "red",
+    "Forest": "green",
+    "Wastes": "colorless",
+    "Ancient Den": "white",
+    "Seat of the Synod": "blue",
+    "Vault of Whispers": "black",
+    "Great Furnace": "red",
+    "Tree of Tales": "green",
+}
+
+
+def parse_mana_cost(cost, fallback_cmc=0):
+    """Parse a mana cost into generic, colored, and flexible hybrid symbols."""
+    if isinstance(cost, (int, float)):
+        return {"generic": int(cost), "colored": defaultdict(int), "hybrid": []}
+    if not cost:
+        return {
+            "generic": int(float(fallback_cmc or 0)),
+            "colored": defaultdict(int),
+            "hybrid": [],
+        }
+
+    parsed = {"generic": 0, "colored": defaultdict(int), "hybrid": []}
+    for raw_symbol in re.findall(r"\{([^}]+)\}", str(cost).upper()):
+        symbol = raw_symbol.strip()
+        if symbol.isdigit():
+            parsed["generic"] += int(symbol)
+        elif symbol in ("X", "Y", "Z"):
+            continue
+        elif symbol in MANA_SYMBOL_TO_POOL:
+            parsed["colored"][MANA_SYMBOL_TO_POOL[symbol]] += 1
+        elif "/" in symbol:
+            options = [
+                MANA_SYMBOL_TO_POOL[part]
+                for part in symbol.split("/")
+                if part in MANA_SYMBOL_TO_POOL
+            ]
+            if options:
+                parsed["hybrid"].append(options)
+            elif any(part.isdigit() for part in symbol.split("/")):
+                parsed["generic"] += 1
+        else:
+            parsed["generic"] += 1
+    return parsed
+
+
+def card_mana_cost(card, additional_generic=0):
+    parsed = parse_mana_cost(card.get("mana_cost"), card.get("cmc", 0))
+    parsed["generic"] += additional_generic
+    return parsed
+
+
+def source_colors(source):
+    """Return pool colors a source can produce; unknown legacy sources are generic."""
+    if source == "land":
+        return ["generic"]
+    if not isinstance(source, dict):
+        return ["generic"]
+    explicit = (
+        source.get("produces")
+        or source.get("produced_mana")
+        or source.get("color_identity")
+    )
+    if isinstance(explicit, str):
+        explicit = re.findall(r"[WUBRGC]", explicit.upper())
+    if explicit:
+        colors = [
+            MANA_SYMBOL_TO_POOL.get(str(color).upper(), str(color).lower())
+            for color in explicit
+        ]
+        valid = [color for color in colors if color in set(MANA_SYMBOL_TO_POOL.values())]
+        return ["wildcard"] if len(valid) > 1 else (valid or ["generic"])
+    basic_color = BASIC_LAND_COLORS.get(source.get("name", ""))
+    return [basic_color] if basic_color else ["generic"]
+
+
+def enrich_card(card):
+    """Preserve imported metadata and expose combat keywords as booleans."""
+    enriched = dict(card)
+    keyword_text = " ".join(enriched.get("keywords", []))
+    keyword_text += " " + str(enriched.get("oracle_text", ""))
+    normalized = keyword_text.lower().replace(" ", "_")
+    for keyword in (
+        "flying",
+        "reach",
+        "trample",
+        "deathtouch",
+        "first_strike",
+        "double_strike",
+        "lifelink",
+        "indestructible",
+    ):
+        if keyword in normalized:
+            enriched[keyword] = True
+    return enriched
+
+
 # ═══════════════════════════════════════════
 # DECK LOADING
 # ═══════════════════════════════════════════
@@ -49,7 +159,7 @@ def load_deck(deck_id=6):
     rows = conn.execute("""
         SELECT card_name, quantity, CAST(COALESCE(cmc,0) AS REAL) as cmc,
                COALESCE(functional_tag,'unknown') as functional_tag,
-               type_line, is_commander
+               type_line, oracle_text, is_commander
         FROM deck_cards WHERE deck_id=?
     """, (deck_id,)).fetchall()
     conn.close()
@@ -57,10 +167,14 @@ def load_deck(deck_id=6):
     deck = []
     for row in rows:
         qty = row["quantity"] or 1
-        card = {"name": row["card_name"], "cmc": float(row["cmc"] or 0),
-                "tag": row["functional_tag"] or "unknown",
-                "type_line": row["type_line"] or "",
-                "is_commander": bool(row["is_commander"])}
+        card = enrich_card({
+            "name": row["card_name"],
+            "cmc": float(row["cmc"] or 0),
+            "tag": row["functional_tag"] or "unknown",
+            "type_line": row["type_line"] or "",
+            "oracle_text": row["oracle_text"] or "",
+            "is_commander": bool(row["is_commander"]),
+        })
         if card["is_commander"]: commander = card
         else:
             for _ in range(qty): deck.append(card)
@@ -239,14 +353,23 @@ def get_opponent_commander(profile):
 # ═══════════════════════════════════════════
 
 class ManaPool:
-    def __init__(self): self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = 0
-    def total(self): return self.generic + self.white + self.blue + self.black + self.red + self.green + self.colorless
+    def __init__(self): self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = self.wildcard = 0
+    def total(self): return self.generic + self.white + self.blue + self.black + self.red + self.green + self.colorless + self.wildcard
     def add_generic(self, n): self.generic += n
+    def add(self, color, amount=1):
+        if color not in ("generic", "white", "blue", "black", "red", "green", "colorless", "wildcard"):
+            color = "generic"
+        setattr(self, color, getattr(self, color) + amount)
+    def snapshot(self):
+        return {
+            color: getattr(self, color)
+            for color in ("generic", "white", "blue", "black", "red", "green", "colorless", "wildcard")
+        }
     def spend(self, amount):
         if amount < 0 or amount > self.total():
             return False
         remaining = amount
-        for color in ("generic", "colorless", "white", "blue", "black", "red", "green"):
+        for color in ("generic", "colorless", "wildcard", "white", "blue", "black", "red", "green"):
             available = getattr(self, color)
             used = min(available, remaining)
             setattr(self, color, available - used)
@@ -255,7 +378,7 @@ class ManaPool:
                 break
         return True
     def empty(self):
-        self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = 0
+        self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = self.wildcard = 0
 
 class Player:
     def shuffle(self, rng): rng.shuffle(self.library)
@@ -304,23 +427,28 @@ class Player:
     def refresh_mana_sources(self, turn=None):
         """Untap mana sources once for this player's turn."""
         self.mana_pool.empty()
-        lands = sum(
-            1
-            for c in self.battlefield
-            if c == "land" or (isinstance(c, dict) and c.get("effect") == "land")
-        )
-        ramp_mana = sum(
-            c.get("mana_produced", 1)
-            for c in self.battlefield
-            if isinstance(c, dict)
-            and c.get("effect") in ("ramp_permanent", "ramp_engine")
-        )
-        self.mana_pool.add_generic(lands + ramp_mana)
+        sources = [
+            source
+            for source in self.battlefield
+            if source == "land"
+            or (
+                isinstance(source, dict)
+                and source.get("effect") in ("land", "ramp_permanent", "ramp_engine")
+            )
+        ]
+        for source in sources:
+            produced = source.get("mana_produced", 1) if isinstance(source, dict) else 1
+            colors = source_colors(source)
+            # A source with multiple options is treated as flexible generic unless
+            # the imported data specifies one concrete produced color.
+            color = colors[0] if len(colors) == 1 else "generic"
+            self.mana_pool.add(color, produced)
         emit_replay_event(
             "mana_refreshed",
             player=self.name,
             mana=self.available_mana(),
-            sources=lands + ramp_mana,
+            sources=len(sources),
+            mana_pool=self.mana_pool.snapshot(),
             treasures=self.treasures,
             turn=turn,
         )
@@ -328,15 +456,67 @@ class Player:
     def available_mana(self):
         return self.mana_pool.total() + self.treasures
 
-    def spend_mana(self, amount):
-        """Spend the current untapped-source budget, then Treasure tokens."""
-        if amount < 0 or amount > self.available_mana():
+    def _payment_plan(self, cost):
+        parsed = (
+            cost
+            if isinstance(cost, dict) and "colored" in cost
+            else parse_mana_cost(cost, cost if isinstance(cost, (int, float)) else 0)
+        )
+        pool = self.mana_pool.snapshot()
+        treasures = self.treasures
+
+        for color, required in parsed["colored"].items():
+            paid = min(pool[color], required)
+            pool[color] -= paid
+            missing = required - paid
+            wildcard_paid = min(pool["wildcard"], missing)
+            pool["wildcard"] -= wildcard_paid
+            missing -= wildcard_paid
+            if missing > treasures:
+                return None
+            treasures -= missing
+
+        for options in parsed["hybrid"]:
+            chosen = next((color for color in options if pool[color] > 0), None)
+            if chosen:
+                pool[chosen] -= 1
+            elif pool["wildcard"] > 0:
+                pool["wildcard"] -= 1
+            elif treasures > 0:
+                treasures -= 1
+            else:
+                return None
+
+        generic = parsed["generic"]
+        for color in ("generic", "colorless", "wildcard", "white", "blue", "black", "red", "green"):
+            paid = min(pool[color], generic)
+            pool[color] -= paid
+            generic -= paid
+            if generic == 0:
+                break
+        if generic > treasures:
+            return None
+        treasures -= generic
+        return pool, treasures
+
+    def can_pay(self, cost):
+        return self._payment_plan(cost) is not None
+
+    def can_pay_card(self, card, additional_generic=0):
+        return self.can_pay(card_mana_cost(card, additional_generic))
+
+    def spend_mana(self, cost):
+        """Spend colored/generic mana and flexible Treasure according to a real cost."""
+        plan = self._payment_plan(cost)
+        if plan is None:
             return False
-        from_pool = min(amount, self.mana_pool.total())
-        if from_pool and not self.mana_pool.spend(from_pool):
-            return False
-        self.treasures -= amount - from_pool
+        pool, self.treasures = plan
+        for color, amount in pool.items():
+            setattr(self.mana_pool, color, amount)
         return True
+
+    def spend_card_mana(self, card, additional_generic=0):
+        return self.spend_mana(card_mana_cost(card, additional_generic))
 
     def is_alive(self): return self.life > 0
 
@@ -365,7 +545,7 @@ class Player:
         if castable_only:
             counters = [
                 card for card in counters
-                if card.get("cmc", 0) <= self.available_mana()
+                if self.can_pay_card(card)
             ]
         return counters
 
@@ -376,7 +556,7 @@ class Player:
             return None
         counter = min(counters, key=lambda card: card.get("cmc", 0))
         cost = counter.get("cmc", 0)
-        if not self.spend_mana(cost):
+        if not self.spend_card_mana(counter):
             return None
         self.hand.remove(counter)
         self.graveyard.append(counter)
@@ -521,13 +701,13 @@ def priority_round(active_player, all_players, stack, turn, rng):
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             if score >= 40:
-                instants = [c for c in player.hand if is_instant(c) and player.available_mana() >= c["cmc"]]
+                instants = [c for c in player.hand if is_instant(c) and player.can_pay_card(c)]
                 for c in instants:
                     eff = get_card_effect(c)
                     if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm"):
-                        if player.available_mana() >= c["cmc"]:
+                        if player.can_pay_card(c):
                             player.hand.remove(c)
-                            player.spend_mana(c["cmc"])
+                            player.spend_card_mana(c)
                             apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
                             return True
         else:
@@ -692,39 +872,41 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
     if is_main_phase and player.command_zone:
         cmd = player.command_zone[0]
         cost = cmd["cmc"] + player.commander_tax
-        if mana >= cost:
+        if player.can_pay_card(cmd, player.commander_tax):
             already_there = any(isinstance(c, dict) and c.get("name") == cmd.get("name") for c in player.battlefield)
             if not already_there:
                 player.command_zone.pop(0)
-                cmd_copy = dict(cmd)
+                cmd_copy = enrich_card(cmd)
                 haste = cmd.get("haste") or "Haste" in cmd.get("type_line", "")
                 cmd_copy["summoning_sick"] = not haste
                 cmd_copy["haste"] = haste
                 player.battlefield.append(cmd_copy)
-                player.spend_mana(cost)
+                player.spend_card_mana(cmd, player.commander_tax)
                 player.commander_tax += 2
                 mana = player.available_mana()
 
     # 2. Ramp (main phase only)
     if is_main_phase:
-        ramp_cards = [c for c in player.hand if c["cmc"] <= mana and get_card_effect(c).get("effect") in ("ramp_permanent", "ramp_engine", "ramp_ritual")]
+        ramp_cards = [c for c in player.hand if player.can_pay_card(c) and get_card_effect(c).get("effect") in ("ramp_permanent", "ramp_engine", "ramp_ritual")]
         for c in ramp_cards[:2]:
-            if c in player.hand and c["cmc"] <= mana:
+            if c in player.hand and player.can_pay_card(c):
                 player.hand.remove(c)
-                player.spend_mana(c["cmc"])
+                player.spend_card_mana(c)
                 eff = get_card_effect(c)
                 if eff.get("effect") == "ramp_ritual":
                     player.mana_pool.add_generic(eff.get("mana_produced", 3))
                     player.graveyard.append(c)
                 else:
-                    player.battlefield.append(eff)
-                    player.mana_pool.add_generic(eff.get("mana_produced", 1))
+                    permanent = enrich_card({**c, **eff})
+                    player.battlefield.append(permanent)
+                    colors = source_colors(permanent)
+                    player.mana_pool.add(colors[0], permanent.get("mana_produced", 1))
                 mana = player.available_mana()
 
     # 3. Cast spells to stack
     castable = [
         c for c in player.hand
-        if c["cmc"] <= mana and get_card_effect(c).get("effect") != "counter"
+        if player.can_pay_card(c) and get_card_effect(c).get("effect") != "counter"
     ]
     # v8: Miracle check for Lorehold
     if player.is_human:
@@ -745,9 +927,9 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
         wincons = [c for c, s in scored if s >= 50]
         if wincons:
             c = wincons[0]
-            if c in player.hand and c["cmc"] <= player.available_mana():
+            if c in player.hand and player.can_pay_card(c):
                 player.hand.remove(c)
-                player.spend_mana(c["cmc"])
+                player.spend_card_mana(c)
                 eff = get_card_effect(c)
                 stack.push(c, player, eff)
                 priority_round(player, all_players, stack, turn, rng)
@@ -760,24 +942,24 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 return
 
     # Other spells: 2 per phase max
-    remaining = sorted([c for c in castable if c["cmc"] <= player.available_mana()], key=lambda c: c["cmc"])
+    remaining = sorted([c for c in castable if player.can_pay_card(c)], key=lambda c: c["cmc"])
     played = 0
     for c in remaining:
         if played >= 2: break
-        if c in player.hand and c["cmc"] <= player.available_mana():
+        if c in player.hand and player.can_pay_card(c):
             eff = get_card_effect(c)
             if eff.get("effect") == "creature":
                 if not is_main_phase: continue  # creatures only in main phase
                 player.hand.remove(c)
-                player.spend_mana(c["cmc"])
-                c_copy = dict(c)
+                player.spend_card_mana(c)
+                c_copy = enrich_card(c)
                 c_copy["summoning_sick"] = True
                 c_copy["tapped"] = False
                 player.battlefield.append(c_copy)
                 played += 1
             else:
                 player.hand.remove(c)
-                player.spend_mana(c["cmc"])
+                player.spend_card_mana(c)
                 stack.push(c, player, eff)
                 played += 1
 
@@ -1068,12 +1250,12 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     # v8: Instant-speed removal window before combat damage
     for opp in alive_defenders:
         if opp.is_human: continue
-        removals = [c for c in opp.hand if get_card_effect(c).get("effect") in ("remove_creature",) and opp.available_mana() >= c["cmc"]]
+        removals = [c for c in opp.hand if get_card_effect(c).get("effect") in ("remove_creature",) and opp.can_pay_card(c)]
         if removals and rng.random() < 0.3:
             c = rng.choice(removals)
-            if c in opp.hand and opp.available_mana() >= c["cmc"]:
+            if c in opp.hand and opp.can_pay_card(c):
                 opp.hand.remove(c)
-                opp.spend_mana(c["cmc"])
+                opp.spend_card_mana(c)
                 # Remove one attacker
                 if attackers:
                     target = rng.choice(attackers)
@@ -1118,29 +1300,57 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     else:
         target = max(alive_defenders, key=lambda o: o.life)
 
-    # Only the attacked player can block, and each blocker is assigned once.
+    # Only the attacked player can block. Multiple blockers may gang-block one attacker.
     block_assignments = []
-    for a in attackers:
-        assigned = [blocker for _, blocker in block_assignments]
+    assigned_blockers = []
+    for a in sorted(attackers, key=lambda creature: creature.get("power", 2), reverse=True):
         available = [
             blocker
             for blocker in target.creatures_for_blocking()
-            if blocker not in assigned
+            if blocker not in assigned_blockers
             and (
                 not a.get("flying")
                 or blocker.get("flying")
                 or blocker.get("reach")
             )
         ]
-        if available and rng.random() < 0.5:
-            block_assignments.append((a, rng.choice(available)))
+        lethal_attack = target.life <= a.get("power", 2)
+        if not available or (not lethal_attack and rng.random() >= 0.35):
+            block_assignments.append((a, []))
+            continue
+        blockers = []
+        combined_power = 0
+        for blocker in sorted(available, key=lambda creature: creature.get("power", 2), reverse=True):
+            blockers.append(blocker)
+            combined_power += blocker.get("power", 2)
+            if combined_power >= a.get("toughness", a.get("power", 2)):
+                break
+        can_kill_attacker = combined_power >= a.get("toughness", a.get("power", 2))
+        if not can_kill_attacker:
+            blockers = blockers[:1] if lethal_attack else []
+        elif not lethal_attack:
+            attack_damage = a.get("power", 2)
+            estimated_losses = 0
+            for blocker in blockers:
+                lethal_to_blocker = 1 if a.get("deathtouch") else blocker.get(
+                    "toughness", blocker.get("power", 2)
+                )
+                if attack_damage >= lethal_to_blocker:
+                    estimated_losses += 1
+                    attack_damage -= lethal_to_blocker
+            # Avoid an automatic full-board suicide unless it prevents lethal.
+            if estimated_losses == len(blockers):
+                blockers = []
+        assigned_blockers.extend(blockers)
+        block_assignments.append((a, blockers))
 
     emit_replay_event(
         "combat",
         attacker=attacker.name,
         target=target.name,
         attackers=len(attackers),
-        blockers=len(block_assignments),
+        blockers=sum(len(blockers) for _, blockers in block_assignments),
+        multi_blocks=sum(1 for _, blockers in block_assignments if len(blockers) > 1),
         total_power=total_power,
         turn=turn,
     )
@@ -1151,42 +1361,82 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         except (TypeError, ValueError):
             return fallback
 
-    def deal_player_damage(creature):
-        damage = stat(creature, "power", 2)
+    def deal_player_damage(creature, damage=None):
+        damage = stat(creature, "power", 2) if damage is None else damage
         target.life -= damage
         if creature.get("lifelink"):
             attacker.life = min(40, attacker.life + damage)
         if creature.get("is_commander") and creature.get("owner") == attacker.name:
             attacker.commander_damage[target.name] += damage
 
-    # First strike attackers deal once here. Only double strike attacks again later.
-    first_strikers = [a for a in attackers if a.get("first_strike") or a.get("double_strike")]
-    for a in first_strikers:
-        blocker = next((b for assigned, b in block_assignments if assigned is a), None)
-        if blocker is None:
-            deal_player_damage(a)
-        elif blocker in target.battlefield and stat(a, "power", 2) >= stat(blocker, "toughness", stat(blocker, "power", 2)):
-            target.battlefield.remove(blocker)
-            target.graveyard.append(blocker)
+    marked_damage = defaultdict(int)
+    deathtouch_damage = set()
 
-    # Regular combat damage is simultaneous for each surviving attacker/blocker pair.
-    for a in attackers:
-        if a.get("first_strike") and not a.get("double_strike"):
-            continue
-        blocker = next((b for assigned, b in block_assignments if assigned is a), None)
-        if blocker is None:
-            deal_player_damage(a)
-            continue
-        if blocker not in target.battlefield:
-            continue
-        attacker_dies = stat(blocker, "power", 2) >= stat(a, "toughness", stat(a, "power", 2))
-        blocker_dies = stat(a, "power", 2) >= stat(blocker, "toughness", stat(blocker, "power", 2))
-        if attacker_dies and a in attacker.battlefield:
-            attacker.battlefield.remove(a)
-            attacker.graveyard.append(a)
-        if blocker_dies and blocker in target.battlefield:
-            target.battlefield.remove(blocker)
-            target.graveyard.append(blocker)
+    def deals_in_phase(creature, first_strike_phase):
+        if first_strike_phase:
+            return creature.get("first_strike") or creature.get("double_strike")
+        return not creature.get("first_strike") or creature.get("double_strike")
+
+    def mark_damage(source, damaged, amount):
+        if amount <= 0:
+            return
+        marked_damage[id(damaged)] += amount
+        if source.get("deathtouch"):
+            deathtouch_damage.add(id(damaged))
+
+    def destroy_lethal_creatures():
+        for owner, creatures in ((attacker, attackers), (target, target.creatures_for_blocking())):
+            for creature in list(creatures):
+                lethal = (
+                    marked_damage[id(creature)]
+                    >= stat(creature, "toughness", stat(creature, "power", 2))
+                    or id(creature) in deathtouch_damage
+                )
+                if lethal and not creature.get("indestructible") and creature in owner.battlefield:
+                    owner.battlefield.remove(creature)
+                    owner.graveyard.append(creature)
+
+    def combat_damage_step(first_strike_phase):
+        for attacking_creature, declared_blockers in block_assignments:
+            if attacking_creature not in attacker.battlefield:
+                continue
+            surviving_blockers = [
+                blocker for blocker in declared_blockers if blocker in target.battlefield
+            ]
+
+            if deals_in_phase(attacking_creature, first_strike_phase):
+                remaining = stat(attacking_creature, "power", 2)
+                if not declared_blockers:
+                    deal_player_damage(attacking_creature, remaining)
+                else:
+                    for blocker in surviving_blockers:
+                        lethal_needed = (
+                            1
+                            if attacking_creature.get("deathtouch")
+                            else max(
+                                0,
+                                stat(blocker, "toughness", stat(blocker, "power", 2))
+                                - marked_damage[id(blocker)],
+                            )
+                        )
+                        assigned_damage = min(remaining, lethal_needed)
+                        mark_damage(attacking_creature, blocker, assigned_damage)
+                        remaining -= assigned_damage
+                    if attacking_creature.get("trample") and remaining > 0:
+                        deal_player_damage(attacking_creature, remaining)
+
+            for blocker in surviving_blockers:
+                if deals_in_phase(blocker, first_strike_phase):
+                    mark_damage(blocker, attacking_creature, stat(blocker, "power", 2))
+
+        destroy_lethal_creatures()
+
+    if any(
+        creature.get("first_strike") or creature.get("double_strike")
+        for creature in attackers + target.creatures_for_blocking()
+    ):
+        combat_damage_step(first_strike_phase=True)
+    combat_damage_step(first_strike_phase=False)
 
     # Check for commander damage kill
     for name, dmg in attacker.commander_damage.items():
@@ -1252,10 +1502,12 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     total_mana = player.available_mana()
     lands_in_hand = [c for c in player.hand if is_land(c)]  # v10.2
     if lands_in_hand and player.lands_played_this_turn < player.max_lands_per_turn:
-        player.hand.remove(lands_in_hand[0])
-        player.battlefield.append("land")
+        land = lands_in_hand[0]
+        player.hand.remove(land)
+        land_permanent = enrich_card({**land, "effect": "land"})
+        player.battlefield.append(land_permanent)
         player.lands_played_this_turn += 1
-        player.mana_pool.add_generic(1)
+        player.mana_pool.add(source_colors(land_permanent)[0], 1)
     cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
     if game_winner(all_players):
         return
@@ -1295,11 +1547,11 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # All opponents can cast instants on this player's end step
     for opp in opponents:
         if not opp.is_alive(): continue
-        instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.available_mana() >= c["cmc"]]
+        instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.can_pay_card(c)]
         for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
-            if opp.available_mana() >= c["cmc"]:
+            if opp.can_pay_card(c):
                 opp.hand.remove(c)
-                opp.spend_mana(c["cmc"])
+                opp.spend_card_mana(c)
                 apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
 
 
@@ -1466,9 +1718,18 @@ def load_learned_opponents():
                     elif role == "tutor": effect = "tutor"; tag = "tutor"
                     elif role == "protection": effect = "protection"; tag = "protection"
                     elif role in ("wincon","combo_piece"): effect = "wincon"; tag = "wincon"
-                    deck.append({"name": name, "cmc": cmc, "tag": tag, "effect": effect,
-                                 "power": max(1, int(cmc)) if effect == "creature" else 0,
-                                 "type_line": tl, "is_commander": c.get("is_commander", False)})
+                    imported = dict(c)
+                    imported.update({
+                        "name": name,
+                        "cmc": cmc,
+                        "tag": tag,
+                        "effect": effect,
+                        "power": c.get("power", max(1, int(cmc)) if effect == "creature" else 0),
+                        "toughness": c.get("toughness", c.get("power", max(1, int(cmc)) if effect == "creature" else 0)),
+                        "type_line": tl,
+                        "is_commander": c.get("is_commander", False),
+                    })
+                    deck.append(enrich_card(imported))
             while len(deck) < 99:
                 deck.append({"name": "Filler", "cmc": 3, "tag": "creature", "effect": "creature", "power": 2, "type_line": "Creature"})
             decks.append({
