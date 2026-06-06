@@ -18,37 +18,52 @@ PROFILE_MAP = {
     "Atraxa, Praetors' Voice": ('a', 'atraxa_praetors_voice'),
 }
 
-# Role to deck column mapping
-ROLE_COL_MAP = {
+# Profile role key -> tag_metrics key mapping (used to match commander-specific profile keys to standard functional tags)
+PROFILE_ROLE_TO_TAG = {
+    # Lands
     'lands': 'lands',
-    'ramp': 'ramp_count',
-    'ramp_fixing': 'ramp_count',
-    'ramp_extra_lands': 'ramp_count',
-    'ramp_treasure': 'ramp_count',
-    'ramp_rocks': 'ramp_count',
-    'ramp_any': 'ramp_count',
-    'mana_dorks': 'ramp_count',
-    'draw': 'draw_count',
-    'supplemental_draw': 'draw_count',
-    'draw_value': 'draw_count',
-    'card_advantage': 'draw_count',
-    'removal': 'removal_count',
-    'interaction': 'removal_count',
-    'tutor': 'tutor_count',
-    'board_wipe': 'board_wipe_count',
-    'wipe': 'board_wipe_count',
-    'protection': 'protection_count',
-    'interaction_protection': 'protection_count',
-    'wincon': 'wincon_count',
-    'finishers': 'wincon_count',
-    'recursion': 'recursion_count',
-    'big_spell': 'engine_count',
-    'engine': 'engine_count',
-    'counter_payoffs': 'engine_count',
-    'proliferate_engines': 'engine_count',
-    'planeswalkers_superfriends': 'engine_count',
-    'nonland_mana_sources': 'ramp_count',
+    # Ramp variants
+    'ramp': 'ramp', 'ramp_fixing': 'ramp', 'ramp_extra_lands': 'ramp',
+    'ramp_treasure': 'ramp', 'ramp_rocks': 'ramp', 'ramp_any': 'ramp',
+    'mana_dorks': 'ramp', 'mana_creatures': 'ramp', 'nonland_mana_sources': 'ramp',
+    'rituals': 'ramp', 'artifact_mana': 'ramp', 'treasure_generation': 'ramp',
+    # Draw variants
+    'draw': 'draw', 'supplemental_draw': 'draw', 'draw_value': 'draw',
+    'card_advantage': 'draw',
+    # Removal / Interaction
+    'removal': 'removal', 'interaction': 'removal',
+    'interaction_counter': 'removal', 'replayable_interaction': 'removal',
+    'interaction_protection': 'protection',
+    # Tutors
+    'tutor': 'tutor', 'tutors': 'tutor',
+    # Board wipes
+    'board_wipe': 'board_wipe', 'wipe': 'board_wipe',
+    'board_wipes_bounce': 'board_wipe',
+    # Protection
+    'protection': 'protection', 'graveyard_protection': 'protection',
+    'stax_disruption': 'protection',
+    # Wincons / Finishers
+    'wincon': 'wincon', 'finishers': 'wincon',
+    'combo_finishers': 'wincon', 'storm_combo': 'wincon',
+    # Recursion
+    'recursion': 'recursion', 'recursion_value': 'recursion',
+    'land_recursion_bounce': 'recursion',
+    # Engines / Payoffs (catch-all for commander-specific categories)
+    'engine': 'engine', 'big_spell': 'engine',
+    'counter_payoffs': 'engine', 'proliferate_engines': 'engine',
+    'planeswalkers_superfriends': 'engine', 'landfall_payoffs': 'engine',
+    'payoffs_outlets': 'engine', 'sacrifice_fodder': 'engine',
+    'sacrifice_outlets': 'engine', 'aristocrat_payoffs': 'engine',
+    'self_mill': 'engine', 'exile_casting': 'engine',
+    'treasure_payoffs': 'engine', 'nonhuman_enablers': 'engine',
+    'human_hits': 'engine', 'combat_payoffs': 'engine',
+    'evasive_enablers': 'engine', 'ninjas': 'engine',
+    'topdeck_manipulation': 'engine', 'high_mv_reveals': 'engine',
+    'cheap_creature_density': 'engine', 'bounce_loop_pieces': 'engine',
+    'infinite_mana_pieces': 'engine',
 }
+# Alias for backward compat
+ROLE_COL_MAP = PROFILE_ROLE_TO_TAG
 
 ROLE_DISPLAY = {
     'lands': 'Lands',
@@ -180,7 +195,12 @@ def main():
             for role_key, role_target in role_targets.items():
                 min_v = role_target.get('min', 0)
                 max_v = role_target.get('max', 0)
-                tag_val = tag_metrics.get(role_key)
+                # Map profile role key to standard tag metric via ROLE_COL_MAP
+                mapped_key = ROLE_COL_MAP.get(role_key, role_key)
+                tag_val = tag_metrics.get(mapped_key)
+                if tag_val is None:
+                    # Try direct lookup as fallback (for profile keys that ARE standard)
+                    tag_val = tag_metrics.get(role_key)
                 if tag_val is None:
                     continue
                 status, diff = check_range(tag_val, min_v, max_v)
