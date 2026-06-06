@@ -1,11 +1,11 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-06 19:00 UTC
+> Data: 2026-06-06 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; rodadas recentes agora reportam baixa contagem e exigem validação manual do item restante (`Imports quebrados: 1` na execução local de 2026-06-06 19:00 UTC). Ainda assim, as rodadas focadas revelaram frentes prioritárias de organização:
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-06 23:00 UTC no checkout `1fbc07d8` reportou `Imports quebrados: 0` no recorte backend do auditor base. Ainda assim, as rodadas focadas revelaram frentes prioritárias de organização:
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -15,7 +15,23 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze` focado em `server/` falha com
    `uri_does_not_exist`.
-5. **P1 — Ownership e contratos app-facing em rotas deck/AI**: **REVALIDADO no checkout local `49939bb6` em 2026-06-05 23:00 UTC**. `POST /ai/optimize` e `POST /ai/archetypes` ainda carregam deck/cartas por `id` sem `user_id` na query real, apesar de serem chamados pelo app como operacoes do usuario autenticado. `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` tambem preservam jobs com `user_id = NULL` como legiveis no endpoint app-facing. `POST /ai/rebuild`, `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram verificados como controles positivos porque fazem gate de `deck_id + user_id` antes de carregar dados do deck. Deck analysis ja usa `functional_tags` app-facing, mas optimize ainda nao threada `card_function_tags` no contexto/validator, somente `semantic_tags_v2`. `/decks/:id/recommendations`, `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual nesta busca, mas devem ganhar owner-scope ou contrato publico antes de promocao. A mesma rodada tambem encontrou drift de activation telemetry: o app envia `deck_rebuild_created`, mas `_allowedEvents` da rota rejeita esse evento e o contrato ainda marca o endpoint como `internal`/`not proven` apesar de consumidores reais em `app/lib`.
+5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
+   **REVALIDADO no checkout local `1fbc07d8` em 2026-06-06 23:00 UTC**.
+   `POST /ai/optimize` e `POST /ai/archetypes` continuam chamados pelo app com
+   `deck_id`, mas as queries reais carregam `decks`/`deck_cards` por `id` sem
+   `user_id`: a rota optimize le `userId` e nao passa para
+   `loadOptimizeDeckContext`, e `/ai/archetypes` busca o deck por `id` direto.
+   `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` continuam
+   legiveis quando `job.userId == null`, embora sejam usados por polling do app.
+   `POST /ai/rebuild`, `GET /decks/:id/analysis` e
+   `POST /decks/:id/ai-analysis` seguem como controles positivos porque fazem
+   gate de `deck_id + user_id` antes de carregar cartas. Deck analysis carrega
+   `card_function_tags` + `semantic_tags_v2`, mas o contexto principal de
+   optimize ainda threada somente `semantic_tags_v2`, apesar do contrato de
+   `/ai/optimize` listar `card_function_tags` como fonte. A mesma rodada
+   revalidou drift de activation telemetry: o app envia `deck_rebuild_created`,
+   mas `_allowedEvents` rejeita o evento e o contrato ainda marca
+   `/users/me/activation-events` como `internal`/`not proven`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-06 05:30 UTC no checkout `3a83ae79`. `commander_fallback_policy.dart`
    nao existe nesta branch, e ainda ha excecoes por nome em
@@ -71,13 +87,18 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `EndpointCache.clearExpired`). A observabilidade automatica do
     `PerformanceService` foi separada como controle positivo (`init`,
     observer de tela e `traceAsync` em smoke), nao como codigo morto.
-13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
-    checkout local `6364db29` (2026-06-06 11:00 UTC).** O auditor base continua
-    reportando 1 import quebrado dentro de seu recorte:
-    `server/routes/ai/commander-learning/index.dart:4` importa o support ausente
-    `server/lib/ai/commander_learned_deck_support.dart`, e `dart analyze`
-    focado confirma `uri_does_not_exist` com cascata em
-    `CommanderLearnedDeckInput`; o mesmo analyze confirma
+13. **P1/P2 — Imports quebrados e ciclo app/server**: **HISTORICO; PARCIALMENTE
+    SUPERADO PELO CHECKOUT `1fbc07d8` EM 2026-06-06 23:00 UTC.** O auditor base
+    desta rodada reportou `Imports quebrados: 0` em `server/lib`/`server/routes`,
+    e `server/lib/ai/commander_learned_deck_support.dart` existe no checkout
+    atual. A rodada anterior segue registrada como historico e ainda precisa de
+    nova revalidacao por `dart analyze` focado antes de ser tratada como estado
+    atual. Naquele checkout local `6364db29` (2026-06-06 11:00 UTC), o auditor
+    base reportava 1 import quebrado dentro de seu recorte:
+    `server/routes/ai/commander-learning/index.dart:4` importava o support
+    ausente `server/lib/ai/commander_learned_deck_support.dart`, e `dart analyze`
+    focado confirmava `uri_does_not_exist` com cascata em
+    `CommanderLearnedDeckInput`; o mesmo analyze confirmava
     `server/bin/local_test_server.dart:3` apontando para o artefato ausente
     `server/.dart_frog/server.dart`. A varredura local ampliada encontrou
     somente 4 imports locais quebrados em 424 arquivos: esse
