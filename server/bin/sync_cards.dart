@@ -27,12 +27,14 @@ const _setListUrl = 'https://mtgjson.com/api/v5/SetList.json';
 const _atomicCardsUrl = 'https://mtgjson.com/api/v5/AtomicCards.json';
 const _atomicCardsFileName = 'AtomicCards.json';
 
-/// Tamanho do batch para envio paralelo ao Postgres.
-/// 500 = bom equilíbrio entre throughput e uso de memória.
+/// Tamanho do batch incremental.
+/// 500 = bom equilíbrio para sets pequenos sem estourar a query Dart.
 const _batchSize = 500;
 
-/// Concorrência maxima por batch para evitar pico de queries simultaneas.
-const _dbBatchConcurrency = 24;
+/// Tamanho do batch do full sync executado pelo helper Python.
+/// O full sync processa ~300k legalities; batch maior reduz centenas de
+/// round-trips e commits sem prender tudo em uma única transação gigante.
+const _fullBatchSize = 10000;
 
 /// Timeout e tentativas para downloads HTTP externos.
 const _httpTimeout = Duration(minutes: 3);
@@ -119,23 +121,10 @@ Opcoes:
       final atomicFile = await _downloadAtomicCards(force: force);
       final sw = Stopwatch()..start();
 
-      final decoded =
-          jsonDecode(await atomicFile.readAsString()) as Map<String, dynamic>;
-      final cardsMap = decoded['data'] as Map<String, dynamic>;
-      print(
-          '📂 JSON parseado em ${sw.elapsedMilliseconds}ms (${cardsMap.length} entradas)');
-
-      sw.reset();
-      processedCards = await pool.runTx((session) async {
-        return _upsertCardsFromAtomic(session, cardsMap);
-      });
-      print('🃏 Cards concluido em ${sw.elapsedMilliseconds}ms');
-
-      sw.reset();
-      processedLegalities = await pool.runTx((session) async {
-        return _upsertLegalitiesFromAtomic(session, cardsMap);
-      });
-      print('⚖️  Legalities concluido em ${sw.elapsedMilliseconds}ms');
+      final fullResult = await _syncFullAtomicFast(atomicFile);
+      processedCards = fullResult.processedCards;
+      processedLegalities = fullResult.processedLegalities;
+      print('🃏 Cards + legalities concluido em ${sw.elapsedMilliseconds}ms');
     } else {
       // INCREMENTAL SYNC
       final setCodes =
@@ -157,12 +146,8 @@ Opcoes:
                   const [];
           if (cards.isEmpty) continue;
 
-          processedCards += await pool.runTx((session) async {
-            return _upsertCardsFromSet(session, cards, code);
-          });
-          processedLegalities += await pool.runTx((session) async {
-            return _upsertLegalitiesFromSet(session, cards);
-          });
+          processedCards += await _upsertCardsFromSet(pool, cards, code);
+          processedLegalities += await _upsertLegalitiesFromSet(pool, cards);
         }
       }
     }
@@ -328,30 +313,6 @@ Future<http.Response> _httpGetWithRetry(
       'Falha ao baixar $label apos $_httpMaxRetries tentativas: $lastError');
 }
 
-Future<void> _runWithConcurrency<T>(
-  List<T> items,
-  Future<void> Function(T item) task, {
-  int concurrency = _dbBatchConcurrency,
-}) async {
-  if (items.isEmpty) return;
-
-  var nextIndex = 0;
-  Future<void> worker() async {
-    while (true) {
-      if (nextIndex >= items.length) return;
-      final currentIndex = nextIndex;
-      nextIndex++;
-      await task(items[currentIndex]);
-    }
-  }
-
-  final workers = List.generate(
-    concurrency.clamp(1, items.length),
-    (_) => worker(),
-  );
-  await Future.wait(workers);
-}
-
 Future<void> _logSync(
   Pool pool, {
   required String syncType,
@@ -470,138 +431,211 @@ Future<File> _downloadAtomicCards({required bool force}) async {
   return file;
 }
 
+Future<_FullAtomicSyncResult> _syncFullAtomicFast(File atomicFile) async {
+  print('🚀 Full sync rapido via psycopg2/execute_values...');
+  final pythonExecutable = Platform.isWindows ? 'python' : 'python3';
+  final result = await Process.run(
+    pythonExecutable,
+    [
+      'bin/sync_cards_full_fast.py',
+      '--atomic-cards',
+      atomicFile.path,
+      '--batch-size',
+      _fullBatchSize.toString(),
+    ],
+    workingDirectory: Directory.current.path,
+    runInShell: Platform.isWindows,
+  );
+
+  final stderrText = result.stderr?.toString().trim() ?? '';
+  if (stderrText.isNotEmpty) {
+    for (final line in stderrText.split(RegExp(r'\r?\n'))) {
+      if (line.trim().isNotEmpty) print('  $line');
+    }
+  }
+
+  if (result.exitCode != 0) {
+    final stdoutText = result.stdout?.toString().trim() ?? '';
+    throw Exception(
+      'sync_cards_full_fast.py falhou com exit=${result.exitCode}: '
+      '${stderrText.isNotEmpty ? stderrText : stdoutText}',
+    );
+  }
+
+  final stdoutText = result.stdout?.toString().trim() ?? '';
+  if (stdoutText.isEmpty) {
+    throw Exception('sync_cards_full_fast.py nao retornou JSON.');
+  }
+  final lastLine = stdoutText.split(RegExp(r'\r?\n')).last.trim();
+  final decoded = jsonDecode(lastLine) as Map<String, dynamic>;
+  return _FullAtomicSyncResult(
+    processedCards: (decoded['processed_cards'] as num?)?.toInt() ?? 0,
+    processedLegalities:
+        (decoded['processed_legalities'] as num?)?.toInt() ?? 0,
+  );
+}
+
+class _FullAtomicSyncResult {
+  const _FullAtomicSyncResult({
+    required this.processedCards,
+    required this.processedLegalities,
+  });
+
+  final int processedCards;
+  final int processedLegalities;
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // SYNC DE SETS
 // ═══════════════════════════════════════════════════════════════════════
 
 Future<void> _syncSetsFromData(Pool pool, List<dynamic> setListData) async {
   print('📋 Sincronizando ${setListData.length} sets...');
-  await pool.runTx((session) async {
-    final updateStmt = await session.prepare('''
-      UPDATE sets
-      SET
-        name = \$2,
-        release_date = \$3,
-        type = \$4,
-        block = \$5,
-        is_online_only = \$6,
-        is_foreign_only = \$7,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE LOWER(code) = LOWER(\$1)
-      RETURNING code
-    ''');
-    final insertStmt = await session.prepare('''
-      INSERT INTO sets (code, name, release_date, type, block, is_online_only, is_foreign_only, updated_at)
-      VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, CURRENT_TIMESTAMP)
-      ON CONFLICT (code) DO UPDATE SET
-        name = EXCLUDED.name, release_date = EXCLUDED.release_date,
-        type = EXCLUDED.type, block = EXCLUDED.block,
-        is_online_only = EXCLUDED.is_online_only, is_foreign_only = EXCLUDED.is_foreign_only,
-        updated_at = CURRENT_TIMESTAMP
-    ''');
-    try {
-      for (final item in setListData) {
-        if (item is! Map) continue;
-        final code = normalizeMtgSetCode(item['code']?.toString());
-        final name = item['name']?.toString().trim();
-        if (code == null || code.isEmpty || name == null || name.isEmpty)
-          continue;
 
-        final releaseDateStr = item['releaseDate']?.toString();
-        final releaseDate =
-            releaseDateStr != null ? DateTime.tryParse(releaseDateStr) : null;
+  final rows = <List<Object?>>[];
+  for (final item in setListData) {
+    if (item is! Map) continue;
+    final code = normalizeMtgSetCode(item['code']?.toString());
+    final name = item['name']?.toString().trim();
+    if (code == null || code.isEmpty || name == null || name.isEmpty) continue;
 
-        final values = [
-          code,
-          name,
-          releaseDate?.toIso8601String().split('T').first,
-          item['type']?.toString(),
-          item['block']?.toString(),
-          item['isOnlineOnly'] as bool?,
-          item['isForeignOnly'] as bool?,
-        ];
-        final updated = await updateStmt.run(values);
-        if (updated.isEmpty) {
-          await insertStmt.run(values);
-        }
-      }
-    } finally {
-      await updateStmt.dispose();
-      await insertStmt.dispose();
+    final releaseDateStr = item['releaseDate']?.toString();
+    final releaseDate =
+        releaseDateStr != null ? DateTime.tryParse(releaseDateStr) : null;
+
+    rows.add([
+      code,
+      name,
+      releaseDate?.toIso8601String().split('T').first,
+      item['type']?.toString(),
+      item['block']?.toString(),
+      item['isOnlineOnly'] as bool?,
+      item['isForeignOnly'] as bool?,
+    ]);
+  }
+
+  final dedupedRows = _dedupeRowsByKey(rows, (row) => row[0]?.toString() ?? '');
+  for (var i = 0; i < dedupedRows.length; i += _batchSize) {
+    final end = (i + _batchSize).clamp(0, dedupedRows.length);
+    await _upsertSetRowsBatch(pool, dedupedRows.sublist(i, end));
+  }
+}
+
+Future<void> _upsertSetRowsBatch(Pool pool, List<List<Object?>> rows) async {
+  if (rows.isEmpty) return;
+
+  const columns = [
+    'code',
+    'name',
+    'release_date',
+    'type',
+    'block',
+    'is_online_only',
+    'is_foreign_only',
+  ];
+  final parameters = <String, Object?>{};
+  final valuesSql = <String>[];
+
+  for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    final placeholders = <String>[];
+    final row = rows[rowIndex];
+    for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+      final key = 'r${rowIndex}c$colIndex';
+      parameters[key] = row[colIndex];
+      placeholders.add('@$key');
     }
-  });
+    valuesSql.add('(${placeholders.join(', ')}, CURRENT_TIMESTAMP)');
+  }
+
+  await pool.execute(Sql.named('''
+    INSERT INTO sets (${columns.join(', ')}, updated_at)
+    VALUES ${valuesSql.join(', ')}
+    ON CONFLICT (code) DO UPDATE SET
+      name = EXCLUDED.name,
+      release_date = EXCLUDED.release_date,
+      type = EXCLUDED.type,
+      block = EXCLUDED.block,
+      is_online_only = EXCLUDED.is_online_only,
+      is_foreign_only = EXCLUDED.is_foreign_only,
+      updated_at = CURRENT_TIMESTAMP
+  '''), parameters: parameters);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // UPSERT DE CARDS
 // ═══════════════════════════════════════════════════════════════════════
 
-/// Full sync: processa AtomicCards com prepared statement em batches.
-Future<int> _upsertCardsFromAtomic(
-    Session session, Map<String, dynamic> cardsMap) async {
-  print('🃏 Upsert de ${cardsMap.length} cards (batches de $_batchSize)...');
-
-  final stmt = await session.prepare('''
-    INSERT INTO cards (
-      scryfall_id, name, mana_cost, type_line, oracle_text,
-      colors, color_identity, power, toughness, keywords,
-      image_url, set_code, rarity
-    ) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12, \$13)
-    ON CONFLICT (scryfall_id) DO UPDATE SET
-      name = EXCLUDED.name,
-      mana_cost = EXCLUDED.mana_cost,
-      type_line = EXCLUDED.type_line,
-      oracle_text = EXCLUDED.oracle_text,
-      colors = EXCLUDED.colors,
-      color_identity = EXCLUDED.color_identity,
-      power = EXCLUDED.power,
-      toughness = EXCLUDED.toughness,
-      keywords = EXCLUDED.keywords,
-      image_url = EXCLUDED.image_url,
-      set_code = EXCLUDED.set_code,
-      rarity = EXCLUDED.rarity
-  ''');
-
-  var processed = 0;
-  try {
-    // Extrai todas as rows primeiro (evita misturar I/O com CPU)
-    final rows = <List<Object?>>[];
-    for (final entry in cardsMap.entries) {
-      final row = _extractCardRow(entry.key, entry.value as List<dynamic>);
-      if (row != null) rows.add(row);
-    }
-
-    // Envia em batches paralelos para o Postgres
-    for (var i = 0; i < rows.length; i += _batchSize) {
-      final end = (i + _batchSize).clamp(0, rows.length);
-      final batch = rows.sublist(i, end);
-      await _runWithConcurrency(batch, (row) async {
-        await stmt.run(row);
-      });
-      processed += batch.length;
-      stdout.write('\r  ... $processed / ${rows.length}');
-    }
-  } finally {
-    await stmt.dispose();
-  }
-
-  stdout.writeln('\r  ✅ $processed cards                ');
-  return processed;
-}
-
 /// Incremental: processa cartas de um set em batch.
 Future<int> _upsertCardsFromSet(
-    Session session, List<Map<String, dynamic>> cards, String setCode) async {
+    Pool pool, List<Map<String, dynamic>> cards, String setCode) async {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   print('🃏 Upsert de ${cards.length} cards (set=$canonicalSetCode)...');
 
-  final stmt = await session.prepare('''
-    INSERT INTO cards (
-      scryfall_id, name, mana_cost, type_line, oracle_text,
-      colors, color_identity, power, toughness, keywords,
-      image_url, set_code, rarity,
-      collector_number, foil
-    ) VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12, \$13, \$14, \$15)
+  var processed = 0;
+  final rows = <List<Object?>>[];
+  for (final card in cards) {
+    final row = _extractCardRowFromSet(card, canonicalSetCode);
+    if (row != null) rows.add(row);
+  }
+  final dedupedRows = _dedupeRowsByKey(rows, (row) => row[0]?.toString() ?? '');
+
+  for (var i = 0; i < dedupedRows.length; i += _batchSize) {
+    final end = (i + _batchSize).clamp(0, dedupedRows.length);
+    final batch = dedupedRows.sublist(i, end);
+    await _upsertCardRowsBatch(pool, batch, includeCollectorFoil: true);
+    processed += batch.length;
+  }
+  return processed;
+}
+
+Future<void> _upsertCardRowsBatch(
+  Pool pool,
+  List<List<Object?>> rows, {
+  required bool includeCollectorFoil,
+}) async {
+  if (rows.isEmpty) return;
+
+  final columns = [
+    'scryfall_id',
+    'name',
+    'mana_cost',
+    'type_line',
+    'oracle_text',
+    'colors',
+    'color_identity',
+    'power',
+    'toughness',
+    'keywords',
+    'image_url',
+    'set_code',
+    'rarity',
+    if (includeCollectorFoil) 'collector_number',
+    if (includeCollectorFoil) 'foil',
+  ];
+  final params = <String, Object?>{};
+  final values = <String>[];
+
+  for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    final row = rows[rowIndex];
+    final placeholders = <String>[];
+    for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+      final key = 'v_${rowIndex}_$columnIndex';
+      params[key] = row[columnIndex];
+      placeholders.add('@$key');
+    }
+    values.add('(${placeholders.join(', ')})');
+  }
+
+  final collectorUpdates = includeCollectorFoil
+      ? '''
+      collector_number = COALESCE(EXCLUDED.collector_number, cards.collector_number),
+      foil = COALESCE(EXCLUDED.foil, cards.foil),
+'''
+      : '';
+
+  final sql = '''
+    INSERT INTO cards (${columns.join(', ')})
+    VALUES ${values.join(',\n')}
     ON CONFLICT (scryfall_id) DO UPDATE SET
       name = EXCLUDED.name,
       mana_cost = EXCLUDED.mana_cost,
@@ -615,226 +649,99 @@ Future<int> _upsertCardsFromSet(
       image_url = EXCLUDED.image_url,
       set_code = EXCLUDED.set_code,
       rarity = EXCLUDED.rarity,
-      collector_number = COALESCE(EXCLUDED.collector_number, cards.collector_number),
-      foil = COALESCE(EXCLUDED.foil, cards.foil)
-  ''');
+      $collectorUpdates
+      created_at = cards.created_at
+  ''';
 
-  var processed = 0;
-  try {
-    final rows = <List<Object?>>[];
-    for (final card in cards) {
-      final ids = card['identifiers'] as Map<String, dynamic>?;
-      final oracleId = ids?['scryfallOracleId']?.toString();
-      if (oracleId == null || oracleId.isEmpty) continue;
-
-      final name = card['name']?.toString();
-      if (name == null || name.isEmpty) continue;
-
-      final colors =
-          (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
-              const <String>[];
-      final colorIdentity =
-          (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
-              const <String>[];
-      final keywords =
-          (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
-              const <String>[];
-
-      // Use scryfallId for direct image URL (more reliable than name-based)
-      final scryfallId = ids?['scryfallId']?.toString();
-      String imageUrl;
-      if (scryfallId != null && scryfallId.isNotEmpty) {
-        imageUrl =
-            'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
-      } else {
-        // Fallback to name-based URL (less reliable)
-        final encodedName = Uri.encodeQueryComponent(name);
-        final setParam =
-            canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
-        imageUrl =
-            'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
-      }
-
-      // MTGJSON: "number" = collector number, "hasFoil"/"hasNonFoil" para foil status
-      final collectorNumber = card['number']?.toString();
-      final hasFoil = card['hasFoil'] as bool?;
-      final hasNonFoil = card['hasNonFoil'] as bool?;
-      // Se só tem foil (e não tem non-foil) → foil=true
-      // Se só tem non-foil (e não tem foil) → foil=false
-      // Se tem ambos → null (pode ser qualquer um)
-      bool? foil;
-      if (hasFoil == true && hasNonFoil != true) {
-        foil = true;
-      } else if (hasNonFoil == true && hasFoil != true) {
-        foil = false;
-      }
-
-      rows.add([
-        oracleId,
-        name,
-        card['manaCost']?.toString(),
-        card['type']?.toString(),
-        card['text']?.toString(),
-        colors,
-        colorIdentity,
-        card['power']?.toString(),
-        card['toughness']?.toString(),
-        keywords,
-        imageUrl,
-        canonicalSetCode,
-        card['rarity']?.toString(),
-        collectorNumber,
-        foil,
-      ]);
-    }
-
-    for (var i = 0; i < rows.length; i += _batchSize) {
-      final end = (i + _batchSize).clamp(0, rows.length);
-      final batch = rows.sublist(i, end);
-      await _runWithConcurrency(batch, (row) async {
-        await stmt.run(row);
-      });
-      processed += batch.length;
-    }
-  } finally {
-    await stmt.dispose();
-  }
-  return processed;
+  await pool.runTx((session) async {
+    await session.execute(Sql.named(sql), parameters: params);
+  });
 }
 
-/// Extrai dados de uma carta do AtomicCards.
-List<Object?>? _extractCardRow(String cardName, List<dynamic> printings) {
-  Map<String, dynamic>? chosen;
-  for (final p in printings) {
-    if (p is! Map<String, dynamic>) continue;
-    final ids = p['identifiers'] as Map<String, dynamic>?;
-    if (ids?['scryfallOracleId'] != null &&
-        (ids!['scryfallOracleId'] as String).isNotEmpty) {
-      chosen = p;
-      break;
-    }
-  }
-  if (chosen == null) return null;
-
-  final ids = chosen['identifiers'] as Map<String, dynamic>?;
-  final oracleId = ids?['scryfallOracleId'] as String?;
+/// Extrai dados de uma carta de um Set.json incremental.
+List<Object?>? _extractCardRowFromSet(
+  Map<String, dynamic> card,
+  String canonicalSetCode,
+) {
+  final ids = card['identifiers'] as Map<String, dynamic>?;
+  final oracleId = ids?['scryfallOracleId']?.toString();
   if (oracleId == null || oracleId.isEmpty) return null;
 
-  final name = (chosen['name'] ?? cardName).toString();
-  final manaCost = chosen['manaCost']?.toString();
-  final typeLine = chosen['type']?.toString();
-  final oracleText = chosen['text']?.toString();
-  final colors =
-      (chosen['colors'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
+  final name = card['name']?.toString();
+  if (name == null || name.isEmpty) return null;
+
+  final colors = (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
+      const <String>[];
   final colorIdentity =
-      (chosen['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
+      (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
   final keywords =
-      (chosen['keywords'] as List?)?.map((e) => e.toString()).toList() ??
+      (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
-  final setCode = normalizeMtgSetCode(
-    (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString(),
-  );
-  final rarity = chosen['rarity']?.toString();
 
-  // Use scryfallId for direct image URL (more reliable than name-based)
   final scryfallId = ids?['scryfallId']?.toString();
   String imageUrl;
   if (scryfallId != null && scryfallId.isNotEmpty) {
     imageUrl =
         'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
   } else {
-    // Fallback to name-based URL (less reliable)
     final encodedName = Uri.encodeQueryComponent(name);
     final setParam =
-        setCode != null && setCode.isNotEmpty ? '&set=$setCode' : '';
+        canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
     imageUrl =
         'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
+  }
+
+  final collectorNumber = card['number']?.toString();
+  final hasFoil = card['hasFoil'] as bool?;
+  final hasNonFoil = card['hasNonFoil'] as bool?;
+  bool? foil;
+  if (hasFoil == true && hasNonFoil != true) {
+    foil = true;
+  } else if (hasNonFoil == true && hasFoil != true) {
+    foil = false;
   }
 
   return [
     oracleId,
     name,
-    manaCost,
-    typeLine,
-    oracleText,
+    card['manaCost']?.toString(),
+    card['type']?.toString(),
+    card['text']?.toString(),
     colors,
     colorIdentity,
-    chosen['power']?.toString(),
-    chosen['toughness']?.toString(),
+    card['power']?.toString(),
+    card['toughness']?.toString(),
     keywords,
     imageUrl,
-    setCode,
-    rarity,
+    canonicalSetCode,
+    card['rarity']?.toString(),
+    collectorNumber,
+    foil,
   ];
+}
+
+List<List<Object?>> _dedupeRowsByKey(
+  List<List<Object?>> rows,
+  String Function(List<Object?> row) keyOf,
+) {
+  final byKey = <String, List<Object?>>{};
+  for (final row in rows) {
+    final key = keyOf(row);
+    if (key.isEmpty) continue;
+    byKey[key] = row;
+  }
+  return byKey.values.toList(growable: false);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // UPSERT DE LEGALITIES
 // ═══════════════════════════════════════════════════════════════════════
 
-/// Full sync: legalidades com prepared statement em batches.
-Future<int> _upsertLegalitiesFromAtomic(
-    Session session, Map<String, dynamic> cardsMap) async {
-  print('⚖️  Upsert de legalidades (batches de $_batchSize)...');
-
-  // Carrega mapa oracleId -> internal UUID (1x)
-  final cardIdMap = await _loadCardIdMap(session);
-
-  final stmt = await session.prepare('''
-    INSERT INTO card_legalities (card_id, format, status)
-    VALUES (\$1, \$2, \$3)
-    ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status
-  ''');
-
-  var processed = 0;
-  try {
-    // Pré-monta todas as rows
-    final rows = <List<Object?>>[];
-    for (final cardPrintings in cardsMap.values) {
-      final cardList = cardPrintings as List<dynamic>;
-      if (cardList.isEmpty) continue;
-      final first = cardList.first;
-      if (first is! Map<String, dynamic>) continue;
-
-      final ids = first['identifiers'] as Map<String, dynamic>?;
-      final oracleId = ids?['scryfallOracleId'] as String?;
-      final legalities = first['legalities'] as Map<String, dynamic>?;
-      if (oracleId == null || legalities == null) continue;
-
-      final internalId = cardIdMap[oracleId];
-      if (internalId == null) continue;
-
-      for (final entry in legalities.entries) {
-        rows.add([internalId, entry.key, entry.value.toString().toLowerCase()]);
-      }
-    }
-
-    // Envia em batches paralelos
-    for (var i = 0; i < rows.length; i += _batchSize) {
-      final end = (i + _batchSize).clamp(0, rows.length);
-      final batch = rows.sublist(i, end);
-      await _runWithConcurrency(batch, (row) async {
-        await stmt.run(row);
-      });
-      processed += batch.length;
-      if (processed % 20000 < _batchSize) {
-        stdout.write('\r  ... $processed / ${rows.length} legalidades');
-      }
-    }
-  } finally {
-    await stmt.dispose();
-  }
-
-  stdout.writeln('\r  ✅ $processed legalidades                ');
-  return processed;
-}
-
 /// Incremental: legalidades de um set em batch.
 /// Carrega APENAS os card IDs relevantes (nao todos 33k+).
 Future<int> _upsertLegalitiesFromSet(
-    Session session, List<Map<String, dynamic>> cards) async {
+    Pool pool, List<Map<String, dynamic>> cards) async {
   // Coleta oracle IDs deste set
   final oracleIds = <String>{};
   for (final card in cards) {
@@ -845,63 +752,43 @@ Future<int> _upsertLegalitiesFromSet(
   if (oracleIds.isEmpty) return 0;
 
   // Carrega APENAS os IDs internos necessarios
-  final cardIdMap = await _loadCardIdMapForOracleIds(session, oracleIds);
-
-  final stmt = await session.prepare('''
-    INSERT INTO card_legalities (card_id, format, status)
-    VALUES (\$1, \$2, \$3)
-    ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status
-  ''');
+  final cardIdMap = await _loadCardIdMapForOracleIds(pool, oracleIds);
 
   var processed = 0;
-  try {
-    final rows = <List<Object?>>[];
-    for (final card in cards) {
-      final ids = card['identifiers'] as Map<String, dynamic>?;
-      final oracleId = ids?['scryfallOracleId']?.toString();
-      if (oracleId == null) continue;
-      final internalId = cardIdMap[oracleId];
-      if (internalId == null) continue;
+  final rows = <List<Object?>>[];
+  for (final card in cards) {
+    final ids = card['identifiers'] as Map<String, dynamic>?;
+    final oracleId = ids?['scryfallOracleId']?.toString();
+    if (oracleId == null) continue;
+    final internalId = cardIdMap[oracleId];
+    if (internalId == null) continue;
 
-      final legalities = card['legalities'] as Map<String, dynamic>?;
-      if (legalities == null) continue;
+    final legalities = card['legalities'] as Map<String, dynamic>?;
+    if (legalities == null) continue;
 
-      for (final entry in legalities.entries) {
-        rows.add([internalId, entry.key, entry.value.toString().toLowerCase()]);
-      }
+    for (final entry in legalities.entries) {
+      rows.add([internalId, entry.key, entry.value.toString().toLowerCase()]);
     }
+  }
+  final dedupedRows = _dedupeRowsByKey(
+    rows,
+    (row) => '${row[0]}|${row[1]}',
+  );
 
-    for (var i = 0; i < rows.length; i += _batchSize) {
-      final end = (i + _batchSize).clamp(0, rows.length);
-      final batch = rows.sublist(i, end);
-      await _runWithConcurrency(batch, (row) async {
-        await stmt.run(row);
-      });
-      processed += batch.length;
-    }
-  } finally {
-    await stmt.dispose();
+  for (var i = 0; i < dedupedRows.length; i += _batchSize) {
+    final end = (i + _batchSize).clamp(0, dedupedRows.length);
+    final batch = dedupedRows.sublist(i, end);
+    await _upsertLegalityRowsBatch(pool, batch);
+    processed += batch.length;
   }
   return processed;
 }
 
-/// Carrega TODOS os oracle_id -> internal_id (para full sync).
-Future<Map<String, String>> _loadCardIdMap(Session session) async {
-  final result = await session.execute(
-    Sql.named('SELECT scryfall_id::text, id::text FROM cards'),
-  );
-  final map = <String, String>{};
-  for (final row in result) {
-    map[row[0] as String] = row[1] as String;
-  }
-  return map;
-}
-
 /// Carrega APENAS os oracle_id -> internal_id de um conjunto especifico.
 Future<Map<String, String>> _loadCardIdMapForOracleIds(
-    Session session, Set<String> oracleIds) async {
+    Pool pool, Set<String> oracleIds) async {
   if (oracleIds.isEmpty) return {};
-  final result = await session.execute(
+  final result = await pool.execute(
     Sql.named(
         'SELECT scryfall_id::text, id::text FROM cards WHERE scryfall_id = ANY(@ids)'),
     parameters: {'ids': oracleIds.toList()},
@@ -913,6 +800,32 @@ Future<Map<String, String>> _loadCardIdMapForOracleIds(
   return map;
 }
 
-extension _FirstOrNullList<T> on List<T> {
-  T? get firstOrNull => isEmpty ? null : first;
+Future<void> _upsertLegalityRowsBatch(
+  Pool pool,
+  List<List<Object?>> rows,
+) async {
+  if (rows.isEmpty) return;
+
+  final params = <String, Object?>{};
+  final values = <String>[];
+  for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    final row = rows[rowIndex];
+    final placeholders = <String>[];
+    for (var columnIndex = 0; columnIndex < 3; columnIndex++) {
+      final key = 'l_${rowIndex}_$columnIndex';
+      params[key] = row[columnIndex];
+      placeholders.add('@$key');
+    }
+    values.add('(${placeholders.join(', ')})');
+  }
+
+  final sql = '''
+    INSERT INTO card_legalities (card_id, format, status)
+    VALUES ${values.join(',\n')}
+    ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status
+  ''';
+
+  await pool.runTx((session) async {
+    await session.execute(Sql.named(sql), parameters: params);
+  });
 }
