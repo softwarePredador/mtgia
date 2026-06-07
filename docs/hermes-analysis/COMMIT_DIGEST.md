@@ -1,18 +1,155 @@
 # Hermes Analysis: Commit Digest
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-04T14:10Z (Incremento: Commander Learning Loop — 7 commits, 70e170f0).
+> Atualizado em 2026-06-07T13:00Z (Incremento: Visual Polish + Premium QA — 16 commits, bbe358f9).
 
 ## Estado atual
 
 - Branch observada: `master`
-- HEAD anterior: `d693b9fb` (Capture Lorehold learned deck visual proof).
-- HEAD atual: **`70e170f0`** (Harden Hermes learned deck sync).
+- HEAD anterior: `70e170f0` (Harden Hermes learned deck sync).
+- HEAD atual: **`bbe358f9`** (Document internal non-scanner visual release review).
 - Branch de analise: `codex/hermes-analysis-docs`
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- SHA publicado confirmado em producao: **`70e170f0`** (`/health` retornou HTTP 200 em 2026-06-04T14:04Z — producao operacional).
-- Local `master`: 46 commits atrasado (`3f7d784f`) — precisa de `git pull origin master`
+- SHA publicado confirmado em producao: **`bbe358f9`** (`/health` retornou HTTP 200 em 2026-06-07T12:58Z — producao operacional).
+- Local `master`: 62 commits atrasado (`3f7d784f`) — precisa de `git pull origin master`
 
+
+
+
+## Novos commits nesta rodada (2026-06-07 13:00Z)
+
+
+### `bbe358f9` — Document internal non-scanner visual release review (HEAD)
+
+- **1 arquivo**, **+68/-0 linhas**
+- **Tipo: DOCS** — Documentacao interna de revisao visual de release non-scanner. Sem mudancas de codigo.
+- **Avaliacao Hermes**: Documentacao operacional. Sem risco.
+- **Verificacao**: Health endpoint confirma `git_sha: bbe358f9` em producao (2026-06-07T12:58Z).
+
+### `f9c3cdde` — Fix life counter hub color tokens
+
+- **4 arquivos**, **+6/-13 linhas**
+- **Tipo: CODE/UI** — Move cores do hub do life counter para tokens do `AppTheme`:
+  1. `app_theme.dart`: +156 linhas de tokens `lifeCounter*` (cores de jogador, gradientes, overlays)
+  2. `life_counter_screen.dart`: `_playerColors` agora referencia `AppTheme.lifeCounterPlayerColors`
+  3. Golden tests atualizados
+- **Avaliacao Hermes**: Passo significativo de tokenizacao visual. Baixo risco.
+- **Verificacao**: `flutter analyze`: No issues found. `dart test`: 604 passed.
+
+### `7ca158fd` — Fix Flutter UI audit findings
+
+- **47 arquivos**, **+763/-464 linhas**
+- **Tipo: CODE/UI** — Correcao ampla de achados da auditoria Flutter UI:
+  1. `app_theme.dart`: +78 linhas de tokens (life counter, mist, outline, overlay)
+  2. 30+ arquivos de life counter alinhados com tokens do `AppTheme`
+  3. `deck_progress_indicator.dart`: 197 linhas revisadas (cleanup de cores)
+  4. `create_trade_screen.dart`: 114 linhas revisadas
+  5. `scanned_card_preview.dart`: 135 linhas revisadas
+  6. Golden tests atualizados; `flutter_ui_static_auditor.py` ampliado
+- **Avaliacao Hermes**: Limpeza massiva de tokens visuais. 47 arquivos, mas mudancas previsiveis (cores → `AppTheme.*`). Baixo risco funcional, risco visual moderado.
+- **Verificacao**: `flutter analyze`: No issues found.
+
+### `a9b9150c` — Fix Hermes bracket and learned deck gates
+
+- **4 arquivos**, **+265/-31 linhas**
+- **Tipo: CODE/TEST** — Hardening da politica de bracket EDH + gates de learned deck:
+  1. `edh_bracket_policy.dart`: tutor heuristic agora exclui land-ramp/fetch; free interaction inclui lista conhecida (Deadly Rollick, Deflecting Swat, Force of Will, etc.); fast mana lands expandido (Gaea's Cradle, Mishra's Workshop, Serra's Sanctum)
+  2. `edh_bracket_policy_test.dart`: +81 linhas de novos testes
+  3. `export_hermes_learned_deck.py`: novo script de export
+- **Avaliacao Hermes**: Melhoria de precisao na bracket policy. Tutor heuristic mais inteligente. Testes novos protegem contra regressao. Baixo risco.
+- **Verificacao**: `dart test`: 604 passed (incluindo `edh_bracket_policy_test.dart`).
+
+### `fad7a9e3` — Refine Inter typography visual proof
+
+- **3 arquivos**, **+164/-35 linhas**
+- **Tipo: DOCS/UI** — Refinamento da tipografia Inter no `home_screen.dart` + documentacao.
+- **Avaliacao Hermes**: Ajuste visual. Baixo risco funcional.
+- **Verificacao**: `flutter analyze`: No issues found.
+
+### `3238fe18` — Fix auto-sync apply mode, JSON card_list export, pull SQL, tracking path
+
+- **14 arquivos**, **+241/-67 linhas**
+- **Tipo: CODE/FONT** — Fixes no pipeline de auto-sync + adicao da fonte Inter:
+  1. `Inter.ttf` (879 KB): nova fonte UI em `app/assets/lotus/fonts/`
+  2. `app_theme.dart`: `uiFontFamily` muda de `Manrope` para `Inter`; +191 linhas de tokens
+  3. Scripts de sync ajustados; testes de smoke/visual atualizados
+- **Avaliacao Hermes**: Mudanca de fonte UI (Manrope → Inter). Golden tests precisam de revalidacao. Risco visual moderado.
+- **Verificacao**: `flutter analyze`: No issues found. `dart test`: 604 passed.
+
+### `aa520e50` — Polish learned deck generation UX
+
+- **6 arquivos**, **+714/-464 linhas**
+- **Tipo: CODE/UI** — Refatoracao da tela de geracao de decks aprendidos:
+  1. `deck_generate_screen.dart`: 511 linhas revisadas (reorganizacao da UX de learned decks)
+  2. Testes de integration atualizados
+- **Avaliacao Hermes**: Refatoracao de UX significativa. Risco moderado de regressao de fluxo.
+- **Verificacao**: `flutter analyze`: No issues found.
+
+### `477a70c2` — docs: record strict visual revalidation
+
+- **2 arquivos**, **+227/-107 linhas**
+- **Tipo: DOCS** — Documentacao. Sem mudancas de codigo.
+- **Avaliacao Hermes**: Documentacao. Sem risco.
+
+### `4af68ade` — fix: polish life counter visual overlays
+
+- **3 arquivos**, **+105/-35 linhas**
+- **Tipo: CODE/UI** — Polimento de overlays visuais do life counter (set life sheet, lotus visual skin).
+- **Avaliacao Hermes**: Polimento visual incremental. Baixo risco.
+- **Verificacao**: `flutter analyze`: No issues found.
+
+### `75d41d40` — test: harden premium visual runtime proof
+
+- **8 arquivos**, **+114/-37 linhas**
+- **Tipo: TEST** — Endurecimento de provas visuais de runtime (integration tests, premium visual audit config).
+- **Avaliacao Hermes**: Cobertura de testes visuais melhorada. Baixo risco.
+- **Verificacao**: Integration tests atualizados.
+
+### `504f6e94` — Record premium visual runtime proof
+
+- **3 arquivos**, **+112/-11 linhas**
+- **Tipo: DOCS** — Registro de prova visual de runtime premium. Documentacao.
+- **Avaliacao Hermes**: Documentacao. Sem risco.
+
+### `e8b610fc` — Add premium visual QA gate
+
+- **8 arquivos**, **+283/-17 linhas**
+- **Tipo: CODE/TOOLING** — Novo gate de QA visual premium:
+  1. `premium_visual_audit.py` + `.sh`: scripts deterministicos de QA visual
+  2. `ui_audit_pipeline.py`: pipeline de auditoria UI incremental
+  3. `premium_visual_qa_surfaces.json`: config de superficies alvo
+  4. `MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md`: rubrica de QA (164 linhas)
+- **Avaliacao Hermes**: Nova capacidade de auditoria visual automatizada. Ferramenta operacional positiva. Sem risco de runtime.
+- **Verificacao**: Scripts Python validados.
+
+### `f7324381` — Improve life counter accessibility layout
+
+- **7 arquivos**, **+145/-37 linhas**
+- **Tipo: CODE/UI** — Melhorias de acessibilidade no layout do life counter.
+- **Avaliacao Hermes**: Melhoria de acessibilidade. Baixo risco.
+- **Verificacao**: `flutter analyze`: No issues found.
+
+### `f19ac7ff` — Harden Hermes UI audit cron
+
+- **22 arquivos**, **+1300/-200 linhas** (estimado)
+- **Tipo: CODE/TOOLING** — Endurecimento do cron de auditoria UI:
+  1. `flutter_ui_static_auditor.py` + `.sh`: auditor estatico deterministico
+  2. `ui_audit_pipeline.py` + `.sh`: pipeline incremental
+  3. 15+ telas Flutter alinhadas com tokens de auditoria
+- **Avaliacao Hermes**: Infraestrutura de auditoria UI robustecida. Risco moderado pelo volume.
+- **Verificacao**: `flutter analyze`: No issues found.
+
+### `f16700a8` — Add Flutter UI/UX audit pipeline
+
+- **2 arquivos**, **+94/-7 linhas**
+- **Tipo: TOOLING** — Pipeline de analise incremental tela por tela.
+- **Avaliacao Hermes**: Ferramenta operacional. Sem risco de runtime.
+
+### `69b8bca0` — Document Hermes AWS operational audit
+
+- **2 arquivos**, **+170/-0 linhas** (estimado)
+- **Tipo: DOCS** — Documentacao de auditoria operacional AWS + update do `manual-de-instrucao.md`.
+- **Avaliacao Hermes**: Documentacao. Sem risco.
 
 
 ## Novos commits nesta rodada (2026-06-04 14:10Z)

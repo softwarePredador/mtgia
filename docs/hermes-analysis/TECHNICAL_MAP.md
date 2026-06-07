@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 13:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -127,9 +127,9 @@ mtgia/
 
 ## Qualidade e validacao
 
-- `flutter analyze --no-pub --no-fatal-infos`: VERDE, No issues found (2026-06-04)
-- `dart test`: VERDE, 599 tests PASS (backend, 2026-06-04)
-- `dart analyze lib/`: No issues found (2026-06-04)
+- `flutter analyze --no-pub --no-fatal-infos`: VERDE, No issues found (2026-06-07)
+- `dart test`: VERDE, 604 tests PASS (backend, 2026-06-07)
+- `dart analyze lib/`: No issues found (2026-06-07)
   **VERMELHO** por `server/bin/local_test_server.dart:3` importar
   `../.dart_frog/server.dart`, artefato ausente em clone limpo nesta branch.
   A resolucao historica em `origin/master@a830f9f3` nao esta refletida aqui.
@@ -138,6 +138,18 @@ mtgia/
 - Corpus estavel de resolucao Commander: 19/19 passed
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
+
+## Novas ferramentas de auditoria (2026-06-07)
+
+- **Premium Visual QA gate** (`server/bin/premium_visual_audit.py`): gate deterministico de qualidade visual, com config em
+  `server/config/premium_visual_qa_surfaces.json`. Adicionado pelo commit `e8b610fc`.
+- **Flutter UI static auditor** (`server/bin/flutter_ui_static_auditor.py`): varredura estatica de baixo custo para o
+  cron do Hermes. Nao depende de screenshots. Adicionado pelo commit `f19ac7ff`.
+- **UI audit pipeline** (`server/bin/ui_audit_pipeline.py`): analise incremental tela por tela.
+  Adicionado pelo commit `f16700a8`.
+- **EDH bracket policy enhancements** (`server/lib/edh_bracket_policy.dart`): tutor heuristic agora exclui land-ramp/fetch;
+  free interaction agora inclui lista conhecida (Deadly Rollick, Deflecting Swat, etc.); fast mana lands expandido
+  (Gaea's Cradle, Mishra's Workshop, Serra's Sanctum). Novos testes em `edh_bracket_policy_test.dart`. Commit `a9b9150c`.
 
 ## Achados do audit de estrutura (atualizado 2026-06-07)
 

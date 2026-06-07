@@ -1,6 +1,6 @@
 # Hermes Analysis: Open Risks
 
-> Riscos abertos do ManaLoom. Atualizado em 2026-06-04T14:10Z (Commander Learning Loop audit).
+> Riscos abertos do ManaLoom. Atualizado em 2026-06-07T13:00Z (Visual Polish + Premium QA audit — 16 commits, bbe358f9).
 > Este arquivo nao substitui os documentos canonicos; resume a leitura operacional atual.
 
 ## P0 — Bloqueante
@@ -104,8 +104,9 @@ Validacao em `origin/master` 771c9318 (2026-05-28) confirmou os maiores gargalos
 F3 Modularizacao (2026-05-30): optimize_runtime_support.dart extraido em 3 submodulos (filler_loader ~1300, route_internal ~430, response ~144). optimize/index.dart reduzido em 514 linhas. Tamanhos atuais em origin/master 84553ef8:
 - `server/routes/ai/optimize/index.dart`: 3075 linhas (F3 mod: -420)
 - `server/lib/ai/optimize_runtime_support.dart`: 2718 linhas (F3 mod: -1479)
-- `app/lib/features/home/life_counter_screen.dart`: 6400 linhas
+- `app/lib/features/home/life_counter_screen.dart`: 6718 linhas
 - `app/lib/features/home/lotus/lotus_visual_skin.dart`: 1991 linhas
+- `app/lib/core/theme/app_theme.dart`: 840 linhas (dobrou com tokens do life counter; nao e gargalo, e catalogo de design)
 - `app/lib/features/decks/providers/deck_provider.dart`: 1226 linhas
 
 Impacto: gargalos de manutencao permanecem relevantes; Lotus visual skin cresceu
@@ -179,6 +180,16 @@ Risco de manutencao: recomendacao documentada e criar rota dedicada.
 O novo golden test do hero da home (`home_hero_sma135m.png`) adiciona risco de falha
 em CI se o viewport, DPR ou fontes mudarem. A baseline precisa ser atualizada
 manualmente com `--update-goldens` e revisao visual do PNG gerado.
+
+### Mudanca de fonte UI: Manrope → Inter
+**NOVO em 2026-06-07.** O commit `3238fe18` trocou a fonte UI de `Manrope`
+para `Inter` (`app/assets/lotus/fonts/Inter.ttf`, 879 KB). A familia
+`fraunces` de display foi preservada.
+
+Impacto: golden tests podem falhar se a baseline foi gerada com Manrope.
+
+Recomendacao: revalidar `home_hero_sma135m.png` e outros goldens apos a troca
+de fonte; atualizar baselines com `--update-goldens` se necessario.
 
 ### Premium Visual System pode mascarar bugs funcionais
 Os commits recentes (3eebd0f6, 63 arquivos) focam quase exclusivamente em
