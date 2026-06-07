@@ -41,12 +41,14 @@ Importante: este cron nao aplica swaps. Ele mantem o Hermes pronto para entrar n
 
 Cron auxiliar de swap/slot scan:
 
-- Job planejado: `manaloom-master-optimizer-slot-scan`.
+- Job registrado em `/opt/data/cron/jobs.json` como `manaloom-master-optimizer-slot-scan`.
 - Script: `/opt/data/scripts/manaloom-master-optimizer-slot-scan.sh`.
 - Origem versionada: `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_slot_scan_cron.sh`.
 - Funcao: rodar sync de metadata, preflight e `slot_optimizer.py`.
 - Seguranca: usa `slot_optimizer.py` porque ele testa swaps isolados e restaura o deck; nao usa `universal_optimizer.py` como cron automatico porque ele ainda possui auto-apply de swaps.
-- Estado recomendado: registrado e pronto, mas ativado apenas quando o baseline estiver aprovado, porque o slot scan e pesado e pode durar horas.
+- Estado atual: `paused`, `enabled=false`.
+- Motivo: ativar apenas quando o baseline estiver aprovado, porque o slot scan e pesado e pode durar horas.
+- Schedule preparado: `every 720m`.
 - Artefato esperado: `/opt/data/artifacts/hermes_master_optimizer/latest_master_optimizer_slot_scan.log`.
 
 Arquivos principais:
