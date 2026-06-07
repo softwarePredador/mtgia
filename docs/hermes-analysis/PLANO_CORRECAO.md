@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-07 03:00 UTC
+> Data: 2026-06-07 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -33,17 +33,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    mas `_allowedEvents` rejeita o evento e o contrato ainda marca
    `/users/me/activation-events` como `internal`/`not proven`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-06 05:30 UTC no checkout `3a83ae79`. `commander_fallback_policy.dart`
-   nao existe nesta branch, e ainda ha excecoes por nome em
+   2026-06-07 05:30 UTC no checkout `84a97d75`. Ainda ha excecoes por nome em
    `functional_card_tags.dart`, `candidate_quality_data_support.dart`,
    `optimize_runtime_support.dart`, `rebuild_guided_service.dart`,
-   `/decks/:id/recommendations`, `/ai/weakness-analysis` e no mock runtime de
-   `/ai/optimize` quando `deckOptimizer == null`. A rodada separou examples,
-   aliases, UI search seeds e corpus declarado de riscos reais. Ha tambem
-   excecoes intencionais em `edh_bracket_policy.dart` que devem virar policy
-   versionada com fonte/teste dedicado. Seeds Commander Reference seguem
-   allowed-with-caution se permanecerem corpus/profile versionado, nao regra
-   global de utilidade.
+   `/decks/:id/recommendations`, `/ai/weakness-analysis`, no mock runtime de
+   `/ai/optimize` quando `deckOptimizer == null` e em prompts runtime carregados
+   por `otimizacao.dart`. A rodada separou exemplos de UI/import, comentarios,
+   seeds de busca, docs/corpus/artifacts/test fixtures e seeds Commander
+   Reference dos riscos reais. `edh_bracket_policy.dart` continua excecao
+   intencional por regra externa/curadoria de bracket, mas precisa manter
+   fonte/versionamento/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-06 15:00 UTC no checkout `bd5add18`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.
@@ -57,15 +56,14 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `LotusLifeCounterScreen` e `DeckProgressIndicator`; a varredura textual
    ampla nao foi usada para acusar DTOs/helpers locais sem evidencia adicional.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
-   2026-06-06 05:30 UTC no checkout `3a83ae79`. Deck analysis prefere
+   2026-06-07 05:30 UTC no checkout `84a97d75`. Deck analysis prefere
    `card_function_tags`; o contexto de optimize, `additionsData`, validator e
    role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags`
    persistidos nesse caminho. Candidate quality tem uso parcial de
    `card_function_tags` em SQL de sinais, portanto o gap atual e o adapter de
-   role preservation/gate, nao toda a superficie de optimize. O checkout atual
-   nao contem `optimizationFunctionalRolesForCard`; o caminho vivo ainda e
-   escalar e `semantic_tags_v2` multi-tag segue colapsado em um unico role no
-   delta.
+   role preservation/gate, nao toda a superficie de optimize. O caminho vivo
+   continua escalar via `classifyOptimizationFunctionalRole`; `semantic_tags_v2`
+   multi-tag segue colapsado em um unico role no validator/quality gate/delta.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -227,11 +225,12 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
-- **Status 2026-06-06 05:30 UTC: REVALIDADO/ABERTO no checkout `3a83ae79`.** A revalidacao local nao
-  encontrou `server/lib/ai/commander_fallback_policy.dart`; o unico arquivo
-  `*policy*` em `server/lib` e `server/lib/edh_bracket_policy.dart`. Portanto a
-  anotacao historica de resolucao em `origin/master@65f30387` nao deve ser
-  aplicada a este checkout.
+- **Status 2026-06-07 05:30 UTC: REVALIDADO/ABERTO no checkout `84a97d75`.**
+  A revalidacao local confirmou que nomes hardcoded ainda participam de tags,
+  score, fillers, rebuild, recomendacoes, weakness suggestions, mock runtime e
+  prompt runtime. A separacao de classificacao segue: exemplos de UI/import,
+  comentarios, corpus/test fixtures e seeds declaradas nao sao bug por si so;
+  decisoes de runtime por nome continuam risco salvo policy versionada.
 - **Evidência**:
   - `server/lib/ai/functional_card_tags.dart:220`-`:226` classifica ramp por
     `signet`, `talisman`, `sol ring` e `arcane signet`; `:714`-`:717`,
@@ -264,6 +263,11 @@ Histórico do problema:
     recalcula utilidade por heuristicas locais e dois nomes de protecao, e
     `:206`-`:248` e `:352`-`:357` retornam listas fixas de nomes para ramp,
     draw, removal, wipes e protecao.
+  - `server/lib/ai/otimizacao.dart:856`-`:865` e `:1004`-`:1009` carregam
+    `server/lib/ai/prompt.md` e `prompt_complete.md`; os prompts incluem nomes
+    em `prompt.md:93`-`:123`/`:158`-`:172` e
+    `prompt_complete.md:63`-`:80`/`:112`-`:117`. Isso nao e branch
+    deterministico, mas e comportamento de produto quando a IA e chamada.
   - `server/lib/edh_bracket_policy.dart:134`-`:142` usa listas por nome para
     combos infinitos e Game Changers; este caso e excecao intencional de regra
     externa, mas ainda precisa de fonte/versionamento/teste dedicado.
@@ -285,14 +289,14 @@ Histórico do problema:
      e nomes diferentes.
 - **Validação**:
   - `grep -RIn --include='*.dart' -E "Sol Ring|Command Tower|Thassa's Oracle|Isochron Scepter|Dramatic Reversal|Blood Artist" server/lib server/routes app/lib`
-    nao encontra decisao runtime fora de fixtures, docs, prompts, seed/corpus
-    declarado ou policy versionada;
+    nao encontra decisao runtime fora de fixtures, docs, exemplos de UI/import,
+    seed/corpus declarado, prompts gerados por policy ou policy versionada;
   - testes provam que score/bracket/premium vem da policy e continua respeitando
     legalidade, identidade de cor e bracket.
 
 ### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
 
-- **Status 2026-06-06 05:30 UTC: REVALIDADO/ABERTO no checkout `3a83ae79`.**
+- **Status 2026-06-07 05:30 UTC: REVALIDADO/ABERTO no checkout `84a97d75`.**
 - **Evidência**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
     `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
@@ -308,9 +312,9 @@ Histórico do problema:
   - `classifyOptimizationFunctionalRole` usa `semantic_tags_v2` primeiro e
     depois `type_line`/`oracle_text`, sem ler `functional_tags`, em
     `server/lib/ai/optimization_functional_roles.dart:55`-`:124`.
-  - `OptimizationValidator` e `OptimizationSwapGateResult` chamam esse
-    classificador em `server/lib/ai/optimization_validator.dart:265`-`:267` e
-    `server/lib/ai/optimization_quality_gate.dart:52`-`:53`.
+  - `OptimizationValidator` e o quality gate chamam esse classificador em
+    `server/lib/ai/optimization_validator.dart:266`-`:268` e
+    `server/lib/ai/optimization_quality_gate.dart:53`-`:54`.
   - O checkout atual nao contem `optimizationFunctionalRolesForCard`; o caminho
     vivo ainda e `classifyOptimizationFunctionalRole`, escalar. O mesmo arquivo
     colapsa `semantic_tags_v2` para um unico role em
