@@ -160,6 +160,17 @@ Revalidacao de `Fork` em Hermes, 2026-06-07:
 - `Underworld Breach` foi rejeitado/retest: `86.3%` WR, delta `-0.4pp`, alem de warning de Game Changer.
 - Proxima decisao recomendada: escolher `Reversal of Fortune` se o objetivo for ganho medido; nao forcar `Fork` sem uma razao de design/deck owner.
 
+Revalidacao de `Reversal of Fortune` em Hermes, 2026-06-07:
+
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_reversal_revalidation_20260607_154522/`.
+- A evidencia foi recriada no SQLite Hermes atual antes de qualquer apply.
+- Baseline fresco id `2`: `86.7%` WR, `260W/11L/29S`, 300 jogos.
+- `Reversal of Fortune` nao reproduziu o ganho anterior: scan `83.3%`, full confirmation `85.3%`, delta `-1.4pp`, `256W/7L/37S`.
+- `master_optimizer_apply.py` bloqueou corretamente o apply porque nao havia candidato aprovado com delta minimo seguro.
+- Nenhuma mutacao foi feita: `Past in Flames` continua presente e `Reversal of Fortune` continua ausente.
+- Rechecagem adicional encontrou apenas ganhos marginais: `Invoke Calamity` `+0.6pp` e `Restoration Seminar` `+0.6pp`.
+- Estado recomendado: nao aplicar `Reversal of Fortune` com a evidencia atual; se ainda quiser otimizar o slot `Past in Flames`, rodar amostra maior para `Invoke Calamity`/`Restoration Seminar` ou ampliar o scan.
+
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
 Arquivos principais:
