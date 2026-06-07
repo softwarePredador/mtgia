@@ -223,6 +223,33 @@ Hardening de oponentes reais em Hermes, 2026-06-07:
 - Cron `/opt/data/scripts/manaloom-master-optimizer-auto-cycle.sh` atualizado no servidor para rodar `sync_pg_meta_decks_to_hermes.py --apply` antes de `sync_pg_card_metadata_to_hermes.py`, baseline e slot scan.
 - Estado importante: a comparacao com baselines antigos mudou de dificuldade; os resultados contra perfis genericos nao devem ser comparados diretamente com os novos resultados contra decks reais PG.
 
+Hardening de regras de battle em Hermes, 2026-06-07:
+
+- Problema revisado: o battle ainda era um simulador heuristico, nao um rules engine completo; os pontos mais perigosos eram `miracle`, duracao de efeitos temporarios, `Boros Charm`, `Akroma's Will`, `silence_opponents` e `life_cant_change`.
+- `Player.draw()` agora conta `cards_drawn_this_turn`.
+- `play_turn_v8()` zera o contador no inicio do turno e `miracle` so pode disparar se a carta comprada foi a primeira compra real do turno.
+- `miracle` continua exigindo `Lorehold, the Historian` em campo e mana suficiente; o simulador ainda escolhe automaticamente castar se puder pagar.
+- `Boros Charm` em resposta a board wipe agora concede `indestructible` temporario as criaturas, em vez de apenas marcar `player.indestructible`.
+- `Boros Charm` modo double strike nao dobra poder e passa a ser ate o fim do turno.
+- `Akroma's Will` agora concede `flying`, `double_strike`, `lifelink` e `indestructible` ate o fim do turno e nao dobra poder.
+- Sistema `until end of turn` criado com restauracao de atributos originais no cleanup.
+- `silence_opponents` agora bloqueia counters/respostas dos oponentes contra spells do controlador e tambem bloqueia instants no end step do jogador ativo.
+- `life_cant_change`/`protection_from_everything` agora bloqueiam dano e ganho de vida nos helpers de vida usados pelo battle.
+- Testes adicionados em `test_battle_analyst_v10_3.py`:
+  - miracle exige Lorehold em campo;
+  - miracle dispara so na primeira compra do turno;
+  - miracle nao dispara na segunda compra se houve draw no upkeep;
+  - Boros Charm protege criaturas ate cleanup;
+  - Akroma's Will limpa keywords no cleanup e nao muda poder permanentemente;
+  - silence bloqueia counterspell;
+  - life can't change bloqueia dano/ganho de vida.
+- Validacao local: `python -m py_compile ...` aprovado e 31 testes passaram.
+- Validacao Hermes container: `python3 test_battle_analyst_v10_3.py` aprovado com 31 testes.
+- Smoke baseline Hermes: baseline id `13`, 15 jogos contra 3 oponentes reais, `73.3%` WR; relatorio `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260607_174845.md`.
+- Batalha volumetrica Hermes: 300 jogos contra 6 oponentes reais, `64.3%` WR, `193W/103L/4S`.
+- Replay estruturado Hermes: `/opt/data/artifacts/hermes_master_optimizer/replay_rules_hardening_20260607.txt`, com oponentes reais `Sisay`, `Urza` e `Magda`.
+- Ainda nao e rules engine 100% MTG: custos modais completos, todos os tipos de replacement/prevention effects, escolha humana de miracle, alvo modal exato e todas as camadas de continuous effects continuam simplificados.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`

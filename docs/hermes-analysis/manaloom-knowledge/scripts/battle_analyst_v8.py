@@ -510,6 +510,7 @@ class Player:
                 c = self.library.pop(0)
                 self.hand.append(c)
                 drawn.append(c)
+                self.cards_drawn_this_turn += 1
         return drawn
 
     def __init__(self, name, commander, deck, is_human=False, strategy="midrange"):
@@ -543,6 +544,7 @@ class Player:
         self.approach_revealed = []  # v8.1: opponents who know approach was cast
         self.eliminated = False
         self.win_reason = None
+        self.cards_drawn_this_turn = 0
 
     def refresh_mana_sources(self, turn=None):
         """Untap mana sources once for this player's turn."""
@@ -818,6 +820,8 @@ def priority_round(active_player, all_players, stack, turn, rng):
     for player in order:
         if not player.is_alive():
             continue
+        if player != top_item.controller and top_item.controller.silenced_opponents:
+            continue
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             if score >= 40:
@@ -828,6 +832,7 @@ def priority_round(active_player, all_players, stack, turn, rng):
                         if player.can_pay_card(c):
                             player.hand.remove(c)
                             player.spend_card_mana(c)
+                            c["_response_to_effect"] = top_item.effect_data.get("effect")
                             apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
                             return True
         else:
@@ -975,6 +980,75 @@ def counter_worth(threat_score, opp, rng):
 
     return False
 
+
+def remember_until_eot(card, key):
+    originals = card.setdefault("_until_eot_originals", {})
+    if key not in originals:
+        originals[key] = card.get(key, None)
+
+
+def set_until_eot(card, key, value):
+    remember_until_eot(card, key)
+    card[key] = value
+
+
+def clear_until_eot(player):
+    """Restore temporary combat keywords/stat changes at cleanup."""
+    zones = (player.battlefield, player.phased_out)
+    for zone in zones:
+        for card in zone:
+            if not isinstance(card, dict):
+                continue
+            originals = card.pop("_until_eot_originals", {})
+            for key, original in originals.items():
+                if original is None:
+                    card.pop(key, None)
+                else:
+                    card[key] = original
+    player.indestructible = False
+
+
+def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
+    creatures = [
+        card
+        for card in player.battlefield
+        if isinstance(card, dict) and card.get("effect") == "creature"
+    ]
+    for creature in creatures:
+        for keyword in keywords:
+            if keyword == "protection_all":
+                continue
+            set_until_eot(creature, keyword, True)
+        if power_multiplier:
+            remember_until_eot(creature, "power")
+            try:
+                base_power = int(float(creature.get("power", 2)))
+            except (TypeError, ValueError):
+                base_power = 2
+            creature["power"] = base_power * power_multiplier
+    return len(creatures)
+
+
+def change_life(player, delta):
+    if delta and (player.life_cant_change or player.protection_from_everything):
+        return False
+    player.life += delta
+    return True
+
+
+def deal_damage(player, amount):
+    if amount <= 0:
+        return False
+    return change_life(player, -amount)
+
+
+def gain_life(player, amount, cap=40):
+    if amount <= 0 or player.life_cant_change or player.protection_from_everything:
+        return False
+    player.life = min(cap, player.life + amount)
+    return True
+
+
 def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
     """v8: Cast spells respecting instant/sorcery timing and stack."""
     mana = player.available_mana()
@@ -1050,7 +1124,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
     if player.is_human:
         lorehold_on_board = any(isinstance(c, dict) and c.get("name") == "Lorehold, the Historian" for c in player.battlefield)
         for c in castable[:]:
-            if (is_sorcery(c) or "Instant" in c.get("type_line", "")) and not is_main_phase:
+            if (is_sorcery(c) or is_instant(c)) and not is_main_phase:
                 if not is_instant(c) or not lorehold_on_board:
                     castable.remove(c)  # can't cast sorcery outside main phase
 
@@ -1251,23 +1325,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
     elif effect == "silence_opponents":
         player.battlefield.append(effect_data)
         player.silenced_opponents = True
+    elif effect == "indestructible":
+        grant_creatures_until_eot(player, keywords=("indestructible",))
+        player.indestructible = True
+        player.graveyard.append(card)
     elif effect == "modal_boros_charm":
-        # v8: Choose mode based on context
-        # If there's a board wipe coming or on the stack, use indestructible
-        in_combat = any(o.is_alive() for o in opponents)
-        if player.indestructible:  # already protected
-            # Use double strike in combat
-            for c in player.battlefield:
-                if isinstance(c, dict) and c.get("effect") == "creature":
-                    c["double_strike"] = True
-                    c["power"] = c.get("power", 2) * 2  # effectively double damage
+        response_to = card.get("_response_to_effect")
+        preferred_mode = card.get("preferred_mode")
+        if preferred_mode == "double_strike" and response_to != "board_wipe":
+            grant_creatures_until_eot(player, keywords=("double_strike",))
         else:
-            # Default: indestructible (most valuable)
+            grant_creatures_until_eot(player, keywords=("indestructible",))
             player.indestructible = True
         player.graveyard.append(card)
     elif effect == "approach":
         player.approach_count += 1
-        player.life = min(40, player.life + 7)
+        gain_life(player, 7)
         # v8.1: THREAT — all opponents now know Approach was cast
         player.threat_level += 50  # massive threat spike
         for opp in opponents:
@@ -1299,7 +1372,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if alive_opps and total_power > 0:
             dmg_each = total_power // len(alive_opps)
             for opp in alive_opps:
-                opp.life -= dmg_each
+                deal_damage(opp, dmg_each)
     elif effect == "token_maker":
         token_count = effect_data.get("token_count", 5)
         if isinstance(token_count, str):
@@ -1315,17 +1388,23 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         dmg = len(spells) * 3
         alive_opps = [o for o in opponents if o.is_alive()]
         if alive_opps:
-            for opp in alive_opps: opp.life -= dmg // len(alive_opps)
+            for opp in alive_opps: deal_damage(opp, dmg // len(alive_opps))
         player.graveyard.append(card)
     elif effect == "pump_all":
         kw = effect_data.get("keywords", [])
-        for c in player.battlefield:
-            if isinstance(c, dict) and c.get("effect") == "creature":
-                c["power"] = c.get("power", 2) * 2
-                if "flying" in kw: c["flying"] = True
-                if "double_strike" in kw: c["double_strike"] = True
-                if "lifelink" in kw: c["lifelink"] = True
-                if "indestructible" in kw: c["indestructible"] = True
+        combat_keywords = [
+            keyword
+            for keyword in ("flying", "double_strike", "lifelink", "indestructible")
+            if keyword in kw
+        ]
+        power_multiplier = None if card.get("name") == "Akroma's Will" else 2
+        grant_creatures_until_eot(
+            player,
+            keywords=combat_keywords,
+            power_multiplier=power_multiplier,
+        )
+        if "indestructible" in combat_keywords:
+            player.indestructible = True
         player.graveyard.append(card)
     elif effect == "copy_spell":
         player.battlefield.append(effect_data)
@@ -1370,7 +1449,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if total_power > 0:
             alive_opps = [o for o in opponents if o.is_alive()]
             if alive_opps:
-                rng.choice(alive_opps).life -= total_power
+                deal_damage(rng.choice(alive_opps), total_power)
         player.graveyard.append(card)
     elif effect == "exile_value":
         # Dance with Calamity — exile top X, play for free
@@ -1378,6 +1457,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.draw(min(X, 3), rng)
         player.graveyard.append(card)
     elif effect == "redirect_removal":
+        grant_creatures_until_eot(player, keywords=("indestructible",))
         player.indestructible = True
         player.graveyard.append(card)
 
@@ -1393,7 +1473,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         total_damage = 3 + grave_copies  # +3 per copy in grave
         for opp in opponents:
             if opp.is_alive():
-                opp.life -= total_damage
+                deal_damage(opp, total_damage)
         
         # Ripple: after casting, reveal top 4 and cast matching spells for free
         has_ripple = any(isinstance(c, dict) and c.get("effect") == "ripple_engine" for c in player.battlefield)
@@ -1408,7 +1488,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     # Cast it for free — deal damage again
                     for opp in opponents:
                         if opp.is_alive():
-                            opp.life -= total_damage
+                            deal_damage(opp, total_damage)
                     # Remove from library
                     player.library.pop(i)
             if extra_casts > 0:
@@ -1441,7 +1521,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 if alive_opps:
                     dmg_each = total_power // len(alive_opps)
                     for opp in alive_opps:
-                        opp.life -= dmg_each
+                        deal_damage(opp, dmg_each)
                 print(f"  [COMBO] Dualcaster+Twinflame = {tokens_needed} hasty 2/2s! {total_power} total damage")
         
         player.battlefield.append(dict(card))
@@ -1636,10 +1716,10 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
 
     def deal_player_damage(creature, damage=None):
         damage = stat(creature, "power", 2) if damage is None else damage
-        target.life -= damage
-        if creature.get("lifelink"):
-            attacker.life = min(40, attacker.life + damage)
-        if creature.get("is_commander") and creature.get("owner") == attacker.name:
+        damage_dealt = deal_damage(target, damage)
+        if damage_dealt and creature.get("lifelink"):
+            gain_life(attacker, damage)
+        if damage_dealt and creature.get("is_commander") and creature.get("owner") == attacker.name:
             attacker.commander_damage[target.name] += damage
 
     marked_damage = defaultdict(int)
@@ -1743,6 +1823,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         board=len(player.battlefield),
     )
     player.lands_played_this_turn = 0
+    player.cards_drawn_this_turn = 0
+    clear_until_eot(player)
     player.indestructible = False
 
     # ── UNTAP ──
@@ -1762,17 +1844,17 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                 player.draw(1, rng)
 
     # ── DRAW ──
-    player.draw(1, rng)
+    drawn_for_turn = player.draw(1, rng)
     if not player.library and not player.hand:
         player.life = 0
         check_sbas(all_players)
         return
 
     # v8: MIRACLE check
-    if player.is_human and player.hand:
+    if player.is_human and drawn_for_turn and player.cards_drawn_this_turn == 1:
         lorehold_on_board = any(isinstance(c, dict) and c.get("name") == "Lorehold, the Historian" for c in player.battlefield)
-        last_drawn = player.hand[-1] if player.hand else None
-        if last_drawn and (is_sorcery(last_drawn) or "Instant" in last_drawn.get("type_line", "")):
+        last_drawn = drawn_for_turn[-1]
+        if last_drawn and (is_sorcery(last_drawn) or is_instant(last_drawn)):
             miracle_cost = 2  # Lorehold gives miracle {2}
             if last_drawn.get("name") == "Reforge the Soul":
                 miracle_cost = 2  # 1R but simplified
@@ -1845,22 +1927,23 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     
     # ── OPPONENT END STEP INTERACTION (NEW) ──
     # All opponents can cast instants on this player's end step
-    for opp in opponents:
-        if not opp.is_alive(): continue
-        instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.can_pay_card(c)]
-        for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
-            if opp.can_pay_card(c):
-                opp.hand.remove(c)
-                opp.spend_card_mana(c)
-                emit_replay_event(
-                    "end_step_instant",
-                    player=opp.name,
-                    card=c.get("name", "?"),
-                    effect=get_card_effect(c).get("effect", "unknown"),
-                    active_player=player.name,
-                    turn=turn,
-                )
-                apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
+    if not player.silenced_opponents:
+        for opp in opponents:
+            if not opp.is_alive(): continue
+            instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.can_pay_card(c)]
+            for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
+                if opp.can_pay_card(c):
+                    opp.hand.remove(c)
+                    opp.spend_card_mana(c)
+                    emit_replay_event(
+                        "end_step_instant",
+                        player=opp.name,
+                        card=c.get("name", "?"),
+                        effect=get_card_effect(c).get("effect", "unknown"),
+                        active_player=player.name,
+                        turn=turn,
+                    )
+                    apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
 
 
     # ── CLEANUP ──
@@ -1881,6 +1964,9 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         graveyard=len(player.graveyard),
         discarded=discarded,
     )
+
+    for participant in all_players:
+        clear_until_eot(participant)
 
     # v8: SBA check at end of turn
     check_sbas(all_players)

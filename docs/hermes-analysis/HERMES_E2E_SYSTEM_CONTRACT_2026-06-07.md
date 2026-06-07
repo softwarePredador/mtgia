@@ -595,6 +595,41 @@ Saida esperada:
 - deck hash;
 - Markdown `master_optimizer_baseline_*.md`.
 
+## Contrato de regras do battle
+
+O `battle_analyst_v8.py` nao deve ser tratado como rules engine completo de MTG.
+Ele e um simulador deterministico/heuristico para comparar hipoteses de deck,
+mas algumas regras agora sao obrigatorias e cobertas por teste.
+
+Regras obrigatorias cobertas por `test_battle_analyst_v10_3.py`:
+
+- cleanup descarta ate 7 cartas mesmo com jogador ja eliminado;
+- Approach of the Second Sun encerra o jogo imediatamente na segunda resolucao;
+- counters consomem mana/carta e nao counteram spell do proprio controlador;
+- mana colorida precisa da cor correta;
+- treasures/fontes flexiveis pagam custos coloridos;
+- combate usa apenas bloqueadores do jogador atacado;
+- combate suporta multiplos bloqueadores, trample, deathtouch, first strike,
+  double strike e indestructible;
+- `card_oracle_cache` enriquece mana cost, cmc, power/toughness e keywords;
+- miracle de Lorehold exige `Lorehold, the Historian` em campo;
+- miracle so dispara na primeira carta comprada no turno;
+- miracle nao dispara na segunda compra quando houve draw no upkeep;
+- Boros Charm protege criaturas contra board wipe ate cleanup;
+- Akroma's Will concede keywords ate cleanup e nao altera poder permanentemente;
+- silence/Grand Abolisher bloqueia respostas/counters dos oponentes;
+- life can't change/protection bloqueia dano e ganho de vida.
+
+Limites conhecidos que ainda nao devem virar promessa de produto:
+
+- miracle e auto-castado se puder pagar; ainda nao ha escolha humana/heuristica fina
+  para recusar o cast;
+- custos modais e escolhas de alvo sao simplificados;
+- camadas completas de continuous effects nao sao modeladas;
+- prevention/replacement effects complexos continuam aproximados;
+- cards especificos fora de `KNOWN_CARDS`/`known_cards_generated.json` dependem de
+  tags e heuristicas.
+
 ### `slot_optimizer.py`
 
 Funcao:
