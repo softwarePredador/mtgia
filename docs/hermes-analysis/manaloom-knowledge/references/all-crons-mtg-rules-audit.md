@@ -1,275 +1,233 @@
 # Auditoria Completa — Regras MTG em Todas as Crons
 
-**Versão:** v6.0
-**Data:** 2026-06-07T16:00:00+00:00
-**Commit:** `3c252249` (HEAD local, não pushado — sem credenciais Git)
+**Versão:** v8.0
+**Data:** 2026-06-07T22:00:00+00:00
+**Commit:** `f70bcf84` (HEAD local, codex/hermes-analysis-docs)
 **Auditor:** MTG Rules Auditor v3 (cron `c0591cb18024`)
-**Escopo:** Auditoria completa dos 18 crons ativos + gaps desde v5.0 (2026-06-06 05:27Z)
-**Status:** v5.0 → v6.0 (36h desde última auditoria bem-sucedida; execuções intermediárias falharam com HTTP 429)
+**Escopo:** Auditoria completa dos 24 crons ativos + delta desde v7.0 (2026-06-07 18:45Z)
+**Status:** v7.0 → v8.0 (~3h desde última auditoria). **8ª execução consecutiva com prompt stale.**
 
-**⚠️ AVISO:** O prompt deste cron contém 5 IDs de crons descomissionados desde v3.7 (2026-06-04). Esta é a 6ª execução consecutiva com prompt stale. Os diretórios `/opt/data/cron/output/f20ac299992b/`, `/opt/data/cron/output/712579b15767/`, `/opt/data/cron/output/08468451a06a/`, `/opt/data/cron/output/94f8590b1beb/`, e `/opt/data/cron/output/a50bef4c2a59/` **não existem**. O auditor opera usando o skill `manaloom-mtg-domain` v2.7.0 e inspeção direta dos outputs no lugar dos diretórios inexistentes.
+**⚠️ AVISO CRÍTICO:** O prompt deste cron contém 5 IDs de crons descomissionados desde v3.7 (2026-06-04). Esta é a **8ª execução consecutiva** com prompt desatualizado. Os diretórios `/opt/data/cron/output/f20ac299992b/`, `/opt/data/cron/output/712579b15767/`, `/opt/data/cron/output/08468451a06a/`, `/opt/data/cron/output/94f8590b1beb/`, e `/opt/data/cron/output/a50bef4c2a59/` **não existem**. O auditor opera usando o skill `manaloom-mtg-domain` v2.10.0 e inspeção direta dos outputs ativos.
 
 ---
 
-## Sumário Executivo (v6.0)
+## Sumário Executivo (v8.0)
 
-| Cron | ID | Status | Nota MTG | Mudança vs v5.0 |
+| Cron | ID | Status | Nota MTG | Mudança vs v7.0 |
 |:-----|:--|:-------|:--------:|:----------------|
 | **Pipeline Lorehold** | — | 🔴 DESCOMISSIONADO | N/A | — |
 | Master Watchdog | `757eefb8738b` | ✅ script-only | N/A | — |
-| Normal Audit | `660397bb97e1` | ✅ Ativo | 8.0/10 | — (provider backoff resolved) |
-| Weekly Parallel Audit | `aeaeb666d377` | 🔴 HTTP 429 | N/A | ↓ (falhou última exec) |
-| **Commander Knowledge Deep** | `75eed994c103` | 🔴 **Battle-Validated** | 3.0/10 | ↓ (Exec #11 cita Battle Simulator, P0 tasks baseadas nele) |
-| Game Changer Research | `7915cc2377a0` | ✅ Ativo | 7.5/10 | ↓ (Exec #9: Tergrid oracle_text ainda vazio, regressão) |
-| Tag Accuracy Reporter | `b340374bc4e7` | 🔴 HTTP 429 | N/A | ↓ (última exec falhou) |
-| Mana Base Validator | `444aa9510c2c` | ✅ Ativo | 7.0/10 | — (CMC corruption descoberto, mas só reporta) |
+| Normal Audit | `660397bb97e1` | ✅ Ativo | 8.0/10 | — |
+| Weekly Parallel Audit | `aeaeb666d377` | 🔴 HTTP 429 | N/A | 🔴 (persiste) |
+| **Commander Knowledge Deep** | `75eed994c103` | 🟡 MELHOROU | 5.0/10 | ↑ (+2.0) Exec #13 sem "BATTLE-VALIDATED" |
+| Game Changer Research | `7915cc2377a0` | 🟡 Regressão | 3.0/10 | ↓ (-0.5) 3 bracket categories vazias |
+| Tag Accuracy Reporter | `b340374bc4e7` | ⏳ Pendente | 5.0/10 | — (último run 23:12Z, antes de v7.0) |
+| Mana Base Validator | `444aa9510c2c` | ✅ Ativo | 6.0/10 | — |
 | Knowledge Import | `b2f5c21ce2d7` | ✅ script-only | N/A | — |
-| **Knowledge Synthesis** | `10a59b3bdf4d` | 🔴 HTTP 404 | 5.0/10 | ↓ (nova falha de provider) |
+| **Knowledge Synthesis** | `10a59b3bdf4d` | ✅ Voltou | 6.0/10 | ↑ (+6.0) Exec #11 funcionou (74KB) |
 | Logic Coherence Auditor | `de6fb777f5d1` | ✅ Ativo | 8.0/10 | — |
 | Code Structure Auditor | `577a0a669714` | ✅ Ativo | N/A | — |
 | Cron Governor Report | `21fa86eb0d84` | ✅ Ativo | N/A | — |
-| **Auto-sync-learned-decks** | `7fcab928efd3` | 🔴 script-only | 0/10 | — (PermissionError persiste) |
-| Pull-learning-events | `262dc49e1be1` | ✅ script-only | N/A | ↑ (último run ok, mas UUID cast persiste) |
+| Auto-sync-learned-decks | `7fcab928efd3` | 🔴 script-only | 0/10 | — (PermissionError persiste) |
+| Pull-learning-events | `262dc49e1be1` | ✅ script-only | N/A | — (UUID cast persiste) |
 | Auto-promote-learned | `104fd03a2ea2` | ✅ script-only | N/A | — |
-| Knowncards Generator | `b9c8a7d6e5f4` | ⛔ PAUSADO | 0/10 | — (root-owned + path errado) |
-| **Universal Optimizer** | `c8d9e0f1a2b3` | ⛔ PAUSADO | 1.0/10 | — (propõe cortar staples, root-owned) |
-| Knowncards Validator | `d4e5f6a7b8c9` | 🔴 LOCKED | 2.0/10 | ↓ (5420s lock, funcionamento intermitente) |
-| **Master Optimizer Preflight** | `mmo-preflight01` | 🔴 SQLite READONLY | N/A | 🆕 Nova falha |
+| Knowncards Generator | `b9c8a7d6e5f4` | 🔴 QUEBRADO | 0/10 | — (script path + root-owned) |
+| Universal Optimizer | `c8d9e0f1a2b3` | ⛔ PAUSADO | 1.0/10 | — (corta staples) |
+| Knowncards Validator | `d4e5f6a7b8c9` | ✅ OK | 7.0/10 | — (lock resolvido) |
+| Master Optimizer Preflight | `mmo-preflight01` | ✅ OK | 7.5/10 | — (estável) |
+| Master Optimizer Auto-Cycle | `mmo-auto-cycle01` | 🔴 Timeout | N/A | 🆕 Timeout 120s |
 | Manager Watchdog | `2d436c71bbf7` | ⛔ PAUSADO | N/A | — |
-| **MTG Rules Auditor** | `c0591cb18024` | 🔴 PROMPT STALE | 2.0/10 | ↓ (6ª exec stale + HTTP 429 intermitente) |
-| **PIPELINE SCORE** | | | **2.5/10** 🔴 | **↓0.5 vs v5.0** |
+| **MTG Rules Auditor** | `c0591cb18024` | 🔴 PROMPT STALE | 2.0/10 | — (8ª exec stale) |
+| **PIPELINE SCORE** | | | **3.5/10** 🟡 | **↑0.5 vs v7.0** |
+
+**Pipeline score subiu de 3.0/10 para 3.5/10.** Motivo: Commander Knowledge Deep Exec #13 abandonou o padrão "BATTLE-VALIDATED" e agora investiga regressões em vez de gerar tasks P0 de apply; Knowledge Synthesis voltou a funcionar; CMC safety module implementado no produto. Porém, **0/11 correções do plano v4.0 ainda não aplicadas** (entrando no 3º dia).
 
 ---
 
-## Mudanças desde v5.0 (2026-06-06 05:27Z → 2026-06-07 16:00Z)
+## Mudanças desde v7.0 (2026-06-07 18:45Z → 22:00Z)
 
-### 🔴 1. Commander Knowledge Deep — Exec #11 Continua Padrão "Battle-Validated"
+### 🟢 1. Commander Knowledge Deep — IMPROVEMENT (Exec #13, 21:38Z)
 
-**Exec #10 (2026-06-06 05:10Z):** Reportou "6 swaps battle-validados" com WR 89.5% (Slot Optimizer v3). 5 tasks P0-P1 geradas.
+**Exec #13 rompeu o padrão "BATTLE-VALIDATED"** que persistiu por 4 execuções consecutivas (#9-12):
 
-**Exec #11 (2026-06-07 15:29Z):** Continua citando "Battle-Validated Run" com WR 87.0% (300 games do Master Optimizer). **Gera 2 tasks P0** baseadas em dados do Battle Simulator: "Apply Slot Optimizer Phase 3 Findings" (+12.5pp) e "Integrate Master Optimizer as Cron Pipeline".
+- ❌ **ANTES (Exec #9-12):** "BATTLE-VALIDATED", "6 swaps battle-validados", tasks P0 "Apply Slot Optimizer Phase 3 Findings", "Flow remaining 5 Slot Optimizer swaps"
+- ✅ **AGORA (Exec #13):** Menções a Battle WR qualificadas como "opponent-pool-driven", task P0 virou "**Investigate** WR Regression" (investigar, não aplicar), tasks P1/P2 focadas em effect_map e estabilidade
+- **Sem menção a "BATTLE-VALIDATED"** — léxico abandonado
+- **5 tasks geradas:** P0 Investigate WR Regression, P1 effect_map, P1 KC Validator sampling, P2 re-baseline cron, P2 cross-deck confidence. Nenhuma propõe aplicar swaps automaticamente.
 
-**O Battle Simulator (`battle_simulator.dart`, 879 linhas, linha 9) declara:** "Sem stack complexo (resolução imediata)". NÃO implementa:
-- Stack/priority (CR 117.3-117.4)
-- Commander damage (CR 903.10a) ou tax (CR 903.8)
-- Multiplayer (2-player apenas)
-- ETB triggers, planeswalkers
-- Múltiplos bloqueadores
+**Avaliação MTG:** 5.0/10 🟡 (subiu de 3.0). Ainda discute dados do Battle Simulator, mas não os trata como validação de Commander real e não gera tasks de apply. O "Investigate" é uma postura correta.
 
-**O WR de 87-89% é do simulador 2-player sem stack — inválido para decisões de deckbuilding em Commander. As 2 tasks P0 geradas na Exec #11 são baseadas em dados de um simulador que não segue regras oficiais.**
+**Risco:** Exec #13 é uma única execução. O padrão pode retornar. Monitorar Exec #14.
 
-**Status:** 3 execuções consecutivas (#9, #10, #11) com o mesmo padrão. NENHUMA correção aplicada.
+### 🟢 2. Knowledge Synthesis — Voltou a Funcionar (Exec #11, 20:34Z)
 
-**Avaliação MTG:** 3.0/10 🔴 (↓1.0 vs v5.0. Não é mais apenas "cita Battle"; agora GERA TASKS P0 baseadas nos dados inválidos.)
+- **Exec #9 (12:23Z):** `RuntimeError: HTTP 404 — Not Found | opencode`
+- **Exec #10 (16:29Z):** Voltou, 74KB output
+- **Exec #11 (20:34Z):** **Funcionou novamente**, 74KB de output com análise completa de código Dart + conhecimento MTG
+- **Provider:** `opencode-go` (diferente do resto da frota `deepseek-pro`) — inconsistência permanece como risco de falha futura
 
-### 🔴 2. Tergrid — REGRESSÃO Confirmada (Skill vs DB)
+**Avaliação MTG:** 6.0/10 🟡 (subiu de 0.0). Funcionando, mas provider instável. Migrar para `deepseek-pro` evitaria falhas futuras.
 
-**O skill `manaloom-mtg-domain` v2.7.0 afirma:** "Tergrid, God of Fright oracle_text está OK. A reimportação via Scryfall fuzzy search foi bem-sucedida."
+### 🟢 3. CMC Safety Module — IMPLEMENTADO NO PRODUTO (Gap 19 Parcialmente Resolvido)
 
-**O DB contradiz (confirmado Game Changer Research Exec #8 e #9):** `oracle_text` é string vazia (`''`), não texto funcional. A "resolução" apenas converteu NULL → `''` sem popular o oracle real. Tergrid permanece invisível para heurísticas baseadas em oracle_text.
+**Descoberto pelo Logic Coherence Auditor (Exec #52, 21:49Z):**
 
-**Pitfall:** `WHERE oracle_text IS NULL` não detecta mais Tergrid (agora é `''`). Query correta: `WHERE oracle_text IS NULL OR oracle_text = ''`.
+- `server/lib/ai/cmc_safety.dart` (80 linhas): **3-tier fallback para CMC**
+  1. DB `cmc` → parse `_parseRawCmc()`
+  2. `mana_cost` string → parse `parseManaCostCmc()` (ex: `{2}{R}{W}` → 4)
+  3. Fallback final: `unknownNonLandFallback=99` para não-lands
+- Wireado em: `optimization_validator.dart:737`, `optimization_quality_gate.dart:607`, `goldfish_simulator.dart:265,577`
+- 57 linhas de teste. Todos passam.
+- **Defesa contra CMC=0.0 corruption ativa no código de produto.**
 
-**Status:** Lacuna documentada, mas o fix aplicado foi cosmético (NULL→''), não funcional (sem texto oracle). O skill e o DB divergem — o skill afirma "RESOLVIDO", o DB mostra o contrário.
+**Avaliação:** O DB ainda tem 142/543 (26.2%) cartas com CMC corrompido, mas o produto agora tem uma camada de defesa que usa `mana_cost` como fallback. `fix_cmc_batch.py` ainda pendente para corrigir a raiz no DB.
 
-### 🔴 3. Knowledge Synthesis — HTTP 404 (Nova Falha)
+### 🟢 4. 53 Game Changers no Bracket Policy + 11 Categorias (Gap 3 Parcialmente Resolvido)
 
-**Exec #9 (2026-06-07 12:23Z):** Falhou com `RuntimeError: HTTP 404 — Not Found | opencode`. O provider `opencode-go` (ou `deepseek-pro`) retornou 404 para o modelo `deepseek-v4-pro`. **Nova falha — não era HTTP 429 como os demais crons.** Impacto: sem geração de IMPLEMENTATION_TASKS.md desde 2026-06-07.
+**Descoberto pelo Logic Coherence Auditor:**
 
-### 🔴 4. CMC Corruption — 144 Cartas (26.6%), Inalterado desde v5.0
+- `server/lib/edh_bracket_policy.dart`: **11 valores em `BracketCategory`** (eram 5)
+  - Novas: `boardWipe`, `cardAdvantage`, `stax`, `protection`, `valueEngine`, `gameChanger`
+- **All 53 official GC names** em `officialGameChangerNamesForBracketPolicy` (linhas 354-408)
+- Heurísticas para categorias novas: `_looksLikeGameChangerBoardWipe()`, `_looksLikeGameChangerCardAdvantage()`, `_looksLikeGameChangerStax()`, `_looksLikeGameChangerProtection()`
+- `_knownValueEngineNames` — lista curada de value engines
 
+**Avaliação:** O código Dart agora cobre todas as 12 categorias (5 originais + 7 novas). Porém o **SQLite ainda tem apenas 24/53 (45%) detectados** — a implementação no código não foi retroaplicada ao DB. Gap 3 passa de 🔴 para 🟡: código existe, mas dados históricos não foram reclassificados.
+
+---
+
+## 🔴 Regressões e Problemas Persistentes
+
+### 🔴 5. Bracket Categories Esvaziadas — 3/5 Categorias Originais com ZERO Cartas
+
+**Gamechanger Research Exec #10 (21:42Z):** Hash rotacionou (`c62005...` → `b8eec6...`) por 3 reclassificações de `bracket_category`:
+
+| Carta | Categoria Anterior | Categoria Atual | Diagnóstico |
+|:------|:-------------------|:----------------|:------------|
+| Force of Will | `freeInteraction` ✅ | `other` ❌ | Regressão. "rather than pay" → freeInteraction |
+| Bolas's Citadel | `infiniteCombo` ✅ | `other` ❌ | Regressão. Combo piece Top/Reservoir |
+| Panoptic Mirror | `extraTurns` 🟡 | `freeInteraction` 🟡 | Reclassificação ambígua |
+
+**Impacto:** `detected=1 & bracket='other'` subiu de 14 → 16. 3/5 categorias originais vazias: `tutor` (0), `extraTurns` (0), `infiniteCombo` (0). Apenas `fastMana` (7) e `freeInteraction` (2) retêm cartas. Consumidores do DB não conseguem distinguir tipo funcional de 88% dos GCs detectados.
+
+**Avaliação MTG:** 3.0/10 🔴 (piorou de 4.0 no v7.0). O código Dart tem as 11 categorias, mas o SQLite está regredindo por batch/migration que reclassifica incorretamente.
+
+### 🔴 6. CMC Corruption — 142/543 (26.2%) Inalterado (3º dia sem correção)
+
+**Query confirmada (22:00Z):**
 ```sql
 SELECT COUNT(*) FROM deck_cards WHERE cmc IS NULL OR cmc = 0.0;
--- Resultado: 144/542 (26.6%)
+-- 142/543 (26.2%) — INALTERADO desde v5.0
 ```
 
-Distribuição por deck: deck 1=2, deck 2=19, deck 4=15, deck 5=19, deck 6=38, deck 7=22, deck 9=29.
+**`fix_cmc_batch.py`** continua pendente desde 2026-06-05. O `cmc_safety.dart` mitiga no produto, mas o DB permanece corrompido — qualquer ferramenta que leia `deck_cards.cmc` diretamente recebe dado inválido.
 
-**Novo (Mana Base Validator Exec #3, 2026-06-07 12:54Z):** Confirmado que TODOS os decks exceto Atraxa (#9) têm `decks.avg_cmc` armazenado divergindo do `AVG(cmc) WHERE cmc>0`. Lorehold (#6) é o pior: stored 1.79 vs computed 3.14.
+### 🔴 7. Tergrid oracle_text Vazio — Regressão Persiste (3º dia)
 
-**Impacto MTG:** Curva de mana, mulligan simulation, e quality gate operam com dados corrompidos. Cartas com CMC 5+ tratadas como CMC 0.0 distorcem todas as métricas derivadas.
+- Scryfall: oracle_text está em `card_faces[0].oracle_text` (DFC)
+- DB: `oracle_text = ''` (string vazia)
+- A "resolução" documentada no skill converteu NULL → `''` sem popular o oracle real
+- Tergrid permanece invisível para heurísticas baseadas em oracle_text
 
-**Status:** Script `fix_cmc_batch.py` pendente desde 2026-06-05. NÃO EXECUTADO.
+### 🔴 8. Prompt Stale — 8ª Execução Consecutiva
 
-### 🆕 5. Master Optimizer Preflight — SQLite Read-Only (Falha Nova)
+O `mtg-rules-auditor` (c0591cb18024) está na **8ª execução consecutiva** com prompt que referencia 5 IDs de crons descomissionados. O prompt no `jobs.json` nunca foi atualizado desde v3.7 (2026-06-04).
 
-**Todas as execuções:** `sqlite3.OperationalError: attempt to write a readonly database` em `sync_pg_card_metadata_to_hermes.py` linha 370. O script tenta escrever em `knowledge.db` que está em modo read-only. **43 falhas consecutivas.**
+### 🟡 9. Git Push Failures — Multi-Cron
 
-### 🔴 6. Git Push — 19+ Commits Acumulados sem Credenciais
+**Cróns afetados:**
+- Commander Knowledge Deep (Exec #13): commit `3ccbc1ee` local, push blocked (`.git-credentials missing`)
+- Gamechanger Research (Exec #10): commit `f70bcf84` local, push blocked
+- Knowledge Synthesis: provável mesmo problema
 
-**Status:** TODOS os crons que produzem commits estão bloqueados no push. Commits locais acumulados incluem `3c252249` (Commander Knowledge Deep), `0fe0bcf9` (Game Changer Research), `94d9e87d` (Mana Base Validator), e `b9b68751` (Knowledge Synthesis). **Nenhum push bem-sucedido desde 2026-06-06.**
+Nenhum cron tem credenciais Git no ambiente. Commits acumulam localmente sem push.
 
-### 🔴 7. KC Validator — LOCKED (5420s)
+### 🟡 10. Master Optimizer Auto-Cycle — Timeout (NOVA)
 
-**Exec #63 (2026-06-07 15:11Z):** "LOCKED (5420s). Exiting." O lock file persiste por 1.5 horas. O validator não está produzindo novos relatórios de conflito de classificação.
-
----
-
-## Auditoria MTG Rules — Crons Ativos
-
-### Commander Knowledge Deep (`75eed994c103`) — 3.0/10 🔴
-
-**O que faz:** Analisa 1 commander por execução, gera padrões de ramp/draw/removal/wincon, cria tasks.
-
-**Contra regras MTG:**
-- ❌ Cita Battle Simulator como "BATTLE-VALIDATED" (Exec #9, #10, #11)
-- ❌ Gera tasks P0 baseadas em WR de simulador 2-player sem stack (Exec #11)
-- ❌ WR de 87-89% é do simulador, não de jogo real Commander
-- ✅ Análise de sinergia e arquétipo é sólida e baseada em regras reais
-- ✅ Identifica padrões de deckbuilding corretamente
-
-**Recomendação:** Adicionar disclaimer obrigatório: "Battle Analyst não implementa regras oficiais de Commander. WR é indicativo apenas para comparação entre builds do mesmo simulador." Remover "BATTLE-VALIDATED" do léxico. Não gerar tasks P0 baseadas exclusivamente em dados do simulador.
-
-### Game Changer Research (`7915cc2377a0`) — 7.5/10 🟡
-
-**O que faz:** Analisa GCs, detecta lacunas de categoria/heurística.
-
-**Contra regras MTG:**
-- ✅ Categorização semanticamente correta (card_advantage, stax, etc.)
-- ✅ 24/53 GCs detectados (45%) — gap conhecido no código Dart
-- ❌ Tergrid `oracle_text` vazio — regressão documentada
-- ✅ Auto-diagnóstico em `notes` (CATEGORY_GAP, NOT_DETECTED, FALSE_FLAG)
-- ✅ 8 cartas RL com `price_usd=NULL` — documentado, pendente de fix
-
-**Impacto MTG:** Médio. O gap de detecção de GCs (45%) significa que 55% dos Game Changers oficiais não são sinalizados pelo bracket policy. Isso afeta a classificação de bracket dos decks e a validação de deckbuilding.
-
-### Knowledge Synthesis (`10a59b3bdf4d`) — 5.0/10 🔴
-
-**O que faz:** Cruza conhecimento MTG com código Dart, gera IMPLEMENTATION_TASKS.md.
-
-**Contra regras MTG:**
-- ✅ Tasks geradas são baseadas em gaps reais de código vs regras MTG
-- ❌ Falhando com HTTP 404 (provider `opencode-go` não encontra modelo)
-- ⚠️ Tasks P2 frequentemente duplicadas entre execuções
-- ✅ Metodologia de cross-reference é correta: conhecimento → código → gap → task
-
-**Recomendação:** Corrigir provider/modelo. Adicionar deduplicação de tasks.
-
-### Mana Base Validator (`444aa9510c2c`) — 7.0/10 🟡
-
-**O que faz:** Valida mana base de decks vs perfis EDHREC.
-
-**Contra regras MTG:**
-- ✅ Validação de lands/ramp/draw vs perfis EDHREC é sólida
-- ✅ Detectou CMC corruption sistêmico (decks.avg_cmc vs computed)
-- ⚠️ Não avalia regras MTG diretamente (apenas métricas de deckbuilding)
-- ⚠️ Limitação: `role_targets` de commander profiles não mapeiam 1:1 para `functional_tag`
-
-**Recomendação:** Adicionar verificação de color identity compliance. Reportar decks que violam identidade de cor.
-
-### Universal Optimizer (`c8d9e0f1a2b3`) — 1.0/10 🔴
-
-**O que faz:** Otimizador universal de deck via Battle Simulator.
-
-**Contra regras MTG:**
-- ❌ Avalia 576 candidatos via Battle Simulator (2-player, sem stack)
-- ❌ Propõe cortar Smothering Tithe (40%+ EDHREC, staple Commander) e Imperial Recruiter
-- ❌ Cortes baseados em simulação inválida para Commander real
-- 🟢 PAUSADO — mitigação acidental (PermissionError em root-owned files)
-- ❌ CMC corruption (26.6%) distorce seleção de candidatos
-
-**Recomendação:** Não reativar sem: (a) corrigir Battle Simulator para regras Commander, (b) adicionar heurística de proteção para staples EDHREC ≥ 30%, (c) corrigir CMC corruption.
-
-### MTG Rules Auditor (`c0591cb18024`) — 2.0/10 🔴 (ESTE CRON)
-
-**O que faz:** Audita crons contra regras MTG oficiais.
-
-**Contra regras MTG:**
-- ❌ Prompt stale há 6 execuções consecutivas (desde v3.7, 2026-06-04)
-- ❌ Referencia 5 IDs de crons descomissionados cujos diretórios não existem
-- ❌ Últimas 4 execuções falharam com HTTP 429 (rate limit)
-- ✅ Quando roda, produz auditoria precisa baseada nos skills
-- ⚠️ Skill `manaloom-commander-knowledge` listado em `jobs.json` não existe — todos os crons que o listam recebem aviso "[SKIPPED]"
+**Exec #1 (20:07Z):** `Script timed out after 120s`. Primeiro run do novo cron `mmo-auto-cycle01` falhou com timeout. Aguardando Exec #2 para diagnóstico.
 
 ---
 
-## Gaps de Código Dart — Status (inalterado desde v3.8)
+## Tabela Completa de Gaps (atualizada v8.0)
 
-| Gap | Descrição | Arquivo | Status |
-|:----|:----------|:--------|:------|
-| Gap 3 | Bracket policy: 29/53 GCs não detectados (54.7%) | `edh_bracket_policy.dart` | 🔴 Persiste |
-| Gap 6 | Classificador "duplo nulo": 10%+ cartas invisíveis | `functional_card_tags.dart` | 🔴 Persiste |
-| Gap 8 | Battle Simulator: sem stack/priority/commander | `battle_simulator.dart` | 🔴 Persiste |
-| Gap 13 | Bulk import: `functional_tag='unknown'`, CMC NULL | `import_lorehold_decks.py` | 🔴 Persiste |
-| Gap 15 | Ramp misclassification: 10/16 cartas não detectadas | `functional_card_tags.dart` | 🟡 Parcial (classificador corrigido no DB, código Dart pode regredir) |
-
----
-
-## Dados Corrompidos — Impacto em Regras MTG
-
-### CMC Corruption (144/542 cartas, 26.6%)
-
-**Impacto direto em regras MTG:** Curva de mana é um aspecto fundamental de deckbuilding Commander. Com 26.6% das cartas tendo CMC=0.0 incorreto:
-- Simulações de mulligan operam com distribuição de CMC errada
-- Quality gate valida swaps contra thresholds de CMC errados
-- Candidatos de swap com CMC real alto (5+) podem ser selecionados como "CMC 0" — distorcendo completamente a análise de curva
-
-### Tergrid oracle_text (string vazia)
-
-**Impacto direto em regras MTG:** Tergrid é um Game Changer oficial. Sem oracle_text:
-- Nenhuma heurística pode avaliar Tergrid (precisa do texto da carta)
-- O bracket policy não detecta Tergrid como GC (falso negativo)
-- Decks incluindo Tergrid não consomem slot de GC — violação silenciosa de bracket
-
-### 8 Cartas Reserved List (price_usd=NULL)
-
-**Impacto:** Médio. Afeta apenas métricas de custo, não conformidade com regras MTG.
-
----
-
-## Plano de Correções (v6.0, ordenado por impacto)
-
-| # | Severidade | Alvo | Ação | Estado |
-|:-:|:----------:|:-----|:-----|:------|
-| 1 | 🔴 P0 | Commander Knowledge Deep | **Adicionar disclaimer obrigatório sobre Battle Simulator. Remover "BATTLE-VALIDATED" do léxico. Não gerar tasks P0 baseadas em dados do simulador.** | ❌ NÃO RESOLVIDO (3 execs) |
-| 2 | 🔴 P0 | MTG Rules Auditor | **Atualizar prompt no jobs.json — remover 5 IDs descomissionados, focar nos 18 crons ativos.** | ❌ NÃO RESOLVIDO (6 execs) |
-| 3 | 🔴 P0 | CMC Corruption | **Rodar fix_cmc_batch.py para corrigir 144 cartas com CMC=0.0** | ❌ NÃO RESOLVIDO (48h+) |
-| 4 | 🔴 P0 | Tergrid oracle_text | **Reimportar via Scryfall buscando "Tergrid, God of Fright" (sem //). Verificar resultado NÃO é string vazia.** | ❌ REGRESSÃO |
-| 5 | 🔴 P0 | Universal Optimizer | **Não reativar. Remover script ou adicionar disclaimer de que simulador não implementa Commander.** | 🟢 PAUSADO (mitigado) |
-| 6 | 🟡 P1 | Git Credentials | **Configurar GIT_TOKEN ou .git-credentials no ambiente cron. 19+ commits locais não pushados.** | ❌ NÃO RESOLVIDO |
-| 7 | 🟡 P1 | Root-owned files | `sudo chown -R hermes:hermes docs/hermes-analysis/manaloom-knowledge/` | 🟡 references/ OK, scripts/ ainda root |
-| 8 | 🟡 P1 | Knowledge Synthesis | Corrigir HTTP 404 (provider/modelo) | ❌ NOVO |
-| 9 | 🟡 P1 | Master Optimizer Preflight | Corrigir SQLite read-only (knowledge.db permissão) | 🆕 NOVO |
-| 10 | 🟡 P1 | KC Validator | Corrigir LOCKED (5420s) — lock file stale | 🆕 NOVO |
-| 11 | 🟡 P2 | Skill manaloom-commander-knowledge | Criar skill ou remover referências em jobs.json | ❌ NÃO RESOLVIDO |
-
-**0 de 11 correções resolvidas. 3 novas falhas adicionadas desde v5.0.**
+| Gap | Descrição | Severidade | Status | Mudança vs v7.0 |
+|:----|:----------|:-----------|:-------|:-----------------|
+| 1 | EDHREC inclusion rate não usado | 🟡 P1 | Aberto | — |
+| 2 | Single-tag vs multi-tag ordem | 🟢 P2 | Aberto | — |
+| 3 | Bracket detection incompleta | 🟡 P1 | **Parcialmente resolvido** | ↑ Código: 11 cats + 53 GCs. DB: 24/53 detectados |
+| 4 | Sem tema-aware validation | 🟡 P1 | **Parcialmente resolvido** | ↑ `theme_contextual_rules_service.dart` criado |
+| 5 | Co-pilot vs auto-pilot | 🟢 P3 | Aberto | — |
+| 6 | Classificador duplo-nulo | 🟡 P1 | Aberto | — |
+| 7 | Cartas novas fora do deck | 🟢 P3 | Maturidade atingida | — |
+| 8 | Battle Analyst não é cron | 🔴 P0 | Documentado | — |
+| 9 | Mulligan tapped lands | 🟡 P1 | Aberto | — |
+| 10 | Battle 2-player apenas | 🔴 P0 | Documentado | — |
+| 11 | Scout 94% SILENT | N/A | Cron descomissionado | — |
+| 12 | Evolution Oracle parado | N/A | Cron descomissionado | — |
+| 13 | Bulk import corruption | 🟡 P1 | Aberto | — |
+| 14 | Pipeline staleness | 🟡 P1 | Aberto | — |
+| 15 | Ramp misclassification | 🟢 P3 | **Resolvido** | ✅ Classificador corrigido (6→19) |
+| 16 | Banlist blindness | 🟢 P3 | **Resolvido** | ✅ sync PG→SQLite |
+| 17 | Short-circuit perpetua erros | 🟡 P1 | Aberto | — |
+| 18 | CKC Deep cita Battle Analyst | 🔴 P0 | **Melhorou** | ↑ Exec #13: "Investigate" ao invés de "Apply" |
+| 19 | CMC corruption (26.2%) | 🔴 P0 | **Parcialmente resolvido** | ↑ cmc_safety.dart no produto. DB ainda corrompido |
+| 20 | Universal Optimizer corta staples | 🔴 P0 | Bloqueado (perm error) | — |
+| 21 | Knowledge Synthesis HTTP 404 | 🟡 P1 | **Resolvido** | ✅ Exec #11 funcionou |
+| 22 | Master Optimizer Preflight SQLite | 🟢 P3 | **Resolvido** | ✅ Exec #51+ passando |
+| 23 | KC Validator LOCKED | 🟢 P3 | **Resolvido** | ✅ Lock resolvido |
+| 24 | Stored metrics não atualizam | 🔴 P0 | Aberto | — |
+| 25 | Bracket categories esvaziadas | 🔴 P0 | 🆕 NOVO | Force of Will, Bolas's Citadel → `other` |
+| 26 | Auto-cycle timeout | 🟡 P1 | 🆕 NOVO | Primeiro run falhou 120s |
 
 ---
 
-## Bloqueio Operacional — Root-Owned Files (Atualizado)
+## Plano de Correções (ordenado por impacto, atualizado v8.0)
 
-**Confirmado 2026-06-07:**
-- `docs/hermes-analysis/manaloom-knowledge/references/` → ✅ `hermes:hermes` (corrigido)
-- `docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json` → ❓ provável `root:root`
-- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py` → ❓ provável `root:root`
+### 🔴 P0 — Imediato
+1. **Atualizar prompt do mtg-rules-auditor** no `jobs.json` — remover 5 IDs descomissionados, referenciar crons ativos (8ª exec stale)
+2. **Corrigir CMC no DB** — rodar `fix_cmc_batch.py` (142 cartas, 26.2%, 3º dia)
+3. **Reimportar Tergrid oracle_text** — buscar face frontal via Scryfall, popular `card_faces[0].oracle_text`
+4. **Restaurar bracket_category no SQLite** para Force of Will (`freeInteraction`), Bolas's Citadel (`infiniteCombo`), tutores (`tutor`)
+5. **Configurar Git credentials** no ambiente cron para destravar push de 3+ crons
 
-Comando para destravar (requer sudo):
-```bash
-sudo chown -R hermes:hermes /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/
-```
+### 🟡 P1 — Alto
+6. Migrar Knowledge Synthesis de `opencode-go` para `deepseek-pro`
+7. Investigar timeout do auto-cycle (mmo-auto-cycle01)
+8. Implementar stored-vs-actual metric recomputation após correção de classificador (Gap 24)
+9. Retroaplicar classificação de bracket no SQLite usando novas 11 categorias do `edh_bracket_policy.dart`
+10. Adicionar disclaimer obrigatório no Commander Knowledge Deep sobre limitações do Battle Simulator
+
+### 🟢 P2 — Médio
+11. Adicionar contract tests para `theme_contextual_rules_service.dart`
+12. Atualizar `API_CONTRACTS_AND_DATA_MAP.md` com 11 bracket categories
+13. Corrigir UUID cast no `pull-learning-events`
+14. Corrigir PermissionError no `auto-sync-learned-decks`
+15. Corrigir script path do `knowncards-generator`
 
 ---
 
 ## Conclusão
 
-O pipeline de conhecimento Commander do ManaLoom tem confiabilidade **MUITO BAIXA (2.5/10)** em relação às regras oficiais de MTG. **↓0.5 vs v5.0 (3.0/10).**
+A pipeline de conhecimento Commander está em **3.5/10** — melhora marginal (+0.5 vs v7.0). 
 
-**O que piorou (v5.0→v6.0):**
-1. Commander Knowledge Deep passou de "citar Battle" para GERAR TASKS P0 baseadas no simulador inválido
-2. Knowledge Synthesis quebrou com HTTP 404 (nova falha de provider)
-3. Master Optimizer Preflight quebrou com SQLite read-only (nova falha)
-4. KC Validator travou em LOCKED state
-5. Tergrid regressão confirmada (skill diz "OK", DB mostra string vazia)
-6. CMC corruption permanece em 144 cartas (26.6%) — 48h+ sem correção
+**Progresso real:**
+- ✅ Commander Knowledge Deep abandonou "BATTLE-VALIDATED" e agora investiga em vez de aplicar
+- ✅ Knowledge Synthesis voltou a funcionar (2 execuções consecutivas)
+- ✅ CMC safety module implementado no produto (defesa contra corrupção)
+- ✅ 53 GCs + 11 categorias no código Dart
+- ✅ Theme-aware validation service criado
 
-**O que permanece igual:**
-- 5 crons Lorehold descomissionados (correto)
-- Git push bloqueado em todos os crons (19+ commits locais)
-- Dados de Battle Simulator continuam sendo usados como se fossem válidos para Commander
-- Prompt do MTG Rules Auditor stale há 6 execuções
+**Preocupações:**
+- 🔴 0/11 correções do plano v4.0 aplicadas em 3 dias
+- 🔴 CMC corruption (26.2%) persiste no DB
+- 🔴 Tergrid oracle_text vazio persiste
+- 🔴 Bracket categories regredindo no SQLite (3/5 vazias)
+- 🔴 Git push bloqueado para múltiplos crons (sem credenciais)
+- 🔴 Este auditor está na 8ª execução com prompt stale
 
-**Ações imediatas (top 3):**
-1. Atualizar prompt do Commander Knowledge Deep — adicionar disclaimer sobre Battle Simulator e remover "BATTLE-VALIDATED"
-2. Rodar `fix_cmc_batch.py` — 26.6% dos dados estão corrompidos, toda análise derivada é inválida
-3. Atualizar prompt do MTG Rules Auditor no `jobs.json` para auditar os 18 crons ativos, não os 5 descomissionados
+**Tendência:** 🟡 ESTÁVEL COM VIÉS POSITIVO. O produto está melhorando (cmc_safety, bracket expansion, theme service) mas o pipeline de conhecimento e o DB permanecem com problemas crônicos não resolvidos.
+
+---
+
+*Relatório gerado pelo MTG Rules Auditor v8.0 — 2026-06-07 22:00Z*
+*Próxima execução programada: ~01:00Z (se prompt for atualizado)*
