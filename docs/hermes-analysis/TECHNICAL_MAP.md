@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 19:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -188,7 +188,7 @@ mtgia/
   pela allow-list da rota `/users/me/activation-events`, e o contrato ainda
   lista esse endpoint como `internal`/`not proven` apesar de consumidores reais
   em `app/lib`.
-- **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em 2026-06-06 19:00 UTC no checkout local `2f283904`. `resolveOptimizeArchetype` diverge entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`; heuristicas semanticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart` com regras diferentes; `_isBasicLandName` tem variantes para snow basics em optimize, generated deck validation, meta reference e commander-reference; utilitarios de request/log repetem-se em rotas de trades, conversations e follow apesar de `request_trace.dart`; trust SQL/serializer de trades/marketplace, normalizacao/rejeicao/filtro de `condition` e helpers de CMC/tipo tambem continuam duplicados. A rodada confirmou que os wrappers de `server/routes/ai/optimize/index.dart` delegam para support e nao foram contados como corpo duplicado independente.
+- **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em 2026-06-07 19:00 UTC no checkout local `5b9c361d`. `resolveOptimizeArchetype` diverge entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`; heuristicas semanticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart` com regras diferentes; `_isBasicLandName` tem variantes para snow basics em optimize, generated deck validation, meta reference e commander-reference; utilitarios de request/log repetem-se em rotas de trades, conversations e follow apesar de `request_trace.dart`; trust SQL/serializer de trades/marketplace, normalizacao/rejeicao/filtro de `condition` e helpers de CMC/tipo tambem continuam duplicados. A rodada confirmou que os wrappers de `server/routes/ai/optimize/index.dart` delegam para support e nao foram contados como corpo duplicado independente.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
