@@ -21,6 +21,45 @@ REPORT_DIR = os.environ.get(
 os.environ["PGPASSWORD"] = "c2abeef5e66f21b0ce86"
 BASELINE_WR = 81.8
 
+MANUAL_EFFECT_OVERRIDES = {
+    # Large face-capable burn is treated as a closer in the simplified battle
+    # engine; otherwise it wastes 7-damage spells as creature-only removal.
+    "Cinder Storm": "finisher",
+    # Spellslinger payoff. Offspring exists, but the deck role is repeatable
+    # table damage from noncreature spells.
+    "Coruscation Mage": "finisher",
+    # Prevention/reflection is defensive protection in the current battle model.
+    "Deflecting Palm": "indestructible",
+    # Reveal/damage/draw hybrid. Keep the value/topdeck role until the battle
+    # engine has a dedicated burn-plus-card effect.
+    "Explosive Revelation": "topdeck_manipulation",
+    "Firebrand Archer": "finisher",
+    "Firesong and Sunspeaker": "finisher",
+    # Storm finisher. Treating this as one-point removal makes the battle engine
+    # undervalue storm kills.
+    "Grapeshot": "finisher",
+    "Kessig Flamebreather": "finisher",
+    "Longshot, Rebel Bowman": "finisher",
+    # One-shot mana burst, not a rock/permanent.
+    "Mana Geyser": "ramp_ritual",
+    # Stax lock. Generic enchantment fallback misreads it as draw engine.
+    "Overwhelming Splendor": "silence_opponents",
+    # Repeatable punish/removal trigger.
+    "Scalelord Reckoner": "remove_permanent",
+    # Modal sweeper. The creature-wipe mode is the safest simplified role.
+    "Slagstorm": "board_wipe",
+    # Ugin's relevant simplified role is permanent removal.
+    "Ugin, the Ineffable": "remove_permanent",
+    # Stax/mana denial, not a mana rock.
+    "Winter Orb": "silence_opponents",
+    # Mass reanimate. The generic classifier sees this as a finisher because it
+    # can close games, but the simulator role is still recursion.
+    "Storm of Souls": "recursion",
+    # Recast engine for instants/sorceries. The generic fallback sees a creature,
+    # but the relevant battle role is graveyard spell recursion.
+    "Radiant Scrollwielder": "overload_recursion",
+}
+
 if os.path.exists(LOCK):
     age = time.time() - os.path.getmtime(LOCK)
     if age < 7200:
@@ -302,6 +341,16 @@ def classify(ot, tl, cmc_val):
         return {"effect": "draw_engine", "cmc": cmc_val}
     return {"effect": "unknown", "cmc": cmc_val}
 
+
+def apply_manual_override(name, entry):
+    expected_effect = MANUAL_EFFECT_OVERRIDES.get(name)
+    if not expected_effect:
+        return entry
+    overridden = dict(entry)
+    overridden["effect"] = expected_effect
+    overridden["manual_override"] = True
+    return overridden
+
 # Classify and add new cards
 new_entries = {}
 for r in rows:
@@ -318,6 +367,7 @@ for r in rows:
         continue
     
     entry = classify(oracle, tl, cmc_val)
+    entry = apply_manual_override(name, entry)
     if entry["effect"] != "unknown" and entry["effect"] != "creature":
         new_entries[name] = entry
 
@@ -329,7 +379,10 @@ print(f"  New cards classified: {len(new_entries)}")
 print(f"\nSTEP 2: VALIDATING EXISTING CLASSIFICATIONS")
 
 # Re-classify existing cards from PG oracle
-names_to_check = list(existing_names)[:500]  # Check 500 per run (limit PG load)
+check_limit = int(os.environ.get("KC_VALIDATOR_CHECK_LIMIT", "500"))
+names_to_check = sorted(existing_names)
+if check_limit > 0:
+    names_to_check = names_to_check[:check_limit]
 corrections = 0
 conflicts = 0
 correction_records = []
@@ -364,7 +417,26 @@ for chunk_start in range(0, len(names_to_check), 100):
         
         # Re-classify
         new_entry = classify(oracle, tl, cmc_val)
+        new_entry = apply_manual_override(name, new_entry)
         new_effect = new_entry.get("effect", "unknown")
+
+        if name in MANUAL_EFFECT_OVERRIDES:
+            if current_effect != new_effect:
+                corrected = dict(current_entry)
+                corrected.update(new_entry)
+                corrected["manual_override"] = True
+                existing[name] = corrected
+                corrections += 1
+                correction_records.append(
+                    {
+                        "name": name,
+                        "from": current_effect,
+                        "to": new_effect,
+                    }
+                )
+                if corrections <= 10:
+                    print(f"  OVERRIDE: {name}: {current_effect} → {new_effect}")
+            continue
         
         if new_effect == "unknown":
             continue

@@ -7,6 +7,7 @@ import argparse
 import json
 
 from master_optimizer_common import (
+    assert_current_deck_matches_baseline,
     candidate_rows,
     connect,
     ensure_optimizer_tables,
@@ -28,7 +29,18 @@ def main() -> int:
         baseline = latest_baseline(conn, args.deck_id)
         if not baseline:
             raise SystemExit("No approved baseline found. Run master_optimizer_baseline.py first.")
-        rows = candidate_rows(conn, args.limit, float(baseline["wr"]))
+        try:
+            assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
+        except RuntimeError as exc:
+            raise SystemExit(str(exc)) from exc
+        rows = candidate_rows(
+            conn,
+            args.limit,
+            float(baseline["wr"]),
+            deck_id=args.deck_id,
+            baseline_id=int(baseline["id"]),
+            baseline_hash=str(baseline["deck_hash"]),
+        )
         reviews = []
         for row in rows:
             review = quality_gate_candidate(

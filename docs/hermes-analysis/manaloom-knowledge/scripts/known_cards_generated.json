@@ -829,6 +829,10 @@
     "cmc": 2.0,
     "effect": "ramp_permanent"
   },
+  "Borrowed Knowledge": {
+    "cmc": 0.0,
+    "effect": "draw_cards"
+  },
   "Boseiju, Who Shelters All": {
     "cmc": 0.0,
     "effect": "silence_opponents",
@@ -1209,6 +1213,11 @@
     "effect": "draw_cards",
     "instant": true
   },
+  "Choreographed Sparks": {
+    "cmc": 0.0,
+    "effect": "copy_spell",
+    "instant": true
+  },
   "Chromatic Lantern": {
     "cmc": 3.0,
     "effect": "ramp_permanent"
@@ -1232,8 +1241,9 @@
   },
   "Cinder Storm": {
     "cmc": 7.0,
-    "effect": "remove_creature",
-    "instant": true
+    "effect": "finisher",
+    "instant": true,
+    "manual_override": true
   },
   "Circle of Dreams Druid": {
     "cmc": 3.0,
@@ -2695,6 +2705,10 @@
     "token_count": 1,
     "token_power": 1
   },
+  "Fields of Strife": {
+    "cmc": 0.0,
+    "effect": "topdeck_manipulation"
+  },
   "Fierce Empath": {
     "cmc": 3.0,
     "effect": "tutor"
@@ -2820,6 +2834,11 @@
     "cmc": 4.0,
     "count": 1,
     "effect": "draw_cards",
+    "instant": true
+  },
+  "Flashback": {
+    "cmc": 0.0,
+    "effect": "recursion",
     "instant": true
   },
   "Flawless Maneuver": {
@@ -2967,6 +2986,10 @@
     "cmc": 0.0,
     "effect": "ramp_permanent",
     "mana_produced": 1
+  },
+  "Furygale Flocking": {
+    "cmc": 0.0,
+    "effect": "token_maker"
   },
   "Fyndhorn Elves": {
     "cmc": 1.0,
@@ -3286,8 +3309,9 @@
   },
   "Grapeshot": {
     "cmc": 2.0,
-    "effect": "remove_creature",
-    "instant": true
+    "effect": "finisher",
+    "instant": true,
+    "manual_override": true
   },
   "Grapple with the Past": {
     "cmc": 2.0,
@@ -4492,6 +4516,11 @@
     "cmc": 0.0,
     "effect": "topdeck_manipulation"
   },
+  "Lorehold Charm": {
+    "cmc": 0.0,
+    "effect": "pump_all",
+    "instant": true
+  },
   "Lorehold Command": {
     "cmc": 5.0,
     "effect": "pump_all",
@@ -4624,8 +4653,9 @@
   },
   "Mana Geyser": {
     "cmc": 5.0,
-    "effect": "ramp_permanent",
-    "mana_produced": 1
+    "effect": "ramp_ritual",
+    "mana_produced": 1,
+    "manual_override": true
   },
   "Mana Leak": {
     "cmc": 2.0,
@@ -4783,6 +4813,10 @@
     "cmc": 2.0,
     "effect": "ramp_permanent",
     "mana_produced": 1
+  },
+  "Mica, Reader of Ruins": {
+    "cmc": 0.0,
+    "effect": "copy_spell"
   },
   "Midnight Clock": {
     "cmc": 3.0,
@@ -5727,6 +5761,10 @@
     "effect": "remove_permanent",
     "instant": true
   },
+  "Prismari Pianist": {
+    "cmc": 0.0,
+    "effect": "token_maker"
+  },
   "Prismatic Lens": {
     "cmc": 2.0,
     "effect": "ramp_permanent"
@@ -5814,6 +5852,10 @@
   "Purphoros, God of the Forge": {
     "cmc": 4.0,
     "effect": "pump_all"
+  },
+  "Pursue the Past": {
+    "cmc": 0.0,
+    "effect": "draw_cards"
   },
   "Putrefy": {
     "cmc": 3.0,
@@ -6093,6 +6135,10 @@
     "effect": "silence_opponents",
     "instant": true,
     "uncounterable": true
+  },
+  "Renegade Bull": {
+    "cmc": 0.0,
+    "effect": "overload_recursion"
   },
   "Renewed Solidarity": {
     "cmc": 3.0,
@@ -6971,6 +7017,10 @@
     "cmc": 1.0,
     "effect": "ramp_permanent"
   },
+  "Sol Ring // Sol Ring": {
+    "cmc": 1.0,
+    "effect": "ramp_permanent"
+  },
   "Solemn Simulacrum": {
     "cmc": 4.0,
     "effect": "draw_cards"
@@ -7466,6 +7516,10 @@
     "cmc": 2.0,
     "effect": "draw_cards"
   },
+  "Tablet of Discovery": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent"
+  },
   "Tainted Pact": {
     "cmc": 2.0,
     "count": 1,
@@ -7727,6 +7781,10 @@
     "effect": "ramp_permanent",
     "mana_produced": 1
   },
+  "The Dawning Archaic": {
+    "cmc": 0.0,
+    "effect": "recursion"
+  },
   "The Earth Crystal": {
     "cmc": 4.0,
     "effect": "ramp_permanent",
@@ -7932,6 +7990,10 @@
     "cmc": 5.0,
     "effect": "ripple_engine"
   },
+  "Thunderdrum Soloist": {
+    "cmc": 0.0,
+    "effect": "finisher"
+  },
   "Thunderfoot Baloth": {
     "cmc": 6.0,
     "effect": "pump_all"
@@ -8113,6 +8175,10 @@
   "Trumpeting Carnosaur": {
     "cmc": 6.0,
     "effect": "remove_creature"
+  },
+  "Turbulent Steppe": {
+    "cmc": 0.0,
+    "effect": "ramp_permanent"
   },
   "Turntimber Symbiosis // Turntimber, Serpentine Wood": {
     "cmc": 7.0,

@@ -1210,15 +1210,19 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
     elif effect == "board_wipe":
         destroyed = 0
         protected = 0
+        creatures_seen = 0
+        unprotected_seen = 0
         for p in [player] + list(opponents):
             survivors = []
             for c in p.battlefield:
                 if isinstance(c, dict) and c.get("effect") == "creature":
+                    creatures_seen += 1
                     # v8: indestructible per-creature
                     if c.get("indestructible"):
                         survivors.append(c)
                         protected += 1
                         continue
+                    unprotected_seen += 1
                     if c.get("is_commander"):
                         p.command_zone.append(c)
                     else:
@@ -1233,6 +1237,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             card=card.get("name", "?"),
             destroyed=destroyed,
             protected=protected,
+            creatures_seen=creatures_seen,
+            unprotected_seen=unprotected_seen,
             turn=turn,
         )
         player.graveyard.append(card)

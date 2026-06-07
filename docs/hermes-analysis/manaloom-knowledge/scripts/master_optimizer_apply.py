@@ -8,12 +8,14 @@ import json
 
 from master_optimizer_common import (
     REPORT_DIR,
+    assert_current_deck_matches_baseline,
     card_metadata,
     connect,
     deck_hash,
     deck_rows,
     ensure_optimizer_tables,
     get_deck_summary,
+    latest_baseline,
     quality_gate_candidate,
     utc_now,
     write_report,
@@ -24,8 +26,13 @@ def row_to_dict(row) -> dict[str, object]:
     return {key: row[key] for key in row.keys()}
 
 
-def find_candidate(conn, deck_id: int, card_added: str, min_delta: float):
-    params: list[object] = [min_delta]
+def find_candidate(conn, deck_id: int, baseline, card_added: str, min_delta: float):
+    params: list[object] = [
+        deck_id,
+        int(baseline["id"]),
+        str(baseline["deck_hash"]),
+        min_delta,
+    ]
     extra = ""
     if card_added:
         extra = "AND lower(card_added)=lower(?)"
@@ -34,6 +41,9 @@ def find_candidate(conn, deck_id: int, card_added: str, min_delta: float):
         f"""
         SELECT * FROM swap_benchmarks
         WHERE phase='full_confirmation'
+          AND deck_id=?
+          AND baseline_id=?
+          AND baseline_hash=?
           AND COALESCE(applied, 0)=0
           AND delta_pp >= ?
           {extra}
@@ -54,7 +64,14 @@ def main() -> int:
 
     with connect() as conn:
         ensure_optimizer_tables(conn)
-        candidate = find_candidate(conn, args.deck_id, args.card_added, args.min_delta)
+        baseline = latest_baseline(conn, args.deck_id)
+        if not baseline:
+            raise SystemExit("No approved baseline found. Run master_optimizer_baseline.py first.")
+        try:
+            assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
+        except RuntimeError as exc:
+            raise SystemExit(str(exc)) from exc
+        candidate = find_candidate(conn, args.deck_id, baseline, args.card_added, args.min_delta)
         if not candidate:
             raise SystemExit("No unapplied approved full_confirmation candidate found.")
 

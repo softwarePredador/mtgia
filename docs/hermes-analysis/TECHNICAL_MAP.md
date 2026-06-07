@@ -279,14 +279,18 @@ mantidos como texto solto.
   automatica do `PerformanceService` (`init`, observer de tela e `traceAsync`
   em smoke) foi separada como controle positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-06 15:00 UTC no checkout local `bd5add18`. `deck_matchups` e
+  em 2026-06-07 15:00 UTC no checkout local `52f6084e`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
   `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
   `/ai/ml-status`; `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   runtime confirmado, enquanto o produto le o agregado
-  `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao
-  encontrou novo candidato alem desses itens; `commander_reference_deck_analysis`
+  `commander_reference_deck_analysis`. A varredura focada de DDL versus
+  operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente
+  `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com
+  write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como
+  achado manual por ser raw corpus apagado/reinserido sem leitura de produto
+  confirmada. Nenhum novo candidato foi confirmado; `commander_reference_deck_analysis`
   e as tabelas de candidate quality/jobs/cache/telemetry foram separadas como
   controles positivos por terem leitores runtime, writes e/ou runners dedicados
   confirmados. `deck_learning_events` e `commander_card_usage` aparecem somente

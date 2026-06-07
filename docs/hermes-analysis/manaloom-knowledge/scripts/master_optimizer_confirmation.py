@@ -7,6 +7,7 @@ import argparse
 import json
 
 from master_optimizer_common import (
+    assert_current_deck_matches_baseline,
     candidate_rows,
     connect,
     ensure_optimizer_tables,
@@ -53,12 +54,19 @@ def main() -> int:
         baseline = latest_baseline(conn, args.deck_id)
         if not baseline:
             raise SystemExit("No approved baseline found. Run master_optimizer_baseline.py first.")
+        try:
+            assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
+        except RuntimeError as exc:
+            raise SystemExit(str(exc)) from exc
 
         baseline_wr = float(baseline["wr"])
         candidates = candidate_rows(
             conn,
             args.candidate_limit,
             baseline_wr,
+            deck_id=args.deck_id,
+            baseline_id=int(baseline["id"]),
+            baseline_hash=str(baseline["deck_hash"]),
             include_existing=args.include_existing,
             only_added=args.only_added,
         )
@@ -107,12 +115,16 @@ def main() -> int:
             conn.execute(
                 """
                 INSERT INTO swap_benchmarks
-                    (card_added, card_removed, add_cmc, add_effect, add_tag,
+                    (deck_id, baseline_id, baseline_hash,
+                     card_added, card_removed, add_cmc, add_effect, add_tag,
                      wr, wins, losses, draws, games, phase, delta_pp, applied,
                      tested_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
                 """,
                 (
+                    args.deck_id,
+                    int(baseline["id"]),
+                    str(baseline["deck_hash"]),
                     row["card_added"],
                     row["card_removed"],
                     row["add_cmc"],

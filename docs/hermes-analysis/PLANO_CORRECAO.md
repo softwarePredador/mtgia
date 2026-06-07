@@ -43,7 +43,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    Reference dos riscos reais. `edh_bracket_policy.dart` continua excecao
    intencional por regra externa/curadoria de bracket, mas precisa manter
    fonte/versionamento/teste dedicado.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-06 15:00 UTC no checkout `bd5add18`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de operacoes SQL nao encontrou novo candidato alem desses itens; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional em `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.
    `LifeCounterScreen` segue
@@ -674,23 +674,26 @@ app-side novo sem chamada.
     continua vazio ate haver contrato seguro;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-06 15:00 UTC: REVALIDADO no checkout `bd5add18`.** A rodada local focada em
+- **Status 2026-06-07 15:00 UTC: REVALIDADO no checkout `52f6084e`.** A rodada local focada em
   `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
   pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
-  por ser tabela interna do migrador. Uma varredura de `CREATE TABLE` versus
-  `FROM/JOIN/INSERT/UPDATE/DELETE` confirmou que nao apareceu novo candidato de
-  tabela persistida sem leitura alem dos itens ja listados; `ml_prompt_feedback`
+  por ser tabela interna do migrador. Uma varredura focada de DDL versus
+  `FROM/JOIN/INSERT/UPDATE/DELETE` encontrou 53 tabelas criadas no recorte de
+  codigo e somente `commander_reference_decks`, `deck_matchups` e
+  `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards`
+  foi mantida como achado manual por ser raw corpus apagado/reinserido sem
+  leitura de produto confirmada. `ml_prompt_feedback`
   tem apenas leitura de `COUNT(*)` operacional. `battle_simulations`,
   `format_staples`, `archetype_counters`, `archetype_patterns`,
   `synergy_packages`, `activation_funnel_events` e `ai_user_preferences` foram
   separados como controles positivos por terem leitores runtime ou runners
   dedicados confirmados.
 - **Evidência**:
-  - `deck_matchups` é definida em `server/database_setup.sql:162` e recebe
+  - `deck_matchups` é definida em `server/database_setup.sql:169` e recebe
     upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
     leitura operacional em `app/lib`, `server/bin`, `server/lib` ou
     `server/routes`.
-  - `deck_weakness_reports` é definida em `server/database_setup.sql:363` e
+  - `deck_weakness_reports` é definida em `server/database_setup.sql:370` e
     `server/bin/migrate_create_missing_tables.dart:97`, recebe insert em
     `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha leitura em
     `app/lib`, `server/bin`, `server/lib` ou `server/routes`; o campo

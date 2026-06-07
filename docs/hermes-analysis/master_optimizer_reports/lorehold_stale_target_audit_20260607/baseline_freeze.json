@@ -1,0 +1,835 @@
+{
+  "timestamp": "2026-06-07T13:22:47Z",
+  "baseline_wr": 86.0,
+  "wins": 258,
+  "losses": 10,
+  "stalls": 32,
+  "deck": [
+    {
+      "name": "Lorehold, the Historian",
+      "qty": 1,
+      "cmc": 5.0,
+      "tag": "commander",
+      "type": "Legendary Creature \u2014 Elder Dragon",
+      "commander": true
+    },
+    {
+      "name": "Needleverge Pathway",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": null,
+      "commander": false
+    },
+    {
+      "name": "Birgi, God of Storytelling",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "ramp",
+      "type": null,
+      "commander": false
+    },
+    {
+      "name": "Valakut Awakening",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "draw",
+      "type": null,
+      "commander": false
+    },
+    {
+      "name": "Chrome Mox",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Lotus Petal",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Mox Diamond",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Mana Vault",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Sensei's Divining Top",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "draw",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Sol Ring",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Arcane Signet",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Boros Signet",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Ruby Medallion",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Scroll Rack",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "draw",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Talisman of Conviction",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "ramp",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Monument to Endurance",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "draw",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Aetherflux Reservoir",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "wincon",
+      "type": "Artifact",
+      "commander": false
+    },
+    {
+      "name": "Esper Sentinel",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "draw",
+      "type": "Artifact Creature \u2014 Human Soldier",
+      "commander": false
+    },
+    {
+      "name": "Ancient Den",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Artifact Land",
+      "commander": false
+    },
+    {
+      "name": "Great Furnace",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Artifact Land",
+      "commander": false
+    },
+    {
+      "name": "Mountain",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Basic Land \u2014 Mountain",
+      "commander": false
+    },
+    {
+      "name": "Plains",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Basic Land \u2014 Plains",
+      "commander": false
+    },
+    {
+      "name": "Storm-Kiln Artist",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "ramp",
+      "type": "Creature \u2014 Dwarf Shaman",
+      "commander": false
+    },
+    {
+      "name": "Guttersnipe",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "wincon",
+      "type": "Creature \u2014 Goblin Shaman",
+      "commander": false
+    },
+    {
+      "name": "Imperial Recruiter",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "tutor",
+      "type": "Creature \u2014 Human Advisor",
+      "commander": false
+    },
+    {
+      "name": "Mother of Runes",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "protection",
+      "type": "Creature \u2014 Human Cleric",
+      "commander": false
+    },
+    {
+      "name": "Grand Abolisher",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "protection",
+      "type": "Creature \u2014 Human Cleric",
+      "commander": false
+    },
+    {
+      "name": "Recruiter of the Guard",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "tutor",
+      "type": "Creature \u2014 Human Soldier",
+      "commander": false
+    },
+    {
+      "name": "Ranger-Captain of Eos",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "tutor",
+      "type": "Creature \u2014 Human Soldier Ranger",
+      "commander": false
+    },
+    {
+      "name": "Drannith Magistrate",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "stax",
+      "type": "Creature \u2014 Human Wizard",
+      "commander": false
+    },
+    {
+      "name": "Dualcaster Mage",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "combo",
+      "type": "Creature \u2014 Human Wizard",
+      "commander": false
+    },
+    {
+      "name": "Giver of Runes",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "protection",
+      "type": "Creature \u2014 Kor Cleric",
+      "commander": false
+    },
+    {
+      "name": "Land Tax",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "ramp",
+      "type": "Enchantment",
+      "commander": false
+    },
+    {
+      "name": "Smothering Tithe",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "ramp",
+      "type": "Enchantment",
+      "commander": false
+    },
+    {
+      "name": "Fiery Emancipation",
+      "qty": 1,
+      "cmc": 6.0,
+      "tag": "wincon",
+      "type": "Enchantment",
+      "commander": false
+    },
+    {
+      "name": "Rite of the Dragoncaller",
+      "qty": 1,
+      "cmc": 6.0,
+      "tag": "spellslinger",
+      "type": "Enchantment",
+      "commander": false
+    },
+    {
+      "name": "Urza's Saga",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Enchantment Land \u2014 Urza's Saga",
+      "commander": false
+    },
+    {
+      "name": "Enlightened Tutor",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "tutor",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Orim's Chant",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Path to Exile",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "removal",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Pyroblast",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Silence",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Swords to Plowshares",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "removal",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Boros Charm",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Reverberate",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "engine",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Deflecting Swat",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Flawless Maneuver",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Generous Gift",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "removal",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Reiterate",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "engine",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Seething Song",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "ramp",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Teferi's Protection",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "protection",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Unexpected Windfall",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "draw",
+      "type": "Instant",
+      "commander": false
+    },
+    {
+      "name": "Ancient Tomb",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Arid Mesa",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Battlefield Forge",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Bloodstained Mire",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "City of Brass",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Clifftop Retreat",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Command Tower",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Flooded Strand",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Inspiring Vantage",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Mana Confluence",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Marsh Flats",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Rugged Prairie",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Scalding Tarn",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Spectator Seating",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Sunbaked Canyon",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Sunbillow Verge",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Sundown Pass",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "War Room",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Windswept Heath",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Wooded Foothills",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Prismatic Vista",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "unknown",
+      "type": "Land",
+      "commander": false
+    },
+    {
+      "name": "Elegant Parlor",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land \u2014 Mountain Plains",
+      "commander": false
+    },
+    {
+      "name": "Plateau",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land \u2014 Mountain Plains",
+      "commander": false
+    },
+    {
+      "name": "Sacred Foundry",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Land \u2014 Mountain Plains",
+      "commander": false
+    },
+    {
+      "name": "Mox Amber",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "ramp",
+      "type": "Legendary Artifact",
+      "commander": false
+    },
+    {
+      "name": "Mox Opal",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "ramp",
+      "type": "Legendary Artifact",
+      "commander": false
+    },
+    {
+      "name": "The One Ring",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "draw",
+      "type": "Legendary Artifact",
+      "commander": false
+    },
+    {
+      "name": "Longshot, Rebel Bowman",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "wincon",
+      "type": "Legendary Creature \u2014 Human Rebel Ally",
+      "commander": false
+    },
+    {
+      "name": "Gemstone Caverns",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Legendary Land",
+      "commander": false
+    },
+    {
+      "name": "Hall of Heliod's Generosity",
+      "qty": 1,
+      "cmc": 0.0,
+      "tag": "land",
+      "type": "Legendary Land",
+      "commander": false
+    },
+    {
+      "name": "Inventors' Fair",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "unknown",
+      "type": "Legendary Land",
+      "commander": false
+    },
+    {
+      "name": "Faithless Looting",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "draw",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Gamble",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "tutor",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Rite of Flame",
+      "qty": 1,
+      "cmc": 1.0,
+      "tag": "ramp",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Twinflame",
+      "qty": 1,
+      "cmc": 2.0,
+      "tag": "combo",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Heat Shimmer",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "combo",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Jeska's Will",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "ramp",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Reforge the Soul",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "unknown",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Wheel of Fortune",
+      "qty": 1,
+      "cmc": 3.0,
+      "tag": "draw",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Mizzix's Mastery",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "wincon",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Past in Flames",
+      "qty": 1,
+      "cmc": 4.0,
+      "tag": "engine",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Mana Geyser",
+      "qty": 1,
+      "cmc": 5.0,
+      "tag": "ramp",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Surge to Victory",
+      "qty": 1,
+      "cmc": 6.0,
+      "tag": "wincon",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Approach of the Second Sun",
+      "qty": 1,
+      "cmc": 7.0,
+      "tag": "wincon",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Blasphemous Act",
+      "qty": 1,
+      "cmc": 9.0,
+      "tag": "board_wipe",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Worldfire",
+      "qty": 1,
+      "cmc": 9.0,
+      "tag": "wincon",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Rise of the Eldrazi",
+      "qty": 1,
+      "cmc": 10.0,
+      "tag": "wincon",
+      "type": "Sorcery",
+      "commander": false
+    },
+    {
+      "name": "Storm Herd",
+      "qty": 1,
+      "cmc": 10.0,
+      "tag": "wincon",
+      "type": "Sorcery",
+      "commander": false
+    }
+  ],
+  "stats": {
+    "lands": 32,
+    "ramp": 19,
+    "removal": 4,
+    "avg_cmc": 2.84
+  },
+  "matchup_results": [
+    {
+      "raw": "\u2705 vs Aggro (Krenko)                 WR= 88.0% W=44 L=3 S=3 T=19.2 [elimination=30, approach=14]"
+    },
+    {
+      "raw": "\u2705 vs Control (Atraxa)               WR= 86.0% W=43 L=1 S=6 T=19.0 [approach=18, elimination=25]"
+    },
+    {
+      "raw": "\u2705 vs Combo (Kinnan)                 WR= 80.0% W=40 L=3 S=7 T=19.2 [approach=20, elimination=20]"
+    },
+    {
+      "raw": "\u2705 vs Midrange (Korvold)             WR= 84.0% W=42 L=1 S=7 T=19.0 [elimination=18, approach=24]"
+    },
+    {
+      "raw": "\u2705 vs Spellslinger (Niv)             WR= 90.0% W=45 L=0 S=5 T=19.6 [elimination=26, approach=19]"
+    },
+    {
+      "raw": "\u2705 vs Stax (Winota)                  WR= 88.0% W=44 L=2 S=4 T=18.5 [elimination=22, approach=22]"
+    }
+  ]
+}

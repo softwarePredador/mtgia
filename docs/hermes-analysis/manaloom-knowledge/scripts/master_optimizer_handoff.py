@@ -7,6 +7,7 @@ import argparse
 import json
 
 from master_optimizer_common import (
+    assert_current_deck_matches_baseline,
     connect,
     ensure_optimizer_tables,
     latest_baseline,
@@ -26,13 +27,21 @@ def main() -> int:
         baseline = latest_baseline(conn, args.deck_id)
         if not baseline:
             raise SystemExit("No approved baseline found. Run baseline first.")
+        try:
+            assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
+        except RuntimeError as exc:
+            raise SystemExit(str(exc)) from exc
         confirmations = conn.execute(
             """
             SELECT * FROM swap_benchmarks
             WHERE phase IN ('confirmation', 'full_confirmation')
+              AND deck_id=?
+              AND baseline_id=?
+              AND baseline_hash=?
             ORDER BY tested_at DESC, id DESC
             LIMIT 20
-            """
+            """,
+            (args.deck_id, int(baseline["id"]), str(baseline["deck_hash"])),
         ).fetchall()
         approved = [
             row

@@ -97,14 +97,54 @@ Hardening final em Hermes, 2026-06-07:
 - Heuristica de combate corrigida: alvo default agora prioriza vida baixa/ameaca, nao maior vida.
 - Heuristica de removal corrigida: removal agora prioriza comandante/maior poder, nao alvo aleatorio.
 - `kc_validator.py` agora grava fila de conflitos em Markdown/JSON.
-- Validacao KC fresca: 500 cartas validadas, 0 correcoes automaticas, 2 conflitos para revisao.
-- Relatorio KC: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_081557.md`.
-- Jobs de agente bloqueados por provider 429 foram pausados com backup de `/opt/data/cron/jobs.json`.
+- Validacao KC final: 1970 cartas validadas, 3 correcoes automaticas, 0 conflitos para revisao.
+- Relatorio KC final: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_125916.md`.
+- `kc_validator.py` passou a aceitar `KC_VALIDATOR_CHECK_LIMIT=0` para auditoria completa e usa overrides manuais documentados para cartas cuja leitura simplificada do simulador precisa ser deterministica.
+- Jobs de agente bloqueados por provider 429 foram inicialmente pausados com backup de `/opt/data/cron/jobs.json`.
 - Relatorio provider backoff: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
+- Provider foi migrado para `deepseek-pro` com modelo funcional `deepseek-v4-pro` e endpoint `https://opencode.ai/zen/go/v1`.
+- O valor literal `opencode` foi testado como modelo e falhou com `HTTP 404`; ele nao deve ser usado como model id.
+- Prova provider: `manaloom-hermes-normal-audit` terminou `ok` em `2026-06-07T12:49:11.907701+00:00`.
+- Relatorio provider: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_deepseek_pro_20260607_124911.md`.
 - Handoff separado para produto criado via `master_optimizer_product_handoff.py`.
 - Handoff produto gerado com status `needs_product_owner_approval`; nenhuma mutacao de producao foi feita.
 - Relatorio produto: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_product_handoff_20260607_081454.md`.
 - Preflight final aprovado: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_20260607_081631.md`.
+
+Hardening de stale-target em Hermes, 2026-06-07:
+
+- Auditoria criada para pacote Lorehold `86.0%` WR com suspeita de targets stale.
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_stale_target_audit_20260607/`.
+- Prova direta no SQLite real: deck id `6` tem 100 cartas, 33 lands, CMC medio `2.913` e hash `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`.
+- Prova direta no SQLite real: `Mana Geyser`, `Blasphemous Act` e `Storm-Kiln Artist` ainda estao presentes.
+- Prova direta no SQLite real: `Sticky Fingers`, `Decree of Pain`, `Academy Manufactor`, `Assassin's Trophy`, `Adrix and Nev, Twincasters` e `Damning Verdict` estao ausentes.
+- `swap_benchmarks` agora e criado por `ensure_optimizer_tables()`, removendo falha de inicializacao em bancos que ainda nao tinham essa tabela.
+- `candidate_rows()` agora aceita fases `best-in-slot` e `phase1`, que correspondem ao formato atual gravado pelo slot scan.
+- `quality_gate`, `confirmation`, `handoff` e `apply` agora bloqueiam quando o hash atual do deck nao bate com o hash do ultimo baseline aprovado.
+- `temporary_swap()` agora falha imediatamente se o alvo de corte nao existe ou se a carta de entrada ja esta no deck.
+- Smoke real em SQLite temporario confirmou o bloqueio: apos remover `Mana Geyser` da copia temporaria, `master_optimizer_handoff.py` recusou gerar handoff por hash divergente.
+- Resultado do smoke: `GUARDRAIL_SMOKE_OK`.
+
+Validacao full-flow Lorehold em Hermes, 2026-06-07:
+
+- Rodada real executada no container `d5fe57bf9de2`.
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_full_flow_20260607_144021/`.
+- O `slot_optimizer.py` legado foi interrompido porque testava cartas off-color e deixou uma mutacao parcial no SQLite.
+- Mutacao parcial corrigida: `Chaos Warp` removido e `Deflecting Swat` restaurado.
+- Hash do deck restaurado e validado: `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`.
+- `slot_optimizer.py` foi substituido por scan seguro: filtra identidade de cor, exige legalidade Commander explicita, usa `run_battle()` temporario e grava `deck_id`, `baseline_id` e `baseline_hash`.
+- Baseline fresco id `3`: `87.0%` WR, `261W/10L/29S`, 300 jogos.
+- Slot scan seguro: 120 candidatos legais testados; 851 candidatos off-color filtrados.
+- Full confirmation: `Fork` sobre `Past in Flames` passou com `88.0%` WR, delta `+1.0pp`, `264W/6L/30S`.
+- Full confirmation: `Harness the Storm` sobre `Past in Flames` passou com `88.0%` WR, delta `+1.0pp`, `264W/8L/28S`.
+- `Expedition Map`, `Lotus Bloom` e `Astral Cornucopia` nao passaram o corte de aprovacao final.
+- Replay audit inicialmente apontou falsos positivos de board wipe.
+- `battle_analyst_v8.py` agora emite `creatures_seen` e `unprotected_seen` em `board_wipe_resolved`.
+- `replay_decision_auditor.py` agora bloqueia board wipe apenas quando havia criatura desprotegida e zero foram destruidas.
+- Replay audit fresco apos correcoes: `turn_by_turn_clean`, 1334 eventos estruturados, 0 findings turno-a-turno.
+- Handoff final: `approved_swaps_ready_for_manual_apply`.
+- Nenhum swap foi aplicado automaticamente.
+- Como `Fork` e `Harness the Storm` cortam a mesma carta, apenas um deles pode ser aplicado sem nova rodada de baseline/confirmacao.
 
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
@@ -151,7 +191,9 @@ O optimizer nao deve apenas testar carta por carta. Ele precisa de cinco camadas
 
 - Nunca aplicar swap automaticamente na fase quick.
 - Nunca aplicar swap sem baseline salvo.
+- Nunca confirmar, gerar handoff ou aplicar swap se o hash atual do deck divergir do hash do baseline aprovado.
 - Nunca aplicar swap com menos de 2 rodadas de confirmacao.
+- Nunca testar swap se a carta cortada nao existe no deck atual ou se a carta adicionada ja existe no deck atual.
 - Nunca cortar comandante, land essencial, wincon primaria, protecao critica ou carta travada por regra do plano.
 - Sempre restaurar o deck apos teste isolado.
 - Sempre gerar relatorio antes de aplicar.
@@ -190,6 +232,8 @@ Rodar battle sem swaps e salvar:
 
 O baseline deve ser imutavel durante uma rodada de teste.
 
+Se qualquer job detectar hash divergente entre deck atual e baseline aprovado, a rodada deve ser descartada e reiniciada por esta fase.
+
 ### Fase 2 — Slot scan
 
 Usar `slot_optimizer.py` para testar candidato isolado por categoria.
@@ -207,6 +251,8 @@ Nenhuma aplicacao permanente nesta fase.
 ### Fase 3 — Confirmacao
 
 Pegar apenas candidatos com ganho real e rodar mais jogos.
+
+Antes de testar, a confirmacao deve validar que o deck atual ainda e exatamente o deck congelado no baseline. Candidatos com alvo stale devem ser bloqueados, nao corrigidos implicitamente.
 
 Criterios minimos recomendados:
 
@@ -238,6 +284,9 @@ Aplicar somente se:
 - tem explicacao objetiva;
 - nao contradiz o plano do deck;
 - nao aumenta fragilidade sem ganho claro.
+- o hash atual do deck ainda bate com o baseline aprovado;
+- o alvo de corte ainda esta presente;
+- a carta de entrada ainda esta ausente.
 
 ### Fase 6 — Replay audit
 
@@ -282,7 +331,8 @@ Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix n
 
 Proximos passos agora sao de maturidade, nao de infraestrutura basica:
 
-- revisar os 2 conflitos do KC report (`Storm of Souls`, `Radiant Scrollwielder`);
+- descartar o pacote Lorehold `86.0%` como autorizacao de apply e trata-lo apenas como diagnostico ate uma nova rodada com hash fresco;
 - aumentar amostra de replay audit para mais seeds quando for promover swap a produto;
 - criar um apply product-facing separado apenas depois do checklist `needs_product_owner_approval`;
-- manter jobs 429 pausados ate cota/provider voltar, para nao poluir o scheduler.
+- limpar prompts antigos de jobs que ainda citam IDs/schema legados;
+- considerar limpar `last_error` antigos apenas apos cada job rodar de novo com `last_run_at` posterior a `2026-06-07T12:49:11+00:00`.

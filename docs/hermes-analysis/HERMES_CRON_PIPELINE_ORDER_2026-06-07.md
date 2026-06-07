@@ -24,7 +24,7 @@ Paused intentionally:
 - `manaloom-master-optimizer-slot-scan` — ready but paused until an approved baseline is frozen.
 - `manaloom-master-optimizer-end-to-end` — manual-only pipeline; schedule placeholder is `every 1440m`, but it is disabled/paused for supervised runs only.
 
-Agent/report jobs paused by provider 429 backoff:
+Provider-backed agent/report jobs:
 
 - `manaloom-hermes-normal-audit`
 - `manaloom-commander-knowledge-deep`
@@ -37,11 +37,17 @@ Agent/report jobs paused by provider 429 backoff:
 - `mtg-rules-auditor`
 - `manaloom-cron-governor-report`
 
-Provider backoff evidence:
+Current provider state:
 
-- Script: `docs/hermes-analysis/manaloom-knowledge/scripts/hermes_provider_backoff.py`.
-- Report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
-- Backup on server: `/opt/data/cron/jobs.json.bak_provider_backoff_20260607_081300`.
+- Provider-backed jobs were initially paused by the provider 429 backoff script.
+- They were then migrated to provider `deepseek-pro`, model `deepseek-v4-pro`.
+- Working base URL is `https://opencode.ai/zen/go/v1`.
+- The literal model value `opencode` returned `HTTP 404` and is not a valid model id for the current setup.
+- Validation proof: `manaloom-hermes-normal-audit` finished `ok` at `2026-06-07T12:49:11.907701+00:00`.
+- Provider report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_deepseek_pro_20260607_124911.md`.
+- Backoff report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
+- Server backup from the original backoff: `/opt/data/cron/jobs.json.bak_provider_backoff_20260607_081300`.
+- Some jobs may still show stale `last_error` values until their next scheduled run; judge them by `last_run_at`.
 
 ## Current Lorehold evidence
 
@@ -68,6 +74,43 @@ Important interpretation:
 - The current deck is playable in the simulator, but not proven optimal.
 - The old 75.0% battle entry was from a previous state/configuration and should not be treated as the current baseline.
 - Current baseline should be frozen from the latest clean 50.2% run or rerun with a dedicated baseline script before any swap test.
+
+## Stale-target guardrail update
+
+Fresh audit, 2026-06-07:
+
+- A later Lorehold report claimed `86.0%` WR and seven confirmed swaps, but it is diagnostic only.
+- Real SQLite probe showed deck id `6` at 100 cards, 33 lands, average CMC `2.913`, hash `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`.
+- Real SQLite probe showed `Mana Geyser`, `Blasphemous Act` and `Storm-Kiln Artist` still present.
+- The pulled report included off-color suggestions for Lorehold RW, including `Decree of Pain`, `Assassin's Trophy` and `Adrix and Nev, Twincasters`.
+- `master_optimizer_common.py` now creates `swap_benchmarks` and blocks temporary swaps when cut/add targets do not match the current deck.
+- `master_optimizer_quality_gate.py`, `master_optimizer_confirmation.py`, `master_optimizer_handoff.py` and `master_optimizer_apply.py` now require current deck hash to match the latest approved baseline.
+- Smoke test on a copied SQLite proved the handoff blocks after a temp mutation: `GUARDRAIL_SMOKE_OK`.
+
+Operational meaning:
+
+- Any stale-target report must be discarded as an apply source.
+- The correct recovery is re-freeze baseline from the exact current deck, rerun slot scan, rerun quality gate, rerun confirmation, then generate a new handoff.
+
+## Lorehold full-flow proof update
+
+Fresh run, 2026-06-07:
+
+- Flow log: `/opt/data/artifacts/hermes_master_optimizer/lorehold_full_flow_20260607_144021.log`.
+- Local evidence: `docs/hermes-analysis/master_optimizer_reports/lorehold_full_flow_20260607_144021/`.
+- Baseline id `3`: `87.0%` WR, `261W/10L/29S`, 300 games.
+- Safe slot scan tested `120` legal candidates and filtered `851` off-color candidates.
+- Replay audit after board-wipe event hardening: `turn_by_turn_clean`, 1334 structured events, 0 turn-by-turn findings.
+- Full confirmation approved two manual-review candidates:
+- `Fork` over `Past in Flames`: `88.0%` WR, `+1.0pp`, `264W/6L/30S`.
+- `Harness the Storm` over `Past in Flames`: `88.0%` WR, `+1.0pp`, `264W/8L/28S`.
+- No automatic apply happened.
+
+Operational meaning:
+
+- The pipeline can now run from sync through handoff with fresh evidence.
+- The next decision is product/deck-owner choice between `Fork` and `Harness the Storm`.
+- Since both cut `Past in Flames`, apply at most one, then immediately re-freeze baseline and rerun replay audit.
 
 ## Ideal order for end-to-end deck learning
 
@@ -108,8 +151,8 @@ Purpose:
 Missing hardening:
 
 - Conflicts from `kc_validator.py` are now persisted as actionable review items.
-- Latest report: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_081557.md`.
-- Latest result: 500 cards validated, 0 corrections, 2 conflicts.
+- Latest report: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_125916.md`.
+- Latest result: 1970 cards validated, 3 corrections, 0 conflicts.
 
 ### 3. Validate rules and simulator readiness
 
@@ -128,7 +171,7 @@ Purpose:
 
 Current state:
 
-- Agent jobs that were blocked by provider 429 are paused by backoff, instead of failing noisily.
+- Provider-backed jobs have been migrated to `deepseek-pro` and one real audit job completed successfully after the endpoint fix.
 - Some prompts still reference legacy/decommissioned cron IDs or old schema assumptions.
 
 ### 4. Freeze current baseline
@@ -155,6 +198,7 @@ Current state:
 - Implemented as `master_optimizer_baseline.py`.
 - Validated on Hermes with baseline id `2`: 45.0% WR, 27W/31L/2S, 60 games.
 - Baseline data is persisted in `optimizer_baseline_runs`.
+- Every downstream optimizer phase must compare the current deck hash to the approved baseline hash before doing work.
 
 ### 5. Scan candidate swaps safely
 
@@ -174,6 +218,7 @@ Current state:
 - Job is registered but paused.
 - It should stay paused until baseline is frozen.
 - It should replace the old `lorehold-universal-optimizer`.
+- `slot_optimizer.py` has been hardened to filter Commander color identity, require explicit Commander legality, avoid editing the battle script directly, and bind rows to `deck_id`/`baseline_id`/`baseline_hash`.
 
 ### 6. Confirm promising candidates
 
@@ -193,6 +238,7 @@ Current state:
 - Implemented as `master_optimizer_confirmation.py`.
 - `swap_benchmarks` now has short `confirmation` and stricter `full_confirmation` rows.
 - Full confirmation validated `Sticky Fingers` over `Storm-Kiln Artist`: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
+- Confirmation now blocks stale deck state before simulation and reads current slot scan phases `best-in-slot` and `phase1`.
 
 ### 7. Quality gate before applying
 
@@ -218,6 +264,7 @@ Current state:
 - Implemented as `master_optimizer_quality_gate.py`.
 - Quality gate blocks illegal color identity candidates and records reasons in `optimizer_quality_reviews`.
 - It now prevents off-color candidates such as `Imperial Seal`, `Aether Channeler`, `Korvold, Fae-Cursed King`, and `Spectral Sailor`.
+- Quality gate now blocks if the current deck hash diverges from the approved baseline.
 
 ### 8. Replay audit
 
@@ -262,6 +309,7 @@ Current state:
 - Before/after hashes and rollback path were generated.
 - Post-apply deck state was validated at 100 cards, 35 lands and CMC 2.5.
 - No production database was mutated.
+- Apply now refuses to run unless the deck hash still matches the approved baseline and the add/cut targets are still valid.
 
 Post-apply proof:
 
@@ -291,19 +339,17 @@ Current state:
 
 ## What is missing to build the best Lorehold deck
 
-1. Review the 2 KC conflicts and decide whether classification rules need adjustment.
-2. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
-3. Resume provider-backed agent jobs only after quota/backoff is resolved.
-4. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
-5. Re-run confirmation and replay audit with larger sample sizes before product-facing mutation.
-6. Execute product apply only through the product handoff checklist.
+1. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
+2. Let provider-backed jobs cycle naturally and only judge errors whose `last_run_at` is after the deepseek-pro fix.
+3. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
+4. Re-run confirmation and replay audit with larger sample sizes before product-facing mutation.
+5. Execute product apply only through the product handoff checklist.
 
 ## Recommended next implementation order
 
-1. Review KC conflicts and patch classification rules if needed.
-2. Update stale provider-backed agent prompts while they remain paused.
-3. Run larger confirmation plus larger replay audit before any product-facing mutation.
-4. If approved, run product backup/dry-run/smoke-test flow from the product handoff.
+1. Update stale provider-backed agent prompts now that provider execution is healthy again.
+2. Run larger confirmation plus larger replay audit before any product-facing mutation.
+3. If approved, run product backup/dry-run/smoke-test flow from the product handoff.
 
 ## Practical verdict
 
@@ -320,8 +366,8 @@ The Hermes pipeline now has a functional safe loop through manual apply on Herme
 - rollback-aware manual apply;
 - post-apply battle verification.
 - turn-by-turn replay audit;
-- KC conflict report;
-- provider 429 backoff;
+- KC conflict report with 0 remaining conflicts;
+- provider 429 backoff plus deepseek-pro recovery;
 - product-facing handoff gate.
 
 It produced and applied one approved Hermes-local swap for Lorehold:
@@ -330,4 +376,4 @@ It produced and applied one approved Hermes-local swap for Lorehold:
 - full confirmation: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
 - post-apply baseline: 47.5% WR, 57W/63L/0S, 120 games.
 
-It still must not auto-apply. The remaining gap is operational review: KC conflicts, stale prompt cleanup, larger samples and explicit product approval before copying any Hermes-local result into a product-facing deck.
+It still must not auto-apply. The remaining gap is operational review: stale prompt cleanup, larger samples and explicit product approval before copying any Hermes-local result into a product-facing deck.
