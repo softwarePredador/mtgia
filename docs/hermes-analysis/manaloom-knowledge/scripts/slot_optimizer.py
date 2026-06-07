@@ -1,299 +1,415 @@
 #!/usr/bin/env python3
-"""
-Lorehold Deck Optimizer v3 — Category-based, isolated testing.
-Phase 1: Best-in-Slot (which card is best for each slot)
-Phase 2: Structure Tuning (optimal distribution between categories)
-Phase 3: Synergy Check (card combinations)
+"""Safe Lorehold slot scan.
 
-CRITICAL RULES:
-- NEVER modify the deck permanently during testing
-- Each test: swap -> Battle -> restore (always!)
-- Baseline stays fixed throughout
-- Only apply changes manually after all testing is done
+This script proposes and tests isolated swaps only for the current approved
+baseline. It does not edit battle_analyst_v8.py directly and it refuses stale
+deck state before scanning.
 """
-import sqlite3, subprocess, os, json, re, time, sys, random
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
 from collections import defaultdict
+from pathlib import Path
 
-DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
-BATTLE = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py'
-KC_JSON = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json'
-LOCK_FILE = '/tmp/optimizer_v3.lock'
+from master_optimizer_common import (
+    PROTECTED_CARDS,
+    SCRIPT_DIR,
+    assert_current_deck_matches_baseline,
+    card_metadata,
+    commander_legality,
+    connect,
+    deck_commander_identity,
+    deck_rows,
+    ensure_optimizer_tables,
+    json_list,
+    latest_baseline,
+    normalize_name,
+    quality_gate_candidate,
+    run_battle,
+    temporary_swap,
+    utc_now,
+)
 
-GAMES_QUICK = 10   # Phase 1: per-candidate tests (fast scan of 1856 cards)
-GAMES_FULL = 50    # Phase 2 & 3: confirmation tests
+KC_JSON = SCRIPT_DIR / "known_cards_generated.json"
+LOCK_FILE = Path(os.environ.get("MANALOOM_SLOT_SCAN_LOCK", "/tmp/optimizer_v3.lock"))
 
-# ── Lock ──
-if os.path.exists(LOCK_FILE):
-    age = time.time() - os.path.getmtime(LOCK_FILE)
-    if age < 43200:
-        print(f"LOCKED ({age:.0f}s ago). Exiting.")
-        sys.exit(0)
-    os.remove(LOCK_FILE)
-open(LOCK_FILE, 'w').close()
+EFFECT_TO_CATEGORY = {
+    "ramp_permanent": "ramp",
+    "ramp_ritual": "ramp",
+    "ramp_engine": "ramp",
+    "silence_opponents": "protection",
+    "indestructible": "protection",
+    "phase_out": "protection",
+    "counter": "protection",
+    "draw_cards": "draw",
+    "draw_engine": "draw",
+    "topdeck_manipulation": "draw",
+    "tutor": "tutor",
+    "finisher": "wincon",
+    "approach": "wincon",
+    "token_maker": "wincon",
+    "overload_recursion": "wincon",
+    "steal_all_creatures": "wincon",
+    "pump_all": "wincon",
+    "extra_turn": "wincon",
+    "board_wipe": "wipe",
+    "remove_creature": "removal",
+    "remove_permanent": "removal",
+    "remove_artifact_or_3dmg": "removal",
+    "copy_spell": "engine",
+    "recursion": "engine",
+    "ripple_engine": "engine",
+}
 
-try:
-    conn = sqlite3.connect(DB)
-    
-    # ── Load deck ──
-    deck = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6 AND is_commander=0").fetchall()
-    cmdr = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6 AND is_commander=1").fetchone()
-    if not cmdr:
-        # Fallback: find by name and set flag
-        cmdr = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6 AND card_name='Lorehold, the Historian'").fetchone()
-        if cmdr:
-            conn.execute("UPDATE deck_cards SET is_commander=1 WHERE deck_id=6 AND card_name='Lorehold, the Historian'")
-            conn.commit()
-            cmdr = list(cmdr)
-            cmdr[5] = 1  # set is_commander flag
-            cmdr = tuple(cmdr)
-    all_cards = list(deck) + ([cmdr] if cmdr else [])
-    deck_names = set(c[0] for c in deck)
-    
-    # ── Load KNOWN_CARDS ──
-    with open(KC_JSON) as f:
-        kc = json.load(f)
-    
-    # ── Load ALL candidates from KNOWN_CARDS JSON (1955 entries) ──
-    basics = {'Plains','Mountain','Island','Swamp','Forest','Wastes'}
-    candidates = []
-    for name, entry in sorted(kc.items()):
-        if name in deck_names or name in basics:
-            continue
-        eff = entry.get('effect', 'unknown')
-        if eff in ('creature', 'unknown'):
-            continue
-        candidates.append((name, entry))
-    
-    # ── EFFECT → CATEGORY MAPPING ──
-    EFFECT_TO_CATEGORY = {
-        # Ramp
-        'ramp_permanent': 'ramp', 'ramp_ritual': 'ramp', 'ramp_engine': 'ramp',
-        # Protection
-        'silence_opponents': 'protection', 'indestructible': 'protection',
-        'phase_out': 'protection', 'counter': 'protection',
-        # Draw
-        'draw_cards': 'draw', 'draw_engine': 'draw', 'topdeck_manipulation': 'draw',
-        # Tutor
-        'tutor': 'tutor',
-        # Wincon
-        'finisher': 'wincon', 'approach': 'wincon', 'token_maker': 'wincon',
-        'overload_recursion': 'wincon', 'steal_all_creatures': 'wincon',
-        'pump_all': 'wincon', 'extra_turn': 'wincon',
-        # Board Wipe
-        'board_wipe': 'wipe',
-        # Removal
-        'remove_creature': 'removal', 'remove_permanent': 'removal',
-        'remove_artifact_or_3dmg': 'removal',
-        # Engine
-        'copy_spell': 'engine', 'recursion': 'engine',
-        'ripple_engine': 'engine',
-        # Combo
-        'dragons_approach': 'combo',
-        # Land
-        'land': 'land',
-        # Stax
+CATEGORY_TERMS = {
+    "draw": ("draw", "card", "wheel", "discard", "exile the top", "impulse"),
+    "engine": ("copy", "cast", "instant", "sorcery", "graveyard", "trigger"),
+    "protection": ("prevent", "indestructible", "hexproof", "protection", "phase", "counter"),
+    "ramp": ("treasure", "mana", "cost", "ritual", "artifact", "add "),
+    "removal": ("destroy", "exile", "damage", "target", "permanent"),
+    "tutor": ("search", "library", "reveal", "put into your hand"),
+    "wincon": ("win the game", "damage", "token", "copy", "cast", "approach"),
+    "wipe": ("destroy all", "exile all", "each creature", "all creatures", "board"),
+}
+
+MAX_CMC_BY_CATEGORY = {
+    "draw": 6.0,
+    "engine": 6.0,
+    "protection": 5.0,
+    "ramp": 6.0,
+    "removal": 5.0,
+    "tutor": 5.0,
+    "wincon": 8.0,
+    "wipe": 9.0,
+}
+
+BASICS = {"Plains", "Mountain", "Island", "Swamp", "Forest", "Wastes"}
+EXTRA_PROTECTED = {
+    "Deflecting Swat",
+    "Esper Sentinel",
+    "Smothering Tithe",
+    "Dockside Extortionist",
+    "Chrome Mox",
+    "Mox Diamond",
+    "Sol Ring",
+}
+
+
+def load_known_cards() -> dict[str, dict[str, object]]:
+    with KC_JSON.open("r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]]) -> str:
+    type_line = str(row["type_line"] or "")
+    if "Land" in type_line:
+        return "land"
+    entry = known_cards.get(name, {})
+    effect = str(entry.get("effect") or "")
+    if effect in EFFECT_TO_CATEGORY:
+        return EFFECT_TO_CATEGORY[effect]
+    tag = str(row["functional_tag"] or "")
+    tag_map = {
+        "ramp": "ramp",
+        "draw": "draw",
+        "tutor": "tutor",
+        "removal": "removal",
+        "board_wipe": "wipe",
+        "wincon": "wincon",
+        "combo": "wincon",
+        "protection": "protection",
+        "stax": "protection",
+        "engine": "engine",
+        "land": "land",
     }
-    
-    # ── CATEGORIZE CURRENT DECK ──
-    print("=" * 60)
-    print("CURRENT DECK COMPOSITION")
-    deck_categories = defaultdict(list)
-    for c in deck:
-        name, qty, cmc, tag, tl, is_cmd = c
-        cmc = float(cmc or 0)
-        # Determine category from KNOWN_CARDS
-        cat = 'unknown'
-        if name in kc:
-            eff = kc[name].get('effect', 'unknown')
-            cat = EFFECT_TO_CATEGORY.get(eff, 'unknown')
-        if 'Land' in (tl or ''):
-            cat = 'land'
-        if cat == 'unknown':
-            # Fallback by tag
-            tag_map = {'ramp': 'ramp', 'draw': 'draw', 'tutor': 'tutor', 'removal': 'removal',
-                       'board_wipe': 'wipe', 'wincon': 'wincon', 'combo': 'combo',
-                       'protection': 'protection', 'stax': 'stax', 'engine': 'engine'}
-            cat = tag_map.get(tag, 'unknown')
-        deck_categories[cat].append((name, cmc))
-    
-    for cat, cards in sorted(deck_categories.items()):
-        names = [n for n, _ in cards]
-        count = len(cards)
-        avg_cmc = sum(c for _, c in cards) / count if count else 0
-        print(f"  {cat:<15s} x{count:<3d} avg CMC={avg_cmc:.1f}  {', '.join(names[:4])}{'...' if len(names) > 4 else ''}")
-    
-    # ── FIND CANDIDATES PER CATEGORY ──
-    print(f"\n{'='*60}")
-    print("PHASE 1: BEST-IN-SLOT (25 games/candidate, ISOLATED)")
-    
-    # Get all candidates with KNOWN_CARDS, not in deck
-    candidates_by_cat = defaultdict(list)
-    for name, entry in candidates:
-        eff = entry.get('effect', 'unknown')
-        cat = EFFECT_TO_CATEGORY.get(eff, 'unknown')
-        if cat == 'unknown':
-            continue
-        cmc = entry.get('cmc', 3)
-        candidates_by_cat[cat].append((name, cmc, entry))
-    
-    for cat, cands in sorted(candidates_by_cat.items()):
-        if cat == 'land':
-            continue  # skip lands for Phase 1
-        print(f"  {cat:<15s} {len(cands)} candidates (deck has {len(deck_categories[cat])})")
-    
-    total_cands = sum(len(c) for cat, c in candidates_by_cat.items() if cat != 'land')
-    print(f"\n  TOTAL: {total_cands} candidates to test (~{total_cands * 1.5:.0f} min)")
-    
-    # ── PICK SWAP TARGETS ──
-    # For each category, pick the card to swap out (highest CMC non-critical)
-    swap_targets = {}
-    for cat, cards in deck_categories.items():
-        if not cards:
-            swap_targets[cat] = None
-            continue
-        # Never cut these
-        protected = {'Spiteful Banditry', 'Increasing Vengeance', 'Approach of the Second Sun',
-                     'Teferi\'s Protection', 'Grand Abolisher', 'Silence'}
-        cuttable = [(n, c) for n, c in cards if n not in protected]
-        if not cuttable:
-            cuttable = list(cards)
-        # Pick highest CMC
-        cuttable.sort(key=lambda x: -x[1])
-        swap_targets[cat] = cuttable[0][0]
-    
-    print(f"\n  Swap targets per category:")
-    for cat, target in sorted(swap_targets.items()):
-        if target:
-            print(f"    {cat:<15s} -> cut '{target}'")
-    
-    # ── RUN PHASE 1 TESTS ──
-    # Patch Battle
-    battle_orig = open(BATTLE).read()
-    battle_patched = battle_orig.replace("GAMES = 50", f"GAMES = {GAMES_QUICK}")
-    with open(BATTLE, 'w') as f:
-        f.write(battle_patched)
-    
-    # Create results table
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS slot_benchmarks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT NOT NULL,
-            card_added TEXT NOT NULL,
-            card_removed TEXT NOT NULL,
-            add_cmc REAL, add_effect TEXT,
-            wr REAL, wins INTEGER, losses INTEGER, draws INTEGER,
-            games INTEGER, delta_pp REAL,
-            phase TEXT,
-            tested_at TEXT DEFAULT (datetime('now'))
-        )
-    """)
-    conn.commit()
-    
-    # Skip already tested
-    already_tested = set()
-    for row in conn.execute("SELECT card_added, card_removed FROM slot_benchmarks WHERE phase='best-in-slot'"):
-        already_tested.add((row[0], row[1]))
-    
-    os.chdir(os.path.dirname(BATTLE))
-    tested = applied = 0
-    
-    for cat, candidates in sorted(candidates_by_cat.items()):
-        if cat == 'land':
-            continue
-        if cat not in swap_targets or not swap_targets[cat]:
-            print(f"\n  [{cat}] SKIP — no swap target")
-            continue
-        
-        remove_card = swap_targets[cat]
-        untested = [(n, c, e) for n, c, e in candidates if (n, remove_card) not in already_tested]
-        
-        if not untested:
-            print(f"\n  [{cat}] All {len(candidates)} already tested. Showing top 3:")
-            for row in conn.execute("SELECT card_added, wr, delta_pp FROM slot_benchmarks WHERE category=? AND phase='best-in-slot' ORDER BY wr DESC LIMIT 3", (cat,)):
-                print(f"    +{row[0]:<35s} WR={row[1]:.1f}% {row[2]:+.1f}pp")
-            continue
-        
-        print(f"\n  [{cat}] {len(untested)} remaining of {len(candidates)} candidates (target: cut {remove_card})")
-        
-        for name, cmc, entry in untested:
-            add_effect = entry.get('effect', 'unknown')
-            
-            # Apply swap
-            conn.execute("DELETE FROM deck_cards WHERE deck_id=6 AND card_name=?", (remove_card,))
-            conn.execute("INSERT OR REPLACE INTO deck_cards (deck_id,card_name,quantity,cmc,functional_tag,type_line,is_commander) VALUES (6,?,1,?,?,?,0)",
-                (name, cmc, add_effect, 'Spell'))
-            conn.commit()
-            
-            # Run Battle
-            r = subprocess.run(["python3", BATTLE], capture_output=True, text=True, timeout=180)
-            
-            # Parse result
-            wr = wins = losses = draws = 0
-            for line in r.stdout.split("\n"):
-                if "OVERALL" in line:
-                    mw = re.search(r'WR=([\d.]+)%', line)
-                    mc = re.search(r'(\d+)W/(\d+)L/(\d+)S', line)
-                    if mw: wr = float(mw.group(1))
-                    if mc: wins, losses, draws = int(mc.group(1)), int(mc.group(2)), int(mc.group(3))
-                    break
-            
-            delta = wr - 75.0  # v9 baseline
-            total_g = GAMES_QUICK * 12
-            
-            # Save
-            conn.execute("""INSERT INTO slot_benchmarks (category, card_added, card_removed, add_cmc, add_effect, wr, wins, losses, draws, games, delta_pp, phase)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (cat, name, remove_card, cmc, add_effect, wr, wins, losses, draws, total_g, delta, 'best-in-slot'))
-            conn.commit()
-            
-            sym = "UP" if delta > 1 else "DOWN" if delta < -1 else "-"
-            print(f"    +{name:<35s} WR={wr:.1f}% {sym} {delta:+.1f}pp", end="")
-            if delta > 0.5:
-                print(" ★", end="")
-            print()
-            
-            # RESTORE — always!
-            conn.execute("DELETE FROM deck_cards WHERE deck_id=6 AND card_name=?", (name,))
-            # Re-insert removed card from original deck data
-            restore = [(n, q, c, t, tl, ic) for n, q, c, t, tl, ic in all_cards if n == remove_card]
-            if restore:
-                rn, rq, rc, rt, rtl, ric = restore[0]
-                conn.execute("INSERT OR REPLACE INTO deck_cards (deck_id,card_name,quantity,cmc,functional_tag,type_line,is_commander) VALUES (6,?,?,?,?,?,?)",
-                    (rn, rq, rc, rt, rtl, ric))
-            conn.commit()
-            
-            tested += 1
-    
-    # ── Restore Battle ──
-    with open(BATTLE, 'w') as f:
-        f.write(battle_orig)
-    
-    # ── PHASE 1 SUMMARY ──
-    print(f"\n{'='*60}")
-    print("PHASE 1 SUMMARY: Top candidate per category")
-    
-    phase1_results = {}
-    for cat in sorted(candidates_by_cat.keys()):
-        if cat == 'land':
-            continue
-        rows = conn.execute("SELECT card_added, card_removed, wr, delta_pp FROM slot_benchmarks WHERE category=? AND phase='best-in-slot' ORDER BY wr DESC LIMIT 5", (cat,)).fetchall()
-        if rows:
-            phase1_results[cat] = rows
-            print(f"\n  [{cat}] (deck has {len(deck_categories[cat])} cards)")
-            for i, row in enumerate(rows):
-                marker = " ← BEST" if i == 0 else ""
-                print(f"    {i+1}. +{row[0]:<35s} (cut {row[1]:<20s}) WR={row[2]:.1f}%  {row[3]:+.1f}pp{marker}")
-    
-    conn.close()
+    if tag in tag_map:
+        return tag_map[tag]
+    return "unknown"
 
-finally:
-    # SAFE restore: read FIRST, then write
-    with open(BATTLE, 'r') as f:
-        current = f.read()
-    restored = current.replace(f"GAMES = {GAMES_QUICK}", "GAMES = 50")
-    if restored != current:
-        with open(BATTLE, 'w') as f:
-            f.write(restored)
-    if os.path.exists(LOCK_FILE):
-        os.remove(LOCK_FILE)
-    print(f"\nDone. Results in slot_benchmarks table.")
+
+def candidate_score(name: str, entry: dict[str, object], meta, category: str) -> float:
+    type_line = str(meta["type_line"] or "")
+    oracle = str(meta["oracle_text"] or "").lower()
+    cmc = float(meta["cmc"] if meta["cmc"] is not None else entry.get("cmc", 3) or 3)
+    score = max(0.0, 8.0 - cmc)
+    score += float(entry.get("count", 0) or 0) * 0.1
+
+    if "Instant" in type_line or "Sorcery" in type_line:
+        score += 2.0
+    if "Artifact" in type_line and category == "ramp":
+        score += 1.5
+    if "Creature" in type_line and category not in {"wincon", "engine", "draw"}:
+        score -= 1.0
+    if category == "wipe" and cmc <= 6:
+        score += 2.0
+    if category == "wincon" and cmc >= 9:
+        score -= 3.0
+
+    for term in CATEGORY_TERMS.get(category, ()):
+        if term in oracle:
+            score += 1.0
+
+    # Lorehold specifically rewards spells that can be copied, recurred, or cast
+    # cheaply around the commander plan.
+    for term in ("instant", "sorcery", "copy", "cast", "graveyard", "treasure"):
+        if term in oracle:
+            score += 0.5
+    return score
+
+
+def build_deck_categories(rows, known_cards):
+    categories: dict[str, list[tuple[str, float]]] = defaultdict(list)
+    for row in rows:
+        if row["is_commander"]:
+            continue
+        name = str(row["card_name"])
+        category = category_for_card(name, row, known_cards)
+        cmc = float(row["cmc"] or 0)
+        categories[category].append((name, cmc))
+    return categories
+
+
+def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> dict[str, str]:
+    protected = set(PROTECTED_CARDS) | EXTRA_PROTECTED
+    targets: dict[str, str] = {}
+    for category, cards in deck_categories.items():
+        if category in {"land", "unknown"} or not cards:
+            continue
+        cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
+        if not cuttable:
+            continue
+        cuttable.sort(key=lambda item: (-item[1], item[0]))
+        targets[category] = cuttable[0][0]
+    return targets
+
+
+def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, only_category: str):
+    allowed = deck_commander_identity(conn, deck_id)
+    deck_names = {normalize_name(row["card_name"]) for row in deck_rows(conn, deck_id)}
+    by_category: dict[str, list[tuple[float, str, float, str, dict[str, object]]]] = defaultdict(list)
+    stats = {"deck": 0, "basic": 0, "unknown_category": 0, "missing_meta": 0, "off_color": 0, "illegal": 0, "high_cmc": 0}
+
+    for name, entry in known_cards.items():
+        if normalize_name(name) in deck_names:
+            stats["deck"] += 1
+            continue
+        if name in BASICS:
+            stats["basic"] += 1
+            continue
+        effect = str(entry.get("effect") or "unknown")
+        category = EFFECT_TO_CATEGORY.get(effect, "unknown")
+        if category == "unknown" or category == "land":
+            stats["unknown_category"] += 1
+            continue
+        if only_category and category != only_category:
+            continue
+        meta = card_metadata(conn, name)
+        if not meta:
+            stats["missing_meta"] += 1
+            continue
+        identity = set(json_list(meta["color_identity_json"]))
+        if not identity.issubset(allowed):
+            stats["off_color"] += 1
+            continue
+        legality = commander_legality(conn, name)
+        if legality != "legal":
+            stats["illegal"] += 1
+            continue
+        cmc = float(meta["cmc"] if meta["cmc"] is not None else entry.get("cmc", 3) or 3)
+        if cmc > MAX_CMC_BY_CATEGORY.get(category, 8.0):
+            stats["high_cmc"] += 1
+            continue
+        score = candidate_score(name, entry, meta, category)
+        by_category[category].append((score, name, cmc, effect, entry))
+
+    selected: dict[str, list[tuple[str, float, str, dict[str, object]]]] = {}
+    for category, rows in by_category.items():
+        rows.sort(key=lambda item: (-item[0], item[2], item[1]))
+        selected[category] = [
+            (name, cmc, effect, entry)
+            for _, name, cmc, effect, entry in rows[:max_per_category]
+        ]
+    return selected, stats
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--deck-id", type=int, default=int(os.environ.get("MANALOOM_OPTIMIZER_DECK_ID", "6")))
+    parser.add_argument("--games", type=int, default=int(os.environ.get("MANALOOM_SLOT_GAMES", "10")))
+    parser.add_argument("--max-per-category", type=int, default=int(os.environ.get("MANALOOM_SLOT_MAX_PER_CATEGORY", "15")))
+    parser.add_argument("--category", default="")
+    parser.add_argument("--phase", default="phase1")
+    parser.add_argument("--reset-current-baseline", action="store_true")
+    args = parser.parse_args()
+
+    if LOCK_FILE.exists():
+        age = int(__import__("time").time() - LOCK_FILE.stat().st_mtime)
+        if age < 43200:
+            print(f"slot_scan=locked age_seconds={age}")
+            return 0
+        LOCK_FILE.unlink()
+    LOCK_FILE.write_text(str(os.getpid()), encoding="utf-8")
+
+    try:
+        known_cards = load_known_cards()
+        with connect() as conn:
+            ensure_optimizer_tables(conn)
+            baseline = latest_baseline(conn, args.deck_id)
+            if not baseline:
+                raise SystemExit("No approved baseline found. Run master_optimizer_baseline.py first.")
+            assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
+            baseline_id = int(baseline["id"])
+            baseline_hash = str(baseline["deck_hash"])
+            baseline_wr = float(baseline["wr"])
+
+            if args.reset_current_baseline:
+                conn.execute(
+                    """
+                    DELETE FROM slot_benchmarks
+                    WHERE deck_id=? AND baseline_id=? AND baseline_hash=? AND phase=?
+                    """,
+                    (args.deck_id, baseline_id, baseline_hash, args.phase),
+                )
+                conn.commit()
+
+            rows = deck_rows(conn, args.deck_id)
+            deck_categories = build_deck_categories(rows, known_cards)
+            targets = choose_swap_targets(deck_categories)
+            candidates, stats = legal_candidates(
+                conn,
+                args.deck_id,
+                known_cards,
+                args.max_per_category,
+                args.category,
+            )
+
+            total = sum(len(items) for items in candidates.values())
+            print("=" * 72)
+            print("SAFE LOREHOLD SLOT SCAN")
+            print(f"deck_id={args.deck_id}")
+            print(f"baseline_id={baseline_id}")
+            print(f"baseline_wr={baseline_wr:.1f}%")
+            print(f"baseline_hash={baseline_hash}")
+            print(f"games_per_opponent={args.games}")
+            print(f"max_per_category={args.max_per_category}")
+            print(f"selected_candidates={total}")
+            print(f"filter_stats={json.dumps(stats, sort_keys=True)}")
+            print("\nCurrent deck composition:")
+            for category, cards in sorted(deck_categories.items()):
+                if category == "land":
+                    continue
+                avg = sum(cmc for _, cmc in cards) / max(1, len(cards))
+                print(f"  {category:<12s} x{len(cards):<2d} avg_cmc={avg:.1f}")
+            print("\nSwap targets:")
+            for category, target in sorted(targets.items()):
+                print(f"  {category:<12s} -> {target}")
+
+            already_tested = {
+                (row["card_added"], row["card_removed"])
+                for row in conn.execute(
+                    """
+                    SELECT card_added, card_removed FROM slot_benchmarks
+                    WHERE deck_id=? AND baseline_id=? AND baseline_hash=? AND phase=?
+                    """,
+                    (args.deck_id, baseline_id, baseline_hash, args.phase),
+                )
+            }
+
+            tested = 0
+            blocked = 0
+            skipped = 0
+            for category, items in sorted(candidates.items()):
+                target = targets.get(category)
+                if not target:
+                    print(f"\n[{category}] skipped: no swap target")
+                    skipped += len(items)
+                    continue
+                print(f"\n[{category}] {len(items)} selected candidates (cut target: {target})")
+                for name, cmc, effect, _entry in items:
+                    if (name, target) in already_tested:
+                        print(f"  ={name:<36s} already tested")
+                        skipped += 1
+                        continue
+                    review = quality_gate_candidate(conn, args.deck_id, name, target, "slot_scan")
+                    if review["status"] != "passed":
+                        print(f"  !{name:<36s} blocked: {', '.join(review['reasons'])}")
+                        blocked += 1
+                        continue
+                    with temporary_swap(conn, args.deck_id, name, target, category):
+                        result = run_battle(args.games)
+                    delta = result.win_rate - baseline_wr
+                    conn.execute(
+                        """
+                        INSERT INTO slot_benchmarks
+                            (deck_id, baseline_id, baseline_hash, category,
+                             card_added, card_removed, add_cmc, add_effect, add_tag,
+                             wr, wins, losses, draws, games, delta_pp, phase, tested_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            args.deck_id,
+                            baseline_id,
+                            baseline_hash,
+                            category,
+                            name,
+                            target,
+                            cmc,
+                            effect,
+                            category,
+                            result.win_rate,
+                            result.wins,
+                            result.losses,
+                            result.stalls,
+                            result.total_games,
+                            delta,
+                            args.phase,
+                            utc_now(),
+                        ),
+                    )
+                    conn.commit()
+                    tested += 1
+                    marker = "UP" if delta > 0.5 else "DOWN" if delta < -0.5 else "FLAT"
+                    print(
+                        f"  +{name:<36s} WR={result.win_rate:>5.1f}% "
+                        f"{marker} {delta:+.1f}pp "
+                        f"record={result.wins}W/{result.losses}L/{result.stalls}S"
+                    )
+
+            print("\n" + "=" * 72)
+            print("SLOT SCAN SUMMARY")
+            print(f"tested={tested}")
+            print(f"blocked={blocked}")
+            print(f"skipped={skipped}")
+            for category in sorted(candidates):
+                rows = conn.execute(
+                    """
+                    SELECT card_added, card_removed, wr, delta_pp FROM slot_benchmarks
+                    WHERE deck_id=? AND baseline_id=? AND baseline_hash=? AND phase=? AND category=?
+                    ORDER BY wr DESC, delta_pp DESC
+                    LIMIT 5
+                    """,
+                    (args.deck_id, baseline_id, baseline_hash, args.phase, category),
+                ).fetchall()
+                if not rows:
+                    continue
+                print(f"\n[{category}] top candidates")
+                for idx, row in enumerate(rows, start=1):
+                    print(
+                        f"  {idx}. +{row['card_added']} "
+                        f"(cut {row['card_removed']}) "
+                        f"WR={float(row['wr']):.1f}% {float(row['delta_pp']):+.1f}pp"
+                    )
+            print("\nslot_scan=ok")
+            return 0
+    finally:
+        try:
+            LOCK_FILE.unlink()
+        except FileNotFoundError:
+            pass
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

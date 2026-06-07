@@ -35,9 +35,13 @@ def main() -> int:
             """
             SELECT * FROM swap_benchmarks
             WHERE phase IN ('confirmation', 'full_confirmation')
+              AND deck_id=?
+              AND baseline_id=?
+              AND baseline_hash=?
             ORDER BY tested_at DESC, id DESC
             LIMIT 20
-            """
+            """,
+            (args.deck_id, int(baseline["id"]), str(baseline["deck_hash"])),
         ).fetchall()
         approved = [
             row

@@ -88,6 +88,40 @@ def run_command(command: list[str], cwd: Path | None = None, timeout: int = 900)
 def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
     conn.execute(
         """
+        CREATE TABLE IF NOT EXISTS slot_benchmarks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            deck_id INTEGER,
+            baseline_id INTEGER,
+            baseline_hash TEXT,
+            category TEXT NOT NULL,
+            card_added TEXT NOT NULL,
+            card_removed TEXT NOT NULL,
+            add_cmc REAL,
+            add_effect TEXT,
+            add_tag TEXT,
+            wr REAL,
+            wins INTEGER,
+            losses INTEGER,
+            draws INTEGER,
+            games INTEGER,
+            delta_pp REAL,
+            phase TEXT,
+            tested_at TEXT DEFAULT (datetime('now'))
+        )
+        """
+    )
+    _ensure_columns(
+        conn,
+        "slot_benchmarks",
+        {
+            "deck_id": "INTEGER",
+            "baseline_id": "INTEGER",
+            "baseline_hash": "TEXT",
+            "add_tag": "TEXT",
+        },
+    )
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS optimizer_baseline_runs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             deck_id INTEGER NOT NULL,
@@ -110,6 +144,9 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
         """
         CREATE TABLE IF NOT EXISTS swap_benchmarks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            deck_id INTEGER,
+            baseline_id INTEGER,
+            baseline_hash TEXT,
             card_added TEXT NOT NULL,
             card_removed TEXT NOT NULL,
             add_cmc REAL,
@@ -126,6 +163,15 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             tested_at TEXT NOT NULL
         )
         """
+    )
+    _ensure_columns(
+        conn,
+        "swap_benchmarks",
+        {
+            "deck_id": "INTEGER",
+            "baseline_id": "INTEGER",
+            "baseline_hash": "TEXT",
+        },
     )
     conn.execute(
         """
@@ -186,6 +232,13 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+def _ensure_columns(conn: sqlite3.Connection, table: str, columns: dict[str, str]) -> None:
+    existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+    for name, definition in columns.items():
+        if name not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {definition}")
+
+
 def deck_rows(conn: sqlite3.Connection, deck_id: int) -> list[sqlite3.Row]:
     return conn.execute(
         "SELECT * FROM deck_cards WHERE deck_id=? ORDER BY is_commander DESC, card_name",
@@ -217,7 +270,11 @@ def get_deck_summary(conn: sqlite3.Connection, deck_id: int) -> dict[str, object
         for row in rows
         if row["functional_tag"] == "land" or "Land" in str(row["type_line"] or "")
     )
-    nonlands = [row for row in rows if row["functional_tag"] != "land"]
+    nonlands = [
+        row
+        for row in rows
+        if row["functional_tag"] != "land" and "Land" not in str(row["type_line"] or "")
+    ]
     avg_cmc = sum(float(row["cmc"] or 0) for row in nonlands) / max(1, len(nonlands))
     return {
         "deck_id": deck_id,
@@ -559,6 +616,9 @@ def candidate_rows(
     limit: int,
     baseline_wr: float,
     *,
+    deck_id: int | None = None,
+    baseline_id: int | None = None,
+    baseline_hash: str = "",
     include_existing: bool = False,
     only_added: str = "",
 ) -> list[sqlite3.Row]:
@@ -567,15 +627,36 @@ def candidate_rows(
         "phase IN ('best-in-slot', 'phase1')",
     ]
     params: list[object] = []
+    if deck_id is not None:
+        where.append("deck_id=?")
+        params.append(deck_id)
+    if baseline_id is not None:
+        where.append("baseline_id=?")
+        params.append(baseline_id)
+    if baseline_hash:
+        where.append("baseline_hash=?")
+        params.append(baseline_hash)
     if not include_existing:
+        swap_where = ["phase IN ('confirmation', 'full_confirmation')"]
+        swap_params: list[object] = []
+        if deck_id is not None:
+            swap_where.append("deck_id=?")
+            swap_params.append(deck_id)
+        if baseline_id is not None:
+            swap_where.append("baseline_id=?")
+            swap_params.append(baseline_id)
+        if baseline_hash:
+            swap_where.append("baseline_hash=?")
+            swap_params.append(baseline_hash)
         where.append(
-            """
+            f"""
             card_added NOT IN (
                 SELECT card_added FROM swap_benchmarks
-                WHERE phase IN ('confirmation', 'full_confirmation')
+                WHERE {' AND '.join(swap_where)}
             )
             """
         )
+        params.extend(swap_params)
     if only_added:
         where.append("lower(card_added)=lower(?)")
         params.append(only_added)

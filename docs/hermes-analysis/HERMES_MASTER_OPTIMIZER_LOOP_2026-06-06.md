@@ -125,6 +125,27 @@ Hardening de stale-target em Hermes, 2026-06-07:
 - Smoke real em SQLite temporario confirmou o bloqueio: apos remover `Mana Geyser` da copia temporaria, `master_optimizer_handoff.py` recusou gerar handoff por hash divergente.
 - Resultado do smoke: `GUARDRAIL_SMOKE_OK`.
 
+Validacao full-flow Lorehold em Hermes, 2026-06-07:
+
+- Rodada real executada no container `d5fe57bf9de2`.
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_full_flow_20260607_144021/`.
+- O `slot_optimizer.py` legado foi interrompido porque testava cartas off-color e deixou uma mutacao parcial no SQLite.
+- Mutacao parcial corrigida: `Chaos Warp` removido e `Deflecting Swat` restaurado.
+- Hash do deck restaurado e validado: `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`.
+- `slot_optimizer.py` foi substituido por scan seguro: filtra identidade de cor, exige legalidade Commander explicita, usa `run_battle()` temporario e grava `deck_id`, `baseline_id` e `baseline_hash`.
+- Baseline fresco id `3`: `87.0%` WR, `261W/10L/29S`, 300 jogos.
+- Slot scan seguro: 120 candidatos legais testados; 851 candidatos off-color filtrados.
+- Full confirmation: `Fork` sobre `Past in Flames` passou com `88.0%` WR, delta `+1.0pp`, `264W/6L/30S`.
+- Full confirmation: `Harness the Storm` sobre `Past in Flames` passou com `88.0%` WR, delta `+1.0pp`, `264W/8L/28S`.
+- `Expedition Map`, `Lotus Bloom` e `Astral Cornucopia` nao passaram o corte de aprovacao final.
+- Replay audit inicialmente apontou falsos positivos de board wipe.
+- `battle_analyst_v8.py` agora emite `creatures_seen` e `unprotected_seen` em `board_wipe_resolved`.
+- `replay_decision_auditor.py` agora bloqueia board wipe apenas quando havia criatura desprotegida e zero foram destruidas.
+- Replay audit fresco apos correcoes: `turn_by_turn_clean`, 1334 eventos estruturados, 0 findings turno-a-turno.
+- Handoff final: `approved_swaps_ready_for_manual_apply`.
+- Nenhum swap foi aplicado automaticamente.
+- Como `Fork` e `Harness the Storm` cortam a mesma carta, apenas um deles pode ser aplicado sem nova rodada de baseline/confirmacao.
+
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
 Arquivos principais:

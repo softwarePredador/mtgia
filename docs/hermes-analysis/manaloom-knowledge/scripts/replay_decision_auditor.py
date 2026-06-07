@@ -214,7 +214,13 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         elif kind == "board_wipe_resolved":
             destroyed = int(event.get("destroyed") or 0)
             protected = int(event.get("protected") or 0)
-            if destroyed == 0:
+            unprotected_seen = event.get("unprotected_seen")
+            if unprotected_seen is None:
+                # Older replay events did not include board state before the wipe.
+                # Do not block trust on missing context; new replays include it.
+                unprotected_seen = 0
+            unprotected_seen = int(unprotected_seen or 0)
+            if destroyed == 0 and unprotected_seen > 0:
                 add_finding(findings, "high", event, "Board wipe resolved without destroying creatures.")
             if protected > destroyed and destroyed > 0:
                 add_finding(

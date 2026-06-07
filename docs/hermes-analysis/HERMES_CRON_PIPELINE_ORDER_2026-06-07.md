@@ -92,6 +92,26 @@ Operational meaning:
 - Any stale-target report must be discarded as an apply source.
 - The correct recovery is re-freeze baseline from the exact current deck, rerun slot scan, rerun quality gate, rerun confirmation, then generate a new handoff.
 
+## Lorehold full-flow proof update
+
+Fresh run, 2026-06-07:
+
+- Flow log: `/opt/data/artifacts/hermes_master_optimizer/lorehold_full_flow_20260607_144021.log`.
+- Local evidence: `docs/hermes-analysis/master_optimizer_reports/lorehold_full_flow_20260607_144021/`.
+- Baseline id `3`: `87.0%` WR, `261W/10L/29S`, 300 games.
+- Safe slot scan tested `120` legal candidates and filtered `851` off-color candidates.
+- Replay audit after board-wipe event hardening: `turn_by_turn_clean`, 1334 structured events, 0 turn-by-turn findings.
+- Full confirmation approved two manual-review candidates:
+- `Fork` over `Past in Flames`: `88.0%` WR, `+1.0pp`, `264W/6L/30S`.
+- `Harness the Storm` over `Past in Flames`: `88.0%` WR, `+1.0pp`, `264W/8L/28S`.
+- No automatic apply happened.
+
+Operational meaning:
+
+- The pipeline can now run from sync through handoff with fresh evidence.
+- The next decision is product/deck-owner choice between `Fork` and `Harness the Storm`.
+- Since both cut `Past in Flames`, apply at most one, then immediately re-freeze baseline and rerun replay audit.
+
 ## Ideal order for end-to-end deck learning
 
 ### 1. Ingest real data
@@ -198,6 +218,7 @@ Current state:
 - Job is registered but paused.
 - It should stay paused until baseline is frozen.
 - It should replace the old `lorehold-universal-optimizer`.
+- `slot_optimizer.py` has been hardened to filter Commander color identity, require explicit Commander legality, avoid editing the battle script directly, and bind rows to `deck_id`/`baseline_id`/`baseline_hash`.
 
 ### 6. Confirm promising candidates
 

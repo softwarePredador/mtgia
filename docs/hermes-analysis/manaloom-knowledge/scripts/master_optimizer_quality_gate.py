@@ -33,7 +33,14 @@ def main() -> int:
             assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
         except RuntimeError as exc:
             raise SystemExit(str(exc)) from exc
-        rows = candidate_rows(conn, args.limit, float(baseline["wr"]))
+        rows = candidate_rows(
+            conn,
+            args.limit,
+            float(baseline["wr"]),
+            deck_id=args.deck_id,
+            baseline_id=int(baseline["id"]),
+            baseline_hash=str(baseline["deck_hash"]),
+        )
         reviews = []
         for row in rows:
             review = quality_gate_candidate(
