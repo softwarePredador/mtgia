@@ -22,6 +22,11 @@ import sqlite3, random, json, os, re, copy
 from datetime import datetime, timezone
 from collections import defaultdict
 
+try:
+    import battle_rule_registry
+except Exception:
+    battle_rule_registry = None
+
 DB = "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
 KNOWLEDGE_DIR = "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge"
 LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
@@ -427,6 +432,12 @@ if os.path.exists(_gen_json_path):
     except Exception: pass
 def get_card_effect(card):
     name = card.get("name", "")
+    if battle_rule_registry is not None:
+        rule = battle_rule_registry.lookup_battle_card_rule(DB, name)
+        if rule and rule.get("effect_json"):
+            effect = dict(rule["effect_json"])
+            effect["_rule_source"] = rule.get("source", "battle_card_rules")
+            return normalize_effect_by_oracle(card, effect)
     if name in KNOWN_CARDS:
         return normalize_effect_by_oracle(card, KNOWN_CARDS[name].copy())
     tag = card.get("tag", "")
@@ -449,6 +460,8 @@ def get_card_effect(card):
 
 def is_instant(card):
     """v8: Check if a card can be cast at instant speed."""
+    if get_card_effect(card).get("instant"):
+        return True
     name = card.get("name", "")
     if name in KNOWN_CARDS and KNOWN_CARDS[name].get("instant"):
         return True

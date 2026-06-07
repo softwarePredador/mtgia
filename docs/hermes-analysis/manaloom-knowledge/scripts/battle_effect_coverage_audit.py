@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import battle_analyst_v8 as battle
+import battle_rule_registry
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -66,10 +67,17 @@ def generated_cards() -> dict[str, Any]:
     return decoded if isinstance(decoded, dict) else {}
 
 
-def effect_source(card: dict[str, Any], generated: dict[str, Any]) -> str:
+def effect_source(
+    card: dict[str, Any],
+    generated: dict[str, Any],
+    rules: dict[str, dict[str, Any]],
+) -> str:
     name = card.get("name", "")
     if "land" in str(card.get("type_line", "")).lower():
         return "type_land"
+    rule = rules.get(battle_rule_registry.normalize_card_name(name))
+    if rule:
+        return f"battle_rule_{rule.get('source', 'unknown')}"
     if name in battle.HANDCRAFTED_KNOWN_CARDS:
         return "handcrafted"
     if name in generated:
@@ -103,7 +111,14 @@ def risk_flags(card: dict[str, Any], effect: str, source: str) -> list[str]:
     is_land = "land" in str(card.get("type_line", "")).lower()
     if source == "unknown":
         flags.append("unknown_effect")
-    if source in {"generated", "tag", "effect_map", "type_creature"}:
+    if source in {
+        "generated",
+        "tag",
+        "effect_map",
+        "type_creature",
+        "battle_rule_generated",
+        "battle_rule_heuristic",
+    }:
         flags.append("heuristic_effect")
     if (
         re.search(r"\b(destroy|exile)\s+target\b", text)
@@ -144,6 +159,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(args.seed)
 
     generated = generated_cards()
+    rules = battle_rule_registry.load_active_battle_card_rules(args.sqlite_db)
     commander, lorehold_deck = battle.load_deck(args.deck_id)
     lorehold_cards = ([commander] if commander else []) + lorehold_deck
     opponents = battle.load_learned_opponents()
@@ -164,7 +180,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     for deck_name, card in rows:
         name = card.get("name", "?")
         effect = battle.get_card_effect(card).get("effect", "unknown")
-        source = effect_source(card, generated)
+        source = effect_source(card, generated, rules)
         flags = risk_flags(card, effect, source)
         source_totals[source] += 1
         effect_totals[effect] += 1
@@ -247,15 +263,18 @@ def render_markdown(audit: dict[str, Any]) -> str:
         "",
         "## Deck Coverage",
         "",
-        "| Deck | Cards | Handcrafted | Generated | Tag | Effect Map | Type Land | Type Creature | Unknown | Flagged |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Deck | Cards | Battle Manual | Battle Generated | Handcrafted | Generated | Tag | Effect Map | Type Land | Type Creature | Unknown | Flagged |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ])
     for deck, totals in sorted(audit["deck_totals"].items()):
         lines.append(
-            "| {deck} | {cards} | {handcrafted} | {generated} | {tag} | "
-            "{effect_map} | {type_land} | {type_creature} | {unknown} | {flagged} |".format(
+            "| {deck} | {cards} | {battle_rule_manual} | {battle_rule_generated} | "
+            "{handcrafted} | {generated} | {tag} | {effect_map} | {type_land} | "
+            "{type_creature} | {unknown} | {flagged} |".format(
                 deck=deck,
                 cards=totals.get("cards", 0),
+                battle_rule_manual=totals.get("battle_rule_manual", 0),
+                battle_rule_generated=totals.get("battle_rule_generated", 0),
                 handcrafted=totals.get("handcrafted", 0),
                 generated=totals.get("generated", 0),
                 tag=totals.get("tag", 0),

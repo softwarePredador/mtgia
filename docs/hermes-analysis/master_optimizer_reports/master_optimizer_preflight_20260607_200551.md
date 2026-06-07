@@ -1,0 +1,28 @@
+# Hermes Master Optimizer Preflight
+
+- generated_at: 2026-06-07 20:05:51 UTC
+- status: approved
+
+## Checks
+
+| Check | Status | Detail |
+| --- | --- | --- |
+| knowledge_db | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db |
+| battle | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py |
+| battle_regression | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py |
+| slot_optimizer | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py |
+| universal_optimizer | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py |
+| meta_decks_sync | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py |
+| metadata_sync | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py |
+| effect_coverage_audit | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py |
+| sqlite_tables | ok | all essential tables present |
+| sqlite_content | ok | deck_cards=543, learned_decks=202 |
+| python_compile | ok | battle and metadata sync compile |
+| battle_regression | ok | test_battle_analyst_v10_3 passed |
+| oracle_cache_coverage | ok | {"keywords_filled": 1623, "mana_cost_filled": 3065, "oracle_cache_rows": 3464, "oracle_text_filled": 3461, "power_filled": 1243, "toughness_filled": 1243} |
+
+## Next action
+
+- If status is `approved`, run baseline battle and isolated slot scan.
+- If status is `blocked`, fix battle/metadata before running optimizer.
+- Do not apply swaps from quick phase automatically.

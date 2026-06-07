@@ -147,6 +147,7 @@ Snapshot vivo observado em 2026-06-07 apos sync de meta decks PG:
 | `deck_cards` | 543 | Decks locais do Hermes, incluindo deck alvo `deck_id=6`. |
 | `learned_decks` | 202 | Oponentes reais aprendidos para battle, incluindo 120 `pg_meta_decks`. |
 | `card_oracle_cache` | 3464 | Cache de metadata importada do Postgres. |
+| `battle_card_rules` | variavel | Semantica canonica de cartas para battle e montagem de deck. |
 | `card_legalities` | 31369 | Legalidade por formato. |
 | `game_changers` | 53 | Politica de bracket/Game Changer. |
 | `slot_benchmarks` | 30 | Resultados de scan isolado por slot. |
@@ -277,6 +278,44 @@ Contrato:
 - Deve incluir alias da face frontal para cartas dupla-face.
 - `battle_analyst_v8.py` usa este cache para mana colorida, poder/resistencia e keywords.
 - `slot_optimizer.py` usa este cache para identidade de cor e legalidade indireta.
+
+### `battle_card_rules`
+
+Criada/atualizada por `sync_battle_card_rules.py`.
+
+Leituras principais:
+
+- `battle_analyst_v8.py`, antes de `KNOWN_CARDS`/JSON/tags;
+- `slot_optimizer.py`, para categorizar candidatos e cortes;
+- `battle_effect_coverage_audit.py`, para separar regra manual/gerada de heuristica.
+
+Colunas:
+
+- `normalized_name`
+- `card_name`
+- `effect_json`
+- `deck_role_json`
+- `source`
+- `confidence`
+- `review_status`
+- `rule_version`
+- `oracle_hash`
+- `notes`
+- `created_at`
+- `updated_at`
+- `last_seen_at`
+
+Contrato:
+
+- `effect_json` descreve comportamento suportado pelo battle.
+- `deck_role_json` descreve papel para montagem/optimizer.
+- `source='manual'` e `review_status='verified'` tem prioridade sobre gerado.
+- `source='generated'` entra como `needs_review`; pode rodar, mas deve aparecer
+  como risco em auditoria quando influenciar decisao.
+- uma carta `creature` generica nao vira categoria de deckbuilding confiavel sem
+  papel explicito.
+- lands sao primeiro lands; habilidade utilitaria de land precisa regra propria
+  futura ou fica como gap auditado.
 
 ### `card_legalities`
 
@@ -550,6 +589,35 @@ Saida esperada:
 - tabela `card_oracle_cache` criada/atualizada;
 - report JSON com cobertura;
 - nenhuma credencial impressa.
+
+### `sync_battle_card_rules.py`
+
+Funcao:
+
+- criar/atualizar `battle_card_rules`;
+- copiar regras manuais de `HANDCRAFTED_KNOWN_CARDS` como `verified`;
+- copiar regras geradas de `known_cards_generated.json` como `needs_review`;
+- manter prioridade: gerado nao sobrescreve manual/curado.
+
+Entradas:
+
+- SQLite Hermes via `--sqlite-db`;
+- `battle_analyst_v8.py` para regras manuais;
+- `known_cards_generated.json` para regras geradas.
+
+Parametros:
+
+- `--sqlite-db`: caminho do `knowledge.db`;
+- `--apply`: grava no SQLite; sem isso apenas mede;
+- `--skip-generated`: popula apenas regras manuais;
+- `--report`: JSON de sync.
+
+Saida esperada:
+
+- tabela `battle_card_rules` presente;
+- regras manuais como `source='manual'`, `review_status='verified'`;
+- regras geradas como `source='generated'`, `review_status='needs_review'`;
+- nenhuma mutacao em Postgres/producao.
 
 ### `master_optimizer_loop.py --preflight --report`
 
@@ -901,6 +969,10 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_he
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py \
   --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
   --report /opt/data/artifacts/hermes_master_optimizer/card_oracle_cache_sync_manual.json
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --apply \
+  --report /opt/data/artifacts/hermes_master_optimizer/battle_card_rules_sync_manual.json
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py --preflight --report
 ```
 
@@ -908,6 +980,7 @@ Bloquear se:
 
 - sync de meta decks falhar;
 - sync de metadata falhar;
+- sync de battle rules falhar;
 - `card_oracle_cache` ficar vazio/baixo;
 - houver menos de 3 oponentes reais validos em `learned_decks`;
 - battle tests falharem;
@@ -1109,6 +1182,7 @@ correta de validar job e olhar:
 - carrega `/opt/data/secrets/manaloom-postgres.env`;
 - roda sync PG `meta_decks` -> SQLite `learned_decks`;
 - roda sync PG -> SQLite para metadata;
+- roda sync de `battle_card_rules`;
 - roda preflight;
 - copia ultimo report para artefato latest.
 
@@ -1129,6 +1203,7 @@ correta de validar job e olhar:
 - carrega Postgres env;
 - roda sync de meta decks PG para `learned_decks`;
 - roda sync de metadata para `card_oracle_cache`;
+- roda sync de `battle_card_rules`;
 - roda preflight;
 - roda baseline;
 - roda slot scan fresco para o baseline atual;

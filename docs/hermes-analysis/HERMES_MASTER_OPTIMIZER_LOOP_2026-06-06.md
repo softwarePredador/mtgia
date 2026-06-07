@@ -271,9 +271,27 @@ Auditoria de cobertura de efeitos em Hermes, 2026-06-07:
 - Conclusao operacional: o battle ainda nao cobre "todas as regras sem excecao"; agora ele mede a lacuna e impede que a equipe trate heuristica como regra completa.
 - Proxima evolucao correta: transformar as cartas mais influentes marcadas pela auditoria em regras explicitas de `KNOWN_CARDS`, começando por cartas que aparecem nos candidatos aprovados, nos commanders oponentes e nos flags `oracle_*_mismatch`.
 
+Arquitetura correta para battle + montagem de deck, 2026-06-07:
+
+- Novo documento canonico: `docs/hermes-analysis/HERMES_BATTLE_DECKBUILDING_RULE_REGISTRY_2026-06-07.md`.
+- Nova tabela operacional: `battle_card_rules`.
+- Novo modulo: `battle_rule_registry.py`.
+- Novo sync: `sync_battle_card_rules.py`.
+- A tabela separa fatos de carta (`card_oracle_cache`) de interpretacao do simulador (`battle_card_rules`).
+- `effect_json` passa a ser a semantica usada pelo battle.
+- `deck_role_json` passa a ser a semantica usada pela montagem/optimizer.
+- `battle_analyst_v8.py` agora consulta `battle_card_rules` antes de `KNOWN_CARDS`, JSON gerado, tags e heuristicas.
+- `slot_optimizer.py` agora mescla `battle_card_rules` por cima de `known_cards_generated.json`; categoria de deck da tabela tem prioridade.
+- Criaturas genericas nao viram categoria confiavel de deckbuilding; continuam `unknown` ate receberem papel explicito.
+- `battle_effect_coverage_audit.py` agora diferencia `battle_rule_manual` e `battle_rule_generated`.
+- Preflight, auto-cycle e slot-scan cron agora sincronizam `battle_card_rules`.
+- Validacao local: `sync_battle_card_rules.py` populou 1970 regras em banco temporario (`manual=40`, `generated=1930`) e os 32 testes do battle passaram.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py`
