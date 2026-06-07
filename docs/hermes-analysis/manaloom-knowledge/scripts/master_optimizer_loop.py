@@ -28,6 +28,8 @@ DEFAULT_BATTLE_TEST = SCRIPT_DIR / "test_battle_analyst_v10_3.py"
 DEFAULT_SLOT_OPTIMIZER = SCRIPT_DIR / "slot_optimizer.py"
 DEFAULT_UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 DEFAULT_SYNC_METADATA = SCRIPT_DIR / "sync_pg_card_metadata_to_hermes.py"
+DEFAULT_SYNC_META_DECKS = SCRIPT_DIR / "sync_pg_meta_decks_to_hermes.py"
+DEFAULT_EFFECT_COVERAGE_AUDIT = SCRIPT_DIR / "battle_effect_coverage_audit.py"
 
 ESSENTIAL_TABLES = {
     "deck_cards",
@@ -122,7 +124,9 @@ def run_preflight(args: argparse.Namespace) -> list[CheckResult]:
         "battle_regression": args.battle_test,
         "slot_optimizer": args.slot_optimizer,
         "universal_optimizer": args.universal_optimizer,
+        "meta_decks_sync": args.sync_meta_decks,
         "metadata_sync": args.sync_metadata,
+        "effect_coverage_audit": args.effect_coverage_audit,
     }
     for name, path in required_files.items():
         checks.append(
@@ -269,6 +273,8 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_UNIVERSAL_OPTIMIZER,
     )
     parser.add_argument("--sync-metadata", type=Path, default=DEFAULT_SYNC_METADATA)
+    parser.add_argument("--sync-meta-decks", type=Path, default=DEFAULT_SYNC_META_DECKS)
+    parser.add_argument("--effect-coverage-audit", type=Path, default=DEFAULT_EFFECT_COVERAGE_AUDIT)
     return parser.parse_args()
 
 

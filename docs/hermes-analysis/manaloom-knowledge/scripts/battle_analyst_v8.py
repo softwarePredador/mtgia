@@ -349,6 +349,8 @@ KNOWN_CARDS = {
     "Reforge the Soul": {"effect": "draw_cards", "count": 7, "miracle": "1R"},
 }
 
+HANDCRAFTED_KNOWN_CARDS = set(KNOWN_CARDS)
+
 TAG_EFFECTS = {
     "ramp": {"effect": "ramp_permanent", "mana_produced": 1},
     "ritual": {"effect": "ramp_ritual", "mana_produced": 3},
@@ -365,6 +367,53 @@ TAG_EFFECTS = {
 }
 
 
+def normalize_effect_by_oracle(card, effect_data):
+    """Correct broad generated/tag mistakes using imported oracle metadata."""
+    normalized = effect_data.copy()
+    effect = normalized.get("effect", "unknown")
+    type_line = str(card.get("type_line") or "")
+    oracle_text = str(card.get("oracle_text") or "")
+    text = f"{type_line}\n{oracle_text}".lower()
+
+    if "land" in type_line.lower():
+        normalized["effect"] = "land"
+        return normalized
+
+    if "counter target" in text:
+        normalized["effect"] = "counter"
+        normalized["instant"] = True
+        return normalized
+
+    if re.search(r"\b(destroy|exile)\s+target\b", text):
+        normalized["effect"] = (
+            "remove_creature" if "target creature" in text else "remove_permanent"
+        )
+        return normalized
+
+    if re.search(r"\breturn target\b", text):
+        normalized["effect"] = "remove_permanent"
+        return normalized
+
+    if (
+        ("return each" in text or "return all" in text)
+        and "nonland permanent" in text
+    ):
+        normalized["effect"] = "board_wipe"
+        return normalized
+
+    if (
+        effect == "silence_opponents"
+        and "can't be countered" in text
+        and not re.search(r"opponents? can't cast", text)
+        and "can't cast spells" not in text
+    ):
+        if "creature" in type_line.lower():
+            normalized["effect"] = "creature"
+        else:
+            normalized["effect"] = "unknown"
+    return normalized
+
+
 # ── KNOWN_CARDS Auto-Generator Loader (v8.4) ──
 # Loads generated entries from known_cards_generated.json (handcrafted takes priority)
 _gen_json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'known_cards_generated.json')
@@ -379,22 +428,24 @@ if os.path.exists(_gen_json_path):
 def get_card_effect(card):
     name = card.get("name", "")
     if name in KNOWN_CARDS:
-        return KNOWN_CARDS[name].copy()
+        return normalize_effect_by_oracle(card, KNOWN_CARDS[name].copy())
     tag = card.get("tag", "")
     if tag in TAG_EFFECTS:
-        return TAG_EFFECTS[tag].copy()
+        return normalize_effect_by_oracle(card, TAG_EFFECTS[tag].copy())
     effect = card.get("effect", "")
     effect_map = {"ramp": "ramp_permanent", "removal": "remove_creature",
                   "board_wipe": "board_wipe", "wincon": "finisher", "draw": "draw_cards",
                   "counter": "counter", "land": "land"}
     if effect in effect_map:
-        if effect == "ramp": return {"effect": "ramp_permanent", "mana_produced": 1}
-        if effect == "wincon": return {"effect": "finisher"}
-        if effect == "draw": return {"effect": "draw_cards", "count": 2}
-        return {"effect": effect_map[effect]}
+        if effect == "ramp": return normalize_effect_by_oracle(card, {"effect": "ramp_permanent", "mana_produced": 1})
+        if effect == "wincon": return normalize_effect_by_oracle(card, {"effect": "finisher"})
+        if effect == "draw": return normalize_effect_by_oracle(card, {"effect": "draw_cards", "count": 2})
+        return normalize_effect_by_oracle(card, {"effect": effect_map[effect]})
+    if "land" in card.get("type_line", "").lower():
+        return {"effect": "land"}
     if effect == "creature" or "creature" in card.get("type_line", "").lower():
-        return {"effect": "creature", "power": card.get("power", 2)}
-    return {"effect": "unknown"}
+        return normalize_effect_by_oracle(card, {"effect": "creature", "power": card.get("power", 2)})
+    return normalize_effect_by_oracle(card, {"effect": "unknown"})
 
 def is_instant(card):
     """v8: Check if a card can be cast at instant speed."""
@@ -2146,7 +2197,7 @@ def load_learned_opponents():
                     "toughness": 2,
                     "type_line": "Creature",
                 })
-            real_name = f"{row['commander']} (real)"
+            real_name = f"{row['commander']} #{row['id']} (real)"
             decks.append({
                 "name": real_name, "archetype": row["archetype"] or "midrange",
                 "source": row["source"],

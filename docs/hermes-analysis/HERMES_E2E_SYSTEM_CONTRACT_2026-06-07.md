@@ -564,7 +564,9 @@ Contrato esperado:
 - `battle_analyst_v8.py` compila;
 - testes de battle passam;
 - `card_oracle_cache` existe e tem cobertura minima;
-- scripts do optimizer existem.
+- scripts do optimizer existem;
+- script de sync de oponentes reais existe;
+- script de auditoria de cobertura de efeitos existe.
 
 Saida esperada:
 
@@ -629,6 +631,48 @@ Limites conhecidos que ainda nao devem virar promessa de produto:
 - prevention/replacement effects complexos continuam aproximados;
 - cards especificos fora de `KNOWN_CARDS`/`known_cards_generated.json` dependem de
   tags e heuristicas.
+
+### `battle_effect_coverage_audit.py`
+
+Funcao:
+
+- auditar o deck alvo e os oponentes reais que entrarao no battle;
+- classificar cada carta por fonte de efeito: `handcrafted`, `generated`, `tag`,
+  `effect_map`, `type_land`, `type_creature` ou `unknown`;
+- listar riscos de regra antes de confiar em uma decisao do optimizer.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--sqlite-db`, caminho do `knowledge.db`;
+- `--opponent-limit`, default `12`;
+- `--seed`, seed fixa para reproduzir os mesmos oponentes;
+- `--report`, grava Markdown e JSON em `master_optimizer_reports`;
+- `--fail-on-high-risk`, modo estrito para bloquear quando houver risco alto.
+
+Flags importantes:
+
+- `unknown_effect`: carta sem efeito reconhecido;
+- `heuristic_effect`: efeito veio de tag/gerador/mapa amplo, nao de regra explicita;
+- `oracle_target_removal_mismatch`: texto parece removal, mas efeito nao modela isso;
+- `oracle_counter_mismatch`: texto parece counter, mas efeito nao modela isso;
+- `oracle_silence_mismatch`: texto limita casts/respostas, mas efeito nao modela isso;
+- `temporary_effect_not_explicit`: texto ate o fim do turno sem regra explicita;
+- `trigger_not_explicit`: trigger `whenever` sem regra explicita;
+- `cast_permission_not_explicit`: permissao de cast alternativa sem regra explicita;
+- `copy_effect_mismatch`: texto de copia sem efeito de copia;
+- `land_utility_ability_not_modeled`: land funciona como land, mas habilidade extra
+  como channel/ativacao ainda nao esta modelada;
+- `land_effect_mismatch`: land deixou de ser tratada como land, bug de simulacao.
+
+Politica:
+
+- Nunca declarar que o battle cobre "todas as regras" se a auditoria tiver
+  `unknown_effect`, mismatch de oracle ou heuristicas relevantes sem excecao assinada.
+- O optimizer pode continuar rodando com heuristicas, mas o handoff precisa citar
+  o relatorio de cobertura e os riscos que influenciam o candidato aprovado.
+- Lands sao modeladas primariamente como lands. Habilidades utilitarias de lands
+  entram como lacuna auditada, nao como spell gratis.
 
 ### `slot_optimizer.py`
 
@@ -961,6 +1005,24 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.
   --report
 ```
 
+### Fase 6.5 — battle effect coverage audit
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py \
+  --deck-id 6 \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --opponent-limit 12 \
+  --seed 20260607 \
+  --report
+```
+
+Bloquear confianca alta se:
+
+- houver `unknown_effect` em cartas que aparecem nos matchups relevantes;
+- houver `oracle_*_mismatch`;
+- o candidato aprovado depender diretamente de carta com `heuristic_effect`;
+- o ganho medido for pequeno e houver muitos triggers/temporarios nao explicitos.
+
 ### Fase 7 — handoff
 
 ```bash
@@ -1025,7 +1087,7 @@ Snapshot vivo observado em 2026-06-07:
 | `lorehold-knowncards-generator` | every 120m | true | Gera `known_cards_generated.json` com env seguro e escrita atomica. |
 | `lorehold-knowncards-validator` | every 30m | true | Valida/expande known cards. |
 | `manaloom-master-optimizer-preflight` | every 20m | true | Mantem Hermes pronto, sem apply. |
-| `manaloom-master-optimizer-auto-cycle` | every 180m | true | Ciclo seguro: sync meta decks PG, sync metadata, preflight, baseline, scan, confirmation, full confirmation, replay audit, apply Hermes-local max 1 swap, post-apply gate e rollback se piorar. |
+| `manaloom-master-optimizer-auto-cycle` | every 180m | true | Ciclo seguro: sync meta decks PG, sync metadata, preflight, baseline, scan, confirmation, full confirmation, replay audit, coverage audit, apply Hermes-local max 1 swap, post-apply gate e rollback se piorar. |
 | `manaloom-master-optimizer-slot-scan` | every 720m | false | Mantido pausado para nao duplicar o auto-cycle. |
 | `manaloom-master-optimizer-end-to-end` | every 1440m | false | Pipeline manual/supervisionado para prova completa sob demanda. |
 | `lorehold-universal-optimizer` | every 10m | false | Deve ficar pausado; risco de auto-apply legado. |
@@ -1045,6 +1107,7 @@ correta de validar job e olhar:
 
 - faz `git fetch/checkout/pull --ff-only`;
 - carrega `/opt/data/secrets/manaloom-postgres.env`;
+- roda sync PG `meta_decks` -> SQLite `learned_decks`;
 - roda sync PG -> SQLite para metadata;
 - roda preflight;
 - copia ultimo report para artefato latest.
@@ -1073,6 +1136,7 @@ correta de validar job e olhar:
 - roda confirmation;
 - roda full confirmation a partir dos candidatos da confirmation;
 - roda replay audit;
+- roda auditoria de cobertura dos efeitos usados no battle;
 - gera handoff Hermes;
 - aplica no maximo um swap no SQLite Hermes local se passar full confirmation e delta minimo;
 - roda baseline pos-apply;

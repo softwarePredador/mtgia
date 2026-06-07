@@ -8,6 +8,8 @@ ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/herm
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-/opt/data/secrets/manaloom-postgres.env}"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
 
+META_DECK_LIMIT="${MANALOOM_META_DECK_SYNC_LIMIT:-120}"
+META_DECK_MIN_CARDS="${MANALOOM_META_DECK_SYNC_MIN_CARDS:-80}"
 BASELINE_GAMES="${MANALOOM_AUTO_BASELINE_GAMES:-50}"
 SLOT_GAMES="${MANALOOM_AUTO_SLOT_GAMES:-10}"
 SLOT_MAX_PER_CATEGORY="${MANALOOM_AUTO_SLOT_MAX_PER_CATEGORY:-12}"
@@ -67,6 +69,8 @@ apply_out="$(mktemp)"
 {
   echo "== auto cycle config =="
   echo "deck_id=$DECK_ID"
+  echo "meta_deck_limit=$META_DECK_LIMIT"
+  echo "meta_deck_min_cards=$META_DECK_MIN_CARDS"
   echo "baseline_games=$BASELINE_GAMES"
   echo "slot_games=$SLOT_GAMES"
   echo "slot_max_per_category=$SLOT_MAX_PER_CATEGORY"
@@ -75,6 +79,13 @@ apply_out="$(mktemp)"
   echo "full_confirm_games=$FULL_CONFIRM_GAMES"
   echo "apply_min_delta=$APPLY_MIN_DELTA"
   echo "post_apply_min_delta=$POST_APPLY_MIN_DELTA"
+
+  echo "== pg meta decks sync =="
+  python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
+    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --limit "$META_DECK_LIMIT" \
+    --min-cards "$META_DECK_MIN_CARDS" \
+    --apply
 
   echo "== metadata sync =="
   python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
@@ -132,6 +143,14 @@ apply_out="$(mktemp)"
   echo "== replay audit before apply =="
   python3 "$SCRIPT_DIR/replay_decision_auditor.py" \
     --deck-id "$DECK_ID" \
+    --report
+
+  echo "== battle effect coverage audit before apply =="
+  python3 "$SCRIPT_DIR/battle_effect_coverage_audit.py" \
+    --deck-id "$DECK_ID" \
+    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --opponent-limit "${MANALOOM_BATTLE_REAL_OPPONENT_LIMIT:-12}" \
+    --seed "${MANALOOM_BATTLE_REAL_OPPONENT_SEED:-auto-cycle}" \
     --report
 
   echo "== handoff before apply =="

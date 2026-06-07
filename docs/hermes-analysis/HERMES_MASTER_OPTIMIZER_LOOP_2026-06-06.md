@@ -250,9 +250,31 @@ Hardening de regras de battle em Hermes, 2026-06-07:
 - Replay estruturado Hermes: `/opt/data/artifacts/hermes_master_optimizer/replay_rules_hardening_20260607.txt`, com oponentes reais `Sisay`, `Urza` e `Magda`.
 - Ainda nao e rules engine 100% MTG: custos modais completos, todos os tipos de replacement/prevention effects, escolha humana de miracle, alvo modal exato e todas as camadas de continuous effects continuam simplificados.
 
+Auditoria de cobertura de efeitos em Hermes, 2026-06-07:
+
+- Problema revisado: corrigir efeitos do Lorehold nao garante que os oponentes reais estejam modelados corretamente; decks reais trazem centenas de triggers, efeitos temporarios, permissoes de cast e lands utilitarias.
+- Novo script versionado: `battle_effect_coverage_audit.py`.
+- A auditoria classifica cada carta por fonte de efeito: `handcrafted`, `generated`, `tag`, `effect_map`, `type_land`, `type_creature` ou `unknown`.
+- `battle_analyst_v8.py` agora preserva `HANDCRAFTED_KNOWN_CARDS` para diferenciar regras escritas a mao de entradas geradas.
+- `get_card_effect()` agora normaliza erros perigosos via oracle text: target removal, counterspells, board wipe de nonland permanent e falso `silence_opponents` causado por "can't be countered".
+- Lands agora sao tratadas primariamente como `land`; habilidades utilitarias como channel/ativacoes entram no relatorio como `land_utility_ability_not_modeled`, nao como removal/counter gratis.
+- Nomes de oponentes reais agora incluem o id do deck aprendido, evitando relatorios que pareciam somar dois decks diferentes do mesmo comandante em uma lista de 198 cartas.
+- Cron `manaloom-master-optimizer-preflight` agora sincroniza `meta_decks` do Postgres real antes do sync de metadata.
+- Cron `manaloom-master-optimizer-auto-cycle` agora roda sync de `meta_decks` antes de metadata e gera auditoria de cobertura antes do handoff/apply.
+- Validacao local: `py_compile` aprovado, 31 testes de battle passaram, preflight local aprovado.
+- Validacao Hermes container: `bash -n` dos scripts de cron aprovado, `py_compile` aprovado, 31 testes de battle passaram, preflight aprovado.
+- Auditoria fresca Hermes: `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260607_180414.md`.
+- JSON fresco Hermes: `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260607_180414.json`.
+- Snapshot da auditoria Hermes: 12 oponentes reais, 1288 instancias de cartas, 554 cartas unicas.
+- Fontes de efeito na auditoria Hermes: `handcrafted=98`, `generated=599`, `tag=71`, `effect_map=123`, `type_land=377`, `unknown=20`.
+- Flags de risco na auditoria Hermes: `heuristic_effect=793`, `trigger_not_explicit=133`, `temporary_effect_not_explicit=63`, `cast_permission_not_explicit=77`, `land_utility_ability_not_modeled=48`, `oracle_target_removal_mismatch=9`, `oracle_silence_mismatch=1`, `copy_effect_mismatch=1`, `unknown_effect=20`.
+- Conclusao operacional: o battle ainda nao cobre "todas as regras sem excecao"; agora ele mede a lacuna e impede que a equipe trate heuristica como regra completa.
+- Proxima evolucao correta: transformar as cartas mais influentes marcadas pela auditoria em regras explicitas de `KNOWN_CARDS`, começando por cartas que aparecem nos candidatos aprovados, nos commanders oponentes e nos flags `oracle_*_mismatch`.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py`

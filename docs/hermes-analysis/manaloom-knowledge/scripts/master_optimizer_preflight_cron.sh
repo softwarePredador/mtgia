@@ -30,6 +30,13 @@ if [[ -f "$SECRET_ENV" ]]; then
   export PGPASSWORD="${PGPASSWORD:-${DB_PASS:-}}"
 fi
 
+meta_decks_log="$ARTIFACT_DIR/meta_decks_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
+python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
+  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+  --limit "${MANALOOM_META_DECK_SYNC_LIMIT:-120}" \
+  --min-cards "${MANALOOM_META_DECK_SYNC_MIN_CARDS:-80}" \
+  --apply | tee "$meta_decks_log"
+
 sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --sqlite-db "$SCRIPT_DIR/knowledge.db" \
@@ -44,5 +51,6 @@ if [[ -n "$latest_report" ]]; then
 fi
 
 echo "master_optimizer_preflight=ok"
+echo "meta_decks_log=$meta_decks_log"
 echo "sync_report=$sync_report"
 echo "preflight_log=$preflight_log"
