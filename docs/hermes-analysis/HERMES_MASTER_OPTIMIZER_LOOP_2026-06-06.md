@@ -146,6 +146,20 @@ Validacao full-flow Lorehold em Hermes, 2026-06-07:
 - Nenhum swap foi aplicado automaticamente.
 - Como `Fork` e `Harness the Storm` cortam a mesma carta, apenas um deles pode ser aplicado sem nova rodada de baseline/confirmacao.
 
+Revalidacao de `Fork` em Hermes, 2026-06-07:
+
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_fork_revalidation_20260607_153114/`.
+- O SQLite Hermes atual nao tinha mais tabelas `optimizer_*`/`slot_benchmarks`/`swap_benchmarks`, entao a evidencia foi recriada antes de qualquer apply.
+- Baseline fresco id `1`: `86.7%` WR, `260W/6L/34S`, 300 jogos.
+- Slot scan focado em `engine` testou 15 candidatos legais sobre o corte `Past in Flames`.
+- `Fork` revalidou com `86.7%` WR, delta `+0.0pp`, `260W/9L/31S`.
+- `master_optimizer_apply.py` bloqueou corretamente o apply de `Fork` porque ele nao atingiu o delta minimo seguro de `+0.5pp`.
+- Nenhuma mutacao foi feita: `Past in Flames` continua presente e `Fork` continua ausente.
+- Confirmacao adicional encontrou candidato melhor: `Reversal of Fortune` sobre `Past in Flames`, `90.7%` WR, delta `+4.0pp`, `272W/4L/24S`.
+- `Flare of Duplication` tambem passou: `89.0%` WR, delta `+2.3pp`, `267W/5L/28S`.
+- `Underworld Breach` foi rejeitado/retest: `86.3%` WR, delta `-0.4pp`, alem de warning de Game Changer.
+- Proxima decisao recomendada: escolher `Reversal of Fortune` se o objetivo for ganho medido; nao forcar `Fork` sem uma razao de design/deck owner.
+
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
 Arquivos principais:
