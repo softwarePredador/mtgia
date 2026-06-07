@@ -4,7 +4,7 @@ Updated: 2026-06-07
 
 ## Current operational snapshot
 
-Hermes currently has 22 scheduler jobs.
+Hermes currently has 23 scheduler jobs.
 
 Healthy script jobs:
 
@@ -20,8 +20,9 @@ Paused intentionally:
 
 - `manaloom-manager-watchdog` — superseded by report-only governance.
 - `lorehold-knowncards-generator` — paused after permission failure; validator now expands the pool.
-- `lorehold-universal-optimizer` — paused because `universal_optimizer.py` has auto-apply behavior and permission failures.
+- `lorehold-universal-optimizer` — paused; schedule remains `every 10m`, but it must stay disabled because `universal_optimizer.py` has auto-apply behavior and permission failures.
 - `manaloom-master-optimizer-slot-scan` — ready but paused until an approved baseline is frozen.
+- `manaloom-master-optimizer-end-to-end` — manual-only pipeline; schedule placeholder is `every 1440m`, but it is disabled/paused for supervised runs only.
 
 Agent/report jobs currently failing mostly because of provider usage limits:
 
@@ -243,31 +244,41 @@ Purpose:
 
 Current state:
 
-- Missing.
+- Implemented as `master_optimizer_apply.py`.
 - Old `universal_optimizer.py` had auto-apply and is paused.
-- Current approved handoff is manual-review only; no deck mutation happened.
+- One manual approved apply was validated on Hermes local SQLite only.
+- Applied `Sticky Fingers` over `Storm-Kiln Artist` after full confirmation.
+- Before/after hashes and rollback path were generated.
+- Post-apply deck state was validated at 100 cards, 35 lands and CMC 2.5.
+- No production database was mutated.
+
+Post-apply proof:
+
+- Report: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_apply_hermes_20260607_041841.md`.
+- Post-apply baseline: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_post_apply_baseline_hermes_20260607_041859.md`.
+- Post-apply battle: 47.5% WR, 57W/63L/0S, 120 games.
 
 ## What is missing to build the best Lorehold deck
 
-1. Add rollback-aware apply script for approved swaps.
-2. Add turn-by-turn replay decision auditor, replacing aggregate-only audit.
-3. Convert `kc_validator.py` conflicts into a report and review queue.
-4. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
-5. Resolve provider 429 or slow/pause agent jobs so they do not fail noisily.
-6. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
-7. Re-run full confirmation with a larger sample before applying to a real product-facing deck.
+1. Add turn-by-turn replay decision auditor, replacing aggregate-only audit.
+2. Convert `kc_validator.py` conflicts into a report and review queue.
+3. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
+4. Resolve provider 429 or slow/pause agent jobs so they do not fail noisily.
+5. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
+6. Add an explicit production/apply handoff if a Hermes-approved swap should ever be copied to a product-facing deck.
+7. Re-run confirmation with larger sample sizes before product-facing mutation.
 
 ## Recommended next implementation order
 
-1. Add `master_optimizer_apply.py` with rollback file and manual approval input.
-2. Add structured replay event capture to `battle_analyst_v8.py`.
-3. Upgrade `replay_decision_auditor.py` from aggregate audit to turn-by-turn audit.
-4. Add a conflict report for `kc_validator.py`.
-5. Re-run full confirmation at higher sample size before final deck mutation.
+1. Add structured replay event capture to `battle_analyst_v8.py`.
+2. Upgrade `replay_decision_auditor.py` from aggregate audit to turn-by-turn audit.
+3. Add a conflict report for `kc_validator.py`.
+4. Add production/apply handoff rules so Hermes local SQLite never silently mutates app-facing decks.
+5. Re-run confirmation at higher sample size before any product-facing mutation.
 
 ## Practical verdict
 
-The Hermes pipeline now has a functional safe loop through handoff:
+The Hermes pipeline now has a functional safe loop through manual apply on Hermes local SQLite:
 
 - sync metadata;
 - preflight;
@@ -277,10 +288,13 @@ The Hermes pipeline now has a functional safe loop through handoff:
 - full confirmation;
 - aggregate replay audit;
 - manual-review handoff.
+- rollback-aware manual apply;
+- post-apply battle verification.
 
-It produced one approved manual-review swap for Lorehold:
+It produced and applied one approved Hermes-local swap for Lorehold:
 
 - `Sticky Fingers` over `Storm-Kiln Artist`;
 - full confirmation: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
+- post-apply baseline: 47.5% WR, 57W/63L/0S, 120 games.
 
-It still must not auto-apply. The remaining gap is a rollback-aware apply script plus richer turn-by-turn replay audit.
+It still must not auto-apply. The remaining gap is richer turn-by-turn replay audit and a separate approval path before copying any Hermes-local result into a product-facing deck.

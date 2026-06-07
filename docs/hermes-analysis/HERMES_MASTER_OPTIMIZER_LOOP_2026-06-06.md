@@ -63,9 +63,32 @@ Validacao end-to-end real em Hermes, 2026-06-07:
 - Full confirmation real: `55.8%` WR, `67W/53L/0S`, delta `+10.8pp`, 120 jogos.
 - Relatorio: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_confirmation_hermes_20260607_041142.md`.
 - Handoff: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_handoff_hermes_20260607_041200.md`.
-- O deck foi restaurado apos o teste: `Sticky Fingers` nao ficou no deck; `Storm-Kiln Artist` permaneceu.
+- O deck foi restaurado apos os testes de scan/confirmacao: nenhuma mutacao permanente ocorreu nessas fases.
 
-Importante: ainda nao houve apply automatico. O estado correto agora e `approved_swaps_ready_for_manual_apply`, aguardando script de apply com rollback.
+Validacao de apply manual seguro em Hermes, 2026-06-07:
+
+- Script `master_optimizer_apply.py` criado com rollback antes de alterar deck.
+- Apply real executado apenas no SQLite local do Hermes, sem mutar banco de producao.
+- Swap aplicado: `Sticky Fingers` entrou sobre `Storm-Kiln Artist`.
+- Confirmacao usada para aprovar: `55.8%` WR, delta `+10.8pp`, `67W/53L/0S`, 120 jogos.
+- Hash antes: `a5adcf8e0bb65cb293ff375320ff41b3c3a6162e60498effdc1be1b0d6f8a84e`.
+- Hash depois: `4af984e0cea47c781321a9fe4e99f579d02f70dd2a5f8c980c94463abd5563ee`.
+- Estado do deck apos apply: 100 cartas, 35 lands, CMC medio 2.5.
+- Verificacao direta no deck: `Sticky Fingers` presente com count `1`; `Storm-Kiln Artist` ausente com count `0`.
+- Verificacao direta em `swap_benchmarks`: linha `full_confirmation` marcada como `applied=1`.
+- Rollback gerado no servidor: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_rollback_20260607T041841557329+0000.json`.
+- Rollback nao versionado localmente porque contem decklist completa.
+- Relatorio local: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_apply_hermes_20260607_041841.md`.
+
+Validacao pos-apply em Hermes, 2026-06-07:
+
+- Baseline novo rodado apos a mutacao: baseline id `3`.
+- Total: 120 jogos contra 12 oponentes reais aprendidos.
+- Resultado pos-apply: `47.5%` WR, `57W/63L/0S`.
+- Deck continua valido: 100 cartas, 35 lands, CMC medio 2.5.
+- Relatorio local: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_post_apply_baseline_hermes_20260607_041859.md`.
+
+Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
 Arquivos principais:
 
@@ -74,6 +97,7 @@ Arquivos principais:
 - `docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
 
