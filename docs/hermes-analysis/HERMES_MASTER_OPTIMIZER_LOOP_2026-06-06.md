@@ -97,10 +97,15 @@ Hardening final em Hermes, 2026-06-07:
 - Heuristica de combate corrigida: alvo default agora prioriza vida baixa/ameaca, nao maior vida.
 - Heuristica de removal corrigida: removal agora prioriza comandante/maior poder, nao alvo aleatorio.
 - `kc_validator.py` agora grava fila de conflitos em Markdown/JSON.
-- Validacao KC fresca: 500 cartas validadas, 0 correcoes automaticas, 2 conflitos para revisao.
-- Relatorio KC: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_081557.md`.
-- Jobs de agente bloqueados por provider 429 foram pausados com backup de `/opt/data/cron/jobs.json`.
+- Validacao KC final: 1970 cartas validadas, 3 correcoes automaticas, 0 conflitos para revisao.
+- Relatorio KC final: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_125916.md`.
+- `kc_validator.py` passou a aceitar `KC_VALIDATOR_CHECK_LIMIT=0` para auditoria completa e usa overrides manuais documentados para cartas cuja leitura simplificada do simulador precisa ser deterministica.
+- Jobs de agente bloqueados por provider 429 foram inicialmente pausados com backup de `/opt/data/cron/jobs.json`.
 - Relatorio provider backoff: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
+- Provider foi migrado para `deepseek-pro` com modelo funcional `deepseek-v4-pro` e endpoint `https://opencode.ai/zen/go/v1`.
+- O valor literal `opencode` foi testado como modelo e falhou com `HTTP 404`; ele nao deve ser usado como model id.
+- Prova provider: `manaloom-hermes-normal-audit` terminou `ok` em `2026-06-07T12:49:11.907701+00:00`.
+- Relatorio provider: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_deepseek_pro_20260607_124911.md`.
 - Handoff separado para produto criado via `master_optimizer_product_handoff.py`.
 - Handoff produto gerado com status `needs_product_owner_approval`; nenhuma mutacao de producao foi feita.
 - Relatorio produto: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_product_handoff_20260607_081454.md`.
@@ -282,7 +287,7 @@ Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix n
 
 Proximos passos agora sao de maturidade, nao de infraestrutura basica:
 
-- revisar os 2 conflitos do KC report (`Storm of Souls`, `Radiant Scrollwielder`);
 - aumentar amostra de replay audit para mais seeds quando for promover swap a produto;
 - criar um apply product-facing separado apenas depois do checklist `needs_product_owner_approval`;
-- manter jobs 429 pausados ate cota/provider voltar, para nao poluir o scheduler.
+- limpar prompts antigos de jobs que ainda citam IDs/schema legados;
+- considerar limpar `last_error` antigos apenas apos cada job rodar de novo com `last_run_at` posterior a `2026-06-07T12:49:11+00:00`.

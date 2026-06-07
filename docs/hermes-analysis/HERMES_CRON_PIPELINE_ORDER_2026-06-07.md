@@ -24,7 +24,7 @@ Paused intentionally:
 - `manaloom-master-optimizer-slot-scan` — ready but paused until an approved baseline is frozen.
 - `manaloom-master-optimizer-end-to-end` — manual-only pipeline; schedule placeholder is `every 1440m`, but it is disabled/paused for supervised runs only.
 
-Agent/report jobs paused by provider 429 backoff:
+Provider-backed agent/report jobs:
 
 - `manaloom-hermes-normal-audit`
 - `manaloom-commander-knowledge-deep`
@@ -37,11 +37,17 @@ Agent/report jobs paused by provider 429 backoff:
 - `mtg-rules-auditor`
 - `manaloom-cron-governor-report`
 
-Provider backoff evidence:
+Current provider state:
 
-- Script: `docs/hermes-analysis/manaloom-knowledge/scripts/hermes_provider_backoff.py`.
-- Report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
-- Backup on server: `/opt/data/cron/jobs.json.bak_provider_backoff_20260607_081300`.
+- Provider-backed jobs were initially paused by the provider 429 backoff script.
+- They were then migrated to provider `deepseek-pro`, model `deepseek-v4-pro`.
+- Working base URL is `https://opencode.ai/zen/go/v1`.
+- The literal model value `opencode` returned `HTTP 404` and is not a valid model id for the current setup.
+- Validation proof: `manaloom-hermes-normal-audit` finished `ok` at `2026-06-07T12:49:11.907701+00:00`.
+- Provider report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_deepseek_pro_20260607_124911.md`.
+- Backoff report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
+- Server backup from the original backoff: `/opt/data/cron/jobs.json.bak_provider_backoff_20260607_081300`.
+- Some jobs may still show stale `last_error` values until their next scheduled run; judge them by `last_run_at`.
 
 ## Current Lorehold evidence
 
@@ -108,8 +114,8 @@ Purpose:
 Missing hardening:
 
 - Conflicts from `kc_validator.py` are now persisted as actionable review items.
-- Latest report: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_081557.md`.
-- Latest result: 500 cards validated, 0 corrections, 2 conflicts.
+- Latest report: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_125916.md`.
+- Latest result: 1970 cards validated, 3 corrections, 0 conflicts.
 
 ### 3. Validate rules and simulator readiness
 
@@ -128,7 +134,7 @@ Purpose:
 
 Current state:
 
-- Agent jobs that were blocked by provider 429 are paused by backoff, instead of failing noisily.
+- Provider-backed jobs have been migrated to `deepseek-pro` and one real audit job completed successfully after the endpoint fix.
 - Some prompts still reference legacy/decommissioned cron IDs or old schema assumptions.
 
 ### 4. Freeze current baseline
@@ -291,19 +297,17 @@ Current state:
 
 ## What is missing to build the best Lorehold deck
 
-1. Review the 2 KC conflicts and decide whether classification rules need adjustment.
-2. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
-3. Resume provider-backed agent jobs only after quota/backoff is resolved.
-4. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
-5. Re-run confirmation and replay audit with larger sample sizes before product-facing mutation.
-6. Execute product apply only through the product handoff checklist.
+1. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
+2. Let provider-backed jobs cycle naturally and only judge errors whose `last_run_at` is after the deepseek-pro fix.
+3. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
+4. Re-run confirmation and replay audit with larger sample sizes before product-facing mutation.
+5. Execute product apply only through the product handoff checklist.
 
 ## Recommended next implementation order
 
-1. Review KC conflicts and patch classification rules if needed.
-2. Update stale provider-backed agent prompts while they remain paused.
-3. Run larger confirmation plus larger replay audit before any product-facing mutation.
-4. If approved, run product backup/dry-run/smoke-test flow from the product handoff.
+1. Update stale provider-backed agent prompts now that provider execution is healthy again.
+2. Run larger confirmation plus larger replay audit before any product-facing mutation.
+3. If approved, run product backup/dry-run/smoke-test flow from the product handoff.
 
 ## Practical verdict
 
@@ -320,8 +324,8 @@ The Hermes pipeline now has a functional safe loop through manual apply on Herme
 - rollback-aware manual apply;
 - post-apply battle verification.
 - turn-by-turn replay audit;
-- KC conflict report;
-- provider 429 backoff;
+- KC conflict report with 0 remaining conflicts;
+- provider 429 backoff plus deepseek-pro recovery;
 - product-facing handoff gate.
 
 It produced and applied one approved Hermes-local swap for Lorehold:
@@ -330,4 +334,4 @@ It produced and applied one approved Hermes-local swap for Lorehold:
 - full confirmation: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
 - post-apply baseline: 47.5% WR, 57W/63L/0S, 120 games.
 
-It still must not auto-apply. The remaining gap is operational review: KC conflicts, stale prompt cleanup, larger samples and explicit product approval before copying any Hermes-local result into a product-facing deck.
+It still must not auto-apply. The remaining gap is operational review: stale prompt cleanup, larger samples and explicit product approval before copying any Hermes-local result into a product-facing deck.
