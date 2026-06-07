@@ -2497,3 +2497,278 @@ The 12.5pp improvement across 6 swaps was only possible because each swap was in
 ---
 
 > **Next Cron Cycle (2026-06-06 ~04:30 UTC):** **BREAKTHROUGH findings:** (1) NEW: **Slot Optimizer v3 delivers +12.5pp WR improvement** — 77.0% → 89.5% across 6 battle-validated swaps (Phases 1-3). The most significant single-cycle improvement in ManaLoom history. (2) NEW: **CMC compression is the dominant vector** — Phase 2 alone delivered +11.2pp by replacing CMC 5-10 cards with CMC 0-5 alternatives. (3) NEW: **Land destruction viable in Boros** — Strip Mine + Wasteland (+4.4pp combined) as asymmetrical cEDH tool. (4) NEW: **Instant-speed copy engines superior** — Radiant Scrollwielder (+5.4pp) replaces sorcery-speed enchantments. (5) NEW: **Systematic swap testing proven** — test-before-apply methodology must be integrated into Evolution pipeline. (6) Battle config vs DB state reconciliation now CRITICAL — blocks battle-validated swap recommendations for other commanders. (7) Pipeline remains decommissioned — Slot Optimizer is a manual tool, not cron-integrated. (8) Data integrity crisis for non-Lorehold decks persists. **Priority order:** Task 1 (battle-validate swaps in Evolution — P0, methodology proven with +12.5pp) → Task 2 (CMC compression heuristic — P1) → Task 3 (land destruction detection — P1) → Task 4 (battle config reconciliation — P1, blocks Task 1) → Task 5 (resource-generating interaction flag — P2). All tasks are informed by Phase 1-3 battle data.
+
+---
+
+## 51. 🆕 MASTER OPTIMIZER — FIRST AUTOMATED BATTLE-VALIDATED PIPELINE (2026-06-07 ~14:44 UTC)
+
+### 51.1 Pipeline Architecture — Test-Before-Apply Systematized
+
+The `master_optimizer_apply.py` pipeline represents the **first automated implementation** of the Slot Optimizer v3's test-before-apply methodology (§49). It ran a complete cycle on 2026-06-07:
+
+```
+Preflight (13:10 UTC) → Baseline Freeze (13:22, WR=86.0%) 
+→ Baseline Battle (14:26, WR=87.0%, baseline_id=3) 
+→ Slot Scan (50 candidates) → Quality Gate (50 passed)
+→ Full Confirmation (5 tested) → Handoff (2 approved)
+→ Replay Audit (0 critical/high findings)
+```
+
+**This is the first fully automated battle-validated optimization pipeline in ManaLoom.** The Slot Optimizer v3 (§49) was a manual tool; the Master Optimizer runs autonomously.
+
+### 51.2 Baseline State — Deck ID 6, Third Baseline
+
+| Metric | Value |
+|:-------|:-----:|
+| Deck ID | 6 |
+| Baseline ID | 3 (third baseline created) |
+| Deck Hash | `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811` |
+| Cards | 100 |
+| Lands | 33 |
+| Ramp | 19 |
+| Removal | 4 |
+| Avg CMC | 2.91 |
+| Games per opponent | 50 |
+| Opponents | 6 |
+| Total Games | 300 |
+| Overall WR | **87.0%** |
+| Record | 261W / 10L / 29S |
+
+**Matchup performance (baseline):**
+
+| Opponent | WR | W | L | S | Avg Turn |
+|:---------|:---:|:---:|:---:|:---:|:--------:|
+| Aggro (Krenko) | 88.0% | 44 | 3 | 3 | 21.2 |
+| Control (Atraxa) | 84.0% | 42 | 0 | 8 | 17.3 |
+| Combo (Kinnan) | 90.0% | 45 | 1 | 4 | 18.3 |
+| Midrange (Korvold) | 80.0% | 40 | 5 | 5 | 20.9 |
+| Spellslinger (Niv) | 88.0% | 44 | 1 | 5 | 18.1 |
+| Stax (Winota) | 92.0% | 46 | 0 | 4 | 17.8 |
+
+**Key observation:** 87.0% WR is consistent with the 84.5% aggregate from §46 (Battle Analyst v8, 6 runs, 3,600 games). The deck has stabilized at a high WR tier. However, avg win turns of 17-21 are **too slow for cEDH** — bracket 4 decks should close by turns 5-8. The high WR is achieved by preventing opponents from winning (stax + protection), not by fast combo execution.
+
+### 51.3 Quality Gate — 50 Candidates Scanned, All Passed
+
+The quality gate scanned 50 swap candidates across 7 categories. All passed the initial scan with WRs ranging from 86.7% to 95.0%:
+
+| Category | Candidates | Best Scan WR | Examples |
+|:---------|:----------:|:------------:|:---------|
+| Engine | 13 | 95.0% | Fork, Harness the Storm → Past in Flames |
+| Tutor | 7 | 95.0% | Expedition Map → Imperial Recruiter |
+| Ramp | 6 | 93.3% | Lotus Bloom, Astral Cornucopia → Mana Geyser |
+| Removal | 5 | 93.3% | Erode, Needle Drop → Generous Gift |
+| Draw | 4 | 90.0% | Wheel of Fate, Tormenting Voice → Reforge the Soul |
+| Wipe | 5 | 91.7% | Final Showdown, Starfall Invocation → Blasphemous Act |
+| Protection | 6 | 91.7% | Blacksmith's Skill → Rise of the Eldrazi |
+
+**Warnings:** 2 candidates flagged for Game Changer additions (Lion's Eye Diamond, Mishra's Workshop → would push bracket ≥ 5).
+
+### 51.4 Full Confirmation — 5 Candidates Tested, 2 Approved
+
+The confirmation phase ran 50-game simulations (4-player, 6 opponents) for 5 candidates:
+
+| Add | Cut | Category | Scan WR | Confirm WR | Delta | Record | Verdict |
+|:----|:----|:---------|:-------:|:----------:|:-----:|:------:|:--------|
+| **Fork** | **Past in Flames** | engine | 95.0% | **88.0%** | **+1.0pp** | 264W/6L/30S | ✅ **APPROVED** |
+| **Harness the Storm** | **Past in Flames** | engine | 95.0% | **88.0%** | **+1.0pp** | 264W/8L/28S | ✅ **APPROVED** |
+| Expedition Map | Imperial Recruiter | tutor | 95.0% | 87.3% | +0.3pp | 262W/7L/31S | ⚠️ Marginal |
+| Lotus Bloom | Mana Geyser | ramp | 93.3% | 84.7% | **-2.3pp** | 254W/9L/37S | ❌ Rejected |
+| Astral Cornucopia | Mana Geyser | ramp | 93.3% | 84.3% | **-2.7pp** | 253W/12L/35S | ❌ Rejected |
+
+**Key insight:** The quality gate's quick scan (25 games) showed inflated WRs (93-95%) for all candidates. The full confirmation (50 games) revealed that only 2 candidates maintained positive delta. The ramp swaps (Lotus Bloom, Astral Cornucopia → Mana Geyser) were net-negative despite passing initial scans. **This validates the two-phase approach: quick scan for filtering, full confirmation for decision.**
+
+**Anti-pattern detected:** Quality Gate scan WRs are systematically inflated. The gap between scan WR and confirm WR is 5-10pp for most candidates. This suggests the quick scan is too optimistic — likely due to small sample size (25 games vs 50) or different seed variance.
+
+### 51.5 Handoff — Approved Swaps Awaiting Manual Apply
+
+The handoff report documents 2 approved swaps ready for manual application:
+
+| Verdict | Add | Cut | Confirm WR | Delta |
+|:--------|:----|:----|:----------:|:-----:|
+| `approve_manual_review` | Harness the Storm | Past in Flames | 88.0% | +1.0pp |
+| `approve_manual_review` | Fork | Past in Flames | 88.0% | +1.0pp |
+
+**Both swaps target the same cut (Past in Flames).** This is a mutually exclusive pair — only one can be applied (you can't cut Past in Flames twice). The handoff correctly identifies this as `approve_manual_review` rather than `approve_auto_apply`. A human must choose Fork vs Harness the Storm.
+
+**Wait — this is a problem:** Both swaps propose cutting Past in Flames. Past in Flames is one of the deck's core recursion engines (Motor Framework v3.25, §23.5). Cutting it removes the deck's primary graveyard recursion line. The approved swaps replace it with Fork (instant copy, no recursion) or Harness the Storm (sorcery recursion from graveyard, CMC 3). The full confirmation shows both are net-positive (+1.0pp), but losing Past in Flames (flashback ALL instants/sorceries) is a structural change. The Marginal swap (Expedition Map → Imperial Recruiter, +0.3pp) targets a different cut and could be applied independently.
+
+### 51.6 Replay Audit — Turn-by-Turn Clean, Aggregate Stalls
+
+The replay audit analyzed 1,334 structured events across 3 replay files (seeds 42-44). Results:
+
+- **Turn-by-turn: CLEAN** — 0 critical, 0 high, 0 medium, 0 low findings
+- **Aggregate: MEDIUM stalls across all opponents**
+
+| Opponent | Stalls | Avg Win Turn | Concern |
+|:---------|:------:|:------------:|:--------|
+| Aggro (Krenko) | 3 | **21.2** | 🔴 Slowest — approach delayed |
+| Control (Atraxa) | **8** | 17.3 | 🔴 Most stalls |
+| Combo (Kinnan) | 4 | 18.3 | 🟡 |
+| Midrange (Korvold) | 5 | **20.9** | 🔴 Second slowest |
+| Spellslinger (Niv) | 5 | 18.1 | 🟡 |
+| Stax (Winota) | 4 | 17.8 | 🟡 |
+
+**Key insight:** Stalls (opponent eliminated but game not won) are 3-8 per 50 games across all opponents. For Control (Atraxa), 8 stalls in 50 games = 16% stall rate. Combined with 84% WR, this means the deck either wins cleanly or stalls — it rarely loses to opponent threat. The stalls are caused by the deck running out of gas after eliminating opponents but before finding Approach of the Second Sun for the win.
+
+**Root cause:** The deck wins 84-88% of games but takes 17-21 turns. In cEDH, this speed is a structural issue — any opponent resolving a faster combo (turns 3-6) should win before Lorehold can close. The high WR suggests the stax package (Drannith Magistrate) + stack protection (Silence, Orim's Chant, Pyroblast) successfully delays opponents, but the deck itself lacks fast-closing capability. **Approach of the Second Sun needs to be cast twice, and with only 5 tutors, finding it both times takes many turns.**
+
+### 51.7 Deck State Drift — Slot Optimizer Changes NEVER Applied
+
+The Master Optimizer baseline freeze (`baseline_freeze.json`, 13:22 UTC) reveals a critical finding: **the Slot Optimizer v3 Phase 1-3 changes (§49) were TEST-ONLY and never applied to the database.**
+
+| Metric | Slot Optimizer Final (§49.4) | Master Optimizer Baseline (§51.2) | Delta |
+|:-------|:---------------------------:|:---------------------------------:|:-----:|
+| Lands | 34 | 33 | -1 |
+| Ramp | 20 | 19 | -1 |
+| Removal | 5 | 4 | -1 |
+| Avg CMC | 2.54 | 2.91 | **+0.37** |
+| WR | 89.5% | 87.0% | **-2.5pp** |
+
+**The +12.5pp improvement from 6 swaps documented in §49 was achieved in test-only mode.** The Slot Optimizer explicitly enforces: "NEVER modify deck permanently during testing." The changes to Radiant Scrollwielder, Strip Mine, Wasteland, Mogg Infestation, Spiteful Banditry, and Increasing Vengeance exist only in Battle Analyst simulations — not in `deck_cards`.
+
+**This is a pipeline execution gap:** The system found +12.5pp of proven improvement but has no mechanism to apply it. The Master Optimizer handoff mechanism (`approve_manual_review`) could be the bridge, but the Slot Optimizer findings need to be re-tested through the Master Optimizer pipeline for formal approval.
+
+**Baseline freeze cards (partial — key cards present):**
+- Rite of the Dragoncaller (CMC 6, tag=spellslinger) — should be cut (Slot Optimizer would replace)
+- Guttersnipe (CMC 3, tag=wincon) — fragile wincon, 13 total in deck
+- Storm-Kiln Artist (CMC 4, tag=ramp) — solid ramp engine
+- Ancient Den + Great Furnace — artifact land vulnerability persists
+- Mountain + Plains — 2 basic lands present
+
+### 51.8 Signals for App/Backend Logic (from Master Optimizer)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Scan-to-confirm WR inflation** 🆕 | §51.3-51.4 | Quality gate should flag candidates where confirm_WR - scan_WR < -5pp as "inflated_scan" — indicates the quick scan is unreliable for that candidate |
+| **Mutually exclusive swaps detection** 🆕 | §51.5 | Handoff should detect when multiple approved swaps target the same cut card and flag as "choose_one" |
+| **Win turn optimization** 🆕 | §51.6 | Stall rate > 10% with avg win turn > 15 should trigger "speed deficit" — deck wins but is too slow for bracket 4 |
+| **Test-only vs applied state tracking** 🆕 | §51.7 | System must track which optimizations were test-only (Slot Optimizer) vs applied (Master Optimizer handoff). Currently, both live in separate report silos |
+| **Baseline freezing as deck snapshot** 🆕 | §51.2 | `baseline_freeze.json` captures complete deck state at a point in time — enables reliable delta comparison |
+
+---
+
+## 52. 🆕 BATTLE ANALYST v8 — 5 RUNS TODAY (2026-06-07 ~14:44 UTC)
+
+### 52.1 Confirmation Battle Runs
+
+The Master Optimizer's full confirmation phase executed 5 Battle Analyst v8 runs (50 games each, 4-player, 6 generic opponents) with different swap configurations:
+
+| Run | L | R | X | CMC | Instants | WR | Record | Swap Tested |
+|:----|:--:|:--:|:--:|:---:|:--------:|:---:|:------:|:------------|
+| 1 | 33 | 19 | 4 | 2.82 | 21 | **88.0%** | 264W/6L/30S | Fork → Past in Flames |
+| 2 | 33 | 19 | 4 | 2.84 | 20 | **88.0%** | 264W/8L/28S | Harness the Storm → Past in Flames |
+| 3 | 33 | 19 | 4 | 2.82 | 20 | 87.3% | 262W/7L/31S | Expedition Map → Imperial Recruiter |
+| 4 | 33 | 19 | 4 | 2.78 | 20 | 84.7% | 254W/9L/37S | Lotus Bloom → Mana Geyser |
+| 5 | 33 | 19 | 4 | 2.78 | 20 | 84.3% | 253W/12L/35S | Astral Cornucopia → Mana Geyser |
+
+**Win reasoning distribution (run 1, Fork):**
+- elimination: 23 wins (opponent life reduced to zero)
+- approach: 22 wins (Approach of the Second Sun cast twice)
+
+**Win reasoning distribution (run 2, Harness the Storm):**
+- approach: 23 wins
+- elimination: 21 wins
+
+**Key insight:** Approach of the Second Sun remains the primary wincon (~50% of wins), consistent with §46.2 (60-70% in earlier runs). The slight decline from 60-70% to ~50% may reflect the engine swap (Fork/Harness instead of Past in Flames) reducing recursion depth.
+
+### 52.2 Config Stability
+
+The deck config (L=33 R=19 X=4 CMC≈2.82 Instants≈20) is stable across today's 5 runs — only the swap candidate changes. This suggests the Master Optimizer is using a locked baseline, unlike earlier Battle Analyst runs (§14.2) that tested wildly different land/ramp/removal distributions.
+
+**Improvement from earlier cycles:** The Master Optimizer's baseline freeze + locked config prevents the config-drift problem documented in §14.2 (broken configs like L=17 or L=49). The preflight step validates the deck before running battles.
+
+---
+
+## 53. 🆕 KC VALIDATOR — 4 CLASSIFICATION CONFLICTS (2026-06-07 ~12:58 UTC)
+
+### 53.1 Conflict Report
+
+The KC Validator processed 500 cards (1,970 filtered) and found **4 classification conflicts** where the current functional tag disagrees with oracle text analysis:
+
+| Card | Current Tag | Reclassified To | Oracle Sample |
+|:-----|:------------|:----------------|:--------------|
+| **Firesong and Sunspeaker** | `finisher` | `remove_creature` | Red instant/sorcery spells have lifelink. Whenever a white instant/sorcery causes life gain, deal 3 damage to target creature or player. |
+| **Overwhelming Splendor** | `silence_opponents` | `draw_engine` | Enchant player. Creatures enchanted player controls lose all abilities and have base P/T 1/1. Can't activate non-mana/loyalty abilities. |
+| **Kessig Flamebreather** | `finisher` | `creature` | Whenever you cast a noncreature spell, deals 1 damage to each opponent. |
+| **Longshot, Rebel Bowman** | `finisher` | `creature` | Reach. Noncreature spells cost {1} less. Whenever you cast a noncreature spell, Longshot deals 2 damage to each opponent. |
+
+**Analysis:**
+
+1. **Firesong and Sunspeaker** — Tagged as `finisher` but oracle text describes lifelink-granting + conditional removal. A Boros commander that turns burn spells into lifegain + removal. The reclassification to `remove_creature` is narrow — it's a commander-synergy engine, not pure removal. However, `finisher` is incorrect (it doesn't end games directly).
+
+2. **Overwhelming Splendor** — Tagged as `silence_opponents` but oracle text describes creature neutering + ability lock. It's a stax/hate piece, not card draw. The reclassification to `draw_engine` is **incorrect** — the oracle text has no draw effect. This appears to be a classification error in the validator itself.
+
+3. **Kessig Flamebreather** — Tagged as `finisher` but oracle text describes a pinger (1 damage per noncreature spell). It's a spellslinger payoff creature. `creature` is too generic but `finisher` is wrong (it doesn't close games alone). Should be `spellslinger` or `wincon`.
+
+4. **Longshot, Rebel Bowman** — Tagged as `finisher` but oracle text describes a cost reducer + pinger. Same pattern as Kessig. `creature` is too generic. Should be `ramp` (cost reducer) + `wincon` (pinger).
+
+**Key insight:** All 4 conflicts involve cards currently tagged as `finisher` — suggesting the `finisher` tag is over-applied by the classifier. The validator's reclassification heuristics also have weaknesses (Overwhelming Splendor → `draw_engine` is clearly wrong).
+
+### 53.2 Signal for App/Backend Logic
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **`finisher` tag over-application** | §53.1 | Audit classifier for `finisher` tag precision — 4 false positives detected in one run. May affect 10-20% of `finisher` tags system-wide |
+| **Validator reclassification false positives** | §53.1 | Overwhelming Splendor → `draw_engine` is a false positive. The validator's own reclassification needs quality gates |
+| **Conflict review queue** | §53.1 | 4 conflicts not auto-applied (correctly). But no review queue exists — conflicts sit unresolved indefinitely |
+
+---
+
+## 54. 🆕 UPDATED CONCRETE TASKS (2026-06-07 ~15:00 UTC — max 5)
+
+### Task 1: 🔴 P0 — Apply Slot Optimizer Phase 3 Findings via Master Optimizer Pipeline
+
+- **Evidence:** Slot Optimizer v3 (§49) demonstrated +12.5pp WR improvement (77.0% → 89.5%) across 6 swaps: Spiteful Banditry (+3.5pp), Increasing Vengeance (+1.3pp), Radiant Scrollwielder (+5.4pp), Strip Mine (+2.9pp), Mogg Infestation (+2.9pp), Wasteland (+1.5pp). These changes were TEST-ONLY and never applied to `deck_cards` (§51.7). The Master Optimizer baseline (L=33 R=19 X=4 CMC=2.91, WR=87.0%) reflects the pre-optimization state. The Master Optimizer handoff mechanism (§51.5) provides the first automated apply pathway.
+- **What to change:** (a) Re-test all 6 Slot Optimizer swaps through the Master Optimizer pipeline (quality gate → full confirmation → handoff) to produce formal approval records. (b) For swaps with positive confirmation delta, generate handoff entries with `approve_manual_review` or `approve_auto_apply` verdict. (c) Apply approved swaps to `deck_cards` via the handoff's apply mechanism. (d) Re-baseline after application to verify cumulative WR improvement.
+- **Impact:** The single largest known optimization (+12.5pp) becomes real. Transforms test-only findings into applied deck improvements. Validates the Master Optimizer as the bridge between Slot Optimizer discovery and deck mutation.
+- **Risk:** Medium — applying 6 swaps simultaneously may have non-linear interaction effects. The Slot Optimizer tested each swap independently against a fixed baseline, but cumulative CMC reduction and synergy changes require re-validation.
+- **Validation:** Post-apply, Battle Analyst WR should reach 88-90% (close to the 89.5% Slot Optimizer final). `deck_cards` hash must change to reflect applied swaps.
+
+### Task 2: 🟡 P1 — Resolve Mutually Exclusive Swap Detection in Handoff
+
+- **Evidence:** Master Optimizer handoff (§51.5) approved 2 swaps that both target cutting Past in Flames (Fork → Past in Flames, Harness the Storm → Past in Flames). The handoff correctly flags both as `approve_manual_review` but doesn't detect that they're mutually exclusive — you can only cut Past in Flames once. No automated logic prevents both from being published as independent recommendations.
+- **What to change:** Add `detect_mutually_exclusive_swaps()` to the handoff generation. When multiple approved swaps share the same `cut` card: (a) group them as "choose_one" alternatives, (b) rank by confirmation WR delta, (c) present as a single decision with variants. The handoff output should format mutually exclusive groups distinctly from independent swaps.
+- **Impact:** Prevents impossible swap combinations from reaching the apply stage. Reduces manual review burden by pre-grouping alternatives.
+- **Risk:** Low — additive grouping logic. Does not change swap evaluation.
+- **Validation:** After implementation, Fork and Harness the Storm should appear as a single "choose_one" group in the handoff, not as 2 independent rows.
+
+### Task 3: 🟡 P1 — Win Turn Speed Optimization (Stall Reduction)
+
+- **Evidence:** Replay audit (§51.6) shows avg win turns of 17-21 with 3-8 stalls per 50 games across all opponents. For a cEDH bracket 4 deck with 87% WR, this speed is a structural weakness — any opponent resolving a turn 3-6 combo should win before Lorehold can close. The deck wins by preventing opponents from playing (stax + protection) rather than fast combo execution. Approach of the Second Sun requires 2 casts with 7-card gap; with only 5 tutors, consistently finding Approach twice takes many turns. Root cause: insufficient tutor density + no deterministic 1-turn combo line.
+- **What to change:** (a) Add `approach_cast_turn` and `approach_win_turn` metrics to Battle Analyst output (§47 Task 3, carried forward). (b) Test adding 1-2 more tutors (Mystical Tutor, Solve the Equation) through Master Optimizer quality gate. (c) Test whether replacing a redundant wincon (Guttersnipe, Rite of the Dragoncaller) with an additional tutor improves avg win turn while maintaining WR. (d) Add `avg_win_turn` to the Master Optimizer's tracked metrics alongside WR — optimize for both, not just WR.
+- **Impact:** Reduces avg win turn from 17-21 toward 5-8 (cEDH-appropriate). Makes the deck competitive against fast combo opponents, not just resilient against slow ones.
+- **Risk:** Low — test-only recommendations. Additional tutors may dilute interaction density.
+- **Validation:** Post-optimization, avg win turn should decrease by ≥3 turns while maintaining WR ≥ 84%.
+
+### Task 4: 🟢 P2 — Fix KC Validator Classification Conflicts
+
+- **Evidence:** KC Validator (2026-06-07 12:58 UTC) found 4 classification conflicts (§53.1): Firesong and Sunspeaker (finisher → remove_creature), Overwhelming Splendor (silence_opponents → draw_engine — FALSE POSITIVE), Kessig Flamebreather (finisher → creature), Longshot Rebel Bowman (finisher → creature). All 4 involve the `finisher` tag, suggesting systematic over-application. The validator's own reclassification produced a false positive (Overwhelming Splendor → draw_engine), indicating its heuristics also need quality gates.
+- **What to change:** (a) Review and resolve the 4 conflicts: set correct functional tags. (b) Audit `finisher` tag precision across all cards in known_cards — 4 false positives in one run suggests 10-20% error rate. (c) Add a quality gate to the validator's reclassification: if reclassified tag has <3 keyword matches in oracle text, flag as `low_confidence` and skip auto-apply. (d) Update `tag_accuracy` table with corrected counts.
+- **Impact:** Improves classification quality for all downstream agents. The `finisher` tag currently has unknown false-positive rate.
+- **Risk:** Low — manual review of 4 cards. Does not modify product code.
+- **Validation:** After fixes, re-run KC Validator — conflicts should reduce from 4 to 0 for these cards.
+
+### Task 5: 🔴 P0 — Integrate Master Optimizer as Cron Pipeline (Replaces Decommissioned Evolution Oracle)
+
+- **Evidence:** The Master Optimizer pipeline (§51) executed a complete test-before-apply cycle today: preflight → baseline freeze → baseline battle → quality gate (50 candidates) → full confirmation (5 tested) → handoff (2 approved) → replay audit. This is the first fully automated implementation of the Slot Optimizer v3 methodology (§49) that delivered +12.5pp. ALL 5 Lorehold crons were decommissioned in early June (§35). The Multi-Commander Evolution cron has only analyzed Winota once (§35.3). The Commander Knowledge Deep cron (this job) does manual analysis but can't run simulations. The Master Optimizer fills the gap: automated, battle-validated, with handoff for controlled application.
+- **What to change:** (a) Register the Master Optimizer as a scheduled cron job (weekly or on-demand). (b) Extend it to support multiple commanders (currently only deck_id=6). The quality gate scanned 50 candidates from the collection — the same logic can run against Winota (deck_id=7), Atraxa (deck_id=9), Kinnan (deck_id=1), and Korvold (deck_id=3) once their card data is repaired (§44-45). (c) Add a `cron_handoff` mode that auto-generates the handoff report and commits it to `docs/hermes-analysis/master_optimizer_reports/`. (d) Link the handoff to the Commander Knowledge Deep report so approved swaps are documented here.
+- **Impact:** Restores automated deck optimization for Lorehold. Extends battle-validated swap methodology to all commanders. Closes the 8-day pipeline gap since Lorehold crons were decommissioned.
+- **Risk:** Medium — the Master Optimizer is new (first run today). The quality gate's scan-to-confirm WR inflation (§51.4) needs investigation before enabling auto-apply. Start with `approve_manual_review` only.
+- **Validation:** After registration, a weekly cron produces: baseline WR, quality gate report, confirmation report, handoff report, and replay audit for deck_id=6. Subsequent runs detect hash changes and re-baseline automatically.
+
+---
+
+## 55. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-07 ~15:00 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Scan-to-confirm WR gap detection** 🆕 | §51.3-51.4 | Flag quality gate candidates where confirm_WR - scan_WR < -5pp — prevents false-positive swap recommendations |
+| **Mutually exclusive swap grouping** 🆕 | §51.5, Task 2 | Detect when multiple approved swaps share the same cut card — present as "choose_one" alternatives |
+| **Win turn speed metric** 🆕 | §51.6, Task 3 | Track avg_win_turn alongside WR — optimize for both. Stall rate > 10% + avg_turn > 15 = speed deficit |
+| **Test-only vs applied state tracking** 🆕 | §51.7 | Distinguish optimizations proven in simulation (Slot Optimizer) from those applied to DB (Master Optimizer handoff) |
+| **Baseline freeze as immutable snapshot** 🆕 | §51.2 | `baseline_freeze.json` enables reliable delta comparison across time — should be standard for all deck analysis |
+| **KC Validator conflict queue** 🆕 | §53.1 | Unresolved tag conflicts accumulate indefinitely — need a review queue with staleness alert |
+| **`finisher` tag precision audit** 🆕 | §53.2 | 4 false positives in one validator run suggests systematic over-application — affects all tag-dependent agents |
+| **Master Optimizer as cron pipeline** 🆕 | §54 Task 5 | The test-before-apply methodology is now automated — should replace decommissioned Evolution Oracle crons |
+| **Cumulative swap interaction effects** 🆕 | §54 Task 1 | 6 independent swaps may have non-linear interactions when applied together — need cumulative re-validation |
+| **Approach win turn gap** 🆕 | §51.6 | 5 tutors for a 2-cast wincon in 99-card deck — tutor density is the bottleneck for win speed |
