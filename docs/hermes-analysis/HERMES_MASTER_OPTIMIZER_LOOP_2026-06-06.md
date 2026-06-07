@@ -31,13 +31,23 @@ Validacao operacional do cron em Hermes, 2026-06-07:
 - Job registrado em `/opt/data/cron/jobs.json` como `manaloom-master-optimizer-preflight`.
 - Script instalado em `/opt/data/scripts/manaloom-master-optimizer-preflight.sh`.
 - Origem versionada em `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_preflight_cron.sh`.
-- Schedule: `every 360m`.
+- Schedule atual: `every 20m`.
 - Status do scheduler apos validacao manual: `ok`.
-- Proxima execucao registrada: `2026-06-07T06:04:53.625131+00:00`.
+- Proxima execucao registrada apos ajuste: `2026-06-07T00:28:16.898797+00:00`.
 - Relatorio fresco salvo em `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_cron_hermes_20260607_000346.md`.
 - Artefato vivo no container: `/opt/data/artifacts/hermes_master_optimizer/latest_master_optimizer_preflight.md`.
 
 Importante: este cron nao aplica swaps. Ele mantem o Hermes pronto para entrar no optimizer ao validar regressao do battle, sincronizar metadata do Postgres real para o SQLite e registrar se o ambiente esta aprovado ou bloqueado.
+
+Cron auxiliar de swap/slot scan:
+
+- Job planejado: `manaloom-master-optimizer-slot-scan`.
+- Script: `/opt/data/scripts/manaloom-master-optimizer-slot-scan.sh`.
+- Origem versionada: `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_slot_scan_cron.sh`.
+- Funcao: rodar sync de metadata, preflight e `slot_optimizer.py`.
+- Seguranca: usa `slot_optimizer.py` porque ele testa swaps isolados e restaura o deck; nao usa `universal_optimizer.py` como cron automatico porque ele ainda possui auto-apply de swaps.
+- Estado recomendado: registrado e pronto, mas ativado apenas quando o baseline estiver aprovado, porque o slot scan e pesado e pode durar horas.
+- Artefato esperado: `/opt/data/artifacts/hermes_master_optimizer/latest_master_optimizer_slot_scan.log`.
 
 Arquivos principais:
 
