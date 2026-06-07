@@ -156,6 +156,41 @@ def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
                 if isinstance(card, dict) and card.get("name"):
                     names.add(str(card["name"]))
 
+    if table_exists(cur, "slot_benchmarks"):
+        for added, removed in cur.execute(
+            """
+            SELECT DISTINCT card_added, card_removed
+            FROM slot_benchmarks
+            WHERE COALESCE(card_added,'')!='' OR COALESCE(card_removed,'')!=''
+            """
+        ):
+            if added:
+                names.add(str(added))
+            if removed:
+                names.add(str(removed))
+
+    if table_exists(cur, "swap_benchmarks"):
+        for added, removed in cur.execute(
+            """
+            SELECT DISTINCT card_added, card_removed
+            FROM swap_benchmarks
+            WHERE COALESCE(card_added,'')!='' OR COALESCE(card_removed,'')!=''
+            """
+        ):
+            if added:
+                names.add(str(added))
+            if removed:
+                names.add(str(removed))
+
+    known_cards_path = Path(__file__).resolve().parent / "known_cards_generated.json"
+    if known_cards_path.exists():
+        try:
+            decoded = json.loads(known_cards_path.read_text(encoding="utf-8"))
+        except Exception:
+            decoded = {}
+        if isinstance(decoded, dict):
+            names.update(str(name) for name in decoded.keys() if name)
+
     return {name.strip() for name in names if name and name.strip()}
 
 
