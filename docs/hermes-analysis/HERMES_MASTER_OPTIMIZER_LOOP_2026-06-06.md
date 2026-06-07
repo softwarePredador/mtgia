@@ -51,6 +51,22 @@ Cron auxiliar de swap/slot scan:
 - Schedule preparado: `every 720m`.
 - Artefato esperado: `/opt/data/artifacts/hermes_master_optimizer/latest_master_optimizer_slot_scan.log`.
 
+Validacao end-to-end real em Hermes, 2026-06-07:
+
+- Pipeline instalado como `/opt/data/scripts/manaloom-master-optimizer-end-to-end.sh`.
+- Job registrado como `manaloom-master-optimizer-end-to-end`, em modo `paused`, manual-only.
+- Sync de metadata expandido para incluir `known_cards_generated.json`, `slot_benchmarks` e `swap_benchmarks`.
+- `card_oracle_cache` subiu para 2479 aliases; `mana_cost_filled=2228`; `oracle_text_filled=2478`; `keywords_filled=1121`.
+- Baseline real curto congelado: `45.0%` WR, `27W/31L/2S`, 60 jogos.
+- Quality gate bloqueou candidatos fora da identidade RW e liberou candidatos Boros/legais.
+- `Sticky Fingers` por `Storm-Kiln Artist` passou na confirmacao curta e na `full_confirmation`.
+- Full confirmation real: `55.8%` WR, `67W/53L/0S`, delta `+10.8pp`, 120 jogos.
+- Relatorio: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_confirmation_hermes_20260607_041142.md`.
+- Handoff: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_handoff_hermes_20260607_041200.md`.
+- O deck foi restaurado apos o teste: `Sticky Fingers` nao ficou no deck; `Storm-Kiln Artist` permaneceu.
+
+Importante: ainda nao houve apply automatico. O estado correto agora e `approved_swaps_ready_for_manual_apply`, aguardando script de apply com rollback.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`

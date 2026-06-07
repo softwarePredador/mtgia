@@ -143,8 +143,9 @@ Purpose:
 
 Current state:
 
-- This job does not exist yet.
-- Without it, slot scan results can be compared against stale or wrong baselines.
+- Implemented as `master_optimizer_baseline.py`.
+- Validated on Hermes with baseline id `2`: 45.0% WR, 27W/31L/2S, 60 games.
+- Baseline data is persisted in `optimizer_baseline_runs`.
 
 ### 5. Scan candidate swaps safely
 
@@ -180,8 +181,9 @@ Purpose:
 
 Current state:
 
-- `swap_benchmarks` exists but is empty.
-- No confirmation job exists.
+- Implemented as `master_optimizer_confirmation.py`.
+- `swap_benchmarks` now has short `confirmation` and stricter `full_confirmation` rows.
+- Full confirmation validated `Sticky Fingers` over `Storm-Kiln Artist`: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
 
 ### 7. Quality gate before applying
 
@@ -204,7 +206,9 @@ Purpose:
 
 Current state:
 
-- Quality gate rules are documented, but no Hermes cron enforces them before swap application.
+- Implemented as `master_optimizer_quality_gate.py`.
+- Quality gate blocks illegal color identity candidates and records reasons in `optimizer_quality_reviews`.
+- It now prevents off-color candidates such as `Imperial Seal`, `Aether Channeler`, `Korvold, Fae-Cursed King`, and `Spectral Sailor`.
 
 ### 8. Replay audit
 
@@ -221,7 +225,9 @@ Purpose:
 
 Current state:
 
-- Missing.
+- Implemented as aggregate `replay_decision_auditor.py`.
+- Current limitation: it audits aggregate battle output, not turn-by-turn decisions yet.
+- Remaining hardening: add structured replay events for attacks, blocks, spell timing, tutor target and counter/removal use.
 
 ### 9. Apply only after approval
 
@@ -239,32 +245,42 @@ Current state:
 
 - Missing.
 - Old `universal_optimizer.py` had auto-apply and is paused.
+- Current approved handoff is manual-review only; no deck mutation happened.
 
 ## What is missing to build the best Lorehold deck
 
-1. Freeze a current baseline from the exact current deck.
-2. Create `baseline_runs` or equivalent table to persist baseline data.
-3. Create a confirmation runner that fills `swap_benchmarks`.
-4. Add a quality gate cron before any swap application.
-5. Add replay decision audit.
-6. Convert `kc_validator.py` conflicts into a report and review queue.
-7. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
-8. Resolve provider 429 or slow/pause agent jobs so they do not fail noisily.
-9. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
-10. Use `manaloom-master-optimizer-slot-scan` only after baseline approval.
+1. Add rollback-aware apply script for approved swaps.
+2. Add turn-by-turn replay decision auditor, replacing aggregate-only audit.
+3. Convert `kc_validator.py` conflicts into a report and review queue.
+4. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
+5. Resolve provider 429 or slow/pause agent jobs so they do not fail noisily.
+6. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
+7. Re-run full confirmation with a larger sample before applying to a real product-facing deck.
 
 ## Recommended next implementation order
 
-1. Add `master_optimizer_baseline.py`.
-2. Add `master_optimizer_confirmation.py`.
-3. Add `master_optimizer_quality_gate.py`.
-4. Add `replay_decision_auditor.py`.
-5. Add a final handoff report generator.
-6. Only then enable `manaloom-master-optimizer-slot-scan`.
+1. Add `master_optimizer_apply.py` with rollback file and manual approval input.
+2. Add structured replay event capture to `battle_analyst_v8.py`.
+3. Upgrade `replay_decision_auditor.py` from aggregate audit to turn-by-turn audit.
+4. Add a conflict report for `kc_validator.py`.
+5. Re-run full confirmation at higher sample size before final deck mutation.
 
 ## Practical verdict
 
-The Hermes pipeline now has the right ingredients, but not the full closed loop yet.
+The Hermes pipeline now has a functional safe loop through handoff:
 
-It can ingest, sync, preflight, validate known cards and run battle.
-It cannot yet safely transform slot-scan findings into an approved best Lorehold deck without manual review, because the baseline, confirmation, quality gate and replay-audit stages are still missing.
+- sync metadata;
+- preflight;
+- freeze baseline;
+- quality gate;
+- short confirmation;
+- full confirmation;
+- aggregate replay audit;
+- manual-review handoff.
+
+It produced one approved manual-review swap for Lorehold:
+
+- `Sticky Fingers` over `Storm-Kiln Artist`;
+- full confirmation: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
+
+It still must not auto-apply. The remaining gap is a rollback-aware apply script plus richer turn-by-turn replay audit.
