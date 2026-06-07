@@ -1,5 +1,9 @@
 # Hermes Analysis: UI Actionable Tasks
 
+> Status atual: backlog UI/produto.
+> Nao e contrato Hermes runtime. Revalide visualmente no app antes de tratar
+> qualquer item como atual.
+
 > Tasks validadas no codigo (origin/master) em 2026-05-28.
 > Nenhuma task foi criada por suposicao. Cada uma tem evidencia concreta.
 

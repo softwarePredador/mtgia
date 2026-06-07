@@ -1,5 +1,9 @@
 # Audit Report — 2026-05-30
 
+> Status atual: historico/snapshot antigo.
+> Use apenas como memoria de auditoria. Para execucao atual, consulte
+> `README.md` e `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+
 > Auditoria profunda: 20 commits desde `3f7d784f` até `21768cca`.
 > Atualizado em: 2026-05-30T21:00Z.
 > Validacao: 599 dart test PASSED, 1 flutter analyze issue (pre-existing).

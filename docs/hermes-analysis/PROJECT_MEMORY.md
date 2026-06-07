@@ -1,5 +1,9 @@
 # Hermes Analysis: Project Memory
 
+> Status atual: memoria historica do agente.
+> Quando houver conflito, `README.md` e
+> `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md` prevalecem.
+
 > Memoria operacional do agente residente para o projeto ManaLoom.
 > Versionada neste diretorio — atualizar sempre que houver mudanca estrutural.
 

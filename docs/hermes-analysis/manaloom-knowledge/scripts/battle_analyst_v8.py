@@ -349,6 +349,8 @@ KNOWN_CARDS = {
     "Reforge the Soul": {"effect": "draw_cards", "count": 7, "miracle": "1R"},
 }
 
+HANDCRAFTED_KNOWN_CARDS = set(KNOWN_CARDS)
+
 TAG_EFFECTS = {
     "ramp": {"effect": "ramp_permanent", "mana_produced": 1},
     "ritual": {"effect": "ramp_ritual", "mana_produced": 3},
@@ -365,6 +367,53 @@ TAG_EFFECTS = {
 }
 
 
+def normalize_effect_by_oracle(card, effect_data):
+    """Correct broad generated/tag mistakes using imported oracle metadata."""
+    normalized = effect_data.copy()
+    effect = normalized.get("effect", "unknown")
+    type_line = str(card.get("type_line") or "")
+    oracle_text = str(card.get("oracle_text") or "")
+    text = f"{type_line}\n{oracle_text}".lower()
+
+    if "land" in type_line.lower():
+        normalized["effect"] = "land"
+        return normalized
+
+    if "counter target" in text:
+        normalized["effect"] = "counter"
+        normalized["instant"] = True
+        return normalized
+
+    if re.search(r"\b(destroy|exile)\s+target\b", text):
+        normalized["effect"] = (
+            "remove_creature" if "target creature" in text else "remove_permanent"
+        )
+        return normalized
+
+    if re.search(r"\breturn target\b", text):
+        normalized["effect"] = "remove_permanent"
+        return normalized
+
+    if (
+        ("return each" in text or "return all" in text)
+        and "nonland permanent" in text
+    ):
+        normalized["effect"] = "board_wipe"
+        return normalized
+
+    if (
+        effect == "silence_opponents"
+        and "can't be countered" in text
+        and not re.search(r"opponents? can't cast", text)
+        and "can't cast spells" not in text
+    ):
+        if "creature" in type_line.lower():
+            normalized["effect"] = "creature"
+        else:
+            normalized["effect"] = "unknown"
+    return normalized
+
+
 # ── KNOWN_CARDS Auto-Generator Loader (v8.4) ──
 # Loads generated entries from known_cards_generated.json (handcrafted takes priority)
 _gen_json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'known_cards_generated.json')
@@ -379,22 +428,24 @@ if os.path.exists(_gen_json_path):
 def get_card_effect(card):
     name = card.get("name", "")
     if name in KNOWN_CARDS:
-        return KNOWN_CARDS[name].copy()
+        return normalize_effect_by_oracle(card, KNOWN_CARDS[name].copy())
     tag = card.get("tag", "")
     if tag in TAG_EFFECTS:
-        return TAG_EFFECTS[tag].copy()
+        return normalize_effect_by_oracle(card, TAG_EFFECTS[tag].copy())
     effect = card.get("effect", "")
     effect_map = {"ramp": "ramp_permanent", "removal": "remove_creature",
                   "board_wipe": "board_wipe", "wincon": "finisher", "draw": "draw_cards",
                   "counter": "counter", "land": "land"}
     if effect in effect_map:
-        if effect == "ramp": return {"effect": "ramp_permanent", "mana_produced": 1}
-        if effect == "wincon": return {"effect": "finisher"}
-        if effect == "draw": return {"effect": "draw_cards", "count": 2}
-        return {"effect": effect_map[effect]}
+        if effect == "ramp": return normalize_effect_by_oracle(card, {"effect": "ramp_permanent", "mana_produced": 1})
+        if effect == "wincon": return normalize_effect_by_oracle(card, {"effect": "finisher"})
+        if effect == "draw": return normalize_effect_by_oracle(card, {"effect": "draw_cards", "count": 2})
+        return normalize_effect_by_oracle(card, {"effect": effect_map[effect]})
+    if "land" in card.get("type_line", "").lower():
+        return {"effect": "land"}
     if effect == "creature" or "creature" in card.get("type_line", "").lower():
-        return {"effect": "creature", "power": card.get("power", 2)}
-    return {"effect": "unknown"}
+        return normalize_effect_by_oracle(card, {"effect": "creature", "power": card.get("power", 2)})
+    return normalize_effect_by_oracle(card, {"effect": "unknown"})
 
 def is_instant(card):
     """v8: Check if a card can be cast at instant speed."""
@@ -510,6 +561,7 @@ class Player:
                 c = self.library.pop(0)
                 self.hand.append(c)
                 drawn.append(c)
+                self.cards_drawn_this_turn += 1
         return drawn
 
     def __init__(self, name, commander, deck, is_human=False, strategy="midrange"):
@@ -543,6 +595,7 @@ class Player:
         self.approach_revealed = []  # v8.1: opponents who know approach was cast
         self.eliminated = False
         self.win_reason = None
+        self.cards_drawn_this_turn = 0
 
     def refresh_mana_sources(self, turn=None):
         """Untap mana sources once for this player's turn."""
@@ -818,6 +871,8 @@ def priority_round(active_player, all_players, stack, turn, rng):
     for player in order:
         if not player.is_alive():
             continue
+        if player != top_item.controller and top_item.controller.silenced_opponents:
+            continue
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             if score >= 40:
@@ -828,6 +883,7 @@ def priority_round(active_player, all_players, stack, turn, rng):
                         if player.can_pay_card(c):
                             player.hand.remove(c)
                             player.spend_card_mana(c)
+                            c["_response_to_effect"] = top_item.effect_data.get("effect")
                             apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
                             return True
         else:
@@ -975,6 +1031,75 @@ def counter_worth(threat_score, opp, rng):
 
     return False
 
+
+def remember_until_eot(card, key):
+    originals = card.setdefault("_until_eot_originals", {})
+    if key not in originals:
+        originals[key] = card.get(key, None)
+
+
+def set_until_eot(card, key, value):
+    remember_until_eot(card, key)
+    card[key] = value
+
+
+def clear_until_eot(player):
+    """Restore temporary combat keywords/stat changes at cleanup."""
+    zones = (player.battlefield, player.phased_out)
+    for zone in zones:
+        for card in zone:
+            if not isinstance(card, dict):
+                continue
+            originals = card.pop("_until_eot_originals", {})
+            for key, original in originals.items():
+                if original is None:
+                    card.pop(key, None)
+                else:
+                    card[key] = original
+    player.indestructible = False
+
+
+def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
+    creatures = [
+        card
+        for card in player.battlefield
+        if isinstance(card, dict) and card.get("effect") == "creature"
+    ]
+    for creature in creatures:
+        for keyword in keywords:
+            if keyword == "protection_all":
+                continue
+            set_until_eot(creature, keyword, True)
+        if power_multiplier:
+            remember_until_eot(creature, "power")
+            try:
+                base_power = int(float(creature.get("power", 2)))
+            except (TypeError, ValueError):
+                base_power = 2
+            creature["power"] = base_power * power_multiplier
+    return len(creatures)
+
+
+def change_life(player, delta):
+    if delta and (player.life_cant_change or player.protection_from_everything):
+        return False
+    player.life += delta
+    return True
+
+
+def deal_damage(player, amount):
+    if amount <= 0:
+        return False
+    return change_life(player, -amount)
+
+
+def gain_life(player, amount, cap=40):
+    if amount <= 0 or player.life_cant_change or player.protection_from_everything:
+        return False
+    player.life = min(cap, player.life + amount)
+    return True
+
+
 def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
     """v8: Cast spells respecting instant/sorcery timing and stack."""
     mana = player.available_mana()
@@ -1050,7 +1175,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
     if player.is_human:
         lorehold_on_board = any(isinstance(c, dict) and c.get("name") == "Lorehold, the Historian" for c in player.battlefield)
         for c in castable[:]:
-            if (is_sorcery(c) or "Instant" in c.get("type_line", "")) and not is_main_phase:
+            if (is_sorcery(c) or is_instant(c)) and not is_main_phase:
                 if not is_instant(c) or not lorehold_on_board:
                     castable.remove(c)  # can't cast sorcery outside main phase
 
@@ -1251,23 +1376,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
     elif effect == "silence_opponents":
         player.battlefield.append(effect_data)
         player.silenced_opponents = True
+    elif effect == "indestructible":
+        grant_creatures_until_eot(player, keywords=("indestructible",))
+        player.indestructible = True
+        player.graveyard.append(card)
     elif effect == "modal_boros_charm":
-        # v8: Choose mode based on context
-        # If there's a board wipe coming or on the stack, use indestructible
-        in_combat = any(o.is_alive() for o in opponents)
-        if player.indestructible:  # already protected
-            # Use double strike in combat
-            for c in player.battlefield:
-                if isinstance(c, dict) and c.get("effect") == "creature":
-                    c["double_strike"] = True
-                    c["power"] = c.get("power", 2) * 2  # effectively double damage
+        response_to = card.get("_response_to_effect")
+        preferred_mode = card.get("preferred_mode")
+        if preferred_mode == "double_strike" and response_to != "board_wipe":
+            grant_creatures_until_eot(player, keywords=("double_strike",))
         else:
-            # Default: indestructible (most valuable)
+            grant_creatures_until_eot(player, keywords=("indestructible",))
             player.indestructible = True
         player.graveyard.append(card)
     elif effect == "approach":
         player.approach_count += 1
-        player.life = min(40, player.life + 7)
+        gain_life(player, 7)
         # v8.1: THREAT — all opponents now know Approach was cast
         player.threat_level += 50  # massive threat spike
         for opp in opponents:
@@ -1299,7 +1423,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if alive_opps and total_power > 0:
             dmg_each = total_power // len(alive_opps)
             for opp in alive_opps:
-                opp.life -= dmg_each
+                deal_damage(opp, dmg_each)
     elif effect == "token_maker":
         token_count = effect_data.get("token_count", 5)
         if isinstance(token_count, str):
@@ -1315,17 +1439,23 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         dmg = len(spells) * 3
         alive_opps = [o for o in opponents if o.is_alive()]
         if alive_opps:
-            for opp in alive_opps: opp.life -= dmg // len(alive_opps)
+            for opp in alive_opps: deal_damage(opp, dmg // len(alive_opps))
         player.graveyard.append(card)
     elif effect == "pump_all":
         kw = effect_data.get("keywords", [])
-        for c in player.battlefield:
-            if isinstance(c, dict) and c.get("effect") == "creature":
-                c["power"] = c.get("power", 2) * 2
-                if "flying" in kw: c["flying"] = True
-                if "double_strike" in kw: c["double_strike"] = True
-                if "lifelink" in kw: c["lifelink"] = True
-                if "indestructible" in kw: c["indestructible"] = True
+        combat_keywords = [
+            keyword
+            for keyword in ("flying", "double_strike", "lifelink", "indestructible")
+            if keyword in kw
+        ]
+        power_multiplier = None if card.get("name") == "Akroma's Will" else 2
+        grant_creatures_until_eot(
+            player,
+            keywords=combat_keywords,
+            power_multiplier=power_multiplier,
+        )
+        if "indestructible" in combat_keywords:
+            player.indestructible = True
         player.graveyard.append(card)
     elif effect == "copy_spell":
         player.battlefield.append(effect_data)
@@ -1370,7 +1500,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if total_power > 0:
             alive_opps = [o for o in opponents if o.is_alive()]
             if alive_opps:
-                rng.choice(alive_opps).life -= total_power
+                deal_damage(rng.choice(alive_opps), total_power)
         player.graveyard.append(card)
     elif effect == "exile_value":
         # Dance with Calamity — exile top X, play for free
@@ -1378,6 +1508,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.draw(min(X, 3), rng)
         player.graveyard.append(card)
     elif effect == "redirect_removal":
+        grant_creatures_until_eot(player, keywords=("indestructible",))
         player.indestructible = True
         player.graveyard.append(card)
 
@@ -1393,7 +1524,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         total_damage = 3 + grave_copies  # +3 per copy in grave
         for opp in opponents:
             if opp.is_alive():
-                opp.life -= total_damage
+                deal_damage(opp, total_damage)
         
         # Ripple: after casting, reveal top 4 and cast matching spells for free
         has_ripple = any(isinstance(c, dict) and c.get("effect") == "ripple_engine" for c in player.battlefield)
@@ -1408,7 +1539,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     # Cast it for free — deal damage again
                     for opp in opponents:
                         if opp.is_alive():
-                            opp.life -= total_damage
+                            deal_damage(opp, total_damage)
                     # Remove from library
                     player.library.pop(i)
             if extra_casts > 0:
@@ -1441,7 +1572,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 if alive_opps:
                     dmg_each = total_power // len(alive_opps)
                     for opp in alive_opps:
-                        opp.life -= dmg_each
+                        deal_damage(opp, dmg_each)
                 print(f"  [COMBO] Dualcaster+Twinflame = {tokens_needed} hasty 2/2s! {total_power} total damage")
         
         player.battlefield.append(dict(card))
@@ -1636,10 +1767,10 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
 
     def deal_player_damage(creature, damage=None):
         damage = stat(creature, "power", 2) if damage is None else damage
-        target.life -= damage
-        if creature.get("lifelink"):
-            attacker.life = min(40, attacker.life + damage)
-        if creature.get("is_commander") and creature.get("owner") == attacker.name:
+        damage_dealt = deal_damage(target, damage)
+        if damage_dealt and creature.get("lifelink"):
+            gain_life(attacker, damage)
+        if damage_dealt and creature.get("is_commander") and creature.get("owner") == attacker.name:
             attacker.commander_damage[target.name] += damage
 
     marked_damage = defaultdict(int)
@@ -1743,6 +1874,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         board=len(player.battlefield),
     )
     player.lands_played_this_turn = 0
+    player.cards_drawn_this_turn = 0
+    clear_until_eot(player)
     player.indestructible = False
 
     # ── UNTAP ──
@@ -1762,17 +1895,17 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                 player.draw(1, rng)
 
     # ── DRAW ──
-    player.draw(1, rng)
+    drawn_for_turn = player.draw(1, rng)
     if not player.library and not player.hand:
         player.life = 0
         check_sbas(all_players)
         return
 
     # v8: MIRACLE check
-    if player.is_human and player.hand:
+    if player.is_human and drawn_for_turn and player.cards_drawn_this_turn == 1:
         lorehold_on_board = any(isinstance(c, dict) and c.get("name") == "Lorehold, the Historian" for c in player.battlefield)
-        last_drawn = player.hand[-1] if player.hand else None
-        if last_drawn and (is_sorcery(last_drawn) or "Instant" in last_drawn.get("type_line", "")):
+        last_drawn = drawn_for_turn[-1]
+        if last_drawn and (is_sorcery(last_drawn) or is_instant(last_drawn)):
             miracle_cost = 2  # Lorehold gives miracle {2}
             if last_drawn.get("name") == "Reforge the Soul":
                 miracle_cost = 2  # 1R but simplified
@@ -1845,22 +1978,23 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     
     # ── OPPONENT END STEP INTERACTION (NEW) ──
     # All opponents can cast instants on this player's end step
-    for opp in opponents:
-        if not opp.is_alive(): continue
-        instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.can_pay_card(c)]
-        for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
-            if opp.can_pay_card(c):
-                opp.hand.remove(c)
-                opp.spend_card_mana(c)
-                emit_replay_event(
-                    "end_step_instant",
-                    player=opp.name,
-                    card=c.get("name", "?"),
-                    effect=get_card_effect(c).get("effect", "unknown"),
-                    active_player=player.name,
-                    turn=turn,
-                )
-                apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
+    if not player.silenced_opponents:
+        for opp in opponents:
+            if not opp.is_alive(): continue
+            instants_in_hand = [c for c in opp.hand if is_instant(c) and opp.can_pay_card(c)]
+            for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
+                if opp.can_pay_card(c):
+                    opp.hand.remove(c)
+                    opp.spend_card_mana(c)
+                    emit_replay_event(
+                        "end_step_instant",
+                        player=opp.name,
+                        card=c.get("name", "?"),
+                        effect=get_card_effect(c).get("effect", "unknown"),
+                        active_player=player.name,
+                        turn=turn,
+                    )
+                    apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
 
 
     # ── CLEANUP ──
@@ -1881,6 +2015,9 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         graveyard=len(player.graveyard),
         discarded=discarded,
     )
+
+    for participant in all_players:
+        clear_until_eot(participant)
 
     # v8: SBA check at end of turn
     check_sbas(all_players)
@@ -1999,18 +2136,32 @@ def load_learned_opponents():
     try:
         conn = sqlite3.connect(DB)
         conn.row_factory = sqlite3.Row
-        rows = conn.execute("SELECT * FROM learned_decks WHERE commander NOT LIKE '%Lorehold%' ORDER BY id DESC LIMIT 12").fetchall()
+        candidate_limit = int(os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES", "96"))
+        opponent_limit = int(os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_LIMIT", "12"))
+        min_cards = int(os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS", "80"))
+        rows = conn.execute(
+            """
+            SELECT *
+            FROM learned_decks
+            WHERE COALESCE(commander, '') != ''
+              AND commander NOT LIKE '%Lorehold%'
+              AND COALESCE(card_list, '') != ''
+              AND length(card_list) >= 500
+              AND COALESCE(card_count, 0) >= ?
+            ORDER BY
+              CASE WHEN source = 'pg_meta_decks' THEN 0 ELSE 1 END,
+              COALESCE(card_count, 0) DESC,
+              id DESC
+            LIMIT ?
+            """,
+            (min_cards, candidate_limit),
+        ).fetchall()
         decoded_rows = []
         cache_names = []
         for row in rows:
-            if len(str(row['card_list'] or '')) < 500:
-                continue  # v10.2: skip junk
-            try:
-                card_data = json.loads(row["card_list"]) if row["card_list"] else []
-            except:
-                card_data = []
-            if not isinstance(card_data, list):
-                card_data = []
+            card_data = decode_learned_card_list(row["card_list"])
+            if len(card_data) < min_cards:
+                continue
             decoded_rows.append((row, card_data))
             if row["commander"]:
                 cache_names.append(row["commander"])
@@ -2024,54 +2175,191 @@ def load_learned_opponents():
         decks = []
         for row, card_data in decoded_rows:
             deck = []
-            for c in card_data:
-                if isinstance(c, dict):
-                    name = c.get("name", "?")
-                    cmc = float(c.get("cmc", 3))
-                    tl = c.get("type_line", "")
-                    role = c.get("role", c.get("category", "creature"))
-                    effect = "creature"; tag = "creature"
-                    if role == "land": effect = "land"; tag = "land"; tl = tl or "Land"
-                    elif role in ("ramp","rock"): effect = "ramp"; tag = "ramp"
-                    elif role in ("removal","sweeper"): effect = "removal"; tag = "removal"
-                    elif role == "board_wipe": effect = "board_wipe"; tag = "board_wipe"
-                    elif role in ("draw","cantrip","wheel"): effect = "draw"; tag = "draw"
-                    elif role in ("counterspell","counter"): effect = "counter"; tag = "counter"; tl = tl or "Instant"
-                    elif role == "tutor": effect = "tutor"; tag = "tutor"
-                    elif role == "protection": effect = "protection"; tag = "protection"
-                    elif role in ("wincon","combo_piece"): effect = "wincon"; tag = "wincon"
-                    imported = dict(c)
-                    imported.update({
-                        "name": name,
-                        "cmc": cmc,
-                        "tag": tag,
-                        "effect": effect,
-                        "power": c.get("power", max(1, int(cmc)) if effect == "creature" else 0),
-                        "toughness": c.get("toughness", c.get("power", max(1, int(cmc)) if effect == "creature" else 0)),
-                        "type_line": tl,
-                        "is_commander": c.get("is_commander", False),
-                    })
-                    imported = merge_oracle_metadata(imported, oracle_cache)
-                    deck.append(enrich_card(imported))
+            commander_key = normalize_card_name(row["commander"])
+            for raw_card in card_data:
+                expanded_cards = expand_learned_card(raw_card)
+                for c in expanded_cards:
+                    if normalize_card_name(c.get("name")) == commander_key:
+                        continue
+                    if len(deck) >= 99:
+                        break
+                    deck.append(build_learned_battle_card(c, oracle_cache))
+                if len(deck) >= 99:
+                    break
+            original_deck_count = len(deck)
             while len(deck) < 99:
-                deck.append({"name": "Filler", "cmc": 3, "tag": "creature", "effect": "creature", "power": 2, "type_line": "Creature"})
+                deck.append({
+                    "name": "Filler",
+                    "cmc": 3,
+                    "tag": "creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "type_line": "Creature",
+                })
+            real_name = f"{row['commander']} #{row['id']} (real)"
             decks.append({
-                "name": f"{row['commander']} (real)", "archetype": row["archetype"] or "midrange",
+                "name": real_name, "archetype": row["archetype"] or "midrange",
+                "source": row["source"],
+                "learned_deck_id": row["id"],
+                "source_card_count": row["card_count"],
+                "battle_card_count": original_deck_count,
                 "built_deck": deck,
                 "commander_name": row["commander"],
-                "strategy": (row["archetype"] or "midrange").split()[0].lower() if row["archetype"] else "midrange",
+                "strategy": infer_strategy(row["archetype"] or "midrange"),
                 "life": 40, "lands": sum(1 for c in deck if c.get("effect") == "land"),
                 "ramp": sum(1 for c in deck if c.get("effect") in ("ramp",)),
-                "removal": sum(1 for c in deck if c.get("effect") in ("removal", "board_wipe")),
+                "removal": sum(1 for c in deck if c.get("effect") in ("removal", "board_wipe")) ,
                 "counters": sum(1 for c in deck if c.get("effect") == "counter"),
                 "creatures": sum(1 for c in deck if c.get("effect") == "creature"),
                 "avg_cmc": sum(c.get("cmc", 3) for c in deck) / max(1, len(deck)),
                 "is_real": True,
             })
+        seed = real_opponent_seed()
+        rng = random.Random(seed)
+        rng.shuffle(decks)
+        decks = decks[:opponent_limit]
+        if decks:
+            print(
+                f"Loaded {len(decks)} real opponent decks from {len(decoded_rows)} "
+                f"valid candidates (seed={seed})"
+            )
         return decks
     except Exception as e:
         print(f"load_learned_opponents: {e}")
         return []
+
+
+def decode_learned_card_list(value):
+    """Decode JSON card lists and legacy plain-text decklists into card entries."""
+    if not value:
+        return []
+    text = str(value)
+    try:
+        decoded = json.loads(text)
+    except Exception:
+        decoded = None
+    if isinstance(decoded, list):
+        return decoded
+
+    cards = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or line.lower() in ("deck", "commander", "sideboard", "maybeboard"):
+            continue
+        line = re.sub(r"^(sb:|sideboard:)\s*", "", line, flags=re.I).strip()
+        match = re.match(r"^(\d+)\s*x?\s+(.+)$", line, flags=re.I)
+        if not match:
+            continue
+        quantity = max(1, min(30, int(match.group(1))))
+        name = re.sub(r"\s+\([^)]*\)\s*\d*\s*$", "", match.group(2)).strip()
+        if name:
+            cards.append({"name": name, "quantity": quantity})
+    return cards
+
+
+def expand_learned_card(card):
+    if isinstance(card, str):
+        return [{"name": card}]
+    if not isinstance(card, dict):
+        return []
+    quantity = card.get("quantity", 1)
+    try:
+        quantity = int(quantity)
+    except (TypeError, ValueError):
+        quantity = 1
+    quantity = max(1, min(30, quantity))
+    base = dict(card)
+    base.pop("quantity", None)
+    return [dict(base) for _ in range(quantity)]
+
+
+def infer_strategy(archetype):
+    normalized = str(archetype or "").lower()
+    if "stax" in normalized:
+        return "stax"
+    if "combo" in normalized or "storm" in normalized:
+        return "combo"
+    if "control" in normalized:
+        return "control"
+    if "aggro" in normalized or "rush" in normalized:
+        return "rush"
+    if "spell" in normalized:
+        return "spells"
+    if "midrange" in normalized or "value" in normalized:
+        return "value"
+    return "midrange"
+
+
+def infer_battle_card_identity(card):
+    role = str(card.get("role") or card.get("category") or card.get("tag") or "").lower()
+    type_line = str(card.get("type_line") or "").lower()
+    oracle_text = str(card.get("oracle_text") or "").lower()
+    name = str(card.get("name") or "").lower()
+
+    if role == "land" or "land" in type_line:
+        return "land", "land"
+    if role in ("ramp", "rock") or "add " in oracle_text or "treasure token" in oracle_text:
+        return "ramp", "ramp"
+    if role in ("counterspell", "counter") or "counter target" in oracle_text:
+        return "counter", "counter"
+    if role in ("board_wipe", "sweeper") or "destroy all" in oracle_text or "exile all" in oracle_text:
+        return "board_wipe", "board_wipe"
+    if role in ("removal",) or "destroy target" in oracle_text or "exile target" in oracle_text:
+        return "removal", "removal"
+    if role in ("draw", "cantrip", "wheel") or "draw" in oracle_text:
+        return "draw", "draw"
+    if role == "tutor" or "search your library" in oracle_text:
+        return "tutor", "tutor"
+    if role == "protection" or "indestructible" in oracle_text or "protection from" in oracle_text:
+        return "protection", "protection"
+    if role in ("wincon", "combo_piece") or "you win the game" in oracle_text:
+        return "wincon", "wincon"
+    if "creature" in type_line or "token" in name:
+        return "creature", "creature"
+    if "instant" in type_line:
+        return "spell", "instant"
+    if "sorcery" in type_line:
+        return "spell", "sorcery"
+    return "creature", "creature"
+
+
+def build_learned_battle_card(card, oracle_cache):
+    name = card.get("name", "?")
+    imported = dict(card)
+    imported["name"] = name
+    imported = merge_oracle_metadata(imported, oracle_cache)
+    tag, effect = infer_battle_card_identity(imported)
+    cmc = imported.get("cmc")
+    try:
+        cmc = float(cmc if cmc is not None else 3)
+    except (TypeError, ValueError):
+        cmc = 3
+    imported.update({
+        "cmc": cmc,
+        "tag": tag,
+        "effect": effect,
+        "type_line": imported.get("type_line") or ("Land" if effect == "land" else "Creature"),
+        "is_commander": bool(imported.get("is_commander", False)),
+    })
+    if effect == "creature":
+        default_power = max(1, int(cmc))
+        imported["power"] = imported.get("power") or default_power
+        imported["toughness"] = imported.get("toughness") or imported.get("power") or default_power
+    else:
+        imported["power"] = imported.get("power") or 0
+        imported["toughness"] = imported.get("toughness") or 0
+    return enrich_card(imported)
+
+
+def real_opponent_seed():
+    seed_raw = os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_SEED")
+    if seed_raw:
+        try:
+            return int(seed_raw)
+        except ValueError:
+            return abs(hash(seed_raw)) % 1_000_000_000
+    return int(datetime.now(timezone.utc).strftime("%Y%m%d%H"))
 
 
 def main():
@@ -2095,9 +2383,11 @@ def main():
     learned = load_learned_opponents()
     if learned and len(learned) >= 3:
         opponent_sources = learned
+        opponent_kind = "real"
         print(f"\nUsing {len(learned)} REAL learned opponent decks")
     else:
         opponent_sources = OPPONENT_ARCHETYPES
+        opponent_kind = "generic"
         print(f"\nUsing {len(OPPONENT_ARCHETYPES)} generic archetype profiles")
 
     GAMES = 50
@@ -2106,7 +2396,7 @@ def main():
     results = []
     total_wins = total_losses = total_stalls = 0
 
-    print(f"\n{GAMES} games vs each of {len(opponent_sources)} archetypes (4-player)...\n")
+    print(f"\n{GAMES} games vs each of {len(opponent_sources)} {opponent_kind} opponents (4-player)...\n")
 
     for profile in opponent_sources:
         wins = losses = stalls = 0
@@ -2115,7 +2405,7 @@ def main():
 
         for g in range(GAMES):
             others = [p for p in opponent_sources if p != profile]
-            picked = [profile] + rng.sample(others, 2)
+            picked = [profile] + rng.sample(others, min(2, len(others)))
             # For learned decks, attach card list directly
             for p in picked:
                 if p.get("is_real"):
@@ -2155,7 +2445,7 @@ def main():
     with open(LOG_PATH, "a") as f:
         f.write(f"\n## [{ts}] Battle Analyst v8 — Interactive Commander\n")
         f.write(f"Games: {GAMES} 4-player | Deck: L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}\n")
-        f.write(f"Opponents: {len(opponent_sources)} ({'real' if learned else 'generic'})\n\n")
+        f.write(f"Opponents: {len(opponent_sources)} ({opponent_kind})\n\n")
         f.write(f"| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |\n")
         f.write(f"|:---------|----:|-----:|-------:|-------:|------:|:--------|\n")
         for r in results:

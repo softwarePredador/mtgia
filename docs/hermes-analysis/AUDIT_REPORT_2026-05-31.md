@@ -1,5 +1,9 @@
 # Audit Report — 2026-05-31 (Incremento)
 
+> Status atual: historico/snapshot antigo.
+> Use apenas como memoria de auditoria. Para execucao atual, consulte
+> `README.md` e `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+
 > Auditoria incremental: 2 commits desde 21768cca ate 84553ef8.
 > Atualizado em: 2026-05-31T03:00Z.
 > Validacao: dart analyze optimization_quality_gate.dart — No issues found.

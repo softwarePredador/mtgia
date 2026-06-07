@@ -7,18 +7,20 @@ KNOWN_CARDS Validator & Expander — Cron-safe
 - Expands card pool continuously
 """
 import sqlite3, subprocess, os, json, re, sys, time
+from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, timezone
 
-DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
-OUT = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json'
+DEFAULT_SCRIPT_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts")
+SCRIPT_DIR = Path(os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", DEFAULT_SCRIPT_DIR))
+DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", str(SCRIPT_DIR / "knowledge.db"))
+OUT = os.environ.get("MANALOOM_KNOWN_CARDS_OUT", str(SCRIPT_DIR / "known_cards_generated.json"))
 LOCK = '/tmp/kc_validator.lock'
 REPORT_DIR = os.environ.get(
     "KC_VALIDATOR_REPORT_DIR",
     "/opt/data/workspace/mtgia/docs/hermes-analysis/kc_validator_reports",
 )
 
-os.environ["PGPASSWORD"] = "c2abeef5e66f21b0ce86"
 BASELINE_WR = 81.8
 
 MANUAL_EFFECT_OVERRIDES = {
@@ -68,10 +70,40 @@ if os.path.exists(LOCK):
     os.remove(LOCK)
 open(LOCK, 'w').close()
 
+def _pg_command():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return ["psql", database_url]
+
+    host = os.environ.get("PGHOST") or os.environ.get("DB_HOST")
+    port = os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432"
+    user = os.environ.get("PGUSER") or os.environ.get("DB_USER")
+    database = os.environ.get("PGDATABASE") or os.environ.get("DB_NAME")
+    password = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASS")
+    if password and not os.environ.get("PGPASSWORD"):
+        os.environ["PGPASSWORD"] = password
+
+    missing = [
+        name
+        for name, value in (
+            ("PGHOST/DB_HOST", host),
+            ("PGUSER/DB_USER", user),
+            ("PGDATABASE/DB_NAME", database),
+            ("PGPASSWORD/DB_PASS", os.environ.get("PGPASSWORD")),
+        )
+        if not value
+    ]
+    if missing:
+        raise RuntimeError("Postgres environment missing: " + ", ".join(missing))
+    return ["psql", "-h", host, "-p", port, "-U", user, "-d", database]
+
+
 def pg(query):
-    r = subprocess.run(["psql","-h","143.198.230.247","-p","5433","-U","postgres","-d","halder",
-        "-t","-A","-F","\x1f","-R","\x1e","-c",query],
-        capture_output=True, text=True, timeout=60)
+    command = _pg_command() + ["-t", "-A", "-F", "\x1f", "-R", "\x1e", "-c", query]
+    r = subprocess.run(command, capture_output=True, text=True, timeout=60)
+    if r.returncode != 0:
+        detail = (r.stderr or "psql failed").strip().splitlines()[-1]
+        raise RuntimeError(detail[:300])
     rows = []
     for line in r.stdout.strip().split("\x1e"):
         line = line.strip()
@@ -499,8 +531,15 @@ for name, entry in new_entries.items():
 filtered = {k: v for k, v in existing.items() if v.get("effect") not in ("unknown", "creature")}
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-with open(OUT, "w") as f:
+tmp_out = f"{OUT}.tmp.{os.getpid()}"
+with open(tmp_out, "w", encoding="utf-8") as f:
     json.dump(filtered, f, indent=2, sort_keys=True, default=str)
+    f.write("\n")
+os.replace(tmp_out, OUT)
+try:
+    os.chmod(OUT, 0o664)
+except OSError:
+    pass
 
 print(f"\nSTEP 3: SAVED")
 print(f"  Total entries: {len(existing)} (filtered: {len(filtered)})")

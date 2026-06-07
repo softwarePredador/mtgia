@@ -1,5 +1,10 @@
 # Hermes Cron Governance Report
 
+> Status atual: historico/snapshot antigo.
+> Nao use este arquivo como fonte operacional atual de cron ou optimizer.
+> Para execucao atual, leia `docs/hermes-analysis/README.md` e
+> `docs/hermes-analysis/HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+
 > Generated: 2026-06-05T02:09:36Z
 > Cron: manaloom-cron-governor-report (21fa86eb0d84) — fourth execution
 > Workdir: /opt/data/workspace/mtgia | Branch: codex/hermes-analysis-docs | HEAD: 28f16849

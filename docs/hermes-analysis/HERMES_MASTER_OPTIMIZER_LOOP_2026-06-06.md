@@ -1,5 +1,11 @@
 # Hermes Master Optimizer Loop — Battle + Optimizer com maestria
 
+> Status atual: diario tecnico e historico de evidencias.
+> Para contrato operacional completo de scripts, bancos, tabelas, parametros e
+> guardrails, use `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+> Nao use um resultado antigo deste arquivo como autorizacao de apply sem
+> revalidar contra o SQLite vivo.
+
 > Objetivo: transformar o Hermes em um ciclo confiavel de otimizacao por evidencia:
 > simular, detectar erro, propor swap, testar isolado, confirmar em massa, validar regras,
 > aplicar somente se aprovado e documentar o motivo.
@@ -160,11 +166,115 @@ Revalidacao de `Fork` em Hermes, 2026-06-07:
 - `Underworld Breach` foi rejeitado/retest: `86.3%` WR, delta `-0.4pp`, alem de warning de Game Changer.
 - Proxima decisao recomendada: escolher `Reversal of Fortune` se o objetivo for ganho medido; nao forcar `Fork` sem uma razao de design/deck owner.
 
+Revalidacao de `Reversal of Fortune` em Hermes, 2026-06-07:
+
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_reversal_revalidation_20260607_154522/`.
+- A evidencia foi recriada no SQLite Hermes atual antes de qualquer apply.
+- Baseline fresco id `2`: `86.7%` WR, `260W/11L/29S`, 300 jogos.
+- `Reversal of Fortune` nao reproduziu o ganho anterior: scan `83.3%`, full confirmation `85.3%`, delta `-1.4pp`, `256W/7L/37S`.
+- `master_optimizer_apply.py` bloqueou corretamente o apply porque nao havia candidato aprovado com delta minimo seguro.
+- Nenhuma mutacao foi feita: `Past in Flames` continua presente e `Reversal of Fortune` continua ausente.
+- Rechecagem adicional encontrou apenas ganhos marginais: `Invoke Calamity` `+0.6pp` e `Restoration Seminar` `+0.6pp`.
+- Estado recomendado: nao aplicar `Reversal of Fortune` com a evidencia atual; se ainda quiser otimizar o slot `Past in Flames`, rodar amostra maior para `Invoke Calamity`/`Restoration Seminar` ou ampliar o scan.
+
+E2E corrigido + apply local seguro em Hermes, 2026-06-07:
+
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_e2e_apply_20260607_162220/`.
+- Script instalado no Hermes: `/opt/data/scripts/manaloom-master-optimizer-end-to-end.sh`.
+- Correcoes validadas no fluxo: E2E agora roda `slot_optimizer.py` e `full_confirmation` antes do handoff.
+- Metadata sync: 2428 nomes solicitados, 2629 cartas Postgres correspondidas, 2501 aliases no SQLite, 2 unresolved.
+- Preflight: `approved`.
+- Baseline fresco id `3`: `85.3%` WR, `256W/10L/34S`, 300 jogos, hash `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`.
+- Slot scan seguro: 120 candidatos testados, 851 off-color filtrados, 18 ilegais filtrados.
+- Full confirmation aprovou:
+  - `Cloudshift` sobre `Generous Gift`: `89.0%`, delta `+3.7pp`, mas nao aplicado por risco de role mismatch e reducao de removal/interacao.
+  - `Wheel of Misfortune` sobre `Reforge the Soul`: `88.0%`, delta `+2.7pp`.
+  - `Return the Favor` sobre `Past in Flames`: `87.7%`, delta `+2.4pp`.
+- Replay audit pre-apply: `turn_by_turn_clean`, 1423 eventos estruturados, 0 findings turno-a-turno.
+- Apply local Hermes executado apenas para `Wheel of Misfortune` sobre `Reforge the Soul`.
+- Rollback gerado no servidor: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_rollback_20260607T162657677855+0000.json`.
+- Hash apos apply: `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`.
+- Verificacao direta no SQLite Hermes: `Wheel of Misfortune` presente; `Reforge the Soul` ausente.
+- Baseline pos-apply id `4`: `89.3%` WR, `268W/6L/26S`, 300 jogos, 33 lands, 100 cartas.
+- Replay audit pos-apply: `turn_by_turn_clean`, 1303 eventos estruturados, 0 findings turno-a-turno.
+- Handoff produto criado com status `needs_product_owner_approval`.
+- Nenhum banco de producao/app foi alterado.
+
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
+
+Hardening de oponentes reais em Hermes, 2026-06-07:
+
+- Problema encontrado: `battle_analyst_v8.py` buscava apenas os 12 `learned_decks` mais recentes; esses registros recentes eram meta decks pequenos/incompletos com `card_list` de 69-88 bytes, entao o battle voltava para os 6 perfis genericos.
+- Fonte real validada no Postgres: `meta_decks` contem 581 decks com `card_list` preenchido; `commander_reference_decks` contem 22 decks aceitos com 90+ cartas resolvidas; `commander_learned_decks` contem 5 decks ativos validos, alem de Lorehold.
+- Novo script versionado: `sync_pg_meta_decks_to_hermes.py`.
+- Contrato do novo sync: le `meta_decks` no Postgres real, converte decklists texto (`1 Card Name`) para JSON local e escreve somente no SQLite Hermes em `learned_decks` com `source='pg_meta_decks'`.
+- Sync real aplicado no container: 120 decks PG importados para `learned_decks`, todos com pelo menos 80 cartas; amostra inclui Kinnan, Rograkh, Tayam, Thrasios, Umbris, Kenrith, Kefka e Najeela.
+- `sync_pg_card_metadata_to_hermes.py` rerodado apos o sync: 3377 nomes solicitados, 3573 cartas Postgres correspondidas, 3464 aliases no `card_oracle_cache`, 10 unresolved.
+- `battle_analyst_v8.py` agora prefere candidatos reais validos, ignora registros pequenos, remove comandante duplicado, monta comandante + 99, infere `land/ramp/removal/counter/draw/tutor/wincon` via `card_oracle_cache` e embaralha o pool por seed.
+- Variacao controlada:
+  - `MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES`, default `96`.
+  - `MANALOOM_BATTLE_REAL_OPPONENT_LIMIT`, default `12`.
+  - `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`.
+  - `MANALOOM_BATTLE_REAL_OPPONENT_SEED`; se ausente, varia por hora UTC.
+- `battle_replay_v10_3.py` agora sorteia os 3 oponentes do replay em vez de fixar sempre `source[0]`, e registra `Opponents picked`.
+- Prova direta do battle: `MANALOOM_BATTLE_REAL_OPPONENT_LIMIT=6` rodou 300 jogos contra 6 oponentes reais PG e registrou `Using 6 REAL learned opponent decks`; resultado `57.3%` WR, `172W/126L/2S`.
+- Prova do optimizer: baseline id `12`, 240 jogos contra 12 oponentes reais PG, `56.2%` WR, `135W/103L/2S`; relatorio `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260607_173227.md`.
+- Prova de replay: `/opt/data/artifacts/hermes_master_optimizer/replay_real_opponents_20260607.txt` escolheu `Sisay, Weatherlight Captain`, `Urza, Lord High Artificer` e `Magda, Brazen Outlaw` como oponentes reais.
+- Cron `/opt/data/scripts/manaloom-master-optimizer-auto-cycle.sh` atualizado no servidor para rodar `sync_pg_meta_decks_to_hermes.py --apply` antes de `sync_pg_card_metadata_to_hermes.py`, baseline e slot scan.
+- Estado importante: a comparacao com baselines antigos mudou de dificuldade; os resultados contra perfis genericos nao devem ser comparados diretamente com os novos resultados contra decks reais PG.
+
+Hardening de regras de battle em Hermes, 2026-06-07:
+
+- Problema revisado: o battle ainda era um simulador heuristico, nao um rules engine completo; os pontos mais perigosos eram `miracle`, duracao de efeitos temporarios, `Boros Charm`, `Akroma's Will`, `silence_opponents` e `life_cant_change`.
+- `Player.draw()` agora conta `cards_drawn_this_turn`.
+- `play_turn_v8()` zera o contador no inicio do turno e `miracle` so pode disparar se a carta comprada foi a primeira compra real do turno.
+- `miracle` continua exigindo `Lorehold, the Historian` em campo e mana suficiente; o simulador ainda escolhe automaticamente castar se puder pagar.
+- `Boros Charm` em resposta a board wipe agora concede `indestructible` temporario as criaturas, em vez de apenas marcar `player.indestructible`.
+- `Boros Charm` modo double strike nao dobra poder e passa a ser ate o fim do turno.
+- `Akroma's Will` agora concede `flying`, `double_strike`, `lifelink` e `indestructible` ate o fim do turno e nao dobra poder.
+- Sistema `until end of turn` criado com restauracao de atributos originais no cleanup.
+- `silence_opponents` agora bloqueia counters/respostas dos oponentes contra spells do controlador e tambem bloqueia instants no end step do jogador ativo.
+- `life_cant_change`/`protection_from_everything` agora bloqueiam dano e ganho de vida nos helpers de vida usados pelo battle.
+- Testes adicionados em `test_battle_analyst_v10_3.py`:
+  - miracle exige Lorehold em campo;
+  - miracle dispara so na primeira compra do turno;
+  - miracle nao dispara na segunda compra se houve draw no upkeep;
+  - Boros Charm protege criaturas ate cleanup;
+  - Akroma's Will limpa keywords no cleanup e nao muda poder permanentemente;
+  - silence bloqueia counterspell;
+  - life can't change bloqueia dano/ganho de vida.
+- Validacao local: `python -m py_compile ...` aprovado e 31 testes passaram.
+- Validacao Hermes container: `python3 test_battle_analyst_v10_3.py` aprovado com 31 testes.
+- Smoke baseline Hermes: baseline id `13`, 15 jogos contra 3 oponentes reais, `73.3%` WR; relatorio `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260607_174845.md`.
+- Batalha volumetrica Hermes: 300 jogos contra 6 oponentes reais, `64.3%` WR, `193W/103L/4S`.
+- Replay estruturado Hermes: `/opt/data/artifacts/hermes_master_optimizer/replay_rules_hardening_20260607.txt`, com oponentes reais `Sisay`, `Urza` e `Magda`.
+- Ainda nao e rules engine 100% MTG: custos modais completos, todos os tipos de replacement/prevention effects, escolha humana de miracle, alvo modal exato e todas as camadas de continuous effects continuam simplificados.
+
+Auditoria de cobertura de efeitos em Hermes, 2026-06-07:
+
+- Problema revisado: corrigir efeitos do Lorehold nao garante que os oponentes reais estejam modelados corretamente; decks reais trazem centenas de triggers, efeitos temporarios, permissoes de cast e lands utilitarias.
+- Novo script versionado: `battle_effect_coverage_audit.py`.
+- A auditoria classifica cada carta por fonte de efeito: `handcrafted`, `generated`, `tag`, `effect_map`, `type_land`, `type_creature` ou `unknown`.
+- `battle_analyst_v8.py` agora preserva `HANDCRAFTED_KNOWN_CARDS` para diferenciar regras escritas a mao de entradas geradas.
+- `get_card_effect()` agora normaliza erros perigosos via oracle text: target removal, counterspells, board wipe de nonland permanent e falso `silence_opponents` causado por "can't be countered".
+- Lands agora sao tratadas primariamente como `land`; habilidades utilitarias como channel/ativacoes entram no relatorio como `land_utility_ability_not_modeled`, nao como removal/counter gratis.
+- Nomes de oponentes reais agora incluem o id do deck aprendido, evitando relatorios que pareciam somar dois decks diferentes do mesmo comandante em uma lista de 198 cartas.
+- Cron `manaloom-master-optimizer-preflight` agora sincroniza `meta_decks` do Postgres real antes do sync de metadata.
+- Cron `manaloom-master-optimizer-auto-cycle` agora roda sync de `meta_decks` antes de metadata e gera auditoria de cobertura antes do handoff/apply.
+- Validacao local: `py_compile` aprovado, 31 testes de battle passaram, preflight local aprovado.
+- Validacao Hermes container: `bash -n` dos scripts de cron aprovado, `py_compile` aprovado, 31 testes de battle passaram, preflight aprovado.
+- Auditoria fresca Hermes: `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260607_180414.md`.
+- JSON fresco Hermes: `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260607_180414.json`.
+- Snapshot da auditoria Hermes: 12 oponentes reais, 1288 instancias de cartas, 554 cartas unicas.
+- Fontes de efeito na auditoria Hermes: `handcrafted=98`, `generated=599`, `tag=71`, `effect_map=123`, `type_land=377`, `unknown=20`.
+- Flags de risco na auditoria Hermes: `heuristic_effect=793`, `trigger_not_explicit=133`, `temporary_effect_not_explicit=63`, `cast_permission_not_explicit=77`, `land_utility_ability_not_modeled=48`, `oracle_target_removal_mismatch=9`, `oracle_silence_mismatch=1`, `copy_effect_mismatch=1`, `unknown_effect=20`.
+- Conclusao operacional: o battle ainda nao cobre "todas as regras sem excecao"; agora ele mede a lacuna e impede que a equipe trate heuristica como regra completa.
+- Proxima evolucao correta: transformar as cartas mais influentes marcadas pela auditoria em regras explicitas de `KNOWN_CARDS`, começando por cartas que aparecem nos candidatos aprovados, nos commanders oponentes e nos flags `oracle_*_mismatch`.
 
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py`
@@ -176,6 +286,7 @@ Arquivos principais:
 - `docs/hermes-analysis/manaloom-knowledge/scripts/hermes_provider_backoff.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
 
 ## O que ainda falta no battle
@@ -318,6 +429,46 @@ Se o replay mostrar decisao ruim, o problema volta para o battle, nao para o opt
 
 Estado atual: implementado. O auditor turno-a-turno bloqueia findings `critical/high`, exige revisao para `medium` antes de produto e aceita `low` apenas como polish de Hermes-local.
 
+## Cron auto-cycle funcional em Hermes, 2026-06-07
+
+Estado vivo validado no container `d5fe57bf9de2`:
+
+- `lorehold-knowncards-generator`: reativado com wrapper seguro `known_cards_generator_cron.sh`, schedule `every 120m`.
+- `lorehold-knowncards-validator`: trocado para wrapper seguro `known_cards_validator_cron.sh`, schedule `every 30m`.
+- `manaloom-master-optimizer-preflight`: ativo, schedule `every 20m`.
+- `manaloom-master-optimizer-auto-cycle`: criado e ativo, script `manaloom-master-optimizer-auto-cycle.sh`, schedule `every 180m`.
+- `manaloom-master-optimizer-slot-scan`: mantido pausado porque o auto-cycle ja executa baseline, scan, quality gate, confirmation e full confirmation.
+- `manaloom-master-optimizer-end-to-end`: mantido manual-only para prova completa sob demanda.
+
+Correcoes aplicadas para cron confiavel:
+
+- `generate_known_cards.py` e `kc_validator.py` deixaram de depender de credenciais hardcoded e passam a usar `PGHOST/PGDATABASE/PGUSER/PGPASSWORD` ou `DATABASE_URL` do ambiente do servidor.
+- `known_cards_generated.json` agora e escrito de forma atomica, reduzindo risco de arquivo parcial durante cron.
+- `replay_decision_auditor.py` agora escolhe diretorio gravavel para replays e cai para `/opt/data/artifacts/hermes_master_optimizer/replays` se `master_optimizer_reports/replays` estiver sem permissao.
+- `battle_replay_v10_3.py` cria os diretorios de saida antes de escrever replay/eventos.
+- `master_optimizer_confirmation.py` agora usa candidatos da fase `confirmation` como fonte primaria para `full_confirmation`.
+- `master_optimizer_common.py` ganhou gate de papel critico para impedir cortes que reduzam funcoes escassas como removal, wipe, draw e ramp sem reposicao de papel equivalente.
+- `master_optimizer_rollback.py` restaura deck Hermes local por rollback JSON e marca `swap_benchmarks.applied=-1` para nao reaplicar candidato revertido.
+- `master_optimizer_post_apply_gate.py` compara baseline antes/depois e faz rollback automatico quando o ganho nao se sustenta.
+- `master_optimizer_auto_cycle_cron.sh` executa o ciclo completo e aplica no maximo um swap Hermes-local por rodada, nunca no produto.
+
+Validacoes reais executadas:
+
+- `known_cards_generator_cron.sh`: `known_cards_generator=ok`; 689 entradas salvas na rodada de geracao direta.
+- `known_cards_validator_cron.sh`: `known_cards_validator=ok`; pool expandido para 1968 entradas filtradas na rodada de validacao curta.
+- Auto-cycle smoke pos-patch: `master_optimizer_auto_cycle=ok`, com apply bloqueado por falta de full confirmation aprovada.
+- Auto-cycle real: baseline `85.0%`, slot scan de 96 candidatos, full confirmation aprovou `Plaza of Heroes` sobre `Rise of the Eldrazi` com `+2.3pp`, apply Hermes-local executado.
+- Post-apply gate real: baseline pos-apply caiu para `83.7%`; rollback automatico executado com motivo `post_apply_delta_below_threshold:-1.3pp < +0.0pp`.
+- Verificacao direta SQLite: `Plaza of Heroes` ausente, `Rise of the Eldrazi` presente, `Wheel of Misfortune` presente, `Reforge the Soul` ausente.
+- Handoff de produto do swap revertido foi marcado como `superseded_by_rollback`.
+- Baseline final serio apos rollback: baseline id `11`, hash `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`, 300 jogos, `87.3%` WR, 100 cartas, 33 lands.
+
+Interpretação atual:
+
+- As crons agora estao funcionais para evoluir o Lorehold em Hermes com seguranca operacional.
+- A automacao pode aprender, testar, aplicar no SQLite Hermes e desfazer se o resultado pos-apply piorar.
+- Produto/app continuam protegidos: qualquer copia para deck real exige `optimizer_product_handoffs.status = needs_product_owner_approval` e checklist humano.
+
 ## Criterios de aprovacao
 
 Um pacote de otimizacao so fica aprovado quando tiver:
@@ -337,7 +488,8 @@ Use este prompt no Copilot/Codex:
 ```text
 Use o Hermes Master Optimizer Loop. Primeiro rode o preflight com relatorio.
 Se passar, rode baseline do battle, slot scan isolado e confirmacao full para os candidatos promissores.
-Nao aplique swaps automaticamente. Gere handoff com winrate, delta, motivo de cada swap, riscos, replays auditados e proximas correcoes do battle.
+Pode aplicar no SQLite Hermes local apenas se houver full confirmation aprovada, quality gate verde, hash atual compativel, rollback gerado e post-apply gate configurado.
+Nao aplique no produto automaticamente. Gere handoff com winrate, delta, motivo de cada swap, riscos, replays auditados e proximas correcoes do battle.
 Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix no battle_analyst_v8.py com teste novo em test_battle_analyst_v10_3.py.
 ```
 
@@ -345,8 +497,8 @@ Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix n
 
 Proximos passos agora sao de maturidade, nao de infraestrutura basica:
 
-- descartar o pacote Lorehold `86.0%` como autorizacao de apply e trata-lo apenas como diagnostico ate uma nova rodada com hash fresco;
-- aumentar amostra de replay audit para mais seeds quando for promover swap a produto;
+- deixar o auto-cycle rodar algumas janelas e revisar apenas os handoffs que sobreviverem ao post-apply gate;
+- aumentar amostra de replay audit para mais seeds quando for promover qualquer swap a produto;
 - criar um apply product-facing separado apenas depois do checklist `needs_product_owner_approval`;
 - limpar prompts antigos de jobs que ainda citam IDs/schema legados;
 - considerar limpar `last_error` antigos apenas apos cada job rodar de novo com `last_run_at` posterior a `2026-06-07T12:49:11+00:00`.

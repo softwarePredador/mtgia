@@ -7,10 +7,18 @@ ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/herm
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-/opt/data/secrets/manaloom-postgres.env}"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
 BASELINE_GAMES="${MANALOOM_BASELINE_GAMES:-50}"
+SLOT_GAMES="${MANALOOM_SLOT_GAMES:-10}"
+SLOT_MAX_PER_CATEGORY="${MANALOOM_SLOT_MAX_PER_CATEGORY:-15}"
+SLOT_PHASE="${MANALOOM_SLOT_PHASE:-phase1}"
+SLOT_CATEGORY="${MANALOOM_SLOT_CATEGORY:-}"
 CONFIRM_GAMES="${MANALOOM_CONFIRM_GAMES:-10}"
 CONFIRM_RUN_LIMIT="${MANALOOM_CONFIRM_RUN_LIMIT:-3}"
 CONFIRM_CANDIDATE_LIMIT="${MANALOOM_CONFIRM_CANDIDATE_LIMIT:-25}"
 CONFIRM_MIN_SCAN_DELTA="${MANALOOM_CONFIRM_MIN_SCAN_DELTA:--2.0}"
+FULL_CONFIRM_GAMES="${MANALOOM_FULL_CONFIRM_GAMES:-50}"
+FULL_CONFIRM_RUN_LIMIT="${MANALOOM_FULL_CONFIRM_RUN_LIMIT:-3}"
+FULL_CONFIRM_CANDIDATE_LIMIT="${MANALOOM_FULL_CONFIRM_CANDIDATE_LIMIT:-25}"
+FULL_CONFIRM_MIN_SCAN_DELTA="${MANALOOM_FULL_CONFIRM_MIN_SCAN_DELTA:-0.5}"
 LOCK_FILE="${MANALOOM_END_TO_END_LOCK:-/tmp/manaloom-master-optimizer-end-to-end.lock}"
 
 mkdir -p "$ARTIFACT_DIR"
@@ -58,6 +66,19 @@ log="$ARTIFACT_DIR/master_optimizer_end_to_end_$(date -u +%Y%m%d_%H%M%S).log"
     --games "$BASELINE_GAMES" \
     --report
 
+  echo "== slot scan =="
+  slot_args=(
+    --deck-id "$DECK_ID"
+    --games "$SLOT_GAMES"
+    --max-per-category "$SLOT_MAX_PER_CATEGORY"
+    --phase "$SLOT_PHASE"
+    --reset-current-baseline
+  )
+  if [[ -n "$SLOT_CATEGORY" ]]; then
+    slot_args+=(--category "$SLOT_CATEGORY")
+  fi
+  python3 "$SCRIPT_DIR/slot_optimizer.py" "${slot_args[@]}"
+
   echo "== quality gate =="
   python3 "$SCRIPT_DIR/master_optimizer_quality_gate.py" \
     --deck-id "$DECK_ID" \
@@ -71,6 +92,17 @@ log="$ARTIFACT_DIR/master_optimizer_end_to_end_$(date -u +%Y%m%d_%H%M%S).log"
     --run-limit "$CONFIRM_RUN_LIMIT" \
     --games "$CONFIRM_GAMES" \
     --min-scan-delta "$CONFIRM_MIN_SCAN_DELTA" \
+    --phase confirmation \
+    --report
+
+  echo "== full confirmation =="
+  python3 "$SCRIPT_DIR/master_optimizer_confirmation.py" \
+    --deck-id "$DECK_ID" \
+    --candidate-limit "$FULL_CONFIRM_CANDIDATE_LIMIT" \
+    --run-limit "$FULL_CONFIRM_RUN_LIMIT" \
+    --games "$FULL_CONFIRM_GAMES" \
+    --min-scan-delta "$FULL_CONFIRM_MIN_SCAN_DELTA" \
+    --phase full_confirmation \
     --report
 
   echo "== replay audit =="
