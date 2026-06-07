@@ -15,6 +15,10 @@ CONFIRM_GAMES="${MANALOOM_CONFIRM_GAMES:-10}"
 CONFIRM_RUN_LIMIT="${MANALOOM_CONFIRM_RUN_LIMIT:-3}"
 CONFIRM_CANDIDATE_LIMIT="${MANALOOM_CONFIRM_CANDIDATE_LIMIT:-25}"
 CONFIRM_MIN_SCAN_DELTA="${MANALOOM_CONFIRM_MIN_SCAN_DELTA:--2.0}"
+FULL_CONFIRM_GAMES="${MANALOOM_FULL_CONFIRM_GAMES:-50}"
+FULL_CONFIRM_RUN_LIMIT="${MANALOOM_FULL_CONFIRM_RUN_LIMIT:-3}"
+FULL_CONFIRM_CANDIDATE_LIMIT="${MANALOOM_FULL_CONFIRM_CANDIDATE_LIMIT:-25}"
+FULL_CONFIRM_MIN_SCAN_DELTA="${MANALOOM_FULL_CONFIRM_MIN_SCAN_DELTA:-0.5}"
 LOCK_FILE="${MANALOOM_END_TO_END_LOCK:-/tmp/manaloom-master-optimizer-end-to-end.lock}"
 
 mkdir -p "$ARTIFACT_DIR"
@@ -88,6 +92,17 @@ log="$ARTIFACT_DIR/master_optimizer_end_to_end_$(date -u +%Y%m%d_%H%M%S).log"
     --run-limit "$CONFIRM_RUN_LIMIT" \
     --games "$CONFIRM_GAMES" \
     --min-scan-delta "$CONFIRM_MIN_SCAN_DELTA" \
+    --phase confirmation \
+    --report
+
+  echo "== full confirmation =="
+  python3 "$SCRIPT_DIR/master_optimizer_confirmation.py" \
+    --deck-id "$DECK_ID" \
+    --candidate-limit "$FULL_CONFIRM_CANDIDATE_LIMIT" \
+    --run-limit "$FULL_CONFIRM_RUN_LIMIT" \
+    --games "$FULL_CONFIRM_GAMES" \
+    --min-scan-delta "$FULL_CONFIRM_MIN_SCAN_DELTA" \
+    --phase full_confirmation \
     --report
 
   echo "== replay audit =="

@@ -939,6 +939,7 @@ correta de validar job e olhar:
 - roda slot scan fresco para o baseline atual;
 - roda quality gate;
 - roda confirmation;
+- roda full confirmation;
 - roda replay audit;
 - roda handoff.
 
@@ -946,7 +947,11 @@ Furo identificado durante esta documentacao e corrigido no script versionado:
 `master_optimizer_end_to_end.sh` nao rodava `slot_optimizer.py` entre baseline e
 quality gate. Agora ele executa slot scan com `--reset-current-baseline`, usando
 `MANALOOM_SLOT_GAMES`, `MANALOOM_SLOT_MAX_PER_CATEGORY`, `MANALOOM_SLOT_PHASE` e
-`MANALOOM_SLOT_CATEGORY` quando definidos.
+`MANALOOM_SLOT_CATEGORY` quando definidos. O script tambem roda
+`full_confirmation` antes do replay audit/handoff, usando
+`MANALOOM_FULL_CONFIRM_GAMES`, `MANALOOM_FULL_CONFIRM_RUN_LIMIT`,
+`MANALOOM_FULL_CONFIRM_CANDIDATE_LIMIT` e
+`MANALOOM_FULL_CONFIRM_MIN_SCAN_DELTA`.
 
 ## Estado atual do Lorehold
 
