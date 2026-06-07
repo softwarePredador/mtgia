@@ -10,6 +10,7 @@ BASELINE_GAMES="${MANALOOM_BASELINE_GAMES:-50}"
 CONFIRM_GAMES="${MANALOOM_CONFIRM_GAMES:-10}"
 CONFIRM_RUN_LIMIT="${MANALOOM_CONFIRM_RUN_LIMIT:-3}"
 CONFIRM_CANDIDATE_LIMIT="${MANALOOM_CONFIRM_CANDIDATE_LIMIT:-25}"
+CONFIRM_MIN_SCAN_DELTA="${MANALOOM_CONFIRM_MIN_SCAN_DELTA:--2.0}"
 LOCK_FILE="${MANALOOM_END_TO_END_LOCK:-/tmp/manaloom-master-optimizer-end-to-end.lock}"
 
 mkdir -p "$ARTIFACT_DIR"
@@ -69,6 +70,7 @@ log="$ARTIFACT_DIR/master_optimizer_end_to_end_$(date -u +%Y%m%d_%H%M%S).log"
     --candidate-limit "$CONFIRM_CANDIDATE_LIMIT" \
     --run-limit "$CONFIRM_RUN_LIMIT" \
     --games "$CONFIRM_GAMES" \
+    --min-scan-delta "$CONFIRM_MIN_SCAN_DELTA" \
     --report
 
   echo "== replay audit =="
