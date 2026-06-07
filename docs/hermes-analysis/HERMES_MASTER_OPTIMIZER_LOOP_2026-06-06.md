@@ -177,6 +177,29 @@ Revalidacao de `Reversal of Fortune` em Hermes, 2026-06-07:
 - Rechecagem adicional encontrou apenas ganhos marginais: `Invoke Calamity` `+0.6pp` e `Restoration Seminar` `+0.6pp`.
 - Estado recomendado: nao aplicar `Reversal of Fortune` com a evidencia atual; se ainda quiser otimizar o slot `Past in Flames`, rodar amostra maior para `Invoke Calamity`/`Restoration Seminar` ou ampliar o scan.
 
+E2E corrigido + apply local seguro em Hermes, 2026-06-07:
+
+- Artefatos locais: `docs/hermes-analysis/master_optimizer_reports/lorehold_e2e_apply_20260607_162220/`.
+- Script instalado no Hermes: `/opt/data/scripts/manaloom-master-optimizer-end-to-end.sh`.
+- Correcoes validadas no fluxo: E2E agora roda `slot_optimizer.py` e `full_confirmation` antes do handoff.
+- Metadata sync: 2428 nomes solicitados, 2629 cartas Postgres correspondidas, 2501 aliases no SQLite, 2 unresolved.
+- Preflight: `approved`.
+- Baseline fresco id `3`: `85.3%` WR, `256W/10L/34S`, 300 jogos, hash `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`.
+- Slot scan seguro: 120 candidatos testados, 851 off-color filtrados, 18 ilegais filtrados.
+- Full confirmation aprovou:
+  - `Cloudshift` sobre `Generous Gift`: `89.0%`, delta `+3.7pp`, mas nao aplicado por risco de role mismatch e reducao de removal/interacao.
+  - `Wheel of Misfortune` sobre `Reforge the Soul`: `88.0%`, delta `+2.7pp`.
+  - `Return the Favor` sobre `Past in Flames`: `87.7%`, delta `+2.4pp`.
+- Replay audit pre-apply: `turn_by_turn_clean`, 1423 eventos estruturados, 0 findings turno-a-turno.
+- Apply local Hermes executado apenas para `Wheel of Misfortune` sobre `Reforge the Soul`.
+- Rollback gerado no servidor: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_rollback_20260607T162657677855+0000.json`.
+- Hash apos apply: `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`.
+- Verificacao direta no SQLite Hermes: `Wheel of Misfortune` presente; `Reforge the Soul` ausente.
+- Baseline pos-apply id `4`: `89.3%` WR, `268W/6L/26S`, 300 jogos, 33 lands, 100 cartas.
+- Replay audit pos-apply: `turn_by_turn_clean`, 1303 eventos estruturados, 0 findings turno-a-turno.
+- Handoff produto criado com status `needs_product_owner_approval`.
+- Nenhum banco de producao/app foi alterado.
+
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
 Arquivos principais:
