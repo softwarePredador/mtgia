@@ -92,6 +92,12 @@ apply_out="$(mktemp)"
     --sqlite-db "$SCRIPT_DIR/knowledge.db" \
     --report "$ARTIFACT_DIR/card_oracle_cache_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
 
+  echo "== battle card rules sync =="
+  python3 "$SCRIPT_DIR/sync_battle_card_rules.py" \
+    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --apply \
+    --report "$ARTIFACT_DIR/battle_card_rules_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
+
   echo "== preflight =="
   python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report
 

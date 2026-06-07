@@ -15,6 +15,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from master_optimizer_common import (
+    DEFAULT_DB,
     PROTECTED_CARDS,
     SCRIPT_DIR,
     assert_current_deck_matches_baseline,
@@ -32,6 +33,7 @@ from master_optimizer_common import (
     temporary_swap,
     utc_now,
 )
+import battle_rule_registry
 
 KC_JSON = SCRIPT_DIR / "known_cards_generated.json"
 LOCK_FILE = Path(os.environ.get("MANALOOM_SLOT_SCAN_LOCK", "/tmp/optimizer_v3.lock"))
@@ -99,8 +101,26 @@ EXTRA_PROTECTED = {
 
 
 def load_known_cards() -> dict[str, dict[str, object]]:
-    with KC_JSON.open("r", encoding="utf-8") as fh:
-        return json.load(fh)
+    if KC_JSON.exists():
+        with KC_JSON.open("r", encoding="utf-8") as fh:
+            known_cards = json.load(fh)
+    else:
+        known_cards = {}
+    rules = battle_rule_registry.load_active_battle_card_rules(DEFAULT_DB)
+    for rule in rules.values():
+        name = str(rule.get("card_name") or "")
+        effect = dict(rule.get("effect_json") or {})
+        if not name or not effect:
+            continue
+        role = dict(rule.get("deck_role_json") or {})
+        merged = dict(known_cards.get(name, {}))
+        merged.update(effect)
+        if role.get("category"):
+            merged["deck_category"] = role["category"]
+        merged["battle_rule_source"] = rule.get("source")
+        merged["battle_rule_review_status"] = rule.get("review_status")
+        known_cards[name] = merged
+    return known_cards
 
 
 def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]]) -> str:
@@ -108,6 +128,8 @@ def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]])
     if "Land" in type_line:
         return "land"
     entry = known_cards.get(name, {})
+    if entry.get("deck_category"):
+        return str(entry["deck_category"])
     effect = str(entry.get("effect") or "")
     if effect in EFFECT_TO_CATEGORY:
         return EFFECT_TO_CATEGORY[effect]
@@ -200,7 +222,7 @@ def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, onl
             stats["basic"] += 1
             continue
         effect = str(entry.get("effect") or "unknown")
-        category = EFFECT_TO_CATEGORY.get(effect, "unknown")
+        category = str(entry.get("deck_category") or EFFECT_TO_CATEGORY.get(effect, "unknown"))
         if category == "unknown" or category == "land":
             stats["unknown_category"] += 1
             continue

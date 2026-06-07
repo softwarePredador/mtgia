@@ -42,6 +42,12 @@ python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --sqlite-db "$SCRIPT_DIR/knowledge.db" \
   --report "$sync_report"
 
+battle_rules_report="$ARTIFACT_DIR/battle_card_rules_sync_$(date -u +%Y%m%d_%H%M%S).json"
+python3 "$SCRIPT_DIR/sync_battle_card_rules.py" \
+  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+  --apply \
+  --report "$battle_rules_report"
+
 preflight_log="$ARTIFACT_DIR/master_optimizer_preflight_$(date -u +%Y%m%d_%H%M%S).log"
 python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report | tee "$preflight_log"
 
@@ -53,4 +59,5 @@ fi
 echo "master_optimizer_preflight=ok"
 echo "meta_decks_log=$meta_decks_log"
 echo "sync_report=$sync_report"
+echo "battle_rules_report=$battle_rules_report"
 echo "preflight_log=$preflight_log"

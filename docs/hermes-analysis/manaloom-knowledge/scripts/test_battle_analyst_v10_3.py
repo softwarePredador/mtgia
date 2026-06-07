@@ -10,6 +10,7 @@ import json
 import os
 import random
 import sqlite3
+import tempfile
 from pathlib import Path
 
 
@@ -654,6 +655,44 @@ def test_card_oracle_cache_enriches_battle_cards():
     conn.close()
 
 
+def test_battle_card_rules_table_overrides_fallbacks():
+    if battle.battle_rule_registry is None:
+        raise AssertionError("battle_rule_registry failed to import")
+    old_db = battle.DB
+    with tempfile.TemporaryDirectory() as tmp:
+        db_path = Path(tmp) / "rules.db"
+        conn = sqlite3.connect(db_path)
+        battle.battle_rule_registry.upsert_battle_card_rule(
+            conn,
+            "Registry Counter",
+            {"effect": "counter", "instant": True},
+            source="manual",
+            confidence=1.0,
+            review_status="verified",
+            notes="Unit test rule.",
+        )
+        conn.commit()
+        conn.close()
+
+        try:
+            battle.DB = str(db_path)
+            battle.battle_rule_registry._RULE_CACHE.clear()
+            effect = battle.get_card_effect(
+                {
+                    "name": "Registry Counter",
+                    "type_line": "Sorcery",
+                    "oracle_text": "A deliberately weird test card.",
+                }
+            )
+
+            assert effect["effect"] == "counter"
+            assert effect["_rule_source"] == "manual"
+            assert battle.is_instant({"name": "Registry Counter", "type_line": "Sorcery"})
+        finally:
+            battle.DB = old_db
+            battle.battle_rule_registry._RULE_CACHE.clear()
+
+
 def test_lorehold_miracle_requires_lorehold_on_battlefield():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -870,6 +909,7 @@ if __name__ == "__main__":
         test_indestructible_blocker_survives_lethal_combat_damage,
         test_double_strike_trample_deals_excess_in_both_steps,
         test_card_oracle_cache_enriches_battle_cards,
+        test_battle_card_rules_table_overrides_fallbacks,
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
         test_lorehold_miracle_does_not_use_second_draw_of_turn,
