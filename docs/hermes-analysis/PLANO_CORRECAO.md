@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-07 19:00 UTC
+> Data: 2026-06-07 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,7 +20,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
    com `uri_does_not_exist`.
 5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
-   **REVALIDADO no checkout local `1fbc07d8` em 2026-06-06 23:00 UTC**.
+   **REVALIDADO no checkout local `82b85df2` em 2026-06-07 23:00 UTC**.
    `POST /ai/optimize` e `POST /ai/archetypes` continuam chamados pelo app com
    `deck_id`, mas as queries reais carregam `decks`/`deck_cards` por `id` sem
    `user_id`: a rota optimize le `userId` e nao passa para
@@ -584,8 +584,8 @@ app-side novo sem chamada.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-05 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `49939bb6`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
+- **Status 2026-06-07 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `82b85df2`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
   jobs async de optimize/generate nao esta resolvida nesta branch. `POST /ai/rebuild`,
   `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram usados como
   controles positivos de owner gate. `/decks/:id/recommendations`,
@@ -604,7 +604,7 @@ app-side novo sem chamada.
     `server/routes/ai/optimize/index.dart:549`-`:558` sem passar usuario.
   - `server/lib/ai/optimize_request_support.dart:53`-`:73` declara o loader
     sem `userId` e consulta `SELECT name, format FROM decks WHERE id = @id`;
-    `:87`-`:110` carrega cartas por `WHERE dc.deck_id = @id`.
+    `:87`-`:137` carrega cartas por `WHERE dc.deck_id = @id`.
   - O app tambem envia `POST /ai/archetypes` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`;
     `server/routes/ai/archetypes/index.dart:39`-`:42` busca o deck por `id`
