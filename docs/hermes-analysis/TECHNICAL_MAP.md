@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 19:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 23:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -167,7 +167,7 @@ mtgia/
   ciclo local backend.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1 — Coerencia app-facing de IA/deck revalidada no checkout local**: a
-  rodada de coerencia de 2026-06-06 23:00 UTC (`1fbc07d8`) confirmou drift entre
+  rodada de coerencia de 2026-06-07 23:00 UTC (`82b85df2`) confirmou drift entre
   app, rotas e support. `POST /ai/optimize` e chamado pelo app com `deck_id`,
   mas `server/routes/ai/optimize/index.dart` nao passa `userId` para
   `loadOptimizeDeckContext`, e `server/lib/ai/optimize_request_support.dart`
