@@ -358,6 +358,46 @@ Se o replay mostrar decisao ruim, o problema volta para o battle, nao para o opt
 
 Estado atual: implementado. O auditor turno-a-turno bloqueia findings `critical/high`, exige revisao para `medium` antes de produto e aceita `low` apenas como polish de Hermes-local.
 
+## Cron auto-cycle funcional em Hermes, 2026-06-07
+
+Estado vivo validado no container `d5fe57bf9de2`:
+
+- `lorehold-knowncards-generator`: reativado com wrapper seguro `known_cards_generator_cron.sh`, schedule `every 120m`.
+- `lorehold-knowncards-validator`: trocado para wrapper seguro `known_cards_validator_cron.sh`, schedule `every 30m`.
+- `manaloom-master-optimizer-preflight`: ativo, schedule `every 20m`.
+- `manaloom-master-optimizer-auto-cycle`: criado e ativo, script `manaloom-master-optimizer-auto-cycle.sh`, schedule `every 180m`.
+- `manaloom-master-optimizer-slot-scan`: mantido pausado porque o auto-cycle ja executa baseline, scan, quality gate, confirmation e full confirmation.
+- `manaloom-master-optimizer-end-to-end`: mantido manual-only para prova completa sob demanda.
+
+Correcoes aplicadas para cron confiavel:
+
+- `generate_known_cards.py` e `kc_validator.py` deixaram de depender de credenciais hardcoded e passam a usar `PGHOST/PGDATABASE/PGUSER/PGPASSWORD` ou `DATABASE_URL` do ambiente do servidor.
+- `known_cards_generated.json` agora e escrito de forma atomica, reduzindo risco de arquivo parcial durante cron.
+- `replay_decision_auditor.py` agora escolhe diretorio gravavel para replays e cai para `/opt/data/artifacts/hermes_master_optimizer/replays` se `master_optimizer_reports/replays` estiver sem permissao.
+- `battle_replay_v10_3.py` cria os diretorios de saida antes de escrever replay/eventos.
+- `master_optimizer_confirmation.py` agora usa candidatos da fase `confirmation` como fonte primaria para `full_confirmation`.
+- `master_optimizer_common.py` ganhou gate de papel critico para impedir cortes que reduzam funcoes escassas como removal, wipe, draw e ramp sem reposicao de papel equivalente.
+- `master_optimizer_rollback.py` restaura deck Hermes local por rollback JSON e marca `swap_benchmarks.applied=-1` para nao reaplicar candidato revertido.
+- `master_optimizer_post_apply_gate.py` compara baseline antes/depois e faz rollback automatico quando o ganho nao se sustenta.
+- `master_optimizer_auto_cycle_cron.sh` executa o ciclo completo e aplica no maximo um swap Hermes-local por rodada, nunca no produto.
+
+Validacoes reais executadas:
+
+- `known_cards_generator_cron.sh`: `known_cards_generator=ok`; 689 entradas salvas na rodada de geracao direta.
+- `known_cards_validator_cron.sh`: `known_cards_validator=ok`; pool expandido para 1968 entradas filtradas na rodada de validacao curta.
+- Auto-cycle smoke pos-patch: `master_optimizer_auto_cycle=ok`, com apply bloqueado por falta de full confirmation aprovada.
+- Auto-cycle real: baseline `85.0%`, slot scan de 96 candidatos, full confirmation aprovou `Plaza of Heroes` sobre `Rise of the Eldrazi` com `+2.3pp`, apply Hermes-local executado.
+- Post-apply gate real: baseline pos-apply caiu para `83.7%`; rollback automatico executado com motivo `post_apply_delta_below_threshold:-1.3pp < +0.0pp`.
+- Verificacao direta SQLite: `Plaza of Heroes` ausente, `Rise of the Eldrazi` presente, `Wheel of Misfortune` presente, `Reforge the Soul` ausente.
+- Handoff de produto do swap revertido foi marcado como `superseded_by_rollback`.
+- Baseline final serio apos rollback: baseline id `11`, hash `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`, 300 jogos, `87.3%` WR, 100 cartas, 33 lands.
+
+Interpretação atual:
+
+- As crons agora estao funcionais para evoluir o Lorehold em Hermes com seguranca operacional.
+- A automacao pode aprender, testar, aplicar no SQLite Hermes e desfazer se o resultado pos-apply piorar.
+- Produto/app continuam protegidos: qualquer copia para deck real exige `optimizer_product_handoffs.status = needs_product_owner_approval` e checklist humano.
+
 ## Criterios de aprovacao
 
 Um pacote de otimizacao so fica aprovado quando tiver:
@@ -377,7 +417,8 @@ Use este prompt no Copilot/Codex:
 ```text
 Use o Hermes Master Optimizer Loop. Primeiro rode o preflight com relatorio.
 Se passar, rode baseline do battle, slot scan isolado e confirmacao full para os candidatos promissores.
-Nao aplique swaps automaticamente. Gere handoff com winrate, delta, motivo de cada swap, riscos, replays auditados e proximas correcoes do battle.
+Pode aplicar no SQLite Hermes local apenas se houver full confirmation aprovada, quality gate verde, hash atual compativel, rollback gerado e post-apply gate configurado.
+Nao aplique no produto automaticamente. Gere handoff com winrate, delta, motivo de cada swap, riscos, replays auditados e proximas correcoes do battle.
 Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix no battle_analyst_v8.py com teste novo em test_battle_analyst_v10_3.py.
 ```
 
@@ -385,8 +426,8 @@ Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix n
 
 Proximos passos agora sao de maturidade, nao de infraestrutura basica:
 
-- descartar o pacote Lorehold `86.0%` como autorizacao de apply e trata-lo apenas como diagnostico ate uma nova rodada com hash fresco;
-- aumentar amostra de replay audit para mais seeds quando for promover swap a produto;
+- deixar o auto-cycle rodar algumas janelas e revisar apenas os handoffs que sobreviverem ao post-apply gate;
+- aumentar amostra de replay audit para mais seeds quando for promover qualquer swap a produto;
 - criar um apply product-facing separado apenas depois do checklist `needs_product_owner_approval`;
 - limpar prompts antigos de jobs que ainda citam IDs/schema legados;
 - considerar limpar `last_error` antigos apenas apos cada job rodar de novo com `last_run_at` posterior a `2026-06-07T12:49:11+00:00`.

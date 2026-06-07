@@ -1,18 +1,52 @@
 """Comprehensive fix: reclassify ALL unknowns with better patterns + fix PG parsing."""
 import sqlite3, subprocess, os, re, json
+from pathlib import Path
 
-DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
-OUT = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json'
+DEFAULT_SCRIPT_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts")
+SCRIPT_DIR = Path(os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", DEFAULT_SCRIPT_DIR))
+DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", str(SCRIPT_DIR / "knowledge.db"))
+OUT = os.environ.get("MANALOOM_KNOWN_CARDS_OUT", str(SCRIPT_DIR / "known_cards_generated.json"))
 
-os.environ["PGPASSWORD"] = "c2abeef5e66f21b0ce86"
+
+def _pg_command():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return ["psql", database_url]
+
+    host = os.environ.get("PGHOST") or os.environ.get("DB_HOST")
+    port = os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432"
+    user = os.environ.get("PGUSER") or os.environ.get("DB_USER")
+    database = os.environ.get("PGDATABASE") or os.environ.get("DB_NAME")
+    password = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASS")
+    if password and not os.environ.get("PGPASSWORD"):
+        os.environ["PGPASSWORD"] = password
+
+    missing = [
+        name
+        for name, value in (
+            ("PGHOST/DB_HOST", host),
+            ("PGUSER/DB_USER", user),
+            ("PGDATABASE/DB_NAME", database),
+            ("PGPASSWORD/DB_PASS", os.environ.get("PGPASSWORD")),
+        )
+        if not value
+    ]
+    if missing:
+        raise RuntimeError("Postgres environment missing: " + ", ".join(missing))
+    return ["psql", "-h", host, "-p", port, "-U", user, "-d", database]
 
 def pg(query):
     """PG query using RECORD=0x1e FIELD=0x1f (printable, no null bytes)."""
+    command = _pg_command() + [
+        "-t", "-A", "-F", "\x1f", "-R", "\x1e", "-c", query
+    ]
     r = subprocess.run(
-        ["psql","-h","143.198.230.247","-p","5433","-U","postgres","-d","halder",
-         "-t","-A","-F","\x1f","-R","\x1e","-c",query],
+        command,
         capture_output=True, text=True, timeout=60
     )
+    if r.returncode != 0:
+        detail = (r.stderr or "psql failed").strip().splitlines()[-1]
+        raise RuntimeError(detail[:300])
     rows = []
     for line in r.stdout.strip().split("\x1e"):
         line = line.strip()
@@ -47,7 +81,7 @@ for row in conn.execute(
 print(f"Total Lorehold cards: {len(all_cards)}")
 
 # 2. Existing handcrafted
-battle_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'battle_analyst_v8.py')
+battle_path = os.path.join(str(SCRIPT_DIR), 'battle_analyst_v8.py')
 with open(battle_path) as f:
     battle_text = f.read()
 existing_hand = set(re.findall(r'"([^"]+)"\s*:\s*\{',
@@ -403,8 +437,15 @@ for name in sorted(missing):
 # 6. Save only non-unknown
 filtered = {k: v for k, v in new_entries.items() if v["effect"] != "unknown"}
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-with open(OUT, "w") as f:
+tmp_out = f"{OUT}.tmp.{os.getpid()}"
+with open(tmp_out, "w", encoding="utf-8") as f:
     json.dump(filtered, f, indent=2, sort_keys=True, default=str)
+    f.write("\n")
+os.replace(tmp_out, OUT)
+try:
+    os.chmod(OUT, 0o664)
+except OSError:
+    pass
 
 print(f"\nEffect distribution:")
 for eff, cnt in sorted(stats.items(), key=lambda x: -x[1]):

@@ -26,6 +26,8 @@ def load_battle():
 def main():
     battle = load_battle()
 
+    Path(OUT).parent.mkdir(parents=True, exist_ok=True)
+    Path(EVENTS_OUT).parent.mkdir(parents=True, exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as replay, open(EVENTS_OUT, "w", encoding="utf-8") as events:
         def log(event, data):
             events.write(

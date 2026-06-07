@@ -20,6 +20,66 @@ from master_optimizer_common import (
 )
 
 
+def confirmed_candidate_rows(
+    conn,
+    *,
+    deck_id: int,
+    baseline_id: int,
+    baseline_hash: str,
+    baseline_wr: float,
+    limit: int,
+    include_existing: bool,
+    only_added: str,
+):
+    where = [
+        "phase='confirmation'",
+        "deck_id=?",
+        "baseline_id=?",
+        "baseline_hash=?",
+    ]
+    params: list[object] = [deck_id, baseline_id, baseline_hash]
+    if not include_existing:
+        where.append(
+            """
+            card_added NOT IN (
+                SELECT card_added FROM swap_benchmarks
+                WHERE phase='full_confirmation'
+                  AND deck_id=?
+                  AND baseline_id=?
+                  AND baseline_hash=?
+            )
+            """
+        )
+        params.extend([deck_id, baseline_id, baseline_hash])
+    if only_added:
+        where.append("lower(card_added)=lower(?)")
+        params.append(only_added)
+    params.append(limit)
+    return conn.execute(
+        f"""
+        SELECT
+            add_tag AS category,
+            card_added,
+            card_removed,
+            add_cmc,
+            add_effect,
+            wr,
+            wins,
+            losses,
+            draws,
+            games,
+            delta_pp,
+            phase,
+            tested_at
+        FROM swap_benchmarks
+        WHERE {' AND '.join(where)}
+        ORDER BY delta_pp DESC, wr DESC, id DESC
+        LIMIT ?
+        """,
+        params,
+    ).fetchall()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--deck-id", type=int, default=6)
@@ -60,16 +120,41 @@ def main() -> int:
             raise SystemExit(str(exc)) from exc
 
         baseline_wr = float(baseline["wr"])
-        candidates = candidate_rows(
-            conn,
-            args.candidate_limit,
-            baseline_wr,
-            deck_id=args.deck_id,
-            baseline_id=int(baseline["id"]),
-            baseline_hash=str(baseline["deck_hash"]),
-            include_existing=args.include_existing,
-            only_added=args.only_added,
-        )
+        baseline_id = int(baseline["id"])
+        baseline_hash = str(baseline["deck_hash"])
+        if args.phase == "full_confirmation":
+            candidates = confirmed_candidate_rows(
+                conn,
+                deck_id=args.deck_id,
+                baseline_id=baseline_id,
+                baseline_hash=baseline_hash,
+                baseline_wr=baseline_wr,
+                limit=args.candidate_limit,
+                include_existing=args.include_existing,
+                only_added=args.only_added,
+            )
+            if not candidates:
+                candidates = candidate_rows(
+                    conn,
+                    args.candidate_limit,
+                    baseline_wr,
+                    deck_id=args.deck_id,
+                    baseline_id=baseline_id,
+                    baseline_hash=baseline_hash,
+                    include_existing=args.include_existing,
+                    only_added=args.only_added,
+                )
+        else:
+            candidates = candidate_rows(
+                conn,
+                args.candidate_limit,
+                baseline_wr,
+                deck_id=args.deck_id,
+                baseline_id=baseline_id,
+                baseline_hash=baseline_hash,
+                include_existing=args.include_existing,
+                only_added=args.only_added,
+            )
 
         for row in candidates:
             scan_delta = float(row["wr"] or 0) - baseline_wr

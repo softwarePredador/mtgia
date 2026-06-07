@@ -25,6 +25,27 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPLAY_GENERATOR = SCRIPT_DIR / "battle_replay_v10_3.py"
 
 
+def writable_replay_dir(report: bool) -> Path:
+    if not report:
+        return Path(tempfile.mkdtemp(prefix="hermes_replay_audit_"))
+
+    preferred = Path(os.environ.get("MANALOOM_REPLAY_DIR", REPORT_DIR / "replays"))
+    fallback = (
+        Path(os.environ.get("MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR", "/opt/data/artifacts/hermes_master_optimizer"))
+        / "replays"
+    )
+    for candidate in (preferred, fallback):
+        try:
+            candidate.mkdir(parents=True, exist_ok=True)
+            probe = candidate / f".write_probe_{os.getpid()}"
+            probe.write_text("ok", encoding="utf-8")
+            probe.unlink(missing_ok=True)
+            return candidate
+        except OSError:
+            continue
+    raise RuntimeError(f"No writable replay output directory: {preferred} or {fallback}")
+
+
 def load_events(path: Path, replay_id: str = "external") -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
@@ -405,10 +426,7 @@ def main() -> int:
     if args.events:
         events.extend(load_events(args.events))
     else:
-        tmp_dir = REPORT_DIR / "replays" if args.report else Path(
-            tempfile.mkdtemp(prefix="hermes_replay_audit_")
-        )
-        tmp_dir.mkdir(parents=True, exist_ok=True)
+        tmp_dir = writable_replay_dir(args.report)
         for seed in range(args.seed_start, args.seed_start + max(1, args.generate)):
             generated, txt, jsonl = generate_replay_events(seed, tmp_dir)
             events.extend(generated)

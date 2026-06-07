@@ -877,7 +877,24 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_baselin
   --report
 ```
 
-### Fase 10 — handoff produto
+### Fase 10 — post-apply gate
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py \
+  --deck-id 6 \
+  --min-post-delta 0.0 \
+  --rollback-on-fail \
+  --report
+```
+
+Contrato:
+
+- se o baseline pos-apply nao sustentar pelo menos o baseline anterior, reverter o swap Hermes-local;
+- marcar `swap_benchmarks.applied=-1` para o candidato revertido;
+- marcar handoffs de produto relacionados como `superseded_by_rollback`;
+- nunca mutar produto.
+
+### Fase 11 — handoff produto
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py \
@@ -894,10 +911,12 @@ Snapshot vivo observado em 2026-06-07:
 | `manaloom-master-watchdog` | every 30m | true | Supervisao geral. |
 | `manaloom-knowledge-import` | every 120m | true | Import de conhecimento. |
 | `manaloom-pull-learning-events` | every 30m | true | Puxa eventos/decks aprendidos. |
+| `lorehold-knowncards-generator` | every 120m | true | Gera `known_cards_generated.json` com env seguro e escrita atomica. |
 | `lorehold-knowncards-validator` | every 30m | true | Valida/expande known cards. |
 | `manaloom-master-optimizer-preflight` | every 20m | true | Mantem Hermes pronto, sem apply. |
-| `manaloom-master-optimizer-slot-scan` | every 720m | false | Scan pesado, deve ficar pausado ate baseline aprovado. |
-| `manaloom-master-optimizer-end-to-end` | every 1440m | false | Pipeline manual/supervisionado. |
+| `manaloom-master-optimizer-auto-cycle` | every 180m | true | Ciclo seguro: sync, preflight, baseline, scan, confirmation, full confirmation, replay audit, apply Hermes-local max 1 swap, post-apply gate e rollback se piorar. |
+| `manaloom-master-optimizer-slot-scan` | every 720m | false | Mantido pausado para nao duplicar o auto-cycle. |
+| `manaloom-master-optimizer-end-to-end` | every 1440m | false | Pipeline manual/supervisionado para prova completa sob demanda. |
 | `lorehold-universal-optimizer` | every 10m | false | Deve ficar pausado; risco de auto-apply legado. |
 
 Nota operacional: o snapshot mostrou `last_error` stale em alguns jobs. A forma
@@ -925,9 +944,29 @@ correta de validar job e olhar:
 - carrega Postgres env;
 - roda sync;
 - roda preflight;
-- roda `slot_optimizer.py`;
+- roda baseline fresco;
+- roda `slot_optimizer.py` para o baseline atual;
 - copia log para `latest_master_optimizer_slot_scan.log`;
-- deve ficar desabilitado ate baseline controlado.
+- deve ficar desabilitado enquanto `master_optimizer_auto_cycle_cron.sh` estiver ativo.
+
+`master_optimizer_auto_cycle_cron.sh`:
+
+- tem lock de 12h;
+- carrega Postgres env;
+- roda sync;
+- roda preflight;
+- roda baseline;
+- roda slot scan fresco para o baseline atual;
+- roda quality gate;
+- roda confirmation;
+- roda full confirmation a partir dos candidatos da confirmation;
+- roda replay audit;
+- gera handoff Hermes;
+- aplica no maximo um swap no SQLite Hermes local se passar full confirmation e delta minimo;
+- roda baseline pos-apply;
+- roda post-apply gate;
+- se piorar, executa rollback automatico;
+- se sustentar, gera handoff de produto `needs_product_owner_approval`.
 
 `master_optimizer_end_to_end.sh`:
 
@@ -958,20 +997,22 @@ quality gate. Agora ele executa slot scan com `--reset-current-baseline`, usando
 Deck alvo:
 
 - `deck_id=6`
-- hash atual observado: `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`
+- hash atual observado: `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`
 
-Ultima revalidacao documentada:
+Estado vivo validado apos auto-cycle e rollback:
 
-- `Fork`: nao aplicado; delta fresco `+0.0pp`.
-- `Reversal of Fortune`: nao aplicado; delta fresco `-1.4pp`.
-- `Invoke Calamity`: marginal `+0.6pp`.
-- `Restoration Seminar`: marginal `+0.6pp`.
+- `Wheel of Misfortune` esta presente.
+- `Reforge the Soul` esta ausente.
+- `Plaza of Heroes` foi revertido apos post-apply gate.
+- `Rise of the Eldrazi` esta presente.
+- baseline final serio: id `11`, 300 jogos, `87.3%` WR, 100 cartas, 33 lands.
+- handoff de produto do swap revertido marcado como `superseded_by_rollback`.
 
 Interpretacao:
 
-- Nao ha swap forte o bastante para apply automatico agora.
-- O proximo passo correto e ampliar amostra para os marginais ou ampliar scan.
-- Forcar apply seria ir contra a evidencia atual.
+- As crons conseguem construir hipotese, testar, aplicar localmente e desfazer quando o ganho nao sustenta.
+- O proximo passo correto e deixar o auto-cycle rodar janelas regulares e revisar somente swaps que sobrevivam ao post-apply gate.
+- Forcar copia para produto continua bloqueado ate handoff `needs_product_owner_approval`.
 
 ## Furos e riscos encontrados ao documentar
 

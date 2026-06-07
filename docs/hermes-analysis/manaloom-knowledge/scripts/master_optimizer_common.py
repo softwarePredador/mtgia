@@ -42,6 +42,47 @@ PROTECTED_CARDS = {
     "Increasing Vengeance",
 }
 
+ROLE_FAMILIES = {
+    "removal": {
+        "tags": {"removal", "remove_creature", "remove_permanent"},
+        "patterns": (
+            r"\bdestroy target\b",
+            r"\bexile target\b",
+            r"\bdamage to (?:any|target)",
+            r"\bdeals? \d+ damage to target\b",
+        ),
+        "minimum": 4,
+    },
+    "wipe": {
+        "tags": {"wipe", "board_wipe", "damage_wipe"},
+        "patterns": (
+            r"\bdestroy all\b",
+            r"\bexile all\b",
+            r"\beach creature\b",
+            r"\ball creatures\b",
+        ),
+        "minimum": 3,
+    },
+    "draw": {
+        "tags": {"draw", "draw_cards", "draw_engine"},
+        "patterns": (
+            r"\bdraw (?:a|\d+|two|three|seven) cards?\b",
+            r"\bdiscard.*hand.*draw\b",
+            r"\bwhenever.*draw\b",
+        ),
+        "minimum": 7,
+    },
+    "ramp": {
+        "tags": {"ramp", "ramp_permanent", "ramp_ritual", "ramp_engine"},
+        "patterns": (
+            r"\badd .*mana\b",
+            r"\btreasure token\b",
+            r"\bcosts? .* less\b",
+        ),
+        "minimum": 10,
+    },
+}
+
 
 @dataclass
 class BattleResult:
@@ -516,6 +557,25 @@ def quality_gate_candidate(
     if type_line and "Basic" in type_line and "Land" not in type_line:
         warnings.append("unusual_basic_type_line")
 
+    removed_role = infer_role(
+        str(removed[0]["functional_tag"] if removed else ""),
+        str(removed[0]["type_line"] if removed else ""),
+        str(removed[0]["oracle_text"] if removed else ""),
+    )
+    added_role = infer_role("", type_line, str(meta["oracle_text"] if meta else ""))
+    if removed_role and removed_role != added_role:
+        role_count = count_role(rows, removed_role)
+        minimum = ROLE_FAMILIES[removed_role]["minimum"]
+        if role_count <= minimum:
+            reasons.append(
+                f"cannot_cut_low_count_{removed_role}:"
+                f"{card_removed} role={removed_role} count={role_count} add_role={added_role or 'unknown'}"
+            )
+        else:
+            warnings.append(
+                f"role_mismatch:{card_removed} role={removed_role} add_role={added_role or 'unknown'}"
+            )
+
     before = get_deck_summary(conn, deck_id)
     lands_after = int(before["lands"])
     if removed and "Land" in str(removed[0]["type_line"] or ""):
@@ -558,6 +618,30 @@ def quality_gate_candidate(
         "add_cmc": add_cmc,
         "type_line": type_line,
     }
+
+
+def infer_role(functional_tag: str, type_line: str, oracle_text: str) -> str | None:
+    tag = normalize_name(functional_tag).replace(" ", "_")
+    text = f"{type_line}\n{oracle_text}".lower()
+    for role, spec in ROLE_FAMILIES.items():
+        if tag in spec["tags"]:
+            return role
+        if any(re.search(pattern, text) for pattern in spec["patterns"]):
+            return role
+    return None
+
+
+def count_role(rows: Iterable[sqlite3.Row], role: str) -> int:
+    return sum(
+        1
+        for row in rows
+        if infer_role(
+            str(row["functional_tag"] or ""),
+            str(row["type_line"] or ""),
+            str(row["oracle_text"] or ""),
+        )
+        == role
+    )
 
 
 @contextmanager

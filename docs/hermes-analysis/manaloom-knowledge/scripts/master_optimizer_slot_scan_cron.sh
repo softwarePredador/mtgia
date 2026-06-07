@@ -6,6 +6,12 @@ SCRIPT_DIR="$REPO/docs/hermes-analysis/manaloom-knowledge/scripts"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/hermes_master_optimizer}"
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-/opt/data/secrets/manaloom-postgres.env}"
 LOCK_FILE="${MANALOOM_SLOT_SCAN_LOCK:-/tmp/manaloom-master-optimizer-slot-scan.lock}"
+DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
+BASELINE_GAMES="${MANALOOM_SLOT_BASELINE_GAMES:-50}"
+SLOT_GAMES="${MANALOOM_SLOT_GAMES:-10}"
+SLOT_MAX_PER_CATEGORY="${MANALOOM_SLOT_MAX_PER_CATEGORY:-15}"
+SLOT_CATEGORY="${MANALOOM_SLOT_CATEGORY:-}"
+SLOT_PHASE="${MANALOOM_SLOT_PHASE:-phase1}"
 
 mkdir -p "$ARTIFACT_DIR"
 
@@ -49,11 +55,28 @@ python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
 preflight_log="$ARTIFACT_DIR/master_optimizer_slot_scan_preflight_$(date -u +%Y%m%d_%H%M%S).log"
 python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report | tee "$preflight_log"
 
+baseline_log="$ARTIFACT_DIR/master_optimizer_slot_scan_baseline_$(date -u +%Y%m%d_%H%M%S).log"
+python3 "$SCRIPT_DIR/master_optimizer_baseline.py" \
+  --deck-id "$DECK_ID" \
+  --games "$BASELINE_GAMES" \
+  --report | tee "$baseline_log"
+
 slot_log="$ARTIFACT_DIR/master_optimizer_slot_scan_$(date -u +%Y%m%d_%H%M%S).log"
-python3 "$SCRIPT_DIR/slot_optimizer.py" | tee "$slot_log"
+slot_args=(
+  --deck-id "$DECK_ID"
+  --games "$SLOT_GAMES"
+  --max-per-category "$SLOT_MAX_PER_CATEGORY"
+  --phase "$SLOT_PHASE"
+  --reset-current-baseline
+)
+if [[ -n "$SLOT_CATEGORY" ]]; then
+  slot_args+=(--category "$SLOT_CATEGORY")
+fi
+python3 "$SCRIPT_DIR/slot_optimizer.py" "${slot_args[@]}" | tee "$slot_log"
 cp "$slot_log" "$ARTIFACT_DIR/latest_master_optimizer_slot_scan.log"
 
 echo "slot_scan=ok"
 echo "sync_report=$sync_report"
 echo "preflight_log=$preflight_log"
+echo "baseline_log=$baseline_log"
 echo "slot_log=$slot_log"
