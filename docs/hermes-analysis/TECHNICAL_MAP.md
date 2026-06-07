@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -252,22 +252,26 @@ mantidos como texto solto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-06 07:00 UTC como aberto no checkout local `bb1870de`.
+  2026-06-07 07:00 UTC no checkout local `82bb454e`.
   `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
-  `server/bin/sync_cards.dart` mantem copias privadas/inline de parse/extracao.
-  Tambem seguem sem chamador runtime confirmado `getRequestTrace`/
-  `tryGetRequestId`, `normalizedCommanderReferenceCandidate`,
+  `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
+  contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+  `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
+  `getRequestTrace`/`tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`,
   `buildLoreholdReferenceCardStatsFromProfile`,
   `extractMtgTop8FormatCodeFromSourceUrl`,
   `buildCandidateQualitySamplePoolSql`,
-  `summarizeAggressiveOptimizeUtilitySamples`,
-  `MLKnowledgeService.recordFeedback` e a API manual/custom metrics/debug de
-  `PerformanceService`. A rodada tambem marcou como P3 conveniencias publicas
-  sem chamador em EDHREC/cache (`getTopByCategory`, `calculateFitScore`,
-  `cleanupCache`, `isHighSynergy`, `EndpointCache.clearExpired`). A parte
-  automatica do `PerformanceService`
-  (`init`, observer de tela e `traceAsync` em smoke) foi separada como controle
-  positivo, nao como codigo morto.
+  `summarizeAggressiveOptimizeUtilitySamples` e
+  `MLKnowledgeService.recordFeedback`. Novo achado app-side:
+  `ApiClient.loadTokenFromDisk()` diz ser chamado 1x no boot, mas `rg`
+  encontrou somente a definicao; o boot real le `auth_token` via
+  `AuthProvider.initialize` e chama `ApiClient.setToken`. A API manual/custom
+  metrics/debug de `PerformanceService` e conveniencias EDHREC/cache
+  (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
+  `EndpointCache.clearExpired`) seguem sem chamador confirmado. A parte
+  automatica do `PerformanceService` (`init`, observer de tela e `traceAsync`
+  em smoke) foi separada como controle positivo, nao como codigo morto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-06 15:00 UTC no checkout local `bd5add18`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;

@@ -1,6 +1,6 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-07 05:30 UTC
+> Data: 2026-06-07 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -73,18 +73,22 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-06 07:00 UTC como **ABERTO neste checkout `bb1870de`**.
+    2026-06-07 07:00 UTC como **ABERTO neste checkout `82bb454e`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
-    `server/bin/sync_cards.dart` mantem copias privadas/inline da mesma logica.
-    Tambem seguem sem chamador runtime confirmado wrappers/helpers em request
-    trace, Commander Reference, MTGTop8, candidate quality, optimize utility
-    samples, `MLKnowledgeService.recordFeedback` e a API manual/custom
-    metrics/debug de `PerformanceService`. A revalidacao tambem acrescentou como
-    P3 conveniencias publicas sem chamador confirmado em EDHREC/cache
+    `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
+    contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+    `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
+    wrappers/helpers em request trace, Commander Reference, MTGTop8, candidate
+    quality, optimize utility samples e `MLKnowledgeService.recordFeedback`.
+    Novo achado app-side: `ApiClient.loadTokenFromDisk()` diz ser chamado no
+    boot, mas nao tem chamada em `app/lib`; o boot real usa
+    `AuthProvider.initialize` + `ApiClient.setToken`. A API manual/custom
+    metrics/debug de `PerformanceService` e conveniencias EDHREC/cache
     (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
-    `EndpointCache.clearExpired`). A observabilidade automatica do
-    `PerformanceService` foi separada como controle positivo (`init`,
-    observer de tela e `traceAsync` em smoke), nao como codigo morto.
+    `EndpointCache.clearExpired`) seguem sem chamador confirmado. A
+    observabilidade automatica do `PerformanceService` foi separada como
+    controle positivo (`init`, observer de tela e `traceAsync` em smoke), nao
+    como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app/server**: **HISTORICO; PARCIALMENTE
     SUPERADO PELO CHECKOUT `1fbc07d8` EM 2026-06-06 23:00 UTC.** O auditor base
     desta rodada reportou `Imports quebrados: 0` em `server/lib`/`server/routes`,
@@ -497,20 +501,20 @@ SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-06 07:00 UTC:** **REABERTO no checkout local
-`codex/hermes-analysis-docs@bb1870de`**. As anotacoes historicas de resolucao em
+**Status 2026-06-07 07:00 UTC:** **REABERTO no checkout local
+`codex/hermes-analysis-docs@82bb454e`**. As anotacoes historicas de resolucao em
 outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
-presentes e sem chamador runtime confirmado.
+presentes e sem chamador runtime confirmado; a rodada tambem encontrou um helper
+app-side novo sem chamada.
 
 - **Evidência**:
   - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:116`, `:161` e
     `:172` definem helpers cobertos por `server/test/sync_cards_test.dart`, mas
-    `grep` nao encontrou import desse arquivo em `server/bin`, `server/lib`
-    runtime ou rotas. `server/bin/sync_cards.dart:9`-`:10` importa apenas
-    `database.dart` e `mtg_data_integrity_support.dart`, e ainda possui
-    `_parseSinceDays` em `:376`, `_getNewSetCodesSinceFromData` em `:413`,
-    chamada de `_extractCardRow` em `:554`, definicao de `_extractCardRow` em
-    `:680` e coleta de oracle IDs/legalidade inline em `:807`-`:837`.
+    `rg "sync_cards_utils"` nao encontrou import desse arquivo em `server/bin`,
+    `server/lib` runtime ou rotas. `server/bin/sync_cards.dart:64` chama
+    `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
+    `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
+    `_extractCardRowFromSet`, definido em `:662`-`:710`.
   - `server/lib/request_trace.dart:48` e `:51` definem
     `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
     `context.read<RequestTrace>()` diretamente, por exemplo
@@ -532,6 +536,12 @@ presentes e sem chamador runtime confirmado.
   - `server/lib/ai/optimize_runtime_support.dart:3326` define
     `summarizeAggressiveOptimizeUtilitySamples`; a busca encontrou apenas teste
     e definicao.
+  - `app/lib/core/api/api_client.dart:128` define
+    `ApiClient.loadTokenFromDisk()`, cujo comentario diz que e chamado 1x no
+    boot, mas `rg "loadTokenFromDisk" app/lib app/test app/integration_test`
+    encontrou somente a definicao. O boot real le `auth_token` em
+    `app/lib/features/auth/providers/auth_provider.dart:37`-`:46` e chama
+    `ApiClient.setToken(savedToken)`.
   - `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
     `:210`, `:220` e `:248` expõem traces/metricas/debug manuais sem chamador
     em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init` em
@@ -553,12 +563,14 @@ presentes e sem chamador runtime confirmado.
      legado; se for fonte real, importar no CLI e remover as copias privadas;
   2. para cada wrapper test-only, ligar ao runner/rota esperado ou remover o
      helper e o teste correspondente;
-  3. manter `PerformanceService` como API publica apenas se houver plano de
+  3. remover `ApiClient.loadTokenFromDisk()`/comentario ou religar
+     explicitamente ao boot se esse for o contrato desejado;
+  4. manter `PerformanceService` como API publica apenas se houver plano de
      observabilidade mobile/manual traces; caso contrario, simplificar para
      `init` + observer + `traceAsync`;
-  4. transformar conveniencias EDHREC/cache sem consumidor em private/remover,
+  5. transformar conveniencias EDHREC/cache sem consumidor em private/remover,
      ou ligar a rotina real com teste;
-  5. continuar usando busca de chamadores como guardrail antes de adicionar
+  6. continuar usando busca de chamadores como guardrail antes de adicionar
      novos helpers publicos.
 - **Validação**:
   - `grep -RIn "sync_cards_utils" server` encontra o binario ativo, ou o arquivo
