@@ -1999,18 +1999,32 @@ def load_learned_opponents():
     try:
         conn = sqlite3.connect(DB)
         conn.row_factory = sqlite3.Row
-        rows = conn.execute("SELECT * FROM learned_decks WHERE commander NOT LIKE '%Lorehold%' ORDER BY id DESC LIMIT 12").fetchall()
+        candidate_limit = int(os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES", "96"))
+        opponent_limit = int(os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_LIMIT", "12"))
+        min_cards = int(os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS", "80"))
+        rows = conn.execute(
+            """
+            SELECT *
+            FROM learned_decks
+            WHERE COALESCE(commander, '') != ''
+              AND commander NOT LIKE '%Lorehold%'
+              AND COALESCE(card_list, '') != ''
+              AND length(card_list) >= 500
+              AND COALESCE(card_count, 0) >= ?
+            ORDER BY
+              CASE WHEN source = 'pg_meta_decks' THEN 0 ELSE 1 END,
+              COALESCE(card_count, 0) DESC,
+              id DESC
+            LIMIT ?
+            """,
+            (min_cards, candidate_limit),
+        ).fetchall()
         decoded_rows = []
         cache_names = []
         for row in rows:
-            if len(str(row['card_list'] or '')) < 500:
-                continue  # v10.2: skip junk
-            try:
-                card_data = json.loads(row["card_list"]) if row["card_list"] else []
-            except:
-                card_data = []
-            if not isinstance(card_data, list):
-                card_data = []
+            card_data = decode_learned_card_list(row["card_list"])
+            if len(card_data) < min_cards:
+                continue
             decoded_rows.append((row, card_data))
             if row["commander"]:
                 cache_names.append(row["commander"])
@@ -2024,54 +2038,191 @@ def load_learned_opponents():
         decks = []
         for row, card_data in decoded_rows:
             deck = []
-            for c in card_data:
-                if isinstance(c, dict):
-                    name = c.get("name", "?")
-                    cmc = float(c.get("cmc", 3))
-                    tl = c.get("type_line", "")
-                    role = c.get("role", c.get("category", "creature"))
-                    effect = "creature"; tag = "creature"
-                    if role == "land": effect = "land"; tag = "land"; tl = tl or "Land"
-                    elif role in ("ramp","rock"): effect = "ramp"; tag = "ramp"
-                    elif role in ("removal","sweeper"): effect = "removal"; tag = "removal"
-                    elif role == "board_wipe": effect = "board_wipe"; tag = "board_wipe"
-                    elif role in ("draw","cantrip","wheel"): effect = "draw"; tag = "draw"
-                    elif role in ("counterspell","counter"): effect = "counter"; tag = "counter"; tl = tl or "Instant"
-                    elif role == "tutor": effect = "tutor"; tag = "tutor"
-                    elif role == "protection": effect = "protection"; tag = "protection"
-                    elif role in ("wincon","combo_piece"): effect = "wincon"; tag = "wincon"
-                    imported = dict(c)
-                    imported.update({
-                        "name": name,
-                        "cmc": cmc,
-                        "tag": tag,
-                        "effect": effect,
-                        "power": c.get("power", max(1, int(cmc)) if effect == "creature" else 0),
-                        "toughness": c.get("toughness", c.get("power", max(1, int(cmc)) if effect == "creature" else 0)),
-                        "type_line": tl,
-                        "is_commander": c.get("is_commander", False),
-                    })
-                    imported = merge_oracle_metadata(imported, oracle_cache)
-                    deck.append(enrich_card(imported))
+            commander_key = normalize_card_name(row["commander"])
+            for raw_card in card_data:
+                expanded_cards = expand_learned_card(raw_card)
+                for c in expanded_cards:
+                    if normalize_card_name(c.get("name")) == commander_key:
+                        continue
+                    if len(deck) >= 99:
+                        break
+                    deck.append(build_learned_battle_card(c, oracle_cache))
+                if len(deck) >= 99:
+                    break
+            original_deck_count = len(deck)
             while len(deck) < 99:
-                deck.append({"name": "Filler", "cmc": 3, "tag": "creature", "effect": "creature", "power": 2, "type_line": "Creature"})
+                deck.append({
+                    "name": "Filler",
+                    "cmc": 3,
+                    "tag": "creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "type_line": "Creature",
+                })
+            real_name = f"{row['commander']} (real)"
             decks.append({
-                "name": f"{row['commander']} (real)", "archetype": row["archetype"] or "midrange",
+                "name": real_name, "archetype": row["archetype"] or "midrange",
+                "source": row["source"],
+                "learned_deck_id": row["id"],
+                "source_card_count": row["card_count"],
+                "battle_card_count": original_deck_count,
                 "built_deck": deck,
                 "commander_name": row["commander"],
-                "strategy": (row["archetype"] or "midrange").split()[0].lower() if row["archetype"] else "midrange",
+                "strategy": infer_strategy(row["archetype"] or "midrange"),
                 "life": 40, "lands": sum(1 for c in deck if c.get("effect") == "land"),
                 "ramp": sum(1 for c in deck if c.get("effect") in ("ramp",)),
-                "removal": sum(1 for c in deck if c.get("effect") in ("removal", "board_wipe")),
+                "removal": sum(1 for c in deck if c.get("effect") in ("removal", "board_wipe")) ,
                 "counters": sum(1 for c in deck if c.get("effect") == "counter"),
                 "creatures": sum(1 for c in deck if c.get("effect") == "creature"),
                 "avg_cmc": sum(c.get("cmc", 3) for c in deck) / max(1, len(deck)),
                 "is_real": True,
             })
+        seed = real_opponent_seed()
+        rng = random.Random(seed)
+        rng.shuffle(decks)
+        decks = decks[:opponent_limit]
+        if decks:
+            print(
+                f"Loaded {len(decks)} real opponent decks from {len(decoded_rows)} "
+                f"valid candidates (seed={seed})"
+            )
         return decks
     except Exception as e:
         print(f"load_learned_opponents: {e}")
         return []
+
+
+def decode_learned_card_list(value):
+    """Decode JSON card lists and legacy plain-text decklists into card entries."""
+    if not value:
+        return []
+    text = str(value)
+    try:
+        decoded = json.loads(text)
+    except Exception:
+        decoded = None
+    if isinstance(decoded, list):
+        return decoded
+
+    cards = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or line.lower() in ("deck", "commander", "sideboard", "maybeboard"):
+            continue
+        line = re.sub(r"^(sb:|sideboard:)\s*", "", line, flags=re.I).strip()
+        match = re.match(r"^(\d+)\s*x?\s+(.+)$", line, flags=re.I)
+        if not match:
+            continue
+        quantity = max(1, min(30, int(match.group(1))))
+        name = re.sub(r"\s+\([^)]*\)\s*\d*\s*$", "", match.group(2)).strip()
+        if name:
+            cards.append({"name": name, "quantity": quantity})
+    return cards
+
+
+def expand_learned_card(card):
+    if isinstance(card, str):
+        return [{"name": card}]
+    if not isinstance(card, dict):
+        return []
+    quantity = card.get("quantity", 1)
+    try:
+        quantity = int(quantity)
+    except (TypeError, ValueError):
+        quantity = 1
+    quantity = max(1, min(30, quantity))
+    base = dict(card)
+    base.pop("quantity", None)
+    return [dict(base) for _ in range(quantity)]
+
+
+def infer_strategy(archetype):
+    normalized = str(archetype or "").lower()
+    if "stax" in normalized:
+        return "stax"
+    if "combo" in normalized or "storm" in normalized:
+        return "combo"
+    if "control" in normalized:
+        return "control"
+    if "aggro" in normalized or "rush" in normalized:
+        return "rush"
+    if "spell" in normalized:
+        return "spells"
+    if "midrange" in normalized or "value" in normalized:
+        return "value"
+    return "midrange"
+
+
+def infer_battle_card_identity(card):
+    role = str(card.get("role") or card.get("category") or card.get("tag") or "").lower()
+    type_line = str(card.get("type_line") or "").lower()
+    oracle_text = str(card.get("oracle_text") or "").lower()
+    name = str(card.get("name") or "").lower()
+
+    if role == "land" or "land" in type_line:
+        return "land", "land"
+    if role in ("ramp", "rock") or "add " in oracle_text or "treasure token" in oracle_text:
+        return "ramp", "ramp"
+    if role in ("counterspell", "counter") or "counter target" in oracle_text:
+        return "counter", "counter"
+    if role in ("board_wipe", "sweeper") or "destroy all" in oracle_text or "exile all" in oracle_text:
+        return "board_wipe", "board_wipe"
+    if role in ("removal",) or "destroy target" in oracle_text or "exile target" in oracle_text:
+        return "removal", "removal"
+    if role in ("draw", "cantrip", "wheel") or "draw" in oracle_text:
+        return "draw", "draw"
+    if role == "tutor" or "search your library" in oracle_text:
+        return "tutor", "tutor"
+    if role == "protection" or "indestructible" in oracle_text or "protection from" in oracle_text:
+        return "protection", "protection"
+    if role in ("wincon", "combo_piece") or "you win the game" in oracle_text:
+        return "wincon", "wincon"
+    if "creature" in type_line or "token" in name:
+        return "creature", "creature"
+    if "instant" in type_line:
+        return "spell", "instant"
+    if "sorcery" in type_line:
+        return "spell", "sorcery"
+    return "creature", "creature"
+
+
+def build_learned_battle_card(card, oracle_cache):
+    name = card.get("name", "?")
+    imported = dict(card)
+    imported["name"] = name
+    imported = merge_oracle_metadata(imported, oracle_cache)
+    tag, effect = infer_battle_card_identity(imported)
+    cmc = imported.get("cmc")
+    try:
+        cmc = float(cmc if cmc is not None else 3)
+    except (TypeError, ValueError):
+        cmc = 3
+    imported.update({
+        "cmc": cmc,
+        "tag": tag,
+        "effect": effect,
+        "type_line": imported.get("type_line") or ("Land" if effect == "land" else "Creature"),
+        "is_commander": bool(imported.get("is_commander", False)),
+    })
+    if effect == "creature":
+        default_power = max(1, int(cmc))
+        imported["power"] = imported.get("power") or default_power
+        imported["toughness"] = imported.get("toughness") or imported.get("power") or default_power
+    else:
+        imported["power"] = imported.get("power") or 0
+        imported["toughness"] = imported.get("toughness") or 0
+    return enrich_card(imported)
+
+
+def real_opponent_seed():
+    seed_raw = os.environ.get("MANALOOM_BATTLE_REAL_OPPONENT_SEED")
+    if seed_raw:
+        try:
+            return int(seed_raw)
+        except ValueError:
+            return abs(hash(seed_raw)) % 1_000_000_000
+    return int(datetime.now(timezone.utc).strftime("%Y%m%d%H"))
 
 
 def main():
@@ -2095,9 +2246,11 @@ def main():
     learned = load_learned_opponents()
     if learned and len(learned) >= 3:
         opponent_sources = learned
+        opponent_kind = "real"
         print(f"\nUsing {len(learned)} REAL learned opponent decks")
     else:
         opponent_sources = OPPONENT_ARCHETYPES
+        opponent_kind = "generic"
         print(f"\nUsing {len(OPPONENT_ARCHETYPES)} generic archetype profiles")
 
     GAMES = 50
@@ -2106,7 +2259,7 @@ def main():
     results = []
     total_wins = total_losses = total_stalls = 0
 
-    print(f"\n{GAMES} games vs each of {len(opponent_sources)} archetypes (4-player)...\n")
+    print(f"\n{GAMES} games vs each of {len(opponent_sources)} {opponent_kind} opponents (4-player)...\n")
 
     for profile in opponent_sources:
         wins = losses = stalls = 0
@@ -2115,7 +2268,7 @@ def main():
 
         for g in range(GAMES):
             others = [p for p in opponent_sources if p != profile]
-            picked = [profile] + rng.sample(others, 2)
+            picked = [profile] + rng.sample(others, min(2, len(others)))
             # For learned decks, attach card list directly
             for p in picked:
                 if p.get("is_real"):
@@ -2155,7 +2308,7 @@ def main():
     with open(LOG_PATH, "a") as f:
         f.write(f"\n## [{ts}] Battle Analyst v8 — Interactive Commander\n")
         f.write(f"Games: {GAMES} 4-player | Deck: L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}\n")
-        f.write(f"Opponents: {len(opponent_sources)} ({'real' if learned else 'generic'})\n\n")
+        f.write(f"Opponents: {len(opponent_sources)} ({opponent_kind})\n\n")
         f.write(f"| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |\n")
         f.write(f"|:---------|----:|-----:|-------:|-------:|------:|:--------|\n")
         for r in results:

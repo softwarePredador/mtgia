@@ -202,6 +202,27 @@ E2E corrigido + apply local seguro em Hermes, 2026-06-07:
 
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
+Hardening de oponentes reais em Hermes, 2026-06-07:
+
+- Problema encontrado: `battle_analyst_v8.py` buscava apenas os 12 `learned_decks` mais recentes; esses registros recentes eram meta decks pequenos/incompletos com `card_list` de 69-88 bytes, entao o battle voltava para os 6 perfis genericos.
+- Fonte real validada no Postgres: `meta_decks` contem 581 decks com `card_list` preenchido; `commander_reference_decks` contem 22 decks aceitos com 90+ cartas resolvidas; `commander_learned_decks` contem 5 decks ativos validos, alem de Lorehold.
+- Novo script versionado: `sync_pg_meta_decks_to_hermes.py`.
+- Contrato do novo sync: le `meta_decks` no Postgres real, converte decklists texto (`1 Card Name`) para JSON local e escreve somente no SQLite Hermes em `learned_decks` com `source='pg_meta_decks'`.
+- Sync real aplicado no container: 120 decks PG importados para `learned_decks`, todos com pelo menos 80 cartas; amostra inclui Kinnan, Rograkh, Tayam, Thrasios, Umbris, Kenrith, Kefka e Najeela.
+- `sync_pg_card_metadata_to_hermes.py` rerodado apos o sync: 3377 nomes solicitados, 3573 cartas Postgres correspondidas, 3464 aliases no `card_oracle_cache`, 10 unresolved.
+- `battle_analyst_v8.py` agora prefere candidatos reais validos, ignora registros pequenos, remove comandante duplicado, monta comandante + 99, infere `land/ramp/removal/counter/draw/tutor/wincon` via `card_oracle_cache` e embaralha o pool por seed.
+- Variacao controlada:
+  - `MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES`, default `96`.
+  - `MANALOOM_BATTLE_REAL_OPPONENT_LIMIT`, default `12`.
+  - `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`.
+  - `MANALOOM_BATTLE_REAL_OPPONENT_SEED`; se ausente, varia por hora UTC.
+- `battle_replay_v10_3.py` agora sorteia os 3 oponentes do replay em vez de fixar sempre `source[0]`, e registra `Opponents picked`.
+- Prova direta do battle: `MANALOOM_BATTLE_REAL_OPPONENT_LIMIT=6` rodou 300 jogos contra 6 oponentes reais PG e registrou `Using 6 REAL learned opponent decks`; resultado `57.3%` WR, `172W/126L/2S`.
+- Prova do optimizer: baseline id `12`, 240 jogos contra 12 oponentes reais PG, `56.2%` WR, `135W/103L/2S`; relatorio `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260607_173227.md`.
+- Prova de replay: `/opt/data/artifacts/hermes_master_optimizer/replay_real_opponents_20260607.txt` escolheu `Sisay, Weatherlight Captain`, `Urza, Lord High Artificer` e `Magda, Brazen Outlaw` como oponentes reais.
+- Cron `/opt/data/scripts/manaloom-master-optimizer-auto-cycle.sh` atualizado no servidor para rodar `sync_pg_meta_decks_to_hermes.py --apply` antes de `sync_pg_card_metadata_to_hermes.py`, baseline e slot scan.
+- Estado importante: a comparacao com baselines antigos mudou de dificuldade; os resultados contra perfis genericos nao devem ser comparados diretamente com os novos resultados contra decks reais PG.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
@@ -216,6 +237,7 @@ Arquivos principais:
 - `docs/hermes-analysis/manaloom-knowledge/scripts/hermes_provider_backoff.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
 
 ## O que ainda falta no battle

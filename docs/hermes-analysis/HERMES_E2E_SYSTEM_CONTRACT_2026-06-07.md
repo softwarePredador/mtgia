@@ -66,6 +66,8 @@ pelos scripts shell no servidor, nunca copiado para docs.
 
 O Postgres real e a fonte de metadata de cartas que deve alimentar o Hermes.
 O script `sync_pg_card_metadata_to_hermes.py` consulta a tabela publica `cards`.
+O script `sync_pg_meta_decks_to_hermes.py` consulta `meta_decks` para popular
+oponentes reais no SQLite Hermes.
 
 Colunas usadas quando existem no Postgres:
 
@@ -109,6 +111,24 @@ Observacao: se o Postgres nao tiver `power`, `toughness` ou `keywords`, o Hermes
 continua funcionando, mas perde precisao em combate, habilidades e avaliacao de
 criaturas. O cache local ja aceita esses campos.
 
+Decks reais usados como oponentes:
+
+- Tabela primaria atual: `meta_decks`.
+- Campos usados: `id`, `commander_name`, `archetype`, `strategy_archetype`,
+  `shell_label`, `source_url`, `card_list`, `created_at`.
+- `card_list` no PG e decklist texto, normalmente no formato `1 Card Name`.
+- O sync converte essa decklist para JSON no SQLite `learned_decks`.
+- O sync nao escreve no Postgres; ele apenas le `meta_decks` e escreve cache local.
+- Validacao 2026-06-07: 581 `meta_decks` com `card_list` preenchido foram
+  encontrados no PG; 120 foram importados para o SQLite Hermes no primeiro sync.
+
+Fontes PG auxiliares observadas:
+
+- `commander_learned_decks`: 5 decks ativos validos alem de Lorehold.
+- `commander_reference_decks`: 22 decks aceitos com 90+ cartas resolvidas.
+- `commander_reference_deck_cards`: cartas resolvidas desses decks de referencia.
+- `deck_learning_events`: eventos de aprendizado sincronizados.
+
 ### SQLite Hermes
 
 O SQLite `knowledge.db` e a fonte operacional do battle/optimizer. Ele recebe:
@@ -120,13 +140,13 @@ O SQLite `knowledge.db` e a fonte operacional do battle/optimizer. Ele recebe:
 - Game Changers;
 - resultados de baseline, scan, confirmation, handoff e apply local.
 
-Snapshot vivo observado em 2026-06-07:
+Snapshot vivo observado em 2026-06-07 apos sync de meta decks PG:
 
 | Tabela | Linhas | Uso |
 | --- | ---: | --- |
 | `deck_cards` | 543 | Decks locais do Hermes, incluindo deck alvo `deck_id=6`. |
-| `learned_decks` | 82 | Oponentes reais aprendidos para battle. |
-| `card_oracle_cache` | 1260 | Cache de metadata importada do Postgres. |
+| `learned_decks` | 202 | Oponentes reais aprendidos para battle, incluindo 120 `pg_meta_decks`. |
+| `card_oracle_cache` | 3464 | Cache de metadata importada do Postgres. |
 | `card_legalities` | 31369 | Legalidade por formato. |
 | `game_changers` | 53 | Politica de bracket/Game Changer. |
 | `slot_benchmarks` | 30 | Resultados de scan isolado por slot. |
@@ -188,6 +208,12 @@ Leituras principais:
 - `sync_pg_card_metadata_to_hermes.py` para coletar nomes a cachear;
 - `kc_validator.py` para expandir/validar conhecimento.
 
+Escritas principais:
+
+- `sync_pg_meta_decks_to_hermes.py`, apenas no SQLite Hermes, com
+  `source='pg_meta_decks'`;
+- importadores locais de decks aprendidos.
+
 Colunas observadas:
 
 - `id`
@@ -206,9 +232,23 @@ Colunas observadas:
 
 Contrato:
 
-- `card_list` deve ser JSON.
-- Decks incompletos devem ser excluidos do battle/optimizer.
-- Promocao ideal deve rejeitar decks com menos de 90 cartas por codigo.
+- `card_list` preferencial deve ser JSON local.
+- `battle_analyst_v8.py` tambem aceita decklist texto legado, mas o sync PG deve
+  gravar JSON.
+- Decks incompletos/pequenos devem ser excluidos do battle/optimizer.
+- O battle atual usa `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`,
+  porque existem meta decks reais com 80-100 cartas; promocao ideal para fonte
+  canonica deve mirar 90+.
+- O battle remove o comandante duplicado da lista e monta comandante + 99.
+- O battle deve cair para perfis genericos somente se houver menos de 3 decks
+  reais validos.
+
+Parametros de variacao dos oponentes reais:
+
+- `MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES`, default `96`.
+- `MANALOOM_BATTLE_REAL_OPPONENT_LIMIT`, default `12`.
+- `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`.
+- `MANALOOM_BATTLE_REAL_OPPONENT_SEED`; se ausente, varia por hora UTC.
 
 ### `card_oracle_cache`
 
@@ -454,6 +494,35 @@ Contrato:
 - Serve para transportar uma decisao Hermes validada para o fluxo app/producao com checklist.
 
 ## Scripts e responsabilidades
+
+### `sync_pg_meta_decks_to_hermes.py`
+
+Funcao:
+
+- coleta decks reais de `meta_decks` no Postgres;
+- converte `card_list` texto para JSON local;
+- escreve/atualiza somente o SQLite Hermes em `learned_decks`;
+- marca linhas com `source='pg_meta_decks'`.
+
+Entradas:
+
+- SQLite Hermes via `--sqlite-db`;
+- Postgres via `DATABASE_URL` ou variaveis `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`;
+- `meta_decks.card_list` em formato texto.
+
+Parametros:
+
+- `--sqlite-db`: caminho do `knowledge.db`;
+- `--limit`: quantidade maxima de decks PG a cachear, default `120`;
+- `--min-cards`: minimo de cartas para aceitar, default `80`;
+- `--apply`: grava no SQLite; sem isso roda dry-run;
+- `--include-lorehold`: inclui Lorehold como fonte, desativado por default para nao virar oponente contra ele mesmo.
+
+Saida esperada:
+
+- `learned_decks` com oponentes reais suficientes para battle;
+- nenhum write em Postgres/producao;
+- nenhuma credencial impressa.
 
 ### `sync_pg_card_metadata_to_hermes.py`
 
@@ -745,6 +814,11 @@ cd /opt/data/workspace/mtgia
 set -a
 . /opt/data/secrets/manaloom-postgres.env
 set +a
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --limit 120 \
+  --min-cards 80 \
+  --apply
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py \
   --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
   --report /opt/data/artifacts/hermes_master_optimizer/card_oracle_cache_sync_manual.json
@@ -753,8 +827,10 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py
 
 Bloquear se:
 
-- sync falhar;
+- sync de meta decks falhar;
+- sync de metadata falhar;
 - `card_oracle_cache` ficar vazio/baixo;
+- houver menos de 3 oponentes reais validos em `learned_decks`;
 - battle tests falharem;
 - SQLite nao tiver tabelas essenciais.
 
@@ -914,7 +990,7 @@ Snapshot vivo observado em 2026-06-07:
 | `lorehold-knowncards-generator` | every 120m | true | Gera `known_cards_generated.json` com env seguro e escrita atomica. |
 | `lorehold-knowncards-validator` | every 30m | true | Valida/expande known cards. |
 | `manaloom-master-optimizer-preflight` | every 20m | true | Mantem Hermes pronto, sem apply. |
-| `manaloom-master-optimizer-auto-cycle` | every 180m | true | Ciclo seguro: sync, preflight, baseline, scan, confirmation, full confirmation, replay audit, apply Hermes-local max 1 swap, post-apply gate e rollback se piorar. |
+| `manaloom-master-optimizer-auto-cycle` | every 180m | true | Ciclo seguro: sync meta decks PG, sync metadata, preflight, baseline, scan, confirmation, full confirmation, replay audit, apply Hermes-local max 1 swap, post-apply gate e rollback se piorar. |
 | `manaloom-master-optimizer-slot-scan` | every 720m | false | Mantido pausado para nao duplicar o auto-cycle. |
 | `manaloom-master-optimizer-end-to-end` | every 1440m | false | Pipeline manual/supervisionado para prova completa sob demanda. |
 | `lorehold-universal-optimizer` | every 10m | false | Deve ficar pausado; risco de auto-apply legado. |
@@ -934,7 +1010,7 @@ correta de validar job e olhar:
 
 - faz `git fetch/checkout/pull --ff-only`;
 - carrega `/opt/data/secrets/manaloom-postgres.env`;
-- roda sync PG -> SQLite;
+- roda sync PG -> SQLite para metadata;
 - roda preflight;
 - copia ultimo report para artefato latest.
 
@@ -942,7 +1018,7 @@ correta de validar job e olhar:
 
 - tem lock de 12h;
 - carrega Postgres env;
-- roda sync;
+- roda sync de metadata;
 - roda preflight;
 - roda baseline fresco;
 - roda `slot_optimizer.py` para o baseline atual;
@@ -953,7 +1029,8 @@ correta de validar job e olhar:
 
 - tem lock de 12h;
 - carrega Postgres env;
-- roda sync;
+- roda sync de meta decks PG para `learned_decks`;
+- roda sync de metadata para `card_oracle_cache`;
 - roda preflight;
 - roda baseline;
 - roda slot scan fresco para o baseline atual;
@@ -972,7 +1049,7 @@ correta de validar job e olhar:
 
 - tem lock de 12h;
 - carrega Postgres env;
-- roda sync;
+- roda sync de metadata;
 - roda preflight;
 - roda baseline;
 - roda slot scan fresco para o baseline atual;

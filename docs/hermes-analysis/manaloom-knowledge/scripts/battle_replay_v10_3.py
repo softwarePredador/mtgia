@@ -114,12 +114,17 @@ def main():
         learned = battle.load_learned_opponents()
         source = learned if learned and len(learned) >= 3 else battle.OPPONENT_ARCHETYPES
         rng = random.Random(int(os.environ.get("REPLAY_SEED", "42")))
-        picked = [source[0]] + rng.sample(source[1:], 2)
+        picked = rng.sample(source, 3) if len(source) >= 3 else list(source)
 
         replay.write("=" * 70 + "\n")
         replay.write("BATTLE v10.3 - STRUCTURED REPLAY\n")
         replay.write(f"Commander: {commander['name']}\n")
         replay.write(f"Opponents available: {len(source)}\n")
+        replay.write(
+            "Opponents picked: "
+            + ", ".join(profile.get("name", "?") for profile in picked)
+            + "\n"
+        )
         replay.write("=" * 70 + "\n")
 
         lorehold = battle.Player(
