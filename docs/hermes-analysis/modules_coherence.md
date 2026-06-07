@@ -1,5 +1,8 @@
 # Análise de Coerência entre Módulos (server/lib ↔ server/routes ↔ app)
 
+> Status atual: auditoria historica de modulos.
+> Use apenas como contexto. Revalide contra codigo vivo antes de agir.
+
 > Gerado: 2026-05-27 21:28 UTC (Execução #6 — Foco: COERÊNCIA)
 
 ## Arquitetura Esperada

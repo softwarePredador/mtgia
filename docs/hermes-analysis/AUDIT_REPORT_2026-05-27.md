@@ -1,5 +1,9 @@
 # Hermes Analysis: Audit Report 2026-05-27
 
+> Status atual: historico/snapshot antigo.
+> Nao use como fonte operacional atual do Hermes. Consulte `README.md` e
+> `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md` antes de agir.
+
 > Auditoria agendada em `origin/master` 7329fbbd, com branch de memoria
 > `codex/hermes-analysis-docs`. Subtarefas separadas cobriram Flutter app/UX,
 > backend contratos/rotas, IA semantica/optimize, deriva documental e commits

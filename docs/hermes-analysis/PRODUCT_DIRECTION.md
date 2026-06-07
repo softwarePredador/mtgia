@@ -1,5 +1,8 @@
 # Hermes Analysis: Product Direction
 
+> Status atual: direcao de produto historica.
+> Use como norte estrategico, nao como prova tecnica ou contrato de execucao.
+
 > Direcao de produto do ManaLoom. Atualizado em 2026-05-26.
 
 ## O Produto

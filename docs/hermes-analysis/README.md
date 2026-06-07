@@ -1,5 +1,9 @@
 # Hermes Analysis Docs — leitura canonica
 
+> Status atual: canonico.
+> Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
+> tarefas Hermes.
+
 Updated: 2026-06-07
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
@@ -28,6 +32,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
    - Evidencias de execucoes.
    - Use sempre o report mais fresco que bate com `baseline_id`, `baseline_hash`
      e o SQLite vivo.
+
+5. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
+   - Classificacao de todos os docs raiz desta pasta.
+   - Use para saber se um arquivo e canonico, operacional, historico ou backlog.
 
 ## Historico util, mas nao operacional
 

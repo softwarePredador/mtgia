@@ -1,5 +1,8 @@
 # Hermes E2E System Contract — Battle, Knowledge, Optimizer e Produto
 
+> Status atual: canonico.
+> Este e o contrato operacional atual do Hermes E2E.
+
 Updated: 2026-06-07
 
 ## Objetivo deste documento

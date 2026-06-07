@@ -1,5 +1,9 @@
 # Hermes Analysis: Technical Map
 
+> Status atual: mapa tecnico app/backend.
+> Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
+> E2E nem reports frescos.
+
 > Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 11:00 UTC.
 
 ## Estrutura do repositorio

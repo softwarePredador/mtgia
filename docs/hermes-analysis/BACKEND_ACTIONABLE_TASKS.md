@@ -1,5 +1,9 @@
 # Hermes Analysis: Backend Actionable Tasks
 
+> Status atual: backlog backend/produto.
+> Nao e contrato operacional Hermes. Revalide qualquer item contra codigo vivo
+> antes de implementar.
+
 > Tasks validadas no codigo (`origin/master` 771c9318) em 2026-05-28.
 > Escopo: contratos/rotas backend, IA semantica e optimize. Nenhuma task foi criada por suposicao.
 >

@@ -1,5 +1,9 @@
 # Plano de Correcao — Audit de Estrutura
 
+> Status atual: plano de correcao estrutural app/backend.
+> Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
+> cada item antes de executar.
+
 > Data: 2026-06-07 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 

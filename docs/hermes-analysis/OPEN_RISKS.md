@@ -1,5 +1,9 @@
 # Hermes Analysis: Open Risks
 
+> Status atual: registro historico de riscos.
+> Qualquer risco precisa ser revalidado contra codigo, SQLite vivo ou reports
+> frescos antes de virar acao.
+
 > Riscos abertos do ManaLoom. Atualizado em 2026-06-04T14:10Z (Commander Learning Loop audit).
 > Este arquivo nao substitui os documentos canonicos; resume a leitura operacional atual.
 

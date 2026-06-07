@@ -1,5 +1,9 @@
 # Flutter UI/UX Audit — 2026-06-05
 
+> Status atual: auditoria UI/produto.
+> Nao e contrato Hermes runtime. Revalide visualmente no app antes de tratar
+> qualquer achado como atual.
+
 ## Metadata
 
 - Gerado em UTC: `2026-06-05T12:00:00+00:00`

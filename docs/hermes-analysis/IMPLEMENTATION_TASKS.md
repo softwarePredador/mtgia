@@ -1,4 +1,9 @@
 # Implementation Tasks — MTG Knowledge ↔ Code Cross-Reference
+
+> Status atual: backlog grande de implementacao.
+> Use como fila de ideias/tarefas, nao como prova de estado atual. Revalide
+> contra codigo vivo antes de executar.
+
 > **Gerado:** 2026-06-06 por ManaLoom Knowledge Synthesis (Cron #11)
 > **Branch:** codex/hermes-analysis-docs
 > **HEAD:** 565b73af

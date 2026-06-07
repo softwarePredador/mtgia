@@ -1,4 +1,9 @@
 # ManaLoom Code Structure Audit
+
+> Status atual: auditoria estrutural grande e historica.
+> Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
+> estrutural ampla e revalide achados contra codigo vivo.
+
 > Atualizacao local Codex: 2026-06-07 15:00 UTC
 > Rotacao: `postgresql-tables-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`

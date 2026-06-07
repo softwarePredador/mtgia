@@ -1,5 +1,9 @@
 # Hermes Analysis: Commit Digest
 
+> Status atual: historico de commits.
+> Nao use como fonte operacional atual. Use para contexto, depois revalide em
+> codigo/docs canonicos.
+
 > Acompanhamento continuo dos commits do ManaLoom.
 > Atualizado em 2026-06-04T14:10Z (Incremento: Commander Learning Loop — 7 commits, 70e170f0).
 

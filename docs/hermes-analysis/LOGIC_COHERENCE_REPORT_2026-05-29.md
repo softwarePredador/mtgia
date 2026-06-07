@@ -1,5 +1,9 @@
 # Logic Coherence Report — E2E Pipeline de Decks
 
+> Status atual: auditoria historica de coerencia.
+> Nao use como fonte atual sem revalidar contra codigo vivo e contrato Hermes
+> E2E.
+
 > Data: 2026-05-29T12:00Z
 > Escopo: Análise E2E do pipeline de criação/validação/otimização de decks
 > Commits analisados: `771c9318` → `origin/master` (13 commits, 53 arquivos, +2397/-790 linhas)

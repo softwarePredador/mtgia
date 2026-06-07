@@ -1,5 +1,9 @@
 # Relatório de Coerência Lógica E2E — Pipeline de Decks
 
+> Status atual: auditoria historica de coerencia.
+> Nao use como fonte atual sem revalidar contra codigo vivo e contrato Hermes
+> E2E.
+
 > Data: 2026-05-29T20:15Z
 > Commit analisado: `3f7d784f` (Guard expanded semantic roles behind flag) + análise de todo o pipeline
 > Validação: `dart analyze` PASS, `dart test` 599/599 PASS
