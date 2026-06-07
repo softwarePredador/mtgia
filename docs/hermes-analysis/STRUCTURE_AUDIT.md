@@ -1,7 +1,153 @@
 # ManaLoom Code Structure Audit
-> Atualizacao local Codex: 2026-06-07 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-07 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies — revalidacao 2026-06-07 11:00 UTC
+
+Escopo desta rodada: somente imports locais quebrados e ciclos de importacao
+entre arquivos Dart. Nao foi feita auditoria ampla de classes, funcoes, tabelas,
+duplicacao ou coerencia app/backend fora do necessario para validar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `2061f291`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 172.
+- Classes encontradas: 169.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor base cobre apenas `server/lib` e
+`server/routes`; ele nao inclui `app/lib` nem `server/bin`. A execucao tambem
+reescreveu `STRUCTURE_AUDIT.md` para o bloco gerado porque o arquivo atual nao
+tem o marcador de merge esperado; essa mutacao automatica foi descartada para
+preservar o historico manual. Os numeros acima foram incorporados, e os achados
+abaixo vieram de varredura manual focada.
+
+### Metodo manual focado
+
+- Grafo local de imports Dart em 426 arquivos de `app/lib`, `server/lib`,
+  `server/routes` e `server/bin`.
+- Resolucao de imports relativos a partir do arquivo origem.
+- Resolucao de imports locais `package:server/...` para `server/lib`,
+  `package:manaloom/...` para `app/lib` e alias historico `package:ai/...`
+  para `server/lib/ai`.
+- Deteccao de componentes fortemente conexos no grafo de imports locais.
+- Validacao parcial por analyzer:
+  - `cd server && dart analyze bin/local_test_server.dart`;
+  - `cd app && flutter analyze --no-pub --no-fatal-infos
+    lib/features/decks/widgets/deck_analysis_tab.dart
+    lib/features/home/life_counter_screen.dart`.
+
+### Achados revalidados
+
+#### P1 — Dois imports app-side ainda resolvem para `app/core`, fora de `app/lib`
+
+- **Import quebrado 1:** `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
+  importa `../../../../core/utils/mana_helper.dart`. Resolvido a partir do
+  arquivo origem, o alvo e `app/core/utils/mana_helper.dart`, que nao existe.
+  O arquivo real existe em `app/lib/core/utils/mana_helper.dart`, e imports
+  vizinhos usam `../../../core/utils/mana_helper.dart`, por exemplo
+  `app/lib/features/decks/widgets/deck_diagnostic_panel.dart:4` e
+  `app/lib/features/decks/widgets/sample_hand_widget.dart:6`.
+- **Import quebrado 2:** `app/lib/features/home/life_counter_screen.dart:7`
+  importa `../../../core/theme/app_theme.dart`. Resolvido a partir do arquivo
+  origem, o alvo e `app/core/theme/app_theme.dart`, que nao existe. O arquivo
+  real existe em `app/lib/core/theme/app_theme.dart`, e imports vizinhos dentro
+  de `app/lib/features/home` usam `../../core/theme/app_theme.dart`, por exemplo
+  `app/lib/features/home/home_screen.dart:8` e
+  `app/lib/features/home/onboarding_core_flow_screen.dart:6`.
+- **Analyzer:** `flutter analyze --no-pub --no-fatal-infos` focado nos dois
+  arquivos foi **nao conclusivo para saude geral do app** porque
+  `app/.dart_tool/package_config.json` nao existe neste checkout, gerando muitas
+  falhas de pacotes (`flutter`, `provider`, `fl_chart`). Mesmo assim, a saida
+  incluiu os dois `uri_does_not_exist` locais:
+  `../../../../core/utils/mana_helper.dart` e
+  `../../../core/theme/app_theme.dart`.
+- **Por que parece quebrado:** a resolucao relativa sai de `app/lib` e aponta
+  para `app/core`, enquanto os alvos reais estao em `app/lib/core`.
+- **O que valida:** trocar os imports para `../../../core/utils/mana_helper.dart`
+  e `../../core/theme/app_theme.dart`, depois rodar `flutter pub get` se
+  necessario e `flutter analyze` no app.
+- **O que falsifica:** existencia real dos arquivos em `app/core/...` ou
+  configuracao de analyzer/build que remapeie esses caminhos relativos, o que
+  nao foi encontrado neste checkout.
+
+#### P1 — Entry point local do backend ainda importa artefato Dart Frog ausente
+
+- **Import quebrado:** `server/bin/local_test_server.dart:3` importa
+  `../.dart_frog/server.dart` como `generated`.
+- **Alvo resolvido:** `server/.dart_frog/server.dart`, ausente neste checkout.
+- **Analyzer:** `cd server && dart analyze bin/local_test_server.dart` confirma
+  `uri_does_not_exist` em `local_test_server.dart:3:8`.
+- **Controle positivo:** `server/.dart_tool/package_config.json` existe, entao
+  esta falha nao depende do mesmo bloqueio de package resolution observado no
+  app.
+- **Por que parece quebrado:** o entry point depende de um artefato gerado por
+  Dart Frog que nao esta versionado nem presente localmente.
+- **O que valida:** gerar o artefato antes de usar o entry point, remover o
+  import estatico ou substituir por um caminho de bootstrap compatibilidade
+  que nao quebre `dart analyze` em clone limpo.
+- **O que falsifica:** `server/.dart_frog/server.dart` existir apos etapa
+  documentada de geracao e o analyzer focado ficar verde.
+
+#### P2 — Ciclo local app-side entre detalhe de deck publico e perfil social
+
+- **Ciclo encontrado:** componente fortemente conexo de 2 arquivos:
+  `app/lib/features/community/screens/community_deck_detail_screen.dart` e
+  `app/lib/features/social/screens/user_profile_screen.dart`.
+- **Aresta 1:** `community_deck_detail_screen.dart:8` importa
+  `../../social/screens/user_profile_screen.dart`; o mesmo arquivo instancia
+  `UserProfileScreen` no fluxo de navegacao em `:213`.
+- **Aresta 2:** `user_profile_screen.dart:7` importa
+  `../../community/screens/community_deck_detail_screen.dart`; o mesmo arquivo
+  instancia `CommunityDeckDetailScreen` no fluxo de navegacao em `:469`.
+- **Por que parece ciclo real:** ambos os arquivos importam e constroem a tela
+  oposta diretamente por `Navigator.push`, criando dependencia bidirecional de
+  camada UI entre comunidade e social.
+- **Impacto:** nao apareceu como falha de import quebrado, mas aumenta risco de
+  cascata em refactors e dificulta separar social/community em modulos menores.
+- **O que valida:** extrair navegacao para rotas nomeadas/adapter compartilhado
+  ou mover os builders para uma camada comum, deixando cada tela depender da
+  abstracao em vez da tela oposta.
+- **O que falsifica:** grafo de imports apos refactor nao conter mais SCC entre
+  esses dois arquivos, ou decisao explicita de aceitar esse ciclo como UI shell
+  temporario com teste de regressao.
+
+### Achados historicos atualizados nesta rodada
+
+- O import historico de
+  `server/routes/ai/commander-learning/index.dart:4` para
+  `server/lib/ai/commander_learned_deck_support.dart` **nao esta mais quebrado**
+  neste checkout: o arquivo alvo existe, e a varredura de imports locais nao
+  reportou falha para esse caminho.
+- Nenhum ciclo local backend foi encontrado em `server/lib`, `server/routes` ou
+  `server/bin`.
+
+### Resultado desta revalidacao
+
+No checkout `2061f291`, o auditor base segue verde para imports quebrados em
+`server/lib`/`server/routes`, mas a varredura ampliada app/server confirma 3
+imports locais quebrados fora desse recorte e 1 ciclo app-side de 2 arquivos. O
+achado `commander_learned_deck_support.dart` foi reclassificado como stale para
+este checkout; os dois imports app-side e o `local_test_server.dart` permanecem
+abertos ate correcao ou geracao comprovada dos alvos.
 
 ## Rodada focada: Functions not called — revalidacao 2026-06-07 07:00 UTC
 

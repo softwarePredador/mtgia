@@ -1,6 +1,6 @@
 # Hermes Analysis: Technical Map
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 07:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 11:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -139,34 +139,28 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-06)
+## Achados do audit de estrutura (atualizado 2026-06-07)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclo local fora do recorte do auditor base**:
-  **ATUALIZACAO PARCIAL em 2026-06-06 23:00 UTC no checkout `1fbc07d8`:**
-  o auditor base reportou `Imports quebrados: 0` em `server/lib` e
-  `server/routes`, e `server/lib/ai/commander_learned_deck_support.dart` existe
-  neste checkout. A varredura ampliada app/server da rodada anterior nao foi
-  reexecutada nesta rotacao de coerencia, entao os imports app e o ciclo
-  `CommunityDeckDetailScreen`/`UserProfileScreen` abaixo permanecem historicos
-  ate nova revalidacao focada.
-  **REVALIDADO/ABERTO no checkout local `6364db29` em 2026-06-06 11:00 UTC.** O
+  **REVALIDADO/ABERTO em 2026-06-07 11:00 UTC no checkout `2061f291`.** O
   auditor base cobre apenas `server/lib` e `server/routes` e reportou
-  `Imports quebrados: 1`: `server/routes/ai/commander-learning/index.dart:4`
-  importa `server/lib/ai/commander_learned_deck_support.dart`, arquivo ausente
-  neste checkout; `dart analyze` focado tambem confirma `uri_does_not_exist`
-  para `server/bin/local_test_server.dart:3` importar
-  `server/.dart_frog/server.dart`. A triagem focada em 424 arquivos Dart de
-  `app/lib`, `server/lib`, `server/routes` e `server/bin` encontrou somente
-  estes 4 imports locais quebrados: `deck_analysis_tab.dart:5` resolvendo para
-  `app/core/utils/mana_helper.dart`, `life_counter_screen.dart:7` resolvendo
-  para `app/core/theme/app_theme.dart`, `commander-learning/index.dart:4`
-  resolvendo para o support ausente e `local_test_server.dart:3` resolvendo
-  para o artefato ausente. A mesma varredura achou 1 SCC de 2 arquivos entre
-  `CommunityDeckDetailScreen` e `UserProfileScreen`, e nenhum ciclo local
-  backend. `flutter analyze --no-pub` do app foi nao conclusivo neste checkout
-  porque pacotes Flutter/provider/fl_chart nao estavam resolvidos, embora a
-  saida inclua os dois `uri_does_not_exist` locais do app.
+  `Imports quebrados: 0`. O import historico de
+  `server/routes/ai/commander-learning/index.dart:4` para
+  `server/lib/ai/commander_learned_deck_support.dart` nao esta mais quebrado
+  neste checkout porque o arquivo alvo existe. A triagem focada em 426 arquivos
+  Dart de `app/lib`, `server/lib`, `server/routes` e `server/bin` encontrou
+  somente 3 imports locais quebrados: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
+  resolvendo para `app/core/utils/mana_helper.dart`,
+  `app/lib/features/home/life_counter_screen.dart:7` resolvendo para
+  `app/core/theme/app_theme.dart`, e `server/bin/local_test_server.dart:3`
+  resolvendo para `server/.dart_frog/server.dart`. `dart analyze
+  bin/local_test_server.dart` confirma o erro backend. `flutter analyze
+  --no-pub` focado no app foi nao conclusivo porque
+  `app/.dart_tool/package_config.json` nao existe, mas a saida incluiu os dois
+  `uri_does_not_exist` locais do app. A mesma varredura achou 1 SCC de 2
+  arquivos entre `CommunityDeckDetailScreen` e `UserProfileScreen`, e nenhum
+  ciclo local backend.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1 — Coerencia app-facing de IA/deck revalidada no checkout local**: a
   rodada de coerencia de 2026-06-06 23:00 UTC (`1fbc07d8`) confirmou drift entre

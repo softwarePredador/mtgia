@@ -1,20 +1,20 @@
 # Plano de Correcao — Audit de Estrutura
 
-> Data: 2026-06-07 07:00 UTC
+> Data: 2026-06-07 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-06 23:00 UTC no checkout `1fbc07d8` reportou `Imports quebrados: 0` no recorte backend do auditor base. Ainda assim, as rodadas focadas revelaram frentes prioritárias de organização:
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-07 11:00 UTC no checkout `2061f291` reportou `Imports quebrados: 0` no recorte backend do auditor base (`server/lib` e `server/routes`). Ainda assim, a varredura ampliada app/server segue apontando frentes prioritárias de organização:
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-06 19:00 UTC no checkout `2f283904`. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo. A revalidacao confirmou que wrappers finos em `server/routes/ai/optimize/index.dart` delegam para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
-   `61749fe2` em 2026-06-05 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
+   `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
-   nao existe neste checkout, e `dart analyze` focado em `server/` falha com
-   `uri_does_not_exist`.
+   nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
+   com `uri_does_not_exist`.
 5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
    **REVALIDADO no checkout local `1fbc07d8` em 2026-06-06 23:00 UTC**.
    `POST /ai/optimize` e `POST /ai/archetypes` continuam chamados pelo app com
@@ -89,27 +89,24 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     observabilidade automatica do `PerformanceService` foi separada como
     controle positivo (`init`, observer de tela e `traceAsync` em smoke), nao
     como codigo morto.
-13. **P1/P2 — Imports quebrados e ciclo app/server**: **HISTORICO; PARCIALMENTE
-    SUPERADO PELO CHECKOUT `1fbc07d8` EM 2026-06-06 23:00 UTC.** O auditor base
-    desta rodada reportou `Imports quebrados: 0` em `server/lib`/`server/routes`,
-    e `server/lib/ai/commander_learned_deck_support.dart` existe no checkout
-    atual. A rodada anterior segue registrada como historico e ainda precisa de
-    nova revalidacao por `dart analyze` focado antes de ser tratada como estado
-    atual. Naquele checkout local `6364db29` (2026-06-06 11:00 UTC), o auditor
-    base reportava 1 import quebrado dentro de seu recorte:
-    `server/routes/ai/commander-learning/index.dart:4` importava o support
-    ausente `server/lib/ai/commander_learned_deck_support.dart`, e `dart analyze`
-    focado confirmava `uri_does_not_exist` com cascata em
-    `CommanderLearnedDeckInput`; o mesmo analyze confirmava
-    `server/bin/local_test_server.dart:3` apontando para o artefato ausente
-    `server/.dart_frog/server.dart`. A varredura local ampliada encontrou
-    somente 4 imports locais quebrados em 424 arquivos: esse
-    `commander-learning`, `deck_analysis_tab.dart:5` e
-    `life_counter_screen.dart:7` usando imports relativos que saem de `app/lib`
-    para `app/core/...`, e `local_test_server.dart:3`. A varredura SCC encontrou
-    somente um ciclo local: `CommunityDeckDetailScreen` e `UserProfileScreen`
-    importam e instanciam uma a outra por `Navigator.push`; nenhum ciclo local
-    backend foi encontrado.
+13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
+    checkout local `2061f291` em 2026-06-07 11:00 UTC.** O auditor base reportou
+    `Imports quebrados: 0` em `server/lib`/`server/routes`, e o import historico
+    de `server/routes/ai/commander-learning/index.dart:4` deixou de estar
+    quebrado porque `server/lib/ai/commander_learned_deck_support.dart` existe
+    neste checkout. A varredura local ampliada encontrou 3 imports locais
+    quebrados em 426 arquivos: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
+    resolvendo para `app/core/utils/mana_helper.dart`,
+    `app/lib/features/home/life_counter_screen.dart:7` resolvendo para
+    `app/core/theme/app_theme.dart`, e `server/bin/local_test_server.dart:3`
+    resolvendo para `server/.dart_frog/server.dart`. `dart analyze
+    bin/local_test_server.dart` confirma o erro backend; `flutter analyze
+    --no-pub` focado no app foi nao conclusivo por falta de
+    `app/.dart_tool/package_config.json`, mas incluiu os dois
+    `uri_does_not_exist` locais. A varredura SCC encontrou somente um ciclo
+    local: `CommunityDeckDetailScreen` e `UserProfileScreen` importam e
+    instanciam uma a outra por `Navigator.push`; nenhum ciclo local backend foi
+    encontrado.
 
 ## Achados priorizados
 
@@ -410,11 +407,11 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
-- **Status 2026-06-03 11:00 UTC: REVALIDADO/ABERTO no checkout local
-  `4795a07b`.** A resolucao historica citada para `origin/master@a830f9f3` nao
+- **Status 2026-06-07 11:00 UTC: REVALIDADO/ABERTO no checkout local
+  `2061f291`.** A resolucao historica citada para `origin/master@a830f9f3` nao
   esta presente nesta branch de memoria.
 - **Evidência**:
-  - `dart analyze` em `server/` falhou com:
+  - `dart analyze bin/local_test_server.dart` em `server/` falhou com:
     - `bin/local_test_server.dart:3:8 - Target of URI doesn't exist: '../.dart_frog/server.dart'`
   - `server/bin/local_test_server.dart:3` importa `../.dart_frog/server.dart`
     estaticamente.
@@ -433,8 +430,8 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-06-03 11:00 UTC: REVALIDADO/ABERTO no checkout local
-`4795a07b`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
+**Status 2026-06-07 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`2061f291`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
 `origin/master@a830f9f3` nao estao refletidas nesta branch de memoria.
 
 - **Evidência**:
@@ -449,6 +446,9 @@ Histórico do problema:
   - `server/bin/local_test_server.dart:3` importa
     `../.dart_frog/server.dart`; `dart analyze` confirma `uri_does_not_exist`
     porque `server/.dart_frog/server.dart` nao existe no checkout atual.
+  - O import historico de `server/routes/ai/commander-learning/index.dart:4`
+    para `server/lib/ai/commander_learned_deck_support.dart` nao esta mais
+    quebrado neste checkout; o arquivo alvo existe.
 - **Impacto**: builds/checks com package config valido tendem a falhar no app
   quando esses arquivos entram no grafo; no backend, `dart analyze` segue
   bloqueado pelo entrypoint local.
@@ -469,8 +469,8 @@ Histórico do problema:
 
 ### P2 — Quebrar o ciclo direto entre `CommunityDeckDetailScreen` e `UserProfileScreen`
 
-**Status 2026-06-02 11:00 UTC: REVALIDADO/ABERTO no checkout local
-`eecb2f95`.** A resolucao historica citada para `origin/master@640f4ab4` nao
+**Status 2026-06-07 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`2061f291`.** A resolucao historica citada para `origin/master@640f4ab4` nao
 esta refletida nesta branch de memoria; o grafo local focado ainda encontrou 1
 SCC com esses dois arquivos.
 
@@ -481,7 +481,7 @@ SCC com esses dois arquivos.
   - `app/lib/features/social/screens/user_profile_screen.dart:7` importa
     `../../community/screens/community_deck_detail_screen.dart` e navega para
     `CommunityDeckDetailScreen` em `:469`.
-  - A rodada focada de 721 arquivos Dart encontrou 1 unico SCC com mais de um
+  - A rodada focada de 426 arquivos Dart encontrou 1 unico SCC com mais de um
     arquivo, composto por essas duas telas; nao encontrou ciclos locais no
     backend.
 - **Impacto**: `community` e `social` ficam acoplados por classes concretas de
