@@ -134,6 +134,21 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS optimizer_applied_swaps (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            deck_id INTEGER NOT NULL,
+            swap_benchmark_id INTEGER NOT NULL,
+            card_added TEXT NOT NULL,
+            card_removed TEXT NOT NULL,
+            before_hash TEXT NOT NULL,
+            after_hash TEXT NOT NULL,
+            rollback_path TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+        """
+    )
     conn.commit()
 
 
