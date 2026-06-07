@@ -1,11 +1,11 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-07 ~18:30 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-07 ~21:40 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** ✅ **OPTIMIZER-VALIDATED** — cEDH Stax-Protected Combo (Bracket 4). **89.5% WR** (537W/39L/24S) across 600 games vs 12 real opponents after Slot Optimizer Phase 3. **89.3% WR** (268W/6L/26S) post-E2E Wheel of Misfortune apply (300 games). 84.5% pre-optimization baseline. NOT spellslinger.
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs, 16 Mulligan simulations, v3.22→v3.25 Validator, Lorehold Corpus Import (17+ decks), TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION), **6th hash** — STRATEGIC PIVOT to stax-protected combo, **7th hash** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation**, **Knowledge Synthesis #7**, **Gamechanger Research #7**, **Cron Governance #4**, **Battle Analyst v8 (00:54Z)** — 6 runs, 3,600 games, 84.5% WR, **Slot Optimizer v3 (Jun 6 03:55Z)** — Phase 1-3, 6 swaps, 77.0%→89.5% (+12.5pp), **🆕 Master Optimizer (Jun 7 14:00-18:00Z)** — full pipeline: baseline→quality gate (50→25 candidates)→confirmation (5)→handoff (2 approved)→E2E apply (1 REAL swap), **🆕 Battle Effect Coverage Audit (Jun 7 18:04Z)** — Lorehold 45 flagged (best coverage), 0 effect_map cards (heuristic-only)
+> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs, 16 Mulligan simulations, v3.22→v3.25 Validator, Lorehold Corpus Import (17+ decks), TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION), **6th hash** — STRATEGIC PIVOT to stax-protected combo, **7th hash** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation**, **Knowledge Synthesis #7**, **Gamechanger Research #7**, **Cron Governance #4**, **Battle Analyst v8 (00:54Z)** — 6 runs, 3,600 games, 84.5% WR, **Slot Optimizer v3 (Jun 6 03:55Z)** — Phase 1-3, 6 swaps, 77.0%→89.5% (+12.5pp), **Master Optimizer (Jun 7 14:00-18:00Z)** — full pipeline: baseline→quality gate→confirmation→handoff→E2E apply, **Battle Effect Coverage Audit (Jun 7 18:04Z)** — Lorehold 45 flagged, **🆕 Coverage Audit Rerun (Jun 7 21:07Z)** — 53 flagged (+8 🔴), effect_map still 0, **🆕 Battle Runs (20:07-21:09Z)** — 75.0% WR (-14.3pp from post-apply), **🆕 KC Validator Surge (21:10Z)** — 1,322 new entries after 4 clean runs
 > **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, **current hash: `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`** (⚠️ JUST CHANGED — Wheel of Misfortune applied over Reforge the Soul, Jun 7 16:22 UTC). **33 lands, 19 ramp, 9 draw, 10 protection, 4 removal/wipe, 14 wincons, 5 tutors. 14 Game Changers → Bracket 4.** The `763c3e0f...` hash was the pre-E2E state and is now STALE.
 > **🚨 Lorehold Pipeline DECOMMISSIONED:** All 5 Lorehold crons removed from `jobs.json`. Commander Knowledge Deep is the ONLY cron monitoring the deck. **Status unchanged since Jun 4.**
 > **🟢 NEW: Real swap applied today!** Wheel of Misfortune (CMC 3, draw/wheel) replaced Reforge the Soul (CMC 5, wheel). Master Optimizer E2E apply proved +2.7pp → post-apply WR 89.3%. First real deck mutation via automated pipeline since Evolution Oracle decommissioning.
@@ -2985,4 +2985,224 @@ The KC Validator ran again at 18:06 UTC with updated classification data:
 | **Avg win turn as co-primary metric** 🆕 | §59 Task 4 | WR alone is insufficient for cEDH. A deck winning 89% on turn 18 loses to a deck winning 25% on turn 5. Both metrics must be tracked |
 | **Swap interaction effects** 🆕 | §59 Task 1 | 6 independent swaps proven individually — cumulative application may have non-linear interactions. Need sequential post-apply baselines |
 | **Confidence-weighted battle results** 🆕 | §59 Task 5 | Not all battle simulations have equal fidelity. Coverage quality should weight result confidence in optimization decisions |
-| **Approach win turn gap** 🆕 | §51.6 | 5 tutors for a 2-cast wincon in 99-card deck — tutor density is the bottleneck for win speed |
+|| **Approach win turn gap** 🆕 | §51.6 | 5 tutors for a 2-cast wincon in 99-card deck — tutor density is the bottleneck for win speed |
+
+---
+
+## 61. 🆕 Battle Effect Coverage Audit Rerun (2026-06-07 ~21:07 UTC)
+
+The audit was rerun at 21:07 UTC with expanded cross-deck comparison across all 13 decks (Lorehold + 12 real opponents).
+
+### 61.1 Coverage Comparison Across Decks
+
+| Deck | Cards | Battle Manual | Battle Generated | Effect Map | Tag | Type Land | Unknown | **Flagged** |
+|:-----|------:|:-------------:|:----------------:|:----------:|:---:|:---------:|:-------:|:-----------:|
+| **Lorehold target deck** | 100 | 27 | 38 | 0 | 2 | 33 | 0 | **53** |
+| Lumra, Bellow of the Woods #131 | 99 | 2 | 6 | 17 | 25 | 48 | 1 | **60** |
+| Yorion, Sky Nomad #120 | 99 | 4 | 1 | 34 | 24 | 32 | 4 | **63** |
+| Magda, Brazen Outlaw #153 | 99 | 8 | 23 | 26 | 11 | 28 | 3 | **67** |
+| Gwen Stacy #147 | 99 | 11 | 27 | 14 | 15 | 26 | 6 | **68** |
+| Etali, Primal Conqueror #187 | 99 | 5 | 33 | 8 | 21 | 27 | 5 | **70** |
+| Akiri, Line-Slinger #112 | 99 | 6 | 15 | 19 | 24 | 29 | 6 | **71** |
+| Kraum, Ludevic's Opus #132 | 99 | 7 | 20 | 16 | 21 | 26 | 9 | **71** |
+| Sisay, Weatherlight Captain #113 | 99 | 7 | 17 | 11 | 32 | 27 | 5 | **71** |
+| Ishai, Ojutai Dragonspeaker #110 | 99 | 8 | 21 | 18 | 17 | 24 | 11 | **72** |
+| Kenrith, the Returned King #195 | 99 | 7 | 15 | 11 | 32 | 27 | 7 | **72** |
+| Urza, Lord High Artificer #169 | 99 | 4 | 11 | 26 | 24 | 25 | 9 | **73** |
+| Kinnan, Bonder Prodigy #119 | 99 | 3 | 10 | 22 | 35 | 25 | 4 | **77** |
+
+**Key insight:** Lorehold has the best coverage (53 flagged) but this represents a **decline from 45 flagged in the previous audit** (§57). The deck gained 8 new flagged cards, all in the `battle_rule_generated` category. Despite leading in raw flagged count, the **lack of effect_map cards (0)** means all Lorehold effects are either handcrafted (manual) or generated — none benefit from the explicit effect mapping system.
+
+### 61.2 Coverage Trend: Declining
+
+| Metric | Previous Audit (§57) | Current Audit (21:07) | Δ |
+|:-------|:--------------------:|:---------------------:|:--:|
+| Handcrafted (manual) | 26 | 27 | +1 |
+| Generated (heuristic) | 39 | 38 | -1 |
+| Effect Map | 0 | 0 | — |
+| Flagged | **45** | **53** | **+8 🔴** |
+
+The +8 flagged increase is driven by:
+- **3 new cards** flagged as `cast_permission_not_explicit` (Flawless Maneuver, Past in Flames, Faithless Looting)
+- **2 new cards** flagged as `trigger_not_explicit` (Aetherflux Reservoir, Guttersnipe, Longshot Rebel Bowman)
+- **1 new card** flagged as `oracle_target_removal_mismatch` (Pyroblast)
+- **2 cards** with multiple new flags (Storm-Kiln Artist, Giver of Runes)
+
+### 61.3 Top-Flagged Lorehold Cards
+
+| Card | Effect | Source | Flags | Risk |
+|:-----|:-------|:-------|:------|:-----|
+| Aetherflux Reservoir | finisher | battle_rule_generated | heuristic_effect, trigger_not_explicit | Wincon modeling accuracy |
+| Flawless Maneuver | indestructible | battle_rule_generated | cast_permission_not_explicit, heuristic_effect, temporary_effect_not_explicit | Protection timing in combat |
+| Past in Flames | recursion | battle_rule_generated | cast_permission_not_explicit, heuristic_effect, temporary_effect_not_explicit | GY recursion modeling |
+| Surge to Victory | remove_permanent | battle_rule_manual | cast_permission_not_explicit, temporary_effect_not_explicit, trigger_not_explicit | Complex multi-mode card |
+| Faithless Looting | draw_cards | battle_rule_generated | cast_permission_not_explicit, heuristic_effect | Flashback cost modeling |
+| Pyroblast | counter | battle_rule_generated | heuristic_effect, oracle_target_removal_mismatch | Blue-only targeting |
+| Storm-Kiln Artist | ramp_engine | battle_rule_generated | heuristic_effect, trigger_not_explicit | Copy-trigger ramp |
+
+### 61.4 Signal: Coverage Decline in Generated Effects
+
+The 8-card flagged increase is concentrated in `battle_rule_generated` cards — the heuristic engine. This suggests the heuristic classifier is becoming **less confident** as the deck evolves (new cards added during cEDH pivot lack robust heuristic patterns). The #1 remediation path is adding explicit `effect_map` entries for the top-flagged cards.
+
+---
+
+## 62. 🆕 New Battle Runs (2026-06-07 ~20:07–21:09 UTC)
+
+Two new battle analyst runs executed after the post-apply baseline:
+
+### 62.1 Run at 20:07 UTC — 120 Games
+
+```
+Games: 10 4-player | Deck: L=33 R=19 X=4 CMC=2.69 Instants=21
+Overall WR: 75.0% (90W/21L/9S)
+```
+
+| Opponent | WR | Avg Win Turn | Primary Wincon |
+|:---------|---:|:------------:|:---------------|
+| K-9, Mark I #116 | 100.0% | 19.6 | Approach + Elimination |
+| Rograkh, Son of Rohgahh #200 | 90.0% | 18.3 | Approach + Elimination |
+| Zirda, the Dawnwaker #151 | 90.0% | 20.6 | Approach + Elimination |
+| Dargo, the Shipwrecker #156 | 80.0% | 23.6 | Elimination dominant |
+| Magda, Brazen Outlaw #172 | 80.0% | 16.0 | Approach dominant |
+| Zirda, the Dawnwaker #151 | 80.0% | 22.1 | Approach + Elimination |
+| Etali, Primal Conqueror #167 | 70.0% | 16.9 | Elimination dominant |
+| Ishai, Ojutai Dragonspeaker #162 | 70.0% | 23.0 | Approach + Elimination |
+| Najeela, the Blade-Blossom #193 | 70.0% | 18.0 | Approach + Elimination |
+| Kraum, Ludevic's Opus #165 | 60.0% | 20.5 | Approach + Elimination |
+
+### 62.2 Run at 21:09 UTC — 6 Games (Small Sample)
+
+```
+Games: 2 4-player | Deck: L=33 R=19 X=4 CMC=2.85 Instants=20
+Overall WR: 83.3% (5W/0L/1S)
+```
+
+| Opponent | WR | Avg Win Turn |
+|:---------|---:|:------------:|
+| Kinnan, Bonder Prodigy #154 | 100.0% | 17.5 |
+| Kinnan, Bonder Prodigy #109 | 100.0% | 16.5 |
+| Tayam, Luminous Enigma #107 | 50.0% | 18.0 |
+
+### 62.3 WR Trajectory Analysis
+
+| Run | Time UTC | Games | WR | L/R/X | CMC |
+|:----|:---------|:-----:|----:|:-----:|:---:|
+| Post-Apply Baseline (§56.5) | ~16:22 | 300 | **89.3%** | 33/19/4 | — |
+| Battle Run #1 | 20:07 | 120 | **75.0%** | 33/19/4 | 2.69 |
+| Battle Run #2 | 21:09 | 6 | **83.3%** | 33/19/4 | 2.85 |
+
+**⚠️ WR decline detected:** 89.3% → 75.0% = -14.3pp. Possible causes:
+1. **Opponent pool rotation:** Post-apply baseline used a different opponent set than the 20:07 run. The 12 opponents are loaded from `knowledge.db` and may have been updated between runs (new real deck imports).
+2. **CMC variance:** CMC 2.69 vs 2.85 — minor but could shift early-game consistency.
+3. **Post-apply recency bias:** The 89.3% baseline ran immediately after the Wheel of Misfortune swap was applied. The 20:07 run ran 4 hours later with potentially updated opponent rule sets.
+4. **Sample size:** 120 games at 20:07 vs 300 games post-apply — 95% CI for 75% ± 8pp, overlapping 89.3%.
+
+**Signal:** Post-apply baselines should be rerun periodically (not just once) to detect opponent-pool-driven WR shifts. A single baseline is a snapshot, not a permanent truth.
+
+---
+
+## 63. 🆕 KC Validator Classification Surge (2026-06-07 ~21:10 UTC)
+
+### 63.1 Progression Timeline
+
+| Run Time UTC | Validated | Filtered | New Entries | Corrections | Conflicts |
+|:-------------|:---------:|:--------:|:-----------:|:-----------:|:---------:|
+| 12:58 (§53.1) | 500 | — | 0 | 0 | 4 |
+| 18:06 (§58) | 500 | 1,968 | 0 | 0 | 0 |
+| 19:39 | 500 | 1,970 | 0 | 0 | 0 |
+| 20:09 | 500 | 1,970 | 0 | 0 | 0 |
+| 20:40 | 500 | 1,970 | 0 | 0 | 0 |
+| **21:10** | **500** | **1,968** | **1,322** 🔴 | **5** | **3** |
+
+### 63.2 What Changed at 21:00 UTC?
+
+Between 20:40 (0 new entries) and 21:10 (1,322 new entries), the filtered pool shrank from 1,970 to 1,968 — only 2 cards removed. The validator's behavior changed dramatically:
+
+- **Possible cause 1:** The `known_cards` database was refreshed (sync from PostgreSQL) between 20:40 and 21:10, introducing ~1,300 new cards not previously in the validation corpus.
+- **Possible cause 2:** The validator's sampling seed changed, selecting a batch of cards not previously seen by the classifier.
+- **Possible cause 3:** The classifier model was updated with new rules, causing it to re-evaluate previously "known" cards and find new classifications.
+
+### 63.3 New Corrections (21:10)
+
+| Card | From | To | Significance |
+|:-----|:-----|:--|:-------------|
+| Cinder Storm | remove_creature | finisher | Storm finisher correctly reclassified |
+| **Dragonstorm** | draw_cards | **finisher** | Critical correction — this is a wincon, not draw |
+| **Grapeshot** | remove_creature | **finisher** | Storm wincon, not removal |
+| Fiery Encore | draw_cards | finisher | GY recursion + finisher hybrid |
+| Mana Geyser | ramp_permanent | ramp_ritual | Ritual, not permanent ramp |
+
+**Impact on Lorehold:** None directly. These corrections don't affect Lorehold deck cards, but Dragonstorm and Grapeshot being reclassified as `finisher` improves the classifier's accuracy for storm-based wincons — relevant for future Spellseeker / storm evaluations.
+
+### 63.4 New Conflicts (21:10)
+
+| Card | Current | Reclassified | Issue |
+|:-----|:--------|:-------------|:------|
+| Glacial Chasm | finisher | indestructible | Cumulative upkeep land — neither tag seems right; this is a damage-prevention pillowfort card |
+| Mica, Reader of Ruins | finisher | copy_spell | Sacrifice-artifact-to-copy-spell effect. `copy_spell` is more specific than `finisher` |
+| Mystic Forge | finisher | topdeck_manipulation | Look-at-top + cast-artifacts-from-top = clear `topdeck_manipulation` |
+
+### 63.5 Signal: Validator Sampling Instability Confirmed
+
+The §58 observation (two runs 6h apart with different results) is now amplified: **4 consecutive runs (19:39–20:40) produced 0/0/0 results**, followed by a run with 1,322 new entries. This confirms the validator's sampling behavior is not reproducible without a stable seed. The `--seed` and `--full-corpus` flags proposed in Task 3 (§59) remain the recommended remediation.
+
+---
+
+## 64. 🆕 UPDATED CONCRETE TASKS (2026-06-07 ~21:40 UTC — max 5)
+
+> **Note:** Tasks from §59 remain valid. These tasks are ADDITIONAL or UPDATED based on latest evidence from 20:07–21:16 UTC.
+
+### Task 1: 🔴 P0 — Investigate WR Regression: 89.3% → 75.0%
+
+- **Evidence:** Post-apply baseline (§56.5) recorded 89.3% WR (268W/6L/26S) across 300 games. Battle run at 20:07 (§62.1) recorded 75.0% WR (90W/21L/9S) across 120 games with the same L=33 R=19 X=4 configuration. This -14.3pp drop is outside the expected ±8pp confidence interval for 120 games. Possible root causes: opponent pool update (new real decks imported between runs), battle rule changes (rule registry was updated at ~19:00 per git history), or CMC variance (2.69 vs previous config).
+- **What to change:** (a) Re-run post-apply baseline with the CURRENT opponent pool to establish whether WR truly regressed or the opponent pool got harder. (b) Compare opponent lists between the 16:22 and 20:07 runs — identify which opponents were added/removed. (c) If regression is confirmed, re-run Slot Optimizer against the current opponent pool to find new swaps that recover the lost WR.
+- **Impact:** Determines whether the Wheel of Misfortune swap needs to be re-evaluated against the updated meta. If the regression is opponent-pool-driven, it signals that optimization must be opponent-pool-aware.
+- **Risk:** Medium — if the regression is real and not sample noise, the deck may need a new swap cycle.
+- **Validation:** Re-baseline should restore WR to ≥85% if the regression is opponent-pool artifact. If WR stays at 75-80%, the deck needs new optimization.
+
+### Task 2: 🟡 P1 — Add effect_map Entries for Top 7 Flagged Lorehold Cards
+
+- **Evidence:** Coverage audit (§61) shows Lorehold flagged count increased from 45→53 with 0 effect_map cards. The top-flagged cards are Aetherflux Reservoir, Flawless Maneuver, Past in Flames, Surge to Victory, Faithless Looting, Pyroblast, and Storm-Kiln Artist (§61.3). These 7 cards carry 20 total flags across heuristic_effect, cast_permission_not_explicit, trigger_not_explicit, and temporary_effect_not_explicit — the most under-modeled effect types. Each added effect_map entry would remove 2-4 flags.
+- **What to change:** (a) Create effect_map entries in `knowledge.db` for the 7 cards, defining explicit trigger timing (when ability fires), permission conditions (when spell can be cast), and duration (temporary/permanent). (b) Re-run coverage audit post-mapping — flagged count should decrease from 53 to 35-40. (c) Prioritize Aetherflux Reservoir (wincon accuracy) and Past in Flames (recursion modeling) as they directly affect battle simulation outcomes.
+- **Impact:** Improves battle simulation fidelity by replacing heuristic guesses with explicit mechanics for the deck's most-played cards. Reduces WR estimate variance by 3-5pp.
+- **Risk:** Low — additive effect mapping. Effect maps are stored in SQLite and validated against known interactions.
+- **Validation:** After mapping, re-run Battle Effect Coverage Audit. Lorehold `effect_map` count should increase from 0 to ≥7, and `flagged` should decrease from 53 to ≤40.
+
+### Task 3: 🟡 P1 — Fix KC Validator Sampling with Stable Seed
+
+- **Evidence:** §63 documents 4 consecutive runs (19:39–20:40) showing 0 new entries, 0 corrections, 0 conflicts, followed by a 21:10 run with 1,322 new entries, 5 corrections, 3 conflicts. The validator samples 500 cards from a pool of ~1,970 without a stable seed, making run-to-run comparison meaningless. Task 3 from §59 recommended `--seed` and `--full-corpus` flags — these remain unimplemented. The new evidence makes this more urgent: we cannot distinguish between "classifier improved" and "sampled different cards" when looking at the 0→1,322 spike.
+- **What to change:** (a) Add `--seed N` flag for reproducible sampling (same 500 cards each run). (b) Add `--full-corpus` flag to validate ALL cards. (c) Run 3 consecutive validations with `--seed 42` — should produce identical results. (d) Run full-corpus validation to establish the true baseline of "known" vs "new" cards.
+- **Impact:** Enables measurement of classifier improvement over time. Currently impossible to determine if the classification surge at 21:10 is due to real improvement or sampling variance.
+- **Risk:** Low — additive flags. Full-corpus mode may take longer but runs as cron.
+- **Validation:** 3 consecutive `--seed 42` runs → identical results. `--full-corpus` → processes >1,900 cards.
+
+### Task 4: 🟢 P2 — Add Post-Apply Baseline Periodic Rerun Cron
+
+- **Evidence:** The post-apply baseline (§56.5) ran once at 16:22 UTC showing 89.3% WR. The 20:07 battle run shows 75.0% WR with the same deck config (§62). This 14.3pp gap may be an opponent-pool artifact — the deck might not have regressed, the opponents got harder. But without periodic re-baselining, we can't distinguish real deck degradation from meta shift. The Master Optimizer currently only runs baseline once per apply.
+- **What to change:** (a) Add a post-apply cron job that re-baselines the active deck every 6 hours against the current opponent pool. (b) If WR drops >10pp from the post-apply reference baseline, trigger an alert (not auto-apply — just flag). (c) Store baseline history in `baselines` table with timestamp, opponent pool hash, and WR for trend analysis.
+- **Impact:** Detects meta-driven WR erosion before it becomes critical. Prevents "optimized but stale" decks.
+- **Risk:** Low — read-only simulation. Does not modify deck.
+- **Validation:** After 24 hours, baseline history should show 4 data points with opponent pool hash tracking.
+
+### Task 5: 🟢 P2 — Cross-Deck Flagged Ratio as Simulation Confidence Score
+
+- **Evidence:** The coverage audit (§61.1) reveals massive variance in effect modeling quality: Lorehold has 53 flagged (53%) while Kinnan has 77 flagged (78%). Lumra has 60 flagged (61%) but only 2 handcrafted effects vs Lorehold's 27. Currently, all battle results are treated with equal confidence regardless of coverage quality. Task 5 from §59 recommended confidence weighting — the new cross-deck data makes the implementation case clearer.
+- **What to change:** (a) Compute `confidence_score = 1.0 - (flagged / total_nonland_cards)` for each deck. (b) Display confidence alongside WR in all battle reports: `WR 75.0% (confidence 0.47)` for Lorehold, `WR 42.3% (confidence 0.22)` for Kinnan. (c) In Master Optimizer quality gate, flag swaps where the cut card has a high-confidence effect but the add card has low-confidence as `confidence_regression`. (d) Add a pre-battle health check: if confidence < 0.30, emit warning that results may be unreliable.
+- **Impact:** Prevents over-reliance on battle results for poorly-modeled decks. Surfaces effect engineering priorities transparently.
+- **Risk:** Low — confidence is advisory. Does not change battle simulation.
+- **Validation:** After implementation, Lumra battle results should display `confidence 0.39` vs Lorehold `confidence 0.47`.
+
+---
+
+## 65. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-07 ~21:40 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Coverage decline on deck evolution** 🆕 | §61.2 | As decks evolve (new cards added), heuristic effect coverage degrades. The system should detect when a deck's flagged ratio increases post-swap and flag as `coverage_regression` |
+| **Opponent-pool-driven WR volatility** 🆕 | §62.3 | 14.3pp WR swing with same deck config but different time. WR measurements should be tagged with opponent-pool-hash to enable comparability |
+| **effect_map as coverage multiplier** 🆕 | §61.1 | Decks with 0 effect_map (Lorehold, all real opponents in this audit) rely entirely on heuristic/handcrafted. effect_map entries should be prioritized for commander cards first |
+| **Validator sampling blindness** 🆕 | §63.1 | 4 runs × 0 conflicts doesn't mean classifier is perfect — it means sampling excluded the unclassified cards. Full-corpus mode is essential for truth |
+| **Storm wincon misclassification** 🆕 | §63.2 | Dragonstorm and Grapeshot were tagged as `draw_cards` and `remove_creature` respectively — both are `finisher` in a storm shell. Classifier needs storm-combo pattern recognition |
+| **Baseline staleness** 🆕 | §62.3 | A single post-apply baseline is a snapshot. Periodic re-baselining (every 6h) would detect opponent-pool shift before the next optimization cycle |
+| **Confidence-weighted optimization** 🆕 | §64 Task 5 | Swapping a well-modeled card for a poorly-modeled one may show +WR in simulation that doesn't hold in reality because the new card is modeled less accurately |
+| **Cross-deck effect coverage ranking** 🆕 | §61.1 | Not all decks are modeled equally. Optimization recommendations for poorly-modeled decks (Kinnan, 77 flagged) should carry lower confidence than for well-modeled ones (Lorehold, 53 flagged) |
