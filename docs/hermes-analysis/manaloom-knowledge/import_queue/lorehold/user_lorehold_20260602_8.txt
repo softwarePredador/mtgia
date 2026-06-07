@@ -1,0 +1,86 @@
+=== User Lorehold Deck 2026-06-02 #8 ===
+Source: user-import
+Archetype: stax-mass-land-destruction-big-threats
+
+1 Lorehold, the Historian
+1 Academy Rector
+1 Ancient Copper Dragon
+1 Ancient Den
+1 Ancient Tomb
+1 Ankh of Mishra
+1 Apocalypse
+1 Arcane Signet
+1 Arid Mesa
+1 Armageddon
+1 Avacyn, Angel of Hope
+1 Battlefield Forge
+1 Bearer of the Heavens
+1 Blasphemous Act
+1 Blightsteel Colossus
+1 Boros Charm
+1 Caretaker's Talent
+1 Catastrophe
+1 Chrome Mox
+1 City of Traitors
+1 Clever Concealment
+1 Darksteel Citadel
+1 Darksteel Ingot
+1 Dawn's Truce
+1 Decree of Annihilation
+1 Devastation
+1 Eerie Interlude
+1 Elegant Parlor
+1 Elesh Norn, Grand Cenobite
+1 Enlightened Tutor
+1 Epicenter
+1 Esper Sentinel
+1 Fall of the Thran
+1 Farewell
+1 Flare of Fortitude
+1 Gamble
+1 Geier Reach Sanitarium
+1 Great Furnace
+1 Grim Monolith
+1 Hellkite Tyrant
+1 Hexing Squelcher
+1 Idyllic Tutor
+1 Impending Disaster
+1 Inspiring Vantage
+1 Jokulhaups
+1 Keldon Firebombers
+1 Kormus Bell
+1 Mana Vault
+1 Mithril Coat
+10 Mountain
+1 Obliterate
+10 Plains
+1 Plea for Guidance
+1 Price of Glory
+1 Ragavan, Nimble Pilferer
+1 Ravages of War
+1 Razia's Purification
+1 Restoration Magic
+1 Robe of Stars
+1 Ruination
+1 Rustvale Bridge
+1 Sacred Foundry
+1 Scroll Rack
+1 Sensei's Divining Top
+1 Smothering Tithe
+1 Sneak Attack
+1 Sol Ring
+1 Soul of New Phyrexia
+1 Soulscour
+1 Strip Mine
+1 Sun Titan
+1 Sundown Pass
+1 Teferi's Protection
+1 The One Ring
+1 Ultimate Magic: Holy
+1 Urborg, Tomb of Yawgmoth
+1 Urza's Saga
+1 Valakut Awakening
+1 Vandalblast
+1 Wildfire
+1 Worldfire
+1 Zo-Zu the Punisher

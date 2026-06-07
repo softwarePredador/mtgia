@@ -1,0 +1,64 @@
+=== User Lorehold Deck 2026-06-02 #9 ===
+Source: user-import
+Archetype: dragons-approach-thrumming-stone
+
+1 Lorehold, the Historian
+1 Ancient Copper Dragon
+1 Ancient Tomb
+1 Apex of Power
+1 Arid Mesa
+1 Balefire Dragon
+1 Bender's Waterskin
+1 Call Forth the Tempest
+1 Chrome Mox
+1 City of Brass
+1 City of Traitors
+1 Cloud Key
+1 Command Tower
+1 Deafening Silence
+25 Dragon's Approach
+1 Drannith Magistrate
+1 Esper Sentinel
+1 Faithless Looting
+1 Grand Abolisher
+1 Hit the Mother Lode
+1 Land Tax
+1 Mana Clash
+1 Mana Vault
+1 Monologue Tax
+1 Mox Amber
+1 Mox Diamond
+1 Mox Jasper
+1 Mox Opal
+1 Plateau
+1 Prismatic Vista
+1 Ranger-Captain of Eos
+1 Rise of the Eldrazi
+1 Scalding Tarn
+1 Scroll Rack
+1 Sensei's Divining Top
+1 Serra Ascendant
+1 Silence
+1 Simian Spirit Guide
+1 Skittering Invasion
+1 Smothering Tithe
+9 Snow-Covered Mountain
+9 Snow-Covered Plains
+1 Sol Ring
+1 Spellweaver Helix
+1 Storm Herd
+1 Talisman of Conviction
+1 Tataru Taru
+1 Teferi's Protection
+1 Thalia, Guardian of Thraben
+1 Thrumming Stone
+1 Tithe
+1 Tithe Taker
+1 Unwinding Clock
+1 Victory Chimes
+1 Virtue of Courage
+1 Voice of Victory
+1 Wandering Archaic
+1 Wheel of Fortune
+1 Winds of Change
+1 Wooded Foothills

@@ -1,0 +1,1415 @@
+# Hermes E2E System Contract — Battle, Knowledge, Optimizer e Produto
+
+> Status atual: canonico.
+> Este e o contrato operacional atual do Hermes E2E.
+
+Updated: 2026-06-07
+
+## Objetivo deste documento
+
+Este e o mapa operacional ponta a ponta do Hermes dentro do projeto ManaLoom.
+Ele existe para responder, sem depender de memoria de conversa:
+
+- o que cada etapa usa;
+- de onde os dados vem;
+- quais scripts rodam;
+- quais bancos e tabelas sao lidos/escritos;
+- quais parametros controlam o fluxo;
+- quais retornos sao esperados;
+- quais guardrails bloqueiam mutacao;
+- quais furos aparecem quando o fluxo e documentado por inteiro.
+
+Este documento nao substitui os relatorios historicos. Ele e o contrato de
+execucao. Relatorios de rodada ficam em `docs/hermes-analysis/master_optimizer_reports/`.
+
+## Principio de seguranca
+
+Hermes e sandbox de aprendizado e simulacao. O SQLite do Hermes pode receber
+swaps locais para validar hipotese, mas isso nao significa apply no produto.
+
+Regras duras:
+
+- Nao aplicar swap no produto a partir de `slot_benchmarks`.
+- Nao aplicar swap no Hermes sem `full_confirmation` aprovada.
+- Nao aplicar swap se o hash atual do deck divergir do hash do baseline.
+- Nao aplicar swap se a carta de corte nao existe no deck atual.
+- Nao aplicar swap se a carta de entrada ja existe no deck atual.
+- Nao copiar swap Hermes para deck real/produto sem handoff de produto e aprovacao humana.
+- Nao tratar `last_error` de cron como verdade isolada; confirmar com log/artefato fresco.
+
+## Ambientes
+
+### Repositorio local
+
+- Workspace local: `C:\Users\rafae\OneDrive\Documents\mtgia`
+- Branch de trabalho do fluxo Hermes: `codex/hermes-analysis-docs`
+- Docs principais: `docs/hermes-analysis/`
+- Scripts versionados: `docs/hermes-analysis/manaloom-knowledge/scripts/`
+
+### Hermes remoto observado
+
+- Host atual: `ubuntu@3.16.217.179`
+- Container observado: `d5fe57bf9de2`
+- Workspace no container: `/opt/data/workspace/mtgia`
+- SQLite Hermes: `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
+- Artefatos runtime: `/opt/data/artifacts/hermes_master_optimizer/`
+- Cron config no container: `/opt/data/cron/jobs.json`
+- Scripts instalados no container: `/opt/data/scripts/`
+- Segredos Postgres no container: `/opt/data/secrets/manaloom-postgres.env`
+
+Nao versionar segredos. O arquivo de ambiente do Postgres deve ser carregado
+pelos scripts shell no servidor, nunca copiado para docs.
+
+## Fonte de verdade dos dados
+
+### Postgres real
+
+O Postgres real e a fonte de metadata de cartas que deve alimentar o Hermes.
+O script `sync_pg_card_metadata_to_hermes.py` consulta a tabela publica `cards`.
+O script `sync_pg_meta_decks_to_hermes.py` consulta `meta_decks` para popular
+oponentes reais no SQLite Hermes.
+
+Colunas usadas quando existem no Postgres:
+
+- `name`
+- `mana_cost`
+- `type_line`
+- `oracle_text`
+- `colors`
+- `color_identity`
+- `cmc`
+- `power`
+- `toughness`
+- `keywords`
+- `scryfall_id`
+
+O script consulta `information_schema.columns` antes de montar o SELECT.
+Se uma coluna nao existir, usa fallback `NULL`, exceto `name`, que e obrigatoria.
+
+Contrato esperado do SELECT:
+
+```sql
+SELECT
+  c.name,
+  c.mana_cost,
+  c.type_line,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.power,
+  c.toughness,
+  c.keywords,
+  c.scryfall_id::text
+FROM cards c
+WHERE lower(c.name) = ANY(...)
+   OR lower(split_part(c.name, ' // ', 1)) = ANY(...)
+ORDER BY c.name;
+```
+
+Observacao: se o Postgres nao tiver `power`, `toughness` ou `keywords`, o Hermes
+continua funcionando, mas perde precisao em combate, habilidades e avaliacao de
+criaturas. O cache local ja aceita esses campos.
+
+Decks reais usados como oponentes:
+
+- Tabela primaria atual: `meta_decks`.
+- Campos usados: `id`, `commander_name`, `archetype`, `strategy_archetype`,
+  `shell_label`, `source_url`, `card_list`, `created_at`.
+- `card_list` no PG e decklist texto, normalmente no formato `1 Card Name`.
+- O sync converte essa decklist para JSON no SQLite `learned_decks`.
+- O sync nao escreve no Postgres; ele apenas le `meta_decks` e escreve cache local.
+- Validacao 2026-06-07: 581 `meta_decks` com `card_list` preenchido foram
+  encontrados no PG; 120 foram importados para o SQLite Hermes no primeiro sync.
+
+Fontes PG auxiliares observadas:
+
+- `commander_learned_decks`: 5 decks ativos validos alem de Lorehold.
+- `commander_reference_decks`: 22 decks aceitos com 90+ cartas resolvidas.
+- `commander_reference_deck_cards`: cartas resolvidas desses decks de referencia.
+- `deck_learning_events`: eventos de aprendizado sincronizados.
+
+### SQLite Hermes
+
+O SQLite `knowledge.db` e a fonte operacional do battle/optimizer. Ele recebe:
+
+- decks aprendidos;
+- deck alvo atual;
+- cache de metadata importada do Postgres;
+- legalidades;
+- Game Changers;
+- resultados de baseline, scan, confirmation, handoff e apply local.
+
+Snapshot vivo observado em 2026-06-07 apos sync de meta decks PG:
+
+| Tabela | Linhas | Uso |
+| --- | ---: | --- |
+| `deck_cards` | 543 | Decks locais do Hermes, incluindo deck alvo `deck_id=6`. |
+| `learned_decks` | 202 | Oponentes reais aprendidos para battle, incluindo 120 `pg_meta_decks`. |
+| `card_oracle_cache` | 3464 | Cache de metadata importada do Postgres. |
+| `battle_card_rules` | variavel | Semantica canonica de cartas para battle e montagem de deck. |
+| `card_legalities` | 31369 | Legalidade por formato. |
+| `game_changers` | 53 | Politica de bracket/Game Changer. |
+| `slot_benchmarks` | 30 | Resultados de scan isolado por slot. |
+| `swap_benchmarks` | 5 | Confirmacoes e full confirmations. |
+| `optimizer_baseline_runs` | 2 | Baselines congelados por deck/hash. |
+| `optimizer_quality_reviews` | 50 | Reviews de quality gate. |
+| `optimizer_handoffs` | 1 | Handoffs de candidatos aprovados. |
+| `optimizer_applied_swaps` | 0 | Applies locais Hermes. |
+| `optimizer_product_handoffs` | 0 | Handoffs para produto. |
+
+Tabela local `cards`: ausente no SQLite vivo observado. Portanto battle e
+optimizer nao devem depender dela no Hermes atual. Se algum script passar a
+depender de `cards`, precisa criar fallback para `card_oracle_cache` ou falhar no
+preflight.
+
+## Contrato das tabelas principais
+
+### `deck_cards`
+
+Leituras principais:
+
+- `battle_analyst_v8.py`
+- `master_optimizer_common.py`
+- `slot_optimizer.py`
+- `sync_pg_card_metadata_to_hermes.py`
+
+Escritas principais:
+
+- importadores de decks;
+- `temporary_swap()` durante teste isolado, com restauracao obrigatoria;
+- `master_optimizer_apply.py` quando apply local Hermes e aprovado.
+
+Colunas observadas:
+
+- `id`
+- `deck_id`
+- `card_name`
+- `quantity`
+- `functional_tag`
+- `tag_confidence`
+- `is_commander`
+- `is_partner`
+- `cmc`
+- `type_line`
+- `oracle_text`
+
+Contrato:
+
+- `deck_id=6` e o Lorehold alvo atual.
+- Commander deve ter `is_commander=1`.
+- Total Commander precisa continuar 100 cartas considerando quantity.
+- `card_name` e chave funcional para lookup, hash e swap.
+
+### `learned_decks`
+
+Leituras principais:
+
+- `battle_analyst_v8.py` como pool de oponentes;
+- `sync_pg_card_metadata_to_hermes.py` para coletar nomes a cachear;
+- `kc_validator.py` para expandir/validar conhecimento.
+
+Escritas principais:
+
+- `sync_pg_meta_decks_to_hermes.py`, apenas no SQLite Hermes, com
+  `source='pg_meta_decks'`;
+- importadores locais de decks aprendidos.
+
+Colunas observadas:
+
+- `id`
+- `source`
+- `source_url`
+- `commander`
+- `deck_name`
+- `archetype`
+- `card_list`
+- `card_count`
+- `wincon_primary`
+- `wincon_backup`
+- `budget_level`
+- `notes`
+- `created_at`
+
+Contrato:
+
+- `card_list` preferencial deve ser JSON local.
+- `battle_analyst_v8.py` tambem aceita decklist texto legado, mas o sync PG deve
+  gravar JSON.
+- Decks incompletos/pequenos devem ser excluidos do battle/optimizer.
+- O battle atual usa `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`,
+  porque existem meta decks reais com 80-100 cartas; promocao ideal para fonte
+  canonica deve mirar 90+.
+- O battle remove o comandante duplicado da lista e monta comandante + 99.
+- O battle deve cair para perfis genericos somente se houver menos de 3 decks
+  reais validos.
+
+Parametros de variacao dos oponentes reais:
+
+- `MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES`, default `96`.
+- `MANALOOM_BATTLE_REAL_OPPONENT_LIMIT`, default `12`.
+- `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`.
+- `MANALOOM_BATTLE_REAL_OPPONENT_SEED`; se ausente, varia por hora UTC.
+
+### `card_oracle_cache`
+
+Criada/atualizada por `sync_pg_card_metadata_to_hermes.py`.
+
+Colunas:
+
+- `normalized_name`
+- `name`
+- `mana_cost`
+- `colors_json`
+- `color_identity_json`
+- `type_line`
+- `oracle_text`
+- `cmc`
+- `power`
+- `toughness`
+- `keywords_json`
+- `scryfall_id`
+- `source`
+- `updated_at`
+
+Contrato:
+
+- `normalized_name` e chave primaria.
+- Deve incluir alias da face frontal para cartas dupla-face.
+- `battle_analyst_v8.py` usa este cache para mana colorida, poder/resistencia e keywords.
+- `slot_optimizer.py` usa este cache para identidade de cor e legalidade indireta.
+
+### `battle_card_rules`
+
+Criada/atualizada por `sync_battle_card_rules.py`.
+
+Leituras principais:
+
+- `battle_analyst_v8.py`, antes de `KNOWN_CARDS`/JSON/tags;
+- `slot_optimizer.py`, para categorizar candidatos e cortes;
+- `battle_effect_coverage_audit.py`, para separar regra manual/gerada de heuristica.
+
+Colunas:
+
+- `normalized_name`
+- `card_name`
+- `effect_json`
+- `deck_role_json`
+- `source`
+- `confidence`
+- `review_status`
+- `rule_version`
+- `oracle_hash`
+- `notes`
+- `created_at`
+- `updated_at`
+- `last_seen_at`
+
+Contrato:
+
+- `effect_json` descreve comportamento suportado pelo battle.
+- `deck_role_json` descreve papel para montagem/optimizer.
+- `source='manual'` e `review_status='verified'` tem prioridade sobre gerado.
+- `source='generated'` entra como `needs_review`; pode rodar, mas deve aparecer
+  como risco em auditoria quando influenciar decisao.
+- uma carta `creature` generica nao vira categoria de deckbuilding confiavel sem
+  papel explicito.
+- lands sao primeiro lands; habilidade utilitaria de land precisa regra propria
+  futura ou fica como gap auditado.
+
+### `card_legalities`
+
+Colunas observadas:
+
+- `card_name`
+- `format`
+- `status`
+- `scryfall_id`
+- `synced_at`
+
+Contrato:
+
+- Quality gate deve exigir `format='commander'` e `status='legal'`.
+- Qualquer fallback por ausencia de legalidade deve ser bloqueador, nao aprovacao silenciosa.
+
+### `game_changers`
+
+Colunas observadas:
+
+- `card_name`
+- `impact_level`
+- `impact_category`
+- `manaloom_bracket_category`
+- `restricted_bracket`
+- demais metadata de carta.
+
+Contrato:
+
+- Usada como politica externa de bracket/Game Changer.
+- Warnings de Game Changer nao sao necessariamente bloqueio, mas precisam aparecer em handoff.
+
+### `optimizer_baseline_runs`
+
+Criada por `ensure_optimizer_tables()`.
+
+Escrita por:
+
+- `master_optimizer_baseline.py`
+
+Lida por:
+
+- `slot_optimizer.py`
+- `master_optimizer_quality_gate.py`
+- `master_optimizer_confirmation.py`
+- `replay_decision_auditor.py`
+- `master_optimizer_handoff.py`
+- `master_optimizer_apply.py`
+
+Colunas:
+
+- `id`
+- `deck_id`
+- `deck_hash`
+- `battle_version`
+- `games_per_opponent`
+- `opponents`
+- `total_games`
+- `wr`
+- `wins`
+- `losses`
+- `stalls`
+- `status`
+- `result_json`
+- `created_at`
+
+Contrato:
+
+- Somente baseline `status='approved'` pode ser usado.
+- Baseline e imutavel para uma rodada.
+- O hash atual do deck precisa bater com `deck_hash`.
+- `result_json` deve preservar matchup payload e stdout tail.
+
+Baseline vivo observado para `deck_id=6`:
+
+- `id=2`
+- `deck_hash=110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`
+- `wr=86.7`
+- `260W/11L/29S`
+- `total_games=300`
+- `created_at=2026-06-07T15:45:25.698034+00:00`
+
+### `slot_benchmarks`
+
+Criada por `ensure_optimizer_tables()`.
+
+Escrita por:
+
+- `slot_optimizer.py`
+
+Lida por:
+
+- `master_optimizer_quality_gate.py`
+- `master_optimizer_confirmation.py`
+- `master_optimizer_handoff.py`
+- `sync_pg_card_metadata_to_hermes.py`
+
+Colunas:
+
+- `id`
+- `deck_id`
+- `baseline_id`
+- `baseline_hash`
+- `category`
+- `card_added`
+- `card_removed`
+- `add_cmc`
+- `add_effect`
+- `add_tag`
+- `wr`
+- `wins`
+- `losses`
+- `draws`
+- `games`
+- `delta_pp`
+- `phase`
+- `tested_at`
+
+Contrato:
+
+- Cada linha deve estar vinculada ao `deck_id`, `baseline_id` e `baseline_hash`.
+- Resultados so valem para o deck/hash exato do baseline.
+- Scan deve ser temporario; apos cada teste, o deck deve ser restaurado.
+- Fases atuais aceitas: `phase1`, `best-in-slot` e fases equivalentes consumidas por `candidate_rows()`.
+
+### `swap_benchmarks`
+
+Criada por `ensure_optimizer_tables()`.
+
+Escrita por:
+
+- `master_optimizer_confirmation.py`
+
+Atualizada por:
+
+- `master_optimizer_apply.py`, que marca `applied=1` apos apply local Hermes.
+
+Colunas:
+
+- `id`
+- `deck_id`
+- `baseline_id`
+- `baseline_hash`
+- `card_added`
+- `card_removed`
+- `add_cmc`
+- `add_effect`
+- `add_tag`
+- `wr`
+- `wins`
+- `losses`
+- `draws`
+- `games`
+- `phase`
+- `delta_pp`
+- `applied`
+- `tested_at`
+
+Contrato:
+
+- `confirmation` e triagem reforcada.
+- `full_confirmation` e a unica fase elegivel para apply.
+- `delta_pp` minimo atual para apply: `+0.5pp`.
+- Uma linha negativa ou flat deve bloquear apply, mesmo que uma rodada anterior tenha sido positiva.
+
+### `optimizer_quality_reviews`
+
+Escrita por `quality_gate_candidate()`.
+
+Colunas:
+
+- `deck_id`
+- `card_added`
+- `card_removed`
+- `source_phase`
+- `status`
+- `reasons_json`
+- `warnings_json`
+- `created_at`
+
+Contrato:
+
+- `status='passed'` e necessario para confirmation.
+- `reasons_json` deve explicar bloqueios.
+- `warnings_json` deve chegar ao handoff.
+
+### `optimizer_handoffs`
+
+Escrita por `master_optimizer_handoff.py`.
+
+Contrato:
+
+- Status `approved_swaps_ready_for_manual_apply` significa pronto para decisao humana.
+- Nao significa apply automatico.
+- Se dois candidatos cortam a mesma carta, aplicar no maximo um e recomeçar baseline.
+
+### `optimizer_applied_swaps`
+
+Escrita por `master_optimizer_apply.py`.
+
+Contrato:
+
+- Registra apply local Hermes.
+- Precisa ter `before_hash`, `after_hash` e `rollback_path`.
+- `rollback_path` pode conter decklist completa e nao deve ser versionado sem revisao.
+
+### `optimizer_product_handoffs`
+
+Escrita por `master_optimizer_product_handoff.py`.
+
+Contrato:
+
+- Status esperado inicial: `needs_product_owner_approval`.
+- Nunca muta produto.
+- Serve para transportar uma decisao Hermes validada para o fluxo app/producao com checklist.
+
+## Scripts e responsabilidades
+
+### `sync_pg_meta_decks_to_hermes.py`
+
+Funcao:
+
+- coleta decks reais de `meta_decks` no Postgres;
+- converte `card_list` texto para JSON local;
+- escreve/atualiza somente o SQLite Hermes em `learned_decks`;
+- marca linhas com `source='pg_meta_decks'`.
+
+Entradas:
+
+- SQLite Hermes via `--sqlite-db`;
+- Postgres via `DATABASE_URL` ou variaveis `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`;
+- `meta_decks.card_list` em formato texto.
+
+Parametros:
+
+- `--sqlite-db`: caminho do `knowledge.db`;
+- `--limit`: quantidade maxima de decks PG a cachear, default `120`;
+- `--min-cards`: minimo de cartas para aceitar, default `80`;
+- `--apply`: grava no SQLite; sem isso roda dry-run;
+- `--include-lorehold`: inclui Lorehold como fonte, desativado por default para nao virar oponente contra ele mesmo.
+
+Saida esperada:
+
+- `learned_decks` com oponentes reais suficientes para battle;
+- nenhum write em Postgres/producao;
+- nenhuma credencial impressa.
+
+### `sync_pg_card_metadata_to_hermes.py`
+
+Funcao:
+
+- coleta nomes relevantes do SQLite;
+- consulta metadata no Postgres real;
+- escreve/atualiza `card_oracle_cache`.
+
+Entradas:
+
+- SQLite Hermes via `--sqlite-db`;
+- Postgres via `DATABASE_URL` ou variaveis `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`;
+- nomes vindos de `deck_cards`, `learned_decks`, `slot_benchmarks`, `swap_benchmarks`, `known_cards_generated.json`.
+
+Parametros:
+
+- `--sqlite-db`: caminho do `knowledge.db`;
+- `--dry-run`: mede sem escrever;
+- `--limit`: smoke pequeno;
+- `--report`: JSON sanitizado.
+
+Saida esperada:
+
+- tabela `card_oracle_cache` criada/atualizada;
+- report JSON com cobertura;
+- nenhuma credencial impressa.
+
+### `sync_battle_card_rules.py`
+
+Funcao:
+
+- criar/atualizar `battle_card_rules`;
+- copiar regras manuais de `HANDCRAFTED_KNOWN_CARDS` como `verified`;
+- copiar regras geradas de `known_cards_generated.json` como `needs_review`;
+- manter prioridade: gerado nao sobrescreve manual/curado.
+
+Entradas:
+
+- SQLite Hermes via `--sqlite-db`;
+- `battle_analyst_v8.py` para regras manuais;
+- `known_cards_generated.json` para regras geradas.
+
+Parametros:
+
+- `--sqlite-db`: caminho do `knowledge.db`;
+- `--apply`: grava no SQLite; sem isso apenas mede;
+- `--skip-generated`: popula apenas regras manuais;
+- `--report`: JSON de sync.
+
+Saida esperada:
+
+- tabela `battle_card_rules` presente;
+- regras manuais como `source='manual'`, `review_status='verified'`;
+- regras geradas como `source='generated'`, `review_status='needs_review'`;
+- nenhuma mutacao em Postgres/producao.
+
+### `master_optimizer_loop.py --preflight --report`
+
+Funcao:
+
+- validar se o ambiente Hermes esta pronto para battle/optimizer.
+
+Contrato esperado:
+
+- `knowledge.db` existe;
+- tabelas essenciais existem;
+- `battle_analyst_v8.py` compila;
+- testes de battle passam;
+- `card_oracle_cache` existe e tem cobertura minima;
+- scripts do optimizer existem;
+- script de sync de oponentes reais existe;
+- script de auditoria de cobertura de efeitos existe.
+
+Saida esperada:
+
+- Markdown `master_optimizer_preflight_*.md`;
+- status de shell `0` em ambiente aprovado.
+
+### `master_optimizer_baseline.py`
+
+Funcao:
+
+- congelar baseline do deck atual.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--games`, default `50` por oponente;
+- `--report`.
+
+Escreve:
+
+- `optimizer_baseline_runs`.
+
+Saida esperada:
+
+- baseline id;
+- winrate;
+- record;
+- deck hash;
+- Markdown `master_optimizer_baseline_*.md`.
+
+## Contrato de regras do battle
+
+O `battle_analyst_v8.py` nao deve ser tratado como rules engine completo de MTG.
+Ele e um simulador deterministico/heuristico para comparar hipoteses de deck,
+mas algumas regras agora sao obrigatorias e cobertas por teste.
+
+Regras obrigatorias cobertas por `test_battle_analyst_v10_3.py`:
+
+- cleanup descarta ate 7 cartas mesmo com jogador ja eliminado;
+- Approach of the Second Sun encerra o jogo imediatamente na segunda resolucao;
+- counters consomem mana/carta e nao counteram spell do proprio controlador;
+- mana colorida precisa da cor correta;
+- treasures/fontes flexiveis pagam custos coloridos;
+- combate usa apenas bloqueadores do jogador atacado;
+- combate suporta multiplos bloqueadores, trample, deathtouch, first strike,
+  double strike e indestructible;
+- `card_oracle_cache` enriquece mana cost, cmc, power/toughness e keywords;
+- miracle de Lorehold exige `Lorehold, the Historian` em campo;
+- miracle so dispara na primeira carta comprada no turno;
+- miracle nao dispara na segunda compra quando houve draw no upkeep;
+- Boros Charm protege criaturas contra board wipe ate cleanup;
+- Akroma's Will concede keywords ate cleanup e nao altera poder permanentemente;
+- silence/Grand Abolisher bloqueia respostas/counters dos oponentes;
+- life can't change/protection bloqueia dano e ganho de vida.
+
+Limites conhecidos que ainda nao devem virar promessa de produto:
+
+- miracle e auto-castado se puder pagar; ainda nao ha escolha humana/heuristica fina
+  para recusar o cast;
+- custos modais e escolhas de alvo sao simplificados;
+- camadas completas de continuous effects nao sao modeladas;
+- prevention/replacement effects complexos continuam aproximados;
+- cards especificos fora de `KNOWN_CARDS`/`known_cards_generated.json` dependem de
+  tags e heuristicas.
+
+### `battle_effect_coverage_audit.py`
+
+Funcao:
+
+- auditar o deck alvo e os oponentes reais que entrarao no battle;
+- classificar cada carta por fonte de efeito: `handcrafted`, `generated`, `tag`,
+  `effect_map`, `type_land`, `type_creature` ou `unknown`;
+- listar riscos de regra antes de confiar em uma decisao do optimizer.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--sqlite-db`, caminho do `knowledge.db`;
+- `--opponent-limit`, default `12`;
+- `--seed`, seed fixa para reproduzir os mesmos oponentes;
+- `--report`, grava Markdown e JSON em `master_optimizer_reports`;
+- `--fail-on-high-risk`, modo estrito para bloquear quando houver risco alto.
+
+Flags importantes:
+
+- `unknown_effect`: carta sem efeito reconhecido;
+- `heuristic_effect`: efeito veio de tag/gerador/mapa amplo, nao de regra explicita;
+- `oracle_target_removal_mismatch`: texto parece removal, mas efeito nao modela isso;
+- `oracle_counter_mismatch`: texto parece counter, mas efeito nao modela isso;
+- `oracle_silence_mismatch`: texto limita casts/respostas, mas efeito nao modela isso;
+- `temporary_effect_not_explicit`: texto ate o fim do turno sem regra explicita;
+- `trigger_not_explicit`: trigger `whenever` sem regra explicita;
+- `cast_permission_not_explicit`: permissao de cast alternativa sem regra explicita;
+- `copy_effect_mismatch`: texto de copia sem efeito de copia;
+- `land_utility_ability_not_modeled`: land funciona como land, mas habilidade extra
+  como channel/ativacao ainda nao esta modelada;
+- `land_effect_mismatch`: land deixou de ser tratada como land, bug de simulacao.
+
+Politica:
+
+- Nunca declarar que o battle cobre "todas as regras" se a auditoria tiver
+  `unknown_effect`, mismatch de oracle ou heuristicas relevantes sem excecao assinada.
+- O optimizer pode continuar rodando com heuristicas, mas o handoff precisa citar
+  o relatorio de cobertura e os riscos que influenciam o candidato aprovado.
+- Lands sao modeladas primariamente como lands. Habilidades utilitarias de lands
+  entram como lacuna auditada, nao como spell gratis.
+
+### `slot_optimizer.py`
+
+Funcao:
+
+- testar candidatos por categoria, um swap por vez, sem mutacao permanente.
+
+Parametros:
+
+- `--deck-id`, default `MANALOOM_OPTIMIZER_DECK_ID` ou `6`;
+- `--games`, default `MANALOOM_SLOT_GAMES` ou `10`;
+- `--max-per-category`, default `MANALOOM_SLOT_MAX_PER_CATEGORY` ou `15`;
+- `--category`;
+- `--phase`, default `phase1`;
+- `--reset-current-baseline`.
+
+Le:
+
+- `known_cards_generated.json`;
+- `deck_cards`;
+- `card_oracle_cache`;
+- `card_legalities`;
+- `game_changers`;
+- ultimo baseline aprovado.
+
+Escreve:
+
+- `slot_benchmarks`.
+
+Guardrails:
+
+- exige baseline aprovado;
+- exige hash atual igual ao baseline;
+- filtra identidade de cor Commander;
+- exige legalidade Commander;
+- usa `temporary_swap()` e restaura deck.
+
+Saida esperada:
+
+- linhas em `slot_benchmarks`;
+- resumo `slot_scan=ok`;
+- nenhum card permanente alterado em `deck_cards`.
+
+### `master_optimizer_quality_gate.py`
+
+Funcao:
+
+- revisar candidatos antes de confirmacao.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--limit`, default `25`;
+- `--report`.
+
+Le:
+
+- ultimo baseline aprovado;
+- `slot_benchmarks`;
+- `card_oracle_cache`;
+- `card_legalities`;
+- `game_changers`;
+- deck atual.
+
+Escreve:
+
+- `optimizer_quality_reviews`.
+
+Saida esperada:
+
+- Markdown com `passed`/`blocked`;
+- razoes e warnings por candidato.
+
+### `master_optimizer_confirmation.py`
+
+Funcao:
+
+- retestar candidatos promissores com amostra maior.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--candidate-limit`, default `25`;
+- `--run-limit`, default `3`;
+- `--games`, default `10`;
+- `--min-scan-delta`, default `-2.0`;
+- `--phase confirmation|full_confirmation`;
+- `--include-existing`;
+- `--only-added`;
+- `--report`.
+
+Le:
+
+- ultimo baseline aprovado;
+- `slot_benchmarks`;
+- `optimizer_quality_reviews`;
+- deck atual.
+
+Escreve:
+
+- `swap_benchmarks`.
+
+Saida esperada:
+
+- candidatos testados;
+- candidatos bloqueados;
+- candidatos skipped;
+- `delta_pp` contra baseline atual.
+
+### `replay_decision_auditor.py`
+
+Funcao:
+
+- validar qualidade turno-a-turno da logica do battle.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--events`, opcional;
+- `--generate`, default `3`;
+- `--seed-start`, default `42`;
+- `--report`.
+
+Le:
+
+- ultimo baseline aprovado;
+- eventos gerados por `battle_replay_v10_3.py` quando `--events` nao e informado.
+
+Saida esperada:
+
+- status `turn_by_turn_clean` quando sem findings;
+- Markdown `master_optimizer_replay_audit_*.md`;
+- findings estruturados quando detectar erro de combate, removal, tutor, cleanup, Approach ou encerramento.
+
+### `master_optimizer_handoff.py`
+
+Funcao:
+
+- produzir pacote de decisao humana/agente apos confirmation.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--report`.
+
+Le:
+
+- ultimo baseline aprovado;
+- `swap_benchmarks`;
+- `optimizer_quality_reviews`.
+
+Escreve:
+
+- `optimizer_handoffs`.
+
+Saida esperada:
+
+- status `approved_swaps_ready_for_manual_apply` quando houver `full_confirmation` com `delta_pp >= +0.5`;
+- recomendacao de ampliar scan/retestar quando nao houver candidato forte.
+
+### `master_optimizer_apply.py`
+
+Funcao:
+
+- aplicar um swap aprovado apenas no SQLite Hermes.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--card-added`, opcional;
+- `--min-delta`, default `0.5`;
+- `--report`.
+
+Le:
+
+- ultimo baseline aprovado;
+- `swap_benchmarks` com `phase='full_confirmation'`, `applied=0`, `delta_pp >= min_delta`.
+
+Escreve:
+
+- `deck_cards`;
+- `swap_benchmarks.applied=1`;
+- `optimizer_applied_swaps`;
+- rollback JSON em `master_optimizer_reports`.
+
+Guardrails:
+
+- bloqueia sem baseline;
+- bloqueia hash divergente;
+- bloqueia sem candidato aprovado;
+- gera rollback antes da mutacao;
+- revalida resumo do deck depois.
+
+### `master_optimizer_product_handoff.py`
+
+Funcao:
+
+- criar handoff separado para copiar uma decisao Hermes ao produto depois de aprovacao.
+
+Parametros:
+
+- `--deck-id`, default `6`;
+- `--applied-swap-id`, opcional;
+- `--report`.
+
+Saida esperada:
+
+- status `needs_product_owner_approval`;
+- checklist de backup, dry-run, legalidade e smoke app/API;
+- zero mutacao em produto.
+
+## Ordem ponta a ponta recomendada
+
+### Fase 0 — sync e preflight
+
+```bash
+cd /opt/data/workspace/mtgia
+set -a
+. /opt/data/secrets/manaloom-postgres.env
+set +a
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --limit 120 \
+  --min-cards 80 \
+  --apply
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --report /opt/data/artifacts/hermes_master_optimizer/card_oracle_cache_sync_manual.json
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --apply \
+  --report /opt/data/artifacts/hermes_master_optimizer/battle_card_rules_sync_manual.json
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py --preflight --report
+```
+
+Bloquear se:
+
+- sync de meta decks falhar;
+- sync de metadata falhar;
+- sync de battle rules falhar;
+- `card_oracle_cache` ficar vazio/baixo;
+- houver menos de 3 oponentes reais validos em `learned_decks`;
+- battle tests falharem;
+- SQLite nao tiver tabelas essenciais.
+
+### Fase 1 — baseline
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_baseline.py \
+  --deck-id 6 \
+  --games 25 \
+  --report
+```
+
+Para decisao forte, preferir `--games 50` ou maior. O baseline deve virar a
+referencia unica para todas as fases seguintes.
+
+### Fase 2 — slot scan
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py \
+  --deck-id 6 \
+  --games 10 \
+  --max-per-category 15 \
+  --phase phase1
+```
+
+Para focar uma categoria:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py \
+  --deck-id 6 \
+  --games 10 \
+  --max-per-category 15 \
+  --category engine \
+  --phase phase1
+```
+
+### Fase 3 — quality gate
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_quality_gate.py \
+  --deck-id 6 \
+  --limit 25 \
+  --report
+```
+
+### Fase 4 — confirmation curta
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_confirmation.py \
+  --deck-id 6 \
+  --candidate-limit 25 \
+  --run-limit 3 \
+  --games 25 \
+  --min-scan-delta 0.5 \
+  --phase confirmation \
+  --report
+```
+
+### Fase 5 — full confirmation
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_confirmation.py \
+  --deck-id 6 \
+  --candidate-limit 25 \
+  --run-limit 3 \
+  --games 50 \
+  --min-scan-delta 0.5 \
+  --phase full_confirmation \
+  --report
+```
+
+Para revalidar apenas uma carta:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_confirmation.py \
+  --deck-id 6 \
+  --candidate-limit 25 \
+  --run-limit 1 \
+  --games 50 \
+  --min-scan-delta 0.5 \
+  --phase full_confirmation \
+  --only-added "Nome da Carta" \
+  --include-existing \
+  --report
+```
+
+### Fase 6 — replay audit
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py \
+  --deck-id 6 \
+  --generate 3 \
+  --report
+```
+
+### Fase 6.5 — battle effect coverage audit
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py \
+  --deck-id 6 \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --opponent-limit 12 \
+  --seed 20260607 \
+  --report
+```
+
+Bloquear confianca alta se:
+
+- houver `unknown_effect` em cartas que aparecem nos matchups relevantes;
+- houver `oracle_*_mismatch`;
+- o candidato aprovado depender diretamente de carta com `heuristic_effect`;
+- o ganho medido for pequeno e houver muitos triggers/temporarios nao explicitos.
+
+### Fase 7 — handoff
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py \
+  --deck-id 6 \
+  --report
+```
+
+### Fase 8 — apply local Hermes, se aprovado
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py \
+  --deck-id 6 \
+  --card-added "Nome da Carta" \
+  --min-delta 0.5 \
+  --report
+```
+
+### Fase 9 — baseline pos-apply
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_baseline.py \
+  --deck-id 6 \
+  --games 50 \
+  --report
+```
+
+### Fase 10 — post-apply gate
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py \
+  --deck-id 6 \
+  --min-post-delta 0.0 \
+  --rollback-on-fail \
+  --report
+```
+
+Contrato:
+
+- se o baseline pos-apply nao sustentar pelo menos o baseline anterior, reverter o swap Hermes-local;
+- marcar `swap_benchmarks.applied=-1` para o candidato revertido;
+- marcar handoffs de produto relacionados como `superseded_by_rollback`;
+- nunca mutar produto.
+
+### Fase 11 — handoff produto
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py \
+  --deck-id 6 \
+  --report
+```
+
+## Crons atuais e papel correto
+
+Snapshot vivo observado em 2026-06-07:
+
+| Job | Schedule | Enabled | Papel |
+| --- | --- | --- | --- |
+| `manaloom-master-watchdog` | every 30m | true | Supervisao geral. |
+| `manaloom-knowledge-import` | every 120m | true | Import de conhecimento. |
+| `manaloom-pull-learning-events` | every 30m | true | Puxa eventos/decks aprendidos. |
+| `lorehold-knowncards-generator` | every 120m | true | Gera `known_cards_generated.json` com env seguro e escrita atomica. |
+| `lorehold-knowncards-validator` | every 30m | true | Valida/expande known cards. |
+| `manaloom-master-optimizer-preflight` | every 20m | true | Mantem Hermes pronto, sem apply. |
+| `manaloom-master-optimizer-auto-cycle` | every 180m | true | Ciclo seguro: sync meta decks PG, sync metadata, preflight, baseline, scan, confirmation, full confirmation, replay audit, coverage audit, apply Hermes-local max 1 swap, post-apply gate e rollback se piorar. |
+| `manaloom-master-optimizer-slot-scan` | every 720m | false | Mantido pausado para nao duplicar o auto-cycle. |
+| `manaloom-master-optimizer-end-to-end` | every 1440m | false | Pipeline manual/supervisionado para prova completa sob demanda. |
+| `lorehold-universal-optimizer` | every 10m | false | Deve ficar pausado; risco de auto-apply legado. |
+
+Nota operacional: o snapshot mostrou `last_error` stale em alguns jobs. A forma
+correta de validar job e olhar:
+
+- `enabled`;
+- log fresco em `/opt/data/artifacts/hermes_master_optimizer/`;
+- report fresco em `docs/hermes-analysis/master_optimizer_reports/`;
+- timestamp de execucao;
+- saida final `*_ok`.
+
+## Fluxo shell pronto
+
+`master_optimizer_preflight_cron.sh`:
+
+- faz `git fetch/checkout/pull --ff-only`;
+- carrega `/opt/data/secrets/manaloom-postgres.env`;
+- roda sync PG `meta_decks` -> SQLite `learned_decks`;
+- roda sync PG -> SQLite para metadata;
+- roda sync de `battle_card_rules`;
+- roda preflight;
+- copia ultimo report para artefato latest.
+
+`master_optimizer_slot_scan_cron.sh`:
+
+- tem lock de 12h;
+- carrega Postgres env;
+- roda sync de metadata;
+- roda preflight;
+- roda baseline fresco;
+- roda `slot_optimizer.py` para o baseline atual;
+- copia log para `latest_master_optimizer_slot_scan.log`;
+- deve ficar desabilitado enquanto `master_optimizer_auto_cycle_cron.sh` estiver ativo.
+
+`master_optimizer_auto_cycle_cron.sh`:
+
+- tem lock de 12h;
+- carrega Postgres env;
+- roda sync de meta decks PG para `learned_decks`;
+- roda sync de metadata para `card_oracle_cache`;
+- roda sync de `battle_card_rules`;
+- roda preflight;
+- roda baseline;
+- roda slot scan fresco para o baseline atual;
+- roda quality gate;
+- roda confirmation;
+- roda full confirmation a partir dos candidatos da confirmation;
+- roda replay audit;
+- roda auditoria de cobertura dos efeitos usados no battle;
+- gera handoff Hermes;
+- aplica no maximo um swap no SQLite Hermes local se passar full confirmation e delta minimo;
+- roda baseline pos-apply;
+- roda post-apply gate;
+- se piorar, executa rollback automatico;
+- se sustentar, gera handoff de produto `needs_product_owner_approval`.
+
+`master_optimizer_end_to_end.sh`:
+
+- tem lock de 12h;
+- carrega Postgres env;
+- roda sync de metadata;
+- roda preflight;
+- roda baseline;
+- roda slot scan fresco para o baseline atual;
+- roda quality gate;
+- roda confirmation;
+- roda full confirmation;
+- roda replay audit;
+- roda handoff.
+
+Furo identificado durante esta documentacao e corrigido no script versionado:
+`master_optimizer_end_to_end.sh` nao rodava `slot_optimizer.py` entre baseline e
+quality gate. Agora ele executa slot scan com `--reset-current-baseline`, usando
+`MANALOOM_SLOT_GAMES`, `MANALOOM_SLOT_MAX_PER_CATEGORY`, `MANALOOM_SLOT_PHASE` e
+`MANALOOM_SLOT_CATEGORY` quando definidos. O script tambem roda
+`full_confirmation` antes do replay audit/handoff, usando
+`MANALOOM_FULL_CONFIRM_GAMES`, `MANALOOM_FULL_CONFIRM_RUN_LIMIT`,
+`MANALOOM_FULL_CONFIRM_CANDIDATE_LIMIT` e
+`MANALOOM_FULL_CONFIRM_MIN_SCAN_DELTA`.
+
+## Estado atual do Lorehold
+
+Deck alvo:
+
+- `deck_id=6`
+- hash atual observado: `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`
+
+Estado vivo validado apos auto-cycle e rollback:
+
+- `Wheel of Misfortune` esta presente.
+- `Reforge the Soul` esta ausente.
+- `Plaza of Heroes` foi revertido apos post-apply gate.
+- `Rise of the Eldrazi` esta presente.
+- baseline final serio: id `11`, 300 jogos, `87.3%` WR, 100 cartas, 33 lands.
+- handoff de produto do swap revertido marcado como `superseded_by_rollback`.
+
+Interpretacao:
+
+- As crons conseguem construir hipotese, testar, aplicar localmente e desfazer quando o ganho nao sustenta.
+- O proximo passo correto e deixar o auto-cycle rodar janelas regulares e revisar somente swaps que sobrevivam ao post-apply gate.
+- Forcar copia para produto continua bloqueado ate handoff `needs_product_owner_approval`.
+
+## Furos e riscos encontrados ao documentar
+
+### P0 — E2E shell nao incluia slot scan
+
+Problema:
+
+- `master_optimizer_end_to_end.sh` roda baseline -> quality gate -> confirmation,
+  mas nao rodava `slot_optimizer.py`.
+- Isso faz o E2E depender de linhas antigas em `slot_benchmarks`.
+
+Impacto:
+
+- Risco de confirmation usar candidatos incompletos ou nao encontrar candidatos.
+- Guardrail de hash reduz risco de stale target, mas nao garante que houve scan
+  suficiente para o baseline atual.
+
+Correcao recomendada:
+
+- Corrigido no script versionado: `slot_optimizer.py` roda depois do baseline
+  com `--reset-current-baseline`.
+- Evolucao futura: tambem bloquear explicitamente se o scan terminar sem linhas
+  em `slot_benchmarks` para o baseline atual.
+
+### P0 — Baselines podem sumir se o SQLite for recriado
+
+Problema observado:
+
+- Em rodada anterior, tabelas `optimizer_*`, `slot_benchmarks` e `swap_benchmarks`
+  estavam ausentes/recriadas.
+
+Impacto:
+
+- Apply bloqueia corretamente sem baseline, mas a equipe pode achar que havia
+  evidencia valida por docs antigos.
+
+Correcao recomendada:
+
+- Sempre anexar `baseline_id`, `baseline_hash`, timestamp e caminho do SQLite
+  aos reports.
+- Antes de apply, consultar o SQLite vivo, nao apenas doc historico.
+
+### P1 — `cards` ausente no SQLite Hermes
+
+Problema:
+
+- Snapshot vivo nao tem tabela local `cards`.
+- Alguns validadores antigos fazem fallback ou tentam ler `cards`.
+
+Impacto:
+
+- Scripts novos devem usar `card_oracle_cache`; scripts antigos podem falhar ou
+  usar menos dados.
+
+Correcao recomendada:
+
+- Preflight deve declarar explicitamente que `cards` local e opcional.
+- Qualquer script que precise metadata deve usar `card_oracle_cache`.
+
+### P1 — Cron `last_error` pode estar stale
+
+Problema:
+
+- Jobs ativos podem manter `last_error` antigo mesmo apos correcao ou mudanca de provider.
+
+Impacto:
+
+- Diagnostico visual de cron pode parecer pior do que o estado real.
+
+Correcao recomendada:
+
+- Padronizar `last_status`, `last_run_at` e artefato `latest_*.status`.
+- Docs e agentes devem citar logs frescos, nao apenas `last_error`.
+
+### P1 — Produto ainda nao tem ponte automatizada segura
+
+Problema:
+
+- Hermes valida no SQLite local.
+- Produto real precisa de backup/dry-run/legalidade/smoke antes de receber swap.
+
+Impacto:
+
+- Sem handoff produto, um swap bom no Hermes pode ser copiado errado.
+
+Correcao recomendada:
+
+- So permitir copia para produto via `master_optimizer_product_handoff.py`.
+- Criar script futuro de dry-run no produto que nao escreva antes de aprovacao.
+
+### P2 — Amostra estatistica ainda pode oscilar
+
+Problema:
+
+- Reversal passou forte em uma rodada e falhou na revalidacao seguinte.
+
+Impacto:
+
+- Alguns ganhos podem ser ruido de simulacao/seed/matchup.
+
+Correcao recomendada:
+
+- Para apply real, exigir duas full confirmations independentes ou amostra maior.
+- Registrar seed/run config no `result_json`.
+
+## Checklist de uma rodada valida
+
+Antes de aceitar qualquer recomendacao:
+
+- [ ] Sync PG -> SQLite rodou com report fresco.
+- [ ] Preflight passou com report fresco.
+- [ ] Baseline novo existe no SQLite vivo.
+- [ ] Hash atual do deck bate com baseline.
+- [ ] Slot scan rodou para o mesmo `baseline_id`/`baseline_hash`.
+- [ ] Quality gate revisou candidatos do baseline atual.
+- [ ] Confirmation curta passou.
+- [ ] Full confirmation passou com delta minimo.
+- [ ] Replay audit nao encontrou erro turno-a-turno.
+- [ ] Handoff foi gerado.
+- [ ] Apply local Hermes, se feito, gerou rollback.
+- [ ] Baseline pos-apply foi rodado.
+- [ ] Handoff produto foi gerado antes de qualquer copia para app/prod.
+
+## Comando seguro para pedir ao Hermes
+
+Use este pedido quando quiser o fluxo completo, sem auto-apply:
+
+```text
+Rode o fluxo Hermes E2E para o deck Lorehold deck_id=6 seguindo docs/hermes-analysis/HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md. Nao aplique swap automaticamente. Execute sync PG->SQLite, preflight, baseline fresco, slot scan para o baseline atual, quality gate, confirmation, full_confirmation, replay audit e handoff. Em cada fase, valide baseline_id e baseline_hash contra o SQLite vivo. Se qualquer etapa falhar, pare e documente o bloqueio. Ao final, entregue caminhos dos reports, status, candidatos aprovados, deltas, record e recomendacao de apply ou no-apply.
+```
+
+Use este pedido quando quiser validar um candidato especifico:
+
+```text
+Revalide o candidato <CARD_IN> sobre <CARD_OUT> no Hermes para Lorehold deck_id=6 seguindo docs/hermes-analysis/HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md. Recrie baseline fresco se o hash divergir. Rode full_confirmation com amostra suficiente, replay audit e handoff. Nao aplique se delta_pp < +0.5pp ou se a evidencia nao reproduzir. Documente deck_hash, baseline_id, record, delta e estado final do deck.
+```
+
+## Conclusao
+
+Nao havia um documento unico com esse nivel de contrato. A documentacao anterior
+registrava evolucao e evidencias, mas nao amarrava completamente scripts,
+tabelas, parametros, retornos e bloqueios.
+
+Ao documentar o fluxo inteiro, o principal furo encontrado foi o script E2E nao
+executar slot scan antes de quality gate/confirmation; isso foi corrigido no
+script versionado. O segundo ponto critico e que a evidencia antiga nao pode ser
+usada se o SQLite vivo perdeu/recriou tabelas de baseline. Esse risco continua
+mitigado pelos hash guardrails, mas toda rodada deve consultar o SQLite vivo
+antes de qualquer apply.

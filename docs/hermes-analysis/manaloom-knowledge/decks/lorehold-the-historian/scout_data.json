@@ -1,0 +1,743 @@
+{
+  "total_external_decks": 3,
+  "unique_external_cards": 176,
+  "our_cards_count": 87,
+  "our_metrics": {
+    "lands": 34,
+    "avg_cmc": 3.98,
+    "ramp": 17,
+    "draw": 8,
+    "removal": 7,
+    "wipes": 6
+  },
+  "top30_external": [
+    [
+      "Arcane Signet",
+      3,
+      100.0
+    ],
+    [
+      "Arid Mesa",
+      3,
+      100.0
+    ],
+    [
+      "Bloodstained Mire",
+      3,
+      100.0
+    ],
+    [
+      "Call Forth the Tempest",
+      3,
+      100.0
+    ],
+    [
+      "Command Tower",
+      3,
+      100.0
+    ],
+    [
+      "Dance with Calamity",
+      3,
+      100.0
+    ],
+    [
+      "Deflecting Swat",
+      3,
+      100.0
+    ],
+    [
+      "Enlightened Tutor",
+      3,
+      100.0
+    ],
+    [
+      "Esper Sentinel",
+      3,
+      100.0
+    ],
+    [
+      "Gamble",
+      3,
+      100.0
+    ],
+    [
+      "Gemstone Caverns",
+      3,
+      100.0
+    ],
+    [
+      "Hit the Mother Lode",
+      3,
+      100.0
+    ],
+    [
+      "Library of Leng",
+      3,
+      100.0
+    ],
+    [
+      "Marsh Flats",
+      3,
+      100.0
+    ],
+    [
+      "Monument to Endurance",
+      3,
+      100.0
+    ],
+    [
+      "Mountain",
+      3,
+      100.0
+    ],
+    [
+      "Plains",
+      3,
+      100.0
+    ],
+    [
+      "Plateau",
+      3,
+      100.0
+    ],
+    [
+      "Redirect Lightning",
+      3,
+      100.0
+    ],
+    [
+      "Sacred Foundry",
+      3,
+      100.0
+    ],
+    [
+      "Scalding Tarn",
+      3,
+      100.0
+    ],
+    [
+      "Scroll Rack",
+      3,
+      100.0
+    ],
+    [
+      "Sensei's Divining Top",
+      3,
+      100.0
+    ],
+    [
+      "Smothering Tithe",
+      3,
+      100.0
+    ],
+    [
+      "Sol Ring",
+      3,
+      100.0
+    ],
+    [
+      "Spectator Seating",
+      3,
+      100.0
+    ],
+    [
+      "Urza's Saga",
+      3,
+      100.0
+    ],
+    [
+      "Wooded Foothills",
+      3,
+      100.0
+    ],
+    [
+      "Ancient Tomb",
+      2,
+      66.66666666666666
+    ],
+    [
+      "Archivist of Oghma",
+      2,
+      66.66666666666666
+    ]
+  ],
+  "missing_high_priority": [
+    [
+      "Dance with Calamity",
+      3,
+      100.0
+    ],
+    [
+      "Esper Sentinel",
+      3,
+      100.0
+    ],
+    [
+      "Gamble",
+      3,
+      100.0
+    ],
+    [
+      "Gemstone Caverns",
+      3,
+      100.0
+    ],
+    [
+      "Hit the Mother Lode",
+      3,
+      100.0
+    ],
+    [
+      "Marsh Flats",
+      3,
+      100.0
+    ],
+    [
+      "Plateau",
+      3,
+      100.0
+    ],
+    [
+      "Redirect Lightning",
+      3,
+      100.0
+    ],
+    [
+      "Spectator Seating",
+      3,
+      100.0
+    ],
+    [
+      "Wooded Foothills",
+      3,
+      100.0
+    ]
+  ],
+  "cut_candidates": [
+    [
+      "Deflecting Palm",
+      null
+    ],
+    [
+      "Orim's Chant",
+      null
+    ],
+    [
+      "Pearl Medallion",
+      null
+    ],
+    [
+      "Ruby Medallion",
+      null
+    ],
+    [
+      "Sunbird's Invocation",
+      "big_spell"
+    ],
+    [
+      "Fated Clash",
+      "board_wipe"
+    ],
+    [
+      "Jokulhaups",
+      "board_wipe"
+    ],
+    [
+      "Obliterate",
+      "board_wipe"
+    ],
+    [
+      "Artist's Talent",
+      "draw"
+    ],
+    [
+      "Season of the Bold",
+      "exile_value"
+    ],
+    [
+      "Boseiju, Who Shelters All",
+      "land"
+    ],
+    [
+      "Dormant Volcano",
+      "land"
+    ],
+    [
+      "Emeria's Call // Emeria, Shattered Skyclave",
+      "land"
+    ],
+    [
+      "Inspiring Vantage",
+      "land"
+    ],
+    [
+      "Karoo",
+      "land"
+    ],
+    [
+      "Kor Haven",
+      "land"
+    ],
+    [
+      "Valakut Awakening // Valakut Stoneforge",
+      "land"
+    ],
+    [
+      "Lightning Greaves",
+      "protection"
+    ],
+    [
+      "Mother of Runes",
+      "protection"
+    ],
+    [
+      "Archaeomancer's Map",
+      "ramp"
+    ],
+    [
+      "Claim Jumper",
+      "ramp"
+    ],
+    [
+      "Goldspan Dragon",
+      "ramp"
+    ],
+    [
+      "Land Tax",
+      "ramp"
+    ],
+    [
+      "Weathered Wayfarer",
+      "ramp"
+    ],
+    [
+      "Surge to Victory",
+      "recursion"
+    ],
+    [
+      "Rite of the Dragoncaller",
+      "spellslinger"
+    ],
+    [
+      "Ancient Copper Dragon",
+      "token_maker"
+    ],
+    [
+      "Furygale Flocking",
+      "token_maker"
+    ],
+    [
+      "Oswald Fiddlebender",
+      "tutor"
+    ],
+    [
+      "Hellkite Tyrant",
+      "wincon"
+    ]
+  ],
+  "shared_cards": [
+    [
+      "Galadriel's Dismissal",
+      1
+    ],
+    [
+      "Grand Abolisher",
+      1
+    ],
+    [
+      "Penance",
+      2
+    ],
+    [
+      "Scroll Rack",
+      3
+    ],
+    [
+      "Taunt from the Rampart",
+      2
+    ],
+    [
+      "Victory Chimes",
+      1
+    ],
+    [
+      "Deflecting Swat",
+      3
+    ],
+    [
+      "Insurrection",
+      1
+    ],
+    [
+      "Austere Command",
+      1
+    ],
+    [
+      "Call Forth the Tempest",
+      3
+    ],
+    [
+      "Volcanic Vision",
+      1
+    ],
+    [
+      "Sensei's Divining Top",
+      3
+    ],
+    [
+      "Library of Leng",
+      3
+    ],
+    [
+      "Ol\u00f3rin's Searing Light",
+      1
+    ],
+    [
+      "Ancient Tomb",
+      2
+    ],
+    [
+      "Arid Mesa",
+      3
+    ],
+    [
+      "Bloodstained Mire",
+      3
+    ],
+    [
+      "Cavern of Souls",
+      2
+    ],
+    [
+      "Clifftop Retreat",
+      2
+    ],
+    [
+      "Command Tower",
+      3
+    ],
+    [
+      "Flooded Strand",
+      2
+    ],
+    [
+      "Mountain",
+      3
+    ],
+    [
+      "Plains",
+      3
+    ],
+    [
+      "Sacred Foundry",
+      3
+    ],
+    [
+      "Scalding Tarn",
+      3
+    ],
+    [
+      "Sundown Pass",
+      2
+    ],
+    [
+      "Urza's Saga",
+      3
+    ],
+    [
+      "Windswept Heath",
+      2
+    ],
+    [
+      "Reforge the Soul",
+      2
+    ],
+    [
+      "Longshot, Rebel Bowman",
+      1
+    ],
+    [
+      "Hexing Squelcher",
+      2
+    ],
+    [
+      "Perch Protection",
+      1
+    ],
+    [
+      "Teferi's Protection",
+      1
+    ],
+    [
+      "Apex of Power",
+      1
+    ],
+    [
+      "Arcane Signet",
+      3
+    ],
+    [
+      "Bender's Waterskin",
+      2
+    ],
+    [
+      "Brass's Bounty",
+      2
+    ],
+    [
+      "Desperate Ritual",
+      2
+    ],
+    [
+      "Jeska's Will",
+      2
+    ],
+    [
+      "Monument to Endurance",
+      3
+    ],
+    [
+      "Seething Song",
+      1
+    ],
+    [
+      "Smothering Tithe",
+      3
+    ],
+    [
+      "Sol Ring",
+      3
+    ],
+    [
+      "Talisman of Conviction",
+      2
+    ],
+    [
+      "Unexpected Windfall",
+      2
+    ],
+    [
+      "Goblin Engineer",
+      2
+    ],
+    [
+      "Mizzix's Mastery",
+      2
+    ],
+    [
+      "Restoration Seminar",
+      1
+    ],
+    [
+      "Boros Charm",
+      1
+    ],
+    [
+      "Path to Exile",
+      2
+    ],
+    [
+      "Rise of the Eldrazi",
+      2
+    ],
+    [
+      "Swords to Plowshares",
+      2
+    ],
+    [
+      "Double Vision",
+      1
+    ],
+    [
+      "Galvanoth",
+      1
+    ],
+    [
+      "Storm Herd",
+      2
+    ],
+    [
+      "Enlightened Tutor",
+      3
+    ]
+  ],
+  "external_card_freq": {
+    "Arcane Signet": 3,
+    "Arid Mesa": 3,
+    "Bloodstained Mire": 3,
+    "Call Forth the Tempest": 3,
+    "Command Tower": 3,
+    "Dance with Calamity": 3,
+    "Deflecting Swat": 3,
+    "Enlightened Tutor": 3,
+    "Esper Sentinel": 3,
+    "Gamble": 3,
+    "Gemstone Caverns": 3,
+    "Hit the Mother Lode": 3,
+    "Library of Leng": 3,
+    "Marsh Flats": 3,
+    "Monument to Endurance": 3,
+    "Mountain": 3,
+    "Plains": 3,
+    "Plateau": 3,
+    "Redirect Lightning": 3,
+    "Sacred Foundry": 3,
+    "Scalding Tarn": 3,
+    "Scroll Rack": 3,
+    "Sensei's Divining Top": 3,
+    "Smothering Tithe": 3,
+    "Sol Ring": 3,
+    "Spectator Seating": 3,
+    "Urza's Saga": 3,
+    "Wooded Foothills": 3,
+    "Ancient Tomb": 2,
+    "Archivist of Oghma": 2,
+    "Bolt Bend": 2,
+    "Cavern of Souls": 2,
+    "City of Brass": 2,
+    "Desperate Ritual": 2,
+    "Dualcaster Mage": 2,
+    "Faithless Looting": 2,
+    "Flooded Strand": 2,
+    "Goblin Engineer": 2,
+    "Hexing Squelcher": 2,
+    "Improvisation Capstone": 2,
+    "Jeska's Will": 2,
+    "Mana Confluence": 2,
+    "Pyretic Ritual": 2,
+    "Pyroblast": 2,
+    "Red Elemental Blast": 2,
+    "Simian Spirit Guide": 2,
+    "Swords to Plowshares": 2,
+    "Talisman of Conviction": 2,
+    "Twinflame": 2,
+    "Windswept Heath": 2,
+    "Battlefield Forge": 2,
+    "Bender's Waterskin": 2,
+    "Big Score": 2,
+    "Brass's Bounty": 2,
+    "Clifftop Retreat": 2,
+    "Elegant Parlor": 2,
+    "Emeria's Call": 2,
+    "Mizzix's Mastery": 2,
+    "Path to Exile": 2,
+    "Penance": 2,
+    "Reforge the Soul": 2,
+    "Rise of the Eldrazi": 2,
+    "Storm Herd": 2,
+    "Sunbaked Canyon": 2,
+    "Sunbillow Verge": 2,
+    "Sundown Pass": 2,
+    "Taunt from the Rampart": 2,
+    "Unexpected Windfall": 2,
+    "Worldfire": 2,
+    "Aetherflux Reservoir": 1,
+    "Archon of Emeria": 1,
+    "Armageddon": 1,
+    "Basalt Monolith": 1,
+    "Blind Obedience": 1,
+    "Blood Moon": 1,
+    "Cataclysm": 1,
+    "Chrome Mox": 1,
+    "City of Traitors": 1,
+    "Crystal Vein": 1,
+    "Cursed Totem": 1,
+    "Damping Sphere": 1,
+    "Deep Gnome Terramancer": 1,
+    "Drannith Magistrate": 1,
+    "Ethersworn Canonist": 1,
+    "Fellwar Stone": 1,
+    "Goblin Welder": 1,
+    "Grand Abolisher": 1,
+    "Grim Monolith": 1,
+    "Grinding Station": 1,
+    "High Noon": 1,
+    "Karn, the Great Creator": 1,
+    "Lightning Bolt": 1,
+    "Lion's Eye Diamond": 1,
+    "Lotus Petal": 1,
+    "Mana Vault": 1,
+    "Molten Duplication": 1,
+    "Mox Diamond": 1,
+    "Mox Opal": 1,
+    "Ragavan, Nimble Pilferer": 1,
+    "Ranger-Captain of Eos": 1,
+    "Ravages of War": 1,
+    "Rite of Flame": 1,
+    "Sevinne's Reclamation": 1,
+    "Silence": 1,
+    "Stranglehold": 1,
+    "Strike It Rich": 1,
+    "Talon Gates of Madara": 1,
+    "Tezzeret, Cruel Captain": 1,
+    "Thalia, Heretic Cathar": 1,
+    "The One Ring": 1,
+    "Underworld Breach": 1,
+    "Unwinding Clock": 1,
+    "Vexing Bauble": 1,
+    "Voice of Victory": 1,
+    "Wildfire": 1,
+    "Apex of Power": 1,
+    "Approach of the Second Sun": 1,
+    "Arcane Bombardment": 1,
+    "Beacon of Immortality": 1,
+    "Chandra, Hope's Beacon": 1,
+    "Double Vision": 1,
+    "Dragon's Rage Channeler": 1,
+    "Erode": 1,
+    "Farewell": 1,
+    "Fateful Absence": 1,
+    "Galvanoth": 1,
+    "Insurrection": 1,
+    "Mana Geyser": 1,
+    "Naktamun Lorespinner": 1,
+    "Ol\u00f3rin's Searing Light": 1,
+    "Pinnacle Monk": 1,
+    "Primal Amulet": 1,
+    "Prismatic Vista": 1,
+    "Seething Song": 1,
+    "Soulfire Eruption": 1,
+    "Storm-Kiln Artist": 1,
+    "Surly Badgersaur": 1,
+    "Teferi's Protection": 1,
+    "Valakut Awakening": 1,
+    "Vanquish the Horde": 1,
+    "Victory Chimes": 1,
+    "Volcanic Vision": 1,
+    "Austere Command": 1,
+    "Boros Charm": 1,
+    "Chaos Warp": 1,
+    "Chaotic Transformation": 1,
+    "Deploy to the Front": 1,
+    "Descent into Avernus": 1,
+    "Exotic Orchard": 1,
+    "Galadriel's Dismissal": 1,
+    "Generous Gift": 1,
+    "Gideon's Phalanx": 1,
+    "Goblin Game": 1,
+    "Guff Rewrites History": 1,
+    "Hidden Retreat": 1,
+    "Invincible Hymn": 1,
+    "Longshot, Rebel Bowman": 1,
+    "Master Warcraft": 1,
+    "Monologue Tax": 1,
+    "Needleverge Pathway": 1,
+    "Perch Protection": 1,
+    "Prisoner's Dilemma": 1,
+    "Promise of Loyalty": 1,
+    "Restoration Seminar": 1,
+    "Restore Balance": 1,
+    "Reverberate": 1,
+    "Reverse the Sands": 1,
+    "Rugged Prairie": 1,
+    "Seize the Spoils": 1,
+    "Semblance Anvil": 1,
+    "Sunscorched Divide": 1,
+    "Temple of Triumph": 1,
+    "Triumph of Saint Katherine": 1,
+    "Wheel of Fate": 1,
+    "Wheel of Fortune": 1,
+    "Witch Enchanter": 1
+  }
+}

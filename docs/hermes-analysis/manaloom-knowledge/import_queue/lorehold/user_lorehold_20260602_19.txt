@@ -1,0 +1,100 @@
+=== User Lorehold Deck 2026-06-02 #19 ===
+Source: user-import
+Archetype: aetherflux-approach-mld-ritual-big-x
+
+1 Lorehold, the Historian
+1 Aetherflux Reservoir
+1 Approach of the Second Sun
+1 Arcane Signet
+1 Arid Mesa
+1 Armageddon
+1 Battlefield Forge
+1 Beacon of Immortality
+1 Big Score
+1 Bloodstained Mire
+1 Boom // Bust
+1 Cataclysm
+1 Chrome Mox
+1 Command Tower
+1 Crackle with Power
+1 Creative Technique
+1 Deflecting Swat
+1 Dimensional Breach
+1 Double Vision
+1 Emeria's Call
+1 Enlightened Tutor
+1 Everything Comes to Dust
+1 Fellwar Stone
+1 Flawless Maneuver
+1 Gallifrey Falls // No More
+1 Gamble
+1 Giver of Runes
+1 Hall of Heliod's Generosity
+1 Hit the Mother Lode
+1 Idyllic Tutor
+1 Inventors' Fair
+1 Ishgard, the Holy See
+1 Jaya's Immolating Inferno
+1 Jeska's Will
+1 Jokulhaups
+1 Land Tax
+1 Library of Leng
+1 Mana Geyser
+1 Mana Vault
+1 Mizzix's Mastery
+1 Mother of Runes
+4 Mountain
+1 Mox Amber
+1 Mox Diamond
+1 Mox Opal
+1 Needleverge Pathway
+1 Ondu Inversion
+1 Orim's Chant
+1 Past in Flames
+1 Pearl Medallion
+1 Penance
+2 Plains
+1 Primal Amulet
+1 Profound Journey
+1 Pyretic Ritual
+1 Pyroblast
+1 Ravages of War
+1 Reckless Endeavor
+1 Red Elemental Blast
+1 Reforge the Soul
+1 Reiterate
+1 Restoration Seminar
+1 Reverberate
+1 Rise of the Eldrazi
+1 Rite of Flame
+1 Ruby Medallion
+1 Rugged Prairie
+1 Ruination
+1 Sacred Foundry
+1 Scalding Tarn
+1 Scroll Rack
+1 Seething Song
+1 Sejiri Shelter
+1 Sensei's Divining Top
+1 Shatterskull Smashing
+1 Silence
+1 Snort
+1 Sol Ring
+1 Soulfire Eruption
+1 Spectator Seating
+1 Star of Extinction
+1 Sunbillow Verge
+1 Sundering Eruption
+1 Sunscorched Divide
+1 Talisman of Conviction
+1 Teferi's Protection
+1 Ultima
+1 Urza's Saga
+1 Valakut Awakening
+1 Volcanic Awakening
+1 Volcanic Vision
+1 Warping Wail
+1 Wheel of Fortune
+1 Wheel of Misfortune
+1 Will of the Jeskai
+1 Worldfire

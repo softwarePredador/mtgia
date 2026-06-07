@@ -19,6 +19,7 @@ import '../../../lib/ai/optimize_swap_integrity.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
+import '../../../lib/ai/theme_contextual_rules_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/edh_bracket_policy.dart';
@@ -2324,7 +2325,8 @@ Future<Response> onRequest(RequestContext context) async {
           // 6. VALIDAÃ‡ÃƒO AUTOMÃTICA (Monte Carlo + Funcional + Critic IA)
           // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           try {
-            final validator = OptimizationValidator(openAiKey: apiKey);
+            final themeService = ThemeContextualRulesService(pool);
+            final validator = OptimizationValidator(openAiKey: apiKey, themeService: themeService);
             final validationReport = await validator.validate(
               originalDeck: allCardData,
               optimizedDeck: virtualDeck,

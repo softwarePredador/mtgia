@@ -1,0 +1,776 @@
+{
+  "research_date": "2026-05-31",
+  "commander": "Lorehold, the Historian",
+  "commander_text": "Flying, haste. Each instant and sorcery card in your hand has miracle {2}. At the beginning of each opponent's upkeep, you may discard a card. If you do, draw a card.",
+  "color_identity": [
+    "R",
+    "W"
+  ],
+  "cmc": 5,
+  "total_decks_analyzed": 7851,
+  "edhrec_rank": 308,
+  "decks": [
+    {
+      "source": "EDHREC Average Deck",
+      "url": "https://edhrec.com/average-decks/lorehold-the-historian",
+      "type": "aggregate_average",
+      "deck_count": 7851,
+      "average_price_usd": 959,
+      "bracket": "varies (mostly 2-3)",
+      "card_list": {
+        "commander": [
+          "Lorehold, the Historian"
+        ],
+        "creatures": [
+          "Caldera Pyremaw",
+          "Dragon's Rage Channeler",
+          "Esper Sentinel",
+          "Goliath Daydreamer",
+          "Guttersnipe",
+          "Hexing Squelcher",
+          "Longshot, Rebel Bowman",
+          "Mother of Runes",
+          "Pinnacle Monk",
+          "Storm-Kiln Artist",
+          "The Dawning Archaic",
+          "Velomachus Lorehold",
+          "Verge Rangers"
+        ],
+        "instants": [
+          "Beacon of Immortality",
+          "Big Score",
+          "Bolt Bend",
+          "Boros Charm",
+          "Chaos Warp",
+          "Deflecting Swat",
+          "Generous Gift",
+          "Invoke Calamity",
+          "Ol\u00f3rin's Searing Light",
+          "Path to Exile",
+          "Perch Protection",
+          "Swords to Plowshares",
+          "Unexpected Windfall"
+        ],
+        "sorceries": [
+          "Apex of Power",
+          "Approach of the Second Sun",
+          "Austere Command",
+          "Blasphemous Act",
+          "Brass's Bounty",
+          "Call Forth the Tempest",
+          "Dance with Calamity",
+          "Emeria's Call",
+          "Hit the Mother Lode",
+          "Improvisation Capstone",
+          "Insurrection",
+          "Invincible Hymn",
+          "Jeska's Will",
+          "Mizzix's Mastery",
+          "Reforge the Soul",
+          "Restoration Seminar",
+          "Rise of the Eldrazi",
+          "Soulfire Eruption",
+          "Storm Herd",
+          "Taunt from the Rampart",
+          "Volcanic Vision"
+        ],
+        "artifacts": [
+          "Arcane Signet",
+          "Bender's Waterskin",
+          "Boros Signet",
+          "Library of Leng",
+          "Lightning Greaves",
+          "Monument to Endurance",
+          "Ruby Medallion",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Sol Ring",
+          "Tablet of Discovery",
+          "Talisman of Conviction",
+          "Victory Chimes"
+        ],
+        "enchantments": [
+          "Arcane Bombardment",
+          "Double Vision",
+          "Land Tax",
+          "Penance"
+        ],
+        "lands_nonbasic": [
+          "Arid Mesa",
+          "Battlefield Forge",
+          "Clifftop Retreat",
+          "Command Tower",
+          "Elegant Parlor",
+          "Exotic Orchard",
+          "Furycalm Snarl",
+          "Radiant Summit",
+          "Reliquary Tower",
+          "Rugged Prairie",
+          "Sacred Foundry",
+          "Spectator Seating",
+          "Sunbillow Verge",
+          "Sundown Pass",
+          "Temple of Triumph"
+        ],
+        "lands_basic": [
+          "12 Mountain",
+          "8 Plains"
+        ]
+      },
+      "win_conditions": [
+        {
+          "name": "Approach of the Second Sun",
+          "description": "Cast for miracle cost {2} from hand, then recast normally 7 turns later or dig for it immediately with Scroll Rack/SDT",
+          "enablers": [
+            "Scroll Rack",
+            "Sensei's Divining Top",
+            "Wheel of Fortune (combo)"
+          ]
+        },
+        {
+          "name": "Storm Herd Token Swarm",
+          "description": "Cast Storm Herd for miracle {2}, creating X 1/1 Pegasi where X is your life total. Often 30+ tokens for 2 mana",
+          "enablers": [
+            "Beacon of Immortality (double life first)"
+          ]
+        },
+        {
+          "name": "Big Spell Cheating",
+          "description": "Apex of Power, Rise of the Eldrazi, Call Forth the Tempest \u2014 all castable for {2} via miracle, generating insurmountable advantage",
+          "enablers": [
+            "Jeska's Will",
+            "Brass's Bounty",
+            "Storm-Kiln Artist"
+          ]
+        },
+        {
+          "name": "Mizzix's Mastery Overload",
+          "description": "Cast Mizzix's Mastery overloaded to replay all instants/sorceries from graveyard for free",
+          "enablers": [
+            "Discard outlets (Lorehold triggers)",
+            "Big Score",
+            "Unexpected Windfall"
+          ]
+        },
+        {
+          "name": "Arcane Bombardment / Double Vision",
+          "description": "Copy spells multiple times. Double Vision doubles first sorcery/instant each turn; Arcane Bombardment exiles and copies each turn",
+          "enablers": [
+            "Cheap miracle spells to trigger repeatedly"
+          ]
+        },
+        {
+          "name": "Insurrection",
+          "description": "Steal all creatures on the battlefield for {2} mana and swing for lethal",
+          "enablers": [
+            "Haste from commander"
+          ]
+        }
+      ],
+      "top_combos_edhrec": [
+        "Approach of the Second Sun + Scroll Rack",
+        "Approach of the Second Sun + Reprieve",
+        "Approach of the Second Sun + Wheel of Fortune"
+      ],
+      "top_tags": [
+        {
+          "tag": "Spellslinger",
+          "count": 403
+        },
+        {
+          "tag": "Topdeck",
+          "count": 401
+        },
+        {
+          "tag": "Discard",
+          "count": 111
+        },
+        {
+          "tag": "Burn",
+          "count": 105
+        },
+        {
+          "tag": "Reanimator",
+          "count": 54
+        },
+        {
+          "tag": "Big Mana",
+          "count": 51
+        },
+        {
+          "tag": "Tokens",
+          "count": 35
+        },
+        {
+          "tag": "Graveyard",
+          "count": 33
+        },
+        {
+          "tag": "Combo",
+          "count": 28
+        }
+      ],
+      "mana_curve": {
+        "1": 9,
+        "2": 12,
+        "3": 11,
+        "4": 8,
+        "5": 7,
+        "6": 3,
+        "7": 6,
+        "8": 3,
+        "9": 1,
+        "10": 2,
+        "12": 1
+      },
+      "type_distribution": {
+        "Creature": 13,
+        "Instant": 13,
+        "Sorcery": 21,
+        "Artifact": 13,
+        "Enchantment": 4,
+        "Land": 35
+      },
+      "similar_commanders": [
+        "Velomachus Lorehold",
+        "Firesong and Sunspeaker",
+        "Feather, the Redeemed",
+        "Rem Karolus, Stalwart Slayer",
+        "Galazeth Prismari",
+        "Hinata, Dawn-Crowned"
+      ]
+    },
+    {
+      "source": "TappedOut - Major Miracle",
+      "url": "https://tappedout.net/mtg-decks/major-miracle/",
+      "author": "SnowLeo",
+      "type": "player_decklist",
+      "bracket": 2,
+      "price_tcgplayer_usd": "183-206",
+      "price_cardkingdom_usd": "301-319",
+      "card_list": {
+        "commander": [
+          "Lorehold, the Historian"
+        ],
+        "creatures": [
+          "Aziza, Mage Tower Captain",
+          "Crystal Barricade",
+          "Dualcaster Mage",
+          "Galvanoth",
+          "Knight of the White Orchid",
+          "Leonin Lightscribe",
+          "Mica, Reader of Ruins",
+          "Monastery Mentor",
+          "Pinnacle Monk",
+          "Prismari Pianist",
+          "Quintorius, Loremaster",
+          "Radiant Scrollwielder",
+          "Renegade Bull",
+          "Rumor Gatherer",
+          "Storm-Kiln Artist",
+          "Tajic, Legion's Edge",
+          "Velomachus Lorehold",
+          "Verge Rangers",
+          "Young Pyromancer"
+        ],
+        "instants": [
+          "Banishing Stroke",
+          "Boros Charm",
+          "Chaos Warp",
+          "Flare of Duplication",
+          "Lorehold Command",
+          "Return the Favor",
+          "Seething Song"
+        ],
+        "sorceries": [
+          "Apex of Power",
+          "Archangel's Light",
+          "Blasphemous Act",
+          "Blessed Wind",
+          "Brass's Bounty",
+          "Chaotic Transformation",
+          "Chronomantic Escape",
+          "Deploy to the Front",
+          "Devout Invocation",
+          "Emeria's Call",
+          "Entreat the Angels",
+          "Full Throttle",
+          "Furygale Flocking",
+          "Hit the Mother Lode",
+          "Improvisation Capstone",
+          "Invincible Hymn",
+          "Mizzix's Mastery",
+          "Nomads' Assembly",
+          "Ondu Inversion",
+          "Reckless Endeavor",
+          "Reversal of Fortune",
+          "Reverse the Sands",
+          "Rousing Refrain",
+          "Storm Herd",
+          "Surge to Victory",
+          "Terminus",
+          "Valiant Endeavor",
+          "Volcanic Vision"
+        ],
+        "artifacts": [
+          "Arcane Signet",
+          "Archaeomancer's Map",
+          "Boros Signet",
+          "Brainstone",
+          "Crystal Ball",
+          "Lightning Greaves",
+          "Mazemind Tome",
+          "Primal Amulet",
+          "Sol Ring",
+          "Swiftfoot Boots",
+          "Treasure Map"
+        ],
+        "enchantments": [
+          "Monologue Tax"
+        ],
+        "lands_nonbasic": [
+          "Battlefield Forge",
+          "Boros Garrison",
+          "Clifftop Retreat",
+          "Command Tower",
+          "Elegant Parlor",
+          "Fields of Strife",
+          "Furycalm Snarl",
+          "Lorehold Campus",
+          "Needleverge Pathway",
+          "New Benalia",
+          "Radiant Summit",
+          "Reliquary Tower",
+          "Rogue's Passage",
+          "Rugged Prairie",
+          "Sacred Foundry",
+          "Spectator Seating",
+          "Sunbillow Verge",
+          "Sundown Pass",
+          "Sunscorched Divide",
+          "Temple of Triumph",
+          "Temple of the False God"
+        ],
+        "lands_basic": [
+          "7 Mountain",
+          "5 Plains"
+        ],
+        "maybeboard": {
+          "instants": [
+            "Beacon of Immortality",
+            "Increasing Vengeance",
+            "Thunderous Wrath"
+          ],
+          "sorceries": [
+            "Mascot Exhibition",
+            "Restoration Seminar",
+            "Soulfire Eruption"
+          ],
+          "creatures": [
+            "Soul-Scar Mage"
+          ],
+          "enchantments": [
+            "Blessed Sanctuary",
+            "Mark of Asylum"
+          ],
+          "planeswalkers": [
+            "Jaya, Fiery Negotiator",
+            "The Wanderer"
+          ]
+        }
+      },
+      "win_conditions": [
+        {
+          "name": "Token Army Swarm",
+          "description": "Cast Storm Herd, Deploy to the Front, Devout Invocation, Entreat the Angels, or Nomads' Assembly all for miracle {2} each, flooding board with tokens",
+          "enablers": [
+            "Anointed Procession (not in list but synergistic)",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ]
+        },
+        {
+          "name": "Surge to Victory Combat",
+          "description": "Exile a high-CMC sorcery (Apex of Power, Storm Herd) with Surge to Victory, giving all creatures +X/+0 and casting copies on combat damage",
+          "enablers": [
+            "Token creatures from Mentor/Pyromancer"
+          ]
+        },
+        {
+          "name": "Mizzix's Mastery Graveyard Storm",
+          "description": "Overload Mizzix's Mastery to replay all instants/sorceries from graveyard \u2014 with 28 sorceries, this can end games",
+          "enablers": [
+            "Lorehold discard trigger fills graveyard",
+            "Seething Song for mana"
+          ]
+        },
+        {
+          "name": "Primal Amulet Flip",
+          "description": "Transform Primal Amulet into Primal Wellspring, then double key spells",
+          "enablers": [
+            "Cheap miracle spells to build counters quickly"
+          ]
+        },
+        {
+          "name": "Dualcaster Mage + Flare of Duplication",
+          "description": "Copy opponents' key spells or your own big spells for extra value",
+          "enablers": [
+            "Seething Song for mana"
+          ]
+        },
+        {
+          "name": "Galvanoth Free Casts",
+          "description": "Galvanoth lets you cast top card of library for free each upkeep \u2014 works with topdeck manipulation",
+          "enablers": [
+            "Brainstone",
+            "Crystal Ball"
+          ]
+        }
+      ],
+      "unique_cards_not_in_edhrec_average": [
+        "Archangel's Light",
+        "Aziza, Mage Tower Captain",
+        "Blessed Wind",
+        "Chaotic Transformation",
+        "Chronomantic Escape",
+        "Crystal Barricade",
+        "Devout Invocation",
+        "Dualcaster Mage",
+        "Flare of Duplication",
+        "Full Throttle",
+        "Galvanoth",
+        "Leonin Lightscribe",
+        "Lorehold Command",
+        "Mica, Reader of Ruins",
+        "Nomads' Assembly",
+        "Prismari Pianist",
+        "Quintorius, Loremaster",
+        "Radiant Scrollwielder",
+        "Reckless Endeavor",
+        "Renegade Bull",
+        "Return the Favor",
+        "Reversal of Fortune",
+        "Rousing Refrain",
+        "Rumor Gatherer",
+        "Seething Song",
+        "Surge to Victory",
+        "Tajic, Legion's Edge",
+        "Treasure Map",
+        "Valiant Endeavor"
+      ],
+      "support_cards_notable": [
+        "Primal Amulet (spell copy + land)",
+        "Galvanoth (free spell each upkeep)",
+        "Seething Song (ritual for big turns)",
+        "Brainstone + Crystal Ball (topdeck manipulation)",
+        "Archaeomancer's Map (ramp in Boros)",
+        "Treasure Map (ramp + draw)",
+        "Monologue Tax (tax draw)"
+      ]
+    },
+    {
+      "source": "TappedOut - Lorehold Shenanigans",
+      "url": "https://tappedout.net/mtg-decks/lorehold-shenanigans-1/",
+      "author": "midknightcruiser",
+      "type": "player_decklist",
+      "bracket": 3,
+      "price_tcgplayer_usd": "113-117",
+      "price_cardkingdom_usd": "178-181",
+      "card_list": {
+        "commander": [
+          "Lorehold, the Historian"
+        ],
+        "creatures": [
+          "Aven Interrupter",
+          "Caldera Pyremaw",
+          "Goliath Daydreamer",
+          "Magmakin Artillerist",
+          "Molten Man, Inferno Incarnate",
+          "Prismari Pianist",
+          "Quintorius, Loremaster",
+          "Renegade Bull",
+          "Scuzzback Scrounger",
+          "Sunset Strikemaster",
+          "The Dawning Archaic",
+          "Verge Rangers",
+          "Young Pyromancer"
+        ],
+        "instants": [
+          "Chaos Warp",
+          "Choreographed Sparks",
+          "Erode",
+          "Perch Protection",
+          "Redirect Lightning",
+          "Searing Wind"
+        ],
+        "sorceries": [
+          "Approach of the Second Sun",
+          "Austere Command",
+          "Blasphemous Act",
+          "Borrowed Knowledge",
+          "Dance with Calamity",
+          "Deploy to the Front",
+          "Disrupt Decorum",
+          "Faithless Looting",
+          "Farewell",
+          "Furygale Flocking",
+          "Insurrection",
+          "Invincible Hymn",
+          "Prisoner's Dilemma",
+          "Promise of Loyalty",
+          "Restore Balance",
+          "Reverse the Sands",
+          "Scrambleverse",
+          "Seize the Spoils",
+          "Seize the Storm",
+          "Single Combat",
+          "Soulfire Eruption",
+          "Starfall Invocation",
+          "Steal the Show",
+          "Storm Herd",
+          "Surge to Victory",
+          "Thieves' Auction",
+          "Wheel of Misfortune",
+          "Whims of the Fates"
+        ],
+        "artifacts": [
+          "Bender's Waterskin",
+          "Blitzball",
+          "Boros Signet",
+          "Cloud Key",
+          "Commander's Sphere",
+          "Lightning Greaves",
+          "Moonring Mirror",
+          "Semblance Anvil",
+          "Sol Ring",
+          "Swiftfoot Boots",
+          "Tablet of Discovery",
+          "The Endstone"
+        ],
+        "enchantments": [
+          "Gift of Immortality",
+          "Triple Triad"
+        ],
+        "lands_nonbasic": [
+          "Adventurer's Inn",
+          "Boros Guildgate",
+          "Capital City",
+          "Command Bridge",
+          "Crossroads Village",
+          "Dimension X",
+          "Evolving Wilds",
+          "Fields of Strife",
+          "Kabira Crossroads",
+          "Lindblum, Industrial Regency",
+          "Rabanastre, Royal City",
+          "Sun-Blessed Peak",
+          "Terramorphic Expanse",
+          "The Autonomous Furnace",
+          "Uncharted Haven",
+          "Wind-Scarred Crag"
+        ],
+        "lands_basic": [
+          "11 Mountain",
+          "11 Plains"
+        ]
+      },
+      "win_conditions": [
+        {
+          "name": "Approach of the Second Sun (Primary)",
+          "description": "The dedicated win condition. Cast for {2} via miracle, then use chaos effects to stall while digging for the second cast",
+          "enablers": [
+            "Dance with Calamity (digs deep)",
+            "Wheel of Misfortune (wheels)",
+            "Faithless Looting",
+            "Moonring Mirror"
+          ]
+        },
+        {
+          "name": "Chaos Lock / Disruption",
+          "description": "Scrambleverse + Thieves' Auction + Restore Balance \u2014 disrupt opponents' boards while assembling your win. Whims of the Fates can randomly eliminate threats",
+          "enablers": [
+            "Gift of Immortality (protect commander)",
+            "Perch Protection (teammate protection/goad)"
+          ]
+        },
+        {
+          "name": "Insurrection / Storm Herd",
+          "description": "Traditional finishers \u2014 steal all creatures or make massive token army for {2}",
+          "enablers": [
+            "Haste from commander for Insurrection"
+          ]
+        },
+        {
+          "name": "Surge to Victory",
+          "description": "Exile a high-CMC spell, pump the team, and cast free copies on combat damage",
+          "enablers": [
+            "Young Pyromancer tokens",
+            "Furygale Flocking tokens"
+          ]
+        },
+        {
+          "name": "Single Combat",
+          "description": "Miracle for {2} to force a 1v1 creature situation where your commander (5/5 flying haste) dominates",
+          "enablers": [
+            "Commander's natural evasion + haste"
+          ]
+        }
+      ],
+      "unique_cards_not_in_edhrec_average": [
+        "Aven Interrupter",
+        "Blitzball",
+        "Borrowed Knowledge",
+        "Choreographed Sparks",
+        "Disrupt Decorum",
+        "Erode",
+        "Farewell",
+        "Gift of Immortality",
+        "Magmakin Artillerist",
+        "Molten Man, Inferno Incarnate",
+        "Moonring Mirror",
+        "Prisoner's Dilemma",
+        "Promise of Loyalty",
+        "Redirect Lightning",
+        "Restore Balance",
+        "Scrambleverse",
+        "Scuzzback Scrounger",
+        "Searing Wind",
+        "Seize the Spoils",
+        "Seize the Storm",
+        "Single Combat",
+        "Starfall Invocation",
+        "Steal the Show",
+        "Sunset Strikemaster",
+        "The Endstone",
+        "Thieves' Auction",
+        "Triple Triad",
+        "Wheel of Misfortune",
+        "Whims of the Fates"
+      ],
+      "support_cards_notable": [
+        "Semblance Anvil / Cloud Key (cost reduction for sorceries)",
+        "Moonring Mirror (impulse draw / card selection)",
+        "Tablet of Discovery (topdeck manipulation + ramp)",
+        "Bender's Waterskin (mana + lifegain synergy with Invincible Hymn)",
+        "Blitzball (removal + card draw)",
+        "The Endstone (ramp + graveyard hate)",
+        "Gift of Immortality (commander protection)",
+        "Triple Triad (political card draw)"
+      ]
+    }
+  ],
+  "cross_deck_analysis": {
+    "common_win_conditions": [
+      "Approach of the Second Sun (miracle for {2})",
+      "Storm Herd (miracle for {2} -> massive pegasi army)",
+      "Mizzix's Mastery (overload from graveyard)",
+      "Insurrection (steal all creatures for {2})",
+      "Big spell cheating (Apex of Power, Rise of the Eldrazi, etc. for {2})"
+    ],
+    "unique_win_conditions_found": [
+      "Surge to Victory (exile big spell, pump team, cast copies on damage)",
+      "Single Combat (miracle for {2} -> 1v1 creature, commander dominates)",
+      "Chaos Lock (Scrambleverse/Thieves' Auction/Restore Balance stalling)",
+      "Galvanoth + topdeck manipulation (free spells each upkeep)",
+      "Dualcaster Mage + Flare of Duplication (spell copying)",
+      "Primal Amulet transform (spell doubling engine)",
+      "Dance with Calamity (impulsive deep-dig for combo pieces)",
+      "Seize the Storm (create massive token from graveyard spell count)"
+    ],
+    "key_synergy_cards_from_cardkingdom_article": [
+      "Library of Leng (discard to top of library -> guarantee miracle)",
+      "Penance (put card from hand on top of library)",
+      "Sensei's Divining Top (topdeck manipulation)",
+      "Scroll Rack (swap hand with top of library -> setup miracles)",
+      "Victory Chimes / Bender's Waterskin (mana on each turn -> cast miracles on opponents' turns)",
+      "Planetarium of Wan Shi Tong (topdeck filtering)",
+      "Palant\u00edr of Orthanc (scry + mill or draw)",
+      "Longshot, Rebel Bowman (triggers on each opponent's draw)",
+      "Monument to Endurance (discard payoff -> create tokens)",
+      "Angel of Indemnity (reanimation target)"
+    ],
+    "support_cards_different_from_typical": [
+      "Primal Amulet / Double Vision / Arcane Bombardment (spell copying)",
+      "Semblance Anvil / Cloud Key / Ruby Medallion (cost reduction stacking)",
+      "Galvanoth (free spell each upkeep \u2014 rare in Lorehold decks)",
+      "Archaeomancer's Map (Boros ramp)",
+      "Seething Song (ritual for explosive turns)",
+      "Moonring Mirror (impulse draw \u2014 unusual card selection)",
+      "Monologue Tax (stax-like draw)",
+      "Treasure Map (ramp + card selection)",
+      "Gift of Immortality (commander protection)",
+      "Triple Triad (political card draw engine)"
+    ],
+    "ramp_package_common": [
+      "Sol Ring",
+      "Arcane Signet",
+      "Boros Signet",
+      "Talisman of Conviction",
+      "Fellwar Stone",
+      "Mind Stone",
+      "Thought Vessel",
+      "Thran Dynamo",
+      "Worn Powerstone",
+      "Commander's Sphere"
+    ],
+    "card_draw_package_common": [
+      "Library of Leng",
+      "Monument to Endurance",
+      "Scroll Rack",
+      "Sensei's Divining Top",
+      "Brainstone",
+      "Crystal Ball",
+      "Jeska's Will",
+      "Valakut Awakening",
+      "Reforge the Soul"
+    ],
+    "protection_package_common": [
+      "Lightning Greaves",
+      "Swiftfoot Boots",
+      "Boros Charm",
+      "Deflecting Swat",
+      "Bolt Bend",
+      "Perch Protection",
+      "Mother of Runes",
+      "Gift of Immortality"
+    ],
+    "what_makes_lorehold_unique": [
+      "Miracle {2} on ALL instants/sorceries in hand \u2014 not just the first drawn",
+      "Rummage trigger on EACH opponent's upkeep \u2014 3 extra looting per turn cycle",
+      "5/5 Flying Haste body for 5 mana \u2014 legitimate combat threat",
+      "Boros colors with spell-based strategy \u2014 traditionally Gruul/aggro colors",
+      "Topdeck manipulation matters more than usual due to miracle setup",
+      "Can hold up interaction and cast on opponents' turns for {2}"
+    ]
+  },
+  "card_kingdom_article": {
+    "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+    "title": "10 Crazy Synergy Cards for Lorehold, the Historian",
+    "key_insights": [
+      "Cast haymaker finishers like Storm Herd, Beacon of Immortality, Call Forth the Tempest for {2}",
+      "Dastardly spells like Rise of the Eldrazi, Ultima, Razia's Purification on opponents' turns for {2}",
+      "White reanimator spells (Storm of Souls, Late to Dinner, Miraculous Recovery) for {2}",
+      "Library of Leng is the #1 synergy card \u2014 discard to top, then draw it for miracle",
+      "Penance puts cards from hand back on top for miracle setup",
+      "Sensei's Divining Top and Scroll Rack are premium topdeck manipulation",
+      "Victory Chimes/Bender's Waterskin provide mana on EVERY turn for miracle casts",
+      "Planetarium of Wan Shi Tong and Palant\u00edr of Orthanc filter topdecks",
+      "Longshot, Rebel Bowman triggers on opponents' draws",
+      "Monument to Endurance creates tokens on discard",
+      "Angel of Indemnity provides recursive reanimation"
+    ]
+  },
+  "edhrec_meta": {
+    "popularity_trend": "Rose from rank #569 (Jan 2026) to #8 (May 2026) \u2014 VERY rapidly growing",
+    "deck_counts_by_month": {
+      "2026-01": 243,
+      "2026-02": 848,
+      "2026-03": 499,
+      "2026-04": 2985,
+      "2026-05": 135
+    },
+    "price_trend": "Average deck price ~$959, relatively affordable for Commander",
+    "salt_score": 0,
+    "cedh_viable": "No \u2014 no cEDH decks found. Card is too slow at 5 CMC for competitive play"
+  }
+}

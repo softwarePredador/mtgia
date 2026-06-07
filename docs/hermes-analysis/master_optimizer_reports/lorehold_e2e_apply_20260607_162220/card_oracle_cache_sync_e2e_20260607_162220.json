@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-06-07T16:22:22.058463+00:00",
+  "dry_run": false,
+  "postgres_target": "143.198.230.247:5433/halder",
+  "requested_unique_names": 2428,
+  "postgres_cards_matched": 2629,
+  "sqlite_cache_alias_rows": 2501,
+  "unresolved_count": 2,
+  "unresolved_sample": [
+    "Bartolome del Presidio",
+    "Worldfire 1 Lorehold, the Historian"
+  ],
+  "postgres_columns_present": [
+    "cmc",
+    "color_identity",
+    "colors",
+    "keywords",
+    "mana_cost",
+    "oracle_text",
+    "power",
+    "scryfall_id",
+    "toughness",
+    "type_line"
+  ],
+  "field_coverage": {
+    "mana_cost": 2345,
+    "oracle_text": 2627,
+    "colors": 1954,
+    "color_identity": 2154,
+    "power": 788,
+    "toughness": 788,
+    "keywords": 1127
+  }
+}

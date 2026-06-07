@@ -1,0 +1,94 @@
+=== User Lorehold Deck 2026-06-02 #16 ===
+Source: user-import
+Archetype: big-spells-chaos-alternate-wincons
+
+1 Lorehold, the Historian
+1 Approach of the Second Sun
+1 Arcane Bombardment
+1 Austere Command
+1 Battlefield Forge
+1 Bazaar of Baghdad
+1 Beacon of Destruction
+1 Beacon of Immortality
+1 Bender's Waterskin
+1 Blasted Landscape
+1 Blessed Wind
+1 Call Forth the Tempest
+1 Call the Coppercoats
+1 Chandra's Ignition
+1 Clifftop Retreat
+1 Deflecting Swat
+1 Deploy to the Front
+1 Desert of the Fervent
+1 Desert of the True
+1 Dimensional Breach
+1 Double Vision
+1 Drifting Meadow
+1 Emeria's Call
+1 Endure
+1 Enduring Renewal
+1 Explosive Singularity
+1 Flamescroll Celebrant
+1 Flawless Maneuver
+1 Forgotten Cave
+1 Gallifrey Falls // No More
+1 Glittering Massif
+1 Goblin Game
+1 Hexing Squelcher
+1 Hit the Mother Lode
+1 Hour of Devastation
+1 Improvisation Capstone
+1 Incite Rebellion
+1 Inferno
+1 Inspiring Vantage
+1 Insult // Injury
+1 Insurrection
+1 Invoke Calamity
+1 Isengard Unleashed
+1 Kabira Takedown
+1 Kaboom!
+1 Kazuul's Fury
+1 Lightning Greaves
+1 Makindi Stampede
+1 Mana Geyser
+1 Mithril Coat
+1 Mogg Infestation
+6 Mountain
+1 Ondu Inversion
+1 Pearl Medallion
+1 Perch Protection
+6 Plains
+1 Prisoner's Dilemma
+1 Razia's Purification
+1 Razorgrass Ambush
+1 Reckless Endeavor
+1 Reversal of Fortune
+1 Reverse the Sands
+1 Rise of the Eldrazi
+1 Rousing Refrain
+1 Ruby Medallion
+1 Rugged Prairie
+1 Scrambleverse
+1 Secluded Steppe
+1 Sejiri Shelter
+1 Skittering Invasion
+1 Slash the Ranks
+1 Smoldering Crater
+1 Sol Ring
+1 Song-Mad Treachery
+1 Soulfire Eruption
+1 Spiteful Repossession
+1 Star of Extinction
+1 Storm Herd
+1 Sundering Eruption
+1 Sundown Pass
+1 Surge to Victory
+1 Tablet of Discovery
+1 Talisman of Conviction
+1 Thieves' Auction
+1 Valakut Awakening
+1 Victory Chimes
+1 War Room
+1 Warp World
+1 Will of the Mardu
+1 Worldfire

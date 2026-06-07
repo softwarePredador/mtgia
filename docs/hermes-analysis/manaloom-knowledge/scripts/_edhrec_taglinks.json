@@ -1,0 +1,382 @@
+[
+  {
+    "count": 391,
+    "slug": "spellslinger",
+    "value": "Spellslinger"
+  },
+  {
+    "count": 385,
+    "slug": "topdeck",
+    "value": "Topdeck"
+  },
+  {
+    "count": 106,
+    "slug": "discard",
+    "value": "Discard"
+  },
+  {
+    "count": 101,
+    "slug": "burn",
+    "value": "Burn"
+  },
+  {
+    "count": 54,
+    "slug": "reanimator",
+    "value": "Reanimator"
+  },
+  {
+    "count": 51,
+    "slug": "big-mana",
+    "value": "Big Mana"
+  },
+  {
+    "count": 34,
+    "slug": "tokens",
+    "value": "Tokens"
+  },
+  {
+    "count": 33,
+    "slug": "graveyard",
+    "value": "Graveyard"
+  },
+  {
+    "count": 27,
+    "slug": "combo",
+    "value": "Combo"
+  },
+  {
+    "count": 27,
+    "slug": "control",
+    "value": "Control"
+  },
+  {
+    "count": 26,
+    "slug": "artifacts",
+    "value": "Artifacts"
+  },
+  {
+    "count": 25,
+    "slug": "flashback",
+    "value": "Flashback"
+  },
+  {
+    "count": 24,
+    "slug": "chaos",
+    "value": "Chaos"
+  },
+  {
+    "count": 23,
+    "slug": "commander-matters",
+    "value": "Commander Matters"
+  },
+  {
+    "count": 23,
+    "slug": "dragons",
+    "value": "Dragons"
+  },
+  {
+    "count": 23,
+    "slug": "land-destruction",
+    "value": "Land Destruction"
+  },
+  {
+    "count": 21,
+    "slug": "midrange",
+    "value": "Midrange"
+  },
+  {
+    "count": 21,
+    "slug": "self-discard",
+    "value": "Self-Discard"
+  },
+  {
+    "count": 19,
+    "slug": "lifegain",
+    "value": "Lifegain"
+  },
+  {
+    "count": 19,
+    "slug": "wheels",
+    "value": "Wheels"
+  },
+  {
+    "count": 18,
+    "slug": "card-draw",
+    "value": "Card Draw"
+  },
+  {
+    "count": 16,
+    "slug": "aggro",
+    "value": "Aggro"
+  },
+  {
+    "count": 16,
+    "slug": "self-mill",
+    "value": "Self-Mill"
+  },
+  {
+    "count": 14,
+    "slug": "dragons-approach",
+    "value": "Dragon's Approach"
+  },
+  {
+    "count": 14,
+    "slug": "good-stuff",
+    "value": "Good Stuff"
+  },
+  {
+    "count": 11,
+    "slug": "looting",
+    "value": "Looting"
+  },
+  {
+    "count": 10,
+    "slug": "cascade",
+    "value": "Cascade"
+  },
+  {
+    "count": 8,
+    "slug": "ramp",
+    "value": "Ramp"
+  },
+  {
+    "count": 8,
+    "slug": "stax",
+    "value": "Stax"
+  },
+  {
+    "count": 8,
+    "slug": "treasure",
+    "value": "Treasure"
+  },
+  {
+    "count": 7,
+    "slug": "dredge",
+    "value": "Dredge"
+  },
+  {
+    "count": 6,
+    "slug": "flying",
+    "value": "Flying"
+  },
+  {
+    "count": 6,
+    "slug": "forced-combat",
+    "value": "Forced Combat"
+  },
+  {
+    "count": 6,
+    "slug": "spell-copy",
+    "value": "Spell Copy"
+  },
+  {
+    "count": 5,
+    "slug": "cycling",
+    "value": "Cycling"
+  },
+  {
+    "count": 5,
+    "slug": "group-slug",
+    "value": "Group Slug"
+  },
+  {
+    "count": 5,
+    "slug": "tempo",
+    "value": "Tempo"
+  },
+  {
+    "count": 4,
+    "slug": "discover",
+    "value": "Discover"
+  },
+  {
+    "count": 4,
+    "slug": "mill",
+    "value": "Mill"
+  },
+  {
+    "count": 4,
+    "slug": "scry",
+    "value": "Scry"
+  },
+  {
+    "count": 4,
+    "slug": "storm",
+    "value": "Storm"
+  },
+  {
+    "count": 4,
+    "slug": "toolbox",
+    "value": "Toolbox"
+  },
+  {
+    "count": 3,
+    "slug": "plus-1-plus-1-counters",
+    "value": "+1/+1 Counters"
+  },
+  {
+    "count": 3,
+    "slug": "exile",
+    "value": "Exile"
+  },
+  {
+    "count": 3,
+    "slug": "extra-combats",
+    "value": "Extra Combats"
+  },
+  {
+    "count": 3,
+    "slug": "extra-turns",
+    "value": "Extra Turns"
+  },
+  {
+    "count": 3,
+    "slug": "impulse-draw",
+    "value": "Impulse Draw"
+  },
+  {
+    "count": 3,
+    "slug": "x-spells",
+    "value": "X Spells"
+  },
+  {
+    "count": 2,
+    "slug": "all-spells",
+    "value": "All Spells"
+  },
+  {
+    "count": 2,
+    "slug": "blink",
+    "value": "Blink"
+  },
+  {
+    "count": 2,
+    "slug": "politics",
+    "value": "Politics"
+  },
+  {
+    "count": 2,
+    "slug": "triggered-abilities",
+    "value": "Triggered Abilities"
+  },
+  {
+    "count": 1,
+    "slug": "adventures",
+    "value": "Adventures"
+  },
+  {
+    "count": 1,
+    "slug": "angels",
+    "value": "Angels"
+  },
+  {
+    "count": 1,
+    "slug": "dwarves",
+    "value": "Dwarves"
+  },
+  {
+    "count": 1,
+    "slug": "enchantress",
+    "value": "Enchantress"
+  },
+  {
+    "count": 1,
+    "slug": "equipment",
+    "value": "Equipment"
+  },
+  {
+    "count": 1,
+    "slug": "flash",
+    "value": "Flash"
+  },
+  {
+    "count": 1,
+    "slug": "glass-cannon",
+    "value": "Glass Cannon"
+  },
+  {
+    "count": 1,
+    "slug": "group-hug",
+    "value": "Group Hug"
+  },
+  {
+    "count": 1,
+    "slug": "haste",
+    "value": "Haste"
+  },
+  {
+    "count": 1,
+    "slug": "hatebears",
+    "value": "Hatebears"
+  },
+  {
+    "count": 1,
+    "slug": "historic",
+    "value": "Historic"
+  },
+  {
+    "count": 1,
+    "slug": "indestructible",
+    "value": "Indestructible"
+  },
+  {
+    "count": 1,
+    "slug": "lands-matter",
+    "value": "Lands Matter"
+  },
+  {
+    "count": 1,
+    "slug": "legends",
+    "value": "Legends"
+  },
+  {
+    "count": 1,
+    "slug": "madness",
+    "value": "Madness"
+  },
+  {
+    "count": 1,
+    "slug": "modular",
+    "value": "Modular"
+  },
+  {
+    "count": 1,
+    "slug": "monks",
+    "value": "Monks"
+  },
+  {
+    "count": 1,
+    "slug": "pillow-fort",
+    "value": "Pillow Fort"
+  },
+  {
+    "count": 1,
+    "slug": "pingers",
+    "value": "Pingers"
+  },
+  {
+    "count": 1,
+    "slug": "populate",
+    "value": "Populate"
+  },
+  {
+    "count": 1,
+    "slug": "power",
+    "value": "Power"
+  },
+  {
+    "count": 1,
+    "slug": "prison",
+    "value": "Prison"
+  },
+  {
+    "count": 1,
+    "slug": "self-damage",
+    "value": "Self-Damage"
+  },
+  {
+    "count": 1,
+    "slug": "voltron",
+    "value": "Voltron"
+  }
+]

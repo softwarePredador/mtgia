@@ -27,6 +27,26 @@ void main() {
       expect(input.isActive, isTrue);
     });
 
+    test('parses bullets, comments, collection suffixes and duplicate names',
+        () {
+      final cards = parseCommanderLearnedDeckCards('''
+1 Korvold, Fae-Cursed King
+2 Forest
+- 1 Sol Ring # ramp
+1 Command Tower (CMM) 123
+''');
+
+      expect(
+        cards.map((card) => (card.name, card.quantity)).toList(),
+        containsAll([
+          ('Korvold, Fae-Cursed King', 1),
+          ('Forest', 2),
+          ('Sol Ring', 1),
+          ('Command Tower', 1),
+        ]),
+      );
+    });
+
     test('validates Commander 100-card learned deck gate', () {
       final main = List.generate(99, (index) => '1 Learned Card $index');
       final input = parseCommanderLearnedDeckInput({

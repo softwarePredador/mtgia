@@ -1,0 +1,95 @@
+=== User Lorehold Deck 2026-06-02 #4 ===
+Source: user-import
+Archetype: spellslinger-copy-combo-big-mana
+
+1 Lorehold, the Historian
+1 Arcane Bombardment
+1 Arcane Signet
+1 Arid Mesa
+1 Battlefield Forge
+1 Bender's Waterskin
+1 Big Score
+1 Blasphemous Act
+1 Bloodstained Mire
+1 Boros Charm
+1 Boseiju, Who Shelters All
+1 Call Forth the Tempest
+1 Chaos Warp
+1 Clifftop Retreat
+1 Clive, Ifrit's Dominant
+1 Command Tower
+1 Currency Converter
+1 Cursed Mirror
+1 Dance with Calamity
+1 Deep Gnome Terramancer
+1 Deflecting Swat
+1 Dragon's Rage Channeler
+1 Drannith Magistrate
+1 Elegant Parlor
+1 Esper Sentinel
+1 Faithless Looting
+1 Flare of Duplication
+1 Flooded Strand
+1 Gemstone Caverns
+1 Generous Gift
+1 Gods Willing
+1 Goldspan Dragon
+1 Grand Abolisher
+1 Hexing Squelcher
+1 Hit the Mother Lode
+1 Improvisation Capstone
+1 Impulsivity
+1 Increasing Vengeance
+1 Insurrection
+1 Jeska's Will
+1 Longshot, Rebel Bowman
+1 Loran's Escape
+1 Mana Geyser
+1 Marsh Flats
+1 Mizzix's Mastery
+1 Monument to Endurance
+1 Mother of Runes
+7 Mountain
+1 Needleverge Pathway
+1 Ondu Inversion
+1 Orim's Chant
+1 Pinnacle Monk
+4 Plains
+1 Plateau
+1 Ragavan, Nimble Pilferer
+1 Redirect Lightning
+1 Restoration Seminar
+1 Return the Favor
+1 Reverberate
+1 Rise of the Eldrazi
+1 Sacred Foundry
+1 Scalding Tarn
+1 Scroll Rack
+1 Sejiri Shelter
+1 Sol Ring
+1 Spectator Seating
+1 Stroke of Midnight
+1 Sunbaked Canyon
+1 Sunbillow Verge
+1 Swords to Plowshares
+1 Tablet of Discovery
+1 Talisman of Conviction
+1 Tataru Taru
+1 Teferi's Protection
+1 Terror of the Peaks
+1 The Fire Crystal
+1 Tibalt's Trickery
+1 Turbulent Steppe
+1 Twinflame
+1 Unexpected Windfall
+1 Valakut Awakening
+1 Vandalblast
+1 Velomachus Lorehold
+1 Voice of Victory
+1 Volcanic Vision
+1 Wandering Archaic
+1 War Room
+1 Wheel of Fortune
+1 Windswept Heath
+1 Witch Enchanter
+1 Wooded Foothills

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'cmc_safety.dart';
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimization_validator.dart';
@@ -603,11 +604,7 @@ bool _hasMaterialImprovement({
 }
 
 int _getCmc(Map<String, dynamic> card) {
-  final cmc = card['cmc'];
-  if (cmc == null) return 0;
-  if (cmc is int) return cmc;
-  if (cmc is double) return cmc.toInt();
-  return int.tryParse(cmc.toString()) ?? 0;
+  return safeCmcForOptimization(card);
 }
 
 bool _landLooksColorProducing(Map<String, dynamic> card) {

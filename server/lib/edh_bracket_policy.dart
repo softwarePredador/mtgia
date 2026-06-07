@@ -15,6 +15,7 @@ enum BracketCategory {
   stax,
   protection,
   valueEngine,
+  gameChanger,
 }
 
 class BracketPolicy {
@@ -43,6 +44,7 @@ class BracketPolicy {
             BracketCategory.stax: 0,
             BracketCategory.protection: 1,
             BracketCategory.valueEngine: 1,
+            BracketCategory.gameChanger: 0,
           },
         );
       case 2:
@@ -59,6 +61,7 @@ class BracketPolicy {
             BracketCategory.stax: 1,
             BracketCategory.protection: 2,
             BracketCategory.valueEngine: 2,
+            BracketCategory.gameChanger: 0,
           },
         );
       case 3:
@@ -75,6 +78,7 @@ class BracketPolicy {
             BracketCategory.stax: 3,
             BracketCategory.protection: 4,
             BracketCategory.valueEngine: 6,
+            BracketCategory.gameChanger: 3,
           },
         );
       case 4:
@@ -92,6 +96,7 @@ class BracketPolicy {
             BracketCategory.stax: 99,
             BracketCategory.protection: 99,
             BracketCategory.valueEngine: 99,
+            BracketCategory.gameChanger: 99,
           },
         );
     }
@@ -116,6 +121,10 @@ BracketTagResult tagCardForBracket({
   final n = name.toLowerCase().trim();
   final t = typeLine.toLowerCase();
   final o = oracleText.toLowerCase();
+
+  if (_isOfficialGameChangerName(n)) {
+    return BracketTagResult({BracketCategory.gameChanger});
+  }
 
   if (_fastManaNames.contains(n)) {
     categories.add(BracketCategory.fastMana);
@@ -196,6 +205,7 @@ Map<BracketCategory, int> countBracketCategories(
     BracketCategory.stax: 0,
     BracketCategory.protection: 0,
     BracketCategory.valueEngine: 0,
+    BracketCategory.gameChanger: 0,
   };
 
   for (final c in cards) {
@@ -339,6 +349,86 @@ const _knownInfiniteComboPieces = <String>{
   'demonic consultation',
   'tainted pact',
 };
+
+// BEGIN GENERATED GAME CHANGERS
+const officialGameChangerNamesForBracketPolicy = <String>{
+  'ad nauseam',
+  'ancient tomb',
+  'aura shards',
+  'biorhythm',
+  'bolas\'s citadel',
+  'braids, cabal minion',
+  'chrome mox',
+  'coalition victory',
+  'consecrated sphinx',
+  'crop rotation',
+  'cyclonic rift',
+  'demonic tutor',
+  'drannith magistrate',
+  'enlightened tutor',
+  'farewell',
+  'field of the dead',
+  'fierce guardianship',
+  'force of will',
+  'gaea\'s cradle',
+  'gamble',
+  'gifts ungiven',
+  'glacial chasm',
+  'grand arbiter augustin iv',
+  'grim monolith',
+  'humility',
+  'imperial seal',
+  'intuition',
+  'jeska\'s will',
+  'lion\'s eye diamond',
+  'mana vault',
+  'mishra\'s workshop',
+  'mox diamond',
+  'mystical tutor',
+  'narset, parter of veils',
+  'natural order',
+  'necropotence',
+  'notion thief',
+  'opposition agent',
+  'orcish bowmasters',
+  'panoptic mirror',
+  'rhystic study',
+  'seedborn muse',
+  'serra\'s sanctum',
+  'smothering tithe',
+  'survival of the fittest',
+  'teferi\'s protection',
+  'tergrid, god of fright // tergrid\'s lantern',
+  'thassa\'s oracle',
+  'the one ring',
+  'the tabernacle at pendrell vale',
+  'underworld breach',
+  'vampiric tutor',
+  'worldly tutor',
+};
+// END GENERATED GAME CHANGERS
+
+bool _isOfficialGameChangerName(String name) {
+  final variants = _normalizedBracketNameVariants(name);
+  for (final officialName in officialGameChangerNamesForBracketPolicy) {
+    final officialVariants = _normalizedBracketNameVariants(officialName);
+    if (variants.any(officialVariants.contains)) return true;
+  }
+  return false;
+}
+
+Set<String> _normalizedBracketNameVariants(String name) {
+  final normalized = name.toLowerCase().trim();
+  if (normalized.isEmpty) return const <String>{};
+
+  final variants = <String>{normalized};
+  final splitIndex = normalized.indexOf('//');
+  if (splitIndex != -1) {
+    final firstFace = normalized.substring(0, splitIndex).trim();
+    if (firstFace.isNotEmpty) variants.add(firstFace);
+  }
+  return variants;
+}
 
 bool _looksLikeBracketTutorText(String oracleLower) {
   if (!oracleLower.contains('search your library')) return false;

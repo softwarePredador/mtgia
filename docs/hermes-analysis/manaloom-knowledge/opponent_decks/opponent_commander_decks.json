@@ -1,0 +1,3680 @@
+[
+  {
+    "url": "https://edhrec.com/commanders/krenko-mob-boss",
+    "commander": "Krenko, Mob Boss",
+    "archetype": "aggro",
+    "card_list": [
+      {
+        "name": "Krenko, Mob Boss",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Goblin Warrior",
+        "role": "commander"
+      },
+      {
+        "name": "Goblin Ringleader",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Muxus, Goblin Grandee",
+        "cmc": 6.0,
+        "type_line": "Legendary Creature \u2014 Goblin Noble",
+        "category": "creature"
+      },
+      {
+        "name": "Goblin Instigator",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Rogue",
+        "category": "creature"
+      },
+      {
+        "name": "Legion Warboss",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Rundvelt Hordemaster",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Purphoros, God of the Forge",
+        "cmc": 4.0,
+        "type_line": "Legendary Enchantment Creature \u2014 God",
+        "category": "creature"
+      },
+      {
+        "name": "Warren Instigator",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Berserker",
+        "category": "creature"
+      },
+      {
+        "name": "Goblin Lackey",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Kiki-Jiki, Mirror Breaker",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Goblin Shaman",
+        "category": "creature"
+      },
+      {
+        "name": "Battle Cry Goblin",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "General Kreat, the Boltbringer",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Goblin Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Beetleback Chief",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Goblin Piledriver",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Mogg War Marshal",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Gempalm Incinerator",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Howlsquad Heavy",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Mercenary",
+        "category": "creature"
+      },
+      {
+        "name": "Treasure Nabber",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Rogue",
+        "category": "creature"
+      },
+      {
+        "name": "Grenzo, Havoc Raiser",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Goblin Rogue",
+        "category": "creature"
+      },
+      {
+        "name": "Goro-Goro, Disciple of Ryusei",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Goblin Samurai",
+        "category": "creature"
+      },
+      {
+        "name": "Goblin Motivator",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Volley Veteran",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Searslicer Goblin",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Siege-Gang Lieutenant",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Moria Marauder",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Marvin, Murderous Mimic",
+        "cmc": 2.0,
+        "type_line": "Legendary Artifact Creature \u2014 Toy",
+        "category": "creature"
+      },
+      {
+        "name": "Squee, Dubious Monarch",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Goblin Noble",
+        "category": "creature"
+      },
+      {
+        "name": "Goblin Sharpshooter",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Legion Loyalist",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Goblin Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Brash Taunter",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Goblin Lookout",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Torch Courier",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Goblin",
+        "category": "creature"
+      },
+      {
+        "name": "Battle Hymn",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Chaos Warp",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Abrade",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Massive Raid",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Thrill of Possibility",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Lightning Bolt",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Goblin Surprise",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Hordeling Outburst",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Blasphemous Act",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Faithless Looting",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Vandalblast",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Goblin Grenade",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Empty the Warrens",
+        "cmc": 4.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Mob Justice",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Goblin Negotiation",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Shared Animosity",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Blood Moon",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Boggart Shenanigans",
+        "cmc": 3.0,
+        "type_line": "Kindred Enchantment \u2014 Goblin",
+        "category": "enchantment"
+      },
+      {
+        "name": "Raid Bombardment",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Quest for the Goblin Lord",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Rising of the Day",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Fervor",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Lightning Greaves",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Ruby Medallion",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Sting, the Glinting Dagger",
+        "cmc": 2.0,
+        "type_line": "Legendary Artifact \u2014 Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Thousand-Year Elixir",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Hazoret's Monument",
+        "cmc": 3.0,
+        "type_line": "Legendary Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Coat of Arms",
+        "cmc": 5.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Patriar's Seal",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Staff of Domination",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Thornbite Staff",
+        "cmc": 2.0,
+        "type_line": "Kindred Artifact \u2014 Shaman Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Castle Embereth",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Path of Ancestry",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Three Tree City",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Den of the Bugbear",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Arena of Glory",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "category": "land"
+      }
+    ],
+    "wincon_primary": "Overwhelm opponents with an army of goblin tokens created by Krenko's activated ability, then attack for lethal with mass pump effects",
+    "wincon_backup": "Purphoros, God of the Forge / Impact Tremors etb damage triggers; Goblin combo lines with Skirk Prospector + sacrifices",
+    "budget_level": "mid",
+    "avg_price_usd": 590.0,
+    "num_decks_analyzed": 40629,
+    "source": "EDHREC Average Deck"
+  },
+  {
+    "url": "https://edhrec.com/commanders/winota-joiner-of-forces",
+    "commander": "Winota, Joiner of Forces",
+    "archetype": "aggro",
+    "card_list": [
+      {
+        "name": "Winota, Joiner of Forces",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Warrior",
+        "role": "commander"
+      },
+      {
+        "name": "Goblin Rabblemaster",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Spirit of the Labyrinth",
+        "cmc": 2.0,
+        "type_line": "Enchantment Creature \u2014 Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "Soulless Jailer",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Golem",
+        "category": "creature"
+      },
+      {
+        "name": "Rograkh, Son of Rohgahh",
+        "cmc": 0.0,
+        "type_line": "Legendary Creature \u2014 Kobold Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Rionya, Fire Dancer",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Human Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Hope of Ghirapur",
+        "cmc": 1.0,
+        "type_line": "Legendary Artifact Creature \u2014 Thopter",
+        "category": "creature"
+      },
+      {
+        "name": "Alseid of Life's Bounty",
+        "cmc": 1.0,
+        "type_line": "Enchantment Creature \u2014 Nymph",
+        "category": "creature"
+      },
+      {
+        "name": "Simian Spirit Guide",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Ape Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "Ethersworn Canonist",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Human Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Esper Sentinel",
+        "cmc": 1.0,
+        "type_line": "Artifact Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Cathar Commando",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Mother of Runes",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Goldnight Commander",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Cleric Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Giver of Runes",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Kor Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Magus of the Moon",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Ragavan, Nimble Pilferer",
+        "cmc": 1.0,
+        "type_line": "Legendary Creature \u2014 Monkey Pirate",
+        "category": "creature"
+      },
+      {
+        "name": "Phyrexian Walker",
+        "cmc": 0.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Construct",
+        "category": "creature"
+      },
+      {
+        "name": "Phoenix Chick",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Phoenix",
+        "category": "creature"
+      },
+      {
+        "name": "Imperial Recruiter",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Advisor",
+        "category": "creature"
+      },
+      {
+        "name": "Skyclave Apparition",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Kor Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "Myrel, Shield of Argive",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Thalia, Heretic Cathar",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Witch Enchanter",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "creature"
+      },
+      {
+        "name": "Sanctum Prelate",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Phyrexian Revoker",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Horror",
+        "category": "creature"
+      },
+      {
+        "name": "Skrelv, Defector Mite",
+        "cmc": 1.0,
+        "type_line": "Legendary Artifact Creature \u2014 Phyrexian Mite",
+        "category": "creature"
+      },
+      {
+        "name": "Ranger-Captain of Eos",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Soldier Ranger",
+        "category": "creature"
+      },
+      {
+        "name": "Archivist of Oghma",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Halfling Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Greymond, Avacyn's Stalwart",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Dauntless Dismantler",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Artificer",
+        "category": "creature"
+      },
+      {
+        "name": "Alexios, Deimos of Kosmos",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Berserker",
+        "category": "creature"
+      },
+      {
+        "name": "Geist-Honored Monk",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Human Monk",
+        "category": "creature"
+      },
+      {
+        "name": "Selfless Spirit",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Spirit Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Captain of the Watch",
+        "cmc": 6.0,
+        "type_line": "Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Recruiter of the Guard",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Vryn Wingmare",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Pegasus",
+        "category": "creature"
+      },
+      {
+        "name": "Aven Interrupter",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Bird Rogue",
+        "category": "creature"
+      },
+      {
+        "name": "\u00c9omer, King of Rohan",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Human Noble",
+        "category": "creature"
+      },
+      {
+        "name": "Charismatic Conqueror",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Vampire Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Zealous Conscripts",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Human Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Evangel of Heliod",
+        "cmc": 6.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Serra Ascendant",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Human Monk",
+        "category": "creature"
+      },
+      {
+        "name": "Voice of Victory",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Bard",
+        "category": "creature"
+      },
+      {
+        "name": "Kiki-Jiki, Mirror Breaker",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Goblin Shaman",
+        "category": "creature"
+      },
+      {
+        "name": "Cliffside Rescuer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Kor Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Pia and Kiran Nalaar",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Artificer",
+        "category": "creature"
+      },
+      {
+        "name": "Deflecting Swat",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Silence",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Flare of Fortitude",
+        "cmc": 4.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Red Elemental Blast",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Boros Charm",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Abrade",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Flawless Maneuver",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Raise the Alarm",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Shatterskull Smashing",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Blasphemous Act",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Dragon Fodder",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "High Noon",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Touch the Spirit Realm",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Windcrag Siege",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Breath of Fury",
+        "cmc": 4.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "category": "enchantment"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Talisman of Conviction",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Boros Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Lotus Petal",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Battlefield Forge",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Sacred Foundry",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Mountain Plains",
+        "category": "land"
+      },
+      {
+        "name": "Clifftop Retreat",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Sokenzan, Crucible of Defiance",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Spectator Seating",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Arid Mesa",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Blinkmoth Nexus",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Needleverge Pathway",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "land"
+      },
+      {
+        "name": "Witch Enchanter",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "land"
+      },
+      {
+        "name": "Sunbaked Canyon",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Rugged Prairie",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Furycalm Snarl",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Eiganjo, Seat of the Empire",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "category": "land"
+      }
+    ],
+    "wincon_primary": "Snowball aggressive advantage by triggering Winota's ability with non-Human attackers, cheating Humans into play for free each combat",
+    "wincon_backup": "Stax effects (Drannith Magistrate, Archon of Emeria) slowing opponents while beatdown continues; Kiki-Jiki combo lines",
+    "budget_level": "optimized",
+    "avg_price_usd": 1298.0,
+    "num_decks_analyzed": 12897,
+    "source": "EDHREC Average Deck"
+  },
+  {
+    "url": "https://edhrec.com/commanders/kinnan-bonder-prodigy",
+    "commander": "Kinnan, Bonder Prodigy",
+    "archetype": "combo",
+    "card_list": [
+      {
+        "name": "Kinnan, Bonder Prodigy",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Human Druid",
+        "role": "commander"
+      },
+      {
+        "name": "Tidespout Tyrant",
+        "cmc": 8.0,
+        "type_line": "Creature \u2014 Djinn",
+        "category": "creature"
+      },
+      {
+        "name": "Elvish Spirit Guide",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Elf Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "Bloom Tender",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "category": "creature"
+      },
+      {
+        "name": "Endurance",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Elemental Incarnation",
+        "category": "creature"
+      },
+      {
+        "name": "Wandering Archaic",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "creature"
+      },
+      {
+        "name": "Colossal Skyturtle",
+        "cmc": 7.0,
+        "type_line": "Enchantment Creature \u2014 Turtle",
+        "category": "creature"
+      },
+      {
+        "name": "Spellskite",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Horror",
+        "category": "creature"
+      },
+      {
+        "name": "Clever Impersonator",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Shapeshifter",
+        "category": "creature"
+      },
+      {
+        "name": "Valley Floodcaller",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Otter Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Void Winnower",
+        "cmc": 9.0,
+        "type_line": "Creature \u2014 Eldrazi",
+        "category": "creature"
+      },
+      {
+        "name": "Faerie Mastermind",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Faerie Rogue",
+        "category": "creature"
+      },
+      {
+        "name": "Walking Ballista",
+        "cmc": 0.0,
+        "type_line": "Artifact Creature \u2014 Construct",
+        "category": "creature"
+      },
+      {
+        "name": "Drift of Phantasms",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "High Fae Trickster",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Faerie Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Hydroelectric Specimen",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "creature"
+      },
+      {
+        "name": "Paradise Druid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "category": "creature"
+      },
+      {
+        "name": "Manglehorn",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Beast",
+        "category": "creature"
+      },
+      {
+        "name": "Glen Elendra Archmage",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Faerie Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Koma, Cosmos Serpent",
+        "cmc": 7.0,
+        "type_line": "Legendary Creature \u2014 Serpent",
+        "category": "creature"
+      },
+      {
+        "name": "Flesh Duplicate",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Shapeshifter Rebel",
+        "category": "creature"
+      },
+      {
+        "name": "Gilded Drake",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Drake",
+        "category": "creature"
+      },
+      {
+        "name": "Wan Shi Tong, Librarian",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Bird Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "Devoted Druid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "category": "creature"
+      },
+      {
+        "name": "Mockingbird",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Bird Bard",
+        "category": "creature"
+      },
+      {
+        "name": "Incubation Druid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "category": "creature"
+      },
+      {
+        "name": "Armored Scrapgorger",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Beast",
+        "category": "creature"
+      },
+      {
+        "name": "Thorn Mammoth",
+        "cmc": 7.0,
+        "type_line": "Creature \u2014 Elephant",
+        "category": "creature"
+      },
+      {
+        "name": "Eternal Witness",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Shaman",
+        "category": "creature"
+      },
+      {
+        "name": "Ilysian Caryatid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Plant",
+        "category": "creature"
+      },
+      {
+        "name": "Chord of Calling",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mental Misstep",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mindbreak Trap",
+        "cmc": 4.0,
+        "type_line": "Instant \u2014 Trap",
+        "category": "instant"
+      },
+      {
+        "name": "Sink into Stupor",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "instant"
+      },
+      {
+        "name": "Crop Rotation",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mana Drain",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Veil of Summer",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Dramatic Reversal",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Counterspell",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Dispel",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Chain of Vapor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Pongify",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mystical Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Force of Vigor",
+        "cmc": 4.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Into the Flood Maw",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Whir of Invention",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Misdirection",
+        "cmc": 5.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Green Sun's Zenith",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Fabricate",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Transmute Artifact",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Nature's Rhythm",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Reshape",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Freed from the Real",
+        "cmc": 3.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "category": "enchantment"
+      },
+      {
+        "name": "Sylvan Library",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Mirrormade",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Pemmin's Aura",
+        "cmc": 3.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "category": "enchantment"
+      },
+      {
+        "name": "Copy Artifact",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Tezzeret the Seeker",
+        "cmc": 5.0,
+        "type_line": "Legendary Planeswalker \u2014 Tezzeret",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Basalt Monolith",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Talisman of Curiosity",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Simic Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Springleaf Drum",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Mox Amber",
+        "cmc": 0.0,
+        "type_line": "Legendary Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Lotus Petal",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Mox Opal",
+        "cmc": 0.0,
+        "type_line": "Legendary Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Moonsilver Key",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "The One Ring",
+        "cmc": 4.0,
+        "type_line": "Legendary Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Mox Diamond",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Grim Monolith",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Thought Vessel",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Breeding Pool",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Island",
+        "category": "land"
+      },
+      {
+        "name": "Yavimaya Coast",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Rejuvenating Springs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Misty Rainforest",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Boseiju, Who Endures",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Waterlogged Grove",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Otawara, Soaring City",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Treasure Vault",
+        "cmc": 0.0,
+        "type_line": "Artifact Land",
+        "category": "land"
+      },
+      {
+        "name": "Tropical Island",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Island",
+        "category": "land"
+      },
+      {
+        "name": "City of Brass",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Gemstone Caverns",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Mana Confluence",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Flooded Strand",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Polluted Delta",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Scalding Tarn",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Gaea's Cradle",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Sink into Stupor",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      }
+    ],
+    "wincon_primary": "Generate infinite mana via Basalt Monolith / Grim Monolith combos with Kinnan's ability, then activate Kinnan repeatedly to dump all creatures onto the battlefield",
+    "wincon_backup": "Thassa's Oracle + Demonic Consultation / Tainted Pact; Walking Ballista as infinite mana outlet; Finale of Devastation for X=large",
+    "budget_level": "cEDH",
+    "avg_price_usd": 4606.0,
+    "num_decks_analyzed": 19530,
+    "source": "EDHREC Average Deck"
+  },
+  {
+    "url": "https://edhrec.com/commanders/urza-lord-high-artificer",
+    "commander": "Urza, Lord High Artificer",
+    "archetype": "combo",
+    "card_list": [
+      {
+        "name": "Urza, Lord High Artificer",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Artificer",
+        "role": "commander"
+      },
+      {
+        "name": "The Reality Chip",
+        "cmc": 2.0,
+        "type_line": "Legendary Artifact Creature \u2014 Equipment Jellyfish",
+        "category": "creature"
+      },
+      {
+        "name": "Phyrexian Metamorph",
+        "cmc": 4.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Shapeshifter",
+        "category": "creature"
+      },
+      {
+        "name": "Spellskite",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Horror",
+        "category": "creature"
+      },
+      {
+        "name": "Emry, Lurker of the Loch",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Merfolk Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Ornithopter",
+        "cmc": 0.0,
+        "type_line": "Artifact Creature \u2014 Thopter",
+        "category": "creature"
+      },
+      {
+        "name": "Padeem, Consul of Innovation",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Vedalken Artificer",
+        "category": "creature"
+      },
+      {
+        "name": "Displacer Kitten",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Cat Beast",
+        "category": "creature"
+      },
+      {
+        "name": "Thought Monitor",
+        "cmc": 7.0,
+        "type_line": "Artifact Creature \u2014 Construct",
+        "category": "creature"
+      },
+      {
+        "name": "Trinket Mage",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Walking Ballista",
+        "cmc": 0.0,
+        "type_line": "Artifact Creature \u2014 Construct",
+        "category": "creature"
+      },
+      {
+        "name": "Shimmer Myr",
+        "cmc": 3.0,
+        "type_line": "Artifact Creature \u2014 Myr",
+        "category": "creature"
+      },
+      {
+        "name": "Vedalken Archmage",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Vedalken Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Tribute Mage",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Liberator, Urza's Battlethopter",
+        "cmc": 3.0,
+        "type_line": "Legendary Artifact Creature \u2014 Thopter",
+        "category": "creature"
+      },
+      {
+        "name": "Trophy Mage",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Kappa Cannoneer",
+        "cmc": 6.0,
+        "type_line": "Artifact Creature \u2014 Turtle Warrior",
+        "category": "creature"
+      },
+      {
+        "name": "Muddle the Mixture",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Force of Negation",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Brainstorm",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Pongify",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Pact of Negation",
+        "cmc": 0.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Flusterstorm",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Negate",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Sink into Stupor",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "instant"
+      },
+      {
+        "name": "Mental Misstep",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Rapid Hybridization",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Arcane Denial",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mindbreak Trap",
+        "cmc": 4.0,
+        "type_line": "Instant \u2014 Trap",
+        "category": "instant"
+      },
+      {
+        "name": "Resculpt",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Dispel",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Narset's Reversal",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Chain of Vapor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Reshape",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Windfall",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Ponder",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Thoughtcast",
+        "cmc": 5.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Merchant Scroll",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Efficient Construction",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Back to Basics",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Thopter Spy Network",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Power Artifact",
+        "cmc": 2.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "category": "enchantment"
+      },
+      {
+        "name": "Tezzeret the Seeker",
+        "cmc": 5.0,
+        "type_line": "Legendary Planeswalker \u2014 Tezzeret",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Karn, the Great Creator",
+        "cmc": 4.0,
+        "type_line": "Legendary Planeswalker \u2014 Karn",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Everflowing Chalice",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Basalt Monolith",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Lotus Petal",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Winter Orb",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Mystic Forge",
+        "cmc": 4.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Aether Spellbomb",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Rings of Brighthearth",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Mox Opal",
+        "cmc": 0.0,
+        "type_line": "Legendary Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Manifold Key",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Thought Vessel",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Howling Mine",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Static Orb",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Welding Jar",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Voltaic Key",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Mind Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Lightning Greaves",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Codex Shredder",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Urza's Bauble",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Grim Monolith",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Jeweled Amulet",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Spellbook",
+        "cmc": 0.0,
+        "type_line": "Artifact \u2014 Book",
+        "category": "artifact"
+      },
+      {
+        "name": "Urza's Saga",
+        "cmc": 0.0,
+        "type_line": "Enchantment Land \u2014 Urza's Saga",
+        "category": "land"
+      },
+      {
+        "name": "Inventors' Fair",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Academy Ruins",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Darksteel Citadel",
+        "cmc": 0.0,
+        "type_line": "Artifact Land",
+        "category": "land"
+      },
+      {
+        "name": "Otawara, Soaring City",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Reliquary Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Buried Ruin",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Mystic Sanctuary",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Sink into Stupor",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "category": "land"
+      },
+      {
+        "name": "Gemstone Caverns",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      }
+    ],
+    "wincon_primary": "Generate infinite mana through Urza's ability + artifact untappers (Isochron Scepter + Dramatic Reversal), then cast entire deck with Urza's activated ability",
+    "wincon_backup": "Thassa's Oracle + Demonic Consultation; Hullbreaker Horror infinite mana loops; Winter Orb / Static Orb hard lock with Urza breaking parity",
+    "budget_level": "cEDH",
+    "avg_price_usd": 3145.0,
+    "num_decks_analyzed": 19183,
+    "source": "EDHREC Average Deck"
+  },
+  {
+    "url": "https://edhrec.com/commanders/atraxa-praetors-voice",
+    "commander": "Atraxa, Praetors' Voice",
+    "archetype": "control",
+    "card_list": [
+      {
+        "name": "Atraxa, Praetors' Voice",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Phyrexian Angel Horror",
+        "role": "commander"
+      },
+      {
+        "name": "Cankerbloom",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Fungus",
+        "category": "creature"
+      },
+      {
+        "name": "Ichor Rats",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Phyrexian Rat",
+        "category": "creature"
+      },
+      {
+        "name": "Dreamtide Whale",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Whale",
+        "category": "creature"
+      },
+      {
+        "name": "Deepglow Skate",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Fish",
+        "category": "creature"
+      },
+      {
+        "name": "Birds of Paradise",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Bird",
+        "category": "creature"
+      },
+      {
+        "name": "Skrelv, Defector Mite",
+        "cmc": 1.0,
+        "type_line": "Legendary Artifact Creature \u2014 Phyrexian Mite",
+        "category": "creature"
+      },
+      {
+        "name": "Blighted Agent",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Human Rogue",
+        "category": "creature"
+      },
+      {
+        "name": "Ixhel, Scion of Atraxa",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Phyrexian Angel",
+        "category": "creature"
+      },
+      {
+        "name": "Metastatic Evangel",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Human Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Contaminant Grafter",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Phyrexian Druid",
+        "category": "creature"
+      },
+      {
+        "name": "Voidwing Hybrid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Bat",
+        "category": "creature"
+      },
+      {
+        "name": "Skithiryx, the Blight Dragon",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Phyrexian Dragon Skeleton",
+        "category": "creature"
+      },
+      {
+        "name": "Blightbelly Rat",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Rat",
+        "category": "creature"
+      },
+      {
+        "name": "Tainted Observer",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Phyrexian Bird",
+        "category": "creature"
+      },
+      {
+        "name": "Plague Stinger",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Phyrexian Insect Horror",
+        "category": "creature"
+      },
+      {
+        "name": "Phyrexian Swarmlord",
+        "cmc": 6.0,
+        "type_line": "Creature \u2014 Phyrexian Insect Horror",
+        "category": "creature"
+      },
+      {
+        "name": "Vishgraz, the Doomhive",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Phyrexian Insect",
+        "category": "creature"
+      },
+      {
+        "name": "Norn's Choirmaster",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Phyrexian Angel",
+        "category": "creature"
+      },
+      {
+        "name": "Bloom Tender",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "category": "creature"
+      },
+      {
+        "name": "Grateful Apparition",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Spirit",
+        "category": "creature"
+      },
+      {
+        "name": "Shalai, Voice of Plenty",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Angel",
+        "category": "creature"
+      },
+      {
+        "name": "Spark Double",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Illusion",
+        "category": "creature"
+      },
+      {
+        "name": "Bilious Skulldweller",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Phyrexian Insect",
+        "category": "creature"
+      },
+      {
+        "name": "Necrogen Rotpriest",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Phyrexian Zombie Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Experimental Augury",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Infectious Bite",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Heroic Intervention",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Atomize",
+        "cmc": 4.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Assassin's Trophy",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Ripples of Potential",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mana Drain",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Radstorm",
+        "cmc": 4.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Anguished Unmaking",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Unnatural Restoration",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Phyresis Outbreak",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Nature's Lore",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Drown in Ichor",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Three Visits",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Contentious Plan",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Thirsting Roots",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Kodama's Reach",
+        "cmc": 3.0,
+        "type_line": "Sorcery \u2014 Arcane",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Brokers Ascendancy",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Doubling Season",
+        "cmc": 5.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Norn's Decree",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Oath of Teferi",
+        "cmc": 5.0,
+        "type_line": "Legendary Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Phyrexian Arena",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Innkeeper's Talent",
+        "cmc": 2.0,
+        "type_line": "Enchantment \u2014 Class",
+        "category": "enchantment"
+      },
+      {
+        "name": "Skrelv's Hive",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Tamiyo, Field Researcher",
+        "cmc": 4.0,
+        "type_line": "Legendary Planeswalker \u2014 Tamiyo",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Ajani, Sleeper Agent",
+        "cmc": 4.0,
+        "type_line": "Legendary Planeswalker \u2014 Ajani",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Teferi, Master of Time",
+        "cmc": 4.0,
+        "type_line": "Legendary Planeswalker \u2014 Teferi",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Oko, Thief of Crowns",
+        "cmc": 3.0,
+        "type_line": "Legendary Planeswalker \u2014 Oko",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Teferi, Temporal Archmage",
+        "cmc": 6.0,
+        "type_line": "Legendary Planeswalker \u2014 Teferi",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Teferi, Hero of Dominaria",
+        "cmc": 5.0,
+        "type_line": "Legendary Planeswalker \u2014 Teferi",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Chromatic Lantern",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Astral Cornucopia",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Everflowing Chalice",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Contagion Engine",
+        "cmc": 6.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Glistening Sphere",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Lightning Greaves",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "category": "artifact"
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Breeding Pool",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Island",
+        "category": "land"
+      },
+      {
+        "name": "Overgrown Tomb",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Forest",
+        "category": "land"
+      },
+      {
+        "name": "Temple Garden",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Plains",
+        "category": "land"
+      },
+      {
+        "name": "Hallowed Fountain",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island",
+        "category": "land"
+      },
+      {
+        "name": "Watery Grave",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island Swamp",
+        "category": "land"
+      },
+      {
+        "name": "Godless Shrine",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Swamp",
+        "category": "land"
+      },
+      {
+        "name": "Indatha Triome",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Swamp Forest",
+        "category": "land"
+      },
+      {
+        "name": "Zagoth Triome",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Forest Island",
+        "category": "land"
+      },
+      {
+        "name": "Spara's Headquarters",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Plains Island",
+        "category": "land"
+      },
+      {
+        "name": "Windswept Heath",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Misty Rainforest",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Verdant Catacombs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Flooded Strand",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Polluted Delta",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Sandsteppe Citadel",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Marsh Flats",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Raffine's Tower",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island Swamp",
+        "category": "land"
+      },
+      {
+        "name": "Opulent Palace",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Path of Ancestry",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Seaside Citadel",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Arcane Sanctum",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "category": "land"
+      }
+    ],
+    "wincon_primary": "Ultimate planeswalkers after accumulating loyalty counters via Atraxa's proliferate ability (Superfriends strategy)",
+    "wincon_backup": "Infect/toxic proliferation (Blighted Agent, Viral Drake) as alt win; +1/+1 counter combat damage; Darksteel Reactor alt win",
+    "budget_level": "mid",
+    "avg_price_usd": 1496.0,
+    "num_decks_analyzed": 41638,
+    "source": "EDHREC Average Deck"
+  },
+  {
+    "url": "https://edhrec.com/commanders/grand-arbiter-augustin-iv",
+    "commander": "Grand Arbiter Augustin IV",
+    "archetype": "control",
+    "card_list": [
+      {
+        "name": "Grand Arbiter Augustin IV",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Advisor",
+        "role": "commander"
+      },
+      {
+        "name": "Hushbringer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Faerie",
+        "category": "creature"
+      },
+      {
+        "name": "Thalia, Heretic Cathar",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Archon of Emeria",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Archon",
+        "category": "creature"
+      },
+      {
+        "name": "Fatespinner",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "category": "creature"
+      },
+      {
+        "name": "Consecrated Sphinx",
+        "cmc": 6.0,
+        "type_line": "Creature \u2014 Sphinx",
+        "category": "creature"
+      },
+      {
+        "name": "Azor's Elocutors",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Human Advisor",
+        "category": "creature"
+      },
+      {
+        "name": "Linvala, Keeper of Silence",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Angel",
+        "category": "creature"
+      },
+      {
+        "name": "Soulless Jailer",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Golem",
+        "category": "creature"
+      },
+      {
+        "name": "Baird, Steward of Argive",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "category": "creature"
+      },
+      {
+        "name": "Jin-Gitaxias, Progress Tyrant",
+        "cmc": 7.0,
+        "type_line": "Legendary Creature \u2014 Phyrexian Praetor",
+        "category": "creature"
+      },
+      {
+        "name": "Strict Proctor",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Spirit Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Leonin Arbiter",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Cat Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "The Council of Four",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Human Noble",
+        "category": "creature"
+      },
+      {
+        "name": "Containment Priest",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Archivist of Oghma",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Halfling Cleric",
+        "category": "creature"
+      },
+      {
+        "name": "Elesh Norn, Grand Cenobite",
+        "cmc": 7.0,
+        "type_line": "Legendary Creature \u2014 Phyrexian Praetor",
+        "category": "creature"
+      },
+      {
+        "name": "Hullbreaker Horror",
+        "cmc": 7.0,
+        "type_line": "Creature \u2014 Kraken Horror",
+        "category": "creature"
+      },
+      {
+        "name": "Gold-Forged Thopteryx",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Dinosaur Thopter",
+        "category": "creature"
+      },
+      {
+        "name": "Vryn Wingmare",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Pegasus",
+        "category": "creature"
+      },
+      {
+        "name": "Negate",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Render Silent",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Silence",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Brainstorm",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Swan Song",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Force of Will",
+        "cmc": 5.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Arcane Denial",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Force of Negation",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Mana Leak",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Permission Denied",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Generous Gift",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Aetherize",
+        "cmc": 4.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Sphinx's Revelation",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "No More Lies",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "category": "instant"
+      },
+      {
+        "name": "Ponder",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Time Wipe",
+        "cmc": 5.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Windfall",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Idyllic Tutor",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Wrath of God",
+        "cmc": 4.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Austere Command",
+        "cmc": 6.0,
+        "type_line": "Sorcery",
+        "category": "sorcerie"
+      },
+      {
+        "name": "Mystic Remora",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Authority of the Consuls",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Land Tax",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Rest in Peace",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Sphere of Safety",
+        "cmc": 5.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Rule of Law",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Frozen Aether",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Stasis",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Deafening Silence",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Trouble in Pairs",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Back to Basics",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "category": "enchantment"
+      },
+      {
+        "name": "Teferi, Time Raveler",
+        "cmc": 3.0,
+        "type_line": "Legendary Planeswalker \u2014 Teferi",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Teferi, Hero of Dominaria",
+        "cmc": 5.0,
+        "type_line": "Legendary Planeswalker \u2014 Teferi",
+        "category": "planeswalker"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Azorius Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Talisman of Progress",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Thought Vessel",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Sapphire Medallion",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Winter Orb",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Sphere of Resistance",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Pearl Medallion",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Cursed Totem",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Norn's Annex",
+        "cmc": 5.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "category": "artifact"
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Glacial Fortress",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Hallowed Fountain",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island",
+        "category": "land"
+      },
+      {
+        "name": "Prairie Stream",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island",
+        "category": "land"
+      },
+      {
+        "name": "Reliquary Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Sea of Clouds",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Flooded Strand",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Deserted Beach",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Port Town",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Adarkar Wastes",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Azorius Chancery",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Temple of Enlightenment",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Nimbus Maze",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Mystic Gate",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "category": "land"
+      }
+    ],
+    "wincon_primary": "Establish hard stax lock (Winter Orb, Static Orb, Stasis effects) while breaking parity with Arbiter's cost reduction, win through concession or slow combat",
+    "wincon_backup": "Approach of the Second Sun; Azor's Elocutors; Rest in Peace + Helm of Obedience combo; Luminarch Ascension beats",
+    "budget_level": "optimized",
+    "avg_price_usd": 1859.0,
+    "num_decks_analyzed": 12763,
+    "source": "EDHREC Average Deck"
+  }
+]

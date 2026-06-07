@@ -11,6 +11,8 @@ import 'edhrec_service.dart';
 import 'format_staples_service.dart';
 import 'hate_cards_service.dart';
 import 'sinergia.dart';
+import 'theme_contextual_rules_service.dart';
+import 'commander_reference_profile_support.dart' as cmd_ref;
 
 class DeckOptimizerService {
   final String openAiKey;
@@ -20,14 +22,18 @@ class DeckOptimizerService {
   final MLKnowledgeService? _mlService;
   final FormatStaplesService? _staplesService;
   final HateCardsService? _hateService;
+  final ThemeContextualRulesService? _themeRulesService;
+  final dynamic _db;
 
   DeckOptimizerService(this.openAiKey, {dynamic db})
-      : synergyEngine = SynergyEngine(),
+      : _db = db,
+        synergyEngine = SynergyEngine(),
         edhrecService = EdhrecService(),
         _logService = db != null ? AiLogService(db) : null,
         _mlService = db != null ? MLKnowledgeService(db) : null,
         _staplesService = db != null ? FormatStaplesService(db) : null,
-        _hateService = db != null ? HateCardsService(db) : null;
+        _hateService = db != null ? HateCardsService(db) : null,
+        _themeRulesService = db != null ? ThemeContextualRulesService(db) : null;
 
   /// O fluxo principal de otimização
   Future<Map<String, dynamic>> optimizeDeck({
@@ -198,6 +204,46 @@ class DeckOptimizerService {
       if (hateContext != null) hateContext,
     ].join('\n');
 
+    // Buscar perfil do commander no PostgreSQL
+    // Buscar perfil do commander no PostgreSQL
+    String? commanderProfileText;
+    if (_db != null && commanders.isNotEmpty) {
+      try {
+        final profile = await cmd_ref.loadUsableCommanderReferenceProfile(
+          pool: _db,
+          commanderName: commanders.first,
+        );
+        if (profile != null) {
+          commanderProfileText = cmd_ref.buildCommanderReferenceProfilePrompt(profile);
+          Log.i('Commander profile loaded for: ${commanders.first}');
+        }
+      } catch (e) {
+        Log.w('Failed to load commander profile: $e');
+      }
+    }
+
+    // Buscar regras contextuais do tema
+    Map<String, dynamic>? themeRules;
+    if (_themeRulesService != null) {
+      try {
+        final rules = await _themeRulesService!.getRulesForArchetype(targetArchetype);
+        if (rules.isNotEmpty) {
+          themeRules = {
+            'theme': ThemeContextualRulesService.archetypeToTheme(targetArchetype),
+            'rules': rules.map((r) => {
+              'function': r.function,
+              'min': r.minCount,
+              'max': r.maxCount,
+              'priority': r.priority,
+            }).toList(),
+          };
+          Log.i('Theme rules loaded: ${rules.length} rules');
+        }
+      } catch (e) {
+        Log.w('Failed to load theme rules: $e');
+      }
+    }
+
     final optimizationResult = await _callOpenAI(
       deckList: currentCards.map((c) => c['name'].toString()).toList(),
       commanders: commanders,
@@ -215,6 +261,8 @@ class DeckOptimizerService {
       userId: userId,
       deckId: deckId,
       mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
+      commanderProfileText: commanderProfileText,
+      themeRules: themeRules,
     );
 
     return optimizationResult;
@@ -656,6 +704,8 @@ class DeckOptimizerService {
     String? userId,
     String? deckId,
     String? mlContext,
+    String? commanderProfileText,
+    Map<String, dynamic>? themeRules,
   }) async {
     final stopwatch = Stopwatch()..start();
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
@@ -687,32 +737,42 @@ class DeckOptimizerService {
     Log.d(
         'Trocas dinâmicas: $suggestedSwaps (baseado em $weakCount cartas fracas)');
 
-    final userPrompt = jsonEncode({
+    // Construir prompt com dados contextuais enriquecidos
+    final promptMap = <String, dynamic>{
       "commander": commanders.join(" & "),
       "archetype": archetype,
       "bracket": bracket,
-      "suggested_swaps": suggestedSwaps, // Número dinâmico de trocas
-      "constraints": {
+      "suggested_swaps": suggestedSwaps,
+      "constraints": <String, dynamic>{
         "keep_theme": keepTheme,
         if (detectedTheme != null) "deck_theme": detectedTheme,
         if (coreCards != null && coreCards.isNotEmpty) "core_cards": coreCards,
         "notes":
-            "Se keep_theme=true: NÃO mude o plano/tema do deck; preserve as core_cards (nunca remover). Preserve o papel funcional das trocas. Se não houver upgrade seguro, retorne MENOS swaps em vez de forçar sugestões ruins.",
+            "Se keep_theme=true: NÃO mude o plano/tema do deck; preserve as core_cards (nunca remover). Preserve o papel funcional das trocas.",
       },
-      "context": {
-        "statistically_weak_cards":
-            weakCandidates, // A IA vai olhar isso com carinho para cortar
-        "high_synergy_options":
-            synergyPool, // A IA vai escolher daqui para adicionar
+      "context": <String, dynamic>{
+        "statistically_weak_cards": weakCandidates,
+        "high_synergy_options": synergyPool,
         "commander_priority_options": priorityPool,
         "deterministic_swap_candidates": deterministicSwapCandidates,
         "format_staples": staplesPool,
-        if (metaEvidenceContext != null)
-          "meta_deck_evidence": metaEvidenceContext,
+        if (metaEvidenceContext != null) "meta_deck_evidence": metaEvidenceContext,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
-      "current_decklist": deckList
-    });
+      "current_decklist": deckList,
+    };
+
+    // Adicionar perfil do commander se disponível
+    if (commanderProfileText != null) {
+      promptMap["commander_profile"] = commanderProfileText;
+    }
+
+    // Adicionar regras temáticas se disponíveis
+    if (themeRules != null) {
+      promptMap["theme_rules"] = themeRules;
+    }
+
+    final userPrompt = jsonEncode(promptMap);
 
     try {
       final response = await http
@@ -850,23 +910,19 @@ class DeckOptimizerService {
     final userPrompt = jsonEncode({
       "commander": commanders.join(" & "),
       "archetype": archetype,
-      "bracket": bracket,
       "target_additions": targetAdditions,
       "constraints": {
         "keep_theme": keepTheme,
         if (detectedTheme != null) "deck_theme": detectedTheme,
         if (coreCards != null && coreCards.isNotEmpty) "core_cards": coreCards,
-        "notes":
-            "Se keep_theme=true: complete sem desviar do tema; preserve as core_cards (nunca sugerir remover).",
       },
       "context": {
         "high_synergy_options": synergyPool,
         "format_staples": staplesPool,
-        if (metaEvidenceContext != null)
-          "meta_deck_evidence": metaEvidenceContext,
+        if (metaEvidenceContext != null) "meta_deck_evidence": metaEvidenceContext,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
-      "current_decklist": deckList
+      "current_decklist": deckList,
     });
 
     try {

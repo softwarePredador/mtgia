@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-06-06T15:18:51.152298+00:00",
+  "dry_run": false,
+  "postgres_target": "143.198.230.247:5433/halder",
+  "requested_unique_names": 1241,
+  "postgres_cards_matched": 1425,
+  "sqlite_cache_alias_rows": 1260,
+  "unresolved_count": 18,
+  "unresolved_sample": [
+    "Bartolome del Presidio",
+    "Blazing Firesinger",
+    "Borrowed Knowledge",
+    "Choreographed Sparks",
+    "Fields of Strife",
+    "Flashback",
+    "Hardened Academic",
+    "Lorehold Archivist",
+    "Lorehold Charm",
+    "Mica, Reader of Ruins",
+    "Prismari Pianist",
+    "Pursue the Past",
+    "Renegade Bull",
+    "Resonating Lute",
+    "Tablet of Discovery",
+    "The Dawning Archaic",
+    "Turbulent Steppe",
+    "Worldfire 1 Lorehold, the Historian"
+  ],
+  "postgres_columns_present": [
+    "cmc",
+    "color_identity",
+    "colors",
+    "keywords",
+    "mana_cost",
+    "oracle_text",
+    "power",
+    "scryfall_id",
+    "toughness",
+    "type_line"
+  ],
+  "field_coverage": {
+    "mana_cost": 1173,
+    "oracle_text": 1423,
+    "colors": 990,
+    "color_identity": 1157,
+    "power": 443,
+    "toughness": 443,
+    "keywords": 564
+  }
+}

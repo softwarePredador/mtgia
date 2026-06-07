@@ -1,0 +1,3062 @@
+{
+  "Krenko, Mob Boss": {
+    "commander_name": "Krenko, Mob Boss",
+    "commander_cmc": 4.0,
+    "commander_type": "Legendary Creature \u2014 Goblin Warrior",
+    "commander_color_identity": [
+      "R"
+    ],
+    "avg_price_usd": 590.0,
+    "num_decks_avg": 40629,
+    "edhrec_url": "https://edhrec.com/commanders/krenko-mob-boss",
+    "deck_size": 99,
+    "cards": [
+      {
+        "name": "Goblin Ringleader",
+        "category": "creature",
+        "num_decks": 21505
+      },
+      {
+        "name": "Muxus, Goblin Grandee",
+        "category": "creature",
+        "num_decks": 20400
+      },
+      {
+        "name": "Goblin Instigator",
+        "category": "creature",
+        "num_decks": 18734
+      },
+      {
+        "name": "Legion Warboss",
+        "category": "creature",
+        "num_decks": 18043
+      },
+      {
+        "name": "Rundvelt Hordemaster",
+        "category": "creature",
+        "num_decks": 17984
+      },
+      {
+        "name": "Purphoros, God of the Forge",
+        "category": "creature",
+        "num_decks": 17097
+      },
+      {
+        "name": "Warren Instigator",
+        "category": "creature",
+        "num_decks": 16214
+      },
+      {
+        "name": "Goblin Lackey",
+        "category": "creature",
+        "num_decks": 15993
+      },
+      {
+        "name": "Kiki-Jiki, Mirror Breaker",
+        "category": "creature",
+        "num_decks": 15583
+      },
+      {
+        "name": "Battle Cry Goblin",
+        "category": "creature",
+        "num_decks": 15481
+      },
+      {
+        "name": "General Kreat, the Boltbringer",
+        "category": "creature",
+        "num_decks": 15447
+      },
+      {
+        "name": "Beetleback Chief",
+        "category": "creature",
+        "num_decks": 15249
+      },
+      {
+        "name": "Goblin Piledriver",
+        "category": "creature",
+        "num_decks": 14667
+      },
+      {
+        "name": "Mogg War Marshal",
+        "category": "creature",
+        "num_decks": 14599
+      },
+      {
+        "name": "Gempalm Incinerator",
+        "category": "creature",
+        "num_decks": 14518
+      },
+      {
+        "name": "Howlsquad Heavy",
+        "category": "creature",
+        "num_decks": 14495
+      },
+      {
+        "name": "Treasure Nabber",
+        "category": "creature",
+        "num_decks": 12768
+      },
+      {
+        "name": "Grenzo, Havoc Raiser",
+        "category": "creature",
+        "num_decks": 12496
+      },
+      {
+        "name": "Goro-Goro, Disciple of Ryusei",
+        "category": "creature",
+        "num_decks": 12476
+      },
+      {
+        "name": "Goblin Motivator",
+        "category": "creature",
+        "num_decks": 11119
+      },
+      {
+        "name": "Volley Veteran",
+        "category": "creature",
+        "num_decks": 10621
+      },
+      {
+        "name": "Searslicer Goblin",
+        "category": "creature",
+        "num_decks": 10609
+      },
+      {
+        "name": "Siege-Gang Lieutenant",
+        "category": "creature",
+        "num_decks": 10561
+      },
+      {
+        "name": "Moria Marauder",
+        "category": "creature",
+        "num_decks": 10509
+      },
+      {
+        "name": "Marvin, Murderous Mimic",
+        "category": "creature",
+        "num_decks": 10221
+      },
+      {
+        "name": "Squee, Dubious Monarch",
+        "category": "creature",
+        "num_decks": 9822
+      },
+      {
+        "name": "Goblin Sharpshooter",
+        "category": "creature",
+        "num_decks": 9812
+      },
+      {
+        "name": "Legion Loyalist",
+        "category": "creature",
+        "num_decks": 9333
+      },
+      {
+        "name": "Brash Taunter",
+        "category": "creature",
+        "num_decks": 9285
+      },
+      {
+        "name": "Goblin Lookout",
+        "category": "creature",
+        "num_decks": 9057
+      },
+      {
+        "name": "Torch Courier",
+        "category": "creature",
+        "num_decks": 8935
+      },
+      {
+        "name": "Battle Hymn",
+        "category": "instant",
+        "num_decks": 20792
+      },
+      {
+        "name": "Chaos Warp",
+        "category": "instant",
+        "num_decks": 20769
+      },
+      {
+        "name": "Abrade",
+        "category": "instant",
+        "num_decks": 15464
+      },
+      {
+        "name": "Massive Raid",
+        "category": "instant",
+        "num_decks": 15013
+      },
+      {
+        "name": "Thrill of Possibility",
+        "category": "instant",
+        "num_decks": 12306
+      },
+      {
+        "name": "Lightning Bolt",
+        "category": "instant",
+        "num_decks": 11728
+      },
+      {
+        "name": "Goblin Surprise",
+        "category": "instant",
+        "num_decks": 8878
+      },
+      {
+        "name": "Hordeling Outburst",
+        "category": "sorcerie",
+        "num_decks": 18685
+      },
+      {
+        "name": "Blasphemous Act",
+        "category": "sorcerie",
+        "num_decks": 14488
+      },
+      {
+        "name": "Faithless Looting",
+        "category": "sorcerie",
+        "num_decks": 14485
+      },
+      {
+        "name": "Vandalblast",
+        "category": "sorcerie",
+        "num_decks": 14407
+      },
+      {
+        "name": "Goblin Grenade",
+        "category": "sorcerie",
+        "num_decks": 14072
+      },
+      {
+        "name": "Empty the Warrens",
+        "category": "sorcerie",
+        "num_decks": 12734
+      },
+      {
+        "name": "Mob Justice",
+        "category": "sorcerie",
+        "num_decks": 9329
+      },
+      {
+        "name": "Goblin Negotiation",
+        "category": "sorcerie",
+        "num_decks": 8251
+      },
+      {
+        "name": "Shared Animosity",
+        "category": "enchantment",
+        "num_decks": 20929
+      },
+      {
+        "name": "Blood Moon",
+        "category": "enchantment",
+        "num_decks": 13617
+      },
+      {
+        "name": "Boggart Shenanigans",
+        "category": "enchantment",
+        "num_decks": 12240
+      },
+      {
+        "name": "Raid Bombardment",
+        "category": "enchantment",
+        "num_decks": 11894
+      },
+      {
+        "name": "Quest for the Goblin Lord",
+        "category": "enchantment",
+        "num_decks": 11391
+      },
+      {
+        "name": "Rising of the Day",
+        "category": "enchantment",
+        "num_decks": 10816
+      },
+      {
+        "name": "Fervor",
+        "category": "enchantment",
+        "num_decks": 9332
+      },
+      {
+        "name": "Sol Ring",
+        "category": "artifact",
+        "num_decks": 34408
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "category": "artifact",
+        "num_decks": 21861
+      },
+      {
+        "name": "Arcane Signet",
+        "category": "artifact",
+        "num_decks": 21316
+      },
+      {
+        "name": "Lightning Greaves",
+        "category": "artifact",
+        "num_decks": 19695
+      },
+      {
+        "name": "Ruby Medallion",
+        "category": "artifact",
+        "num_decks": 19630
+      },
+      {
+        "name": "Sting, the Glinting Dagger",
+        "category": "artifact",
+        "num_decks": 13413
+      },
+      {
+        "name": "Thousand-Year Elixir",
+        "category": "artifact",
+        "num_decks": 13036
+      },
+      {
+        "name": "Hazoret's Monument",
+        "category": "artifact",
+        "num_decks": 11817
+      },
+      {
+        "name": "Coat of Arms",
+        "category": "artifact",
+        "num_decks": 11207
+      },
+      {
+        "name": "Patriar's Seal",
+        "category": "artifact",
+        "num_decks": 10936
+      },
+      {
+        "name": "Staff of Domination",
+        "category": "artifact",
+        "num_decks": 10866
+      },
+      {
+        "name": "Thornbite Staff",
+        "category": "artifact",
+        "num_decks": 10250
+      },
+      {
+        "name": "Castle Embereth",
+        "category": "land",
+        "num_decks": 15758
+      },
+      {
+        "name": "Path of Ancestry",
+        "category": "land",
+        "num_decks": 12201
+      },
+      {
+        "name": "Three Tree City",
+        "category": "land",
+        "num_decks": 11189
+      },
+      {
+        "name": "Den of the Bugbear",
+        "category": "land",
+        "num_decks": 10983
+      },
+      {
+        "name": "Arena of Glory",
+        "category": "land",
+        "num_decks": 9738
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      },
+      {
+        "name": "Mountain",
+        "category": "land",
+        "num_decks": 39633
+      }
+    ]
+  },
+  "Winota, Joiner of Forces": {
+    "commander_name": "Winota, Joiner of Forces",
+    "commander_cmc": 4.0,
+    "commander_type": "Legendary Creature \u2014 Human Warrior",
+    "commander_color_identity": [
+      "R",
+      "W"
+    ],
+    "avg_price_usd": 1298.0,
+    "num_decks_avg": 12897,
+    "edhrec_url": "https://edhrec.com/commanders/winota-joiner-of-forces",
+    "deck_size": 99,
+    "cards": [
+      {
+        "name": "Goblin Rabblemaster",
+        "category": "creature",
+        "num_decks": 6622
+      },
+      {
+        "name": "Spirit of the Labyrinth",
+        "category": "creature",
+        "num_decks": 6553
+      },
+      {
+        "name": "Soulless Jailer",
+        "category": "creature",
+        "num_decks": 6502
+      },
+      {
+        "name": "Rograkh, Son of Rohgahh",
+        "category": "creature",
+        "num_decks": 6473
+      },
+      {
+        "name": "Rionya, Fire Dancer",
+        "category": "creature",
+        "num_decks": 6246
+      },
+      {
+        "name": "Hope of Ghirapur",
+        "category": "creature",
+        "num_decks": 6229
+      },
+      {
+        "name": "Alseid of Life's Bounty",
+        "category": "creature",
+        "num_decks": 6180
+      },
+      {
+        "name": "Simian Spirit Guide",
+        "category": "creature",
+        "num_decks": 6143
+      },
+      {
+        "name": "Ethersworn Canonist",
+        "category": "creature",
+        "num_decks": 6120
+      },
+      {
+        "name": "Esper Sentinel",
+        "category": "creature",
+        "num_decks": 6037
+      },
+      {
+        "name": "Cathar Commando",
+        "category": "creature",
+        "num_decks": 5981
+      },
+      {
+        "name": "Mother of Runes",
+        "category": "creature",
+        "num_decks": 5922
+      },
+      {
+        "name": "Goldnight Commander",
+        "category": "creature",
+        "num_decks": 5867
+      },
+      {
+        "name": "Giver of Runes",
+        "category": "creature",
+        "num_decks": 5383
+      },
+      {
+        "name": "Magus of the Moon",
+        "category": "creature",
+        "num_decks": 5366
+      },
+      {
+        "name": "Ragavan, Nimble Pilferer",
+        "category": "creature",
+        "num_decks": 5363
+      },
+      {
+        "name": "Phyrexian Walker",
+        "category": "creature",
+        "num_decks": 5309
+      },
+      {
+        "name": "Phoenix Chick",
+        "category": "creature",
+        "num_decks": 5195
+      },
+      {
+        "name": "Imperial Recruiter",
+        "category": "creature",
+        "num_decks": 5099
+      },
+      {
+        "name": "Skyclave Apparition",
+        "category": "creature",
+        "num_decks": 5078
+      },
+      {
+        "name": "Myrel, Shield of Argive",
+        "category": "creature",
+        "num_decks": 5052
+      },
+      {
+        "name": "Thalia, Heretic Cathar",
+        "category": "creature",
+        "num_decks": 4991
+      },
+      {
+        "name": "Witch Enchanter",
+        "category": "creature",
+        "num_decks": 4959
+      },
+      {
+        "name": "Sanctum Prelate",
+        "category": "creature",
+        "num_decks": 4892
+      },
+      {
+        "name": "Phyrexian Revoker",
+        "category": "creature",
+        "num_decks": 4825
+      },
+      {
+        "name": "Skrelv, Defector Mite",
+        "category": "creature",
+        "num_decks": 4753
+      },
+      {
+        "name": "Ranger-Captain of Eos",
+        "category": "creature",
+        "num_decks": 4730
+      },
+      {
+        "name": "Archivist of Oghma",
+        "category": "creature",
+        "num_decks": 4718
+      },
+      {
+        "name": "Greymond, Avacyn's Stalwart",
+        "category": "creature",
+        "num_decks": 4698
+      },
+      {
+        "name": "Dauntless Dismantler",
+        "category": "creature",
+        "num_decks": 4689
+      },
+      {
+        "name": "Alexios, Deimos of Kosmos",
+        "category": "creature",
+        "num_decks": 4684
+      },
+      {
+        "name": "Geist-Honored Monk",
+        "category": "creature",
+        "num_decks": 4677
+      },
+      {
+        "name": "Selfless Spirit",
+        "category": "creature",
+        "num_decks": 4660
+      },
+      {
+        "name": "Captain of the Watch",
+        "category": "creature",
+        "num_decks": 4586
+      },
+      {
+        "name": "Recruiter of the Guard",
+        "category": "creature",
+        "num_decks": 4287
+      },
+      {
+        "name": "Vryn Wingmare",
+        "category": "creature",
+        "num_decks": 4282
+      },
+      {
+        "name": "Aven Interrupter",
+        "category": "creature",
+        "num_decks": 4040
+      },
+      {
+        "name": "\u00c9omer, King of Rohan",
+        "category": "creature",
+        "num_decks": 3908
+      },
+      {
+        "name": "Charismatic Conqueror",
+        "category": "creature",
+        "num_decks": 3905
+      },
+      {
+        "name": "Zealous Conscripts",
+        "category": "creature",
+        "num_decks": 3731
+      },
+      {
+        "name": "Evangel of Heliod",
+        "category": "creature",
+        "num_decks": 3721
+      },
+      {
+        "name": "Serra Ascendant",
+        "category": "creature",
+        "num_decks": 3698
+      },
+      {
+        "name": "Voice of Victory",
+        "category": "creature",
+        "num_decks": 3395
+      },
+      {
+        "name": "Kiki-Jiki, Mirror Breaker",
+        "category": "creature",
+        "num_decks": 3338
+      },
+      {
+        "name": "Cliffside Rescuer",
+        "category": "creature",
+        "num_decks": 3222
+      },
+      {
+        "name": "Pia and Kiran Nalaar",
+        "category": "creature",
+        "num_decks": 3217
+      },
+      {
+        "name": "Deflecting Swat",
+        "category": "instant",
+        "num_decks": 5032
+      },
+      {
+        "name": "Silence",
+        "category": "instant",
+        "num_decks": 4949
+      },
+      {
+        "name": "Flare of Fortitude",
+        "category": "instant",
+        "num_decks": 3955
+      },
+      {
+        "name": "Red Elemental Blast",
+        "category": "instant",
+        "num_decks": 3575
+      },
+      {
+        "name": "Boros Charm",
+        "category": "instant",
+        "num_decks": 3368
+      },
+      {
+        "name": "Abrade",
+        "category": "instant",
+        "num_decks": 3286
+      },
+      {
+        "name": "Flawless Maneuver",
+        "category": "instant",
+        "num_decks": 2637
+      },
+      {
+        "name": "Raise the Alarm",
+        "category": "instant",
+        "num_decks": 2467
+      },
+      {
+        "name": "Shatterskull Smashing",
+        "category": "sorcerie",
+        "num_decks": 2439
+      },
+      {
+        "name": "Blasphemous Act",
+        "category": "sorcerie",
+        "num_decks": 2044
+      },
+      {
+        "name": "Dragon Fodder",
+        "category": "sorcerie",
+        "num_decks": 1937
+      },
+      {
+        "name": "High Noon",
+        "category": "enchantment",
+        "num_decks": 5268
+      },
+      {
+        "name": "Touch the Spirit Realm",
+        "category": "enchantment",
+        "num_decks": 3080
+      },
+      {
+        "name": "Windcrag Siege",
+        "category": "enchantment",
+        "num_decks": 2747
+      },
+      {
+        "name": "Breath of Fury",
+        "category": "enchantment",
+        "num_decks": 2719
+      },
+      {
+        "name": "Sol Ring",
+        "category": "artifact",
+        "num_decks": 11925
+      },
+      {
+        "name": "Arcane Signet",
+        "category": "artifact",
+        "num_decks": 8961
+      },
+      {
+        "name": "Talisman of Conviction",
+        "category": "artifact",
+        "num_decks": 6395
+      },
+      {
+        "name": "Boros Signet",
+        "category": "artifact",
+        "num_decks": 4383
+      },
+      {
+        "name": "Lotus Petal",
+        "category": "artifact",
+        "num_decks": 4336
+      },
+      {
+        "name": "Fellwar Stone",
+        "category": "artifact",
+        "num_decks": 2640
+      },
+      {
+        "name": "Command Tower",
+        "category": "land",
+        "num_decks": 11713
+      },
+      {
+        "name": "Battlefield Forge",
+        "category": "land",
+        "num_decks": 9298
+      },
+      {
+        "name": "Sacred Foundry",
+        "category": "land",
+        "num_decks": 7176
+      },
+      {
+        "name": "Clifftop Retreat",
+        "category": "land",
+        "num_decks": 6886
+      },
+      {
+        "name": "Sokenzan, Crucible of Defiance",
+        "category": "land",
+        "num_decks": 6343
+      },
+      {
+        "name": "Spectator Seating",
+        "category": "land",
+        "num_decks": 6166
+      },
+      {
+        "name": "Arid Mesa",
+        "category": "land",
+        "num_decks": 5686
+      },
+      {
+        "name": "Blinkmoth Nexus",
+        "category": "land",
+        "num_decks": 5184
+      },
+      {
+        "name": "Needleverge Pathway",
+        "category": "land",
+        "num_decks": 5009
+      },
+      {
+        "name": "Witch Enchanter",
+        "category": "land",
+        "num_decks": 4959
+      },
+      {
+        "name": "Sunbaked Canyon",
+        "category": "land",
+        "num_decks": 4857
+      },
+      {
+        "name": "Rugged Prairie",
+        "category": "land",
+        "num_decks": 4525
+      },
+      {
+        "name": "Furycalm Snarl",
+        "category": "land",
+        "num_decks": 4424
+      },
+      {
+        "name": "Exotic Orchard",
+        "category": "land",
+        "num_decks": 4375
+      },
+      {
+        "name": "Eiganjo, Seat of the Empire",
+        "category": "land",
+        "num_decks": 4281
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      },
+      {
+        "name": "Plains",
+        "category": "land",
+        "num_decks": 12679
+      }
+    ]
+  },
+  "Kinnan, Bonder Prodigy": {
+    "commander_name": "Kinnan, Bonder Prodigy",
+    "commander_cmc": 2.0,
+    "commander_type": "Legendary Creature \u2014 Human Druid",
+    "commander_color_identity": [
+      "G",
+      "U"
+    ],
+    "avg_price_usd": 4606.0,
+    "num_decks_avg": 19530,
+    "edhrec_url": "https://edhrec.com/commanders/kinnan-bonder-prodigy",
+    "deck_size": 99,
+    "cards": [
+      {
+        "name": "Tidespout Tyrant",
+        "category": "creature",
+        "num_decks": 10199
+      },
+      {
+        "name": "Elvish Spirit Guide",
+        "category": "creature",
+        "num_decks": 9832
+      },
+      {
+        "name": "Bloom Tender",
+        "category": "creature",
+        "num_decks": 9737
+      },
+      {
+        "name": "Endurance",
+        "category": "creature",
+        "num_decks": 9587
+      },
+      {
+        "name": "Wandering Archaic",
+        "category": "creature",
+        "num_decks": 9415
+      },
+      {
+        "name": "Colossal Skyturtle",
+        "category": "creature",
+        "num_decks": 7994
+      },
+      {
+        "name": "Spellskite",
+        "category": "creature",
+        "num_decks": 7625
+      },
+      {
+        "name": "Clever Impersonator",
+        "category": "creature",
+        "num_decks": 7395
+      },
+      {
+        "name": "Valley Floodcaller",
+        "category": "creature",
+        "num_decks": 7232
+      },
+      {
+        "name": "Void Winnower",
+        "category": "creature",
+        "num_decks": 7050
+      },
+      {
+        "name": "Faerie Mastermind",
+        "category": "creature",
+        "num_decks": 7020
+      },
+      {
+        "name": "Walking Ballista",
+        "category": "creature",
+        "num_decks": 6189
+      },
+      {
+        "name": "Drift of Phantasms",
+        "category": "creature",
+        "num_decks": 6137
+      },
+      {
+        "name": "High Fae Trickster",
+        "category": "creature",
+        "num_decks": 5678
+      },
+      {
+        "name": "Hydroelectric Specimen",
+        "category": "creature",
+        "num_decks": 5507
+      },
+      {
+        "name": "Paradise Druid",
+        "category": "creature",
+        "num_decks": 4862
+      },
+      {
+        "name": "Manglehorn",
+        "category": "creature",
+        "num_decks": 4778
+      },
+      {
+        "name": "Glen Elendra Archmage",
+        "category": "creature",
+        "num_decks": 4579
+      },
+      {
+        "name": "Koma, Cosmos Serpent",
+        "category": "creature",
+        "num_decks": 4427
+      },
+      {
+        "name": "Flesh Duplicate",
+        "category": "creature",
+        "num_decks": 4278
+      },
+      {
+        "name": "Gilded Drake",
+        "category": "creature",
+        "num_decks": 4270
+      },
+      {
+        "name": "Wan Shi Tong, Librarian",
+        "category": "creature",
+        "num_decks": 4055
+      },
+      {
+        "name": "Devoted Druid",
+        "category": "creature",
+        "num_decks": 3873
+      },
+      {
+        "name": "Mockingbird",
+        "category": "creature",
+        "num_decks": 3845
+      },
+      {
+        "name": "Incubation Druid",
+        "category": "creature",
+        "num_decks": 3679
+      },
+      {
+        "name": "Armored Scrapgorger",
+        "category": "creature",
+        "num_decks": 3666
+      },
+      {
+        "name": "Thorn Mammoth",
+        "category": "creature",
+        "num_decks": 3561
+      },
+      {
+        "name": "Eternal Witness",
+        "category": "creature",
+        "num_decks": 3485
+      },
+      {
+        "name": "Ilysian Caryatid",
+        "category": "creature",
+        "num_decks": 3392
+      },
+      {
+        "name": "Chord of Calling",
+        "category": "instant",
+        "num_decks": 11018
+      },
+      {
+        "name": "Mental Misstep",
+        "category": "instant",
+        "num_decks": 10586
+      },
+      {
+        "name": "Mindbreak Trap",
+        "category": "instant",
+        "num_decks": 10038
+      },
+      {
+        "name": "Sink into Stupor",
+        "category": "instant",
+        "num_decks": 8574
+      },
+      {
+        "name": "Crop Rotation",
+        "category": "instant",
+        "num_decks": 8323
+      },
+      {
+        "name": "Mana Drain",
+        "category": "instant",
+        "num_decks": 8234
+      },
+      {
+        "name": "Veil of Summer",
+        "category": "instant",
+        "num_decks": 7982
+      },
+      {
+        "name": "Dramatic Reversal",
+        "category": "instant",
+        "num_decks": 7188
+      },
+      {
+        "name": "Counterspell",
+        "category": "instant",
+        "num_decks": 6678
+      },
+      {
+        "name": "Dispel",
+        "category": "instant",
+        "num_decks": 5934
+      },
+      {
+        "name": "Chain of Vapor",
+        "category": "instant",
+        "num_decks": 5702
+      },
+      {
+        "name": "Pongify",
+        "category": "instant",
+        "num_decks": 5697
+      },
+      {
+        "name": "Mystical Tutor",
+        "category": "instant",
+        "num_decks": 5624
+      },
+      {
+        "name": "Force of Vigor",
+        "category": "instant",
+        "num_decks": 5025
+      },
+      {
+        "name": "Into the Flood Maw",
+        "category": "instant",
+        "num_decks": 4580
+      },
+      {
+        "name": "Whir of Invention",
+        "category": "instant",
+        "num_decks": 4483
+      },
+      {
+        "name": "Misdirection",
+        "category": "instant",
+        "num_decks": 4408
+      },
+      {
+        "name": "Green Sun's Zenith",
+        "category": "sorcerie",
+        "num_decks": 10235
+      },
+      {
+        "name": "Fabricate",
+        "category": "sorcerie",
+        "num_decks": 9468
+      },
+      {
+        "name": "Transmute Artifact",
+        "category": "sorcerie",
+        "num_decks": 7716
+      },
+      {
+        "name": "Nature's Rhythm",
+        "category": "sorcerie",
+        "num_decks": 7141
+      },
+      {
+        "name": "Reshape",
+        "category": "sorcerie",
+        "num_decks": 2693
+      },
+      {
+        "name": "Freed from the Real",
+        "category": "enchantment",
+        "num_decks": 6778
+      },
+      {
+        "name": "Sylvan Library",
+        "category": "enchantment",
+        "num_decks": 5527
+      },
+      {
+        "name": "Mirrormade",
+        "category": "enchantment",
+        "num_decks": 5025
+      },
+      {
+        "name": "Pemmin's Aura",
+        "category": "enchantment",
+        "num_decks": 4683
+      },
+      {
+        "name": "Copy Artifact",
+        "category": "enchantment",
+        "num_decks": 4291
+      },
+      {
+        "name": "Tezzeret the Seeker",
+        "category": "planeswalker",
+        "num_decks": 10189
+      },
+      {
+        "name": "Sol Ring",
+        "category": "artifact",
+        "num_decks": 18858
+      },
+      {
+        "name": "Arcane Signet",
+        "category": "artifact",
+        "num_decks": 18473
+      },
+      {
+        "name": "Basalt Monolith",
+        "category": "artifact",
+        "num_decks": 17240
+      },
+      {
+        "name": "Talisman of Curiosity",
+        "category": "artifact",
+        "num_decks": 16052
+      },
+      {
+        "name": "Fellwar Stone",
+        "category": "artifact",
+        "num_decks": 15014
+      },
+      {
+        "name": "Simic Signet",
+        "category": "artifact",
+        "num_decks": 13981
+      },
+      {
+        "name": "Springleaf Drum",
+        "category": "artifact",
+        "num_decks": 13412
+      },
+      {
+        "name": "Mox Amber",
+        "category": "artifact",
+        "num_decks": 13104
+      },
+      {
+        "name": "Lotus Petal",
+        "category": "artifact",
+        "num_decks": 12466
+      },
+      {
+        "name": "Mox Opal",
+        "category": "artifact",
+        "num_decks": 10772
+      },
+      {
+        "name": "Moonsilver Key",
+        "category": "artifact",
+        "num_decks": 10250
+      },
+      {
+        "name": "The One Ring",
+        "category": "artifact",
+        "num_decks": 9856
+      },
+      {
+        "name": "Mox Diamond",
+        "category": "artifact",
+        "num_decks": 9846
+      },
+      {
+        "name": "Grim Monolith",
+        "category": "artifact",
+        "num_decks": 8666
+      },
+      {
+        "name": "Thought Vessel",
+        "category": "artifact",
+        "num_decks": 3402
+      },
+      {
+        "name": "Command Tower",
+        "category": "land",
+        "num_decks": 18354
+      },
+      {
+        "name": "Breeding Pool",
+        "category": "land",
+        "num_decks": 15459
+      },
+      {
+        "name": "Yavimaya Coast",
+        "category": "land",
+        "num_decks": 15049
+      },
+      {
+        "name": "Rejuvenating Springs",
+        "category": "land",
+        "num_decks": 13845
+      },
+      {
+        "name": "Misty Rainforest",
+        "category": "land",
+        "num_decks": 13638
+      },
+      {
+        "name": "Boseiju, Who Endures",
+        "category": "land",
+        "num_decks": 12631
+      },
+      {
+        "name": "Waterlogged Grove",
+        "category": "land",
+        "num_decks": 12141
+      },
+      {
+        "name": "Otawara, Soaring City",
+        "category": "land",
+        "num_decks": 12090
+      },
+      {
+        "name": "Treasure Vault",
+        "category": "land",
+        "num_decks": 11209
+      },
+      {
+        "name": "Tropical Island",
+        "category": "land",
+        "num_decks": 11112
+      },
+      {
+        "name": "City of Brass",
+        "category": "land",
+        "num_decks": 10690
+      },
+      {
+        "name": "Gemstone Caverns",
+        "category": "land",
+        "num_decks": 10548
+      },
+      {
+        "name": "Mana Confluence",
+        "category": "land",
+        "num_decks": 10251
+      },
+      {
+        "name": "Flooded Strand",
+        "category": "land",
+        "num_decks": 10020
+      },
+      {
+        "name": "Polluted Delta",
+        "category": "land",
+        "num_decks": 9473
+      },
+      {
+        "name": "Scalding Tarn",
+        "category": "land",
+        "num_decks": 9401
+      },
+      {
+        "name": "Gaea's Cradle",
+        "category": "land",
+        "num_decks": 8788
+      },
+      {
+        "name": "Sink into Stupor",
+        "category": "land",
+        "num_decks": 8574
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 17507
+      }
+    ]
+  },
+  "Urza, Lord High Artificer": {
+    "commander_name": "Urza, Lord High Artificer",
+    "commander_cmc": 4.0,
+    "commander_type": "Legendary Creature \u2014 Human Artificer",
+    "commander_color_identity": [
+      "U"
+    ],
+    "avg_price_usd": 3145.0,
+    "num_decks_avg": 19183,
+    "edhrec_url": "https://edhrec.com/commanders/urza-lord-high-artificer",
+    "deck_size": 99,
+    "cards": [
+      {
+        "name": "The Reality Chip",
+        "category": "creature",
+        "num_decks": 8645
+      },
+      {
+        "name": "Phyrexian Metamorph",
+        "category": "creature",
+        "num_decks": 8504
+      },
+      {
+        "name": "Spellskite",
+        "category": "creature",
+        "num_decks": 7785
+      },
+      {
+        "name": "Emry, Lurker of the Loch",
+        "category": "creature",
+        "num_decks": 7732
+      },
+      {
+        "name": "Ornithopter",
+        "category": "creature",
+        "num_decks": 7123
+      },
+      {
+        "name": "Padeem, Consul of Innovation",
+        "category": "creature",
+        "num_decks": 7109
+      },
+      {
+        "name": "Displacer Kitten",
+        "category": "creature",
+        "num_decks": 5715
+      },
+      {
+        "name": "Thought Monitor",
+        "category": "creature",
+        "num_decks": 5265
+      },
+      {
+        "name": "Trinket Mage",
+        "category": "creature",
+        "num_decks": 4912
+      },
+      {
+        "name": "Walking Ballista",
+        "category": "creature",
+        "num_decks": 4652
+      },
+      {
+        "name": "Shimmer Myr",
+        "category": "creature",
+        "num_decks": 4597
+      },
+      {
+        "name": "Vedalken Archmage",
+        "category": "creature",
+        "num_decks": 4539
+      },
+      {
+        "name": "Tribute Mage",
+        "category": "creature",
+        "num_decks": 4440
+      },
+      {
+        "name": "Liberator, Urza's Battlethopter",
+        "category": "creature",
+        "num_decks": 3911
+      },
+      {
+        "name": "Trophy Mage",
+        "category": "creature",
+        "num_decks": 3623
+      },
+      {
+        "name": "Kappa Cannoneer",
+        "category": "creature",
+        "num_decks": 3487
+      },
+      {
+        "name": "Muddle the Mixture",
+        "category": "instant",
+        "num_decks": 7615
+      },
+      {
+        "name": "Force of Negation",
+        "category": "instant",
+        "num_decks": 7590
+      },
+      {
+        "name": "Brainstorm",
+        "category": "instant",
+        "num_decks": 7210
+      },
+      {
+        "name": "Pongify",
+        "category": "instant",
+        "num_decks": 6657
+      },
+      {
+        "name": "Pact of Negation",
+        "category": "instant",
+        "num_decks": 6506
+      },
+      {
+        "name": "Flusterstorm",
+        "category": "instant",
+        "num_decks": 6336
+      },
+      {
+        "name": "Negate",
+        "category": "instant",
+        "num_decks": 6331
+      },
+      {
+        "name": "Sink into Stupor",
+        "category": "instant",
+        "num_decks": 5242
+      },
+      {
+        "name": "Mental Misstep",
+        "category": "instant",
+        "num_decks": 4906
+      },
+      {
+        "name": "Rapid Hybridization",
+        "category": "instant",
+        "num_decks": 4690
+      },
+      {
+        "name": "Arcane Denial",
+        "category": "instant",
+        "num_decks": 4653
+      },
+      {
+        "name": "Mindbreak Trap",
+        "category": "instant",
+        "num_decks": 4302
+      },
+      {
+        "name": "Resculpt",
+        "category": "instant",
+        "num_decks": 3926
+      },
+      {
+        "name": "Dispel",
+        "category": "instant",
+        "num_decks": 3768
+      },
+      {
+        "name": "Narset's Reversal",
+        "category": "instant",
+        "num_decks": 3551
+      },
+      {
+        "name": "Chain of Vapor",
+        "category": "instant",
+        "num_decks": 3481
+      },
+      {
+        "name": "Reshape",
+        "category": "sorcerie",
+        "num_decks": 7763
+      },
+      {
+        "name": "Windfall",
+        "category": "sorcerie",
+        "num_decks": 5346
+      },
+      {
+        "name": "Ponder",
+        "category": "sorcerie",
+        "num_decks": 5271
+      },
+      {
+        "name": "Thoughtcast",
+        "category": "sorcerie",
+        "num_decks": 5068
+      },
+      {
+        "name": "Merchant Scroll",
+        "category": "sorcerie",
+        "num_decks": 4590
+      },
+      {
+        "name": "Efficient Construction",
+        "category": "enchantment",
+        "num_decks": 4413
+      },
+      {
+        "name": "Back to Basics",
+        "category": "enchantment",
+        "num_decks": 4248
+      },
+      {
+        "name": "Thopter Spy Network",
+        "category": "enchantment",
+        "num_decks": 4202
+      },
+      {
+        "name": "Power Artifact",
+        "category": "enchantment",
+        "num_decks": 4093
+      },
+      {
+        "name": "Tezzeret the Seeker",
+        "category": "planeswalker",
+        "num_decks": 9224
+      },
+      {
+        "name": "Karn, the Great Creator",
+        "category": "planeswalker",
+        "num_decks": 3920
+      },
+      {
+        "name": "Sol Ring",
+        "category": "artifact",
+        "num_decks": 18166
+      },
+      {
+        "name": "Arcane Signet",
+        "category": "artifact",
+        "num_decks": 12367
+      },
+      {
+        "name": "Everflowing Chalice",
+        "category": "artifact",
+        "num_decks": 11092
+      },
+      {
+        "name": "Basalt Monolith",
+        "category": "artifact",
+        "num_decks": 10892
+      },
+      {
+        "name": "Lotus Petal",
+        "category": "artifact",
+        "num_decks": 9282
+      },
+      {
+        "name": "Winter Orb",
+        "category": "artifact",
+        "num_decks": 8854
+      },
+      {
+        "name": "Mystic Forge",
+        "category": "artifact",
+        "num_decks": 8417
+      },
+      {
+        "name": "Aether Spellbomb",
+        "category": "artifact",
+        "num_decks": 8337
+      },
+      {
+        "name": "Rings of Brighthearth",
+        "category": "artifact",
+        "num_decks": 8224
+      },
+      {
+        "name": "Mox Opal",
+        "category": "artifact",
+        "num_decks": 7959
+      },
+      {
+        "name": "Manifold Key",
+        "category": "artifact",
+        "num_decks": 7402
+      },
+      {
+        "name": "Thought Vessel",
+        "category": "artifact",
+        "num_decks": 7195
+      },
+      {
+        "name": "Howling Mine",
+        "category": "artifact",
+        "num_decks": 6803
+      },
+      {
+        "name": "Static Orb",
+        "category": "artifact",
+        "num_decks": 6711
+      },
+      {
+        "name": "Welding Jar",
+        "category": "artifact",
+        "num_decks": 6618
+      },
+      {
+        "name": "Voltaic Key",
+        "category": "artifact",
+        "num_decks": 6178
+      },
+      {
+        "name": "Mind Stone",
+        "category": "artifact",
+        "num_decks": 5942
+      },
+      {
+        "name": "Lightning Greaves",
+        "category": "artifact",
+        "num_decks": 5791
+      },
+      {
+        "name": "Codex Shredder",
+        "category": "artifact",
+        "num_decks": 5512
+      },
+      {
+        "name": "Fellwar Stone",
+        "category": "artifact",
+        "num_decks": 5071
+      },
+      {
+        "name": "Urza's Bauble",
+        "category": "artifact",
+        "num_decks": 5036
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "category": "artifact",
+        "num_decks": 5024
+      },
+      {
+        "name": "Grim Monolith",
+        "category": "artifact",
+        "num_decks": 4986
+      },
+      {
+        "name": "Jeweled Amulet",
+        "category": "artifact",
+        "num_decks": 4726
+      },
+      {
+        "name": "Spellbook",
+        "category": "artifact",
+        "num_decks": 4384
+      },
+      {
+        "name": "Urza's Saga",
+        "category": "land",
+        "num_decks": 10814
+      },
+      {
+        "name": "Inventors' Fair",
+        "category": "land",
+        "num_decks": 9993
+      },
+      {
+        "name": "Academy Ruins",
+        "category": "land",
+        "num_decks": 8504
+      },
+      {
+        "name": "Darksteel Citadel",
+        "category": "land",
+        "num_decks": 8388
+      },
+      {
+        "name": "Otawara, Soaring City",
+        "category": "land",
+        "num_decks": 7531
+      },
+      {
+        "name": "Reliquary Tower",
+        "category": "land",
+        "num_decks": 6937
+      },
+      {
+        "name": "Buried Ruin",
+        "category": "land",
+        "num_decks": 6476
+      },
+      {
+        "name": "Mystic Sanctuary",
+        "category": "land",
+        "num_decks": 6280
+      },
+      {
+        "name": "Sink into Stupor",
+        "category": "land",
+        "num_decks": 5242
+      },
+      {
+        "name": "Gemstone Caverns",
+        "category": "land",
+        "num_decks": 4464
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 16888
+      }
+    ]
+  },
+  "Atraxa, Praetors' Voice": {
+    "commander_name": "Atraxa, Praetors' Voice",
+    "commander_cmc": 4.0,
+    "commander_type": "Legendary Creature \u2014 Phyrexian Angel Horror",
+    "commander_color_identity": [
+      "G",
+      "W",
+      "U",
+      "B"
+    ],
+    "avg_price_usd": 1496.0,
+    "num_decks_avg": 41638,
+    "edhrec_url": "https://edhrec.com/commanders/atraxa-praetors-voice",
+    "deck_size": 99,
+    "cards": [
+      {
+        "name": "Cankerbloom",
+        "category": "creature",
+        "num_decks": 13817
+      },
+      {
+        "name": "Ichor Rats",
+        "category": "creature",
+        "num_decks": 13407
+      },
+      {
+        "name": "Dreamtide Whale",
+        "category": "creature",
+        "num_decks": 12900
+      },
+      {
+        "name": "Deepglow Skate",
+        "category": "creature",
+        "num_decks": 12775
+      },
+      {
+        "name": "Birds of Paradise",
+        "category": "creature",
+        "num_decks": 12679
+      },
+      {
+        "name": "Skrelv, Defector Mite",
+        "category": "creature",
+        "num_decks": 12432
+      },
+      {
+        "name": "Blighted Agent",
+        "category": "creature",
+        "num_decks": 12247
+      },
+      {
+        "name": "Ixhel, Scion of Atraxa",
+        "category": "creature",
+        "num_decks": 12233
+      },
+      {
+        "name": "Metastatic Evangel",
+        "category": "creature",
+        "num_decks": 12009
+      },
+      {
+        "name": "Contaminant Grafter",
+        "category": "creature",
+        "num_decks": 10962
+      },
+      {
+        "name": "Voidwing Hybrid",
+        "category": "creature",
+        "num_decks": 10846
+      },
+      {
+        "name": "Skithiryx, the Blight Dragon",
+        "category": "creature",
+        "num_decks": 10372
+      },
+      {
+        "name": "Blightbelly Rat",
+        "category": "creature",
+        "num_decks": 10154
+      },
+      {
+        "name": "Tainted Observer",
+        "category": "creature",
+        "num_decks": 9587
+      },
+      {
+        "name": "Plague Stinger",
+        "category": "creature",
+        "num_decks": 8665
+      },
+      {
+        "name": "Phyrexian Swarmlord",
+        "category": "creature",
+        "num_decks": 8522
+      },
+      {
+        "name": "Vishgraz, the Doomhive",
+        "category": "creature",
+        "num_decks": 8415
+      },
+      {
+        "name": "Norn's Choirmaster",
+        "category": "creature",
+        "num_decks": 8191
+      },
+      {
+        "name": "Bloom Tender",
+        "category": "creature",
+        "num_decks": 7929
+      },
+      {
+        "name": "Grateful Apparition",
+        "category": "creature",
+        "num_decks": 7642
+      },
+      {
+        "name": "Shalai, Voice of Plenty",
+        "category": "creature",
+        "num_decks": 7614
+      },
+      {
+        "name": "Spark Double",
+        "category": "creature",
+        "num_decks": 6939
+      },
+      {
+        "name": "Bilious Skulldweller",
+        "category": "creature",
+        "num_decks": 6903
+      },
+      {
+        "name": "Necrogen Rotpriest",
+        "category": "creature",
+        "num_decks": 6892
+      },
+      {
+        "name": "Experimental Augury",
+        "category": "instant",
+        "num_decks": 13752
+      },
+      {
+        "name": "Infectious Bite",
+        "category": "instant",
+        "num_decks": 12357
+      },
+      {
+        "name": "Heroic Intervention",
+        "category": "instant",
+        "num_decks": 9318
+      },
+      {
+        "name": "Atomize",
+        "category": "instant",
+        "num_decks": 8776
+      },
+      {
+        "name": "Assassin's Trophy",
+        "category": "instant",
+        "num_decks": 7540
+      },
+      {
+        "name": "Ripples of Potential",
+        "category": "instant",
+        "num_decks": 6959
+      },
+      {
+        "name": "Mana Drain",
+        "category": "instant",
+        "num_decks": 6627
+      },
+      {
+        "name": "Radstorm",
+        "category": "instant",
+        "num_decks": 6276
+      },
+      {
+        "name": "Anguished Unmaking",
+        "category": "instant",
+        "num_decks": 5875
+      },
+      {
+        "name": "Unnatural Restoration",
+        "category": "sorcerie",
+        "num_decks": 13425
+      },
+      {
+        "name": "Phyresis Outbreak",
+        "category": "sorcerie",
+        "num_decks": 12656
+      },
+      {
+        "name": "Nature's Lore",
+        "category": "sorcerie",
+        "num_decks": 11742
+      },
+      {
+        "name": "Drown in Ichor",
+        "category": "sorcerie",
+        "num_decks": 10720
+      },
+      {
+        "name": "Three Visits",
+        "category": "sorcerie",
+        "num_decks": 9520
+      },
+      {
+        "name": "Contentious Plan",
+        "category": "sorcerie",
+        "num_decks": 9230
+      },
+      {
+        "name": "Thirsting Roots",
+        "category": "sorcerie",
+        "num_decks": 8124
+      },
+      {
+        "name": "Kodama's Reach",
+        "category": "sorcerie",
+        "num_decks": 8018
+      },
+      {
+        "name": "Brokers Ascendancy",
+        "category": "enchantment",
+        "num_decks": 13739
+      },
+      {
+        "name": "Doubling Season",
+        "category": "enchantment",
+        "num_decks": 13381
+      },
+      {
+        "name": "Norn's Decree",
+        "category": "enchantment",
+        "num_decks": 10874
+      },
+      {
+        "name": "Oath of Teferi",
+        "category": "enchantment",
+        "num_decks": 8066
+      },
+      {
+        "name": "Phyrexian Arena",
+        "category": "enchantment",
+        "num_decks": 8011
+      },
+      {
+        "name": "Innkeeper's Talent",
+        "category": "enchantment",
+        "num_decks": 8005
+      },
+      {
+        "name": "Skrelv's Hive",
+        "category": "enchantment",
+        "num_decks": 6788
+      },
+      {
+        "name": "Tamiyo, Field Researcher",
+        "category": "planeswalker",
+        "num_decks": 11330
+      },
+      {
+        "name": "Ajani, Sleeper Agent",
+        "category": "planeswalker",
+        "num_decks": 9600
+      },
+      {
+        "name": "Teferi, Master of Time",
+        "category": "planeswalker",
+        "num_decks": 7070
+      },
+      {
+        "name": "Oko, Thief of Crowns",
+        "category": "planeswalker",
+        "num_decks": 6979
+      },
+      {
+        "name": "Teferi, Temporal Archmage",
+        "category": "planeswalker",
+        "num_decks": 6010
+      },
+      {
+        "name": "Teferi, Hero of Dominaria",
+        "category": "planeswalker",
+        "num_decks": 5970
+      },
+      {
+        "name": "Sol Ring",
+        "category": "artifact",
+        "num_decks": 35414
+      },
+      {
+        "name": "Arcane Signet",
+        "category": "artifact",
+        "num_decks": 32553
+      },
+      {
+        "name": "Chromatic Lantern",
+        "category": "artifact",
+        "num_decks": 18853
+      },
+      {
+        "name": "Astral Cornucopia",
+        "category": "artifact",
+        "num_decks": 18399
+      },
+      {
+        "name": "Everflowing Chalice",
+        "category": "artifact",
+        "num_decks": 15828
+      },
+      {
+        "name": "Contagion Engine",
+        "category": "artifact",
+        "num_decks": 11930
+      },
+      {
+        "name": "Glistening Sphere",
+        "category": "artifact",
+        "num_decks": 11674
+      },
+      {
+        "name": "Fellwar Stone",
+        "category": "artifact",
+        "num_decks": 11159
+      },
+      {
+        "name": "Lightning Greaves",
+        "category": "artifact",
+        "num_decks": 10313
+      },
+      {
+        "name": "Command Tower",
+        "category": "land",
+        "num_decks": 38189
+      },
+      {
+        "name": "Exotic Orchard",
+        "category": "land",
+        "num_decks": 26203
+      },
+      {
+        "name": "Breeding Pool",
+        "category": "land",
+        "num_decks": 19657
+      },
+      {
+        "name": "Overgrown Tomb",
+        "category": "land",
+        "num_decks": 19190
+      },
+      {
+        "name": "Temple Garden",
+        "category": "land",
+        "num_decks": 18988
+      },
+      {
+        "name": "Hallowed Fountain",
+        "category": "land",
+        "num_decks": 18710
+      },
+      {
+        "name": "Watery Grave",
+        "category": "land",
+        "num_decks": 18626
+      },
+      {
+        "name": "Godless Shrine",
+        "category": "land",
+        "num_decks": 18342
+      },
+      {
+        "name": "Indatha Triome",
+        "category": "land",
+        "num_decks": 15697
+      },
+      {
+        "name": "Zagoth Triome",
+        "category": "land",
+        "num_decks": 15588
+      },
+      {
+        "name": "Spara's Headquarters",
+        "category": "land",
+        "num_decks": 15048
+      },
+      {
+        "name": "Windswept Heath",
+        "category": "land",
+        "num_decks": 14742
+      },
+      {
+        "name": "Misty Rainforest",
+        "category": "land",
+        "num_decks": 14210
+      },
+      {
+        "name": "Verdant Catacombs",
+        "category": "land",
+        "num_decks": 14054
+      },
+      {
+        "name": "Flooded Strand",
+        "category": "land",
+        "num_decks": 13993
+      },
+      {
+        "name": "Polluted Delta",
+        "category": "land",
+        "num_decks": 13844
+      },
+      {
+        "name": "Sandsteppe Citadel",
+        "category": "land",
+        "num_decks": 13527
+      },
+      {
+        "name": "Marsh Flats",
+        "category": "land",
+        "num_decks": 13475
+      },
+      {
+        "name": "Raffine's Tower",
+        "category": "land",
+        "num_decks": 13410
+      },
+      {
+        "name": "Opulent Palace",
+        "category": "land",
+        "num_decks": 12838
+      },
+      {
+        "name": "Path of Ancestry",
+        "category": "land",
+        "num_decks": 12615
+      },
+      {
+        "name": "Seaside Citadel",
+        "category": "land",
+        "num_decks": 12101
+      },
+      {
+        "name": "Arcane Sanctum",
+        "category": "land",
+        "num_decks": 11757
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      },
+      {
+        "name": "Forest",
+        "category": "land",
+        "num_decks": 38123
+      }
+    ]
+  },
+  "Grand Arbiter Augustin IV": {
+    "commander_name": "Grand Arbiter Augustin IV",
+    "commander_cmc": 4.0,
+    "commander_type": "Legendary Creature \u2014 Human Advisor",
+    "commander_color_identity": [
+      "W",
+      "U"
+    ],
+    "avg_price_usd": 1859.0,
+    "num_decks_avg": 12763,
+    "edhrec_url": "https://edhrec.com/commanders/grand-arbiter-augustin-iv",
+    "deck_size": 99,
+    "cards": [
+      {
+        "name": "Hushbringer",
+        "category": "creature",
+        "num_decks": 5352
+      },
+      {
+        "name": "Thalia, Heretic Cathar",
+        "category": "creature",
+        "num_decks": 5322
+      },
+      {
+        "name": "Archon of Emeria",
+        "category": "creature",
+        "num_decks": 4758
+      },
+      {
+        "name": "Fatespinner",
+        "category": "creature",
+        "num_decks": 4602
+      },
+      {
+        "name": "Consecrated Sphinx",
+        "category": "creature",
+        "num_decks": 3747
+      },
+      {
+        "name": "Azor's Elocutors",
+        "category": "creature",
+        "num_decks": 3600
+      },
+      {
+        "name": "Linvala, Keeper of Silence",
+        "category": "creature",
+        "num_decks": 3517
+      },
+      {
+        "name": "Soulless Jailer",
+        "category": "creature",
+        "num_decks": 3347
+      },
+      {
+        "name": "Baird, Steward of Argive",
+        "category": "creature",
+        "num_decks": 3113
+      },
+      {
+        "name": "Jin-Gitaxias, Progress Tyrant",
+        "category": "creature",
+        "num_decks": 3105
+      },
+      {
+        "name": "Strict Proctor",
+        "category": "creature",
+        "num_decks": 2717
+      },
+      {
+        "name": "Leonin Arbiter",
+        "category": "creature",
+        "num_decks": 2313
+      },
+      {
+        "name": "The Council of Four",
+        "category": "creature",
+        "num_decks": 2255
+      },
+      {
+        "name": "Containment Priest",
+        "category": "creature",
+        "num_decks": 2054
+      },
+      {
+        "name": "Archivist of Oghma",
+        "category": "creature",
+        "num_decks": 2052
+      },
+      {
+        "name": "Elesh Norn, Grand Cenobite",
+        "category": "creature",
+        "num_decks": 1969
+      },
+      {
+        "name": "Hullbreaker Horror",
+        "category": "creature",
+        "num_decks": 1886
+      },
+      {
+        "name": "Gold-Forged Thopteryx",
+        "category": "creature",
+        "num_decks": 1816
+      },
+      {
+        "name": "Vryn Wingmare",
+        "category": "creature",
+        "num_decks": 1806
+      },
+      {
+        "name": "Negate",
+        "category": "instant",
+        "num_decks": 5457
+      },
+      {
+        "name": "Render Silent",
+        "category": "instant",
+        "num_decks": 4932
+      },
+      {
+        "name": "Silence",
+        "category": "instant",
+        "num_decks": 4363
+      },
+      {
+        "name": "Brainstorm",
+        "category": "instant",
+        "num_decks": 4290
+      },
+      {
+        "name": "Swan Song",
+        "category": "instant",
+        "num_decks": 3966
+      },
+      {
+        "name": "Force of Will",
+        "category": "instant",
+        "num_decks": 3588
+      },
+      {
+        "name": "Arcane Denial",
+        "category": "instant",
+        "num_decks": 3408
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "category": "instant",
+        "num_decks": 3268
+      },
+      {
+        "name": "Force of Negation",
+        "category": "instant",
+        "num_decks": 3040
+      },
+      {
+        "name": "Mana Leak",
+        "category": "instant",
+        "num_decks": 2888
+      },
+      {
+        "name": "Permission Denied",
+        "category": "instant",
+        "num_decks": 2800
+      },
+      {
+        "name": "Generous Gift",
+        "category": "instant",
+        "num_decks": 2450
+      },
+      {
+        "name": "Aetherize",
+        "category": "instant",
+        "num_decks": 2374
+      },
+      {
+        "name": "Sphinx's Revelation",
+        "category": "instant",
+        "num_decks": 2312
+      },
+      {
+        "name": "No More Lies",
+        "category": "instant",
+        "num_decks": 2031
+      },
+      {
+        "name": "Ponder",
+        "category": "sorcerie",
+        "num_decks": 3610
+      },
+      {
+        "name": "Time Wipe",
+        "category": "sorcerie",
+        "num_decks": 3254
+      },
+      {
+        "name": "Windfall",
+        "category": "sorcerie",
+        "num_decks": 3181
+      },
+      {
+        "name": "Idyllic Tutor",
+        "category": "sorcerie",
+        "num_decks": 2861
+      },
+      {
+        "name": "Wrath of God",
+        "category": "sorcerie",
+        "num_decks": 2688
+      },
+      {
+        "name": "Austere Command",
+        "category": "sorcerie",
+        "num_decks": 2043
+      },
+      {
+        "name": "Mystic Remora",
+        "category": "enchantment",
+        "num_decks": 5386
+      },
+      {
+        "name": "Authority of the Consuls",
+        "category": "enchantment",
+        "num_decks": 4760
+      },
+      {
+        "name": "Land Tax",
+        "category": "enchantment",
+        "num_decks": 4270
+      },
+      {
+        "name": "Rest in Peace",
+        "category": "enchantment",
+        "num_decks": 4112
+      },
+      {
+        "name": "Sphere of Safety",
+        "category": "enchantment",
+        "num_decks": 3458
+      },
+      {
+        "name": "Rule of Law",
+        "category": "enchantment",
+        "num_decks": 2935
+      },
+      {
+        "name": "Frozen Aether",
+        "category": "enchantment",
+        "num_decks": 2390
+      },
+      {
+        "name": "Stasis",
+        "category": "enchantment",
+        "num_decks": 2366
+      },
+      {
+        "name": "Deafening Silence",
+        "category": "enchantment",
+        "num_decks": 1999
+      },
+      {
+        "name": "Trouble in Pairs",
+        "category": "enchantment",
+        "num_decks": 1668
+      },
+      {
+        "name": "Back to Basics",
+        "category": "enchantment",
+        "num_decks": 1570
+      },
+      {
+        "name": "Teferi, Time Raveler",
+        "category": "planeswalker",
+        "num_decks": 5334
+      },
+      {
+        "name": "Teferi, Hero of Dominaria",
+        "category": "planeswalker",
+        "num_decks": 2368
+      },
+      {
+        "name": "Sol Ring",
+        "category": "artifact",
+        "num_decks": 11422
+      },
+      {
+        "name": "Arcane Signet",
+        "category": "artifact",
+        "num_decks": 10108
+      },
+      {
+        "name": "Azorius Signet",
+        "category": "artifact",
+        "num_decks": 6512
+      },
+      {
+        "name": "Talisman of Progress",
+        "category": "artifact",
+        "num_decks": 5735
+      },
+      {
+        "name": "Thought Vessel",
+        "category": "artifact",
+        "num_decks": 4675
+      },
+      {
+        "name": "Sapphire Medallion",
+        "category": "artifact",
+        "num_decks": 3980
+      },
+      {
+        "name": "Winter Orb",
+        "category": "artifact",
+        "num_decks": 3797
+      },
+      {
+        "name": "Sphere of Resistance",
+        "category": "artifact",
+        "num_decks": 3655
+      },
+      {
+        "name": "Pearl Medallion",
+        "category": "artifact",
+        "num_decks": 3560
+      },
+      {
+        "name": "Cursed Totem",
+        "category": "artifact",
+        "num_decks": 3210
+      },
+      {
+        "name": "Norn's Annex",
+        "category": "artifact",
+        "num_decks": 3047
+      },
+      {
+        "name": "Fellwar Stone",
+        "category": "artifact",
+        "num_decks": 2986
+      },
+      {
+        "name": "Command Tower",
+        "category": "land",
+        "num_decks": 10363
+      },
+      {
+        "name": "Glacial Fortress",
+        "category": "land",
+        "num_decks": 7731
+      },
+      {
+        "name": "Hallowed Fountain",
+        "category": "land",
+        "num_decks": 7404
+      },
+      {
+        "name": "Prairie Stream",
+        "category": "land",
+        "num_decks": 7252
+      },
+      {
+        "name": "Reliquary Tower",
+        "category": "land",
+        "num_decks": 6703
+      },
+      {
+        "name": "Sea of Clouds",
+        "category": "land",
+        "num_decks": 5567
+      },
+      {
+        "name": "Flooded Strand",
+        "category": "land",
+        "num_decks": 5563
+      },
+      {
+        "name": "Deserted Beach",
+        "category": "land",
+        "num_decks": 4887
+      },
+      {
+        "name": "Port Town",
+        "category": "land",
+        "num_decks": 4855
+      },
+      {
+        "name": "Adarkar Wastes",
+        "category": "land",
+        "num_decks": 4788
+      },
+      {
+        "name": "Azorius Chancery",
+        "category": "land",
+        "num_decks": 4323
+      },
+      {
+        "name": "Temple of Enlightenment",
+        "category": "land",
+        "num_decks": 4297
+      },
+      {
+        "name": "Nimbus Maze",
+        "category": "land",
+        "num_decks": 3460
+      },
+      {
+        "name": "Mystic Gate",
+        "category": "land",
+        "num_decks": 3429
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      },
+      {
+        "name": "Island",
+        "category": "land",
+        "num_decks": 12355
+      }
+    ]
+  }
+}

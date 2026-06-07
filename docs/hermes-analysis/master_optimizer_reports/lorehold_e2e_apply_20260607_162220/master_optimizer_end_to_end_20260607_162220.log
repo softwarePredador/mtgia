@@ -1,0 +1,477 @@
+== metadata sync ==
+postgres target: 143.198.230.247:5433/halder
+requested unique names: 2428
+postgres cards matched: 2629
+sqlite cache alias rows: 2501
+unresolved: 2
+dry_run: False
+== preflight ==
+# Hermes Master Optimizer Preflight
+
+- generated_at: 2026-06-07 16:22:22 UTC
+- status: approved
+
+## Checks
+
+| Check | Status | Detail |
+| --- | --- | --- |
+| knowledge_db | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db |
+| battle | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py |
+| battle_regression | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py |
+| slot_optimizer | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py |
+| universal_optimizer | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py |
+| metadata_sync | ok | /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py |
+| sqlite_tables | ok | all essential tables present |
+| sqlite_content | ok | deck_cards=543, learned_decks=82 |
+| python_compile | ok | battle and metadata sync compile |
+| battle_regression | ok | test_battle_analyst_v10_3 passed |
+| oracle_cache_coverage | ok | {"keywords_filled": 1138, "mana_cost_filled": 2249, "oracle_cache_rows": 2501, "oracle_text_filled": 2500, "power_filled": 807, "toughness_filled": 807} |
+
+## Next action
+
+- If status is `approved`, run baseline battle and isolated slot scan.
+- If status is `blocked`, fix battle/metadata before running optimizer.
+- Do not apply swaps from quick phase automatically.
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_20260607_162222.md
+== baseline ==
+# Hermes Master Optimizer Baseline
+
+- baseline_id: 3
+- deck_id: 6
+- deck_hash: `110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811`
+- cards: 100
+- lands: 33
+- avg_cmc: 2.91
+- games_per_opponent: 50
+- opponents: 6
+- total_games: 300
+- overall_wr: 85.3%
+- record: 256W/10L/34S
+
+## Matchups
+
+| Opponent | WR | W | L | S | Avg Turn | Reasons |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Aggro (Krenko) | 74.0% | 37 | 2 | 11 | 17.0 | elimination=20, approach=17 |
+| Control (Atraxa) | 92.0% | 46 | 2 | 2 | 18.8 | elimination=24, approach=22 |
+| Combo (Kinnan) | 90.0% | 45 | 0 | 5 | 18.9 | elimination=27, approach=18 |
+| Midrange (Korvold) | 78.0% | 39 | 2 | 9 | 18.7 | approach=19, elimination=20 |
+| Spellslinger (Niv) | 90.0% | 45 | 2 | 3 | 16.2 | approach=25, elimination=20 |
+| Stax (Winota) | 88.0% | 44 | 2 | 4 | 16.2 | approach=26, elimination=18 |
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260607_162224.md
+== slot scan ==
+========================================================================
+SAFE LOREHOLD SLOT SCAN
+deck_id=6
+baseline_id=3
+baseline_wr=85.3%
+baseline_hash=110ce10b8152085ec589ed09b15ab1e0c21a5656b60b366f59a34e369b2ff811
+games_per_opponent=10
+max_per_category=15
+selected_candidates=120
+filter_stats={"basic": 0, "deck": 97, "high_cmc": 65, "illegal": 18, "missing_meta": 0, "off_color": 851, "unknown_category": 3}
+
+Current deck composition:
+  draw         x7  avg_cmc=2.1
+  engine       x4  avg_cmc=3.0
+  protection   x13 avg_cmc=2.6
+  ramp         x21 avg_cmc=2.0
+  removal      x3  avg_cmc=1.7
+  tutor        x5  avg_cmc=1.8
+  wincon       x11 avg_cmc=5.0
+  wipe         x2  avg_cmc=9.0
+
+Swap targets:
+  draw         -> Reforge the Soul
+  engine       -> Past in Flames
+  protection   -> Rise of the Eldrazi
+  ramp         -> Mana Geyser
+  removal      -> Generous Gift
+  tutor        -> Imperial Recruiter
+  wincon       -> Storm Herd
+  wipe         -> Blasphemous Act
+
+[draw] 15 selected candidates (cut target: Reforge the Soul)
+  +Wheel of Fate                        WR= 90.0% UP +4.7pp record=54W/1L/5S
+  +Magmatic Insight                     WR= 88.3% UP +3.0pp record=53W/2L/5S
+  +Improvisation Capstone               WR= 81.7% DOWN -3.6pp record=49W/3L/8S
+  +Cathartic Reunion                    WR= 81.7% DOWN -3.6pp record=49W/0L/11S
+  +Demand Answers                       WR= 86.7% UP +1.4pp record=52W/0L/8S
+  +Grab the Prize                       WR= 81.7% DOWN -3.6pp record=49W/0L/11S
+  +Thrill of Possibility                WR= 85.0% FLAT -0.3pp record=51W/0L/9S
+  +Tormenting Voice                     WR= 90.0% UP +4.7pp record=54W/0L/6S
+  +Shattered Perception                 WR= 90.0% UP +4.7pp record=54W/0L/6S
+  +Wheel of Misfortune                  WR= 93.3% UP +8.0pp record=56W/2L/2S
+  +Will of the Jeskai                   WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Thrilling Discovery                  WR= 86.7% UP +1.4pp record=52W/0L/8S
+  +Bazaar of Baghdad                    WR= 81.7% DOWN -3.6pp record=49W/3L/8S
+  +Laughing Mad                         WR= 86.7% UP +1.4pp record=52W/2L/6S
+  +Blasted Landscape                    WR= 88.3% UP +3.0pp record=53W/0L/7S
+
+[engine] 15 selected candidates (cut target: Past in Flames)
+  +Increasing Vengeance                 WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Restoration Seminar                  WR= 91.7% UP +6.4pp record=55W/0L/5S
+  +Pyromancer Ascension                 WR= 83.3% DOWN -2.0pp record=50W/2L/8S
+  +Return the Favor                     WR= 95.0% UP +9.7pp record=57W/0L/3S
+  +Fork                                 WR= 90.0% UP +4.7pp record=54W/0L/6S
+  +Aziza, Mage Tower Captain            WR= 85.0% FLAT -0.3pp record=51W/1L/8S
+  +Sevinne's Reclamation                WR= 80.0% DOWN -5.3pp record=48W/1L/11S
+  +Flare of Duplication                 WR= 90.0% UP +4.7pp record=54W/1L/5S
+  +Harness the Storm                    WR= 85.0% FLAT -0.3pp record=51W/2L/7S
+  +Invoke Calamity                      WR= 91.7% UP +6.4pp record=55W/2L/3S
+  +Bulk Up                              WR= 81.7% DOWN -3.6pp record=49W/2L/9S
+  +Reconstruct History                  WR= 85.0% FLAT -0.3pp record=51W/1L/8S
+  +Cleric Class                         WR= 85.0% FLAT -0.3pp record=51W/2L/7S
+  +Reversal of Fortune                  WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Planar Birth                         WR= 90.0% UP +4.7pp record=54W/1L/5S
+
+[protection] 15 selected candidates (cut target: Rise of the Eldrazi)
+  +Blacksmith's Skill                   WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Loran's Escape                       WR= 90.0% UP +4.7pp record=54W/2L/4S
+  +Restoration Magic                    WR= 85.0% FLAT -0.3pp record=51W/2L/7S
+  +Plaza of Heroes                      WR= 86.7% UP +1.4pp record=52W/1L/7S
+  +Divine Resilience                    WR= 86.7% UP +1.4pp record=52W/0L/8S
+  +Eldritch Immunity                    WR= 86.7% UP +1.4pp record=52W/1L/7S
+  +Galadriel's Dismissal                WR= 86.7% UP +1.4pp record=52W/2L/6S
+  +Dawn's Truce                         WR= 91.7% UP +6.4pp record=55W/0L/5S
+  +Unbreakable Formation                WR= 81.7% DOWN -3.6pp record=49W/3L/8S
+  +Boseiju, Who Shelters All            WR= 93.3% UP +8.0pp record=56W/1L/3S
+  +Glacial Chasm                        WR= 91.7% UP +6.4pp record=55W/1L/4S
+  +Gods Willing                         WR= 93.3% UP +8.0pp record=56W/2L/2S
+  +Indestructible Aura                  WR= 78.3% DOWN -7.0pp record=47W/3L/10S
+  +Lithomantic Barrage                  WR= 85.0% FLAT -0.3pp record=51W/1L/8S
+  +Mana Tithe                           WR= 88.3% UP +3.0pp record=53W/2L/5S
+
+[ramp] 15 selected candidates (cut target: Mana Geyser)
+  +Strike It Rich                       WR= 88.3% UP +3.0pp record=53W/2L/5S
+  +Lotus Bloom                          WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Lion's Eye Diamond                   WR= 88.3% UP +3.0pp record=53W/0L/7S
+  +Diamond Pick-Axe                     WR= 83.3% DOWN -2.0pp record=50W/1L/9S
+  +Seize the Spoils                     WR= 86.7% UP +1.4pp record=52W/1L/7S
+  +Astral Cornucopia                    WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Goldvein Pick                        WR= 76.7% DOWN -8.6pp record=46W/3L/11S
+  +Everflowing Chalice                  WR= 85.0% FLAT -0.3pp record=51W/1L/8S
+  +Treasure Vault                       WR= 81.7% DOWN -3.6pp record=49W/4L/7S
+  +Impulsive Pilferer                   WR= 90.0% UP +4.7pp record=54W/0L/6S
+  +Collector's Vault                    WR= 96.7% UP +11.4pp record=58W/0L/2S
+  +Isochron Scepter                     WR= 83.3% DOWN -2.0pp record=50W/1L/9S
+  +Big Score                            WR= 90.0% UP +4.7pp record=54W/1L/5S
+  +Pirate's Pillage                     WR= 86.7% UP +1.4pp record=52W/2L/6S
+  +Mishra's Workshop                    WR= 86.7% UP +1.4pp record=52W/2L/6S
+
+[removal] 15 selected candidates (cut target: Generous Gift)
+  +Chain Lightning                      WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Erode                                WR= 86.7% UP +1.4pp record=52W/1L/7S
+  +Sacred Fire                          WR= 86.7% UP +1.4pp record=52W/1L/7S
+  +Ephemerate                           WR= 81.7% DOWN -3.6pp record=49W/2L/9S
+  +March of Otherworldly Light          WR= 91.7% UP +6.4pp record=55W/1L/4S
+  +Vandalblast                          WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Cloudshift                           WR= 95.0% UP +9.7pp record=57W/2L/1S
+  +Lightning Bolt                       WR= 85.0% FLAT -0.3pp record=51W/1L/8S
+  +Needle Drop                          WR= 78.3% DOWN -7.0pp record=47W/3L/10S
+  +Requisition Raid                     WR= 90.0% UP +4.7pp record=54W/0L/6S
+  +Shock                                WR= 86.7% UP +1.4pp record=52W/0L/8S
+  +Abrade                               WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Fiery Temper                         WR= 90.0% UP +4.7pp record=54W/3L/3S
+  +Electrodominance                     WR= 96.7% UP +11.4pp record=58W/0L/2S
+  +Get Lost                             WR= 90.0% UP +4.7pp record=54W/3L/3S
+
+[tutor] 15 selected candidates (cut target: Imperial Recruiter)
+  +Steelshaper's Gift                   WR= 85.0% FLAT -0.3pp record=51W/1L/8S
+  +Tithe                                WR= 83.3% DOWN -2.0pp record=50W/1L/9S
+  +Open the Armory                      WR= 73.3% DOWN -12.0pp record=44W/6L/10S
+  +Reckless Handling                    WR= 81.7% DOWN -3.6pp record=49W/2L/9S
+  +Expedition Map                       WR= 83.3% DOWN -2.0pp record=50W/2L/8S
+  +Idyllic Tutor                        WR= 85.0% FLAT -0.3pp record=51W/0L/9S
+  +Fighter Class                        WR= 83.3% DOWN -2.0pp record=50W/3L/7S
+  +Weathered Wayfarer                   WR= 83.3% DOWN -2.0pp record=50W/1L/9S
+  +Moonsilver Key                       WR= 88.3% UP +3.0pp record=53W/2L/5S
+  +Cloud, Midgar Mercenary              WR= 85.0% FLAT -0.3pp record=51W/3L/6S
+  +Stoneforge Mystic                    WR= 88.3% UP +3.0pp record=53W/1L/6S
+  +Archaeomancer's Map                  WR= 93.3% UP +8.0pp record=56W/1L/3S
+  +Tezzeret, Cruel Captain              WR= 86.7% UP +1.4pp record=52W/3L/5S
+  +Goblin Engineer                      WR= 85.0% FLAT -0.3pp record=51W/2L/7S
+  +Oswald Fiddlebender                  WR= 91.7% UP +6.4pp record=55W/2L/3S
+
+[wincon] 15 selected candidates (cut target: Storm Herd)
+  +Grapeshot                            WR= 80.0% DOWN -5.3pp record=48W/5L/7S
+  +Great Train Heist                    WR= 76.7% DOWN -8.6pp record=46W/4L/10S
+  +Electroduplicate                     WR= 78.3% DOWN -7.0pp record=47W/2L/11S
+  +Adagia, Windswept Bastion            WR= 71.7% DOWN -13.6pp record=43W/6L/11S
+  +Agate Instigator                     WR= 78.3% DOWN -7.0pp record=47W/3L/10S
+  +Coruscation Mage                     WR= 76.7% DOWN -8.6pp record=46W/2L/12S
+  +Bloodforged Battle-Axe               WR= 80.0% DOWN -5.3pp record=48W/1L/11S
+  +Comet Storm                          WR= 83.3% DOWN -2.0pp record=50W/2L/8S
+  +Molten Duplication                   WR= 85.0% FLAT -0.3pp record=51W/3L/6S
+  +Secure the Wastes                    WR= 76.7% DOWN -8.6pp record=46W/1L/13S
+  +Song of Totentanz                    WR= 75.0% DOWN -10.3pp record=45W/3L/12S
+  +Ocelot Pride                         WR= 85.0% FLAT -0.3pp record=51W/4L/5S
+  +Electrostatic Field                  WR= 80.0% DOWN -5.3pp record=48W/3L/9S
+  +Erebor Flamesmith                    WR= 73.3% DOWN -12.0pp record=44W/5L/11S
+  +Young Pyromancer                     WR= 66.7% DOWN -18.6pp record=40W/4L/16S
+
+[wipe] 15 selected candidates (cut target: Blasphemous Act)
+  +Final Showdown                       WR= 83.3% DOWN -2.0pp record=50W/2L/8S
+  +The Battle of Bywater                WR= 88.3% UP +3.0pp record=53W/3L/4S
+  +Magmaquake                           WR= 83.3% DOWN -2.0pp record=50W/1L/9S
+  +Martial Coup                         WR= 88.3% UP +3.0pp record=53W/2L/5S
+  +White Sun's Twilight                 WR= 93.3% UP +8.0pp record=56W/0L/4S
+  +Ruinous Rampage                      WR= 85.0% FLAT -0.3pp record=51W/3L/6S
+  +Slagstorm                            WR= 78.3% DOWN -7.0pp record=47W/2L/11S
+  +Split Up                             WR= 86.7% UP +1.4pp record=52W/1L/7S
+  +Day of Judgment                      WR= 85.0% FLAT -0.3pp record=51W/2L/7S
+  +Dusk // Dawn                         WR= 76.7% DOWN -8.6pp record=46W/3L/11S
+  +Wrath of God                         WR= 83.3% DOWN -2.0pp record=50W/1L/9S
+  +Fumigate                             WR= 88.3% UP +3.0pp record=53W/0L/7S
+  +Mogg Infestation                     WR= 81.7% DOWN -3.6pp record=49W/0L/11S
+  +Starfall Invocation                  WR= 98.3% UP +13.0pp record=59W/0L/1S
+  +Spiteful Banditry                    WR= 85.0% FLAT -0.3pp record=51W/2L/7S
+
+========================================================================
+SLOT SCAN SUMMARY
+tested=120
+blocked=0
+skipped=0
+
+[draw] top candidates
+  1. +Wheel of Misfortune (cut Reforge the Soul) WR=93.3% +8.0pp
+  2. +Wheel of Fate (cut Reforge the Soul) WR=90.0% +4.7pp
+  3. +Tormenting Voice (cut Reforge the Soul) WR=90.0% +4.7pp
+  4. +Shattered Perception (cut Reforge the Soul) WR=90.0% +4.7pp
+  5. +Magmatic Insight (cut Reforge the Soul) WR=88.3% +3.0pp
+
+[engine] top candidates
+  1. +Return the Favor (cut Past in Flames) WR=95.0% +9.7pp
+  2. +Restoration Seminar (cut Past in Flames) WR=91.7% +6.4pp
+  3. +Invoke Calamity (cut Past in Flames) WR=91.7% +6.4pp
+  4. +Fork (cut Past in Flames) WR=90.0% +4.7pp
+  5. +Flare of Duplication (cut Past in Flames) WR=90.0% +4.7pp
+
+[protection] top candidates
+  1. +Boseiju, Who Shelters All (cut Rise of the Eldrazi) WR=93.3% +8.0pp
+  2. +Gods Willing (cut Rise of the Eldrazi) WR=93.3% +8.0pp
+  3. +Dawn's Truce (cut Rise of the Eldrazi) WR=91.7% +6.4pp
+  4. +Glacial Chasm (cut Rise of the Eldrazi) WR=91.7% +6.4pp
+  5. +Loran's Escape (cut Rise of the Eldrazi) WR=90.0% +4.7pp
+
+[ramp] top candidates
+  1. +Collector's Vault (cut Mana Geyser) WR=96.7% +11.4pp
+  2. +Impulsive Pilferer (cut Mana Geyser) WR=90.0% +4.7pp
+  3. +Big Score (cut Mana Geyser) WR=90.0% +4.7pp
+  4. +Strike It Rich (cut Mana Geyser) WR=88.3% +3.0pp
+  5. +Lotus Bloom (cut Mana Geyser) WR=88.3% +3.0pp
+
+[removal] top candidates
+  1. +Electrodominance (cut Generous Gift) WR=96.7% +11.4pp
+  2. +Cloudshift (cut Generous Gift) WR=95.0% +9.7pp
+  3. +March of Otherworldly Light (cut Generous Gift) WR=91.7% +6.4pp
+  4. +Requisition Raid (cut Generous Gift) WR=90.0% +4.7pp
+  5. +Fiery Temper (cut Generous Gift) WR=90.0% +4.7pp
+
+[tutor] top candidates
+  1. +Archaeomancer's Map (cut Imperial Recruiter) WR=93.3% +8.0pp
+  2. +Oswald Fiddlebender (cut Imperial Recruiter) WR=91.7% +6.4pp
+  3. +Moonsilver Key (cut Imperial Recruiter) WR=88.3% +3.0pp
+  4. +Stoneforge Mystic (cut Imperial Recruiter) WR=88.3% +3.0pp
+  5. +Tezzeret, Cruel Captain (cut Imperial Recruiter) WR=86.7% +1.4pp
+
+[wincon] top candidates
+  1. +Molten Duplication (cut Storm Herd) WR=85.0% -0.3pp
+  2. +Ocelot Pride (cut Storm Herd) WR=85.0% -0.3pp
+  3. +Comet Storm (cut Storm Herd) WR=83.3% -2.0pp
+  4. +Grapeshot (cut Storm Herd) WR=80.0% -5.3pp
+  5. +Bloodforged Battle-Axe (cut Storm Herd) WR=80.0% -5.3pp
+
+[wipe] top candidates
+  1. +Starfall Invocation (cut Blasphemous Act) WR=98.3% +13.0pp
+  2. +White Sun's Twilight (cut Blasphemous Act) WR=93.3% +8.0pp
+  3. +The Battle of Bywater (cut Blasphemous Act) WR=88.3% +3.0pp
+  4. +Martial Coup (cut Blasphemous Act) WR=88.3% +3.0pp
+  5. +Fumigate (cut Blasphemous Act) WR=88.3% +3.0pp
+
+slot_scan=ok
+== quality gate ==
+# Hermes Master Optimizer Quality Gate
+
+- deck_id: 6
+- baseline_id: 3
+- baseline_wr: 85.3%
+- candidates_reviewed: 25
+
+| Status | Category | Add | Cut | Scan WR | Reasons | Warnings |
+| --- | --- | --- | --- | ---: | --- | --- |
+| passed | wipe | Starfall Invocation | Blasphemous Act | 98.3% | - | - |
+| passed | ramp | Collector's Vault | Mana Geyser | 96.7% | - | - |
+| passed | removal | Electrodominance | Generous Gift | 96.7% | - | - |
+| passed | engine | Return the Favor | Past in Flames | 95.0% | - | - |
+| passed | removal | Cloudshift | Generous Gift | 95.0% | - | - |
+| passed | draw | Wheel of Misfortune | Reforge the Soul | 93.3% | - | - |
+| passed | protection | Boseiju, Who Shelters All | Rise of the Eldrazi | 93.3% | - | - |
+| passed | protection | Gods Willing | Rise of the Eldrazi | 93.3% | - | - |
+| passed | tutor | Archaeomancer's Map | Imperial Recruiter | 93.3% | - | - |
+| passed | wipe | White Sun's Twilight | Blasphemous Act | 93.3% | - | - |
+| passed | engine | Restoration Seminar | Past in Flames | 91.7% | - | - |
+| passed | engine | Invoke Calamity | Past in Flames | 91.7% | - | - |
+| passed | protection | Dawn's Truce | Rise of the Eldrazi | 91.7% | - | - |
+| passed | protection | Glacial Chasm | Rise of the Eldrazi | 91.7% | - | adds_game_changer_requires_bracket_review |
+| passed | removal | March of Otherworldly Light | Generous Gift | 91.7% | - | - |
+| passed | tutor | Oswald Fiddlebender | Imperial Recruiter | 91.7% | - | - |
+| passed | draw | Wheel of Fate | Reforge the Soul | 90.0% | - | - |
+| passed | draw | Tormenting Voice | Reforge the Soul | 90.0% | - | - |
+| passed | draw | Shattered Perception | Reforge the Soul | 90.0% | - | - |
+| passed | engine | Fork | Past in Flames | 90.0% | - | - |
+| passed | engine | Flare of Duplication | Past in Flames | 90.0% | - | - |
+| passed | engine | Planar Birth | Past in Flames | 90.0% | - | - |
+| passed | protection | Loran's Escape | Rise of the Eldrazi | 90.0% | - | - |
+| passed | ramp | Impulsive Pilferer | Mana Geyser | 90.0% | - | - |
+| passed | ramp | Big Score | Mana Geyser | 90.0% | - | - |
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260607_162336.md
+== confirmation ==
+# Hermes Master Optimizer Confirmation
+
+- deck_id: 6
+- baseline_id: 3
+- baseline_wr: 85.3%
+- phase: confirmation
+- games_per_opponent: 10
+- tested: 3
+- blocked: 0
+- skipped: 0
+
+## Tested
+
+| Add | Cut | Category | Scan WR | Confirm WR | Delta | Record | Warnings |
+| --- | --- | --- | ---: | ---: | ---: | --- | --- |
+| Starfall Invocation | Blasphemous Act | wipe | 98.3% | 88.3% | +3.0pp | 53W/1L/6S | - |
+| Collector's Vault | Mana Geyser | ramp | 96.7% | 88.3% | +3.0pp | 53W/1L/6S | - |
+| Electrodominance | Generous Gift | removal | 96.7% | 83.3% | -2.0pp | 50W/1L/9S | - |
+
+## Blocked
+
+| Add | Cut | Scan WR | Reasons |
+| --- | --- | ---: | --- |
+
+## Skipped
+
+| Add | Cut | Scan WR | Reason |
+| --- | --- | ---: | --- |
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_confirmation_20260607_162338.md
+== full confirmation ==
+# Hermes Master Optimizer Confirmation
+
+- deck_id: 6
+- baseline_id: 3
+- baseline_wr: 85.3%
+- phase: full_confirmation
+- games_per_opponent: 50
+- tested: 3
+- blocked: 0
+- skipped: 0
+
+## Tested
+
+| Add | Cut | Category | Scan WR | Confirm WR | Delta | Record | Warnings |
+| --- | --- | --- | ---: | ---: | ---: | --- | --- |
+| Return the Favor | Past in Flames | engine | 95.0% | 87.7% | +2.4pp | 263W/11L/26S | - |
+| Cloudshift | Generous Gift | removal | 95.0% | 89.0% | +3.7pp | 267W/4L/29S | - |
+| Wheel of Misfortune | Reforge the Soul | draw | 93.3% | 88.0% | +2.7pp | 264W/7L/29S | - |
+
+## Blocked
+
+| Add | Cut | Scan WR | Reasons |
+| --- | --- | ---: | --- |
+
+## Skipped
+
+| Add | Cut | Scan WR | Reason |
+| --- | --- | ---: | --- |
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_confirmation_20260607_162346.md
+== replay audit ==
+# Hermes Replay Decision Audit
+
+- deck_id: 6
+- baseline_id: 3
+- status: turn_by_turn_clean
+- structured_events: 1423
+- turn_findings: 0
+- critical: 0
+- high: 0
+- medium: 0
+- low: 0
+
+## Replay Files
+
+- text: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/replays/battle_replay_seed_42.txt`
+- events: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/replays/battle_replay_seed_42.jsonl`
+- text: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/replays/battle_replay_seed_43.txt`
+- events: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/replays/battle_replay_seed_43.jsonl`
+- text: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/replays/battle_replay_seed_44.txt`
+- events: `/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/replays/battle_replay_seed_44.jsonl`
+
+## Turn-By-Turn Findings
+
+| Severity | Replay | Turn | Player | Event | Finding |
+| --- | --- | ---: | --- | --- | --- |
+| info | all | - | all | all | No turn-by-turn red flags found. |
+
+## Aggregate Baseline Findings
+
+| Severity | Opponent | Finding |
+| --- | --- | --- |
+| medium | Aggro (Krenko) | 11 stalls; inspect missed wincon or game-end conditions. |
+| medium | Aggro (Krenko) | Slow average turn 17.0; inspect sequencing and finisher timing. |
+| medium | Control (Atraxa) | 2 stalls; inspect missed wincon or game-end conditions. |
+| medium | Control (Atraxa) | Slow average turn 18.8; inspect sequencing and finisher timing. |
+| medium | Combo (Kinnan) | 5 stalls; inspect missed wincon or game-end conditions. |
+| medium | Combo (Kinnan) | Slow average turn 18.9; inspect sequencing and finisher timing. |
+| medium | Midrange (Korvold) | 9 stalls; inspect missed wincon or game-end conditions. |
+| medium | Midrange (Korvold) | Slow average turn 18.7; inspect sequencing and finisher timing. |
+| medium | Spellslinger (Niv) | 3 stalls; inspect missed wincon or game-end conditions. |
+| medium | Spellslinger (Niv) | Slow average turn 16.2; inspect sequencing and finisher timing. |
+| medium | Stax (Winota) | 4 stalls; inspect missed wincon or game-end conditions. |
+| medium | Stax (Winota) | Slow average turn 16.2; inspect sequencing and finisher timing. |
+
+## Gate Interpretation
+
+- `critical` or `high` turn findings block optimizer trust until battle logic is fixed.
+- `medium` findings require review before product-facing deck mutation.
+- `low` findings are polish/heuristic notes and do not block a Hermes-local experiment.
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_replay_audit_20260607_162346.md
+== handoff ==
+# Hermes Master Optimizer Handoff
+
+- deck_id: 6
+- baseline_id: 3
+- baseline_wr: 85.3%
+- baseline_record: 256W/10L/34S
+- status: approved_swaps_ready_for_manual_apply
+
+## Confirmed Candidates
+
+| Verdict | Phase | Add | Cut | Confirm WR | Delta | Record |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| approve_manual_review | full_confirmation | Wheel of Misfortune | Reforge the Soul | 88.0% | +2.7pp | 264W/7L/29S |
+| approve_manual_review | full_confirmation | Cloudshift | Generous Gift | 89.0% | +3.7pp | 267W/4L/29S |
+| approve_manual_review | full_confirmation | Return the Favor | Past in Flames | 87.7% | +2.4pp | 263W/11L/26S |
+| reject_or_retest | confirmation | Electrodominance | Generous Gift | 83.3% | -2.0pp | 50W/1L/9S |
+| candidate_needs_full_confirmation | confirmation | Collector's Vault | Mana Geyser | 88.3% | +3.0pp | 53W/1L/6S |
+| candidate_needs_full_confirmation | confirmation | Starfall Invocation | Blasphemous Act | 88.3% | +3.0pp | 53W/1L/6S |
+
+## Quality Blocks
+
+| Add | Cut | Reasons |
+| --- | --- | --- |
+| - | - | No blocked candidates in latest review window. |
+
+## Next Action
+
+Manual review can inspect the approved rows, then apply with a dedicated rollback-aware apply script. No automatic apply happened in this run.
+
+Report written: /opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/master_optimizer_handoff_20260607_162346.md
+master_optimizer_end_to_end=ok

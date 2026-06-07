@@ -357,12 +357,88 @@ void main() {
   });
 
   group('bracket safety', () {
+    test('counts official Game Changers only as Game Changers', () {
+      for (final card in const [
+        {
+          'name': 'Mana Vault',
+          'type_line': 'Artifact',
+          'oracle_text': '{T}: Add {C}{C}{C}.',
+        },
+        {
+          'name': 'Demonic Tutor',
+          'type_line': 'Sorcery',
+          'oracle_text':
+              'Search your library for a card, put that card into your hand, then shuffle.',
+        },
+        {
+          'name': 'Force of Will',
+          'type_line': 'Instant',
+          'oracle_text':
+              'You may pay 1 life and exile a blue card from your hand rather than pay this spell\'s mana cost.',
+        },
+        {
+          'name': 'Thassa\'s Oracle',
+          'type_line': 'Creature',
+          'oracle_text':
+              'When this creature enters, look at the top X cards of your library.',
+        },
+      ]) {
+        final tags = tagCardForBracket(
+          name: card['name']!,
+          typeLine: card['type_line']!,
+          oracleText: card['oracle_text']!,
+        );
+
+        expect(
+          tags.categories,
+          equals({BracketCategory.gameChanger}),
+          reason: '${card['name']} must not consume secondary budgets.',
+        );
+      }
+    });
+
+    test('game changer budget does not consume fast mana budget', () {
+      final counts = countBracketCategories(const [
+        {
+          'name': 'Mana Vault',
+          'type_line': 'Artifact',
+          'oracle_text': '{T}: Add {C}{C}{C}.',
+          'quantity': 1,
+        },
+      ]);
+
+      expect(counts[BracketCategory.gameChanger], equals(1));
+      expect(counts[BracketCategory.fastMana], equals(0));
+    });
+
+    test('official game changer list stays complete and handles MDFC names',
+        () {
+      expect(officialGameChangerNamesForBracketPolicy, hasLength(53));
+      expect(
+        officialGameChangerNamesForBracketPolicy,
+        contains('tergrid, god of fright // tergrid\'s lantern'),
+      );
+
+      for (final name in const [
+        'Tergrid, God of Fright // Tergrid\'s Lantern',
+        'Tergrid, God of Fright',
+      ]) {
+        final tags = tagCardForBracket(
+          name: name,
+          typeLine: 'Legendary Creature — God',
+          oracleText: '',
+        );
+
+        expect(tags.categories, equals({BracketCategory.gameChanger}));
+      }
+    });
+
     test('detects commander free-cast interaction as free interaction', () {
       final tags = tagCardForBracket(
-        name: 'Fierce Guardianship',
+        name: 'Force of Negation',
         typeLine: 'Instant',
         oracleText:
-            'If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell.',
+            'If it is not your turn, you may exile a blue card from your hand rather than pay this spell\'s mana cost. Counter target noncreature spell.',
       );
 
       expect(tags.categories, contains(BracketCategory.freeInteraction));

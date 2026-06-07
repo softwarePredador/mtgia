@@ -84,6 +84,32 @@ void main() {
       expect(result.landCount, equals(35));
     });
 
+    test('does not treat corrupted non-land CMC as free', () {
+      final cards = [
+        ..._generateLands(35),
+        {
+          'name': 'Mana Vault',
+          'cmc': 0,
+          'mana_cost': '{1}',
+          'type_line': 'Artifact',
+          'quantity': 1,
+        },
+        {
+          'name': 'Unknown Spell',
+          'cmc': null,
+          'type_line': 'Sorcery',
+          'quantity': 1,
+        },
+      ];
+
+      final simulator = GoldfishSimulator(cards, simulations: 100);
+      final result = simulator.simulate();
+
+      expect(result.cmcDistribution[0], isNull);
+      expect(result.cmcDistribution[1], equals(1));
+      expect(result.cmcDistribution[10], equals(1));
+    });
+
     test('handles quantity correctly', () {
       final cards = [
         {'name': 'Island', 'type_line': 'Basic Land', 'quantity': 36},

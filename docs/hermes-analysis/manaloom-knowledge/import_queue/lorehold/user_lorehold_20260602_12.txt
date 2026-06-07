@@ -1,0 +1,83 @@
+=== User Lorehold Deck 2026-06-02 #12 ===
+Source: user-import
+Archetype: stax-copy-combo-dragons-approach
+
+1 Lorehold, the Historian
+1 Ancient Tomb
+1 Arcane Signet
+1 Arid Mesa
+1 Aven Mindcensor
+1 Bloodstained Mire
+1 Boros Charm
+1 City of Brass
+1 Command Tower
+1 Conspiracy Theorist
+1 Deflecting Swat
+1 Disenchant
+10 Dragon's Approach
+1 Dualcaster Mage
+1 Enlightened Tutor
+1 Esper Sentinel
+1 Felidar Guardian
+1 Flooded Strand
+1 Forbidden Orchard
+1 Fork
+1 Furycalm Snarl
+1 Galadriel's Dismissal
+1 Gamble
+1 Gemstone Caverns
+1 Ghostly Prison
+1 Giver of Runes
+1 Glint-Horn Buccaneer
+1 Grand Abolisher
+1 Grim Monolith
+1 Imperial Recruiter
+1 Jeska's Will
+1 Kiki-Jiki, Mirror Breaker
+1 Lightning Bolt
+1 Lightning Greaves
+1 Lotus Petal
+1 Magmakin Artillerist
+1 Mana Confluence
+1 Marsh Flats
+9 Mountain
+1 Mox Amber
+1 Mox Opal
+1 Ornithopter of Paradise
+1 Path to Exile
+5 Plains
+1 Plateau
+1 Powerbalance
+1 Prismatic Vista
+1 Professional Face-Breaker
+1 Pyroblast
+1 Radiant Scrollwielder
+1 Ranger-Captain of Eos
+1 Recruiter of the Guard
+1 Red Elemental Blast
+1 Redirect Lightning
+1 Reprieve
+1 Reverberate
+1 Sacred Foundry
+1 Scalding Tarn
+1 Secret Rendezvous
+1 Sensei's Divining Top
+1 Silence
+1 Simian Spirit Guide
+1 Smothering Tithe
+1 Sol Ring
+1 Spectator Seating
+1 Spire of Industry
+1 Starting Town
+1 Stranglehold
+1 Sword of Feast and Famine
+1 Swords to Plowshares
+1 Talisman of Conviction
+1 Tarnished Citadel
+1 Tempest of Light
+1 Untimely Malfunction
+1 Vandalblast
+1 Wandering Archaic
+1 Wheel of Fortune
+1 Windswept Heath
+1 Wooded Foothills

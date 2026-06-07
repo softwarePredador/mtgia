@@ -1,0 +1,3176 @@
+[
+  {
+    "commander": "Korvold, Fae-Cursed King",
+    "archetype": "Midrange (Sacrifice/Aristocrats)",
+    "url": "https://edhrec.com/average-decks/korvold-fae-cursed-king",
+    "wincon_primary": "Commander damage via Korvold growing massive from sacrifice triggers; often paired with extra combats or Chandra's Ignition",
+    "wincon_backup": "Drain the table with Blood Artist / Zulaport Cutthroat / Mayhem Devil ping loops; Revel in Riches alternate win condition",
+    "budget_level": "Medium-High ($200-$400 typical build cost)",
+    "avg_price_usd": 20.45,
+    "salt_score": "High (top-tier commander, can be oppressive)",
+    "card_list": [
+      {
+        "name": "Academy Manufactor",
+        "cmc": 3.0,
+        "type_line": "Artifact Creature \u2014 Assembly-Worker",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Birds of Paradise",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Bird",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Blood Artist",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Vampire",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Braids, Arisen Nightmare",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Nightmare",
+        "mana_cost": "{1}{B}{B}"
+      },
+      {
+        "name": "Chatterfang, Squirrel General",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Squirrel Warrior",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Deathrite Shaman",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Elf Shaman",
+        "mana_cost": "{B/G}"
+      },
+      {
+        "name": "Delighted Halfling",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Halfling Citizen",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Eternal Witness",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Shaman",
+        "mana_cost": "{1}{G}{G}"
+      },
+      {
+        "name": "Goldspan Dragon",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Dragon",
+        "mana_cost": "{3}{R}{R}"
+      },
+      {
+        "name": "Ignoble Hierarch",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Goblin Shaman",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Impulsive Pilferer",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Goblin Pirate",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Juri, Master of the Revue",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Human Shaman",
+        "mana_cost": "{B}{R}"
+      },
+      {
+        "name": "Mahadi, Emporium Master",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Devil",
+        "mana_cost": "{1}{B}{R}"
+      },
+      {
+        "name": "Mayhem Devil",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Devil",
+        "mana_cost": "{1}{B}{R}"
+      },
+      {
+        "name": "Mirkwood Bats",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Bat",
+        "mana_cost": "{3}{B}"
+      },
+      {
+        "name": "Old Gnawbone",
+        "cmc": 7.0,
+        "type_line": "Legendary Creature \u2014 Dragon",
+        "mana_cost": "{5}{G}{G}"
+      },
+      {
+        "name": "Pitiless Plunderer",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Pirate",
+        "mana_cost": "{3}{B}"
+      },
+      {
+        "name": "Professional Face-Breaker",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Warrior",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Ragavan, Nimble Pilferer",
+        "cmc": 1.0,
+        "type_line": "Legendary Creature \u2014 Monkey Pirate",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Reassembling Skeleton",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Skeleton Warrior",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Ruthless Technomancer",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{3}{B}"
+      },
+      {
+        "name": "Sakura-Tribe Elder",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Snake Shaman",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Squee, the Immortal",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Goblin",
+        "mana_cost": "{1}{R}{R}"
+      },
+      {
+        "name": "Tireless Provisioner",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Elf Scout",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Viscera Seer",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Vampire Wizard",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Warren Soultrader",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Zombie Goblin Wizard",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Xorn",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Elemental",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Ziatora, the Incinerator",
+        "cmc": 6.0,
+        "type_line": "Legendary Creature \u2014 Demon Dragon",
+        "mana_cost": "{3}{B}{R}{G}"
+      },
+      {
+        "name": "Zulaport Cutthroat",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Rogue Ally",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Abrupt Decay",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}{G}"
+      },
+      {
+        "name": "Assassin's Trophy",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}{G}"
+      },
+      {
+        "name": "Beast Within",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Crop Rotation",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Dark Ritual",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Deadly Dispute",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Deflecting Swat",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Harrow",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Heroic Intervention",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Vampiric Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Worldly Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Blasphemous Act",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{8}{R}"
+      },
+      {
+        "name": "Culling Ritual",
+        "cmc": 4.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{B}{G}"
+      },
+      {
+        "name": "Cultivate",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Demonic Tutor",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Diabolic Intent",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Eldritch Evolution",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{G}{G}"
+      },
+      {
+        "name": "Farseek",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Nature's Lore",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Reanimate",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Victimize",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Ashnod's Altar",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Bootleggers' Stash",
+        "cmc": 6.0,
+        "type_line": "Artifact",
+        "mana_cost": "{5}{G}"
+      },
+      {
+        "name": "Lightning Greaves",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Lotus Petal",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Phyrexian Altar",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "The Reaver Cleaver",
+        "cmc": 3.0,
+        "type_line": "Legendary Artifact \u2014 Equipment",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Awakening Zone",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Black Market Connections",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Goblin Bombardment",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Revel in Riches",
+        "cmc": 5.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{4}{B}"
+      },
+      {
+        "name": "Rhythm of the Wild",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{R}{G}"
+      },
+      {
+        "name": "Underworld Breach",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Blood Crypt",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Mountain",
+        "mana_cost": ""
+      },
+      {
+        "name": "Bloodstained Mire",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Boseiju, Who Endures",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Cinder Glade",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Mountain Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Dragonskull Summit",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Evolving Wilds",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Fabled Passage",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Overgrown Tomb",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Phyrexian Tower",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Reliquary Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Savage Lands",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Smoldering Marsh",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Mountain",
+        "mana_cost": ""
+      },
+      {
+        "name": "Stomping Ground",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Mountain Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Terramorphic Expanse",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Undergrowth Stadium",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Verdant Catacombs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Windswept Heath",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Wooded Foothills",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Woodland Cemetery",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Ziatora's Proving Ground",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Mountain Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "mana_cost": ""
+      },
+      {
+        "name": "Swamp",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Swamp",
+        "mana_cost": ""
+      }
+    ]
+  },
+  {
+    "commander": "Tivit, Seller of Secrets",
+    "archetype": "Midrange (Voting/Artifacts/Combo)",
+    "url": "https://edhrec.com/average-decks/tivit-seller-of-secrets",
+    "wincon_primary": "Time Sieve infinite turns combo using Tivit artifact token generation on ETB and combat damage",
+    "wincon_backup": "Marionette Master / Disciple of the Vault artifact aristocrat drain; combat damage with evasive commander",
+    "budget_level": "Medium ($300-$500, Time Sieve combo pieces add cost)",
+    "avg_price_usd": 33.98,
+    "salt_score": "Medium-High (extra turns combo can be frustrating)",
+    "card_list": [
+      {
+        "name": "Academy Manufactor",
+        "cmc": 3.0,
+        "type_line": "Artifact Creature \u2014 Assembly-Worker",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Ballot Broker",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Advisor",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Brago's Representative",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Advisor",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Displacer Kitten",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Cat Beast",
+        "mana_cost": "{3}{U}"
+      },
+      {
+        "name": "Drannith Magistrate",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Esper Sentinel",
+        "cmc": 1.0,
+        "type_line": "Artifact Creature \u2014 Human Soldier",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Grand Abolisher",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "mana_cost": "{W}{W}"
+      },
+      {
+        "name": "Grudge Keeper",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Zombie Wizard",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Lotho, Corrupt Shirriff",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Halfling Rogue",
+        "mana_cost": "{W}{B}"
+      },
+      {
+        "name": "Marionette Master",
+        "cmc": 6.0,
+        "type_line": "Creature \u2014 Human Artificer",
+        "mana_cost": "{4}{B}{B}"
+      },
+      {
+        "name": "Mirkwood Bats",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Bat",
+        "mana_cost": "{3}{B}"
+      },
+      {
+        "name": "Nadier's Nightblade",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Elf Warrior",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Opposition Agent",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Rogue",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Orcish Bowmasters",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Orc Archer",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Phyrexian Metamorph",
+        "cmc": 4.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Shapeshifter",
+        "mana_cost": "{3}{U/P}"
+      },
+      {
+        "name": "Ranger-Captain of Eos",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Soldier Ranger",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Soulherder",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Spirit",
+        "mana_cost": "{1}{W}{U}"
+      },
+      {
+        "name": "Thassa's Oracle",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Merfolk Wizard",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Urza, Lord High Artificer",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Artificer",
+        "mana_cost": "{2}{U}{U}"
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Counterspell",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Cyclonic Rift",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Dark Ritual",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Demonic Consultation",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Dovin's Veto",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}{U}"
+      },
+      {
+        "name": "Enlightened Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Ephemerate",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Flusterstorm",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Force of Negation",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}{U}"
+      },
+      {
+        "name": "Force of Will",
+        "cmc": 5.0,
+        "type_line": "Instant",
+        "mana_cost": "{3}{U}{U}"
+      },
+      {
+        "name": "Illusion of Choice",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Mana Drain",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Path to Exile",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Silence",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Swan Song",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Swords to Plowshares",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Vampiric Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Capital Punishment",
+        "cmc": 6.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{4}{B}{B}"
+      },
+      {
+        "name": "Council's Judgment",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Demonic Tutor",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Expropriate",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{7}{U}{U}"
+      },
+      {
+        "name": "Imperial Seal",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Plea for Power",
+        "cmc": 4.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{3}{U}"
+      },
+      {
+        "name": "Sevinne's Reclamation",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Toxic Deluge",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Azorius Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Dimir Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Lotus Petal",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Mana Vault",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Mox Opal",
+        "cmc": 0.0,
+        "type_line": "Legendary Artifact",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Talisman of Dominance",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Talisman of Hierarchy",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Talisman of Progress",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "The One Ring",
+        "cmc": 4.0,
+        "type_line": "Legendary Artifact",
+        "mana_cost": "{4}"
+      },
+      {
+        "name": "Time Sieve",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{U}{B}"
+      },
+      {
+        "name": "Wishclaw Talisman",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Blind Obedience",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Mystic Remora",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Propaganda",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Rhystic Study",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Smothering Tithe",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{3}{W}"
+      },
+      {
+        "name": "Teleportation Circle",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{3}{W}"
+      },
+      {
+        "name": "Teferi, Time Raveler",
+        "cmc": 3.0,
+        "type_line": "Legendary Planeswalker \u2014 Teferi",
+        "mana_cost": "{1}{W}{U}"
+      },
+      {
+        "name": "Ancient Tomb",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Arcane Sanctum",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "City of Brass",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Flooded Strand",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Godless Shrine",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Hallowed Fountain",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mana Confluence",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Marsh Flats",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Morphic Pool",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Otawara, Soaring City",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Polluted Delta",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Raffine's Tower",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Scalding Tarn",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Scrubland",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Sea of Clouds",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Tundra",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Underground Sea",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Urza's Saga",
+        "cmc": 0.0,
+        "type_line": "Enchantment Land \u2014 Urza's Saga",
+        "mana_cost": ""
+      },
+      {
+        "name": "Vault of Champions",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Watery Grave",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "mana_cost": ""
+      },
+      {
+        "name": "Swamp",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Swamp",
+        "mana_cost": ""
+      }
+    ]
+  },
+  {
+    "commander": "Niv-Mizzet, Parun",
+    "archetype": "Spellslinger (Draw-Ping Combo)",
+    "url": "https://edhrec.com/average-decks/niv-mizzet-parun",
+    "wincon_primary": "Curiosity / Ophidian Eye / Tandem Lookout combo with Niv-Mizzet for infinite draw-to-damage loop killing the table",
+    "wincon_backup": "Laboratory Maniac / Jace, Wielder of Mysteries deck-out win; Guttersnipe / Electrostatic Field storm burn",
+    "budget_level": "Medium ($150-$300, mostly cheap instants and sorceries)",
+    "avg_price_usd": 12.9,
+    "salt_score": "High (Curiosity combo is a known cEDH win line)",
+    "card_list": [
+      {
+        "name": "Archmage Emeritus",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{2}{U}{U}"
+      },
+      {
+        "name": "Baral, Chief of Compliance",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Human Wizard",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Electrostatic Field",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Wall",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Goblin Electromancer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Wizard",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Guttersnipe",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Shaman",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Harmonic Prodigy",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Laboratory Maniac",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Niv-Mizzet, the Firemind",
+        "cmc": 6.0,
+        "type_line": "Legendary Creature \u2014 Dragon Wizard",
+        "mana_cost": "{2}{U}{U}{R}{R}"
+      },
+      {
+        "name": "Niv-Mizzet, Visionary",
+        "cmc": 6.0,
+        "type_line": "Legendary Creature \u2014 Dragon Wizard",
+        "mana_cost": "{4}{U}{R}"
+      },
+      {
+        "name": "Psychosis Crawler",
+        "cmc": 5.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Horror",
+        "mana_cost": "{5}"
+      },
+      {
+        "name": "Stormcatch Mentor",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Otter Wizard",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Storm-Kiln Artist",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Dwarf Shaman",
+        "mana_cost": "{3}{R}"
+      },
+      {
+        "name": "Talrand, Sky Summoner",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Merfolk Wizard",
+        "mana_cost": "{2}{U}{U}"
+      },
+      {
+        "name": "Tandem Lookout",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Scout",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Veyran, Voice of Duality",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Efreet Wizard",
+        "mana_cost": "{1}{U}{R}"
+      },
+      {
+        "name": "Young Pyromancer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Shaman",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Abrade",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Arcane Denial",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Brainstorm",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Chaos Warp",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Consider",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Counterspell",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Cyclonic Rift",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Fierce Guardianship",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Flame of Anor",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}{R}"
+      },
+      {
+        "name": "Frantic Search",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Izzet Charm",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Lightning Bolt",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Mana Drain",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Mystical Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Negate",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Opt",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Pongify",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Rapid Hybridization",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Snap",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Swan Song",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Thrill of Possibility",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Blasphemous Act",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{8}{R}"
+      },
+      {
+        "name": "Expressive Iteration",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Faithless Looting",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Gamble",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Gitaxian Probe",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U/P}"
+      },
+      {
+        "name": "Ponder",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Preordain",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Serum Visions",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Treasure Cruise",
+        "cmc": 8.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{7}{U}"
+      },
+      {
+        "name": "Vandalblast",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Windfall",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Commander's Sphere",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Decanter of Endless Water",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Izzet Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "cmc": 2.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Talisman of Creativity",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Thought Vessel",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Curiosity",
+        "cmc": 1.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Mystic Remora",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Ophidian Eye",
+        "cmc": 3.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Rhystic Study",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Teferi's Ageless Insight",
+        "cmc": 4.0,
+        "type_line": "Legendary Enchantment",
+        "mana_cost": "{2}{U}{U}"
+      },
+      {
+        "name": "Narset, Parter of Veils",
+        "cmc": 3.0,
+        "type_line": "Legendary Planeswalker \u2014 Narset",
+        "mana_cost": "{1}{U}{U}"
+      },
+      {
+        "name": "Cascade Bluffs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Frostboil Snarl",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Izzet Boilerworks",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mystic Sanctuary",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Reliquary Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Shivan Reef",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Steam Vents",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island Mountain",
+        "mana_cost": ""
+      },
+      {
+        "name": "Stormcarved Coast",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Sulfur Falls",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Swiftwater Cliffs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Temple of Epiphany",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Training Center",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "mana_cost": ""
+      }
+    ]
+  },
+  {
+    "commander": "Veyran, Voice of Duality",
+    "archetype": "Spellslinger (Storm/Cantrips/Magecraft)",
+    "url": "https://edhrec.com/average-decks/veyran-voice-of-duality",
+    "wincon_primary": "Commander damage via Veyran getting massive from doubled magecraft triggers after chaining cantrips and rituals",
+    "wincon_backup": "Guttersnipe / Fiery Inscription / Aetherflux Reservoir storm kills; infinite storm combos via Birgi / Isochron Scepter",
+    "budget_level": "Low-Medium ($50-$150, many cheap cantrips and commons)",
+    "avg_price_usd": 7.47,
+    "salt_score": "Medium (long storm turns can be tiresome)",
+    "card_list": [
+      {
+        "name": "Archmage Emeritus",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{2}{U}{U}"
+      },
+      {
+        "name": "Archmage of Runes",
+        "cmc": 5.0,
+        "type_line": "Creature \u2014 Giant Wizard",
+        "mana_cost": "{3}{U}{U}"
+      },
+      {
+        "name": "Balmor, Battlemage Captain",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Bird Wizard",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Birgi, God of Storytelling",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "mana_cost": ""
+      },
+      {
+        "name": "Coruscation Mage",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Otter Wizard",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Electrostatic Field",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Wall",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Firebrand Archer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Archer",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Goblin Electromancer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Goblin Wizard",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Guttersnipe",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Shaman",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Harmonic Prodigy",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Kessig Flamebreather",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Shaman",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Krark, the Thumbless",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Goblin Wizard",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Niv-Mizzet, Parun",
+        "cmc": 6.0,
+        "type_line": "Legendary Creature \u2014 Dragon Wizard",
+        "mana_cost": "{U}{U}{U}{R}{R}{R}"
+      },
+      {
+        "name": "Stormcatch Mentor",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Otter Wizard",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Storm-Kiln Artist",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Dwarf Shaman",
+        "mana_cost": "{3}{R}"
+      },
+      {
+        "name": "Talrand, Sky Summoner",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Merfolk Wizard",
+        "mana_cost": "{2}{U}{U}"
+      },
+      {
+        "name": "Third Path Iconoclast",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Monk",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Young Pyromancer",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Shaman",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Arcane Denial",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Brainstorm",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Chaos Warp",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Consider",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Counterspell",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Cyclonic Rift",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Expedite",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Flame of Anor",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}{R}"
+      },
+      {
+        "name": "Frantic Search",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Lightning Bolt",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Mystical Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Narset's Reversal",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}{U}"
+      },
+      {
+        "name": "Negate",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Opt",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Pongify",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Prismari Command",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}{R}"
+      },
+      {
+        "name": "Rapid Hybridization",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Seething Song",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Shadow Rift",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Snap",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}"
+      },
+      {
+        "name": "Blasphemous Act",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{8}{R}"
+      },
+      {
+        "name": "Crash Through",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Expressive Iteration",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}{R}"
+      },
+      {
+        "name": "Faithless Looting",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Gitaxian Probe",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U/P}"
+      },
+      {
+        "name": "Grapeshot",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Jeska's Will",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Mana Geyser",
+        "cmc": 5.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{3}{R}{R}"
+      },
+      {
+        "name": "Mizzix's Mastery",
+        "cmc": 4.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{3}{R}"
+      },
+      {
+        "name": "Ponder",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Preordain",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Serum Visions",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Slip Through Space",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{U}"
+      },
+      {
+        "name": "Vandalblast",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Windfall",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Fellwar Stone",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Izzet Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Resonating Lute",
+        "cmc": 4.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}{U}{R}"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Talisman of Creativity",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Thought Vessel",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Arcane Bombardment",
+        "cmc": 6.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{4}{R}{R}"
+      },
+      {
+        "name": "Fiery Inscription",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Rhystic Study",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{U}"
+      },
+      {
+        "name": "Thousand-Year Storm",
+        "cmc": 6.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{4}{U}{R}"
+      },
+      {
+        "name": "Ral, Storm Conduit",
+        "cmc": 4.0,
+        "type_line": "Legendary Planeswalker \u2014 Ral",
+        "mana_cost": "{2}{U}{R}"
+      },
+      {
+        "name": "Cascade Bluffs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Frostboil Snarl",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Izzet Boilerworks",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mystic Sanctuary",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Reliquary Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Riverglide Pathway",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "mana_cost": ""
+      },
+      {
+        "name": "Shivan Reef",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Steam Vents",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Island Mountain",
+        "mana_cost": ""
+      },
+      {
+        "name": "Stormcarved Coast",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Sulfur Falls",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Temple of Epiphany",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Training Center",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Island",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Island",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "mana_cost": ""
+      }
+    ]
+  },
+  {
+    "commander": "Winota, Joiner of Forces",
+    "archetype": "Stax (Hatebears/Aggro)",
+    "url": "https://edhrec.com/average-decks/winota-joiner-of-forces",
+    "wincon_primary": "Overwhelming board via Winota triggers cheating multiple humans into play each combat; Kiki-Jiki / Combat Celebrant combos",
+    "wincon_backup": "Combat damage with Blade Historian / Angrath Marauders doubling; infinite combats with Combat Celebrant loops",
+    "budget_level": "Medium ($200-$400, some stax pieces are expensive)",
+    "avg_price_usd": 12.98,
+    "salt_score": "Very High (banned in some circles, extremely oppressive stax+aggro combination)",
+    "card_list": [
+      {
+        "name": "Alexios, Deimos of Kosmos",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Berserker",
+        "mana_cost": "{3}{R}"
+      },
+      {
+        "name": "Alseid of Life's Bounty",
+        "cmc": 1.0,
+        "type_line": "Enchantment Creature \u2014 Nymph",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Angrath's Marauders",
+        "cmc": 7.0,
+        "type_line": "Creature \u2014 Human Pirate",
+        "mana_cost": "{5}{R}{R}"
+      },
+      {
+        "name": "Archon of Emeria",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Archon",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Aven Mindcensor",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Bird Wizard",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Blade Historian",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "mana_cost": "{R/W}{R/W}{R/W}{R/W}"
+      },
+      {
+        "name": "Boromir, Warden of the Tower",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Cathar Commando",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Soldier",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Combat Celebrant",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Warrior",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Drannith Magistrate",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Eidolon of Rhetoric",
+        "cmc": 3.0,
+        "type_line": "Enchantment Creature \u2014 Spirit",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Esper Sentinel",
+        "cmc": 1.0,
+        "type_line": "Artifact Creature \u2014 Human Soldier",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Ethersworn Canonist",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Human Cleric",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Gingerbrute",
+        "cmc": 1.0,
+        "type_line": "Artifact Creature \u2014 Food Golem",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Giver of Runes",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Kor Cleric",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Goblin Rabblemaster",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Warrior",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Goldnight Commander",
+        "cmc": 4.0,
+        "type_line": "Creature \u2014 Human Cleric Soldier",
+        "mana_cost": "{3}{W}"
+      },
+      {
+        "name": "Grand Abolisher",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "mana_cost": "{W}{W}"
+      },
+      {
+        "name": "Hope of Ghirapur",
+        "cmc": 1.0,
+        "type_line": "Legendary Artifact Creature \u2014 Thopter",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Imperial Recruiter",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Advisor",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Legion Warboss",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Goblin Soldier",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Lena, Selfless Champion",
+        "cmc": 6.0,
+        "type_line": "Legendary Creature \u2014 Human Knight",
+        "mana_cost": "{4}{W}{W}"
+      },
+      {
+        "name": "Loyal Apprentice",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Artificer",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Magus of the Moon",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Mother of Runes",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Myrel, Shield of Argive",
+        "cmc": 4.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "mana_cost": "{3}{W}"
+      },
+      {
+        "name": "Ornithopter",
+        "cmc": 0.0,
+        "type_line": "Artifact Creature \u2014 Thopter",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Ornithopter of Paradise",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Thopter",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Phoenix Chick",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Phoenix",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Phyrexian Revoker",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Horror",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Phyrexian Walker",
+        "cmc": 0.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Construct",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Professional Face-Breaker",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Warrior",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Ragavan, Nimble Pilferer",
+        "cmc": 1.0,
+        "type_line": "Legendary Creature \u2014 Monkey Pirate",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Ranger-Captain of Eos",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Soldier Ranger",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Rionya, Fire Dancer",
+        "cmc": 5.0,
+        "type_line": "Legendary Creature \u2014 Human Wizard",
+        "mana_cost": "{3}{R}{R}"
+      },
+      {
+        "name": "Rograkh, Son of Rohgahh",
+        "cmc": 0.0,
+        "type_line": "Legendary Creature \u2014 Kobold Warrior",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Sanctum Prelate",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Cleric",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Signal Pest",
+        "cmc": 1.0,
+        "type_line": "Artifact Creature \u2014 Pest",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Simian Spirit Guide",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Ape Spirit",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Skrelv, Defector Mite",
+        "cmc": 1.0,
+        "type_line": "Legendary Artifact Creature \u2014 Phyrexian Mite",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Skyclave Apparition",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Kor Spirit",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Soulless Jailer",
+        "cmc": 2.0,
+        "type_line": "Artifact Creature \u2014 Phyrexian Golem",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Spirit of the Labyrinth",
+        "cmc": 2.0,
+        "type_line": "Enchantment Creature \u2014 Spirit",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Thalia, Guardian of Thraben",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Thalia, Heretic Cathar",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Human Soldier",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Witch Enchanter",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "mana_cost": ""
+      },
+      {
+        "name": "Abrade",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Boros Charm",
+        "cmc": 2.0,
+        "type_line": "Instant",
+        "mana_cost": "{R}{W}"
+      },
+      {
+        "name": "Deflecting Swat",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{R}"
+      },
+      {
+        "name": "Flare of Fortitude",
+        "cmc": 4.0,
+        "type_line": "Instant",
+        "mana_cost": "{2}{W}{W}"
+      },
+      {
+        "name": "Path to Exile",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Red Elemental Blast",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{R}"
+      },
+      {
+        "name": "Silence",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Swords to Plowshares",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Blasphemous Act",
+        "cmc": 9.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{8}{R}"
+      },
+      {
+        "name": "Dragon Fodder",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{R}"
+      },
+      {
+        "name": "Shatterskull Smashing",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "mana_cost": ""
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Boros Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Chrome Mox",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Lotus Petal",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Talisman of Conviction",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Deafening Silence",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "High Noon",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Touch the Spirit Realm",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Windcrag Siege",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{R}{W}"
+      },
+      {
+        "name": "Arid Mesa",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Battlefield Forge",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Blinkmoth Nexus",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Cavern of Souls",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Clifftop Retreat",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Eiganjo, Seat of the Empire",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Furycalm Snarl",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Needleverge Pathway",
+        "cmc": 0,
+        "type_line": "Unknown",
+        "mana_cost": ""
+      },
+      {
+        "name": "Rugged Prairie",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Sacred Foundry",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Mountain Plains",
+        "mana_cost": ""
+      },
+      {
+        "name": "Sokenzan, Crucible of Defiance",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Spectator Seating",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Sunbaked Canyon",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mountain",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Mountain",
+        "mana_cost": ""
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "mana_cost": ""
+      }
+    ]
+  },
+  {
+    "commander": "Tayam, Luminous Enigma",
+    "archetype": "Stax (Graveyard/Combo/Counters)",
+    "url": "https://edhrec.com/average-decks/tayam-luminous-enigma",
+    "wincon_primary": "Infinite Tayam activations via persist/undying combo loops milling library and recurring all 3CMC or less permanents from graveyard",
+    "wincon_backup": "Hatebear beatdown with stax creatures; Devoted Druid combo lines; classic reanimator beats",
+    "budget_level": "Medium-High ($300-$600, stax pieces and tutors add significant cost)",
+    "avg_price_usd": 25.51,
+    "salt_score": "High (complex combo lines, stax elements slow game)",
+    "card_list": [
+      {
+        "name": "Archon of Emeria",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Archon",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Avacyn's Pilgrim",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Human Monk",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Aven Interrupter",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Bird Rogue",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Aven Mindcensor",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Bird Wizard",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Badgermole Cub",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Badger Mole",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Bartolom\u00e9 del Presidio",
+        "cmc": 2.0,
+        "type_line": "Legendary Creature \u2014 Vampire Knight",
+        "mana_cost": "{W}{B}"
+      },
+      {
+        "name": "Basking Broodscale",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Eldrazi Lizard",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Birds of Paradise",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Bird",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Bloom Tender",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Carrion Feeder",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Zombie",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Deathrite Shaman",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Elf Shaman",
+        "mana_cost": "{B/G}"
+      },
+      {
+        "name": "Delighted Halfling",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Halfling Citizen",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Devoted Druid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Drannith Magistrate",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{1}{W}"
+      },
+      {
+        "name": "Eidolon of Rhetoric",
+        "cmc": 3.0,
+        "type_line": "Enchantment Creature \u2014 Spirit",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Elves of Deep Shadow",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Elvish Mystic",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Enduring Vitality",
+        "cmc": 3.0,
+        "type_line": "Enchantment Creature \u2014 Elk Glimmer",
+        "mana_cost": "{1}{G}{G}"
+      },
+      {
+        "name": "Eternal Witness",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Shaman",
+        "mana_cost": "{1}{G}{G}"
+      },
+      {
+        "name": "Faeburrow Elder",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Treefolk Druid",
+        "mana_cost": "{1}{G}{W}"
+      },
+      {
+        "name": "Good-Fortune Unicorn",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Unicorn",
+        "mana_cost": "{1}{G}{W}"
+      },
+      {
+        "name": "Icatian Moneychanger",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Human",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Incubation Druid",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Llanowar Elves",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Elf Druid",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Marvin, Murderous Mimic",
+        "cmc": 2.0,
+        "type_line": "Legendary Artifact Creature \u2014 Toy",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Moonshadow",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Elemental",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Opposition Agent",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Rogue",
+        "mana_cost": "{2}{B}"
+      },
+      {
+        "name": "Orcish Bowmasters",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Orc Archer",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Patrolling Peacemaker",
+        "cmc": 3.0,
+        "type_line": "Artifact Creature \u2014 Robot Soldier",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Ranger-Captain of Eos",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Soldier Ranger",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Recruiter of the Guard",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Human Soldier",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Rishkar, Peema Renegade",
+        "cmc": 3.0,
+        "type_line": "Legendary Creature \u2014 Elf Druid",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "Skyclave Apparition",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Kor Spirit",
+        "mana_cost": "{1}{W}{W}"
+      },
+      {
+        "name": "Strangleroot Geist",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Spirit",
+        "mana_cost": "{G}{G}"
+      },
+      {
+        "name": "Sylvan Safekeeper",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Human Wizard",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Wall of Roots",
+        "cmc": 2.0,
+        "type_line": "Creature \u2014 Plant Wall",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Warden of the Grove",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Hydra",
+        "mana_cost": "{2}{G}"
+      },
+      {
+        "name": "White Plume Adventurer",
+        "cmc": 3.0,
+        "type_line": "Creature \u2014 Orc Cleric",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Young Wolf",
+        "cmc": 1.0,
+        "type_line": "Creature \u2014 Wolf",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Chord of Calling",
+        "cmc": 3.0,
+        "type_line": "Instant",
+        "mana_cost": "{X}{G}{G}{G}"
+      },
+      {
+        "name": "Crop Rotation",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Path to Exile",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Swords to Plowshares",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Vampiric Tutor",
+        "cmc": 1.0,
+        "type_line": "Instant",
+        "mana_cost": "{B}"
+      },
+      {
+        "name": "Demonic Tutor",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{B}"
+      },
+      {
+        "name": "Farseek",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Green Sun's Zenith",
+        "cmc": 1.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{X}{G}"
+      },
+      {
+        "name": "Nature's Rhythm",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "mana_cost": "{X}{G}{G}"
+      },
+      {
+        "name": "Agatha's Soul Cauldron",
+        "cmc": 2.0,
+        "type_line": "Legendary Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Arcane Signet",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "mana_cost": "{2}"
+      },
+      {
+        "name": "Ashnod's Altar",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Lion's Eye Diamond",
+        "cmc": 0.0,
+        "type_line": "Artifact",
+        "mana_cost": "{0}"
+      },
+      {
+        "name": "Sol Ring",
+        "cmc": 1.0,
+        "type_line": "Artifact",
+        "mana_cost": "{1}"
+      },
+      {
+        "name": "Thousand-Year Elixir",
+        "cmc": 3.0,
+        "type_line": "Artifact",
+        "mana_cost": "{3}"
+      },
+      {
+        "name": "Abzan Ascendancy",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{W}{B}{G}"
+      },
+      {
+        "name": "Carpet of Flowers",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Cryptolith Rite",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Deafening Silence",
+        "cmc": 1.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{W}"
+      },
+      {
+        "name": "Earthcraft",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{1}{G}"
+      },
+      {
+        "name": "Insidious Roots",
+        "cmc": 2.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{B}{G}"
+      },
+      {
+        "name": "Nature's Chosen",
+        "cmc": 1.0,
+        "type_line": "Enchantment \u2014 Aura",
+        "mana_cost": "{G}"
+      },
+      {
+        "name": "Promise of Bunrei",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Touch the Spirit Realm",
+        "cmc": 3.0,
+        "type_line": "Enchantment",
+        "mana_cost": "{2}{W}"
+      },
+      {
+        "name": "Tyvar, Jubilant Brawler",
+        "cmc": 3.0,
+        "type_line": "Legendary Planeswalker \u2014 Tyvar",
+        "mana_cost": "{1}{B}{G}"
+      },
+      {
+        "name": "Bayou",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Boseiju, Who Endures",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Caves of Koilos",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Centaur Garden",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "City of Brass",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Command Tower",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Exotic Orchard",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Gaea's Cradle",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Gavony Township",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Godless Shrine",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Llanowar Wastes",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Mana Confluence",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Marsh Flats",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Misty Rainforest",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Overgrown Tomb",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Swamp Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Phyrexian Tower",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Savannah",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Plains",
+        "mana_cost": ""
+      },
+      {
+        "name": "Scrubland",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Plains Swamp",
+        "mana_cost": ""
+      },
+      {
+        "name": "Temple Garden",
+        "cmc": 0.0,
+        "type_line": "Land \u2014 Forest Plains",
+        "mana_cost": ""
+      },
+      {
+        "name": "Verdant Catacombs",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Windswept Heath",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Wooded Foothills",
+        "cmc": 0.0,
+        "type_line": "Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Yavimaya, Cradle of Growth",
+        "cmc": 0.0,
+        "type_line": "Legendary Land",
+        "mana_cost": ""
+      },
+      {
+        "name": "Forest",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Forest",
+        "mana_cost": ""
+      },
+      {
+        "name": "Plains",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Plains",
+        "mana_cost": ""
+      },
+      {
+        "name": "Swamp",
+        "cmc": 0.0,
+        "type_line": "Basic Land \u2014 Swamp",
+        "mana_cost": ""
+      }
+    ]
+  }
+]

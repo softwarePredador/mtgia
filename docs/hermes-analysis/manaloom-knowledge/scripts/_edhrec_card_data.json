@@ -1,0 +1,2567 @@
+[
+  {
+    "name": "Mountain",
+    "sanitized": "mountain",
+    "inclusion": 7526,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": 0,
+    "pct": 98.4
+  },
+  {
+    "name": "Plains",
+    "sanitized": "plains",
+    "inclusion": 7492,
+    "potential_decks": 7651,
+    "synergy": 0,
+    "trend_zscore": 0,
+    "pct": 97.9
+  },
+  {
+    "name": "Sol Ring",
+    "sanitized": "sol-ring",
+    "inclusion": 6926,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 90.5
+  },
+  {
+    "name": "Command Tower",
+    "sanitized": "command-tower",
+    "inclusion": 6747,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": 0,
+    "pct": 88.2
+  },
+  {
+    "name": "Arcane Signet",
+    "sanitized": "arcane-signet",
+    "inclusion": 6742,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": 0,
+    "pct": 88.1
+  },
+  {
+    "name": "Hit the Mother Lode",
+    "sanitized": "hit-the-mother-lode",
+    "inclusion": 6075,
+    "potential_decks": 7651,
+    "synergy": 0.77,
+    "trend_zscore": 1.2975055239052113,
+    "pct": 79.4
+  },
+  {
+    "name": "Library of Leng",
+    "sanitized": "library-of-leng",
+    "inclusion": 5944,
+    "potential_decks": 7651,
+    "synergy": 0.75,
+    "trend_zscore": 1.4577130582453561,
+    "pct": 77.7
+  },
+  {
+    "name": "Clifftop Retreat",
+    "sanitized": "clifftop-retreat",
+    "inclusion": 5785,
+    "potential_decks": 7651,
+    "synergy": 0.1,
+    "trend_zscore": 0,
+    "pct": 75.6
+  },
+  {
+    "name": "Storm Herd",
+    "sanitized": "storm-herd",
+    "inclusion": 5755,
+    "potential_decks": 7651,
+    "synergy": 0.72,
+    "trend_zscore": 1.2103199158392381,
+    "pct": 75.2
+  },
+  {
+    "name": "Monument to Endurance",
+    "sanitized": "monument-to-endurance",
+    "inclusion": 5580,
+    "potential_decks": 7651,
+    "synergy": 0.68,
+    "trend_zscore": 1.2929275816193637,
+    "pct": 72.9
+  },
+  {
+    "name": "Bender's Waterskin",
+    "sanitized": "benders-waterskin",
+    "inclusion": 5445,
+    "potential_decks": 7651,
+    "synergy": 0.65,
+    "trend_zscore": 0,
+    "pct": 71.2
+  },
+  {
+    "name": "Swords to Plowshares",
+    "sanitized": "swords-to-plowshares",
+    "inclusion": 5273,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": 1.1985357954945244,
+    "pct": 68.9
+  },
+  {
+    "name": "Brass's Bounty",
+    "sanitized": "brasss-bounty",
+    "inclusion": 5142,
+    "potential_decks": 7651,
+    "synergy": 0.65,
+    "trend_zscore": 1.1436113164646249,
+    "pct": 67.2
+  },
+  {
+    "name": "Big Score",
+    "sanitized": "big-score",
+    "inclusion": 5141,
+    "potential_decks": 7651,
+    "synergy": 0.55,
+    "trend_zscore": 1.53169582478914,
+    "pct": 67.2
+  },
+  {
+    "name": "Sacred Foundry",
+    "sanitized": "sacred-foundry",
+    "inclusion": 5132,
+    "potential_decks": 7651,
+    "synergy": 0.2,
+    "trend_zscore": 0,
+    "pct": 67.1
+  },
+  {
+    "name": "Sensei's Divining Top",
+    "sanitized": "senseis-divining-top",
+    "inclusion": 5123,
+    "potential_decks": 7651,
+    "synergy": 0.63,
+    "trend_zscore": 0.5900954351645934,
+    "pct": 67.0
+  },
+  {
+    "name": "Call Forth the Tempest",
+    "sanitized": "call-forth-the-tempest",
+    "inclusion": 5021,
+    "potential_decks": 7651,
+    "synergy": 0.63,
+    "trend_zscore": -0.29968912492074656,
+    "pct": 65.6
+  },
+  {
+    "name": "Talisman of Conviction",
+    "sanitized": "talisman-of-conviction",
+    "inclusion": 4964,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": 0,
+    "pct": 64.9
+  },
+  {
+    "name": "Volcanic Vision",
+    "sanitized": "volcanic-vision",
+    "inclusion": 4891,
+    "potential_decks": 7651,
+    "synergy": 0.62,
+    "trend_zscore": 1.2165330359926105,
+    "pct": 63.9
+  },
+  {
+    "name": "Approach of the Second Sun",
+    "sanitized": "approach-of-the-second-sun",
+    "inclusion": 4888,
+    "potential_decks": 7651,
+    "synergy": 0.62,
+    "trend_zscore": 0.7613615877249613,
+    "pct": 63.9
+  },
+  {
+    "name": "Battlefield Forge",
+    "sanitized": "battlefield-forge",
+    "inclusion": 4857,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 63.5
+  },
+  {
+    "name": "Improvisation Capstone",
+    "sanitized": "improvisation-capstone",
+    "inclusion": 3725,
+    "potential_decks": 6091,
+    "synergy": 0.54,
+    "trend_zscore": 8.21485443786242,
+    "pct": 61.2
+  },
+  {
+    "name": "Sundown Pass",
+    "sanitized": "sundown-pass",
+    "inclusion": 4611,
+    "potential_decks": 7651,
+    "synergy": 0.23,
+    "trend_zscore": 0,
+    "pct": 60.3
+  },
+  {
+    "name": "Scroll Rack",
+    "sanitized": "scroll-rack",
+    "inclusion": 4572,
+    "potential_decks": 7651,
+    "synergy": 0.57,
+    "trend_zscore": 0.4697568608917706,
+    "pct": 59.8
+  },
+  {
+    "name": "Mizzix's Mastery",
+    "sanitized": "mizzixs-mastery",
+    "inclusion": 4412,
+    "potential_decks": 7651,
+    "synergy": 0.55,
+    "trend_zscore": 1.0571521390009682,
+    "pct": 57.7
+  },
+  {
+    "name": "Path to Exile",
+    "sanitized": "path-to-exile",
+    "inclusion": 4377,
+    "potential_decks": 7651,
+    "synergy": 0,
+    "trend_zscore": 0.8779810822847902,
+    "pct": 57.2
+  },
+  {
+    "name": "Unexpected Windfall",
+    "sanitized": "unexpected-windfall",
+    "inclusion": 4348,
+    "potential_decks": 7651,
+    "synergy": 0.48,
+    "trend_zscore": 0.6720853883071406,
+    "pct": 56.8
+  },
+  {
+    "name": "Storm-Kiln Artist",
+    "sanitized": "storm-kiln-artist",
+    "inclusion": 4235,
+    "potential_decks": 7651,
+    "synergy": 0.48,
+    "trend_zscore": 0.7459571348705202,
+    "pct": 55.4
+  },
+  {
+    "name": "Apex of Power",
+    "sanitized": "apex-of-power",
+    "inclusion": 4230,
+    "potential_decks": 7651,
+    "synergy": 0.54,
+    "trend_zscore": 0.09088934335706073,
+    "pct": 55.3
+  },
+  {
+    "name": "Rise of the Eldrazi",
+    "sanitized": "rise-of-the-eldrazi",
+    "inclusion": 4206,
+    "potential_decks": 7651,
+    "synergy": 0.54,
+    "trend_zscore": -0.4918892624779689,
+    "pct": 55.0
+  },
+  {
+    "name": "Victory Chimes",
+    "sanitized": "victory-chimes",
+    "inclusion": 4123,
+    "potential_decks": 7651,
+    "synergy": 0.52,
+    "trend_zscore": 0,
+    "pct": 53.9
+  },
+  {
+    "name": "Spectator Seating",
+    "sanitized": "spectator-seating",
+    "inclusion": 4082,
+    "potential_decks": 7651,
+    "synergy": 0.14,
+    "trend_zscore": 0,
+    "pct": 53.4
+  },
+  {
+    "name": "Ol\u00f3rin's Searing Light",
+    "sanitized": "olorins-searing-light",
+    "inclusion": 4081,
+    "potential_decks": 7651,
+    "synergy": 0.49,
+    "trend_zscore": 0.594647617655786,
+    "pct": 53.3
+  },
+  {
+    "name": "Rugged Prairie",
+    "sanitized": "rugged-prairie",
+    "inclusion": 4005,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": 0,
+    "pct": 52.3
+  },
+  {
+    "name": "Dance with Calamity",
+    "sanitized": "dance-with-calamity",
+    "inclusion": 3853,
+    "potential_decks": 7651,
+    "synergy": 0.49,
+    "trend_zscore": 0.5892059153498498,
+    "pct": 50.4
+  },
+  {
+    "name": "Boros Signet",
+    "sanitized": "boros-signet",
+    "inclusion": 3854,
+    "potential_decks": 7651,
+    "synergy": 0,
+    "trend_zscore": 0,
+    "pct": 50.4
+  },
+  {
+    "name": "Restoration Seminar",
+    "sanitized": "restoration-seminar",
+    "inclusion": 2844,
+    "potential_decks": 5922,
+    "synergy": 0.39,
+    "trend_zscore": 9.141686229724515,
+    "pct": 48.0
+  },
+  {
+    "name": "Longshot, Rebel Bowman",
+    "sanitized": "longshot-rebel-bowman",
+    "inclusion": 3673,
+    "potential_decks": 7651,
+    "synergy": 0.44,
+    "trend_zscore": 0.36130210581683714,
+    "pct": 48.0
+  },
+  {
+    "name": "Elegant Parlor",
+    "sanitized": "elegant-parlor",
+    "inclusion": 3666,
+    "potential_decks": 7651,
+    "synergy": 0.28,
+    "trend_zscore": 0,
+    "pct": 47.9
+  },
+  {
+    "name": "Double Vision",
+    "sanitized": "double-vision",
+    "inclusion": 3580,
+    "potential_decks": 7651,
+    "synergy": 0.44,
+    "trend_zscore": 0.15192005860524868,
+    "pct": 46.8
+  },
+  {
+    "name": "Radiant Summit",
+    "sanitized": "radiant-summit",
+    "inclusion": 3548,
+    "potential_decks": 7651,
+    "synergy": 0.24,
+    "trend_zscore": 0,
+    "pct": 46.4
+  },
+  {
+    "name": "Boros Charm",
+    "sanitized": "boros-charm",
+    "inclusion": 3482,
+    "potential_decks": 7651,
+    "synergy": -0.02,
+    "trend_zscore": 0.3417829784599786,
+    "pct": 45.5
+  },
+  {
+    "name": "Insurrection",
+    "sanitized": "insurrection",
+    "inclusion": 3480,
+    "potential_decks": 7651,
+    "synergy": 0.42,
+    "trend_zscore": 0.06109500191129552,
+    "pct": 45.5
+  },
+  {
+    "name": "Arid Mesa",
+    "sanitized": "arid-mesa",
+    "inclusion": 3471,
+    "potential_decks": 7651,
+    "synergy": 0.17,
+    "trend_zscore": 0,
+    "pct": 45.4
+  },
+  {
+    "name": "Lightning Greaves",
+    "sanitized": "lightning-greaves",
+    "inclusion": 3458,
+    "potential_decks": 7651,
+    "synergy": 0.16,
+    "trend_zscore": 0.8636740607764397,
+    "pct": 45.2
+  },
+  {
+    "name": "Sunbillow Verge",
+    "sanitized": "sunbillow-verge",
+    "inclusion": 3443,
+    "potential_decks": 7651,
+    "synergy": 0.21,
+    "trend_zscore": 0,
+    "pct": 45.0
+  },
+  {
+    "name": "Temple of Triumph",
+    "sanitized": "temple-of-triumph",
+    "inclusion": 3430,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": 0,
+    "pct": 44.8
+  },
+  {
+    "name": "Emeria's Call",
+    "sanitized": "emerias-call",
+    "inclusion": 3327,
+    "potential_decks": 7651,
+    "synergy": 0.41,
+    "trend_zscore": 0,
+    "pct": 43.5
+  },
+  {
+    "name": "Emeria's Call",
+    "sanitized": "emerias-call",
+    "inclusion": 3327,
+    "potential_decks": 7651,
+    "synergy": 0.41,
+    "trend_zscore": 0,
+    "pct": 43.5
+  },
+  {
+    "name": "Soulfire Eruption",
+    "sanitized": "soulfire-eruption",
+    "inclusion": 3265,
+    "potential_decks": 7651,
+    "synergy": 0.41,
+    "trend_zscore": 0.32052022524019685,
+    "pct": 42.7
+  },
+  {
+    "name": "Arcane Bombardment",
+    "sanitized": "arcane-bombardment",
+    "inclusion": 3262,
+    "potential_decks": 7651,
+    "synergy": 0.41,
+    "trend_zscore": 0.08480132818433538,
+    "pct": 42.6
+  },
+  {
+    "name": "Ruby Medallion",
+    "sanitized": "ruby-medallion",
+    "inclusion": 3243,
+    "potential_decks": 7651,
+    "synergy": 0.37,
+    "trend_zscore": -0.40095300171396586,
+    "pct": 42.4
+  },
+  {
+    "name": "Penance",
+    "sanitized": "penance",
+    "inclusion": 3195,
+    "potential_decks": 7651,
+    "synergy": 0.41,
+    "trend_zscore": 1.152262004279367,
+    "pct": 41.8
+  },
+  {
+    "name": "Pinnacle Monk",
+    "sanitized": "pinnacle-monk",
+    "inclusion": 3179,
+    "potential_decks": 7651,
+    "synergy": 0.35,
+    "trend_zscore": 0,
+    "pct": 41.6
+  },
+  {
+    "name": "Pinnacle Monk",
+    "sanitized": "pinnacle-monk",
+    "inclusion": 3179,
+    "potential_decks": 7651,
+    "synergy": 0.35,
+    "trend_zscore": 0,
+    "pct": 41.6
+  },
+  {
+    "name": "Hexing Squelcher",
+    "sanitized": "hexing-squelcher",
+    "inclusion": 3135,
+    "potential_decks": 7651,
+    "synergy": 0.33,
+    "trend_zscore": 0.3315523877380719,
+    "pct": 41.0
+  },
+  {
+    "name": "Blasphemous Act",
+    "sanitized": "blasphemous-act",
+    "inclusion": 3096,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": 0.07762073614076494,
+    "pct": 40.5
+  },
+  {
+    "name": "Furycalm Snarl",
+    "sanitized": "furycalm-snarl",
+    "inclusion": 3051,
+    "potential_decks": 7651,
+    "synergy": -0.04,
+    "trend_zscore": 0,
+    "pct": 39.9
+  },
+  {
+    "name": "Dragon's Rage Channeler",
+    "sanitized": "dragons-rage-channeler",
+    "inclusion": 3027,
+    "potential_decks": 7651,
+    "synergy": 0.38,
+    "trend_zscore": 0.48297600845248034,
+    "pct": 39.6
+  },
+  {
+    "name": "Chaos Warp",
+    "sanitized": "chaos-warp",
+    "inclusion": 2973,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": 0.4301166864296807,
+    "pct": 38.9
+  },
+  {
+    "name": "Reforge the Soul",
+    "sanitized": "reforge-the-soul",
+    "inclusion": 2903,
+    "potential_decks": 7651,
+    "synergy": 0.36,
+    "trend_zscore": 0.35165844252281653,
+    "pct": 37.9
+  },
+  {
+    "name": "Deflecting Swat",
+    "sanitized": "deflecting-swat",
+    "inclusion": 2820,
+    "potential_decks": 7651,
+    "synergy": 0.21,
+    "trend_zscore": 0.03237802617025572,
+    "pct": 36.9
+  },
+  {
+    "name": "Tablet of Discovery",
+    "sanitized": "tablet-of-discovery",
+    "inclusion": 1981,
+    "potential_decks": 5420,
+    "synergy": 0.3,
+    "trend_zscore": 0,
+    "pct": 36.5
+  },
+  {
+    "name": "Taunt from the Rampart",
+    "sanitized": "taunt-from-the-rampart",
+    "inclusion": 2698,
+    "potential_decks": 7651,
+    "synergy": 0.28,
+    "trend_zscore": 0.1604411283751136,
+    "pct": 35.3
+  },
+  {
+    "name": "Perch Protection",
+    "sanitized": "perch-protection",
+    "inclusion": 2653,
+    "potential_decks": 7651,
+    "synergy": 0.33,
+    "trend_zscore": -0.4145972470603391,
+    "pct": 34.7
+  },
+  {
+    "name": "Mother of Runes",
+    "sanitized": "mother-of-runes",
+    "inclusion": 2641,
+    "potential_decks": 7651,
+    "synergy": 0.22,
+    "trend_zscore": 0.21655054846792912,
+    "pct": 34.5
+  },
+  {
+    "name": "Beacon of Immortality",
+    "sanitized": "beacon-of-immortality",
+    "inclusion": 2638,
+    "potential_decks": 7651,
+    "synergy": 0.33,
+    "trend_zscore": -0.439398886068796,
+    "pct": 34.5
+  },
+  {
+    "name": "Fellwar Stone",
+    "sanitized": "fellwar-stone",
+    "inclusion": 2626,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": 0,
+    "pct": 34.3
+  },
+  {
+    "name": "Reliquary Tower",
+    "sanitized": "reliquary-tower",
+    "inclusion": 2620,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": -0.020058625664148653,
+    "pct": 34.2
+  },
+  {
+    "name": "Invoke Calamity",
+    "sanitized": "invoke-calamity",
+    "inclusion": 2598,
+    "potential_decks": 7651,
+    "synergy": 0.33,
+    "trend_zscore": 0.091696360893429,
+    "pct": 34.0
+  },
+  {
+    "name": "Goliath Daydreamer",
+    "sanitized": "goliath-daydreamer",
+    "inclusion": 2559,
+    "potential_decks": 7651,
+    "synergy": 0.3,
+    "trend_zscore": 1.1533560227988597,
+    "pct": 33.4
+  },
+  {
+    "name": "Austere Command",
+    "sanitized": "austere-command",
+    "inclusion": 2551,
+    "potential_decks": 7651,
+    "synergy": 0.17,
+    "trend_zscore": -0.14945641751377617,
+    "pct": 33.3
+  },
+  {
+    "name": "Velomachus Lorehold",
+    "sanitized": "velomachus-lorehold",
+    "inclusion": 2508,
+    "potential_decks": 7651,
+    "synergy": 0.31,
+    "trend_zscore": 0.04437529517493856,
+    "pct": 32.8
+  },
+  {
+    "name": "Generous Gift",
+    "sanitized": "generous-gift",
+    "inclusion": 2484,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": 0.22772285511117196,
+    "pct": 32.5
+  },
+  {
+    "name": "Guttersnipe",
+    "sanitized": "guttersnipe",
+    "inclusion": 2476,
+    "potential_decks": 7651,
+    "synergy": 0.26,
+    "trend_zscore": -0.09416852435981383,
+    "pct": 32.4
+  },
+  {
+    "name": "Esper Sentinel",
+    "sanitized": "esper-sentinel",
+    "inclusion": 2474,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.5433996264582001,
+    "pct": 32.3
+  },
+  {
+    "name": "Land Tax",
+    "sanitized": "land-tax",
+    "inclusion": 2391,
+    "potential_decks": 7651,
+    "synergy": 0.2,
+    "trend_zscore": 0.7966649849317813,
+    "pct": 31.3
+  },
+  {
+    "name": "Exotic Orchard",
+    "sanitized": "exotic-orchard",
+    "inclusion": 2379,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": 0,
+    "pct": 31.1
+  },
+  {
+    "name": "Needleverge Pathway",
+    "sanitized": "needleverge-pathway",
+    "inclusion": 2353,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 30.8
+  },
+  {
+    "name": "Jeska's Will",
+    "sanitized": "jeskas-will",
+    "inclusion": 2331,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": 0.37517229893415055,
+    "pct": 30.5
+  },
+  {
+    "name": "Invincible Hymn",
+    "sanitized": "invincible-hymn",
+    "inclusion": 2329,
+    "potential_decks": 7651,
+    "synergy": 0.3,
+    "trend_zscore": 0.303587740736434,
+    "pct": 30.4
+  },
+  {
+    "name": "Primal Amulet",
+    "sanitized": "primal-amulet",
+    "inclusion": 2325,
+    "potential_decks": 7651,
+    "synergy": 0.29,
+    "trend_zscore": -0.30439894423765085,
+    "pct": 30.4
+  },
+  {
+    "name": "Caldera Pyremaw",
+    "sanitized": "caldera-pyremaw",
+    "inclusion": 2301,
+    "potential_decks": 7651,
+    "synergy": 0.28,
+    "trend_zscore": 0.1354061156300672,
+    "pct": 30.1
+  },
+  {
+    "name": "Verge Rangers",
+    "sanitized": "verge-rangers",
+    "inclusion": 2287,
+    "potential_decks": 7651,
+    "synergy": 0.29,
+    "trend_zscore": 0.06995081489076578,
+    "pct": 29.9
+  },
+  {
+    "name": "The Dawning Archaic",
+    "sanitized": "the-dawning-archaic",
+    "inclusion": 1817,
+    "potential_decks": 6091,
+    "synergy": 0.27,
+    "trend_zscore": 5.313718193950545,
+    "pct": 29.8
+  },
+  {
+    "name": "Faithless Looting",
+    "sanitized": "faithless-looting",
+    "inclusion": 2265,
+    "potential_decks": 7651,
+    "synergy": 0.12,
+    "trend_zscore": 0.4601087659064929,
+    "pct": 29.6
+  },
+  {
+    "name": "Smothering Tithe",
+    "sanitized": "smothering-tithe",
+    "inclusion": 2251,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": 0.09361127560383481,
+    "pct": 29.4
+  },
+  {
+    "name": "Turbulent Steppe",
+    "sanitized": "turbulent-steppe",
+    "inclusion": 1738,
+    "potential_decks": 6055,
+    "synergy": 0.11,
+    "trend_zscore": 0,
+    "pct": 28.7
+  },
+  {
+    "name": "Bolt Bend",
+    "sanitized": "bolt-bend",
+    "inclusion": 2189,
+    "potential_decks": 7651,
+    "synergy": 0.25,
+    "trend_zscore": 0.4768974316653088,
+    "pct": 28.6
+  },
+  {
+    "name": "Valakut Awakening",
+    "sanitized": "valakut-awakening",
+    "inclusion": 2056,
+    "potential_decks": 7651,
+    "synergy": 0.2,
+    "trend_zscore": 0,
+    "pct": 26.9
+  },
+  {
+    "name": "Urza's Saga",
+    "sanitized": "urzas-saga",
+    "inclusion": 2058,
+    "potential_decks": 7651,
+    "synergy": 0.17,
+    "trend_zscore": -0.33988195290599416,
+    "pct": 26.9
+  },
+  {
+    "name": "Valakut Awakening",
+    "sanitized": "valakut-awakening",
+    "inclusion": 2056,
+    "potential_decks": 7651,
+    "synergy": 0.2,
+    "trend_zscore": 0,
+    "pct": 26.9
+  },
+  {
+    "name": "Radiant Scrollwielder",
+    "sanitized": "radiant-scrollwielder",
+    "inclusion": 2042,
+    "potential_decks": 7651,
+    "synergy": 0.24,
+    "trend_zscore": -0.457463491214881,
+    "pct": 26.7
+  },
+  {
+    "name": "Galvanoth",
+    "sanitized": "galvanoth",
+    "inclusion": 2032,
+    "potential_decks": 7651,
+    "synergy": 0.26,
+    "trend_zscore": 0.04330763199452085,
+    "pct": 26.6
+  },
+  {
+    "name": "Creative Technique",
+    "sanitized": "creative-technique",
+    "inclusion": 2019,
+    "potential_decks": 7651,
+    "synergy": 0.26,
+    "trend_zscore": 0.49254844140424303,
+    "pct": 26.4
+  },
+  {
+    "name": "Mana Geyser",
+    "sanitized": "mana-geyser",
+    "inclusion": 2012,
+    "potential_decks": 7651,
+    "synergy": 0.22,
+    "trend_zscore": -0.2291699869537354,
+    "pct": 26.3
+  },
+  {
+    "name": "Swiftfoot Boots",
+    "sanitized": "swiftfoot-boots",
+    "inclusion": 1942,
+    "potential_decks": 7651,
+    "synergy": -0.17,
+    "trend_zscore": -0.021890582473949868,
+    "pct": 25.4
+  },
+  {
+    "name": "Pearl Medallion",
+    "sanitized": "pearl-medallion",
+    "inclusion": 1929,
+    "potential_decks": 7651,
+    "synergy": 0.19,
+    "trend_zscore": -0.4835321715658446,
+    "pct": 25.2
+  },
+  {
+    "name": "Boros Garrison",
+    "sanitized": "boros-garrison",
+    "inclusion": 1914,
+    "potential_decks": 7651,
+    "synergy": -0.12,
+    "trend_zscore": 0,
+    "pct": 25.0
+  },
+  {
+    "name": "Promise of Loyalty",
+    "sanitized": "promise-of-loyalty",
+    "inclusion": 1860,
+    "potential_decks": 7651,
+    "synergy": 0.2,
+    "trend_zscore": 0.8798922042095331,
+    "pct": 24.3
+  },
+  {
+    "name": "Reprieve",
+    "sanitized": "reprieve",
+    "inclusion": 1833,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": 0.31121353358863274,
+    "pct": 24.0
+  },
+  {
+    "name": "Electro, Assaulting Battery",
+    "sanitized": "electro-assaulting-battery",
+    "inclusion": 1789,
+    "potential_decks": 7651,
+    "synergy": 0.21,
+    "trend_zscore": -0.5488054582412449,
+    "pct": 23.4
+  },
+  {
+    "name": "Rite of the Dragoncaller",
+    "sanitized": "rite-of-the-dragoncaller",
+    "inclusion": 1785,
+    "potential_decks": 7651,
+    "synergy": 0.22,
+    "trend_zscore": -0.2101733038976017,
+    "pct": 23.3
+  },
+  {
+    "name": "Reckless Endeavor",
+    "sanitized": "reckless-endeavor",
+    "inclusion": 1714,
+    "potential_decks": 7651,
+    "synergy": 0.22,
+    "trend_zscore": -0.5498449364072381,
+    "pct": 22.4
+  },
+  {
+    "name": "Mind Stone",
+    "sanitized": "mind-stone",
+    "inclusion": 1714,
+    "potential_decks": 7651,
+    "synergy": -0.02,
+    "trend_zscore": 0,
+    "pct": 22.4
+  },
+  {
+    "name": "Surly Badgersaur",
+    "sanitized": "surly-badgersaur",
+    "inclusion": 1633,
+    "potential_decks": 7651,
+    "synergy": 0.2,
+    "trend_zscore": -0.06346502756754831,
+    "pct": 21.3
+  },
+  {
+    "name": "Sunscorched Divide",
+    "sanitized": "sunscorched-divide",
+    "inclusion": 1631,
+    "potential_decks": 7651,
+    "synergy": 0,
+    "trend_zscore": 0,
+    "pct": 21.3
+  },
+  {
+    "name": "Teferi's Protection",
+    "sanitized": "teferis-protection",
+    "inclusion": 1620,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0.014786758620839389,
+    "pct": 21.2
+  },
+  {
+    "name": "Sunbaked Canyon",
+    "sanitized": "sunbaked-canyon",
+    "inclusion": 1607,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": 0,
+    "pct": 21.0
+  },
+  {
+    "name": "Artist's Talent",
+    "sanitized": "artists-talent",
+    "inclusion": 1599,
+    "potential_decks": 7651,
+    "synergy": 0.19,
+    "trend_zscore": -0.7229111795188982,
+    "pct": 20.9
+  },
+  {
+    "name": "Redirect Lightning",
+    "sanitized": "redirect-lightning",
+    "inclusion": 1579,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": -0.23710477028188967,
+    "pct": 20.6
+  },
+  {
+    "name": "Deploy to the Front",
+    "sanitized": "deploy-to-the-front",
+    "inclusion": 1563,
+    "potential_decks": 7651,
+    "synergy": 0.19,
+    "trend_zscore": 0.16063223225372852,
+    "pct": 20.4
+  },
+  {
+    "name": "Command Beacon",
+    "sanitized": "command-beacon",
+    "inclusion": 1562,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": -0.2240139421672748,
+    "pct": 20.4
+  },
+  {
+    "name": "Deflecting Palm",
+    "sanitized": "deflecting-palm",
+    "inclusion": 1537,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.05557089271086412,
+    "pct": 20.1
+  },
+  {
+    "name": "Flawless Maneuver",
+    "sanitized": "flawless-maneuver",
+    "inclusion": 1528,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.30624464202469115,
+    "pct": 20.0
+  },
+  {
+    "name": "Surge to Victory",
+    "sanitized": "surge-to-victory",
+    "inclusion": 1505,
+    "potential_decks": 7651,
+    "synergy": 0.18,
+    "trend_zscore": 0.5427414801055404,
+    "pct": 19.7
+  },
+  {
+    "name": "Giver of Runes",
+    "sanitized": "giver-of-runes",
+    "inclusion": 1500,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": -0.29169479054091174,
+    "pct": 19.6
+  },
+  {
+    "name": "Reverse the Sands",
+    "sanitized": "reverse-the-sands",
+    "inclusion": 1450,
+    "potential_decks": 7651,
+    "synergy": 0.18,
+    "trend_zscore": 0.052932940898619586,
+    "pct": 19.0
+  },
+  {
+    "name": "Fabled Passage",
+    "sanitized": "fabled-passage",
+    "inclusion": 1450,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": 0,
+    "pct": 19.0
+  },
+  {
+    "name": "Witch Enchanter",
+    "sanitized": "witch-enchanter",
+    "inclusion": 1448,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 18.9
+  },
+  {
+    "name": "Witch Enchanter",
+    "sanitized": "witch-enchanter",
+    "inclusion": 1448,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 18.9
+  },
+  {
+    "name": "Thought Vessel",
+    "sanitized": "thought-vessel",
+    "inclusion": 1433,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 18.7
+  },
+  {
+    "name": "Plateau",
+    "sanitized": "plateau",
+    "inclusion": 1428,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 18.7
+  },
+  {
+    "name": "Enlightened Tutor",
+    "sanitized": "enlightened-tutor",
+    "inclusion": 1400,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": -0.1364574450769893,
+    "pct": 18.3
+  },
+  {
+    "name": "Brainstone",
+    "sanitized": "brainstone",
+    "inclusion": 1403,
+    "potential_decks": 7651,
+    "synergy": 0.18,
+    "trend_zscore": -0.2937739717149652,
+    "pct": 18.3
+  },
+  {
+    "name": "Reverberate",
+    "sanitized": "reverberate",
+    "inclusion": 1381,
+    "potential_decks": 7651,
+    "synergy": 0.16,
+    "trend_zscore": -0.5104178154759924,
+    "pct": 18.0
+  },
+  {
+    "name": "Untimely Malfunction",
+    "sanitized": "untimely-malfunction",
+    "inclusion": 1377,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.2657323236226971,
+    "pct": 18.0
+  },
+  {
+    "name": "Stroke of Midnight",
+    "sanitized": "stroke-of-midnight",
+    "inclusion": 1375,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.21883043007448974,
+    "pct": 18.0
+  },
+  {
+    "name": "Goldspan Dragon",
+    "sanitized": "goldspan-dragon",
+    "inclusion": 1366,
+    "potential_decks": 7651,
+    "synergy": 0.14,
+    "trend_zscore": -0.2231984038808977,
+    "pct": 17.9
+  },
+  {
+    "name": "Hidden Retreat",
+    "sanitized": "hidden-retreat",
+    "inclusion": 1346,
+    "potential_decks": 7651,
+    "synergy": 0.17,
+    "trend_zscore": 0,
+    "pct": 17.6
+  },
+  {
+    "name": "Planetarium of Wan Shi Tong",
+    "sanitized": "planetarium-of-wan-shi-tong",
+    "inclusion": 1341,
+    "potential_decks": 7651,
+    "synergy": 0.16,
+    "trend_zscore": 0.24808460120173073,
+    "pct": 17.5
+  },
+  {
+    "name": "Farewell",
+    "sanitized": "farewell",
+    "inclusion": 1326,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.9408538729756527,
+    "pct": 17.3
+  },
+  {
+    "name": "Archaeomancer's Map",
+    "sanitized": "archaeomancers-map",
+    "inclusion": 1319,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": 0.2897205601095854,
+    "pct": 17.2
+  },
+  {
+    "name": "Searing Wind",
+    "sanitized": "searing-wind",
+    "inclusion": 1308,
+    "potential_decks": 7651,
+    "synergy": 0.17,
+    "trend_zscore": -0.6545582198527385,
+    "pct": 17.1
+  },
+  {
+    "name": "Young Pyromancer",
+    "sanitized": "young-pyromancer",
+    "inclusion": 1301,
+    "potential_decks": 7651,
+    "synergy": 0.12,
+    "trend_zscore": -0.249426862236948,
+    "pct": 17.0
+  },
+  {
+    "name": "Dualcaster Mage",
+    "sanitized": "dualcaster-mage",
+    "inclusion": 1298,
+    "potential_decks": 7651,
+    "synergy": 0.14,
+    "trend_zscore": -0.24931029575343516,
+    "pct": 17.0
+  },
+  {
+    "name": "Loran's Escape",
+    "sanitized": "lorans-escape",
+    "inclusion": 1271,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": 0.5133272869389899,
+    "pct": 16.6
+  },
+  {
+    "name": "Palant\u00edr of Orthanc",
+    "sanitized": "palantir-of-orthanc",
+    "inclusion": 1272,
+    "potential_decks": 7651,
+    "synergy": 0.16,
+    "trend_zscore": -0.2216886670080554,
+    "pct": 16.6
+  },
+  {
+    "name": "Seize the Spoils",
+    "sanitized": "seize-the-spoils",
+    "inclusion": 1259,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": 1.2356666793218825,
+    "pct": 16.5
+  },
+  {
+    "name": "Borrowed Knowledge",
+    "sanitized": "borrowed-knowledge",
+    "inclusion": 974,
+    "potential_decks": 5922,
+    "synergy": 0.11,
+    "trend_zscore": 3.6587048256924195,
+    "pct": 16.4
+  },
+  {
+    "name": "Cool but Rude",
+    "sanitized": "cool-but-rude",
+    "inclusion": 1253,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": 0.8391613754279516,
+    "pct": 16.4
+  },
+  {
+    "name": "Seething Song",
+    "sanitized": "seething-song",
+    "inclusion": 1230,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": -0.48581437359871427,
+    "pct": 16.1
+  },
+  {
+    "name": "Erode",
+    "sanitized": "erode",
+    "inclusion": 952,
+    "potential_decks": 5922,
+    "synergy": 0.07,
+    "trend_zscore": 2.934118578914175,
+    "pct": 16.1
+  },
+  {
+    "name": "Biblioplex Assistant",
+    "sanitized": "biblioplex-assistant",
+    "inclusion": 1217,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": 0.18324423153124156,
+    "pct": 15.9
+  },
+  {
+    "name": "Pyromancer's Goggles",
+    "sanitized": "pyromancers-goggles",
+    "inclusion": 1219,
+    "potential_decks": 7651,
+    "synergy": 0.14,
+    "trend_zscore": 0,
+    "pct": 15.9
+  },
+  {
+    "name": "Fated Clash",
+    "sanitized": "fated-clash",
+    "inclusion": 1195,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": -0.19904938465310398,
+    "pct": 15.6
+  },
+  {
+    "name": "Explosive Singularity",
+    "sanitized": "explosive-singularity",
+    "inclusion": 1191,
+    "potential_decks": 7651,
+    "synergy": 0.15,
+    "trend_zscore": -0.21574051078819276,
+    "pct": 15.6
+  },
+  {
+    "name": "Furygale Flocking",
+    "sanitized": "furygale-flocking",
+    "inclusion": 923,
+    "potential_decks": 6055,
+    "synergy": 0.13,
+    "trend_zscore": 2.312314811887445,
+    "pct": 15.2
+  },
+  {
+    "name": "Ghostly Prison",
+    "sanitized": "ghostly-prison",
+    "inclusion": 1160,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.3683220816557849,
+    "pct": 15.2
+  },
+  {
+    "name": "Chandra, Hope's Beacon",
+    "sanitized": "chandra-hopes-beacon",
+    "inclusion": 1152,
+    "potential_decks": 7651,
+    "synergy": 0.14,
+    "trend_zscore": -0.6233184016063354,
+    "pct": 15.1
+  },
+  {
+    "name": "Return the Favor",
+    "sanitized": "return-the-favor",
+    "inclusion": 1142,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": 0.8587328016245597,
+    "pct": 14.9
+  },
+  {
+    "name": "Prisoner's Dilemma",
+    "sanitized": "prisoners-dilemma",
+    "inclusion": 1121,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": -0.5100731023507368,
+    "pct": 14.7
+  },
+  {
+    "name": "Sejiri Shelter",
+    "sanitized": "sejiri-shelter",
+    "inclusion": 1070,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 14.0
+  },
+  {
+    "name": "Avatar's Wrath",
+    "sanitized": "avatars-wrath",
+    "inclusion": 1071,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": -0.37534208644507294,
+    "pct": 14.0
+  },
+  {
+    "name": "Sejiri Shelter",
+    "sanitized": "sejiri-shelter",
+    "inclusion": 1070,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 14.0
+  },
+  {
+    "name": "Ancient Tomb",
+    "sanitized": "ancient-tomb",
+    "inclusion": 1061,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.5548481941149435,
+    "pct": 13.9
+  },
+  {
+    "name": "Thrill of Possibility",
+    "sanitized": "thrill-of-possibility",
+    "inclusion": 1060,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": 0.01753850795795931,
+    "pct": 13.9
+  },
+  {
+    "name": "Gods Willing",
+    "sanitized": "gods-willing",
+    "inclusion": 1060,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": -0.14860531012965533,
+    "pct": 13.9
+  },
+  {
+    "name": "Sunbird's Invocation",
+    "sanitized": "sunbirds-invocation",
+    "inclusion": 1050,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": -0.1284250701350962,
+    "pct": 13.7
+  },
+  {
+    "name": "Glittering Massif",
+    "sanitized": "glittering-massif",
+    "inclusion": 1049,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 13.7
+  },
+  {
+    "name": "Lorehold Command",
+    "sanitized": "lorehold-command",
+    "inclusion": 1038,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": -0.9505066794992405,
+    "pct": 13.6
+  },
+  {
+    "name": "Semblance Anvil",
+    "sanitized": "semblance-anvil",
+    "inclusion": 1042,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": -0.3222814418646743,
+    "pct": 13.6
+  },
+  {
+    "name": "Boseiju, Who Shelters All",
+    "sanitized": "boseiju-who-shelters-all",
+    "inclusion": 1017,
+    "potential_decks": 7651,
+    "synergy": 0.13,
+    "trend_zscore": -0.6131406878316211,
+    "pct": 13.3
+  },
+  {
+    "name": "Bloodstained Mire",
+    "sanitized": "bloodstained-mire",
+    "inclusion": 1014,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": 0,
+    "pct": 13.3
+  },
+  {
+    "name": "Flashback",
+    "sanitized": "flashback",
+    "inclusion": 780,
+    "potential_decks": 5922,
+    "synergy": 0.07,
+    "trend_zscore": 2.5663314663917167,
+    "pct": 13.2
+  },
+  {
+    "name": "Pirate's Pillage",
+    "sanitized": "pirates-pillage",
+    "inclusion": 1008,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": -0.26752874469480276,
+    "pct": 13.2
+  },
+  {
+    "name": "Starfall Invocation",
+    "sanitized": "starfall-invocation",
+    "inclusion": 1004,
+    "potential_decks": 7651,
+    "synergy": 0.11,
+    "trend_zscore": 0.300472409803425,
+    "pct": 13.1
+  },
+  {
+    "name": "Tibalt's Trickery",
+    "sanitized": "tibalts-trickery",
+    "inclusion": 982,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.5194137330276071,
+    "pct": 12.8
+  },
+  {
+    "name": "Lorehold Charm",
+    "sanitized": "lorehold-charm",
+    "inclusion": 790,
+    "potential_decks": 6189,
+    "synergy": 0,
+    "trend_zscore": 1.7227521472869136,
+    "pct": 12.8
+  },
+  {
+    "name": "Inspiring Vantage",
+    "sanitized": "inspiring-vantage",
+    "inclusion": 936,
+    "potential_decks": 7651,
+    "synergy": -0.04,
+    "trend_zscore": 0,
+    "pct": 12.2
+  },
+  {
+    "name": "Gamble",
+    "sanitized": "gamble",
+    "inclusion": 924,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.5015080882359567,
+    "pct": 12.1
+  },
+  {
+    "name": "Inti, Seneschal of the Sun",
+    "sanitized": "inti-seneschal-of-the-sun",
+    "inclusion": 926,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": -0.052481220316268555,
+    "pct": 12.1
+  },
+  {
+    "name": "Monastery Mentor",
+    "sanitized": "monastery-mentor",
+    "inclusion": 902,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.0391757467252453,
+    "pct": 11.8
+  },
+  {
+    "name": "Grand Abolisher",
+    "sanitized": "grand-abolisher",
+    "inclusion": 901,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.28341912476826814,
+    "pct": 11.8
+  },
+  {
+    "name": "Myriad Landscape",
+    "sanitized": "myriad-landscape",
+    "inclusion": 895,
+    "potential_decks": 7651,
+    "synergy": -0.07,
+    "trend_zscore": 0,
+    "pct": 11.7
+  },
+  {
+    "name": "Aziza, Mage Tower Captain",
+    "sanitized": "aziza-mage-tower-captain",
+    "inclusion": 681,
+    "potential_decks": 5922,
+    "synergy": 0.09,
+    "trend_zscore": 2.140820964617081,
+    "pct": 11.5
+  },
+  {
+    "name": "War Room",
+    "sanitized": "war-room",
+    "inclusion": 866,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.5495439908729567,
+    "pct": 11.3
+  },
+  {
+    "name": "Marsh Flats",
+    "sanitized": "marsh-flats",
+    "inclusion": 847,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 11.1
+  },
+  {
+    "name": "Ultima",
+    "sanitized": "ultima",
+    "inclusion": 841,
+    "potential_decks": 7651,
+    "synergy": 0.1,
+    "trend_zscore": -0.3097302063563258,
+    "pct": 11.0
+  },
+  {
+    "name": "Demand Answers",
+    "sanitized": "demand-answers",
+    "inclusion": 836,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.550173230530362,
+    "pct": 10.9
+  },
+  {
+    "name": "Spinerock Tyrant",
+    "sanitized": "spinerock-tyrant",
+    "inclusion": 826,
+    "potential_decks": 7651,
+    "synergy": 0.1,
+    "trend_zscore": -0.833832272168122,
+    "pct": 10.8
+  },
+  {
+    "name": "Dawn's Truce",
+    "sanitized": "dawns-truce",
+    "inclusion": 828,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.5338387992974568,
+    "pct": 10.8
+  },
+  {
+    "name": "Will of the Jeskai",
+    "sanitized": "will-of-the-jeskai",
+    "inclusion": 808,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": -0.18102044071385204,
+    "pct": 10.6
+  },
+  {
+    "name": "Wheel of Fortune",
+    "sanitized": "wheel-of-fortune",
+    "inclusion": 807,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.6081536341381015,
+    "pct": 10.5
+  },
+  {
+    "name": "Trouble in Pairs",
+    "sanitized": "trouble-in-pairs",
+    "inclusion": 801,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.4270891410257749,
+    "pct": 10.5
+  },
+  {
+    "name": "Wooded Foothills",
+    "sanitized": "wooded-foothills",
+    "inclusion": 806,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 10.5
+  },
+  {
+    "name": "Sevinne's Reclamation",
+    "sanitized": "sevinnes-reclamation",
+    "inclusion": 796,
+    "potential_decks": 7651,
+    "synergy": -0.03,
+    "trend_zscore": -0.1017322823618047,
+    "pct": 10.4
+  },
+  {
+    "name": "Crystal Ball",
+    "sanitized": "crystal-ball",
+    "inclusion": 793,
+    "potential_decks": 7651,
+    "synergy": 0.1,
+    "trend_zscore": -0.1538329432342792,
+    "pct": 10.4
+  },
+  {
+    "name": "Windswept Heath",
+    "sanitized": "windswept-heath",
+    "inclusion": 791,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": 0,
+    "pct": 10.3
+  },
+  {
+    "name": "Disrupt Decorum",
+    "sanitized": "disrupt-decorum",
+    "inclusion": 781,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.3267448341005697,
+    "pct": 10.2
+  },
+  {
+    "name": "Zhalfirin Void",
+    "sanitized": "zhalfirin-void",
+    "inclusion": 774,
+    "potential_decks": 7651,
+    "synergy": 0.1,
+    "trend_zscore": -0.12134003878551348,
+    "pct": 10.1
+  },
+  {
+    "name": "Eiganjo, Seat of the Empire",
+    "sanitized": "eiganjo-seat-of-the-empire",
+    "inclusion": 768,
+    "potential_decks": 7651,
+    "synergy": -0.03,
+    "trend_zscore": -0.4349726159558281,
+    "pct": 10.0
+  },
+  {
+    "name": "Abrade",
+    "sanitized": "abrade",
+    "inclusion": 755,
+    "potential_decks": 7651,
+    "synergy": -0.03,
+    "trend_zscore": 0.1498479201772781,
+    "pct": 9.9
+  },
+  {
+    "name": "Season of the Bold",
+    "sanitized": "season-of-the-bold",
+    "inclusion": 761,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": -0.14995630731376855,
+    "pct": 9.9
+  },
+  {
+    "name": "Chandra's Ignition",
+    "sanitized": "chandras-ignition",
+    "inclusion": 760,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.39069614637665856,
+    "pct": 9.9
+  },
+  {
+    "name": "Cut a Deal",
+    "sanitized": "cut-a-deal",
+    "inclusion": 747,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": -0.20220534544827326,
+    "pct": 9.8
+  },
+  {
+    "name": "Scalding Tarn",
+    "sanitized": "scalding-tarn",
+    "inclusion": 752,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 9.8
+  },
+  {
+    "name": "Inspired Tinkering",
+    "sanitized": "inspired-tinkering",
+    "inclusion": 744,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.6187884184718369,
+    "pct": 9.7
+  },
+  {
+    "name": "Flooded Strand",
+    "sanitized": "flooded-strand",
+    "inclusion": 745,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": 0,
+    "pct": 9.7
+  },
+  {
+    "name": "Terramorphic Expanse",
+    "sanitized": "terramorphic-expanse",
+    "inclusion": 734,
+    "potential_decks": 7651,
+    "synergy": -0.04,
+    "trend_zscore": 0,
+    "pct": 9.6
+  },
+  {
+    "name": "Evolving Wilds",
+    "sanitized": "evolving-wilds",
+    "inclusion": 733,
+    "potential_decks": 7651,
+    "synergy": -0.09,
+    "trend_zscore": 0,
+    "pct": 9.6
+  },
+  {
+    "name": "Claim Jumper",
+    "sanitized": "claim-jumper",
+    "inclusion": 724,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.07139317060170958,
+    "pct": 9.5
+  },
+  {
+    "name": "Currency Converter",
+    "sanitized": "currency-converter",
+    "inclusion": 724,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": 0.03185218021880732,
+    "pct": 9.5
+  },
+  {
+    "name": "Lorehold Campus",
+    "sanitized": "lorehold-campus",
+    "inclusion": 722,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 9.4
+  },
+  {
+    "name": "Fields of Strife",
+    "sanitized": "fields-of-strife",
+    "inclusion": 568,
+    "potential_decks": 6055,
+    "synergy": 0.02,
+    "trend_zscore": 0,
+    "pct": 9.4
+  },
+  {
+    "name": "Balefire Liege",
+    "sanitized": "balefire-liege",
+    "inclusion": 712,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.7210628521594861,
+    "pct": 9.3
+  },
+  {
+    "name": "Pursue the Past",
+    "sanitized": "pursue-the-past",
+    "inclusion": 506,
+    "potential_decks": 5420,
+    "synergy": 0.01,
+    "trend_zscore": 2.14625033494436,
+    "pct": 9.3
+  },
+  {
+    "name": "Heartflame Duelist",
+    "sanitized": "heartflame-duelist",
+    "inclusion": 705,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.32406398398923053,
+    "pct": 9.2
+  },
+  {
+    "name": "Helm of Awakening",
+    "sanitized": "helm-of-awakening",
+    "inclusion": 704,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": -0.6666066222990358,
+    "pct": 9.2
+  },
+  {
+    "name": "Containment Construct",
+    "sanitized": "containment-construct",
+    "inclusion": 694,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.3838984385174717,
+    "pct": 9.1
+  },
+  {
+    "name": "Lindblum, Industrial Regency",
+    "sanitized": "lindblum-industrial-regency",
+    "inclusion": 699,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.31563002549849023,
+    "pct": 9.1
+  },
+  {
+    "name": "Temple of the False God",
+    "sanitized": "temple-of-the-false-god",
+    "inclusion": 680,
+    "potential_decks": 7651,
+    "synergy": 0,
+    "trend_zscore": -0.2354104907992238,
+    "pct": 8.9
+  },
+  {
+    "name": "Glint-Horn Buccaneer",
+    "sanitized": "glint-horn-buccaneer",
+    "inclusion": 676,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.07359630655474367,
+    "pct": 8.8
+  },
+  {
+    "name": "Riddle of Lightning",
+    "sanitized": "riddle-of-lightning",
+    "inclusion": 674,
+    "potential_decks": 7651,
+    "synergy": 0.09,
+    "trend_zscore": -0.2490134214173774,
+    "pct": 8.8
+  },
+  {
+    "name": "Prismatic Vista",
+    "sanitized": "prismatic-vista",
+    "inclusion": 676,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": 0,
+    "pct": 8.8
+  },
+  {
+    "name": "Single Combat",
+    "sanitized": "single-combat",
+    "inclusion": 667,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.07944967290215195,
+    "pct": 8.7
+  },
+  {
+    "name": "Quintorius, Loremaster",
+    "sanitized": "quintorius-loremaster",
+    "inclusion": 658,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.27978325977352214,
+    "pct": 8.6
+  },
+  {
+    "name": "Gideon's Phalanx",
+    "sanitized": "gideons-phalanx",
+    "inclusion": 655,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.5973781606675146,
+    "pct": 8.6
+  },
+  {
+    "name": "Senu, Keen-Eyed Protector",
+    "sanitized": "senu-keen-eyed-protector",
+    "inclusion": 652,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.15642840549775328,
+    "pct": 8.5
+  },
+  {
+    "name": "Solemn Simulacrum",
+    "sanitized": "solemn-simulacrum",
+    "inclusion": 651,
+    "potential_decks": 7651,
+    "synergy": -0.14,
+    "trend_zscore": -0.3853663257881911,
+    "pct": 8.5
+  },
+  {
+    "name": "Monologue Tax",
+    "sanitized": "monologue-tax",
+    "inclusion": 647,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": -0.021024521638498016,
+    "pct": 8.5
+  },
+  {
+    "name": "The One Ring",
+    "sanitized": "the-one-ring",
+    "inclusion": 645,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.31292642136359516,
+    "pct": 8.4
+  },
+  {
+    "name": "Vandalblast",
+    "sanitized": "vandalblast",
+    "inclusion": 646,
+    "potential_decks": 7651,
+    "synergy": -0.07,
+    "trend_zscore": -0.7421650741731094,
+    "pct": 8.4
+  },
+  {
+    "name": "Naktamun Lorespinner",
+    "sanitized": "naktamun-lorespinner",
+    "inclusion": 502,
+    "potential_decks": 6055,
+    "synergy": 0.04,
+    "trend_zscore": 1.0176749521172326,
+    "pct": 8.3
+  },
+  {
+    "name": "Wear // Tear",
+    "sanitized": "wear-tear",
+    "inclusion": 636,
+    "potential_decks": 7651,
+    "synergy": -0.12,
+    "trend_zscore": -0.7042148646318114,
+    "pct": 8.3
+  },
+  {
+    "name": "Heroes Remembered",
+    "sanitized": "heroes-remembered",
+    "inclusion": 625,
+    "potential_decks": 7651,
+    "synergy": 0.08,
+    "trend_zscore": -0.7866519506339155,
+    "pct": 8.2
+  },
+  {
+    "name": "Powerbalance",
+    "sanitized": "powerbalance",
+    "inclusion": 627,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.24616851921611832,
+    "pct": 8.2
+  },
+  {
+    "name": "Firesong and Sunspeaker",
+    "sanitized": "firesong-and-sunspeaker",
+    "inclusion": 612,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.780550969351135,
+    "pct": 8.0
+  },
+  {
+    "name": "Twinflame Tyrant",
+    "sanitized": "twinflame-tyrant",
+    "inclusion": 607,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.6673913533688662,
+    "pct": 7.9
+  },
+  {
+    "name": "Legion Leadership",
+    "sanitized": "legion-leadership",
+    "inclusion": 602,
+    "potential_decks": 7651,
+    "synergy": -0.1,
+    "trend_zscore": 0,
+    "pct": 7.9
+  },
+  {
+    "name": "Cloud Key",
+    "sanitized": "cloud-key",
+    "inclusion": 606,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.6912218998650086,
+    "pct": 7.9
+  },
+  {
+    "name": "Thran Dynamo",
+    "sanitized": "thran-dynamo",
+    "inclusion": 604,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": 0,
+    "pct": 7.9
+  },
+  {
+    "name": "Legion Leadership",
+    "sanitized": "legion-leadership",
+    "inclusion": 602,
+    "potential_decks": 7651,
+    "synergy": -0.1,
+    "trend_zscore": 0,
+    "pct": 7.9
+  },
+  {
+    "name": "Burning Prophet",
+    "sanitized": "burning-prophet",
+    "inclusion": 600,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.02186450592300905,
+    "pct": 7.8
+  },
+  {
+    "name": "Path of Ancestry",
+    "sanitized": "path-of-ancestry",
+    "inclusion": 594,
+    "potential_decks": 7651,
+    "synergy": -0.08,
+    "trend_zscore": 0,
+    "pct": 7.8
+  },
+  {
+    "name": "Magmakin Artillerist",
+    "sanitized": "magmakin-artillerist",
+    "inclusion": 587,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.13530007126127389,
+    "pct": 7.7
+  },
+  {
+    "name": "Sundering Eruption",
+    "sanitized": "sundering-eruption",
+    "inclusion": 588,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": 0,
+    "pct": 7.7
+  },
+  {
+    "name": "Mystic Forge",
+    "sanitized": "mystic-forge",
+    "inclusion": 588,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": -0.45405069325696307,
+    "pct": 7.7
+  },
+  {
+    "name": "Sundering Eruption",
+    "sanitized": "sundering-eruption",
+    "inclusion": 588,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": 0,
+    "pct": 7.7
+  },
+  {
+    "name": "Birgi, God of Storytelling",
+    "sanitized": "birgi-god-of-storytelling",
+    "inclusion": 575,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": -0.6494110829216911,
+    "pct": 7.5
+  },
+  {
+    "name": "Lightning Bolt",
+    "sanitized": "lightning-bolt",
+    "inclusion": 573,
+    "potential_decks": 7651,
+    "synergy": -0.03,
+    "trend_zscore": -0.5757422872765104,
+    "pct": 7.5
+  },
+  {
+    "name": "Worn Powerstone",
+    "sanitized": "worn-powerstone",
+    "inclusion": 576,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 7.5
+  },
+  {
+    "name": "Knight of the White Orchid",
+    "sanitized": "knight-of-the-white-orchid",
+    "inclusion": 561,
+    "potential_decks": 7651,
+    "synergy": -0.02,
+    "trend_zscore": -0.2831843232083026,
+    "pct": 7.3
+  },
+  {
+    "name": "Ragavan, Nimble Pilferer",
+    "sanitized": "ragavan-nimble-pilferer",
+    "inclusion": 557,
+    "potential_decks": 7651,
+    "synergy": 0,
+    "trend_zscore": -0.4840007980226425,
+    "pct": 7.3
+  },
+  {
+    "name": "Increasing Vengeance",
+    "sanitized": "increasing-vengeance",
+    "inclusion": 559,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.5324819271613802,
+    "pct": 7.3
+  },
+  {
+    "name": "Ondu Inversion",
+    "sanitized": "ondu-inversion",
+    "inclusion": 562,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 7.3
+  },
+  {
+    "name": "Secret Rendezvous",
+    "sanitized": "secret-rendezvous",
+    "inclusion": 560,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": -0.43467150350998757,
+    "pct": 7.3
+  },
+  {
+    "name": "Wheel of Misfortune",
+    "sanitized": "wheel-of-misfortune",
+    "inclusion": 557,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.26296515891358613,
+    "pct": 7.3
+  },
+  {
+    "name": "Worldfire",
+    "sanitized": "worldfire",
+    "inclusion": 557,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.31118634882849566,
+    "pct": 7.3
+  },
+  {
+    "name": "Mass Calcify",
+    "sanitized": "mass-calcify",
+    "inclusion": 556,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.2734206311287262,
+    "pct": 7.3
+  },
+  {
+    "name": "Ondu Inversion",
+    "sanitized": "ondu-inversion",
+    "inclusion": 562,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": 0,
+    "pct": 7.3
+  },
+  {
+    "name": "Pyretic Ritual",
+    "sanitized": "pyretic-ritual",
+    "inclusion": 553,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.2644830213966737,
+    "pct": 7.2
+  },
+  {
+    "name": "Coruscation Mage",
+    "sanitized": "coruscation-mage",
+    "inclusion": 541,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.5112919375338246,
+    "pct": 7.1
+  },
+  {
+    "name": "Ensnared by the Mara",
+    "sanitized": "ensnared-by-the-mara",
+    "inclusion": 545,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.19926248468524715,
+    "pct": 7.1
+  },
+  {
+    "name": "Squee, Goblin Nabob",
+    "sanitized": "squee-goblin-nabob",
+    "inclusion": 530,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": 0.30692430603780535,
+    "pct": 6.9
+  },
+  {
+    "name": "Renegade Bull",
+    "sanitized": "renegade-bull",
+    "inclusion": 418,
+    "potential_decks": 6055,
+    "synergy": 0.06,
+    "trend_zscore": 1.0939458169772427,
+    "pct": 6.9
+  },
+  {
+    "name": "Flare of Duplication",
+    "sanitized": "flare-of-duplication",
+    "inclusion": 527,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.7163963834705876,
+    "pct": 6.9
+  },
+  {
+    "name": "Terminus",
+    "sanitized": "terminus",
+    "inclusion": 528,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": -0.48107662808338164,
+    "pct": 6.9
+  },
+  {
+    "name": "Wayfarer's Bauble",
+    "sanitized": "wayfarers-bauble",
+    "inclusion": 529,
+    "potential_decks": 7651,
+    "synergy": -0.04,
+    "trend_zscore": -0.27135289031255105,
+    "pct": 6.9
+  },
+  {
+    "name": "Impulsivity",
+    "sanitized": "impulsivity",
+    "inclusion": 522,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.5533553355052313,
+    "pct": 6.8
+  },
+  {
+    "name": "Profound Journey",
+    "sanitized": "profound-journey",
+    "inclusion": 517,
+    "potential_decks": 7651,
+    "synergy": 0.07,
+    "trend_zscore": 0,
+    "pct": 6.8
+  },
+  {
+    "name": "Underworld Breach",
+    "sanitized": "underworld-breach",
+    "inclusion": 504,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": -0.38596819552251316,
+    "pct": 6.6
+  },
+  {
+    "name": "Prismari Pianist",
+    "sanitized": "prismari-pianist",
+    "inclusion": 397,
+    "potential_decks": 6055,
+    "synergy": 0.05,
+    "trend_zscore": 0.9283779584183247,
+    "pct": 6.6
+  },
+  {
+    "name": "Archivist of Oghma",
+    "sanitized": "archivist-of-oghma",
+    "inclusion": 497,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.3643512179116442,
+    "pct": 6.5
+  },
+  {
+    "name": "Silence",
+    "sanitized": "silence",
+    "inclusion": 501,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.6262293986402973,
+    "pct": 6.5
+  },
+  {
+    "name": "Into the Time Vortex",
+    "sanitized": "into-the-time-vortex",
+    "inclusion": 500,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.5000401557215604,
+    "pct": 6.5
+  },
+  {
+    "name": "Reconstruct History",
+    "sanitized": "reconstruct-history",
+    "inclusion": 499,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": -0.4382393399260041,
+    "pct": 6.5
+  },
+  {
+    "name": "Invoke Justice",
+    "sanitized": "invoke-justice",
+    "inclusion": 491,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.27943294419029663,
+    "pct": 6.4
+  },
+  {
+    "name": "Plaza of Heroes",
+    "sanitized": "plaza-of-heroes",
+    "inclusion": 487,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": 0,
+    "pct": 6.4
+  },
+  {
+    "name": "Mithril Coat",
+    "sanitized": "mithril-coat",
+    "inclusion": 481,
+    "potential_decks": 7651,
+    "synergy": -0.04,
+    "trend_zscore": -0.5429989685989969,
+    "pct": 6.3
+  },
+  {
+    "name": "Commander's Sphere",
+    "sanitized": "commanders-sphere",
+    "inclusion": 475,
+    "potential_decks": 7651,
+    "synergy": -0.08,
+    "trend_zscore": 0,
+    "pct": 6.2
+  },
+  {
+    "name": "Restoration Magic",
+    "sanitized": "restoration-magic",
+    "inclusion": 453,
+    "potential_decks": 7651,
+    "synergy": -0.04,
+    "trend_zscore": -0.27665827597686576,
+    "pct": 5.9
+  },
+  {
+    "name": "Mana Vault",
+    "sanitized": "mana-vault",
+    "inclusion": 447,
+    "potential_decks": 7651,
+    "synergy": 0.02,
+    "trend_zscore": 0,
+    "pct": 5.8
+  },
+  {
+    "name": "Ashling, Flame Dancer",
+    "sanitized": "ashling-flame-dancer",
+    "inclusion": 442,
+    "potential_decks": 7651,
+    "synergy": 0.04,
+    "trend_zscore": -0.5179361549495151,
+    "pct": 5.8
+  },
+  {
+    "name": "Red Elemental Blast",
+    "sanitized": "red-elemental-blast",
+    "inclusion": 443,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.5351059851770458,
+    "pct": 5.8
+  },
+  {
+    "name": "Explosive Welcome",
+    "sanitized": "explosive-welcome",
+    "inclusion": 438,
+    "potential_decks": 7651,
+    "synergy": 0.06,
+    "trend_zscore": -0.5188867473774926,
+    "pct": 5.7
+  },
+  {
+    "name": "Emergence Zone",
+    "sanitized": "emergence-zone",
+    "inclusion": 436,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.5198631005216844,
+    "pct": 5.7
+  },
+  {
+    "name": "Fiery Inscription",
+    "sanitized": "fiery-inscription",
+    "inclusion": 432,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": -0.41402191916530906,
+    "pct": 5.6
+  },
+  {
+    "name": "Wandering Archaic",
+    "sanitized": "wandering-archaic",
+    "inclusion": 418,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": -0.5892667206949599,
+    "pct": 5.5
+  },
+  {
+    "name": "Conduit Pylons",
+    "sanitized": "conduit-pylons",
+    "inclusion": 422,
+    "potential_decks": 7651,
+    "synergy": 0.05,
+    "trend_zscore": 0,
+    "pct": 5.5
+  },
+  {
+    "name": "Sacred Peaks",
+    "sanitized": "sacred-peaks",
+    "inclusion": 411,
+    "potential_decks": 7651,
+    "synergy": -0.06,
+    "trend_zscore": 0,
+    "pct": 5.4
+  },
+  {
+    "name": "City of Brass",
+    "sanitized": "city-of-brass",
+    "inclusion": 407,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": 0,
+    "pct": 5.3
+  },
+  {
+    "name": "Spinerock Knoll",
+    "sanitized": "spinerock-knoll",
+    "inclusion": 399,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": -0.5698869772303825,
+    "pct": 5.2
+  },
+  {
+    "name": "Unwinding Clock",
+    "sanitized": "unwinding-clock",
+    "inclusion": 387,
+    "potential_decks": 7651,
+    "synergy": 0.03,
+    "trend_zscore": -0.37036423390844025,
+    "pct": 5.1
+  },
+  {
+    "name": "Gemstone Caverns",
+    "sanitized": "gemstone-caverns",
+    "inclusion": 389,
+    "potential_decks": 7651,
+    "synergy": 0.01,
+    "trend_zscore": 0,
+    "pct": 5.1
+  }
+]

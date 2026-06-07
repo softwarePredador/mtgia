@@ -1,0 +1,77 @@
+=== User Lorehold Deck 2026-06-02 #14 ===
+Source: user-import
+Archetype: dragons-approach-thrumming-stone-big-spells
+
+1 Lorehold, the Historian
+1 Ancient Tomb
+1 Arcane Signet
+1 Arid Mesa
+1 Artist's Talent
+1 Battlefield Forge
+1 Big Score
+1 Blasphemous Act
+1 Blind Obedience
+1 Bloodstained Mire
+1 Boros Signet
+1 Buried Ruin
+1 Cavern of Souls
+1 Chaos Warp
+1 Command Beacon
+1 Command Tower
+1 Deflecting Swat
+1 Demand Answers
+1 Dragon Mage
+20 Dragon's Approach
+1 Eiganjo, Seat of the Empire
+1 Elegant Parlor
+1 Esper Sentinel
+1 Faithless Looting
+1 Generous Gift
+1 Glittering Massif
+1 Heartflame Duelist
+1 Inventors' Fair
+1 Jeska's Will
+1 Knollspine Dragon
+1 Library of Leng
+1 Locket of Yesterdays
+1 Monument to Endurance
+1 Mother of Runes
+8 Mountain
+1 Mox Jasper
+1 Mox Opal
+1 Pinnacle Monk
+2 Plains
+1 Plateau
+1 Plaza of Heroes
+1 Pyromancer Ascension
+1 Reprieve
+1 Rise of the Eldrazi
+1 Ruby Medallion
+1 Sacred Foundry
+1 Scalding Tarn
+1 Scroll Rack
+1 Sejiri Shelter
+1 Smothering Tithe
+1 Sol Ring
+1 Spectator Seating
+1 Storm-Kiln Artist
+1 Summon: Bahamut
+1 Sunbaked Canyon
+1 Sunbillow Verge
+1 Swords to Plowshares
+1 Talisman of Conviction
+1 Teferi's Protection
+1 The Fire Crystal
+1 The One Ring
+1 Thrilling Discovery
+1 Thrumming Stone
+1 Twinflame Tyrant
+1 Urza's Saga
+1 Valakut Awakening
+1 Velomachus Lorehold
+1 War Room
+1 Wheel of Fortune
+1 Will of the Jeskai
+1 Windswept Heath
+1 Witch Enchanter
+1 Wooded Foothills

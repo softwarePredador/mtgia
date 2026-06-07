@@ -236,23 +236,48 @@ CommanderLearnedDeckValidationResult validateCommanderLearnedDeckInput(
 List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCardList(
   String cardList,
 ) {
-  final cards = <CommanderLearnedDeckCardLine>[];
+  final byName = <String, int>{};
   for (final rawLine in cardList.split(RegExp(r'\r?\n'))) {
     final line = rawLine.trim();
-    if (line.isEmpty) continue;
-    final match = RegExp(r'^(\d+)\s+(.+)$').firstMatch(line);
-    if (match == null) {
-      cards.add(CommanderLearnedDeckCardLine(name: line, quantity: 1));
-      continue;
-    }
-    cards.add(
-      CommanderLearnedDeckCardLine(
-        name: match.group(2)!.trim(),
-        quantity: int.tryParse(match.group(1)!) ?? 1,
-      ),
-    );
+    if (line.isEmpty || line.startsWith('#')) continue;
+
+    final parsed = _parseCommanderLearnedDeckCardLine(line);
+    if (parsed == null) continue;
+    byName[parsed.name] = (byName[parsed.name] ?? 0) + parsed.quantity;
   }
-  return cards;
+  return [
+    for (final entry in byName.entries)
+      CommanderLearnedDeckCardLine(name: entry.key, quantity: entry.value),
+  ];
+}
+
+List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCards(
+  String cardList,
+) =>
+    parseCommanderLearnedDeckCardList(cardList);
+
+CommanderLearnedDeckCardLine? _parseCommanderLearnedDeckCardLine(String line) {
+  final withoutBullet = line.replaceFirst(RegExp(r'^[-*]\s+'), '').trim();
+  final match = RegExp(r'^(\d+)\s+(.+)$').firstMatch(withoutBullet);
+  if (match != null) {
+    final quantity = int.tryParse(match.group(1) ?? '') ?? 0;
+    final name = _cleanCommanderLearnedDeckCardName(match.group(2) ?? '');
+    if (quantity > 0 && name.isNotEmpty) {
+      return CommanderLearnedDeckCardLine(name: name, quantity: quantity);
+    }
+  }
+
+  final name = _cleanCommanderLearnedDeckCardName(withoutBullet);
+  if (name.isEmpty) return null;
+  return CommanderLearnedDeckCardLine(name: name, quantity: 1);
+}
+
+String _cleanCommanderLearnedDeckCardName(String value) {
+  var name = value.trim();
+  name = name.replaceFirst(RegExp(r'\s+\[[^\]]+\]$'), '');
+  name = name.replaceFirst(RegExp(r'\s+\([A-Z0-9]{2,5}\)\s*\d*\s*$'), '');
+  name = name.replaceFirst(RegExp(r'\s+#.*$'), '');
+  return name.trim();
 }
 
 Future<void> ensureCommanderLearnedDecksTable(Pool pool) async {

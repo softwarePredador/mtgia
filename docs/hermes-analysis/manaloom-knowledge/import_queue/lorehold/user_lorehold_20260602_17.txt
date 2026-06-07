@@ -1,0 +1,66 @@
+=== User Lorehold Deck 2026-06-02 #17 ===
+Source: user-import
+Archetype: big-spells-chaos-mld-life-swing
+
+1 Lorehold, the Historian
+1 Ancestral Tribute
+1 Apocalypse
+1 Archangel's Light
+1 Bargain
+1 Beacon of Immortality
+1 Blessed Wind
+1 Brawl
+1 Call Forth the Tempest
+1 Catastrophe
+1 Channel Harm
+1 Chant of Vitu-Ghazi
+1 Cinder Storm
+1 Deploy to the Front
+1 Desperate Ritual
+1 Dimensional Breach
+1 Ember Shot
+1 Epicenter
+1 Feudkiller's Verdict
+1 Global Ruin
+1 Goblin Game
+1 Grim Monolith
+1 Guan Yu's 1,000-Li March
+1 Heroes Remembered
+1 Icatian Town
+1 Illicit Auction
+1 Invincible Hymn
+1 Jokulhaups
+1 Kaboom!
+1 Landbind Ritual
+1 Lavaball Trap
+1 Lion's Eye Diamond
+1 Lotus Bloom
+1 Lotus Petal
+1 Mana Vault
+20 Mountain
+1 Obliterate
+1 Omen of Fire
+1 Over the Top
+1 Perch Protection
+20 Plains
+1 Planar Birth
+1 Providence
+1 Pyretic Ritual
+1 Rain of Salt
+1 Razia's Purification
+1 Resupply
+1 Reverse the Sands
+1 Righteous Fury
+1 Rite of Flame
+1 Rite of Ruin
+1 Scrambleverse
+1 Searing Flesh
+1 Searing Wind
+1 Seething Song
+1 Simian Spirit Guide
+1 Storm Herd
+1 Thieves' Auction
+1 Twist Allegiance
+1 Wake of Destruction
+1 Warp World
+1 Wildfire
