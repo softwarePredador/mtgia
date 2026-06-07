@@ -26,6 +26,19 @@ Validacao operacional em Hermes, 2026-06-06:
 - `master_optimizer_loop.py --preflight --report` aprovado no container.
 - Relatorio salvo em `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_hermes_20260606_234524.md`.
 
+Validacao operacional do cron em Hermes, 2026-06-07:
+
+- Job registrado em `/opt/data/cron/jobs.json` como `manaloom-master-optimizer-preflight`.
+- Script instalado em `/opt/data/scripts/manaloom-master-optimizer-preflight.sh`.
+- Origem versionada em `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_preflight_cron.sh`.
+- Schedule: `every 360m`.
+- Status do scheduler apos validacao manual: `ok`.
+- Proxima execucao registrada: `2026-06-07T06:04:53.625131+00:00`.
+- Relatorio fresco salvo em `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_cron_hermes_20260607_000346.md`.
+- Artefato vivo no container: `/opt/data/artifacts/hermes_master_optimizer/latest_master_optimizer_preflight.md`.
+
+Importante: este cron nao aplica swaps. Ele mantem o Hermes pronto para entrar no optimizer ao validar regressao do battle, sincronizar metadata do Postgres real para o SQLite e registrar se o ambiente esta aprovado ou bloqueado.
+
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
