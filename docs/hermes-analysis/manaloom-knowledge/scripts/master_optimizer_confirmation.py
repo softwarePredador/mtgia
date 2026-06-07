@@ -26,6 +26,21 @@ def main() -> int:
     parser.add_argument("--run-limit", type=int, default=3)
     parser.add_argument("--games", type=int, default=10)
     parser.add_argument("--min-scan-delta", type=float, default=-2.0)
+    parser.add_argument(
+        "--phase",
+        choices=("confirmation", "full_confirmation"),
+        default="confirmation",
+    )
+    parser.add_argument(
+        "--include-existing",
+        action="store_true",
+        help="Allow retesting candidates already present in swap_benchmarks.",
+    )
+    parser.add_argument(
+        "--only-added",
+        default="",
+        help="Restrict confirmation to a single added card name.",
+    )
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
 
@@ -40,7 +55,13 @@ def main() -> int:
             raise SystemExit("No approved baseline found. Run master_optimizer_baseline.py first.")
 
         baseline_wr = float(baseline["wr"])
-        candidates = candidate_rows(conn, args.candidate_limit, baseline_wr)
+        candidates = candidate_rows(
+            conn,
+            args.candidate_limit,
+            baseline_wr,
+            include_existing=args.include_existing,
+            only_added=args.only_added,
+        )
 
         for row in candidates:
             scan_delta = float(row["wr"] or 0) - baseline_wr
@@ -60,7 +81,7 @@ def main() -> int:
                 args.deck_id,
                 row["card_added"],
                 row["card_removed"],
-                "confirmation",
+                args.phase,
             )
             if review["status"] != "passed":
                 blocked.append(
@@ -89,7 +110,7 @@ def main() -> int:
                     (card_added, card_removed, add_cmc, add_effect, add_tag,
                      wr, wins, losses, draws, games, phase, delta_pp, applied,
                      tested_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmation', ?, 0, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
                 """,
                 (
                     row["card_added"],
@@ -102,6 +123,7 @@ def main() -> int:
                     result.losses,
                     result.stalls,
                     result.total_games,
+                    args.phase,
                     delta,
                     utc_now(),
                 ),
@@ -128,6 +150,7 @@ def main() -> int:
         f"- deck_id: {args.deck_id}",
         f"- baseline_id: {baseline['id']}",
         f"- baseline_wr: {baseline_wr:.1f}%",
+        f"- phase: {args.phase}",
         f"- games_per_opponent: {args.games}",
         f"- tested: {len(tested)}",
         f"- blocked: {len(blocked)}",

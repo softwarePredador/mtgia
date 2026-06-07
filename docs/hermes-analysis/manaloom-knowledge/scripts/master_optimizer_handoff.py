@@ -29,12 +29,16 @@ def main() -> int:
         confirmations = conn.execute(
             """
             SELECT * FROM swap_benchmarks
-            WHERE phase='confirmation'
+            WHERE phase IN ('confirmation', 'full_confirmation')
             ORDER BY tested_at DESC, id DESC
             LIMIT 20
             """
         ).fetchall()
-        approved = [row for row in confirmations if float(row["delta_pp"] or 0) >= 0.5]
+        approved = [
+            row
+            for row in confirmations
+            if row["phase"] == "full_confirmation" and float(row["delta_pp"] or 0) >= 0.5
+        ]
         blocked = conn.execute(
             """
             SELECT * FROM optimizer_quality_reviews
@@ -57,19 +61,24 @@ def main() -> int:
         "",
         "## Confirmed Candidates",
         "",
-        "| Verdict | Add | Cut | Confirm WR | Delta | Record |",
-        "| --- | --- | --- | ---: | ---: | --- |",
+        "| Verdict | Phase | Add | Cut | Confirm WR | Delta | Record |",
+        "| --- | --- | --- | --- | ---: | ---: | --- |",
     ]
     for row in confirmations:
         delta = float(row["delta_pp"] or 0)
-        verdict = "approve_manual_review" if delta >= 0.5 else "reject_or_retest"
+        if row["phase"] == "full_confirmation" and delta >= 0.5:
+            verdict = "approve_manual_review"
+        elif row["phase"] == "confirmation" and delta >= 0.5:
+            verdict = "candidate_needs_full_confirmation"
+        else:
+            verdict = "reject_or_retest"
         lines.append(
-            f"| {verdict} | {row['card_added']} | {row['card_removed']} | "
+            f"| {verdict} | {row['phase']} | {row['card_added']} | {row['card_removed']} | "
             f"{float(row['wr']):.1f}% | {delta:+.1f}pp | "
             f"{row['wins']}W/{row['losses']}L/{row['draws']}S |"
         )
     if not confirmations:
-        lines.append("| none | - | - | - | - | No confirmation rows yet. |")
+        lines.append("| none | - | - | - | - | - | No confirmation rows yet. |")
 
     lines.extend(
         [

@@ -471,19 +471,39 @@ def temporary_swap(
         conn.commit()
 
 
-def candidate_rows(conn: sqlite3.Connection, limit: int, baseline_wr: float) -> list[sqlite3.Row]:
+def candidate_rows(
+    conn: sqlite3.Connection,
+    limit: int,
+    baseline_wr: float,
+    *,
+    include_existing: bool = False,
+    only_added: str = "",
+) -> list[sqlite3.Row]:
+    where = [
+        "phase='best-in-slot'",
+    ]
+    params: list[object] = []
+    if not include_existing:
+        where.append(
+            """
+            card_added NOT IN (
+                SELECT card_added FROM swap_benchmarks
+                WHERE phase IN ('confirmation', 'full_confirmation')
+            )
+            """
+        )
+    if only_added:
+        where.append("lower(card_added)=lower(?)")
+        params.append(only_added)
+    params.append(limit)
     return conn.execute(
-        """
+        f"""
         SELECT category, card_added, card_removed, add_cmc, add_effect,
                wr, wins, losses, draws, games, delta_pp, phase, tested_at
         FROM slot_benchmarks
-        WHERE phase='best-in-slot'
-          AND card_added NOT IN (
-              SELECT card_added FROM swap_benchmarks WHERE phase='confirmation'
-          )
+        WHERE {' AND '.join(where)}
         ORDER BY wr DESC, delta_pp DESC
         LIMIT ?
         """,
-        (limit,),
+        params,
     ).fetchall()
-
