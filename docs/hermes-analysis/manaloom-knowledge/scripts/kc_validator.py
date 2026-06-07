@@ -8,10 +8,15 @@ KNOWN_CARDS Validator & Expander — Cron-safe
 """
 import sqlite3, subprocess, os, json, re, sys, time
 from collections import defaultdict
+from datetime import datetime, timezone
 
 DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
 OUT = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json'
 LOCK = '/tmp/kc_validator.lock'
+REPORT_DIR = os.environ.get(
+    "KC_VALIDATOR_REPORT_DIR",
+    "/opt/data/workspace/mtgia/docs/hermes-analysis/kc_validator_reports",
+)
 
 os.environ["PGPASSWORD"] = "c2abeef5e66f21b0ce86"
 BASELINE_WR = 81.8
@@ -34,6 +39,84 @@ def pg(query):
         if line:
             rows.append(line.split("\x1f"))
     return rows
+
+
+def write_validation_report(validated_count, new_entries, corrections, conflicts, stats, total_filtered):
+    os.makedirs(REPORT_DIR, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    json_path = os.path.join(REPORT_DIR, f"kc_validator_conflicts_{stamp}.json")
+    md_path = os.path.join(REPORT_DIR, f"kc_validator_conflicts_{stamp}.md")
+    payload = {
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "validated_count": validated_count,
+        "total_filtered": total_filtered,
+        "new_entries_count": len(new_entries),
+        "corrections_count": len(corrections),
+        "conflicts_count": len(conflicts),
+        "new_entries": sorted(new_entries.keys()),
+        "corrections": corrections,
+        "conflicts": conflicts,
+        "effect_distribution": dict(sorted(stats.items(), key=lambda item: (-item[1], item[0]))),
+    }
+    with open(json_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, ensure_ascii=True, sort_keys=True, default=str)
+
+    lines = [
+        "# KC Validator Conflict Report",
+        "",
+        f"- created_at: {payload['created_at']}",
+        f"- validated_count: {validated_count}",
+        f"- total_filtered: {total_filtered}",
+        f"- new_entries: {len(new_entries)}",
+        f"- corrections: {len(corrections)}",
+        f"- conflicts: {len(conflicts)}",
+        f"- json: `{json_path}`",
+        "",
+        "## Corrections",
+        "",
+        "| Card | From | To |",
+        "| --- | --- | --- |",
+    ]
+    if corrections:
+        for item in corrections[:100]:
+            lines.append(f"| {item['name']} | {item['from']} | {item['to']} |")
+    else:
+        lines.append("| info | none | none |")
+
+    lines.extend(
+        [
+            "",
+            "## Conflicts Requiring Review",
+            "",
+            "| Card | Current | Reclassified | Oracle sample |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    if conflicts:
+        for item in conflicts[:100]:
+            oracle = " ".join(str(item.get("oracle_sample") or "").split()).replace("|", "\\|")
+            lines.append(
+                f"| {item['name']} | {item['current']} | {item['reclassified']} | {oracle} |"
+            )
+    else:
+        lines.append("| info | none | none | none |")
+
+    lines.extend(
+        [
+            "",
+            "## Next Action",
+            "",
+            "- Corrections are auto-applied only when the new effect is clearly more specific.",
+            "- Conflicts are not auto-applied; review them before changing classification rules.",
+            "- Use this report as the review queue for Hermes knowledge hardening.",
+            "",
+        ]
+    )
+    with open(md_path, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines))
+    print(f"  Conflict report: {md_path}")
+    print(f"  Conflict JSON: {json_path}")
+    return md_path, json_path
 
 # ══════════════════════════════════════════
 # STEP 1: EXPAND — Pull new Boros/WR cards from PG
@@ -249,6 +332,8 @@ print(f"\nSTEP 2: VALIDATING EXISTING CLASSIFICATIONS")
 names_to_check = list(existing_names)[:500]  # Check 500 per run (limit PG load)
 corrections = 0
 conflicts = 0
+correction_records = []
+conflict_records = []
 
 for chunk_start in range(0, len(names_to_check), 100):
     chunk = names_to_check[chunk_start:chunk_start+100]
@@ -298,6 +383,13 @@ for chunk_start in range(0, len(names_to_check), 100):
                 # Auto-correct: specific effect is more accurate
                 existing[name] = new_entry
                 corrections += 1
+                correction_records.append(
+                    {
+                        "name": name,
+                        "from": current_effect,
+                        "to": new_effect,
+                    }
+                )
                 if corrections <= 10:
                     print(f"  CORRECTED: {name}: {current_effect} → {new_effect}")
             elif current_effect in specific_effects and new_effect == "draw_cards":
@@ -306,6 +398,16 @@ for chunk_start in range(0, len(names_to_check), 100):
             else:
                 # Both specific — conflict, log it
                 conflicts += 1
+                conflict_records.append(
+                    {
+                        "name": name,
+                        "current": current_effect,
+                        "reclassified": new_effect,
+                        "oracle_sample": oracle[:240],
+                        "type_line": tl,
+                        "cmc": cmc_val,
+                    }
+                )
                 if conflicts <= 10:
                     print(f"  CONFLICT: {name}: {current_effect} vs {new_effect} (oracle: {oracle[:80]}...)")
 
@@ -340,6 +442,15 @@ for v in filtered.values():
 print(f"\n  Effect distribution:")
 for eff, cnt in sorted(stats.items(), key=lambda x: -x[1])[:15]:
     print(f"    {eff:<25s} {cnt}")
+
+write_validation_report(
+    len(names_to_check),
+    new_entries,
+    correction_records,
+    conflict_records,
+    stats,
+    len(filtered),
+)
 
 os.remove(LOCK)
 print(f"\nDone.")

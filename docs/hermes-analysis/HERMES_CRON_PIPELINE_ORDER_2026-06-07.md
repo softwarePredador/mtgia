@@ -24,17 +24,24 @@ Paused intentionally:
 - `manaloom-master-optimizer-slot-scan` — ready but paused until an approved baseline is frozen.
 - `manaloom-master-optimizer-end-to-end` — manual-only pipeline; schedule placeholder is `every 1440m`, but it is disabled/paused for supervised runs only.
 
-Agent/report jobs currently failing mostly because of provider usage limits:
+Agent/report jobs paused by provider 429 backoff:
 
 - `manaloom-hermes-normal-audit`
 - `manaloom-commander-knowledge-deep`
 - `manaloom-gamechanger-research`
 - `manaloom-tag-accuracy-reporter`
 - `manaloom-mana-base-validator`
+- `manaloom-code-structure-auditor`
 - `manaloom-logic-coherence-auditor`
 - `manaloom-knowledge-synthesis`
 - `mtg-rules-auditor`
 - `manaloom-cron-governor-report`
+
+Provider backoff evidence:
+
+- Script: `docs/hermes-analysis/manaloom-knowledge/scripts/hermes_provider_backoff.py`.
+- Report: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
+- Backup on server: `/opt/data/cron/jobs.json.bak_provider_backoff_20260607_081300`.
 
 ## Current Lorehold evidence
 
@@ -100,8 +107,9 @@ Purpose:
 
 Missing hardening:
 
-- Conflicts from `kc_validator.py` must be persisted as actionable review items.
-- The validator should not only print conflicts; it should write a compact conflict report.
+- Conflicts from `kc_validator.py` are now persisted as actionable review items.
+- Latest report: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_081557.md`.
+- Latest result: 500 cards validated, 0 corrections, 2 conflicts.
 
 ### 3. Validate rules and simulator readiness
 
@@ -118,9 +126,9 @@ Purpose:
 - Check MTG rules assumptions.
 - Check mana base and functional tags.
 
-Current blocker:
+Current state:
 
-- Agent jobs are mostly blocked by provider 429.
+- Agent jobs that were blocked by provider 429 are paused by backoff, instead of failing noisily.
 - Some prompts still reference legacy/decommissioned cron IDs or old schema assumptions.
 
 ### 4. Freeze current baseline
@@ -226,9 +234,12 @@ Purpose:
 
 Current state:
 
-- Implemented as aggregate `replay_decision_auditor.py`.
-- Current limitation: it audits aggregate battle output, not turn-by-turn decisions yet.
-- Remaining hardening: add structured replay events for attacks, blocks, spell timing, tutor target and counter/removal use.
+- Implemented as turn-by-turn `replay_decision_auditor.py`.
+- `battle_replay_v10_3.py` now writes text replay plus JSONL structured events.
+- Audits attacks, blocks, target selection, cleanup, Approach, tutor, removal, board wipe and game close.
+- Latest report: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_replay_audit_20260607_081614.md`.
+- Latest result: 895 structured events across 3 fresh replays, 0 turn-by-turn findings.
+- Remaining hardening: larger seed batches and deeper counter/removal expected-value scoring.
 
 ### 9. Apply only after approval
 
@@ -258,23 +269,41 @@ Post-apply proof:
 - Post-apply baseline: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_post_apply_baseline_hermes_20260607_041859.md`.
 - Post-apply battle: 47.5% WR, 57W/63L/0S, 120 games.
 
+### 10. Product-facing handoff
+
+Needed before copying any Hermes-local result into the app/product database:
+
+- `master_optimizer_product_handoff.py`
+
+Purpose:
+
+- Separate Hermes learning from product mutation.
+- Require explicit product owner approval.
+- Require product backup, dry-run diff, legality check and app/API smoke test.
+- Prevent automatic optimizer changes from touching product-facing decks.
+
+Current state:
+
+- Implemented and validated.
+- Report: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_product_handoff_20260607_081454.md`.
+- Status: `needs_product_owner_approval`.
+- No production database was mutated.
+
 ## What is missing to build the best Lorehold deck
 
-1. Add turn-by-turn replay decision auditor, replacing aggregate-only audit.
-2. Convert `kc_validator.py` conflicts into a report and review queue.
-3. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
-4. Resolve provider 429 or slow/pause agent jobs so they do not fail noisily.
-5. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
-6. Add an explicit production/apply handoff if a Hermes-approved swap should ever be copied to a product-facing deck.
-7. Re-run confirmation with larger sample sizes before product-facing mutation.
+1. Review the 2 KC conflicts and decide whether classification rules need adjustment.
+2. Fix stale prompts in agent jobs that reference old cron IDs or old SQLite schema.
+3. Resume provider-backed agent jobs only after quota/backoff is resolved.
+4. Keep `lorehold-universal-optimizer` paused unless it is rewritten into proposal-only mode.
+5. Re-run confirmation and replay audit with larger sample sizes before product-facing mutation.
+6. Execute product apply only through the product handoff checklist.
 
 ## Recommended next implementation order
 
-1. Add structured replay event capture to `battle_analyst_v8.py`.
-2. Upgrade `replay_decision_auditor.py` from aggregate audit to turn-by-turn audit.
-3. Add a conflict report for `kc_validator.py`.
-4. Add production/apply handoff rules so Hermes local SQLite never silently mutates app-facing decks.
-5. Re-run confirmation at higher sample size before any product-facing mutation.
+1. Review KC conflicts and patch classification rules if needed.
+2. Update stale provider-backed agent prompts while they remain paused.
+3. Run larger confirmation plus larger replay audit before any product-facing mutation.
+4. If approved, run product backup/dry-run/smoke-test flow from the product handoff.
 
 ## Practical verdict
 
@@ -290,6 +319,10 @@ The Hermes pipeline now has a functional safe loop through manual apply on Herme
 - manual-review handoff.
 - rollback-aware manual apply;
 - post-apply battle verification.
+- turn-by-turn replay audit;
+- KC conflict report;
+- provider 429 backoff;
+- product-facing handoff gate.
 
 It produced and applied one approved Hermes-local swap for Lorehold:
 
@@ -297,4 +330,4 @@ It produced and applied one approved Hermes-local swap for Lorehold:
 - full confirmation: 55.8% WR, +10.8pp, 67W/53L/0S, 120 games.
 - post-apply baseline: 47.5% WR, 57W/63L/0S, 120 games.
 
-It still must not auto-apply. The remaining gap is richer turn-by-turn replay audit and a separate approval path before copying any Hermes-local result into a product-facing deck.
+It still must not auto-apply. The remaining gap is operational review: KC conflicts, stale prompt cleanup, larger samples and explicit product approval before copying any Hermes-local result into a product-facing deck.

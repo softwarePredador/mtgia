@@ -1,0 +1,54 @@
+{
+  "conflicts": [
+    {
+      "cmc": 6.0,
+      "current": "recursion",
+      "name": "Storm of Souls",
+      "oracle_sample": "Return all creature cards from your graveyard to the battlefield. Each of them is a 1/1 Spirit with flying in addition to its other types. Exile Storm of Souls.",
+      "reclassified": "finisher",
+      "type_line": "Sorcery"
+    },
+    {
+      "cmc": 4.0,
+      "current": "overload_recursion",
+      "name": "Radiant Scrollwielder",
+      "oracle_sample": "Instant and sorcery spells you control have lifelink.\nAt the beginning of your upkeep, exile an instant or sorcery card at random from your graveyard. You may cast it this turn. If a spell cast this way would be put into your graveyard, exi",
+      "reclassified": "creature",
+      "type_line": "Creature \u2014 Dwarf Cleric"
+    }
+  ],
+  "conflicts_count": 2,
+  "corrections": [],
+  "corrections_count": 0,
+  "created_at": "2026-06-07T08:15:57.081778+00:00",
+  "effect_distribution": {
+    "board_wipe": 73,
+    "copy_spell": 22,
+    "counter": 34,
+    "draw_cards": 440,
+    "draw_engine": 152,
+    "extra_turn": 10,
+    "finisher": 54,
+    "indestructible": 101,
+    "land": 8,
+    "overload_recursion": 4,
+    "phase_out": 9,
+    "pump_all": 35,
+    "ramp_engine": 70,
+    "ramp_permanent": 312,
+    "ramp_ritual": 35,
+    "recursion": 80,
+    "remove_creature": 49,
+    "remove_permanent": 95,
+    "ripple_engine": 1,
+    "silence_opponents": 50,
+    "steal_all_creatures": 2,
+    "token_maker": 208,
+    "topdeck_manipulation": 65,
+    "tutor": 61
+  },
+  "new_entries": [],
+  "new_entries_count": 0,
+  "total_filtered": 1970,
+  "validated_count": 500
+}

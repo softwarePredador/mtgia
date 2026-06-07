@@ -233,8 +233,8 @@ def test_only_attacked_player_can_block():
     attacker = player("Attacker")
     non_target = player("Non Target")
     target = player("Target")
-    non_target.life = 39
-    target.life = 40
+    non_target.life = 40
+    target.life = 39
     attacker.battlefield = [
         {
             "name": "Attacker Creature",

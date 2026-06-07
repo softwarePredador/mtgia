@@ -1,21 +1,388 @@
 #!/usr/bin/env python3
-"""Aggregate replay/decision audit for the optimizer loop.
+"""Turn-by-turn replay/decision audit for the optimizer loop.
 
-This first version audits real battle metrics already persisted by the baseline
-runner. It is deliberately honest when turn-by-turn replay data is unavailable.
+The aggregate baseline still matters, but optimizer trust requires checking the
+actual decisions that produced those numbers. This auditor can generate fresh
+structured replays or consume a JSONL replay event file from
+``battle_replay_v10_3.py``.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any
 
-from master_optimizer_common import connect, ensure_optimizer_tables, latest_baseline, write_report
+from master_optimizer_common import REPORT_DIR, connect, ensure_optimizer_tables, latest_baseline, write_report
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPLAY_GENERATOR = SCRIPT_DIR / "battle_replay_v10_3.py"
+
+
+def load_events(path: Path, replay_id: str = "external") -> list[dict[str, Any]]:
+    events: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for index, line in enumerate(handle, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"Invalid JSONL event at {path}:{index}: {exc}") from exc
+            event.setdefault("replay_id", replay_id)
+            events.append(event)
+    return events
+
+
+def generate_replay_events(seed: int, output_dir: Path) -> tuple[list[dict[str, Any]], Path, Path]:
+    replay_txt = output_dir / f"battle_replay_seed_{seed}.txt"
+    replay_jsonl = output_dir / f"battle_replay_seed_{seed}.jsonl"
+    env = os.environ.copy()
+    env.update(
+        {
+            "REPLAY_SEED": str(seed),
+            "REPLAY_OUT": str(replay_txt),
+            "REPLAY_EVENTS_OUT": str(replay_jsonl),
+        }
+    )
+    completed = subprocess.run(
+        [sys.executable, str(REPLAY_GENERATOR)],
+        cwd=str(SCRIPT_DIR),
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+    if completed.returncode != 0:
+        output = (completed.stdout or "") + "\n" + (completed.stderr or "")
+        raise RuntimeError(f"Replay generator failed for seed {seed}:\n{output[-2000:]}")
+    return load_events(replay_jsonl, replay_id=f"seed_{seed}"), replay_txt, replay_jsonl
+
+
+def add_finding(
+    findings: list[dict[str, Any]],
+    severity: str,
+    event: dict[str, Any],
+    finding: str,
+) -> None:
+    findings.append(
+        {
+            "severity": severity,
+            "replay_id": event.get("replay_id", "?"),
+            "turn": event.get("turn", "?"),
+            "player": event.get("player") or event.get("attacker") or "?",
+            "event": event.get("event", "?"),
+            "finding": finding,
+        }
+    )
+
+
+def defender_life_gaps(event: dict[str, Any]) -> list[dict[str, Any]]:
+    target = event.get("target")
+    target_life = int(event.get("target_life_before") or 0)
+    defenders = event.get("defenders") or []
+    if not isinstance(defenders, list):
+        return []
+    return [
+        defender
+        for defender in defenders
+        if defender.get("name") != target
+        and int(defender.get("life") or 0) < target_life
+    ]
+
+
+def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    latest_combat: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {}
+    approach_resolved: dict[tuple[Any, str], int] = {}
+    approach_won: set[tuple[Any, str]] = set()
+    game_closed: dict[Any, bool] = {}
+
+    for event in events:
+        kind = event.get("event")
+        replay_id = event.get("replay_id", "external")
+
+        if game_closed.get(replay_id) and kind == "turn_start":
+            add_finding(
+                findings,
+                "critical",
+                event,
+                "Game produced a new turn after a game_won event.",
+            )
+
+        if kind == "turn_end":
+            hand = int(event.get("hand") or 0)
+            discarded = int(event.get("discarded") or 0)
+            if hand > 7:
+                add_finding(findings, "critical", event, f"Cleanup ended with hand size {hand} > 7.")
+            if discarded >= 12:
+                add_finding(
+                    findings,
+                    "medium",
+                    event,
+                    f"Cleanup discarded {discarded} cards; inspect draw/hand overflow sequencing.",
+                )
+
+        elif kind == "combat":
+            attackers = int(event.get("attackers") or 0)
+            total_power = int(event.get("total_power") or 0)
+            target_life = int(event.get("target_life_before") or 0)
+            target_reason = str(event.get("target_reason") or "")
+            blockers = int(event.get("blockers") or 0)
+            if attackers > 0 and total_power <= 0:
+                add_finding(findings, "high", event, "Combat declared attackers with non-positive total power.")
+            if total_power >= target_life > 0 and target_reason != "lethal":
+                add_finding(
+                    findings,
+                    "high",
+                    event,
+                    f"Potential lethal attack ({total_power} power vs {target_life} life) was not tagged as lethal.",
+                )
+            if target_reason == "default_high_life":
+                lower_life_defenders = defender_life_gaps(event)
+                if lower_life_defenders:
+                    names = ", ".join(
+                        f"{d.get('name')}({d.get('life')})" for d in lower_life_defenders[:3]
+                    )
+                    add_finding(
+                        findings,
+                        "medium",
+                        event,
+                        f"Default targeting chose the highest-life player while lower-life defenders existed: {names}.",
+                    )
+            if blockers == 0 and target_life <= 0:
+                add_finding(findings, "high", event, "Combat targeted an already-dead player.")
+            latest_combat[
+                (replay_id, event.get("turn"), event.get("attacker"), event.get("target"))
+            ] = event
+
+        elif kind == "combat_result":
+            key = (replay_id, event.get("turn"), event.get("attacker"), event.get("target"))
+            combat = latest_combat.get(key)
+            if combat:
+                blockers = int(combat.get("blockers") or 0)
+                attackers = int(combat.get("attackers") or 0)
+                target_life = int(combat.get("target_life_before") or 0)
+                total_power = int(combat.get("total_power") or 0)
+                damage = int(event.get("damage_to_player") or 0)
+                target_dead = bool(event.get("target_dead"))
+                if attackers > 0 and blockers == 0 and damage == 0:
+                    add_finding(findings, "high", event, "Unblocked combat dealt 0 player damage.")
+                if blockers == 0 and total_power >= target_life > 0 and not target_dead:
+                    add_finding(
+                        findings,
+                        "high",
+                        event,
+                        "Unblocked lethal-looking combat did not kill the target.",
+                    )
+
+        elif kind == "spell_resolved" and event.get("effect") == "approach":
+            key = (replay_id, str(event.get("player") or "?"))
+            approach_resolved[key] = approach_resolved.get(key, 0) + 1
+
+        elif kind == "game_won":
+            game_closed[replay_id] = True
+            if event.get("reason") == "approach":
+                approach_won.add((replay_id, str(event.get("player") or "?")))
+
+        elif kind == "tutor_resolved":
+            if not event.get("found"):
+                add_finding(findings, "medium", event, "Tutor resolved without finding a target.")
+
+        elif kind == "removal_resolved":
+            available_targets = int(event.get("available_targets") or 0)
+            target_power = event.get("target_power")
+            try:
+                target_power_value = int(target_power)
+            except (TypeError, ValueError):
+                target_power_value = 0
+            if available_targets >= 3 and target_power_value <= 1:
+                add_finding(
+                    findings,
+                    "low",
+                    event,
+                    "Removal hit a low-power target while multiple targets were available.",
+                )
+
+        elif kind == "board_wipe_resolved":
+            destroyed = int(event.get("destroyed") or 0)
+            protected = int(event.get("protected") or 0)
+            if destroyed == 0:
+                add_finding(findings, "high", event, "Board wipe resolved without destroying creatures.")
+            if protected > destroyed and destroyed > 0:
+                add_finding(
+                    findings,
+                    "low",
+                    event,
+                    f"Board wipe left more protected creatures ({protected}) than destroyed ({destroyed}).",
+                )
+
+    for key, count in approach_resolved.items():
+        if count >= 2 and key not in approach_won:
+            findings.append(
+                {
+                    "severity": "critical",
+                    "replay_id": key[0],
+                    "turn": "?",
+                    "player": key[1],
+                    "event": "approach",
+                    "finding": "Approach resolved at least twice without an approach game_won event.",
+                }
+            )
+
+    return findings
+
+
+def aggregate_findings(matchups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    for matchup in matchups:
+        wr = float(matchup.get("wr") or 0)
+        reasons = str(matchup.get("reasons") or "")
+        opponent = str(matchup.get("opponent") or "?")
+        stalls = int(matchup.get("stalls") or 0)
+        avg_turn = float(matchup.get("avg_turn") or 0)
+        event = {
+            "event": "aggregate_baseline",
+            "replay_id": "baseline",
+            "turn": "-",
+            "player": opponent,
+        }
+        if wr < 40:
+            add_finding(
+                findings,
+                "high",
+                event,
+                f"Low matchup WR {wr:.1f}%; needs replay review before optimizer trusts cuts.",
+            )
+        if stalls > 0:
+            add_finding(
+                findings,
+                "medium",
+                event,
+                f"{stalls} stalls; inspect missed wincon or game-end conditions.",
+            )
+        if avg_turn > 15:
+            add_finding(
+                findings,
+                "medium",
+                event,
+                f"Slow average turn {avg_turn:.1f}; inspect sequencing and finisher timing.",
+            )
+        if not reasons:
+            add_finding(
+                findings,
+                "medium",
+                event,
+                "Missing win/loss reason detail in aggregate output.",
+            )
+    return findings
+
+
+def severity_counts(findings: list[dict[str, Any]]) -> dict[str, int]:
+    counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    for finding in findings:
+        severity = str(finding.get("severity") or "low")
+        counts[severity] = counts.get(severity, 0) + 1
+    return counts
+
+
+def render_report(
+    *,
+    deck_id: int,
+    baseline_id: int,
+    baseline_findings: list[dict[str, Any]],
+    turn_findings: list[dict[str, Any]],
+    event_count: int,
+    replay_files: list[tuple[Path, Path]],
+) -> str:
+    counts = severity_counts(turn_findings)
+    critical_or_high = counts.get("critical", 0) + counts.get("high", 0)
+    status = "blocked_turn_decisions" if critical_or_high else "turn_by_turn_clean"
+    lines = [
+        "# Hermes Replay Decision Audit",
+        "",
+        f"- deck_id: {deck_id}",
+        f"- baseline_id: {baseline_id}",
+        f"- status: {status}",
+        f"- structured_events: {event_count}",
+        f"- turn_findings: {len(turn_findings)}",
+        f"- critical: {counts.get('critical', 0)}",
+        f"- high: {counts.get('high', 0)}",
+        f"- medium: {counts.get('medium', 0)}",
+        f"- low: {counts.get('low', 0)}",
+        "",
+        "## Replay Files",
+        "",
+    ]
+    if replay_files:
+        for txt, jsonl in replay_files:
+            lines.append(f"- text: `{txt}`")
+            lines.append(f"- events: `{jsonl}`")
+    else:
+        lines.append("- external events file was used.")
+
+    lines.extend(
+        [
+            "",
+            "## Turn-By-Turn Findings",
+            "",
+            "| Severity | Replay | Turn | Player | Event | Finding |",
+            "| --- | --- | ---: | --- | --- | --- |",
+        ]
+    )
+    if turn_findings:
+        for finding in turn_findings:
+            lines.append(
+                "| {severity} | {replay_id} | {turn} | {player} | {event} | {finding} |".format(
+                    **finding
+                )
+            )
+    else:
+        lines.append("| info | all | - | all | all | No turn-by-turn red flags found. |")
+
+    lines.extend(
+        [
+            "",
+            "## Aggregate Baseline Findings",
+            "",
+            "| Severity | Opponent | Finding |",
+            "| --- | --- | --- |",
+        ]
+    )
+    if baseline_findings:
+        for finding in baseline_findings:
+            lines.append(
+                f"| {finding['severity']} | {finding['player']} | {finding['finding']} |"
+            )
+    else:
+        lines.append("| info | all | No aggregate red flags found. |")
+
+    lines.extend(
+        [
+            "",
+            "## Gate Interpretation",
+            "",
+            "- `critical` or `high` turn findings block optimizer trust until battle logic is fixed.",
+            "- `medium` findings require review before product-facing deck mutation.",
+            "- `low` findings are polish/heuristic notes and do not block a Hermes-local experiment.",
+        ]
+    )
+    return "\n".join(lines) + "\n"
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--deck-id", type=int, default=6)
+    parser.add_argument("--events", type=Path)
+    parser.add_argument("--generate", type=int, default=3, help="fresh replays to generate when --events is omitted")
+    parser.add_argument("--seed-start", type=int, default=42)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
 
@@ -27,78 +394,30 @@ def main() -> int:
         payload = json.loads(baseline["result_json"])
         matchups = payload.get("matchups", [])
 
-    findings = []
-    for matchup in matchups:
-        wr = float(matchup.get("wr") or 0)
-        reasons = str(matchup.get("reasons") or "")
-        opponent = str(matchup.get("opponent") or "?")
-        stalls = int(matchup.get("stalls") or 0)
-        avg_turn = float(matchup.get("avg_turn") or 0)
-        if wr < 40:
-            findings.append(
-                {
-                    "severity": "high",
-                    "opponent": opponent,
-                    "finding": f"Low matchup WR {wr:.1f}%; needs replay review before optimizer trusts cuts.",
-                }
-            )
-        if stalls > 0:
-            findings.append(
-                {
-                    "severity": "medium",
-                    "opponent": opponent,
-                    "finding": f"{stalls} stalls; inspect for missed wincon or game-end condition.",
-                }
-            )
-        if avg_turn > 15:
-            findings.append(
-                {
-                    "severity": "medium",
-                    "opponent": opponent,
-                    "finding": f"Slow average win turn {avg_turn:.1f}; inspect sequencing and finisher timing.",
-                }
-            )
-        if not reasons:
-            findings.append(
-                {
-                    "severity": "medium",
-                    "opponent": opponent,
-                    "finding": "Missing win/loss reason detail; replay log needs richer structured events.",
-                }
-            )
-
-    status = "needs_replay_detail" if findings else "aggregate_clean"
-    lines = [
-        "# Hermes Replay Decision Audit",
-        "",
-        f"- deck_id: {args.deck_id}",
-        f"- baseline_id: {baseline['id']}",
-        f"- status: {status}",
-        f"- findings: {len(findings)}",
-        "",
-        "## Findings",
-        "",
-        "| Severity | Opponent | Finding |",
-        "| --- | --- | --- |",
-    ]
-    for finding in findings:
-        lines.append(
-            f"| {finding['severity']} | {finding['opponent']} | {finding['finding']} |"
+    replay_files: list[tuple[Path, Path]] = []
+    events: list[dict[str, Any]] = []
+    if args.events:
+        events.extend(load_events(args.events))
+    else:
+        tmp_dir = REPORT_DIR / "replays" if args.report else Path(
+            tempfile.mkdtemp(prefix="hermes_replay_audit_")
         )
-    if not findings:
-        lines.append("| info | all | No aggregate red flags found. |")
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        for seed in range(args.seed_start, args.seed_start + max(1, args.generate)):
+            generated, txt, jsonl = generate_replay_events(seed, tmp_dir)
+            events.extend(generated)
+            replay_files.append((txt, jsonl))
 
-    lines.extend(
-        [
-            "",
-            "## Limitation",
-            "",
-            "This audit uses aggregate battle output. The next hardening step is a "
-            "turn-by-turn structured replay logger that records attacks, blocks, "
-            "spell timing, tutor targets and counter/removal decisions.",
-        ]
+    turn_findings = audit_turn_events(events)
+    baseline_findings = aggregate_findings(matchups)
+    markdown = render_report(
+        deck_id=args.deck_id,
+        baseline_id=baseline["id"],
+        baseline_findings=baseline_findings,
+        turn_findings=turn_findings,
+        event_count=len(events),
+        replay_files=replay_files,
     )
-    markdown = "\n".join(lines) + "\n"
     print(markdown)
     if args.report:
         path = write_report("master_optimizer_replay_audit", markdown)

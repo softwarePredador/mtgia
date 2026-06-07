@@ -2,6 +2,7 @@
 """Generate a structured step-by-step replay from Battle Analyst events."""
 
 import importlib.util
+import json
 import os
 import random
 from pathlib import Path
@@ -12,6 +13,7 @@ BATTLE_PATH = os.environ.get(
     str(Path(__file__).with_name("battle_analyst_v8.py")),
 )
 OUT = os.environ.get("REPLAY_OUT", "/tmp/battle_full_replay.txt")
+EVENTS_OUT = os.environ.get("REPLAY_EVENTS_OUT", str(Path(OUT).with_suffix(".jsonl")))
 
 
 def load_battle():
@@ -24,8 +26,21 @@ def load_battle():
 def main():
     battle = load_battle()
 
-    with open(OUT, "w") as replay:
+    with open(OUT, "w", encoding="utf-8") as replay, open(EVENTS_OUT, "w", encoding="utf-8") as events:
         def log(event, data):
+            events.write(
+                json.dumps(
+                    {
+                        "event": event,
+                        **data,
+                    },
+                    ensure_ascii=True,
+                    sort_keys=True,
+                    default=str,
+                )
+                + "\n"
+            )
+            events.flush()
             if event == "turn_start":
                 replay.write(
                     "\nTURN {turn} - {player} | Life={life} Hand={hand} Board={board}\n".format(
@@ -54,8 +69,27 @@ def main():
                 replay.write(
                     "  COMBAT {attacker} -> {target}: "
                     "{attackers} attackers, {blockers} blockers, "
-                    "{multi_blocks} gang blocks, {total_power} power\n".format(
+                    "{multi_blocks} gang blocks, {total_power} power "
+                    "(reason={target_reason}, target_life={target_life_before})\n".format(
                         **{**data, "multi_blocks": data.get("multi_blocks", 0)},
+                    )
+                )
+            elif event == "combat_result":
+                replay.write(
+                    "  DAMAGE {attacker} -> {target}: "
+                    "{damage_to_player} player damage, target life {target_life_after}, "
+                    "target_dead={target_dead}\n".format(**data)
+                )
+            elif event == "removal_resolved":
+                replay.write(
+                    "  REMOVAL {player}: {card} removed {target} from {target_player}\n".format(
+                        **data
+                    )
+                )
+            elif event == "tutor_resolved":
+                replay.write(
+                    "  TUTOR {player}: {card} found {found} ({target_type})\n".format(
+                        **data
                     )
                 )
             elif event == "turn_end":
@@ -165,6 +199,7 @@ def main():
             )
 
     print(f"Replay: {OUT}")
+    print(f"Replay events: {EVENTS_OUT}")
 
 
 if __name__ == "__main__":

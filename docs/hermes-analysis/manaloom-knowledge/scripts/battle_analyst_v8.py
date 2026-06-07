@@ -39,6 +39,33 @@ def emit_replay_event(event, **data):
         pass
 
 
+def replay_card_snapshot(card):
+    """Small JSON-safe card summary for turn-by-turn replay audits."""
+    if not isinstance(card, dict):
+        return {"name": str(card)}
+    return {
+        "name": card.get("name", "?"),
+        "power": card.get("power"),
+        "toughness": card.get("toughness"),
+        "cmc": card.get("cmc"),
+        "keywords": [
+            keyword
+            for keyword in (
+                "flying",
+                "reach",
+                "trample",
+                "deathtouch",
+                "first_strike",
+                "double_strike",
+                "lifelink",
+                "indestructible",
+            )
+            if card.get(keyword)
+        ],
+        "is_commander": bool(card.get("is_commander")),
+    }
+
+
 MANA_SYMBOL_TO_POOL = {
     "W": "white",
     "U": "blue",
@@ -976,6 +1003,14 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 player.battlefield.append(cmd_copy)
                 player.spend_card_mana(cmd, player.commander_tax)
                 player.commander_tax += 2
+                emit_replay_event(
+                    "commander_cast",
+                    player=player.name,
+                    card=cmd.get("name", "?"),
+                    cost=cost,
+                    turn=turn,
+                    phase=phase,
+                )
                 mana = player.available_mana()
 
     # 2. Ramp (main phase only)
@@ -986,6 +1021,16 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 player.hand.remove(c)
                 player.spend_card_mana(c)
                 eff = get_card_effect(c)
+                emit_replay_event(
+                    "spell_cast",
+                    player=player.name,
+                    card=c.get("name", "?"),
+                    effect=eff.get("effect", "unknown"),
+                    cmc=c.get("cmc", 0),
+                    turn=turn,
+                    phase=phase,
+                    role="ramp",
+                )
                 if eff.get("effect") == "ramp_ritual":
                     player.mana_pool.add_generic(eff.get("mana_produced", 3))
                     player.graveyard.append(c)
@@ -1024,6 +1069,17 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 player.hand.remove(c)
                 player.spend_card_mana(c)
                 eff = get_card_effect(c)
+                emit_replay_event(
+                    "spell_cast",
+                    player=player.name,
+                    card=c.get("name", "?"),
+                    effect=eff.get("effect", "unknown"),
+                    cmc=c.get("cmc", 0),
+                    threat_score=scored[0][1],
+                    turn=turn,
+                    phase=phase,
+                    role="high_threat",
+                )
                 stack.push(c, player, eff)
                 priority_round(player, all_players, stack, turn, rng)
                 if game_winner(all_players):
@@ -1049,10 +1105,30 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 c_copy["summoning_sick"] = True
                 c_copy["tapped"] = False
                 player.battlefield.append(c_copy)
+                emit_replay_event(
+                    "creature_cast",
+                    player=player.name,
+                    card=c.get("name", "?"),
+                    cmc=c.get("cmc", 0),
+                    power=c_copy.get("power"),
+                    toughness=c_copy.get("toughness"),
+                    turn=turn,
+                    phase=phase,
+                )
                 played += 1
             else:
                 player.hand.remove(c)
                 player.spend_card_mana(c)
+                emit_replay_event(
+                    "spell_cast",
+                    player=player.name,
+                    card=c.get("name", "?"),
+                    effect=eff.get("effect", "unknown"),
+                    cmc=c.get("cmc", 0),
+                    turn=turn,
+                    phase=phase,
+                    role="normal",
+                )
                 stack.push(c, player, eff)
                 played += 1
 
@@ -1104,7 +1180,26 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         for opp in opponents:
             targets = [c for c in opp.battlefield if isinstance(c, dict) and c.get("effect") == "creature"]
             if targets:
-                t = rng.choice(targets)
+                t = max(
+                    targets,
+                    key=lambda target: (
+                        bool(target.get("is_commander")),
+                        int(target.get("power") or 0),
+                        int(target.get("toughness") or 0),
+                        int(target.get("cmc") or 0),
+                    ),
+                )
+                emit_replay_event(
+                    "removal_resolved",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    target_player=opp.name,
+                    target=t.get("name", "?"),
+                    target_power=t.get("power"),
+                    target_toughness=t.get("toughness"),
+                    available_targets=len(targets),
+                    turn=turn,
+                )
                 opp.battlefield.remove(t)
                 if t.get("is_commander"):
                     opp.command_zone.append(t)
@@ -1113,6 +1208,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 break
         player.graveyard.append(card)
     elif effect == "board_wipe":
+        destroyed = 0
+        protected = 0
         for p in [player] + list(opponents):
             survivors = []
             for c in p.battlefield:
@@ -1120,14 +1217,24 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     # v8: indestructible per-creature
                     if c.get("indestructible"):
                         survivors.append(c)
+                        protected += 1
                         continue
                     if c.get("is_commander"):
                         p.command_zone.append(c)
                     else:
                         p.graveyard.append(c)
+                    destroyed += 1
                 else:
                     survivors.append(c)
             p.battlefield = survivors
+        emit_replay_event(
+            "board_wipe_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            destroyed=destroyed,
+            protected=protected,
+            turn=turn,
+        )
         player.graveyard.append(card)
     elif effect == "phase_out":
         player.phased_out = [c for c in player.battlefield if isinstance(c, dict) and c.get("effect") not in ("land",)]
@@ -1233,6 +1340,14 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if found:
             player.library.remove(found)
             player.hand.append(found)
+        emit_replay_event(
+            "tutor_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_type=target_type,
+            found=found.get("name", "?") if found else None,
+            turn=turn,
+        )
         player.graveyard.append(card)
     elif effect == "topdeck_manipulation":
         player.battlefield.append(effect_data)
@@ -1351,7 +1466,26 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
                 opp.spend_card_mana(c)
                 # Remove one attacker
                 if attackers:
-                    target = rng.choice(attackers)
+                    target = max(
+                        attackers,
+                        key=lambda card: (
+                            bool(card.get("is_commander")),
+                            int(card.get("power") or 0),
+                            int(card.get("toughness") or 0),
+                            int(card.get("cmc") or 0),
+                        ),
+                    )
+                    emit_replay_event(
+                        "instant_removal",
+                        player=opp.name,
+                        card=c.get("name", "?"),
+                        target_player=attacker.name,
+                        target=target.get("name", "?"),
+                        target_power=target.get("power"),
+                        target_toughness=target.get("toughness"),
+                        attackers_before=len(attackers),
+                        turn=turn,
+                    )
                     attackers.remove(target)
                     attacker.battlefield.remove(target)
                     if target.get("is_commander"):
@@ -1370,13 +1504,16 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     # Visible lethal is always the best attack. Known alternate-win threats follow.
     if lethal_targets:
         target = min(lethal_targets, key=lambda opp: opp.life)
+        target_reason = "lethal"
     elif known_approach_casters:
         target = max(
             known_approach_casters,
             key=lambda opp: (opp.approach_count, opp.threat_level, -opp.life),
         )
+        target_reason = "known_approach"
     elif attacker.strategy in ("aggro", "rush"):
         target = min(alive_defenders, key=lambda o: o.life)
+        target_reason = "aggro_low_life"
     elif attacker.strategy == "control":
         target = max(
             alive_defenders,
@@ -1390,8 +1527,21 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
                 -opp.life,
             ),
         )
+        target_reason = "control_high_threat"
     else:
-        target = max(alive_defenders, key=lambda o: o.life)
+        target = min(
+            alive_defenders,
+            key=lambda opp: (
+                opp.life,
+                -opp.threat_level,
+                -sum(
+                    card.get("power", 0)
+                    for card in opp.battlefield
+                    if isinstance(card, dict) and card.get("effect") == "creature"
+                ),
+            ),
+        )
+        target_reason = "default_low_life"
 
     # Only the attacked player can block. Multiple blockers may gang-block one attacker.
     block_assignments = []
@@ -1437,12 +1587,36 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         assigned_blockers.extend(blockers)
         block_assignments.append((a, blockers))
 
+    combat_target_life_before = target.life
+    combat_attacker_life_before = attacker.life
+
     emit_replay_event(
         "combat",
         attacker=attacker.name,
         target=target.name,
+        target_reason=target_reason,
+        target_life_before=combat_target_life_before,
+        attacker_life_before=combat_attacker_life_before,
+        defenders=[
+            {
+                "name": defender.name,
+                "life": defender.life,
+                "threat_level": defender.threat_level,
+                "creatures": len(defender.creatures_for_blocking()),
+                "approach_count": defender.approach_count,
+            }
+            for defender in alive_defenders
+        ],
         attackers=len(attackers),
+        attackers_detail=[replay_card_snapshot(card) for card in attackers],
         blockers=sum(len(blockers) for _, blockers in block_assignments),
+        blockers_detail=[
+            {
+                "attacker": replay_card_snapshot(attacking_creature),
+                "blockers": [replay_card_snapshot(blocker) for blocker in blockers],
+            }
+            for attacking_creature, blockers in block_assignments
+        ],
         multi_blocks=sum(1 for _, blockers in block_assignments if len(blockers) > 1),
         total_power=total_power,
         turn=turn,
@@ -1537,6 +1711,19 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             for opp in opponents:
                 if opp.name == name: opp.life = 0
 
+    emit_replay_event(
+        "combat_result",
+        attacker=attacker.name,
+        target=target.name,
+        target_life_after=target.life,
+        attacker_life_after=attacker.life,
+        damage_to_player=max(0, combat_target_life_before - target.life),
+        attackers_survived=sum(1 for card in attackers if card in attacker.battlefield),
+        blockers_survived=len(target.creatures_for_blocking()),
+        target_dead=not target.is_alive(),
+        turn=turn,
+    )
+
 def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     """v8: Full turn with priority windows between phases."""
     if game_winner(all_players):
@@ -1587,6 +1774,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             if mana >= miracle_cost and lorehold_on_board:
                 player.hand.remove(last_drawn)
                 player.spend_mana(miracle_cost)
+                emit_replay_event(
+                    "miracle_cast",
+                    player=player.name,
+                    card=last_drawn.get("name", "?"),
+                    effect=get_card_effect(last_drawn).get("effect", "unknown"),
+                    miracle_cost=miracle_cost,
+                    turn=turn,
+                )
                 stack.push(last_drawn, player, get_card_effect(last_drawn))
                 while not stack.empty():
                     priority_round(player, all_players, stack, turn, rng)
@@ -1601,6 +1796,12 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         player.battlefield.append(land_permanent)
         player.lands_played_this_turn += 1
         player.mana_pool.add(source_colors(land_permanent)[0], 1)
+        emit_replay_event(
+            "land_played",
+            player=player.name,
+            card=land.get("name", "?"),
+            turn=turn,
+        )
     cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
     if game_winner(all_players):
         return
@@ -1645,6 +1846,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             if opp.can_pay_card(c):
                 opp.hand.remove(c)
                 opp.spend_card_mana(c)
+                emit_replay_event(
+                    "end_step_instant",
+                    player=opp.name,
+                    card=c.get("name", "?"),
+                    effect=get_card_effect(c).get("effect", "unknown"),
+                    active_player=player.name,
+                    turn=turn,
+                )
                 apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
 
 

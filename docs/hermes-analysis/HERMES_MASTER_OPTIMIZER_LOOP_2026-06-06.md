@@ -88,6 +88,24 @@ Validacao pos-apply em Hermes, 2026-06-07:
 - Deck continua valido: 100 cartas, 35 lands, CMC medio 2.5.
 - Relatorio local: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_post_apply_baseline_hermes_20260607_041859.md`.
 
+Hardening final em Hermes, 2026-06-07:
+
+- Replay turno-a-turno implementado via eventos JSONL em `battle_replay_v10_3.py`.
+- `replay_decision_auditor.py` agora gera replays frescos e audita decisoes de combate, removal, tutor, cleanup, Approach e encerramento.
+- Auditoria fresca com 3 replays: 895 eventos estruturados, 0 findings turno-a-turno.
+- Relatorio local: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_replay_audit_20260607_081614.md`.
+- Heuristica de combate corrigida: alvo default agora prioriza vida baixa/ameaca, nao maior vida.
+- Heuristica de removal corrigida: removal agora prioriza comandante/maior poder, nao alvo aleatorio.
+- `kc_validator.py` agora grava fila de conflitos em Markdown/JSON.
+- Validacao KC fresca: 500 cartas validadas, 0 correcoes automaticas, 2 conflitos para revisao.
+- Relatorio KC: `docs/hermes-analysis/kc_validator_reports/kc_validator_conflicts_20260607_081557.md`.
+- Jobs de agente bloqueados por provider 429 foram pausados com backup de `/opt/data/cron/jobs.json`.
+- Relatorio provider backoff: `docs/hermes-analysis/master_optimizer_reports/hermes_provider_backoff_20260607_081300.md`.
+- Handoff separado para produto criado via `master_optimizer_product_handoff.py`.
+- Handoff produto gerado com status `needs_product_owner_approval`; nenhuma mutacao de producao foi feita.
+- Relatorio produto: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_product_handoff_20260607_081454.md`.
+- Preflight final aprovado: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_20260607_081631.md`.
+
 Importante: nao houve apply automatico. O apply feito foi manual, com rollback, usando apenas swap aprovado por full confirmation. Nenhum banco de producao foi alterado.
 
 Arquivos principais:
@@ -98,28 +116,26 @@ Arquivos principais:
 - `docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/hermes_provider_backoff.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
 
 ## O que ainda falta no battle
 
-1. Validacao massiva com decks reais, nao apenas testes unitarios.
-2. Analise automatica de replay para detectar jogadas ruins.
-3. Melhor heuristica de prioridade:
-   - quando atacar;
-   - quando segurar bloqueador;
-   - quando gastar removal;
-   - quando gastar counter;
-   - quando tutorizar;
-   - quando preservar wincon.
-4. Relatorio por partida com motivo de vitoria/derrota.
-5. Metricas persistidas por matchup:
+1. Validacao massiva com amostras maiores e mais seeds, alem dos 3 replays frescos ja auditados.
+2. Evoluir a auditoria para medir qualidade de counter/removal com valor esperado por alvo.
+3. Persistir metricas mais finas por matchup:
    - winrate;
    - turnos ate vitoria;
    - cartas mortas na mao;
    - screw/flood;
    - dano perdido por ataque ruim;
    - spells relevantes seguradas ou gastas cedo demais.
+4. Investigar matchups agregados fracos, especialmente Winota e Tivit, antes de qualquer mutacao product-facing.
 
 ## O que falta para o optimizer ficar excelente
 
@@ -237,6 +253,8 @@ Depois de aplicar, gerar replays novos e procurar:
 
 Se o replay mostrar decisao ruim, o problema volta para o battle, nao para o optimizer.
 
+Estado atual: implementado. O auditor turno-a-turno bloqueia findings `critical/high`, exige revisao para `medium` antes de produto e aceita `low` apenas como polish de Hermes-local.
+
 ## Criterios de aprovacao
 
 Um pacote de otimizacao so fica aprovado quando tiver:
@@ -262,16 +280,9 @@ Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix n
 
 ## Proximo passo tecnico recomendado
 
-Criar o analisador de replay:
+Proximos passos agora sao de maturidade, nao de infraestrutura basica:
 
-```text
-replay_decision_auditor.py
-```
-
-Responsabilidades:
-
-- ler replay estruturado;
-- marcar decisoes ruins;
-- classificar severidade;
-- sugerir teste de regressao;
-- impedir que o optimizer aplique swap baseado em battle com decisao obviamente ruim.
+- revisar os 2 conflitos do KC report (`Storm of Souls`, `Radiant Scrollwielder`);
+- aumentar amostra de replay audit para mais seeds quando for promover swap a produto;
+- criar um apply product-facing separado apenas depois do checklist `needs_product_owner_approval`;
+- manter jobs 429 pausados ate cota/provider voltar, para nao poluir o scheduler.

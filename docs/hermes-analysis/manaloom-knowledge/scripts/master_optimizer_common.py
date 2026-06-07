@@ -149,6 +149,19 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS optimizer_product_handoffs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            deck_id INTEGER NOT NULL,
+            applied_swap_id INTEGER,
+            status TEXT NOT NULL,
+            report_path TEXT NOT NULL,
+            approval_json TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+        """
+    )
     conn.commit()
 
 
