@@ -205,82 +205,144 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> **Data:** 2026-06-07T12:54:26Z
+> **Data:** 2026-06-07T19:00:00Z
 > **Cron:** manaloom-mana-base-validator
-> **Decks analisados:** 8 (IDs 1-7, 9)
-> **Fonte profiles:** 32 profiles (4 dirs, commander_reference_profile_*)
-> **Método:** Normalized name matching (underscore↔space); lands via `role_targets.lands.{min,max}`; dados complementares via deck_cards.functional_tag
+> **Decks analisados:** 8
+> **Profiles:** 24 profiles (3 batch dirs: anchor30 A/B/C)
+> **Método:** Profile matching via JSON file names; lands/ramp/draw via `role_targets.{min,max}`; CMC computed from `deck_cards` excluding NULL/0 and lands
 
-### Resumo Geral — Validação de Lands vs Perfil EDHREC
+### Resumo Geral — Validação vs Perfis EDHREC
 
-| # | Deck | Cards (rec/qty) | Status | Lands | Perfil Lands | Dados Corrompidos |
-|---|------|:-----:|:------:|:-----:|:------------:|-------------------|
-| 1 | Kinnan, Bonder Prodigy | 13/13 | INCOMPLETE | 29 | [29-34] | 2/13 CMC NULL; 1/13 tag NULL; 13 cards total |
-| 2 | Yuriko — Dimir Ninja Topdeck Tempo | 84/99 | OK | 33 | [30-34] | 19/84 CMC NULL (23%); 21/84 tag NULL (25%) |
-| 3 | Korvold — EDHREC Average Default | 11/11 | INCOMPLETE | 25 | — | 11 cards total; CMC stored=3.2 vs computed=2.64 |
-| 4 | Teysa Karlov — EDHREC Average | 80/80 | LANDS OK | 35 | [35-37] | lands_tag=15 vs perfil[35-37] — basic lands não em deck_cards; 15/80 CMC NULL; 4/80 tag NULL |
-| 5 | Aesi EDHREC Average Default | 79/100 | LANDS OK | 40 | [39-43] | 19/79 CMC NULL (24%); 6/79 tag NULL; CMC stored=2.61 vs computed=3.40 |
-| 6 | Lorehold Best-of Learned No Premium Mox | 100/100 | NO PROFILE | 33 | — | 36/100 CMC NULL (36%!); CMC stored=1.79 vs computed=3.14 (maior divergência) |
-| 7 | Winota — Boros Combat Trigger Humans | 85/100 | LANDS OK | 34 | [31-35] | 22/85 CMC NULL (26%) |
-| 9 | Atraxa, Praetors' Voice — EDHREC (41k) | 91/100 | LANDS OK | 36 | [35-38] | 29/91 CMC NULL (32%); CMC mais preciso (stored=2.97 vs computed=2.98) |
+| # | Deck | Cards | Status | Lands (stored) | Perfil Lands | CMC (stored/computed) | Ramp (stored/perfil) | Draw (stored/perfil) | Dados Corrompidos |
+|---|------|:---:|:------:|:---:|:------------:|:---:|:---:|:---:|:---|
+| 1 | Kinnan, Bonder Prodigy | 13 | INCOMPLETE | 29 | 29-34 | 1.8/2.8 ⚠️ | 4/— | 3/— | CMC NULL/0: 2/13 (15%); tag NULL: 1/13 (8%) |
+| 2 | Yuriko — Dimir Ninja Topdeck Tempo | 84 | OK | 33 | 30-34 ✅ | 2.8/3.43 ⚠️ | 8/— | 14/— | CMC NULL/0: 19/84 (23%); tag NULL: 21/84 (25%) |
+| 3 | Korvold — EDHREC Average Default | 11 | INCOMPLETE | 25 | 34-37 ⚠️ | 3.2/2.64 ⚠️ | 3/10-14 ⚠️ | 1/6-10 ⚠️ | CMC delta: +0.56; lands under profile min |
+| 4 | Teysa Karlov — EDHREC Average | 80 | OK | 35 | 35-37 ✅ | 2.9/2.64 ⚠️ | 15/9-11 ⚠️ | 11/10-14 ✅ | CMC NULL/0: 15/80 (19%); ramp stored acima do perfil |
+| 5 | Aesi EDHREC Average Default | 79 | OK | 40 | 39-43 ✅ | 2.61/3.35 ⚠️ | 28/14-18 ⚠️ | 12/6-9 ⚠️ | CMC NULL/0: 19/79 (24%); ramp/draw stored acima do perfil |
+| 6 | Lorehold Best-of Learned No Premium Mox | 100 | NO PROFILE | 33 | — | 1.79/3.14 🔴 | 6 (stored) / 19 (actual) | 6 (stored) / 9 (actual) | CMC NULL/0: 36/100 (36%); CMC delta: -1.35 (maior); ramp stored=6 vs actual=19 (classificador corrigido) |
+| 7 | Winota — Boros Combat Trigger Humans | 85 | CMC CORRUPT | 34 | 31-35 ✅ | 2.35/2.54 ✅ | 10/— | 3/— | CMC NULL/0: 22/85 (26%) |
+| 9 | Atraxa, Praetors' Voice — EDHREC (41k) | 91 | CMC CORRUPT | 36 | 35-38 ✅ | 2.97/2.98 ✅ | 14/10-13 ⚠️ | 12/8-12 ✅ | CMC NULL/0: 29/91 (32%); ramp stored levemente acima |
 
-*Legenda: OK | INCOMPLETE (<50 cards) | NO PROFILE | CORRUPT (CMC/tag)*
+*Legenda: OK | INCOMPLETE (<50 cards) | NO PROFILE | CMC CORRUPT (>25% NULL)*
 
-### Diagnóstico de Dados — CMC Sistemicamente Corrompido 🔴
+### Diagnóstico Detalhado por Deck
 
-**TODOS os decks** exceto Atraxa (#9) têm CMC stored vs computed divergente (>0.1 de diferença):
+#### Deck #1: Kinnan, Bonder Prodigy (13 cards — INCOMPLETO)
+- **Profile:** `kinnan_bonder_prodigy.json` (anchor30 batch A) — lands [29-34], nonland_mana_sources [18-26]
+- **Lands:** Stored 29 ✅ (no range). Apenas 13 cartas não-land no DB — lands não populadas.
+- **CMC:** Stored 1.80 vs computed 2.80 (nonland, >0). Delta -1.00: stored inclui CMC=0 de Chrome Mox/Walking Ballista.
+- **Corrupção:** 2/13 CMC NULL/0, 1/13 tag NULL (Freed from the Real)
 
-| Deck | Stored CMC | Computed CMC | Delta | CMC NULL/0 |
-|------|:----------:|:------------:|:-----:|:----------:|
-| Kinnan #1 | 1.80 | 2.82 | **+1.02** | 2/13 (15%) |
-| Yuriko #2 | 2.80 | 3.29 | **+0.49** | 19/84 (23%) |
-| Korvold #3 | 3.20 | 2.64 | -0.56 | 0/11 |
-| Teysa #4 | 2.90 | 2.74 | -0.16 | 15/80 (19%) |
-| Aesi #5 | 2.61 | 3.40 | **+0.79** | 19/79 (24%) |
-| **Lorehold #6** | **1.79** | **3.14** | **+1.35** 🔴 | 36/100 (36%) |
-| Winota #7 | 2.35 | 2.56 | +0.21 | 22/85 (26%) |
-| Atraxa #9 | 2.97 | 2.98 | +0.01 ✅ | 29/91 (32%) |
+#### Deck #2: Yuriko, the Tiger's Shadow (84 cards — OK)
+- **Profile:** `yuriko_the_tigers_shadow.json` (anchor30 batch A) — lands [30-34], evasive_enablers [10-15], ninjas [10-17]
+- **Lands:** Stored 33 ✅. 16/84 tagged as land (lands = CMC=0 tagged land, +4 land CMC=0 not tagged).
+- **CMC:** Stored 2.80 vs computed 3.43. Delta -0.63: 19 lands com CMC=0 puxando stored para baixo.
+- **Corrupção:** 🔴 21/84 (25%) tag NULL — pior caso. Un evasivos, ninjas e split cards sem classificação.
 
-**Hipótese:** O `avg_cmc` armazenado em `decks.avg_cmc` foi calculado com um subconjunto diferente de cartas do que `AVG(cmc) WHERE cmc > 0`. Possíveis causas:
-1. Cálculo original usou `WHERE cmc IS NOT NULL` (incluindo cmc=0, puxando média pra baixo)
-2. Ou o cálculo foi feito antes de bulk inserts com CMC=0
-3. Lorehold (#6) tem 36% de cartas com CMC NULL — mais de 1/3 do deck sem CMC válido
+#### Deck #3: Korvold, Fae-Cursed King (11 cards — INCOMPLETO)
+- **Profile:** `korvold_fae_cursed_king.json` (anchor30 batch A) — lands [34-37], ramp_treasure [10-14], draw_value [6-10]
+- **Lands:** Stored 25 ⚠️ (abaixo do perfil 34-37). Apenas 11 cartas no DB.
+- **Ramp:** Stored 3 vs ramp_treasure [10-14] ⚠️
+- **Draw:** Stored 1 vs draw_value [6-10] ⚠️
+- **Status:** Deck truncado — precisa de import completo (99 cartas esperadas).
 
-**Recomendação:** Recomputar `decks.avg_cmc` para todos os decks, excluindo CMC=0 e NULL.
+#### Deck #4: Teysa Karlov (80 cards — OK)
+- **Profile:** `teysa_karlov.json` (anchor30 batch B) — lands [35-37], ramp [9-11], draw_value [10-14]
+- **Lands:** Stored 35 ✅. 15/80 tagged as land (20 basic lands não populadas no DB).
+- **Ramp:** Stored 15 ⚠️ vs ramp [9-11] — 4 acima do máximo. Possível over-count de ramp (signets e rocks contados como ramp mas podem incluir mana dorks e rituais).
+- **Draw:** Stored 11 ✅ vs draw_value [10-14].
+- **CMC:** Stored 2.90 vs computed 2.64. Delta +0.26 — stored mais alto que real.
 
-### Perfis EDHREC — Coverage e Lacunas
+#### Deck #5: Aesi, Tyrant of Gyre Strait (79 cards — OK)
+- **Profile:** `aesi_tyrant_of_gyre_strait.json` (anchor30 batch B) — lands [39-43], ramp_extra_lands [14-18], supplemental_draw [6-9]
+- **Lands:** Stored 40 ✅. 19/79 tagged as land (21 basic lands não populadas).
+- **Ramp:** Stored 28 ⚠️ vs ramp_extra_lands [14-18] — 10 acima do máximo. Aesi tem muita ramp (land ramp + artifact ramp + dorks) — stored pode superestimar.
+- **Draw:** Stored 12 ⚠️ vs supplemental_draw [6-9] — Aesi é comandante que draw por landfall, então draw extra é esperado.
 
-- **7/8 comandantes matched** (Kinnan, Yuriko, Korvold, Teysa, Aesi, Winota, Atraxa)
-- **1/8 sem perfil:** Lorehold (não está nos 32 profiles)
-- **Limitação estrutural:** Os `role_targets` dos perfis usam nomes específicos por commander (`ramp_extra_lands`, `supplemental_draw`, `draw_value`, `interaction`, `fodder_tokens`, `death_payoffs`, `mana_dorks`, `artifact_mana`, etc.) que **não mapeiam 1:1** para os `functional_tag` genéricos em `deck_cards` (`ramp`, `draw`, `removal`, `engine`, etc.). Apenas `lands` é diretamente comparável.
-- Para validação completa de ramp/draw/interaction/finishers, seria necessário um mapping commander-específico (como o `PROFILE_ROLE_TO_TAG` de 54 entradas mencionado na validação anterior).
+#### Deck #6: Lorehold, the Historian (100 cards — NO PROFILE)
+- **Profile:** NÃO ENCONTRADO — Lorehold é comandante custom do sistema, não está nos profiles anchor30.
+- **Lands:** Stored 33. 31/100 tagged as land, 2 lands (Inventors' Fair, Prismatic Vista) com tag 'unknown'.
+- **CMC:** Stored 1.79 vs computed 3.14. Delta -1.35 🔴 — maior divergência. 36% CMC NULL/0.
+- **Ramp:** Stored 6 vs actual 19 (via deck_cards `functional_tag='ramp'`). O stored foi calculado ANTES da correção do classificador (Gap 15 resolvido). Após correção, 19 cartas têm tag 'ramp'. O stored NÃO reflete a realidade.
+- **Draw:** Stored 6 vs actual 9 (via deck_cards).
 
-### Tags NULL/Unknown por Deck
+#### Deck #7: Winota, Joiner of Forces (85 cards — CMC CORRUPT)
+- **Profile:** `winota_joiner_of_forces.json` (anchor30 batch A) — lands [31-35], nonhuman_enablers [18-28], human_hits [16-24]
+- **Lands:** Stored 34 ✅. 19/85 tagged as land (15 basic lands não populadas).
+- **CMC:** Stored 2.35 vs computed 2.54 — delta baixo (-0.19), mais preciso que a maioria ✅.
+- **Corrupção:** 22/85 (26%) CMC NULL/0 — acima do threshold de 25%.
 
-| Deck | Tags NULL/Unknown | % | Cartas Afetadas (exemplos) |
-|------|:---:|:---:|------|
-| Kinnan #1 | 1/13 | 8% | — |
-| Yuriko #2 | 21/84 | 25% | 21 cartas sem tag — inclui Misdirection, Lim-Dûl's Vault, Commit//Memory |
-| Korvold #3 | 0/11 | 0% | — |
-| Teysa #4 | 4/80 | 5% | — |
-| Aesi #5 | 6/79 | 8% | — |
-| Lorehold #6 | 3/100 | 3% | — |
-| Winota #7 | 0/85 | 0% | — |
-| Atraxa #9 | 0/91 | 0% | — |
-
-**Yuriko (#2) é o pior caso:** 25% das cartas sem functional_tag — o classificador não rodou em 1/4 das cartas.
-
-### Mudanças vs Validação Anterior (2026-06-06)
-
-1. **Profile matching corrigido:** De 4/8 → 7/8 commanders matched (normalização de nomes com underscore↔space)
-2. **Identificado CMC corruption sistêmico:** Descoberto que TODOS os decks (exceto Atraxa) têm `avg_cmc` divergente — problema estrutural, não pontual
-3. **Lorehold #6 pior caso:** 36% CMC NULL (antes reportado como 37/100, confirmado)
-4. **Lands validation agora usa ranges reais** dos perfis (min/max), não estimativas
-5. **Tags NULL:** Yuriko #2 piorou relativo (continua 21/84 NULL, 25%)
+#### Deck #9: Atraxa, Praetors' Voice (91 cards — CMC CORRUPT)
+- **Profile:** `atraxa_praetors_voice.json` (anchor30 batch A) — lands [35-38], ramp_fixing [10-13], card_advantage [8-12]
+- **Lands:** Stored 36 ✅. 27/91 tagged as land (9 basic lands não populadas).
+- **CMC:** Stored 2.97 vs computed 2.98 — delta -0.01 ✅ mais preciso da frota.
+- **Ramp:** Stored 14 ⚠️ vs ramp_fixing [10-13] — 1 acima.
+- **Draw:** Stored 12 ✅ vs card_advantage [8-12].
+- **Corrupção:** 29/91 (32%) CMC NULL/0 — maioria são lands com CMC=0 (correto), mas inclui Astral Cornucopia (X=0) e Everflowing Chalice (X=0).
 
 ---
 
-*Validação gerada por manaloom-mana-base-validator em 2026-06-07T12:54:26Z*
+### CMC Corruption — Análise Sistêmica 🔴
+
+| Deck | Stored CMC | Computed CMC (nonland, >0) | Delta | CMC NULL/0 | % NULL |
+|------|:----------:|:--------------------------:|:-----:|:----------:|:-----:|
+| Kinnan #1 | 1.80 | 2.80 | -1.00 🔴 | 2 | 15% |
+| Yuriko #2 | 2.80 | 3.43 | -0.63 🔴 | 19 | 23% |
+| Korvold #3 | 3.20 | 2.64 | +0.56 🔴 | 0 | 0% |
+| Teysa #4 | 2.90 | 2.64 | +0.26 ⚠️ | 15 | 19% |
+| Aesi #5 | 2.61 | 3.35 | -0.74 🔴 | 19 | 24% |
+| Lorehold #6 | 1.79 | 3.14 | -1.35 🔴 | 36 | 36% |
+| Winota #7 | 2.35 | 2.54 | -0.19 ✅ | 22 | 26% |
+| Atraxa #9 | 2.97 | 2.98 | -0.01 ✅ | 29 | 32% |
+
+**Diagnóstico:**
+- **Todos os decks** exceto Korvold (#3) têm cartas com CMC=0.0 (lands + Chrome Mox/Everflowing Chalice/Astral Cornucopia).
+- O CMC stored parece incluir CMC=0 (puxa média para baixo), enquanto o computed exclui CMC=0 e lands (mais preciso para não-lands).
+- **Lorehold #6 é o pior:** 36% CMC NULL/0, delta -1.35 — o deck é inanalisável para curva de mana com dados atuais.
+- **Korvold #3:** Stored MAIOR que computed (+0.56) — único caso onde stored > computed, sugere que as 11 cartas têm CMCs altos e o stored foi calculado diferentemente.
+- **Winota #7 e Atraxa #9** têm os CMCs mais precisos (delta < 0.2) apesar de alta % de NULL — porque a maioria dos NULL são lands.
+
+**Recomendação:** Corrigir `decks.avg_cmc` para todos os decks. O stored atual é inconfiável. Usar `AVG(cmc) FROM deck_cards WHERE cmc > 0 AND functional_tag != 'land'` como fonte de verdade.
+
+### Tags NULL/Unknown — Piora em Yuriko e Melhora em Lorehold
+
+| Deck | Tags NULL/Unknown | % | Pior caso |
+|------|:---:|:---:|------|
+| Kinnan #1 | 1/13 | 8% | Freed from the Real |
+| Yuriko #2 | 21/84 | 25% 🔴 | 21 cartas: unblockable creatures, ninjas, split cards |
+| Korvold #3 | 0/11 | 0% | — |
+| Teysa #4 | 4/80 | 5% | Dictate of Erebos, Grave Pact, Luminous Broodmoth, Teysa Karlov |
+| Aesi #5 | 6/79 | 8% | Ashaya, Azusa, Mossborn Hydra, Murkfiend Liege, Retreat to Coralhelm, Whelming Wave |
+| Lorehold #6 | 3/100 | 3% 🟢 | Inventors' Fair, Prismatic Vista, Reforge the Soul (tag='unknown') |
+| Winota #7 | 0/85 | 0% ✅ | — |
+| Atraxa #9 | 0/91 | 0% ✅ | — |
+
+**Yuriko #2 permanece o pior caso** com 25% de cartas sem tag. Lorehold #6 melhorou de ~30% para 3% após correção do classificador.
+
+### Mudanças vs Validação Anterior (2026-06-07 12:54Z)
+
+1. **Ramp e Draw agora com perfil:** Mapeamento de `role_targets` específicos → comparação direta (ramp_treasure, draw_value, ramp, ramp_fixing, card_advantage, etc.)
+2. **Lorehold ramp stored vs actual:** Identificada divergência massiva: stored=6 vs actual=19. O stored foi calculado ANTES da correção do classificador (Gap 15, resolvido 2026-06-03). O `decks.ramp_count` e `decks.draw_count` NÃO foram atualizados após a reclassificação.
+3. **Status CMC CORRUPT:** Winota #7 e Atraxa #9 agora marcados como CMC CORRUPT (>25% NULL). O threshold foi aplicado corretamente.
+4. **7/8 commanders com profile:** Mantido. Lorehold sem perfil (comandante custom).
+5. **CMC delta:** Lorehold #6 piorou de +1.35 para -1.35 (sinal corrigido — stored é MENOR que computed, confirmando que stored inclui CMC=0 puxando média para baixo).
+
+### Decks com INSERT INCOMPLETO ou Dados Corrompidos
+
+| Deck | Problema | Severidade |
+|------|------|:---:|
+| Kinnan #1 | 13/100 cards. Lands não populadas. Deck truncado. | 🔴 |
+| Korvold #3 | 11/100 cards. Lands não populadas. Deck truncado. | 🔴 |
+| Yuriko #2 | 84 cards (faltam 16). 25% tags NULL. 23% CMC NULL. | 🟡 |
+| Lorehold #6 | `ramp_count`=6 vs actual=19. `draw_count`=6 vs actual=9. Stored desatualizado. | 🔴 |
+| Aesi #5 | 79 cards (faltam 21). `ramp_count`=28 vs perfil 14-18. | 🟡 |
+
+**Ação recomendada:** Rodar script de recomputação de `decks.avg_cmc`, `decks.ramp_count`, `decks.draw_count` a partir de `deck_cards` para sincronizar stored com actual.
+
+---
+
+*Validação gerada por manaloom-mana-base-validator em 2026-06-07T19:00:00Z*
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
 > Última atualização: **2026-06-03T06:00:00Z**
