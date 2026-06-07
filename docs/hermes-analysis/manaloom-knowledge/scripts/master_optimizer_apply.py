@@ -8,12 +8,14 @@ import json
 
 from master_optimizer_common import (
     REPORT_DIR,
+    assert_current_deck_matches_baseline,
     card_metadata,
     connect,
     deck_hash,
     deck_rows,
     ensure_optimizer_tables,
     get_deck_summary,
+    latest_baseline,
     quality_gate_candidate,
     utc_now,
     write_report,
@@ -54,6 +56,13 @@ def main() -> int:
 
     with connect() as conn:
         ensure_optimizer_tables(conn)
+        baseline = latest_baseline(conn, args.deck_id)
+        if not baseline:
+            raise SystemExit("No approved baseline found. Run master_optimizer_baseline.py first.")
+        try:
+            assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
+        except RuntimeError as exc:
+            raise SystemExit(str(exc)) from exc
         candidate = find_candidate(conn, args.deck_id, args.card_added, args.min_delta)
         if not candidate:
             raise SystemExit("No unapplied approved full_confirmation candidate found.")

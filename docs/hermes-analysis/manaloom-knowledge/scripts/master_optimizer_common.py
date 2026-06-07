@@ -28,8 +28,8 @@ DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
 REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
-DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v8.py"
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v8.py"))
 
 PROTECTED_CARDS = {
     "Lorehold, the Historian",
@@ -103,6 +103,27 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             status TEXT NOT NULL DEFAULT 'approved',
             result_json TEXT NOT NULL,
             created_at TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS swap_benchmarks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            card_added TEXT NOT NULL,
+            card_removed TEXT NOT NULL,
+            add_cmc REAL,
+            add_effect TEXT,
+            add_tag TEXT,
+            wr REAL NOT NULL,
+            wins INTEGER,
+            losses INTEGER,
+            draws INTEGER,
+            games INTEGER,
+            phase TEXT NOT NULL,
+            delta_pp REAL NOT NULL,
+            applied INTEGER NOT NULL DEFAULT 0,
+            tested_at TEXT NOT NULL
         )
         """
     )
@@ -218,6 +239,35 @@ def latest_baseline(conn: sqlite3.Connection, deck_id: int) -> sqlite3.Row | Non
         """,
         (deck_id,),
     ).fetchone()
+
+
+def deck_contains(conn: sqlite3.Connection, deck_id: int, card_name: str) -> bool:
+    return (
+        conn.execute(
+            """
+            SELECT 1 FROM deck_cards
+            WHERE deck_id=? AND lower(card_name)=lower(?)
+            LIMIT 1
+            """,
+            (deck_id, card_name),
+        ).fetchone()
+        is not None
+    )
+
+
+def assert_current_deck_matches_baseline(
+    conn: sqlite3.Connection,
+    deck_id: int,
+    baseline: sqlite3.Row,
+) -> None:
+    current_hash = deck_hash(conn, deck_id)
+    baseline_hash = str(baseline["deck_hash"])
+    if current_hash != baseline_hash:
+        raise RuntimeError(
+            "Current deck hash does not match latest approved baseline. "
+            f"current={current_hash} baseline={baseline_hash}. "
+            "Re-freeze the baseline before quality gate, confirmation, handoff, or apply."
+        )
 
 
 def parse_battle_output(output: str, games_per_opponent: int) -> BattleResult:
@@ -464,6 +514,11 @@ def temporary_swap(
     rows = conn.execute("SELECT * FROM deck_cards WHERE deck_id=?", (deck_id,)).fetchall()
     columns = [row[1] for row in conn.execute("PRAGMA table_info(deck_cards)")]
     meta = card_metadata(conn, card_added)
+    current_names = {normalize_name(row["card_name"]) for row in rows}
+    if normalize_name(card_removed) not in current_names:
+        raise RuntimeError(f"Cannot test stale swap target; card is not in deck: {card_removed}")
+    if normalize_name(card_added) in current_names:
+        raise RuntimeError(f"Cannot test duplicate candidate; card is already in deck: {card_added}")
     try:
         conn.execute(
             "DELETE FROM deck_cards WHERE deck_id=? AND lower(card_name)=lower(?)",
@@ -507,8 +562,9 @@ def candidate_rows(
     include_existing: bool = False,
     only_added: str = "",
 ) -> list[sqlite3.Row]:
+    ensure_optimizer_tables(conn)
     where = [
-        "phase='best-in-slot'",
+        "phase IN ('best-in-slot', 'phase1')",
     ]
     params: list[object] = []
     if not include_existing:

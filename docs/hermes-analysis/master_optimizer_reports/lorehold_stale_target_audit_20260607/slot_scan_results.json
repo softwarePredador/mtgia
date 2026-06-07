@@ -1,0 +1,77 @@
+{
+  "baseline": 86.0,
+  "games": 25,
+  "tested": 160,
+  "top": [
+    [
+      "wincon",
+      "Adrix and Nev, Twincasters // Adrix and Nev, Twincasters",
+      "Rise of the Eldrazi",
+      93.3,
+      7.299999999999997
+    ],
+    [
+      "wincon",
+      "Agate Instigator",
+      "Rise of the Eldrazi",
+      93.3,
+      7.299999999999997
+    ],
+    [
+      "ramp",
+      "Academy Manufactor",
+      "Mana Geyser",
+      92.0,
+      6.0
+    ],
+    [
+      "ramp",
+      "Altar of the Brood",
+      "Mana Geyser",
+      92.0,
+      6.0
+    ],
+    [
+      "ramp",
+      "Ankh of Mishra",
+      "Mana Geyser",
+      92.0,
+      6.0
+    ],
+    [
+      "ramp",
+      "Assassin's Trophy",
+      "Mana Geyser",
+      92.0,
+      6.0
+    ],
+    [
+      "wipe",
+      "Damning Verdict",
+      "Blasphemous Act",
+      92.0,
+      6.0
+    ],
+    [
+      "wipe",
+      "Decree of Pain",
+      "Blasphemous Act",
+      92.0,
+      6.0
+    ],
+    [
+      "engine",
+      "Ancestral Tribute",
+      "Past in Flames",
+      90.7,
+      4.700000000000003
+    ],
+    [
+      "engine",
+      "Backdraft Hellkite",
+      "Past in Flames",
+      90.7,
+      4.700000000000003
+    ]
+  ]
+}
