@@ -1,5 +1,11 @@
 # Hermes Master Optimizer Loop — Battle + Optimizer com maestria
 
+> Status atual: diario tecnico e historico de evidencias.
+> Para contrato operacional completo de scripts, bancos, tabelas, parametros e
+> guardrails, use `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+> Nao use um resultado antigo deste arquivo como autorizacao de apply sem
+> revalidar contra o SQLite vivo.
+
 > Objetivo: transformar o Hermes em um ciclo confiavel de otimizacao por evidencia:
 > simular, detectar erro, propor swap, testar isolado, confirmar em massa, validar regras,
 > aplicar somente se aprovado e documentar o motivo.

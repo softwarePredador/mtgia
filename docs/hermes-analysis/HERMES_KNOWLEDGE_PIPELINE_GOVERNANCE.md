@@ -1,5 +1,10 @@
 # Hermes Knowledge Pipeline Governance
 
+> Status atual: historico/snapshot antigo.
+> Este arquivo ainda descreve parte da estrategia original das crons Lorehold.
+> Para o contrato operacional atual, leia `docs/hermes-analysis/README.md` e
+> `docs/hermes-analysis/HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+
 Updated: 2026-06-01
 
 ## Purpose

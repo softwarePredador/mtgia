@@ -1,5 +1,9 @@
 # Hermes Cron Pipeline Order — Deck Learning + Optimizer
 
+> Status atual: snapshot operacional de cron.
+> Use junto com `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
+> O contrato E2E prevalece quando houver conflito sobre ordem de execucao.
+
 Updated: 2026-06-07
 
 ## Current operational snapshot
