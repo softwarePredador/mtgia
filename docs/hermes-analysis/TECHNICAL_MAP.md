@@ -197,15 +197,16 @@ mtgia/
 - **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-07 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases localizados, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, os profiles/seeds de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes, weakness suggestions, mock runtime e prompt runtime por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/ai/optimize` quando `deckOptimizer == null`, `/decks/:id/recommendations`, `/ai/weakness-analysis`, `prompt.md` e `prompt_complete.md`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-07 03:00 UTC no checkout local `ee74c6a9`. `LifeCounterScreen` segue
+  2026-06-08 03:04 UTC no checkout local `cce6ec34`. `LifeCounterScreen` segue
   legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
   `DeckCard` e `DeckProgressChip` nao tem uso runtime confirmado nas listagens;
   `LotusPresentationMode` nao e importado/chamado pelo Lotus; e
   `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface` aparecem somente no
   proprio `auth_visual_shell.dart`. Controles positivos descartaram
   `LotusLifeCounterScreen` e `DeckProgressIndicator`. Uma varredura textual
-  ampla de classes publicas foi usada apenas como triagem, mas DTOs/helpers
-  vivos dentro do proprio arquivo nao foram reportados como codigo morto sem
+  ampla de classes publicas foi usada apenas como triagem; DTOs/helpers vivos
+  dentro do proprio arquivo, como classes de optimize sections/dialogs, binder,
+  trades e life-counter engine, nao foram reportados como codigo morto sem
   evidencia adicional.
 
 ## Pipeline semantico de cartas

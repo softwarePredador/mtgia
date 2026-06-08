@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-07 23:00 UTC
+> Data: 2026-06-08 03:04 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -49,7 +49,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    fonte/versionamento/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional em `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.
+   na rotacao local Codex de 2026-06-08 03:04 UTC no checkout `cce6ec34`.
    `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
    `DeckCard` continua testado mas sem import/chamada na listagem real;
@@ -741,16 +741,15 @@ app-side novo sem chamada.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-04 03:00 UTC: REVALIDADO/ABERTO.**
+- **Status 2026-06-08 03:04 UTC: REVALIDADO/ABERTO no checkout `cce6ec34`.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:283` usa
     `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
-    `LifeCounterScreen(` apenas no construtor da propria classe. Os testes
-    `app/test/features/home/life_counter_screen_test.dart:1`-`:2` e
-    `app/test/features/home/life_counter_clone_proof_test.dart:1`-`:2`
-    declaram que sao suites legadas e que a cobertura viva mira
-    `LotusLifeCounterScreen`; ambos ainda importam e instanciam a tela legada.
+    `LifeCounterScreen(` apenas no construtor da propria classe. A busca focada
+    com limite de palavra encontrou instanciacao fora do arquivo apenas em
+    `app/test/features/home/life_counter_screen_test.dart:36` e
+    `app/test/features/home/life_counter_clone_proof_test.dart:277`.
   - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
     busca por import de `deck_card.dart` em `app/lib` nao retornou ocorrencias,
     e a busca por `DeckCard(` em `app/lib` encontrou somente o construtor.
@@ -758,8 +757,7 @@ app-side novo sem chamada.
     `app/test/features/decks/widgets/deck_card_test.dart:4`/`:9` e
     `app/test/features/decks/widgets/deck_card_overflow_test.dart:4`/`:47`.
     As listagens reais usam widgets privados/locais como `_RecentDeckCard`,
-    `_CommunityDeckCard`, `_FollowingDeckCard`, `_DeckGalleryCard` e
-    `_EmptyDeckCard`.
+    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`.
   - `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` define
     `DeckProgressChip`, sem ocorrencias alem do construtor em `app/lib`,
     `app/test` e `app/integration_test`. `DeckProgressIndicator` no mesmo
@@ -770,7 +768,8 @@ app-side novo sem chamada.
   - `app/lib/features/auth/widgets/auth_visual_shell.dart:5`, `:105` e `:196`
     definem `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface`; busca por
     esses simbolos e por `auth_visual_shell.dart` em arquivos Dart encontrou
-    apenas definicoes/construtores no proprio arquivo.
+    apenas definicoes/construtores no proprio arquivo. `login_screen.dart:82`-`:108`
+    e `register_screen.dart:85`-`:121` constroem suas superficies inline.
   - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
     `DeckProgressIndicator` seguem ativos; `PerformanceNavigatorObserver`,
     `AppObservabilityNavigatorObserver`, classes do scanner com chamadores reais
