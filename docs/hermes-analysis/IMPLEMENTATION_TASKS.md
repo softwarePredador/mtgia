@@ -4,16 +4,168 @@
 > Use como fila de ideias/tarefas, nao como prova de estado atual. Revalide
 > contra codigo vivo antes de executar.
 
-> **Gerado:** 2026-06-07 por ManaLoom Knowledge Synthesis (Cron #12) — STRUCTURE_AUDIT + GAME_CHANGERS + THEMES + VALIDATOR_LOG
+> **Gerado:** 2026-06-08 por ManaLoom Knowledge Synthesis (Cron #13) — STRUCTURE_AUDIT module-coherence + duplicated-logic (2026-06-07) + THEMES.md + VALIDATOR_LOG — STRUCTURE_AUDIT + GAME_CHANGERS + THEMES + VALIDATOR_LOG
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** 4ca88ffb
-> **Metodo:** Cruzamento do conhecimento MTG (VALIDATOR_LOG 2026-06-02 — pipeline integrity crisis + CMC corruption, GAME_CHANGERS.md — 53 GCs com double-counting detectado, SCOUT_LOG — Lorehold maturity, TAG_ACCURACY — payoff 35% accuracy) com codigo Dart (edh_bracket_policy, optimization_quality_gate, optimization_functional_roles, goldfish_simulator)
+> **HEAD:** cce6ec34
+> **Novas tasks Cron #13:** 5 (2xP1: owner-scope + job polling NULL user_id; 3xP2: card_function_tags no optimize, resolveOptimizeArchetype duplicate, theme coverage gap) — STRUCTURE_AUDIT module-coherence + duplicated-logic — pipeline integrity crisis + CMC corruption, GAME_CHANGERS.md — 53 GCs com double-counting detectado, SCOUT_LOG — Lorehold maturity, TAG_ACCURACY — payoff 35% accuracy) com codigo Dart (edh_bracket_policy, optimization_quality_gate, optimization_functional_roles, goldfish_simulator)
 > **Base de conhecimento (Cron #11):** VALIDATOR_LOG, GAME_CHANGERS, tag_accuracy, SCOUT_LOG
 > **Novas tasks Cron #11:** 5 (1xP1, 4xP2) — GC double-counting fix, payoff accuracy, contextual heuristics, CMC hardening, GC list sync
 > **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
 > **Atualizacao Codex 2026-06-06:** P2 payoff/enabler contextual resolvido em `server/lib/ai/optimization_functional_roles.dart`; testes em `server/test/optimization_quality_gate_test.dart` cobrem spellslinger, aristocrats e tokens.
 > **Atualizacao Codex 2026-06-06:** P2 goldfish CMC hardening resolvido em `server/lib/ai/cmc_safety.dart`; `GoldfishSimulator`, `OptimizationValidator` e `OptimizationSwapGate` agora recuperam CMC pelo `mana_cost` quando o CMC bruto esta corrompido e tratam CMC desconhecido non-land como custo alto, nunca como carta gratis.
-> **Atualizacao Codex 2026-06-06:** P2 Game Changer drift guard resolvido com bloco Dart gerado a partir do SQLite, script `docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py --check` e teste cobrindo lista com 53 entradas + nome MDFC de Tergrid.
+> **Atualizacao Codex 2026-06-06:** P2 Game Changer drift guard resolvido com bloco Dart gerado a partir do SQLite
+> **Base de conhecimento (Cron #13):** STRUCTURE_AUDIT module-coherence + duplicated-logic (2026-06-07), THEMES.md (42 temas), VALIDATOR_LOG (pipeline integrity crisis)
+> **Novas tasks Cron #12:** 5 (2xP1, 3xP2) — GC double-counting fix, semantic helpers unification, basic land centralization, theme-specific targets, deck stats deduplication, script `docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py --check` e teste cobrindo lista com 53 entradas + nome MDFC de Tergrid.
+
+### [P1] Owner-Scope: Propagar userId da rota para o data loader em /ai/optimize e /ai/archetypes — qualquer usuario autenticado pode carregar decks de terceiros
+
+**Conhecimento MTG:** O STRUCTURE_AUDIT (Rodada: module-coherence, 2026-06-07) documenta que o endpoint POST /ai/optimize le userId do contexto de autenticacao mas NAO o propaga para o SQL que carrega o deck e suas cartas. A rota /ai/archetypes tem o mesmo padrao. O controle positivo existe em outras rotas: /ai/rebuild faz WHERE id=$1 AND user_id=$2, assim como /decks/[id]/analysis e /decks/[id]/ai-analysis. As rotas de optimize e archetypes sao as UNICAS que falham nesse gate.
+
+**Evidencia no codigo:**
+- server/routes/ai/optimize/index.dart:401-406 — Le userId do contexto mas o descarta.
+- server/routes/ai/optimize/index.dart:545-559 — Chama loadOptimizeDeckContext() sem passar userId.
+- server/lib/ai/optimize_request_support.dart:53-62 — A funcao loadOptimizeDeckContext() NAO aceita userId como parametro.
+- server/lib/ai/optimize_request_support.dart:63-73 — Query SELECT name, format FROM decks WHERE id=$1 sem AND user_id=$2.
+- server/routes/ai/archetypes/index.dart:39-42 — Mesmo padrao: busca deck por id sem user_id.
+
+**Gap:** Embora o app Flutter envie deck_id do usuario autenticado, nada no backend impede que um usuario malicioso passe um deck_id de outro usuario e receba dados de deck alheio (nome, formato, lista de cartas) nos responses de optimize e archetypes.
+
+**Impacto:** P1 — Vazamento de dados de deck entre usuarios. Embora o app so envie o proprio deck_id, a API nao valida ownership, abrindo brecha para ataques diretos a API (fora do app).
+
+**Risco:** P1 — Seguranca e isolamento de dados. Afeta diretamente a confianca do usuario na plataforma.
+
+**Acao recomendada:**
+1. Adicionar String? userId como parametro em loadOptimizeDeckContext().
+2. Alterar queries SQL para incluir AND user_id = $2.
+3. Propagar userId da rota para o loader em optimize/index.dart:545-559.
+4. Aplicar mesmo padrao em archetypes/index.dart.
+5. Adicionar teste: request com deck_id de outro usuario retorna 403/404.
+
+**Validacao:**
+dart analyze lib/ai/optimize_request_support.dart
+dart analyze routes/ai/optimize/index.dart
+dart analyze routes/ai/archetypes/index.dart
+dart test test/routes/ai/optimize_test.dart
+
+---
+
+### [P1] Job Polling: Exigir user_id nao-nulo na criacao de jobs app-facing — qualquer usuario autenticado pode acessar jobs com user_id=NULL
+
+**Conhecimento MTG:** O STRUCTURE_AUDIT (Rodada: module-coherence, 2026-06-07) documenta que jobs de optimize (OptimizeJob) e generate (AiGenerateJob) permitem userId nullable. As rotas de polling bloqueiam acesso apenas quando job.userId != null && job.userId != userId — ou seja, jobs com userId=NULL sao acessiveis por QUALQUER usuario autenticado que conheca o job_id.
+
+**Evidencia no codigo:**
+- server/lib/ai/optimize_job.dart:25-42 — OptimizeJob com String? userId.
+- server/lib/ai_generate_job.dart:12-17 — AiGenerateJob tambem com String? userId.
+- server/routes/ai/optimize/jobs/[id].dart:26-49 — So bloqueia quando job.userId != null && job.userId != userId.
+- server/routes/ai/generate/jobs/[id].dart:16-29 — Mesma regra permissiva para jobs nulos.
+- server/routes/ai/optimize/index.dart:545-559 — Cria job sem sempre atribuir userId.
+
+**Gap:** Jobs criados sem userId (ex: chamadas internas, scripts, ou race conditions) ficam publicos para qualquer usuario autenticado. Um atacante que descubra um job_id pode ler resultados de optimize de outro usuario.
+
+**Impacto:** P1 — Vazamento de resultados de otimizacao (decklists sugeridas, metricas, analise de IA). Jobs contem dados sensiveis de deck.
+
+**Risco:** P1 — Seguranca. Afeta tanto optimize quanto generate jobs.
+
+**Acao recomendada:**
+1. Tornar userId obrigatorio (non-nullable) em OptimizeJob e AiGenerateJob.
+2. Nas rotas de polling, retornar 404 quando job.userId == null || job.userId != userId.
+3. Garantir que a criacao de jobs sempre atribua userId do contexto autenticado.
+4. Adicionar teste: request com job_id de outro usuario retorna 404.
+
+**Validacao:**
+dart analyze lib/ai/optimize_job.dart
+dart analyze lib/ai_generate_job.dart
+dart analyze routes/ai/optimize/jobs/[id].dart
+dart test test/routes/ai/optimize_jobs_test.dart
+
+---
+
+### [P2] Otimizacao: Carregar card_function_tags no contexto do optimize alem de semantic_tags_v2 — classification drift entre analise e otimizacao
+
+**Conhecimento MTG:** O STRUCTURE_AUDIT (Rodada: module-coherence, 2026-06-07) documenta que a aba de analise carrega TANTO card_function_tags (tags funcionais persistidas, multi-tag, 29 heuristicas) QUANTO card_semantic_tags_v2 (analise semantica por IA). Porem, o optimize pipeline (loadOptimizeDeckContext) carrega APENAS semantic_tags_v2. Isso significa que o quality gate — que decide se swaps sao seguros — opera com dados de classificacao diferentes dos que o usuario ve na analise.
+
+**Evidencia no codigo:**
+- server/routes/decks/[id]/analysis/index.dart:80-99 — Agrega card_function_tags E card_semantic_tags_v2.
+- server/lib/ai/optimize_request_support.dart:86-137 — Query do optimize carrega APENAS semantic_tags_v2. NENHUMA referencia a card_function_tags.
+- server/lib/ai/optimization_functional_roles.dart:55-61 — classifyOptimizationFunctionalRole() consulta APENAS semantic_tags_v2 antes de cair para heuristicas.
+- server/lib/ai/functional_card_tags.dart:455-465 — summarizeFunctionalTagsForDeck() implementa cadeia CORRETA: persistedTags -> semanticV2 -> inferredTags.
+
+**Gap:** O optimize pipeline classifica cartas usando apenas semantic_tags_v2 + heuristicas, enquanto a analise exibida ao usuario usa card_function_tags que tem curadoria e validacao. Uma mesma carta pode ter papeis diferentes nos dois fluxos.
+
+**Impacto:** P2 — Swaps podem ser recomendados (ou bloqueados) com base em classificacao que discorda da analise funcional exibida.
+
+**Risco:** P2 — Inconsistencia entre o que o sistema mostra e o que o sistema decide.
+
+**Acao recomendada:**
+1. Adicionar JOIN com card_function_tags na query de loadOptimizeDeckContext().
+2. Passar card_function_tags como campo functional_tags no allCardData.
+3. Em classifyOptimizationFunctionalRole(), verificar card['functional_tags'] antes de semantic_tags_v2.
+4. Adicionar teste cruzado para cartas sentinela.
+
+**Validacao:**
+dart analyze lib/ai/optimize_request_support.dart
+dart analyze lib/ai/optimization_functional_roles.dart
+dart test test/ai/optimization_functional_roles_test.dart
+
+---
+
+### [P2] Unificar resolveOptimizeArchetype — duas implementacoes com regras divergentes para null/empty/unknown/generic
+
+**Conhecimento MTG:** O STRUCTURE_AUDIT (Rodada: duplicated-or-similar-logic, 2026-06-07) documenta que resolveOptimizeArchetype existe em DOIS lugares com semanticas diferentes:
+- deck_state_analysis.dart:573-585 — Aceita requestedArchetype nullable, trata general/tempo como genericos.
+- optimize_runtime_support.dart:3369-3389 — Exige string nao-nullable, trata unknown, usa goodstuff como generico.
+
+**Evidencia no codigo:**
+- server/lib/ai/deck_state_analysis.dart:573-585 — resolveOptimizeArchetype() versao A.
+- server/lib/ai/optimize_runtime_support.dart:3369-3389 — resolveOptimizeArchetype() versao B.
+- server/lib/ai/rebuild_guided_service.dart:171 — Usa versao A.
+- server/lib/ai/optimize_request_support.dart:289,294 — Usa versao B.
+
+**Gap:** Duas implementacoes da mesma funcao com regras diferentes. Correcoes de bug em uma podem ser esquecidas na outra.
+
+**Impacto:** P2 — Rebuild e optimize podem discordar sobre o arquetipo do deck.
+
+**Risco:** P2 — Drift entre fluxos de rebuild e optimize.
+
+**Acao recomendada:**
+1. Extrair para helper unico resolveOptimizeArchetype(String? requested, String? detected) em modulo compartilhado.
+2. Unificar regras para null, vazio, unknown, general, tempo, value, midrange, goodstuff.
+3. Atualizar ambos os call sites.
+4. Adicionar testes para todos os casos de borda.
+
+**Validacao:**
+dart analyze lib/ai/deck_state_analysis.dart
+dart analyze lib/ai/optimize_runtime_support.dart
+dart test test/ai/deck_state_analysis_test.dart
+
+---
+
+### [P2] ThemeContextualRulesService.archetypeToTheme: Expandir cobertura de 12 para 42 temas documentados no THEMES.md
+
+**Conhecimento MTG:** O THEMES.md documenta 42 temas de Commander com metricas validadas. O ThemeContextualRulesService.archetypeToTheme() mapeia apenas ~12 temas (spellslinger, goblins, elves, vampires, dragons, landfall, graveyard, tokens, voltron, aristocrats, combo/cedh). Temas importantes como enchantress, artifacts, zombies, wheels, stax, blink/flicker, reanimator, slivers, humans, superfriends, e mill nao tem mapeamento.
+
+**Evidencia no codigo:**
+- server/lib/ai/theme_contextual_rules_service.dart:54-67 — archetypeToTheme() cobre apenas 12 temas.
+- docs/hermes-analysis/manaloom-knowledge/THEMES.md — Documenta 42 temas com metricas.
+- server/lib/ai/theme_contextual_rules_service.dart:70-78 — getRulesForArchetype() so funciona se o tema for reconhecido.
+
+**Gap:** 30/42 temas (71%) nao tem mapeamento. Decks desses temas nao recebem validacao contextual.
+
+**Impacto:** P2 — Validacao e otimizacao sub-otimas para 71% dos temas documentados.
+
+**Risco:** P2 — Cobertura parcial do conhecimento tematico ja documentado.
+
+**Acao recomendada:**
+1. Expandir archetypeToTheme() com mappings para os 30 temas faltantes.
+2. Garantir que theme_contextual_rules no PG tenha entradas para esses temas.
+3. Adicionar fallback de substring matching.
+4. Testar com decks de temas nao cobertos.
+
+**Validacao:**
+dart analyze lib/ai/theme_contextual_rules_service.dart
+dart test test/ai/theme_contextual_rules_service_test.dart
+
+---
 
 ### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
 
