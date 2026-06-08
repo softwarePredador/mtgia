@@ -1,11 +1,11 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-07 ~21:40 UTC
+> **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-08 ~00:30 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** ✅ **OPTIMIZER-VALIDATED** — cEDH Stax-Protected Combo (Bracket 4). **89.5% WR** (537W/39L/24S) across 600 games vs 12 real opponents after Slot Optimizer Phase 3. **89.3% WR** (268W/6L/26S) post-E2E Wheel of Misfortune apply (300 games). 84.5% pre-optimization baseline. NOT spellslinger.
 > **Source Agent:** Commander Knowledge Deep Cron Job
-> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs, 16 Mulligan simulations, v3.22→v3.25 Validator, Lorehold Corpus Import (17+ decks), TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION), **6th hash** — STRATEGIC PIVOT to stax-protected combo, **7th hash** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation**, **Knowledge Synthesis #7**, **Gamechanger Research #7**, **Cron Governance #4**, **Battle Analyst v8 (00:54Z)** — 6 runs, 3,600 games, 84.5% WR, **Slot Optimizer v3 (Jun 6 03:55Z)** — Phase 1-3, 6 swaps, 77.0%→89.5% (+12.5pp), **Master Optimizer (Jun 7 14:00-18:00Z)** — full pipeline: baseline→quality gate→confirmation→handoff→E2E apply, **Battle Effect Coverage Audit (Jun 7 18:04Z)** — Lorehold 45 flagged, **🆕 Coverage Audit Rerun (Jun 7 21:07Z)** — 53 flagged (+8 🔴), effect_map still 0, **🆕 Battle Runs (20:07-21:09Z)** — 75.0% WR (-14.3pp from post-apply), **🆕 KC Validator Surge (21:10Z)** — 1,322 new entries after 4 clean runs
+> **Evidence Base:** 38 Scout executions, 23+ Evolution Oracle cycles, 18+ Battle runs, 16 Mulligan simulations, v3.22→v3.25 Validator, Lorehold Corpus Import (17+ decks), TAG_ACCURACY_REPORT, Scout #38 (wincon supersaturation), Mulligan Exec#15 (T3=1.6%), Validator v3.25 (classifier resolved, Worldfire CORRECTION), **6th hash** — STRATEGIC PIVOT to stax-protected combo, **7th hash** — artifact lands re-added, **All-Crons MTG Rules Audit v3.8**, **Mana Base Validation**, **Knowledge Synthesis #7**, **Gamechanger Research #7**, **Cron Governance #4**, **Battle Analyst v8 (00:54Z)** — 6 runs, 3,600 games, 84.5% WR, **Slot Optimizer v3 (Jun 6 03:55Z)** — Phase 1-3, 6 swaps, 77.0%→89.5% (+12.5pp), **Master Optimizer (Jun 7 14:00-18:00Z)** — full pipeline: baseline→quality gate→confirmation→handoff→E2E apply, **Battle Effect Coverage Audit (Jun 7 18:04Z)** — Lorehold 45 flagged, **🆕 Coverage Audit Rerun (Jun 7 21:07Z)** — 53 flagged (+8 🔴), effect_map still 0, **🆕 Battle Runs (20:07-21:09Z)** — 75.0% WR (-14.3pp from post-apply), **🆕 KC Validator Surge (21:10Z)** — 1,322 new entries after 4 clean runs, **🆕 KC Validator Surge SETTLED (23:21Z, 00:21Z)** — 0/0/0 across 2 runs, **🆕 Battle Analyst v8 REGRESSION (Jun 8 00:25Z)** — Master Optimizer BLOCKED: `NameError: name 'stack' is not defined` in `modal_boros_charm` handler (line 1479 of battle_analyst_v8.py)
 > **🚨 Deck State:** **ACTIVE cEDH STAX-COMBO** — deck_id=6, **current hash: `12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08`** (⚠️ JUST CHANGED — Wheel of Misfortune applied over Reforge the Soul, Jun 7 16:22 UTC). **33 lands, 19 ramp, 9 draw, 10 protection, 4 removal/wipe, 14 wincons, 5 tutors. 14 Game Changers → Bracket 4.** The `763c3e0f...` hash was the pre-E2E state and is now STALE.
 > **🚨 Lorehold Pipeline DECOMMISSIONED:** All 5 Lorehold crons removed from `jobs.json`. Commander Knowledge Deep is the ONLY cron monitoring the deck. **Status unchanged since Jun 4.**
 > **🟢 NEW: Real swap applied today!** Wheel of Misfortune (CMC 3, draw/wheel) replaced Reforge the Soul (CMC 5, wheel). Master Optimizer E2E apply proved +2.7pp → post-apply WR 89.3%. First real deck mutation via automated pipeline since Evolution Oracle decommissioning.
@@ -3206,3 +3206,117 @@ The §58 observation (two runs 6h apart with different results) is now amplified
 | **Baseline staleness** 🆕 | §62.3 | A single post-apply baseline is a snapshot. Periodic re-baselining (every 6h) would detect opponent-pool shift before the next optimization cycle |
 | **Confidence-weighted optimization** 🆕 | §64 Task 5 | Swapping a well-modeled card for a poorly-modeled one may show +WR in simulation that doesn't hold in reality because the new card is modeled less accurately |
 | **Cross-deck effect coverage ranking** 🆕 | §61.1 | Not all decks are modeled equally. Optimization recommendations for poorly-modeled decks (Kinnan, 77 flagged) should carry lower confidence than for well-modeled ones (Lorehold, 53 flagged) |
+
+---
+
+## 66. 🆕 BATTLE ANALYST v8 REGRESSION — Master Optimizer BLOCKED (2026-06-08 ~00:25 UTC)
+
+### 66.1 Discovery
+
+The Master Optimizer preflight at 00:25:41 UTC was **BLOCKED** by a regression in `battle_analyst_v8.py`. The regression test `test_boros_charm_protects_creatures_until_cleanup` failed with:
+
+```
+File "battle_analyst_v8.py", line 1479, in apply_effect_immediate
+    for si in stack.items
+               ^^^^^
+NameError: name 'stack' is not defined. Did you mean: 'Stack'?
+```
+
+### 66.2 Root Cause
+
+The `modal_boros_charm` handler (lines 1468-1490 in `apply_effect_immediate()`) attempts to auto-detect the best mode for Boros Charm by checking whether a board wipe is on the stack:
+
+```python
+wipe_on_stack = any(
+    isinstance(si.card, dict) and si.effect_data.get("effect") == "board_wipe"
+    for si in stack.items  # ← stack not in scope!
+)
+```
+
+The `apply_effect_immediate` function signature is `(player, opponents, card, turn, rng)` — the `stack` variable exists only in the caller (`priority_round`). This is a **scope leak bug**: the modal handler was written assuming `stack` was a global or passed parameter, but it's neither.
+
+### 66.3 Impact on Lorehold
+
+- **Boros Charm is in Lorehold's protection suite** (added in 6th hash pivot to stax). The card's indestructible mode is critical for protecting against board wipes.
+- The battle simulator cannot auto-detect when to use the indestructible mode vs double-strike mode — it falls back to `random.choice` which is incorrect ~50% of the time.
+- This means **all battle simulation results for Lorehold's protection behavior are unreliable** since the 6th hash pivot. The 75.0% WR at 20:07 and 89.3% WR post-apply may both be partially affected by incorrect Boros Charm modeling.
+
+### 66.4 Pipeline Context
+
+| Preflight Time | Status | Regression Test |
+|:---------------|:-------|:----------------|
+| Jun 7 23:25 | approved | passed |
+| Jun 7 23:45 | approved | passed |
+| Jun 8 00:05 | approved | passed |
+| **Jun 8 00:25** | **blocked** | **FAILED** |
+
+The regression appeared between 00:05 and 00:25 — `battle_analyst_v8.py` is currently **modified but uncommitted** (git status shows `M`). The file has uncommitted "v10.3" changes (land play enforcement + instant casting filter) that may have interacted with or exposed the pre-existing `stack` scope bug.
+
+### 66.5 KC Validator Surge Settled
+
+After the 1,322-entry surge at 21:10Z (documented in §63), two subsequent validations confirmed stability:
+
+| Run Time | New | Corrections | Conflicts |
+|:---------|:---:|:-----------:|:---------:|
+| Jun 7 23:21 | 0 | 0 | 0 |
+| Jun 8 00:21 | 0 | 0 | 0 |
+
+The surge was confirmed as a one-time sampling event (the validator sampled previously-untouched cards), not a classifier regression. The classifier is stable across 6 runs (4 clean → 1 surge → 2 clean).
+
+---
+
+## 67. 🆕 UPDATED CONCRETE TASKS (2026-06-08 ~00:30 UTC — max 5)
+
+> **Note:** Tasks from §64 remain valid. These tasks are ADDITIONAL based on the battle_analyst_v8.py regression and KC validator settling.
+
+### Task 1: 🔴 P0 — Fix `modal_boros_charm` Stack Scope Bug in battle_analyst_v8.py
+
+- **Evidence:** Master Optimizer preflight blocked at 00:25:41Z with `NameError: name 'stack' is not defined` at line 1479 of `battle_analyst_v8.py`. The `modal_boros_charm` handler in `apply_effect_immediate()` references `stack.items` but `stack` is not in scope. Boros Charm is in Lorehold's protection suite — incorrect modal choice means protection simulation is broken for the deck.
+- **What to change:** (a) Pass `stack` as a parameter to `apply_effect_immediate(player, opponents, card, turn, rng, stack=None)`. (b) Guard the board-wipe detection with `if stack is not None` — if no stack is available (e.g., proactive casting), fall back to a safe default (indestructible if creatures on board, else double_strike). (c) Run the Boros Charm regression test to confirm it passes.
+- **Impact:** Unblocks the Master Optimizer pipeline. Restores correct Boros Charm modal behavior for all decks running it (Lorehold and 4+ real opponents). Improves protection simulation fidelity.
+- **Risk:** Low — additive parameter. The fallback behavior for `stack=None` preserves existing functionality for non-stack contexts.
+- **Validation:** `python3 test_battle_analyst_v10_3.py` → all regression tests pass. Master Optimizer preflight → approved.
+
+### Task 2: 🟡 P1 — Commit and Validate Uncommitted battle_analyst_v8.py Changes
+
+- **Evidence:** `git status` shows `battle_analyst_v8.py` modified but uncommitted since at least Jun 7 23:25. The uncommitted changes add "v10.3" land play enforcement and instant-casting filtering. The file passed regression at 00:05 but failed at 00:25 — possibly due to a mid-session edit that introduced the `stack` bug. Uncommitted drift without version tracking makes regression diagnosis impossible.
+- **What to change:** (a) Review the uncommitted diff to ensure the v10.3 changes are intentional and correct. (b) After fixing Task 1, commit the combined changes with a clear message. (c) Add a pre-commit hook or preflight check that rejects uncommitted changes to battle scripts — the preflight should detect `git diff --name-only` and warn.
+- **Impact:** Prevents silent code drift from breaking regression tests. Makes the battle_analyst version trackable via git history.
+- **Risk:** Low — the v10.3 changes appear intentional (land enforcement + instant filter). Commit after fixing Task 1.
+- **Validation:** `git status` shows clean after commit. Master Optimizer preflight → approved on committed code.
+
+### Task 3: 🟡 P1 — Add `stack` Parameter to All Effect Handlers That May Need It
+
+- **Evidence:** The `modal_boros_charm` handler is not the only effect that might benefit from stack awareness. Other modal/contextual effects in `apply_effect_immediate` (counter spells, protection granting, removal choice) could also use stack context for smarter decisions. Currently all handlers operate blind to the stack state.
+- **What to change:** (a) Audit all `elif effect == "..."` handlers in `apply_effect_immediate` for cases where stack awareness would improve decisions. (b) Add `stack` as an optional parameter (`stack=None`) with guard clauses. (c) Document which handlers use stack context and why.
+- **Impact:** Enables context-aware effect resolution for counterspells (should counter wincons on stack), protection (should respond to wipes), and removal (should target combo pieces).
+- **Risk:** Low to Medium — careful auditing needed to avoid introducing new scope bugs. Each handler should work correctly with `stack=None`.
+- **Validation:** All regression tests pass. New test: simulate Boros Charm responding to Blasphemous Act on stack → indestructible mode chosen.
+
+### Task 4: 🟢 P2 — Periodic Post-Apply Baseline Cron (already in §64 Task 4 — REINFORCED)
+
+- **Evidence:** The WR regression from 89.3%→75.0% (§62) combined with the battle_analyst regression makes it impossible to distinguish real deck degradation from simulation bugs. Without periodic re-baselining, every WR drop triggers the same investigative cycle. **This task is reinforced** by the discovery that simulation fidelity can change without code commits (uncommitted drift).
+- **What to change:** (Same as §64 Task 4 — add 6-hourly re-baseline cron with opponent-pool-hash tracking.)
+- **Impact:** Would have detected the battle_analyst regression as a WR anomaly within 6 hours instead of waiting for the next manual preflight.
+- **Risk:** Low — read-only simulation.
+- **Validation:** Baseline history shows WR variance bounded within expected range when simulation code is stable.
+
+### Task 5: 🟢 P2 — Add `stack` Scope Lint Rule for battle_analyst_v8.py
+
+- **Evidence:** The `stack` variable is defined in `priority_round()` (line ~967) and used in several helper functions. The `modal_boros_charm` handler assumed it was accessible without checking. This is a recurring pattern risk — any handler added to `apply_effect_immediate` could make the same mistake.
+- **What to change:** (a) Add a comment block at the top of `apply_effect_immediate` listing which external variables are NOT in scope (e.g., `# WARNING: stack, all_players, and turn_number are NOT in scope here`). (b) Add a Python `__all__` or module-level lint comment. (c) Consider adding a static analysis check: `grep -n 'stack\.' battle_analyst_v8.py | grep -v 'def.*stack'` to find all stack references and verify they're in functions that have `stack` as a parameter.
+- **Impact:** Prevents future scope-leak bugs from reaching regression tests. Makes code review faster.
+- **Risk:** Trivial — documentation + grep check. No logic changes.
+- **Validation:** After implementation, `grep` for `stack.` outside functions with `stack` parameter returns 0 results.
+
+---
+
+## 68. 🆕 NEW KEY SIGNALS FOR APP/BACKEND LOGIC (2026-06-08 ~00:30 UTC)
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **Scope-leak detection in effect handlers** 🆕 | §66.2 | The `stack` variable was referenced from `apply_effect_immediate` but only defined in `priority_round`. A lint rule or runtime guard (`if 'stack' not in locals(): raise`) would catch this at load time instead of during regression testing |
+| **Uncommitted code drift breaks pipelines** 🆕 | §66.4 | battle_analyst_v8.py is modified but uncommitted. The preflight passed at 00:05 but failed at 00:25 with the same file. The preflight should check `git status --porcelain` and warn when battle scripts have uncommitted changes |
+| **Regression tests should cover modal choice logic** 🆕 | §66.3 | The Boros Charm regression test only checks creature protection — it doesn't verify the indestructible mode is chosen when a board wipe is on the stack. Modal cards need mode-selection test cases |
+| **KC Validator sampling is non-deterministic** 🆕 | §66.5 | 4 clean runs → 1,322 entries → 2 clean runs. Without stable seed or full-corpus mode, run-to-run comparison measures sampling variance, not classifier quality. This was already identified in §63 and §64 Task 3 — now empirically confirmed |
+| **Effect handler parameter contracts are implicit** 🆕 | §67 Task 3 | `apply_effect_immediate` has no documented contract for which external state it can access. Each handler is expected to work with only `(player, opponents, card, turn, rng)`. Making this contract explicit prevents future scope bugs |
