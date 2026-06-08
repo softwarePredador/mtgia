@@ -416,6 +416,40 @@ def normalize_effect_by_oracle(card, effect_data):
             normalized["effect"] = "creature"
         else:
             normalized["effect"] = "unknown"
+
+    # v10.3: Fix Rise of the Eldrazi — uncounterable + extra turn = finisher
+    if ("can't be countered" in text and "take an extra turn" in text):
+        normalized["effect"] = "finisher"
+        normalized["uncounterable"] = True
+        normalized["extra_turn"] = True
+        return normalized
+    
+    # v10.3: Fix Rise of the Eldrazi — uncounterable + extra turn = finisher
+    if ("can't be countered" in text and "take an extra turn" in text):
+        normalized["effect"] = "finisher"
+        normalized["uncounterable"] = True
+        normalized["extra_turn"] = True
+        return normalized
+    
+    # v10.3: Fix pump_all misclassified as removal/draw
+    if re.search(r"creatures you control get \+", text) or re.search(r"creatures.*get \+.\+/\+", text):
+        normalized["effect"] = "pump_all"
+        return normalized
+
+    # v10.3: Fix "deal damage to each opponent" as finisher, not removal
+    if re.search(r"deals?.*damage to each opponent", text) or re.search(r"deal.*damage to each player", text):
+        normalized["effect"] = "finisher"
+        return normalized
+
+    # v10.3: Creatures must keep effect="creature" — prevent graveyard discard
+    if "creature" in type_line.lower():
+        discard_effects = ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg",
+                          "draw_cards", "ramp_ritual", "indestructible", 
+                          "topdeck_manipulation", "draw_engine")
+        if normalized.get("effect") in discard_effects:
+            normalized["effect"] = "creature"
+            normalized["power"] = card.get("power", max(1, int(float(card.get("cmc", 3)))))
+
     return normalized
 
 
@@ -709,11 +743,13 @@ class Player:
     def has_won(self): return self.win_reason is not None
 
     def untapped_creatures(self):
-        return [c for c in self.battlefield if isinstance(c, dict) and c.get("effect") == "creature"
+        """v10.3 fix: detect creatures by type_line, not just effect."""
+        return [c for c in self.battlefield if isinstance(c, dict) and is_creature_card(c)
                 and not c.get("tapped", False) and not c.get("summoning_sick", False)]
 
     def creatures_for_blocking(self):
-        return [c for c in self.battlefield if isinstance(c, dict) and c.get("effect") == "creature"
+        """v10.3 fix: detect creatures by type_line, not just effect."""
+        return [c for c in self.battlefield if isinstance(c, dict) and is_creature_card(c)
                 and not c.get("tapped", False)]
 
     def has_counterspell(self):
@@ -779,6 +815,18 @@ def is_land(card):
     if "Land" in card.get("type_line", ""): return True
     name = card.get("name", "")
     if name in ("Plains","Island","Swamp","Mountain","Forest","Wastes"): return True
+    return False
+
+
+def is_creature_card(card):
+    """Detect creature regardless of its KNOWN_CARDS effect classification.
+    Grand Abolisher has effect='silence_opponents' but IS a creature."""
+    if not isinstance(card, dict):
+        return False
+    if card.get("effect") == "creature":
+        return True
+    if "Creature" in card.get("type_line", ""):
+        return True
     return False
 
 class Stack:
@@ -1394,8 +1442,29 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.indestructible = True
         player.graveyard.append(card)
     elif effect == "modal_boros_charm":
+        # v10.3: Smart context — check if board wipe is on stack or imminent
         response_to = card.get("_response_to_effect")
         preferred_mode = card.get("preferred_mode")
+        
+        # Auto-detect best mode if not specified
+        if not preferred_mode:
+            has_creatures = any(is_creature_card(c) for c in player.battlefield)
+            # Check if board wipe is on stack
+            wipe_on_stack = any(
+                isinstance(si.card, dict) and si.effect_data.get("effect") == "board_wipe"
+                for si in stack.items
+            )
+            # Check if opponent has many creatures (we might need to protect)
+            opp_creatures = sum(1 for o in opponents if o.is_alive() 
+                              for c in o.battlefield if isinstance(c,dict) and 
+                              is_creature_card(c))
+            if wipe_on_stack:
+                preferred_mode = "indestructible"
+            elif has_creatures and opp_creatures < 5:
+                preferred_mode = "double_strike"
+            else:
+                preferred_mode = "indestructible"
+        
         if preferred_mode == "double_strike" and response_to != "board_wipe":
             grant_creatures_until_eot(player, keywords=("double_strike",))
         else:
@@ -1471,8 +1540,25 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             player.indestructible = True
         player.graveyard.append(card)
     elif effect == "copy_spell":
+        # v10.3: Copy the best instant/sorcery in graveyard (approximate)
         player.battlefield.append(effect_data)
         player.copy_engines += 1
+        # Try to copy a valuable spell from graveyard
+        spells_in_grave = [c for c in player.graveyard if isinstance(c, dict) and c.get("cmc", 0) > 0
+                          and (c.get("effect") in ("draw_cards", "tutor", "approach", "ramp_ritual", "finisher")
+                               or "Instant" in c.get("type_line", "")
+                               or "Sorcery" in c.get("type_line", ""))]
+        if spells_in_grave:
+            # Copy the highest-value spell (prefer approach > tutor > draw > ramp)
+            priority = {"approach": 5, "tutor": 4, "finisher": 4, "overload_recursion": 4,
+                       "draw_cards": 3, "ramp_ritual": 2, "board_wipe": 1, "pump_all": 3}
+            scored = [(c, priority.get(c.get("effect", ""), 0), c.get("cmc", 0)) for c in spells_in_grave]
+            scored.sort(key=lambda x: (-x[1], -x[2]))
+            best = scored[0][0]
+            # Re-cast the copied spell
+            apply_effect_immediate(player, opponents, best, turn, rng)
+            player.graveyard.append(card)  # both original and copy go to grave
+            return
     elif effect == "tutor":
         target_type = effect_data.get("target", "any")
         found = None
@@ -1592,7 +1678,9 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         card["summoning_sick"] = False  # haste from combo
 
 def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
+    """v10.3 fix: use is_creature_card() for valid creature detection."""
     creatures = attacker.untapped_creatures()
+    emit_replay_event("combat_phase", player=attacker.name, creatures=len(creatures), turn=turn)
     if not creatures: return
 
     attackers = []
@@ -1601,6 +1689,7 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             c["tapped"] = True
             attackers.append(c)
     if not attackers: return
+    emit_replay_event("declare_attackers", player=attacker.name, count=len(attackers), total_power=sum(a.get("power",2) for a in attackers), turn=turn)
 
     alive_defenders = [o for o in opponents if o.is_alive()]
     if not alive_defenders: return
@@ -1708,7 +1797,7 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             )
         ]
         lethal_attack = target.life <= a.get("power", 2)
-        if not available or (not lethal_attack and rng.random() >= 0.35):
+        if not available or (not lethal_attack and rng.random() >= 0.65):
             block_assignments.append((a, []))
             continue
         blockers = []
@@ -1720,7 +1809,8 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
                 break
         can_kill_attacker = combined_power >= a.get("toughness", a.get("power", 2))
         if not can_kill_attacker:
-            blockers = blockers[:1] if lethal_attack else []
+            # v10.3 fix: chump block lethal attacks with all available creatures
+            blockers = available[:min(3, len(available))] if lethal_attack else (blockers[:1] if rng.random() < 0.5 else [])
         elif not lethal_attack:
             attack_damage = a.get("power", 2)
             estimated_losses = 0
@@ -1732,8 +1822,8 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
                     estimated_losses += 1
                     attack_damage -= lethal_to_blocker
             # Avoid an automatic full-board suicide unless it prevents lethal.
-            if estimated_losses == len(blockers):
-                blockers = []
+            if estimated_losses == len(blockers) and not lethal_attack:
+                blockers = []  # only avoid suicide for non-lethal attacks
         assigned_blockers.extend(blockers)
         block_assignments.append((a, blockers))
 
