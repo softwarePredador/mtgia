@@ -59,8 +59,9 @@ abaixo foram revalidados por `rg` focado e leitura direta.
   API manual de `PerformanceService` e conveniencias de EDHREC/cache.
 - Leitura direta dos arquivos onde o `rg` mostrou definicoes, testes ou
 controles positivos de runtime.
-- Uma tentativa de varredura textual ampla adicional foi interrompida por custo
-alto sem produzir saida util; ela nao foi usada como evidencia.
+- Varredura textual ampla adicional retornou 462 candidatos de baixa contagem
+  de simbolo; ela foi usada somente como triagem. Nenhum item dessa lista foi
+  promovido a achado sem `rg` focado e leitura direta.
 
 ### Achados revalidados
 
@@ -215,6 +216,10 @@ alto sem produzir saida util; ela nao foi usada como evidencia.
   wrappers `getRequestTrace`/`tryGetRequestId` seguem sem chamador.
 - `EndpointCache` nao foi classificado como morto: apenas `clearExpired` segue
   sem chamador confirmado.
+- Metodos de providers, engines do life counter, harnesses/debug do Lotus,
+  scanner/OCR e scripts SQL-like apareceram na varredura ampla de baixa
+  contagem, mas nao foram reportados como achados sem confirmacao adicional de
+  fluxo visual/runtime.
 
 ### Resultado desta revalidacao
 
