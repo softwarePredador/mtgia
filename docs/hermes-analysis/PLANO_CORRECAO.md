@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-08 05:30 UTC
+> Data: 2026-06-08 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -78,8 +78,8 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     **RESOLVIDO em `origin/master@4913a733`**. Sucessos com sugestoes filtradas
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
-12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-07 07:00 UTC como **ABERTO neste checkout `82bb454e`**.
+12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
+    2026-06-08 07:00 UTC como **ABERTO neste checkout `37077efd`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
     contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e

@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-08 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-08 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -250,8 +250,8 @@ mantidos como texto solto.
   restam swaps validos, a resposta pode incluir
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
-- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-07 07:00 UTC no checkout local `82bb454e`.
+- **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
+  novamente em 2026-06-08 07:00 UTC no checkout local `37077efd`.
   `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
   `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
   contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
