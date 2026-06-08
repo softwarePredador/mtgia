@@ -4,9 +4,157 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-08 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-08 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies — revalidacao 2026-06-08 11:00 UTC
+
+Escopo desta rodada: somente imports quebrados e dependencias circulares. Nao
+foi feita auditoria ampla de classes sem uso, funcoes sem chamada, tabelas
+PostgreSQL sem uso, duplicacao geral ou coerencia app/backend fora do
+necessario para validar imports e ciclos.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `fed6ee85`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 172.
+- Classes encontradas: 169.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor base cobre somente `server/lib` e
+`server/routes`, ignora imports locais `package:` e nao varre `app/lib` nem
+`server/bin`. A execucao tambem reescreveu `STRUCTURE_AUDIT.md` para o bloco
+gerado porque o arquivo atual nao tem o marcador de merge esperado; essa
+mutacao automatica foi revertida para preservar o historico manual. Os numeros
+acima foram incorporados, e os achados abaixo foram revalidados por resolver
+imports locais em `app/lib`, `server/lib`, `server/routes` e `server/bin`.
+
+### Metodo manual focado
+
+- Varredura local de 426 arquivos Dart em `app/lib`, `server/lib`,
+  `server/routes` e `server/bin`.
+- Resolucao de imports/exports/parts relativos a partir do arquivo de origem.
+- Resolucao de imports locais `package:server/...` para `server/lib`,
+  `package:manaloom/...` para `app/lib` e alias historico `package:ai/...`
+  para `server/lib/ai`.
+- Calculo de SCCs no grafo de imports locais desses mesmos arquivos.
+- Validacao complementar:
+  - `cd server && dart analyze bin/local_test_server.dart` confirmou o import
+    quebrado backend em `local_test_server.dart`.
+  - `cd app && flutter analyze --no-pub --no-fatal-infos ...` foi nao
+    conclusivo porque `app/.dart_tool/package_config.json` nao existe neste
+    checkout, mas a saida incluiu os dois `uri_does_not_exist` locais do app.
+
+### Achados revalidados
+
+#### P1 — Dois imports app-side estao quebrados por profundidade relativa errada
+
+- **Import 1:** `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
+  importa `../../../../core/utils/mana_helper.dart`.
+- **Alvo resolvido:** `app/core/utils/mana_helper.dart`.
+- **Alvo existente correto:** `app/lib/core/utils/mana_helper.dart`.
+- **Evidencia:** o arquivo esta em `app/lib/features/decks/widgets`; subir
+  quatro niveis sai de `app/lib` para `app`. A varredura local marcou o import
+  como quebrado, e o analyzer Flutter tambem reportou
+  `uri_does_not_exist` para esse URI, embora a execucao tenha sido ruidosa por
+  falta de package config.
+- **Import 2:** `app/lib/features/home/life_counter_screen.dart:7` importa
+  `../../../core/theme/app_theme.dart`.
+- **Alvo resolvido:** `app/core/theme/app_theme.dart`.
+- **Alvo existente correto:** `app/lib/core/theme/app_theme.dart`.
+- **Evidencia:** o arquivo esta em `app/lib/features/home`; subir tres niveis
+  sai de `app/lib` para `app`. A varredura local marcou o import como quebrado,
+  e o analyzer Flutter tambem reportou `uri_does_not_exist` para esse URI.
+- **Por que parece real:** `find app/lib -path '*mana_helper.dart' -o -path
+  '*app_theme.dart'` encontrou somente os alvos em `app/lib/core/...`; nao ha
+  `app/core/...` neste checkout.
+- **O que valida:** corrigir os imports para profundidade relativa correta ou
+  para `package:manaloom/core/...`, depois rerodar `flutter analyze` com
+  package config presente.
+- **O que falsifica:** criacao intencional de `app/core/...` ou mudanca de
+  layout que torne esses caminhos reais, acompanhada de analyzer verde.
+
+#### P1 — `server/bin/local_test_server.dart` depende de artefato Dart Frog ausente
+
+- **Import:** `server/bin/local_test_server.dart:3` importa
+  `../.dart_frog/server.dart` como `generated`.
+- **Alvo resolvido:** `server/.dart_frog/server.dart`.
+- **Evidencia:** `server/.dart_frog` nao existe neste checkout; `find server
+  -maxdepth 3 -path '*server.dart' -o -path 'server/.dart_frog*'` encontrou
+  somente `server/bin/local_test_server.dart`.
+- **Validacao por analyzer:** `cd server && dart analyze
+  bin/local_test_server.dart` falhou com
+  `Target of URI doesn't exist: '../.dart_frog/server.dart'`.
+- **Por que parece real:** e um import estatico; clone limpo sem geracao previa
+  do Dart Frog nao consegue analisar/rodar esse entry point.
+- **O que valida:** gerar o artefato `.dart_frog/server.dart` antes do uso,
+  remover o wrapper, ou trocar para um entry point suportado pelo Dart Frog com
+  teste/README operacional.
+- **O que falsifica:** `server/.dart_frog/server.dart` presente de forma
+  reproduzivel no fluxo local/CI antes de `dart analyze` ou decisao documentada
+  de excluir `bin/local_test_server.dart` de analise.
+
+#### P2 — Ciclo direto entre telas de comunidade e perfil social
+
+- **Arquivos no SCC:** `app/lib/features/community/screens/community_deck_detail_screen.dart`
+  e `app/lib/features/social/screens/user_profile_screen.dart`.
+- **Aresta A:** `community_deck_detail_screen.dart:8` importa
+  `../../social/screens/user_profile_screen.dart`; a tela instancia
+  `UserProfileScreen` em `:213` quando o usuario toca no dono do deck.
+- **Aresta B:** `user_profile_screen.dart:7` importa
+  `../../community/screens/community_deck_detail_screen.dart`; a tela instancia
+  `CommunityDeckDetailScreen` em `:469` quando o usuario abre um deck publico
+  do perfil.
+- **Evidencia:** a varredura SCC encontrou somente esse componente fortemente
+  conectado de 2 arquivos no recorte `app/lib` + backend runtime; nao encontrou
+  ciclos locais em `server/lib`, `server/routes` ou `server/bin`.
+- **Por que parece real:** nao e apenas import de DTO compartilhado; as duas
+  telas concretas se conhecem e fazem `Navigator.push` uma para a outra,
+  aumentando acoplamento entre features `community` e `social`.
+- **O que valida:** extrair navegacao para rotas nomeadas/callbacks/shared
+  coordinator ou mover a composicao para uma camada comum, deixando ao menos
+  uma tela sem import direto da outra.
+- **O que falsifica:** remocao de uma das importacoes diretas ou prova de que o
+  ciclo e intencional e coberto por contrato de navegacao dedicado.
+
+### Candidatos triados e nao reportados como achado
+
+- O import historico de `server/routes/ai/commander-learning/index.dart` para
+  `server/lib/ai/commander_learned_deck_support.dart` nao esta quebrado neste
+  checkout; o arquivo alvo existe.
+- O auditor base reportou `Imports quebrados: 0` no recorte backend
+  `server/lib` + `server/routes`; os achados reais ficam fora desse recorte
+  (`app/lib` e `server/bin`) ou em ciclo app-side.
+- Imports externos de pacotes (`flutter`, `provider`, `fl_chart`, etc.) nao
+  foram classificados como achado desta rodada porque a falta de
+  `app/.dart_tool/package_config.json` torna essa validacao nao conclusiva no
+  app. O foco publicado acima usa somente imports locais com alvo de arquivo
+  deterministico.
+
+### Resultado desta revalidacao
+
+No checkout `fed6ee85`, os achados historicos de imports quebrados e ciclo
+local continuam abertos: 3 imports locais quebrados em 426 arquivos Dart
+runtime e 1 SCC app-side de 2 arquivos. Nenhum novo import quebrado ou ciclo
+backend foi encontrado nesta rodada.
 
 ## Rodada focada: Functions not called — revalidacao 2026-06-08 07:00 UTC
 
