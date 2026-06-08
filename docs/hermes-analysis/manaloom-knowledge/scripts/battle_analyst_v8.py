@@ -424,13 +424,30 @@ def normalize_effect_by_oracle(card, effect_data):
         normalized["extra_turn"] = True
         return normalized
     
-    # v10.3: Fix Rise of the Eldrazi — uncounterable + extra turn = finisher
-    if ("can't be countered" in text and "take an extra turn" in text):
-        normalized["effect"] = "finisher"
-        normalized["uncounterable"] = True
-        normalized["extra_turn"] = True
+    # v10.3: Fix tutor spells misclassified as draw_cards
+    if re.search(r"search your library for", text) and "draw" not in text.split("search")[0][-20:]:
+        normalized["effect"] = "tutor"
+        if "creature" in text: normalized["target"] = "creature"
+        if "land" in text: normalized["target"] = "land"
+        if "instant" in text or "sorcery" in text: normalized["target"] = "instant_or_sorcery"
         return normalized
-    
+
+    # v10.3: Fix ramp enchantments misclassified as draw_engine
+    if re.search(r"add.*mana.*for each", text) or re.search(r"add.*\{[WUBRG]\}.*for each", text):
+        if "enchantment" in type_line.lower() or "enchant" in type_line.lower():
+            normalized["effect"] = "ramp_engine"
+            return normalized
+
+    # v10.3: Fix stax pieces misclassified as draw_engine
+    if re.search(r"players can't cast|can't cast.*spells|can't activate", text):
+        normalized["effect"] = "silence_opponents"
+        return normalized
+
+    # v10.3: Mass removal detection
+    if re.search(r"destroy all|exile all|each player sacrifices", text) and "target" not in text[:50]:
+        normalized["effect"] = "board_wipe"
+        return normalized
+
     # v10.3: Fix pump_all misclassified as removal/draw
     if re.search(r"creatures you control get \+", text) or re.search(r"creatures.*get \+.\+/\+", text):
         normalized["effect"] = "pump_all"
