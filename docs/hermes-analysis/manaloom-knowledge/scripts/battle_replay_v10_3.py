@@ -10,7 +10,7 @@ from pathlib import Path
 
 BATTLE_PATH = os.environ.get(
     "BATTLE_ANALYST_PATH",
-    str(Path(__file__).with_name("battle_analyst_v8.py")),
+    str(Path(__file__).with_name("battle_analyst_v9.py")),
 )
 OUT = os.environ.get("REPLAY_OUT", "/tmp/battle_full_replay.txt")
 EVENTS_OUT = os.environ.get("REPLAY_EVENTS_OUT", str(Path(OUT).with_suffix(".jsonl")))

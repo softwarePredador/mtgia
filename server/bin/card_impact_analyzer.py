@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Card Impact Analyzer — WDWR, WPWR, and loss-mode swap suggestions.
 
-Importa e estende battle_analyst_v8 sem modificar o arquivo original.
+Importa e estende o battle engine ativo sem modificar o arquivo original.
 Calcula When Drawn Win Rate, When Played Win Rate, e gera sugestoes
 de swap baseadas nos modos de derrota (loss-mode-driven swaps).
 """
 
-import argparse, json, os, sqlite3, sys, random
+import argparse, importlib.util, json, os, sqlite3, sys, random
 from collections import defaultdict
 from pathlib import Path
 
@@ -16,7 +16,14 @@ SCRIPT_DIR = os.environ.get(
 )
 sys.path.insert(0, SCRIPT_DIR)
 
-import battle_analyst_v8 as ba
+BATTLE_PATH = os.environ.get(
+    "MANALOOM_BATTLE_SCRIPT",
+    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
+)
+
+spec = importlib.util.spec_from_file_location("card_impact_battle", BATTLE_PATH)
+ba = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(ba)
 
 # ── Monkey-patch to add tracking vars to Player ─────────────────
 _original_player_init = ba.Player.__init__

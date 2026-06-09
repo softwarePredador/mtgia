@@ -23,7 +23,7 @@ DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
 REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 
 DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
-DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v8.py"
+DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v9.py"
 DEFAULT_BATTLE_TEST = SCRIPT_DIR / "test_battle_analyst_v10_3.py"
 DEFAULT_SLOT_OPTIMIZER = SCRIPT_DIR / "slot_optimizer.py"
 DEFAULT_UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"

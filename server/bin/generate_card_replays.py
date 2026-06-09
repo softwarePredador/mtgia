@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Generate replay JSONL files with card tracking + win/loss data.
 
-Usa o REPLAY_EVENT_HANDLER existente no battle_analyst_v8.py
+Usa o REPLAY_EVENT_HANDLER existente no battle engine ativo
 para capturar todos os eventos do jogo, adicionar hand_cards
 ao turn_start/turn_end, e marcar vitória/derrota.
 
 Gera arquivos em docs/hermes-analysis/master_optimizer_replays/
 """
 
-import argparse, json, os, random, sqlite3, sys
+import argparse, importlib.util, json, os, random, sqlite3, sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -18,7 +18,13 @@ SCRIPT_DIR = os.environ.get(
 )
 sys.path.insert(0, SCRIPT_DIR)
 
-import battle_analyst_v8 as ba
+BATTLE_PATH = os.environ.get(
+    "MANALOOM_BATTLE_SCRIPT",
+    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
+)
+spec = importlib.util.spec_from_file_location("generate_replays_battle", BATTLE_PATH)
+ba = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(ba)
 
 OUTPUT_DIR = "/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_replays"
 

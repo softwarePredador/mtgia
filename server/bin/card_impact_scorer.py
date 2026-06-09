@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Card Impact Scoring via monkey-patching simulate_game_v8.
 
-Nao modifica battle_analyst_v8.py — faz monkey-patch em runtime.
+Nao modifica o battle engine ativo — faz monkey-patch em runtime.
 Calcula WDWR (When Drawn Win Rate) e WPWR (When Played Win Rate).
 """
 
-import argparse, os, sqlite3, sys, json
+import argparse, importlib.util, os, sqlite3, sys, json
 from collections import defaultdict
 from pathlib import Path
 
@@ -16,7 +16,13 @@ SCRIPT_DIR = os.environ.get(
 sys.path.insert(0, SCRIPT_DIR)
 
 # Monkey-patch: wrap simulate_game_v8 to also collect card data
-import battle_analyst_v8 as ba
+BATTLE_PATH = os.environ.get(
+    "MANALOOM_BATTLE_SCRIPT",
+    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
+)
+spec = importlib.util.spec_from_file_location("card_impact_scorer_battle", BATTLE_PATH)
+ba = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(ba)
 from master_optimizer_common import is_land
 
 _original_simulate = ba.simulate_game_v8

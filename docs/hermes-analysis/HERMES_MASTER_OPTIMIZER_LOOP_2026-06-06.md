@@ -5,6 +5,10 @@
 > guardrails, use `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
 > Nao use um resultado antigo deste arquivo como autorizacao de apply sem
 > revalidar contra o SQLite vivo.
+> Nota operacional 2026-06-09: este diário histórico ainda menciona
+> `battle_analyst_v8.py` em eventos antigos. O engine ativo atual é
+> `battle_analyst_v9.py`; crons/optimizer devem usar v9 via
+> `MANALOOM_BATTLE_SCRIPT` ou fallback atual dos scripts.
 
 > Objetivo: transformar o Hermes em um ciclo confiavel de otimizacao por evidencia:
 > simular, detectar erro, propor swap, testar isolado, confirmar em massa, validar regras,
@@ -614,7 +618,7 @@ Use o Hermes Master Optimizer Loop. Primeiro rode o preflight com relatorio.
 Se passar, rode baseline do battle, slot scan isolado e confirmacao full para os candidatos promissores.
 Pode aplicar no SQLite Hermes local apenas se houver full confirmation aprovada, quality gate verde, hash atual compativel, rollback gerado e post-apply gate configurado.
 Nao aplique no produto automaticamente. Gere handoff com winrate, delta, motivo de cada swap, riscos, replays auditados e proximas correcoes do battle.
-Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix no battle_analyst_v8.py com teste novo em test_battle_analyst_v10_3.py.
+Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix no engine ativo `battle_analyst_v9.py` com teste novo em `test_battle_analyst_v10_3.py`.
 ```
 
 ## Proximo passo tecnico recomendado

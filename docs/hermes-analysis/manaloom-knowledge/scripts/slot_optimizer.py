@@ -2,7 +2,7 @@
 """Safe Lorehold slot scan.
 
 This script proposes and tests isolated swaps only for the current approved
-baseline. It does not edit battle_analyst_v8.py directly and it refuses stale
+baseline. It does not edit the battle engine directly and it refuses stale
 deck state before scanning.
 """
 

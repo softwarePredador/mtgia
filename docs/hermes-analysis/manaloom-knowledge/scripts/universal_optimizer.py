@@ -8,9 +8,9 @@ Auto-applies winning swaps. Cron-safe: skip already-tested, lock file prevents c
 import sqlite3, subprocess, os, json, re, time, sys
 from datetime import datetime, timezone
 
-DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
-BATTLE = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py'
-KC_JSON = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json'
+DB = os.environ.get('MANALOOM_KNOWLEDGE_DB', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+BATTLE = os.environ.get('MANALOOM_BATTLE_SCRIPT', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py')
+KC_JSON = os.environ.get('MANALOOM_KNOWN_CARDS_JSON', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json')
 LOCK_FILE = '/tmp/optimizer.lock'
 
 GAMES_QUICK = 10

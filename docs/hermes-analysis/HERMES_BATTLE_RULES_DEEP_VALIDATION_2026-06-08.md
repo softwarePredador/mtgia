@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Validar e endurecer regras basicas de MTG no `battle_analyst_v8.py`, principalmente:
+Validar e endurecer regras basicas de MTG no engine ativo `battle_analyst_v9.py`, principalmente:
 
 - criaturas atacam/tapam corretamente;
 - enjoo de invocacao impede ataque e mana abilities com `{T}`;
@@ -46,7 +46,7 @@ Comandos locais:
 
 ```powershell
 python docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py
-python -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py
+python -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py
 ```
 
 Resultado:
@@ -99,4 +99,3 @@ Ainda precisam de modelagem dedicada se forem relevantes para swaps:
 - efeitos de copia permanentes/temporarios mais fieis;
 - planeswalkers completos;
 - loops/combo lines que exigem prioridade e escolhas multi-etapa.
-

@@ -29,7 +29,7 @@ REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
-DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v8.py"))
+DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v9.py"))
 
 PROTECTED_CARDS = {
     "Lorehold, the Historian",
@@ -173,7 +173,7 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             deck_id INTEGER NOT NULL,
             deck_hash TEXT NOT NULL,
-            battle_version TEXT NOT NULL DEFAULT 'battle_analyst_v8',
+            battle_version TEXT NOT NULL DEFAULT 'battle_analyst_v9',
             games_per_opponent INTEGER NOT NULL,
             opponents INTEGER NOT NULL,
             total_games INTEGER NOT NULL,

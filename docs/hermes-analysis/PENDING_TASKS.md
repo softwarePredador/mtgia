@@ -452,7 +452,7 @@ CONFORMANCE_SCENARIOS = [
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5461 |
-| `battle_analyst_v8.py` | Engine original (ainda usado pelo optimizer até trocar env var) | 5263 |
+| `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |
 | `slot_optimizer.py` | Teste de swaps por categoria | ~550 |
@@ -466,9 +466,10 @@ CONFORMANCE_SCENARIOS = [
 
 ---
 
-## Como Ativar v9 no Optimizer
+## Engine Ativo no Optimizer
 
-O optimizer loop já está configurado para usar v9 via env var:
+O optimizer loop e os fallbacks atuais já usam v9. Para deixar explícito no
+Hermes/AWS:
 ```bash
 export MANALOOM_BATTLE_SCRIPT="/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
 ```

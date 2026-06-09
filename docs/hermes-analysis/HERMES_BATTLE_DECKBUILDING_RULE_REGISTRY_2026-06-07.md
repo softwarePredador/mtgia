@@ -25,7 +25,7 @@ Hermes should separate raw facts from interpreted behavior:
 | --- | --- | --- | --- |
 | Raw card facts | Postgres `cards` -> SQLite `card_oracle_cache` | Mana cost, type line, oracle text, power/toughness, keywords | Fact source |
 | Battle/deck rule | Postgres `card_battle_rules` -> SQLite `battle_card_rules` | What Hermes believes the card does in simulation and deckbuilding | Reviewable source |
-| Battle engine | `battle_analyst_v8.py` | Executes supported effects and phases | Deterministic simulator |
+| Battle engine | `battle_analyst_v9.py` | Executes supported effects and phases | Deterministic simulator |
 | Deck optimizer | `slot_optimizer.py` and gates | Chooses candidates/cuts using rule categories | Evidence consumer |
 | Audits | `battle_effect_coverage_audit.py`, replay auditor | Shows unknowns, heuristics and mismatches | Trust gate |
 

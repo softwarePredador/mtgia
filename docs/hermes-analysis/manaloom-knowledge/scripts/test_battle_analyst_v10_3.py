@@ -17,7 +17,7 @@ from pathlib import Path
 MODULE_PATH = Path(
     os.environ.get(
         "BATTLE_ANALYST_PATH",
-        Path(__file__).with_name("battle_analyst_v8.py"),
+        Path(__file__).with_name("battle_analyst_v9.py"),
     )
 )
 spec = importlib.util.spec_from_file_location("battle_under_test", MODULE_PATH)

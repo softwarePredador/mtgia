@@ -8,7 +8,7 @@ Roda simulate_game_v8 N vezes, coleta dados de cada jogo,
 e calcula metricas por carta.
 """
 
-import argparse, os, sqlite3, sys, json
+import argparse, importlib.util, os, sqlite3, sys, json
 from collections import defaultdict
 from pathlib import Path
 
@@ -21,7 +21,13 @@ BATTLE_DIR = os.environ.get(
 )
 sys.path.insert(0, BATTLE_DIR)
 
-import battle_analyst_v8 as ba
+BATTLE_PATH = os.environ.get(
+    "MANALOOM_BATTLE_SCRIPT",
+    os.path.join(BATTLE_DIR, "battle_analyst_v9.py"),
+)
+spec = importlib.util.spec_from_file_location("card_impact_analysis_battle", BATTLE_PATH)
+ba = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(ba)
 from master_optimizer_common import (
     connect as optimizer_connect,
     deck_rows as optimizer_deck_rows,

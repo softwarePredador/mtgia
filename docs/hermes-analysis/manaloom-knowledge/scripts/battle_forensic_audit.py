@@ -292,7 +292,7 @@ def audit_rule_provenance(
                 findings,
                 "critical",
                 event,
-                f"Effect `{effect}` is not implemented by battle_analyst_v8.py.",
+                f"Effect `{effect}` is not implemented by the active battle engine.",
                 "Implement the effect branch or map the card to a supported approximation.",
             )
 

@@ -1,7 +1,7 @@
 # Implementation Gaps — PDF Spec vs Codebase
 
 > Mapeamento da "Especificação técnica de regras faltantes para o ManaLoom Commander"
-> para o código atual do battle_analyst_v8.py (5263 linhas).
+> para o código atual do battle_analyst_v9.py (engine ativo).
 > Status: 2026-06-09
 
 ## Resumo

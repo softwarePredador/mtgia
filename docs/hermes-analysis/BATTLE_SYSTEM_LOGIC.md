@@ -31,7 +31,11 @@ generate_card_replays.py
 
 ---
 
-## 2. Battle Engine (battle_analyst_v8.py)
+## 2. Battle Engine (battle_analyst_v9.py)
+
+`battle_analyst_v9.py` é o engine ativo. `battle_analyst_v8.py` permanece
+versionado apenas como legado histórico/comparação forense e não deve ser usado
+como default de cron ou optimizer.
 
 ### 2.1 Arquitetura de Turno
 

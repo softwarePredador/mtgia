@@ -172,7 +172,7 @@ preflight.
 
 Leituras principais:
 
-- `battle_analyst_v8.py`
+- `battle_analyst_v9.py`
 - `master_optimizer_common.py`
 - `slot_optimizer.py`
 - `sync_pg_card_metadata_to_hermes.py`
@@ -208,7 +208,7 @@ Contrato:
 
 Leituras principais:
 
-- `battle_analyst_v8.py` como pool de oponentes;
+- `battle_analyst_v9.py` como pool de oponentes;
 - `sync_pg_card_metadata_to_hermes.py` para coletar nomes a cachear;
 - `kc_validator.py` para expandir/validar conhecimento.
 
@@ -237,7 +237,7 @@ Colunas observadas:
 Contrato:
 
 - `card_list` preferencial deve ser JSON local.
-- `battle_analyst_v8.py` tambem aceita decklist texto legado, mas o sync PG deve
+- `battle_analyst_v9.py` tambem aceita decklist texto legado, mas o sync PG deve
   gravar JSON.
 - Decks incompletos/pequenos devem ser excluidos do battle/optimizer.
 - O battle atual usa `MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS`, default `80`,
@@ -279,7 +279,7 @@ Contrato:
 
 - `normalized_name` e chave primaria.
 - Deve incluir alias da face frontal para cartas dupla-face.
-- `battle_analyst_v8.py` usa este cache para mana colorida, poder/resistencia e keywords.
+- `battle_analyst_v9.py` usa este cache para mana colorida, poder/resistencia e keywords.
 - `slot_optimizer.py` usa este cache para identidade de cor e legalidade indireta.
 
 ### `card_battle_rules` (Postgres) e `battle_card_rules` (SQLite)
@@ -290,7 +290,7 @@ Contrato:
 
 Leituras principais:
 
-- `battle_analyst_v8.py`, antes de `KNOWN_CARDS`/JSON/tags;
+- `battle_analyst_v9.py`, antes de `KNOWN_CARDS`/JSON/tags;
 - `slot_optimizer.py`, para categorizar candidatos e cortes;
 - `battle_effect_coverage_audit.py`, para separar regra manual/gerada de heuristica.
 
@@ -608,7 +608,7 @@ Funcao:
 Entradas:
 
 - SQLite Hermes via `--sqlite-db`;
-- `battle_analyst_v8.py` para regras manuais;
+- `battle_analyst_v9.py` para regras manuais;
 - `known_cards_generated.json` para regras geradas.
 
 Parametros:
@@ -689,7 +689,7 @@ Contrato esperado:
 
 - `knowledge.db` existe;
 - tabelas essenciais existem;
-- `battle_analyst_v8.py` compila;
+- `battle_analyst_v9.py` compila;
 - testes de battle passam;
 - `card_oracle_cache` existe e tem cobertura minima;
 - scripts do optimizer existem;
@@ -727,7 +727,7 @@ Saida esperada:
 
 ## Contrato de regras do battle
 
-O `battle_analyst_v8.py` nao deve ser tratado como rules engine completo de MTG.
+O `battle_analyst_v9.py` nao deve ser tratado como rules engine completo de MTG.
 Ele e um simulador deterministico/heuristico para comparar hipoteses de deck,
 mas algumas regras agora sao obrigatorias e cobertas por teste.
 

@@ -81,7 +81,10 @@ for row in conn.execute(
 print(f"Total Lorehold cards: {len(all_cards)}")
 
 # 2. Existing handcrafted
-battle_path = os.path.join(str(SCRIPT_DIR), 'battle_analyst_v8.py')
+battle_path = os.environ.get(
+    "MANALOOM_BATTLE_SCRIPT",
+    os.path.join(str(SCRIPT_DIR), 'battle_analyst_v9.py'),
+)
 with open(battle_path) as f:
     battle_text = f.read()
 existing_hand = set(re.findall(r'"([^"]+)"\s*:\s*\{',

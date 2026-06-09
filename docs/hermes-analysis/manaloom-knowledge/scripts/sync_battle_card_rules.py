@@ -13,11 +13,12 @@ local cache used by simulations.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
+import os
 import sqlite3
 from pathlib import Path
 
-import battle_analyst_v8 as battle
 from battle_rule_registry import (
     DEFAULT_DB,
     ensure_battle_card_rules,
@@ -27,6 +28,17 @@ from battle_rule_registry import (
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 GENERATED_PATH = SCRIPT_DIR / "known_cards_generated.json"
+BATTLE_PATH = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v9.py"))
+
+
+def load_battle_module(path: Path):
+    spec = importlib.util.spec_from_file_location("sync_battle_rules_battle", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+battle = load_battle_module(BATTLE_PATH)
 
 
 def parse_args() -> argparse.Namespace:
@@ -51,7 +63,7 @@ def load_generated_rules() -> dict[str, dict]:
 def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> list[dict]:
     """Keep persisted rule cache aligned with runtime oracle normalization.
 
-    `battle_analyst_v8.get_card_effect()` normalizes broad generated rules with
+    The active battle engine normalizes broad generated rules with
     oracle metadata before the spell resolves. If the cache is written without
     the same pass, the forensic audit sees false mismatches like lands stored as
     ramp engines. This mirrors runtime behavior at sync time.
