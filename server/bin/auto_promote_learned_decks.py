@@ -11,7 +11,7 @@ Criterios minimos:
 Seguro para rodar em cron: idempotente (checa deck_promotions antes de inserir).
 """
 
-import os, re, sqlite3, sys
+import os, re, sqlite3, sys, json
 from datetime import datetime, timezone
 
 SQLITE_DB = os.environ.get(
@@ -28,8 +28,21 @@ def _normalize_name(name):
 
 
 def _parse_card_list(card_list_text):
+    text = (card_list_text or "").strip()
+    if text.startswith("["):
+        try:
+            cards_json = json.loads(text)
+            cards = []
+            for item in cards_json:
+                name = item.get("name", "")
+                qty = item.get("quantity", 1)
+                if name:
+                    cards.append((int(qty), name))
+            return cards
+        except Exception:
+            pass
     cards = []
-    for raw_line in (card_list_text or "").splitlines():
+    for raw_line in text.splitlines():
         line = raw_line.strip()
         if not line:
             continue
