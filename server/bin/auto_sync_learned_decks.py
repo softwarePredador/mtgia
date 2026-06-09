@@ -37,6 +37,30 @@ TRACKING_FILE = os.path.join(ARTIFACT_DIR, "synced_learned_ids.txt")
 SERVER_DIR = os.path.join(SYNC_PROJECT_DIR, "server")
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
+ENV_FILES = [
+    os.path.join(SERVER_DIR, ".env"),
+    "/opt/data/secrets/manaloom-postgres.env",
+]
+
+
+def _load_env():
+    for env_file in ENV_FILES:
+        if not os.path.isfile(env_file):
+            continue
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip("\"'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
+
+
+_load_env()
+
 os.makedirs(ARTIFACT_DIR, exist_ok=True)
 if not os.path.exists(TRACKING_FILE):
     open(TRACKING_FILE, "w").close()
@@ -85,7 +109,7 @@ def main(argv=None):
             if line.isdigit():
                 synced_ids.add(int(line))
 
-    applied, dry_run_ok, already_synced, skipped, failed = 0, 0, 0, 0, 0
+    applied, dry_run_ok, already_synced, skipped, invalid_skipped, failed = 0, 0, 0, 0, 0, 0
 
     for deck_id, commander, deck_name, card_count, promoted_at in rows:
         # Lorehold — freio manual de Mox
@@ -122,7 +146,16 @@ def main(argv=None):
             cwd=SERVER_DIR,
         )
         if app.returncode != 0:
-            print(f"  APPLY_FAILED: {app.stderr[-500:]}")
+            app_error = (app.stderr or "") + "\n" + (app.stdout or "")
+            if (
+                "falhou no gate de importacao" in app_error
+                or "deck Commander aprendido precisa" in app_error
+                or "card_count declarado" in app_error
+            ):
+                print(f"  INVALID_SKIPPED: {app_error[-500:]}")
+                invalid_skipped += 1
+                continue
+            print(f"  APPLY_FAILED: {app_error[-500:]}")
             failed += 1
             continue
 
@@ -141,7 +174,8 @@ def main(argv=None):
 
     print(
         f"\nTOTALS applied={applied} dry_run_ok={dry_run_ok} "
-        f"already_synced={already_synced} skipped={skipped} failed={failed}"
+        f"already_synced={already_synced} skipped={skipped} "
+        f"invalid_skipped={invalid_skipped} failed={failed}"
     )
     return 1 if failed else 0
 

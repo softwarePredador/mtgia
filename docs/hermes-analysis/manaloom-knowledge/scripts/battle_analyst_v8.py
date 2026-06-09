@@ -2279,6 +2279,7 @@ class Player:
         self.extra_turns = 0
         self.extra_turn_loss_pending = 0
         self.eliminated = False
+        self.poison = 0  # v9: poison counters
         self.win_reason = None
         self.cards_drawn_this_turn = 0
         self.failed_draw_from_empty_library = False
@@ -2548,13 +2549,15 @@ def check_sbas(all_players):
                             reason="commander_damage",
                         )
                         return True
-        if not p.library and not p.hand and not p.eliminated:
-            p.life = 0
-            p.eliminated = True
-            emit_replay_event("player_eliminated", player=p.name, reason="deck_out")
             return True
     return False
 
+
+
+def check_sbas_until_stable(all_players):
+    """v9: Loop SBAs until no more actions (CR 704.3)."""
+    while check_sbas(all_players):
+        pass
 
 def game_winner(all_players):
     return next((player for player in all_players if player.has_won()), None)
@@ -2826,8 +2829,15 @@ def move_creature_from_battlefield(owner, creature):
     if creature in owner.battlefield:
         owner.battlefield.remove(creature)
     if creature.get("is_commander"):
-        owner.command_zone.append(creature)
-        return "command_zone"
+        # v9: Commander replacement (CR 903.9a) — owner MAY move to CZ
+        if owner.is_human:
+            owner.command_zone.append(creature)
+            return "command_zone"
+        else:
+            import random as _cr
+            if _cr.random() < 0.7:
+                owner.command_zone.append(creature)
+                return "command_zone"
     if creature.get("tag") == "token" or "token" in str(creature.get("type_line") or "").lower():
         return "vanished_token"
     owner.graveyard.append(creature)
@@ -4865,7 +4875,8 @@ def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list,
             for p in all_players:
                 if p.has_won():
                     return ("win" if p is lorehold else "loss"), turn, p.win_reason
-            if check_sbas(all_players):
+            check_sbas_until_stable(all_players)
+            if any(hasattr(p, "eliminated") and p.eliminated for p in all_players):
                 break
 
     if lorehold.is_alive():
@@ -4921,7 +4932,8 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
             for p in all_players:
                 if p.has_won():
                     return ("win" if p is lorehold else "loss"), turn, p.win_reason
-            if check_sbas(all_players):
+            check_sbas_until_stable(all_players)
+            if any(hasattr(p, "eliminated") and p.eliminated for p in all_players):
                 break
 
     if lorehold.is_alive():
