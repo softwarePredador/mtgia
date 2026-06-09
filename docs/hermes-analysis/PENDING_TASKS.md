@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 15/25 itens implementados no battle_analyst_v9.py (5400+ linhas).  
-> 10 pendentes de alta complexidade — requerem refatoração arquitetural.  
+> 16/25 itens implementados no battle_analyst_v9.py (5400+ linhas).
+> 9 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -26,7 +26,7 @@
 | ✅ | Token lifecycle SBA | v9:2590 |
 | ✅ | copy_spell_on_stack | v9:2443 |
 | ✅ | 3 docs (LOGIC, GAPS, TASKS) | docs/hermes-analysis/ |
-| ⏳ | APNAP trigger ordering | P1 |
+| ✅ | APNAP trigger ordering básico | v9:2444, 2752, tests |
 | ⏳ | Prioridade com pilha vazia | P1 |
 | ⏳ | Casting pipeline 601.2 | P1 |
 | ⏳ | Passos de combate formais | P1 |
@@ -43,16 +43,15 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | APNAP trigger ordering | 3-4 dias | Alto | — |
-| 2 | Prioridade com pilha vazia | 2-3 dias | Alto | #1 |
-| 3 | Passos de combate formais | 4-5 dias | Alto | #2 |
-| 4 | Casting pipeline 601.2 | 5-7 dias | Alto | #2 |
-| 5 | Replacement effects | 5-7 dias | Alto | — |
-| 6 | Layers 1-7 | 7-10 dias | Alto | #5 |
-| 7 | Planeswalkers/Battles | 3-4 dias | Médio | #2, #3 |
-| 8 | DFC/Adventure/Prototype | 4-5 dias | Médio | #4 |
-| 9 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 10 | Suite de conformidade | 5-7 dias | Alto | #1-9 |
+| 1 | Prioridade com pilha vazia | 2-3 dias | Alto | APNAP básico |
+| 2 | Passos de combate formais | 4-5 dias | Alto | prioridade |
+| 3 | Casting pipeline 601.2 | 5-7 dias | Alto | prioridade |
+| 4 | Replacement effects | 5-7 dias | Alto | — |
+| 5 | Layers 1-7 | 7-10 dias | Alto | #4 |
+| 6 | Planeswalkers/Battles | 3-4 dias | Médio | #1, #2 |
+| 7 | DFC/Adventure/Prototype | 4-5 dias | Médio | #3 |
+| 8 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 9 | Suite de conformidade | 5-7 dias | Alto | #1-8 |
 
 ---
 
@@ -60,48 +59,21 @@
 
 ### 1. APNAP Trigger Ordering
 
-**Gap**: Triggers resolvem imediatamente via `emit_replay_event()`, não vão para a stack.
+**Status 2026-06-09**: ✅ APNAP básico implementado.
 
-**Arquivo**: `battle_analyst_v9.py` — todas as chamadas que emitem eventos de trigger
+**Arquivos**:
+- `battle_analyst_v9.py`: `_pending_triggers`, `enqueue_trigger`, `flush_triggers_in_apnap`, `resolve_or_enqueue_trigger`, `triggered_ability` no `priority_round`.
+- `test_battle_analyst_v10_3.py`: `test_apnap_trigger_order_puts_nonactive_trigger_on_top`, `test_same_controller_triggers_keep_timestamp_stack_order`.
 
-**Implementação**:
-```python
-# Adicionar ao início do módulo:
-_pending_triggers: list[dict] = []
-
-def enqueue_trigger(source, event_type, controller, data):
-    """Enfileira trigger para processamento APNAP — não resolve ainda."""
-    _pending_triggers.append({
-        "source": source,
-        "event": event_type,
-        "controller": controller,
-        "data": data,
-        "timestamp": _trigger_counter,
-    })
-    global _trigger_counter
-    _trigger_counter += 1
-
-def flush_triggers_in_apnap(active_player, all_players):
-    """Coloca todas as triggers pendentes na stack em ordem APNAP."""
-    # Ordena: active player primeiro, depois non-active em ordem de turno
-    turn_order = [active_player] + [p for p in all_players if p != active_player]
-    
-    for player in turn_order:
-        player_triggers = [t for t in _pending_triggers if t["controller"] == player]
-        # Player chooses order for own triggers (sim: by timestamp)
-        player_triggers.sort(key=lambda t: t["timestamp"])
-        for trigger in player_triggers:
-            stack.push(trigger)
-    
-    _pending_triggers.clear()
-
-# Substituir todos os emit_replay_event("trigger_*") por enqueue_trigger()
-# Chamar flush_triggers_in_apnap() antes de cada janela de prioridade
-```
+**O que foi coberto**:
+- Triggers entram na stack como `triggered_ability`.
+- Ordem APNAP: active player primeiro, non-active depois, logo non-active resolve primeiro por LIFO.
+- Chamadas legadas sem `stack` continuam resolvendo imediatamente para compatibilidade.
+- Estado global de triggers é limpo entre simulações e testes.
 
 **Regra**: CR 603.3, CR 603.3b
 
-**Testes**: Duas triggers do mesmo jogador; triggers de jogadores diferentes; ETB que cria outra trigger
+**Limite restante**: escolha manual de ordenação pelo jogador e triggers aninhadas complexas ainda precisam de suite própria, junto com o pipeline 601.2.
 
 ---
 

@@ -1952,6 +1952,131 @@ def test_rule_sync_oracle_normalizes_generated_land_rules():
     assert rows[0]["_oracle_normalized"] is True
 
 
+def test_apnap_trigger_order_puts_nonactive_trigger_on_top():
+    if not hasattr(battle, "clear_pending_triggers"):
+        return
+
+    battle.clear_pending_triggers()
+    events = []
+    active = player("Active")
+    opponent = player("Opponent")
+    stack = battle.Stack()
+
+    battle.resolve_or_enqueue_trigger(
+        active,
+        {"name": "Active Trigger Source"},
+        "active_test_trigger",
+        lambda: events.append("active"),
+        stack=stack,
+        active_player=active,
+        all_players=[active, opponent],
+    )
+    battle.resolve_or_enqueue_trigger(
+        opponent,
+        {"name": "Opponent Trigger Source"},
+        "opponent_test_trigger",
+        lambda: events.append("opponent"),
+        stack=stack,
+        active_player=active,
+        all_players=[active, opponent],
+    )
+
+    assert battle.flush_triggers_in_apnap(active, [active, opponent], stack) == 2
+    assert [item.effect_data["trigger"] for item in stack.items] == [
+        "active_test_trigger",
+        "opponent_test_trigger",
+    ]
+
+    battle.priority_round(active, [active, opponent], stack, 1, random.Random(100))
+    assert events == ["opponent"]
+    battle.priority_round(active, [active, opponent], stack, 1, random.Random(101))
+    assert events == ["opponent", "active"]
+
+
+def test_same_controller_triggers_keep_timestamp_stack_order():
+    if not hasattr(battle, "clear_pending_triggers"):
+        return
+
+    battle.clear_pending_triggers()
+    active = player("Active")
+    stack = battle.Stack()
+
+    battle.resolve_or_enqueue_trigger(
+        active,
+        {"name": "First"},
+        "first_trigger",
+        lambda: None,
+        stack=stack,
+        active_player=active,
+        all_players=[active],
+    )
+    battle.resolve_or_enqueue_trigger(
+        active,
+        {"name": "Second"},
+        "second_trigger",
+        lambda: None,
+        stack=stack,
+        active_player=active,
+        all_players=[active],
+    )
+
+    battle.flush_triggers_in_apnap(active, [active], stack)
+
+    assert [item.card["name"] for item in stack.items] == ["First", "Second"]
+
+
+def test_spell_cast_trigger_resolves_from_stack_before_spell():
+    if not hasattr(battle, "clear_pending_triggers"):
+        return
+
+    battle.clear_pending_triggers()
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player("Active", [card("Drawn")])
+        opponent = player("Opponent", [card("Opp Drawn")])
+        active.battlefield = [
+            {
+                "name": "Guttersnipe",
+                "effect": "creature",
+                "type_line": "Creature",
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "damage_each_opponent",
+                "damage": 2,
+            }
+        ]
+        spell = {
+            "name": "Test Sorcery",
+            "cmc": 2,
+            "effect": "draw",
+            "type_line": "Sorcery",
+        }
+        stack = battle.Stack()
+
+        battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            spell,
+            turn=1,
+            phase="precombat_main",
+            stack=stack,
+            active_player=active,
+        )
+        stack.push(spell, active, battle.get_card_effect(spell))
+
+        battle.priority_round(active, [active, opponent], stack, 1, random.Random(102))
+        assert opponent.life == 38
+        assert stack.items[-1].card["name"] == "Test Sorcery"
+        battle.priority_round(active, [active, opponent], stack, 1, random.Random(103))
+        assert stack.empty()
+
+        event_names = [event for event, _ in events]
+        assert event_names.index("trigger_resolved") < event_names.index("spell_resolved")
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 if __name__ == "__main__":
     tests = [
         test_sba_only_reports_new_elimination,
@@ -2025,7 +2150,12 @@ if __name__ == "__main__":
         test_zero_power_creature_without_attack_trigger_does_not_attack,
         test_treasure_maker_can_discard_draw_and_create_treasures,
         test_rule_sync_oracle_normalizes_generated_land_rules,
+        test_apnap_trigger_order_puts_nonactive_trigger_on_top,
+        test_same_controller_triggers_keep_timestamp_stack_order,
+        test_spell_cast_trigger_resolves_from_stack_before_spell,
     ]
     for test in tests:
+        if hasattr(battle, "clear_pending_triggers"):
+            battle.clear_pending_triggers()
         test()
         print(f"PASS {test.__name__}")

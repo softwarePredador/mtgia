@@ -2441,6 +2441,95 @@ class Player:
 # STACK (v8)
 # ═══════════════════════════════════════════
 
+_pending_triggers = []
+_trigger_counter = 0
+
+
+def clear_pending_triggers():
+    """Clear queued triggers between simulations/tests."""
+    global _pending_triggers, _trigger_counter
+    _pending_triggers = []
+    _trigger_counter = 0
+
+
+def enqueue_trigger(source, event_type, controller, resolver, data=None):
+    """Queue a triggered ability for APNAP ordering before it reaches the stack."""
+    global _trigger_counter
+    _pending_triggers.append(
+        {
+            "source": source,
+            "event_type": event_type,
+            "controller": controller,
+            "resolver": resolver,
+            "data": data or {},
+            "timestamp": _trigger_counter,
+        }
+    )
+    _trigger_counter += 1
+
+
+def flush_triggers_in_apnap(active_player, all_players, stack):
+    """Put queued triggers on the stack in APNAP order (CR 603.3b)."""
+    if not _pending_triggers:
+        return 0
+
+    turn_order = [active_player] + [p for p in all_players if p != active_player]
+    queued = list(_pending_triggers)
+    _pending_triggers.clear()
+    pushed = 0
+
+    for player in turn_order:
+        player_triggers = [
+            trigger for trigger in queued if trigger.get("controller") == player
+        ]
+        player_triggers.sort(key=lambda trigger: trigger.get("timestamp", 0))
+        for trigger in player_triggers:
+            source = trigger.get("source") or {}
+            source_name = source.get("name", "?") if isinstance(source, dict) else str(source)
+            stack.push(
+                {
+                    "name": source_name,
+                    "type_line": "Triggered Ability",
+                    "is_triggered_ability": True,
+                },
+                player,
+                {
+                    "effect": "triggered_ability",
+                    "trigger": trigger.get("event_type"),
+                    "resolver": trigger.get("resolver"),
+                    "timestamp": trigger.get("timestamp", 0),
+                    **(trigger.get("data") or {}),
+                },
+            )
+            emit_replay_event(
+                "trigger_put_on_stack",
+                player=player.name,
+                card=source_name,
+                trigger=trigger.get("event_type"),
+                timestamp=trigger.get("timestamp", 0),
+            )
+            pushed += 1
+
+    return pushed
+
+
+def resolve_or_enqueue_trigger(
+    controller,
+    source,
+    event_type,
+    resolver,
+    *,
+    stack=None,
+    active_player=None,
+    all_players=None,
+    data=None,
+):
+    """Resolve immediately for legacy direct calls, or enqueue for game-stack flows."""
+    if stack is None or active_player is None or all_players is None:
+        resolver()
+        return
+    enqueue_trigger(source, event_type, controller, resolver, data=data)
+
 
 def copy_spell_on_stack(original, controller, stack):
     """v9: Copy a spell on the stack (CR 706.10).
@@ -2501,8 +2590,11 @@ def is_effective_land(card):
 
 class Stack:
     def __init__(self): self.items = []
-    def push(self, card, controller, effect_data):
-        self.items.append(StackItem(card, controller, effect_data))
+    def push(self, card, controller=None, effect_data=None):
+        if isinstance(card, StackItem) and controller is None:
+            self.items.append(card)
+            return
+        self.items.append(StackItem(card, controller, effect_data or {}))
     def resolve_top(self):
         if self.items:
             item = self.items.pop()
@@ -2585,6 +2677,8 @@ def check_sbas(all_players):
     # v9: Creature SBAs
     for p in all_players:
         for c in list(p.battlefield):
+            if not isinstance(c, dict):
+                continue
             toughness = c.get("toughness", 1)
             damage = c.get("damage_marked", 0)
             if (toughness <= 0 or damage >= toughness) and not c.get("indestructible"):
@@ -2595,6 +2689,8 @@ def check_sbas(all_players):
     legends = {}
     for p in all_players:
         for c in list(p.battlefield):
+            if not isinstance(c, dict):
+                continue
             if c.get("is_legendary") or "Legendary" in str(c.get("type_line", "")):
                 key = c.get("name", c.get("card_name", ""))
                 if not key: continue
@@ -2656,6 +2752,8 @@ def game_winner(all_players):
 
 def priority_round(active_player, all_players, stack, turn, rng):
     """v9: Priority round with optional empty-stack window during main phases."""
+    flush_triggers_in_apnap(active_player, all_players, stack)
+
     # v9: During main phases, allow actions even with empty stack
     # (playing creatures, sorceries, activating abilities)
     if stack.empty():
@@ -2708,12 +2806,23 @@ def priority_round(active_player, all_players, stack, turn, rng):
     # No one responded — resolve
     item = stack.resolve_top()
     if item:
+        if item.effect_data.get("effect") == "triggered_ability":
+            resolver = item.effect_data.get("resolver")
+            if callable(resolver):
+                resolver()
+            if game_winner(all_players):
+                return True
+            check_sbas_until_stable(all_players)
+            flush_triggers_in_apnap(active_player, all_players, stack)
+            return True
         controller = item.controller
         opponents = [p for p in all_players if p != controller]
         apply_effect_immediate(controller, opponents, item.card, turn, rng)
         if game_winner(all_players):
             return True
-        if check_sbas(all_players):
+        check_sbas_until_stable(all_players)
+        flush_triggers_in_apnap(active_player, all_players, stack)
+        if game_winner(all_players):
             return True
     return False
 
@@ -3235,69 +3344,90 @@ def prepare_entering_permanent(permanent):
     return permanent
 
 
-def trigger_landfall(player, land_permanent, turn, source_event, opponents=None):
-    created = []
-    for permanent in list(player.battlefield):
-        if not isinstance(permanent, dict) or not permanent.get("landfall_token_maker"):
-            continue
-        created.append(
-            create_creature_token(
-                player,
-                name="Insect Token",
-                power=int(permanent.get("token_power") or 1),
-                toughness=int(permanent.get("token_toughness") or 1),
-            )
-        )
-    if created:
-        emit_replay_event(
-            "trigger_resolved",
-            player=player.name,
-            card="; ".join(
-                sorted(
-                    {
-                        permanent.get("name", "?")
-                        for permanent in player.battlefield
-                        if isinstance(permanent, dict) and permanent.get("landfall_token_maker")
-                    }
+def trigger_landfall(
+    player,
+    land_permanent,
+    turn,
+    source_event,
+    opponents=None,
+    *,
+    stack=None,
+    active_player=None,
+    all_players=None,
+):
+    def resolve_landfall():
+        created = []
+        for permanent in list(player.battlefield):
+            if not isinstance(permanent, dict) or not permanent.get("landfall_token_maker"):
+                continue
+            created.append(
+                create_creature_token(
+                    player,
+                    name="Insect Token",
+                    power=int(permanent.get("token_power") or 1),
+                    toughness=int(permanent.get("token_toughness") or 1),
                 )
-            ),
-            trigger="landfall",
-            trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
-            source_event=source_event,
-            effect="token_maker",
-            tokens_created=len(created),
-            turn=turn,
-        )
-    opponents = opponents or []
-    for permanent in list(player.battlefield):
-        if not isinstance(permanent, dict) or not permanent.get("landfall_damage_each_opponent"):
-            continue
-        count = int(permanent.get("_landfall_triggers_this_turn") or 0) + 1
-        permanent["_landfall_triggers_this_turn"] = count
-        amount = int(permanent.get("landfall_damage_each_opponent") or 1)
-        damaged = []
-        for opponent in opponents:
-            if opponent.is_alive() and deal_damage(opponent, amount):
-                damaged.append({"player": opponent.name, "life_after": opponent.life})
-        drew = False
-        if permanent.get("landfall_second_draw") and count == 2:
-            player.draw(1, random.Random(turn + count))
-            drew = True
-        emit_replay_event(
-            "trigger_resolved",
-            player=player.name,
-            card=permanent.get("name", "?"),
-            trigger="landfall",
-            trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
-            source_event=source_event,
-            effect="damage_each_opponent",
-            amount=amount,
-            damaged=damaged,
-            draw_card=drew,
-            trigger_count_this_turn=count,
-            turn=turn,
-            **replay_rule_fields(permanent),
-        )
+            )
+        if created:
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card="; ".join(
+                    sorted(
+                        {
+                            permanent.get("name", "?")
+                            for permanent in player.battlefield
+                            if isinstance(permanent, dict) and permanent.get("landfall_token_maker")
+                        }
+                    )
+                ),
+                trigger="landfall",
+                trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                source_event=source_event,
+                effect="token_maker",
+                tokens_created=len(created),
+                turn=turn,
+            )
+        trigger_opponents = opponents or []
+        for permanent in list(player.battlefield):
+            if not isinstance(permanent, dict) or not permanent.get("landfall_damage_each_opponent"):
+                continue
+            count = int(permanent.get("_landfall_triggers_this_turn") or 0) + 1
+            permanent["_landfall_triggers_this_turn"] = count
+            amount = int(permanent.get("landfall_damage_each_opponent") or 1)
+            damaged = []
+            for opponent in trigger_opponents:
+                if opponent.is_alive() and deal_damage(opponent, amount):
+                    damaged.append({"player": opponent.name, "life_after": opponent.life})
+            drew = False
+            if permanent.get("landfall_second_draw") and count == 2:
+                player.draw(1, random.Random(turn + count))
+                drew = True
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="landfall",
+                trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                source_event=source_event,
+                effect="damage_each_opponent",
+                amount=amount,
+                damaged=damaged,
+                draw_card=drew,
+                trigger_count_this_turn=count,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+
+    resolve_or_enqueue_trigger(
+        player,
+        land_permanent,
+        "landfall",
+        resolve_landfall,
+        stack=stack,
+        active_player=active_player,
+        all_players=all_players,
+    )
 
 
 def sacrifice_land_for_effect(player, card, turn, *, required=True):
@@ -3376,7 +3506,15 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
     return returned
 
 
-def trigger_opponent_land_play_engines(active_player, opponents, land_permanent, turn):
+def trigger_opponent_land_play_engines(
+    active_player,
+    opponents,
+    land_permanent,
+    turn,
+    *,
+    stack=None,
+    all_players=None,
+):
     for opponent in opponents:
         if not opponent.is_alive():
             continue
@@ -3392,20 +3530,37 @@ def trigger_opponent_land_play_engines(active_player, opponents, land_permanent,
         land_from_hand = next((card for card in opponent.hand if is_effective_land(card)), None)
         if not land_from_hand:
             continue
-        opponent.hand.remove(land_from_hand)
-        extra_land = enrich_card({**land_from_hand, "effect": "land"})
-        opponent.battlefield.append(extra_land)
-        trigger_landfall(opponent, extra_land, turn, "opponent_land_play")
-        emit_replay_event(
-            "trigger_resolved",
-            player=opponent.name,
-            card=engines[0].get("name", "?"),
-            trigger="opponent_land_play",
-            active_player=active_player.name,
-            trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
-            effect="land",
-            put_land=extra_land.get("name", "?"),
-            turn=turn,
+        def resolve_opponent_land_play(
+            opponent=opponent,
+            land_from_hand=land_from_hand,
+            engine=engines[0],
+        ):
+            if land_from_hand not in opponent.hand:
+                return
+            opponent.hand.remove(land_from_hand)
+            extra_land = enrich_card({**land_from_hand, "effect": "land"})
+            opponent.battlefield.append(extra_land)
+            trigger_landfall(opponent, extra_land, turn, "opponent_land_play")
+            emit_replay_event(
+                "trigger_resolved",
+                player=opponent.name,
+                card=engine.get("name", "?"),
+                trigger="opponent_land_play",
+                active_player=active_player.name,
+                trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                effect="land",
+                put_land=extra_land.get("name", "?"),
+                turn=turn,
+            )
+
+        resolve_or_enqueue_trigger(
+            opponent,
+            engines[0],
+            "opponent_land_play",
+            resolve_opponent_land_play,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
         )
 
 
@@ -3575,7 +3730,16 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     player.graveyard.append(card)
 
 
-def trigger_spell_cast_engines(player, all_players, spell, turn, phase):
+def trigger_spell_cast_engines(
+    player,
+    all_players,
+    spell,
+    turn,
+    phase,
+    *,
+    stack=None,
+    active_player=None,
+):
     if not (is_instant(spell) or is_sorcery(spell)):
         return
     for permanent in list(player.battlefield):
@@ -3586,28 +3750,50 @@ def trigger_spell_cast_engines(player, all_players, spell, turn, phase):
         if permanent.get("trigger_effect") != "damage_each_opponent":
             continue
         amount = int(permanent.get("damage") or 2)
-        damaged = []
-        for opponent in all_players:
-            if opponent == player or not opponent.is_alive():
-                continue
-            if deal_damage(opponent, amount):
-                damaged.append({"player": opponent.name, "life_after": opponent.life})
-        emit_replay_event(
-            "trigger_resolved",
-            player=player.name,
-            card=permanent.get("name", "?"),
-            trigger="instant_sorcery_cast",
-            trigger_spell=spell.get("name", "?"),
-            effect="damage_each_opponent",
-            amount=amount,
-            damaged=damaged,
-            turn=turn,
-            phase=phase,
-            **replay_rule_fields(permanent),
+        def resolve_spell_cast_trigger(permanent=permanent, amount=amount):
+            damaged = []
+            for opponent in all_players:
+                if opponent == player or not opponent.is_alive():
+                    continue
+                if deal_damage(opponent, amount):
+                    damaged.append({"player": opponent.name, "life_after": opponent.life})
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="instant_sorcery_cast",
+                trigger_spell=spell.get("name", "?"),
+                effect="damage_each_opponent",
+                amount=amount,
+                damaged=damaged,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+
+        resolve_or_enqueue_trigger(
+            player,
+            permanent,
+            "instant_sorcery_cast",
+            resolve_spell_cast_trigger,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
         )
 
 
-def trigger_opponent_spell_draw_engines(caster, opponents, spell, turn, phase, rng):
+def trigger_opponent_spell_draw_engines(
+    caster,
+    opponents,
+    spell,
+    turn,
+    phase,
+    rng,
+    *,
+    stack=None,
+    active_player=None,
+    all_players=None,
+):
     spell_effect = get_card_effect(spell).get("effect")
     is_noncreature_spell = spell_effect != "creature"
     for opponent in opponents:
@@ -3622,26 +3808,42 @@ def trigger_opponent_spell_draw_engines(caster, opponents, spell, turn, phase, r
             if trigger == "opponent_noncreature_spell" and not is_noncreature_spell:
                 continue
             tax = int(permanent.get("tax") or 1)
-            # Compact model: caster sometimes pays the tax when spare mana exists.
-            can_pay_tax = caster.available_mana() >= tax
-            pays_tax = can_pay_tax and rng.random() < 0.35
-            if pays_tax:
-                caster.spend_mana(tax)
-                result = "tax_paid"
-            else:
-                opponent.draw(1, rng)
-                result = "card_drawn"
-            emit_replay_event(
-                "trigger_resolved",
-                player=opponent.name,
-                card=permanent.get("name", "?"),
+            def resolve_opponent_draw_trigger(
+                opponent=opponent,
+                permanent=permanent,
                 trigger=trigger,
-                trigger_spell=spell.get("name", "?"),
-                effect="draw_cards",
-                result=result,
-                turn=turn,
-                phase=phase,
-                **replay_rule_fields(permanent),
+                tax=tax,
+            ):
+                # Compact model: caster sometimes pays the tax when spare mana exists.
+                can_pay_tax = caster.available_mana() >= tax
+                pays_tax = can_pay_tax and rng.random() < 0.35
+                if pays_tax:
+                    caster.spend_mana(tax)
+                    result = "tax_paid"
+                else:
+                    opponent.draw(1, rng)
+                    result = "card_drawn"
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=opponent.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="draw_cards",
+                    result=result,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                opponent,
+                permanent,
+                trigger,
+                resolve_opponent_draw_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players or [caster, *opponents],
             )
 
 
@@ -3757,8 +3959,20 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 if not pay_additional_card_costs(player, c, eff, turn=turn):
                     player.graveyard.append(c)
                     continue
-                trigger_spell_cast_engines(player, all_players, c, turn, phase)
-                trigger_opponent_spell_draw_engines(player, opponents, c, turn, phase, rng)
+                trigger_spell_cast_engines(
+                    player, all_players, c, turn, phase, stack=stack, active_player=player
+                )
+                trigger_opponent_spell_draw_engines(
+                    player,
+                    opponents,
+                    c,
+                    turn,
+                    phase,
+                    rng,
+                    stack=stack,
+                    active_player=player,
+                    all_players=all_players,
+                )
                 if eff.get("effect") == "ramp_ritual":
                     player.mana_pool.add_generic(ritual_mana_produced(player, eff))
                     player.graveyard.append(c)
@@ -3819,8 +4033,20 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                     role="high_threat",
                     **replay_rule_fields(eff),
                 )
-                trigger_spell_cast_engines(player, all_players, c, turn, phase)
-                trigger_opponent_spell_draw_engines(player, opponents, c, turn, phase, rng)
+                trigger_spell_cast_engines(
+                    player, all_players, c, turn, phase, stack=stack, active_player=player
+                )
+                trigger_opponent_spell_draw_engines(
+                    player,
+                    opponents,
+                    c,
+                    turn,
+                    phase,
+                    rng,
+                    stack=stack,
+                    active_player=player,
+                    all_players=all_players,
+                )
                 stack.push(c, player, eff)
                 priority_round(player, all_players, stack, turn, rng)
                 if game_winner(all_players):
@@ -3934,8 +4160,20 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                     role="normal",
                     **replay_rule_fields(eff),
                 )
-                trigger_spell_cast_engines(player, all_players, c, turn, phase)
-                trigger_opponent_spell_draw_engines(player, opponents, c, turn, phase, rng)
+                trigger_spell_cast_engines(
+                    player, all_players, c, turn, phase, stack=stack, active_player=player
+                )
+                trigger_opponent_spell_draw_engines(
+                    player,
+                    opponents,
+                    c,
+                    turn,
+                    phase,
+                    rng,
+                    stack=stack,
+                    active_player=player,
+                    all_players=all_players,
+                )
                 stack.push(c, player, eff)
                 played += 1
 
@@ -4844,8 +5082,24 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         player.battlefield.append(land_permanent)
         player.lands_played_this_turn += 1
         player.mana_pool.add(source_colors(land_permanent)[0], 1)
-        trigger_landfall(player, land_permanent, turn, "land_played", opponents=opponents)
-        trigger_opponent_land_play_engines(player, opponents, land_permanent, turn)
+        trigger_landfall(
+            player,
+            land_permanent,
+            turn,
+            "land_played",
+            opponents=opponents,
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        trigger_opponent_land_play_engines(
+            player,
+            opponents,
+            land_permanent,
+            turn,
+            stack=stack,
+            all_players=all_players,
+        )
         emit_replay_event(
             "land_played",
             player=player.name,
@@ -4854,6 +5108,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             turn=turn,
             **replay_rule_fields(eff),
         )
+        while not stack.empty() or _pending_triggers:
+            priority_round(player, all_players, stack, turn, rng)
     activate_land_tutor_creatures(player, turn)
     cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
     if game_winner(all_players):
@@ -4991,6 +5247,7 @@ def play_turn_sequence_v8(player, opponents, all_players, turn, rng, stack, max_
 
 def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list, rng, game_id=0):
     """Simulate game with real learned opponents (pre-built decks)."""
+    clear_pending_triggers()
     turn, max_turns = 0, 35
     stack = Stack()
 
@@ -5074,6 +5331,7 @@ def classify_loss(player, opponents, turn, result, reason):
     return tags
 
 def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
+    clear_pending_triggers()
     turn, max_turns = 0, 35
     stack = Stack()
 

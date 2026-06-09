@@ -59,14 +59,14 @@
 | Battle defense 0 | ❌ Ausente | — | |
 | Commander em GY/exile → CZ (SBA) | ❌ Ausente | — | |
 | **Loop SBA até estabilizar** | ❌ Ausente | — | ✅ FEITO (check_sbas_until_stable) |
-| **APNAP trigger ordering** | ❌ Ausente | — | Triggers resolvem imediatamente, sem stack |
+| **APNAP trigger ordering** | ✅ Básico | v9 | Triggers atuais entram como `triggered_ability`; falta player-choice avançado/aninhamento complexo |
 
 **Ações imediatas**:
 - [x] Creature SBA ✅
 - [x] SBA loop ✅
-- [ ] Legend rule ✅
+- [x] Legend rule ✅
 - [ ] Adicionar deck out correto (trigger no draw, não check de biblioteca vazia)
-- [ ] APNAP ordering para triggers
+- [x] APNAP ordering básico para triggers atuais
 
 ---
 
@@ -179,11 +179,12 @@
 | Creature toughness/damage SBA | ✅ |
 | Legend rule SBA | ✅ |
 | 2 call sites updated to until_stable | ✅ |
+| APNAP trigger ordering básico | ✅ |
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **APNAP trigger ordering** — triggers devem ir pra stack, não resolver imediatamente
-2. **Prioridade com pilha vazia** — main phases devem ter janela de prioridade
-3. **Commander replacement opcional** — owner escolhe se vai ao CZ
-4. **Passos de combate formais** — beg.combat, decl.atk, decl.blk, damage steps
-5. **Casting pipeline 601.2** — lock-in de custo
+1. **Prioridade com pilha vazia** — main phases devem ter janela de prioridade formal
+2. **Passos de combate formais** — beg.combat, decl.atk, decl.blk, damage steps
+3. **Casting pipeline 601.2** — lock-in de custo
+4. **Replacement/prevention effects** — aplicar ordem CR 616 de forma determinística
+5. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
