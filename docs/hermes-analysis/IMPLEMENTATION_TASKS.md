@@ -4,10 +4,10 @@
 > Use como fila de ideias/tarefas, nao como prova de estado atual. Revalide
 > contra codigo vivo antes de executar.
 
-> **Gerado:** 2026-06-08 por ManaLoom Knowledge Synthesis (Cron #13) — STRUCTURE_AUDIT module-coherence + duplicated-logic (2026-06-07) + THEMES.md + VALIDATOR_LOG — STRUCTURE_AUDIT + GAME_CHANGERS + THEMES + VALIDATOR_LOG
+> **Gerado:** 2026-06-09 por ManaLoom Knowledge Synthesis (Cron #14) — SQLite CMC healing, Tag accuracy pipeline, `_classifyContextualRole` theme gap (5/42), GC Reserved List price handling, SQLite bracket_category divergence (14 GCs)
 > **Branch:** codex/hermes-analysis-docs
-> **HEAD:** cce6ec34
-> **Novas tasks Cron #13:** 5 (2xP1: owner-scope + job polling NULL user_id; 3xP2: card_function_tags no optimize, resolveOptimizeArchetype duplicate, theme coverage gap) — STRUCTURE_AUDIT module-coherence + duplicated-logic — pipeline integrity crisis + CMC corruption, GAME_CHANGERS.md — 53 GCs com double-counting detectado, SCOUT_LOG — Lorehold maturity, TAG_ACCURACY — payoff 35% accuracy) com codigo Dart (edh_bracket_policy, optimization_quality_gate, optimization_functional_roles, goldfish_simulator)
+> **HEAD:** 92efd3a7
+> **Novas tasks Cron #14:** 5 (4xP2, 1xP3) — SQLite CMC healing batch script, Tag accuracy revalidation pipeline, `_classifyContextualRole` expand to 15+ themes, GC Reserved List price status flag, SQLite bracket_category divergence correction — Base: SQLite `knowledge.db` queries + THEMES.md + GC research + MANA_BASE_VALIDATION + functional_card_tags.dart + optimization_functional_roles.dart + edh_bracket_policy.dart
 > **Base de conhecimento (Cron #11):** VALIDATOR_LOG, GAME_CHANGERS, tag_accuracy, SCOUT_LOG
 > **Novas tasks Cron #11:** 5 (1xP1, 4xP2) — GC double-counting fix, payoff accuracy, contextual heuristics, CMC hardening, GC list sync
 > **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
@@ -1600,3 +1600,188 @@ cd server && dart test test/ai/goldfish_simulator_test.dart
 
 > **Nota:** Tasks #5 nova (keepable com ramp) e #8 pendente (tapped lands) sao complementares — ambas melhoram o `GoldfishSimulator`. Implementar juntas.
 > **Nota:** Tasks #4 nova (card_deck_profiles) e #4/#5 pendentes (edhrec_inclusion_pct + trend_zscore) sao complementares — todas populam e leem `card_deck_profiles` com dados do EDHREC.
+
+---
+
+### [P2] SQLite CMC Healing — Executar `fix_cmc_batch.py` pendente ha 8+ dias — 15+ cartas nao-land com CMC=0.0 corrompem metricas de analise
+
+**Conhecimento MTG:** O `knowledge.db` (tabela `deck_cards`) tem CMCs corrompidos para cartas nao-land com CMC registrado como 0.0 quando o CMC real e diferente. O `cmc_safety.dart` (criado 2026-06-06) corrige CMC em runtime para o pipeline de optimize, mas o DB permanece corrompido. Os relatorios de analise (SCOUT_LOG, VALIDATOR_LOG, mana base validation, mulligan) leem `deck_cards.cmc` diretamente e produzem metricas incorretas.
+
+**Evidencia no SQLite:**
+```
+SELECT d.deck_name, dc.card_name, dc.cmc
+FROM deck_cards dc JOIN decks d ON d.id = dc.deck_id
+WHERE dc.cmc = 0.0 AND (dc.functional_tag IS NULL OR dc.functional_tag != 'land');
+```
+Retorna 19+ linhas: Mox Diamond, Chrome Mox, Lotus Petal, Mox Amber, Mox Opal, Ornithopter, Phyrexian Walker, Rograkh, Walking Ballista, Improvisation Capstone, Restoration Seminar, Clearwater Pathway, Everflowing Chalice, Astral Cornucopia.
+
+**Evidencia no codigo:**
+- `server/lib/ai/cmc_safety.dart:44-62` — `safeCmcForOptimization()` corrige CMC em runtime por `mana_cost`. O DB permanece corrompido.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/fix_cmc_batch.py` — Script de correcao existe mas nunca foi executado (criado 2026-06-05, agora 8+ dias sem execucao).
+
+**Gap:** A correcao em runtime protege o optimize pipeline, mas todo relatorio que le o DB diretamente (SCOUT_LOG, VALIDATOR_LOG, MANA_BASE_VALIDATION) usa CMC corrompido. O CMC medio, distribuicao de curva, e analise de ramp sao imprecisos.
+
+**Impacto:** P2 — Analises que leem `deck_cards.cmc` diretamente produzem metricas incorretas. CMC medio reportado pode ser 0.5-1.0 abaixo do real. Afeta confiabilidade dos logs de analise.
+
+**Risco:** P2 — Os logs de analise perdem credibilidade. O operador pode tomar decisoes baseadas em metricas incorretas.
+
+**Acao recomendada:**
+1. Executar `fix_cmc_batch.py` contra o `knowledge.db` para corrigir CMCs onde `mana_cost` conhecido difere de `cmc=0.0`.
+2. Adicionar health check no inicio de todo cron que le `deck_cards.cmc`: se detectar mais de 5 cartas com `cmc=0.0` e tipo nao-land, emitir alerta.
+3. Opcional: criar script `heal_cmc.py` que cruza `deck_cards.card_name` com `card_tags.mana_cost` (se disponivel) e corrige `cmc` automaticamente.
+
+**Validacao:**
+```bash
+cd docs/hermes-analysis/manaloom-knowledge && python3 scripts/fix_cmc_batch.py
+python3 -c "
+import sqlite3; conn = sqlite3.connect('scripts/knowledge.db')
+bad = conn.execute(\"SELECT COUNT(*) FROM deck_cards WHERE cmc = 0.0 AND (functional_tag IS NULL OR functional_tag != 'land')\").fetchone()[0]
+print(f'Cards com CMC=0.0 nao-land restantes: {bad} (target: 0)')
+"
+```
+
+---
+
+### [P2] Tag Accuracy Pipeline — 13+ dias sem reavaliacao — `tag_accuracy.last_updated` parado em 2026-05-27
+
+**Conhecimento MTG:** A tabela `tag_accuracy` rastreia precisao/recall de 22 tags funcionais, mas a ultima reavaliacao foi em 2026-05-27T17:44:36Z (13+ dias). As colunas `false_positive` e `false_negative` permanecem zero em todas as linhas — ou seja, NUNCA houve contagem de erros. 13 tags em `deck_cards.functional_tag` e 13 tags em `card_tags.tag` nao tem entrada em `tag_accuracy`. As 3 tags com pior precisao (payoff 35.5%, enabler 50%, combo_piece 50%) permanecem sem reavaliacao.
+
+**Evidencia no SQLite:**
+```sql
+SELECT MAX(last_updated) FROM tag_accuracy;  -- 2026-05-27T17:44:36Z
+SELECT COUNT(*) FROM tag_accuracy WHERE false_positive = 0 AND false_negative = 0;  -- 22/22 (100%)
+```
+Untracked `deck_cards.functional_tag`: aristocrat_payoff (9), big_spell (10), combo (3), commander (2), drain (3), enchantment_synergy (1), exile_value (4), graveyard_synergy (5), lifegain (1), spellslinger (1), stax (1), token_maker (19), unknown (29).
+Untracked `card_tags.tag`: aristocrat_payoff (9), artifact_synergy (22), big_spell (50), blink (1), drain (12), enchantment_synergy (7), exile_value (15), graveyard_synergy (35), lifegain (23), loot (11), ritual (9), spellslinger (9), token_maker (62).
+
+**Gap:** O pipeline de qualidade de tags esta congelado ha 13+ dias. Tags com precisao baixa (payoff 35%) nunca sao revistas. Tags novas (stax, combo, spellslinger, blink, loot, ritual) nunca entram no tracking. O sistema nao consegue detectar se as correcoes do classificador melhoraram ou pioraram a precisao.
+
+**Impacto:** P2 — A qualidade das tags funcionais deteriora sem deteccao. O quality gate e a analise de deck operam com tags de precisao desconhecida.
+
+**Risco:** P2 — Degeneracao silenciosa da qualidade dos dados. Sem reavaliacao, nao ha feedback loop para o classificador.
+
+**Acao recomendada:**
+1. Criar script `recompute_tag_accuracy.py` que, para cada tag em `tag_accuracy`, reavalia precisao/recall comparando contra amostra.
+2. Adicionar 13+ novas tags faltantes ao `tag_accuracy`.
+3. Atualizar o cron `manaloom-tag-accuracy-reporter` para executar `recompute_tag_accuracy.py` e registrar resultados.
+4. Adicionar alerta: se `MAX(last_updated) > 7 days`, escalar como P1.
+
+**Validacao:**
+```bash
+cd docs/hermes-analysis/manaloom-knowledge && python3 scripts/recompute_tag_accuracy.py
+python3 -c "
+import sqlite3; conn = sqlite3.connect('scripts/knowledge.db')
+ut = conn.execute('SELECT COUNT(*) FROM tag_accuracy WHERE last_updated > datetime(\"now\", \"-1 day\")').fetchone()[0]
+tt = conn.execute('SELECT COUNT(*) FROM tag_accuracy').fetchone()[0]
+print(f'Tags atualizadas nas ultimas 24h: {ut}/{tt}')
+"
+```
+
+---
+
+### [P2] `_classifyContextualRole` theme gap — Apenas 5 de 42 temas documentados tem deteccao contextual de payoff/enabler
+
+**Conhecimento MTG:** O THEMES.md documenta 42 temas de Commander. O `_classifyContextualRole()` em `optimization_functional_roles.dart` implementa deteccao de payoff/enabler contextual para APENAS 5 temas: spellslinger, aristocrats, tokens, tribal, graveyard. 37 temas (88%) — incluindo dragons, goblins, elves, vampires, zombies, enchantress, artifacts, landfall, blink, reanimator, stax, mill — nao tem classificacao contextual.
+
+**Evidencia no codigo:**
+- `server/lib/ai/optimization_functional_roles.dart:407-480` — `_classifyContextualRole()`: switch com apenas 5 cases (spellslinger, aristocrats, tokens, tribal, graveyard).
+- `server/lib/ai/optimization_functional_roles.dart:124-131` — Antes de cair em `_classifyContextualRole`, ja tentou `_looksLikeWincon`, `_looksLikeEngine`, `_looksLikeComboPiece`. Depois, `_looksLikePayoff` e `_looksLikeEnabler` como genericos.
+- `server/lib/ai/functional_card_tags.dart:887-906` — `_looksLikePayoff` e `_looksLikeEnabler` tem heuristicas diferentes (nomes de carta como Blood Artist, Greaves) que o optimization_functional_roles.dart nao tem.
+- `docs/hermes-analysis/manaloom-knowledge/THEMES.md` — 42 temas documentados com enablers e payoffs especificos.
+
+**Gap:** Temas como dragons (ETB damage = payoff, cost reducers = enabler), goblins (haste/untap = enabler), elves (mana dorks = enabler, lord effects = payoff), enchantress (draw on enchant = payoff), artifacts (affinity = enabler), landfall (landfall triggers = payoff), blink (ETB reuse = payoff), reanimator (GY reanimation = payoff) nao tem regras contextuais.
+
+**Impacto:** P2 — O quality gate classifica payoffs e enablers de 37 temas usando heuristicas genericas, nao contextuais.
+
+**Risco:** P2 — Cobertura parcial do conhecimento tematico ja documentado.
+
+**Acao recomendada:**
+1. Expandir `_classifyContextualRole()` para cobrir pelo menos 15 temas adicionais (dragons, goblins, elves, vampires, zombies, enchantress, artifacts, landfall, blink, reanimator, stax, mill, warriors, humans, wizards).
+2. Cada tema novo precisa de 2-3 heuristicas de payoff e 2-3 heuristicas de enabler.
+3. Adicionar testes unitarios para cada tema com cartas sentinela.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/ai/optimization_functional_roles.dart
+cd server && dart test test/ai/optimization_functional_roles_test.dart
+```
+
+---
+
+### [P3] Game Changer Reserved List Price Handling — 8 cartas RL com `price_usd=NULL` indistinguiveis de dados faltantes
+
+**Conhecimento MTG:** Scryfall retorna `null` para precos de cartas Reserved List porque flutuam fora do mercado publico regular. Atualmente 8 cartas no SQLite `game_changers` tem `price_usd=NULL`: Lion's Eye Diamond, Mishra's Workshop, Mox Diamond, Survival of the Fittest, The Tabernacle at Pendrell Vale, Glacial Chasm, Humility, Intuition. O sistema nao consegue distinguir entre "preco nao disponivel por ser RL" e "preco nao disponivel por falha de importacao".
+
+**Evidencia no SQLite:**
+```sql
+SELECT card_name FROM game_changers WHERE price_usd IS NULL;
+-- 8 rows: Lion's Eye Diamond, Mishra's Workshop, Mox Diamond, Survival of the Fittest,
+--         The Tabernacle at Pendrell Vale, Glacial Chasm, Humility, Intuition
+```
+
+**Gap:** O pipeline de gamechanger-research reporta `price_usd=NULL` como lacuna de dados a cada execucao, mas nao ha como distinguir "preco RL legitimo" de "dado faltante".
+
+**Impacto:** P3 — Dado de preco ausente para 8 cartas de alto valor. Nao afeta a logica de bracket ou otimizacao. O script `gc_hash_check.py` reporta falsos positivos a cada execucao.
+
+**Risco:** P3 — Baixo. Nenhum impacto funcional.
+
+**Acao recomendada:**
+1. Adicionar coluna `price_status` ao `game_changers` (TEXT: `available`, `reserved_list`, `not_found`).
+2. Migrar 8 cartas RL como `reserved_list`.
+3. Atualizar `gc_hash_check.py` para ignorar `price_usd=NULL` quando `price_status='reserved_list'`.
+
+**Validacao:**
+```bash
+cd docs/hermes-analysis/manaloom-knowledge && python3 -c "
+import sqlite3; conn = sqlite3.connect('scripts/knowledge.db')
+rl = conn.execute(\"SELECT COUNT(*) FROM game_changers WHERE price_status='reserved_list'\").fetchone()[0]
+null = conn.execute('SELECT COUNT(*) FROM game_changers WHERE price_usd IS NULL').fetchone()[0]
+print(f'RL marcados: {rl}, NULL restantes: {null}')
+"
+```
+
+---
+
+### [P2] SQLite `bracket_category` divergencia do Dart — 14 GCs com `other` no DB mas `tutor`/`combo_piece` no `tagCardForBracket()`
+
+**Conhecimento MTG:** O `edh_bracket_policy.dart:tagCardForBracket()` retorna `{BracketCategory.gameChanger}` para todos os 24 GCs detectados (early return na linha 103-104). O SQLite `game_changers.manaloom_bracket_category` tem 14 cartas com `other` que o Dart detecta como `gameChanger` — incluindo TODOS os 12 tutores (Demonic, Vampiric, Mystical, Enlightened, Worldly, Gamble, Gifts Ungiven, Intuition, Imperial Seal, Crop Rotation, Natural Order, Survival of the Fittest) e 2 combo pieces (Thassa's Oracle, Underworld Breach). Alem disso, Force of Will e Bolas's Citadel regrediram para `other`.
+
+**Evidencia no SQLite:**
+```sql
+SELECT card_name, manaloom_bracket_category, impact_category
+FROM game_changers
+WHERE manaloom_detected = 1 AND manaloom_bracket_category = 'other'
+  AND impact_category IN ('tutor', 'combo_piece');
+-- 14 cartas: 12 tutores + Thassa's Oracle + Underworld Breach
+```
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:103-104` — `tagCardForBracket()` retorna `{BracketCategory.gameChanger}` para estas cartas.
+- O SQLite `manaloom_bracket_category` foi preenchido por logica divergente ou sofreu regressao.
+
+**Gap:** SQLite e Dart discordam sobre a categoria de bracket de 14 Game Changers (58% dos detectados). Queries que filtram por `manaloom_bracket_category` perdem 12 tutores e 2 combo pieces. O relatorio mostra 3/5 categorias com 0 cartas — artefato da divergencia.
+
+**Impacto:** P2 — Relatorios que usam `game_changers.manaloom_bracket_category` para agrupar por tipo de impacto perdem 14 cartas.
+
+**Risco:** P2 — Dados inconsistentes entre DB e codigo. A regressao das 2 reclassificacoes mostra que o processo de importacao pode reverter classificacoes corretas.
+
+**Acao recomendada:**
+1. Script de correcao: atualizar `manaloom_bracket_category` no SQLite para 14 cartas:
+   - 12 tutores: `'other'` -> `'tutor'`
+   - Thassa's Oracle, Underworld Breach: `'other'` -> `'infiniteCombo'`
+   - Force of Will: `'other'` -> `'freeInteraction'`
+   - Bolas's Citadel: `'other'` -> `'infiniteCombo'`
+2. Adicionar verificacao no `gc_hash_check.py`: comparar `manaloom_bracket_category` contra `tagCardForBracket()` para cada GC detectado.
+3. Toda execucao do gamechanger-research deve revalidar `manaloom_bracket_category` contra `tagCardForBracket()`.
+
+**Validacao:**
+```bash
+cd docs/hermes-analysis/manaloom-knowledge && python3 -c "
+import sqlite3; conn = sqlite3.connect('scripts/knowledge.db')
+tutor = conn.execute(\"SELECT COUNT(*) FROM game_changers WHERE manaloom_bracket_category='tutor'\").fetchone()[0]
+combo = conn.execute(\"SELECT COUNT(*) FROM game_changers WHERE manaloom_bracket_category='infiniteCombo'\").fetchone()[0]
+fw = conn.execute(\"SELECT manaloom_bracket_category FROM game_changers WHERE card_name='Force of Will'\").fetchone()[0]
+print(f'tutor={tutor} (esperado 12+), infiniteCombo={combo} (esperado 2+), Force of Will={fw} (esperado freeInteraction)')
+"
+```
+
