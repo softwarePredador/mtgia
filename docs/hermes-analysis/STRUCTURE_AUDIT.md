@@ -4,9 +4,223 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-09 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-09 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia `server/lib` ↔ `server/routes` ↔ `app/lib` — revalidacao 2026-06-09 23:00 UTC
+
+Escopo desta rodada: somente coerencia entre helpers/backend routes e os
+consumidores em `app/lib`. Nao foi feita auditoria ampla de classes sem uso,
+funcoes sem chamada, imports/ciclos, tabelas PostgreSQL sem uso ou duplicacao
+fora do necessario para validar contratos app-facing.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `b3f4c0ad`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 172.
+- Classes encontradas: 169.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor base cobre `server/lib` e
+`server/routes`, mas nao cruza consumidores em `app/lib`, nao constroi contrato
+entre client/provider e rota, e sua secao textual de problemas continua sendo
+triagem regex. A execucao tambem reescreveu `STRUCTURE_AUDIT.md` para o bloco
+gerado porque o arquivo atual nao tem o marcador de merge esperado; essa
+mutacao automatica foi revertida para preservar o historico manual. Os achados
+abaixo foram revalidados por `rg` focado e leitura direta de codigo.
+
+### Metodo manual focado
+
+- Mapeamento dos endpoints chamados por `app/lib` via `apiClient`/`_apiClient`.
+- Leitura direta dos consumidores app em:
+  `deck_provider_support_ai.dart`,
+  `deck_provider_support_mutation.dart`,
+  `deck_provider_support_generation.dart`,
+  `deck_provider_support_fetch.dart`,
+  `deck_provider.dart` e `activation_funnel_service.dart`.
+- Comparacao com as rotas e supports correspondentes em `server/routes/ai`,
+  `server/routes/decks`, `server/routes/users/me` e `server/lib/ai`.
+- Controles positivos lidos para rotas deck/import que ja fazem gate
+  `deck_id + user_id` antes de carregar `deck_cards`.
+- Nenhum achado abaixo depende somente da lista bruta do auditor textual.
+
+### Achados revalidados
+
+#### P1 — `POST /ai/optimize` ainda carrega deck app-facing sem owner-scope no support
+
+- **Consumidor app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
+  monta payload com `deck_id`; `:56` envia `POST /ai/optimize`.
+- **Rota:** `server/routes/ai/optimize/index.dart:401`-`:406` tenta ler
+  `userId`, mas chama `loadOptimizeDeckContext` em `:549`-`:558` sem passar
+  o usuario.
+- **Support:** `server/lib/ai/optimize_request_support.dart:53`-`:62` declara
+  `loadOptimizeDeckContext` sem parametro `userId`; `:66`/`:71` consultam
+  `decks` por `SELECT name, format FROM decks WHERE id = @id`; `:107`-`:110`
+  e `:132`-`:135` carregam cartas por `WHERE dc.deck_id = @id`.
+- **Por que parece real:** o app envia um `deck_id` privado em endpoint
+  autenticado, mas a carga efetiva do contexto nao filtra pelo usuario
+  autenticado. Um usuario com UUID de deck alheio poderia potencialmente
+  disparar optimize/analysis desse deck.
+- **O que valida:** adicionar `userId` obrigatorio ao support, filtrar a query
+  inicial por `id + user_id`, carregar cartas por join com `decks` owner-scoped
+  ou somente apos o deck owner-gate, e adicionar teste non-owner.
+- **O que falsifica:** contrato explicito de leitura publica para esse endpoint,
+  com teste provando que apenas decks publicos podem ser otimizados por nao
+  donos e que o app trata essa semantica.
+
+#### P1 — `POST /ai/archetypes` continua sem owner-scope apesar de ser chamado pelo app
+
+- **Consumidor app:** `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`
+  chama `POST /ai/archetypes` com `deck_id`.
+- **Rota:** `server/routes/ai/archetypes/index.dart:27`-`:32` exige
+  `deck_id`, mas `:39`-`:42` busca `SELECT name, format FROM decks WHERE id =
+  @id`, e `:54`-`:60` carrega cartas por `WHERE dc.deck_id = @id`, sem
+  `user_id`.
+- **Cobertura atual:** `server/test/ai_archetypes_flow_test.dart:157`-`:180`
+  cobre o caminho feliz/cache do usuario dono; a busca focada nao encontrou
+  teste non-owner para `/ai/archetypes`.
+- **Por que parece real:** a rota e app-facing e retorna opcoes derivadas da
+  composicao do deck, mas nao valida posse antes de consultar deck/cartas.
+- **O que valida:** usar `context.read<String>()`/`getUserId(context)`,
+  filtrar `decks` por `id + user_id`, carregar cartas somente apos esse gate e
+  adicionar teste owner vs non-owner.
+- **O que falsifica:** promocao documentada de `/ai/archetypes` para leitura
+  publica apenas de decks `is_public=true`, com teste cobrindo privado vs
+  publico.
+
+#### P1 — Polling de jobs optimize/generate ainda aceita `user_id = NULL`
+
+- **Optimize app:** `app/lib/features/decks/providers/deck_provider_support_ai.dart:74`-`:87`
+  aceita `202` com `job_id`; `:190`-`:194` faz polling em
+  `/ai/optimize/jobs/$jobId`.
+- **Optimize backend:** `server/lib/ai/optimize_job.dart:25`-`:30` aceita
+  `String? userId` na criacao; `server/routes/ai/optimize/jobs/[id].dart:39`
+  so bloqueia quando `job.userId != null && job.userId != userId`, entao job
+  sem owner salvo continua legivel por qualquer usuario com o ID.
+- **Generate app:** `app/lib/features/decks/providers/deck_provider_support_generation.dart:230`-`:236`
+  envia `/ai/generate` com `async: true`; `:248`-`:301` usa `job_id` e
+  `poll_url`; `:379` faz `apiClient.get(pollUrl)`.
+- **Generate backend:** `server/routes/ai/generate/index.dart:786`-`:813`
+  cria job com `String? userId`; `server/lib/ai_generate_job.dart:12`-`:17`
+  aceita `String? userId`; `server/routes/ai/generate/jobs/[id].dart:16`-`:19`
+  aplica o mesmo bloqueio somente quando `job.userId` nao e nulo.
+- **Cobertura atual:** a busca focada em `server/test` e `app/test` encontrou
+  teste de parsing/armazenamento de `userId`, mas nao teste que rejeite job com
+  `user_id = NULL` em endpoint app-facing.
+- **Por que parece real:** os jobs sao o mecanismo de polling do app e podem
+  carregar resultado de deck/generation. Owner nullable e aceitavel para jobs
+  internos somente se houver rota separada ou autenticacao interna; nos
+  endpoints app-facing deveria ser owner-obrigatorio.
+- **O que valida:** exigir `userId` na criacao app-facing e retornar 404 quando
+  `job.userId == null || job.userId != userId`.
+- **O que falsifica:** separacao formal de jobs internos anonimos, sem acesso
+  pelas rotas app-facing, com teste de rota mostrando 404 para job sem owner.
+
+#### P1/P2 — Optimize ainda nao threada `card_function_tags` no contexto primario que o app espera como fonte
+
+- **Controle positivo analysis:** `app/lib/features/decks/providers/deck_provider_support_fetch.dart:135`-`:140`
+  chama `GET /decks/:id/analysis`; `app/lib/features/decks/models/deck_analysis.dart:17`
+  parseia `functional_tags`.
+- **Rota analysis:** `server/routes/decks/[id]/analysis/index.dart:18`-`:25`
+  faz owner gate por `deckId + userId`; `:80`-`:96` seleciona
+  `card_function_tags` e `semantic_tags_v2` para as cartas.
+- **Rota ai-analysis:** `server/routes/decks/[id]/ai-analysis/index.dart:25`-`:39`
+  tambem faz owner gate; `:119`-`:135` seleciona `card_function_tags` e
+  `semantic_tags_v2`.
+- **Optimize:** `server/lib/ai/optimize_request_support.dart:86`-`:106`
+  seleciona somente `semantic_tags_v2`; `:186`-`:198` monta `allCardData` com
+  `semantic_tags_v2`, sem `functional_tags`. `server/routes/ai/optimize/index.dart:2090`-`:2099`
+  repete o mesmo padrao para `additionsData`.
+- **Contrato:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md:164` lista
+  `card_function_tags`, `card_role_scores` e `card_semantic_tags_v2` como
+  fontes de `/ai/optimize`, mas o caminho primario de contexto/validator ainda
+  nao recebe `card_function_tags`.
+- **Por que parece real:** a aba de analise e o contrato tratam
+  `card_function_tags` como fonte app-facing, mas o optimize preserva roles a
+  partir de outro adapter, criando drift entre "o que a analise diz" e "o que
+  optimize protege".
+- **O que valida:** carregar `card_function_tags` no contexto de optimize e em
+  `additionsData`, threadar para o adapter de role/gate, e cobrir carta com
+  tag persistida que a heuristica pura classificaria diferente.
+- **O que falsifica:** documentacao/teste declarando que `card_function_tags`
+  e usado apenas por candidate quality indireto e nao pelo contexto primario de
+  optimize.
+
+#### P2 — Telemetria `deck_rebuild_created` e emitida pelo app, mas rejeitada pela allow-list backend
+
+- **Consumidor app:** `app/lib/features/decks/providers/deck_provider.dart:603`-`:614`
+  emite `_trackActivationEvent('deck_rebuild_created', deckId: draftDeckId)`
+  quando `/ai/rebuild` retorna draft.
+- **Servico app:** `app/lib/core/services/activation_funnel_service.dart:17`-`:23`
+  envia `POST /users/me/activation-events`; `:24`-`:26` engole falhas para nao
+  quebrar o fluxo principal.
+- **Rota:** `server/routes/users/me/activation-events/index.dart:10`-`:18`
+  permite `core_flow_started`, `format_selected`, `base_choice_generate`,
+  `base_choice_import`, `deck_created`, `deck_optimized` e
+  `onboarding_completed`; `:46`-`:48` rejeita qualquer evento fora da allow-list.
+- **Contrato:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` ainda classifica
+  `POST /users/me/activation-events` como `internal`, consumidor
+  `onboarding/activation code not proven` e teste `Not proven`, apesar de haver
+  chamadas reais em `app/lib/features/home/onboarding_core_flow_screen.dart:32`,
+  `:39`, `:48`, `:59`, `:69` e em `deck_provider.dart`.
+- **Cobertura atual:** `app/test/features/decks/providers/deck_provider_test.dart:857`
+  espera `deck_rebuild_created` no provider; nao ha evidencia de teste backend
+  aceitando esse evento.
+- **Por que parece real:** a falha fica silenciosa no app, entao o funil perde
+  rebuild guiado sem quebrar UI nem gerar alerta claro.
+- **O que valida:** adicionar `deck_rebuild_created` a `_allowedEvents` com
+  teste backend, ou remover a emissao app se rebuild nao deve participar do
+  funil; quando o contrato puder ser editado, trocar `not proven` por
+  consumidores reais.
+- **O que falsifica:** teste/decisao formal de que eventos fora da allow-list
+  devem ser descartados e que `deck_rebuild_created` e somente um evento local
+  de teste sem envio real.
+
+### Controles positivos e candidatos nao promovidos
+
+- `POST /ai/rebuild` e owner-safe neste recorte: `server/routes/ai/rebuild/index.dart:16`
+  le `userId` e `:62`-`:78` busca o deck por `d.id = @deckId AND d.user_id =
+  @userId` antes de carregar cartas.
+- `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram tratados
+  como controles positivos porque fazem owner gate antes de usar `deck_cards`
+  (`server/routes/decks/[id]/analysis/index.dart:18`-`:25`;
+  `server/routes/decks/[id]/ai-analysis/index.dart:25`-`:39`).
+- Fluxos app-facing de import/pricing/validate/bulk/replace tambem fazem
+  owner gate antes de mutar ou carregar cartas: `server/routes/import/to-deck/index.dart:20`-`:37`,
+  `server/routes/decks/[id]/pricing/index.dart:20`-`:35`,
+  `server/routes/decks/[id]/validate/index.dart:13`-`:24`,
+  `server/routes/decks/[id]/cards/bulk/index.dart:13`-`:75` e
+  `server/routes/decks/[id]/cards/replace/index.dart:19`-`:60`.
+- `/decks/:id/recommendations`, `/decks/:id/simulate`,
+  `/ai/simulate-matchup` e `/ai/weakness-analysis` ainda contem queries por
+  deck id sem owner gate, mas a busca focada em `app/lib` nao encontrou
+  consumidor atual; ficam como bloqueio antes de qualquer promocao app-facing,
+  nao como achado app/backend vivo desta rodada.
+
+### Resultado desta revalidacao
+
+No checkout `b3f4c0ad`, os achados de coerencia app-facing de IA/deck continuam
+abertos. Nenhum novo P0 foi identificado. A principal mudanca desta rodada foi
+atualizar a evidencia para o estado local atual, separar controles positivos
+owner-scoped e confirmar que a incoerencia de activation telemetry segue viva.
 
 ## Rodada focada: Duplicated or similar logic — revalidacao 2026-06-09 19:00 UTC
 

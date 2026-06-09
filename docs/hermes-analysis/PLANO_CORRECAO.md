@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-08 11:00 UTC
+> Data: 2026-06-09 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,7 +20,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
    com `uri_does_not_exist`.
 5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
-   **REVALIDADO no checkout local `82b85df2` em 2026-06-07 23:00 UTC**.
+   **REVALIDADO no checkout local `b3f4c0ad` em 2026-06-09 23:00 UTC**.
    `POST /ai/optimize` e `POST /ai/archetypes` continuam chamados pelo app com
    `deck_id`, mas as queries reais carregam `decks`/`deck_cards` por `id` sem
    `user_id`: a rota optimize le `userId` e nao passa para
@@ -28,8 +28,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` continuam
    legiveis quando `job.userId == null`, embora sejam usados por polling do app.
    `POST /ai/rebuild`, `GET /decks/:id/analysis` e
-   `POST /decks/:id/ai-analysis` seguem como controles positivos porque fazem
-   gate de `deck_id + user_id` antes de carregar cartas. Deck analysis carrega
+   `POST /decks/:id/ai-analysis`, alem de import-to-deck, pricing, validate,
+   bulk e replace, seguem como controles positivos porque fazem gate de
+   `deck_id + user_id` antes de carregar/mutar cartas. Deck analysis carrega
    `card_function_tags` + `semantic_tags_v2`, mas o contexto principal de
    optimize ainda threada somente `semantic_tags_v2`, apesar do contrato de
    `/ai/optimize` listar `card_function_tags` como fonte. A mesma rodada
@@ -601,27 +602,29 @@ app-side novo sem chamada.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-07 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `82b85df2`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
+- **Status 2026-06-09 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `b3f4c0ad`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
   jobs async de optimize/generate nao esta resolvida nesta branch. `POST /ai/rebuild`,
-  `GET /decks/:id/analysis` e `POST /decks/:id/ai-analysis` foram usados como
-  controles positivos de owner gate. `/decks/:id/recommendations`,
-  `/decks/:id/simulate`, `/ai/simulate-matchup` e `/ai/weakness-analysis` nao
-  tem consumidor app atual na busca focada, mas continuam sem contrato de owner
-  antes de eventual promocao. A
-  rodada tambem confirmou incoerencia de activation telemetry:
+  `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis`, import-to-deck,
+  pricing, validate, bulk e replace foram usados como controles positivos de
+  owner gate. `/decks/:id/recommendations`, `/decks/:id/simulate`,
+  `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual
+  na busca focada, mas continuam sem contrato de owner antes de eventual
+  promocao. A rodada tambem confirmou incoerencia de activation telemetry:
   `deck_rebuild_created` e emitido pelo app, rejeitado pela allow-list backend e
   ausente da doc app-facing atual. Tambem foi revalidado que deck analysis
   consome `functional_tags`, enquanto optimize ainda nao propaga
   `card_function_tags` para o contexto/validator.
 - **Evidência**:
-  - O app envia `POST /ai/optimize` com `deck_id` em
-    `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`; a
-    rota tenta ler `userId`, mas chama `loadOptimizeDeckContext` em
-    `server/routes/ai/optimize/index.dart:549`-`:558` sem passar usuario.
-  - `server/lib/ai/optimize_request_support.dart:53`-`:73` declara o loader
-    sem `userId` e consulta `SELECT name, format FROM decks WHERE id = @id`;
-    `:87`-`:137` carrega cartas por `WHERE dc.deck_id = @id`.
+  - O app monta payload com `deck_id` em
+    `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
+    e envia `POST /ai/optimize` em `:56`; a rota tenta ler `userId` em
+    `server/routes/ai/optimize/index.dart:401`-`:406`, mas chama
+    `loadOptimizeDeckContext` em `:549`-`:558` sem passar usuario.
+  - `server/lib/ai/optimize_request_support.dart:53`-`:62` declara o loader
+    sem `userId`; `:66`/`:71` consultam `SELECT name, format FROM decks WHERE
+    id = @id`; `:107`-`:110` e `:132`-`:135` carregam cartas por
+    `WHERE dc.deck_id = @id`.
   - O app tambem envia `POST /ai/archetypes` com `deck_id` em
     `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`;
     `server/routes/ai/archetypes/index.dart:39`-`:42` busca o deck por `id`
@@ -636,6 +639,10 @@ app-side novo sem chamada.
     cria jobs com `String? userId`; `server/lib/ai_generate_job.dart:12`-`:17`
     aceita usuario nullable; `server/routes/ai/generate/jobs/[id].dart:16`-`:19`
     so bloqueia quando o job tem owner diferente.
+  - A busca focada em `server/test` e `app/test` encontrou teste de caminho
+    feliz/cache para `/ai/archetypes`, mas nao teste non-owner; encontrou teste
+    de parsing/armazenamento de `userId` em generate job, mas nao teste de
+    rota rejeitando `job.userId == null`.
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
     `semantic_tags_v2`, e o app parseia `functional_tags`; em contraste,
     `server/lib/ai/optimize_request_support.dart:86`-`:106` carrega apenas
@@ -657,6 +664,17 @@ app-side novo sem chamada.
     `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` ainda chama o endpoint de
     `internal` com consumidor `not proven`, embora haja chamadas reais em
     `app/lib`.
+  - `app/test/features/decks/providers/deck_provider_test.dart:857` espera
+    `deck_rebuild_created` no provider, mas a busca focada nao encontrou teste
+    backend aceitando esse evento.
+  - Controles positivos revalidados: `server/routes/ai/rebuild/index.dart:16`
+    e `:62`-`:78`; `server/routes/decks/[id]/analysis/index.dart:18`-`:25`;
+    `server/routes/decks/[id]/ai-analysis/index.dart:25`-`:39`;
+    `server/routes/import/to-deck/index.dart:20`-`:37`;
+    `server/routes/decks/[id]/pricing/index.dart:20`-`:35`;
+    `server/routes/decks/[id]/validate/index.dart:13`-`:24`;
+    `server/routes/decks/[id]/cards/bulk/index.dart:13`-`:75`; e
+    `server/routes/decks/[id]/cards/replace/index.dart:19`-`:60`.
 - **Impacto**: usuario autenticado pode potencialmente disparar analise/opcoes
   ou leitura de job para recursos sem owner-scope se obtiver IDs validos. Alem
   disso, a memoria tecnica anterior registrava um estado resolvido que nao bate

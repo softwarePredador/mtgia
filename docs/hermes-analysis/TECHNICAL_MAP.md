@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-09 13:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-09 23:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -169,10 +169,10 @@ mtgia/
   arquivos entre `CommunityDeckDetailScreen` e `UserProfileScreen`, e nenhum
   ciclo local backend.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
-- **P1 — Coerencia app-facing de IA/deck revalidada no checkout local**: a
-  rodada de coerencia de 2026-06-07 23:00 UTC (`82b85df2`) confirmou drift entre
-  app, rotas e support. `POST /ai/optimize` e chamado pelo app com `deck_id`,
-  mas `server/routes/ai/optimize/index.dart` nao passa `userId` para
+- **P1 — Coerencia app-facing de IA/deck revalidada no checkout local**:
+  revalidado novamente em 2026-06-09 23:00 UTC no checkout `b3f4c0ad`.
+  `POST /ai/optimize` e chamado pelo app com `deck_id`, mas
+  `server/routes/ai/optimize/index.dart` nao passa `userId` para
   `loadOptimizeDeckContext`, e `server/lib/ai/optimize_request_support.dart`
   consulta `decks`/`deck_cards` somente por `id`. `POST /ai/archetypes` tambem
   e chamado pelo app, mas a rota busca `SELECT name, format FROM decks WHERE id
@@ -180,17 +180,17 @@ mtgia/
   `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` ainda aceitam jobs
   com `user_id = NULL` porque so bloqueiam quando
   `job.userId != null && job.userId != userId`. Corrigir antes de tratar esses
-  endpoints como owner-safe; `POST /ai/rebuild`, `GET /decks/:id/analysis` e
-  `POST /decks/:id/ai-analysis` foram verificados como controles positivos
-  porque buscam `decks` com `id + user_id` antes de carregar dados do deck.
-  Deck analysis usa `card_function_tags` + `semantic_tags_v2` app-facing, mas
-  optimize ainda nao threada `card_function_tags` no contexto primario, somente
-  `semantic_tags_v2`, embora o contrato de `/ai/optimize` liste
-  `card_function_tags` como fonte. A mesma rodada encontrou incoerencia em
-  activation telemetry: `deck_rebuild_created` e emitido pelo app, mas rejeitado
-  pela allow-list da rota `/users/me/activation-events`, e o contrato ainda
-  lista esse endpoint como `internal`/`not proven` apesar de consumidores reais
-  em `app/lib`.
+  endpoints como owner-safe; `POST /ai/rebuild`, `GET /decks/:id/analysis`,
+  `POST /decks/:id/ai-analysis`, import-to-deck, pricing, validate, bulk e
+  replace foram verificados como controles positivos porque fazem owner gate
+  antes de carregar/mutar cartas. Deck analysis usa `card_function_tags` +
+  `semantic_tags_v2` app-facing, mas optimize ainda nao threada
+  `card_function_tags` no contexto primario, somente `semantic_tags_v2`, embora
+  o contrato de `/ai/optimize` liste `card_function_tags` como fonte. A mesma
+  rodada confirmou incoerencia em activation telemetry: `deck_rebuild_created`
+  e emitido pelo app, mas rejeitado pela allow-list da rota
+  `/users/me/activation-events`, e o contrato ainda lista esse endpoint como
+  `internal`/`not proven` apesar de consumidores reais em `app/lib`.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em 2026-06-09 19:00 UTC no checkout local `4bd8ca2a`. O auditor textual executou com sucesso (`172` arquivos backend, `99` problemas textuais, `0` imports quebrados), mas sua lista de duplicacao segue ruidosa porque captura termos SQL/literais como `COUNT`, `COALESCE`, `LATERAL` e nomes de tabelas como funcoes. A revalidacao manual confirmou que `resolveOptimizeArchetype` diverge entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`; heuristicas semanticas (`_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`, `_looksLikeWincon`) existem tanto em `functional_card_tags.dart` quanto em `optimization_functional_roles.dart` com regras diferentes; `_isBasicLandName` tem variantes para snow basics em optimize, generated deck validation, meta reference e commander-reference; utilitarios de request/log repetem-se em rotas de trades, conversations e follow apesar de `request_trace.dart`; trust SQL/serializer de trades/marketplace, normalizacao/rejeicao/filtro de `condition` e helpers de CMC/tipo tambem continuam duplicados. A rodada confirmou que os wrappers de `server/routes/ai/optimize/index.dart` delegam para support e nao foram contados como corpo duplicado independente.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
