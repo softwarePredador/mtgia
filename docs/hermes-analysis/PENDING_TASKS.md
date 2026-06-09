@@ -528,24 +528,23 @@ Criar testes:
 | ✅ | Legend rule SBA | Feito |
 | ✅ | Commander replacement opcional | Feito |
 | ✅ | Loss tagging (classify_loss) | Feito |
+| ✅ | Taxonomia canônica (poison, concede, effect_says_lose) | Feito |
 | ✅ | WDWR/WPWR (card_impact_analyzer) | Feito |
 | ✅ | Loss-mode suggester | Feito |
 | ✅ | Slot optimizer role fix | Feito |
+| ✅ | Ward (check_ward scaffold) | Feito |
+| ✅ | LKI + Zone change counter | Feito |
 | ✅ | BATTLE_SYSTEM_LOGIC.md | Feito |
 | ✅ | IMPLEMENTATION_GAPS.md | Feito |
 | ⏳ | APNAP trigger ordering | Pendente |
 | ⏳ | Prioridade com pilha vazia | Pendente |
 | ⏳ | Casting pipeline 601.2 | Pendente |
 | ⏳ | Passos de combate formais | Pendente |
-| ⏳ | LKI | Pendente |
-| ⏳ | Zone change counter | Pendente |
 | ⏳ | Targeting partial resolution | Pendente |
-| ⏳ | Ward | Pendente |
 | ⏳ | Layers 1-7 | Pendente |
 | ⏳ | Replacement effects | Pendente |
 | ⏳ | Planeswalkers/Battles | Pendente |
 | ⏳ | DFC/Adventure/Prototype | Pendente |
 | ⏳ | Tokens/Cópias | Pendente |
-| ⏳ | Taxonomia canônica de derrota | Pendente |
 | ⏳ | Telemetria de saúde | Pendente |
 | ⏳ | Suite de conformidade | Pendente |
