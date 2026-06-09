@@ -4,6 +4,10 @@
 This does not infer new rules from scratch. It takes the current manual rules
 and generated rules, stores them in `battle_card_rules`, and makes their source
 and review state explicit for battle/optimizer consumers.
+
+For production/Hermes crons, prefer `sync_battle_card_rules_pg.py`: Postgres
+stores the reviewable source of truth and this SQLite table acts as the fast
+local cache used by simulations.
 """
 
 from __future__ import annotations
@@ -44,7 +48,54 @@ def load_generated_rules() -> dict[str, dict]:
     return decoded if isinstance(decoded, dict) else {}
 
 
-def build_rows(include_generated: bool) -> list[dict]:
+def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> list[dict]:
+    """Keep persisted rule cache aligned with runtime oracle normalization.
+
+    `battle_analyst_v8.get_card_effect()` normalizes broad generated rules with
+    oracle metadata before the spell resolves. If the cache is written without
+    the same pass, the forensic audit sees false mismatches like lands stored as
+    ramp engines. This mirrors runtime behavior at sync time.
+    """
+    if not sqlite_db:
+        return rows
+    db_path = Path(sqlite_db)
+    if not db_path.exists():
+        return rows
+
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        oracle_cache = battle.load_card_oracle_cache(
+            conn,
+            [str(row.get("card_name") or "") for row in rows],
+        )
+        conn.close()
+    except Exception:
+        return rows
+
+    normalized_rows: list[dict] = []
+    for row in rows:
+        card_name = str(row.get("card_name") or "")
+        card = battle.merge_oracle_metadata({"name": card_name}, oracle_cache)
+        effect_before = dict(row.get("effect_json") or {})
+        effect_after = battle.normalize_effect_by_oracle(card, effect_before)
+        next_row = dict(row)
+        next_row["effect_json"] = effect_after
+        if effect_after != effect_before:
+            next_row["notes"] = (
+                f"{next_row.get('notes') or ''} "
+                "Oracle-normalized to match battle runtime."
+            ).strip()
+            next_row["_oracle_normalized"] = True
+        normalized_rows.append(next_row)
+    return normalized_rows
+
+
+def build_rows(
+    include_generated: bool,
+    *,
+    sqlite_db: str | Path | None = None,
+) -> list[dict]:
     rows: list[dict] = []
     for name in sorted(battle.HANDCRAFTED_KNOWN_CARDS):
         effect = dict(battle.KNOWN_CARDS[name])
@@ -75,18 +126,19 @@ def build_rows(include_generated: bool) -> list[dict]:
                     "notes": "Seeded from known_cards_generated.json; audit before trusting.",
                 }
             )
-    return rows
+    return _oracle_normalized_rows(sqlite_db, rows)
 
 
 def main() -> int:
     args = parse_args()
-    rows = build_rows(include_generated=not args.skip_generated)
+    rows = build_rows(include_generated=not args.skip_generated, sqlite_db=args.sqlite_db)
     report = {
         "sqlite_db": args.sqlite_db,
         "apply": bool(args.apply),
         "input_rows": len(rows),
         "manual_rows": sum(1 for row in rows if row["source"] == "manual"),
         "generated_rows": sum(1 for row in rows if row["source"] == "generated"),
+        "oracle_normalized_rows": sum(1 for row in rows if row.get("_oracle_normalized")),
         "inserted_or_updated": 0,
         "skipped_lower_priority": 0,
     }

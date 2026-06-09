@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -36,7 +37,9 @@ from master_optimizer_common import (
 import battle_rule_registry
 
 KC_JSON = SCRIPT_DIR / "known_cards_generated.json"
-LOCK_FILE = Path(os.environ.get("MANALOOM_SLOT_SCAN_LOCK", "/tmp/optimizer_v3.lock"))
+LOCK_FILE = Path(
+    os.environ.get("MANALOOM_SLOT_SCAN_LOCK", str(Path(tempfile.gettempdir()) / "optimizer_v3.lock"))
+)
 
 EFFECT_TO_CATEGORY = {
     "ramp_permanent": "ramp",

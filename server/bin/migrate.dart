@@ -486,6 +486,81 @@ final migrations = <Migration>[
       ALTER TABLE cards DROP COLUMN IF EXISTS power;
     ''',
   ),
+  Migration(
+    version: '019',
+    name: 'create_card_battle_rules',
+    up: '''
+      CREATE TABLE IF NOT EXISTS card_battle_rules (
+        normalized_name TEXT PRIMARY KEY,
+        card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
+        card_name TEXT NOT NULL,
+        effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+        deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+        source TEXT NOT NULL DEFAULT 'manual',
+        confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
+          CHECK (confidence >= 0 AND confidence <= 1),
+        review_status TEXT NOT NULL DEFAULT 'verified',
+        rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
+        oracle_hash TEXT,
+        notes TEXT,
+        reviewed_by TEXT,
+        reviewed_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        last_seen_at TIMESTAMP WITH TIME ZONE,
+        CONSTRAINT chk_card_battle_rules_source CHECK (
+          source IN ('manual', 'curated', 'generated', 'heuristic', 'imported')
+        ),
+        CONSTRAINT chk_card_battle_rules_review_status CHECK (
+          review_status IN (
+            'verified',
+            'active',
+            'needs_review',
+            'rejected',
+            'deprecated'
+          )
+        )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_card_id
+      ON card_battle_rules (card_id);
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_source_status
+      ON card_battle_rules (source, review_status);
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_effect
+      ON card_battle_rules USING gin (effect_json);
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_deck_role
+      ON card_battle_rules USING gin (deck_role_json);
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_name_lower
+      ON card_battle_rules (LOWER(card_name));
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_card_battle_rules_name_lower;
+      DROP INDEX IF EXISTS idx_card_battle_rules_deck_role;
+      DROP INDEX IF EXISTS idx_card_battle_rules_effect;
+      DROP INDEX IF EXISTS idx_card_battle_rules_source_status;
+      DROP INDEX IF EXISTS idx_card_battle_rules_card_id;
+      DROP TABLE IF EXISTS card_battle_rules CASCADE;
+    ''',
+  ),
+  Migration(
+    version: '020',
+    name: 'add_card_lookup_indexes',
+    up: '''
+      CREATE INDEX IF NOT EXISTS idx_cards_name_lower
+      ON cards (LOWER(name));
+
+      CREATE INDEX IF NOT EXISTS idx_cards_front_name_lower
+      ON cards (LOWER(split_part(name, ' // ', 1)));
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_cards_front_name_lower;
+      DROP INDEX IF EXISTS idx_cards_name_lower;
+    ''',
+  ),
 ];
 
 class Migration {

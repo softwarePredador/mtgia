@@ -24,6 +24,11 @@ spec = importlib.util.spec_from_file_location("battle_under_test", MODULE_PATH)
 battle = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(battle)
 
+AUDITOR_PATH = MODULE_PATH.with_name("replay_decision_auditor.py")
+auditor_spec = importlib.util.spec_from_file_location("replay_auditor_under_test", AUDITOR_PATH)
+replay_auditor = importlib.util.module_from_spec(auditor_spec)
+auditor_spec.loader.exec_module(replay_auditor)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -680,14 +685,14 @@ def test_battle_card_rules_table_overrides_fallbacks():
             effect = battle.get_card_effect(
                 {
                     "name": "Registry Counter",
-                    "type_line": "Sorcery",
+                    "type_line": "Instant",
                     "oracle_text": "A deliberately weird test card.",
                 }
             )
 
             assert effect["effect"] == "counter"
             assert effect["_rule_source"] == "manual"
-            assert battle.is_instant({"name": "Registry Counter", "type_line": "Sorcery"})
+            assert battle.is_instant({"name": "Registry Counter", "type_line": "Instant"})
         finally:
             battle.DB = old_db
             battle.battle_rule_registry._RULE_CACHE.clear()
@@ -883,6 +888,1070 @@ def test_life_cant_change_prevents_damage_and_life_gain():
     assert active.life == 20
 
 
+def test_lands_are_not_instant_or_sorcery_even_with_generated_metadata():
+    land = {
+        "name": "Mana Confluence",
+        "cmc": 0,
+        "type_line": "Land",
+        "oracle_text": "{T}: Add one mana of any color.",
+        "effect": "land",
+        "tag": "land",
+    }
+
+    assert battle.is_effective_land(land)
+    assert battle.is_instant(land) is False
+    assert battle.is_sorcery(land) is False
+    assert battle.get_card_effect(land).get("instant") is None
+
+
+def test_lorehold_miracle_ignores_lands_and_creatures():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = battle.Player(
+        "Lorehold",
+        None,
+        [
+            {
+                "name": "Mana Confluence",
+                "cmc": 0,
+                "type_line": "Land",
+                "oracle_text": "{T}: Add one mana of any color.",
+                "effect": "land",
+                "tag": "land",
+            },
+            {
+                "name": "Drannith Magistrate",
+                "cmc": 2,
+                "type_line": "Creature",
+                "oracle_text": "Your opponents can't cast spells from anywhere other than their hands.",
+            },
+        ],
+        is_human=True,
+    )
+    active.battlefield = [
+        {"name": "Lorehold, the Historian", "effect": "creature", "haste": True},
+        {"name": "Plains", "effect": "land", "type_line": "Land"},
+        {"name": "Mountain", "effect": "land", "type_line": "Land"},
+    ]
+    defender = player("Defender", [card("Draw")])
+
+    battle.play_turn_v8(
+        active,
+        [defender],
+        [active, defender],
+        turn=3,
+        rng=random.Random(31),
+        stack=battle.Stack(),
+    )
+    battle.REPLAY_EVENT_HANDLER = None
+
+    assert not [event for event, _ in events if event == "miracle_cast"]
+
+
+def test_lorehold_miracle_rejects_flash_creatures():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = battle.Player(
+        "Lorehold",
+        None,
+        [
+            {
+                "name": "Dualcaster Mage",
+                "cmc": 3,
+                "type_line": "Creature — Human Wizard",
+                "oracle_text": "Flash",
+                "keywords": ["Flash"],
+            },
+        ],
+        is_human=True,
+    )
+    active.battlefield = [
+        {"name": "Lorehold, the Historian", "effect": "creature", "haste": True},
+        {"name": "Plains", "effect": "land", "type_line": "Land"},
+        {"name": "Mountain", "effect": "land", "type_line": "Land"},
+    ]
+    defender = player("Defender", [card("Draw")])
+
+    battle.play_turn_v8(
+        active,
+        [defender],
+        [active, defender],
+        turn=3,
+        rng=random.Random(39),
+        stack=battle.Stack(),
+    )
+    battle.REPLAY_EVENT_HANDLER = None
+
+    assert battle.is_instant({"name": "Dualcaster Mage", "type_line": "Creature — Human Wizard", "keywords": ["Flash"]})
+    assert not battle.is_instant_or_sorcery_spell({"name": "Dualcaster Mage", "type_line": "Creature — Human Wizard", "keywords": ["Flash"]})
+    assert not [event for event, _ in events if event == "miracle_cast"]
+
+
+def test_end_step_window_does_not_cast_lands():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active", [card("Draw")])
+    opponent = player("Opponent", [card("Opp Draw")])
+    opponent.hand = [
+        {
+            "name": "Mana Confluence",
+            "cmc": 0,
+            "type_line": "Land",
+            "oracle_text": "{T}: Add one mana of any color.",
+            "effect": "land",
+            "tag": "land",
+        }
+    ]
+    opponent.battlefield = [
+        {"name": "Island", "effect": "land", "type_line": "Land"},
+        {"name": "Island", "effect": "land", "type_line": "Land"},
+    ]
+
+    battle.play_turn_v8(
+        active,
+        [opponent],
+        [active, opponent],
+        turn=3,
+        rng=random.Random(32),
+        stack=battle.Stack(),
+    )
+    battle.REPLAY_EVENT_HANDLER = None
+
+    assert not [
+        data
+        for event, data in events
+        if event == "end_step_instant" and data.get("effect") == "land"
+    ]
+
+
+def test_summoning_sick_creature_cannot_attack_until_next_turn():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    attacker = player("Attacker")
+    defender = player("Defender")
+    creature = {
+        "name": "Fresh Creature",
+        "effect": "creature",
+        "power": 3,
+        "toughness": 3,
+        "summoning_sick": True,
+        "tapped": False,
+    }
+    attacker.battlefield = [creature]
+
+    battle.combat_phase_v8(
+        attacker,
+        [defender],
+        [attacker, defender],
+        turn=2,
+        rng=random.Random(33),
+        stack=battle.Stack(),
+    )
+    battle.REPLAY_EVENT_HANDLER = None
+
+    assert creature["tapped"] is False
+    assert defender.life == 40
+    assert not [event for event, _ in events if event == "combat"]
+
+
+def test_creature_loses_summoning_sickness_at_start_of_controller_turn_and_taps_to_attack():
+    active = player("Active", [card("Draw")])
+    defender = player("Defender", [card("Opp Draw")])
+    creature = {
+        "name": "Ready Next Turn",
+        "effect": "creature",
+        "power": 3,
+        "toughness": 3,
+        "summoning_sick": True,
+        "tapped": False,
+    }
+    active.battlefield = [creature]
+
+    battle.play_turn_v8(
+        active,
+        [defender],
+        [active, defender],
+        turn=3,
+        rng=random.Random(34),
+        stack=battle.Stack(),
+    )
+
+    assert creature["summoning_sick"] is False
+    assert creature["tapped"] is True
+    assert defender.life == 37
+
+
+def test_haste_creature_can_attack_while_summoning_sick_and_taps():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    creature = battle.enrich_card({
+        "name": "Hasty Creature",
+        "effect": "creature",
+        "type_line": "Creature",
+        "oracle_text": "Haste",
+        "power": 4,
+        "toughness": 4,
+        "summoning_sick": True,
+        "tapped": False,
+    })
+    attacker.battlefield = [creature]
+
+    battle.combat_phase_v8(
+        attacker,
+        [defender],
+        [attacker, defender],
+        turn=2,
+        rng=random.Random(35),
+        stack=battle.Stack(),
+    )
+
+    assert attacker.battlefield[0]["tapped"] is True
+    assert defender.life == 36
+
+
+def test_vigilance_creature_attacks_without_tapping():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    creature = battle.enrich_card({
+        "name": "Vigilant Creature",
+        "effect": "creature",
+        "type_line": "Creature",
+        "oracle_text": "Vigilance",
+        "power": 3,
+        "toughness": 3,
+        "summoning_sick": False,
+        "tapped": False,
+    })
+    attacker.battlefield = [creature]
+
+    battle.combat_phase_v8(
+        attacker,
+        [defender],
+        [attacker, defender],
+        turn=2,
+        rng=random.Random(44),
+        stack=battle.Stack(),
+    )
+
+    assert attacker.battlefield[0]["tapped"] is False
+    assert defender.life == 37
+
+
+def test_engine_creature_enters_with_summoning_sickness():
+    active = player("Active")
+    defender = player("Defender")
+    battle.apply_effect_immediate(
+        active,
+        [defender],
+        {
+            "name": "Jin-Gitaxias, Progress Tyrant",
+            "cmc": 7,
+            "type_line": "Legendary Creature — Phyrexian Praetor",
+            "oracle_text": "Whenever you cast an artifact, instant, or sorcery spell, copy that spell.",
+            "power": 5,
+            "toughness": 5,
+        },
+        turn=2,
+        rng=random.Random(67),
+    )
+
+    permanent = active.battlefield[0]
+    assert battle.is_battlefield_creature(permanent) is True
+    assert permanent["effect"] == "copy_spell"
+    assert permanent["summoning_sick"] is True
+    assert permanent["tapped"] is False
+
+    battle.combat_phase_v8(active, [defender], [active, defender], 2, random.Random(68), battle.Stack())
+
+    assert permanent["tapped"] is False
+    assert defender.life == 40
+
+
+def test_permanent_activated_removal_text_does_not_become_free_removal():
+    staff = {
+        "name": "Staff of Compleation",
+        "type_line": "Artifact",
+        "oracle_text": "{T}, Pay 3 life: Destroy target permanent you own.",
+    }
+    lantern = {
+        "name": "Soul-Guide Lantern",
+        "type_line": "Artifact",
+        "oracle_text": "When this artifact enters, exile target card from a graveyard.",
+    }
+    speaker = {
+        "name": "Formidable Speaker",
+        "type_line": "Creature — Elf Druid",
+        "oracle_text": "When this creature enters, you may discard a card. If you do, search your library for a creature card.",
+        "power": 2,
+        "toughness": 4,
+    }
+
+    assert battle.get_card_effect(staff)["effect"] == "ramp_permanent"
+    assert battle.get_card_effect(lantern)["effect"] == "hate_artifact"
+    assert battle.get_card_effect(speaker)["effect"] == "creature"
+
+
+def test_contextual_haste_text_does_not_grant_self_haste():
+    rionya = battle.enrich_card({
+        "name": "Rionya, Fire Dancer",
+        "type_line": "Legendary Creature — Human Wizard",
+        "oracle_text": "At the beginning of combat on your turn, create X tokens. They gain haste.",
+        "keywords": ["haste"],
+    })
+    spider_punk = battle.enrich_card({
+        "name": "Spider-Punk",
+        "type_line": "Creature",
+        "oracle_text": "Haste",
+        "keywords": ["haste"],
+    })
+
+    assert battle.has_haste(rionya) is False
+    assert battle.has_haste(spider_punk) is True
+
+
+def test_commander_destroyed_in_combat_returns_to_command_zone():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    commander = battle.enrich_card({
+        "name": "Tiny Commander",
+        "effect": "creature",
+        "type_line": "Legendary Creature",
+        "power": 1,
+        "toughness": 1,
+        "summoning_sick": False,
+        "tapped": False,
+        "is_commander": True,
+    })
+    blocker = battle.enrich_card({
+        "name": "Big Blocker",
+        "effect": "creature",
+        "type_line": "Creature",
+        "power": 3,
+        "toughness": 3,
+        "summoning_sick": False,
+        "tapped": False,
+    })
+    attacker.battlefield = [commander]
+    defender.battlefield = [blocker]
+    defender.life = 1
+
+    battle.combat_phase_v8(
+        attacker,
+        [defender],
+        [attacker, defender],
+        turn=5,
+        rng=random.Random(69),
+        stack=battle.Stack(),
+    )
+
+    assert commander not in attacker.battlefield
+    assert commander in attacker.command_zone
+    assert commander not in attacker.graveyard
+
+
+def test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard():
+    active = player("Active")
+    token = battle.create_creature_token(active, name="Soldier Token", power=1, toughness=1)
+    previous = battle.KNOWN_CARDS.get("Wrath")
+    was_handcrafted = "Wrath" in battle.HANDCRAFTED_KNOWN_CARDS
+    try:
+        battle.KNOWN_CARDS["Wrath"] = {"effect": "board_wipe"}
+        battle.HANDCRAFTED_KNOWN_CARDS.add("Wrath")
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Wrath", "cmc": 4, "type_line": "Sorcery"},
+            turn=6,
+            rng=random.Random(70),
+        )
+    finally:
+        if previous is None:
+            battle.KNOWN_CARDS.pop("Wrath", None)
+        else:
+            battle.KNOWN_CARDS["Wrath"] = previous
+        if not was_handcrafted:
+            battle.HANDCRAFTED_KNOWN_CARDS.discard("Wrath")
+
+    assert token not in active.battlefield
+    assert token not in active.graveyard
+
+
+def test_artifact_removal_does_not_destroy_creature_target_by_mistake():
+    caster = player("Caster")
+    opponent = player("Opponent")
+    creature = battle.enrich_card({
+        "name": "Real Creature",
+        "effect": "creature",
+        "type_line": "Creature",
+        "power": 6,
+        "toughness": 6,
+    })
+    artifact = battle.enrich_card({
+        "name": "Mana Rock",
+        "effect": "ramp_permanent",
+        "type_line": "Artifact",
+        "mana_produced": 1,
+    })
+    opponent.battlefield = [creature, artifact]
+    opponent.life = 35
+
+    battle.apply_effect_immediate(
+        caster,
+        [opponent],
+        {"name": "Nature's Claim", "cmc": 1, "type_line": "Instant"},
+        turn=7,
+        rng=random.Random(71),
+    )
+
+    assert creature in opponent.battlefield
+    assert artifact not in opponent.battlefield
+    assert artifact in opponent.graveyard
+    assert opponent.life == 39
+
+
+def test_land_ramp_puts_library_land_tapped_and_spell_goes_to_graveyard():
+    active = player("Active")
+    forest = {"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}
+    spell = {"name": "Rampant Growth", "cmc": 2, "type_line": "Sorcery"}
+    active.library = [forest]
+
+    battle.apply_effect_immediate(active, [], spell, turn=8, rng=random.Random(72))
+
+    assert spell in active.graveyard
+    assert forest not in active.library
+    assert any(
+        card.get("name") == "Forest" and card.get("tapped") is True
+        for card in active.battlefield
+        if isinstance(card, dict)
+    )
+    assert not any(card.get("name") == "Rampant Growth" for card in active.battlefield if isinstance(card, dict))
+
+
+def test_land_recursion_returns_graveyard_lands_tapped():
+    active = player("Active")
+    plains = {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"}
+    spell = {"name": "Splendid Reclamation", "cmc": 4, "type_line": "Sorcery"}
+    active.graveyard = [plains]
+
+    battle.apply_effect_immediate(active, [], spell, turn=9, rng=random.Random(73))
+
+    assert plains not in active.graveyard
+    assert spell in active.graveyard
+    assert any(
+        card.get("name") == "Plains" and card.get("tapped") is True
+        for card in active.battlefield
+        if isinstance(card, dict)
+    )
+
+
+def test_passive_permanent_does_not_draw_or_make_mana_on_resolution():
+    active = player("Active")
+    active.library = [card("Future Draw", cmc=1)]
+    skullclamp = {"name": "Skullclamp", "cmc": 1, "type_line": "Artifact — Equipment"}
+
+    battle.apply_effect_immediate(active, [], skullclamp, turn=10, rng=random.Random(74))
+
+    assert len(active.library) == 1
+    assert active.available_mana() == 0
+    assert any(
+        permanent.get("name") == "Skullclamp" and permanent.get("effect") == "passive"
+        for permanent in active.battlefield
+        if isinstance(permanent, dict)
+    )
+
+
+def test_tutor_to_graveyard_moves_library_card_without_drawing():
+    active = player("Active")
+    target = {"name": "Graveyard Target", "cmc": 7, "type_line": "Creature", "effect": "creature"}
+    active.library = [target, card("Small Card", cmc=1)]
+    entomb = {"name": "Entomb", "cmc": 1, "type_line": "Instant"}
+
+    battle.apply_effect_immediate(active, [], entomb, turn=10, rng=random.Random(75))
+
+    assert target not in active.library
+    assert target in active.graveyard
+    assert entomb in active.graveyard
+    assert active.hand == []
+
+
+def test_mystical_tutor_finds_instant_or_sorcery_only():
+    active = player("Active")
+    creature = {"name": "Large Creature", "cmc": 9, "type_line": "Creature", "effect": "creature"}
+    instant = {"name": "Target Instant", "cmc": 2, "type_line": "Instant", "effect": "counter"}
+    sorcery = {"name": "Target Sorcery", "cmc": 4, "type_line": "Sorcery", "effect": "draw_cards"}
+    active.library = [creature, instant, sorcery]
+    mystical = {"name": "Mystical Tutor", "cmc": 1, "type_line": "Instant"}
+
+    battle.apply_effect_immediate(active, [], mystical, turn=10, rng=random.Random(77))
+
+    assert creature in active.library
+    assert sorcery not in active.library
+    assert sorcery in active.hand
+    assert mystical in active.graveyard
+
+
+def test_silence_spell_blocks_responses_until_cleanup_only():
+    active = player("Active")
+    responder = player("Responder")
+    responder.hand = [
+        {
+            "name": "Real Counter",
+            "cmc": 2,
+            "tag": "counter",
+            "effect": "counter",
+            "type_line": "Instant",
+        }
+    ]
+    responder.battlefield = ["land", "land"]
+    responder.refresh_mana_sources(turn=3)
+
+    battle.apply_effect_immediate(active, [responder], {"name": "Silence", "cmc": 1, "type_line": "Instant"}, 3, random.Random(78))
+    stack = battle.Stack()
+    spell = {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"}
+    stack.push(spell, active, battle.get_card_effect(spell))
+
+    battle.priority_round(active, [active, responder], stack, 3, random.Random(78))
+
+    assert active.silenced_opponents_until_eot is True
+    assert responder.hand[0]["name"] == "Real Counter"
+    battle.clear_until_eot(active)
+    assert active.silenced_opponents_until_eot is False
+
+
+def test_reanimation_recursion_returns_creature_to_battlefield():
+    active = player("Active")
+    target = {
+        "name": "Reanimated Creature",
+        "cmc": 4,
+        "type_line": "Creature",
+        "effect": "creature",
+        "power": 4,
+        "toughness": 4,
+    }
+    reanimate = {"name": "Reanimate", "cmc": 1, "type_line": "Sorcery"}
+    active.graveyard = [target]
+
+    battle.apply_effect_immediate(active, [], reanimate, turn=10, rng=random.Random(76))
+
+    assert target not in active.graveyard
+    assert reanimate in active.graveyard
+    assert any(
+        permanent.get("name") == "Reanimated Creature"
+        and permanent.get("effect") == "creature"
+        and permanent.get("summoning_sick") is True
+        for permanent in active.battlefield
+        if isinstance(permanent, dict)
+    )
+
+
+def test_failed_draw_from_empty_library_loses_even_with_cards_in_hand():
+    active = player("Active")
+    active.hand = [card("Still in hand")]
+
+    drawn = active.draw(1, random.Random(45))
+    eliminated = battle.check_sbas([active])
+
+    assert drawn == []
+    assert eliminated is True
+    assert active.eliminated is True
+    assert active.life == 0
+
+
+def test_extra_turns_are_taken_before_next_player():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active", [card("Draw 1"), card("Draw 2"), card("Draw 3")])
+    defender = player("Defender", [card("Opp Draw")])
+    active.extra_turns = 1
+
+    battle.play_turn_sequence_v8(
+        active,
+        [defender],
+        [active, defender],
+        turn=4,
+        rng=random.Random(46),
+        stack=battle.Stack(),
+    )
+    battle.REPLAY_EVENT_HANDLER = None
+
+    assert active.extra_turns == 0
+    assert [event for event, _ in events].count("turn_start") == 2
+    assert any(event == "extra_turn_taken" for event, _ in events)
+
+
+def test_token_maker_tokens_are_sick_unless_rule_grants_haste():
+    active = player("Active")
+    defender = player("Defender")
+    token_spell = {"name": "Token Maker", "cmc": 4, "type_line": "Sorcery"}
+
+    previous_normal = battle.KNOWN_CARDS.get("Token Maker")
+    previous_hasty = battle.KNOWN_CARDS.get("Hasty Token Maker")
+    normal_was_handcrafted = "Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
+    hasty_was_handcrafted = "Hasty Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
+    try:
+        battle.KNOWN_CARDS["Token Maker"] = {
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_power": 2,
+        }
+        battle.KNOWN_CARDS["Hasty Token Maker"] = {
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_power": 2,
+            "token_haste": True,
+        }
+        battle.HANDCRAFTED_KNOWN_CARDS.update({"Token Maker", "Hasty Token Maker"})
+
+        battle.apply_effect_immediate(active, [defender], token_spell, 2, random.Random(36))
+        token = active.battlefield[0]
+        assert token["summoning_sick"] is True
+        battle.combat_phase_v8(active, [defender], [active, defender], 2, random.Random(36), battle.Stack())
+        assert token["tapped"] is False
+        assert defender.life == 40
+
+        hasty = player("Hasty")
+        hasty_spell = {**token_spell, "name": "Hasty Token Maker"}
+        battle.apply_effect_immediate(hasty, [defender], hasty_spell, 2, random.Random(37))
+        assert hasty.battlefield[0]["summoning_sick"] is False
+        assert hasty.battlefield[0]["haste"] is True
+        battle.combat_phase_v8(hasty, [defender], [hasty, defender], 2, random.Random(37), battle.Stack())
+        assert hasty.battlefield[0]["tapped"] is True
+    finally:
+        if previous_normal is None:
+            battle.KNOWN_CARDS.pop("Token Maker", None)
+        else:
+            battle.KNOWN_CARDS["Token Maker"] = previous_normal
+        if previous_hasty is None:
+            battle.KNOWN_CARDS.pop("Hasty Token Maker", None)
+        else:
+            battle.KNOWN_CARDS["Hasty Token Maker"] = previous_hasty
+        if not normal_was_handcrafted:
+            battle.HANDCRAFTED_KNOWN_CARDS.discard("Token Maker")
+        if not hasty_was_handcrafted:
+            battle.HANDCRAFTED_KNOWN_CARDS.discard("Hasty Token Maker")
+
+
+def test_token_maker_counts_dict_lands_for_land_based_tokens():
+    active = player("Active")
+    active.battlefield = [
+        {"name": "Plains", "type_line": "Basic Land — Plains", "effect": "land"},
+        {"name": "Mountain", "type_line": "Basic Land — Mountain", "effect": "land"},
+        {"name": "Arcane Signet", "type_line": "Artifact", "effect": "ramp_permanent"},
+    ]
+    previous = battle.KNOWN_CARDS.get("Land Count Token Maker")
+    was_handcrafted = "Land Count Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
+    try:
+        battle.KNOWN_CARDS["Land Count Token Maker"] = {
+            "effect": "token_maker",
+            "token_count": "lands",
+            "token_power": 1,
+        }
+        battle.HANDCRAFTED_KNOWN_CARDS.add("Land Count Token Maker")
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Land Count Token Maker", "cmc": 4, "type_line": "Sorcery"},
+            6,
+            random.Random(43),
+        )
+        tokens = [c for c in active.battlefield if isinstance(c, dict) and c.get("name") == "Token"]
+        assert len(tokens) == 2
+    finally:
+        if previous is None:
+            battle.KNOWN_CARDS.pop("Land Count Token Maker", None)
+        else:
+            battle.KNOWN_CARDS["Land Count Token Maker"] = previous
+        if not was_handcrafted:
+            battle.HANDCRAFTED_KNOWN_CARDS.discard("Land Count Token Maker")
+
+
+def test_lumra_returns_milled_and_graveyard_lands_tapped():
+    active = player("Lumra")
+    active.battlefield = [
+        {"name": "Forest", "type_line": "Basic Land — Forest", "effect": "land"},
+        {"name": "Mosswort Bridge", "type_line": "Land", "effect": "land"},
+    ]
+    active.graveyard = [
+        {"name": "Fabled Passage", "type_line": "Land", "effect": "land"},
+        {"name": "Cultivate", "type_line": "Sorcery", "effect": "ramp_permanent"},
+    ]
+    active.library = [
+        {"name": "Boseiju, Who Endures", "type_line": "Legendary Land", "effect": "land"},
+        {"name": "Rampant Growth", "type_line": "Sorcery", "effect": "ramp_permanent"},
+        {"name": "Yavimaya, Cradle of Growth", "type_line": "Legendary Land", "effect": "land"},
+        {"name": "Explore", "type_line": "Sorcery", "effect": "draw_cards"},
+    ]
+    lumra = {
+        "name": "Lumra, Bellow of the Woods",
+        "cmc": 6,
+        "type_line": "Legendary Creature — Elemental Bear",
+        "oracle_text": "Vigilance, reach\nLumra's power and toughness are each equal to the number of lands you control.\nWhen Lumra enters, mill four cards. Then return all land cards from your graveyard to the battlefield tapped.",
+    }
+
+    battle.apply_effect_immediate(active, [], lumra, 4, random.Random(40))
+
+    permanent = next(c for c in active.battlefield if isinstance(c, dict) and c.get("name") == "Lumra, Bellow of the Woods")
+    returned_names = {c.get("name") for c in active.battlefield if isinstance(c, dict) and c.get("tapped")}
+    assert {"Fabled Passage", "Boseiju, Who Endures", "Yavimaya, Cradle of Growth"} <= returned_names
+    assert permanent["power"] == 5
+    assert permanent["toughness"] == 5
+    assert permanent["summoning_sick"] is True
+
+
+def test_zuran_orb_is_life_artifact_not_mana_rock():
+    active = player("Active")
+    zuran = {
+        "name": "Zuran Orb",
+        "cmc": 0,
+        "type_line": "Artifact",
+        "oracle_text": "Sacrifice a land: You gain 2 life.",
+    }
+
+    effect = battle.get_card_effect(zuran)
+    assert effect["effect"] == "life_artifact"
+    assert effect["_rule_review_status"] == "verified"
+    battle.apply_effect_immediate(active, [], zuran, 5, random.Random(41))
+
+    permanent = active.battlefield[0]
+    assert permanent["effect"] == "life_artifact"
+    assert "mana_produced" not in permanent
+    assert active.available_mana() == 0
+
+
+def test_vexing_bauble_is_hate_artifact_not_immediate_draw():
+    active = player("Active", [card("Top card")])
+    bauble = {
+        "name": "Vexing Bauble",
+        "cmc": 1,
+        "type_line": "Artifact",
+        "oracle_text": "Whenever a player casts a spell, if no mana was spent to cast it, counter that spell.\n{1}, {T}, Sacrifice Vexing Bauble: Draw a card.",
+    }
+
+    effect = battle.get_card_effect(bauble)
+    assert effect["effect"] == "hate_artifact"
+    assert effect["_rule_review_status"] == "verified"
+    before_hand = len(active.hand)
+    battle.apply_effect_immediate(active, [], bauble, 6, random.Random(42))
+
+    permanent = active.battlefield[0]
+    assert permanent["effect"] == "hate_artifact"
+    assert permanent["counters_free_spells"] is True
+    assert len(active.hand) == before_hand
+
+
+def test_protected_player_prevents_combat_damage_without_audit_finding():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = (
+        lambda event, data: events.append({"event": event, "replay_id": "protected", **data})
+    )
+    attacker = player("Attacker")
+    defender = player("Defender")
+    defender.life = 1
+    defender.life_cant_change = True
+    defender.protection_from_everything = True
+    attacker.battlefield = [
+        {
+            "name": "Unblocked Attacker",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+    ]
+
+    battle.combat_phase_v8(
+        attacker,
+        [defender],
+        [attacker, defender],
+        turn=4,
+        rng=random.Random(43),
+        stack=battle.Stack(),
+    )
+
+    combat_result = next(event for event in events if event["event"] == "combat_result")
+    assert defender.life == 1
+    assert combat_result["damage_to_player"] == 0
+    assert combat_result["target_protection_from_everything"] is True
+    findings = replay_auditor.audit_turn_events(events)
+    assert not [
+        finding
+        for finding in findings
+        if "Unblocked combat dealt 0" in finding["finding"]
+        or "Unblocked lethal-looking combat" in finding["finding"]
+    ]
+
+
+def test_springheart_landfall_creates_sick_insect_token():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active")
+    nantuko = battle.enrich_card(
+        {
+            "name": "Springheart Nantuko",
+            "effect": "creature",
+            "type_line": "Enchantment Creature — Insect Monk",
+            "power": 1,
+            "toughness": 1,
+            "landfall_token_maker": True,
+            "token_power": 1,
+            "token_toughness": 1,
+        }
+    )
+    land = {"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}
+    active.battlefield = [nantuko, land]
+
+    battle.trigger_landfall(active, land, turn=3, source_event="test_land_played")
+
+    tokens = [card for card in active.battlefield if card.get("name") == "Insect Token"]
+    assert len(tokens) == 1
+    assert tokens[0]["power"] == 1
+    assert tokens[0]["summoning_sick"] is True
+    trigger = next(data for event, data in events if event == "trigger_resolved")
+    assert trigger["trigger"] == "landfall"
+    assert trigger["tokens_created"] == 1
+
+
+def test_creature_mana_source_has_summoning_sickness_then_refreshes_mana():
+    active = player("Active")
+    plague_myr = {
+        "name": "Plague Myr",
+        "effect": "creature",
+        "type_line": "Artifact Creature — Phyrexian Myr",
+        "power": 1,
+        "toughness": 1,
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "C",
+    }
+    active.hand = [plague_myr]
+    active.battlefield = [{"name": "Wastes", "effect": "land", "type_line": "Basic Land"} for _ in range(2)]
+    active.refresh_mana_sources(turn=1)
+    active.spend_card_mana(plague_myr)
+    active.hand.remove(plague_myr)
+    permanent = battle.enrich_card({**plague_myr, **battle.get_card_effect(plague_myr)})
+    permanent["effect"] = "creature"
+    permanent["summoning_sick"] = True
+    permanent["tapped"] = False
+    active.battlefield.append(permanent)
+
+    assert active.untapped_creatures() == []
+    active.refresh_mana_sources(turn=1)
+    assert active.available_mana() == 2
+    permanent["summoning_sick"] = False
+    active.refresh_mana_sources(turn=2)
+    assert active.available_mana() == 3
+
+
+def test_elvish_reclaimer_cannot_activate_while_summoning_sick():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active")
+    active.library = [{"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}]
+    active.battlefield = [
+        {"name": "Forest A", "effect": "land", "type_line": "Basic Land — Forest"},
+        {"name": "Forest B", "effect": "land", "type_line": "Basic Land — Forest"},
+        {
+            "name": "Elvish Reclaimer",
+            "effect": "creature",
+            "type_line": "Creature — Elf Warrior",
+            "power": 1,
+            "toughness": 2,
+            "land_tutor_activated": True,
+            "summoning_sick": True,
+            "tapped": False,
+        },
+    ]
+    active.refresh_mana_sources(turn=1)
+
+    battle.activate_land_tutor_creatures(active, turn=1)
+
+    assert len(active.library) == 1
+    assert not [event for event, _ in events if event == "activated_ability"]
+
+
+def test_elvish_reclaimer_activates_after_sickness_clears():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active")
+    active.library = [{"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}]
+    reclaimer = {
+        "name": "Elvish Reclaimer",
+        "effect": "creature",
+        "type_line": "Creature — Elf Warrior",
+        "power": 1,
+        "toughness": 2,
+        "land_tutor_activated": True,
+        "summoning_sick": False,
+        "tapped": False,
+    }
+    active.battlefield = [
+        {"name": "Forest A", "effect": "land", "type_line": "Basic Land — Forest"},
+        {"name": "Forest B", "effect": "land", "type_line": "Basic Land — Forest"},
+        reclaimer,
+    ]
+    active.refresh_mana_sources(turn=2)
+
+    battle.activate_land_tutor_creatures(active, turn=2)
+
+    assert active.library == []
+    assert reclaimer["tapped"] is True
+    assert any(event == "activated_ability" for event, _ in events)
+
+
+def test_known_land_name_without_oracle_imports_as_land_not_creature():
+    imported = battle.build_learned_battle_card({"name": "High Market"}, oracle_cache={})
+
+    assert imported["effect"] == "land"
+    assert imported["type_line"] == "Land"
+    assert battle.is_battlefield_creature(imported) is False
+
+
+def test_unknown_card_without_oracle_does_not_default_to_creature():
+    imported = battle.build_learned_battle_card({"name": "Mystery Card"}, oracle_cache={})
+
+    assert imported["effect"] == "unknown"
+    assert imported["type_line"] == ""
+    assert battle.is_battlefield_creature(imported) is False
+
+
+def test_auditor_flags_noncreature_land_attacker():
+    events = [
+        {
+            "event": "combat",
+            "replay_id": "land_bug",
+            "turn": 2,
+            "attacker": "Player A",
+            "target": "Player B",
+            "attackers_detail": [
+                {
+                    "name": "Forest",
+                    "type_line": "Land",
+                    "tapped": True,
+                    "summoning_sick": False,
+                    "keywords": [],
+                }
+            ],
+        }
+    ]
+
+    findings = replay_auditor.audit_turn_events(events)
+
+    assert any("Non-creature land attacked" in finding["finding"] for finding in findings)
+
+
+def test_zero_power_creature_without_attack_trigger_does_not_attack():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    attacker = player("Attacker")
+    defender = player("Defender")
+    attacker.battlefield = [
+        {
+            "name": "Birds of Paradise",
+            "effect": "creature",
+            "type_line": "Creature — Bird",
+            "power": 0,
+            "toughness": 1,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+    ]
+
+    battle.combat_phase_v8(
+        attacker,
+        [defender],
+        [attacker, defender],
+        turn=3,
+        rng=random.Random(44),
+        stack=battle.Stack(),
+    )
+
+    assert not [event for event, _ in events if event == "combat"]
+    assert attacker.battlefield[0]["tapped"] is False
+    assert defender.life == 40
+
+
+def test_treasure_maker_can_discard_draw_and_create_treasures():
+    active = player("Caster")
+    active.hand = [{"name": "Discard Me", "cmc": 1, "type_line": "Sorcery"}]
+    active.library = [
+        {"name": "Drawn A", "cmc": 1, "type_line": "Instant"},
+        {"name": "Drawn B", "cmc": 2, "type_line": "Sorcery"},
+    ]
+
+    battle.apply_effect_immediate(
+        active,
+        [],
+        {"name": "Unexpected Windfall", "cmc": 4, "type_line": "Instant"},
+        turn=4,
+        rng=random.Random(9),
+    )
+
+    assert active.treasures == 2
+    assert [card["name"] for card in active.hand] == ["Drawn A", "Drawn B"]
+    assert [card["name"] for card in active.graveyard] == [
+        "Discard Me",
+        "Unexpected Windfall",
+    ]
+
+
+def test_rule_sync_oracle_normalizes_generated_land_rules():
+    sync_path = MODULE_PATH.with_name("sync_battle_card_rules.py")
+    sync_spec = importlib.util.spec_from_file_location("sync_rules_under_test", sync_path)
+    sync_rules = importlib.util.module_from_spec(sync_spec)
+    sync_spec.loader.exec_module(sync_rules)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        db_path = str(Path(tmp_dir) / "rules.db")
+        conn = sqlite3.connect(db_path)
+        conn.execute(
+            """
+            CREATE TABLE card_oracle_cache (
+              normalized_name TEXT PRIMARY KEY,
+              name TEXT,
+              mana_cost TEXT,
+              colors_json TEXT,
+              color_identity_json TEXT,
+              type_line TEXT,
+              oracle_text TEXT,
+              cmc REAL,
+              power TEXT,
+              toughness TEXT,
+              keywords_json TEXT,
+              scryfall_id TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO card_oracle_cache (
+              normalized_name, name, type_line, oracle_text, cmc,
+              colors_json, color_identity_json, keywords_json
+            )
+            VALUES ('mystery land', 'Mystery Land', 'Land', '', 0, '[]', '[]', '[]')
+            """
+        )
+        conn.commit()
+        conn.close()
+
+        rows = sync_rules._oracle_normalized_rows(
+            db_path,
+            [
+                {
+                    "card_name": "Mystery Land",
+                    "effect_json": {"effect": "ramp_permanent"},
+                    "source": "generated",
+                    "confidence": 0.55,
+                    "review_status": "needs_review",
+                    "notes": "",
+                }
+            ],
+        )
+
+    assert rows[0]["effect_json"]["effect"] == "land"
+    assert rows[0]["_oracle_normalized"] is True
+
+
 if __name__ == "__main__":
     tests = [
         test_sba_only_reports_new_elimination,
@@ -917,6 +1986,45 @@ if __name__ == "__main__":
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_silence_effect_blocks_counterspell_responses,
         test_life_cant_change_prevents_damage_and_life_gain,
+        test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,
+        test_lorehold_miracle_ignores_lands_and_creatures,
+        test_lorehold_miracle_rejects_flash_creatures,
+        test_end_step_window_does_not_cast_lands,
+        test_summoning_sick_creature_cannot_attack_until_next_turn,
+        test_creature_loses_summoning_sickness_at_start_of_controller_turn_and_taps_to_attack,
+        test_haste_creature_can_attack_while_summoning_sick_and_taps,
+        test_vigilance_creature_attacks_without_tapping,
+        test_engine_creature_enters_with_summoning_sickness,
+        test_permanent_activated_removal_text_does_not_become_free_removal,
+        test_contextual_haste_text_does_not_grant_self_haste,
+        test_commander_destroyed_in_combat_returns_to_command_zone,
+        test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard,
+        test_artifact_removal_does_not_destroy_creature_target_by_mistake,
+        test_land_ramp_puts_library_land_tapped_and_spell_goes_to_graveyard,
+        test_land_recursion_returns_graveyard_lands_tapped,
+        test_passive_permanent_does_not_draw_or_make_mana_on_resolution,
+        test_tutor_to_graveyard_moves_library_card_without_drawing,
+        test_mystical_tutor_finds_instant_or_sorcery_only,
+        test_silence_spell_blocks_responses_until_cleanup_only,
+        test_reanimation_recursion_returns_creature_to_battlefield,
+        test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
+        test_extra_turns_are_taken_before_next_player,
+        test_token_maker_tokens_are_sick_unless_rule_grants_haste,
+        test_token_maker_counts_dict_lands_for_land_based_tokens,
+        test_lumra_returns_milled_and_graveyard_lands_tapped,
+        test_zuran_orb_is_life_artifact_not_mana_rock,
+        test_vexing_bauble_is_hate_artifact_not_immediate_draw,
+        test_protected_player_prevents_combat_damage_without_audit_finding,
+        test_springheart_landfall_creates_sick_insect_token,
+        test_creature_mana_source_has_summoning_sickness_then_refreshes_mana,
+        test_elvish_reclaimer_cannot_activate_while_summoning_sick,
+        test_elvish_reclaimer_activates_after_sickness_clears,
+        test_known_land_name_without_oracle_imports_as_land_not_creature,
+        test_unknown_card_without_oracle_does_not_default_to_creature,
+        test_auditor_flags_noncreature_land_attacker,
+        test_zero_power_creature_without_attack_trigger_does_not_attack,
+        test_treasure_maker_can_discard_draw_and_create_treasures,
+        test_rule_sync_oracle_normalizes_generated_land_rules,
     ]
     for test in tests:
         test()

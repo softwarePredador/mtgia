@@ -129,9 +129,12 @@ Fontes PG auxiliares observadas:
 - `commander_reference_deck_cards`: cartas resolvidas desses decks de referencia.
 - `deck_learning_events`: eventos de aprendizado sincronizados.
 
-### SQLite Hermes
+### Postgres + SQLite Hermes
 
-O SQLite `knowledge.db` e a fonte operacional do battle/optimizer. Ele recebe:
+O Postgres e a fonte central de fatos e revisoes consolidadas. Para semantica
+executavel de cartas, a tabela canonica e `card_battle_rules`.
+
+O SQLite `knowledge.db` e o cache operacional do battle/optimizer. Ele recebe:
 
 - decks aprendidos;
 - deck alvo atual;
@@ -147,7 +150,7 @@ Snapshot vivo observado em 2026-06-07 apos sync de meta decks PG:
 | `deck_cards` | 543 | Decks locais do Hermes, incluindo deck alvo `deck_id=6`. |
 | `learned_decks` | 202 | Oponentes reais aprendidos para battle, incluindo 120 `pg_meta_decks`. |
 | `card_oracle_cache` | 3464 | Cache de metadata importada do Postgres. |
-| `battle_card_rules` | variavel | Semantica canonica de cartas para battle e montagem de deck. |
+| `battle_card_rules` | variavel | Cache runtime de `card_battle_rules` para battle e montagem de deck. |
 | `card_legalities` | 31369 | Legalidade por formato. |
 | `game_changers` | 53 | Politica de bracket/Game Changer. |
 | `slot_benchmarks` | 30 | Resultados de scan isolado por slot. |
@@ -279,9 +282,11 @@ Contrato:
 - `battle_analyst_v8.py` usa este cache para mana colorida, poder/resistencia e keywords.
 - `slot_optimizer.py` usa este cache para identidade de cor e legalidade indireta.
 
-### `battle_card_rules`
+### `card_battle_rules` (Postgres) e `battle_card_rules` (SQLite)
 
-Criada/atualizada por `sync_battle_card_rules.py`.
+`card_battle_rules` e a fonte de verdade revisavel no Postgres.
+`battle_card_rules` e o cache local criado/atualizado por
+`sync_battle_card_rules_pg.py --apply-sqlite-from-pg`.
 
 Leituras principais:
 
@@ -310,7 +315,7 @@ Contrato:
 - `effect_json` descreve comportamento suportado pelo battle.
 - `deck_role_json` descreve papel para montagem/optimizer.
 - `source='manual'` e `review_status='verified'` tem prioridade sobre gerado.
-- `source='generated'` entra como `needs_review`; pode rodar, mas deve aparecer
+- `source='generated'` entra como `needs_review`; pode rodar no cache amplo, mas deve aparecer
   como risco em auditoria quando influenciar decisao.
 - uma carta `creature` generica nao vira categoria de deckbuilding confiavel sem
   papel explicito.
@@ -590,14 +595,15 @@ Saida esperada:
 - report JSON com cobertura;
 - nenhuma credencial impressa.
 
-### `sync_battle_card_rules.py`
+### `sync_battle_card_rules_pg.py`
 
 Funcao:
 
-- criar/atualizar `battle_card_rules`;
+- criar/atualizar `card_battle_rules` no Postgres;
 - copiar regras manuais de `HANDCRAFTED_KNOWN_CARDS` como `verified`;
 - copiar regras geradas de `known_cards_generated.json` como `needs_review`;
-- manter prioridade: gerado nao sobrescreve manual/curado.
+- manter prioridade: gerado nao sobrescreve manual/curado;
+- reconstruir o cache SQLite `battle_card_rules` a partir do Postgres.
 
 Entradas:
 
@@ -614,10 +620,64 @@ Parametros:
 
 Saida esperada:
 
-- tabela `battle_card_rules` presente;
+- tabela PG `card_battle_rules` presente;
+- cache SQLite `battle_card_rules` presente;
 - regras manuais como `source='manual'`, `review_status='verified'`;
 - regras geradas como `source='generated'`, `review_status='needs_review'`;
-- nenhuma mutacao em Postgres/producao.
+- relatorios sem credenciais.
+
+### `sync_pg_target_deck_to_hermes.py`
+
+Funcao:
+
+- importar um deck real do Postgres para o SQLite Hermes;
+- gravar o alvo como `deck_id=6`, que e o default do battle;
+- preservar commander, quantidade, CMC, type line, oracle text e tag funcional;
+- permitir rodar replay/forensic audit local sem depender do SQLite do container.
+
+Comando canonico:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --deck-name-like "%Runtime Lorehold Learned%" \
+  --target-deck-id 6 \
+  --apply \
+  --report /opt/data/artifacts/hermes_master_optimizer/target_deck_sync.json
+```
+
+Saida esperada:
+
+- `deck_cards` com 100 cartas para `deck_id=6`;
+- exatamente 1 commander;
+- `type_line`/`oracle_text` preenchidos para enriquecer o battle.
+
+### `battle_forensic_audit.py`
+
+Funcao:
+
+- gerar ou consumir replay JSONL estruturado;
+- auditar cada evento de carta contra `battle_card_rules`;
+- sinalizar `unknown`, `needs_review`, fonte heuristica e efeito nao implementado;
+- reaproveitar a auditoria turno-a-turno de cleanup, game-end, combat e Approach;
+- produzir um relatorio com carta, turno, fase, regra usada e recomendacao.
+
+Comando canonico:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --seed 42 \
+  --generate 1 \
+  --report
+```
+
+Saida esperada:
+
+- replay humano em `master_optimizer_reports/forensic_replays`;
+- replay JSONL no mesmo diretorio;
+- relatorio `battle_forensic_audit_*.md`;
+- `critical`/`high` bloqueiam confianca no optimizer ate correcao e reteste.
 
 ### `master_optimizer_loop.py --preflight --report`
 
@@ -969,10 +1029,15 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_he
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py \
   --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
   --report /opt/data/artifacts/hermes_master_optimizer/card_oracle_cache_sync_manual.json
-python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py \
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py \
   --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
-  --apply \
-  --report /opt/data/artifacts/hermes_master_optimizer/battle_card_rules_sync_manual.json
+  --apply-pg \
+  --report /opt/data/artifacts/hermes_master_optimizer/card_battle_rules_pg_sync_manual.json
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --apply-sqlite-from-pg \
+  --include-needs-review \
+  --report /opt/data/artifacts/hermes_master_optimizer/battle_card_rules_cache_sync_manual.json
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py --preflight --report
 ```
 
@@ -1182,7 +1247,8 @@ correta de validar job e olhar:
 - carrega `/opt/data/secrets/manaloom-postgres.env`;
 - roda sync PG `meta_decks` -> SQLite `learned_decks`;
 - roda sync PG -> SQLite para metadata;
-- roda sync de `battle_card_rules`;
+- roda seed/update de `card_battle_rules` no PG;
+- roda sync PG `card_battle_rules` -> SQLite `battle_card_rules`;
 - roda preflight;
 - copia ultimo report para artefato latest.
 
@@ -1203,7 +1269,8 @@ correta de validar job e olhar:
 - carrega Postgres env;
 - roda sync de meta decks PG para `learned_decks`;
 - roda sync de metadata para `card_oracle_cache`;
-- roda sync de `battle_card_rules`;
+- roda seed/update de `card_battle_rules` no PG;
+- roda sync PG `card_battle_rules` -> SQLite `battle_card_rules`;
 - roda preflight;
 - roda baseline;
 - roda slot scan fresco para o baseline atual;

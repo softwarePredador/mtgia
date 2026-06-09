@@ -51,8 +51,13 @@ def main():
                 )
             elif event == "spell_resolved":
                 replay.write(
-                    "  RESOLVE {player}: {card} (CMC={cmc}) [{effect}]\n".format(
-                        **data
+                    "  RESOLVE {player}: {card} (CMC={cmc}) [{effect}] "
+                    "rule={rule_source}/{rule_review_status}\n".format(
+                        **{
+                            **data,
+                            "rule_source": data.get("rule_source", "?"),
+                            "rule_review_status": data.get("rule_review_status", "?"),
+                        }
                     )
                 )
             elif event == "spell_countered":

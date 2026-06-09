@@ -25,6 +25,7 @@ SOURCE_PRIORITY = {
     "manual": 100,
     "curated": 90,
     "generated": 40,
+    "imported": 30,
     "heuristic": 20,
 }
 
@@ -32,11 +33,17 @@ EFFECT_TO_DECK_CATEGORY = {
     "ramp_permanent": "ramp",
     "ramp_ritual": "ramp",
     "ramp_engine": "ramp",
+    "land_ramp": "ramp",
+    "treasure_maker": "ramp",
     "silence_opponents": "protection",
+    "silence_spell": "protection",
     "indestructible": "protection",
     "phase_out": "protection",
+    "phase_creatures": "protection",
+    "protect_creature": "protection",
     "redirect_removal": "protection",
     "counter": "protection",
+    "hate_artifact": "protection",
     "draw_cards": "draw",
     "draw_engine": "draw",
     "topdeck_manipulation": "draw",
@@ -54,9 +61,14 @@ EFFECT_TO_DECK_CATEGORY = {
     "remove_creature": "removal",
     "remove_permanent": "removal",
     "remove_artifact_or_3dmg": "removal",
+    "deal_damage": "removal",
     "copy_spell": "engine",
     "recursion": "engine",
+    "land_recursion": "engine",
+    "land_recursion_creature": "engine",
+    "life_artifact": "protection",
     "ripple_engine": "engine",
+    "passive": "unknown",
     "land": "land",
     "creature": "unknown",
 }
@@ -193,7 +205,15 @@ def lookup_battle_card_rule(
     card_name: str,
 ) -> dict[str, Any] | None:
     rules = load_active_battle_card_rules(db_path)
-    rule = rules.get(normalize_card_name(card_name))
+    normalized = normalize_card_name(card_name)
+    rule = rules.get(normalized)
+    if rule:
+        return dict(rule)
+    face_prefix = f"{normalized} //"
+    rule = next(
+        (value for key, value in rules.items() if key.startswith(face_prefix)),
+        None,
+    )
     return dict(rule) if rule else None
 
 
