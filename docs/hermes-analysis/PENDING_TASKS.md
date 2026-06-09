@@ -1,550 +1,507 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
-> Todas as pendências com descrição exata da lógica a implementar.
-> Ordenado por prioridade (P1 = bloqueia confiabilidade, P2 = expande cobertura).
-> Referências: CR = Comprehensive Rules oficiais.
-
-Última atualização: 2026-06-09
+> **Handoff: 2026-06-09.**  
+> 15/25 itens implementados no battle_analyst_v9.py (5400+ linhas).  
+> 10 pendentes de alta complexidade — requerem refatoração arquitetural.  
+> Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
 
-## P1 — Alta Prioridade
+## Progresso
+
+| # | Item | Status |
+|---|---|---|
+| ✅ | SBA loop (check_sbas_until_stable) | v9:2540 |
+| ✅ | Creature toughness/damage SBA | v9:2545 |
+| ✅ | Legend rule SBA | v9:2555 |
+| ✅ | Poison counter + SBA | v9:2282, 2535 |
+| ✅ | Commander replacement opcional | v9:2865 |
+| ✅ | classify_loss + taxonomia canônica | v9:4958 |
+| ✅ | WDWR/WPWR | card_impact_analyzer.py |
+| ✅ | Loss-mode suggester | loss_mode_suggester.py |
+| ✅ | Slot optimizer role fix | slot_optimizer.py |
+| ✅ | Ward (check_ward scaffold) | v9:3530 |
+| ✅ | LKI + Zone change counter | v9:2865, 2863 |
+| ✅ | is_legal_target | v9:2596 |
+| ✅ | Token lifecycle SBA | v9:2590 |
+| ✅ | copy_spell_on_stack | v9:2443 |
+| ✅ | 3 docs (LOGIC, GAPS, TASKS) | docs/hermes-analysis/ |
+| ⏳ | APNAP trigger ordering | P1 |
+| ⏳ | Prioridade com pilha vazia | P1 |
+| ⏳ | Casting pipeline 601.2 | P1 |
+| ⏳ | Passos de combate formais | P1 |
+| ⏳ | Layers 1-7 (continuous effects) | P1 |
+| ⏳ | Replacement/Prevention effects | P1 |
+| ⏳ | Planeswalkers + Battles | P2 |
+| ⏳ | DFC/Adventure/Prototype | P2 |
+| ⏳ | Telemetria de saúde do motor | P2 |
+| ⏳ | Suite de conformidade | P2 |
+
+---
+
+## Ordem Recomendada de Implementação
+
+| Ordem | Item | Esforço | Impacto | Depende de |
+|---|---|---|---|---|
+| 1 | APNAP trigger ordering | 3-4 dias | Alto | — |
+| 2 | Prioridade com pilha vazia | 2-3 dias | Alto | #1 |
+| 3 | Passos de combate formais | 4-5 dias | Alto | #2 |
+| 4 | Casting pipeline 601.2 | 5-7 dias | Alto | #2 |
+| 5 | Replacement effects | 5-7 dias | Alto | — |
+| 6 | Layers 1-7 | 7-10 dias | Alto | #5 |
+| 7 | Planeswalkers/Battles | 3-4 dias | Médio | #2, #3 |
+| 8 | DFC/Adventure/Prototype | 4-5 dias | Médio | #4 |
+| 9 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 10 | Suite de conformidade | 5-7 dias | Alto | #1-9 |
+
+---
+
+## P1 — Kernel de Regras
 
 ### 1. APNAP Trigger Ordering
 
-**O que é**: Quando múltiplas triggered abilities disparam desde a última vez que um jogador recebeu prioridade, elas devem ser colocadas na stack em ordem APNAP (Active Player, Non-Active Player em ordem de turno). Dentro do mesmo controlador, a ordem é escolhida por ele.
+**Gap**: Triggers resolvem imediatamente via `emit_replay_event()`, não vão para a stack.
 
-**Estado atual**: Triggers resolvem imediatamente, sem ir para a stack. Ex: `emit_replay_event("trigger_resolved", ...)` resolve na hora.
+**Arquivo**: `battle_analyst_v9.py` — todas as chamadas que emitem eventos de trigger
 
-**Lógica exata**:
+**Implementação**:
 ```python
-def settle_triggers():
-    batch = []
+# Adicionar ao início do módulo:
+_pending_triggers: list[dict] = []
+
+def enqueue_trigger(source, event_type, controller, data):
+    """Enfileira trigger para processamento APNAP — não resolve ainda."""
+    _pending_triggers.append({
+        "source": source,
+        "event": event_type,
+        "controller": controller,
+        "data": data,
+        "timestamp": _trigger_counter,
+    })
+    global _trigger_counter
+    _trigger_counter += 1
+
+def flush_triggers_in_apnap(active_player, all_players):
+    """Coloca todas as triggers pendentes na stack em ordem APNAP."""
+    # Ordena: active player primeiro, depois non-active em ordem de turno
+    turn_order = [active_player] + [p for p in all_players if p != active_player]
+    
     for player in turn_order:
-        player_triggers = collect_triggered_abilities(player)
-        # Player chooses order for their own triggers
-        batch.extend(player_triggers)  # APNAP: active first, then others
+        player_triggers = [t for t in _pending_triggers if t["controller"] == player]
+        # Player chooses order for own triggers (sim: by timestamp)
+        player_triggers.sort(key=lambda t: t["timestamp"])
+        for trigger in player_triggers:
+            stack.push(trigger)
     
-    for trigger in batch:
-        stack.push(trigger)  # Goes on stack, doesn't resolve immediately
-    
-    # After stacking all triggers, SBAs re-check
-    check_sbas_until_stable()
-    
-    # Now priority loop can respond to triggers
+    _pending_triggers.clear()
+
+# Substituir todos os emit_replay_event("trigger_*") por enqueue_trigger()
+# Chamar flush_triggers_in_apnap() antes de cada janela de prioridade
 ```
 
-**Regra**: CR 603.3, CR 603.3b, CR 405
+**Regra**: CR 603.3, CR 603.3b
 
-**Arquivos**: `battle_analyst_v8.py` — todas as chamadas `emit_replay_event("trigger_*")`
+**Testes**: Duas triggers do mesmo jogador; triggers de jogadores diferentes; ETB que cria outra trigger
 
 ---
 
-### 2. Prioridade com Pilha Vazia
+### 2. Prioridade com Pilha Vazia nos Main Phases
 
-**O que é**: Jogadores devem receber prioridade durante suas main phases mesmo com a pilha vazia, para poder jogar lands, conjurar criaturas/artifacts/enchantments/planeswalkers em velocidade de sorcery, ou ativar abilities.
+**Gap**: `priority_round()` retorna `False` se `stack.empty()` (v9:2580). Jogadores não podem conjurar criaturas/sorceries/artifacts em velocidade de sorcery porque nunca recebem prioridade com pilha vazia.
 
-**Estado atual**: `priority_round()` retorna imediatamente se `stack.empty()` (linha 2564).
+**Arquivo**: `battle_analyst_v9.py:2575-2620`
 
-**Lógica exata**:
+**Implementação**:
 ```python
-def run_priority_loop(active_player, all_players):
-    current_player = active_player
+def run_priority_loop(active_player, all_players, stack, turn, phase):
+    """Loop formal de prioridade — permite ações com pilha vazia em main phases."""
+    current = active_player
     pass_count = 0
+    max_passes = len(all_players)
     
     while True:
-        action = get_player_action(current_player)
+        # Check if game ended
+        if any(hasattr(p, "eliminated") and p.eliminated for p in all_players):
+            break
+        
+        action = get_player_action(current, all_players, stack, phase)
+        
         if action == "pass":
             pass_count += 1
-            if pass_count >= len(all_players):
-                break  # All passed in succession
+            if pass_count >= max_passes:
+                break  # Everyone passed in succession
         else:
             pass_count = 0
-            execute(action)
-            check_sbas_until_stable()
+            execute_action(action, stack)
+            check_sbas_until_stable(all_players)
+            flush_triggers_in_apnap(current, all_players)
         
-        current_player = next_in_turn_order(current_player)
+        current = next_in_turn_order(current, all_players)
+        # Skip eliminated players
+        while hasattr(current, "eliminated") and current.eliminated:
+            current = next_in_turn_order(current, all_players)
+    
+    if stack.not_empty():
+        resolve_top_of_stack()
+        check_sbas_until_stable(all_players)
+
+def get_player_action(player, all_players, stack, phase):
+    """Determina ação do jogador baseado em IA/input."""
+    if player.is_human:
+        # Human: can play land, cast sorcery-speed, activate abilities
+        pass  # UI-driven
+    else:
+        # AI: evaluate best play
+        if phase in ("precombat_main", "postcombat_main"):
+            # Play land, cast creatures/sorceries, activate abilities
+            return ai_decide_action(player, all_players, stack, phase)
+    return "pass"
 ```
 
 **Regra**: CR 117.3, CR 117.4
-
-**Arquivos**: `battle_analyst_v8.py:2563-2620`
 
 ---
 
 ### 3. Casting Pipeline 601.2
 
-**O que é**: O processo formal de casting de uma spell segue 8 passos: (1) anunciar e mover para stack, (2) escolher modos/alternativas/X, (3) escolher targets, (4) dividir efeitos, (5) checar legalidade, (6) determinar custo total, (7) ativar mana abilities e pagar, (8) spell torna-se cast.
+**Gap**: Custo calculado inline como `cmd["cmc"] + player.commander_tax` sem lock-in formal. Sem suporte a custos alternativos (kicker, flashback), X spells, hybrid/Phyrexian mana.
 
-**Estado atual**: Custo calculado inline como `cmd["cmc"] + player.commander_tax` sem lock-in formal, sem suporte a custos alternativos, kicker, X spells, ou hybrid/Phyrexian mana.
+**Arquivo**: `battle_analyst_v9.py:3524-3820` (cast_spells_v8 e funções relacionadas)
 
-**Lógica exata**:
+**Implementação**:
 ```python
-def cast_spell(player, card, stack):
-    # 601.2a: Announce and move to stack
-    spell = StackItem(card, controller=player)
-    stack.push(spell)
+class CastingContext:
+    """Estado durante o processo de casting (CR 601.2)."""
+    def __init__(self, card, controller):
+        self.card = card
+        self.controller = controller
+        self.modes = []
+        self.alternative_cost = None
+        self.x_value = 0
+        self.targets = []
+        self.divisions = {}
+        self.locked_cost = {}
+        self.is_legal = False
+        self.additional_costs = []
+        self.cost_increasers = []
+        self.cost_reducers = []
+
+def cast_spell_v9(player, card, stack, opponents):
+    """Pipeline completo de casting (CR 601.2a-601.2h)."""
+    ctx = CastingContext(card, player)
     
-    # 601.2b: Choose modes, alternative costs, X value
-    modes = choose_modes(card)
-    x_value = choose_x(card) if has_x(card) else 0
+    # 601.2a: Announce, move to stack
+    stack.push(card)
+    
+    # 601.2b: Choose modes, alternative costs, X
+    ctx.modes = choose_modes(card)
+    if has_alternative_cost(card):
+        ctx.alternative_cost = choose_alternative(card)
+    if has_x(card):
+        ctx.x_value = choose_x(player)
     
     # 601.2c: Choose targets
-    targets = choose_targets(card, modes)
+    ctx.targets = choose_targets(card, player, opponents)
     
     # 601.2d: Divide effects (damage, counters)
-    divisions = divide_effects(card, targets)
+    if requires_division(card):
+        ctx.divisions = divide_effects(card, ctx.targets)
     
     # 601.2e: Check legality
-    if not legal_cast(spell, targets):
-        revert()  # CR 733.1 — illegal action rewind
+    if not legal_cast(ctx.targets):
+        revert_illegal_action(card, stack)  # CR 733.1
+        return False
     
     # 601.2f: Determine total cost
-    base_cost = card.mana_cost or alternative_cost
-    additions = sum_additional_costs(card)  # kicker, commander tax
-    increases = sum_increasers(card)
-    reductions = sum_reducers(card)
-    total_cost = base_cost + additions + max(0, increases - reductions)
-    total_cost["generic"] += x_value
-    spell.locked_cost = total_cost  # LOCK — no further changes
+    base = ctx.alternative_cost or card.get("mana_cost", {})
+    additions = commander_tax(card, player) + kicker_cost(ctx)
+    increases = sum_increasers(card, player)
+    reductions = sum_reducers(card, player)
+    total = base["generic"] + additions + max(0, increases - reductions)
+    ctx.locked_cost = total  # LOCK — no more changes
     
     # 601.2g: Activate mana abilities, pay costs
-    if not can_pay(player, total_cost):
-        revert()
-    pay_costs(player, total_cost)
+    if not can_pay(player, total):
+        revert_illegal_action(card, stack)
+        return False
+    pay_costs(player, total)
     
     # 601.2h: Spell becomes cast
-    spell.is_cast = True
-    emit_triggers("when_you_cast", spell)
+    card["is_cast"] = True
+    emit_triggers("when_cast", card, player)
+    return True
 ```
 
 **Regra**: CR 601.2a-601.2h
-
-**Arquivos**: `battle_analyst_v8.py:3524-3820` (cast_spells_v8 e funções relacionadas)
 
 ---
 
 ### 4. Passos de Combate Formais
 
-**O que é**: O combate deve ter 5 passos distintos: Beginning of Combat, Declare Attackers, Declare Blockers, Combat Damage, End of Combat. Cada passo tem janelas de prioridade.
+**Gap**: `combat_phase_v8()` é monolítico. Atacantes auto-declarados, bloqueadores calculados, sem escolha do jogador.
 
-**Estado atual**: `combat_phase_v8()` é monolítico (linhas 4314-4603). Atacantes são declarados automaticamente, bloqueadores são calculados, não há escolha do jogador.
+**Arquivo**: `battle_analyst_v9.py:4314-4603`
 
-**Lógica exata**:
-```python
-def combat_phase():
-    # Beginning of Combat step
-    begin_step("combat_begin")
-    check_sbas_until_stable()
-    run_priority_loop(active_player)
-    
-    # Declare Attackers step
-    begin_step("declare_attackers")
-    attacker = active_player.choose_attackers()  # Human chooses
-    validate_attack_legality(attacker)  # Check restrictions/requirements
-    check_sbas_until_stable()
-    run_priority_loop(active_player)
-    
-    # Declare Blockers step
-    begin_step("declare_blockers")
-    for defending_player in get_defending_players():
-        defender.choose_blockers(attacker)  # Human chooses
-    validate_block_legality()
-    check_sbas_until_stable()
-    run_priority_loop(active_player)
-    
-    # Combat Damage step (first strike if applicable)
-    if has_first_strike_or_double_strike():
-        assign_combat_damage(first_strike=True)
-        check_sbas_until_stable()
-        run_priority_loop(active_player)
-    
-    assign_combat_damage(first_strike=False)
-    check_sbas_until_stable()
-    run_priority_loop(active_player)
-    
-    # End of Combat step
-    begin_step("end_combat")
-    check_sbas_until_stable()
-    run_priority_loop(active_player)
-    remove_from_combat()
-```
-
-**Regra**: CR 506-511
-
-**Arquivos**: `battle_analyst_v8.py:4314-4603`
+**Implementação**: Ver seção 4 do BATTLE_SYSTEM_LOGIC.md. Os 5 passos formais são: Beginning of Combat, Declare Attackers, Declare Blockers, Combat Damage (first strike + normal), End of Combat. Cada passo tem janela de prioridade. A implementação requer refatorar `combat_phase_v8()` em 5 funções separadas.
 
 ---
 
-### 5. LKI (Last Known Information)
+### 5. Replacement/Prevention Effects
 
-**O que é**: Quando um objeto muda de zona ou deixa de existir, o motor precisa lembrar suas últimas características conhecidas (LKI) para resolver efeitos que referenciam o objeto após sua saída.
+**Gap**: Completamente ausente. Nenhum efeito de substituição ou prevenção.
 
-**Lógica exata**:
+**Arquivo**: Novo módulo ou adição ao v9
+
+**Implementação**:
 ```python
-def move_zone(obj, to_zone):
-    # Before moving, snapshot LKI
-    obj._lki_snapshot = {
-        "name": obj.get("name"),
-        "power": obj.get("power"),
-        "toughness": obj.get("toughness"),
-        "cmc": obj.get("cmc"),
-        "colors": obj.get("colors", []),
-        "types": obj.get("type_line", ""),
-        "controller": obj.get("controller"),
-        "owner": obj.get("owner"),
-    }
+class ReplacementRegistry:
+    """Registro de efeitos de replacement/prevention ativos."""
     
-    # Move the object
-    remove_from_current_zone(obj)
-    add_to_zone(obj, to_zone)
-    obj.zone_change_counter += 1
-    
-    # Triggers that fire use LKI if object no longer in expected zone
-    for trigger in find_zone_change_triggers(obj):
-        if obj not in expected_zone(trigger):
-            trigger.use_lki = obj._lki_snapshot
-```
-
-**Exemplo**: Criatura com power 5 morre. Trigger "when this creature dies, it deals damage equal to its power" usa LKI: power=5.
-
-**Regra**: CR 608.2g, CR 400.7
-
-**Arquivos**: `battle_analyst_v8.py:2828-2840` (move_creature_from_battlefield)
-
----
-
-### 6. Zone Change Counter / Instance ID
-
-**O que é**: Cada vez que um objeto muda de zona, ele se torna um "novo objeto" sem memória da existência anterior. Precisa de um contador para distinguir instâncias.
-
-**Lógica exata**:
-```python
-class GameObject:
-    def __init__(self):
-        self.instance_id = generate_uuid()
-        self.zone_change_counter = 0
-        self.current_zone = None
-    
-    def move_to(self, new_zone):
-        if self.current_zone != new_zone:
-            self.zone_change_counter += 1
-            self.instance_id = generate_uuid()  # New identity
-            self.clear_state()  # No damage, no counters, no EOT effects
-            self.current_zone = new_zone
-```
-
-**Impacto**: Blink, reanimate, flicker, delayed triggers, commander returning from CZ.
-
-**Regra**: CR 400.7
-
-**Arquivos**: `battle_analyst_v8.py` — classe Player e estruturas de carta
-
----
-
-### 7. Targeting — Partial Resolution
-
-**O que é**: Se um spell/ability tem múltiplos alvos e alguns se tornam ilegais antes da resolução, o spell NÃO é counterado completamente — ele resolve parcialmente, ignorando os alvos ilegais.
-
-**Lógica exata**:
-```python
-def resolve_spell(spell):
-    legal_targets = []
-    for target_word in spell.target_groups:  # Each instance of "target"
-        remaining = [t for t in target_word if is_legal_target(t, spell)]
-        if not remaining:
-            # ALL targets for this target word are illegal → spell fizzles
-            counter_on_resolution(spell)
-            return
-        legal_targets.append(remaining)
-    
-    # Partial resolution: apply to remaining legal targets
-    apply_effect(spell, legal_targets)
-```
-
-**Exemplo**: "Destroy target artifact and target creature" — se artifact some, ainda destrói a criatura. Se AMBOS somem, fizzle.
-
-**Regra**: CR 608.2b
-
-**Arquivos**: `battle_analyst_v8.py:3644-3669` (apply_effect_immediate)
-
----
-
-### 8. Ward
-
-**O que é**: Ward é uma triggered ability que countera o spell/ability alvo a menos que seu controlador pague o custo de ward.
-
-**Lógica exata**:
-```python
-def check_ward(target, spell):
-    if not target.get("ward_cost"):
-        return False
-    
-    # Ward triggers when target is chosen
-    ward_trigger = TriggeredAbility(
-        source=target,
-        event="becomes_target",
-        controller=target.controller,
-    )
-    stack.push(ward_trigger)
-    
-    # When ward resolves:
-    def resolve_ward():
-        if spell.controller.can_pay(ward_cost) and spell.controller.chooses_to_pay():
-            spell.controller.pay(ward_cost)
-        else:
-            stack.counter(spell)  # Counter the targeting spell
-```
-
-**Regra**: CR 702.21a
-
-**Arquivos**: `battle_analyst_v8.py` — targeting logic (ausente)
-
----
-
-## P2 — Média Prioridade
-
-### 9. Camadas (Layers) 1-7
-
-**O que é**: Características de permanentes são determinadas por efeitos contínuos aplicados em 7 camadas na ordem: (1) copiable values, (2) control, (3) text, (4) type, (5) color, (6) abilities, (7) P/T com subcamadas 7a-7d.
-
-**Lógica exata**:
-```python
-LAYER_ORDER = [1, 2, 3, 4, 5, 6, 7]
-
-def compute_characteristics(permanent):
-    state = permanent.base_characteristics.copy()
-    
-    for layer in LAYER_ORDER:
-        effects = get_continuous_effects_in_layer(layer)
-        # Sort by timestamp, respecting dependencies
-        effects = topological_sort_by_dependency(effects)
-        for effect in effects:
-            effect.apply(state, layer)
-    
-    # Layer 7 sub-layers
-    # 7a: Characteristic-defining abilities (CDA)
-    # 7b: P/T setting effects
-    # 7c: P/T modifying (non-switch, non-counter)
-    # 7d: P/T counters
-    # 7e: P/T switching
-    
-    permanent.characteristics = state
-```
-
-**Regra**: CR 613.1-613.4
-
-**Arquivos**: Ausente. Precisa ser implementado do zero.
-
----
-
-### 10. Replacement/Prevention Effects
-
-**O que é**: Efeitos que substituem ou previnem eventos. Ex: "If a creature would die, exile it instead", "Prevent all combat damage", commander replacement (GY/exile → CZ).
-
-**Lógica exata**:
-```python
-def process_event(event):
-    applicable_replacements = find_applicable_replacements(event)
-    
-    while applicable_replacements:
-        if len(applicable_replacements) == 1:
-            chosen = applicable_replacements[0]
-        else:
-            # Self-replacement first, then control, then APNAP
-            chosen = choose_replacement_order(event, applicable_replacements)
+    @staticmethod
+    def process_event(event, affected_player):
+        """Aplica replacement effects em ordem (CR 614, 616)."""
+        applicable = ReplacementRegistry.find_applicable(event, affected_player)
         
-        event = chosen.replace(event)
-        applicable_replacements = find_applicable_replacements(event)
-    
-    # After replacements, apply prevention
-    if event.type == "damage":
-        applicable_prevention = find_prevention_effects(event)
-        for prevention in applicable_prevention:
-            event.damage_amount = prevention.prevent(event)
-    
-    # Commit the final event
-    execute(event)
+        while applicable:
+            if len(applicable) == 1:
+                chosen = applicable[0]
+            else:
+                # Self-replacement > control-change > APNAP (CR 616.1)
+                chosen = ReplacementRegistry.choose_order(event, applicable, affected_player)
+            
+            event = chosen.replace(event)
+            applicable = ReplacementRegistry.find_applicable(event, affected_player)
+        
+        # Prevention (CR 615) — only for damage events
+        if event.type == "damage":
+            preventions = find_prevention_effects(event)
+            for p in preventions:
+                event.amount = max(0, event.amount - p.shield_amount)
+        
+        return event  # Event is now final, execute it
+
+# Exemplo: Commander replacement
+ReplacementRegistry.register(
+    match=lambda e: e.type == "zone_change" and e.card.get("is_commander") 
+                    and e.to_zone in ("graveyard", "exile", "hand", "library"),
+    replace=lambda e: setattr(e, "to_zone", "command_zone") if e.owner_chooses() else e
+)
 ```
 
-**Regra**: CR 614, CR 615
-
-**Arquivos**: Ausente. Precisa ser implementado do zero.
+**Regra**: CR 614 (Replacement), CR 615 (Prevention), CR 616 (Interaction)
 
 ---
 
-### 11. Planeswalkers e Battles
+### 6. Layers 1-7 (Continuous Effects)
 
-**O que é**: Planeswalkers usam loyalty counters e loyalty abilities (1 por turno). Battles têm defense counters e um protector.
+**Gap**: Completamente ausente. Sem engine de continuous effects.
 
-**Lógica exata**:
+**Arquivo**: Novo módulo dedicado
+
+**Implementação**: Ver seção 6 do BATTLE_SYSTEM_LOGIC.md. As 7 camadas:
+- Layer 1: Copiable values
+- Layer 2: Control-changing
+- Layer 3: Text-changing
+- Layer 4: Type-changing
+- Layer 5: Color-changing
+- Layer 6: Ability-adding/removing
+- Layer 7: P/T (7a: CDA, 7b: set, 7c: modify, 7d: counters, 7e: switch)
+
+Dentro de cada camada, efeitos são ordenados por timestamp com resolução de dependências.
+
+---
+
+## P2 — Tipos Complexos
+
+### 7. Planeswalkers e Battles
+
+**Implementação**:
 ```python
 # Planeswalker
-class Planeswalker(Permanent):
-    loyalty = initial_loyalty  # From printed loyalty
-    abilities_used_this_turn = 0
-    
-    def can_activate_loyalty(self):
-        return (self.controller.has_priority() and 
-                stack.is_empty() and 
-                self.abilities_used_this_turn == 0 and
-                is_main_phase(self.controller))
-    
-    def take_damage(self, amount):
-        self.loyalty -= amount
-        # SBA at loyalty <= 0
+def handle_planeswalker_etb(card, controller):
+    card["loyalty"] = card.get("starting_loyalty", 3)
+    card["loyalty_used_this_turn"] = False
+
+def can_activate_loyalty(player, planeswalker):
+    return (not planeswalker.get("loyalty_used_this_turn") 
+            and player.has_priority()
+            and stack.empty()
+            and is_main_phase(player))
+
+def damage_to_planeswalker(source, planeswalker, amount):
+    planeswalker["loyalty"] = (planeswalker.get("loyalty", 0) - amount)
+    # SBA at loyalty <= 0 (já implementado em check_sbas)
 
 # Battle (Siege)
-class Battle(Permanent):
-    defense = initial_defense
-    protector = chosen_protector  # An opponent of the controller
-    
-    def take_damage(self, amount):
-        self.defense -= amount
-        if self.defense <= 0:
-            exile_and_allow_transform_cast(self)
+def handle_siege_etb(card, controller, opponents):
+    # Controller chooses an opponent as protector
+    card["protector"] = opponents[0]  # Sim: first opponent
+    card["defense"] = card.get("defense", 5)
+
+def battle_takes_damage(battle, amount):
+    battle["defense"] = (battle.get("defense", 0) - amount)
+    if battle["defense"] <= 0:
+        exile_and_allow_transform(battle)
+
+# SBA adicionais:
+# - Planeswalker loyalty <= 0 -> graveyard
+# - Battle defense <= 0 -> exile + transform cast
 ```
-
-**Regra**: CR 306 (Planeswalkers), CR 310 (Battles)
-
-**Arquivos**: `battle_analyst_v8.py` — SBA loop (parcial)
 
 ---
 
-### 12. DFC, Adventure e Prototype
+### 8. DFC/Adventure/Prototype
 
-**O que é**: Cartas com duas faces (DFC), aventuras e protótipos têm características diferentes dependendo de como são jogadas.
-
-**Lógica exata**:
+**Implementação**:
 ```python
-class Card:
-    faces = []  # [front_face, back_face] for DFC
-    adventure_part = None  # Adventure spell characteristics
-    prototype_alt = None  # Prototype alternative characteristics
+def get_card_characteristics(card, zone, cast_mode=None):
+    """Retorna características corretas baseado em zona e modo de cast."""
+    # DFC: fora da stack/battlefield = front face
+    if card.get("is_dfc"):
+        if zone in ("stack", "battlefield") and card.get("is_transformed"):
+            return card["back_face"]
+        return card["front_face"]
     
-    def get_characteristics(self, zone, cast_mode):
-        if cast_mode == "adventure" and self.adventure_part:
-            return self.adventure_part
-        if cast_mode == "prototype" and self.prototype_alt:
-            return self.prototype_alt
-        if zone in ("stack", "battlefield") and self.is_transformed():
-            return self.faces[1]  # Back face
-        return self.faces[0]  # Front face
+    # Adventure: spell na stack usa adventure part
+    if cast_mode == "adventure" and card.get("adventure"):
+        return card["adventure"]
     
-    def color_identity(self):
-        # Color identity includes BOTH faces for DFC
-        colors = set()
-        for face in self.faces:
-            colors.update(face.mana_cost_colors)
-            colors.update(face.rules_text_colors)
-        return colors
+    # Prototype: spell na stack pode usar prototype alt
+    if cast_mode == "prototype" and card.get("prototype"):
+        return card["prototype"]
+    
+    # Split: na stack = metade escolhida; fora = combinado
+    if card.get("is_split"):
+        if zone == "stack":
+            return card[card.get("chosen_half", "half_a")]
+        # Fora da stack: mana value combinado
+        return {
+            "mana_value": card["half_a"]["cmc"] + card["half_b"]["cmc"],
+            "colors": card["half_a"]["colors"] + card["half_b"]["colors"],
+        }
+    
+    return card
+
+def compute_color_identity(card):
+    """Color identity inclui TODAS as faces (CR 903.4)."""
+    colors = set()
+    for face in [card] + card.get("faces", []):
+        colors.update(extract_mana_symbol_colors(face.get("mana_cost", "")))
+        colors.update(extract_text_colors(face.get("oracle_text", "")))
+        if face.get("color_indicator"):
+            colors.update(face["color_indicator"])
+    return colors
 ```
-
-**Regra**: CR 711-714
-
-**Arquivos**: Ausente
-
----
-
-### 13. Tokens e Cópias
-
-**O que é**: Tokens são criados por efeitos e deixam de existir ao sair do battlefield. Cópias de spells na stack não são "cast".
-
-**Lógica exata**:
-```python
-def create_token(definition, controller):
-    token = {
-        "name": definition.name,
-        "power": definition.power,
-        "toughness": definition.toughness,
-        "type_line": definition.type_line,
-        "is_token": True,
-        "owner": controller,
-        "controller": controller,
-        "zone_change_counter": 0,
-    }
-    controller.battlefield.append(token)
-    return token
-
-# SBA: token outside battlefield → cease to exist
-def check_sbas():
-    for zone in ("graveyard", "exile", "hand", "library"):
-        for obj in zone:
-            if obj.get("is_token"):
-                cease_to_exist(obj)  # Vanishes, no death trigger
-
-def copy_spell(original):
-    copy = {
-        "name": original.name,
-        "cmc": original.cmc,
-        "modes": original.modes,  # Copy cast choices
-        "targets": original.targets,
-        "is_copy": True,
-        "was_cast": False,  # Copies are NOT cast
-    }
-    stack.push(copy)
-```
-
-**Regra**: CR 110.5-110.7 (Tokens), CR 706-707 (Copies)
 
 ---
 
 ## P2 — Infraestrutura
 
-### 14. Taxonomia Canônica de Derrota
+### 9. Telemetria de Saúde do Motor
 
-Adicionar ao `classify_loss()`:
-- `poison` — 10+ poison counters
-- `effect_says_lose` — "you lose the game"
-- `effect_says_win` — opponent "wins the game"  
-- `concede` — player conceded
-- `all_opponents_left` — last player standing
+**Implementação**:
+```python
+class EngineMetrics:
+    """Coleta métricas de saúde do motor de regras."""
+    def __init__(self):
+        self.priority_passes = 0
+        self.sba_iterations = []
+        self.illegal_rewinds = 0
+        self.oracle_fallbacks = 0
+        self.stack_max_depth = 0
+        self.triggers_per_window = []
+        self.game_duration_turns = 0
+    
+    def snapshot(self):
+        return {
+            "total_priority_passes": self.priority_passes,
+            "avg_sba_iterations": sum(self.sba_iterations)/max(1,len(self.sba_iterations)),
+            "illegal_rewinds": self.illegal_rewinds,
+            "oracle_fallbacks": self.oracle_fallbacks,
+            "max_stack_depth": self.stack_max_depth,
+        }
 
-### 15. Telemetria de Saúde do Motor
-
-Adicionar métricas:
-- `priority_pass_count` — passes de prioridade por jogo
-- `sba_iterations_per_window` — iterações do loop SBA
-- `illegal_action_rewinds` — ações ilegais revertidas
-- `oracle_fallback_hits` — cartas sem Oracle data
-
-### 16. Suite de Conformidade
-
-Criar testes:
-- "Counter war em mesa de 4" — chain de counterspells
-- "Blink de comandante e ledger de damage" — commander damage persiste
-- "Saga no capítulo final com trigger pendente"
-- "Adventure exilada e recast"
-- "Concede do active player em resposta"
+# Hook nos pontos de medição:
+# check_sbas_until_stable: registrar sba_iterations
+# priority_round: incrementar priority_passes
+# illegal action revert: incrementar illegal_rewinds
+```
 
 ---
 
-## Progresso (2026-06-09)
+### 10. Suite de Conformidade
 
-| # | Item | Status |
+**Cenários mínimos** (cada um deve ser um teste reproduzível):
+```python
+CONFORMANCE_SCENARIOS = [
+    {
+        "name": "counter_war_4p",
+        "setup": "4 players, spell on stack, chain of counterspells",
+        "expected": "stack resolves in LIFO, all players had priority in APNAP",
+        "rule": "CR 117, 405, 608"
+    },
+    {
+        "name": "commander_damage_ledger",
+        "setup": "Commander deals 21 damage across multiple zone changes",
+        "expected": "player loses at exactly 21, ledger persists through blink",
+        "rule": "CR 903.10a, 903.14"
+    },
+    {
+        "name": "saga_final_chapter",
+        "setup": "Saga at final chapter, trigger on stack, SBA check",
+        "expected": "saga sacrificed only after final chapter leaves stack",
+        "rule": "CR 714.4"
+    },
+    {
+        "name": "adventure_recast",
+        "setup": "Cast Adventure, exile on resolve, cast creature from exile",
+        "expected": "creature cast from exile, not adventure zone",
+        "rule": "CR 715.3"
+    },
+    {
+        "name": "blocked_stays_blocked",
+        "setup": "Attacker blocked, blocker removed before damage",
+        "expected": "attacker remains blocked, deals 0 damage to player",
+        "rule": "CR 509.1h"
+    },
+    {
+        "name": "active_player_concede",
+        "setup": "Active player concedes during their own main phase",
+        "expected": "turn continues without active player, priority passes to next",
+        "rule": "CR 800.4a"
+    }
+]
+```
+
+---
+
+## Arquivos do Projeto
+
+| Arquivo | Descrição | Linhas |
 |---|---|---|
-| ✅ | SBA loop (check_sbas_until_stable) | Feito |
-| ✅ | Creature toughness/damage SBA | Feito |
-| ✅ | Legend rule SBA | Feito |
-| ✅ | Commander replacement opcional | Feito |
-| ✅ | Loss tagging (classify_loss) | Feito |
-| ✅ | Taxonomia canônica (poison, concede, effect_says_lose) | Feito |
-| ✅ | WDWR/WPWR (card_impact_analyzer) | Feito |
-| ✅ | Loss-mode suggester | Feito |
-| ✅ | Slot optimizer role fix | Feito |
-| ✅ | Ward (check_ward scaffold) | Feito |
-| ✅ | LKI + Zone change counter | Feito |
-| ✅ | BATTLE_SYSTEM_LOGIC.md | Feito |
-| ✅ | IMPLEMENTATION_GAPS.md | Feito |
-| ⏳ | APNAP trigger ordering | Pendente |
-| ⏳ | Prioridade com pilha vazia | Pendente |
-| ⏳ | Casting pipeline 601.2 | Pendente |
-| ⏳ | Passos de combate formais | Pendente |
-| ⏳ | Targeting partial resolution | Pendente |
-| ⏳ | Layers 1-7 | Pendente |
-| ⏳ | Replacement effects | Pendente |
-| ⏳ | Planeswalkers/Battles | Pendente |
-| ⏳ | DFC/Adventure/Prototype | Pendente |
-| ⏳ | Tokens/Cópias | Pendente |
-| ⏳ | Telemetria de saúde | Pendente |
-| ⏳ | Suite de conformidade | Pendente |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5461 |
+| `battle_analyst_v8.py` | Engine original (ainda usado pelo optimizer até trocar env var) | 5263 |
+| `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
+| `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |
+| `slot_optimizer.py` | Teste de swaps por categoria | ~550 |
+| `master_optimizer_quality_gate.py` | Validação de swaps | ~80 |
+| `battle_forensic_audit.py` | Auditoria de regras de batalha | ~500 |
+| `optimizer_loop.sh` | Pipeline completa (usa v9 via env var) | ~100 |
+| `generate_card_replays.py` | Gerador de replays JSONL | ~120 |
+| `card_impact_analyzer.py` | WDWR/WPWR | ~300 |
+| `loss_mode_suggester.py` | Sugestão de swap por loss mode | ~280 |
+| `auto_promote_battle_rules.py` | Auto-promoção de regras | ~150 |
+
+---
+
+## Como Ativar v9 no Optimizer
+
+O optimizer loop já está configurado para usar v9 via env var:
+```bash
+export MANALOOM_BATTLE_SCRIPT="/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+```
+
+Ou rodar diretamente:
+```bash
+MANALOOM_BATTLE_SCRIPT=.../battle_analyst_v9.py python3 master_optimizer_baseline.py --deck-id 6 --games 10
+```
