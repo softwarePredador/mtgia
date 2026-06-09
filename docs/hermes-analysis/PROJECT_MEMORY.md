@@ -14,8 +14,8 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Master HEAD: bbe358f9 (2026-06-07, Document internal non-scanner visual release review)
-- Backend tests: 604 (2026-06-07 13:00Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
+- Master HEAD: 6c2dd6b1 (2026-06-09, Add auto-promotion of battle rules + integrate into optimizer loop)
+- Backend tests: 604 (2026-06-09 13:00Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
 
 ## Branch de analise
 
@@ -52,8 +52,8 @@ Nunca commitar diretamente na `master`. Fluxo:
 Hermes consegue ler, auditar e analisar o repositorio. O container Hermes usado para
 esta memoria possui **Dart 3.12.0** e **Flutter 3.44.0** instalados em `/opt/data/tools/flutter/bin/`.
 
-- `dart test`: 604 passed (backend, 2026-06-07)
-- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-06-07)
+- `dart test`: 604 passed (backend, 2026-06-09)
+- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-06-09)
 
 ## Politica de resposta
 

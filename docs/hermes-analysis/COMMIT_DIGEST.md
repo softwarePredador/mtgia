@@ -5,7 +5,7 @@
 > codigo/docs canonicos.
 
 > Acompanhamento continuo dos commits do ManaLoom.
-> Atualizado em 2026-06-07T13:00Z (Incremento: Visual Polish + Premium QA — 16 commits, bbe358f9).
+> Atualizado em 2026-06-09T13:00Z (Incremento: Master Optimizer + Battle Rules + Backend Hardening — 480 commits, 6c2dd6b1).
 
 ## Estado atual
 
@@ -20,7 +20,146 @@
 
 
 
-## Novos commits nesta rodada (2026-06-07 13:00Z)
+## Novos commits nesta rodada (2026-06-09 13:00Z)
+
+
+### `6c2dd6b1` — Add auto-promotion of battle rules and integrate into optimizer loop (HEAD)
+
+- **2 arquivos**, **+201/-5 linhas**
+- **Tipo: SCRIPT** — Auto-promocao de battle rules (needs_review→verified) no master optimizer loop.
+- **Risco: Baixo** — Script server-side autonomo, sem tocar codigo de produto.
+
+### `9f8fa74a` — Add master optimizer loop cron script
+
+- **1 arquivo**, **+87 linhas**
+- **Tipo: SCRIPT** — Wrapper de cron que executa sync + forensic + baseline + slot + quality gate.
+- **Risco: Baixo** — Script de automacao.
+
+### `b424be60` — Auto-commit: battle forensic audit artifacts
+
+- **~150 arquivos** — Battle forensic audit reports, replay logs, seed data, cache sync artifacts.
+- **Tipo: DATA** — Artefatos de auditoria forense de batalha. Sem mudanca de codigo de produto.
+
+### `98963d26` — chore: configure hermes postgres optimizer loop
+
+- **Tipo: CONFIG** — Configuracao do loop otimizador com PostgreSQL.
+
+### `9df6e594` — merge: bring Hermes analysis updates to master
+
+- **Tipo: MERGE** — Sincronizacao da branch de analise para master.
+
+### `82b85df2` — feat: add Hermes battle rule registry
+
+- **Tipo: FEAT** — Registro de regras de batalha Hermes.
+
+### `d6e3a4a9` — docs: audit estrutura duplicated-or-similar-logic 2026-06-07
+
+### `5b9c361d` — fix: audit Hermes battle effect coverage
+
+### `72aa0ff7` — fix: harden Hermes battle rules timing
+
+### `a1ba5a2c` — fix: use real PG meta decks in Hermes battles
+
+### `548c8371` — fix: automate safe Hermes optimizer cron loop
+
+### `e4dcc6a2` — Require full confirmation before optimizer approval
+
+- **Tipo: FEAT** — Gate de seguranca: otimizador requer confirmacao completa antes de aplicar.
+
+### `e4349db4` — Add Hermes optimizer end-to-end pipeline
+
+- **Tipo: FEAT** — Pipeline ponta a ponta do otimizador Hermes.
+
+### `dadf1922` — Add Hermes master optimizer cron wrapper
+
+### `b3bb314e` — Add Hermes master optimizer loop
+
+### `aeb1e1ca` — Add Game Changer drift guard
+
+- **Tipo: FEAT** — Guarda contra deriva de Game Changers.
+
+### `1794f780` — Harden optimization CMC handling
+
+- **Arquivos**: `server/lib/ai/cmc_safety.dart` (NOVO, 80 linhas), `server/test/cmc_safety_test.dart` (NOVO, 57 linhas)
+- **Tipo: CODE** — Nova camada de seguranca para parsing de CMC com fallback para mana_cost.
+  Trata casos de CMC=0 com mana_cost real > 0, terrenos, simbolos X/Y/Z, hibridos 2/.
+- **Avaliacao Hermes**: Bom endurecimento. Testes dedicados presentes. Baixo risco.
+- **Verificacao**: `dart analyze lib/`: No issues found. `dart test`: 604/604 PASS.
+
+### `4766fec2` — Improve contextual optimization role classification
+
+### `1fbc07d8` — Fix bracket game changer budget handling
+
+- **Tipo: FIX** — Correcao no orcamento de Game Changers por bracket.
+
+### `2f283904` — Speed up full MTGJSON card sync
+
+- **Arquivos**: `server/bin/sync_cards.dart`, `server/bin/sync_cards_full_fast.py` (NOVO, 285 linhas)
+- **Tipo: CODE/PERF** — Otimizacao da sincronizacao de cartas MTGJSON.
+
+### `06281401` — fix: AI classifier priority + game changer bracket detection
+
+- **Arquivos**: `server/lib/edh_bracket_policy.dart` (NOVO, 90 linhas)
+- **Tipo: CODE** — Nova politica deterministica de brackets EDH (1-4) com categorias:
+  fastMana, tutor, freeInteraction, extraTurns, infiniteCombo, boardWipe, stax, gameChanger.
+  Nao integrada ao fluxo de otimizacao ainda.
+- **Risco: Baixo** — Arquivo isolado, sem dependencias do pipeline de otimizacao.
+- **Verificacao**: `dart analyze lib/`: No issues found.
+
+### `1b97f764` — Enrich Hermes card metadata from production cards
+
+### `6fe6fa59` — docs: audit estrutura postgresql-tables-not-used 2026-06-06
+
+### `bd5add18` — feat: model colored mana and advanced combat
+
+### `fc4d87db` — fix: harden battle mana counters and combat
+
+### `bdb4cd68` — v10.2: critical bug fixes — mulligan, land detection, Approach win check, silence timing, counter priority
+
+- **Tipo: FIX** — Correcoes em scripts de batalha (battle_analyst_v8, kc_validator, slot_optimizer).
+  Scripts Python, nao produto Dart.
+
+### Product code changes (aggregated, 2026-06-05 to 2026-06-07)
+
+Commits anteriores ao merge de analise (b4254..4890 commits) incluem:
+
+- **Theme Contextual Rules** (`server/lib/ai/theme_contextual_rules_service.dart`, +108 linhas):
+  Servico que carrega regras contextuais de tema do PostgreSQL e as integra no prompt de otimizacao.
+  Mapeia archetype→theme via `archetypeToTheme()`, consulta `theme_contextual_rules` table.
+  Baixo risco — erros sao capturados com Log.w.
+
+- **Commander Profile no prompt** (`server/lib/ai/otimizacao.dart`, +98/-58 linhas):
+  Carrega perfil do commander do PostgreSQL e passa como contexto adicional para o prompt de IA.
+  Erros sao capturados (Log.w). Baixo risco.
+
+- **Commander Learned Deck Support** (`server/lib/ai/commander_learned_deck_support.dart`, +51 linhas)
+
+- **Card Combat Metadata Backfill** (`server/bin/backfill_card_combat_metadata.py`, NOVO, 250 linhas)
+
+- **Migration Script** (`server/bin/migrate.dart`, NOVO, 91 linhas)
+
+- **Database setup** (`server/database_setup.sql`, +60 linhas) — novas tabelas para tema/combate
+
+### APP changes (2026-06-05 to 2026-06-07)
+
+Nenhuma alteracao em `app/lib/` neste periodo. Zero risco para codigo Flutter mobile.
+Relatorio de auditoria UI/UX atualizado em `04869c69` — 84 achados (P1=6, P2=78).
+
+### Resumo da rodada
+
+| Metrica | Valor |
+|---------|-------|
+| Commits analisados | 480 |
+| Arquivos de produto alterados | 23 (server/) |
+| Linhas adicionadas | +2.160 |
+| Linhas removidas | -345 |
+| Novos arquivos de produto | 7 (cmc_safety, edh_bracket_policy, theme_rules, backfill, migrate, optimizer_loop, sync_fast) |
+| Novos testes | 4 arquivos (+183 linhas) |
+| `dart analyze lib/` | No issues found |
+| `flutter analyze --no-pub --no-fatal-infos` | No issues found |
+| `dart test` (server) | 604/604 PASS |
+| Producao (/health) | SHA 6c2dd6b1, healthy |
+| Alteracoes app/ | Nenhuma |
 
 
 ### `bbe358f9` — Document internal non-scanner visual release review (HEAD)

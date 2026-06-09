@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-08 07:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-09 13:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -67,6 +67,8 @@ mtgia/
 │   │   ├── commander_learned_deck_support.dart # Modelo/validacao de learned decks (NOVO)
 │   │   └── ...
 │   └── pubspec.yaml
+│
+├── server/lib/edh_bracket_policy.dart  # Politica deterministica de brackets EDH 1-4 (NOVO)
 │
 ├── scripts/                      # Automacoes locais
 │   ├── quality_gate.sh           # quick / full / resolution
