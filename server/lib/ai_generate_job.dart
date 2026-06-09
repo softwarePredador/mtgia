@@ -19,7 +19,7 @@ class AiGenerateJobStore {
     required Pool pool,
     required String cacheKey,
     required String format,
-    String? userId,
+    required String userId,
   }) async {
     await _ensureSchema(pool);
     final id = _generateId();
@@ -213,9 +213,9 @@ class AiGenerateJobStore {
 class AiGenerateJob {
   AiGenerateJob({
     required this.id,
+    required this.userId,
     required this.cacheKey,
     required this.format,
-    this.userId,
     this.status = 'pending',
     this.stage = 'Iniciando...',
     this.stageNumber = 0,
@@ -229,7 +229,7 @@ class AiGenerateJob {
         updatedAt = updatedAt ?? DateTime.now();
 
   final String id;
-  final String? userId;
+  final String userId;
   final String cacheKey;
   final String format;
   final String status;
@@ -245,7 +245,7 @@ class AiGenerateJob {
   factory AiGenerateJob.fromRow(Map<String, dynamic> row) {
     return AiGenerateJob(
       id: row['id'] as String? ?? '',
-      userId: row['user_id'] as String?,
+      userId: row['user_id'] as String? ?? '',
       cacheKey: row['cache_key'] as String? ?? '',
       format: row['format'] as String? ?? '',
       status: row['status'] as String? ?? 'pending',

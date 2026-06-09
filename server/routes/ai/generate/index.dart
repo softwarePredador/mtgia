@@ -814,6 +814,10 @@ Future<Response> _startAiGenerateAsyncJob({
   } catch (_) {
     userId = null;
   }
+  if (userId == null || userId.isEmpty) {
+    return unauthorized('Authentication required');
+  }
+  final authenticatedUserId = userId;
 
   final requestStopwatch = Stopwatch()..start();
   final referenceCacheVersion = await _resolveReferenceGenerateCacheVersion(
@@ -834,7 +838,7 @@ Future<Response> _startAiGenerateAsyncJob({
     pool: pool,
     cacheKey: cacheKey,
     format: format,
-    userId: userId,
+    userId: authenticatedUserId,
   );
 
   final syncPayload = buildAiGenerateSyncPayloadForAsyncJob(body);

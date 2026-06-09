@@ -33,7 +33,7 @@ void main() {
       final storeSource = File('lib/ai/optimize_job.dart').readAsStringSync();
 
       expect(
-          routeSource, contains('job.userId == null || job.userId != userId'));
+          routeSource, contains('job.userId.isEmpty || job.userId != userId'));
       expect(storeSource, contains('required String userId'));
       expect(storeSource, isNot(contains('String? userId,')));
     });
