@@ -4,18 +4,18 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-07 23:00 UTC
+> Data: 2026-06-08 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-07 11:00 UTC no checkout `2061f291` reportou `Imports quebrados: 0` no recorte backend do auditor base (`server/lib` e `server/routes`). Ainda assim, a varredura ampliada app/server segue apontando frentes prioritárias de organização:
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-08 11:00 UTC no checkout `fed6ee85` reportou `Imports quebrados: 0` no recorte backend do auditor base (`server/lib` e `server/routes`). Ainda assim, a varredura ampliada app/server segue apontando frentes prioritárias de organização:
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-07 19:00 UTC no checkout `5b9c361d`. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo. A revalidacao confirmou que wrappers finos em `server/routes/ai/optimize/index.dart` delegam para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
-   `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
+   `fed6ee85` em 2026-06-08 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
    com `uri_does_not_exist`.
@@ -37,19 +37,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    mas `_allowedEvents` rejeita o evento e o contrato ainda marca
    `/users/me/activation-events` como `internal`/`not proven`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-07 05:30 UTC no checkout `84a97d75`. Ainda ha excecoes por nome em
+   2026-06-08 05:30 UTC no checkout `18247725`. Ainda ha excecoes por nome em
    `functional_card_tags.dart`, `candidate_quality_data_support.dart`,
    `optimize_runtime_support.dart`, `rebuild_guided_service.dart`,
    `/decks/:id/recommendations`, `/ai/weakness-analysis`, no mock runtime de
    `/ai/optimize` quando `deckOptimizer == null` e em prompts runtime carregados
-   por `otimizacao.dart`. A rodada separou exemplos de UI/import, comentarios,
-   seeds de busca, docs/corpus/artifacts/test fixtures e seeds Commander
-   Reference dos riscos reais. `edh_bracket_policy.dart` continua excecao
-   intencional por regra externa/curadoria de bracket, mas precisa manter
-   fonte/versionamento/teste dedicado.
+   por `otimizacao.dart`. A rodada separou exemplos de UI/import e aliases
+   localizados como permitidos, docs/corpus/artifacts/test fixtures e seeds
+   Commander Reference dos riscos reais. `edh_bracket_policy.dart` continua
+   excecao intencional por regra externa/curadoria de bracket, mas precisa
+   manter fonte/versionamento/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional em `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.
+   na rotacao local Codex de 2026-06-08 03:04 UTC no checkout `cce6ec34`.
    `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
    `DeckCard` continua testado mas sem import/chamada na listagem real;
@@ -60,14 +60,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `LotusLifeCounterScreen` e `DeckProgressIndicator`; a varredura textual
    ampla nao foi usada para acusar DTOs/helpers locais sem evidencia adicional.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
-   2026-06-07 05:30 UTC no checkout `84a97d75`. Deck analysis prefere
+   2026-06-08 05:30 UTC no checkout `18247725`. Deck analysis prefere
    `card_function_tags`; o contexto de optimize, `additionsData`, validator e
    role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags`
    persistidos nesse caminho. Candidate quality tem uso parcial de
    `card_function_tags` em SQL de sinais, portanto o gap atual e o adapter de
    role preservation/gate, nao toda a superficie de optimize. O caminho vivo
    continua escalar via `classifyOptimizationFunctionalRole`; `semantic_tags_v2`
-   multi-tag segue colapsado em um unico role no validator/quality gate/delta.
+   multi-tag segue colapsado em um unico role no validator/quality gate/delta,
+   e perdas de `engine`/`payoff`/`enabler`/`wincon`/`combo_piece` nao entram no
+   bloqueio parcial de semantic v2.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -76,8 +78,8 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     **RESOLVIDO em `origin/master@4913a733`**. Sucessos com sugestoes filtradas
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
-12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-07 07:00 UTC como **ABERTO neste checkout `82bb454e`**.
+12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
+    2026-06-08 07:00 UTC como **ABERTO neste checkout `37077efd`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
     contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
@@ -94,13 +96,14 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     controle positivo (`init`, observer de tela e `traceAsync` em smoke), nao
     como codigo morto.
 13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
-    checkout local `2061f291` em 2026-06-07 11:00 UTC.** O auditor base reportou
+    checkout local `fed6ee85` em 2026-06-08 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`, e o import historico
     de `server/routes/ai/commander-learning/index.dart:4` deixou de estar
     quebrado porque `server/lib/ai/commander_learned_deck_support.dart` existe
     neste checkout. A varredura local ampliada encontrou 3 imports locais
     quebrados em 426 arquivos: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
-    resolvendo para `app/core/utils/mana_helper.dart`,
+    (`../../../../core/utils/mana_helper.dart`) resolvendo para
+    `app/core/utils/mana_helper.dart`,
     `app/lib/features/home/life_counter_screen.dart:7` resolvendo para
     `app/core/theme/app_theme.dart`, e `server/bin/local_test_server.dart:3`
     resolvendo para `server/.dart_frog/server.dart`. `dart analyze
@@ -230,12 +233,13 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar as politicas por nome restantes em policy versionada
-- **Status 2026-06-07 05:30 UTC: REVALIDADO/ABERTO no checkout `84a97d75`.**
+- **Status 2026-06-08 05:30 UTC: REVALIDADO/ABERTO no checkout `18247725`.**
   A revalidacao local confirmou que nomes hardcoded ainda participam de tags,
   score, fillers, rebuild, recomendacoes, weakness suggestions, mock runtime e
   prompt runtime. A separacao de classificacao segue: exemplos de UI/import,
-  comentarios, corpus/test fixtures e seeds declaradas nao sao bug por si so;
-  decisoes de runtime por nome continuam risco salvo policy versionada.
+  aliases localizados, comentarios, corpus/test fixtures e seeds declaradas nao
+  sao bug por si so; decisoes de runtime por nome continuam risco salvo policy
+  versionada.
 - **Evidência**:
   - `server/lib/ai/functional_card_tags.dart:220`-`:226` classifica ramp por
     `signet`, `talisman`, `sol ring` e `arcane signet`; `:714`-`:717`,
@@ -245,6 +249,12 @@ Histórico do problema:
     `:421`-`:428`, `:439`-`:445`, `:472`-`:478`, `:531`-`:542`,
     `:590`-`:605` e `:611`-`:628` repetem checks por nome e aplicam
     bonus/escopo `highPowerNames`/`premium` ao bracket/score.
+  - Exemplos permitidos foram rechecados em
+    `app/lib/features/home/life_counter_screen.dart:2199`-`:2204`,
+    `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart:39`-`:44`,
+    `app/lib/features/decks/screens/deck_import_screen.dart:383`-`:389`/`:591`-`:592`
+    e `server/lib/import_card_lookup_service.dart:20`-`:30`; estes pontos sao
+    sugestoes de UI/import ou aliases localizados, nao decisao de utilidade.
   - `server/lib/ai/commander_reference_generate_fallback_support.dart:182`-`:245`
     contem seed deterministica Lorehold por nomes fixos (`Sol Ring`,
     `Arcane Signet`, `Boros Charm`, equipamentos/protecao etc.). Classificacao
@@ -273,9 +283,10 @@ Histórico do problema:
     em `prompt.md:93`-`:123`/`:158`-`:172` e
     `prompt_complete.md:63`-`:80`/`:112`-`:117`. Isso nao e branch
     deterministico, mas e comportamento de produto quando a IA e chamada.
-  - `server/lib/edh_bracket_policy.dart:134`-`:142` usa listas por nome para
-    combos infinitos e Game Changers; este caso e excecao intencional de regra
-    externa, mas ainda precisa de fonte/versionamento/teste dedicado.
+  - `server/lib/edh_bracket_policy.dart:142`-`:145` e `:278`-`:283` usam lista
+    curada para combo infinito; `:285` em diante guarda Game Changers gerados.
+    Este caso e excecao intencional de regra externa, mas ainda precisa de
+    fonte/versionamento/teste dedicado.
 - **Impacto**: a maior parte do pipeline semantico ja converge, mas parte da
   decisao de score/bracket/premium ainda depende de listas inline, dificultando
   versao, auditoria e rollout controlado. No checkout local, a divergencia e
@@ -301,7 +312,7 @@ Histórico do problema:
 
 ### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
 
-- **Status 2026-06-07 05:30 UTC: REVALIDADO/ABERTO no checkout `84a97d75`.**
+- **Status 2026-06-08 05:30 UTC: REVALIDADO/ABERTO no checkout `18247725`.**
 - **Evidência**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
     `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
@@ -316,16 +327,16 @@ Histórico do problema:
     `card_semantic_tags_v2`.
   - `classifyOptimizationFunctionalRole` usa `semantic_tags_v2` primeiro e
     depois `type_line`/`oracle_text`, sem ler `functional_tags`, em
-    `server/lib/ai/optimization_functional_roles.dart:55`-`:124`.
+    `server/lib/ai/optimization_functional_roles.dart:55`-`:139`.
   - `OptimizationValidator` e o quality gate chamam esse classificador em
     `server/lib/ai/optimization_validator.dart:266`-`:268` e
     `server/lib/ai/optimization_quality_gate.dart:53`-`:54`.
   - O checkout atual nao contem `optimizationFunctionalRolesForCard`; o caminho
     vivo ainda e `classifyOptimizationFunctionalRole`, escalar. O mesmo arquivo
     colapsa `semantic_tags_v2` para um unico role em
-    `server/lib/ai/optimization_functional_roles.dart:127`-`:180` e calcula
-    `role_delta` sobre esse role unico em `:292`-`:323`.
-    A precedencia tambem diverge no fallback textual: o comentario em `:111`-`:112`
+    `server/lib/ai/optimization_functional_roles.dart:142`-`:195` e calcula
+    `role_delta` sobre esse role unico em `:321`-`:338`.
+    A precedencia tambem diverge no fallback textual: o comentario em `:120`-`:121`
     diz que roles altos sao checados antes do fallback de tipo, mas o codigo
     retorna wipe/protection/removal/ramp/draw/tutor antes de
     `wincon`/`engine`/`combo_piece`/`payoff`/`enabler` em `:63`-`:117`.
@@ -411,8 +422,8 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
-- **Status 2026-06-07 11:00 UTC: REVALIDADO/ABERTO no checkout local
-  `2061f291`.** A resolucao historica citada para `origin/master@a830f9f3` nao
+- **Status 2026-06-08 11:00 UTC: REVALIDADO/ABERTO no checkout local
+  `fed6ee85`.** A resolucao historica citada para `origin/master@a830f9f3` nao
   esta presente nesta branch de memoria.
 - **Evidência**:
   - `dart analyze bin/local_test_server.dart` em `server/` falhou com:
@@ -434,8 +445,8 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-06-07 11:00 UTC: REVALIDADO/ABERTO no checkout local
-`2061f291`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
+**Status 2026-06-08 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`fed6ee85`.** As resolucoes historicas citadas para `origin/master@640f4ab4` e
 `origin/master@a830f9f3` nao estao refletidas nesta branch de memoria.
 
 - **Evidência**:
@@ -453,6 +464,9 @@ Histórico do problema:
   - O import historico de `server/routes/ai/commander-learning/index.dart:4`
     para `server/lib/ai/commander_learned_deck_support.dart` nao esta mais
     quebrado neste checkout; o arquivo alvo existe.
+  - `flutter analyze --no-pub --no-fatal-infos` focado nesses dois arquivos do
+    app foi nao conclusivo por falta de `app/.dart_tool/package_config.json`,
+    mas a saida incluiu `uri_does_not_exist` para os dois imports locais acima.
 - **Impacto**: builds/checks com package config valido tendem a falhar no app
   quando esses arquivos entram no grafo; no backend, `dart analyze` segue
   bloqueado pelo entrypoint local.
@@ -473,8 +487,8 @@ Histórico do problema:
 
 ### P2 — Quebrar o ciclo direto entre `CommunityDeckDetailScreen` e `UserProfileScreen`
 
-**Status 2026-06-07 11:00 UTC: REVALIDADO/ABERTO no checkout local
-`2061f291`.** A resolucao historica citada para `origin/master@640f4ab4` nao
+**Status 2026-06-08 11:00 UTC: REVALIDADO/ABERTO no checkout local
+`fed6ee85`.** A resolucao historica citada para `origin/master@640f4ab4` nao
 esta refletida nesta branch de memoria; o grafo local focado ainda encontrou 1
 SCC com esses dois arquivos.
 
@@ -741,16 +755,15 @@ app-side novo sem chamada.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-04 03:00 UTC: REVALIDADO/ABERTO.**
+- **Status 2026-06-08 03:04 UTC: REVALIDADO/ABERTO no checkout `cce6ec34`.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:283` usa
     `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
-    `LifeCounterScreen(` apenas no construtor da propria classe. Os testes
-    `app/test/features/home/life_counter_screen_test.dart:1`-`:2` e
-    `app/test/features/home/life_counter_clone_proof_test.dart:1`-`:2`
-    declaram que sao suites legadas e que a cobertura viva mira
-    `LotusLifeCounterScreen`; ambos ainda importam e instanciam a tela legada.
+    `LifeCounterScreen(` apenas no construtor da propria classe. A busca focada
+    com limite de palavra encontrou instanciacao fora do arquivo apenas em
+    `app/test/features/home/life_counter_screen_test.dart:36` e
+    `app/test/features/home/life_counter_clone_proof_test.dart:277`.
   - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
     busca por import de `deck_card.dart` em `app/lib` nao retornou ocorrencias,
     e a busca por `DeckCard(` em `app/lib` encontrou somente o construtor.
@@ -758,8 +771,7 @@ app-side novo sem chamada.
     `app/test/features/decks/widgets/deck_card_test.dart:4`/`:9` e
     `app/test/features/decks/widgets/deck_card_overflow_test.dart:4`/`:47`.
     As listagens reais usam widgets privados/locais como `_RecentDeckCard`,
-    `_CommunityDeckCard`, `_FollowingDeckCard`, `_DeckGalleryCard` e
-    `_EmptyDeckCard`.
+    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`.
   - `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` define
     `DeckProgressChip`, sem ocorrencias alem do construtor em `app/lib`,
     `app/test` e `app/integration_test`. `DeckProgressIndicator` no mesmo
@@ -770,7 +782,8 @@ app-side novo sem chamada.
   - `app/lib/features/auth/widgets/auth_visual_shell.dart:5`, `:105` e `:196`
     definem `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface`; busca por
     esses simbolos e por `auth_visual_shell.dart` em arquivos Dart encontrou
-    apenas definicoes/construtores no proprio arquivo.
+    apenas definicoes/construtores no proprio arquivo. `login_screen.dart:82`-`:108`
+    e `register_screen.dart:85`-`:121` constroem suas superficies inline.
   - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
     `DeckProgressIndicator` seguem ativos; `PerformanceNavigatorObserver`,
     `AppObservabilityNavigatorObserver`, classes do scanner com chamadores reais
