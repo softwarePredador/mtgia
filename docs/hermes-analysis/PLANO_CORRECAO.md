@@ -13,7 +13,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-07 19:00 UTC no checkout `5b9c361d`. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo. A revalidacao confirmou que wrappers finos em `server/routes/ai/optimize/index.dart` delegam para support e nao sao o corpo duplicado de maior risco.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-09 19:00 UTC no checkout `4bd8ca2a`. O auditor textual executou com sucesso, mas a lista bruta de duplicacao continua ruidosa por capturar termos SQL/literais como funcoes; os achados atuais foram mantidos por leitura direta. O maior risco continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo. A revalidacao confirmou que wrappers finos em `server/routes/ai/optimize/index.dart` delegam para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
    `fed6ee85` em 2026-06-08 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
@@ -165,7 +165,10 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-07 19:00 UTC: REVALIDADO/ABERTO no checkout `5b9c361d`.**
+- **Status 2026-06-09 19:00 UTC: REVALIDADO/ABERTO no checkout `4bd8ca2a`.**
+  O auditor textual apontou `99` problemas, mas a parte de duplicacao segue
+  limitada por falsos positivos de SQL/literais; este item usa apenas evidencia
+  revalidada por `rg` e leitura direta.
 - **Evidência**:
   - `resolveOptimizeArchetype` existe em
     `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
@@ -177,8 +180,8 @@ Histórico do problema:
     versao de deck state.
   - `_looksLikeComboPiece`, `_looksLikeEnabler`, `_looksLikeEngine`,
     `_looksLikePayoff` e `_looksLikeWincon` existem tanto em
-    `server/lib/ai/functional_card_tags.dart:859`-`:905` quanto em
-    `server/lib/ai/optimization_functional_roles.dart:370`-`:397`, mas a
+    `server/lib/ai/functional_card_tags.dart:859`-`:906` quanto em
+    `server/lib/ai/optimization_functional_roles.dart:529`-`:565`, mas a
     primeira familia usa nomes conhecidos e `oracle_text`, e a segunda usa
     padroes diferentes de `oracle_text` para um role unico do optimize.
   - `_isBasicLandName` aparece em quatro locais com variantes para snow lands:
