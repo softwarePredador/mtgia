@@ -1,0 +1,302 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Thrasios, Triton Hero #101 (real), Zirda, the Dawnwaker #69 (real), Kraum, Ludevic's Opus #86 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Thrasios, Triton Hero #101 (real): 3 mulligan(s), 5 cards, 0 lands
+  Zirda, the Dawnwaker #69 (real): 0 mulligan(s), 7 cards, 4 lands
+  Kraum, Ludevic's Opus #86 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=4 Board=1 Grave=1 Discarded=0
+
+TURN 1 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=0
+  MANA Zirda, the Dawnwaker #69 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=4 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=5 Board=1 Grave=1 Discarded=0
+
+TURN 2 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=2
+  MANA Zirda, the Dawnwaker #69 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=1
+  MANA Kraum, Ludevic's Opus #86 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 3 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=5 Board=2 Grave=1 Discarded=0
+
+TURN 3 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=3
+  MANA Zirda, the Dawnwaker #69 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 4 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=4 Grave=1 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 4 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=5
+  MANA Zirda, the Dawnwaker #69 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=6 Grave=1 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=1
+
+TURN 5 - Lorehold | Life=36 Hand=6 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Path to Exile removed Zirda, the Dawnwaker from Zirda, the Dawnwaker #69 (real)
+  END Lorehold: Life=36 Hand=6 Board=4 Grave=2 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=6 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=0
+
+TURN 5 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=5
+  MANA Zirda, the Dawnwaker #69 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=7 Grave=1 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=2 Grave=3 Discarded=1
+
+TURN 6 - Lorehold | Life=36 Hand=6 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  END Lorehold: Life=36 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 6 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 6 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=7
+  MANA Zirda, the Dawnwaker #69 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=8 Grave=2 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=3 Grave=4 Discarded=0
+
+TURN 7 - Lorehold | Life=32 Hand=7 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Faithless Looting (CMC=1.0) [draw_cards] rule=curated/verified
+  END Lorehold: Life=32 Hand=7 Board=6 Grave=6 Discarded=2
+
+TURN 7 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 7 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Zirda, the Dawnwaker #69 (real): Enlightened Tutor found The One Ring (artifact_or_enchantment)
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  RESOLVE Zirda, the Dawnwaker #69 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=9 Grave=3 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=4 Grave=5 Discarded=0
+
+TURN 8 - Lorehold | Life=28 Hand=7 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=28 Hand=7 Board=8 Grave=7 Discarded=1
+
+TURN 8 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=3 Discarded=1
+
+TURN 8 - Zirda, the Dawnwaker #69 (real) | Life=35 Hand=5 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=35 Hand=4 Board=11 Grave=4 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=4 Grave=5 Discarded=0
+
+TURN 9 - Lorehold | Life=20 Hand=7 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Heat Shimmer (CMC=3.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 5 player damage, target life 30, target_dead=False
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  END Lorehold: Life=20 Hand=5 Board=12 Grave=8 Discarded=0
+
+TURN 9 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=4 Discarded=1
+
+TURN 9 - Zirda, the Dawnwaker #69 (real) | Life=30 Hand=4 Board=11
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 6 player damage, target life 14, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=30 Hand=4 Board=13 Grave=4 Discarded=0
+
+TURN 9 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 10, target_dead=False
+  RESOLVE Zirda, the Dawnwaker #69 (real): Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=4 Grave=6 Discarded=1
+
+TURN 10 - Lorehold | Life=10 Hand=5 Board=12
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 7 player damage, target life 23, target_dead=False
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Storm Herd (any)
+  END Lorehold: Life=10 Hand=5 Board=14 Grave=10 Discarded=0
+
+TURN 10 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=5 Grave=4 Discarded=0
+
+TURN 10 - Zirda, the Dawnwaker #69 (real) | Life=23 Hand=3 Board=13
+  MANA Zirda, the Dawnwaker #69 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 9 power (reason=aggro_low_life, target_life=10)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 10 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 10 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=23)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 19, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=4 Grave=7 Discarded=0
+
+TURN 11 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #101 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=19)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 15, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=5 Grave=5 Discarded=1
+
+TURN 11 - Zirda, the Dawnwaker #69 (real) | Life=15 Hand=3 Board=15
+  MANA Zirda, the Dawnwaker #69 (real): 10 available (10 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 4 attackers, 0 blockers, 0 gang blocks, 11 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 11 player damage, target life 29, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=15 Hand=4 Board=17 Grave=5 Discarded=0
+
+TURN 11 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=15)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 11, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=4 Grave=8 Discarded=1
+
+TURN 12 - Thrasios, Triton Hero #101 (real) | Life=29 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #101 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=11)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 7, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=29 Hand=7 Board=6 Grave=5 Discarded=0
+
+TURN 12 - Zirda, the Dawnwaker #69 (real) | Life=7 Hand=4 Board=17
+  MANA Zirda, the Dawnwaker #69 (real): 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 5 attackers, 0 blockers, 0 gang blocks, 12 power (reason=aggro_low_life, target_life=29)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 12 player damage, target life 17, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=7 Hand=6 Board=19 Grave=5 Discarded=0
+
+TURN 12 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Dark Ritual (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=7)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 3, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=5 Grave=9 Discarded=0
+
+TURN 13 - Thrasios, Triton Hero #101 (real) | Life=17 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 0 player damage, target life 3, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Thrasios, Triton Hero #101 (real): Life=17 Hand=7 Board=6 Grave=6 Discarded=1
+
+TURN 13 - Zirda, the Dawnwaker #69 (real) | Life=3 Hand=6 Board=18
+  MANA Zirda, the Dawnwaker #69 (real): 12 available (12 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 5 attackers, 0 blockers, 0 gang blocks, 12 power (reason=aggro_low_life, target_life=17)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 12 player damage, target life 5, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=3 Hand=6 Board=21 Grave=7 Discarded=0
+
+TURN 13 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 1, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Demonic Consultation (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 0 player damage, target life 3, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=5 Grave=12 Discarded=0
+
+TURN 14 - Thrasios, Triton Hero #101 (real) | Life=5 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Zirda, the Dawnwaker #69 (real): 0 player damage, target life 3, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=5 Hand=7 Board=6 Grave=7 Discarded=1
+
+TURN 14 - Zirda, the Dawnwaker #69 (real) | Life=3 Hand=9 Board=19
+  MANA Zirda, the Dawnwaker #69 (real): 13 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Reckless Handling (CMC=2.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Zirda, the Dawnwaker #69 (real): Reckless Handling found Smothering Tithe (artifact_or_enchantment)
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 5 attackers, 0 blockers, 0 gang blocks, 12 power (reason=lethal, target_life=5)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Thrasios, Triton Hero #101 (real): 12 player damage, target life -7, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #101 (real) (life_zero) <<<
+
+TURN 14 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 1, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Orcish Bowmasters (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Kraum, Ludevic's Opus #86 (real): Orcish Bowmasters removed Drannith Magistrate from Lorehold
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life -1, target_dead=True
+  >>> DIED: Zirda, the Dawnwaker #69 (real) (life_zero) <<<
+
+GAME OVER - Turn 14
+Winner: Kraum, Ludevic's Opus #86 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=5
+Thrasios, Triton Hero #101 (real): DEAD Life=-7 Hand=7
+Zirda, the Dawnwaker #69 (real): DEAD Life=-1 Hand=9
+Kraum, Ludevic's Opus #86 (real): ALIVE Life=40 Hand=4

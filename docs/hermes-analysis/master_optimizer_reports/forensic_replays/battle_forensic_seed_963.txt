@@ -1,0 +1,256 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Umbris, Fear Manifest #114 (real), Etali, Primal Conqueror #105 (real), Kinnan, Bonder Prodigy #79 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Umbris, Fear Manifest #114 (real): 0 mulligan(s), 7 cards, 2 lands
+  Etali, Primal Conqueror #105 (real): 1 mulligan(s), 7 cards, 3 lands
+  Kinnan, Bonder Prodigy #79 (real): 0 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 1 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=0
+  MANA Kinnan, Bonder Prodigy #79 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #79 (real): Fyndhorn Elves (CMC=1.0) [ramp_permanent] rule=curated/verified
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=4 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=1
+  MANA Umbris, Fear Manifest #114 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=1
+  MANA Etali, Primal Conqueror #105 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Mental Misstep (CMC=1.0) [counter] rule=curated/verified
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=4 Board=3
+  MANA Kinnan, Bonder Prodigy #79 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 player damage, target life 39, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=39 Hand=6 Board=3
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=39 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=2
+  MANA Umbris, Fear Manifest #114 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Isochron Scepter (CMC=2.0) [copy_spell] rule=known_cards_manual/verified
+  RESOLVE Umbris, Fear Manifest #114 (real): Dark Ritual (CMC=1.0) [draw_cards] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=4 Board=4 Grave=2 Discarded=0
+
+TURN 3 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=2
+  MANA Etali, Primal Conqueror #105 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=4 Board=5
+  MANA Kinnan, Bonder Prodigy #79 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=control_high_threat, target_life=39)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 8 player damage, target life 31, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=4 Board=6 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=31 Hand=5 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Gamble found Rise of the Eldrazi (any)
+  END Lorehold: Life=31 Hand=3 Board=8 Grave=2 Discarded=0
+
+TURN 4 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=4 Board=4
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Faerie Mastermind (CMC=2.0) [draw_engine] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=5 Grave=2 Discarded=0
+
+TURN 4 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=3
+  MANA Etali, Primal Conqueror #105 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=4 Board=6
+  MANA Kinnan, Bonder Prodigy #79 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #79 (real): Faerie Mastermind (CMC=2.0) [draw_engine] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Etali, Primal Conqueror #105 (real): 3 attackers, 1 blockers, 0 gang blocks, 8 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Etali, Primal Conqueror #105 (real): 5 player damage, target life 35, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=5 Board=7 Grave=2 Discarded=0
+
+TURN 5 - Lorehold | Life=31 Hand=3 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Etali, Primal Conqueror #105 (real): 2 attackers, 1 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Etali, Primal Conqueror #105 (real): 5 player damage, target life 30, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #79 (real): Worldly Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Kinnan, Bonder Prodigy #79 (real): Worldly Tutor found Hullbreaker Horror (creature)
+  END Lorehold: Life=31 Hand=2 Board=10 Grave=3 Discarded=0
+
+TURN 5 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Umbris, Fear Manifest #114 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 1 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=30)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Etali, Primal Conqueror #105 (real): 0 player damage, target life 30, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=6 Grave=3 Discarded=0
+
+TURN 5 - Etali, Primal Conqueror #105 (real) | Life=30 Hand=7 Board=5
+  MANA Etali, Primal Conqueror #105 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=31)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Lorehold: 4 player damage, target life 27, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=30 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 5 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=5 Board=7
+  MANA Kinnan, Bonder Prodigy #79 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 2})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 7 power (reason=control_high_threat, target_life=27)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 7 player damage, target life 20, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=4 Board=9 Grave=4 Discarded=0
+
+TURN 6 - Lorehold | Life=20 Hand=2 Board=10
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Reforge the Soul (CMC=5.0) [draw_cards] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Etali, Primal Conqueror #105 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Etali, Primal Conqueror #105 (real): 7 player damage, target life 23, target_dead=False
+  END Lorehold: Life=20 Hand=6 Board=13 Grave=4 Discarded=0
+
+TURN 6 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=6
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Umbris, Fear Manifest #114 (real): Demonic Tutor found Hullbreaker Horror (any)
+  RESOLVE Umbris, Fear Manifest #114 (real): Cyclonic Rift (CMC=2.0) [remove_permanent] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Cyclonic Rift removed Lorehold, the Historian from Lorehold
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=6 Grave=5 Discarded=0
+
+TURN 6 - Etali, Primal Conqueror #105 (real) | Life=23 Hand=7 Board=5
+  MANA Etali, Primal Conqueror #105 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=23 Hand=7 Board=5 Grave=2 Discarded=1
+
+TURN 6 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=4 Board=9
+  MANA Kinnan, Bonder Prodigy #79 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Kinnan, Bonder Prodigy #79 (real): Chord of Calling (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Etali, Primal Conqueror #105 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=control_high_threat, target_life=23)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Etali, Primal Conqueror #105 (real): 9 player damage, target life 14, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=4 Board=11 Grave=5 Discarded=0
+
+TURN 7 - Lorehold | Life=12 Hand=6 Board=12
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Etali, Primal Conqueror #105 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=14)
+  DAMAGE Lorehold -> Etali, Primal Conqueror #105 (real): 3 player damage, target life 11, target_dead=False
+  END Lorehold: Life=12 Hand=5 Board=15 Grave=4 Discarded=0
+
+TURN 7 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=6
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Mystical Tutor (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Umbris, Fear Manifest #114 (real): Mystical Tutor found Bolas's Citadel (any)
+  COMBAT Umbris, Fear Manifest #114 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=11)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Etali, Primal Conqueror #105 (real): 4 player damage, target life 7, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=6 Grave=6 Discarded=0
+
+TURN 7 - Etali, Primal Conqueror #105 (real) | Life=7 Hand=7 Board=5
+  MANA Etali, Primal Conqueror #105 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=12)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=7 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 7 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=4 Board=11
+  MANA Kinnan, Bonder Prodigy #79 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Kinnan, Bonder Prodigy #79 (real): Cyclonic Rift (CMC=2.0) [remove_permanent] rule=curated/verified
+  REMOVAL Kinnan, Bonder Prodigy #79 (real): Cyclonic Rift removed Lorehold, the Historian from Lorehold
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Etali, Primal Conqueror #105 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=lethal, target_life=7)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Etali, Primal Conqueror #105 (real): 9 player damage, target life -2, target_dead=True
+  >>> DIED: Etali, Primal Conqueror #105 (real) (life_zero) <<<
+
+TURN 8 - Lorehold | Life=8 Hand=5 Board=14
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #79 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #79 (real): 3 player damage, target life 37, target_dead=False
+  END Lorehold: Life=8 Hand=4 Board=17 Grave=5 Discarded=0
+
+TURN 8 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=6
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 4, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=7 Grave=6 Discarded=0
+
+TURN 8 - Kinnan, Bonder Prodigy #79 (real) | Life=37 Hand=3 Board=12
+  MANA Kinnan, Bonder Prodigy #79 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Kinnan, Bonder Prodigy #79 (real): Hullbreaker Horror (CMC=7.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Kinnan, Bonder Prodigy #79 (real): Hullbreaker Horror removed Lorehold, the Historian from Lorehold
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 4 attackers, 1 blockers, 0 gang blocks, 9 power (reason=lethal, target_life=4)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 5 player damage, target life -1, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 9 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=7
+  MANA Umbris, Fear Manifest #114 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=37)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 33, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=7 Grave=7 Discarded=1
+
+TURN 9 - Kinnan, Bonder Prodigy #79 (real) | Life=33 Hand=2 Board=13
+  MANA Kinnan, Bonder Prodigy #79 (real): 11 available (10 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 4})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 10 player damage, target life 30, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=33 Hand=3 Board=14 Grave=7 Discarded=0
+
+TURN 10 - Umbris, Fear Manifest #114 (real) | Life=30 Hand=7 Board=7
+  MANA Umbris, Fear Manifest #114 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Thassa's Oracle (CMC=2.0) [finisher] rule=curated/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=29)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 25, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=30 Hand=6 Board=8 Grave=8 Discarded=0
+
+TURN 10 - Kinnan, Bonder Prodigy #79 (real) | Life=25 Hand=3 Board=14
+  MANA Kinnan, Bonder Prodigy #79 (real): 12 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 4})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=control_high_threat, target_life=30)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 10 player damage, target life 20, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=25 Hand=4 Board=14 Grave=8 Discarded=0
+
+TURN 11 - Umbris, Fear Manifest #114 (real) | Life=20 Hand=6 Board=8
+  MANA Umbris, Fear Manifest #114 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Umbris, Fear Manifest #114 (real): Mindbreak Trap (CMC=4.0) [draw_cards] rule=curated/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=25)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 21, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=20 Hand=5 Board=10 Grave=9 Discarded=0
+
+TURN 11 - Kinnan, Bonder Prodigy #79 (real) | Life=21 Hand=4 Board=14
+  MANA Kinnan, Bonder Prodigy #79 (real): 12 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 4})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=control_high_threat, target_life=20)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 10 player damage, target life 10, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=21 Hand=5 Board=15 Grave=8 Discarded=0
+
+TURN 12 - Umbris, Fear Manifest #114 (real) | Life=10 Hand=5 Board=10
+  MANA Umbris, Fear Manifest #114 (real): 12 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  COMBAT Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=21)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 17, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=10 Hand=5 Board=11 Grave=9 Discarded=0
+
+TURN 12 - Kinnan, Bonder Prodigy #79 (real) | Life=17 Hand=5 Board=15
+  MANA Kinnan, Bonder Prodigy #79 (real): 13 available (12 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 4})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=10)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Umbris, Fear Manifest #114 (real): 10 player damage, target life 0, target_dead=True
+  >>> DIED: Umbris, Fear Manifest #114 (real) (life_zero) <<<
+
+GAME OVER - Turn 12
+Winner: Kinnan, Bonder Prodigy #79 (real) (elimination)
+Lorehold: DEAD Life=-1 Hand=4
+Umbris, Fear Manifest #114 (real): DEAD Life=0 Hand=5
+Etali, Primal Conqueror #105 (real): DEAD Life=-2 Hand=7
+Kinnan, Bonder Prodigy #79 (real): ALIVE Life=17 Hand=5

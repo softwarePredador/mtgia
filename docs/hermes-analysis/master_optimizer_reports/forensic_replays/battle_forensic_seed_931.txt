@@ -1,0 +1,356 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Terra, Magical Adept #88 (real), Rograkh, Son of Rohgahh #109 (real), Umbris, Fear Manifest #114 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 4 lands
+  Terra, Magical Adept #88 (real): 1 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #109 (real): 2 mulligan(s), 6 cards, 2 lands
+  Umbris, Fear Manifest #114 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=0
+  MANA Terra, Magical Adept #88 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Terra, Magical Adept #88 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #109 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Terra, Magical Adept #88 (real) | Life=40 Hand=6 Board=2
+  MANA Terra, Magical Adept #88 (real): 3 available (2 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Terra, Magical Adept #88 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=5 Board=2
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=1
+  MANA Umbris, Fear Manifest #114 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  RESOLVE Rograkh, Son of Rohgahh #109 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 3 - Terra, Magical Adept #88 (real) | Life=40 Hand=6 Board=4
+  MANA Terra, Magical Adept #88 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life 36, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #109 (real) | Life=36 Hand=4 Board=4
+  MANA Rograkh, Son of Rohgahh #109 (real): 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=36 Hand=4 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=8 Board=4
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Umbris, Fear Manifest #114 (real): Demonic Consultation (CMC=1.0) [draw_cards] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=2
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=36)
+  DAMAGE Lorehold -> Terra, Magical Adept #88 (real): 5 player damage, target life 31, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=6 Grave=1 Discarded=0
+
+TURN 4 - Terra, Magical Adept #88 (real) | Life=31 Hand=6 Board=5
+  MANA Terra, Magical Adept #88 (real): 5 available (4 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life 32, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=31 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #109 (real) | Life=32 Hand=4 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=31)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 27, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=32 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=7 Grave=4 Discarded=1
+
+TURN 5 - Lorehold | Life=40 Hand=4 Board=6
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=27)
+  DAMAGE Lorehold -> Terra, Magical Adept #88 (real): 5 player damage, target life 22, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=7 Grave=2 Discarded=0
+
+TURN 5 - Terra, Magical Adept #88 (real) | Life=22 Hand=6 Board=6
+  MANA Terra, Magical Adept #88 (real): 6 available (5 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life 28, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=22 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #109 (real) | Life=28 Hand=5 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 18, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=28 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=7
+  MANA Umbris, Fear Manifest #114 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Agatha's Soul Cauldron (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Agatha's Soul Cauldron removed Lorehold, the Historian from Lorehold
+  RESOLVE Umbris, Fear Manifest #114 (real): Cyclonic Rift (CMC=2.0) [remove_permanent] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Cyclonic Rift removed Terra, Magical Adept from Terra, Magical Adept #88 (real)
+  COMBAT Umbris, Fear Manifest #114 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=18)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 14, target_dead=False
+  RESOLVE Umbris, Fear Manifest #114 (real): Isochron Scepter (CMC=2.0) [copy_spell] rule=known_cards_manual/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=4 Board=10 Grave=6 Discarded=0
+
+TURN 6 - Lorehold | Life=40 Hand=4 Board=6
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  END Lorehold: Life=40 Hand=4 Board=8 Grave=2 Discarded=0
+
+TURN 6 - Terra, Magical Adept #88 (real) | Life=14 Hand=7 Board=5
+  MANA Terra, Magical Adept #88 (real): 6 available (5 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Terra, Magical Adept #88 (real): Life=14 Hand=7 Board=6 Grave=1 Discarded=1
+
+TURN 6 - Rograkh, Son of Rohgahh #109 (real) | Life=28 Hand=6 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 10, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=28 Hand=6 Board=5 Grave=1 Discarded=0
+
+TURN 6 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=10
+  MANA Umbris, Fear Manifest #114 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Thassa's Oracle (CMC=2.0) [finisher] rule=curated/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=10)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 6, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=5 Board=11 Grave=7 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=4 Board=8
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Teferi's Protection (CMC=3.0) [phase_out] rule=known_cards_manual/verified
+  RESOLVE Umbris, Fear Manifest #114 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Lorehold: Life=40 Hand=2 Board=7 Grave=4 Discarded=0
+
+TURN 7 - Terra, Magical Adept #88 (real) | Life=6 Hand=7 Board=6
+  MANA Terra, Magical Adept #88 (real): 6 available (5 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life 20, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=6 Hand=7 Board=6 Grave=2 Discarded=1
+
+TURN 7 - Rograkh, Son of Rohgahh #109 (real) | Life=20 Hand=6 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=6)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 2, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=20 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 7 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=11
+  MANA Umbris, Fear Manifest #114 (real): 8 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Tainted Pact (CMC=2.0) [draw_cards] rule=curated/verified
+  RESOLVE Umbris, Fear Manifest #114 (real): Wan Shi Tong, Librarian (CMC=2.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=2)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life -2, target_dead=True
+  >>> DIED: Terra, Magical Adept #88 (real) (life_zero) <<<
+
+TURN 8 - Lorehold | Life=40 Hand=2 Board=7
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Generous Gift (CMC=3.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Generous Gift removed Terra, Magical Adept from Terra, Magical Adept #88 (real)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=20)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 5 player damage, target life 15, target_dead=False
+  END Lorehold: Life=40 Hand=2 Board=9 Grave=5 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #109 (real) | Life=15 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=15 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 8 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=13
+  MANA Umbris, Fear Manifest #114 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Sink into Stupor (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Sink into Stupor removed Lorehold, the Historian from Lorehold
+  COMBAT Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=15)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 5 player damage, target life 10, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=5 Board=15 Grave=9 Discarded=0
+
+TURN 9 - Lorehold | Life=36 Hand=2 Board=8
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  END Lorehold: Life=36 Hand=2 Board=10 Grave=5 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #109 (real) | Life=10 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #109 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=10 Hand=7 Board=6 Grave=2 Discarded=1
+
+TURN 9 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=15
+  MANA Umbris, Fear Manifest #114 (real): 13 available (11 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Hullbreaker Horror (CMC=7.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Hullbreaker Horror removed Lorehold, the Historian from Lorehold
+  COMBAT Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=10)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 5 player damage, target life 5, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=16 Grave=10 Discarded=0
+
+TURN 10 - Lorehold | Life=32 Hand=2 Board=9
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Worldfire (CMC=9.0) [board_wipe] rule=curated/verified
+  END Lorehold: Life=32 Hand=2 Board=9 Grave=6 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #109 (real) | Life=5 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=5 Hand=7 Board=6 Grave=3 Discarded=1
+
+TURN 10 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=14
+  MANA Umbris, Fear Manifest #114 (real): 14 available (12 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Windfall (CMC=3.0) [draw_cards] rule=known_cards_manual/verified
+  RESOLVE Umbris, Fear Manifest #114 (real): Borne Upon a Wind (CMC=2.0) [draw_cards] rule=curated/verified
+  RESOLVE Umbris, Fear Manifest #114 (real): The Soul Stone (CMC=2.0) [recursion] rule=known_cards_manual/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=16 Grave=21 Discarded=8
+
+TURN 11 - Lorehold | Life=32 Hand=2 Board=9
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Blasphemous Act (CMC=9.0) [board_wipe] rule=known_cards_manual/verified
+  END Lorehold: Life=32 Hand=1 Board=9 Grave=8 Discarded=0
+
+TURN 11 - Rograkh, Son of Rohgahh #109 (real) | Life=5 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=5 Hand=7 Board=7 Grave=3 Discarded=0
+
+TURN 11 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=9 Board=15
+  MANA Umbris, Fear Manifest #114 (real): 15 available (13 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Orcish Bowmasters (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Orcish Bowmasters removed Rograkh, Son of Rohgahh from Rograkh, Son of Rohgahh #109 (real)
+  RESOLVE Umbris, Fear Manifest #114 (real): Demonic Consultation (CMC=1.0) [draw_cards] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=19 Grave=23 Discarded=0
+
+TURN 12 - Lorehold | Life=32 Hand=1 Board=9
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Umbris, Fear Manifest #114 (real): An Offer You Can't Refuse (CMC=1.0) [counter] rule=curated/verified
+  END Lorehold: Life=32 Hand=1 Board=10 Grave=8 Discarded=0
+
+TURN 12 - Rograkh, Son of Rohgahh #109 (real) | Life=5 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #109 (real): 8 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=5 Hand=7 Board=7 Grave=3 Discarded=0
+
+TURN 12 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=19
+  MANA Umbris, Fear Manifest #114 (real): 18 available (16 sources, 0 treasures, pool={'generic': 15, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Mystical Tutor (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Umbris, Fear Manifest #114 (real): Mystical Tutor found Bolas's Citadel (any)
+  COMBAT Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=5)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life 1, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=20 Grave=25 Discarded=1
+
+TURN 13 - Lorehold | Life=32 Hand=1 Board=10
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=32 Hand=2 Board=12 Grave=8 Discarded=0
+
+TURN 13 - Rograkh, Son of Rohgahh #109 (real) | Life=1 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #109 (real): 8 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #109 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  END Rograkh, Son of Rohgahh #109 (real): Life=1 Hand=7 Board=8 Grave=5 Discarded=2
+
+TURN 13 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=10 Board=20
+  MANA Umbris, Fear Manifest #114 (real): 19 available (17 sources, 0 treasures, pool={'generic': 16, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Imperial Seal (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=1)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life -3, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #109 (real) (life_zero) <<<
+
+TURN 14 - Lorehold | Life=32 Hand=2 Board=12
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=32 Hand=2 Board=14 Grave=8 Discarded=0
+
+TURN 14 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=11 Board=21
+  MANA Umbris, Fear Manifest #114 (real): 20 available (18 sources, 0 treasures, pool={'generic': 17, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Lively Dirge (CMC=2.0) [recursion] rule=known_cards_manual/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=22 Grave=31 Discarded=5
+
+TURN 15 - Lorehold | Life=28 Hand=2 Board=14
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  RESOLVE Lorehold: Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  RESOLVE Lorehold: The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Fiery Emancipation (artifact_or_enchantment)
+  END Lorehold: Life=28 Hand=4 Board=15 Grave=9 Discarded=0
+
+TURN 15 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=10 Board=22
+  MANA Umbris, Fear Manifest #114 (real): 21 available (19 sources, 0 treasures, pool={'generic': 18, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Vampiric Tutor (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  RESOLVE Umbris, Fear Manifest #114 (real): Dramatic Reversal (CMC=2.0) [draw_cards] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=25 Grave=35 Discarded=2
+
+TURN 16 - Lorehold | Life=24 Hand=4 Board=15
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  END Lorehold: Life=24 Hand=7 Board=17 Grave=9 Discarded=0
+
+TURN 16 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=25
+  MANA Umbris, Fear Manifest #114 (real): 26 available (22 sources, 0 treasures, pool={'generic': 20, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=26 Grave=36 Discarded=1
+
+TURN 17 - Lorehold | Life=20 Hand=7 Board=17
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Umbris, Fear Manifest #114 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Umbris, Fear Manifest #114 (real): 5 player damage, target life 30, target_dead=False
+  END Lorehold: Life=20 Hand=7 Board=18 Grave=12 Discarded=1
+
+TURN 17 - Umbris, Fear Manifest #114 (real) | Life=30 Hand=9 Board=26
+  MANA Umbris, Fear Manifest #114 (real): 27 available (23 sources, 0 treasures, pool={'generic': 21, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Chain of Vapor removed Lorehold, the Historian from Lorehold
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Umbris, Fear Manifest #114 (real): Life=30 Hand=7 Board=27 Grave=39 Discarded=2
+
+TURN 18 - Lorehold | Life=16 Hand=7 Board=17
+  MANA Lorehold: 12 available (12 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  END Lorehold: Life=16 Hand=7 Board=19 Grave=15 Discarded=3
+
+TURN 18 - Umbris, Fear Manifest #114 (real) | Life=30 Hand=7 Board=27
+  MANA Umbris, Fear Manifest #114 (real): 28 available (24 sources, 0 treasures, pool={'generic': 22, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Umbris, Fear Manifest #114 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Umbris, Fear Manifest #114 (real): Demonic Tutor found Misdirection (any)
+  COMBAT Umbris, Fear Manifest #114 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Umbris, Fear Manifest #114 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  RESOLVE Umbris, Fear Manifest #114 (real): Misdirection (CMC=5.0) [redirect_removal] rule=known_cards_manual/verified
+  END Umbris, Fear Manifest #114 (real): Life=30 Hand=6 Board=28 Grave=42 Discarded=0
+
+TURN 19 - Lorehold | Life=12 Hand=7 Board=19
+  MANA Lorehold: 13 available (13 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=known_cards_manual/verified
+  >>> DIED: Umbris, Fear Manifest #114 (real) (life_zero) <<<
+  END Lorehold: Life=12 Hand=7 Board=22 Grave=16 Discarded=0
+
+GAME OVER - Turn 19
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=12 Hand=7
+Terra, Magical Adept #88 (real): DEAD Life=-2 Hand=7
+Rograkh, Son of Rohgahh #109 (real): DEAD Life=-3 Hand=23
+Umbris, Fear Manifest #114 (real): DEAD Life=-54 Hand=8

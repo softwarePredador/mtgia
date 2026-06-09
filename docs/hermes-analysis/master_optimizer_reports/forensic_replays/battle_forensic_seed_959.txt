@@ -1,0 +1,324 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Kraum, Ludevic's Opus #110 (real), Kinnan, Bonder Prodigy #79 (real), Rograkh, Son of Rohgahh #118 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Kraum, Ludevic's Opus #110 (real): 1 mulligan(s), 7 cards, 2 lands
+  Kinnan, Bonder Prodigy #79 (real): 3 mulligan(s), 5 cards, 0 lands
+  Rograkh, Son of Rohgahh #118 (real): 3 mulligan(s), 5 cards, 1 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #110 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=5 Board=0
+  MANA Kinnan, Bonder Prodigy #79 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=4 Board=1 Grave=1 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=1
+  MANA Kraum, Ludevic's Opus #110 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=4 Board=1
+  MANA Kinnan, Bonder Prodigy #79 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=5 Board=1 Grave=1 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=5 Board=1
+  MANA Rograkh, Son of Rohgahh #118 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=6 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=5 Board=1
+  MANA Kinnan, Bonder Prodigy #79 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=1
+  MANA Rograkh, Son of Rohgahh #118 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 4 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=6 Board=1
+  MANA Kinnan, Bonder Prodigy #79 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #118 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=4 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Gamble found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 3 player damage, target life 37, target_dead=False
+  END Lorehold: Life=40 Hand=5 Board=6 Grave=2 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #110 (real) | Life=37 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=37 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 5 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=1
+  MANA Kinnan, Bonder Prodigy #79 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=1 Grave=2 Discarded=1
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=40 Hand=5 Board=6
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 3 player damage, target life 31, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=7 Grave=3 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #110 (real) | Life=31 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=31 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 6 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=1
+  MANA Kinnan, Bonder Prodigy #79 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 7 - Lorehold | Life=40 Hand=4 Board=7
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Teferi's Protection (CMC=3.0) [phase_out] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=4 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #110 (real) | Life=31 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #110 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 0 player damage, target life 40, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=31 Hand=7 Board=5 Grave=3 Discarded=0
+
+TURN 7 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=2
+  MANA Kinnan, Bonder Prodigy #79 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=4 Grave=2 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 8 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=31)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 3 player damage, target life 28, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=8 Grave=5 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #110 (real) | Life=28 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #110 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=28 Hand=7 Board=6 Grave=3 Discarded=0
+
+TURN 8 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=4
+  MANA Kinnan, Bonder Prodigy #79 (real): 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=28)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Kraum, Ludevic's Opus #110 (real): 4 player damage, target life 24, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=4 Grave=3 Discarded=1
+
+TURN 8 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 9 - Lorehold | Life=36 Hand=4 Board=8
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 2 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 4 player damage, target life 20, target_dead=False
+  END Lorehold: Life=36 Hand=4 Board=9 Grave=5 Discarded=0
+
+TURN 9 - Kraum, Ludevic's Opus #110 (real) | Life=20 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #110 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=20 Hand=7 Board=6 Grave=4 Discarded=1
+
+TURN 9 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=4
+  MANA Kinnan, Bonder Prodigy #79 (real): 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=32)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kraum, Ludevic's Opus #110 (real): 4 player damage, target life 16, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 10 - Lorehold | Life=28 Hand=4 Board=9
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Reiterate (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 3 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=16)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 5 player damage, target life 11, target_dead=False
+  END Lorehold: Life=28 Hand=4 Board=10 Grave=5 Discarded=0
+
+TURN 10 - Kraum, Ludevic's Opus #110 (real) | Life=11 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #110 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=11 Hand=7 Board=6 Grave=5 Discarded=1
+
+TURN 10 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=5
+  MANA Kinnan, Bonder Prodigy #79 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=24)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=6 Grave=3 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=11)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kraum, Ludevic's Opus #110 (real): 4 player damage, target life 7, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=5 Grave=4 Discarded=1
+
+TURN 11 - Lorehold | Life=20 Hand=4 Board=10
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=7)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 10 player damage, target life -3, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #110 (real) (life_zero) <<<
+
+TURN 11 - Kinnan, Bonder Prodigy #79 (real) | Life=40 Hand=7 Board=6
+  MANA Kinnan, Bonder Prodigy #79 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=20)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=40 Hand=7 Board=7 Grave=3 Discarded=0
+
+TURN 11 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=6 Grave=4 Discarded=0
+
+TURN 12 - Lorehold | Life=12 Hand=4 Board=12
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=curated/verified
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #79 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #79 (real): 10 player damage, target life 30, target_dead=False
+  END Lorehold: Life=12 Hand=4 Board=14 Grave=6 Discarded=0
+
+TURN 12 - Kinnan, Bonder Prodigy #79 (real) | Life=30 Hand=7 Board=7
+  MANA Kinnan, Bonder Prodigy #79 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=12)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=30 Hand=7 Board=8 Grave=3 Discarded=0
+
+TURN 12 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #118 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=8)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 4, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=7 Grave=4 Discarded=0
+
+TURN 13 - Lorehold | Life=4 Hand=4 Board=14
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #79 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #79 (real): 10 player damage, target life 20, target_dead=False
+  END Lorehold: Life=4 Hand=4 Board=15 Grave=7 Discarded=0
+
+TURN 13 - Kinnan, Bonder Prodigy #79 (real) | Life=20 Hand=7 Board=8
+  MANA Kinnan, Bonder Prodigy #79 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Lorehold: 4 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 13 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 16, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=7 Grave=5 Discarded=1
+
+TURN 14 - Kinnan, Bonder Prodigy #79 (real) | Life=16 Hand=7 Board=9
+  MANA Kinnan, Bonder Prodigy #79 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 36, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=16 Hand=7 Board=9 Grave=4 Discarded=1
+
+TURN 14 - Rograkh, Son of Rohgahh #118 (real) | Life=36 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 12, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=36 Hand=7 Board=8 Grave=5 Discarded=0
+
+TURN 15 - Kinnan, Bonder Prodigy #79 (real) | Life=12 Hand=7 Board=9
+  MANA Kinnan, Bonder Prodigy #79 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 32, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=12 Hand=7 Board=9 Grave=5 Discarded=1
+
+TURN 15 - Rograkh, Son of Rohgahh #118 (real) | Life=32 Hand=7 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=12)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 8, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=32 Hand=7 Board=8 Grave=6 Discarded=1
+
+TURN 16 - Kinnan, Bonder Prodigy #79 (real) | Life=8 Hand=7 Board=9
+  MANA Kinnan, Bonder Prodigy #79 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=32)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 28, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=8 Hand=7 Board=10 Grave=5 Discarded=0
+
+TURN 16 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=7 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=8)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 4, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=7 Board=8 Grave=7 Discarded=1
+
+TURN 17 - Kinnan, Bonder Prodigy #79 (real) | Life=4 Hand=7 Board=10
+  MANA Kinnan, Bonder Prodigy #79 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=28)
+  DAMAGE Kinnan, Bonder Prodigy #79 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 24, target_dead=False
+  END Kinnan, Bonder Prodigy #79 (real): Life=4 Hand=7 Board=10 Grave=6 Discarded=1
+
+TURN 17 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=7 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kinnan, Bonder Prodigy #79 (real): 4 player damage, target life 0, target_dead=True
+  >>> DIED: Kinnan, Bonder Prodigy #79 (real) (life_zero) <<<
+
+GAME OVER - Turn 17
+Winner: Rograkh, Son of Rohgahh #118 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=4
+Kraum, Ludevic's Opus #110 (real): DEAD Life=-3 Hand=7
+Kinnan, Bonder Prodigy #79 (real): DEAD Life=0 Hand=7
+Rograkh, Son of Rohgahh #118 (real): ALIVE Life=24 Hand=7

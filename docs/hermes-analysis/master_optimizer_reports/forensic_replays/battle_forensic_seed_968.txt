@@ -1,0 +1,234 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #118 (real), Etali, Primal Conqueror #105 (real), Zhulodok, Void Gorger #46 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #118 (real): 0 mulligan(s), 7 cards, 3 lands
+  Etali, Primal Conqueror #105 (real): 3 mulligan(s), 5 cards, 2 lands
+  Zhulodok, Void Gorger #46 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=5 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=7 Board=0
+  MANA Zhulodok, Void Gorger #46 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zhulodok, Void Gorger #46 (real): Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=1 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=5 Board=1
+  MANA Etali, Primal Conqueror #105 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=3 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=3
+  MANA Zhulodok, Void Gorger #46 (real): 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=4
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=35 Hand=6 Board=4
+  MANA Rograkh, Son of Rohgahh #118 (real): 5 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=35 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 3 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=3 Board=4
+  MANA Etali, Primal Conqueror #105 (real): 6 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=2 Board=7 Grave=0 Discarded=0
+
+TURN 3 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=5
+  MANA Zhulodok, Void Gorger #46 (real): 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=35)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 31, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=36 Hand=6 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=31)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 5 player damage, target life 26, target_dead=False
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=36 Hand=5 Board=9 Grave=2 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=26 Hand=5 Board=6
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 5 player damage, target life 31, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=26 Hand=5 Board=7 Grave=0 Discarded=0
+
+TURN 4 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=2 Board=7
+  MANA Etali, Primal Conqueror #105 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Etali, Primal Conqueror #105 (real): Wheel of Fortune (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=26)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 22, target_dead=False
+  RESOLVE Etali, Primal Conqueror #105 (real): Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=6 Board=10 Grave=2 Discarded=0
+
+TURN 4 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=6
+  MANA Zhulodok, Void Gorger #46 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Zhulodok, Void Gorger #46 (real): All Is Dust (CMC=7.0) [board_wipe] rule=known_cards_manual/verified
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=5 Board=6 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=31 Hand=5 Board=7
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=31 Hand=6 Board=9 Grave=3 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=22 Hand=5 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=22 Hand=4 Board=8 Grave=1 Discarded=0
+
+TURN 5 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=6 Board=7
+  MANA Etali, Primal Conqueror #105 (real): 9 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Etali, Primal Conqueror #105 (real): Underworld Breach (CMC=2.0) [recursion] rule=curated/verified
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=6 Board=9 Grave=4 Discarded=0
+
+TURN 5 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=5 Board=6
+  MANA Zhulodok, Void Gorger #46 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 6 - Lorehold | Life=31 Hand=6 Board=9
+  MANA Lorehold: 7 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=22)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 5 player damage, target life 17, target_dead=False
+  END Lorehold: Life=31 Hand=5 Board=12 Grave=3 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=17 Hand=4 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=31)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 27, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=17 Hand=4 Board=9 Grave=1 Discarded=0
+
+TURN 6 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=6 Board=9
+  MANA Etali, Primal Conqueror #105 (real): 10 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Etali, Primal Conqueror #105 (real): Wheel of Fortune (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=17)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 13, target_dead=False
+  RESOLVE Etali, Primal Conqueror #105 (real): Noxious Revival (CMC=1.0) [recursion] rule=known_cards_manual/verified
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=11 Grave=9 Discarded=4
+
+TURN 6 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=7
+  MANA Zhulodok, Void Gorger #46 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=13)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 9, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=8 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=27 Hand=5 Board=12
+  MANA Lorehold: 8 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Rite of the Dragoncaller (artifact_or_enchantment)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=9)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 6 player damage, target life 3, target_dead=False
+  END Lorehold: Life=27 Hand=7 Board=14 Grave=4 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=3 Hand=4 Board=9
+  MANA Rograkh, Son of Rohgahh #118 (real): 11 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=27)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 23, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=3 Hand=5 Board=9 Grave=1 Discarded=0
+
+TURN 7 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=11
+  MANA Etali, Primal Conqueror #105 (real): 13 available (10 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Etali, Primal Conqueror #105 (real): Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life -1, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #118 (real) (life_zero) <<<
+
+TURN 7 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=8
+  MANA Zhulodok, Void Gorger #46 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=23)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 19, target_dead=False
+  RESOLVE Etali, Primal Conqueror #105 (real): Worldly Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Etali, Primal Conqueror #105 (real): Worldly Tutor found Rionya, Fire Dancer (creature)
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=9 Grave=1 Discarded=0
+
+TURN 8 - Lorehold | Life=19 Hand=9 Board=14
+  MANA Lorehold: 8 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Etali, Primal Conqueror #105 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Etali, Primal Conqueror #105 (real): 9 player damage, target life 31, target_dead=False
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=19 Hand=7 Board=17 Grave=7 Discarded=2
+
+TURN 8 - Etali, Primal Conqueror #105 (real) | Life=31 Hand=6 Board=13
+  MANA Etali, Primal Conqueror #105 (real): 14 available (11 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Etali, Primal Conqueror #105 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  RESOLVE Etali, Primal Conqueror #105 (real): Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Etali, Primal Conqueror #105 (real): Gamble found Pyrokinesis (any)
+  COMBAT Etali, Primal Conqueror #105 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=19)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Lorehold: 5 player damage, target life 14, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=31 Hand=5 Board=14 Grave=13 Discarded=0
+
+TURN 8 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=9
+  MANA Zhulodok, Void Gorger #46 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 10, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=10 Grave=1 Discarded=0
+
+TURN 9 - Lorehold | Life=10 Hand=9 Board=17
+  MANA Lorehold: 12 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Fiery Emancipation (CMC=6.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Etali, Primal Conqueror #105 (real): 5 attackers, 0 blockers, 0 gang blocks, 12 power (reason=default_low_life, target_life=19)
+  DAMAGE Lorehold -> Etali, Primal Conqueror #105 (real): 12 player damage, target life 7, target_dead=False
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  END Lorehold: Life=10 Hand=7 Board=19 Grave=11 Discarded=2
+
+TURN 9 - Etali, Primal Conqueror #105 (real) | Life=7 Hand=5 Board=14
+  MANA Etali, Primal Conqueror #105 (real): 15 available (12 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=10)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Lorehold: 5 player damage, target life 5, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=7 Hand=5 Board=15 Grave=13 Discarded=0
+
+TURN 9 - Zhulodok, Void Gorger #46 (real) | Life=28 Hand=6 Board=10
+  MANA Zhulodok, Void Gorger #46 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=5)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 1, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=28 Hand=7 Board=10 Grave=1 Discarded=0
+
+TURN 10 - Lorehold | Life=1 Hand=7 Board=19
+  MANA Lorehold: 13 available (10 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Faithless Looting (CMC=1.0) [draw_cards] rule=curated/verified
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Path to Exile removed Rograkh, Son of Rohgahh from Rograkh, Son of Rohgahh #118 (real)
+  COMBAT Lorehold -> Etali, Primal Conqueror #105 (real): 5 attackers, 1 blockers, 0 gang blocks, 12 power (reason=lethal, target_life=3)
+  DAMAGE Lorehold -> Etali, Primal Conqueror #105 (real): 9 player damage, target life -6, target_dead=True
+  >>> DIED: Etali, Primal Conqueror #105 (real) (life_zero) <<<
+
+TURN 10 - Zhulodok, Void Gorger #46 (real) | Life=24 Hand=7 Board=10
+  MANA Zhulodok, Void Gorger #46 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=1)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life -3, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+GAME OVER - Turn 10
+Winner: Zhulodok, Void Gorger #46 (real) (elimination)
+Lorehold: DEAD Life=-3 Hand=9
+Rograkh, Son of Rohgahh #118 (real): DEAD Life=-1 Hand=5
+Etali, Primal Conqueror #105 (real): DEAD Life=-6 Hand=5
+Zhulodok, Void Gorger #46 (real): ALIVE Life=24 Hand=7

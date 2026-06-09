@@ -1,0 +1,265 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Zirda, the Dawnwaker #69 (real), Kraum, Ludevic's Opus #86 (real), Zhulodok, Void Gorger #46 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Zirda, the Dawnwaker #69 (real): 0 mulligan(s), 7 cards, 2 lands
+  Kraum, Ludevic's Opus #86 (real): 1 mulligan(s), 7 cards, 3 lands
+  Zhulodok, Void Gorger #46 (real): 1 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=0
+  MANA Zirda, the Dawnwaker #69 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Vexing Bauble (CMC=1.0) [hate_artifact] rule=known_cards_manual/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=7 Board=0
+  MANA Zhulodok, Void Gorger #46 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=2
+  MANA Zirda, the Dawnwaker #69 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Basalt Monolith (CMC=3.0) [ramp_permanent] rule=curated/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=5 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=7 Board=1
+  MANA Zhulodok, Void Gorger #46 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=5
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (4 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Staff of Domination (CMC=3.0) [draw_cards] rule=known_cards_manual/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=7 Grave=1 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=3
+  MANA Zhulodok, Void Gorger #46 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=5 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=7
+  MANA Zirda, the Dawnwaker #69 (real): 9 available (5 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=8 Grave=1 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=7 Grave=0 Discarded=0
+
+TURN 4 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=5
+  MANA Zhulodok, Void Gorger #46 (real): 6 available (4 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zhulodok, Void Gorger #46 (real): Liquimetal Torque (CMC=2.0) [ramp_permanent] rule=curated/verified
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=3 Board=9 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=28 Hand=7 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=28 Hand=7 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 10 available (6 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=9 Grave=1 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=3 Board=9
+  MANA Zhulodok, Void Gorger #46 (real): 12 available (8 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Zhulodok, Void Gorger #46 (real): Rise of the Eldrazi (CMC=12.0) [remove_permanent] rule=curated/verified
+  REMOVAL Zhulodok, Void Gorger #46 (real): Rise of the Eldrazi removed Monument to Endurance from Lorehold
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=2 Board=10 Grave=1 Discarded=0
+
+TURN 6 - Lorehold | Life=16 Hand=7 Board=7
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=16 Hand=7 Board=7 Grave=3 Discarded=2
+
+TURN 6 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 11 available (7 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=3 Board=10 Grave=2 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=2 Board=10
+  MANA Zhulodok, Void Gorger #46 (real): 13 available (9 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 4, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=3 Board=10 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=4 Hand=7 Board=7
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=4 Hand=7 Board=7 Grave=5 Discarded=2
+
+TURN 7 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=3 Board=10
+  MANA Zirda, the Dawnwaker #69 (real): 12 available (8 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Lightning Bolt (CMC=1.0) [deal_damage] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=1)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life -3, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Imperial Seal (CMC=1.0) [draw_cards] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=8 Grave=1 Discarded=0
+
+TURN 7 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=3 Board=10
+  MANA Zhulodok, Void Gorger #46 (real): 13 available (9 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 36, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=3 Board=11 Grave=1 Discarded=0
+
+TURN 8 - Zirda, the Dawnwaker #69 (real) | Life=36 Hand=0 Board=12
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (9 sources, 1 treasures, pool={'generic': 11, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 36, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=36 Hand=0 Board=13 Grave=3 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #86 (real) | Life=36 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=36 Hand=7 Board=8 Grave=2 Discarded=1
+
+TURN 8 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=3 Board=11
+  MANA Zhulodok, Void Gorger #46 (real): 14 available (10 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 28, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=3 Board=12 Grave=1 Discarded=0
+
+TURN 9 - Zirda, the Dawnwaker #69 (real) | Life=28 Hand=0 Board=13
+  MANA Zirda, the Dawnwaker #69 (real): 17 available (10 sources, 3 treasures, pool={'generic': 12, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 32, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=28 Hand=0 Board=14 Grave=3 Discarded=0
+
+TURN 9 - Kraum, Ludevic's Opus #86 (real) | Life=32 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 24, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=32 Hand=7 Board=8 Grave=3 Discarded=1
+
+TURN 9 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=3 Board=12
+  MANA Zhulodok, Void Gorger #46 (real): 15 available (11 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 20, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=3 Board=13 Grave=1 Discarded=0
+
+TURN 10 - Zirda, the Dawnwaker #69 (real) | Life=20 Hand=0 Board=14
+  MANA Zirda, the Dawnwaker #69 (real): 19 available (10 sources, 5 treasures, pool={'generic': 12, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 28, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=20 Hand=1 Board=14 Grave=3 Discarded=0
+
+TURN 10 - Kraum, Ludevic's Opus #86 (real) | Life=28 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 16, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=28 Hand=7 Board=8 Grave=4 Discarded=0
+
+TURN 10 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=3 Board=13
+  MANA Zhulodok, Void Gorger #46 (real): 15 available (11 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 12, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=4 Board=13 Grave=1 Discarded=0
+
+TURN 11 - Zirda, the Dawnwaker #69 (real) | Life=12 Hand=1 Board=14
+  MANA Zirda, the Dawnwaker #69 (real): 21 available (10 sources, 7 treasures, pool={'generic': 12, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 24, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=12 Hand=1 Board=15 Grave=3 Discarded=0
+
+TURN 11 - Kraum, Ludevic's Opus #86 (real) | Life=24 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 8, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=24 Hand=7 Board=8 Grave=5 Discarded=1
+
+TURN 11 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=4 Board=13
+  MANA Zhulodok, Void Gorger #46 (real): 15 available (11 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 4, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=4 Board=14 Grave=1 Discarded=0
+
+TURN 12 - Zirda, the Dawnwaker #69 (real) | Life=4 Hand=1 Board=15
+  MANA Zirda, the Dawnwaker #69 (real): 24 available (11 sources, 9 treasures, pool={'generic': 12, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 20, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=4 Hand=2 Board=15 Grave=3 Discarded=0
+
+TURN 12 - Kraum, Ludevic's Opus #86 (real) | Life=20 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 0, target_dead=True
+  >>> DIED: Zirda, the Dawnwaker #69 (real) (life_zero) <<<
+
+TURN 12 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=4 Board=14
+  MANA Zhulodok, Void Gorger #46 (real): 15 available (11 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 2 attackers, 0 blockers, 0 gang blocks, 13 power (reason=default_low_life, target_life=20)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 13 player damage, target life 7, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=5 Board=14 Grave=1 Discarded=0
+
+TURN 13 - Kraum, Ludevic's Opus #86 (real) | Life=7 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 4 player damage, target life 36, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=7 Hand=7 Board=8 Grave=6 Discarded=1
+
+TURN 13 - Zhulodok, Void Gorger #46 (real) | Life=36 Hand=5 Board=14
+  MANA Zhulodok, Void Gorger #46 (real): 15 available (11 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 2 attackers, 0 blockers, 0 gang blocks, 13 power (reason=lethal, target_life=7)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 13 player damage, target life -6, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #86 (real) (life_zero) <<<
+
+GAME OVER - Turn 13
+Winner: Zhulodok, Void Gorger #46 (real) (elimination)
+Lorehold: DEAD Life=-3 Hand=7
+Zirda, the Dawnwaker #69 (real): DEAD Life=0 Hand=2
+Kraum, Ludevic's Opus #86 (real): DEAD Life=-6 Hand=7
+Zhulodok, Void Gorger #46 (real): ALIVE Life=36 Hand=5

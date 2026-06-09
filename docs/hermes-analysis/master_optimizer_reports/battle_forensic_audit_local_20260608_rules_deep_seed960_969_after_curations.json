@@ -1,0 +1,241 @@
+{
+  "replay_files": [
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_960.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_960.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_961.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_961.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_962.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_962.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_963.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_963.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_964.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_964.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_965.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_965.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_966.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_966.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_967.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_967.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_968.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_968.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_969.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_969.txt"
+    }
+  ],
+  "rule_findings": [],
+  "summary": {
+    "by_effect": {
+      "approach": 8,
+      "board_wipe": 6,
+      "commander": 15,
+      "copy_spell": 24,
+      "counter": 18,
+      "creature": 43,
+      "damage_each_opponent": 2,
+      "draw_cards": 63,
+      "draw_engine": 32,
+      "equipment_haste_shroud": 8,
+      "finisher": 16,
+      "hate_artifact": 2,
+      "indestructible": 12,
+      "land": 266,
+      "modal_boros_charm": 2,
+      "overload_recursion": 6,
+      "phase_out": 6,
+      "ramp_engine": 14,
+      "ramp_permanent": 78,
+      "ramp_ritual": 21,
+      "recursion": 8,
+      "redirect_removal": 8,
+      "remove_creature": 20,
+      "remove_permanent": 16,
+      "silence_opponents": 26,
+      "token_maker": 28,
+      "topdeck_manipulation": 16,
+      "tutor": 46
+    },
+    "by_source": {
+      "curated": 558,
+      "known_cards_manual": 220,
+      "type_line_creature": 32
+    },
+    "by_status": {
+      "fact": 32,
+      "verified": 778
+    },
+    "card_event_count": 810,
+    "cards_by_source": {
+      "curated": [
+        "Abstergo Entertainment",
+        "Aetherflux Reservoir",
+        "Agatha's Soul Cauldron",
+        "Ancient Den",
+        "Ancient Tomb",
+        "Arid Mesa",
+        "Basalt Monolith",
+        "Battlefield Forge",
+        "Birds of Paradise",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Bloodstained Mire",
+        "Boseiju, Who Endures",
+        "Breeding Pool",
+        "Cavern of Souls",
+        "Cephalid Coliseum",
+        "Chain of Vapor",
+        "Chord of Calling",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors",
+        "Clifftop Retreat",
+        "Command Tower",
+        "Cyclonic Rift",
+        "Dark Ritual",
+        "Darksteel Citadel",
+        "Demonic Tutor",
+        "Drannith Magistrate",
+        "Dualcaster Mage",
+        "Elegant Parlor",
+        "Emergence Zone",
+        "Enduring Vitality",
+        "Exotic Orchard",
+        "Faerie Mastermind",
+        "Faithless Looting",
+        "Fellwar Stone",
+        "Fiery Emancipation",
+        "Flawless Maneuver",
+        "Flooded Strand",
+        "Flusterstorm",
+        "Fomori Vault"
+      ],
+      "known_cards_manual": [
+        "All Is Dust",
+        "Approach of the Second Sun",
+        "Arcane Signet",
+        "Blasphemous Act",
+        "Bloom Tender",
+        "Boros Charm",
+        "Boros Signet",
+        "Cursed Mirror",
+        "Deflecting Swat",
+        "Dimir Signet",
+        "Enlightened Tutor",
+        "Esper Sentinel",
+        "Fierce Empath",
+        "Force of Negation",
+        "Formidable Speaker",
+        "Gamble",
+        "Grand Abolisher",
+        "Hullbreaker Horror",
+        "Inspiring Statuary",
+        "Isochron Scepter",
+        "Jeska's Will",
+        "Lorehold, the Historian",
+        "Manifold Key",
+        "Mirage Mirror",
+        "Mizzix's Mastery",
+        "Mystic Forge",
+        "Noxious Revival",
+        "Path to Exile",
+        "Reforge the Soul",
+        "Rite of the Dragoncaller",
+        "Scroll Rack",
+        "Sensei's Divining Top",
+        "Smothering Tithe",
+        "Sol Ring",
+        "Squee, the Immortal",
+        "Storm Herd",
+        "Summon: Bahamut",
+        "Swords to Plowshares",
+        "Talisman of Conviction",
+        "Teferi's Protection"
+      ],
+      "type_line_creature": [
+        "Aang, at the Crossroads",
+        "Etali, Primal Conqueror",
+        "Kenrith, the Returned King",
+        "Kraum, Ludevic's Opus",
+        "Rograkh, Son of Rohgahh",
+        "Sisay, Weatherlight Captain",
+        "Terra, Magical Adept",
+        "Umbris, Fear Manifest",
+        "Zhulodok, Void Gorger"
+      ]
+    },
+    "cards_by_status": {
+      "fact": [
+        "Aang, at the Crossroads",
+        "Etali, Primal Conqueror",
+        "Kenrith, the Returned King",
+        "Kraum, Ludevic's Opus",
+        "Rograkh, Son of Rohgahh",
+        "Sisay, Weatherlight Captain",
+        "Terra, Magical Adept",
+        "Umbris, Fear Manifest",
+        "Zhulodok, Void Gorger"
+      ],
+      "verified": [
+        "Abstergo Entertainment",
+        "Aetherflux Reservoir",
+        "Agatha's Soul Cauldron",
+        "All Is Dust",
+        "Ancient Den",
+        "Ancient Tomb",
+        "Approach of the Second Sun",
+        "Arcane Signet",
+        "Arid Mesa",
+        "Basalt Monolith",
+        "Battlefield Forge",
+        "Birds of Paradise",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Blasphemous Act",
+        "Bloodstained Mire",
+        "Bloom Tender",
+        "Boros Charm",
+        "Boros Signet",
+        "Boseiju, Who Endures",
+        "Breeding Pool",
+        "Cavern of Souls",
+        "Cephalid Coliseum",
+        "Chain of Vapor",
+        "Chord of Calling",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors",
+        "Clifftop Retreat",
+        "Command Tower",
+        "Cursed Mirror",
+        "Cyclonic Rift",
+        "Dark Ritual",
+        "Darksteel Citadel",
+        "Deflecting Swat",
+        "Demonic Tutor",
+        "Dimir Signet",
+        "Drannith Magistrate",
+        "Dualcaster Mage",
+        "Elegant Parlor",
+        "Emergence Zone"
+      ]
+    },
+    "unique_cards": 211
+  },
+  "turn_findings": []
+}

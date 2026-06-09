@@ -1,0 +1,230 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Arcum Dagsson #97 (real), Lumra, Bellow of the Woods #49 (real), Thrasios, Triton Hero #59 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Arcum Dagsson #97 (real): 0 mulligan(s), 7 cards, 2 lands
+  Lumra, Bellow of the Woods #49 (real): 0 mulligan(s), 7 cards, 4 lands
+  Thrasios, Triton Hero #59 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Arcum Dagsson #97 (real) | Life=40 Hand=7 Board=0
+  MANA Arcum Dagsson #97 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #97 (real): Grim Monolith (CMC=2.0) [ramp_permanent] rule=curated/verified
+  END Arcum Dagsson #97 (real): Life=40 Hand=3 Board=3 Grave=2 Discarded=0
+
+TURN 1 - Lumra, Bellow of the Woods #49 (real) | Life=40 Hand=7 Board=0
+  MANA Lumra, Bellow of the Woods #49 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lumra, Bellow of the Woods #49 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #59 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Arcum Dagsson #97 (real) | Life=40 Hand=3 Board=3
+  MANA Arcum Dagsson #97 (real): 5 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  COMBAT Arcum Dagsson #97 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=40)
+  DAMAGE Arcum Dagsson #97 (real) -> Lorehold: 1 player damage, target life 39, target_dead=False
+  END Arcum Dagsson #97 (real): Life=40 Hand=3 Board=5 Grave=2 Discarded=0
+
+TURN 2 - Lumra, Bellow of the Woods #49 (real) | Life=40 Hand=7 Board=1
+  MANA Lumra, Bellow of the Woods #49 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  END Lumra, Bellow of the Woods #49 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=6 Board=2
+  MANA Thrasios, Triton Hero #59 (real): 3 available (2 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=39 Hand=5 Board=3
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  END Lorehold: Life=39 Hand=4 Board=4 Grave=3 Discarded=0
+
+TURN 3 - Arcum Dagsson #97 (real) | Life=40 Hand=3 Board=5
+  MANA Arcum Dagsson #97 (real): 6 available (4 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #97 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Arcum Dagsson #97 (real) -> Thrasios, Triton Hero #59 (real): 2 attackers, 1 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=40)
+  DAMAGE Arcum Dagsson #97 (real) -> Thrasios, Triton Hero #59 (real): 4 player damage, target life 36, target_dead=False
+  END Arcum Dagsson #97 (real): Life=40 Hand=4 Board=5 Grave=3 Discarded=0
+
+TURN 3 - Lumra, Bellow of the Woods #49 (real) | Life=40 Hand=7 Board=2
+  MANA Lumra, Bellow of the Woods #49 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  END Lumra, Bellow of the Woods #49 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #59 (real) | Life=36 Hand=6 Board=4
+  MANA Thrasios, Triton Hero #59 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=39)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 4 player damage, target life 35, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=36 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=35 Hand=4 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Heat Shimmer (CMC=3.0) [token_maker] rule=curated/verified
+  END Lorehold: Life=35 Hand=3 Board=6 Grave=4 Discarded=0
+
+TURN 4 - Arcum Dagsson #97 (real) | Life=40 Hand=4 Board=5
+  MANA Arcum Dagsson #97 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #97 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Arcum Dagsson #97 (real) -> Thrasios, Triton Hero #59 (real): 4 player damage, target life 32, target_dead=False
+  END Arcum Dagsson #97 (real): Life=40 Hand=4 Board=7 Grave=3 Discarded=0
+
+TURN 4 - Lumra, Bellow of the Woods #49 (real) | Life=40 Hand=7 Board=3
+  MANA Lumra, Bellow of the Woods #49 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  END Lumra, Bellow of the Woods #49 (real): Life=40 Hand=7 Board=8 Grave=1 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #59 (real) | Life=32 Hand=6 Board=5
+  MANA Thrasios, Triton Hero #59 (real): 5 available (4 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=35)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 4 player damage, target life 31, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=32 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=31 Hand=3 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Generous Gift (CMC=3.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Generous Gift removed Arcum Dagsson from Arcum Dagsson #97 (real)
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=32)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 1 player damage, target life 31, target_dead=False
+  END Lorehold: Life=31 Hand=3 Board=6 Grave=5 Discarded=0
+
+TURN 5 - Arcum Dagsson #97 (real) | Life=40 Hand=4 Board=6
+  MANA Arcum Dagsson #97 (real): 8 available (5 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #97 (real): Life=40 Hand=5 Board=8 Grave=3 Discarded=0
+
+TURN 5 - Lumra, Bellow of the Woods #49 (real) | Life=40 Hand=7 Board=8
+  MANA Lumra, Bellow of the Woods #49 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Lumra, Bellow of the Woods #49 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=31)
+  DAMAGE Lumra, Bellow of the Woods #49 (real) -> Thrasios, Triton Hero #59 (real): 7 player damage, target life 24, target_dead=False
+  END Lumra, Bellow of the Woods #49 (real): Life=40 Hand=7 Board=9 Grave=1 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #59 (real) | Life=24 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #59 (real): 5 available (4 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=31)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 4 player damage, target life 27, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=24 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 6 - Lorehold | Life=27 Hand=3 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=24)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 6 player damage, target life 18, target_dead=False
+  END Lorehold: Life=27 Hand=3 Board=8 Grave=5 Discarded=0
+
+TURN 6 - Arcum Dagsson #97 (real) | Life=40 Hand=5 Board=8
+  MANA Arcum Dagsson #97 (real): 9 available (6 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #97 (real) -> Lumra, Bellow of the Woods #49 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Arcum Dagsson #97 (real) -> Lumra, Bellow of the Woods #49 (real): 0 player damage, target life 40, target_dead=False
+  END Arcum Dagsson #97 (real): Life=40 Hand=6 Board=8 Grave=4 Discarded=0
+
+TURN 6 - Lumra, Bellow of the Woods #49 (real) | Life=40 Hand=7 Board=9
+  MANA Lumra, Bellow of the Woods #49 (real): 8 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Lumra, Bellow of the Woods #49 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=18)
+  DAMAGE Lumra, Bellow of the Woods #49 (real) -> Thrasios, Triton Hero #59 (real): 7 player damage, target life 11, target_dead=False
+  END Lumra, Bellow of the Woods #49 (real): Life=40 Hand=6 Board=11 Grave=1 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #59 (real) | Life=11 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #59 (real): 5 available (4 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=27)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 4 player damage, target life 23, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=11 Hand=7 Board=5 Grave=2 Discarded=1
+
+TURN 7 - Lorehold | Life=23 Hand=3 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Fiery Emancipation (CMC=6.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=11)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 6 player damage, target life 5, target_dead=False
+  END Lorehold: Life=23 Hand=2 Board=9 Grave=6 Discarded=0
+
+TURN 7 - Arcum Dagsson #97 (real) | Life=40 Hand=6 Board=8
+  MANA Arcum Dagsson #97 (real): 9 available (6 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #97 (real) -> Lumra, Bellow of the Woods #49 (real): 1 attackers, 1 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=34)
+  DAMAGE Arcum Dagsson #97 (real) -> Lumra, Bellow of the Woods #49 (real): 0 player damage, target life 34, target_dead=False
+  END Arcum Dagsson #97 (real): Life=40 Hand=7 Board=7 Grave=6 Discarded=1
+
+TURN 7 - Lumra, Bellow of the Woods #49 (real) | Life=34 Hand=6 Board=11
+  MANA Lumra, Bellow of the Woods #49 (real): 11 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Lumra, Bellow of the Woods #49 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 7 power (reason=lethal, target_life=5)
+  DAMAGE Lumra, Bellow of the Woods #49 (real) -> Thrasios, Triton Hero #59 (real): 5 player damage, target life 0, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #59 (real) (commander_damage) <<<
+
+TURN 8 - Lorehold | Life=23 Hand=2 Board=9
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Lumra, Bellow of the Woods #49 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Lumra, Bellow of the Woods #49 (real): 6 player damage, target life 28, target_dead=False
+  END Lorehold: Life=23 Hand=1 Board=20 Grave=8 Discarded=0
+
+TURN 8 - Arcum Dagsson #97 (real) | Life=40 Hand=7 Board=7
+  MANA Arcum Dagsson #97 (real): 9 available (6 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #97 (real): Grafdigger's Cage (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Arcum Dagsson #97 (real): Life=40 Hand=7 Board=8 Grave=7 Discarded=1
+
+TURN 8 - Lumra, Bellow of the Woods #49 (real) | Life=28 Hand=6 Board=12
+  MANA Lumra, Bellow of the Woods #49 (real): 12 available (11 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Lumra, Bellow of the Woods #49 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=23)
+  DAMAGE Lumra, Bellow of the Woods #49 (real) -> Lorehold: 7 player damage, target life 16, target_dead=False
+  END Lumra, Bellow of the Woods #49 (real): Life=28 Hand=6 Board=13 Grave=1 Discarded=0
+
+TURN 9 - Lorehold | Life=16 Hand=1 Board=20
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=curated/verified
+  COMBAT Lorehold -> Lumra, Bellow of the Woods #49 (real): 13 attackers, 1 blockers, 0 gang blocks, 28 power (reason=lethal, target_life=28)
+  DAMAGE Lorehold -> Lumra, Bellow of the Woods #49 (real): 23 player damage, target life 5, target_dead=False
+  END Lorehold: Life=16 Hand=0 Board=21 Grave=9 Discarded=0
+
+TURN 9 - Arcum Dagsson #97 (real) | Life=40 Hand=7 Board=8
+  MANA Arcum Dagsson #97 (real): 9 available (6 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #97 (real): Life=40 Hand=7 Board=9 Grave=8 Discarded=1
+
+TURN 9 - Lumra, Bellow of the Woods #49 (real) | Life=5 Hand=6 Board=13
+  MANA Lumra, Bellow of the Woods #49 (real): 13 available (12 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Lumra, Bellow of the Woods #49 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=16)
+  DAMAGE Lumra, Bellow of the Woods #49 (real) -> Lorehold: 7 player damage, target life 9, target_dead=False
+  END Lumra, Bellow of the Woods #49 (real): Life=5 Hand=6 Board=14 Grave=1 Discarded=0
+
+TURN 10 - Lorehold | Life=9 Hand=0 Board=21
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Electroduplicate (CMC=3.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Lumra, Bellow of the Woods #49 (real): 13 attackers, 1 blockers, 0 gang blocks, 28 power (reason=lethal, target_life=5)
+  DAMAGE Lorehold -> Lumra, Bellow of the Woods #49 (real): 23 player damage, target life -18, target_dead=True
+  >>> DIED: Lumra, Bellow of the Woods #49 (real) (life_zero) <<<
+
+TURN 10 - Arcum Dagsson #97 (real) | Life=40 Hand=7 Board=9
+  MANA Arcum Dagsson #97 (real): 10 available (7 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #97 (real): Life=40 Hand=7 Board=9 Grave=10 Discarded=2
+
+TURN 11 - Lorehold | Life=9 Hand=0 Board=21
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Arcum Dagsson #97 (real): 13 attackers, 0 blockers, 0 gang blocks, 24 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Arcum Dagsson #97 (real): 24 player damage, target life 16, target_dead=False
+  END Lorehold: Life=9 Hand=1 Board=22 Grave=12 Discarded=0
+
+TURN 11 - Arcum Dagsson #97 (real) | Life=16 Hand=7 Board=9
+  MANA Arcum Dagsson #97 (real): 10 available (7 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #97 (real): Life=16 Hand=7 Board=10 Grave=11 Discarded=1
+
+TURN 12 - Lorehold | Life=9 Hand=1 Board=22
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Arcum Dagsson #97 (real): 13 attackers, 0 blockers, 0 gang blocks, 24 power (reason=lethal, target_life=16)
+  DAMAGE Lorehold -> Arcum Dagsson #97 (real): 24 player damage, target life -8, target_dead=True
+  >>> DIED: Arcum Dagsson #97 (real) (life_zero) <<<
+
+GAME OVER - Turn 12
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=9 Hand=1
+Arcum Dagsson #97 (real): DEAD Life=-8 Hand=7
+Lumra, Bellow of the Woods #49 (real): DEAD Life=-18 Hand=6
+Thrasios, Triton Hero #59 (real): DEAD Life=0 Hand=7

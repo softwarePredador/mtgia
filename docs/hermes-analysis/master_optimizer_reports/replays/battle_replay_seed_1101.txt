@@ -1,0 +1,327 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Ral, Monsoon Mage #48 (real), Kraum, Ludevic's Opus #110 (real), Tayam, Luminous Enigma #25 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 4 lands
+  Ral, Monsoon Mage #48 (real): 0 mulligan(s), 7 cards, 2 lands
+  Kraum, Ludevic's Opus #110 (real): 0 mulligan(s), 7 cards, 2 lands
+  Tayam, Luminous Enigma #25 (real): 0 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #110 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Tayam, Luminous Enigma #25 (real) | Life=40 Hand=7 Board=0
+  MANA Tayam, Luminous Enigma #25 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tayam, Luminous Enigma #25 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=1
+  MANA Ral, Monsoon Mage #48 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=6 Board=2
+  MANA Kraum, Ludevic's Opus #110 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Tayam, Luminous Enigma #25 (real) | Life=40 Hand=5 Board=3
+  MANA Tayam, Luminous Enigma #25 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=40)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 2 player damage, target life 38, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=38 Hand=6 Board=3
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=38 Hand=5 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=2
+  MANA Ral, Monsoon Mage #48 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=6 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=6 Board=4 Grave=1 Discarded=0
+
+TURN 3 - Tayam, Luminous Enigma #25 (real) | Life=39 Hand=5 Board=4
+  MANA Tayam, Luminous Enigma #25 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=38)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 2 player damage, target life 36, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=39 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=36 Hand=5 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  RESOLVE Lorehold: Swords to Plowshares (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Swords to Plowshares removed Ral, Monsoon Mage from Ral, Monsoon Mage #48 (real)
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 1 attackers, 1 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=39)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 0 player damage, target life 39, target_dead=False
+  END Lorehold: Life=36 Hand=3 Board=6 Grave=2 Discarded=0
+
+TURN 4 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=4
+  MANA Ral, Monsoon Mage #48 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=6 Board=4
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=4 Grave=1 Discarded=0
+
+TURN 4 - Tayam, Luminous Enigma #25 (real) | Life=39 Hand=5 Board=6
+  MANA Tayam, Luminous Enigma #25 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=32)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 6 player damage, target life 26, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=39 Hand=5 Board=7 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=26 Hand=3 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=39)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 5 player damage, target life 34, target_dead=False
+  END Lorehold: Life=26 Hand=3 Board=8 Grave=2 Discarded=0
+
+TURN 5 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=5
+  MANA Ral, Monsoon Mage #48 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=6 Board=7 Grave=0 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=4
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 4 player damage, target life 22, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=4 Grave=2 Discarded=1
+
+TURN 5 - Tayam, Luminous Enigma #25 (real) | Life=34 Hand=5 Board=7
+  MANA Tayam, Luminous Enigma #25 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=22)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 6 player damage, target life 16, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=34 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=16 Hand=3 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 5 player damage, target life 29, target_dead=False
+  END Lorehold: Life=16 Hand=3 Board=9 Grave=2 Discarded=0
+
+TURN 6 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=7
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Ral, Monsoon Mage #48 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Ral, Monsoon Mage #48 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Ral, Monsoon Mage #48 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=4
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 6 - Tayam, Luminous Enigma #25 (real) | Life=29 Hand=5 Board=8
+  MANA Tayam, Luminous Enigma #25 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 4 attackers, 1 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=8)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 6 player damage, target life 2, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=29 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=2 Hand=3 Board=9
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Path to Exile removed Ral, Monsoon Mage from Ral, Monsoon Mage #48 (real)
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=29)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 7 player damage, target life 22, target_dead=False
+  END Lorehold: Life=2 Hand=2 Board=10 Grave=3 Discarded=0
+
+TURN 7 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Ral, Monsoon Mage #48 (real): Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #110 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Lorehold: 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=2)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Lorehold: 0 player damage, target life 2, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 7 - Tayam, Luminous Enigma #25 (real) | Life=22 Hand=6 Board=7
+  MANA Tayam, Luminous Enigma #25 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=lethal, target_life=2)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 6 player damage, target life -4, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 8 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Ral, Monsoon Mage #48 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=2 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #110 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 4 player damage, target life 18, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=6 Grave=3 Discarded=0
+
+TURN 8 - Tayam, Luminous Enigma #25 (real) | Life=18 Hand=6 Board=8
+  MANA Tayam, Luminous Enigma #25 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 4 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=40)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 7 player damage, target life 33, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=18 Hand=6 Board=9 Grave=1 Discarded=0
+
+TURN 9 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=3 Discarded=1
+
+TURN 9 - Kraum, Ludevic's Opus #110 (real) | Life=33 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #110 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=18)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 4 player damage, target life 14, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=33 Hand=7 Board=6 Grave=4 Discarded=1
+
+TURN 9 - Tayam, Luminous Enigma #25 (real) | Life=14 Hand=6 Board=9
+  MANA Tayam, Luminous Enigma #25 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Tayam, Luminous Enigma #25 (real): Touch the Spirit Realm (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Tayam, Luminous Enigma #25 (real): Touch the Spirit Realm removed Lorehold, the Historian from Lorehold
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 4 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=33)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 7 player damage, target life 26, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=14 Hand=6 Board=9 Grave=2 Discarded=0
+
+TURN 10 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=4 Discarded=1
+
+TURN 10 - Kraum, Ludevic's Opus #110 (real) | Life=26 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #110 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 4 player damage, target life 10, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=26 Hand=7 Board=6 Grave=5 Discarded=1
+
+TURN 10 - Tayam, Luminous Enigma #25 (real) | Life=10 Hand=6 Board=9
+  MANA Tayam, Luminous Enigma #25 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 4 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=26)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 7 player damage, target life 19, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=10 Hand=7 Board=9 Grave=2 Discarded=0
+
+TURN 11 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Ral, Monsoon Mage #48 (real): Will of the Jeskai (CMC=4.0) [draw_cards] rule=generated/needs_review
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=12 Discarded=6
+
+TURN 11 - Kraum, Ludevic's Opus #110 (real) | Life=19 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #110 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=10)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 4 player damage, target life 6, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=19 Hand=7 Board=6 Grave=6 Discarded=1
+
+TURN 11 - Tayam, Luminous Enigma #25 (real) | Life=6 Hand=7 Board=9
+  MANA Tayam, Luminous Enigma #25 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Tayam, Luminous Enigma #25 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Tayam, Luminous Enigma #25 (real): Demonic Tutor found Dismember (any)
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 4 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=19)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 7 player damage, target life 12, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=6 Hand=7 Board=9 Grave=4 Discarded=1
+
+TURN 12 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=13 Discarded=1
+
+TURN 12 - Kraum, Ludevic's Opus #110 (real) | Life=12 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #110 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=6)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 4 player damage, target life 2, target_dead=False
+  RESOLVE Ral, Monsoon Mage #48 (real): Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Kraum, Ludevic's Opus #110 (real): Life=12 Hand=7 Board=7 Grave=6 Discarded=0
+
+TURN 12 - Tayam, Luminous Enigma #25 (real) | Life=2 Hand=7 Board=9
+  MANA Tayam, Luminous Enigma #25 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 4 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=12)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Kraum, Ludevic's Opus #110 (real): 7 player damage, target life 5, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=2 Hand=7 Board=10 Grave=4 Discarded=0
+
+TURN 13 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=6 Grave=13 Discarded=0
+
+TURN 13 - Kraum, Ludevic's Opus #110 (real) | Life=5 Hand=7 Board=7
+  MANA Kraum, Ludevic's Opus #110 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=2)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Tayam, Luminous Enigma #25 (real): 2 player damage, target life 0, target_dead=True
+  >>> DIED: Tayam, Luminous Enigma #25 (real) (commander_damage) <<<
+
+TURN 14 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=6
+  MANA Ral, Monsoon Mage #48 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=7 Grave=13 Discarded=0
+
+TURN 14 - Kraum, Ludevic's Opus #110 (real) | Life=5 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #110 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 4 player damage, target life 36, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=5 Hand=7 Board=9 Grave=6 Discarded=0
+
+TURN 15 - Ral, Monsoon Mage #48 (real) | Life=36 Hand=7 Board=7
+  MANA Ral, Monsoon Mage #48 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=36 Hand=7 Board=7 Grave=14 Discarded=1
+
+TURN 15 - Kraum, Ludevic's Opus #110 (real) | Life=5 Hand=7 Board=9
+  MANA Kraum, Ludevic's Opus #110 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=5 Hand=7 Board=9 Grave=7 Discarded=1
+
+TURN 16 - Ral, Monsoon Mage #48 (real) | Life=32 Hand=7 Board=7
+  MANA Ral, Monsoon Mage #48 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=32 Hand=7 Board=7 Grave=15 Discarded=1
+
+TURN 16 - Kraum, Ludevic's Opus #110 (real) | Life=5 Hand=7 Board=9
+  MANA Kraum, Ludevic's Opus #110 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 4 player damage, target life 28, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=5 Hand=7 Board=10 Grave=7 Discarded=0
+
+TURN 17 - Ral, Monsoon Mage #48 (real) | Life=28 Hand=7 Board=7
+  MANA Ral, Monsoon Mage #48 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=28 Hand=7 Board=8 Grave=15 Discarded=0
+
+TURN 17 - Kraum, Ludevic's Opus #110 (real) | Life=5 Hand=7 Board=10
+  MANA Kraum, Ludevic's Opus #110 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 4 player damage, target life 24, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=5 Hand=7 Board=11 Grave=7 Discarded=0
+
+TURN 18 - Ral, Monsoon Mage #48 (real) | Life=24 Hand=7 Board=8
+  MANA Ral, Monsoon Mage #48 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Ral, Monsoon Mage #48 (real) -> Kraum, Ludevic's Opus #110 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=5)
+  DAMAGE Ral, Monsoon Mage #48 (real) -> Kraum, Ludevic's Opus #110 (real): 2 player damage, target life 3, target_dead=False
+  END Ral, Monsoon Mage #48 (real): Life=24 Hand=7 Board=10 Grave=15 Discarded=0
+
+TURN 18 - Kraum, Ludevic's Opus #110 (real) | Life=3 Hand=7 Board=11
+  MANA Kraum, Ludevic's Opus #110 (real): 12 available (10 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Kraum, Ludevic's Opus #110 (real) -> Ral, Monsoon Mage #48 (real): 4 player damage, target life 20, target_dead=False
+  END Kraum, Ludevic's Opus #110 (real): Life=3 Hand=7 Board=11 Grave=8 Discarded=1
+
+TURN 19 - Ral, Monsoon Mage #48 (real) | Life=20 Hand=7 Board=10
+  MANA Ral, Monsoon Mage #48 (real): 8 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Ral, Monsoon Mage #48 (real) -> Kraum, Ludevic's Opus #110 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=lethal, target_life=3)
+  DAMAGE Ral, Monsoon Mage #48 (real) -> Kraum, Ludevic's Opus #110 (real): 6 player damage, target life -3, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #110 (real) (life_zero) <<<
+
+GAME OVER - Turn 19
+Winner: Ral, Monsoon Mage #48 (real) (elimination)
+Lorehold: DEAD Life=-4 Hand=2
+Ral, Monsoon Mage #48 (real): ALIVE Life=20 Hand=7
+Kraum, Ludevic's Opus #110 (real): DEAD Life=-3 Hand=7
+Tayam, Luminous Enigma #25 (real): DEAD Life=0 Hand=7

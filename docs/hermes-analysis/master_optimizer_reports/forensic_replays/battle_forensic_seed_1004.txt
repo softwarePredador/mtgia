@@ -1,0 +1,248 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Grist, the Hunger Tide #66 (real), Zirda, the Dawnwaker #69 (real), Marneus Calgar #64 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Grist, the Hunger Tide #66 (real): 1 mulligan(s), 7 cards, 2 lands
+  Zirda, the Dawnwaker #69 (real): 0 mulligan(s), 7 cards, 2 lands
+  Marneus Calgar #64 (real): 0 mulligan(s), 7 cards, 4 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Scroll Rack (CMC=2.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=7 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 1 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=0
+  MANA Zirda, the Dawnwaker #69 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=0
+  MANA Marneus Calgar #64 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Imperial Recruiter (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Imperial Recruiter found Rise of the Eldrazi (any)
+  END Lorehold: Life=40 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 2 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=4
+  MANA Grist, the Hunger Tide #66 (real): 6 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Grist, the Hunger Tide #66 (real): Noxious Revival (CMC=1.0) [recursion] rule=known_cards_manual/verified
+  COMBAT Grist, the Hunger Tide #66 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 2 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=3
+  MANA Zirda, the Dawnwaker #69 (real): 3 available (2 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 2 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=2
+  MANA Marneus Calgar #64 (real): 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=36 Hand=6 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 6 player damage, target life 34, target_dead=False
+  END Lorehold: Life=36 Hand=7 Board=8 Grave=1 Discarded=0
+
+TURN 3 - Grist, the Hunger Tide #66 (real) | Life=34 Hand=4 Board=5
+  MANA Grist, the Hunger Tide #66 (real): 7 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Grist, the Hunger Tide #66 (real): Sylvan Library (CMC=2.0) [passive] rule=known_cards_manual/verified
+  COMBAT Grist, the Hunger Tide #66 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=34 Hand=3 Board=7 Grave=1 Discarded=0
+
+TURN 3 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=5
+  MANA Zirda, the Dawnwaker #69 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=3 Board=8 Grave=0 Discarded=0
+
+TURN 3 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=4
+  MANA Marneus Calgar #64 (real): 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=24 Hand=8 Board=8
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 6 player damage, target life 28, target_dead=False
+  END Lorehold: Life=24 Hand=7 Board=8 Grave=4 Discarded=1
+
+TURN 4 - Grist, the Hunger Tide #66 (real) | Life=28 Hand=3 Board=7
+  MANA Grist, the Hunger Tide #66 (real): 8 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=28 Hand=4 Board=7 Grave=1 Discarded=0
+
+TURN 4 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=3 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 9 available (6 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=1 Board=11 Grave=0 Discarded=0
+
+TURN 4 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=5
+  MANA Marneus Calgar #64 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=5 Board=7 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=12 Hand=9 Board=8
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Storm Herd (any)
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=28)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 6 player damage, target life 22, target_dead=False
+  END Lorehold: Life=12 Hand=7 Board=10 Grave=8 Discarded=2
+
+TURN 5 - Grist, the Hunger Tide #66 (real) | Life=22 Hand=4 Board=7
+  MANA Grist, the Hunger Tide #66 (real): 8 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=22 Hand=4 Board=8 Grave=1 Discarded=0
+
+TURN 5 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=1 Board=11
+  MANA Zirda, the Dawnwaker #69 (real): 13 available (8 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=8)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 5 player damage, target life 3, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=1 Board=11 Grave=1 Discarded=0
+
+TURN 5 - Marneus Calgar #64 (real) | Life=40 Hand=5 Board=7
+  MANA Marneus Calgar #64 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life -1, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 6 - Grist, the Hunger Tide #66 (real) | Life=22 Hand=4 Board=8
+  MANA Grist, the Hunger Tide #66 (real): 9 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 36, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=22 Hand=4 Board=9 Grave=1 Discarded=0
+
+TURN 6 - Zirda, the Dawnwaker #69 (real) | Life=36 Hand=1 Board=11
+  MANA Zirda, the Dawnwaker #69 (real): 13 available (8 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Grist, the Hunger Tide #66 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=22)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Grist, the Hunger Tide #66 (real): 5 player damage, target life 17, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=36 Hand=1 Board=12 Grave=1 Discarded=0
+
+TURN 6 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=7
+  MANA Marneus Calgar #64 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=17)
+  DAMAGE Marneus Calgar #64 (real) -> Grist, the Hunger Tide #66 (real): 4 player damage, target life 13, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=8 Grave=0 Discarded=0
+
+TURN 7 - Grist, the Hunger Tide #66 (real) | Life=13 Hand=4 Board=9
+  MANA Grist, the Hunger Tide #66 (real): 10 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 32, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=13 Hand=5 Board=9 Grave=1 Discarded=0
+
+TURN 7 - Zirda, the Dawnwaker #69 (real) | Life=32 Hand=1 Board=12
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (9 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Grist, the Hunger Tide #66 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=13)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Grist, the Hunger Tide #66 (real): 5 player damage, target life 8, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=32 Hand=1 Board=13 Grave=1 Discarded=0
+
+TURN 7 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=8
+  MANA Marneus Calgar #64 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Marneus Calgar #64 (real) -> Grist, the Hunger Tide #66 (real): 4 player damage, target life 4, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=9 Grave=0 Discarded=0
+
+TURN 8 - Grist, the Hunger Tide #66 (real) | Life=4 Hand=5 Board=9
+  MANA Grist, the Hunger Tide #66 (real): 10 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 28, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=4 Hand=6 Board=9 Grave=1 Discarded=0
+
+TURN 8 - Zirda, the Dawnwaker #69 (real) | Life=28 Hand=1 Board=13
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (9 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Staff of Domination (CMC=3.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Grist, the Hunger Tide #66 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=lethal, target_life=4)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Grist, the Hunger Tide #66 (real): 8 player damage, target life -4, target_dead=True
+  >>> DIED: Grist, the Hunger Tide #66 (real) (life_zero) <<<
+
+TURN 8 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=9
+  MANA Marneus Calgar #64 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 24, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=10 Grave=0 Discarded=0
+
+TURN 9 - Zirda, the Dawnwaker #69 (real) | Life=24 Hand=2 Board=13
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (9 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 8 player damage, target life 32, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=24 Hand=2 Board=13 Grave=3 Discarded=0
+
+TURN 9 - Marneus Calgar #64 (real) | Life=32 Hand=6 Board=10
+  MANA Marneus Calgar #64 (real): 11 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 20, target_dead=False
+  END Marneus Calgar #64 (real): Life=32 Hand=7 Board=10 Grave=0 Discarded=0
+
+TURN 10 - Zirda, the Dawnwaker #69 (real) | Life=20 Hand=2 Board=13
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (9 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 8 player damage, target life 24, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=20 Hand=2 Board=14 Grave=3 Discarded=0
+
+TURN 10 - Marneus Calgar #64 (real) | Life=24 Hand=7 Board=10
+  MANA Marneus Calgar #64 (real): 11 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 16, target_dead=False
+  END Marneus Calgar #64 (real): Life=24 Hand=7 Board=10 Grave=1 Discarded=1
+
+TURN 11 - Zirda, the Dawnwaker #69 (real) | Life=16 Hand=2 Board=14
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (9 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 9 player damage, target life 15, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=16 Hand=2 Board=15 Grave=3 Discarded=0
+
+TURN 11 - Marneus Calgar #64 (real) | Life=15 Hand=7 Board=10
+  MANA Marneus Calgar #64 (real): 11 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 12, target_dead=False
+  END Marneus Calgar #64 (real): Life=15 Hand=7 Board=10 Grave=2 Discarded=1
+
+TURN 12 - Zirda, the Dawnwaker #69 (real) | Life=12 Hand=2 Board=15
+  MANA Zirda, the Dawnwaker #69 (real): 15 available (10 sources, 0 treasures, pool={'generic': 14, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=aggro_low_life, target_life=15)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 9 player damage, target life 6, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=12 Hand=2 Board=16 Grave=3 Discarded=0
+
+TURN 12 - Marneus Calgar #64 (real) | Life=6 Hand=7 Board=10
+  MANA Marneus Calgar #64 (real): 11 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Marneus Calgar #64 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 8, target_dead=False
+  END Marneus Calgar #64 (real): Life=6 Hand=7 Board=11 Grave=2 Discarded=0
+
+TURN 13 - Zirda, the Dawnwaker #69 (real) | Life=8 Hand=2 Board=16
+  MANA Zirda, the Dawnwaker #69 (real): 15 available (10 sources, 0 treasures, pool={'generic': 14, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Zirda, the Dawnwaker #69 (real): Enlightened Tutor found Smothering Tithe (artifact_or_enchantment)
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=6)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 10 player damage, target life -4, target_dead=True
+  >>> DIED: Marneus Calgar #64 (real) (life_zero) <<<
+
+GAME OVER - Turn 13
+Winner: Zirda, the Dawnwaker #69 (real) (elimination)
+Lorehold: DEAD Life=-1 Hand=13
+Grist, the Hunger Tide #66 (real): DEAD Life=-4 Hand=6
+Zirda, the Dawnwaker #69 (real): ALIVE Life=8 Hand=3
+Marneus Calgar #64 (real): DEAD Life=-4 Hand=7

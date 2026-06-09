@@ -1,0 +1,173 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Thrasios, Triton Hero #59 (real), Thrasios, Triton Hero #101 (real), Kraum, Ludevic's Opus #86 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Thrasios, Triton Hero #59 (real): 0 mulligan(s), 7 cards, 2 lands
+  Thrasios, Triton Hero #101 (real): 3 mulligan(s), 5 cards, 3 lands
+  Kraum, Ludevic's Opus #86 (real): 2 mulligan(s), 6 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #59 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=2 Grave=1 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=6 Board=0
+  MANA Thrasios, Triton Hero #59 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Redirect Lightning (CMC=1.0) [draw_cards] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=2
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=6 Board=1
+  MANA Thrasios, Triton Hero #59 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=1
+  MANA Kraum, Ludevic's Opus #86 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 7 player damage, target life 33, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #59 (real) | Life=33 Hand=6 Board=2
+  MANA Thrasios, Triton Hero #59 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=33 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=curated/verified
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=33)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 7 player damage, target life 26, target_dead=False
+  END Lorehold: Life=40 Hand=2 Board=8 Grave=2 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #59 (real) | Life=26 Hand=6 Board=3
+  MANA Thrasios, Triton Hero #59 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=26 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=5 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #59 (real): 4 player damage, target life 22, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=4 Board=6 Grave=2 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=2 Board=8
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Teferi's Protection (CMC=3.0) [phase_out] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=2 Board=5 Grave=3 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #59 (real) | Life=22 Hand=6 Board=5
+  MANA Thrasios, Triton Hero #59 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 36, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=22 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #101 (real) | Life=36 Hand=5 Board=5
+  MANA Thrasios, Triton Hero #101 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Thrasios, Triton Hero #59 (real): 4 player damage, target life 18, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=36 Hand=4 Board=6 Grave=1 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=4 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Underworld Breach (CMC=2.0) [recursion] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=18)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #59 (real): 4 player damage, target life 14, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=4 Board=7 Grave=2 Discarded=0
+
+TURN 6 - Lorehold | Life=40 Hand=4 Board=5
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=14)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 10 player damage, target life 4, target_dead=False
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=40 Hand=2 Board=12 Grave=5 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #59 (real) | Life=4 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #59 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 22, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=4 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #101 (real) | Life=22 Hand=4 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Thrasios, Triton Hero #59 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Thrasios, Triton Hero #59 (real): 4 player damage, target life 0, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #59 (real) (life_zero) <<<
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=4 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 18, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=3 Board=8 Grave=3 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=3 Board=12
+  MANA Lorehold: 7 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 5 attackers, 0 blockers, 0 gang blocks, 11 power (reason=default_low_life, target_life=16)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 11 player damage, target life 5, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=16 Grave=5 Discarded=0
+
+TURN 7 - Thrasios, Triton Hero #101 (real) | Life=5 Hand=4 Board=7
+  MANA Thrasios, Triton Hero #101 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=38)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 34, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=5 Hand=5 Board=7 Grave=1 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=34 Hand=3 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Redirect Lightning (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=5)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 1, target_dead=False
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=34 Hand=2 Board=11 Grave=4 Discarded=0
+
+TURN 8 - Lorehold | Life=40 Hand=3 Board=16
+  MANA Lorehold: 9 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=known_cards_manual/verified
+  >>> DIED: Thrasios, Triton Hero #101 (real) (life_zero) <<<
+  >>> DIED: Kraum, Ludevic's Opus #86 (real) (life_zero) <<<
+
+GAME OVER - Turn 8
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=40 Hand=2
+Thrasios, Triton Hero #59 (real): DEAD Life=0 Hand=7
+Thrasios, Triton Hero #101 (real): DEAD Life=-1 Hand=5
+Kraum, Ludevic's Opus #86 (real): DEAD Life=-4 Hand=2

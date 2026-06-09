@@ -1,0 +1,178 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Grist, the Hunger Tide #66 (real), Tannuk, Memorial Ensign #40 (real), Rograkh, Son of Rohgahh #63 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 1 mulligan(s), 7 cards, 2 lands
+  Grist, the Hunger Tide #66 (real): 2 mulligan(s), 6 cards, 2 lands
+  Tannuk, Memorial Ensign #40 (real): 0 mulligan(s), 7 cards, 4 lands
+  Rograkh, Son of Rohgahh #63 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=6 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=0
+  MANA Tannuk, Memorial Ensign #40 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #63 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=6 Board=1
+  MANA Grist, the Hunger Tide #66 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=1
+  MANA Tannuk, Memorial Ensign #40 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=1
+  MANA Rograkh, Son of Rohgahh #63 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=2 Discarded=0
+
+TURN 3 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=6 Board=2
+  MANA Grist, the Hunger Tide #66 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=2
+  MANA Tannuk, Memorial Ensign #40 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=2
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=6 Grave=2 Discarded=0
+
+TURN 4 - Grist, the Hunger Tide #66 (real) | Life=35 Hand=6 Board=3
+  MANA Grist, the Hunger Tide #66 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=35 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=3
+  MANA Tannuk, Memorial Ensign #40 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=2
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=4 Board=6
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 5 player damage, target life 30, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=7 Grave=4 Discarded=0
+
+TURN 5 - Grist, the Hunger Tide #66 (real) | Life=30 Hand=6 Board=5
+  MANA Grist, the Hunger Tide #66 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=30 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=5
+  MANA Tannuk, Memorial Ensign #40 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=30)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Grist, the Hunger Tide #66 (real): 4 player damage, target life 26, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 6 - Lorehold | Life=36 Hand=3 Board=7
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Path to Exile removed Grist, the Hunger Tide from Grist, the Hunger Tide #66 (real)
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=26)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 6 player damage, target life 20, target_dead=False
+  END Lorehold: Life=36 Hand=2 Board=8 Grave=5 Discarded=0
+
+TURN 6 - Grist, the Hunger Tide #66 (real) | Life=20 Hand=6 Board=5
+  MANA Grist, the Hunger Tide #66 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=20 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 6 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=6 Board=6
+  MANA Tannuk, Memorial Ensign #40 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 3, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Grist, the Hunger Tide #66 (real): 4 player damage, target life 16, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 7 - Lorehold | Life=36 Hand=2 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=16)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 8 player damage, target life 8, target_dead=False
+  END Lorehold: Life=36 Hand=2 Board=26 Grave=7 Discarded=0
+
+TURN 7 - Grist, the Hunger Tide #66 (real) | Life=8 Hand=7 Board=5
+  MANA Grist, the Hunger Tide #66 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=8 Hand=7 Board=7 Grave=0 Discarded=0
+
+TURN 7 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=6 Board=7
+  MANA Tannuk, Memorial Ensign #40 (real): 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 3, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=8)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Grist, the Hunger Tide #66 (real): 4 player damage, target life 4, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=6 Board=8 Grave=1 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #63 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Grist, the Hunger Tide #66 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Grist, the Hunger Tide #66 (real): 4 player damage, target life 0, target_dead=True
+  >>> DIED: Grist, the Hunger Tide #66 (real) (life_zero) <<<
+
+TURN 8 - Lorehold | Life=36 Hand=2 Board=26
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Tannuk, Memorial Ensign #40 (real): 21 attackers, 0 blockers, 0 gang blocks, 44 power (reason=lethal, target_life=40)
+  DAMAGE Lorehold -> Tannuk, Memorial Ensign #40 (real): 44 player damage, target life -4, target_dead=True
+  >>> DIED: Tannuk, Memorial Ensign #40 (real) (life_zero) <<<
+
+TURN 8 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=8 Board=5
+  MANA Rograkh, Son of Rohgahh #63 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=6 Grave=3 Discarded=1
+
+TURN 9 - Lorehold | Life=32 Hand=0 Board=29
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #63 (real): 22 attackers, 0 blockers, 0 gang blocks, 46 power (reason=lethal, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #63 (real): 46 player damage, target life -6, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #63 (real) (life_zero) <<<
+
+GAME OVER - Turn 9
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=32 Hand=1
+Grist, the Hunger Tide #66 (real): DEAD Life=0 Hand=7
+Tannuk, Memorial Ensign #40 (real): DEAD Life=-4 Hand=6
+Rograkh, Son of Rohgahh #63 (real): DEAD Life=-6 Hand=7

@@ -1,0 +1,341 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #118 (real), Kenrith, the Returned King #113 (real), Etali, Primal Conqueror #105 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #118 (real): 1 mulligan(s), 7 cards, 3 lands
+  Kenrith, the Returned King #113 (real): 1 mulligan(s), 7 cards, 2 lands
+  Etali, Primal Conqueror #105 (real): 3 mulligan(s), 5 cards, 0 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Ruby Medallion (CMC=2.0) [ramp_permanent] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=0
+  MANA Kenrith, the Returned King #113 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=5 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=1
+  MANA Rograkh, Son of Rohgahh #118 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=6 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=4
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=2
+  MANA Rograkh, Son of Rohgahh #118 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 3 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=1
+
+TURN 4 - Lorehold | Life=40 Hand=6 Board=4
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=4 Grave=0 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=1
+
+TURN 4 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=2 Discarded=1
+
+TURN 5 - Lorehold | Life=40 Hand=7 Board=4
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=3 Discarded=1
+
+TURN 5 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=3 Discarded=1
+
+TURN 6 - Lorehold | Life=36 Hand=7 Board=5
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=36 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #118 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=7 Grave=0 Discarded=0
+
+TURN 6 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=4 Discarded=1
+
+TURN 6 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=4 Discarded=1
+
+TURN 7 - Lorehold | Life=32 Hand=7 Board=5
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=32 Hand=7 Board=5 Grave=2 Discarded=1
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=8 Grave=0 Discarded=0
+
+TURN 7 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=4 Discarded=0
+
+TURN 7 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=5 Discarded=1
+
+TURN 8 - Lorehold | Life=28 Hand=7 Board=5
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Lorehold: Approach of the Second Sun (CMC=7.0) [approach] rule=known_cards_manual/verified
+  END Lorehold: Life=35 Hand=6 Board=6 Grave=2 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=known_approach, target_life=35)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 31, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=8 Grave=1 Discarded=1
+
+TURN 8 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=5 Discarded=1
+
+TURN 8 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=6 Discarded=1
+
+TURN 9 - Lorehold | Life=31 Hand=6 Board=6
+  MANA Lorehold: 7 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=31 Hand=5 Board=7 Grave=3 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=known_approach, target_life=31)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 27, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=9 Grave=1 Discarded=0
+
+TURN 9 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=6 Discarded=1
+
+TURN 9 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=7 Discarded=1
+
+TURN 10 - Lorehold | Life=27 Hand=5 Board=7
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=27 Hand=6 Board=7 Grave=3 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=9
+  MANA Rograkh, Son of Rohgahh #118 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=known_approach, target_life=27)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 27 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 10 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=7 Discarded=1
+
+TURN 10 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=8 Discarded=1
+
+TURN 11 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=10 Grave=2 Discarded=1
+
+TURN 11 - Kenrith, the Returned King #113 (real) | Life=36 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=36 Hand=7 Board=3 Grave=8 Discarded=1
+
+TURN 11 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=9 Discarded=1
+
+TURN 12 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=10 Grave=3 Discarded=1
+
+TURN 12 - Kenrith, the Returned King #113 (real) | Life=32 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=32 Hand=7 Board=3 Grave=9 Discarded=1
+
+TURN 12 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=10 Discarded=1
+
+TURN 13 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=10 Grave=4 Discarded=1
+
+TURN 13 - Kenrith, the Returned King #113 (real) | Life=28 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=28 Hand=7 Board=4 Grave=10 Discarded=0
+
+TURN 13 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=11 Discarded=1
+
+TURN 14 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=10 Grave=5 Discarded=1
+
+TURN 14 - Kenrith, the Returned King #113 (real) | Life=24 Hand=7 Board=4
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 36, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=24 Hand=7 Board=4 Grave=11 Discarded=1
+
+TURN 14 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=7 Board=0 Grave=12 Discarded=1
+
+TURN 15 - Rograkh, Son of Rohgahh #118 (real) | Life=36 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 4 player damage, target life 20, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=36 Hand=7 Board=10 Grave=6 Discarded=1
+
+TURN 15 - Kenrith, the Returned King #113 (real) | Life=20 Hand=7 Board=4
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 32, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=20 Hand=7 Board=4 Grave=12 Discarded=1
+
+TURN 15 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=7 Board=0
+  MANA Etali, Primal Conqueror #105 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Etali, Primal Conqueror #105 (real): Mox Opal (CMC=0.0) [ramp_permanent] rule=curated/verified
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=4 Board=4 Grave=13 Discarded=0
+
+TURN 16 - Rograkh, Son of Rohgahh #118 (real) | Life=32 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Kenrith, the Returned King #113 (real): 20 player damage, target life 0, target_dead=True
+  >>> DIED: Kenrith, the Returned King #113 (real) (commander_damage) <<<
+
+TURN 16 - Etali, Primal Conqueror #105 (real) | Life=40 Hand=4 Board=4
+  MANA Etali, Primal Conqueror #105 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 28, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=40 Hand=4 Board=4 Grave=14 Discarded=0
+
+TURN 17 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=7 Board=11
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=7 Board=12 Grave=6 Discarded=0
+
+TURN 17 - Etali, Primal Conqueror #105 (real) | Life=36 Hand=4 Board=4
+  MANA Etali, Primal Conqueror #105 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 24, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=36 Hand=5 Board=4 Grave=14 Discarded=0
+
+TURN 18 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=7 Board=12
+  MANA Rograkh, Son of Rohgahh #118 (real): 11 available (11 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=7 Board=12 Grave=7 Discarded=1
+
+TURN 18 - Etali, Primal Conqueror #105 (real) | Life=32 Hand=5 Board=4
+  MANA Etali, Primal Conqueror #105 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 20, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=32 Hand=6 Board=4 Grave=14 Discarded=0
+
+TURN 19 - Rograkh, Son of Rohgahh #118 (real) | Life=20 Hand=7 Board=12
+  MANA Rograkh, Son of Rohgahh #118 (real): 11 available (11 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=20 Hand=7 Board=13 Grave=7 Discarded=0
+
+TURN 19 - Etali, Primal Conqueror #105 (real) | Life=28 Hand=6 Board=4
+  MANA Etali, Primal Conqueror #105 (real): 4 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 16, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=28 Hand=6 Board=5 Grave=14 Discarded=0
+
+TURN 20 - Rograkh, Son of Rohgahh #118 (real) | Life=16 Hand=7 Board=13
+  MANA Rograkh, Son of Rohgahh #118 (real): 12 available (12 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=16 Hand=7 Board=13 Grave=8 Discarded=1
+
+TURN 20 - Etali, Primal Conqueror #105 (real) | Life=24 Hand=6 Board=5
+  MANA Etali, Primal Conqueror #105 (real): 7 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 12, target_dead=False
+  END Etali, Primal Conqueror #105 (real): Life=24 Hand=7 Board=5 Grave=14 Discarded=0
+
+TURN 21 - Rograkh, Son of Rohgahh #118 (real) | Life=12 Hand=7 Board=13
+  MANA Rograkh, Son of Rohgahh #118 (real): 12 available (12 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Etali, Primal Conqueror #105 (real): 4 player damage, target life 20, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=12 Hand=7 Board=14 Grave=8 Discarded=0
+
+TURN 21 - Etali, Primal Conqueror #105 (real) | Life=20 Hand=7 Board=5
+  MANA Etali, Primal Conqueror #105 (real): 7 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=12)
+  DAMAGE Etali, Primal Conqueror #105 (real) -> Rograkh, Son of Rohgahh #118 (real): 12 player damage, target life 0, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #118 (real) (life_zero) <<<
+
+GAME OVER - Turn 21
+Winner: Etali, Primal Conqueror #105 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=6
+Rograkh, Son of Rohgahh #118 (real): DEAD Life=0 Hand=7
+Kenrith, the Returned King #113 (real): DEAD Life=0 Hand=7
+Etali, Primal Conqueror #105 (real): ALIVE Life=20 Hand=8

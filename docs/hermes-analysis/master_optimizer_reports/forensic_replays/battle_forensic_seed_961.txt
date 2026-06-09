@@ -1,0 +1,217 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Kinnan, Bonder Prodigy #104 (real), Umbris, Fear Manifest #114 (real), Kenrith, the Returned King #113 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Kinnan, Bonder Prodigy #104 (real): 2 mulligan(s), 6 cards, 2 lands
+  Umbris, Fear Manifest #114 (real): 0 mulligan(s), 7 cards, 2 lands
+  Kenrith, the Returned King #113 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=6 Board=0
+  MANA Kinnan, Bonder Prodigy #104 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Arcane Signet (CMC=2.0) [ramp_permanent] rule=known_cards_manual/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=5 Board=2 Grave=1 Discarded=0
+
+TURN 1 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=0
+  MANA Kenrith, the Returned King #113 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=5 Board=2
+  MANA Kinnan, Bonder Prodigy #104 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 player damage, target life 39, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=2
+  MANA Umbris, Fear Manifest #114 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Agatha's Soul Cauldron (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Umbris, Fear Manifest #114 (real): Agatha's Soul Cauldron removed Walking Ballista from Kinnan, Bonder Prodigy #104 (real)
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=4 Board=3 Grave=2 Discarded=0
+
+TURN 2 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=39 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=39 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=5 Board=2
+  MANA Kinnan, Bonder Prodigy #104 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=5 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=4 Board=3
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Umbris, Fear Manifest #114 (real): Demonic Tutor found Hullbreaker Horror (any)
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=5 Board=3 Grave=3 Discarded=0
+
+TURN 3 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=39 Hand=5 Board=5
+  MANA Lorehold: 7 available (4 sources, 3 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=39 Hand=3 Board=8 Grave=1 Discarded=0
+
+TURN 4 - Kinnan, Bonder Prodigy #104 (real) | Life=35 Hand=5 Board=3
+  MANA Kinnan, Bonder Prodigy #104 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=35 Hand=5 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=3
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=3 Grave=3 Discarded=0
+
+TURN 4 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=39 Hand=3 Board=8
+  MANA Lorehold: 9 available (5 sources, 4 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Rite of the Dragoncaller (CMC=6.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 2 attackers, 1 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 5 player damage, target life 30, target_dead=False
+  END Lorehold: Life=39 Hand=2 Board=12 Grave=3 Discarded=0
+
+TURN 5 - Kinnan, Bonder Prodigy #104 (real) | Life=30 Hand=5 Board=5
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=39)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 35, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=30 Hand=6 Board=5 Grave=1 Discarded=0
+
+TURN 5 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=3
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Isochron Scepter (CMC=2.0) [copy_spell] rule=known_cards_manual/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=4 Grave=3 Discarded=0
+
+TURN 5 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=5
+  MANA Kenrith, the Returned King #113 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=30)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 26, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 6 - Lorehold | Life=35 Hand=2 Board=12
+  MANA Lorehold: 9 available (5 sources, 4 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Fiery Emancipation (artifact_or_enchantment)
+  RESOLVE Lorehold: Fiery Emancipation (CMC=6.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Kenrith, the Returned King #113 (real): 6 attackers, 0 blockers, 0 gang blocks, 28 power (reason=lethal, target_life=12)
+  DAMAGE Lorehold -> Kenrith, the Returned King #113 (real): 28 player damage, target life -16, target_dead=True
+  >>> DIED: Kenrith, the Returned King #113 (real) (life_zero) <<<
+
+TURN 6 - Kinnan, Bonder Prodigy #104 (real) | Life=26 Hand=6 Board=5
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=35)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 31, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=26 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 6 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=4
+  MANA Umbris, Fear Manifest #114 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=6 Grave=3 Discarded=0
+
+TURN 7 - Lorehold | Life=31 Hand=2 Board=12
+  MANA Lorehold: 8 available (5 sources, 3 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Worldfire (CMC=9.0) [board_wipe] rule=curated/verified
+  END Lorehold: Life=31 Hand=1 Board=7 Grave=11 Discarded=0
+
+TURN 7 - Kinnan, Bonder Prodigy #104 (real) | Life=26 Hand=7 Board=4
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=26 Hand=7 Board=4 Grave=2 Discarded=0
+
+TURN 7 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=0
+
+TURN 8 - Lorehold | Life=31 Hand=1 Board=7
+  MANA Lorehold: 8 available (6 sources, 2 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=26)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 5 player damage, target life 21, target_dead=False
+  END Lorehold: Life=31 Hand=2 Board=8 Grave=12 Discarded=0
+
+TURN 8 - Kinnan, Bonder Prodigy #104 (real) | Life=21 Hand=7 Board=4
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=21 Hand=7 Board=4 Grave=3 Discarded=1
+
+TURN 8 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=5 Grave=4 Discarded=1
+
+TURN 9 - Lorehold | Life=31 Hand=2 Board=8
+  MANA Lorehold: 8 available (6 sources, 2 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=curated/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=21)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 5 player damage, target life 16, target_dead=False
+  END Lorehold: Life=31 Hand=2 Board=8 Grave=13 Discarded=0
+
+TURN 9 - Kinnan, Bonder Prodigy #104 (real) | Life=16 Hand=7 Board=4
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=16 Hand=7 Board=4 Grave=4 Discarded=1
+
+TURN 9 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Dark Ritual (CMC=1.0) [draw_cards] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=5 Grave=6 Discarded=1
+
+TURN 10 - Lorehold | Life=31 Hand=2 Board=8
+  MANA Lorehold: 10 available (6 sources, 4 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=16)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 5 player damage, target life 11, target_dead=False
+  END Lorehold: Life=31 Hand=2 Board=23 Grave=14 Discarded=0
+
+TURN 10 - Kinnan, Bonder Prodigy #104 (real) | Life=11 Hand=7 Board=4
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=11 Hand=7 Board=4 Grave=5 Discarded=1
+
+TURN 10 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=5 Grave=7 Discarded=1
+
+TURN 11 - Lorehold | Life=31 Hand=2 Board=23
+  MANA Lorehold: 8 available (6 sources, 2 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 16 attackers, 0 blockers, 0 gang blocks, 35 power (reason=lethal, target_life=11)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 35 player damage, target life -24, target_dead=True
+  >>> DIED: Kinnan, Bonder Prodigy #104 (real) (life_zero) <<<
+
+TURN 11 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=5
+  MANA Umbris, Fear Manifest #114 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=6 Grave=7 Discarded=0
+
+TURN 12 - Lorehold | Life=31 Hand=2 Board=25
+  MANA Lorehold: 10 available (7 sources, 3 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Reforge the Soul (CMC=5.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Umbris, Fear Manifest #114 (real): 16 attackers, 0 blockers, 0 gang blocks, 35 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Umbris, Fear Manifest #114 (real): 35 player damage, target life 5, target_dead=False
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=known_cards_manual/verified
+  >>> DIED: Umbris, Fear Manifest #114 (real) (life_zero) <<<
+  END Lorehold: Life=31 Hand=7 Board=27 Grave=16 Discarded=0
+
+GAME OVER - Turn 12
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=31 Hand=7
+Kinnan, Bonder Prodigy #104 (real): DEAD Life=-24 Hand=7
+Umbris, Fear Manifest #114 (real): DEAD Life=-25 Hand=7
+Kenrith, the Returned King #113 (real): DEAD Life=-16 Hand=7

@@ -1,0 +1,293 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #118 (real), Kinnan, Bonder Prodigy #104 (real), Kenrith, the Returned King #113 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #118 (real): 0 mulligan(s), 7 cards, 2 lands
+  Kinnan, Bonder Prodigy #104 (real): 3 mulligan(s), 5 cards, 2 lands
+  Kenrith, the Returned King #113 (real): 0 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Rise of the Eldrazi (any)
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=2 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=5 Board=0
+  MANA Kinnan, Bonder Prodigy #104 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #104 (real): Finale of Devastation (CMC=2.0) [pump_all] rule=curated/verified
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=2 Board=2 Grave=2 Discarded=0
+
+TURN 1 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=0
+  MANA Kenrith, the Returned King #113 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=3 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #118 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=2 Board=2
+  MANA Kinnan, Bonder Prodigy #104 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=3 Board=2 Grave=2 Discarded=0
+
+TURN 2 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #104 (real): Mana Leak (CMC=2.0) [counter] rule=known_cards_manual/verified
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=4 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=2 Board=2
+  MANA Kinnan, Bonder Prodigy #104 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=1 Board=4 Grave=2 Discarded=0
+
+TURN 3 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=6 Grave=5 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=39 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=39 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 4 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=1 Board=4
+  MANA Kinnan, Bonder Prodigy #104 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=1 Board=6 Grave=2 Discarded=0
+
+TURN 4 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 5 - Lorehold | Life=40 Hand=3 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=39)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 player damage, target life 38, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=7 Grave=5 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=38 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=38 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 5 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=1 Board=6
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=1 Board=7 Grave=2 Discarded=0
+
+TURN 5 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 6 - Lorehold | Life=36 Hand=3 Board=7
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=38)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 8 player damage, target life 30, target_dead=False
+  END Lorehold: Life=36 Hand=3 Board=9 Grave=5 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=30 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=30 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 6 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=1 Board=7
+  MANA Kinnan, Bonder Prodigy #104 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=2 Board=7 Grave=2 Discarded=0
+
+TURN 6 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=3 Discarded=1
+
+TURN 7 - Lorehold | Life=32 Hand=3 Board=9
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 8 player damage, target life 22, target_dead=False
+  END Lorehold: Life=32 Hand=2 Board=10 Grave=6 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=22 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=22 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 7 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=2 Board=7
+  MANA Kinnan, Bonder Prodigy #104 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=28)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=2 Board=8 Grave=2 Discarded=0
+
+TURN 7 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=4 Discarded=1
+
+TURN 8 - Lorehold | Life=24 Hand=2 Board=10
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Imperial Recruiter (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Imperial Recruiter found Storm Herd (any)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=22)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 8 player damage, target life 14, target_dead=False
+  END Lorehold: Life=24 Hand=2 Board=11 Grave=7 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #118 (real) | Life=14 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=14 Hand=7 Board=6 Grave=3 Discarded=0
+
+TURN 8 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=2 Board=8
+  MANA Kinnan, Bonder Prodigy #104 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #104 (real): Tezzeret the Seeker (CMC=5.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #104 (real): Tezzeret the Seeker found Hullbreaker Horror (any)
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=20)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=2 Board=9 Grave=3 Discarded=0
+
+TURN 8 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=5 Discarded=1
+
+TURN 9 - Lorehold | Life=16 Hand=2 Board=11
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=14)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 8 player damage, target life 6, target_dead=False
+  END Lorehold: Life=16 Hand=2 Board=11 Grave=8 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #118 (real) | Life=6 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #118 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=6 Hand=7 Board=7 Grave=3 Discarded=0
+
+TURN 9 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=2 Board=9
+  MANA Kinnan, Bonder Prodigy #104 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #104 (real): Hullbreaker Horror (CMC=7.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Kinnan, Bonder Prodigy #104 (real): Hullbreaker Horror removed Lorehold, the Historian from Lorehold
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=6)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Rograkh, Son of Rohgahh #118 (real): 4 player damage, target life 2, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=2 Board=9 Grave=4 Discarded=0
+
+TURN 9 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=3 Grave=6 Discarded=0
+
+TURN 10 - Lorehold | Life=12 Hand=2 Board=10
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=lethal, target_life=2)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 player damage, target life -1, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #118 (real) (life_zero) <<<
+
+TURN 10 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=2 Board=9
+  MANA Kinnan, Bonder Prodigy #104 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=12)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=2 Board=10 Grave=4 Discarded=0
+
+TURN 10 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=4 Grave=7 Discarded=0
+
+TURN 11 - Lorehold | Life=8 Hand=3 Board=11
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 10 player damage, target life 30, target_dead=False
+  END Lorehold: Life=8 Hand=2 Board=13 Grave=8 Discarded=0
+
+TURN 11 - Kinnan, Bonder Prodigy #104 (real) | Life=30 Hand=2 Board=10
+  MANA Kinnan, Bonder Prodigy #104 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=8)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 8 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 11 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=4
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=30)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 26, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=5 Grave=7 Discarded=0
+
+TURN 12 - Kinnan, Bonder Prodigy #104 (real) | Life=26 Hand=2 Board=11
+  MANA Kinnan, Bonder Prodigy #104 (real): 9 available (9 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 7 player damage, target life 33, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=26 Hand=2 Board=12 Grave=4 Discarded=0
+
+TURN 12 - Kenrith, the Returned King #113 (real) | Life=33 Hand=7 Board=5
+  MANA Kenrith, the Returned King #113 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 22, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=33 Hand=7 Board=6 Grave=7 Discarded=0
+
+TURN 13 - Kinnan, Bonder Prodigy #104 (real) | Life=22 Hand=2 Board=12
+  MANA Kinnan, Bonder Prodigy #104 (real): 10 available (10 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=control_high_threat, target_life=33)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 7 player damage, target life 26, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=22 Hand=2 Board=13 Grave=4 Discarded=0
+
+TURN 13 - Kenrith, the Returned King #113 (real) | Life=26 Hand=7 Board=6
+  MANA Kenrith, the Returned King #113 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 18, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=26 Hand=7 Board=7 Grave=7 Discarded=0
+
+TURN 14 - Kinnan, Bonder Prodigy #104 (real) | Life=18 Hand=2 Board=13
+  MANA Kinnan, Bonder Prodigy #104 (real): 10 available (10 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 3 attackers, 0 blockers, 0 gang blocks, 9 power (reason=control_high_threat, target_life=26)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 9 player damage, target life 17, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=18 Hand=2 Board=14 Grave=4 Discarded=0
+
+TURN 14 - Kenrith, the Returned King #113 (real) | Life=17 Hand=7 Board=7
+  MANA Kenrith, the Returned King #113 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=18)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 14, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=17 Hand=7 Board=7 Grave=8 Discarded=1
+
+TURN 15 - Kinnan, Bonder Prodigy #104 (real) | Life=14 Hand=2 Board=14
+  MANA Kinnan, Bonder Prodigy #104 (real): 11 available (11 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 3 attackers, 0 blockers, 0 gang blocks, 9 power (reason=control_high_threat, target_life=17)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 9 player damage, target life 8, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=14 Hand=2 Board=15 Grave=4 Discarded=0
+
+TURN 15 - Kenrith, the Returned King #113 (real) | Life=8 Hand=7 Board=7
+  MANA Kenrith, the Returned King #113 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 10, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=8 Hand=7 Board=7 Grave=9 Discarded=1
+
+TURN 16 - Kinnan, Bonder Prodigy #104 (real) | Life=10 Hand=2 Board=15
+  MANA Kinnan, Bonder Prodigy #104 (real): 12 available (12 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 3 attackers, 0 blockers, 0 gang blocks, 9 power (reason=lethal, target_life=8)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Kenrith, the Returned King #113 (real): 9 player damage, target life -1, target_dead=True
+  >>> DIED: Kenrith, the Returned King #113 (real) (life_zero) <<<
+
+GAME OVER - Turn 16
+Winner: Kinnan, Bonder Prodigy #104 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=2
+Rograkh, Son of Rohgahh #118 (real): DEAD Life=-1 Hand=7
+Kinnan, Bonder Prodigy #104 (real): ALIVE Life=10 Hand=2
+Kenrith, the Returned King #113 (real): DEAD Life=-1 Hand=7

@@ -1,0 +1,163 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Kenrith, the Returned King #113 (real), Umbris, Fear Manifest #114 (real), Kraum, Ludevic's Opus #110 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 4 lands
+  Kenrith, the Returned King #113 (real): 3 mulligan(s), 5 cards, 1 lands
+  Umbris, Fear Manifest #114 (real): 3 mulligan(s), 5 cards, 0 lands
+  Kraum, Ludevic's Opus #110 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Umbris, Fear Manifest #114 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kenrith, the Returned King #113 (real) | Life=40 Hand=5 Board=0
+  MANA Kenrith, the Returned King #113 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=4 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=5 Board=0 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #110 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Kenrith, the Returned King #113 (real) | Life=40 Hand=5 Board=1
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=5 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=6 Board=1
+  MANA Kraum, Ludevic's Opus #110 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Kenrith, the Returned King #113 (real) | Life=40 Hand=6 Board=1
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=6 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=0 Grave=0 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=6 Board=2
+  MANA Kraum, Ludevic's Opus #110 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Wheel of Fortune (CMC=3.0) [draw_cards] rule=curated/verified
+  END Lorehold: Life=40 Hand=7 Board=5 Grave=6 Discarded=4
+
+TURN 4 - Kenrith, the Returned King #113 (real) | Life=40 Hand=6 Board=2
+  MANA Kenrith, the Returned King #113 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=1
+
+TURN 4 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=2
+  MANA Kraum, Ludevic's Opus #110 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=7 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Lorehold -> Kenrith, the Returned King #113 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kenrith, the Returned King #113 (real): 6 player damage, target life 34, target_dead=False
+  END Lorehold: Life=40 Hand=7 Board=7 Grave=6 Discarded=0
+
+TURN 5 - Kenrith, the Returned King #113 (real) | Life=34 Hand=6 Board=3
+  MANA Kenrith, the Returned King #113 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=34 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=0
+  MANA Umbris, Fear Manifest #114 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 6 - Lorehold | Life=40 Hand=7 Board=7
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Kenrith, the Returned King #113 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Kenrith, the Returned King #113 (real): 6 player damage, target life 28, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=29 Grave=9 Discarded=0
+
+TURN 6 - Kenrith, the Returned King #113 (real) | Life=28 Hand=6 Board=5
+  MANA Kenrith, the Returned King #113 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kenrith, the Returned King #113 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kenrith, the Returned King #113 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Kenrith, the Returned King #113 (real): Life=28 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=1
+  MANA Umbris, Fear Manifest #114 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=1 Grave=2 Discarded=1
+
+TURN 6 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=3 Discarded=1
+
+TURN 7 - Lorehold | Life=36 Hand=4 Board=29
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kenrith, the Returned King #113 (real): 23 attackers, 0 blockers, 0 gang blocks, 47 power (reason=lethal, target_life=28)
+  DAMAGE Lorehold -> Kenrith, the Returned King #113 (real): 47 player damage, target life -19, target_dead=True
+  >>> DIED: Kenrith, the Returned King #113 (real) (life_zero) <<<
+
+TURN 7 - Umbris, Fear Manifest #114 (real) | Life=40 Hand=7 Board=1
+  MANA Umbris, Fear Manifest #114 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  END Umbris, Fear Manifest #114 (real): Life=40 Hand=7 Board=1 Grave=3 Discarded=1
+
+TURN 7 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=4 Discarded=1
+
+TURN 8 - Lorehold | Life=36 Hand=2 Board=31
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  RESOLVE Lorehold: Faithless Looting (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Lorehold -> Umbris, Fear Manifest #114 (real): 24 attackers, 0 blockers, 0 gang blocks, 49 power (reason=lethal, target_life=40)
+  DAMAGE Lorehold -> Umbris, Fear Manifest #114 (real): 49 player damage, target life -9, target_dead=True
+  >>> DIED: Umbris, Fear Manifest #114 (real) (life_zero) <<<
+
+TURN 8 - Kraum, Ludevic's Opus #110 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #110 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #110 (real): Life=40 Hand=7 Board=3 Grave=5 Discarded=1
+
+TURN 9 - Lorehold | Life=36 Hand=3 Board=32
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Scroll Rack (CMC=2.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #110 (real): 24 attackers, 0 blockers, 0 gang blocks, 49 power (reason=lethal, target_life=40)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #110 (real): 49 player damage, target life -9, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #110 (real) (life_zero) <<<
+
+GAME OVER - Turn 9
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=36 Hand=3
+Kenrith, the Returned King #113 (real): DEAD Life=-19 Hand=6
+Umbris, Fear Manifest #114 (real): DEAD Life=-9 Hand=7
+Kraum, Ludevic's Opus #110 (real): DEAD Life=-9 Hand=7

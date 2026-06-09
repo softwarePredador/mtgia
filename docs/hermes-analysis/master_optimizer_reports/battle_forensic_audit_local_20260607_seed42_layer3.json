@@ -1,0 +1,150 @@
+{
+  "replay_files": [
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_42.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_42.txt"
+    }
+  ],
+  "rule_findings": [],
+  "summary": {
+    "by_effect": {
+      "commander": 1,
+      "counter": 4,
+      "creature": 10,
+      "deal_damage": 2,
+      "draw_engine": 4,
+      "equipment_haste_shroud": 2,
+      "land": 21,
+      "modal_boros_charm": 2,
+      "overload_recursion": 2,
+      "ramp_engine": 1,
+      "ramp_permanent": 6,
+      "ramp_ritual": 2,
+      "redirect_removal": 4,
+      "remove_creature": 1,
+      "remove_permanent": 6,
+      "token_maker": 2,
+      "tutor": 2
+    },
+    "by_source": {
+      "curated": 47,
+      "manual": 18,
+      "type_line_creature": 7
+    },
+    "by_status": {
+      "fact": 7,
+      "verified": 65
+    },
+    "card_event_count": 72,
+    "cards_by_source": {
+      "curated": [
+        "An Offer You Can't Refuse",
+        "Ancient Den",
+        "Ancient Tomb",
+        "Bloodstained Mire",
+        "Chain of Vapor",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Gemstone Caverns",
+        "Great Furnace",
+        "Guttersnipe",
+        "Hexing Squelcher",
+        "Inspiring Vantage",
+        "Lightning Greaves",
+        "Lotus Petal",
+        "Magda, Brazen Outlaw",
+        "Mana Vault",
+        "Misty Rainforest",
+        "Mother of Runes",
+        "Mountain",
+        "Mox Diamond",
+        "Mystic Remora",
+        "Pact of Negation",
+        "Plateau",
+        "Rise of the Eldrazi",
+        "Rite of Flame",
+        "Scalding Tarn",
+        "Shatterskull Smashing",
+        "Shinka, the Bloodsoaked Keep",
+        "Smuggler's Copter",
+        "Steam Vents",
+        "Sunbaked Canyon",
+        "Underground Sea",
+        "Untimely Malfunction"
+      ],
+      "manual": [
+        "Arcane Signet",
+        "Boros Charm",
+        "Deflecting Swat",
+        "Gamble",
+        "Lorehold, the Historian",
+        "Mizzix's Mastery",
+        "Path to Exile",
+        "Sol Ring",
+        "Storm Herd"
+      ],
+      "type_line_creature": [
+        "Dwarven Bloodboiler",
+        "Ishai, Ojutai Dragonspeaker",
+        "Rograkh, Son of Rohgahh",
+        "Stoke the Flames",
+        "Three Tree Mascot",
+        "Valley Floodcaller"
+      ]
+    },
+    "cards_by_status": {
+      "fact": [
+        "Dwarven Bloodboiler",
+        "Ishai, Ojutai Dragonspeaker",
+        "Rograkh, Son of Rohgahh",
+        "Stoke the Flames",
+        "Three Tree Mascot",
+        "Valley Floodcaller"
+      ],
+      "verified": [
+        "An Offer You Can't Refuse",
+        "Ancient Den",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Bloodstained Mire",
+        "Boros Charm",
+        "Chain of Vapor",
+        "Deflecting Swat",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Gamble",
+        "Gemstone Caverns",
+        "Great Furnace",
+        "Guttersnipe",
+        "Hexing Squelcher",
+        "Inspiring Vantage",
+        "Lightning Greaves",
+        "Lorehold, the Historian",
+        "Lotus Petal",
+        "Magda, Brazen Outlaw",
+        "Mana Vault",
+        "Misty Rainforest",
+        "Mizzix's Mastery",
+        "Mother of Runes",
+        "Mountain",
+        "Mox Diamond",
+        "Mystic Remora",
+        "Pact of Negation",
+        "Path to Exile",
+        "Plateau",
+        "Rise of the Eldrazi",
+        "Rite of Flame",
+        "Scalding Tarn",
+        "Shatterskull Smashing",
+        "Shinka, the Bloodsoaked Keep",
+        "Smuggler's Copter",
+        "Sol Ring",
+        "Steam Vents",
+        "Storm Herd",
+        "Sunbaked Canyon"
+      ]
+    },
+    "unique_cards": 48
+  },
+  "turn_findings": []
+}

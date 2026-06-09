@@ -1,0 +1,337 @@
+{
+  "replay_files": [
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_42.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_42.txt"
+    }
+  ],
+  "rule_findings": [
+    {
+      "card": "Mountain",
+      "effect": "land",
+      "event": "land_played",
+      "finding": "Runtime effect `land` differs from registry effect `ramp_permanent`.",
+      "phase": "-",
+      "player": "Magda, Brazen Outlaw #71 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 1
+    },
+    {
+      "card": "Culling the Weak",
+      "effect": "draw_cards",
+      "event": "spell_cast",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "precombat_main",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 2
+    },
+    {
+      "card": "Culling the Weak",
+      "effect": "draw_cards",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 2
+    },
+    {
+      "card": "Mountain",
+      "effect": "land",
+      "event": "land_played",
+      "finding": "Runtime effect `land` differs from registry effect `ramp_permanent`.",
+      "phase": "-",
+      "player": "Magda, Brazen Outlaw #71 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 2
+    },
+    {
+      "card": "Mystic Remora",
+      "effect": "draw_engine",
+      "event": "spell_cast",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "precombat_main",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 3
+    },
+    {
+      "card": "Mystic Remora",
+      "effect": "draw_engine",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 3
+    },
+    {
+      "card": "Mountain",
+      "effect": "land",
+      "event": "land_played",
+      "finding": "Runtime effect `land` differs from registry effect `ramp_permanent`.",
+      "phase": "-",
+      "player": "Magda, Brazen Outlaw #71 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 3
+    },
+    {
+      "card": "Into the Flood Maw",
+      "effect": "remove_permanent",
+      "event": "spell_cast",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "precombat_main",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 4
+    },
+    {
+      "card": "Into the Flood Maw",
+      "effect": "remove_permanent",
+      "event": "spell_cast",
+      "finding": "Runtime effect `remove_permanent` differs from registry effect `token_maker`.",
+      "phase": "precombat_main",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 4
+    },
+    {
+      "card": "Into the Flood Maw",
+      "effect": "remove_permanent",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 4
+    },
+    {
+      "card": "Into the Flood Maw",
+      "effect": "remove_permanent",
+      "event": "spell_resolved",
+      "finding": "Runtime effect `remove_permanent` differs from registry effect `token_maker`.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 4
+    },
+    {
+      "card": "Cabal Ritual",
+      "effect": "draw_cards",
+      "event": "spell_cast",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "precombat_main",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 5
+    },
+    {
+      "card": "Cabal Ritual",
+      "effect": "draw_cards",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 5
+    },
+    {
+      "card": "Lotus Petal",
+      "effect": "ramp_ritual",
+      "event": "spell_cast",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "precombat_main",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "medium",
+      "turn": 6
+    },
+    {
+      "card": "Pact of Negation",
+      "effect": "counter",
+      "event": "end_step_instant",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 6
+    },
+    {
+      "card": "Pact of Negation",
+      "effect": "counter",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Najeela, the Blade-Blossom #111 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 6
+    }
+  ],
+  "summary": {
+    "by_effect": {
+      "commander": 1,
+      "counter": 2,
+      "creature": 8,
+      "deal_damage": 2,
+      "draw_cards": 4,
+      "draw_engine": 2,
+      "equipment_haste_shroud": 2,
+      "land": 18,
+      "modal_boros_charm": 2,
+      "overload_recursion": 2,
+      "ramp_engine": 1,
+      "ramp_permanent": 4,
+      "ramp_ritual": 2,
+      "redirect_removal": 2,
+      "remove_creature": 2,
+      "remove_permanent": 2,
+      "token_maker": 2
+    },
+    "by_source": {
+      "curated": 26,
+      "generated": 14,
+      "manual": 12,
+      "type_line_creature": 6
+    },
+    "by_status": {
+      "fact": 6,
+      "needs_review": 14,
+      "verified": 38
+    },
+    "card_event_count": 58,
+    "cards_by_source": {
+      "curated": [
+        "Ancient Den",
+        "Ancient Tomb",
+        "Bloodstained Mire",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Gemstone Caverns",
+        "Guttersnipe",
+        "Hexing Squelcher",
+        "Inspiring Vantage",
+        "Lightning Bolt",
+        "Lightning Greaves",
+        "Magda, Brazen Outlaw",
+        "Mana Vault",
+        "Mox Diamond",
+        "Otawara, Soaring City",
+        "Plateau",
+        "Polluted Delta",
+        "Rite of Flame",
+        "Scalding Tarn",
+        "Sunbaked Canyon",
+        "Verdant Catacombs"
+      ],
+      "generated": [
+        "Cabal Ritual",
+        "Culling the Weak",
+        "Into the Flood Maw",
+        "Lotus Petal",
+        "Mountain",
+        "Mystic Remora",
+        "Pact of Negation"
+      ],
+      "manual": [
+        "Boros Charm",
+        "Deflecting Swat",
+        "Lorehold, the Historian",
+        "Mizzix's Mastery",
+        "Path to Exile",
+        "Sol Ring",
+        "Storm Herd"
+      ],
+      "type_line_creature": [
+        "Firdoch Core",
+        "Kraum, Ludevic's Opus",
+        "Liberated Dwarf",
+        "Liquimetal Coating",
+        "Najeela, the Blade-Blossom",
+        "Tymna the Weaver"
+      ]
+    },
+    "cards_by_status": {
+      "fact": [
+        "Firdoch Core",
+        "Kraum, Ludevic's Opus",
+        "Liberated Dwarf",
+        "Liquimetal Coating",
+        "Najeela, the Blade-Blossom",
+        "Tymna the Weaver"
+      ],
+      "needs_review": [
+        "Cabal Ritual",
+        "Culling the Weak",
+        "Into the Flood Maw",
+        "Lotus Petal",
+        "Mountain",
+        "Mystic Remora",
+        "Pact of Negation"
+      ],
+      "verified": [
+        "Ancient Den",
+        "Ancient Tomb",
+        "Bloodstained Mire",
+        "Boros Charm",
+        "Deflecting Swat",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Gemstone Caverns",
+        "Guttersnipe",
+        "Hexing Squelcher",
+        "Inspiring Vantage",
+        "Lightning Bolt",
+        "Lightning Greaves",
+        "Lorehold, the Historian",
+        "Magda, Brazen Outlaw",
+        "Mana Vault",
+        "Mizzix's Mastery",
+        "Mox Diamond",
+        "Otawara, Soaring City",
+        "Path to Exile",
+        "Plateau",
+        "Polluted Delta",
+        "Rite of Flame",
+        "Scalding Tarn",
+        "Sol Ring",
+        "Storm Herd",
+        "Sunbaked Canyon",
+        "Verdant Catacombs"
+      ]
+    },
+    "unique_cards": 41
+  },
+  "turn_findings": []
+}

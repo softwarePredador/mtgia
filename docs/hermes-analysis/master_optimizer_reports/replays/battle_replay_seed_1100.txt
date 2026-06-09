@@ -1,0 +1,252 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Brigid, Clachan's Heart #82 (real), Rowan, Scion of War #32 (real), Kinnan, Bonder Prodigy #72 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Brigid, Clachan's Heart #82 (real): 3 mulligan(s), 5 cards, 2 lands
+  Rowan, Scion of War #32 (real): 3 mulligan(s), 5 cards, 1 lands
+  Kinnan, Bonder Prodigy #72 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Brigid, Clachan's Heart #82 (real) | Life=40 Hand=5 Board=0
+  MANA Brigid, Clachan's Heart #82 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Brigid, Clachan's Heart #82 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rowan, Scion of War #32 (real) | Life=40 Hand=5 Board=0
+  MANA Rowan, Scion of War #32 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #72 (real) | Life=40 Hand=7 Board=0
+  MANA Kinnan, Bonder Prodigy #72 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #72 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Brigid, Clachan's Heart #82 (real) | Life=40 Hand=5 Board=1
+  MANA Brigid, Clachan's Heart #82 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Brigid, Clachan's Heart #82 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Rowan, Scion of War #32 (real) | Life=40 Hand=5 Board=1
+  MANA Rowan, Scion of War #32 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #72 (real) | Life=40 Hand=5 Board=4
+  MANA Kinnan, Bonder Prodigy #72 (real): 6 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Moonsilver Key (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #72 (real): Moonsilver Key found The One Ring (artifact_or_enchantment)
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  END Kinnan, Bonder Prodigy #72 (real): Life=40 Hand=5 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=36 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  END Lorehold: Life=36 Hand=5 Board=4 Grave=2 Discarded=0
+
+TURN 3 - Brigid, Clachan's Heart #82 (real) | Life=40 Hand=5 Board=2
+  MANA Brigid, Clachan's Heart #82 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Brigid, Clachan's Heart #82 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Rowan, Scion of War #32 (real) | Life=40 Hand=6 Board=1
+  MANA Rowan, Scion of War #32 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #72 (real) | Life=40 Hand=5 Board=6
+  MANA Kinnan, Bonder Prodigy #72 (real): 7 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kinnan, Bonder Prodigy #72 (real): Life=40 Hand=4 Board=9 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=32 Hand=5 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Heat Shimmer (CMC=3.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #72 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #72 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=32 Hand=4 Board=6 Grave=3 Discarded=0
+
+TURN 4 - Brigid, Clachan's Heart #82 (real) | Life=40 Hand=5 Board=3
+  MANA Brigid, Clachan's Heart #82 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Brigid, Clachan's Heart #82 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Rowan, Scion of War #32 (real) | Life=40 Hand=6 Board=1
+  MANA Rowan, Scion of War #32 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=0
+
+TURN 4 - Kinnan, Bonder Prodigy #72 (real) | Life=39 Hand=4 Board=9
+  MANA Kinnan, Bonder Prodigy #72 (real): 12 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Brigid, Clachan's Heart #82 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Brigid, Clachan's Heart #82 (real): 5 player damage, target life 35, target_dead=False
+  END Kinnan, Bonder Prodigy #72 (real): Life=39 Hand=5 Board=10 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=32 Hand=4 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Lorehold -> Brigid, Clachan's Heart #82 (real): 2 attackers, 1 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Brigid, Clachan's Heart #82 (real): 1 player damage, target life 34, target_dead=False
+  END Lorehold: Life=32 Hand=4 Board=6 Grave=4 Discarded=0
+
+TURN 5 - Brigid, Clachan's Heart #82 (real) | Life=34 Hand=5 Board=5
+  MANA Brigid, Clachan's Heart #82 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Brigid, Clachan's Heart #82 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Brigid, Clachan's Heart #82 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Brigid, Clachan's Heart #82 (real): Life=34 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Rowan, Scion of War #32 (real) | Life=40 Hand=7 Board=1
+  MANA Rowan, Scion of War #32 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=0
+
+TURN 5 - Kinnan, Bonder Prodigy #72 (real) | Life=39 Hand=5 Board=10
+  MANA Kinnan, Bonder Prodigy #72 (real): 13 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Nature's Rhythm (CMC=2.0) [recursion] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Brigid, Clachan's Heart #82 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=34)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Brigid, Clachan's Heart #82 (real): 5 player damage, target life 29, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Moonsilver Key (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #72 (real): Moonsilver Key found Rhystic Study (artifact_or_enchantment)
+  END Kinnan, Bonder Prodigy #72 (real): Life=39 Hand=6 Board=11 Grave=2 Discarded=0
+
+TURN 6 - Lorehold | Life=28 Hand=4 Board=6
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Brigid, Clachan's Heart #82 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=29)
+  DAMAGE Lorehold -> Brigid, Clachan's Heart #82 (real): 6 player damage, target life 23, target_dead=False
+  END Lorehold: Life=28 Hand=4 Board=8 Grave=4 Discarded=0
+
+TURN 6 - Brigid, Clachan's Heart #82 (real) | Life=23 Hand=5 Board=6
+  MANA Brigid, Clachan's Heart #82 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Brigid, Clachan's Heart #82 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Brigid, Clachan's Heart #82 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Brigid, Clachan's Heart #82 (real): Life=23 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Rowan, Scion of War #32 (real) | Life=40 Hand=7 Board=2
+  MANA Rowan, Scion of War #32 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=1
+
+TURN 6 - Kinnan, Bonder Prodigy #72 (real) | Life=39 Hand=6 Board=11
+  MANA Kinnan, Bonder Prodigy #72 (real): 14 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Faerie Mastermind (CMC=2.0) [draw_engine] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=24)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 5 player damage, target life 19, target_dead=False
+  END Kinnan, Bonder Prodigy #72 (real): Life=39 Hand=7 Board=14 Grave=2 Discarded=0
+
+TURN 7 - Lorehold | Life=19 Hand=4 Board=8
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Generous Gift (CMC=3.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Generous Gift removed Brigid, Clachan's Heart from Brigid, Clachan's Heart #82 (real)
+  COMBAT Lorehold -> Brigid, Clachan's Heart #82 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=23)
+  DAMAGE Lorehold -> Brigid, Clachan's Heart #82 (real): 6 player damage, target life 17, target_dead=False
+  END Lorehold: Life=19 Hand=2 Board=10 Grave=5 Discarded=0
+
+TURN 7 - Brigid, Clachan's Heart #82 (real) | Life=17 Hand=6 Board=5
+  MANA Brigid, Clachan's Heart #82 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Brigid, Clachan's Heart #82 (real): Life=17 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 7 - Rowan, Scion of War #32 (real) | Life=40 Hand=7 Board=2
+  MANA Rowan, Scion of War #32 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=40 Hand=7 Board=2 Grave=3 Discarded=1
+
+TURN 7 - Kinnan, Bonder Prodigy #72 (real) | Life=39 Hand=7 Board=14
+  MANA Kinnan, Bonder Prodigy #72 (real): 16 available (11 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Rhystic Study (CMC=3.0) [draw_engine] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 7 power (reason=control_high_threat, target_life=19)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 7 player damage, target life 12, target_dead=False
+  END Kinnan, Bonder Prodigy #72 (real): Life=39 Hand=7 Board=18 Grave=4 Discarded=1
+
+TURN 8 - Lorehold | Life=12 Hand=2 Board=10
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Reiterate (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Brigid, Clachan's Heart #82 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=15)
+  DAMAGE Lorehold -> Brigid, Clachan's Heart #82 (real): 8 player damage, target life 7, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Mental Misstep (CMC=1.0) [counter] rule=curated/verified
+  END Lorehold: Life=12 Hand=1 Board=12 Grave=5 Discarded=0
+
+TURN 8 - Brigid, Clachan's Heart #82 (real) | Life=7 Hand=7 Board=5
+  MANA Brigid, Clachan's Heart #82 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Brigid, Clachan's Heart #82 (real): Life=7 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 8 - Rowan, Scion of War #32 (real) | Life=38 Hand=7 Board=2
+  MANA Rowan, Scion of War #32 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=38 Hand=7 Board=2 Grave=4 Discarded=1
+
+TURN 8 - Kinnan, Bonder Prodigy #72 (real) | Life=37 Hand=6 Board=18
+  MANA Kinnan, Bonder Prodigy #72 (real): 18 available (13 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Volatile Stormdrake (CMC=2.0) [indestructible] rule=curated/verified
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Green Sun's Zenith (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #72 (real): Green Sun's Zenith found Sowing Mycospawn (green_creature_to_battlefield)
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Brigid, Clachan's Heart #82 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=7)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Brigid, Clachan's Heart #82 (real): 10 player damage, target life -3, target_dead=True
+  >>> DIED: Brigid, Clachan's Heart #82 (real) (life_zero) <<<
+
+TURN 9 - Lorehold | Life=12 Hand=1 Board=12
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Mana Geyser (CMC=5.0) [ramp_ritual] rule=curated/verified
+  RESOLVE Lorehold: Rite of the Dragoncaller (CMC=6.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #72 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=37)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #72 (real): 8 player damage, target life 29, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Lorehold: Life=12 Hand=0 Board=16 Grave=7 Discarded=0
+
+TURN 9 - Rowan, Scion of War #32 (real) | Life=38 Hand=7 Board=2
+  MANA Rowan, Scion of War #32 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=38 Hand=7 Board=3 Grave=4 Discarded=0
+
+TURN 9 - Kinnan, Bonder Prodigy #72 (real) | Life=29 Hand=6 Board=20
+  MANA Kinnan, Bonder Prodigy #72 (real): 19 available (14 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 6 attackers, 0 blockers, 0 gang blocks, 13 power (reason=lethal, target_life=12)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Lorehold: 13 player damage, target life -1, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 10 - Rowan, Scion of War #32 (real) | Life=38 Hand=7 Board=3
+  MANA Rowan, Scion of War #32 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=38 Hand=7 Board=3 Grave=5 Discarded=1
+
+TURN 10 - Kinnan, Bonder Prodigy #72 (real) | Life=29 Hand=9 Board=22
+  MANA Kinnan, Bonder Prodigy #72 (real): 20 available (15 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 1})
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Rowan, Scion of War #32 (real): 6 attackers, 0 blockers, 0 gang blocks, 13 power (reason=control_high_threat, target_life=38)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Rowan, Scion of War #32 (real): 13 player damage, target life 25, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Wan Shi Tong, Librarian (CMC=2.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Noxious Revival (CMC=1.0) [recursion] rule=known_cards_manual/verified
+  END Kinnan, Bonder Prodigy #72 (real): Life=29 Hand=7 Board=26 Grave=14 Discarded=8
+
+TURN 11 - Rowan, Scion of War #32 (real) | Life=25 Hand=7 Board=3
+  MANA Rowan, Scion of War #32 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=25 Hand=7 Board=3 Grave=6 Discarded=1
+
+TURN 11 - Kinnan, Bonder Prodigy #72 (real) | Life=29 Hand=7 Board=26
+  MANA Kinnan, Bonder Prodigy #72 (real): 21 available (16 sources, 0 treasures, pool={'generic': 14, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 2, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Fanatic of Rhonas (CMC=2.0) [token_maker] rule=generated/needs_review
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Nature's Rhythm (CMC=2.0) [recursion] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Rowan, Scion of War #32 (real): 9 attackers, 0 blockers, 0 gang blocks, 16 power (reason=control_high_threat, target_life=25)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Rowan, Scion of War #32 (real): 16 player damage, target life 9, target_dead=False
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Tezzeret the Seeker (CMC=5.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #72 (real): Tezzeret the Seeker found Force of Will (any)
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Moonsilver Key (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #72 (real): Moonsilver Key found Enduring Vitality (artifact_or_enchantment)
+  END Kinnan, Bonder Prodigy #72 (real): Life=29 Hand=7 Board=35 Grave=22 Discarded=5
+
+TURN 12 - Rowan, Scion of War #32 (real) | Life=9 Hand=7 Board=3
+  MANA Rowan, Scion of War #32 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rowan, Scion of War #32 (real): Life=9 Hand=7 Board=3 Grave=7 Discarded=1
+
+TURN 12 - Kinnan, Bonder Prodigy #72 (real) | Life=29 Hand=7 Board=35
+  MANA Kinnan, Bonder Prodigy #72 (real): 25 available (20 sources, 0 treasures, pool={'generic': 16, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 3, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Kinnan, Bonder Prodigy #72 (real): Finale of Devastation (CMC=2.0) [pump_all] rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #72 (real) -> Rowan, Scion of War #32 (real): 15 attackers, 0 blockers, 0 gang blocks, 54 power (reason=lethal, target_life=9)
+  DAMAGE Kinnan, Bonder Prodigy #72 (real) -> Rowan, Scion of War #32 (real): 54 player damage, target life -45, target_dead=True
+  >>> DIED: Rowan, Scion of War #32 (real) (life_zero) <<<
+
+GAME OVER - Turn 12
+Winner: Kinnan, Bonder Prodigy #72 (real) (elimination)
+Lorehold: DEAD Life=-1 Hand=0
+Brigid, Clachan's Heart #82 (real): DEAD Life=-3 Hand=7
+Rowan, Scion of War #32 (real): DEAD Life=-45 Hand=7
+Kinnan, Bonder Prodigy #72 (real): ALIVE Life=29 Hand=10

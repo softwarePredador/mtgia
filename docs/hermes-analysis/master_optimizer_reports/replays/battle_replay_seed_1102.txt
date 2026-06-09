@@ -1,0 +1,256 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Tayam, Luminous Enigma #25 (real), Ral, Monsoon Mage #48 (real), Yorion, Sky Nomad #38 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Tayam, Luminous Enigma #25 (real): 0 mulligan(s), 7 cards, 2 lands
+  Ral, Monsoon Mage #48 (real): 3 mulligan(s), 5 cards, 0 lands
+  Yorion, Sky Nomad #38 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Tayam, Luminous Enigma #25 (real) | Life=40 Hand=7 Board=0
+  MANA Tayam, Luminous Enigma #25 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tayam, Luminous Enigma #25 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=5 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0
+
+TURN 1 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=7 Board=0
+  MANA Yorion, Sky Nomad #38 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 6 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Tayam, Luminous Enigma #25 (real) | Life=40 Hand=6 Board=2
+  MANA Tayam, Luminous Enigma #25 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 1 player damage, target life 39, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=40 Hand=3 Board=6 Grave=0 Discarded=0
+
+TURN 2 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=0 Discarded=0
+
+TURN 2 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=6 Board=2
+  MANA Yorion, Sky Nomad #38 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=39 Hand=5 Board=4
+  MANA Lorehold: 7 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Rise of the Eldrazi (any)
+  END Lorehold: Life=39 Hand=5 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Tayam, Luminous Enigma #25 (real) | Life=40 Hand=3 Board=6
+  MANA Tayam, Luminous Enigma #25 (real): 6 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 4 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=39)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 5 player damage, target life 34, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=40 Hand=4 Board=7 Grave=0 Discarded=0
+
+TURN 3 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=1
+
+TURN 3 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=6 Board=3
+  MANA Yorion, Sky Nomad #38 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=34 Hand=5 Board=5
+  MANA Lorehold: 8 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=34 Hand=6 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Tayam, Luminous Enigma #25 (real) | Life=40 Hand=4 Board=7
+  MANA Tayam, Luminous Enigma #25 (real): 6 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Tayam, Luminous Enigma #25 (real): Dismember (CMC=3.0) [draw_cards] rule=generated/needs_review
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=34)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 9 player damage, target life 25, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=40 Hand=4 Board=8 Grave=1 Discarded=0
+
+TURN 4 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=2 Discarded=1
+
+TURN 4 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=6 Board=5
+  MANA Yorion, Sky Nomad #38 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 4 player damage, target life 36, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=25 Hand=6 Board=5
+  MANA Lorehold: 8 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Lorehold: Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  END Lorehold: Life=25 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 5 - Tayam, Luminous Enigma #25 (real) | Life=36 Hand=4 Board=8
+  MANA Tayam, Luminous Enigma #25 (real): 7 available (7 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=25)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 9 player damage, target life 16, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=36 Hand=4 Board=9 Grave=1 Discarded=0
+
+TURN 5 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=3 Discarded=1
+
+TURN 5 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=5 Board=8
+  MANA Yorion, Sky Nomad #38 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=36)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 6 player damage, target life 30, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=5 Board=9 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=16 Hand=7 Board=6
+  MANA Lorehold: 8 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 5 player damage, target life 25, target_dead=False
+  END Lorehold: Life=16 Hand=7 Board=8 Grave=1 Discarded=0
+
+TURN 6 - Tayam, Luminous Enigma #25 (real) | Life=25 Hand=4 Board=9
+  MANA Tayam, Luminous Enigma #25 (real): 8 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=16)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 9 player damage, target life 7, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=25 Hand=4 Board=10 Grave=1 Discarded=0
+
+TURN 6 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=4 Discarded=1
+
+TURN 6 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=5 Board=9
+  MANA Yorion, Sky Nomad #38 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=25)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 6 player damage, target life 19, target_dead=False
+  RESOLVE Ral, Monsoon Mage #48 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=6 Board=9 Grave=0 Discarded=0
+
+TURN 7 - Lorehold | Life=7 Hand=7 Board=8
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Gamble found Storm Herd (any)
+  COMBAT Lorehold -> Tayam, Luminous Enigma #25 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=19)
+  DAMAGE Lorehold -> Tayam, Luminous Enigma #25 (real): 5 player damage, target life 14, target_dead=False
+  END Lorehold: Life=7 Hand=6 Board=9 Grave=3 Discarded=0
+
+TURN 7 - Tayam, Luminous Enigma #25 (real) | Life=14 Hand=4 Board=10
+  MANA Tayam, Luminous Enigma #25 (real): 9 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 9 power (reason=lethal, target_life=7)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Lorehold: 9 player damage, target life -2, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 7 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=6 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=4 Discarded=0
+
+TURN 7 - Yorion, Sky Nomad #38 (real) | Life=40 Hand=6 Board=9
+  MANA Yorion, Sky Nomad #38 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=14)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 6 player damage, target life 8, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=40 Hand=7 Board=9 Grave=0 Discarded=0
+
+TURN 8 - Tayam, Luminous Enigma #25 (real) | Life=8 Hand=4 Board=11
+  MANA Tayam, Luminous Enigma #25 (real): 10 available (10 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Yorion, Sky Nomad #38 (real): 5 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=40)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Yorion, Sky Nomad #38 (real): 9 player damage, target life 31, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=8 Hand=4 Board=12 Grave=1 Discarded=0
+
+TURN 8 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=5 Discarded=1
+
+TURN 8 - Yorion, Sky Nomad #38 (real) | Life=31 Hand=7 Board=9
+  MANA Yorion, Sky Nomad #38 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=8)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 6 player damage, target life 2, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=31 Hand=7 Board=9 Grave=1 Discarded=1
+
+TURN 9 - Tayam, Luminous Enigma #25 (real) | Life=2 Hand=4 Board=12
+  MANA Tayam, Luminous Enigma #25 (real): 11 available (11 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 2, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  COMBAT Tayam, Luminous Enigma #25 (real) -> Yorion, Sky Nomad #38 (real): 5 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=31)
+  DAMAGE Tayam, Luminous Enigma #25 (real) -> Yorion, Sky Nomad #38 (real): 9 player damage, target life 22, target_dead=False
+  END Tayam, Luminous Enigma #25 (real): Life=2 Hand=5 Board=12 Grave=1 Discarded=0
+
+TURN 9 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=6 Discarded=1
+
+TURN 9 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=7 Board=9
+  MANA Yorion, Sky Nomad #38 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Yorion, Sky Nomad #38 (real): Wall of Omens (CMC=2.0) [draw_cards] rule=generated/needs_review
+  COMBAT Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=lethal, target_life=2)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Tayam, Luminous Enigma #25 (real): 2 player damage, target life 0, target_dead=True
+  >>> DIED: Tayam, Luminous Enigma #25 (real) (life_zero) <<<
+
+TURN 10 - Ral, Monsoon Mage #48 (real) | Life=40 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=40 Hand=7 Board=0 Grave=7 Discarded=1
+
+TURN 10 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=9 Board=9
+  MANA Yorion, Sky Nomad #38 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Yorion, Sky Nomad #38 (real): Mind Stone (CMC=2.0) [draw_cards] rule=generated/needs_review
+  COMBAT Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=40)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 6 player damage, target life 34, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=22 Hand=7 Board=10 Grave=5 Discarded=2
+
+TURN 11 - Ral, Monsoon Mage #48 (real) | Life=34 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=34 Hand=7 Board=0 Grave=8 Discarded=1
+
+TURN 11 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=7 Board=10
+  MANA Yorion, Sky Nomad #38 (real): 8 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=34)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 6 player damage, target life 28, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=22 Hand=7 Board=11 Grave=5 Discarded=0
+
+TURN 12 - Ral, Monsoon Mage #48 (real) | Life=28 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=28 Hand=7 Board=0 Grave=9 Discarded=1
+
+TURN 12 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=7 Board=11
+  MANA Yorion, Sky Nomad #38 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 2, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=28)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 6 player damage, target life 22, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=22 Hand=7 Board=12 Grave=5 Discarded=0
+
+TURN 13 - Ral, Monsoon Mage #48 (real) | Life=22 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=22 Hand=7 Board=0 Grave=10 Discarded=1
+
+TURN 13 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=7 Board=12
+  MANA Yorion, Sky Nomad #38 (real): 10 available (10 sources, 0 treasures, pool={'generic': 6, 'white': 3, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=22)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 6 player damage, target life 16, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=22 Hand=7 Board=13 Grave=5 Discarded=0
+
+TURN 14 - Ral, Monsoon Mage #48 (real) | Life=16 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=16 Hand=7 Board=0 Grave=11 Discarded=1
+
+TURN 14 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=7 Board=13
+  MANA Yorion, Sky Nomad #38 (real): 11 available (11 sources, 0 treasures, pool={'generic': 6, 'white': 3, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=16)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 6 player damage, target life 10, target_dead=False
+  END Yorion, Sky Nomad #38 (real): Life=22 Hand=7 Board=14 Grave=5 Discarded=0
+
+TURN 15 - Ral, Monsoon Mage #48 (real) | Life=10 Hand=7 Board=0
+  MANA Ral, Monsoon Mage #48 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ral, Monsoon Mage #48 (real): Life=10 Hand=7 Board=0 Grave=12 Discarded=1
+
+TURN 15 - Yorion, Sky Nomad #38 (real) | Life=22 Hand=7 Board=14
+  MANA Yorion, Sky Nomad #38 (real): 12 available (12 sources, 0 treasures, pool={'generic': 7, 'white': 3, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=10)
+  DAMAGE Yorion, Sky Nomad #38 (real) -> Ral, Monsoon Mage #48 (real): 10 player damage, target life 0, target_dead=True
+  >>> DIED: Ral, Monsoon Mage #48 (real) (life_zero) <<<
+
+GAME OVER - Turn 15
+Winner: Yorion, Sky Nomad #38 (real) (elimination)
+Lorehold: DEAD Life=-2 Hand=6
+Tayam, Luminous Enigma #25 (real): DEAD Life=0 Hand=5
+Ral, Monsoon Mage #48 (real): DEAD Life=0 Hand=7
+Yorion, Sky Nomad #38 (real): ALIVE Life=22 Hand=7

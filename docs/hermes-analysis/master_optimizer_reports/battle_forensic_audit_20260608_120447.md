@@ -1,0 +1,66 @@
+# Hermes Battle Forensic Audit
+
+- generated_at: 2026-06-08 12:04:47 UTC
+- status: ready_for_review
+- sqlite_db: `C:\Users\rafae\OneDrive\Documents\mtgia\docs\hermes-analysis\manaloom-knowledge\scripts\knowledge.db`
+- structured_events: 187
+- card_events: 80
+- unique_cards_seen: 48
+- findings_total: 0
+- critical: 0
+- high: 0
+- medium: 0
+- low: 0
+
+## Replay Evidence
+
+- text: `C:\Users\rafae\OneDrive\Documents\mtgia\docs\hermes-analysis\master_optimizer_reports\forensic_replays\battle_forensic_seed_777.txt`
+- events: `C:\Users\rafae\OneDrive\Documents\mtgia\docs\hermes-analysis\master_optimizer_reports\forensic_replays\battle_forensic_seed_777.jsonl`
+
+## Rule Sources Used
+
+| Value | Count |
+| --- | ---: |
+| `curated` | 53 |
+| `manual` | 22 |
+| `type_line_creature` | 5 |
+
+## Review Status Used
+
+| Value | Count |
+| --- | ---: |
+| `verified` | 75 |
+| `fact` | 5 |
+
+## Effects Seen
+
+| Value | Count |
+| --- | ---: |
+| `land` | 24 |
+| `draw_cards` | 12 |
+| `tutor` | 8 |
+| `creature` | 7 |
+| `ramp_permanent` | 7 |
+| `approach` | 4 |
+| `draw_engine` | 4 |
+| `copy_spell` | 2 |
+| `equipment_haste_shroud` | 2 |
+| `remove_creature` | 2 |
+| `silence_opponents` | 2 |
+| `token_maker` | 2 |
+| `commander` | 1 |
+| `damage_each_opponent` | 1 |
+| `ramp_engine` | 1 |
+| `ramp_ritual` | 1 |
+
+## Findings
+
+| Severity | Replay | Turn | Phase | Player | Event | Card | Effect | Finding | Recommendation |
+| --- | --- | ---: | --- | --- | --- | --- | --- | --- | --- |
+| info | all | - | - | all | all | - | - | No forensic findings. | Keep replay as evidence. |
+
+## Promotion Rule
+
+- `critical` and `high` findings block trusting optimizer output from this replay.
+- `needs_review` rules that affect wincons, removal, wipes, counters or protection must become `verified` only after replay/regression coverage.
+- Heuristic sources may remain for broad exploration, but product-facing swaps should prefer `verified` or `active` rules.
