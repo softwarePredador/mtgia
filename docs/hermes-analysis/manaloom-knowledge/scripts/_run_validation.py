@@ -6,9 +6,10 @@ DB = os.path.join(os.path.dirname(__file__), "knowledge.db")
 
 profile_dir_a = "/opt/data/workspace/mtgia/server/test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/profiles"
 profile_dir_b = "/opt/data/workspace/mtgia/server/test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/profiles"
+profile_dir_c = "/opt/data/workspace/mtgia/server/test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/profiles"
 
 def load_profile(filename):
-    for d in [profile_dir_a, profile_dir_b]:
+    for d in [profile_dir_a, profile_dir_b, profile_dir_c]:
         path = os.path.join(d, filename)
         if os.path.exists(path):
             with open(path) as f:
@@ -25,6 +26,7 @@ profile_files = {
     "Lorehold, the Historian": None,
     "Winota, Joiner of Forces": "winota_joiner_of_forces.json",
     "Atraxa, Praetors' Voice": "atraxa_praetors_voice.json",
+    "Niv-Mizzet, Parun": "niv_mizzet_parun.json",
 }
 
 for cmd, fn in profile_files.items():

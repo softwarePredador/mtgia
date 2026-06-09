@@ -205,24 +205,25 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 
 ## Mana Base Validation Report (manaloom-mana-base-validator)
 
-> **Data:** 2026-06-08T01:17:41Z
+> **Data:** 2026-06-09T14:07:55Z
 > **Cron:** manaloom-mana-base-validator
-> **Decks analisados:** 8
+> **Decks analisados:** 73 (8 com dados, 65 battle-sim sem `deck_cards`)
 > **Profiles:** 24 profiles (3 batch dirs: anchor30 A/B/C)
-> **Método:** Profile matching via commander name; lands/ramp/draw via `role_targets.{min,max}`; CMC computed from `deck_cards` excluding NULL/0 and lands; ramp/draw tagged count from `functional_tag`
+> **Método:** Profile matching via commander name; lands/ramp/draw via `role_targets.{min,max}`; CMC computed from `deck_cards` excluding NULL/0 and lands; ramp/draw tagged count from `functional_tag`; agora inclui batch_c profiles e Niv-Mizzet, Parun
 
-### Resumo Geral — Validação vs Perfis EDHREC
+### Resumo Geral — Validação vs Perfis EDHREC (9 decks com dados)
 
 | # | Deck | Cards | Status | Lands (stored) | Perfil Lands | CMC (stored/computed) | Ramp (stored/perfil) | Draw (stored/perfil) | Dados Corrompidos |
 |---|------|:---:|:------:|:---:|:------------:|:---:|:---:|:---:|:---|
-| 1 | Kinnan, Bonder Prodigy | 13 | INCOMPLETE | 29 | 29-34 ✅ | 1.80/2.82 🔴 | 4/— — | 3/— — | tag NULL: 1 (7%); CMC=0 nonland: 2; lands stored(29)≠tagged(0) |
-| 2 | Yuriko — Dimir Ninja Topdeck Tempo | 99 | OK | 33 | 30-34 ✅ | 2.80/3.23 ⚠️ | 8/— — | 14/— — | tag NULL: 21 (21%); CMC=0 nonland: 2; lands stored(33)≠tagged(35); draw stored(14)≠tagged(12) |
+| 1 | Kinnan, Bonder Prodigy | 13 | INCOMPLETE | 29 | 29-34 ✅ | 1.80/2.80 🔴 | 4/— — | 3/— — | tag NULL: 1 (7%); CMC=0 nonland: 2; lands stored(29)≠tagged(0) |
+| 2 | Yuriko — Dimir Ninja Topdeck Tempo | 99 | WARN | 33 | 30-34 ✅ | 2.80/3.43 ⚠️ | 8/— — | 14/— — | tag NULL: 21 (21%); CMC=0 nonland: 3; lands stored(33)≠tagged(31); draw stored(14)≠tagged(12) |
 | 3 | Korvold — EDHREC Average Default | 11 | INCOMPLETE | 25 | 34-37 ⚠️ | 3.20/2.64 ⚠️ | 3/10-14 ⚠️ | 1/6-10 ⚠️ | lands stored(25)≠tagged(0) |
-| 4 | Teysa Karlov — EDHREC Average | 80 | OK | 35 | 35-37 ✅ | 2.90/2.74 ✅ | 15/9-11 ⚠️ | 11/10-14 ✅ | tag NULL: 4 (5%); lands stored(35)≠tagged(15); draw stored(11)≠tagged(8) |
-| 5 | Aesi EDHREC Average Default | 100 | OK | 40 | 39-43 ✅ | 2.61/3.40 ⚠️ | 28/14-18 ⚠️ | 12/6-9 ⚠️ | tag NULL: 6 (6%); draw stored(12)≠tagged(4) |
-| 6 | Lorehold Best-of Learned No Premium Mox | 100 | NO PROFILE | 33 | — — | 1.79/3.11 🔴 | 6/— | 6/— | CMC=0 nonland: 6; lands stored(33)≠tagged(32); ramp stored(6)≠tagged(20); draw stored(6)≠tagged(9) |
+| 4 | Teysa Karlov — EDHREC Average | 80 | OK | 35 | 35-37 ✅ | 2.90/2.64 ✅ | 15/9-11 ⚠️ | 11/10-14 ✅ | tag NULL: 4 (5%); lands stored(35)≠tagged(15); draw stored(11)≠tagged(8) |
+| 5 | Aesi EDHREC Average Default | 100 | OK | 40 | 39-43 ✅ | 2.61/3.35 ⚠️ | 28/14-18 ⚠️ | 12/6-9 ⚠️ | tag NULL: 6 (6%); draw stored(12)≠tagged(4) |
+| 6 | Lorehold Best-of Learned No Premium Mox | 100 | NO PROFILE | 33 | — — | 1.79/3.02 🔴 | 6/— | 6/— | CMC=0 nonland: 5; lands stored(33)≠tagged(31); ramp stored(6)≠tagged(19); draw stored(6)≠tagged(9) |
 | 7 | Winota — Boros Combat Trigger Humans | 100 | OK | 34 | 31-35 ✅ | 2.35/2.54 ✅ | 10/— — | 3/— — | CMC=0 nonland: 5; draw stored(3)≠tagged(4) |
 | 9 | Atraxa, Praetors' Voice — EDHREC (41k) | 100 | OK | 36 | 35-38 ✅ | 2.97/2.98 ✅ | 14/10-13 ⚠️ | 12/8-12 ✅ | CMC=0 nonland: 2; ramp stored(14)≠tagged(11); draw stored(12)≠tagged(13) |
+| 14 | Niv-Mizzet, Parun — Battle Simulator | 100 | WARN | 0 (stale) | 34-36 ⚠️ | —/4.20 🔴 | —/11 vs 10-13 | —/8 vs 12-18 🔴 | unknown: 26 (26%); lands stored(0)≠tagged(32); CMC nonland=4.20 acima do perfil; protection=0 vs [3-5] WARN |
 
 *Legenda: OK | INCOMPLETE (<50 cards) | NO PROFILE | CMC CORRUPT (>25% NULL)*
 
@@ -231,18 +232,19 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 #### Deck #1: Kinnan, Bonder Prodigy (13 cards, stored=13 — INCOMPLETE)
 - **Profile:** `kinnan_bonder_prodigy.json` (anchor30 batch A) — lands [29-34], nonland_mana_sources [18-26], mana_dorks [10-16], artifact_mana [6-11], infinite_mana_pieces [4-8], payoffs_outlets [5-9], interaction_protection [9-14]
 - **Lands:** Stored 29, tagged 0 vs perfil 29-34 ✅
-- **CMC:** Stored 1.80 vs computed 2.82 (nonland, CMC>0). Delta +1.02.
+- **CMC:** Stored 1.80 vs computed 2.80 (nonland, CMC>0). Delta +1.00.
 - **Ramp:** Stored 4, tagged 4 vs perfil — —
 - **Draw:** Stored 3, tagged 3 vs perfil — —
 - **Corrupção:** tag NULL: 1 (7%); CMC=0 nonland: 2; lands stored(29)≠tagged(0)
 
-#### Deck #2: Yuriko, the Tiger's Shadow (99 cards, stored=84 — OK)
+#### Deck #2: Yuriko, the Tiger's Shadow (99 cards, stored=84 — WARN)
 - **Profile:** `yuriko_the_tigers_shadow.json` (anchor30 batch A) — lands [30-34], evasive_enablers [10-15], ninjas [10-17], topdeck_manipulation [7-12], high_mv_reveals [4-8], interaction [10-16], combo_finishers [0-5]
-- **Lands:** Stored 33, tagged 35 vs perfil 30-34 ✅
-- **CMC:** Stored 2.80 vs computed 3.23 (nonland, CMC>0). Delta +0.43.
+- **Lands:** Stored 33, tagged 31 vs perfil 30-34 ✅
+- **CMC:** Stored 2.80 vs computed 3.43 (nonland, CMC>0). Delta +0.63.
 - **Ramp:** Stored 8, tagged 8 vs perfil — —
 - **Draw:** Stored 14, tagged 12 vs perfil — —
-- **Corrupção:** tag NULL: 21 (21%); CMC=0 nonland: 2; lands stored(33)≠tagged(35); draw stored(14)≠tagged(12)
+- **Corrupção:** tag NULL: 21 (21%); CMC=0 nonland: 3; lands stored(33)≠tagged(31); draw stored(14)≠tagged(12)
+- **⚠️ Mudança vs último report:** Lands tagged 35→31 (-4). CMC computed 3.23→3.43 (+0.20). Possível remoção de cartas do `deck_cards`.
 
 #### Deck #3: Korvold, Fae-Cursed King (11 cards, stored=11 — INCOMPLETE)
 - **Profile:** `korvold_fae_cursed_king.json` (anchor30 batch A) — lands [34-37], ramp_treasure [10-14], sacrifice_fodder [10-16], sacrifice_outlets [6-10], aristocrat_payoffs [5-9], draw_value [6-10], interaction [8-12], combo_finishers [3-7]
@@ -255,7 +257,7 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 #### Deck #4: Teysa Karlov (80 cards, stored=80 — OK)
 - **Profile:** `teysa_karlov.json` (anchor30 batch B) — lands [35-37], ramp [9-11], draw_value [10-14], interaction [8-11], board_wipes [2-4], protection [2-4], sacrifice_outlets [7-10], fodder_tokens [10-15], death_payoffs [7-10], recursion [4-7]
 - **Lands:** Stored 35, tagged 15 vs perfil 35-37 ✅
-- **CMC:** Stored 2.90 vs computed 2.74 (nonland, CMC>0). Delta -0.16.
+- **CMC:** Stored 2.90 vs computed 2.64 (nonland, CMC>0). Delta -0.26.
 - **Ramp:** Stored 15, tagged 15 vs perfil 9-11 ⚠️
 - **Draw:** Stored 11, tagged 8 vs perfil 10-14 ✅
 - **Corrupção:** tag NULL: 4 (5%); lands stored(35)≠tagged(15); draw stored(11)≠tagged(8)
@@ -263,18 +265,19 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 #### Deck #5: Aesi, Tyrant of Gyre Strait (100 cards, stored=79 — OK)
 - **Profile:** `aesi_tyrant_of_gyre_strait.json` (anchor30 batch B) — lands [39-43], ramp_extra_lands [14-18], supplemental_draw [6-9], interaction_counter [8-11], board_wipes_bounce [2-3], protection [2-4], landfall_payoffs [8-12], land_recursion_bounce [4-8], finishers [3-5]
 - **Lands:** Stored 40, tagged 40 vs perfil 39-43 ✅
-- **CMC:** Stored 2.61 vs computed 3.40 (nonland, CMC>0). Delta +0.79.
+- **CMC:** Stored 2.61 vs computed 3.35 (nonland, CMC>0). Delta +0.74.
 - **Ramp:** Stored 28, tagged 28 vs perfil 14-18 ⚠️
 - **Draw:** Stored 12, tagged 4 vs perfil 6-9 ⚠️
 - **Corrupção:** tag NULL: 6 (6%); draw stored(12)≠tagged(4)
 
 #### Deck #6: Lorehold, the Historian (100 cards, stored=100 — NO PROFILE)
 - **Profile:** NÃO ENCONTRADO — Lorehold, the Historian não está nos profiles anchor30.
-- **Lands:** Stored 33, tagged 32
-- **CMC:** Stored 1.79 vs computed 3.11 (nonland, CMC>0). Delta +1.32.
-- **Ramp:** Stored 6, tagged 20
+- **Lands:** Stored 33, tagged 31
+- **CMC:** Stored 1.79 vs computed 3.02 (nonland, CMC>0). Delta +1.23.
+- **Ramp:** Stored 6, tagged 19
 - **Draw:** Stored 6, tagged 9
-- **Corrupção:** CMC=0 nonland: 6; lands stored(33)≠tagged(32); ramp stored(6)≠tagged(20); draw stored(6)≠tagged(9)
+- **Corrupção:** CMC=0 nonland: 5; lands stored(33)≠tagged(31); ramp stored(6)≠tagged(19); draw stored(6)≠tagged(9)
+- **⚠️ Mudança vs último report:** Lands tagged 32→31 (-1). Ramp tagged 20→19 (-1).
 
 #### Deck #7: Winota, Joiner of Forces (100 cards, stored=100 — OK)
 - **Profile:** `winota_joiner_of_forces.json` (anchor30 batch A) — lands [31-35], nonhuman_enablers [18-28], human_hits [16-24], stax_disruption [5-10], protection [5-8], combat_payoffs [4-8], interaction [6-10]
@@ -292,26 +295,37 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 - **Draw:** Stored 12, tagged 13 vs perfil 8-12 ✅
 - **Corrupção:** CMC=0 nonland: 2; ramp stored(14)≠tagged(11); draw stored(12)≠tagged(13)
 
+#### Deck #14: Niv-Mizzet, Parun (100 cards, stored=100 — WARN) 🆕
+- **Profile:** `niv_mizzet_parun.json` (anchor30 batch C) — lands [34-36], ramp [10-13], draw_value [12-18], interaction [10-14], board_wipes [1-2], protection [3-5], cantrips_wheels [12-18], combo_enablers [4-7]
+- **Lands:** Stored 0 (stale), tagged 32 vs perfil 34-36 ⚠️ (d=2)
+- **CMC:** Stored — vs computed 4.20 (nonland, CMC>0). Média elevada — perfil Izzet spellslinger deve ter CMC mais baixo.
+- **Ramp:** Stored —, tagged 11 vs perfil 10-13 ✅
+- **Draw:** Stored —, tagged 8 vs perfil 12-18 🔴 (d=4). Draw sub-representado.
+- **Protection:** Stored —, tagged 0 vs perfil 3-5 🔴. Commander de 6 CMC sem proteção.
+- **Corrupção:** unknown: 26 (26%); CMC=0 nonland: 2; lands stored(0)≠tagged(32)
+
 ---
 
 ### CMC Delta — Análise Sistêmica
 
 | Deck | Stored CMC | Computed (nonland>0) | Delta | CMC NULL | % NULL |
 |------|:----------:|:--------------------:|:-----:|:--------:|:-----:|
-| Lorehold #6 | 1.79 | 3.11 | +1.32 🔴 | 0 | 0% |
-| Kinnan #1 | 1.80 | 2.82 | +1.02 🔴 | 0 | 0% |
-| Aesi #5 | 2.61 | 3.40 | +0.79 ⚠️ | 0 | 0% |
+| Lorehold #6 | 1.79 | 3.02 | +1.23 🔴 | 0 | 0% |
+| Kinnan #1 | 1.80 | 2.80 | +1.00 🔴 | 0 | 0% |
+| Aesi #5 | 2.61 | 3.35 | +0.74 ⚠️ | 0 | 0% |
+| Yuriko #2 | 2.80 | 3.43 | +0.63 ⚠️ | 0 | 0% |
 | Korvold #3 | 3.20 | 2.64 | -0.56 ⚠️ | 0 | 0% |
-| Yuriko #2 | 2.80 | 3.23 | +0.43 ⚠️ | 0 | 0% |
+| Teysa #4 | 2.90 | 2.64 | -0.26 ✅ | 0 | 0% |
 | Winota #7 | 2.35 | 2.54 | +0.19 ✅ | 0 | 0% |
-| Teysa #4 | 2.90 | 2.74 | -0.16 ✅ | 0 | 0% |
 | Atraxa #9 | 2.97 | 2.98 | +0.01 ✅ | 0 | 0% |
+| Niv-Mizzet #14 | — | 4.20 | — 🔴 | 0 | 0% |
 
 **Diagnóstico:**
 - 2 decks com delta CMC > 1.0 🔴 — stored significativamente diferente do computed.
-- 5 decks com delta CMC > 0.3 ⚠️.
+- 4 decks com delta CMC > 0.3 ⚠️.
+- Niv-Mizzet #14 sem stored CMC — todas as colunas aggregate estão NULL.
 - A maioria dos stored CMCs são mais baixos que computed porque incluem CMC=0 (lands, moxes) que puxam a média para baixo.
-- Nenhum deck tem CMC NULL — todos os CMCs estão populados no `deck_cards` (melhora vs validação anterior).
+- Nenhum deck tem CMC NULL — todos os CMCs estão populados no `deck_cards`.
 - **Recomendação:** Recomputation de `decks.avg_cmc` a partir de `AVG(cmc) FROM deck_cards WHERE cmc > 0 AND functional_tag != 'land'`.
 
 ### Stored vs Tagged — Divergências de Contagem
@@ -319,24 +333,25 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 | Deck | Lands (stored/tagged) | Ramp (stored/tagged) | Draw (stored/tagged) |
 |------|:---:|:---:|:---:|
 | Kinnan #1 | 29/0 🔴 | 4/4 🟢 | 3/3 🟢 |
-| Yuriko #2 | 33/35 🔴 | 8/8 🟢 | 14/12 🔴 |
+| Yuriko #2 | 33/31 🔴 | 8/8 🟢 | 14/12 🔴 |
 | Korvold #3 | 25/0 🔴 | 3/3 🟢 | 1/1 🟢 |
 | Teysa #4 | 35/15 🔴 | 15/15 🟢 | 11/8 🔴 |
 | Aesi #5 | 40/40 🟢 | 28/28 🟢 | 12/4 🔴 |
-| Lorehold #6 | 33/32 🔴 | 6/20 🔴 | 6/9 🔴 |
+| Lorehold #6 | 33/31 🔴 | 6/19 🔴 | 6/9 🔴 |
 | Winota #7 | 34/34 🟢 | 10/10 🟢 | 3/4 🔴 |
 | Atraxa #9 | 36/36 🟢 | 14/11 🔴 | 12/13 🔴 |
+| Niv-Mizzet #14 | 0/32 🔴 | —/11 🔴 | —/8 🔴 |
 
 **Nota:** 🔴 indica divergência entre o valor armazenado em `decks` e a contagem via `functional_tag` em `deck_cards`. Isto sugere que `decks.ramp_count`/`draw_count`/`total_lands` não foram atualizados após reclassificações de tag.
 
-### Mudanças vs Validação Anterior (2026-06-07 19:00Z)
+### Mudanças vs Validação Anterior (2026-06-08 01:17Z)
 
-1. **CMC computed refinado:** Agora exclui CMC=0 não-land também (antes incluía). Torna o computed mais preciso para curva de mana real.
-2. **CMC NULL zerado:** Ao contrário da validação anterior que reportava 15-36% CMC NULL/0, a análise atual mostra que todas as cartas têm CMC populado no `deck_cards`. A divergência está no stored vs computed (inclusão de CMC=0), não em dados faltantes.
-3. **Stored vs Tagged:** Nova métrica mostrando divergências entre `decks` e `deck_cards.functional_tag`. Lorehold #6 é o pior caso: ramp stored=6 vs tagged=20.
-4. **Tags NULL:** Yuriko #2 com 21/99 (21%) permanece o pior caso. Lorehold #6 zerou tags NULL.
-5. **Status de perfil:** 7/8 decks com profile EDHREC (mantido). Lorehold sem perfil (comandante custom).
-6. **Winota e Atraxa já não são CMC CORRUPT:** Com CMC populado para todas as cartas, o status CMC CORRUPT (>25% NULL) não se aplica mais. Ambos têm CMC delta baixo (✅).
+1. **Yuriko (#2) lands_tag 35→31:** Queda de 4 lands em `deck_cards`. Possível remoção de linhas de `deck_cards` entre execuções. CMC computed subiu 3.23→3.43. Status mudou de OK para WARN.
+2. **Lorehold (#6) lands_tag 32→31 e ramp_tag 20→19:** Queda menor, provavelmente reclassificação de tag de alguma carta.
+3. **Niv-Mizzet (#14) adicionado:** Novo deck battle-simulator com 100 cards, perfil do batch_c. 26% unknown tags, protection=0 (🔴). Sem stored aggregates — todas as colunas da tabela `decks` são NULL.
+4. **65 decks battle-sim sem dados:** Decks 10-74 (exceto 14) têm 0 cartas em `deck_cards`. Provavelmente inseridos por outro pipeline que ainda não populou as cartas.
+5. **CMC computed refinado:** Leve variação em todos os decks (diferenças de ±0.1-0.2) devido a mudanças em `deck_cards` entre execuções.
+6. **Cobertura expandida:** Script `_run_validation.py` atualizado para incluir `batch_c` profiles (8 novos comandantes: Brago, Feather, Giada, Krenko, K'rrik, Light-Paws, Meren, Niv-Mizzet).
 
 ### Decks com INSERT INCOMPLETO ou Dados Corrompidos
 
@@ -344,15 +359,16 @@ Os 3 erros abaixo estão estagnados desde ~03:37Z (sem recuperação nos último
 |------|------|:---:|
 | Kinnan #1 | 13/100 cards. Lands não populadas no DB. Deck truncado. | 🔴 |
 | Korvold #3 | 11/100 cards. Lands não populadas no DB. Deck truncado. | 🔴 |
-| Yuriko #2 | 99 cards DB, stored=84. 21 tags NULL (21%). | 🟡 |
-| Lorehold #6 | ramp stored(6)≠tagged(20), draw stored(6)≠tagged(9). Stored desatualizado pós-reclassificação. | 🔴 |
+| Yuriko #2 | 99 cards DB, stored=84. 21 tags NULL (21%). <br>Lands_tag caiu de 35→31 entre validações. | 🟡 |
+| Lorehold #6 | ramp stored(6)≠tagged(19), draw stored(6)≠tagged(9). <br>Lands_tag caiu de 32→31 entre validações. Stored desatualizado pós-reclassificação. | 🔴 |
 | Aesi #5 | 100 cards DB, stored=79. draw stored(12)≠tagged(4). | 🟡 |
+| Niv-Mizzet #14 | 100 cards, 26% unknown tags. Stored aggregates todos NULL. <br>Protection=0 para commander 6 CMC — crítico. | 🔴 |
 
-**Ação recomendada:** Rodar recomputação de `decks.avg_cmc`, `decks.ramp_count`, `decks.draw_count`, `decks.total_lands` a partir de `deck_cards` para sincronizar stored com actual.
+**Ação recomendada:** Rodar recomputação de `decks.avg_cmc`, `decks.ramp_count`, `decks.draw_count`, `decks.total_lands` a partir de `deck_cards` para sincronizar stored com actual. Além disso, investigar por que `deck_cards` de Yuriko e Lorehold perderam cartas entre validações.
 
 ---
 
-*Validação gerada por manaloom-mana-base-validator em 2026-06-08T01:17:41Z*
+*Validação gerada por manaloom-mana-base-validator em 2026-06-09T14:07:55Z*
 ## Precisão das Functional Tags (manaloom-tag-accuracy-reporter)
 
 > Última atualização: **2026-06-03T06:00:00Z**
