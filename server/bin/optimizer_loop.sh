@@ -49,23 +49,32 @@ python3 "${MW}/scripts/sync_battle_card_rules_pg.py" \
   --report "${BASE}/sync_sqlite_${TIMESTAMP}.json"
 
 # ── Step 3: Forensic audit ────────────────────────────────────────────────
-echo "[3/6] Forensic audit..."
+echo "[3/7] Forensic audit..."
+FORENSIC_JSON="${BASE}/forensic_${TIMESTAMP}.json"
 python3 "${MW}/scripts/battle_forensic_audit.py" \
   --generate 5 \
   --seed "$(date +%s | tail -c6)" \
   --sqlite-db "$SQLITE_DB" \
   --report \
-  --json-report "${BASE}/forensic_${TIMESTAMP}.json"
+  --json-report "$FORENSIC_JSON"
+
+# ── Step 3.5: Auto-promote battle rules ────────────────────────────────────
+echo "[3.5/7] Auto-promote battle rules..."
+python3 "${MW}/scripts/auto_promote_battle_rules.py" \
+  --forensic-json "$FORENSIC_JSON" \
+  --min-seen-count 3 \
+  --min-heuristic-count 5 \
+  --apply
 
 # ── Step 4: Baseline ──────────────────────────────────────────────────────
-echo "[4/6] Baseline..."
+echo "[4/7] Baseline..."
 python3 "${MW}/scripts/master_optimizer_baseline.py" \
   --deck-id "$DECK_ID" \
   --games "$GAMES" \
   --report
 
 # ── Step 5: Slot scan (categorias principais) ─────────────────────────────
-echo "[5/6] Slot optimizer..."
+echo "[5/7] Slot optimizer..."
 CATEGORIES=(ramp draw removal protection wincon wipe tutor engine)
 for CAT in "${CATEGORIES[@]}"; do
   echo "  Slot scan: $CAT"
@@ -78,7 +87,7 @@ for CAT in "${CATEGORIES[@]}"; do
 done
 
 # ── Step 6: Quality gate ──────────────────────────────────────────────────
-echo "[6/6] Quality gate..."
+echo "[6/7] Quality gate..."
 python3 "${MW}/scripts/master_optimizer_quality_gate.py" \
   --deck-id "$DECK_ID" \
   --limit 15 \
