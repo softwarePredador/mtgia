@@ -16,6 +16,7 @@ BASE="/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports"
 SQLITE_DB="${MW}/scripts/knowledge.db"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
 GAMES="${MANALOOM_OPTIMIZER_GAMES:-3}"
+export MANALOOM_BATTLE_SCRIPT="${MW}/scripts/battle_analyst_v9.py"
 TIMESTAMP="$(date -u +%Y%m%d_%H%M%S)"
 
 # ── Secrets ───────────────────────────────────────────────────────────────
