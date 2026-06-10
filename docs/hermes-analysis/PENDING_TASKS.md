@@ -277,6 +277,7 @@
 - `illegal_attachment_sba_704_5m_n`: Aura ilegal vai ao cemitério; Equipment ilegal desanexa.
 - `saga_final_chapter_sba_704_5s`: Saga no capítulo final vai ao cemitério após a habilidade deixar de estar pendente.
 - `zone_change_lki_identity_400_7`: zone change registra LKI e avança identidade lógica por `_zone_id`.
+- `exile_visibility_406_3`: cartas movidas para o exílio preservam metadados básicos de face-up/face-down.
 - `blocked_stays_blocked_509_1h`: criatura bloqueada continua bloqueada após blocker sair.
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.

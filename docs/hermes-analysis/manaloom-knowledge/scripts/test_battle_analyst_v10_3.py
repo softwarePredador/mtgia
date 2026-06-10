@@ -103,6 +103,11 @@ CONFORMANCE_SCENARIOS = [
         "purpose": "Zone changes preserve LKI and advance logical object identity.",
     },
     {
+        "id": "exile_visibility_406_3",
+        "rule": "CR 406.3",
+        "purpose": "Cards moved to exile preserve basic face-up or face-down visibility metadata.",
+    },
+    {
         "id": "blocked_stays_blocked_509_1h",
         "rule": "CR 509.1h",
         "purpose": "A creature remains blocked after all blockers leave combat.",
@@ -260,6 +265,32 @@ def test_zone_change_records_lki_and_advances_zone_identity():
     assert creature["_last_zone"] == "battlefield"
     assert battle.get_lki(creature)["power"] == 4
     assert battle.move_creature_from_battlefield(active, "not a permanent") == "none"
+
+
+def test_exile_records_face_up_and_face_down_visibility():
+    active = player("Active")
+    public_card = {"name": "Public Exile"}
+    hidden_card = {"name": "Hidden Exile"}
+
+    battle.move_to_exile(active, public_card, reason="test_public", turn=3)
+    battle.move_to_exile(
+        active,
+        hidden_card,
+        face_down=True,
+        public=False,
+        reason="test_hidden",
+        turn=3,
+    )
+
+    assert active.exile == [public_card, hidden_card]
+    assert public_card["_exile_face_down"] is False
+    assert public_card["_exile_public"] is True
+    assert public_card["_exile_reason"] == "test_public"
+    assert public_card["_exile_turn"] == 3
+    assert hidden_card["_exile_face_down"] is True
+    assert hidden_card["_exile_public"] is False
+    assert hidden_card["_exile_reason"] == "test_hidden"
+    assert hidden_card["_exile_turn"] == 3
 
 
 def test_draw_step_runs_once_with_multiple_permanents():
@@ -1073,6 +1104,7 @@ def test_conformance_registry_has_executable_coverage():
         "illegal_attachment_sba_704_5m_n",
         "saga_final_chapter_sba_704_5s",
         "zone_change_lki_identity_400_7",
+        "exile_visibility_406_3",
         "blocked_stays_blocked_509_1h",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
@@ -3580,6 +3612,7 @@ if __name__ == "__main__":
         test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
         test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
         test_zone_change_records_lki_and_advances_zone_identity,
+        test_exile_records_face_up_and_face_down_visibility,
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
         test_combat_emits_structured_event,

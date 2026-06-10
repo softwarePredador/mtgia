@@ -731,13 +731,27 @@ def finish_countered_spell(player, card):
     player.graveyard.append(card)
 
 
+def move_to_exile(player, card, *, face_down=False, public=None, reason=None, turn=None):
+    """Move a card to exile while preserving minimal face-up/face-down metadata."""
+    if isinstance(card, dict):
+        is_face_down = bool(face_down)
+        card["_exile_face_down"] = is_face_down
+        card["_exile_public"] = (not is_face_down) if public is None else bool(public)
+        if reason:
+            card["_exile_reason"] = reason
+        if turn is not None:
+            card["_exile_turn"] = turn
+    player.exile.append(card)
+    return card
+
+
 def finish_resolved_spell(player, card, turn=None):
     """Move a resolved nonpermanent spell, honoring Adventure's exile replacement."""
     if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
         parent = copy.deepcopy(card["_adventure_parent"])
         parent["_adventure_available"] = True
         parent["_last_adventure_name"] = card.get("name")
-        player.exile.append(parent)
+        move_to_exile(player, parent, reason="adventure", turn=turn)
         emit_replay_event(
             "adventure_exiled",
             player=player.name,
@@ -3589,7 +3603,7 @@ def check_sbas(all_players):
                 return True
             if is_battle_permanent(permanent) and int(permanent.get("defense", 0) or 0) <= 0:
                 p.battlefield.remove(permanent)
-                p.exile.append(permanent)
+                move_to_exile(p, permanent, reason="battle_defeated")
                 permanent["battle_defeated"] = True
                 back_face = resolve_battle_back_face(p, permanent)
                 emit_replay_event(
@@ -6053,7 +6067,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             turn=turn,
         )
         if effect_data.get("exiles_self"):
-            player.exile.append(card)
+            move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:
             finish_resolved_spell(player, card, turn=turn)
     elif effect == "topdeck_manipulation":
