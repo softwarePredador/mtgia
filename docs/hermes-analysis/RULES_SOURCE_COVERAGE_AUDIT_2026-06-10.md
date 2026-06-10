@@ -1,7 +1,7 @@
 # Rules Source Coverage Audit — ManaLoom Battle Engine
 
-> Data: 2026-06-10  
-> Escopo: battle engine/Hermes e validação Commander prática.  
+> Data: 2026-06-10
+> Escopo: battle engine/Hermes e validação Commander prática.
 > Fonte de verdade: documentação oficial Wizards vigente em 2026-06-10.
 
 ## Fontes oficiais revalidadas
