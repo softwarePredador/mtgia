@@ -4773,7 +4773,7 @@ def check_ward(target, spell, controller, rng):
     # Decision: pay or let it be countered
     if controller.is_human or rng.random() < 0.5:
         # Pay ward cost
-        controller.mana_pool.spend_generic(ward_cost)
+        controller.spend_mana(ward_cost)
         emit_replay_event("ward_paid", target=target.get("name"),
                          spell=spell.get("name"), ward_cost=ward_cost)
         return False  # Ward paid, spell proceeds
@@ -5225,6 +5225,18 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     target_controller=opp,
                     target_type=target_type,
                 )
+                if check_ward(t, card, player, rng):
+                    emit_replay_event(
+                        "removal_countered_by_ward",
+                        player=player.name,
+                        card=card.get("name", "?"),
+                        target_player=opp.name,
+                        target=t.get("name", "?"),
+                        turn=turn,
+                        **decision,
+                    )
+                    player.graveyard.append(card)
+                    return
                 if effect_data.get("target_controller_gains_life"):
                     gain_life(opp, int(effect_data.get("target_controller_gains_life") or 0))
                 emit_replay_event(

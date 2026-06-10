@@ -1015,6 +1015,75 @@ def test_removal_replay_includes_formal_targeting_metadata():
         battle.REPLAY_EVENT_HANDLER = previous_handler
 
 
+def test_ward_counters_targeted_removal_when_unpaid():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        caster = player("Caster")
+        opponent = player("Opponent")
+        ward_creature = {
+            "name": "Ward Creature",
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "ward": 2,
+        }
+        opponent.battlefield = [ward_creature]
+        spell = {
+            "name": "Swords to Plowshares",
+            "type_line": "Instant",
+            "colors": ["W"],
+        }
+
+        battle.apply_effect_immediate(caster, [opponent], spell, turn=5, rng=random.Random(130))
+
+        event_names = [event for event, _ in events]
+        assert "ward_countered" in event_names
+        assert "removal_countered_by_ward" in event_names
+        assert "removal_resolved" not in event_names
+        assert ward_creature in opponent.battlefield
+        assert spell in caster.graveyard
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
+def test_ward_paid_allows_targeted_removal_to_resolve():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        caster = player("Caster")
+        caster.is_human = True
+        caster.mana_pool.add_generic(2)
+        opponent = player("Opponent")
+        ward_creature = {
+            "name": "Ward Creature",
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "ward": 2,
+        }
+        opponent.battlefield = [ward_creature]
+        spell = {
+            "name": "Swords to Plowshares",
+            "type_line": "Instant",
+            "colors": ["W"],
+        }
+
+        battle.apply_effect_immediate(caster, [opponent], spell, turn=5, rng=random.Random(131))
+
+        event_names = [event for event, _ in events]
+        assert "ward_paid" in event_names
+        assert "removal_resolved" in event_names
+        assert ward_creature not in opponent.battlefield
+        assert caster.available_mana() == 0
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -3029,6 +3098,8 @@ if __name__ == "__main__":
         test_formal_targeting_respects_protection_from_source_color,
         test_formal_targeting_keeps_ward_as_legal_target,
         test_removal_replay_includes_formal_targeting_metadata,
+        test_ward_counters_targeted_removal_when_unpaid,
+        test_ward_paid_allows_targeted_removal_to_resolve,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,

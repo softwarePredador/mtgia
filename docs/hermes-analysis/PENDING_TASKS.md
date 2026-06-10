@@ -20,7 +20,7 @@
 | ✅ | WDWR/WPWR | card_impact_analyzer.py |
 | ✅ | Loss-mode suggester | loss_mode_suggester.py |
 | ✅ | Slot optimizer role fix | slot_optimizer.py |
-| ✅ | Ward (check_ward scaffold) | v9:3530 |
+| ✅ | Ward single-target removal integration | v9:check_ward/apply_effect_immediate |
 | ✅ | LKI + Zone change counter | v9:2865, 2863 |
 | ✅ | is_legal_target | v9:2596 |
 | ✅ | Token lifecycle SBA | v9:2590 |
@@ -44,7 +44,7 @@
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
-| 2 | Ward/multi-target partial resolution | 3-5 dias | Alto | Targeting formal básico |
+| 2 | Multi-target partial resolution | 3-5 dias | Alto | Targeting formal básico + ward single-target |
 | 3 | Dashboard/relatório agregado de telemetria | 2-3 dias | Médio | Snapshots JSON |
 
 ---
@@ -250,10 +250,11 @@
 - `max_stack_depth` para detectar cenários de pilha mais profunda.
 - `warnings` opcionais carregadas de eventos.
 - API explícita para ligar/desligar métricas sem alterar o comportamento da simulação.
+- Snapshot JSON sanitizado via `MANALOOM_ENGINE_METRICS_OUT`.
+- Runners Hermes podem gravar snapshots por rodada via `MANALOOM_ENGINE_METRICS_DIR`.
 
 **Limite restante**:
-- Métricas agregadas por rodada/corpus ainda precisam ser persistidas pelos runners do Hermes.
-- Não há dashboard operacional; a saída atual é snapshot em memória para testes e futuras rotinas de QA.
+- Não há dashboard operacional agregado; a saída atual é snapshot JSON por execução para rotinas de QA.
 
 ---
 
@@ -282,7 +283,7 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6784 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6796 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |
