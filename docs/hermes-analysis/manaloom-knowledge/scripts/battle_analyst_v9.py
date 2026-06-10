@@ -2376,6 +2376,7 @@ class Player:
         self.indestructible = False
         self.life_cant_change = False
         self.protection_from_everything = False
+        self.damage_prevention_shields = []
         self.silenced_opponents = False
         self.silenced_opponents_until_eot = False
         self.approach_count = 0
@@ -3135,6 +3136,7 @@ def clear_until_eot(player):
             card.pop("_landfall_triggers_this_turn", None)
     player.indestructible = False
     player.silenced_opponents_until_eot = False
+    player.damage_prevention_shields = []
 
 
 def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
@@ -3233,6 +3235,40 @@ class ReplacementRegistry:
             event.mark_prevented("life_total_cant_change")
         elif player.protection_from_everything:
             event.mark_prevented("protection_from_everything")
+        else:
+            ReplacementRegistry._consume_damage_prevention_shields(event)
+
+    @staticmethod
+    def _consume_damage_prevention_shields(event):
+        shields = getattr(event.affected_player, "damage_prevention_shields", [])
+        remaining_damage = event.amount
+        kept_shields = []
+        prevented_total = 0
+        for shield in shields:
+            try:
+                available = int(shield.get("amount", 0))
+            except (TypeError, ValueError):
+                available = 0
+            if available <= 0 or remaining_damage <= 0:
+                if available > 0:
+                    kept_shields.append(shield)
+                continue
+            prevented = min(available, remaining_damage)
+            prevented_total += prevented
+            remaining_damage -= prevented
+            available -= prevented
+            source = shield.get("source", "prevention_shield")
+            event.replacements.append(f"damage_prevention_shield:{source}:{prevented}")
+            if available > 0:
+                updated = dict(shield)
+                updated["amount"] = available
+                kept_shields.append(updated)
+        event.affected_player.damage_prevention_shields = kept_shields
+        if prevented_total:
+            event.amount = remaining_damage
+            event.delta = -remaining_damage
+            if remaining_damage <= 0:
+                event.prevented = True
 
     @staticmethod
     def _apply_life_change_replacement(event):
@@ -3289,6 +3325,13 @@ def gain_life(player, amount, cap=40):
     if event.prevented or event.delta <= 0:
         return False
     player.life = min(cap, player.life + event.delta)
+    return True
+
+
+def add_damage_prevention_shield(player, amount, source="prevention"):
+    if amount <= 0:
+        return False
+    player.damage_prevention_shields.append({"amount": int(amount), "source": source})
     return True
 
 

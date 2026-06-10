@@ -1057,6 +1057,36 @@ def test_replacement_registry_moves_commander_to_command_zone():
     assert replacement["replacements"] == ["commander_to_command_zone"]
 
 
+def test_damage_prevention_shield_partially_reduces_damage():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append({"event": event, **data})
+    active = player("Active")
+    active.life = 20
+    assert battle.add_damage_prevention_shield(active, 3, source="Test Shield") is True
+
+    assert battle.deal_damage(active, 5) is True
+
+    assert active.life == 18
+    assert active.damage_prevention_shields == []
+    replacement = next(event for event in events if event["event"] == "replacement_applied")
+    assert replacement["event_type"] == "damage"
+    assert replacement["amount"] == 2
+    assert replacement["replacements"] == ["damage_prevention_shield:Test Shield:3"]
+
+
+def test_damage_prevention_shield_fully_prevents_damage_and_clears_at_eot():
+    active = player("Active")
+    active.life = 20
+    assert battle.add_damage_prevention_shield(active, 7, source="Full Shield") is True
+
+    assert battle.deal_damage(active, 5) is False
+
+    assert active.life == 20
+    assert active.damage_prevention_shields == [{"amount": 2, "source": "Full Shield"}]
+    battle.clear_until_eot(active)
+    assert active.damage_prevention_shields == []
+
+
 def test_lands_are_not_instant_or_sorcery_even_with_generated_metadata():
     land = {
         "name": "Mana Confluence",
@@ -2288,6 +2318,8 @@ if __name__ == "__main__":
         test_life_cant_change_prevents_damage_and_life_gain,
         test_replacement_registry_prevents_damage_before_life_mutation,
         test_replacement_registry_moves_commander_to_command_zone,
+        test_damage_prevention_shield_partially_reduces_damage,
+        test_damage_prevention_shield_fully_prevents_damage_and_clears_at_eot,
         test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,
         test_lorehold_miracle_ignores_lands_and_creatures,
         test_lorehold_miracle_rejects_flash_creatures,

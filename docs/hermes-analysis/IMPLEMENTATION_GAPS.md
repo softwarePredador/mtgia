@@ -155,7 +155,7 @@
 | Layer 2-6 (control, text, type, color, abilities) | ❌ Ausente | — | |
 | Layer 7 (P/T com subcamadas) | ❌ Ausente | — | |
 | Timestamps e dependencies | ❌ Ausente | — | |
-| Replacement/prevention effects | ⚠️ Parcial | v9: `ReplacementRegistry` | Prevention/life/commander zone-change mínimos; falta CR 616 completo |
+| Replacement/prevention effects | ⚠️ Parcial | v9: `ReplacementRegistry` | Prevention/life/shields/commander zone-change mínimos; falta CR 616 completo |
 
 ---
 

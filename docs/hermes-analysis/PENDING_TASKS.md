@@ -152,13 +152,13 @@
 **O que foi coberto**:
 - Dano é processado por prevention antes de mutar vida.
 - `life_cant_change` e `protection_from_everything` passam por evento centralizado.
+- Prevention shields quantitativos reduzem dano parcial/total e são consumidos antes da mutação de vida.
 - Ganho/perda de vida usa replacement antes de alterar life total.
 - Commander em zone change para graveyard é redirecionado para command zone por registry mínima.
 - Evento `replacement_applied` expõe `replacement_pipeline=replacement_prevention_minimal`.
 
 **Limite restante**:
 - Ainda não existe escolha APNAP real entre múltiplos replacement effects concorrentes.
-- Prevention shields com quantidade limitada ainda não existem.
 - Replacement para exile/hand/library e efeitos self-replacement específicos ainda precisam de casos dedicados.
 
 **Regra**: CR 614 (Replacement), CR 615 (Prevention), CR 616 (Interaction)
