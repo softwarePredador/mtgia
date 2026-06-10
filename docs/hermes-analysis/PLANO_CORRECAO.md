@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-09 23:00 UTC
+> Data: 2026-06-10 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -50,16 +50,18 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    manter fonte/versionamento/teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional em `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-08 03:04 UTC no checkout `cce6ec34`.
-   `LifeCounterScreen` segue
-   como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
-   `DeckCard` continua testado mas sem import/chamada na listagem real;
-   `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
-   nao tem import nem chamada para `enter()`/`exit()`; `AuthVisualShell`,
-   `AuthBrandHeader` e `AuthFormSurface` aparecem somente no proprio arquivo
-   `auth_visual_shell.dart`. Controles positivos desta rodada descartaram
-   `LotusLifeCounterScreen` e `DeckProgressIndicator`; a varredura textual
-   ampla nao foi usada para acusar DTOs/helpers locais sem evidencia adicional.
+   na rotacao local Codex de 2026-06-10 03:00 UTC no checkout `11e9be38`.
+   `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
+   usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
+   import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
+   construtor; `LotusPresentationMode` nao tem import nem chamada para
+   `enter()`/`exit()`; `AuthVisualShell`, `AuthBrandHeader` e
+   `AuthFormSurface` aparecem somente no proprio arquivo `auth_visual_shell.dart`,
+   enquanto login/register constroem UI inline. Controles positivos desta rodada
+   descartaram `LotusLifeCounterScreen`, `DeckProgressIndicator`, observers de
+   navegacao, scanner/latest-set e candidatos backend de baixa contagem; a
+   varredura textual ampla nao foi usada para acusar DTOs/helpers locais sem
+   evidencia adicional.
 9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
    2026-06-08 05:30 UTC no checkout `18247725`. Deck analysis prefere
    `card_function_tags`; o contexto de optimize, `additionsData`, validator e
@@ -776,7 +778,7 @@ app-side novo sem chamada.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-08 03:04 UTC: REVALIDADO/ABERTO no checkout `cce6ec34`.**
+- **Status 2026-06-10 03:00 UTC: REVALIDADO/ABERTO no checkout `11e9be38`.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:283` usa
@@ -806,10 +808,13 @@ app-side novo sem chamada.
     apenas definicoes/construtores no proprio arquivo. `login_screen.dart:82`-`:108`
     e `register_screen.dart:85`-`:121` constroem suas superficies inline.
   - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
-    `DeckProgressIndicator` seguem ativos; `PerformanceNavigatorObserver`,
-    `AppObservabilityNavigatorObserver`, classes do scanner com chamadores reais
-    e candidatos backend como `PushNotificationService`, `DistributedRateLimiter`,
-    `MarketMoversCache`, `MatchupAnalyzer` e `SynergyEngine` foram descartados.
+    `DeckProgressIndicator` seguem ativos; `PerformanceNavigatorObserver` e
+    `AppObservabilityNavigatorObserver` sao instanciados em `app/lib/main.dart`;
+    `LatestSetCollectionScreen`, `ScannerOverlay`, `CardRecognitionService` e
+    `ImagePreprocessor` tem chamadores em rotas/telas/providers; candidatos
+    backend de baixa contagem (`BattleSimulator`, `DistributedRateLimiter`,
+    `RebuildGuidedService`, `SynergyEngine`) tambem tem chamador runtime
+    confirmado.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
