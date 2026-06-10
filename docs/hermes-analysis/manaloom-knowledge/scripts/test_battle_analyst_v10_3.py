@@ -80,6 +80,14 @@ mana_spec = importlib.util.spec_from_file_location(
 battle_mana_tests = importlib.util.module_from_spec(mana_spec)
 mana_spec.loader.exec_module(battle_mana_tests)
 
+STACK_CASTING_TESTS_PATH = MODULE_PATH.with_name("battle_stack_casting_tests.py")
+stack_casting_spec = importlib.util.spec_from_file_location(
+    "battle_stack_casting_tests_under_test",
+    STACK_CASTING_TESTS_PATH,
+)
+battle_stack_casting_tests = importlib.util.module_from_spec(stack_casting_spec)
+stack_casting_spec.loader.exec_module(battle_stack_casting_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -497,224 +505,6 @@ def test_turn_stops_immediately_after_approach_win():
 
     assert active.has_won() is True
     assert any(card["name"] == "Must Stay In Hand" for card in active.hand)
-
-
-def test_counterspell_consumes_card_mana_and_counters_target():
-    events = []
-    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    active = player("Active")
-    responder = player("Responder")
-    responder.hand = [
-        {
-            "name": "Real Counter",
-            "cmc": 2,
-            "tag": "counter",
-            "effect": "counter",
-            "type_line": "Instant",
-        }
-    ]
-    responder.battlefield = ["land", "land"]
-    responder.refresh_mana_sources(turn=2)
-    spell = {
-        "name": "Approach of the Second Sun",
-        "cmc": 7,
-        "type_line": "Sorcery",
-    }
-    stack = battle.Stack()
-    stack.push(spell, active, battle.get_card_effect(spell))
-
-    assert battle.priority_round(active, [active, responder], stack, 2, random.Random(6)) is True
-    assert stack.items[-1].countered is True
-    assert responder.available_mana() == 0
-    assert responder.hand == []
-    assert responder.graveyard[0]["name"] == "Real Counter"
-    assert any(event == "spell_countered" for event, _ in events)
-
-    battle.priority_round(active, [active, responder], stack, 2, random.Random(6))
-    assert stack.empty()
-    assert active.graveyard[0]["name"] == "Approach of the Second Sun"
-
-
-def test_empty_stack_priority_requires_main_phase():
-    active = player("Active")
-    active.hand = [card("Priority Bear", cmc=2, effect="creature", power=2)]
-    active.mana_pool.add_generic(2)
-    stack = battle.Stack()
-
-    assert battle.priority_round(active, [active], stack, 2, random.Random(106)) is False
-    assert len(active.hand) == 1
-    assert active.battlefield == []
-
-
-def test_empty_stack_priority_casts_main_phase_creature():
-    active = player("Active")
-    active.hand = [card("Priority Bear", cmc=2, effect="creature", power=2)]
-    active.mana_pool.add_generic(2)
-    stack = battle.Stack()
-
-    assert battle.priority_round(
-        active,
-        [active],
-        stack,
-        2,
-        random.Random(107),
-        phase="precombat_main",
-    ) is True
-    assert active.hand == []
-    assert stack.empty()
-    assert active.battlefield[0]["name"] == "Priority Bear"
-    assert active.battlefield[0]["summoning_sick"] is True
-
-
-def test_main_phase_priority_loop_casts_bounded_empty_stack_actions():
-    active = player("Active")
-    active.hand = [
-        card("Priority Bear A", cmc=2, effect="creature", power=2),
-        card("Priority Bear B", cmc=2, effect="creature", power=2),
-    ]
-    active.mana_pool.add_generic(4)
-    stack = battle.Stack()
-
-    assert battle.run_priority_loop(
-        active,
-        [active],
-        stack,
-        2,
-        "precombat_main",
-        random.Random(108),
-        max_empty_actions=2,
-    ) is True
-    assert active.hand == []
-    assert stack.empty()
-    assert [card["name"] for card in active.battlefield] == [
-        "Priority Bear A",
-        "Priority Bear B",
-    ]
-
-
-def test_casting_context_locks_cost_before_payment():
-    active = player("Active")
-    spell = {"name": "Locked Cost Spell", "cmc": 2, "mana_cost": "{1}{U}", "type_line": "Sorcery"}
-    active.mana_pool.add("blue", 1)
-    active.mana_pool.add_generic(1)
-
-    ctx = battle.begin_cast_context(active, spell, "precombat_main")
-    spell["mana_cost"] = "{9}{U}"
-
-    assert ctx.locked_cost["generic"] == 1
-    assert dict(ctx.locked_cost["colored"]) == {"blue": 1}
-    assert battle.commit_cast_payment(ctx) is True
-    assert active.available_mana() == 0
-
-
-def test_casting_context_locks_x_alternative_and_additional_costs():
-    active = player("Active")
-    spell = {
-        "name": "Advanced Cost Spell",
-        "cmc": 7,
-        "mana_cost": "{7}",
-        "type_line": "Sorcery",
-    }
-    active.mana_pool.add("blue", 1)
-    active.mana_pool.add("green", 1)
-    active.mana_pool.add_generic(7)
-
-    ctx = battle.begin_cast_context(
-        active,
-        spell,
-        "precombat_main",
-        alternative_cost="{X}{U}",
-        x_value=4,
-        additional_costs=["{2}", "{G}"],
-        modes=["draw"],
-        targets=["Opponent"],
-        role="advanced",
-    )
-    spell["mana_cost"] = "{9}"
-
-    assert ctx.locked_cost["generic"] == 6
-    assert dict(ctx.locked_cost["colored"]) == {"blue": 1, "green": 1}
-    assert ctx.alternative_cost == "{X}{U}"
-    assert ctx.x_value == 4
-    assert ctx.additional_costs == ["{2}", "{G}"]
-    assert ctx.modes == ["draw"]
-    assert ctx.targets == ["Opponent"]
-    assert battle.commit_cast_payment(ctx) is True
-    assert active.available_mana() == 1
-
-
-def test_casting_context_replay_exposes_modes_targets_and_x_value():
-    events = []
-    previous_handler = battle.REPLAY_EVENT_HANDLER
-    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    try:
-        active = player("Active")
-        spell = {"name": "Modal X Spell", "cmc": 1, "mana_cost": "{X}{R}", "type_line": "Instant"}
-        active.mana_pool.add("red", 1)
-        active.mana_pool.add_generic(3)
-
-        ctx = battle.begin_cast_context(
-            active,
-            spell,
-            "combat",
-            x_value=3,
-            modes=["damage"],
-            targets=["Defender"],
-            role="modal_x",
-        )
-
-        assert battle.commit_cast_payment(ctx) is True
-        event = next(data for name, data in events if name == "cast_announced")
-        assert event["x_value"] == 3
-        assert event["modes"] == ["damage"]
-        assert event["targets"] == ["Defender"]
-        assert event["locked_cost"]["generic"] == 3
-        assert event["locked_cost"]["colored"] == {"red": 1}
-    finally:
-        battle.REPLAY_EVENT_HANDLER = previous_handler
-
-
-def test_casting_context_rejects_illegal_timing_without_payment():
-    active = player("Active")
-    spell = {"name": "Timing Creature", "cmc": 2, "effect": "creature", "type_line": "Creature"}
-    active.hand = [spell]
-    active.mana_pool.add_generic(2)
-    stack = battle.Stack()
-
-    ctx = battle.begin_cast_context(active, spell, "end_step", effect_data=battle.get_card_effect(spell))
-
-    assert battle.commit_cast_payment(ctx) is False
-    assert active.available_mana() == 2
-    assert active.hand == [spell]
-    assert stack.empty()
-
-
-def test_cast_spells_emits_minimal_601_pipeline_fields():
-    events = []
-    previous_handler = battle.REPLAY_EVENT_HANDLER
-    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    try:
-        active = player("Active")
-        active.hand = [card("Pipeline Bear", cmc=2, effect="creature", power=2)]
-        active.mana_pool.add_generic(2)
-
-        assert battle.cast_spells_v8(
-            active,
-            [],
-            [active],
-            2,
-            "precombat_main",
-            battle.Stack(),
-            random.Random(109),
-            max_actions=1,
-        ) is True
-
-        cast_event = next(data for event, data in events if event == "creature_cast")
-        assert cast_event["cast_pipeline"] == "601.2_minimal"
-        assert cast_event["locked_cost"]["generic"] == 2
-        assert cast_event["role"] == "creature"
-    finally:
-        battle.REPLAY_EVENT_HANDLER = previous_handler
 
 
 def test_continuous_effects_apply_layers_and_sublayers_in_order():
@@ -1203,19 +993,6 @@ def test_conformance_registry_has_executable_coverage():
     assert all(scenario.get("purpose") for scenario in CONFORMANCE_SCENARIOS)
 
 
-def test_conformance_stack_resolves_lifo():
-    controller = player("Controller")
-    stack = battle.Stack()
-    for name in ("First Spell", "Second Spell", "Third Spell"):
-        stack.push({"name": name, "type_line": "Instant"}, controller, {"effect": "unknown"})
-
-    resolved = []
-    while not stack.empty():
-        resolved.append(stack.resolve_top().card["name"])
-
-    assert resolved == ["Third Spell", "Second Spell", "First Spell"]
-
-
 def test_conformance_failed_draw_from_empty_library_loses():
     active = player("Active")
     active.hand = [card("Still in hand")]
@@ -1535,35 +1312,6 @@ def test_ward_paid_allows_targeted_removal_to_resolve():
         assert caster.available_mana() == 0
     finally:
         battle.REPLAY_EVENT_HANDLER = previous_handler
-
-
-def test_player_does_not_counter_own_spell():
-    active = player("Active")
-    active.hand = [
-        {
-            "name": "Own Counter",
-            "cmc": 2,
-            "tag": "counter",
-            "effect": "counter",
-            "type_line": "Instant",
-        }
-    ]
-    active.battlefield = ["land", "land"]
-    active.refresh_mana_sources(turn=2)
-    spell = {
-        "name": "Approach of the Second Sun",
-        "cmc": 7,
-        "type_line": "Sorcery",
-    }
-    stack = battle.Stack()
-    stack.push(spell, active, battle.get_card_effect(spell))
-
-    battle.priority_round(active, [active], stack, 2, random.Random(10))
-
-    assert stack.empty()
-    assert active.approach_count == 1
-    assert active.hand[0]["name"] == "Own Counter"
-    assert active.available_mana() == 2
 
 
 def test_card_oracle_cache_enriches_battle_cards():
@@ -3044,15 +2792,7 @@ if __name__ == "__main__":
         test_end_of_combat_triggers_use_stack_and_apnap_order,
         test_turn_stops_immediately_after_approach_win,
         *battle_mana_tests.register_tests(battle, player),
-        test_counterspell_consumes_card_mana_and_counters_target,
-        test_empty_stack_priority_requires_main_phase,
-        test_empty_stack_priority_casts_main_phase_creature,
-        test_main_phase_priority_loop_casts_bounded_empty_stack_actions,
-        test_casting_context_locks_cost_before_payment,
-        test_casting_context_locks_x_alternative_and_additional_costs,
-        test_casting_context_replay_exposes_modes_targets_and_x_value,
-        test_casting_context_rejects_illegal_timing_without_payment,
-        test_cast_spells_emits_minimal_601_pipeline_fields,
+        *battle_stack_casting_tests.register_tests(battle, player),
         test_continuous_effects_apply_layers_and_sublayers_in_order,
         test_continuous_effects_apply_type_color_text_and_ability_layers,
         test_continuous_effect_dependencies_override_timestamp_within_layer,
@@ -3067,7 +2807,6 @@ if __name__ == "__main__":
         test_engine_metrics_report_aggregates_sanitized_snapshots,
         *battle_rules_2026_tests.register_tests(battle, player),
         test_conformance_registry_has_executable_coverage,
-        test_conformance_stack_resolves_lifo,
         *battle_commander_tests.register_tests(battle, player),
         test_conformance_failed_draw_from_empty_library_loses,
         test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves,
@@ -3081,7 +2820,6 @@ if __name__ == "__main__":
         test_ward_counters_targeted_removal_when_unpaid,
         test_ward_paid_allows_targeted_removal_to_resolve,
         *battle_combat_tests.register_tests(battle, player),
-        test_player_does_not_counter_own_spell,
         test_card_oracle_cache_enriches_battle_cards,
         test_battle_card_rules_table_overrides_fallbacks,
         test_lorehold_miracle_requires_lorehold_on_battlefield,

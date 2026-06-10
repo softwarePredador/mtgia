@@ -8,12 +8,12 @@
 
 | Fonte | Uso no ManaLoom | Status |
 |---|---|---|
-| `https://magic.wizards.com/en/rules` | Fonte canônica para Comprehensive Rules e downloads oficiais. | Referência oficial. |
+| `https://magic.wizards.com/en/rules` | Fonte canônica para Comprehensive Rules e downloads oficiais. | Referência oficial revalidada em 2026-06-10. |
 | `MagicCompRules 2026-04-17` | Base para CR 100-903, incluindo Omen/Station/Preparation. | Referência versionada atual nesta rodada. |
-| `https://magic.wizards.com/en/formats/commander` | Commander 99+1, color identity, command zone, commander tax, 21 commander damage e multiplayer free-for-all. | Referência oficial de produto. |
-| `Commander Brackets Beta Update 2026-02-10` | Confirma que hybrid mana continua contando como todas as cores da carta no Commander. | Regra documentada como invariável. |
-| `Edge of Eternities Update Bulletin` | Station, Warp, Spacecraft e elegibilidade de Legendary Vehicle/Spacecraft com P/T como commander. | Implementado como suporte mínimo. |
-| `Secrets of Strixhaven Mechanics` | Prepare, Repartee, Opus, Infusion, Increment, Paradigm, Flashback e Converge. | Implementado como suporte mínimo/telemetria. |
+| `https://magic.wizards.com/en/formats/commander` | Commander 99+1, color identity, command zone, commander tax, 21 commander damage e multiplayer free-for-all com ataque a múltiplos jogadores. | Referência oficial de produto revalidada em 2026-06-10. |
+| `Commander Brackets Beta Update 2026-02-09` | Confirma que hybrid mana continua contando como todas as cores da carta no Commander; não houve mudança para modelo "or". | Regra documentada como invariável. |
+| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Station, Warp, Spacecraft, Lander/Void e elegibilidade de Legendary Vehicle/Spacecraft com P/T como commander. | Implementado como suporte mínimo. |
+| `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-mechanics` | Prepare, Repartee, Opus, Infusion, Increment, Paradigm, Flashback e Converge. | Implementado como suporte mínimo/telemetria. |
 
 ## Cobertura implementada nesta rodada
 

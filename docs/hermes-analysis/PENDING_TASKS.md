@@ -24,7 +24,8 @@
 > movidas para `battle_combat_tests.py`; replacement/prevention foi movido
 > para `battle_replacement_tests.py`; regressões Commander foram movidas
 > para `battle_commander_tests.py`; mana/custos diretos foram movidos para
-> `battle_mana_tests.py`, mantendo
+> `battle_mana_tests.py` e stack/casting foi movido para
+> `battle_stack_casting_tests.py`, mantendo
 > `test_battle_analyst_v10_3.py` como runner único.
 
 ---
@@ -65,6 +66,7 @@
 | ✅ | Terceira extração da suite Hermes | `battle_replacement_tests.py` |
 | ✅ | Quarta extração da suite Hermes | `battle_commander_tests.py` |
 | ✅ | Quinta extração da suite Hermes | `battle_mana_tests.py` |
+| ✅ | Sexta extração da suite Hermes | `battle_stack_casting_tests.py` |
 
 ---
 
