@@ -17,6 +17,11 @@
 > (`functional_tags` persistido → `semantic_tags_v2` → heurística) e expõe
 > `role_source_priority`/`role_signal_source_counts` para auditoria. Testes
 > focados adicionados em `test/optimization_validator_test.dart`.
+>
+> **Atualização 2026-06-10 — modularização.**
+> Primeira extração da suite Hermes concluída: regras oficiais 2026 foram
+> movidas para `battle_rules_2026_tests.py`, mantendo
+> `test_battle_analyst_v10_3.py` como runner único.
 
 ---
 
@@ -51,6 +56,7 @@
 | ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
+| ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
 
 ---
 

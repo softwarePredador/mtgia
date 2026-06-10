@@ -52,24 +52,37 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** aberta, com evidência objetiva.
+**Status:** em andamento, com primeira extração concluída.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7869 linhas.
-- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 4097 linhas.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 3815 linhas após primeira extração.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
 - `server/lib/ai/optimize_runtime_support.dart` — 2772 linhas.
 
 **Decisão:**
-Não misturar esse refactor com correção funcional de role diagnostics. O split
-deve ser uma etapa própria, começando pela separação da suite Hermes e depois
-pela rota/runtime de optimize, sempre com testes verdes antes e depois.
+Não misturar refactors grandes com correções funcionais. A primeira extração
+foi limitada às regras oficiais 2026 porque elas já formavam um domínio
+fechado, com cenários próprios e sem dependência de produto mobile.
+
+**Entregue agora:**
+- Novo módulo `battle_rules_2026_tests.py` com `CONFORMANCE_SCENARIOS_2026`
+  e `register_tests(...)`.
+- `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
+  os testes 2026 a partir do módulo extraído.
+- A saída do runner continua exibindo os testes 2026, provando que a cobertura
+  não foi removida.
+
+**Validação:**
+- `python3 -m py_compile battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
+- `python3 test_battle_analyst_v10_3.py`
 
 ## Etapa 4 — Próximas pendências reais
 
 **Prioridade atual:**
-1. Separar suites Hermes por domínio para reduzir risco de regressão no
-   `test_battle_analyst_v10_3.py`.
+1. Separar mais suites Hermes por domínio, priorizando combat/replacement e
+   commander rules.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
 3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
