@@ -883,6 +883,116 @@ def test_conformance_prevention_applies_before_damage_life_change():
     assert active.damage_prevention_shields == []
 
 
+def test_formal_targeting_rejects_opponent_hexproof_creature():
+    caster = player("Caster")
+    opponent = player("Opponent")
+    protected = {
+        "name": "Hexproof Creature",
+        "type_line": "Creature",
+        "effect": "creature",
+        "hexproof": True,
+    }
+    exposed = {
+        "name": "Exposed Creature",
+        "type_line": "Creature",
+        "effect": "creature",
+    }
+    opponent.battlefield = [protected, exposed]
+    spell = {"name": "Targeted Removal", "type_line": "Instant", "colors": ["black"]}
+
+    targets = battle.removal_target_candidates(
+        opponent,
+        {"effect": "remove_creature", "target": "creature"},
+        controller=caster,
+        source=spell,
+    )
+
+    assert [target["name"] for target in targets] == ["Exposed Creature"]
+
+
+def test_formal_targeting_respects_protection_from_source_color():
+    caster = player("Caster")
+    opponent = player("Opponent")
+    protected = {
+        "name": "White Protected Creature",
+        "type_line": "Creature",
+        "effect": "creature",
+        "protection_from": ["white"],
+    }
+    opponent.battlefield = [protected]
+    white_spell = {"name": "White Removal", "type_line": "Instant", "colors": ["W"]}
+    black_spell = {"name": "Black Removal", "type_line": "Instant", "colors": ["B"]}
+
+    assert battle.is_legal_target(
+        white_spell,
+        protected,
+        caster,
+        target_type="creature",
+        target_controller=opponent,
+    ) is False
+    assert battle.is_legal_target(
+        black_spell,
+        protected,
+        caster,
+        target_type="creature",
+        target_controller=opponent,
+    ) is True
+
+
+def test_formal_targeting_keeps_ward_as_legal_target():
+    caster = player("Caster")
+    opponent = player("Opponent")
+    ward_creature = {
+        "name": "Ward Creature",
+        "type_line": "Creature",
+        "effect": "creature",
+        "ward": 2,
+    }
+    spell = {"name": "Removal", "type_line": "Instant", "colors": ["black"]}
+
+    assert battle.is_legal_target(
+        spell,
+        ward_creature,
+        caster,
+        target_type="creature",
+        target_controller=opponent,
+    ) is True
+
+
+def test_removal_replay_includes_formal_targeting_metadata():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        caster = player("Caster")
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Target Creature",
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+        ]
+        spell = {
+            "name": "Swords to Plowshares",
+            "type_line": "Instant",
+            "colors": ["W"],
+        }
+
+        battle.apply_effect_immediate(caster, [opponent], spell, turn=4, rng=random.Random(121))
+
+        removal_event = next(data for event, data in events if event == "removal_resolved")
+        assert removal_event["targeting_pipeline"] == "targeting_formal_minimal"
+        assert removal_event["target_name"] == "Target Creature"
+        assert removal_event["target_legal"] is True
+        assert removal_event["target_type"] == "creature"
+        assert removal_event["target_controller"] == "Opponent"
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2892,6 +3002,10 @@ if __name__ == "__main__":
         test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves,
         test_conformance_apnap_trigger_order_is_lifo_after_stack_placement,
         test_conformance_prevention_applies_before_damage_life_change,
+        test_formal_targeting_rejects_opponent_hexproof_creature,
+        test_formal_targeting_respects_protection_from_source_color,
+        test_formal_targeting_keeps_ward_as_legal_target,
+        test_removal_replay_includes_formal_targeting_metadata,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,

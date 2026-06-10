@@ -3300,26 +3300,95 @@ def check_sbas_until_stable(all_players):
 
 
 
-def is_legal_target(spell, target, controller, all_players):
+def _normalize_color_symbol(color):
+    text = str(color or "").strip().lower()
+    aliases = {
+        "w": "white",
+        "u": "blue",
+        "b": "black",
+        "r": "red",
+        "g": "green",
+    }
+    return aliases.get(text, text)
+
+
+def target_matches_type(target, target_type):
+    """Minimal target selector matcher used before spell resolution."""
+    target_type = str(target_type or "").lower()
+    if not target_type:
+        return True
+    if target_type in ("creature", "target_creature"):
+        return is_battlefield_creature(target)
+    if target_type in ("artifact", "artifact_permanent"):
+        return is_artifact_permanent(target)
+    if target_type in ("enchantment", "enchantment_permanent"):
+        return is_enchantment_permanent(target)
+    if target_type in ("artifact_or_enchantment", "artifact_enchantment"):
+        return is_artifact_permanent(target) or is_enchantment_permanent(target)
+    if target_type == "artifact_or_creature":
+        return is_artifact_permanent(target) or is_battlefield_creature(target)
+    if target_type == "creature_or_enchantment":
+        return is_battlefield_creature(target) or is_enchantment_permanent(target)
+    if target_type == "colored_permanent":
+        return is_colored_permanent(target)
+    if target_type in ("nonland", "nonland_permanent"):
+        return not is_effective_land(target)
+    if target_type in ("permanent", "any"):
+        return True
+    return True
+
+
+def is_legal_target(spell, target, controller, all_players=None, target_type=None, target_controller=None):
     """v9: Check if a target is still legal for a spell/ability (CR 608.2b)."""
     if not isinstance(target, dict):
         return False
+    if target_type and not target_matches_type(target, target_type):
+        return False
+    if target.get("protection_from_everything"):
+        return False
+    if target.get("eliminated"):
+        return False
     # Hexproof: can't be targeted by opponents
-    if target.get("hexproof") and controller.name != target.get("controller"):
+    target_controller_name = (
+        target.get("controller")
+        or target.get("owner")
+        or getattr(target_controller, "name", None)
+    )
+    if target.get("hexproof") and controller.name != target_controller_name:
         return False
     # Shroud: can't be targeted at all
     if target.get("shroud"):
         return False
     # Protection from source's color
     protections = target.get("protection_from", [])
-    source_colors = spell.get("colors", [])
+    if isinstance(protections, str):
+        protections = [protections]
+    protections = {_normalize_color_symbol(color) for color in protections}
+    source_colors = spell.get("colors") or spell.get("color_identity") or []
+    if isinstance(source_colors, str):
+        source_colors = read_json_list(source_colors) or [source_colors]
+    source_colors = {_normalize_color_symbol(color) for color in source_colors}
     if any(c in protections for c in source_colors):
         return False
     # Ward: doesn't affect legality, only triggers on cast
-    # Target not eliminated
-    if target.get("eliminated"):
-        return False
     return True
+
+
+def targeting_decision(spell, target, controller, *, target_controller=None, target_type=None):
+    legal = is_legal_target(
+        spell,
+        target,
+        controller,
+        target_type=target_type,
+        target_controller=target_controller,
+    )
+    return {
+        "targeting_pipeline": "targeting_formal_minimal",
+        "target_name": target.get("name", "?") if isinstance(target, dict) else "?",
+        "target_type": target_type or "any",
+        "target_legal": legal,
+        "target_controller": getattr(target_controller, "name", None),
+    }
 
 def game_winner(all_players):
     return next((player for player in all_players if player.has_won()), None)
@@ -3928,7 +3997,7 @@ def is_colored_permanent(card):
     return bool(re.search(r"\{[WUBRG]\}", str(card.get("mana_cost") or "")))
 
 
-def removal_target_candidates(player, effect_data=None):
+def removal_target_candidates(player, effect_data=None, *, controller=None, source=None):
     effect_data = effect_data or {"effect": "remove_creature"}
     effect = effect_data.get("effect")
     target_type = str(effect_data.get("target") or "").lower()
@@ -3939,21 +4008,13 @@ def removal_target_candidates(player, effect_data=None):
     for card in player.battlefield:
         if not isinstance(card, dict):
             continue
-        if card.get("shroud") or card.get("protection_from_everything"):
-            continue
-        if target_type in ("creature", "target_creature") and not is_battlefield_creature(card):
-            continue
-        if target_type in ("artifact", "artifact_permanent") and not is_artifact_permanent(card):
-            continue
-        if target_type in ("enchantment", "enchantment_permanent") and not is_enchantment_permanent(card):
-            continue
-        if target_type in ("artifact_or_enchantment", "artifact_enchantment") and not (
-            is_artifact_permanent(card) or is_enchantment_permanent(card)
+        if not is_legal_target(
+            source or effect_data,
+            card,
+            controller or player,
+            target_type=target_type,
+            target_controller=player,
         ):
-            continue
-        if target_type == "colored_permanent" and not is_colored_permanent(card):
-            continue
-        if target_type in ("nonland_permanent", "permanent", "any") and is_effective_land(card):
             continue
         candidates.append(card)
     return candidates
@@ -4519,7 +4580,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     for opp in opponents:
         targets = [
             target
-            for target in removal_target_candidates(opp)
+            for target in removal_target_candidates(opp, controller=player, source=card)
             if int(target.get("toughness") or target.get("power") or 2) <= amount
         ]
         if targets:
@@ -5131,9 +5192,19 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.graveyard.append(card)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
         for opp in opponents:
-            targets = removal_target_candidates(opp, effect_data)
+            target_type = str(effect_data.get("target") or "").lower()
+            if not target_type:
+                target_type = "creature" if effect == "remove_creature" else "nonland_permanent"
+            targets = removal_target_candidates(opp, effect_data, controller=player, source=card)
             if targets:
                 t = choose_best_creature_target(targets)
+                decision = targeting_decision(
+                    card,
+                    t,
+                    player,
+                    target_controller=opp,
+                    target_type=target_type,
+                )
                 if effect_data.get("target_controller_gains_life"):
                     gain_life(opp, int(effect_data.get("target_controller_gains_life") or 0))
                 emit_replay_event(
@@ -5149,6 +5220,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     target_type_line=t.get("type_line", ""),
                     available_targets=len(targets),
                     turn=turn,
+                    **decision,
                 )
                 move_creature_from_battlefield(opp, t)
                 break

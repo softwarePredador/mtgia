@@ -12,7 +12,7 @@
 | SBAs e Triggers | 6/15 | 2/15 | 7/15 |
 | Commander Rules | 5/8 | 2/8 | 1/8 |
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
-| Targeting | 1/5 | 1/5 | 3/5 |
+| Targeting | 3/5 | 2/5 | 0/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 4/6 | 2/6 | 0/6 |
@@ -103,7 +103,7 @@
 **Ações imediatas**:
 - [x] Pipeline 601.2 mínimo: lock-in de custo antes de pagar
 - [x] Expandir 601.2 para modes, X e alternative/additional costs
-- [ ] Levar targeting legal formal para o bloco Targeting
+- [x] Levar targeting legal formal para o bloco Targeting
 
 ---
 
@@ -111,11 +111,11 @@
 
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
-| Seleção de alvos legais | ⚠️ Parcial | — | Alvos são implícitos (combat), não declarados formalmente |
-| Alvos ilegais na resolução (partial resolution) | ❌ Ausente | — | |
+| Seleção de alvos legais | ✅ Básico | v9: `target_matches_type`, `is_legal_target`, `removal_target_candidates` | Remoções filtram target type, hexproof, shroud, protection e proteção global |
+| Alvos ilegais na resolução (partial resolution) | ⚠️ Parcial | v9: `targeting_decision` | Single-target removal valida antes de resolver; multi-target partial resolution ainda não modelado |
 | Hexproof/Shroud | ✅ OK | — | Respeitado via `can_target` |
-| Protection | ❌ Ausente | — | |
-| Ward | ❌ Ausente | — | |
+| Protection | ✅ Básico | v9: `is_legal_target` | `protection_from` por cor e `protection_from_everything` bloqueiam alvo |
+| Ward | ⚠️ Parcial | v9: `check_ward` | Ward não afeta legalidade; trigger/pagamento ainda precisa integração formal com cast de alvos |
 
 ---
 
