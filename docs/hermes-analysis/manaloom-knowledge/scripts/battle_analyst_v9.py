@@ -38,16 +38,82 @@ KNOWLEDGE_DIR = os.environ.get(
 LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
 
 REPLAY_EVENT_HANDLER = None
+ENGINE_METRICS = None
 
 
 def emit_replay_event(event, **data):
     """Emit optional structured replay events without affecting simulation."""
+    if ENGINE_METRICS is not None:
+        try:
+            ENGINE_METRICS.record_event(event, data)
+        except Exception:
+            pass
     if REPLAY_EVENT_HANDLER is None:
         return
     try:
         REPLAY_EVENT_HANDLER(event, data)
     except Exception:
         pass
+
+
+class EngineMetrics:
+    """Lightweight health telemetry for battle-engine simulations."""
+
+    def __init__(self):
+        self.counters = defaultdict(int)
+        self.event_counts = defaultdict(int)
+        self.max_stack_depth = 0
+        self.warnings = []
+
+    def increment(self, name, amount=1):
+        self.counters[name] += amount
+
+    def record_stack_depth(self, depth):
+        self.max_stack_depth = max(self.max_stack_depth, int(depth or 0))
+
+    def record_event(self, event, data=None):
+        self.event_counts[event] += 1
+        if event == "replacement_applied":
+            self.increment("replacement_events")
+        elif event == "cast_announced":
+            self.increment("cast_announcements")
+        elif event == "cast_illegal":
+            self.increment("illegal_casts")
+        elif event == "permanent_moved_by_sba":
+            self.increment("sba_permanent_moves")
+        elif event == "player_eliminated":
+            self.increment("player_eliminations")
+        if data and data.get("warning"):
+            self.warnings.append(data["warning"])
+
+    def snapshot(self):
+        return {
+            "counters": dict(self.counters),
+            "event_counts": dict(self.event_counts),
+            "max_stack_depth": self.max_stack_depth,
+            "warnings": list(self.warnings),
+        }
+
+
+def set_engine_metrics(metrics):
+    global ENGINE_METRICS
+    ENGINE_METRICS = metrics
+    return metrics
+
+
+def clear_engine_metrics():
+    global ENGINE_METRICS
+    ENGINE_METRICS = None
+
+
+def record_engine_metric(name, amount=1):
+    if ENGINE_METRICS is not None:
+        ENGINE_METRICS.increment(name, amount)
+
+
+def record_stack_depth(depth):
+    if ENGINE_METRICS is not None:
+        ENGINE_METRICS.record_stack_depth(depth)
 
 
 def replay_card_snapshot(card):
@@ -3066,11 +3132,16 @@ class Stack:
     def push(self, card, controller=None, effect_data=None):
         if isinstance(card, StackItem) and controller is None:
             self.items.append(card)
+            record_engine_metric("stack_pushes")
+            record_stack_depth(len(self.items))
             return
         self.items.append(StackItem(card, controller, effect_data or {}))
+        record_engine_metric("stack_pushes")
+        record_stack_depth(len(self.items))
     def resolve_top(self):
         if self.items:
             item = self.items.pop()
+            record_engine_metric("stack_resolutions")
             if not item.countered:
                 return item
             item.controller.graveyard.append(item.card)
@@ -3225,7 +3296,7 @@ def check_token_lifecycle(all_players):
 def check_sbas_until_stable(all_players):
     """v9: Loop SBAs until no more actions (CR 704.3)."""
     while check_sbas(all_players):
-        pass
+        record_engine_metric("sba_iterations")
 
 
 
@@ -3259,6 +3330,7 @@ MAIN_PHASES = {"precombat_main", "postcombat_main"}
 
 def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     """v9: Priority round with optional empty-stack window during main phases."""
+    record_engine_metric("priority_rounds")
     flush_triggers_in_apnap(active_player, all_players, stack)
 
     if stack.empty():

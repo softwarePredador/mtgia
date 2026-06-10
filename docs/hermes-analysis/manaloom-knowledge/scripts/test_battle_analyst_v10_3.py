@@ -657,6 +657,40 @@ def test_adventure_prototype_and_split_characteristics_by_cast_mode():
     assert outside_stack["colors"] == ["white", "red"]
 
 
+def test_engine_metrics_collects_core_health_signals():
+    metrics = battle.set_engine_metrics(battle.EngineMetrics())
+    try:
+        stack = battle.Stack()
+        stack.push({"name": "Metric Spell", "type_line": "Instant"})
+        stack.resolve_top()
+
+        active = player("Active")
+        active.life = 5
+        active.life_cant_change = True
+        assert battle.deal_damage(active, 3) is False
+
+        walker = {
+            "name": "Metric Walker",
+            "type_line": "Planeswalker",
+            "loyalty": 0,
+        }
+        active.battlefield = [walker]
+        battle.check_sbas_until_stable([active])
+        battle.priority_round(active, [active], battle.Stack(), 1, random.Random(110), phase="upkeep")
+
+        snapshot = metrics.snapshot()
+        assert snapshot["counters"]["stack_pushes"] == 1
+        assert snapshot["counters"]["stack_resolutions"] == 1
+        assert snapshot["counters"]["replacement_events"] == 1
+        assert snapshot["counters"]["sba_iterations"] == 1
+        assert snapshot["counters"]["sba_permanent_moves"] == 1
+        assert snapshot["counters"]["priority_rounds"] == 1
+        assert snapshot["max_stack_depth"] == 1
+        assert snapshot["event_counts"]["replacement_applied"] == 1
+    finally:
+        battle.clear_engine_metrics()
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2658,6 +2692,7 @@ if __name__ == "__main__":
         test_battle_defense_damage_and_sba,
         test_dfc_characteristics_and_color_identity_use_all_faces,
         test_adventure_prototype_and_split_characteristics_by_cast_mode,
+        test_engine_metrics_collects_core_health_signals,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,

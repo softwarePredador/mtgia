@@ -17,7 +17,7 @@
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 4/6 | 2/6 | 0/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
-| Qualidade/QA | 3/6 | 1/6 | 2/6 |
+| Qualidade/QA | 4/6 | 1/6 | 1/6 |
 
 ---
 
@@ -169,7 +169,7 @@
 | Forensic audit | ✅ OK | battle_forensic_audit.py | |
 | Quality gate | ✅ OK | master_optimizer_quality_gate.py | |
 | Taxonomia canônica de derrota | ⚠️ Parcial | classify_loss | Faltam: poison, effect_says_lose, concede |
-| Telemetria de saúde do motor | ❌ Ausente | — | |
+| Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
 
 ---
 
@@ -185,7 +185,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Telemetria de saúde do motor** — métricas de cobertura/regressão do simulador
+1. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
 2. **Targeting formal** — seleção/validação declarada de alvos
-3. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
-4. **Integração avançada de tipos complexos** — Adventure exile/recast e Battle back face
+3. **Integração avançada de tipos complexos** — Adventure exile/recast e Battle back face
+4. **Persistência operacional da telemetria** — snapshots por corpus/cron do Hermes

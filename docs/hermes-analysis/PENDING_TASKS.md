@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 23/25 itens implementados no battle_analyst_v9.py (6400+ linhas).
-> 2 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 24/25 itens implementados no battle_analyst_v9.py (6600+ linhas).
+> 1 pendente de alta complexidade — requer suite de conformidade versionada.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -34,7 +34,7 @@
 | ✅ | Layers 1-7 básico | v9:ContinuousEffect/apply_continuous_effects |
 | ✅ | Planeswalkers + Battles básico | v9:planeswalker/battle helpers + SBA |
 | ✅ | DFC/Adventure/Prototype/Split básico | v9:get_card_characteristics/compute_color_identity |
-| ⏳ | Telemetria de saúde do motor | P2 |
+| ✅ | Telemetria de saúde do motor | v9:EngineMetrics |
 | ⏳ | Suite de conformidade | P2 |
 
 ---
@@ -43,8 +43,7 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 2 | Suite de conformidade | 5-7 dias | Alto | #1 |
+| 1 | Suite de conformidade | 5-7 dias | Alto | Telemetria básica concluída |
 
 ---
 
@@ -237,33 +236,22 @@
 
 ### 9. Telemetria de Saúde do Motor
 
-**Implementação**:
-```python
-class EngineMetrics:
-    """Coleta métricas de saúde do motor de regras."""
-    def __init__(self):
-        self.priority_passes = 0
-        self.sba_iterations = []
-        self.illegal_rewinds = 0
-        self.oracle_fallbacks = 0
-        self.stack_max_depth = 0
-        self.triggers_per_window = []
-        self.game_duration_turns = 0
-    
-    def snapshot(self):
-        return {
-            "total_priority_passes": self.priority_passes,
-            "avg_sba_iterations": sum(self.sba_iterations)/max(1,len(self.sba_iterations)),
-            "illegal_rewinds": self.illegal_rewinds,
-            "oracle_fallbacks": self.oracle_fallbacks,
-            "max_stack_depth": self.stack_max_depth,
-        }
+**Status 2026-06-10**: ✅ Básico implementado.
 
-# Hook nos pontos de medição:
-# check_sbas_until_stable: registrar sba_iterations
-# priority_round: incrementar priority_passes
-# illegal action revert: incrementar illegal_rewinds
-```
+**Arquivos**:
+- `battle_analyst_v9.py`: `EngineMetrics`, `set_engine_metrics`, `clear_engine_metrics`, hooks em replay events, `Stack`, `check_sbas_until_stable` e `priority_round`.
+- `test_battle_analyst_v10_3.py`: `test_engine_metrics_collects_core_health_signals`.
+
+**O que foi coberto**:
+- Contadores de `stack_pushes`, `stack_resolutions`, `priority_rounds`, `sba_iterations`, `replacement_events` e movimentos por SBA.
+- `event_counts` para eventos estruturados de replay, incluindo `replacement_applied`.
+- `max_stack_depth` para detectar cenários de pilha mais profunda.
+- `warnings` opcionais carregadas de eventos.
+- API explícita para ligar/desligar métricas sem alterar o comportamento da simulação.
+
+**Limite restante**:
+- Métricas agregadas por rodada/corpus ainda precisam ser persistidas pelos runners do Hermes.
+- Não há dashboard operacional; a saída atual é snapshot em memória para testes e futuras rotinas de QA.
 
 ---
 
@@ -317,7 +305,7 @@ CONFORMANCE_SCENARIOS = [
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5867 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6672 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |
