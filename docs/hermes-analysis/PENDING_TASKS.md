@@ -21,7 +21,8 @@
 > **Atualização 2026-06-10 — modularização.**
 > Extrações iniciais da suite Hermes concluídas: regras oficiais 2026 foram
 > movidas para `battle_rules_2026_tests.py` e regressões de combate foram
-> movidas para `battle_combat_tests.py`, mantendo
+> movidas para `battle_combat_tests.py`; replacement/prevention foi movido
+> para `battle_replacement_tests.py`, mantendo
 > `test_battle_analyst_v10_3.py` como runner único.
 
 ---
@@ -59,6 +60,7 @@
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
 | ✅ | Segunda extração da suite Hermes | `battle_combat_tests.py` |
+| ✅ | Terceira extração da suite Hermes | `battle_replacement_tests.py` |
 
 ---
 
