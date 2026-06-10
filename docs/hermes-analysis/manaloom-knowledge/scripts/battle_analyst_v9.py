@@ -3303,6 +3303,60 @@ def mulligan_decision(hand):
     lands = sum(1 for c in hand if is_land(c))  # v10.2
     return (2 <= lands <= 5), 7
 
+PLUS_ONE_COUNTER_KEYS = ("plus_one_counters", "plus1_counters", "+1/+1_counters")
+MINUS_ONE_COUNTER_KEYS = ("minus_one_counters", "minus1_counters", "-1/-1_counters")
+
+
+def _counter_total(card, keys):
+    total = 0
+    for key in keys:
+        value = numeric_stat(card.get(key))
+        if value:
+            total += max(0, value)
+    return total
+
+
+def _replace_counter_aliases(card, keys, canonical_key, value):
+    for key in keys:
+        card.pop(key, None)
+    card[canonical_key] = max(0, int(value or 0))
+
+
+def cancel_plus_minus_counters(all_players):
+    """v9: +1/+1 and -1/-1 counters cancel as a state-based action."""
+    for p in all_players:
+        for permanent in list(p.battlefield):
+            if not isinstance(permanent, dict):
+                continue
+            plus = _counter_total(permanent, PLUS_ONE_COUNTER_KEYS)
+            minus = _counter_total(permanent, MINUS_ONE_COUNTER_KEYS)
+            cancel = min(plus, minus)
+            if cancel <= 0:
+                continue
+            _replace_counter_aliases(
+                permanent,
+                PLUS_ONE_COUNTER_KEYS,
+                "plus_one_counters",
+                plus - cancel,
+            )
+            _replace_counter_aliases(
+                permanent,
+                MINUS_ONE_COUNTER_KEYS,
+                "minus_one_counters",
+                minus - cancel,
+            )
+            emit_replay_event(
+                "counters_cancelled",
+                player=p.name,
+                card=permanent.get("name"),
+                cancelled=cancel,
+                plus_one_remaining=permanent["plus_one_counters"],
+                minus_one_remaining=permanent["minus_one_counters"],
+            )
+            return True
+    return False
+
+
 def check_sbas(all_players):
     """v8: State-Based Actions after each spell resolution."""
     for p in all_players:
@@ -3339,6 +3393,9 @@ def check_sbas(all_players):
             p.eliminated = True
             emit_replay_event("player_eliminated", player=p.name, reason="poison")
             return True
+
+    if cancel_plus_minus_counters(all_players):
+        return True
 
     # v9: Creature SBAs
     for p in all_players:

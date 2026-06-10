@@ -273,6 +273,7 @@
 - `commander_damage_per_origin_903_10a`: múltiplos comandantes acumulam 21 de dano separadamente por origem.
 - `empty_library_draw_104_3c`: draw falho de library vazia perde mesmo com cartas na mão.
 - `token_ceases_outside_battlefield_110_5f`: token em zona não-battlefield deixa de existir via SBA.
+- `plus_minus_counter_cancel_704_5q`: marcadores +1/+1 e -1/-1 se cancelam como SBA.
 - `blocked_stays_blocked_509_1h`: criatura bloqueada continua bloqueada após blocker sair.
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.

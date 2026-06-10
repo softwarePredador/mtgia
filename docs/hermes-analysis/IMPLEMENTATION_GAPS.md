@@ -9,7 +9,7 @@
 | Categoria | Implementado | Parcial | Ausente |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
-| SBAs e Triggers | 12/15 | 0/15 | 3/15 |
+| SBAs e Triggers | 13/15 | 0/15 | 2/15 |
 | Commander Rules | 5/8 | 1/8 | 2/8 |
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 5/5 | 0/5 | 0/5 |
@@ -53,7 +53,7 @@
 | **Legend rule** | ✅ Básico | v9: `check_legend_rule` | Mantém a legenda mais recente por timestamp básico |
 | Token fora do battlefield | ✅ Básico | v9: `check_token_lifecycle` | Token em graveyard/exile/hand deixa de existir no SBA loop |
 | Aura/Equipment ilegal | ❌ Ausente | — | |
-| +1/+1 e -1/-1 cancel | ❌ Ausente | — | |
+| +1/+1 e -1/-1 cancel | ✅ Básico | v9: `cancel_plus_minus_counters` | Cancela pares de marcadores via SBA e preserva aliases normalizados |
 | Planeswalker 0 loyalty | ✅ Básico | v9: `check_sbas` | loyalty <= 0 move para graveyard |
 | Saga capítulo final | ❌ Ausente | — | |
 | Battle defense 0 | ✅ Básico | v9: `check_sbas` | defense <= 0 move para exile |
