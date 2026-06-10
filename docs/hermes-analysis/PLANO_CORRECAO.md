@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-10 11:00 UTC
+> Data: 2026-06-10 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -51,7 +51,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    seeds Commander Reference dos riscos reais. `edh_bracket_policy.dart`
    continua excecao intencional por regra externa/curadoria de bracket, mas
    precisa manter fonte/versionamento/teste dedicado.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional em `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-10 15:00 UTC no checkout `7cdd8a6e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contadores operacionais como `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime. A formulacao foi ajustada para nao confundir schema/audit/counts com consumidores de produto.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-10 03:00 UTC no checkout `11e9be38`.
    `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
@@ -750,7 +750,7 @@ app-side novo sem chamada.
     continua vazio ate haver contrato seguro;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-07 15:00 UTC: REVALIDADO no checkout `52f6084e`.** A rodada local focada em
+- **Status 2026-06-10 15:00 UTC: REVALIDADO no checkout `7cdd8a6e`.** A rodada local focada em
   `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
   pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
   por ser tabela interna do migrador. Uma varredura focada de DDL versus
@@ -759,7 +759,9 @@ app-side novo sem chamada.
   `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards`
   foi mantida como achado manual por ser raw corpus apagado/reinserido sem
   leitura de produto confirmada. `ml_prompt_feedback`
-  tem apenas leitura de `COUNT(*)` operacional. `battle_simulations`,
+  tem apenas leitura de `COUNT(*)` operacional e helper de insert sem chamador.
+  A revalidacao ajustou a formulacao para nao tratar schema/audit/counts como
+  consumidores de produto. `battle_simulations`,
   `format_staples`, `archetype_counters`, `archetype_patterns`,
   `synergy_packages`, `activation_funnel_events` e `ai_user_preferences` foram
   separados como controles positivos por terem leitores runtime ou runners
@@ -767,13 +769,14 @@ app-side novo sem chamada.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:169` e recebe
     upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
-    leitura operacional em `app/lib`, `server/bin`, `server/lib` ou
-    `server/routes`.
+    leitor de produto confirmado; a referencia fora da rota e
+    `server/bin/update_schema.dart:16`, que derruba/recria schema e nao consome
+    `win_rate`/`notes`.
   - `deck_weakness_reports` é definida em `server/database_setup.sql:370` e
     `server/bin/migrate_create_missing_tables.dart:97`, recebe insert em
-    `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha leitura em
-    `app/lib`, `server/bin`, `server/lib` ou `server/routes`; o campo
-    `addressed` tambem nao tem fluxo de update confirmado.
+    `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha
+    `SELECT/JOIN/UPDATE/DELETE` de produto confirmado; o campo `addressed`
+    tambem nao tem fluxo de update confirmado.
   - `ml_prompt_feedback` é definida em
     `server/bin/migrate_ml_knowledge.dart:159`, mas o unico insert fica no
     helper `MLKnowledgeService.recordFeedback`

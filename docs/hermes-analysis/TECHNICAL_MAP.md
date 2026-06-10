@@ -291,10 +291,10 @@ produto.
   `NotificationService.create` -> `sendToUser`, e filtros vivos que usam
   `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-07 15:00 UTC no checkout local `52f6084e`. `deck_matchups` e
+  em 2026-06-10 15:00 UTC no checkout local `7cdd8a6e`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
-  `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
-  `/ai/ml-status`; `commander_reference_decks` e
+  `ml_prompt_feedback` tem helper de insert sem chamador e apenas contadores
+  operacionais como `/ai/ml-status`; `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   runtime confirmado, enquanto o produto le o agregado
   `commander_reference_deck_analysis`. A varredura focada de DDL versus
@@ -305,9 +305,10 @@ produto.
   confirmada. Nenhum novo candidato foi confirmado; `commander_reference_deck_analysis`
   e as tabelas de candidate quality/jobs/cache/telemetry foram separadas como
   controles positivos por terem leitores runtime, writes e/ou runners dedicados
-  confirmados. `deck_learning_events` e `commander_card_usage` aparecem somente
-  em docs historicos neste checkout, nao em `server/database_setup.sql` nem no
-  codigo Dart runtime.
+  confirmados. A revalidacao tambem ajustou a formulacao para nao confundir
+  schema/audit/counts com consumidores de produto. `deck_learning_events` e
+  `commander_card_usage` aparecem somente em docs historicos neste checkout,
+  nao em `server/database_setup.sql` nem no codigo Dart runtime.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
