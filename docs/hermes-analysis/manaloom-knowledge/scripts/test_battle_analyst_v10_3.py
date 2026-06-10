@@ -88,6 +88,11 @@ CONFORMANCE_SCENARIOS = [
         "purpose": "+1/+1 and -1/-1 counters cancel as a state-based action.",
     },
     {
+        "id": "illegal_attachment_sba_704_5m_n",
+        "rule": "CR 704.5m-n",
+        "purpose": "Illegal Auras go to graveyard and illegal Equipment becomes unattached.",
+    },
+    {
         "id": "blocked_stays_blocked_509_1h",
         "rule": "CR 509.1h",
         "purpose": "A creature remains blocked after all blockers leave combat.",
@@ -155,6 +160,43 @@ def test_plus_minus_counters_cancel_as_sba():
     assert creature["plus_one_counters"] == 1
     assert creature["minus_one_counters"] == 0
     assert any(event == "counters_cancelled" for event, _ in events)
+
+
+def test_illegal_aura_goes_to_graveyard_and_equipment_detaches():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active")
+    creature = {
+        "name": "Bearer",
+        "effect": "creature",
+        "type_line": "Creature",
+        "power": 2,
+        "toughness": 2,
+    }
+    land = {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"}
+    aura = {
+        "name": "Creature Aura",
+        "type_line": "Enchantment — Aura",
+        "oracle_text": "Enchant creature",
+        "attached_to": "Missing Creature",
+    }
+    equipment = {
+        "name": "Illegal Sword",
+        "type_line": "Artifact — Equipment",
+        "equipped_to": "Plains",
+    }
+    active.battlefield = [creature, land, aura, equipment]
+
+    battle.check_sbas_until_stable([active])
+
+    assert aura not in active.battlefield
+    assert aura in active.graveyard
+    assert equipment in active.battlefield
+    assert "equipped_to" not in equipment
+    assert [data["action"] for event, data in events if event == "attachment_sba"] == [
+        "moved_to_graveyard",
+        "detached",
+    ]
 
 
 def test_draw_step_runs_once_with_multiple_permanents():
@@ -965,6 +1007,7 @@ def test_conformance_registry_has_executable_coverage():
         "empty_library_draw_104_3c",
         "token_ceases_outside_battlefield_110_5f",
         "plus_minus_counter_cancel_704_5q",
+        "illegal_attachment_sba_704_5m_n",
         "blocked_stays_blocked_509_1h",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
@@ -3411,6 +3454,7 @@ if __name__ == "__main__":
         test_sba_only_reports_new_elimination,
         test_cleanup_runs_with_previously_eliminated_player,
         test_plus_minus_counters_cancel_as_sba,
+        test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
         test_combat_emits_structured_event,

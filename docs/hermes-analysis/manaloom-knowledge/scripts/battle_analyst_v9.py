@@ -3357,6 +3357,97 @@ def cancel_plus_minus_counters(all_players):
     return False
 
 
+def is_aura_permanent(card):
+    return isinstance(card, dict) and "aura" in str(card.get("type_line") or "").lower()
+
+
+def is_equipment_permanent(card):
+    return isinstance(card, dict) and "equipment" in str(card.get("type_line") or "").lower()
+
+
+def _attached_target_reference(permanent):
+    return (
+        permanent.get("attached_to")
+        or permanent.get("equipped_to")
+        or permanent.get("enchanting")
+    )
+
+
+def _find_attached_target(reference, all_players):
+    if not reference:
+        return None
+    for player_obj in all_players:
+        for candidate in getattr(player_obj, "battlefield", []):
+            if not isinstance(candidate, dict):
+                continue
+            if candidate is reference:
+                return candidate
+            if isinstance(reference, str) and candidate.get("name") == reference:
+                return candidate
+    return None
+
+
+def _clear_attachment(permanent):
+    permanent.pop("attached_to", None)
+    permanent.pop("equipped_to", None)
+    permanent.pop("enchanting", None)
+
+
+def _attachment_is_legal(permanent, target):
+    if target is None:
+        return False
+    text = f"{permanent.get('oracle_text', '')} {permanent.get('type_line', '')}".lower()
+    if is_equipment_permanent(permanent):
+        return is_battlefield_creature(target)
+    if is_aura_permanent(permanent):
+        if "enchant land" in text:
+            return is_effective_land(target)
+        if "enchant artifact" in text:
+            return is_artifact_permanent(target)
+        if "enchant player" in text:
+            return False
+        return is_battlefield_creature(target)
+    return True
+
+
+def check_illegal_attachments(all_players):
+    """v9: Basic Aura/Equipment SBA handling for illegal attachments."""
+    for p in all_players:
+        for permanent in list(p.battlefield):
+            if not isinstance(permanent, dict):
+                continue
+            if not (is_aura_permanent(permanent) or is_equipment_permanent(permanent)):
+                continue
+            reference = _attached_target_reference(permanent)
+            if is_equipment_permanent(permanent) and not reference:
+                continue
+            target = _find_attached_target(reference, all_players)
+            legal = _attachment_is_legal(permanent, target)
+            if legal:
+                continue
+            if is_aura_permanent(permanent):
+                p.battlefield.remove(permanent)
+                p.graveyard.append(permanent)
+                emit_replay_event(
+                    "attachment_sba",
+                    player=p.name,
+                    card=permanent.get("name"),
+                    permanent_type="aura",
+                    action="moved_to_graveyard",
+                )
+                return True
+            _clear_attachment(permanent)
+            emit_replay_event(
+                "attachment_sba",
+                player=p.name,
+                card=permanent.get("name"),
+                permanent_type="equipment",
+                action="detached",
+            )
+            return True
+    return False
+
+
 def check_sbas(all_players):
     """v8: State-Based Actions after each spell resolution."""
     for p in all_players:
@@ -3395,6 +3486,9 @@ def check_sbas(all_players):
             return True
 
     if cancel_plus_minus_counters(all_players):
+        return True
+
+    if check_illegal_attachments(all_players):
         return True
 
     # v9: Creature SBAs
