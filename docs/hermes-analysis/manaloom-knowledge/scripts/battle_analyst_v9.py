@@ -384,6 +384,154 @@ def source_colors(source):
     return [basic_color] if basic_color else ["generic"]
 
 
+CONTINUOUS_SUBLAYER_ORDER = {
+    "7a": 0,
+    "7b": 1,
+    "7c": 2,
+    "7d": 3,
+    "7e": 4,
+}
+
+
+class ContinuousEffect:
+    """Serializable continuous effect record for deterministic layer ordering."""
+
+    def __init__(
+        self,
+        effect_id,
+        layer,
+        effect_type,
+        value=None,
+        *,
+        timestamp=0,
+        sublayer=None,
+        depends_on=None,
+    ):
+        self.effect_id = effect_id
+        self.layer = layer
+        self.effect_type = effect_type
+        self.value = value
+        self.timestamp = timestamp
+        self.sublayer = sublayer
+        self.depends_on = list(depends_on or [])
+
+
+def _continuous_effect_from_raw(raw):
+    if isinstance(raw, ContinuousEffect):
+        return raw
+    return ContinuousEffect(
+        raw.get("effect_id") or raw.get("id") or raw.get("effect_type", "effect"),
+        raw.get("layer"),
+        raw.get("effect_type"),
+        raw.get("value"),
+        timestamp=raw.get("timestamp", 0),
+        sublayer=raw.get("sublayer"),
+        depends_on=raw.get("depends_on") or [],
+    )
+
+
+def order_continuous_effects(effects):
+    """Order effects by layer/sublayer/dependency/timestamp (CR 613, simplified)."""
+    normalized = [_continuous_effect_from_raw(effect) for effect in effects]
+    ordered = []
+    remaining = list(normalized)
+    applied_ids = set()
+    while remaining:
+        ready = [
+            effect
+            for effect in remaining
+            if all(dep in applied_ids for dep in effect.depends_on)
+        ]
+        if not ready:
+            ready = list(remaining)
+        ready.sort(
+            key=lambda effect: (
+                int(effect.layer or 0),
+                CONTINUOUS_SUBLAYER_ORDER.get(str(effect.sublayer or ""), -1),
+                int(effect.timestamp or 0),
+                str(effect.effect_id),
+            )
+        )
+        chosen = ready[0]
+        ordered.append(chosen)
+        applied_ids.add(chosen.effect_id)
+        remaining.remove(chosen)
+    return ordered
+
+
+def _card_types(card):
+    return [part.strip() for part in str(card.get("type_line") or "").split() if part.strip()]
+
+
+def _set_card_types(card, types):
+    card["type_line"] = " ".join(dict.fromkeys(types))
+
+
+def _abilities(card):
+    current = card.get("abilities", [])
+    if isinstance(current, str):
+        return [current]
+    return list(current or [])
+
+
+def _set_abilities(card, abilities):
+    card["abilities"] = list(dict.fromkeys(abilities))
+
+
+def apply_continuous_effects(card, effects):
+    """Return a characteristics snapshot after applying continuous effects."""
+    result = copy.deepcopy(card)
+    applied = []
+    for effect in order_continuous_effects(effects):
+        value = effect.value
+        if effect.layer == 1 and effect.effect_type == "copy" and isinstance(value, dict):
+            result.update(copy.deepcopy(value))
+        elif effect.layer == 2 and effect.effect_type == "set_controller":
+            result["controller"] = value
+        elif effect.layer == 3 and effect.effect_type == "replace_text" and isinstance(value, dict):
+            result["oracle_text"] = str(result.get("oracle_text") or "").replace(
+                str(value.get("from", "")),
+                str(value.get("to", "")),
+            )
+        elif effect.layer == 4:
+            types = _card_types(result)
+            if effect.effect_type == "set_type":
+                types = list(value or [])
+            elif effect.effect_type == "add_type":
+                types.extend(list(value or []))
+            elif effect.effect_type == "remove_type":
+                remove = set(value or [])
+                types = [card_type for card_type in types if card_type not in remove]
+            _set_card_types(result, types)
+        elif effect.layer == 5:
+            colors = list(result.get("colors") or [])
+            if effect.effect_type == "set_color":
+                colors = list(value or [])
+            elif effect.effect_type == "add_color":
+                colors.extend(list(value or []))
+            result["colors"] = list(dict.fromkeys(colors))
+        elif effect.layer == 6:
+            abilities = _abilities(result)
+            if effect.effect_type == "add_ability":
+                abilities.extend(list(value or []))
+            elif effect.effect_type == "remove_ability":
+                remove = set(value or [])
+                abilities = [ability for ability in abilities if ability not in remove]
+            _set_abilities(result, abilities)
+        elif effect.layer == 7:
+            if effect.effect_type in ("set_pt", "cda_set_pt") and isinstance(value, dict):
+                result["power"] = value.get("power", result.get("power", 0))
+                result["toughness"] = value.get("toughness", result.get("toughness", 0))
+            elif effect.effect_type in ("modify_pt", "counter_pt") and isinstance(value, dict):
+                result["power"] = int(result.get("power") or 0) + int(value.get("power", 0) or 0)
+                result["toughness"] = int(result.get("toughness") or 0) + int(value.get("toughness", 0) or 0)
+            elif effect.effect_type == "switch_pt":
+                result["power"], result["toughness"] = result.get("toughness", 0), result.get("power", 0)
+        applied.append(effect.effect_id)
+    result["_continuous_effects_applied"] = applied
+    return result
+
+
 SELF_KEYWORD_ABILITIES = {
     "flying",
     "reach",

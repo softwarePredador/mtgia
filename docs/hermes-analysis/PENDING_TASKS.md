@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 20/25 itens implementados no battle_analyst_v9.py (6100+ linhas).
-> 5 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 21/25 itens implementados no battle_analyst_v9.py (6200+ linhas).
+> 4 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -31,7 +31,7 @@
 | ✅ | Passos de combate formais | v9:beginning/declare/damage/end combat steps |
 | ✅ | Casting pipeline 601.2 mínimo | v9:CastingContext/begin_cast_context/commit_cast_payment |
 | ✅ | Replacement/Prevention mínimo | v9:ReplacementRegistry/ReplacementEvent |
-| ⏳ | Layers 1-7 (continuous effects) | P1 |
+| ✅ | Layers 1-7 básico | v9:ContinuousEffect/apply_continuous_effects |
 | ⏳ | Planeswalkers + Battles | P2 |
 | ⏳ | DFC/Adventure/Prototype | P2 |
 | ⏳ | Telemetria de saúde do motor | P2 |
@@ -43,11 +43,10 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Layers 1-7 | 7-10 dias | Alto | replacement registry |
-| 2 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
-| 3 | DFC/Adventure/Prototype | 4-5 dias | Médio | casting contextual |
-| 4 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 5 | Suite de conformidade | 5-7 dias | Alto | #1-4 |
+| 1 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
+| 2 | DFC/Adventure/Prototype | 4-5 dias | Médio | casting contextual |
+| 3 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 4 | Suite de conformidade | 5-7 dias | Alto | #1-3 |
 
 ---
 
@@ -169,20 +168,25 @@
 
 ### 6. Layers 1-7 (Continuous Effects)
 
-**Gap**: Completamente ausente. Sem engine de continuous effects.
+**Status 2026-06-10**: ✅ Engine básico implementado / ⚠️ integração plena no loop pendente.
 
-**Arquivo**: Novo módulo dedicado
+**Arquivos**:
+- `battle_analyst_v9.py`: `ContinuousEffect`, `order_continuous_effects`, `apply_continuous_effects`.
+- `test_battle_analyst_v10_3.py`: testes de sublayers 7a-7e, layers 3-6 e dependência/timestamp.
 
-**Implementação**: Ver seção 6 do BATTLE_SYSTEM_LOGIC.md. As 7 camadas:
-- Layer 1: Copiable values
-- Layer 2: Control-changing
-- Layer 3: Text-changing
-- Layer 4: Type-changing
-- Layer 5: Color-changing
-- Layer 6: Ability-adding/removing
-- Layer 7: P/T (7a: CDA, 7b: set, 7c: modify, 7d: counters, 7e: switch)
+**O que foi coberto**:
+- Layer 1: copiable values via `copy`.
+- Layer 2: controller change via `set_controller`.
+- Layer 3: text replacement.
+- Layer 4: type add/remove/set.
+- Layer 5: color add/set.
+- Layer 6: ability add/remove.
+- Layer 7: set/modify/counter/switch P/T com sublayer ordering.
+- Ordenação por layer, sublayer, timestamp e dependências explícitas.
 
-Dentro de cada camada, efeitos são ordenados por timestamp com resolução de dependências.
+**Limite restante**:
+- O loop de jogo ainda não recalcula todas as características dinamicamente a cada consulta.
+- Dependências complexas de CR 613 ainda são declaradas explicitamente; não há inferência automática.
 
 ---
 

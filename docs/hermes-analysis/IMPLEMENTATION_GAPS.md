@@ -14,7 +14,7 @@
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 1/5 | 1/5 | 3/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
-| Efeitos Contínuos | 0/5 | 1/5 | 4/5 |
+| Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 1/6 | 2/6 | 3/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
 | Qualidade/QA | 3/6 | 1/6 | 2/6 |
@@ -152,10 +152,10 @@
 
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
-| Layer 1 (copiable values) | ❌ Ausente | — | |
-| Layer 2-6 (control, text, type, color, abilities) | ❌ Ausente | — | |
-| Layer 7 (P/T com subcamadas) | ❌ Ausente | — | |
-| Timestamps e dependencies | ❌ Ausente | — | |
+| Layer 1 (copiable values) | ✅ Básico | v9: `apply_continuous_effects` | `copy` aplica snapshot |
+| Layer 2-6 (control, text, type, color, abilities) | ✅ Básico | v9: `apply_continuous_effects` | set controller/text/type/color/abilities |
+| Layer 7 (P/T com subcamadas) | ✅ Básico | v9: `apply_continuous_effects` | 7b/7c/7d/7e testados |
+| Timestamps e dependencies | ✅ Básico | v9: `order_continuous_effects` | dependências declaradas; sem inferência automática |
 | Replacement/prevention effects | ⚠️ Parcial | v9: `ReplacementRegistry` | Ordem determinística, prevention/life/shields/commander zone-change; faltam self-replacements card-specific |
 
 ---
@@ -185,7 +185,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Layers 1-7** — efeitos contínuos com timestamp/dependência
-2. **Planeswalkers/Battles** — loyalty/defense e SBAs dedicadas
-3. **Targeting formal** — seleção/validação declarada de alvos
+1. **Planeswalkers/Battles** — loyalty/defense e SBAs dedicadas
+2. **Targeting formal** — seleção/validação declarada de alvos
+3. **DFC/Adventure/Prototype** — características por zona/modo de cast
 4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
