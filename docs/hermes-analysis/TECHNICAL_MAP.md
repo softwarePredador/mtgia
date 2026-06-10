@@ -262,7 +262,7 @@ produto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-08 07:00 UTC no checkout local `37077efd`.
+  novamente em 2026-06-10 07:00 UTC no checkout local `570ecfbc`.
   `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
   `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
   contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
@@ -272,16 +272,20 @@ produto.
   `buildLoreholdReferenceCardStatsFromProfile`,
   `extractMtgTop8FormatCodeFromSourceUrl`,
   `buildCandidateQualitySamplePoolSql`,
-  `summarizeAggressiveOptimizeUtilitySamples` e
-  `MLKnowledgeService.recordFeedback`. Novo achado app-side:
-  `ApiClient.loadTokenFromDisk()` diz ser chamado 1x no boot, mas `rg`
-  encontrou somente a definicao; o boot real le `auth_token` via
-  `AuthProvider.initialize` e chama `ApiClient.setToken`. A API manual/custom
-  metrics/debug de `PerformanceService` e conveniencias EDHREC/cache
+  `summarizeAggressiveOptimizeUtilitySamples`,
+  `MLKnowledgeService.recordFeedback`, `ApiClient.loadTokenFromDisk`, a API
+  manual/custom metrics/debug de `PerformanceService`, conveniencias EDHREC/cache
   (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
-  `EndpointCache.clearExpired`) seguem sem chamador confirmado. A parte
-  automatica do `PerformanceService` (`init`, observer de tela e `traceAsync`
-  em smoke) foi separada como controle positivo, nao como codigo morto.
+  `EndpointCache.clearExpired`) e novos candidatos de baixa superficie:
+  `BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+  `DeckProvider.clearAllCache`, `hasSuspiciousNonLandCmc`,
+  `OptimizeIntensityConfig.clampRequestedSwapCount`,
+  `ArchetypeCountersService.upsertCounter` e
+  `PushNotificationService.sendToMultipleTokens`. Controles positivos:
+  observabilidade automatica (`init`, `PerformanceNavigatorObserver` e
+  `traceAsync` em smoke), `safeCmcForOptimization`, EDHREC `getHighSynergyCards`,
+  `NotificationService.create` -> `sendToUser`, e filtros vivos que usam
+  `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-07 15:00 UTC no checkout local `52f6084e`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;

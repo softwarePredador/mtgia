@@ -4,9 +4,280 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-10 03:00 UTC
-> Rotacao: `classes-not-used`
+> Atualizacao local Codex: 2026-06-10 07:00 UTC
+> Rotacao: `functions-not-called`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Functions not called - revalidacao 2026-06-10 07:00 UTC
+
+Escopo desta rodada: somente funcoes/metodos publicos, exportados ou wrappers
+expostos sem chamador runtime confirmado. Nao foi feita auditoria ampla de
+classes sem uso, imports/ciclos, tabelas PostgreSQL sem uso, duplicacao geral
+ou coerencia entre app/backend fora do necessario para validar estes candidatos.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `570ecfbc`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 172.
+- Classes encontradas: 169.
+- Tabelas PostgreSQL referenciadas: 87.
+- Problemas identificados pelo relatorio gerado: 99.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual lista funcoes por regex e
+duplicacoes por nome, mas nao constroi grafo de chamadas. A execucao tambem
+reescreveu `STRUCTURE_AUDIT.md` para um relatorio gerado de 555 linhas,
+apagando temporariamente o historico manual; essa mutacao automatica foi
+restaurada antes desta atualizacao para preservar o contexto. Os achados abaixo
+foram revalidados por `rg` focado, leitura direta e uma triagem de baixa
+contagem usada apenas como gerador de candidatos.
+
+### Metodo manual focado
+
+- Revalidacao por `rg` dos candidatos historicos:
+  `sync_cards_utils`, `getRequestTrace`, `tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`,
+  `buildLoreholdReferenceCardStatsFromProfile`,
+  `extractMtgTop8FormatCodeFromSourceUrl`,
+  `buildCandidateQualitySamplePoolSql`,
+  `summarizeAggressiveOptimizeUtilitySamples`,
+  `MLKnowledgeService.recordFeedback`, `ApiClient.loadTokenFromDisk`,
+  API manual de `PerformanceService` e conveniencias de EDHREC/cache.
+- Triagem de declaracoes Dart publicas com baixa contagem textual em
+  `server/lib`, `server/routes`, `server/bin` e `app/lib`; a lista bruta gerou
+  360 candidatos e muitos falsos positivos por SQL, hooks de framework,
+  providers e helpers chamados via testes/harnesses.
+- Leitura direta de controles positivos para separar modulo vivo de metodo
+  isolado sem chamador.
+
+### Achados revalidados
+
+#### P1 - `sync_cards_utils.dart` continua test-only enquanto o CLI real duplica parte da logica
+
+- **Funcoes:** `extractCardRow`, `getNewSetCodesSinceFromData`,
+  `parseSinceDays`, `extractSetCardRow`, `extractOracleIds` e
+  `extractLegalities` em `server/lib/sync_cards_utils.dart:16`, `:82`,
+  `:102`, `:116`, `:161` e `:172`.
+- **Evidencia de ausencia runtime:** `rg "sync_cards_utils|extractCardRow|..." server app --glob '*.dart'`
+  encontrou import de `sync_cards_utils.dart` somente em
+  `server/test/sync_cards_test.dart:3`; nao ha import em `server/bin`,
+  `server/lib` runtime ou `server/routes`.
+- **Drift confirmado:** o CLI operacional importa `database.dart` e
+  `mtg_data_integrity_support.dart`, mas nao `sync_cards_utils.dart`
+  (`server/bin/sync_cards.dart:9`-`:10`). Ele chama `_parseSinceDays` em
+  `:64`, `_getNewSetCodesSinceFromData` em `:130`-`:131`, e mantem as copias
+  privadas em `:349`-`:357`, `:386`-`:402` e `_extractCardRowFromSet` em
+  `:661`-`:715`.
+- **Por que parece nao chamado:** os helpers exportados sao testados, mas o
+  caminho operacional de sync ainda roda implementacoes privadas/inline.
+- **O que valida:** importar `sync_cards_utils.dart` no CLI real e substituir
+  as copias privadas, ou declarar/remover o arquivo como harness de teste.
+- **O que falsifica:** `rg "sync_cards_utils" server/bin server/lib server/routes`
+  encontrar import runtime real, ou decisao explicita de manter esses helpers
+  somente como fixture/test oracle.
+
+#### P2 - Wrappers de `request_trace.dart` seguem sem consumidor externo
+
+- **Funcoes:** `getRequestTrace` e `tryGetRequestId` em
+  `server/lib/request_trace.dart:48` e `:51`.
+- **Controle positivo:** `resolveRequestId` e `RequestTrace` estao vivos:
+  `server/routes/_middleware.dart:29` cria o id, `:30` instancia
+  `RequestTrace`, e `:62`-`:64` injeta o provider. Rotas/libs seguem lendo
+  `context.read<RequestTrace>()` diretamente, por exemplo
+  `server/routes/trades/index.dart:332`,
+  `server/routes/conversations/[id]/messages.dart:249`,
+  `server/lib/observability.dart:225` e `server/lib/auth_middleware.dart:57`.
+- **Evidencia de ausencia:** busca por `getRequestTrace`/`tryGetRequestId` em
+  `server` e `app` encontrou somente as definicoes e a chamada interna de
+  `tryGetRequestId` para `getRequestTrace`.
+- **O que valida:** trocar consumidores que precisam de fallback por esses
+  wrappers, ou remover os wrappers se a leitura direta for a convencao.
+- **O que falsifica:** chamada runtime a `getRequestTrace(context)` ou
+  `tryGetRequestId(context)` fora do proprio arquivo.
+
+#### P2 - Helpers de Commander/MTGTop8/candidate-quality seguem test-only
+
+- **Funcoes:** `normalizedCommanderReferenceCandidate` em
+  `server/lib/ai/commander_reference_profile_support.dart:49`;
+  `buildLoreholdReferenceCardStatsFromProfile` em
+  `server/lib/ai/commander_reference_card_stats_support.dart:257`;
+  `extractMtgTop8FormatCodeFromSourceUrl` em
+  `server/lib/meta/mtgtop8_meta_support.dart:139`;
+  `buildCandidateQualitySamplePoolSql` em
+  `server/lib/ai/candidate_quality_data_support.dart:631`; e
+  `summarizeAggressiveOptimizeUtilitySamples` em
+  `server/lib/ai/optimize_runtime_support.dart:3326`.
+- **Evidencia de ausencia:** busca por simbolo encontrou esses helpers somente
+  nas definicoes e em testes focados:
+  `server/test/commander_reference_card_stats_support_test.dart:13`,
+  `server/test/mtgtop8_meta_support_test.dart:147`,
+  `server/test/candidate_quality_data_support_test.dart:123` e
+  `server/test/optimize_runtime_support_test.dart:169`.
+- **Controles positivos:** o runtime usa caminhos vizinhos/genericos:
+  `buildCommanderReferenceCardStatsFromProfile` em
+  `commander_reference_card_stats_support.dart:368`, e
+  `extractMtgTop8EventIdFromSourceUrl` em
+  `server/bin/repair_mtgtop8_meta_history.dart:59`.
+- **O que valida:** ligar esses helpers a runners/rotas reais ou move-los para
+  arquivos de teste/fixtures quando forem apenas conveniencia de teste.
+- **O que falsifica:** chamada runtime nova fora de `server/test`.
+
+#### P2 - `MLKnowledgeService.recordFeedback` ainda nao alimenta `ml_prompt_feedback`
+
+- **Funcao:** `recordFeedback` em `server/lib/ml_knowledge_service.dart:251`;
+  `:262`-`:284` executa `INSERT INTO ml_prompt_feedback`.
+- **Evidencia de ausencia:** `rg "recordFeedback|MLKnowledgeService|ml_prompt_feedback"`
+  encontrou `recordFeedback` somente na propria definicao. A rota
+  `server/routes/ai/ml-status/index.dart:94`-`:99` apenas conta linhas em
+  `ml_prompt_feedback`; `server/lib/ai/otimizacao.dart:28`-`:34` instancia
+  `MLKnowledgeService` para outros metodos, mas nao chama `recordFeedback`.
+- **O que valida:** rota/app/job de feedback chamar `recordFeedback` com teste
+  de contrato, e algum relatorio/treino consumir esses dados.
+- **O que falsifica:** chamada runtime a `recordFeedback(...)` fora do service.
+
+#### P2 - `ApiClient.loadTokenFromDisk()` contradiz comentario de boot, mas nao e chamado
+
+- **Funcao:** `ApiClient.loadTokenFromDisk` em
+  `app/lib/core/api/api_client.dart:128`; o comentario em `:127` diz que e
+  chamado 1x no boot.
+- **Evidencia de ausencia:** `rg "loadTokenFromDisk" app/lib app/test app/integration_test`
+  encontrou somente a definicao. O boot real le `auth_token` em
+  `app/lib/features/auth/providers/auth_provider.dart:37`-`:39` e chama
+  `ApiClient.setToken(savedToken)` em `:46`; login/register tambem atualizam o
+  cache por `ApiClient.setToken` em `:123` e `:195`.
+- **O que valida:** remover o helper/comentario ou chama-lo explicitamente no
+  boot se ele ainda for o contrato desejado.
+- **O que falsifica:** chamada real a `ApiClient.loadTokenFromDisk()` antes de
+  requests autenticados.
+
+#### P3 - API manual de metricas do `PerformanceService` segue sem uso app-facing
+
+- **Funcoes sem chamada runtime em `app/lib`:** `startTrace`, `stopTrace`,
+  `addMetric`, `addAttribute`, `getLocalStats` e `printLocalStats` em
+  `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
+  `:210`, `:220` e `:248`.
+- **Controle positivo:** a observabilidade viva usa
+  `PerformanceService.instance.init()` em `app/lib/main.dart:121` e registra
+  `PerformanceNavigatorObserver()` em `app/lib/main.dart:208`; o observer chama
+  `startScreenTrace`/`stopScreenTrace` em
+  `performance_service.dart:295`, `:307`, `:334` e `:339`. `traceAsync` aparece
+  no smoke `app/integration_test/release_observability_smoke_test.dart:51`.
+- **O que valida:** instrumentar operacoes reais com a API manual ou reduzir o
+  service para `init`, observer de tela e `traceAsync`.
+- **O que falsifica:** chamada em `app/lib` aos metodos manuais listados.
+
+#### P3 - Conveniencias EDHREC/cache continuam sem chamada confirmada
+
+- **Funcoes:** `EdhrecService.getTopByCategory`,
+  `EdhrecService.calculateFitScore`, `EdhrecService.cleanupCache` e
+  `EdhrecCommanderData.isHighSynergy` em
+  `server/lib/ai/edhrec_service.dart:333`, `:355`, `:363` e `:399`;
+  `EndpointCache.clearExpired` em `server/lib/endpoint_cache.dart:32`.
+- **Evidencia de ausencia:** busca em `server` e `app` encontrou somente as
+  definicoes para esses simbolos.
+- **Controles positivos:** `getHighSynergyCards` esta vivo em
+  `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`;
+  `EndpointCache.instance.get/set` estao vivos em `server/routes/cards/index.dart:33`,
+  `server/routes/sets/index.dart:24`,
+  `server/routes/ai/archetypes/index.dart` e
+  `server/lib/ai_generate_performance_support.dart`.
+- **O que valida:** usar essas conveniencias em fluxos reais de EDHREC/cache ou
+  rebaixar/remover se nao fazem parte do contrato.
+- **O que falsifica:** chamada runtime aos metodos acima fora das definicoes.
+
+### Novos candidatos confirmados nesta rodada
+
+#### P2 - Filtros/cache publicos de providers app seguem sem chamada runtime
+
+- **`BinderProvider.applyFilters`:** definido em
+  `app/lib/features/binder/providers/binder_provider.dart:639` e chamado apenas
+  por `app/test/features/binder/providers/binder_provider_test.dart:160`/`:182`.
+  A tela viva usa `fetchBinderDirect` diretamente em
+  `app/lib/features/binder/screens/binder_screen.dart:184`, passando filtros
+  locais.
+- **`CommunityProvider.clearFilters`:** definido em
+  `app/lib/features/community/providers/community_provider.dart:179`; busca em
+  `app/lib` encontrou somente a definicao. A tela chama `fetchPublicDecks` em
+  `community_screen.dart:34`, `:145`, `:151` e `:249`.
+- **`DeckProvider.clearAllCache`:** definido em
+  `app/lib/features/decks/providers/deck_provider.dart:1018`; busca em
+  `app/lib`, `app/test` e `app/integration_test` encontrou somente a definicao.
+  O caminho vivo de logout/limpeza usa `clearAllState` em `deck_provider.dart:1193`-`:1207`,
+  que tambem limpa os caches.
+- **Por que parece nao chamado:** sao APIs publicas de provider que encapsulam
+  comportamento real, mas as telas/fluxos atuais usam outros caminhos.
+- **O que valida:** conectar UI/fluxos a esses metodos ou remove-los/rebaixa-los
+  se `fetchBinderDirect`, `fetchPublicDecks` e `clearAllState` sao o contrato.
+- **O que falsifica:** chamada em `app/lib` a qualquer um desses metodos.
+
+#### P2/P3 - Helpers backend isolados sem chamador runtime confirmado
+
+- **`hasSuspiciousNonLandCmc`:** definido em
+  `server/lib/ai/cmc_safety.dart:64`; busca encontrou chamada apenas em
+  `server/test/cmc_safety_test.dart:23`. O caminho vivo usa
+  `safeCmcForOptimization` em `optimization_quality_gate.dart:461`,
+  `optimization_validator.dart:723` e `goldfish_simulator.dart:251`/`:563`.
+- **`OptimizeIntensityConfig.clampRequestedSwapCount`:** definido em
+  `server/lib/ai/optimize_runtime_support.dart:70`; rotas usam
+  `intensity.targetMax` diretamente em `server/routes/ai/optimize/index.dart`
+  (`:703`, `:1006`, `:1119`, `:2138`-`:2145`), sem chamar o metodo.
+- **`ArchetypeCountersService.upsertCounter`:** definido em
+  `server/lib/archetype_counters_service.dart:204`; rotas vivas instanciam o
+  service em `server/routes/ai/weakness-analysis/index.dart:26` e
+  `server/routes/ai/simulate-matchup/index.dart:34`, mas para leitura/counters,
+  nao para upsert. A seed inicial de `archetype_counters` aparece em migracao
+  (`server/bin/migrate_create_missing_tables.dart`), nao via esse metodo.
+- **`PushNotificationService.sendToMultipleTokens`:** definido em
+  `server/lib/push_notification_service.dart:295`; notificacoes vivas passam
+  por `NotificationService.create` -> `PushNotificationService.sendToUser`
+  (`server/lib/notification_service.dart:42`-`:52`,
+  `server/lib/push_notification_service.dart:179`), sem chamar o batch helper.
+- **O que valida:** conectar esses helpers a diagnostics/admin/jobs reais, ou
+  remove-los/rebaixa-los se sao sobras de API planejada.
+- **O que falsifica:** chamada runtime nova em `server/lib`, `server/routes` ou
+  `server/bin`.
+
+### Candidatos triados e nao reportados como achado
+
+- `debugHandleShellMessage`, `debugRunJavaScript`,
+  `debugRunJavaScriptReturningResult` e `debugClearLastShellMessage` do Lotus
+  foram mantidos como harness runtime: aparecem amplamente em
+  `app/integration_test`.
+- `playerStatusLabel`, `playerStatusDescription` e `tickTurnTimer` aparecem
+  somente em testes e no proprio engine, mas a frente de life counter usa
+  engines/test harnesses extensivamente; foram mantidos como candidatos a
+  revalidar numa rodada propria antes de acusar codigo morto de produto.
+- Funcoes de providers/deck widgets com contagem textual baixa foram descartadas
+  quando chamadas por tela, callback, provider orquestrador ou teste de fluxo.
+- SQL/literais como `COUNT`, `UNNEST`, `jsonb_typeof`, `string_agg` e
+  `pg_advisory_xact_lock` foram descartados como falsos positivos da regex.
+
+### Resultado desta revalidacao
+
+No checkout `570ecfbc`, os achados historicos de funcoes publicas sem chamador
+runtime continuam abertos. A rodada adicionou candidatos app/backend de baixa
+superficie: `BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+`DeckProvider.clearAllCache`, `hasSuspiciousNonLandCmc`,
+`OptimizeIntensityConfig.clampRequestedSwapCount`,
+`ArchetypeCountersService.upsertCounter` e
+`PushNotificationService.sendToMultipleTokens`. O risco principal segue
+`sync_cards_utils.dart`, porque testes cobrem helpers exportados que o CLI real
+nao usa.
 
 ## Rodada focada: Classes not used - revalidacao 2026-06-10 03:00 UTC
 

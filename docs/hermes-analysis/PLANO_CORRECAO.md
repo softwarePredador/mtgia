@@ -90,22 +90,26 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-08 07:00 UTC como **ABERTO neste checkout `37077efd`**.
+    2026-06-10 07:00 UTC como **ABERTO neste checkout `570ecfbc`**.
     `sync_cards_utils.dart` segue importado apenas por teste, enquanto
     `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
     contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
     `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
     wrappers/helpers em request trace, Commander Reference, MTGTop8, candidate
-    quality, optimize utility samples e `MLKnowledgeService.recordFeedback`.
-    Novo achado app-side: `ApiClient.loadTokenFromDisk()` diz ser chamado no
-    boot, mas nao tem chamada em `app/lib`; o boot real usa
-    `AuthProvider.initialize` + `ApiClient.setToken`. A API manual/custom
-    metrics/debug de `PerformanceService` e conveniencias EDHREC/cache
-    (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
-    `EndpointCache.clearExpired`) seguem sem chamador confirmado. A
-    observabilidade automatica do `PerformanceService` foi separada como
-    controle positivo (`init`, observer de tela e `traceAsync` em smoke), nao
-    como codigo morto.
+    quality, optimize utility samples, `MLKnowledgeService.recordFeedback`,
+    `ApiClient.loadTokenFromDisk`, API manual/custom metrics/debug de
+    `PerformanceService` e conveniencias EDHREC/cache (`getTopByCategory`,
+    `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
+    `EndpointCache.clearExpired`). Novos candidatos adicionados nesta rodada:
+    `BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+    `DeckProvider.clearAllCache`, `hasSuspiciousNonLandCmc`,
+    `OptimizeIntensityConfig.clampRequestedSwapCount`,
+    `ArchetypeCountersService.upsertCounter` e
+    `PushNotificationService.sendToMultipleTokens`. Controles positivos:
+    observabilidade automatica (`init`, observer de tela e `traceAsync` em
+    smoke), `safeCmcForOptimization`, EDHREC `getHighSynergyCards`,
+    `NotificationService.create` -> `sendToUser`, e os fluxos app que usam
+    `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
 13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
     checkout local `fed6ee85` em 2026-06-08 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`, e o import historico
