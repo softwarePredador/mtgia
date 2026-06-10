@@ -34,6 +34,9 @@
 > Summoning sickness/haste/vigilance também foi movido para
 > `battle_summoning_sickness_tests.py`, cobrindo ataque, tokens, mana source
 > creature e ativação de Elvish Reclaimer.
+> Zone transitions também foram movidas para `battle_zone_transition_tests.py`,
+> cobrindo lifecycle de tokens, remoção/tutor sem falsos positivos,
+> land ramp/recursion e reanimation.
 
 ---
 
@@ -77,6 +80,7 @@
 | ✅ | Sétima extração da suite Hermes | `battle_card_specific_tests.py` |
 | ✅ | Oitava extração da suite Hermes | `battle_targeting_tests.py` |
 | ✅ | Nona extração da suite Hermes | `battle_summoning_sickness_tests.py` |
+| ✅ | Décima extração da suite Hermes | `battle_zone_transition_tests.py` |
 
 ---
 
@@ -339,9 +343,10 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7869 |
-| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 2028 |
+| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 1810 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
+| `battle_zone_transition_tests.py` | Regressões isoladas de zone transitions, tokens, tutor, ramp, recursion e reanimation | 229 |
 | `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
