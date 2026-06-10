@@ -478,6 +478,87 @@ def _set_abilities(card, abilities):
     card["abilities"] = list(dict.fromkeys(abilities))
 
 
+def is_planeswalker_permanent(card):
+    return isinstance(card, dict) and "planeswalker" in str(card.get("type_line") or "").lower()
+
+
+def is_battle_permanent(card):
+    return isinstance(card, dict) and "battle" in str(card.get("type_line") or "").lower()
+
+
+def handle_planeswalker_etb(card, controller=None):
+    if not isinstance(card, dict):
+        return card
+    card["loyalty"] = int(card.get("loyalty", card.get("starting_loyalty", 3)) or 0)
+    card["loyalty_used_this_turn"] = False
+    if controller is not None:
+        card["controller"] = controller.name
+    return card
+
+
+def can_activate_loyalty(player, planeswalker, phase, stack):
+    return (
+        is_planeswalker_permanent(planeswalker)
+        and planeswalker in player.battlefield
+        and not planeswalker.get("loyalty_used_this_turn")
+        and phase in MAIN_PHASES
+        and stack.empty()
+    )
+
+
+def activate_loyalty_ability(player, planeswalker, loyalty_delta, phase, stack):
+    if not can_activate_loyalty(player, planeswalker, phase, stack):
+        return False
+    planeswalker["loyalty"] = int(planeswalker.get("loyalty", 0) or 0) + int(loyalty_delta)
+    planeswalker["loyalty_used_this_turn"] = True
+    emit_replay_event(
+        "loyalty_ability_activated",
+        player=player.name,
+        card=planeswalker.get("name", "?"),
+        loyalty_delta=loyalty_delta,
+        loyalty_after=planeswalker.get("loyalty", 0),
+        phase=phase,
+    )
+    return True
+
+
+def damage_to_planeswalker(source, planeswalker, amount):
+    if not is_planeswalker_permanent(planeswalker) or amount <= 0:
+        return False
+    planeswalker["loyalty"] = int(planeswalker.get("loyalty", 0) or 0) - int(amount)
+    emit_replay_event(
+        "planeswalker_damage",
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        card=planeswalker.get("name", "?"),
+        amount=amount,
+        loyalty_after=planeswalker.get("loyalty", 0),
+    )
+    return True
+
+
+def handle_siege_etb(card, controller, opponents):
+    if not isinstance(card, dict):
+        return card
+    card["defense"] = int(card.get("defense", card.get("starting_defense", 5)) or 0)
+    card["protector"] = opponents[0].name if opponents else None
+    card["controller"] = controller.name if controller is not None else card.get("controller")
+    return card
+
+
+def battle_takes_damage(battle_card, amount):
+    if not is_battle_permanent(battle_card) or amount <= 0:
+        return False
+    battle_card["defense"] = int(battle_card.get("defense", 0) or 0) - int(amount)
+    emit_replay_event(
+        "battle_damage",
+        card=battle_card.get("name", "?"),
+        amount=amount,
+        defense_after=battle_card.get("defense", 0),
+        protector=battle_card.get("protector"),
+    )
+    return True
+
+
 def apply_continuous_effects(card, effects):
     """Return a characteristics snapshot after applying continuous effects."""
     result = copy.deepcopy(card)
@@ -3004,6 +3085,37 @@ def check_sbas(all_players):
             damage = c.get("damage_marked", 0)
             if (toughness <= 0 or damage >= toughness) and not c.get("indestructible"):
                 move_creature_from_battlefield(p, c, "sba_lethal", None, all_players)
+                return True
+
+    # v9: Planeswalker/Battle SBAs
+    for p in all_players:
+        for permanent in list(p.battlefield):
+            if not isinstance(permanent, dict):
+                continue
+            if is_planeswalker_permanent(permanent) and int(permanent.get("loyalty", 0) or 0) <= 0:
+                p.battlefield.remove(permanent)
+                p.graveyard.append(permanent)
+                emit_replay_event(
+                    "permanent_moved_by_sba",
+                    player=p.name,
+                    card=permanent.get("name", "?"),
+                    permanent_type="planeswalker",
+                    destination="graveyard",
+                    reason="loyalty_zero",
+                )
+                return True
+            if is_battle_permanent(permanent) and int(permanent.get("defense", 0) or 0) <= 0:
+                p.battlefield.remove(permanent)
+                p.exile.append(permanent)
+                permanent["battle_defeated"] = True
+                emit_replay_event(
+                    "permanent_moved_by_sba",
+                    player=p.name,
+                    card=permanent.get("name", "?"),
+                    permanent_type="battle",
+                    destination="exile",
+                    reason="defense_zero",
+                )
                 return True
 
     # v9: Legend rule

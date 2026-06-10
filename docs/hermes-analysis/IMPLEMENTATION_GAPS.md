@@ -9,7 +9,7 @@
 | Categoria | Implementado | Parcial | Ausente |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
-| SBAs e Triggers | 4/15 | 2/15 | 9/15 |
+| SBAs e Triggers | 6/15 | 2/15 | 7/15 |
 | Commander Rules | 4/8 | 2/8 | 2/8 |
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 1/5 | 1/5 | 3/5 |
@@ -54,9 +54,9 @@
 | Token fuera do battlefield | ❌ Ausente | — | Token é destruído em combate, não por SBA |
 | Aura/Equipment ilegal | ❌ Ausente | — | |
 | +1/+1 e -1/-1 cancel | ❌ Ausente | — | |
-| Planeswalker 0 loyalty | ❌ Ausente | — | |
+| Planeswalker 0 loyalty | ✅ Básico | v9: `check_sbas` | loyalty <= 0 move para graveyard |
 | Saga capítulo final | ❌ Ausente | — | |
-| Battle defense 0 | ❌ Ausente | — | |
+| Battle defense 0 | ✅ Básico | v9: `check_sbas` | defense <= 0 move para exile |
 | Commander em GY/exile → CZ (SBA) | ❌ Ausente | — | |
 | **Loop SBA até estabilizar** | ❌ Ausente | — | ✅ FEITO (check_sbas_until_stable) |
 | **APNAP trigger ordering** | ✅ Básico | v9 | Triggers atuais entram como `triggered_ability`; falta player-choice avançado/aninhamento complexo |
@@ -185,7 +185,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Planeswalkers/Battles** — loyalty/defense e SBAs dedicadas
+1. **DFC/Adventure/Prototype** — características por zona/modo de cast
 2. **Targeting formal** — seleção/validação declarada de alvos
-3. **DFC/Adventure/Prototype** — características por zona/modo de cast
+3. **Telemetria de saúde do motor** — métricas de cobertura/regressão do simulador
 4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9

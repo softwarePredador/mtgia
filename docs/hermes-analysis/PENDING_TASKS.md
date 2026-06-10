@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 21/25 itens implementados no battle_analyst_v9.py (6200+ linhas).
-> 4 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 22/25 itens implementados no battle_analyst_v9.py (6300+ linhas).
+> 3 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -32,7 +32,7 @@
 | ✅ | Casting pipeline 601.2 mínimo | v9:CastingContext/begin_cast_context/commit_cast_payment |
 | ✅ | Replacement/Prevention mínimo | v9:ReplacementRegistry/ReplacementEvent |
 | ✅ | Layers 1-7 básico | v9:ContinuousEffect/apply_continuous_effects |
-| ⏳ | Planeswalkers + Battles | P2 |
+| ✅ | Planeswalkers + Battles básico | v9:planeswalker/battle helpers + SBA |
 | ⏳ | DFC/Adventure/Prototype | P2 |
 | ⏳ | Telemetria de saúde do motor | P2 |
 | ⏳ | Suite de conformidade | P2 |
@@ -43,10 +43,9 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
-| 2 | DFC/Adventure/Prototype | 4-5 dias | Médio | casting contextual |
-| 3 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 4 | Suite de conformidade | 5-7 dias | Alto | #1-3 |
+| 1 | DFC/Adventure/Prototype | 4-5 dias | Médio | casting contextual |
+| 2 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 3 | Suite de conformidade | 5-7 dias | Alto | #1-2 |
 
 ---
 
@@ -194,38 +193,23 @@
 
 ### 7. Planeswalkers e Battles
 
-**Implementação**:
-```python
-# Planeswalker
-def handle_planeswalker_etb(card, controller):
-    card["loyalty"] = card.get("starting_loyalty", 3)
-    card["loyalty_used_this_turn"] = False
+**Status 2026-06-10**: ✅ Básico implementado.
 
-def can_activate_loyalty(player, planeswalker):
-    return (not planeswalker.get("loyalty_used_this_turn") 
-            and player.has_priority()
-            and stack.empty()
-            and is_main_phase(player))
+**Arquivos**:
+- `battle_analyst_v9.py`: `handle_planeswalker_etb`, `can_activate_loyalty`, `activate_loyalty_ability`, `damage_to_planeswalker`, `handle_siege_etb`, `battle_takes_damage`, SBAs de loyalty/defense.
+- `test_battle_analyst_v10_3.py`: `test_planeswalker_loyalty_activation_damage_and_sba`, `test_battle_defense_damage_and_sba`.
 
-def damage_to_planeswalker(source, planeswalker, amount):
-    planeswalker["loyalty"] = (planeswalker.get("loyalty", 0) - amount)
-    # SBA at loyalty <= 0 (já implementado em check_sbas)
+**O que foi coberto**:
+- Planeswalker entra com loyalty inicial e só ativa loyalty uma vez por turno em main phase com stack vazia.
+- Dano em planeswalker reduz loyalty.
+- SBA move planeswalker com loyalty <= 0 para graveyard.
+- Battle/Siege entra com defense e protector.
+- Dano em Battle reduz defense.
+- SBA move Battle com defense <= 0 para exile e marca `battle_defeated`.
 
-# Battle (Siege)
-def handle_siege_etb(card, controller, opponents):
-    # Controller chooses an opponent as protector
-    card["protector"] = opponents[0]  # Sim: first opponent
-    card["defense"] = card.get("defense", 5)
-
-def battle_takes_damage(battle, amount):
-    battle["defense"] = (battle.get("defense", 0) - amount)
-    if battle["defense"] <= 0:
-        exile_and_allow_transform(battle)
-
-# SBA adicionais:
-# - Planeswalker loyalty <= 0 -> graveyard
-# - Battle defense <= 0 -> exile + transform cast
-```
+**Limite restante**:
+- Transform/cast da back face de Battle ainda não está modelado.
+- Loyalty abilities ainda são genéricas; efeitos específicos de cada planeswalker não foram implementados.
 
 ---
 

@@ -530,6 +530,62 @@ def test_continuous_effect_dependencies_override_timestamp_within_layer():
     assert result["_continuous_effects_applied"] == ["add-flying", "remove-flying"]
 
 
+def test_planeswalker_loyalty_activation_damage_and_sba():
+    active = player("Active")
+    walker = {
+        "name": "Test Walker",
+        "type_line": "Legendary Planeswalker",
+        "starting_loyalty": 3,
+    }
+    battle.handle_planeswalker_etb(walker, active)
+    active.battlefield = [walker]
+
+    assert walker["loyalty"] == 3
+    assert battle.activate_loyalty_ability(
+        active,
+        walker,
+        -2,
+        "precombat_main",
+        battle.Stack(),
+    ) is True
+    assert walker["loyalty"] == 1
+    assert battle.activate_loyalty_ability(
+        active,
+        walker,
+        1,
+        "precombat_main",
+        battle.Stack(),
+    ) is False
+    assert battle.damage_to_planeswalker({"name": "Shock"}, walker, 1) is True
+    assert walker["loyalty"] == 0
+
+    assert battle.check_sbas([active]) is True
+    assert walker in active.graveyard
+    assert walker not in active.battlefield
+
+
+def test_battle_defense_damage_and_sba():
+    active = player("Active")
+    protector = player("Protector")
+    siege = {
+        "name": "Test Siege",
+        "type_line": "Battle - Siege",
+        "starting_defense": 3,
+    }
+    battle.handle_siege_etb(siege, active, [protector])
+    active.battlefield = [siege]
+
+    assert siege["defense"] == 3
+    assert siege["protector"] == "Protector"
+    assert battle.battle_takes_damage(siege, 3) is True
+    assert siege["defense"] == 0
+
+    assert battle.check_sbas([active, protector]) is True
+    assert siege in active.exile
+    assert siege not in active.battlefield
+    assert siege["battle_defeated"] is True
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2527,6 +2583,8 @@ if __name__ == "__main__":
         test_continuous_effects_apply_layers_and_sublayers_in_order,
         test_continuous_effects_apply_type_color_text_and_ability_layers,
         test_continuous_effect_dependencies_override_timestamp_within_layer,
+        test_planeswalker_loyalty_activation_damage_and_sba,
+        test_battle_defense_damage_and_sba,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,
