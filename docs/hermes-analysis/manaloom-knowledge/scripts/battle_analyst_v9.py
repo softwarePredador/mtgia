@@ -2750,14 +2750,30 @@ def game_winner(all_players):
     return next((player for player in all_players if player.has_won()), None)
 
 
-def priority_round(active_player, all_players, stack, turn, rng):
+MAIN_PHASES = {"precombat_main", "postcombat_main"}
+
+
+def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     """v9: Priority round with optional empty-stack window during main phases."""
     flush_triggers_in_apnap(active_player, all_players, stack)
 
-    # v9: During main phases, allow actions even with empty stack
-    # (playing creatures, sorceries, activating abilities)
     if stack.empty():
-        # Only during own main phase with priority
+        if phase in MAIN_PHASES and active_player.is_alive():
+            opponents = [p for p in all_players if p != active_player and p.is_alive()]
+            acted = cast_spells_v8(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                phase,
+                stack,
+                rng,
+                max_actions=1,
+            )
+            if acted:
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
         return False
 
     idx = all_players.index(active_player)
@@ -2825,6 +2841,33 @@ def priority_round(active_player, all_players, stack, turn, rng):
         if game_winner(all_players):
             return True
     return False
+
+
+def run_priority_loop(active_player, all_players, stack, turn, phase, rng, max_empty_actions=3):
+    """Run a bounded priority loop, including main-phase actions from empty stack.
+
+    This keeps the simulator's current AI action model, but routes main-phase
+    spell decisions through priority instead of bypassing `priority_round`.
+    """
+    acted = False
+    empty_actions = 0
+
+    while True:
+        if game_winner(all_players):
+            return acted
+        if stack.empty() and not _pending_triggers:
+            if phase not in MAIN_PHASES or empty_actions >= max_empty_actions:
+                return acted
+            if not priority_round(active_player, all_players, stack, turn, rng, phase=phase):
+                return acted
+            acted = True
+            empty_actions += 1
+            continue
+
+        if priority_round(active_player, all_players, stack, turn, rng):
+            acted = True
+            continue
+        return acted
 
 def threat_score(effect_name, card_name, controller, all_players, turn):
     """v8.2: Calculate how threatening a spell is (0-100).
@@ -3061,14 +3104,10 @@ def move_creature_from_battlefield(owner, creature):
         owner.battlefield.remove(creature)
     if creature.get("is_commander"):
         # v9: Commander replacement (CR 903.9a) - owner MAY move to CZ
-        if owner.is_human:
+        choice = creature.get("commander_replacement_choice", "command_zone")
+        if choice != "graveyard":
             owner.command_zone.append(creature)
             return "command_zone"
-        else:
-            import random as _cr
-            if _cr.random() < 0.7:
-                owner.command_zone.append(creature)
-                return "command_zone"
     if creature.get("tag") == "token" or "token" in str(creature.get("type_line") or "").lower():
         return "vanished_token"
     owner.graveyard.append(creature)
@@ -3876,11 +3915,18 @@ def check_ward(target, spell, controller, rng):
                          spell=spell.get("name"), ward_cost=ward_cost)
         return True  # Spell countered by ward
 
-def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
+def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_actions=None):
     """v8: Cast spells respecting instant/sorcery timing and stack."""
     mana = player.available_mana()
     if mana <= 0:
-        return
+        return False
+
+    actions_taken = 0
+
+    def note_action():
+        nonlocal actions_taken
+        actions_taken += 1
+        return max_actions is not None and actions_taken >= max_actions
 
     is_own_turn = (player == all_players[0]) or (turn > 0)
     is_main_phase = phase in ("precombat_main", "postcombat_main")
@@ -3925,6 +3971,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 if cmd_eff.get("effect") == "land_recursion_creature":
                     resolve_land_recursion_creature(player, cmd_copy, cmd_eff, turn)
                 mana = player.available_mana()
+                if note_action():
+                    return True
 
     # 2. Ramp (main phase only)
     if is_main_phase:
@@ -3989,6 +4037,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                         colors = source_colors(permanent)
                         player.mana_pool.add(colors[0], permanent.get("mana_produced", 1))
                 mana = player.available_mana()
+                if note_action():
+                    return True
 
     # 3. Cast spells to stack
     castable = [
@@ -4050,12 +4100,13 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 stack.push(c, player, eff)
                 priority_round(player, all_players, stack, turn, rng)
                 if game_winner(all_players):
-                    return
+                    return True
                 while not stack.empty():
                     priority_round(player, all_players, stack, turn, rng)
                     if game_winner(all_players):
-                        return
-                return
+                        return True
+                note_action()
+                return True
 
     # Other spells: 2 per phase max
     remaining = sorted([c for c in castable if player.can_pay_card(c)], key=lambda c: c["cmc"])
@@ -4145,6 +4196,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                             else:
                                 player.hand.append(recovered_card)
                 played += 1
+                if note_action():
+                    return True
             else:
                 player.hand.remove(c)
                 player.spend_card_mana(c)
@@ -4176,12 +4229,19 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng):
                 )
                 stack.push(c, player, eff)
                 played += 1
+                if note_action():
+                    while not stack.empty():
+                        priority_round(player, all_players, stack, turn, rng)
+                        if game_winner(all_players):
+                            return True
+                    return True
 
 # Resolve stack
     while not stack.empty():
         priority_round(player, all_players, stack, turn, rng)
         if game_winner(all_players):
-            return
+            return True
+    return actions_taken > 0
 
 def apply_effect_immediate(player, opponents, card, turn, rng):
     """v8: Apply card effect (called when spell resolves from stack)."""
@@ -5111,7 +5171,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         while not stack.empty() or _pending_triggers:
             priority_round(player, all_players, stack, turn, rng)
     activate_land_tutor_creatures(player, turn)
-    cast_spells_v8(player, opponents, all_players, turn, "precombat_main", stack, rng)
+    run_priority_loop(player, all_players, stack, turn, "precombat_main", rng)
     if game_winner(all_players):
         return
     if check_sbas(all_players): return
@@ -5135,7 +5195,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── POSTCOMBAT MAIN ──
     total_mana = player.available_mana()
-    cast_spells_v8(player, opponents, all_players, turn, "postcombat_main", stack, rng)
+    run_priority_loop(player, all_players, stack, turn, "postcombat_main", rng)
     if game_winner(all_players):
         return
     if check_sbas(all_players): return

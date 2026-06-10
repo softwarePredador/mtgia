@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 16/25 itens implementados no battle_analyst_v9.py (5400+ linhas).
-> 9 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 17/25 itens implementados no battle_analyst_v9.py (5700+ linhas).
+> 8 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -27,7 +27,7 @@
 | ✅ | copy_spell_on_stack | v9:2443 |
 | ✅ | 3 docs (LOGIC, GAPS, TASKS) | docs/hermes-analysis/ |
 | ✅ | APNAP trigger ordering básico | v9:2444, 2752, tests |
-| ⏳ | Prioridade com pilha vazia | P1 |
+| ✅ | Prioridade com pilha vazia | v9:priority_round/run_priority_loop |
 | ⏳ | Casting pipeline 601.2 | P1 |
 | ⏳ | Passos de combate formais | P1 |
 | ⏳ | Layers 1-7 (continuous effects) | P1 |
@@ -43,15 +43,14 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Prioridade com pilha vazia | 2-3 dias | Alto | APNAP básico |
-| 2 | Passos de combate formais | 4-5 dias | Alto | prioridade |
-| 3 | Casting pipeline 601.2 | 5-7 dias | Alto | prioridade |
-| 4 | Replacement effects | 5-7 dias | Alto | — |
-| 5 | Layers 1-7 | 7-10 dias | Alto | #4 |
-| 6 | Planeswalkers/Battles | 3-4 dias | Médio | #1, #2 |
-| 7 | DFC/Adventure/Prototype | 4-5 dias | Médio | #3 |
-| 8 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 9 | Suite de conformidade | 5-7 dias | Alto | #1-8 |
+| 1 | Passos de combate formais | 4-5 dias | Alto | prioridade |
+| 2 | Casting pipeline 601.2 | 5-7 dias | Alto | prioridade |
+| 3 | Replacement effects | 5-7 dias | Alto | — |
+| 4 | Layers 1-7 | 7-10 dias | Alto | #3 |
+| 5 | Planeswalkers/Battles | 3-4 dias | Médio | #1 |
+| 6 | DFC/Adventure/Prototype | 4-5 dias | Médio | #2 |
+| 7 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 8 | Suite de conformidade | 5-7 dias | Alto | #1-7 |
 
 ---
 
@@ -79,56 +78,19 @@
 
 ### 2. Prioridade com Pilha Vazia nos Main Phases
 
-**Gap**: `priority_round()` retorna `False` se `stack.empty()` (v9:2580). Jogadores não podem conjurar criaturas/sorceries/artifacts em velocidade de sorcery porque nunca recebem prioridade com pilha vazia.
+**Status 2026-06-10**: ✅ Implementado.
 
-**Arquivo**: `battle_analyst_v9.py:2575-2620`
+**Arquivos**:
+- `battle_analyst_v9.py`: `priority_round(..., phase=...)`, `run_priority_loop`, `cast_spells_v8(..., max_actions=...)`.
+- `test_battle_analyst_v10_3.py`: `test_empty_stack_priority_requires_main_phase`, `test_empty_stack_priority_casts_main_phase_creature`, `test_main_phase_priority_loop_casts_bounded_empty_stack_actions`.
 
-**Implementação**:
-```python
-def run_priority_loop(active_player, all_players, stack, turn, phase):
-    """Loop formal de prioridade — permite ações com pilha vazia em main phases."""
-    current = active_player
-    pass_count = 0
-    max_passes = len(all_players)
-    
-    while True:
-        # Check if game ended
-        if any(hasattr(p, "eliminated") and p.eliminated for p in all_players):
-            break
-        
-        action = get_player_action(current, all_players, stack, phase)
-        
-        if action == "pass":
-            pass_count += 1
-            if pass_count >= max_passes:
-                break  # Everyone passed in succession
-        else:
-            pass_count = 0
-            execute_action(action, stack)
-            check_sbas_until_stable(all_players)
-            flush_triggers_in_apnap(current, all_players)
-        
-        current = next_in_turn_order(current, all_players)
-        # Skip eliminated players
-        while hasattr(current, "eliminated") and current.eliminated:
-            current = next_in_turn_order(current, all_players)
-    
-    if stack.not_empty():
-        resolve_top_of_stack()
-        check_sbas_until_stable(all_players)
+**O que foi coberto**:
+- `priority_round` não age com stack vazia fora de main phase.
+- `priority_round(..., phase="precombat_main"|"postcombat_main")` permite uma ação sorcery-speed.
+- `run_priority_loop` aplica janelas vazias de main phase de forma limitada e resolve a stack/triggers entre ações.
+- O turno usa `run_priority_loop` nas duas main phases.
 
-def get_player_action(player, all_players, stack, phase):
-    """Determina ação do jogador baseado em IA/input."""
-    if player.is_human:
-        # Human: can play land, cast sorcery-speed, activate abilities
-        pass  # UI-driven
-    else:
-        # AI: evaluate best play
-        if phase in ("precombat_main", "postcombat_main"):
-            # Play land, cast creatures/sorceries, activate abilities
-            return ai_decide_action(player, all_players, stack, phase)
-    return "pass"
-```
+**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores; isso será aprofundado junto do casting pipeline 601.2 e combate formal.
 
 **Regra**: CR 117.3, CR 117.4
 
@@ -451,7 +413,7 @@ CONFORMANCE_SCENARIOS = [
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5461 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5779 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |

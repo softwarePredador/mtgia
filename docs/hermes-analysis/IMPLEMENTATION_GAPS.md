@@ -8,7 +8,7 @@
 
 | Categoria | Implementado | Parcial | Ausente |
 |---|---|---|---|
-| Turno e Prioridade | 3/10 | 3/10 | 4/10 |
+| Turno e Prioridade | 4/10 | 3/10 | 3/10 |
 | SBAs e Triggers | 4/15 | 2/15 | 9/15 |
 | Commander Rules | 4/8 | 2/8 | 2/8 |
 | Mana e Custos | 1/6 | 1/6 | 4/6 |
@@ -27,8 +27,8 @@
 |---|---|---|---|
 | Fases completas (untap,upkeep,draw,main1,combat,main2,end,cleanup) | ✅ Parcial | 4605-4828 | Upkeep só tem One Ring trigger. Falta janela de prioridade no upkeep |
 | Passos de combate (beg.combat,decl.atk,decl.blk,damage,end.combat) | ❌ Ausente | 4314-4603 | Combat é monolítico, sem passos formais |
-| Prioridade formal (APNAP pass sequence) | ❌ Ausente | 2563-2620 | `priority_round` é sweep único, não loop de passes |
-| Prioridade com pilha vazia | ❌ Ausente | 2564 | `if stack.empty(): return False` — nunca dá prioridade com pilha vazia |
+| Prioridade formal (APNAP pass sequence) | ⚠️ Parcial | 2563-2620 | `run_priority_loop` cobre ações vazias do active player; falta pass sequence completa para todos |
+| Prioridade com pilha vazia | ✅ OK | 2563-2645 | `priority_round(..., phase=main)` permite ação sorcery-speed e o turno usa `run_priority_loop` |
 | Sem prioridade em untap/resolução | ✅ OK | 4622-4633 | Untap não chama priority |
 | Passos/fases extras (extra turn, extra combat) | ⚠️ Parcial | 4789-4828 | `play_turn_sequence_v8` suporta extra turn, mas não extra combat/phase |
 | Ações especiais (play land, morph) | ✅ OK | 4675-4700 | Land play tratado como ação especial |
@@ -36,7 +36,7 @@
 
 **Ações imediatas**: 
 - [ ] Adicionar `check_sbas_until_stable` nos pontos de prioridade ✅ FEITO
-- [ ] Adicionar janela de prioridade com pilha vazia nos main phases
+- [x] Adicionar janela de prioridade com pilha vazia nos main phases ✅
 - [ ] Separar passos de combate (beg.combat, decl.atk, decl.blk, damage, end)
 
 ---

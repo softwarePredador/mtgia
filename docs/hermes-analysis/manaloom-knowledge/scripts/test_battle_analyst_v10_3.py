@@ -233,6 +233,63 @@ def test_counterspell_consumes_card_mana_and_counters_target():
     assert active.graveyard[0]["name"] == "Approach of the Second Sun"
 
 
+def test_empty_stack_priority_requires_main_phase():
+    active = player("Active")
+    active.hand = [card("Priority Bear", cmc=2, effect="creature", power=2)]
+    active.mana_pool.add_generic(2)
+    stack = battle.Stack()
+
+    assert battle.priority_round(active, [active], stack, 2, random.Random(106)) is False
+    assert len(active.hand) == 1
+    assert active.battlefield == []
+
+
+def test_empty_stack_priority_casts_main_phase_creature():
+    active = player("Active")
+    active.hand = [card("Priority Bear", cmc=2, effect="creature", power=2)]
+    active.mana_pool.add_generic(2)
+    stack = battle.Stack()
+
+    assert battle.priority_round(
+        active,
+        [active],
+        stack,
+        2,
+        random.Random(107),
+        phase="precombat_main",
+    ) is True
+    assert active.hand == []
+    assert stack.empty()
+    assert active.battlefield[0]["name"] == "Priority Bear"
+    assert active.battlefield[0]["summoning_sick"] is True
+
+
+def test_main_phase_priority_loop_casts_bounded_empty_stack_actions():
+    active = player("Active")
+    active.hand = [
+        card("Priority Bear A", cmc=2, effect="creature", power=2),
+        card("Priority Bear B", cmc=2, effect="creature", power=2),
+    ]
+    active.mana_pool.add_generic(4)
+    stack = battle.Stack()
+
+    assert battle.run_priority_loop(
+        active,
+        [active],
+        stack,
+        2,
+        "precombat_main",
+        random.Random(108),
+        max_empty_actions=2,
+    ) is True
+    assert active.hand == []
+    assert stack.empty()
+    assert [card["name"] for card in active.battlefield] == [
+        "Priority Bear A",
+        "Priority Bear B",
+    ]
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2088,6 +2145,9 @@ if __name__ == "__main__":
         test_mana_sources_do_not_refill_after_spending,
         test_treasures_are_spent_without_refilling_sources,
         test_counterspell_consumes_card_mana_and_counters_target,
+        test_empty_stack_priority_requires_main_phase,
+        test_empty_stack_priority_casts_main_phase_creature,
+        test_main_phase_priority_loop_casts_bounded_empty_stack_actions,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,
