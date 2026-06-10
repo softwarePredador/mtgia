@@ -4,9 +4,184 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-10 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-10 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia `server/lib` <-> `server/routes` <-> `app/lib` - revalidacao 2026-06-10 23:00 UTC
+
+Escopo desta rodada: somente coerencia entre helpers/servicos de `server/lib`,
+handlers de `server/routes` e consumidores reais em `app/lib`. Nao foi feita
+auditoria ampla de classes, funcoes sem chamada, imports/ciclos, tabelas
+PostgreSQL ou duplicacao fora do necessario para validar este foco.
+
+### Setup executado
+
+- `pwd` e `git rev-parse --show-toplevel` confirmaram o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `1554a1e5`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 183.
+- Classes encontradas: 181.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 112.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
+`server/routes`, mas nao inspeciona `app/lib`; portanto, coerencia app-facing
+exigiu busca manual por consumidores Flutter, handlers e helpers. A execucao do
+script tambem reescreveu `STRUCTURE_AUDIT.md` para um relatorio gerado de 601
+linhas; essa mutacao automatica foi restaurada antes desta atualizacao para
+preservar o historico manual.
+
+### Metodo manual focado
+
+- Busca de chamadas app-facing em `app/lib` por `apiClient.get/post/put/patch/delete`.
+- Leitura direta dos handlers correspondentes em `server/routes`.
+- Leitura dos helpers de suporte em `server/lib` quando a rota delega regra de
+  ownership, jobs, tags funcionais, rate limit ou aprendizado Commander.
+- Revalidacao dos achados historicos de ownership/semantic tags antes de
+  manter qualquer claim.
+
+### Achados revalidados
+
+#### P1 - `deck_rebuild_created` e emitido pelo app, mas rejeitado pela allow-list backend
+
+- **App emissor:** `app/lib/features/decks/providers/deck_provider.dart:603`-`:614`
+  chama `_trackActivationEvent('deck_rebuild_created', deckId: draftDeckId)`
+  apos `POST /ai/rebuild` criar um draft.
+- **Transporte:** `app/lib/core/services/activation_funnel_service.dart:17`-`:23`
+  envia o evento para `POST /users/me/activation-events`; `:24`-`:26` engole a
+  falha para nao quebrar o fluxo principal.
+- **Rota:** `server/routes/users/me/activation-events/index.dart:10`-`:18`
+  permite apenas `core_flow_started`, `format_selected`,
+  `base_choice_generate`, `base_choice_import`, `deck_created`,
+  `deck_optimized` e `onboarding_completed`; `:46`-`:48` rejeita qualquer
+  evento fora da lista.
+- **Doc/contrato:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` ainda marca
+  `POST /users/me/activation-events` como `internal` e consumidor `not proven`,
+  embora existam chamadas reais em `app/lib`.
+- **Teste relacionado:** `app/test/features/decks/providers/deck_provider_test.dart:874`-`:891`
+  espera que o provider emita `deck_rebuild_created`, mas a busca focada nao
+  encontrou teste backend aceitando esse evento.
+- **Por que e incoerente:** a camada app trata rebuild guiado como evento de
+  funil, enquanto a rota descarta o evento silenciosamente. O resultado e perda
+  invisivel de telemetria para um fluxo core de deck/IA.
+- **O que valida:** adicionar `deck_rebuild_created` a `_allowedEvents`, cobrir
+  a rota com teste de aceite/rejeicao e atualizar o contrato app-facing.
+- **O que falsifica:** remover a emissao no app e documentar que rebuild nao
+  pertence ao funil de ativacao.
+
+#### P2 - `/ai/commander-learning` e app-facing, mas esta fora do API contract/data map
+
+- **Consumidor app:** `app/lib/features/decks/screens/deck_generate_screen.dart:41`-`:43`
+  carrega disponibilidade de learned decks no primeiro frame; `:127`-`:143`
+  chama `DeckProvider.fetchCommanderLearningDecks()` e indexa por comandante.
+  O mesmo screen chama `fetchCommanderLearningDeck` em `:257`-`:267` para
+  montar o preview aprendido.
+- **Provider:** `app/lib/features/decks/providers/deck_provider.dart:778`-`:801`
+  chama `GET /ai/commander-learning?commander=...`; `:804`-`:824` chama
+  `GET /ai/commander-learning` e espera `commanders[]`.
+- **Rota:** `server/routes/ai/commander-learning/index.dart:20`-`:27` retorna
+  `{available, source, count, commanders}` sem query; `:43`-`:53` retorna
+  `{commander, available, source, promoted_deck, recommended_deck}` com query.
+- **Helper/tabela:** a rota le `commander_learned_decks` em
+  `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:110`-`:132`;
+  o modelo/schema compartilhado fica em
+  `server/lib/ai/commander_learned_deck_support.dart:7` e `:285`-`:311`.
+- **Doc/contrato:** `rg "/ai/commander-learning" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  nao encontrou contrato. A secao de data sources em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:315` tambem nao lista
+  `commander_learned_decks`, embora `server/database_setup.sql:310`-`:335`
+  crie a tabela.
+- **Por que e incoerente:** o fluxo ja atravessa `app/lib` -> `server/routes`
+  -> `server/lib`, tem testes app de provider, mas a fonte de contratos
+  app-facing nao descreve payload, tabelas, cache/limites nem risco de
+  compatibilidade.
+- **O que valida:** adicionar linha de contrato para `GET /ai/commander-learning`
+  e documentar `commander_learned_decks` como data source app-facing/AI.
+- **O que falsifica:** remover o consumidor do app ou marcar explicitamente a
+  tela como experimental sem dependencia de contrato estavel.
+
+#### P2 - Chamada automatica de learned decks passa pelo middleware de IA custosa
+
+- **App automatico:** `DeckGenerateScreen.initState` agenda
+  `_loadLearnedDeckAvailability()` no primeiro frame em
+  `app/lib/features/decks/screens/deck_generate_screen.dart:36`-`:43`.
+- **Endpoint chamado:** o provider usa `GET /ai/commander-learning` em
+  `app/lib/features/decks/providers/deck_provider.dart:804`-`:805`.
+- **Middleware:** todas as rotas sob `server/routes/ai` usam
+  `authMiddleware()`, `aiPlanLimitMiddleware()` e `aiRateLimit()` em
+  `server/routes/ai/_middleware.dart:16`-`:20`.
+- **Bloqueio por plano:** `server/lib/plan_middleware.dart:35`-`:53` retorna
+  `402` quando `aiRequestsRemaining <= 0`.
+- **Throttle de IA:** `server/lib/rate_limit_middleware.dart:167`-`:170`
+  define bucket de IA em 10/min em producao, e `:381`-`:397` retorna `429`
+  quando o bucket estoura.
+- **Natureza da rota:** `server/routes/ai/commander-learning/index.dart:67`-`:92`
+  e `:110`-`:132` fazem leitura local de `commander_learned_decks`; nao ha
+  chamada OpenAI nesse handler.
+- **Por que e incoerente:** uma consulta read-only local, feita automaticamente
+  ao abrir a tela de gerar deck, compartilha bloqueio de plano e bucket de
+  rate-limit de rotas custosas de IA. Isso pode esconder o affordance de deck
+  aprendido quando o usuario esta sem cota de IA ou apos outras chamadas AI,
+  mesmo sem custo de LLM nesse endpoint.
+- **O que valida:** mover learned-deck availability para rota nao limitada por
+  IA custosa, ou criar excecao documentada/testada no middleware.
+- **O que falsifica:** contrato de produto dizendo que qualquer consulta de
+  learned deck deve ser tratada como capacidade de IA e a UI deve lidar
+  explicitamente com `402/429`.
+
+### Controles positivos e claims historicos atualizados
+
+- `POST /ai/optimize` nao foi reaberto como falha de ownership. O app envia
+  `POST /ai/optimize` em
+  `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`, a rota
+  exige usuario autenticado em `server/routes/ai/optimize/index.dart:451`-`:454`,
+  verifica acesso antes de criar job async em `:466`-`:488` e passa
+  `authenticatedUserId` para `loadOptimizeDeckContext` em `:569`-`:580`. O
+  helper consulta `decks` por `id + user_id` em
+  `server/lib/ai/optimize_request_support.dart:64`-`:84`.
+- O contexto principal de optimize agora carrega `card_function_tags` junto de
+  `semantic_tags_v2`: `server/lib/ai/optimize_request_support.dart:97`-`:123`
+  inclui `$semanticV2Select` e `$functionalTagsSelect`, e
+  `server/lib/ai/optimization_functional_roles.dart:301`-`:338` documenta a
+  precedencia `functional_tags -> semantic_tags_v2 -> heuristica`.
+- `POST /ai/archetypes` nao foi reaberto como falha de ownership:
+  `server/routes/ai/archetypes/index.dart:35`-`:47` le `userId` e busca o deck
+  por `id + user_id` antes de carregar cartas.
+- Jobs async de optimize/generate nao foram reabertos como legiveis com owner
+  nulo. `OptimizeJobStore.create` exige `String userId` em
+  `server/lib/ai/optimize_job.dart:32`-`:37`; o polling retorna 404 quando
+  `job.userId.isEmpty || job.userId != userId` em
+  `server/routes/ai/optimize/jobs/[id].dart:26`-`:47`. O mesmo padrao existe em
+  generate: `AiGenerateJobStore.create` exige `String userId` em
+  `server/lib/ai_generate_job.dart:18`-`:23`, e
+  `server/routes/ai/generate/jobs/[id].dart:16`-`:27` bloqueia owner vazio ou
+  diferente.
+
+### Resultado desta revalidacao
+
+No checkout `1554a1e5`, os achados historicos de ownership em
+`/ai/optimize`, `/ai/archetypes`, polling de jobs e ausencia de
+`card_function_tags` no contexto principal de optimize estao obsoletos e nao
+devem continuar no topo dos documentos como riscos abertos. Permanecem abertos
+achados menores, mas reais, na coerencia app/server: telemetria
+`deck_rebuild_created` rejeitada, `/ai/commander-learning` app-facing sem
+contrato documentado, e consulta automatica de learned decks usando middleware
+de IA custosa.
 
 ## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-10 19:00 UTC
 

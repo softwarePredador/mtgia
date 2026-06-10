@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-10 19:00 UTC
+> Data: 2026-06-10 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -19,24 +19,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
    com `uri_does_not_exist`.
-5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
-   **REVALIDADO no checkout local `b3f4c0ad` em 2026-06-09 23:00 UTC**.
-   `POST /ai/optimize` e `POST /ai/archetypes` continuam chamados pelo app com
-   `deck_id`, mas as queries reais carregam `decks`/`deck_cards` por `id` sem
-   `user_id`: a rota optimize le `userId` e nao passa para
-   `loadOptimizeDeckContext`, e `/ai/archetypes` busca o deck por `id` direto.
-   `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` continuam
-   legiveis quando `job.userId == null`, embora sejam usados por polling do app.
-   `POST /ai/rebuild`, `GET /decks/:id/analysis` e
-   `POST /decks/:id/ai-analysis`, alem de import-to-deck, pricing, validate,
-   bulk e replace, seguem como controles positivos porque fazem gate de
-   `deck_id + user_id` antes de carregar/mutar cartas. Deck analysis carrega
-   `card_function_tags` + `semantic_tags_v2`, mas o contexto principal de
-   optimize ainda threada somente `semantic_tags_v2`, apesar do contrato de
-   `/ai/optimize` listar `card_function_tags` como fonte. A mesma rodada
-   revalidou drift de activation telemetry: o app envia `deck_rebuild_created`,
-   mas `_allowedEvents` rejeita o evento e o contrato ainda marca
-   `/users/me/activation-events` como `internal`/`not proven`.
+5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
+   `server/lib`**: **REVALIDADO no checkout local `1554a1e5` em 2026-06-10
+   23:00 UTC**. Os riscos anteriores de ownership em `POST /ai/optimize`,
+   `POST /ai/archetypes` e polling de jobs async estao stale nesta branch:
+   optimize exige usuario, verifica acesso por `deck_id + user_id`, cria jobs
+   com `String userId`, polling rejeita `job.userId.isEmpty`, e archetypes
+   tambem escopa o deck por `id + user_id`. O contexto principal de optimize
+   agora carrega `card_function_tags` junto de `semantic_tags_v2`. Permanecem
+   abertos tres gaps: o app emite `deck_rebuild_created`, mas `_allowedEvents`
+   rejeita o evento; `GET /ai/commander-learning` e consumido pela tela de
+   geracao e passa por rota/helper/tabela reais, mas nao esta no API contract
+   map; e a consulta automatica de learned decks usa middleware de IA custosa
+   apesar de ser leitura local de `commander_learned_decks`.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-10 05:30 UTC no checkout `fdb22f69`. Ainda ha excecoes por nome em
    `functional_card_tags.dart`, `candidate_quality_data_support.dart`,
@@ -51,7 +46,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    seeds Commander Reference dos riscos reais. `edh_bracket_policy.dart`
    continua excecao intencional por regra externa/curadoria de bracket, mas
    precisa manter fonte/versionamento/teste dedicado.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-10 15:00 UTC no checkout `7cdd8a6e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contadores operacionais como `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime. A formulacao foi ajustada para nao confundir schema/audit/counts com consumidores de produto.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
+   revalidado na rotacao local Codex de 2026-06-10 15:00 UTC no checkout
+   `7cdd8a6e`; a rodada de coerencia de 2026-06-10 23:00 UTC nao refez essa
+   auditoria de tabelas. Ajuste de stale claim: no checkout `1554a1e5`,
+   `commander_learned_decks`, `deck_learning_events` e `commander_card_usage`
+   existem em `server/database_setup.sql` e em `server/lib/ai/*`; portanto,
+   qualquer formulacao dizendo que esses nomes aparecem apenas em docs
+   historicos nao vale para a branch atual. O foco aberto desta rodada e
+   documentar o contrato app-facing de `/ai/commander-learning`, nao reclassificar
+   o uso de todas as tabelas.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-10 03:00 UTC no checkout `11e9be38`.
    `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
@@ -65,22 +69,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    navegacao, scanner/latest-set e candidatos backend de baixa contagem; a
    varredura textual ampla nao foi usada para acusar DTOs/helpers locais sem
    evidencia adicional.
-9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
-   2026-06-10 05:30 UTC no checkout `fdb22f69`. Deck analysis prefere
-   `card_function_tags`; o contexto de optimize, `additionsData`, validator e
-   role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags`
-   persistidos nesse caminho. Candidate quality tem uso parcial de
-   `card_function_tags` em SQL de sinais, portanto o gap atual e o adapter de
-   role preservation/gate, nao toda a superficie de optimize. O caminho vivo
-   continua escalar via `classifyOptimizationFunctionalRole`; `semantic_tags_v2`
-   multi-tag segue colapsado em um unico role no validator/quality gate/delta,
-   e perdas de `engine`/`payoff`/`enabler`/`wincon`/`combo_piece` nao entram no
-   bloqueio parcial de semantic v2. A rodada tambem encontrou uma incoerencia
-   diagnostica: `buildDeterministicOptimizeResponse` fala em ranking ajudado por
-   Semantic Layer v2 quando `candidate_quality_sources` contem
-   `deterministic_semantic_v2`, mas `loadAggressiveCandidateQualitySignals`
-   monta sources de `card_role_scores` filtrando apenas
-   `deterministic_heuristic_v1` e meta, alem de `card_function_tags`/sinergia.
+9. **P1/P2 — Drift entre deck analysis e optimize**: parcialmente saneado no
+   checkout `1554a1e5`. Deck analysis e o contexto principal de optimize agora
+   carregam `card_function_tags` + `semantic_tags_v2`, e
+   `classifyOptimizationFunctionalRole` declara precedencia
+   `functional_tags -> semantic_tags_v2 -> heuristica`. Esta rodada nao refez a
+   auditoria completa de candidate quality, endpoints legacy ou semantic v2, mas
+   remove como stale a acao "threadar `card_function_tags` no contexto principal
+   de optimize". A acao remanescente e manter testes/adapter compartilhado para
+   divergencias multi-role e para endpoints experimentais como
+   `/decks/:id/recommendations` e `/ai/weakness-analysis`.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -362,80 +360,49 @@ Histórico do problema:
   - testes provam que score/bracket/premium vem da policy e continua respeitando
     legalidade, identidade de cor e bracket.
 
-### P1 — Unificar o adapter semantico usado por deck analysis, optimize e candidate quality
+### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-10 05:30 UTC: REVALIDADO/ABERTO no checkout `fdb22f69`.**
-- **Evidência**:
+- **Status 2026-06-10 23:00 UTC: PARCIALMENTE SANEADO no checkout
+  `1554a1e5`.** A acao antiga de "carregar `card_function_tags` no contexto
+  principal de optimize" nao se aplica mais nesta branch.
+- **Evidencia atualizada**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
-    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
-    `POST /decks/:id/ai-analysis` faz o mesmo em
-    `server/routes/decks/[id]/ai-analysis/index.dart:119`-`:135`.
-  - `summarizeFunctionalTagsForDeck` prefere `functional_tags` persistidos e so
-    usa heuristica depois em `server/lib/ai/functional_card_tags.dart:432`-`:465`.
-  - `loadOptimizeDeckContext` carrega `semantic_tags_v2`, mas nao
-    `card_function_tags`, em `server/lib/ai/optimize_request_support.dart:86`-`:107`
-    e monta `allCardData` sem `functional_tags` em `:186`-`:198`.
-    O helper de select em `:323`-`:339` tambem agrega apenas
-    `card_semantic_tags_v2`.
-  - `classifyOptimizationFunctionalRole` usa `semantic_tags_v2` primeiro e
-    depois `type_line`/`oracle_text`, sem ler `functional_tags`, em
-    `server/lib/ai/optimization_functional_roles.dart:55`-`:139`.
-  - `OptimizationValidator` e o quality gate chamam esse classificador em
-    `server/lib/ai/optimization_validator.dart:266`-`:268` e
-    `server/lib/ai/optimization_quality_gate.dart:53`-`:54`.
-  - O checkout atual nao contem `optimizationFunctionalRolesForCard`; o caminho
-    vivo ainda e `classifyOptimizationFunctionalRole`, escalar. O mesmo arquivo
-    colapsa `semantic_tags_v2` para um unico role em
-    `server/lib/ai/optimization_functional_roles.dart:142`-`:195` e calcula
-    `role_delta` sobre esse role unico em `:321`-`:338`.
-    A precedencia tambem diverge no fallback textual: o comentario em `:120`-`:121`
-    diz que roles altos sao checados antes do fallback de tipo, mas o codigo
-    retorna wipe/protection/removal/ramp/draw/tutor antes de
-    `wincon`/`engine`/`combo_piece`/`payoff`/`enabler` em `:63`-`:117`.
-  - Candidate quality aplica outro mapa de normalizacao em
-    `server/lib/ai/candidate_quality_data_support.dart:290`-`:309`.
-  - `server/routes/ai/optimize/index.dart:2090`-`:2099` monta
-    `additionsData` com `semantic_tags_v2`, mas sem `functional_tags`; o helper
-    local de select v2 em `:3197`-`:3213` tambem nao agrega
-    `card_function_tags`.
-  - Nuance revalidada: candidate quality nao deve ser descrito como totalmente
-    sem `card_function_tags`, porque
-    `server/lib/ai/optimize_runtime_support.dart:2650`-`:2658` consulta
-    `card_function_tags` para sinais de candidatos. A lacuna ativa e o caminho de
-    contexto/validator/role preservation e o adapter unico.
-  - Nova nuance de diagnostico: `server/lib/ai/optimize_runtime_support.dart:3246`-`:3253`
-    adiciona nota de ranking por Semantic Layer v2 quando
-    `candidate_quality_sources` contem `semanticLayerV2Source`, mas
-    `server/lib/ai/optimize_runtime_support.dart:2635`-`:2706` monta esses
-    sources sem consultar `card_semantic_tags_v2` e filtra `card_role_scores` para
-    `deterministic_heuristic_v1` + meta. O ramo parece sem prova de alcance.
-  - `server/routes/ai/weakness-analysis/index.dart:42`-`:59` nao carrega
-    `card_function_tags`, `semantic_tags_v2` nem `card_role_scores`; `:114`-`:162`
-    recalcula utilidade por heuristicas locais e `:206`-`:248`/`:352`-`:357`
-    recomenda nomes fixos.
-- **Impacto**: a aba de analise pode contar uma carta por `card_function_tags`
-  persistido, enquanto optimize/validator a tratam por heuristica ou role unico
-  de `semantic_tags_v2`. Swaps podem parecer seguros no gate por perderem roles
-  secundarios como `engine`, `payoff`, `enabler`, `drain` ou `exile_value`.
-- **Ação recomendada**:
-  1. criar adapter unico `resolveCardFunctionalRoles` que receba
-     `functional_tags`, `semantic_tags_v2`, `oracle_text`, `type_line`,
-     `mana_cost` e `cmc`;
-  2. retornar conjunto de roles + `primary_role` compatível, nao apenas string;
-  3. usar o adapter em deck analysis, optimize context, validator, quality gate
-     e candidate quality;
-  4. carregar `card_function_tags` nas queries de optimize e additions;
-  5. alinhar `candidate_quality_sources` com as fontes realmente consultadas
-     (`card_function_tags`, `card_role_scores`, meta/sinergia e, se desejado,
-     `card_semantic_tags_v2`) ou remover a nota v2 sem fonte viva;
-  6. cobrir com testes: persisted functional sem v2, v2 multi-tag, v2 abaixo de
-     confianca e fallback por oracle/tipo.
-- **Validação**:
-  - uma carta com `functional_tags=[draw]` e sem `semantic_tags_v2` e `draw` em
-    deck analysis, validator e quality gate;
-  - uma carta com `semantic_tags_v2.tags=[draw, engine]` preserva ambos os
-    papeis no role delta;
-  - candidate quality e optimize usam a mesma normalizacao de roles.
+    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:91`-`:96`.
+  - `POST /decks/:id/ai-analysis` tambem retorna `functional_tags` e
+    `semantic_tags_v2` em `server/routes/decks/[id]/ai-analysis/index.dart:130`-`:135`.
+  - `loadOptimizeDeckContext` agora monta a query com `$semanticV2Select` e
+    `$functionalTagsSelect` em
+    `server/lib/ai/optimize_request_support.dart:97`-`:123`, e insere ambos em
+    `allCardData` em `:212`-`:213`.
+  - `classifyOptimizationFunctionalRole` le `functional_tags` e
+    `semantic_tags_v2` em `server/lib/ai/optimization_functional_roles.dart:301`-`:338`.
+  - Candidate quality continua usando `card_function_tags` em
+    `server/lib/ai/optimize_runtime_support.dart:1280`-`:1333`, mas esta
+    rodada nao reexecutou a auditoria completa de fontes de
+    `candidate_quality_sources`.
+- **Impacto remanescente**: a branch atual esta melhor alinhada no caminho
+  principal analysis/optimize, mas ainda precisa de testes que provem o mesmo
+  resultado em cartas com `functional_tags` persistidos, `semantic_tags_v2`
+  multi-tag, tags abaixo de confianca e fallback textual. Endpoints
+  experimentais/legacy como `/decks/:id/recommendations` e
+  `/ai/weakness-analysis` continuam devendo ser revalidados antes de promocao
+  app-facing.
+- **Acao recomendada**:
+  1. manter um adapter unico para `functional_tags`, `semantic_tags_v2`,
+     `oracle_text`, `type_line`, `mana_cost` e `cmc`;
+  2. cobrir role primario e conjunto de roles em testes de analysis, optimize,
+     validator e quality gate;
+  3. alinhar `candidate_quality_sources` com as fontes realmente consultadas ou
+     documentar quais fontes sao apenas diagnostico;
+  4. antes de promover endpoints experimentais, exigir que reutilizem o mesmo
+     adapter ou declarem contrato interno separado.
+- **Validacao**:
+  - carta com `functional_tags=[draw]` e sem `semantic_tags_v2` e tratada como
+    draw em analysis, validator e quality gate;
+  - carta com `semantic_tags_v2.tags=[draw, engine]` preserva multi-role onde o
+    contrato exigir;
+  - testes de candidate quality mostram fontes reais em
+    `candidate_quality_sources`;
 
 ### P2 — Threadar estado atual do deck nos fillers de optimize/complete
 
@@ -660,116 +627,89 @@ app-side novo sem chamada.
     quality continuam verdes;
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
-### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-09 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `b3f4c0ad`. A coerencia app-facing de `/ai/optimize`, `/ai/archetypes` e
-  jobs async de optimize/generate nao esta resolvida nesta branch. `POST /ai/rebuild`,
-  `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis`, import-to-deck,
-  pricing, validate, bulk e replace foram usados como controles positivos de
-  owner gate. `/decks/:id/recommendations`, `/decks/:id/simulate`,
-  `/ai/simulate-matchup` e `/ai/weakness-analysis` nao tem consumidor app atual
-  na busca focada, mas continuam sem contrato de owner antes de eventual
-  promocao. A rodada tambem confirmou incoerencia de activation telemetry:
-  `deck_rebuild_created` e emitido pelo app, rejeitado pela allow-list backend e
-  ausente da doc app-facing atual. Tambem foi revalidado que deck analysis
-  consome `functional_tags`, enquanto optimize ainda nao propaga
-  `card_function_tags` para o contexto/validator.
-- **Evidência**:
-  - O app monta payload com `deck_id` em
-    `app/lib/features/decks/providers/deck_provider_support_ai.dart:10`-`:23`
-    e envia `POST /ai/optimize` em `:56`; a rota tenta ler `userId` em
-    `server/routes/ai/optimize/index.dart:401`-`:406`, mas chama
-    `loadOptimizeDeckContext` em `:549`-`:558` sem passar usuario.
-  - `server/lib/ai/optimize_request_support.dart:53`-`:62` declara o loader
-    sem `userId`; `:66`/`:71` consultam `SELECT name, format FROM decks WHERE
-    id = @id`; `:107`-`:110` e `:132`-`:135` carregam cartas por
-    `WHERE dc.deck_id = @id`.
-  - O app tambem envia `POST /ai/archetypes` com `deck_id` em
-    `app/lib/features/decks/providers/deck_provider_support_mutation.dart:168`-`:173`;
-    `server/routes/ai/archetypes/index.dart:39`-`:42` busca o deck por `id`
-    apenas e `:54`-`:60` carrega cartas por `dc.deck_id = @id`.
-  - `OptimizeJobStore.create` aceita `String? userId` em
-    `server/lib/ai/optimize_job.dart:25`-`:30`, e
-    `server/routes/ai/optimize/jobs/[id].dart:39`-`:47` so bloqueia quando o
-    job tem owner diferente; job nulo continua legivel.
-  - O app envia `POST /ai/generate` com `async: true` em
-    `app/lib/features/decks/providers/deck_provider_support_generation.dart:230`-`:236`
-    e faz polling pelo `poll_url` em `:379`. `server/routes/ai/generate/index.dart:786`-`:813`
-    cria jobs com `String? userId`; `server/lib/ai_generate_job.dart:12`-`:17`
-    aceita usuario nullable; `server/routes/ai/generate/jobs/[id].dart:16`-`:19`
-    so bloqueia quando o job tem owner diferente.
-  - A busca focada em `server/test` e `app/test` encontrou teste de caminho
-    feliz/cache para `/ai/archetypes`, mas nao teste non-owner; encontrou teste
-    de parsing/armazenamento de `userId` em generate job, mas nao teste de
-    rota rejeitando `job.userId == null`.
-  - `GET /decks/:id/analysis` seleciona `card_function_tags` e
-    `semantic_tags_v2`, e o app parseia `functional_tags`; em contraste,
-    `server/lib/ai/optimize_request_support.dart:86`-`:106` carrega apenas
-    `card_semantic_tags_v2`, e `:186`-`:198` monta `allCardData` sem
-    `functional_tags`.
-  - `server/routes/decks/[id]/recommendations/index.dart:24`-`:27` busca deck
-    por `id` e `:39`-`:58` busca cartas por `deckId`; a rota esta documentada
-    como experimental/not proven em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
-    e nao tem chamada atual em `app/lib`.
-  - `server/routes/decks/[id]/simulate/index.dart:13`-`:25` carrega cartas por
-    `deckId` sem owner; busca focada em `app/lib` nao encontrou consumidor.
-  - `app/lib/features/decks/providers/deck_provider.dart:605`-`:607` emite
-    `_trackActivationEvent('deck_rebuild_created', deckId: draftDeckId)`.
-    `app/lib/core/services/activation_funnel_service.dart:17`-`:23` envia o
-    evento para `POST /users/me/activation-events`, mas o catch em `:24`-`:26`
-    engole falhas. A rota aceita somente `_allowedEvents` em
-    `server/routes/users/me/activation-events/index.dart:10`-`:18`, sem
-    `deck_rebuild_created`, e rejeita fora da lista em `:46`-`:48`.
-    `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` ainda chama o endpoint de
-    `internal` com consumidor `not proven`, embora haja chamadas reais em
-    `app/lib`.
-  - `app/test/features/decks/providers/deck_provider_test.dart:857` espera
-    `deck_rebuild_created` no provider, mas a busca focada nao encontrou teste
-    backend aceitando esse evento.
-  - Controles positivos revalidados: `server/routes/ai/rebuild/index.dart:16`
-    e `:62`-`:78`; `server/routes/decks/[id]/analysis/index.dart:18`-`:25`;
-    `server/routes/decks/[id]/ai-analysis/index.dart:25`-`:39`;
-    `server/routes/import/to-deck/index.dart:20`-`:37`;
-    `server/routes/decks/[id]/pricing/index.dart:20`-`:35`;
-    `server/routes/decks/[id]/validate/index.dart:13`-`:24`;
-    `server/routes/decks/[id]/cards/bulk/index.dart:13`-`:75`; e
-    `server/routes/decks/[id]/cards/replace/index.dart:19`-`:60`.
-- **Impacto**: usuario autenticado pode potencialmente disparar analise/opcoes
-  ou leitura de job para recursos sem owner-scope se obtiver IDs validos. Alem
-  disso, a memoria tecnica anterior registrava um estado resolvido que nao bate
-  com o codigo local. No caso de activation, o fluxo de rebuild guiado perde
-  telemetria silenciosamente, o que mascara funil/metricas de produto.
-- **Ação recomendada**:
-  1. adicionar `userId` obrigatorio a `loadOptimizeDeckContext` e filtrar
-     `decks`/`deck_cards` por dono;
-  2. aplicar o mesmo owner-scope em `/ai/archetypes`;
-  3. tornar `OptimizeJobStore.create` e `AiGenerateJobStore.create`
-     owner-obrigatorios para jobs app-facing e retornar 404 quando
-     `job.userId == null || job.userId != userId`;
-  4. decidir se `/decks/:id/recommendations` e `/decks/:id/simulate` serao
-     removidas, owner-scoped ou publicas somente para `is_public=true`;
-  5. adicionar `deck_rebuild_created` a `_allowedEvents` com teste, ou remover a
-     emissao app se rebuild nao deve entrar no funil; atualizar
-     `API_CONTRACTS_AND_DATA_MAP.md` para listar consumidores reais do endpoint;
-  6. threadar `card_function_tags` no contexto de optimize ou documentar/testar
-     que optimize ignora essa camada por design;
-  7. exigir teste owner vs non-owner quando qualquer rota nova aceitar
-     `deck_id`.
-- **Validação**:
-  - teste de `POST /ai/optimize` com deck de outro usuario retorna 404;
-  - teste de `POST /ai/archetypes` com deck de outro usuario retorna 404;
-  - source mostra `loadOptimizeDeckContext` com `userId` obrigatorio e query de
-    `decks` por `id + user_id`;
-  - source mostra polling de optimize/generate bloqueando
-    `job.userId == null` ou owner diferente;
-  - source mostra `functional_tags` chegando ao adapter de optimize, ou testes
-    provam a divergencia intencional;
-  - source mostra recommendations/simulate lendo cartas via `deck_cards` +
-    `decks` filtrado por owner, ou docs/testes marcando contrato publico;
-  - teste de activation aceita ou elimina `deck_rebuild_created`, e a doc deixa
-    de chamar consumidores app reais de `not proven`;
-  - `rg "/ai/simulate-matchup|/ai/weakness-analysis|/decks/.*/simulate|/decks/.*/recommendations" app/lib`
-    continua vazio ate haver contrato seguro;
+### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
+- **Status 2026-06-10 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `1554a1e5`. Os achados anteriores de ownership em `/ai/optimize`,
+  `/ai/archetypes` e jobs async de optimize/generate estao resolvidos nesta
+  branch e foram removidos da lista de acoes abertas. A lacuna ativa agora e
+  mais estreita: activation telemetry rejeita um evento emitido pelo app,
+  `/ai/commander-learning` e app-facing mas nao esta no API contract/data map, e
+  a disponibilidade automatica de learned decks usa o mesmo middleware de IA
+  custosa das rotas com LLM.
+- **Evidencia atualizada**:
+  - O app envia `POST /ai/optimize` em
+    `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`. A rota
+    exige usuario autenticado em `server/routes/ai/optimize/index.dart:451`-`:454`,
+    verifica acesso antes de criar job async em `:466`-`:488` e passa
+    `authenticatedUserId` para `loadOptimizeDeckContext` em `:569`-`:580`.
+    O helper consulta `decks` por `id + user_id` em
+    `server/lib/ai/optimize_request_support.dart:64`-`:84`.
+  - O contexto principal de optimize carrega `$semanticV2Select` e
+    `$functionalTagsSelect` em
+    `server/lib/ai/optimize_request_support.dart:97`-`:123`. O classificador de
+    roles declara precedencia `functional_tags -> semantic_tags_v2 ->
+    heuristica` em `server/lib/ai/optimization_functional_roles.dart:301`-`:338`.
+  - `POST /ai/archetypes` le `userId` e busca o deck por `id + user_id` em
+    `server/routes/ai/archetypes/index.dart:35`-`:47`.
+  - `OptimizeJobStore.create` exige `String userId` em
+    `server/lib/ai/optimize_job.dart:32`-`:37`; o polling rejeita
+    `job.userId.isEmpty || job.userId != userId` em
+    `server/routes/ai/optimize/jobs/[id].dart:26`-`:47`. O mesmo padrao existe
+    para generate em `server/lib/ai_generate_job.dart:18`-`:23` e
+    `server/routes/ai/generate/jobs/[id].dart:16`-`:27`.
+  - `app/lib/features/decks/providers/deck_provider.dart:603`-`:614` emite
+    `deck_rebuild_created` quando rebuild cria draft; a rota
+    `server/routes/users/me/activation-events/index.dart:10`-`:18` nao inclui
+    esse evento em `_allowedEvents` e rejeita fora da lista em `:46`-`:48`.
+  - `app/lib/features/decks/screens/deck_generate_screen.dart:41`-`:43` carrega
+    learned decks no primeiro frame; o provider chama
+    `GET /ai/commander-learning` em
+    `app/lib/features/decks/providers/deck_provider.dart:804`-`:824` e a rota
+    retorna `commanders[]` em
+    `server/routes/ai/commander-learning/index.dart:20`-`:27`. Com query, o app
+    chama `fetchCommanderLearningDeck` em
+    `app/lib/features/decks/providers/deck_provider.dart:778`-`:801`, e a rota
+    retorna `promoted_deck`/`recommended_deck` em
+    `server/routes/ai/commander-learning/index.dart:43`-`:53`.
+  - A rota de learned decks le `commander_learned_decks` em
+    `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:110`-`:132`;
+    o schema/modelo fica em
+    `server/lib/ai/commander_learned_deck_support.dart:7` e `:285`-`:311`.
+    `rg "/ai/commander-learning" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+    nao encontrou contrato, e `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:315`
+    nao lista `commander_learned_decks` nos data sources.
+  - `server/routes/ai/_middleware.dart:16`-`:20` aplica
+    `aiPlanLimitMiddleware()` e `aiRateLimit()` a `/ai/commander-learning`.
+    `server/lib/plan_middleware.dart:35`-`:53` bloqueia quando a cota de IA
+    acaba, e `server/lib/rate_limit_middleware.dart:167`-`:170`/`:381`-`:397`
+    aplica bucket AI de 10/min em producao. O handler de commander-learning e
+    leitura local de PG, sem chamada OpenAI.
+- **Impacto**: o risco de acesso cross-owner nos fluxos principais de optimize
+  foi removido nesta branch. Os riscos remanescentes sao de confiabilidade e
+  contrato: telemetria de rebuild some silenciosamente, um endpoint consumido
+  pelo app nao esta documentado como app-facing, e a UI de learned deck pode
+  desaparecer por plano/rate limit de IA mesmo quando a consulta e local.
+- **Acao recomendada**:
+  1. adicionar `deck_rebuild_created` a `_allowedEvents` com teste de rota, ou
+     remover a emissao no app se rebuild nao pertence ao funil;
+  2. atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` com
+     `GET /ai/commander-learning`, payloads sem/com `commander`, consumidores,
+     data source `commander_learned_decks`, testes e notas de compatibilidade;
+  3. decidir se learned-deck availability deve sair do middleware de IA custosa,
+     ganhar excecao documentada/testada ou ser explicitamente tratado como
+     capacidade de IA sujeita a `402/429`;
+  4. manter testes owner vs non-owner para qualquer rota nova que aceite
+     `deck_id`, usando optimize/archetypes como padrao positivo atual.
+- **Validacao**:
+  - teste backend aceita ou elimina `deck_rebuild_created`, e a doc deixa de
+    chamar consumidores app reais de `not proven`;
+  - `API_CONTRACTS_AND_DATA_MAP.md` passa a listar `/ai/commander-learning` e
+    `commander_learned_decks`;
+  - teste/contrato cobre `GET /ai/commander-learning` sem query e com
+    `commander`;
+  - se o endpoint continuar sob `/ai`, teste cobre comportamento esperado para
+    `402/429`; se for isento/movido, teste garante que a tela pode carregar
+    disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
 - **Status 2026-06-10 15:00 UTC: REVALIDADO no checkout `7cdd8a6e`.** A rodada local focada em
