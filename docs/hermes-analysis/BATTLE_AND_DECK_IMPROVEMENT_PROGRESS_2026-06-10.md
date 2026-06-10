@@ -52,12 +52,13 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com primeira extração concluída.
+**Status:** em andamento, com duas extrações concluídas.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7869 linhas.
-- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 3815 linhas após primeira extração.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 3514 linhas após duas extrações.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` — 330 linhas extraídas.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
 - `server/lib/ai/optimize_runtime_support.dart` — 2772 linhas.
 
@@ -66,23 +67,27 @@ Não misturar refactors grandes com correções funcionais. A primeira extraçã
 foi limitada às regras oficiais 2026 porque elas já formavam um domínio
 fechado, com cenários próprios e sem dependência de produto mobile.
 
-**Entregue agora:**
+**Entregue:**
 - Novo módulo `battle_rules_2026_tests.py` com `CONFORMANCE_SCENARIOS_2026`
   e `register_tests(...)`.
+- Novo módulo `battle_combat_tests.py` com 10 regressões de combate:
+  bloqueio pelo jogador correto, alvo letal, foco em caster de Approach,
+  first strike, multi-block, trample, deathtouch, indestructible e double
+  strike + trample.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
-  os testes 2026 a partir do módulo extraído.
-- A saída do runner continua exibindo os testes 2026, provando que a cobertura
-  não foi removida.
+  os testes 2026 e combate a partir dos módulos extraídos.
+- A saída do runner continua exibindo os testes 2026 e combate, provando que a
+  cobertura não foi removida.
 
 **Validação:**
-- `python3 -m py_compile battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
+- `python3 -m py_compile battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
 - `python3 test_battle_analyst_v10_3.py`
 
 ## Etapa 4 — Próximas pendências reais
 
 **Prioridade atual:**
-1. Separar mais suites Hermes por domínio, priorizando combat/replacement e
-   commander rules.
+1. Separar mais suites Hermes por domínio, priorizando replacement e commander
+   rules.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
 3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente

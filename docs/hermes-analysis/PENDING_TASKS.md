@@ -19,8 +19,9 @@
 > focados adicionados em `test/optimization_validator_test.dart`.
 >
 > **Atualização 2026-06-10 — modularização.**
-> Primeira extração da suite Hermes concluída: regras oficiais 2026 foram
-> movidas para `battle_rules_2026_tests.py`, mantendo
+> Extrações iniciais da suite Hermes concluídas: regras oficiais 2026 foram
+> movidas para `battle_rules_2026_tests.py` e regressões de combate foram
+> movidas para `battle_combat_tests.py`, mantendo
 > `test_battle_analyst_v10_3.py` como runner único.
 
 ---
@@ -57,6 +58,7 @@
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
+| ✅ | Segunda extração da suite Hermes | `battle_combat_tests.py` |
 
 ---
 

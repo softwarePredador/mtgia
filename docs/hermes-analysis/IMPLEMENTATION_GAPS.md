@@ -183,8 +183,9 @@
 | Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
 |---|---:|---|---|
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7869 | ⚠️ Split necessário | Extrair rules/helpers por domínio mantendo conformance suite verde |
-| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 3815 | ⚠️ Split em andamento | Regras 2026 extraídas; continuar com combat/replacement/commander |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 3514 | ⚠️ Split em andamento | Regras 2026 e combate extraídos; continuar com replacement/commander |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` | 304 | ✅ Extraído | Mantém cenários e testes oficiais 2026 isolados |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` | 330 | ✅ Extraído | Mantém regressões de combate isoladas |
 | `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
