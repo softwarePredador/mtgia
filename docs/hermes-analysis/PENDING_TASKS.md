@@ -49,6 +49,9 @@
 > Permanents complexos também foram movidos para
 > `battle_permanents_complex_tests.py`, cobrindo planeswalker, battle/siege,
 > DFC, adventure, prototype e split.
+> Continuous effects/layers também foram movidos para
+> `battle_continuous_effects_tests.py`, cobrindo sublayers 7b-7e, layers 3-6,
+> timestamps e dependências declaradas.
 
 ---
 
@@ -97,6 +100,7 @@
 | ✅ | Décima segunda extração da suite Hermes | `battle_turn_flow_tests.py` |
 | ✅ | Décima terceira extração da suite Hermes | `battle_sba_zone_tests.py` |
 | ✅ | Décima quarta extração da suite Hermes | `battle_permanents_complex_tests.py` |
+| ✅ | Décima quinta extração da suite Hermes | `battle_continuous_effects_tests.py` |
 
 ---
 
@@ -234,7 +238,7 @@
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `ContinuousEffect`, `order_continuous_effects`, `apply_continuous_effects`.
-- `test_battle_analyst_v10_3.py`: testes de sublayers 7a-7e, layers 3-6 e dependência/timestamp.
+- `battle_continuous_effects_tests.py`: testes de sublayers 7a-7e, layers 3-6 e dependência/timestamp.
 
 **O que foi coberto**:
 - Layer 1: copiable values via `copy`.
@@ -359,7 +363,7 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7869 |
-| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 1011 |
+| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 910 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
 | `battle_zone_transition_tests.py` | Regressões isoladas de zone transitions, tokens, tutor, ramp, recursion e reanimation | 229 |
@@ -367,6 +371,7 @@
 | `battle_turn_flow_tests.py` | Regressões isoladas de turn flow, draw, failed draw, extra turns e treasure draw | 147 |
 | `battle_sba_zone_tests.py` | Regressões isoladas de SBA, zone metadata, LKI, anexos ilegais e Saga final | 171 |
 | `battle_permanents_complex_tests.py` | Regressões isoladas de planeswalker, battle/siege, DFC, adventure, prototype e split | 246 |
+| `battle_continuous_effects_tests.py` | Regressões isoladas de continuous effects/layers, timestamps e dependencies | 155 |
 | `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |

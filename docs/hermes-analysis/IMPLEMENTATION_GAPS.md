@@ -187,7 +187,7 @@
 | Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
 |---|---:|---|---|
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7869 | ⚠️ Split necessário | Extrair rules/helpers por domínio mantendo conformance suite verde |
-| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 1011 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana, stack/casting, card-specific, targeting, summoning sickness, zone transitions, card import/oracle, turn flow, SBA/zone metadata e permanents complexos extraídos; continuar com continuous effects/layers, métricas do engine, conformance e triggers |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 910 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana, stack/casting, card-specific, targeting, summoning sickness, zone transitions, card import/oracle, turn flow, SBA/zone metadata, permanents complexos e continuous effects extraídos; continuar com métricas do engine, conformance, loss taxonomy e triggers |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` | 304 | ✅ Extraído | Mantém cenários e testes oficiais 2026 isolados |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` | 330 | ✅ Extraído | Mantém regressões de combate isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` | 151 | ✅ Extraído | Mantém regressões de replacement/prevention isoladas |
@@ -202,6 +202,7 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py` | 147 | ✅ Extraído | Mantém regressões de turn flow, draw step, Approach win/turn stop, failed draw, extra turns e Unexpected Windfall isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_zone_tests.py` | 171 | ✅ Extraído | Mantém regressões de SBA, cleanup, counters, anexos ilegais, Saga final, LKI/zone id e exile visibility isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_permanents_complex_tests.py` | 246 | ✅ Extraído | Mantém regressões de planeswalker, battle/siege, DFC, adventure, prototype e split isoladas |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_continuous_effects_tests.py` | 155 | ✅ Extraído | Mantém regressões de continuous effects/layers, sublayers 7b-7e, timestamps e dependencies isoladas |
 | `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |

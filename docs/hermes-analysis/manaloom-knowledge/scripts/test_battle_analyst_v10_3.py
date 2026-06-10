@@ -151,6 +151,14 @@ permanents_complex_spec = importlib.util.spec_from_file_location(
 battle_permanents_complex_tests = importlib.util.module_from_spec(permanents_complex_spec)
 permanents_complex_spec.loader.exec_module(battle_permanents_complex_tests)
 
+CONTINUOUS_EFFECTS_TESTS_PATH = MODULE_PATH.with_name("battle_continuous_effects_tests.py")
+continuous_effects_spec = importlib.util.spec_from_file_location(
+    "battle_continuous_effects_tests_under_test",
+    CONTINUOUS_EFFECTS_TESTS_PATH,
+)
+battle_continuous_effects_tests = importlib.util.module_from_spec(continuous_effects_spec)
+continuous_effects_spec.loader.exec_module(battle_continuous_effects_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -336,113 +344,6 @@ def test_end_of_combat_triggers_use_stack_and_apnap_order():
         assert resolved == ["Nonactive", "Active"]
     finally:
         battle.REPLAY_EVENT_HANDLER = previous_handler
-
-
-def test_continuous_effects_apply_layers_and_sublayers_in_order():
-    creature = {
-        "name": "Layer Test",
-        "type_line": "Creature",
-        "colors": ["red"],
-        "abilities": ["trample"],
-        "power": 2,
-        "toughness": 2,
-    }
-    result = battle.apply_continuous_effects(
-        creature,
-        [
-            {"effect_id": "switch", "layer": 7, "sublayer": "7e", "effect_type": "switch_pt", "timestamp": 1},
-            {
-                "effect_id": "set-pt",
-                "layer": 7,
-                "sublayer": "7b",
-                "effect_type": "set_pt",
-                "value": {"power": 1, "toughness": 4},
-                "timestamp": 5,
-            },
-            {
-                "effect_id": "modify",
-                "layer": 7,
-                "sublayer": "7c",
-                "effect_type": "modify_pt",
-                "value": {"power": 2, "toughness": 0},
-                "timestamp": 2,
-            },
-            {
-                "effect_id": "counter",
-                "layer": 7,
-                "sublayer": "7d",
-                "effect_type": "counter_pt",
-                "value": {"power": 0, "toughness": 1},
-                "timestamp": 3,
-            },
-        ],
-    )
-
-    assert result["power"] == 5
-    assert result["toughness"] == 3
-    assert result["_continuous_effects_applied"] == ["set-pt", "modify", "counter", "switch"]
-
-
-def test_continuous_effects_apply_type_color_text_and_ability_layers():
-    card_state = {
-        "name": "Layer Utility",
-        "type_line": "Creature",
-        "oracle_text": "Target creature gains flying.",
-        "colors": ["white"],
-        "abilities": ["flying", "vigilance"],
-    }
-
-    result = battle.apply_continuous_effects(
-        card_state,
-        [
-            {
-                "effect_id": "text",
-                "layer": 3,
-                "effect_type": "replace_text",
-                "value": {"from": "flying", "to": "trample"},
-                "timestamp": 4,
-            },
-            {"effect_id": "type", "layer": 4, "effect_type": "add_type", "value": ["Artifact"], "timestamp": 3},
-            {"effect_id": "color", "layer": 5, "effect_type": "set_color", "value": ["blue"], "timestamp": 2},
-            {"effect_id": "add", "layer": 6, "effect_type": "add_ability", "value": ["hexproof"], "timestamp": 1},
-            {"effect_id": "remove", "layer": 6, "effect_type": "remove_ability", "value": ["flying"], "timestamp": 5},
-        ],
-    )
-
-    assert result["oracle_text"] == "Target creature gains trample."
-    assert result["type_line"] == "Creature Artifact"
-    assert result["colors"] == ["blue"]
-    assert "hexproof" in result["abilities"]
-    assert "flying" not in result["abilities"]
-    assert "vigilance" in result["abilities"]
-
-
-def test_continuous_effect_dependencies_override_timestamp_within_layer():
-    card_state = {"name": "Dependency Test", "type_line": "Creature", "abilities": []}
-
-    result = battle.apply_continuous_effects(
-        card_state,
-        [
-            {
-                "effect_id": "remove-flying",
-                "layer": 6,
-                "effect_type": "remove_ability",
-                "value": ["flying"],
-                "timestamp": 1,
-                "depends_on": ["add-flying"],
-            },
-            {
-                "effect_id": "add-flying",
-                "layer": 6,
-                "effect_type": "add_ability",
-                "value": ["flying"],
-                "timestamp": 9,
-            },
-        ],
-    )
-
-    assert result["abilities"] == []
-    assert result["_continuous_effects_applied"] == ["add-flying", "remove-flying"]
 
 
 def test_engine_metrics_collects_core_health_signals():
@@ -974,9 +875,7 @@ if __name__ == "__main__":
         *battle_turn_flow_tests.register_tests(battle, player, card),
         *battle_mana_tests.register_tests(battle, player),
         *battle_stack_casting_tests.register_tests(battle, player),
-        test_continuous_effects_apply_layers_and_sublayers_in_order,
-        test_continuous_effects_apply_type_color_text_and_ability_layers,
-        test_continuous_effect_dependencies_override_timestamp_within_layer,
+        *battle_continuous_effects_tests.register_tests(battle),
         *battle_permanents_complex_tests.register_tests(battle, player),
         test_engine_metrics_collects_core_health_signals,
         test_engine_metrics_snapshot_writes_sanitized_json,
