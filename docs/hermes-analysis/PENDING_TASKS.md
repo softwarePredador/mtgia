@@ -43,6 +43,9 @@
 > Turn flow/draw também foi movido para `battle_turn_flow_tests.py`, cobrindo
 > draw step único, Approach win/turn stop, failed draw, extra turns e
 > Unexpected Windfall discard/draw/treasure.
+> SBA/zone metadata também foi movido para `battle_sba_zone_tests.py`, cobrindo
+> eliminação nova, cleanup, counters, anexos ilegais, Saga final, LKI/zone id
+> e exile visibility.
 
 ---
 
@@ -89,6 +92,7 @@
 | ✅ | Décima extração da suite Hermes | `battle_zone_transition_tests.py` |
 | ✅ | Décima primeira extração da suite Hermes | `battle_card_import_tests.py` |
 | ✅ | Décima segunda extração da suite Hermes | `battle_turn_flow_tests.py` |
+| ✅ | Décima terceira extração da suite Hermes | `battle_sba_zone_tests.py` |
 
 ---
 
@@ -351,12 +355,13 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7869 |
-| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 1407 |
+| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 1246 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
 | `battle_zone_transition_tests.py` | Regressões isoladas de zone transitions, tokens, tutor, ramp, recursion e reanimation | 229 |
 | `battle_card_import_tests.py` | Regressões isoladas de import/oracle, rules table, lands e artefatos curados | 278 |
 | `battle_turn_flow_tests.py` | Regressões isoladas de turn flow, draw, failed draw, extra turns e treasure draw | 147 |
+| `battle_sba_zone_tests.py` | Regressões isoladas de SBA, zone metadata, LKI, anexos ilegais e Saga final | 171 |
 | `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
