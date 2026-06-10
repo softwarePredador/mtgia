@@ -43,13 +43,12 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Replacement/prevention avançado | 5-7 dias | Alto | registry mínima |
-| 2 | Casting pipeline 601.2 avançado | 5-7 dias | Alto | 601.2 mínimo |
-| 3 | Layers 1-7 | 7-10 dias | Alto | #1 |
-| 4 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
-| 5 | DFC/Adventure/Prototype | 4-5 dias | Médio | #1 |
-| 6 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 7 | Suite de conformidade | 5-7 dias | Alto | #1-6 |
+| 1 | Casting pipeline 601.2 avançado | 5-7 dias | Alto | 601.2 mínimo |
+| 2 | Layers 1-7 | 7-10 dias | Alto | replacement registry |
+| 3 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
+| 4 | DFC/Adventure/Prototype | 4-5 dias | Médio | #1 |
+| 5 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 6 | Suite de conformidade | 5-7 dias | Alto | #1-5 |
 
 ---
 
@@ -143,7 +142,7 @@
 
 ### 5. Replacement/Prevention Effects
 
-**Status 2026-06-10**: ✅ Mínimo implementado / ⚠️ CR 616 completo pendente.
+**Status 2026-06-10**: ✅ Registry determinística implementada / ⚠️ efeitos card-specific pendentes.
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `ReplacementEvent`, `ReplacementRegistry`, integração em `change_life`, `deal_damage`, `gain_life`, `move_creature_from_battlefield`.
@@ -153,13 +152,14 @@
 - Dano é processado por prevention antes de mutar vida.
 - `life_cant_change` e `protection_from_everything` passam por evento centralizado.
 - Prevention shields quantitativos reduzem dano parcial/total e são consumidos antes da mutação de vida.
+- Efeitos aplicáveis são escolhidos em ordem determinística por prioridade e expõem `replacement_order`.
 - Ganho/perda de vida usa replacement antes de alterar life total.
-- Commander em zone change para graveyard é redirecionado para command zone por registry mínima.
+- Commander em zone change para graveyard/exile/hand/library é redirecionado para command zone quando o owner não escolhe manter a zona destino.
 - Evento `replacement_applied` expõe `replacement_pipeline=replacement_prevention_minimal`.
 
 **Limite restante**:
-- Ainda não existe escolha APNAP real entre múltiplos replacement effects concorrentes.
-- Replacement para exile/hand/library e efeitos self-replacement específicos ainda precisam de casos dedicados.
+- Escolha humana/APNAP real entre replacement effects concorrentes ainda é simulada por prioridade determinística.
+- Efeitos self-replacement específicos por carta ainda precisam de casos dedicados.
 
 **Regra**: CR 614 (Replacement), CR 615 (Prevention), CR 616 (Interaction)
 

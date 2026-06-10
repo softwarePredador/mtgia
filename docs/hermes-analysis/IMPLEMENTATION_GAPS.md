@@ -155,7 +155,7 @@
 | Layer 2-6 (control, text, type, color, abilities) | ❌ Ausente | — | |
 | Layer 7 (P/T com subcamadas) | ❌ Ausente | — | |
 | Timestamps e dependencies | ❌ Ausente | — | |
-| Replacement/prevention effects | ⚠️ Parcial | v9: `ReplacementRegistry` | Prevention/life/shields/commander zone-change mínimos; falta CR 616 completo |
+| Replacement/prevention effects | ⚠️ Parcial | v9: `ReplacementRegistry` | Ordem determinística, prevention/life/shields/commander zone-change; faltam self-replacements card-specific |
 
 ---
 
@@ -184,7 +184,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Replacement/prevention avançado** — aplicar ordem CR 616 de forma determinística
-2. **Casting pipeline 601.2 avançado** — modes, X, custos alternativos/adicionais e targeting formal
-3. **Layers 1-7** — efeitos contínuos com timestamp/dependência
+1. **Casting pipeline 601.2 avançado** — modes, X, custos alternativos/adicionais e targeting formal
+2. **Layers 1-7** — efeitos contínuos com timestamp/dependência
+3. **Planeswalkers/Battles** — loyalty/defense e SBAs dedicadas
 4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
