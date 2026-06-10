@@ -4770,9 +4770,20 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         permanent["tapped"] = False
         player.battlefield.append(permanent)
 
-def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
+def beginning_of_combat_step(attacker, opponents, all_players, turn, rng, stack):
+    emit_replay_event(
+        "combat_step",
+        step="beginning_of_combat",
+        active_player=attacker.name,
+        turn=turn,
+    )
+    run_priority_loop(attacker, all_players, stack, turn, "beginning_of_combat", rng)
+
+
+def declare_attackers_step(attacker, opponents, turn):
     creatures = attacker.untapped_creatures()
-    if not creatures: return
+    if not creatures:
+        return None
 
     attackers = []
     for c in creatures:
@@ -4786,47 +4797,12 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             if not has_vigilance(c):
                 c["tapped"] = True
             attackers.append(c)
-    if not attackers: return
+    if not attackers:
+        return None
 
     alive_defenders = [o for o in opponents if o.is_alive()]
-    if not alive_defenders: return
-
-    # v8: Instant-speed removal window before combat damage
-    for opp in alive_defenders:
-        if opp.is_human: continue
-        removals = [c for c in opp.hand if get_card_effect(c).get("effect") in ("remove_creature",) and opp.can_pay_card(c)]
-        if removals and rng.random() < 0.3:
-            c = rng.choice(removals)
-            if c in opp.hand and opp.can_pay_card(c):
-                opp.hand.remove(c)
-                opp.spend_card_mana(c)
-                # Remove one attacker
-                valid_attackers = [
-                    attacker_card
-                    for attacker_card in attackers
-                    if not attacker_card.get("shroud")
-                    and not attacker_card.get("protection_from_everything")
-                ]
-                if valid_attackers:
-                    eff = get_card_effect(c)
-                    target = choose_best_creature_target(valid_attackers)
-                    emit_replay_event(
-                        "instant_removal",
-                        player=opp.name,
-                        card=c.get("name", "?"),
-                        effect=eff.get("effect", "unknown"),
-                        target_player=attacker.name,
-                        target=target.get("name", "?"),
-                        target_power=target.get("power"),
-                        target_toughness=target.get("toughness"),
-                        attackers_before=len(attackers),
-                        turn=turn,
-                        **replay_rule_fields(eff),
-                    )
-                    attackers.remove(target)
-                    move_creature_from_battlefield(attacker, target)
-
-    if not attackers: return
+    if not alive_defenders:
+        return None
 
     total_power = sum(a.get("power", 2) for a in attackers)
     lethal_targets = [opp for opp in alive_defenders if opp.life <= total_power]
@@ -4876,6 +4852,62 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         )
         target_reason = "default_low_life"
 
+    emit_replay_event(
+        "combat_step",
+        step="declare_attackers",
+        attacker=attacker.name,
+        target=target.name,
+        target_reason=target_reason,
+        attackers=len(attackers),
+        attackers_detail=[replay_card_snapshot(card) for card in attackers],
+        turn=turn,
+    )
+    return attackers, alive_defenders, target, target_reason
+
+
+def combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rng):
+    # v8: Instant-speed removal window after attackers are declared.
+    for opp in alive_defenders:
+        if opp.is_human:
+            continue
+        removals = [
+            c for c in opp.hand
+            if get_card_effect(c).get("effect") in ("remove_creature",)
+            and opp.can_pay_card(c)
+        ]
+        if removals and rng.random() < 0.3:
+            c = rng.choice(removals)
+            if c in opp.hand and opp.can_pay_card(c):
+                opp.hand.remove(c)
+                opp.spend_card_mana(c)
+                valid_attackers = [
+                    attacker_card
+                    for attacker_card in attackers
+                    if attacker_card in attacker.battlefield
+                    and not attacker_card.get("shroud")
+                    and not attacker_card.get("protection_from_everything")
+                ]
+                if valid_attackers:
+                    eff = get_card_effect(c)
+                    target = choose_best_creature_target(valid_attackers)
+                    emit_replay_event(
+                        "instant_removal",
+                        player=opp.name,
+                        card=c.get("name", "?"),
+                        effect=eff.get("effect", "unknown"),
+                        target_player=attacker.name,
+                        target=target.get("name", "?"),
+                        target_power=target.get("power"),
+                        target_toughness=target.get("toughness"),
+                        attackers_before=len(attackers),
+                        turn=turn,
+                        **replay_rule_fields(eff),
+                    )
+                    attackers.remove(target)
+                    move_creature_from_battlefield(attacker, target)
+
+
+def declare_blockers_step(target, attackers, turn, rng):
     # Only the attacked player can block. Multiple blockers may gang-block one attacker.
     block_assignments = []
     assigned_blockers = []
@@ -4919,43 +4951,21 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
                 blockers = []
         assigned_blockers.extend(blockers)
         block_assignments.append((a, blockers))
-
-    combat_target_life_before = target.life
-    combat_attacker_life_before = attacker.life
-
     emit_replay_event(
-        "combat",
-        attacker=attacker.name,
-        target=target.name,
-        target_reason=target_reason,
-        target_life_before=combat_target_life_before,
-        attacker_life_before=combat_attacker_life_before,
-        target_life_cant_change=bool(target.life_cant_change),
-        target_protection_from_everything=bool(target.protection_from_everything),
-        defenders=[
-            {
-                "name": defender.name,
-                "life": defender.life,
-                "threat_level": defender.threat_level,
-                "creatures": len(defender.creatures_for_blocking()),
-                "approach_count": defender.approach_count,
-            }
-            for defender in alive_defenders
-        ],
+        "combat_step",
+        step="declare_blockers",
+        defender=target.name,
         attackers=len(attackers),
-        attackers_detail=[replay_card_snapshot(card) for card in attackers],
         blockers=sum(len(blockers) for _, blockers in block_assignments),
-        blockers_detail=[
-            {
-                "attacker": replay_card_snapshot(attacking_creature),
-                "blockers": [replay_card_snapshot(blocker) for blocker in blockers],
-            }
-            for attacking_creature, blockers in block_assignments
-        ],
         multi_blocks=sum(1 for _, blockers in block_assignments if len(blockers) > 1),
-        total_power=total_power,
         turn=turn,
     )
+    return block_assignments
+
+
+def combat_damage_steps(attacker, opponents, target, attackers, block_assignments, turn):
+    combat_target_life_before = target.life
+    combat_attacker_life_before = attacker.life
 
     def stat(card, key, fallback):
         try:
@@ -5036,7 +5046,21 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         creature.get("first_strike") or creature.get("double_strike")
         for creature in attackers + target.creatures_for_blocking()
     ):
+        emit_replay_event(
+            "combat_step",
+            step="first_strike_damage",
+            attacker=attacker.name,
+            target=target.name,
+            turn=turn,
+        )
         combat_damage_step(first_strike_phase=True)
+    emit_replay_event(
+        "combat_step",
+        step="combat_damage",
+        attacker=attacker.name,
+        target=target.name,
+        turn=turn,
+    )
     combat_damage_step(first_strike_phase=False)
 
     # Check for commander damage kill
@@ -5060,6 +5084,70 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         target_dead=not target.is_alive(),
         turn=turn,
     )
+
+
+def end_of_combat_step(attacker, all_players, turn, rng, stack):
+    emit_replay_event(
+        "combat_step",
+        step="end_of_combat",
+        active_player=attacker.name,
+        turn=turn,
+    )
+    run_priority_loop(attacker, all_players, stack, turn, "end_of_combat", rng)
+
+
+def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
+    beginning_of_combat_step(attacker, opponents, all_players, turn, rng, stack)
+    declared = declare_attackers_step(attacker, opponents, turn)
+    if not declared:
+        return
+    attackers, alive_defenders, target, target_reason = declared
+
+    total_power = sum(a.get("power", 2) for a in attackers)
+    combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rng)
+    if not attackers:
+        return
+
+    block_assignments = declare_blockers_step(target, attackers, turn, rng)
+    combat_target_life_before = target.life
+    combat_attacker_life_before = attacker.life
+
+    emit_replay_event(
+        "combat",
+        attacker=attacker.name,
+        target=target.name,
+        target_reason=target_reason,
+        target_life_before=combat_target_life_before,
+        attacker_life_before=combat_attacker_life_before,
+        target_life_cant_change=bool(target.life_cant_change),
+        target_protection_from_everything=bool(target.protection_from_everything),
+        defenders=[
+            {
+                "name": defender.name,
+                "life": defender.life,
+                "threat_level": defender.threat_level,
+                "creatures": len(defender.creatures_for_blocking()),
+                "approach_count": defender.approach_count,
+            }
+            for defender in alive_defenders
+        ],
+        attackers=len(attackers),
+        attackers_detail=[replay_card_snapshot(card) for card in attackers],
+        blockers=sum(len(blockers) for _, blockers in block_assignments),
+        blockers_detail=[
+            {
+                "attacker": replay_card_snapshot(attacking_creature),
+                "blockers": [replay_card_snapshot(blocker) for blocker in blockers],
+            }
+            for attacking_creature, blockers in block_assignments
+        ],
+        multi_blocks=sum(1 for _, blockers in block_assignments if len(blockers) > 1),
+        total_power=total_power,
+        turn=turn,
+    )
+
+    combat_damage_steps(attacker, opponents, target, attackers, block_assignments, turn)
+    end_of_combat_step(attacker, all_players, turn, rng, stack)
 
 def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     """v8: Full turn with priority windows between phases."""

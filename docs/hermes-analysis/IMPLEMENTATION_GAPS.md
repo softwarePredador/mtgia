@@ -8,12 +8,12 @@
 
 | Categoria | Implementado | Parcial | Ausente |
 |---|---|---|---|
-| Turno e Prioridade | 4/10 | 3/10 | 3/10 |
+| Turno e Prioridade | 4/10 | 4/10 | 2/10 |
 | SBAs e Triggers | 4/15 | 2/15 | 9/15 |
 | Commander Rules | 4/8 | 2/8 | 2/8 |
 | Mana e Custos | 1/6 | 1/6 | 4/6 |
 | Targeting | 1/5 | 1/5 | 3/5 |
-| Combate | 5/10 | 3/10 | 2/10 |
+| Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 0/5 | 0/5 | 5/5 |
 | Tipos Complexos | 1/6 | 2/6 | 3/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
@@ -26,7 +26,7 @@
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
 | Fases completas (untap,upkeep,draw,main1,combat,main2,end,cleanup) | ✅ Parcial | 4605-4828 | Upkeep só tem One Ring trigger. Falta janela de prioridade no upkeep |
-| Passos de combate (beg.combat,decl.atk,decl.blk,damage,end.combat) | ❌ Ausente | 4314-4603 | Combat é monolítico, sem passos formais |
+| Passos de combate (beg.combat,decl.atk,decl.blk,damage,end.combat) | ⚠️ Parcial | 4773-5065 | Funções formais existem; faltam escolhas/restrições avançadas |
 | Prioridade formal (APNAP pass sequence) | ⚠️ Parcial | 2563-2620 | `run_priority_loop` cobre ações vazias do active player; falta pass sequence completa para todos |
 | Prioridade com pilha vazia | ✅ OK | 2563-2645 | `priority_round(..., phase=main)` permite ação sorcery-speed e o turno usa `run_priority_loop` |
 | Sem prioridade em untap/resolução | ✅ OK | 4622-4633 | Untap não chama priority |
@@ -37,7 +37,7 @@
 **Ações imediatas**: 
 - [ ] Adicionar `check_sbas_until_stable` nos pontos de prioridade ✅ FEITO
 - [x] Adicionar janela de prioridade com pilha vazia nos main phases ✅
-- [ ] Separar passos de combate (beg.combat, decl.atk, decl.blk, damage, end)
+- [x] Separar passos de combate (beg.combat, decl.atk, decl.blk, damage, end) ✅
 
 ---
 
@@ -184,7 +184,6 @@
 ## Próximos Passos (Ordem de Impacto)
 
 1. **Prioridade com pilha vazia** — main phases devem ter janela de prioridade formal
-2. **Passos de combate formais** — beg.combat, decl.atk, decl.blk, damage steps
-3. **Casting pipeline 601.2** — lock-in de custo
-4. **Replacement/prevention effects** — aplicar ordem CR 616 de forma determinística
-5. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
+2. **Casting pipeline 601.2** — lock-in de custo
+3. **Replacement/prevention effects** — aplicar ordem CR 616 de forma determinística
+4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9

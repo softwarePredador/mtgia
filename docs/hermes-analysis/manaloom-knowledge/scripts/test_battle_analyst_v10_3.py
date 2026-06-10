@@ -140,6 +140,14 @@ def test_combat_emits_structured_event():
     assert combat_events[0]["attacker"] == "Attacker"
     assert combat_events[0]["target"] == "Defender"
     assert combat_events[0]["attackers"] == 1
+    combat_steps = [data["step"] for event, data in events if event == "combat_step"]
+    assert combat_steps == [
+        "beginning_of_combat",
+        "declare_attackers",
+        "declare_blockers",
+        "combat_damage",
+        "end_of_combat",
+    ]
 
 
 def test_turn_stops_immediately_after_approach_win():

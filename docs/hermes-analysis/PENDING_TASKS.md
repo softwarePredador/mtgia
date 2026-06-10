@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 17/25 itens implementados no battle_analyst_v9.py (5700+ linhas).
-> 8 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 18/25 itens implementados no battle_analyst_v9.py (5800+ linhas).
+> 7 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -28,8 +28,8 @@
 | ✅ | 3 docs (LOGIC, GAPS, TASKS) | docs/hermes-analysis/ |
 | ✅ | APNAP trigger ordering básico | v9:2444, 2752, tests |
 | ✅ | Prioridade com pilha vazia | v9:priority_round/run_priority_loop |
+| ✅ | Passos de combate formais | v9:beginning/declare/damage/end combat steps |
 | ⏳ | Casting pipeline 601.2 | P1 |
-| ⏳ | Passos de combate formais | P1 |
 | ⏳ | Layers 1-7 (continuous effects) | P1 |
 | ⏳ | Replacement/Prevention effects | P1 |
 | ⏳ | Planeswalkers + Battles | P2 |
@@ -43,14 +43,13 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Passos de combate formais | 4-5 dias | Alto | prioridade |
-| 2 | Casting pipeline 601.2 | 5-7 dias | Alto | prioridade |
-| 3 | Replacement effects | 5-7 dias | Alto | — |
-| 4 | Layers 1-7 | 7-10 dias | Alto | #3 |
-| 5 | Planeswalkers/Battles | 3-4 dias | Médio | #1 |
-| 6 | DFC/Adventure/Prototype | 4-5 dias | Médio | #2 |
-| 7 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 8 | Suite de conformidade | 5-7 dias | Alto | #1-7 |
+| 1 | Casting pipeline 601.2 | 5-7 dias | Alto | prioridade |
+| 2 | Replacement effects | 5-7 dias | Alto | — |
+| 3 | Layers 1-7 | 7-10 dias | Alto | #2 |
+| 4 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
+| 5 | DFC/Adventure/Prototype | 4-5 dias | Médio | #1 |
+| 6 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 7 | Suite de conformidade | 5-7 dias | Alto | #1-6 |
 
 ---
 
@@ -172,11 +171,22 @@ def cast_spell_v9(player, card, stack, opponents):
 
 ### 4. Passos de Combate Formais
 
-**Gap**: `combat_phase_v8()` é monolítico. Atacantes auto-declarados, bloqueadores calculados, sem escolha do jogador.
+**Status 2026-06-10**: ✅ Implementado como refatoração incremental.
 
-**Arquivo**: `battle_analyst_v9.py:4314-4603`
+**Arquivos**:
+- `battle_analyst_v9.py`: `beginning_of_combat_step`, `declare_attackers_step`, `declare_blockers_step`, `combat_damage_steps`, `end_of_combat_step`.
+- `test_battle_analyst_v10_3.py`: `test_combat_emits_structured_event` valida sequência `combat_step`.
 
-**Implementação**: Ver seção 4 do BATTLE_SYSTEM_LOGIC.md. Os 5 passos formais são: Beginning of Combat, Declare Attackers, Declare Blockers, Combat Damage (first strike + normal), End of Combat. Cada passo tem janela de prioridade. A implementação requer refatorar `combat_phase_v8()` em 5 funções separadas.
+**O que foi coberto**:
+- Evento formal `combat_step` para `beginning_of_combat`.
+- Declaração de atacantes em função dedicada, mantendo target heuristic existente.
+- Janela de remoção instant-speed depois dos atacantes declarados.
+- Declaração de bloqueadores em função dedicada.
+- Damage step dedicado, incluindo first strike/double strike quando aplicável.
+- Evento formal `combat_step` para `end_of_combat`.
+- Eventos legados `combat` e `combat_result` preservados para consumidores atuais.
+
+**Limite restante**: atacantes/bloqueadores ainda são escolhidos por heurística automática; requirements/restrictions avançadas e escolha interativa ficam pendentes para a suite de conformidade e casting pipeline.
 
 ---
 
@@ -413,7 +423,7 @@ CONFORMANCE_SCENARIOS = [
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5779 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 5867 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |
