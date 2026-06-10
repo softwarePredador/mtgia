@@ -10,6 +10,13 @@
 > Omen, Flashback, multi-defender Commander combat e modern ability-word telemetry.
 > Todos estão cobertos em `test_battle_analyst_v10_3.py`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
+>
+> **Atualização 2026-06-10 — etapa deck-improvement.**
+> O diagnóstico/gate semântico do optimize deixou de depender apenas de
+> `semantic_tags_v2` para `role_delta`: agora usa a mesma precedência do produto
+> (`functional_tags` persistido → `semantic_tags_v2` → heurística) e expõe
+> `role_source_priority`/`role_signal_source_counts` para auditoria. Testes
+> focados adicionados em `test/optimization_validator_test.dart`.
 
 ---
 
@@ -43,6 +50,7 @@
 | ✅ | Telemetria de saúde do motor | v9:EngineMetrics |
 | ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
+| ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 
 ---
 
@@ -54,6 +62,7 @@
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal + multi-target básico |
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
+| 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
 
 ---
 

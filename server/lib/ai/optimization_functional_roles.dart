@@ -338,36 +338,6 @@ Set<String> optimizationFunctionalRolesForCard(Map<String, dynamic> card,
   return {classifyOptimizationFunctionalRole(card)};
 }
 
-String? _classifySemanticV2FunctionalRole(Object? rawSemanticTags) {
-  final roles = _parseSemanticV2Roles(rawSemanticTags);
-  if (roles.isEmpty) return null;
-  for (final role in const [
-    'wipe',
-    'board_wipe',
-    'draw',
-    'removal',
-    'ramp',
-    'tutor',
-    'protection',
-    'recursion',
-    'wincon',
-    'combo_piece'
-  ]) {
-    if (roles.contains(role)) return role == 'board_wipe' ? 'wipe' : role;
-  }
-  if (rawSemanticTags is List) {
-    for (final raw in rawSemanticTags) {
-      if (raw is! Map) continue;
-      if (raw['wincon'] == true) return 'wincon';
-      if (raw['combo_piece'] == true) return 'combo_piece';
-      if (raw['engine'] == true) return 'engine';
-      if (raw['payoff'] == true) return 'payoff';
-      if (raw['enabler'] == true) return 'enabler';
-    }
-  }
-  return roles.first;
-}
-
 // ---------------------------------------------------------------------------
 // Oracle text pattern matchers
 // ---------------------------------------------------------------------------
@@ -711,42 +681,50 @@ Map<String, dynamic> buildOptimizationSemanticV2Diagnostics({
   var addedSemanticRoleCount = 0;
   var pairsWithAnySemanticSignal = 0;
   var pairsWithBothSemanticSignals = 0;
+  final roleSourceCounts = <String, int>{};
 
   for (var i = 0; i < removals.length && i < additions.length; i++) {
     final removed = originalByName[_normalizeRoleCardName(removals[i])];
     final added = optimizedByName[_normalizeRoleCardName(additions[i])];
-    final removedRoles = _parseSemanticV2Roles(removed?['semantic_tags_v2']);
-    final addedRoles = _parseSemanticV2Roles(added?['semantic_tags_v2']);
-    if (removedRoles.isNotEmpty) {
+    final removedSignal = _diagnosticRoleSignal(removed);
+    final addedSignal = _diagnosticRoleSignal(added);
+    if (removedSignal.roles.isNotEmpty) {
       removedSemanticRoleCount++;
-      for (final role in removedRoles) {
+      roleSourceCounts[removedSignal.source] =
+          (roleSourceCounts[removedSignal.source] ?? 0) + 1;
+      for (final role in removedSignal.roles) {
         roleDelta[role] = (roleDelta[role] ?? 0) - 1;
       }
     }
-    if (addedRoles.isNotEmpty) {
+    if (addedSignal.roles.isNotEmpty) {
       addedSemanticRoleCount++;
-      for (final role in addedRoles) {
+      roleSourceCounts[addedSignal.source] =
+          (roleSourceCounts[addedSignal.source] ?? 0) + 1;
+      for (final role in addedSignal.roles) {
         roleDelta[role] = (roleDelta[role] ?? 0) + 1;
       }
     }
-    final removedPrimary =
-        _classifySemanticV2FunctionalRole(removed?['semantic_tags_v2']);
-    final addedPrimary =
-        _classifySemanticV2FunctionalRole(added?['semantic_tags_v2']);
-    if (removedPrimary != null || addedPrimary != null)
+    if (removedSignal.roles.isNotEmpty || addedSignal.roles.isNotEmpty) {
       pairsWithAnySemanticSignal++;
-    if (removedPrimary != null && addedPrimary != null)
+    }
+    if (removedSignal.roles.isNotEmpty && addedSignal.roles.isNotEmpty) {
       pairsWithBothSemanticSignals++;
+    }
   }
 
   final normalizedRoleDelta = Map.fromEntries(
     roleDelta.entries.where((e) => e.value != 0).toList()
       ..sort((a, b) => a.key.compareTo(b.key)),
   );
+  final normalizedSourceCounts = Map.fromEntries(
+    roleSourceCounts.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
+  );
 
   return {
     'schema_version': 'semantic_layer_v2_2026_05_18',
     'source': 'deterministic_semantic_v2',
+    'role_source_priority': 'functional_tags_then_semantic_v2_then_heuristic',
+    'role_signal_source_counts': normalizedSourceCounts,
     'mode': 'shadow',
     'pair_count':
         removals.length < additions.length ? removals.length : additions.length,
@@ -757,4 +735,34 @@ Map<String, dynamic> buildOptimizationSemanticV2Diagnostics({
     'role_delta': normalizedRoleDelta,
     'enforcement': 'disabled',
   };
+}
+
+CardRoles _diagnosticRoleSignal(Map<String, dynamic>? card) {
+  if (card == null) {
+    return const CardRoles(
+      roles: {},
+      primaryRole: 'utility',
+      source: 'missing',
+    );
+  }
+  final resolved = resolveCardFunctionalRoles(
+    functionalTags: card['functional_tags'],
+    semanticTagsV2: card['semantic_tags_v2'],
+    oracleText: (card['oracle_text'] as String?) ?? '',
+    typeLine: (card['type_line'] as String?) ?? '',
+    name: card['name']?.toString() ?? '',
+    manaCost: card['mana_cost']?.toString(),
+    cmc: card['cmc'],
+  );
+  if (resolved.roles.isEmpty) return resolved;
+  return CardRoles(
+    roles: resolved.roles.map(_normalizeDiagnosticRole).toSet(),
+    primaryRole: _normalizeDiagnosticRole(resolved.primaryRole),
+    source: resolved.source,
+  );
+}
+
+String _normalizeDiagnosticRole(String role) {
+  final normalized = role.trim().toLowerCase();
+  return normalized == 'board_wipe' ? 'wipe' : normalized;
 }

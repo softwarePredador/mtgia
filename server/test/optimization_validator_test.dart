@@ -206,6 +206,59 @@ void main() {
       expect(report.functional.roleDelta['removal'], equals(1));
     });
 
+    test('semantic diagnostics prefer persisted functional tags before v2', () {
+      final semantic = buildOptimizationSemanticV2Diagnostics(
+        originalDeck: const [
+          {
+            'name': 'Persisted Draw Engine',
+            'type_line': 'Artifact',
+            'mana_cost': '{3}',
+            'oracle_text': 'Legacy text with no semantic v2 payload.',
+            'cmc': 3,
+            'quantity': 1,
+            'functional_tags': [
+              {'tag': 'draw', 'confidence': 0.95},
+              {'tag': 'engine', 'confidence': 0.92},
+            ],
+          },
+        ],
+        optimizedDeck: const [
+          {
+            'name': 'Persisted Ramp Rock',
+            'type_line': 'Artifact',
+            'mana_cost': '{2}',
+            'oracle_text': '{T}: Add one mana of any color.',
+            'cmc': 2,
+            'quantity': 1,
+            'functional_tags': [
+              {'tag': 'ramp', 'confidence': 0.91},
+            ],
+            'semantic_tags_v2': [
+              {
+                'tags': ['utility'],
+                'role_confidence': 0.98,
+              }
+            ],
+          },
+        ],
+        removals: const ['Persisted Draw Engine'],
+        additions: const ['Persisted Ramp Rock'],
+      );
+
+      expect(
+        semantic['role_source_priority'],
+        equals('functional_tags_then_semantic_v2_then_heuristic'),
+      );
+      expect(
+        semantic['role_signal_source_counts'],
+        equals(const {'persisted': 2}),
+      );
+      expect(semantic['role_delta'], containsPair('draw', -1));
+      expect(semantic['role_delta'], containsPair('engine', -1));
+      expect(semantic['role_delta'], containsPair('ramp', 1));
+      expect(semantic['role_delta'], isNot(containsPair('utility', 1)));
+    });
+
     test('semantic v2 enforcement defaults to disabled and is non-blocking',
         () {
       final mode = resolveSemanticV2OptimizeEnforcementMode(null);

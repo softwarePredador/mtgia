@@ -176,6 +176,18 @@
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
 | Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 15 cenários versionados em `CONFORMANCE_SCENARIOS` |
 | Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
+| Diagnóstico de roles do optimize | ✅ OK | `optimization_functional_roles.dart`, `optimization_validator_test.dart` | `role_delta` usa `functional_tags` persistido antes de `semantic_tags_v2`, alinhando decisão de swap com a análise exibida ao usuário |
+
+### 9.1 Arquivos grandes / modularização (P1)
+
+| Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
+|---|---:|---|---|
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7869 | ⚠️ Split necessário | Extrair rules/helpers por domínio mantendo conformance suite verde |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 4097 | ⚠️ Split necessário | Separar suites por kernel/combat/commander/2026 mechanics |
+| `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
+| `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
+| `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
+| `server/lib/ai/optimization_functional_roles.dart` | 768 | Aceitável por enquanto | Manter coeso; split só se crescer com novas políticas |
 
 ---
 
@@ -192,9 +204,10 @@
 ## Próximos Passos (Ordem de Impacto)
 
 1. **Integração avançada de tipos complexos** — efeitos específicos de Omen/Prepare/Paradigm/Station por carta concreta
-2. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas
-3. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
-4. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário
+2. **Modularização segura** — começar por suites/testes Hermes e depois route/runtime de optimize
+3. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas
+4. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
+5. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário
 
 ---
 
