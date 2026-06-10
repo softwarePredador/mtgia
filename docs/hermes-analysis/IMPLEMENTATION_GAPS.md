@@ -17,7 +17,7 @@
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 4/6 | 2/6 | 0/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
-| Qualidade/QA | 5/7 | 1/7 | 1/7 |
+| Qualidade/QA | 6/7 | 1/7 | 0/7 |
 
 ---
 
@@ -171,7 +171,7 @@
 | Taxonomia canônica de derrota | ⚠️ Parcial | classify_loss | Faltam: poison, effect_says_lose, concede |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
 | Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 6 cenários versionados em `CONFORMANCE_SCENARIOS` |
-| Persistência operacional da telemetria | ❌ Ausente | — | Snapshots ainda não são gravados por corpus/cron |
+| Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
 
 ---
 
@@ -190,4 +190,4 @@
 1. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
 2. **Targeting formal** — seleção/validação declarada de alvos
 3. **Integração avançada de tipos complexos** — Adventure exile/recast e Battle back face
-4. **Persistência operacional da telemetria** — snapshots por corpus/cron do Hermes
+4. **Dashboard/relatório agregado de telemetria** — consolidar snapshots por corpus/cron do Hermes

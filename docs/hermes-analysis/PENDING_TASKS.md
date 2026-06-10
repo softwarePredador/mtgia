@@ -43,9 +43,9 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Persistência operacional da telemetria | 1-2 dias | Médio | EngineMetrics |
-| 2 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
-| 3 | Ward/multi-target partial resolution | 3-5 dias | Alto | Targeting formal básico |
+| 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
+| 2 | Ward/multi-target partial resolution | 3-5 dias | Alto | Targeting formal básico |
+| 3 | Dashboard/relatório agregado de telemetria | 2-3 dias | Médio | Snapshots JSON |
 
 ---
 
@@ -282,7 +282,7 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6744 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6784 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |

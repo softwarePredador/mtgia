@@ -114,10 +114,17 @@ def connect(db_path: Path = DEFAULT_DB) -> sqlite3.Connection:
     return conn
 
 
-def run_command(command: list[str], cwd: Path | None = None, timeout: int = 900) -> tuple[int, str]:
+def run_command(
+    command: list[str],
+    cwd: Path | None = None,
+    timeout: int = 900,
+    env_extra: dict[str, str] | None = None,
+) -> tuple[int, str]:
     env = os.environ.copy()
     env.setdefault("PYTHONIOENCODING", "utf-8")
     env.setdefault("PYTHONUTF8", "1")
+    if env_extra:
+        env.update(env_extra)
     completed = subprocess.run(
         command,
         cwd=str(cwd) if cwd else None,
@@ -427,7 +434,21 @@ def run_battle(games_per_opponent: int, battle_path: Path = DEFAULT_BATTLE) -> B
     tmp_path = battle_path.with_name("_battle_optimizer_tmp.py")
     tmp_path.write_text(patched, encoding="utf-8")
     try:
-        code, output = run_command([sys.executable, str(tmp_path)], cwd=SCRIPT_DIR, timeout=1200)
+        env_extra = {}
+        metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
+        if metrics_dir:
+            Path(metrics_dir).mkdir(parents=True, exist_ok=True)
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            env_extra["MANALOOM_ENGINE_METRICS_OUT"] = str(
+                Path(metrics_dir)
+                / f"battle_engine_metrics_{battle_path.stem}_{games_per_opponent}_{stamp}.json"
+            )
+        code, output = run_command(
+            [sys.executable, str(tmp_path)],
+            cwd=SCRIPT_DIR,
+            timeout=1200,
+            env_extra=env_extra,
+        )
         if code != 0:
             raise RuntimeError(output[-2000:])
         return parse_battle_output(output, games_per_opponent)

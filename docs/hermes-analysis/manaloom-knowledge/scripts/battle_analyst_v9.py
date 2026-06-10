@@ -116,6 +116,26 @@ def record_stack_depth(depth):
         ENGINE_METRICS.record_stack_depth(depth)
 
 
+def write_engine_metrics_snapshot(path, metadata=None):
+    if ENGINE_METRICS is None or not path:
+        return None
+    payload = {
+        "schema_version": "battle_engine_metrics_v1",
+        "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "metadata": metadata or {},
+        **ENGINE_METRICS.snapshot(),
+    }
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    tmp_path = f"{path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=True, sort_keys=True, indent=2)
+        handle.write("\n")
+    os.replace(tmp_path, path)
+    return payload
+
+
 def replay_card_snapshot(card):
     """Small JSON-safe card summary for turn-by-turn replay audits."""
     if not isinstance(card, dict):
@@ -6649,6 +6669,10 @@ def real_opponent_seed():
 
 
 def main():
+    metrics_path = os.environ.get("MANALOOM_ENGINE_METRICS_OUT")
+    if metrics_path:
+        set_engine_metrics(EngineMetrics())
+
     print("=" * 60)
     print("BATTLE ANALYST v8 — Interactive Commander (Priority + Stack + Miracle)")
     print("=" * 60)
@@ -6739,6 +6763,22 @@ def main():
             f.write(f"| {r['opponent']} | {r['win_rate']:.1f}% | {r['wins']} | {r['losses']} | {r['stalls']} | {r['avg_win_turn']:.1f} | {reason_str} |\n")
         f.write(f"\n**Overall WR: {avg_wr:.1f}%** ({total_wins}W/{total_losses}L/{total_stalls}S)\n")
     print(f"\nLog: {LOG_PATH}")
+    if metrics_path:
+        write_engine_metrics_snapshot(
+            metrics_path,
+            {
+                "battle_script": "battle_analyst_v9",
+                "games_per_opponent": GAMES,
+                "opponents": len(opponent_sources),
+                "opponent_kind": opponent_kind,
+                "total_games": total_g,
+                "wins": total_wins,
+                "losses": total_losses,
+                "stalls": total_stalls,
+                "win_rate": avg_wr,
+            },
+        )
+        print(f"Engine metrics: {metrics_path}")
 
 if __name__ == "__main__":
     main()

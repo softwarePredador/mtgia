@@ -725,6 +725,28 @@ def test_engine_metrics_collects_core_health_signals():
         battle.clear_engine_metrics()
 
 
+def test_engine_metrics_snapshot_writes_sanitized_json():
+    metrics = battle.set_engine_metrics(battle.EngineMetrics())
+    try:
+        metrics.increment("priority_rounds", 2)
+        metrics.record_stack_depth(3)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "metrics.json"
+            payload = battle.write_engine_metrics_snapshot(
+                str(path),
+                {"deck_id": "redacted", "games": 4},
+            )
+            saved = json.loads(path.read_text(encoding="utf-8"))
+
+        assert payload["schema_version"] == "battle_engine_metrics_v1"
+        assert saved["metadata"] == {"deck_id": "redacted", "games": 4}
+        assert saved["counters"]["priority_rounds"] == 2
+        assert saved["max_stack_depth"] == 3
+        assert "created_at" in saved
+    finally:
+        battle.clear_engine_metrics()
+
+
 def test_conformance_registry_has_executable_coverage():
     covered = {
         "stack_lifo_405",
@@ -2995,6 +3017,7 @@ if __name__ == "__main__":
         test_dfc_characteristics_and_color_identity_use_all_faces,
         test_adventure_prototype_and_split_characteristics_by_cast_mode,
         test_engine_metrics_collects_core_health_signals,
+        test_engine_metrics_snapshot_writes_sanitized_json,
         test_conformance_registry_has_executable_coverage,
         test_conformance_stack_resolves_lifo,
         test_conformance_commander_damage_ledger_persists_across_zone_change,
