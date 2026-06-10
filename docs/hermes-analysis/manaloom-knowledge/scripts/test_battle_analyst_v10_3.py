@@ -313,6 +313,73 @@ def test_casting_context_locks_cost_before_payment():
     assert active.available_mana() == 0
 
 
+def test_casting_context_locks_x_alternative_and_additional_costs():
+    active = player("Active")
+    spell = {
+        "name": "Advanced Cost Spell",
+        "cmc": 7,
+        "mana_cost": "{7}",
+        "type_line": "Sorcery",
+    }
+    active.mana_pool.add("blue", 1)
+    active.mana_pool.add("green", 1)
+    active.mana_pool.add_generic(7)
+
+    ctx = battle.begin_cast_context(
+        active,
+        spell,
+        "precombat_main",
+        alternative_cost="{X}{U}",
+        x_value=4,
+        additional_costs=["{2}", "{G}"],
+        modes=["draw"],
+        targets=["Opponent"],
+        role="advanced",
+    )
+    spell["mana_cost"] = "{9}"
+
+    assert ctx.locked_cost["generic"] == 6
+    assert dict(ctx.locked_cost["colored"]) == {"blue": 1, "green": 1}
+    assert ctx.alternative_cost == "{X}{U}"
+    assert ctx.x_value == 4
+    assert ctx.additional_costs == ["{2}", "{G}"]
+    assert ctx.modes == ["draw"]
+    assert ctx.targets == ["Opponent"]
+    assert battle.commit_cast_payment(ctx) is True
+    assert active.available_mana() == 1
+
+
+def test_casting_context_replay_exposes_modes_targets_and_x_value():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player("Active")
+        spell = {"name": "Modal X Spell", "cmc": 1, "mana_cost": "{X}{R}", "type_line": "Instant"}
+        active.mana_pool.add("red", 1)
+        active.mana_pool.add_generic(3)
+
+        ctx = battle.begin_cast_context(
+            active,
+            spell,
+            "combat",
+            x_value=3,
+            modes=["damage"],
+            targets=["Defender"],
+            role="modal_x",
+        )
+
+        assert battle.commit_cast_payment(ctx) is True
+        event = next(data for name, data in events if name == "cast_announced")
+        assert event["x_value"] == 3
+        assert event["modes"] == ["damage"]
+        assert event["targets"] == ["Defender"]
+        assert event["locked_cost"]["generic"] == 3
+        assert event["locked_cost"]["colored"] == {"red": 1}
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_casting_context_rejects_illegal_timing_without_payment():
     active = player("Active")
     spell = {"name": "Timing Creature", "cmc": 2, "effect": "creature", "type_line": "Creature"}
@@ -2346,6 +2413,8 @@ if __name__ == "__main__":
         test_empty_stack_priority_casts_main_phase_creature,
         test_main_phase_priority_loop_casts_bounded_empty_stack_actions,
         test_casting_context_locks_cost_before_payment,
+        test_casting_context_locks_x_alternative_and_additional_costs,
+        test_casting_context_replay_exposes_modes_targets_and_x_value,
         test_casting_context_rejects_illegal_timing_without_payment,
         test_cast_spells_emits_minimal_601_pipeline_fields,
         test_only_attacked_player_can_block,

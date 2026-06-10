@@ -182,25 +182,67 @@ def parse_mana_cost(cost, fallback_cmc=0):
     return parsed
 
 
-def card_mana_cost(card, additional_generic=0):
-    parsed = parse_mana_cost(card.get("mana_cost"), card.get("cmc", 0))
+def merge_mana_costs(base, addition):
+    base["generic"] += int(addition.get("generic", 0) or 0)
+    for color, amount in addition.get("colored", {}).items():
+        base["colored"][color] += amount
+    base["hybrid"].extend(addition.get("hybrid", []))
+    return base
+
+
+def variable_mana_symbol_count(cost):
+    return sum(
+        1
+        for raw_symbol in re.findall(r"\{([^}]+)\}", str(cost or "").upper())
+        if raw_symbol.strip() in ("X", "Y", "Z")
+    )
+
+
+def card_mana_cost(
+    card,
+    additional_generic=0,
+    *,
+    alternative_cost=None,
+    x_value=0,
+    additional_costs=None,
+):
+    cost_source = card.get("mana_cost") if alternative_cost is None else alternative_cost
+    fallback_cmc = card.get("cmc", 0) if alternative_cost is None else 0
+    parsed = parse_mana_cost(cost_source, fallback_cmc)
+    parsed["generic"] += max(0, int(x_value or 0)) * variable_mana_symbol_count(cost_source)
     parsed["generic"] += additional_generic
+    for extra_cost in additional_costs or []:
+        merge_mana_costs(parsed, parse_mana_cost(extra_cost, 0))
     return parsed
 
 
 class CastingContext:
     """Minimal CR 601.2 casting context with locked cost and legality state."""
 
-    def __init__(self, card, controller, phase, *, additional_generic=0, role="normal"):
+    def __init__(
+        self,
+        card,
+        controller,
+        phase,
+        *,
+        additional_generic=0,
+        role="normal",
+        modes=None,
+        alternative_cost=None,
+        x_value=0,
+        targets=None,
+        additional_costs=None,
+    ):
         self.card = card
         self.controller = controller
         self.phase = phase
         self.additional_generic = additional_generic
         self.role = role
-        self.modes = []
-        self.alternative_cost = None
-        self.x_value = 0
-        self.targets = []
+        self.modes = list(modes or [])
+        self.alternative_cost = alternative_cost
+        self.x_value = max(0, int(x_value or 0))
+        self.targets = list(targets or [])
+        self.additional_costs = list(additional_costs or [])
         self.locked_cost = None
         self.effect_data = {}
         self.is_legal = False
@@ -211,6 +253,11 @@ class CastingContext:
             "cast_pipeline": "601.2_minimal",
             "locked_cost": replay_cost_snapshot(self.locked_cost),
             "additional_generic": self.additional_generic,
+            "alternative_cost": self.alternative_cost,
+            "x_value": self.x_value,
+            "additional_costs": list(self.additional_costs),
+            "modes": list(self.modes),
+            "targets": list(self.targets),
             "role": self.role,
         }
 
@@ -245,6 +292,11 @@ def begin_cast_context(
     additional_generic=0,
     effect_data=None,
     role="normal",
+    modes=None,
+    alternative_cost=None,
+    x_value=0,
+    targets=None,
+    additional_costs=None,
 ):
     """Announce and lock cost for a simplified CR 601.2 cast."""
     ctx = CastingContext(
@@ -253,10 +305,21 @@ def begin_cast_context(
         phase,
         additional_generic=additional_generic,
         role=role,
+        modes=modes,
+        alternative_cost=alternative_cost,
+        x_value=x_value,
+        targets=targets,
+        additional_costs=additional_costs,
     )
     ctx.effect_data = effect_data or get_card_effect(card)
     ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase)
-    ctx.locked_cost = card_mana_cost(card, additional_generic)
+    ctx.locked_cost = card_mana_cost(
+        card,
+        additional_generic,
+        alternative_cost=alternative_cost,
+        x_value=ctx.x_value,
+        additional_costs=ctx.additional_costs,
+    )
     emit_replay_event(
         "cast_announced",
         player=player.name,

@@ -94,15 +94,16 @@
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
 | Custo de mana básico | ✅ OK | 3532 | `cost = cmd["cmc"] + player.commander_tax` |
-| Pipeline 601.2 (modes→targets→cost→lock→pay) | ⚠️ Parcial | v9: `CastingContext` | Pipeline mínimo com announce, legality, cost lock e pay; faltam modes/X/alt costs/targeting formal |
-| Custos alternativos (kicker, flashback, etc.) | ❌ Ausente | — | |
-| X spells | ❌ Ausente | — | |
+| Pipeline 601.2 (modes→targets→cost→lock→pay) | ⚠️ Parcial | v9: `CastingContext` | Contexto captura modes/targets/X/alt/additional costs; targeting legal formal fica separado |
+| Custos alternativos (kicker, flashback, etc.) | ⚠️ Parcial | v9: `alternative_cost`, `additional_costs` | Suporte contextual/custo travado; falta semântica card-specific |
+| X spells | ✅ Básico | v9: `x_value` | X entra no custo travado |
 | Hybrid/Phyrexian mana | ❌ Ausente | — | |
 | Mana pool com spend restrictions | ⚠️ Parcial | 2288, 2311 | ManaPool existe mas sem restrictions |
 
 **Ações imediatas**:
 - [x] Pipeline 601.2 mínimo: lock-in de custo antes de pagar
-- [ ] Expandir 601.2 para modes, X, alternative/additional costs e targeting formal
+- [x] Expandir 601.2 para modes, X e alternative/additional costs
+- [ ] Levar targeting legal formal para o bloco Targeting
 
 ---
 
@@ -184,7 +185,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Casting pipeline 601.2 avançado** — modes, X, custos alternativos/adicionais e targeting formal
-2. **Layers 1-7** — efeitos contínuos com timestamp/dependência
-3. **Planeswalkers/Battles** — loyalty/defense e SBAs dedicadas
+1. **Layers 1-7** — efeitos contínuos com timestamp/dependência
+2. **Planeswalkers/Battles** — loyalty/defense e SBAs dedicadas
+3. **Targeting formal** — seleção/validação declarada de alvos
 4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9

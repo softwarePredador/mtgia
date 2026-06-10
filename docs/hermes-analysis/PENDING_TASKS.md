@@ -43,12 +43,11 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Casting pipeline 601.2 avançado | 5-7 dias | Alto | 601.2 mínimo |
-| 2 | Layers 1-7 | 7-10 dias | Alto | replacement registry |
-| 3 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
-| 4 | DFC/Adventure/Prototype | 4-5 dias | Médio | #1 |
-| 5 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 6 | Suite de conformidade | 5-7 dias | Alto | #1-5 |
+| 1 | Layers 1-7 | 7-10 dias | Alto | replacement registry |
+| 2 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
+| 3 | DFC/Adventure/Prototype | 4-5 dias | Médio | casting contextual |
+| 4 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 5 | Suite de conformidade | 5-7 dias | Alto | #1-4 |
 
 ---
 
@@ -96,7 +95,7 @@
 
 ### 3. Casting Pipeline 601.2
 
-**Status 2026-06-10**: ✅ Mínimo implementado / ⚠️ avançado pendente.
+**Status 2026-06-10**: ✅ Contextual implementado / ⚠️ targeting legal formal fica no bloco Targeting.
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `CastingContext`, `begin_cast_context`, `commit_cast_payment`, integração em `cast_spells_v8`.
@@ -106,14 +105,17 @@
 - Announce/evento `cast_announced` antes de pagamento.
 - Custo travado via `locked_cost` antes do pagamento.
 - Custo de comandante inclui `commander_tax` como `additional_generic`.
+- X spells entram no custo travado via `x_value`.
+- `alternative_cost` substitui o custo impresso para o cast.
+- `additional_costs` somam custos extras ao custo travado.
+- `modes` e `targets` são capturados no contexto e no replay.
 - Timing básico impede creature/sorcery fora de main phase.
 - Pagamento usa `Player.spend_mana` sobre o custo travado.
 - Eventos de cast carregam `cast_pipeline=601.2_minimal`, `locked_cost`, `additional_generic` e `role`.
 
 **Limite restante**:
-- Ainda não escolhe formalmente modes, X, alternative costs, kicker/flashback/prototype ou divisão de efeitos.
 - Targeting formal ainda fica no bloco próprio de targeting.
-- Hybrid/Phyrexian e spend restrictions seguem pendentes.
+- Hybrid/Phyrexian e spend restrictions seguem pendentes no bloco de mana.
 
 **Regra**: CR 601.2a-601.2h
 
