@@ -139,22 +139,26 @@ mtgia/
   **VERMELHO** por `server/bin/local_test_server.dart:3` importar
   `../.dart_frog/server.dart`, artefato ausente em clone limpo nesta branch.
   A resolucao historica em `origin/master@a830f9f3` nao esta refletida aqui.
-- `flutter analyze --no-pub --no-fatal-infos` local em 2026-05-30: **BLOQUEADO/NAO CONCLUSIVO** porque `app/.dart_tool/package_config.json` nao existe neste checkout; o analyzer reportou pacotes ausentes antes de validar imports locais
+- `flutter analyze --no-pub --no-fatal-infos` focado em `deck_analysis_tab.dart`
+  e `life_counter_screen.dart` em 2026-06-10: **BLOQUEADO/NAO CONCLUSIVO**
+  porque `app/.dart_tool/package_config.json` nao existe neste checkout; a
+  saida tambem incluiu os dois `uri_does_not_exist` locais do app.
 - `flutter test`: VERDE historico; nao reexecutado integralmente nesta higiene semanal
 - Corpus estavel de resolucao Commander: 19/19 passed
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-08)
+## Achados do audit de estrutura (atualizado 2026-06-10)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclo local fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO em 2026-06-08 11:00 UTC no checkout `fed6ee85`.** O
+  **REVALIDADO/ABERTO em 2026-06-10 11:00 UTC no checkout `89261c8d`.** O
   auditor base cobre apenas `server/lib` e `server/routes` e reportou
   `Imports quebrados: 0`. O import historico de
   `server/routes/ai/commander-learning/index.dart:4` para
   `server/lib/ai/commander_learned_deck_support.dart` nao esta mais quebrado
-  neste checkout porque o arquivo alvo existe. A triagem focada em 426 arquivos
+  neste checkout (`dart analyze routes/ai/commander-learning/index.dart`
+  retornou `No issues found`). A triagem focada em 426 arquivos
   Dart de `app/lib`, `server/lib`, `server/routes` e `server/bin` encontrou
   somente 3 imports locais quebrados: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
   (`../../../../core/utils/mana_helper.dart`) resolvendo para
