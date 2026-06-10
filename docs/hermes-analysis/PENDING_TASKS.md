@@ -54,6 +54,8 @@
 > timestamps e dependências declaradas.
 > Telemetria do engine também foi movida para `battle_engine_metrics_tests.py`,
 > cobrindo contadores, snapshots JSON sanitizados e agregação de métricas.
+> Conformance também foi movido para `battle_conformance_tests.py`, cobrindo a
+> registry base e regressões transversais de blocked/APNAP/prevention.
 
 ---
 
@@ -104,6 +106,7 @@
 | ✅ | Décima quarta extração da suite Hermes | `battle_permanents_complex_tests.py` |
 | ✅ | Décima quinta extração da suite Hermes | `battle_continuous_effects_tests.py` |
 | ✅ | Décima sexta extração da suite Hermes | `battle_engine_metrics_tests.py` |
+| ✅ | Décima sétima extração da suite Hermes | `battle_conformance_tests.py` |
 
 ---
 
@@ -335,7 +338,7 @@
 **Status 2026-06-10**: ✅ Básica implementada.
 
 **Arquivo**:
-- `test_battle_analyst_v10_3.py`: `CONFORMANCE_SCENARIOS` + testes de regressão/conformidade.
+- `battle_conformance_tests.py`: `CONFORMANCE_SCENARIOS` base + testes de regressão/conformidade.
 
 **Cenários cobertos**:
 - `stack_lifo_405`: resolução LIFO da stack.
@@ -366,7 +369,7 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7869 |
-| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 808 |
+| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 626 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
 | `battle_zone_transition_tests.py` | Regressões isoladas de zone transitions, tokens, tutor, ramp, recursion e reanimation | 229 |
@@ -376,6 +379,7 @@
 | `battle_permanents_complex_tests.py` | Regressões isoladas de planeswalker, battle/siege, DFC, adventure, prototype e split | 246 |
 | `battle_continuous_effects_tests.py` | Regressões isoladas de continuous effects/layers, timestamps e dependencies | 155 |
 | `battle_engine_metrics_tests.py` | Regressões isoladas de EngineMetrics, snapshot sanitizado e report agregado | 133 |
+| `battle_conformance_tests.py` | Registry base de conformidade e regressões transversais blocked/APNAP/prevention | 201 |
 | `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
