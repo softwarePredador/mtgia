@@ -4323,6 +4323,8 @@ def get_lki(creature):
 
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
     """Move a dead/sacrificed creature to the correct zone for this simulator."""
+    if not isinstance(creature, dict):
+        return "none"
 
     # v9: LKI snapshot before zone change (CR 608.2g, 400.7)
     creature["_lki_snapshot"] = {
@@ -4337,8 +4339,6 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
     # v9: Zone change counter — new identity (CR 400.7)
     creature["_zone_id"] = creature.get("_zone_id", 0) + 1
     creature["_last_zone"] = "battlefield"
-    if not isinstance(creature, dict):
-        return "none"
     if creature in owner.battlefield:
         owner.battlefield.remove(creature)
     if creature.get("is_commander"):

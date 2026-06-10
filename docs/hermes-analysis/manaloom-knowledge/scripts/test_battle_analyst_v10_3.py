@@ -98,6 +98,11 @@ CONFORMANCE_SCENARIOS = [
         "purpose": "A Saga with final chapter reached is sacrificed after its chapter ability is done.",
     },
     {
+        "id": "zone_change_lki_identity_400_7",
+        "rule": "CR 400.7, 608.2g",
+        "purpose": "Zone changes preserve LKI and advance logical object identity.",
+    },
+    {
         "id": "blocked_stays_blocked_509_1h",
         "rule": "CR 509.1h",
         "purpose": "A creature remains blocked after all blockers leave combat.",
@@ -226,6 +231,30 @@ def test_saga_final_chapter_sacrifices_after_pending_ability_resolves():
     assert saga not in active.battlefield
     assert saga in active.graveyard
     assert any(event == "saga_sacrificed_by_sba" for event, _ in events)
+
+
+def test_zone_change_records_lki_and_advances_zone_identity():
+    active = player("Active")
+    creature = {
+        "name": "Tracked Creature",
+        "effect": "creature",
+        "type_line": "Creature",
+        "power": 4,
+        "toughness": 5,
+        "cmc": 3,
+        "_zone_id": 7,
+    }
+    active.battlefield = [creature]
+
+    destination = battle.move_creature_from_battlefield(active, creature, reason="destroyed")
+
+    assert destination == "graveyard"
+    assert creature not in active.battlefield
+    assert creature in active.graveyard
+    assert creature["_zone_id"] == 8
+    assert creature["_last_zone"] == "battlefield"
+    assert battle.get_lki(creature)["power"] == 4
+    assert battle.move_creature_from_battlefield(active, "not a permanent") == "none"
 
 
 def test_draw_step_runs_once_with_multiple_permanents():
@@ -1038,6 +1067,7 @@ def test_conformance_registry_has_executable_coverage():
         "plus_minus_counter_cancel_704_5q",
         "illegal_attachment_sba_704_5m_n",
         "saga_final_chapter_sba_704_5s",
+        "zone_change_lki_identity_400_7",
         "blocked_stays_blocked_509_1h",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
@@ -3498,6 +3528,7 @@ if __name__ == "__main__":
         test_plus_minus_counters_cancel_as_sba,
         test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
         test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
+        test_zone_change_records_lki_and_advances_zone_identity,
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
         test_combat_emits_structured_event,

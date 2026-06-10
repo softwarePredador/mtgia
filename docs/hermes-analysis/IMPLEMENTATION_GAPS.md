@@ -16,7 +16,7 @@
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
-| Zonas e Objetos | 3/5 | 0/5 | 2/5 |
+| Zonas e Objetos | 4/5 | 0/5 | 1/5 |
 | Qualidade/QA | 7/7 | 0/7 | 0/7 |
 
 ---
@@ -140,8 +140,8 @@
 
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
-| Zone change → novo objeto | ❌ Ausente | — | Mesmo dict Python sobrevive entre zonas |
-| LKI (last known information) | ❌ Ausente | — | |
+| Zone change → novo objeto | ✅ Básico | v9: `_zone_id` | Mantém o dict Python, mas avança identidade lógica por `_zone_id` em zone changes modelados |
+| LKI (last known information) | ✅ Básico | v9: `get_lki`, `_lki_snapshot` | Snapshot antes de mover criatura do battlefield |
 | Command zone | ✅ OK | 2252, 2828 | |
 | Exile (face up/down) | ❌ Ausente | — | |
 | Token lifecycle | ✅ Básico | v9: `check_token_lifecycle` | Token em graveyard/exile/hand deixa de existir via SBA |
@@ -170,7 +170,7 @@
 | Quality gate | ✅ OK | master_optimizer_quality_gate.py | |
 | Taxonomia canônica de derrota | ✅ Básico | `classify_loss` | Cobre `poison`, `effect_says_lose`, `concede` e tags heurísticas de screw/flood/mulligan/value |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
-| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 11 cenários versionados em `CONFORMANCE_SCENARIOS` |
+| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 12 cenários versionados em `CONFORMANCE_SCENARIOS` |
 | Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
 
 ---
