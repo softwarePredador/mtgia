@@ -127,6 +127,14 @@ card_import_spec = importlib.util.spec_from_file_location(
 battle_card_import_tests = importlib.util.module_from_spec(card_import_spec)
 card_import_spec.loader.exec_module(battle_card_import_tests)
 
+TURN_FLOW_TESTS_PATH = MODULE_PATH.with_name("battle_turn_flow_tests.py")
+turn_flow_spec = importlib.util.spec_from_file_location(
+    "battle_turn_flow_tests_under_test",
+    TURN_FLOW_TESTS_PATH,
+)
+battle_turn_flow_tests = importlib.util.module_from_spec(turn_flow_spec)
+turn_flow_spec.loader.exec_module(battle_turn_flow_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -386,43 +394,6 @@ def test_exile_records_face_up_and_face_down_visibility():
     assert hidden_card["_exile_turn"] == 3
 
 
-def test_draw_step_runs_once_with_multiple_permanents():
-    active = player("Active", [card("Draw") for _ in range(5)])
-    active.battlefield = [
-        {"name": "Permanent A", "effect": "unknown"},
-        {"name": "Permanent B", "effect": "unknown"},
-    ]
-    opponent = player("Opponent", [card("Opp Draw") for _ in range(5)])
-
-    battle.play_turn_v8(
-        active,
-        [opponent],
-        [active, opponent],
-        turn=1,
-        rng=random.Random(2),
-        stack=battle.Stack(),
-    )
-
-    assert len(active.hand) == 1
-
-
-def test_approach_sets_explicit_win_state():
-    active = player("Active")
-    opponent = player("Opponent")
-    approach = {
-        "name": "Approach of the Second Sun",
-        "cmc": 7,
-        "type_line": "Sorcery",
-    }
-
-    battle.apply_effect_immediate(active, [opponent], approach, 5, random.Random(3))
-    assert active.has_won() is False
-    battle.apply_effect_immediate(active, [opponent], approach, 6, random.Random(3))
-
-    assert active.has_won() is True
-    assert active.win_reason == "approach"
-
-
 def test_combat_emits_structured_event():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -512,38 +483,6 @@ def test_end_of_combat_triggers_use_stack_and_apnap_order():
         assert resolved == ["Nonactive", "Active"]
     finally:
         battle.REPLAY_EVENT_HANDLER = previous_handler
-
-
-def test_turn_stops_immediately_after_approach_win():
-    active = player("Active", [card("Library card") for _ in range(10)])
-    opponent = player("Opponent", [card("Opp Library") for _ in range(10)])
-    active.approach_count = 1
-    active.hand = [
-        {
-            "name": "Approach of the Second Sun",
-            "cmc": 7,
-            "type_line": "Sorcery",
-        },
-        {
-            "name": "Must Stay In Hand",
-            "cmc": 1,
-            "tag": "draw",
-            "type_line": "Sorcery",
-        },
-    ]
-    active.battlefield = ["land" for _ in range(10)]
-
-    battle.play_turn_v8(
-        active,
-        [opponent],
-        [active, opponent],
-        turn=5,
-        rng=random.Random(5),
-        stack=battle.Stack(),
-    )
-
-    assert active.has_won() is True
-    assert any(card["name"] == "Must Stay In Hand" for card in active.hand)
 
 
 def test_continuous_effects_apply_layers_and_sublayers_in_order():
@@ -1032,17 +971,6 @@ def test_conformance_registry_has_executable_coverage():
     assert all(scenario.get("purpose") for scenario in CONFORMANCE_SCENARIOS)
 
 
-def test_conformance_failed_draw_from_empty_library_loses():
-    active = player("Active")
-    active.hand = [card("Still in hand")]
-
-    assert active.draw(1, random.Random(120)) == []
-    assert battle.check_sbas_until_stable([active]) is None
-
-    assert active.eliminated is True
-    assert active.life == 0
-
-
 def test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves():
     attacker = player("Attacker")
     defender = player("Defender")
@@ -1120,19 +1048,6 @@ def test_conformance_prevention_applies_before_damage_life_change():
     assert active.damage_prevention_shields == []
 
 
-def test_failed_draw_from_empty_library_loses_even_with_cards_in_hand():
-    active = player("Active")
-    active.hand = [card("Still in hand")]
-
-    drawn = active.draw(1, random.Random(45))
-    eliminated = battle.check_sbas([active])
-
-    assert drawn == []
-    assert eliminated is True
-    assert active.eliminated is True
-    assert active.life == 0
-
-
 def test_classify_loss_covers_poison_effect_and_concede_tags():
     loser = player("Loser")
     loser.poison = 10
@@ -1143,28 +1058,6 @@ def test_classify_loss_covers_poison_effect_and_concede_tags():
 
     assert tags[:3] == ["concede", "effect_says_lose", "poison"]
     assert battle.classify_loss(loser, [], turn=5, result="win", reason="test") == []
-
-
-def test_extra_turns_are_taken_before_next_player():
-    events = []
-    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    active = player("Active", [card("Draw 1"), card("Draw 2"), card("Draw 3")])
-    defender = player("Defender", [card("Opp Draw")])
-    active.extra_turns = 1
-
-    battle.play_turn_sequence_v8(
-        active,
-        [defender],
-        [active, defender],
-        turn=4,
-        rng=random.Random(46),
-        stack=battle.Stack(),
-    )
-    battle.REPLAY_EVENT_HANDLER = None
-
-    assert active.extra_turns == 0
-    assert [event for event, _ in events].count("turn_start") == 2
-    assert any(event == "extra_turn_taken" for event, _ in events)
 
 
 def test_token_maker_counts_dict_lands_for_land_based_tokens():
@@ -1333,30 +1226,6 @@ def test_zero_power_creature_without_attack_trigger_does_not_attack():
     assert defender.life == 40
 
 
-def test_treasure_maker_can_discard_draw_and_create_treasures():
-    active = player("Caster")
-    active.hand = [{"name": "Discard Me", "cmc": 1, "type_line": "Sorcery"}]
-    active.library = [
-        {"name": "Drawn A", "cmc": 1, "type_line": "Instant"},
-        {"name": "Drawn B", "cmc": 2, "type_line": "Sorcery"},
-    ]
-
-    battle.apply_effect_immediate(
-        active,
-        [],
-        {"name": "Unexpected Windfall", "cmc": 4, "type_line": "Instant"},
-        turn=4,
-        rng=random.Random(9),
-    )
-
-    assert active.treasures == 2
-    assert [card["name"] for card in active.hand] == ["Drawn A", "Drawn B"]
-    assert [card["name"] for card in active.graveyard] == [
-        "Discard Me",
-        "Unexpected Windfall",
-    ]
-
-
 def test_apnap_trigger_order_puts_nonactive_trigger_on_top():
     if not hasattr(battle, "clear_pending_triggers"):
         return
@@ -1491,11 +1360,9 @@ if __name__ == "__main__":
         test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
         test_zone_change_records_lki_and_advances_zone_identity,
         test_exile_records_face_up_and_face_down_visibility,
-        test_draw_step_runs_once_with_multiple_permanents,
-        test_approach_sets_explicit_win_state,
         test_combat_emits_structured_event,
         test_end_of_combat_triggers_use_stack_and_apnap_order,
-        test_turn_stops_immediately_after_approach_win,
+        *battle_turn_flow_tests.register_tests(battle, player, card),
         *battle_mana_tests.register_tests(battle, player),
         *battle_stack_casting_tests.register_tests(battle, player),
         test_continuous_effects_apply_layers_and_sublayers_in_order,
@@ -1513,7 +1380,6 @@ if __name__ == "__main__":
         *battle_rules_2026_tests.register_tests(battle, player),
         test_conformance_registry_has_executable_coverage,
         *battle_commander_tests.register_tests(battle, player),
-        test_conformance_failed_draw_from_empty_library_loses,
         test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves,
         test_conformance_apnap_trigger_order_is_lifo_after_stack_placement,
         test_conformance_prevention_applies_before_damage_life_change,
@@ -1524,15 +1390,12 @@ if __name__ == "__main__":
         *battle_replacement_tests.register_tests(battle, player),
         *battle_summoning_sickness_tests.register_tests(battle, player, card),
         *battle_zone_transition_tests.register_tests(battle, player, card),
-        test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
         test_classify_loss_covers_poison_effect_and_concede_tags,
-        test_extra_turns_are_taken_before_next_player,
         test_token_maker_counts_dict_lands_for_land_based_tokens,
         test_lumra_returns_milled_and_graveyard_lands_tapped,
         test_protected_player_prevents_combat_damage_without_audit_finding,
         test_auditor_flags_noncreature_land_attacker,
         test_zero_power_creature_without_attack_trigger_does_not_attack,
-        test_treasure_maker_can_discard_draw_and_create_treasures,
         test_apnap_trigger_order_puts_nonactive_trigger_on_top,
         test_same_controller_triggers_keep_timestamp_stack_order,
         test_spell_cast_trigger_resolves_from_stack_before_spell,

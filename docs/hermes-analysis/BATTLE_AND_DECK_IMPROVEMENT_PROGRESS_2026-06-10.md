@@ -52,11 +52,11 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com onze extrações concluídas.
+**Status:** em andamento, com doze extrações concluídas.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7869 linhas.
-- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 1544 linhas após onze extrações.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 1407 linhas após doze extrações.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` — 330 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` — 151 linhas extraídas.
@@ -68,6 +68,7 @@ que o usuário vê na análise do deck.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_summoning_sickness_tests.py` — 362 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_tests.py` — 229 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py` — 278 linhas extraídas.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py` — 147 linhas extraídas.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
 - `server/lib/ai/optimize_runtime_support.dart` — 2772 linhas.
 
@@ -113,21 +114,24 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   oracle cache, battle card rules verificadas, lands que não viram instant/sorcery,
   janela de end step sem cast de lands, artefatos curados e sync de regras
   geradas normalizado por oracle.
+- Novo módulo `battle_turn_flow_tests.py` com 7 regressões de turn flow/draw:
+  draw step único, Approach win state/turn stop, failed draw por biblioteca vazia,
+  extra turns e discard/draw/treasure de Unexpected Windfall.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
   os testes 2026, combate, replacement/prevention, Commander, mana/custos e
-  stack/casting/card-specific/targeting/summoning sickness/zone transitions/card import a partir dos módulos extraídos.
+  stack/casting/card-specific/targeting/summoning sickness/zone transitions/card import/turn flow a partir dos módulos extraídos.
 - A saída do runner continua exibindo esses testes, provando que a cobertura
   não foi removida.
 
 **Validação:**
-- `python3 -m py_compile battle_card_import_tests.py battle_zone_transition_tests.py battle_summoning_sickness_tests.py battle_targeting_tests.py battle_card_specific_tests.py battle_stack_casting_tests.py battle_mana_tests.py battle_commander_tests.py battle_replacement_tests.py battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
+- `python3 -m py_compile battle_turn_flow_tests.py battle_card_import_tests.py battle_zone_transition_tests.py battle_summoning_sickness_tests.py battle_targeting_tests.py battle_card_specific_tests.py battle_stack_casting_tests.py battle_mana_tests.py battle_commander_tests.py battle_replacement_tests.py battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
 - `python3 test_battle_analyst_v10_3.py`
 
 ## Etapa 4 — Próximas pendências reais
 
 **Prioridade atual:**
 1. Separar mais suites Hermes por domínio, priorizando regressões remanescentes
-   de draw/library/mulligan/turn flow que ainda estão inline no runner.
+   de SBA/zone metadata/permanent lifecycle que ainda estão inline no runner.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
 3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
