@@ -52,11 +52,11 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com dezesseis extrações concluídas.
+**Status:** em andamento, com dezessete extrações concluídas.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7869 linhas.
-- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 808 linhas após dezesseis extrações.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 626 linhas após dezessete extrações.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` — 330 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` — 151 linhas extraídas.
@@ -73,6 +73,7 @@ que o usuário vê na análise do deck.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_permanents_complex_tests.py` — 246 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_continuous_effects_tests.py` — 155 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_engine_metrics_tests.py` — 133 linhas extraídas.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
 - `server/lib/ai/optimize_runtime_support.dart` — 2772 linhas.
 
@@ -133,22 +134,25 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - Novo módulo `battle_engine_metrics_tests.py` com 3 regressões de telemetria:
   contadores de stack/priority/SBA/replacement, snapshot JSON sanitizado e
   agregação por `engine_metrics_report.py`.
+- Novo módulo `battle_conformance_tests.py` com a registry base de conformidade
+  e 4 regressões transversais: cobertura versionada, blocked-stays-blocked,
+  APNAP trigger order e prevenção antes de dano.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
   os testes 2026, combate, replacement/prevention, Commander, mana/custos e
-  stack/casting/card-specific/targeting/summoning sickness/zone transitions/card import/turn flow/SBA-zone/permanents complexos/continuous effects/engine metrics a partir dos módulos extraídos.
+  stack/casting/card-specific/targeting/summoning sickness/zone transitions/card import/turn flow/SBA-zone/permanents complexos/continuous effects/engine metrics/conformance a partir dos módulos extraídos.
 - A saída do runner continua exibindo esses testes, provando que a cobertura
   não foi removida.
 
 **Validação:**
-- `python3 -m py_compile battle_engine_metrics_tests.py battle_continuous_effects_tests.py battle_permanents_complex_tests.py battle_sba_zone_tests.py battle_turn_flow_tests.py battle_card_import_tests.py battle_zone_transition_tests.py battle_summoning_sickness_tests.py battle_targeting_tests.py battle_card_specific_tests.py battle_stack_casting_tests.py battle_mana_tests.py battle_commander_tests.py battle_replacement_tests.py battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
+- `python3 -m py_compile battle_conformance_tests.py battle_engine_metrics_tests.py battle_continuous_effects_tests.py battle_permanents_complex_tests.py battle_sba_zone_tests.py battle_turn_flow_tests.py battle_card_import_tests.py battle_zone_transition_tests.py battle_summoning_sickness_tests.py battle_targeting_tests.py battle_card_specific_tests.py battle_stack_casting_tests.py battle_mana_tests.py battle_commander_tests.py battle_replacement_tests.py battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
 - `python3 test_battle_analyst_v10_3.py`
 
 ## Etapa 4 — Próximas pendências reais
 
 **Prioridade atual:**
 1. Separar mais suites Hermes por domínio, priorizando regressões remanescentes
-   de conformance, loss taxonomy, token/land recursion e triggers que ainda
-   estão inline no runner.
+   de loss taxonomy, token/land recursion, auditoria de decisões e triggers que
+   ainda estão inline no runner.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
 3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
