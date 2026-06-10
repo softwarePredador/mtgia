@@ -10,12 +10,12 @@
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
 | SBAs e Triggers | 6/15 | 2/15 | 7/15 |
-| Commander Rules | 4/8 | 2/8 | 2/8 |
+| Commander Rules | 5/8 | 2/8 | 1/8 |
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 1/5 | 1/5 | 3/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
-| Tipos Complexos | 1/6 | 2/6 | 3/6 |
+| Tipos Complexos | 4/6 | 2/6 | 0/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
 | Qualidade/QA | 3/6 | 1/6 | 2/6 |
 
@@ -81,7 +81,7 @@
 | Deck construction (100 cards, singleton, color ID) | ⚠️ Parcial | — | Feito no app, não no battle engine |
 | Partner/Background/Friends Forever | ❌ Ausente | — | |
 | Commander ninjutsu do CZ | ❌ Ausente | — | |
-| Color identity de DFC/Adventure | ❌ Ausente | — | |
+| Color identity de DFC/Adventure | ✅ Básico | v9: `compute_color_identity` | Agrega faces/partes/modos complexos |
 
 **Ações imediatas**:
 - [ ] Commander replacement opcional (GY/exile → CZ)
@@ -185,7 +185,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **DFC/Adventure/Prototype** — características por zona/modo de cast
+1. **Telemetria de saúde do motor** — métricas de cobertura/regressão do simulador
 2. **Targeting formal** — seleção/validação declarada de alvos
-3. **Telemetria de saúde do motor** — métricas de cobertura/regressão do simulador
-4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
+3. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
+4. **Integração avançada de tipos complexos** — Adventure exile/recast e Battle back face

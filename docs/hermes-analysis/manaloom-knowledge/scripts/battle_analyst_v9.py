@@ -559,6 +559,77 @@ def battle_takes_damage(battle_card, amount):
     return True
 
 
+def get_card_characteristics(card, zone, cast_mode=None):
+    """Return characteristics for zone-specific complex card modes."""
+    if not isinstance(card, dict):
+        return card
+    if card.get("is_dfc") or card.get("front_face") or card.get("back_face"):
+        front = copy.deepcopy(card.get("front_face") or card)
+        back = copy.deepcopy(card.get("back_face") or {})
+        if zone in ("stack", "battlefield") and card.get("is_transformed") and back:
+            return back
+        return front
+    if cast_mode == "adventure" and card.get("adventure"):
+        result = copy.deepcopy(card["adventure"])
+        result.setdefault("parent_name", card.get("name"))
+        result["cast_mode"] = "adventure"
+        return result
+    if cast_mode == "prototype" and card.get("prototype"):
+        result = copy.deepcopy(card["prototype"])
+        result.setdefault("parent_name", card.get("name"))
+        result["cast_mode"] = "prototype"
+        return result
+    if card.get("is_split") or (card.get("half_a") and card.get("half_b")):
+        if zone == "stack":
+            chosen_half = card.get("chosen_half", "half_a")
+            result = copy.deepcopy(card.get(chosen_half) or card.get("half_a") or {})
+            result["cast_mode"] = chosen_half
+            return result
+        half_a = card.get("half_a") or {}
+        half_b = card.get("half_b") or {}
+        colors = list(dict.fromkeys(list(half_a.get("colors") or []) + list(half_b.get("colors") or [])))
+        return {
+            "name": card.get("name", f"{half_a.get('name', '')} // {half_b.get('name', '')}".strip()),
+            "cmc": int(half_a.get("cmc", 0) or 0) + int(half_b.get("cmc", 0) or 0),
+            "colors": colors,
+            "type_line": card.get("type_line", ""),
+        }
+    return copy.deepcopy(card)
+
+
+def _color_identity_values_from_part(part):
+    colors = []
+    for key in ("color_identity", "colors"):
+        raw = part.get(key) if isinstance(part, dict) else None
+        if isinstance(raw, str):
+            raw = re.findall(r"[WUBRGC]", raw.upper()) or [raw]
+        for color in raw or []:
+            mapped = MANA_SYMBOL_TO_POOL.get(str(color).upper(), str(color).lower())
+            if mapped in ("white", "blue", "black", "red", "green"):
+                colors.append(mapped)
+    for raw_symbol in re.findall(r"\{([^}]+)\}", str(part.get("mana_cost", "") if isinstance(part, dict) else "").upper()):
+        for symbol_part in raw_symbol.split("/"):
+            mapped = MANA_SYMBOL_TO_POOL.get(symbol_part.strip())
+            if mapped in ("white", "blue", "black", "red", "green"):
+                colors.append(mapped)
+    return colors
+
+
+def compute_color_identity(card):
+    """Color identity includes all faces/parts relevant to Commander legality."""
+    if not isinstance(card, dict):
+        return []
+    parts = [card]
+    for key in ("front_face", "back_face", "adventure", "prototype", "half_a", "half_b"):
+        if isinstance(card.get(key), dict):
+            parts.append(card[key])
+    ordered = ["white", "blue", "black", "red", "green"]
+    seen = set()
+    for part in parts:
+        seen.update(_color_identity_values_from_part(part))
+    return [color for color in ordered if color in seen]
+
+
 def apply_continuous_effects(card, effects):
     """Return a characteristics snapshot after applying continuous effects."""
     result = copy.deepcopy(card)

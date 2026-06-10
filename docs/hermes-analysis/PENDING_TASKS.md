@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 22/25 itens implementados no battle_analyst_v9.py (6300+ linhas).
-> 3 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 23/25 itens implementados no battle_analyst_v9.py (6400+ linhas).
+> 2 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -33,7 +33,7 @@
 | ✅ | Replacement/Prevention mínimo | v9:ReplacementRegistry/ReplacementEvent |
 | ✅ | Layers 1-7 básico | v9:ContinuousEffect/apply_continuous_effects |
 | ✅ | Planeswalkers + Battles básico | v9:planeswalker/battle helpers + SBA |
-| ⏳ | DFC/Adventure/Prototype | P2 |
+| ✅ | DFC/Adventure/Prototype/Split básico | v9:get_card_characteristics/compute_color_identity |
 | ⏳ | Telemetria de saúde do motor | P2 |
 | ⏳ | Suite de conformidade | P2 |
 
@@ -43,9 +43,8 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | DFC/Adventure/Prototype | 4-5 dias | Médio | casting contextual |
-| 2 | Telemetria de saúde | 2-3 dias | Médio | — |
-| 3 | Suite de conformidade | 5-7 dias | Alto | #1-2 |
+| 1 | Telemetria de saúde | 2-3 dias | Médio | — |
+| 2 | Suite de conformidade | 5-7 dias | Alto | #1 |
 
 ---
 
@@ -215,46 +214,22 @@
 
 ### 8. DFC/Adventure/Prototype
 
-**Implementação**:
-```python
-def get_card_characteristics(card, zone, cast_mode=None):
-    """Retorna características corretas baseado em zona e modo de cast."""
-    # DFC: fora da stack/battlefield = front face
-    if card.get("is_dfc"):
-        if zone in ("stack", "battlefield") and card.get("is_transformed"):
-            return card["back_face"]
-        return card["front_face"]
-    
-    # Adventure: spell na stack usa adventure part
-    if cast_mode == "adventure" and card.get("adventure"):
-        return card["adventure"]
-    
-    # Prototype: spell na stack pode usar prototype alt
-    if cast_mode == "prototype" and card.get("prototype"):
-        return card["prototype"]
-    
-    # Split: na stack = metade escolhida; fora = combinado
-    if card.get("is_split"):
-        if zone == "stack":
-            return card[card.get("chosen_half", "half_a")]
-        # Fora da stack: mana value combinado
-        return {
-            "mana_value": card["half_a"]["cmc"] + card["half_b"]["cmc"],
-            "colors": card["half_a"]["colors"] + card["half_b"]["colors"],
-        }
-    
-    return card
+**Status 2026-06-10**: ✅ Básico implementado.
 
-def compute_color_identity(card):
-    """Color identity inclui TODAS as faces (CR 903.4)."""
-    colors = set()
-    for face in [card] + card.get("faces", []):
-        colors.update(extract_mana_symbol_colors(face.get("mana_cost", "")))
-        colors.update(extract_text_colors(face.get("oracle_text", "")))
-        if face.get("color_indicator"):
-            colors.update(face["color_indicator"])
-    return colors
-```
+**Arquivos**:
+- `battle_analyst_v9.py`: `get_card_characteristics`, `compute_color_identity`.
+- `test_battle_analyst_v10_3.py`: `test_dfc_characteristics_and_color_identity_use_all_faces`, `test_adventure_prototype_and_split_characteristics_by_cast_mode`.
+
+**O que foi coberto**:
+- DFC usa front face fora da stack/battlefield e back face quando transformado em stack/battlefield.
+- Adventure usa parte adventure no cast mode `adventure`.
+- Prototype usa custo/características prototype no cast mode `prototype`.
+- Split usa metade escolhida na stack e características combinadas fora da stack.
+- Color identity agrega mana/colors de faces/partes/adventure/prototype/split.
+
+**Limite restante**:
+- Resolver Adventure para exile e recast da criatura ainda precisa integração no loop de resolução.
+- Transform/cast de Battle back face segue pendente no bloco de Battles avançado/suite.
 
 ---
 

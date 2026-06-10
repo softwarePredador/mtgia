@@ -586,6 +586,77 @@ def test_battle_defense_damage_and_sba():
     assert siege["battle_defeated"] is True
 
 
+def test_dfc_characteristics_and_color_identity_use_all_faces():
+    dfc = {
+        "name": "Front Face // Back Face",
+        "is_dfc": True,
+        "front_face": {
+            "name": "Front Face",
+            "mana_cost": "{W}",
+            "colors": ["white"],
+            "type_line": "Creature",
+        },
+        "back_face": {
+            "name": "Back Face",
+            "mana_cost": "{B}",
+            "colors": ["black"],
+            "type_line": "Creature",
+        },
+    }
+
+    assert battle.get_card_characteristics(dfc, "hand")["name"] == "Front Face"
+    dfc["is_transformed"] = True
+    assert battle.get_card_characteristics(dfc, "battlefield")["name"] == "Back Face"
+    assert battle.compute_color_identity(dfc) == ["white", "black"]
+
+
+def test_adventure_prototype_and_split_characteristics_by_cast_mode():
+    adventure = {
+        "name": "Questing Example",
+        "mana_cost": "{2}{G}",
+        "colors": ["green"],
+        "type_line": "Creature",
+        "adventure": {
+            "name": "Example Adventure",
+            "mana_cost": "{U}",
+            "colors": ["blue"],
+            "type_line": "Instant - Adventure",
+        },
+    }
+    prototype = {
+        "name": "Prototype Example",
+        "mana_cost": "{7}",
+        "colors": [],
+        "type_line": "Artifact Creature",
+        "prototype": {
+            "name": "Prototype Example",
+            "mana_cost": "{1}{R}",
+            "colors": ["red"],
+            "type_line": "Artifact Creature",
+            "power": 2,
+            "toughness": 2,
+        },
+    }
+    split = {
+        "name": "Left // Right",
+        "is_split": True,
+        "chosen_half": "half_b",
+        "type_line": "Instant // Sorcery",
+        "half_a": {"name": "Left", "cmc": 2, "colors": ["white"]},
+        "half_b": {"name": "Right", "cmc": 3, "colors": ["red"]},
+    }
+
+    assert battle.get_card_characteristics(adventure, "stack", cast_mode="adventure")["name"] == "Example Adventure"
+    assert battle.get_card_characteristics(adventure, "battlefield")["name"] == "Questing Example"
+    assert battle.compute_color_identity(adventure) == ["blue", "green"]
+    assert battle.get_card_characteristics(prototype, "stack", cast_mode="prototype")["mana_cost"] == "{1}{R}"
+    assert battle.compute_color_identity(prototype) == ["red"]
+    assert battle.get_card_characteristics(split, "stack")["name"] == "Right"
+    outside_stack = battle.get_card_characteristics(split, "graveyard")
+    assert outside_stack["cmc"] == 5
+    assert outside_stack["colors"] == ["white", "red"]
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2585,6 +2656,8 @@ if __name__ == "__main__":
         test_continuous_effect_dependencies_override_timestamp_within_layer,
         test_planeswalker_loyalty_activation_damage_and_sba,
         test_battle_defense_damage_and_sba,
+        test_dfc_characteristics_and_color_identity_use_all_faces,
+        test_adventure_prototype_and_split_characteristics_by_cast_mode,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,
