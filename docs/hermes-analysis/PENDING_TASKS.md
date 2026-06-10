@@ -1,7 +1,7 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 25/25 itens implementados no battle_analyst_v9.py (6600+ linhas).
+> 25/25 itens implementados no battle_analyst_v9.py (6900+ linhas).
 > 0 macros pendentes nesta lista. Gaps avançados continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
@@ -218,18 +218,18 @@
 **Status 2026-06-10**: ✅ Básico implementado.
 
 **Arquivos**:
-- `battle_analyst_v9.py`: `get_card_characteristics`, `compute_color_identity`.
-- `test_battle_analyst_v10_3.py`: `test_dfc_characteristics_and_color_identity_use_all_faces`, `test_adventure_prototype_and_split_characteristics_by_cast_mode`.
+- `battle_analyst_v9.py`: `get_card_characteristics`, `compute_color_identity`, `adventure_spell_card`, `finish_resolved_spell`, `cast_adventure_spell_from_hand`, `cast_adventure_creature_from_exile`.
+- `test_battle_analyst_v10_3.py`: `test_dfc_characteristics_and_color_identity_use_all_faces`, `test_adventure_prototype_and_split_characteristics_by_cast_mode`, `test_adventure_resolves_to_exile_then_casts_creature_from_exile`.
 
 **O que foi coberto**:
 - DFC usa front face fora da stack/battlefield e back face quando transformado em stack/battlefield.
 - Adventure usa parte adventure no cast mode `adventure`.
+- Adventure resolvida vai para exile com marker de recast e a criatura pode ser lançada do exile em main phase.
 - Prototype usa custo/características prototype no cast mode `prototype`.
 - Split usa metade escolhida na stack e características combinadas fora da stack.
 - Color identity agrega mana/colors de faces/partes/adventure/prototype/split.
 
 **Limite restante**:
-- Resolver Adventure para exile e recast da criatura ainda precisa integração no loop de resolução.
 - Transform/cast de Battle back face segue pendente no bloco de Battles avançado/suite.
 
 ---
@@ -275,7 +275,7 @@
 
 **Limite restante**:
 - Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
-- Cenários ainda sem suporte formal, como Saga final chapter, Adventure recast, active-player concede e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
+- Cenários ainda sem suporte formal, como Saga final chapter, Battle back face, active-player concede e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 
 ---
 
@@ -283,7 +283,7 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6796 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6958 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |

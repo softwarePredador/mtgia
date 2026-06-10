@@ -691,6 +691,82 @@ def test_adventure_prototype_and_split_characteristics_by_cast_mode():
     assert outside_stack["colors"] == ["white", "red"]
 
 
+def test_adventure_resolves_to_exile_then_casts_creature_from_exile():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player(
+            "Active",
+            deck=[
+                {"name": "Drawn 1", "cmc": 1, "type_line": "Creature"},
+                {"name": "Drawn 2", "cmc": 1, "type_line": "Creature"},
+            ],
+        )
+        opponent = player("Opponent")
+        adventure_card = {
+            "name": "Questing Example",
+            "mana_cost": "{2}",
+            "cmc": 2,
+            "colors": ["green"],
+            "type_line": "Creature",
+            "power": 2,
+            "toughness": 2,
+            "adventure": {
+                "name": "Example Adventure",
+                "mana_cost": "{1}",
+                "cmc": 1,
+                "colors": ["blue"],
+                "type_line": "Instant - Adventure",
+                "tag": "draw",
+            },
+        }
+        active.hand = [adventure_card]
+        active.mana_pool.add_generic(1)
+        stack = battle.Stack()
+
+        assert battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=3,
+            phase="precombat_main",
+            stack=stack,
+            rng=random.Random(600),
+            max_actions=1,
+        ) is True
+
+        assert active.hand and [card["name"] for card in active.hand] == ["Drawn 1", "Drawn 2"]
+        assert len(active.exile) == 1
+        assert active.exile[0]["name"] == "Questing Example"
+        assert active.exile[0]["_adventure_available"] is True
+        assert active.graveyard == []
+        assert [event for event, _ in events if event.startswith("adventure")] == [
+            "adventure_cast",
+            "adventure_exiled",
+        ]
+
+        active.mana_pool.add_generic(2)
+        assert battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=3,
+            phase="postcombat_main",
+            stack=stack,
+            rng=random.Random(601),
+            max_actions=1,
+        ) is True
+
+        assert active.exile == []
+        assert len(active.battlefield) == 1
+        assert active.battlefield[0]["name"] == "Questing Example"
+        assert active.battlefield[0]["effect"] == "creature"
+        assert "adventure_creature_cast_from_exile" in [event for event, _ in events]
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_engine_metrics_collects_core_health_signals():
     metrics = battle.set_engine_metrics(battle.EngineMetrics())
     try:
@@ -3085,6 +3161,7 @@ if __name__ == "__main__":
         test_battle_defense_damage_and_sba,
         test_dfc_characteristics_and_color_identity_use_all_faces,
         test_adventure_prototype_and_split_characteristics_by_cast_mode,
+        test_adventure_resolves_to_exile_then_casts_creature_from_exile,
         test_engine_metrics_collects_core_health_signals,
         test_engine_metrics_snapshot_writes_sanitized_json,
         test_conformance_registry_has_executable_coverage,

@@ -15,7 +15,7 @@
 | Targeting | 4/5 | 1/5 | 0/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
-| Tipos Complexos | 4/6 | 2/6 | 0/6 |
+| Tipos Complexos | 5/6 | 1/6 | 0/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
 | Qualidade/QA | 6/7 | 1/7 | 0/7 |
 
@@ -187,7 +187,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
-2. **Targeting formal** — seleção/validação declarada de alvos
-3. **Integração avançada de tipos complexos** — Adventure exile/recast e Battle back face
+1. **Integração avançada de tipos complexos** — Battle back face e efeitos específicos
+2. **Targeting avançado** — multi-target partial resolution e seleção complexa
+3. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 4. **Dashboard/relatório agregado de telemetria** — consolidar snapshots por corpus/cron do Hermes

@@ -683,6 +683,46 @@ def get_card_characteristics(card, zone, cast_mode=None):
     return copy.deepcopy(card)
 
 
+def is_adventure_card(card):
+    return isinstance(card, dict) and isinstance(card.get("adventure"), dict)
+
+
+def adventure_spell_card(card):
+    """Return the Adventure spell face while keeping a reference to the parent card."""
+    spell = get_card_characteristics(card, "stack", cast_mode="adventure")
+    spell["_adventure_parent"] = copy.deepcopy(card)
+    spell["_adventure_cast"] = True
+    return spell
+
+
+def finish_countered_spell(player, card):
+    """Move a countered spell to the correct graveyard object."""
+    if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
+        parent = copy.deepcopy(card["_adventure_parent"])
+        parent.pop("_adventure_available", None)
+        player.graveyard.append(parent)
+        return
+    player.graveyard.append(card)
+
+
+def finish_resolved_spell(player, card, turn=None):
+    """Move a resolved nonpermanent spell, honoring Adventure's exile replacement."""
+    if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
+        parent = copy.deepcopy(card["_adventure_parent"])
+        parent["_adventure_available"] = True
+        parent["_last_adventure_name"] = card.get("name")
+        player.exile.append(parent)
+        emit_replay_event(
+            "adventure_exiled",
+            player=player.name,
+            card=parent.get("name", "?"),
+            adventure=card.get("name", "?"),
+            turn=turn,
+        )
+        return
+    player.graveyard.append(card)
+
+
 def _color_identity_values_from_part(part):
     colors = []
     for key in ("color_identity", "colors"):
@@ -3164,7 +3204,7 @@ class Stack:
             record_engine_metric("stack_resolutions")
             if not item.countered:
                 return item
-            item.controller.graveyard.append(item.card)
+            finish_countered_spell(item.controller, item.card)
         return None
     def top_is_threat(self):
         """Is the top spell threatening enough for opponents to counter?"""
@@ -4782,6 +4822,102 @@ def check_ward(target, spell, controller, rng):
                          spell=spell.get("name"), ward_cost=ward_cost)
         return True  # Spell countered by ward
 
+
+def can_cast_adventure_spell(card, player, phase):
+    if not is_adventure_card(card):
+        return False
+    adventure = adventure_spell_card(card)
+    if not is_instant(adventure) and not (is_sorcery(adventure) and phase in MAIN_PHASES):
+        return False
+    return player.can_pay_card(adventure)
+
+
+def cast_adventure_spell_from_hand(player, card, opponents, all_players, turn, phase, stack, rng):
+    if not can_cast_adventure_spell(card, player, phase):
+        return False
+    adventure = adventure_spell_card(card)
+    effect_data = get_card_effect(adventure)
+    if effect_data.get("effect") in ("unknown", "land", "creature"):
+        return False
+    cast_ctx = begin_cast_context(
+        player,
+        adventure,
+        phase,
+        effect_data=effect_data,
+        role="adventure",
+        modes=["adventure"],
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False
+    player.hand.remove(card)
+    emit_replay_event(
+        "adventure_cast",
+        player=player.name,
+        card=card.get("name", "?"),
+        adventure=adventure.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        type_line=adventure.get("type_line", ""),
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    trigger_spell_cast_engines(
+        player, all_players, adventure, turn, phase, stack=stack, active_player=player
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        adventure,
+        turn,
+        phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    stack.push(adventure, player, effect_data)
+    return True
+
+
+def cast_adventure_creature_from_exile(player, card, turn, phase):
+    if phase not in MAIN_PHASES or not isinstance(card, dict) or not card.get("_adventure_available"):
+        return False
+    if not is_creature_card(card) or not player.can_pay_card(card):
+        return False
+    effect_data = get_card_effect(card)
+    cast_ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="adventure_creature",
+        modes=["creature_from_exile"],
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False
+    player.exile.remove(card)
+    permanent = enrich_card({**card, **effect_data})
+    permanent.pop("_adventure_available", None)
+    permanent.pop("_last_adventure_name", None)
+    permanent["effect"] = "creature"
+    permanent["haste"] = has_haste(permanent)
+    permanent["summoning_sick"] = not permanent["haste"]
+    permanent["tapped"] = False
+    player.battlefield.append(permanent)
+    emit_replay_event(
+        "adventure_creature_cast_from_exile",
+        player=player.name,
+        card=card.get("name", "?"),
+        type_line=permanent.get("type_line", ""),
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    return True
+
+
 def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_actions=None):
     """v8: Cast spells respecting instant/sorcery timing and stack."""
     mana = player.available_mana()
@@ -4850,6 +4986,32 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             mana = player.available_mana()
             if note_action():
                 return True
+
+    if is_main_phase:
+        for exiled_card in list(player.exile):
+            if cast_adventure_creature_from_exile(player, exiled_card, turn, phase):
+                if note_action():
+                    return True
+                break
+
+        for adventure_card in list(player.hand):
+            if cast_adventure_spell_from_hand(
+                player,
+                adventure_card,
+                opponents,
+                all_players,
+                turn,
+                phase,
+                stack,
+                rng,
+            ):
+                while not stack.empty():
+                    priority_round(player, all_players, stack, turn, rng)
+                    if game_winner(all_players):
+                        return True
+                if note_action():
+                    return True
+                break
 
     # 2. Ramp (main phase only)
     if is_main_phase:
@@ -5147,23 +5309,23 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
     if effect == "land": pass
     elif effect == "passive":
         if is_instant(card) or is_sorcery(card):
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
         else:
             permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
     elif effect == "ramp_permanent":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
             return
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         player.battlefield.append(permanent)
     elif effect == "ramp_ritual":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
             return
         player.mana_pool.add_generic(ritual_mana_produced(player, effect_data))
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "ramp_engine":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "ramp_engine"
@@ -5180,14 +5342,14 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         resolve_land_recursion_creature(player, card, effect_data, turn)
     elif effect == "draw_cards":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
             return
         n = effect_data.get("count", 2)
         player.draw(n, rng)
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "treasure_maker":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
             return
         treasure_count = int(effect_data.get("treasure_count") or 1)
         player.treasures += treasure_count
@@ -5203,13 +5365,13 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             cards_drawn=draw_count,
             turn=turn,
         )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "land_ramp":
         put_lands_from_library(player, card, effect_data, turn, opponents=opponents, source_event="land_ramp")
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "land_recursion":
         return_graveyard_lands_to_battlefield(player, card, turn, opponents=opponents)
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
         for opp in opponents:
             target_type = str(effect_data.get("target") or "").lower()
@@ -5235,7 +5397,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                         turn=turn,
                         **decision,
                     )
-                    player.graveyard.append(card)
+                    finish_resolved_spell(player, card, turn=turn)
                     return
                 if effect_data.get("target_controller_gains_life"):
                     gain_life(opp, int(effect_data.get("target_controller_gains_life") or 0))
@@ -5256,7 +5418,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 )
                 move_creature_from_battlefield(opp, t)
                 break
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "deal_damage":
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":
@@ -5292,13 +5454,13 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             unprotected_seen=unprotected_seen,
             turn=turn,
         )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "phase_out":
         player.phased_out = [c for c in player.battlefield if isinstance(c, dict) and c.get("effect") not in ("land",)]
         player.battlefield = [c for c in player.battlefield if c == "land" or (isinstance(c, dict) and c.get("effect") == "land")]
         player.life_cant_change = True
         player.protection_from_everything = True
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "phase_creatures":
         targets = [c for c in player.battlefield if is_battlefield_creature(c)]
         player.phased_out.extend(targets)
@@ -5310,7 +5472,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             phased=[c.get("name", "?") for c in targets],
             turn=turn,
         )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "silence_opponents":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "silence_opponents"
@@ -5318,11 +5480,11 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.silenced_opponents = True
     elif effect == "silence_spell":
         player.silenced_opponents_until_eot = True
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "indestructible":
         grant_creatures_until_eot(player, keywords=("indestructible",))
         player.indestructible = True
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "protect_creature":
         targets = [creature for creature in player.battlefield if is_battlefield_creature(creature)]
         if targets:
@@ -5342,7 +5504,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 grants=["shroud"],
                 turn=turn,
             )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "modal_boros_charm":
         response_to = card.get("_response_to_effect")
         preferred_mode = card.get("preferred_mode")
@@ -5351,7 +5513,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         else:
             grant_creatures_until_eot(player, keywords=("indestructible",))
             player.indestructible = True
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "approach":
         player.approach_count += 1
         gain_life(player, 7)
@@ -5368,7 +5530,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 reason="approach",
                 turn=turn,
             )
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
             return
         if len(player.library) >= 7:
             player.library.insert(6, card)
@@ -5381,7 +5543,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             for c in creatures:
                 total_power += c.get("power", 2)
             opp.battlefield = [c for c in opp.battlefield if not is_battlefield_creature(c)]
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
         alive_opps = [o for o in opponents if o.is_alive()]
         if alive_opps and total_power > 0:
             dmg_each = total_power // len(alive_opps)
@@ -5403,7 +5565,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 haste=token_haste,
                 artifact=artifact_tokens,
             )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "overload_recursion":
         spells = [c for c in player.graveyard if isinstance(c, dict) and c.get("cmc", 0) > 0]
         if player.copy_engines > 0: spells = spells * 2
@@ -5411,7 +5573,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         alive_opps = [o for o in opponents if o.is_alive()]
         if alive_opps:
             for opp in alive_opps: deal_damage(opp, dmg // len(alive_opps))
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "recursion":
         count = int(effect_data.get("count") or 2)
         target_type = effect_data.get("target")
@@ -5455,7 +5617,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             destination=destination,
             turn=turn,
         )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "pump_all":
         kw = effect_data.get("keywords", [])
         combat_keywords = [
@@ -5473,7 +5635,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         )
         if "indestructible" in combat_keywords:
             player.indestructible = True
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "copy_spell":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "copy_spell"
@@ -5540,7 +5702,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if effect_data.get("exiles_self"):
             player.exile.append(card)
         else:
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn)
     elif effect == "topdeck_manipulation":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "topdeck_manipulation"
@@ -5582,7 +5744,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             alive_opps = [o for o in opponents if o.is_alive()]
             if alive_opps:
                 deal_damage(rng.choice(alive_opps), total_power)
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "extra_turn":
         turns = int(effect_data.get("turns") or 1)
         player.extra_turns += turns
@@ -5596,16 +5758,16 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             lose_after_extra_turn=bool(effect_data.get("lose_after_extra_turn")),
             turn=turn,
         )
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "exile_value":
         # Dance with Calamity — exile top X, play for free
         X = max(3, player.available_mana() // 2)
         player.draw(min(X, 3), rng)
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "redirect_removal":
         grant_creatures_until_eot(player, keywords=("indestructible",))
         player.indestructible = True
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
 
     elif effect == "ripple_engine":
         # Thrumming Stone — gives all spells ripple 4
@@ -5642,7 +5804,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             if extra_casts > 0:
                 print(f"  [RIPPLE] Cast {extra_casts} extra Dragon's Approach!")
         
-        player.graveyard.append(card)
+        finish_resolved_spell(player, card, turn=turn)
 
     elif effect == "combo" and card.get("name") == "Dualcaster Mage":
         # Dualcaster enters, check if Twinflame is on the stack or was just cast
