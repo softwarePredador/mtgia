@@ -22,7 +22,7 @@
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
 | Zonas e Objetos | 5/5 | 0/5 | 0/5 |
 | Qualidade/QA | 7/7 | 0/7 | 0/7 |
-| Regras oficiais 2026 | 5/12 | 5/12 | 2/12 tracked |
+| Regras oficiais 2026 | 5/12 | 6/12 | 1/12 tracked |
 
 ---
 
@@ -234,7 +234,7 @@ Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
 | Spacecraft | ✅ Parcial | `is_vehicle_or_spacecraft_card`, `activate_station_ability` | Efeitos específicos de cada Spacecraft |
 | Warp | ✅ Parcial | `cast_warp_spell_from_hand`, `process_warp_end_step`, `cast_warp_card_from_exile` | Interações card-specific e permissões complexas |
 | Prepare / Preparation cards | ✅ Parcial | `prepare_spell_copy`, `cleanup_prepared_copies` | Cast completo da cópia preparada por UI/interação |
-| Paradigm | ⚠️ Tracked Gap | `resolve_paradigm_spell` rastreia a fonte | Cópia automática na primeira main phase futura |
+| Paradigm | ✅ Parcial | `resolve_paradigm_spell` rastreia a fonte | Cópia automática na primeira main phase futura segue como tracked gap |
 | Flashback | ✅ Básico | `cast_flashback_spell_from_graveyard`, exile replacement | Custos/restrições específicas por carta |
 | Lander tokens | ✅ Básico | `create_lander_token` | Token variants por carta concreta |
 | Void/Repartee/Opus/Increment/Infusion/Converge | ✅ Telemetria | `modern_ability_word_signals` | Sem enforcement porque ability words não têm efeito próprio |
