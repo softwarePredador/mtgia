@@ -65,9 +65,19 @@ CONFORMANCE_SCENARIOS = [
         "purpose": "Commander damage ledger persists across commander zone changes.",
     },
     {
+        "id": "commander_damage_per_origin_903_10a",
+        "rule": "CR 903.10a",
+        "purpose": "Multiple commanders track lethal 21 damage per commander origin.",
+    },
+    {
         "id": "empty_library_draw_104_3c",
         "rule": "CR 104.3c",
         "purpose": "A failed draw from an empty library loses even with cards in hand.",
+    },
+    {
+        "id": "token_ceases_outside_battlefield_110_5f",
+        "rule": "CR 110.5f",
+        "purpose": "Tokens in non-battlefield zones cease to exist through the SBA loop.",
     },
     {
         "id": "blocked_stays_blocked_509_1h",
@@ -920,7 +930,9 @@ def test_conformance_registry_has_executable_coverage():
     covered = {
         "stack_lifo_405",
         "commander_damage_ledger_903_10a",
+        "commander_damage_per_origin_903_10a",
         "empty_library_draw_104_3c",
+        "token_ceases_outside_battlefield_110_5f",
         "blocked_stays_blocked_509_1h",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
@@ -983,6 +995,60 @@ def test_conformance_commander_damage_ledger_persists_across_zone_change():
     battle.check_sbas_until_stable([attacker, defender])
 
     assert attacker.commander_damage[defender.name] == 22
+    assert defender.eliminated is True
+
+
+def test_commander_damage_is_tracked_per_commander_origin():
+    attacker = player("Partner Player")
+    defender = player("Defender")
+    commander_a = {
+        "name": "Partner A",
+        "type_line": "Legendary Creature",
+        "effect": "creature",
+        "power": 11,
+        "toughness": 11,
+        "is_commander": True,
+        "owner": attacker.name,
+        "commander_origin_id": "partner-a-origin",
+    }
+    commander_b = {
+        "name": "Partner B",
+        "type_line": "Legendary Creature",
+        "effect": "creature",
+        "power": 10,
+        "toughness": 10,
+        "is_commander": True,
+        "owner": attacker.name,
+        "commander_origin_id": "partner-b-origin",
+    }
+
+    attacker.battlefield = [commander_a, commander_b]
+    battle.combat_damage_steps(
+        attacker,
+        [defender],
+        defender,
+        [commander_a, commander_b],
+        [(commander_a, []), (commander_b, [])],
+        turn=1,
+    )
+    battle.check_sbas_until_stable([attacker, defender])
+
+    assert attacker.commander_damage[defender.name] == 21
+    assert attacker.commander_damage_by_source["Defender::partner-a-origin"] == 11
+    assert attacker.commander_damage_by_source["Defender::partner-b-origin"] == 10
+    assert defender.eliminated is False
+
+    battle.combat_damage_steps(
+        attacker,
+        [defender],
+        defender,
+        [commander_a],
+        [(commander_a, [])],
+        turn=2,
+    )
+    battle.check_sbas_until_stable([attacker, defender])
+
+    assert attacker.commander_damage_by_source["Defender::partner-a-origin"] == 22
     assert defender.eliminated is True
 
 
@@ -2481,6 +2547,32 @@ def test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard():
     assert token not in active.graveyard
 
 
+def test_token_sba_removes_tokens_from_non_battlefield_zones():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active")
+    token_in_hand = {
+        "name": "Hand Token",
+        "is_token": True,
+        "effect": "creature",
+        "type_line": "Creature Token",
+    }
+    token_in_exile = {
+        "name": "Exile Token",
+        "tag": "token",
+        "effect": "creature",
+        "type_line": "Creature Token",
+    }
+    active.hand = [token_in_hand]
+    active.exile = [token_in_exile]
+
+    battle.check_sbas_until_stable([active])
+
+    assert token_in_hand not in active.hand
+    assert token_in_exile not in active.exile
+    assert [event for event, _ in events].count("token_ceased_to_exist") == 2
+
+
 def test_artifact_removal_does_not_destroy_creature_target_by_mistake():
     caster = player("Caster")
     opponent = player("Opponent")
@@ -3316,6 +3408,7 @@ if __name__ == "__main__":
         test_conformance_registry_has_executable_coverage,
         test_conformance_stack_resolves_lifo,
         test_conformance_commander_damage_ledger_persists_across_zone_change,
+        test_commander_damage_is_tracked_per_commander_origin,
         test_conformance_failed_draw_from_empty_library_loses,
         test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves,
         test_conformance_apnap_trigger_order_is_lifo_after_stack_placement,
@@ -3369,6 +3462,7 @@ if __name__ == "__main__":
         test_contextual_haste_text_does_not_grant_self_haste,
         test_commander_destroyed_in_combat_returns_to_command_zone,
         test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard,
+        test_token_sba_removes_tokens_from_non_battlefield_zones,
         test_artifact_removal_does_not_destroy_creature_target_by_mistake,
         test_land_ramp_puts_library_land_tapped_and_spell_goes_to_graveyard,
         test_land_recursion_returns_graveyard_lands_tapped,

@@ -780,6 +780,42 @@ def compute_color_identity(card):
     return [color for color in ordered if color in seen]
 
 
+def commander_origin_id(card, owner_name=None):
+    """Stable identity for one physical commander across zone changes."""
+    if not isinstance(card, dict):
+        return "unknown"
+    explicit = card.get("commander_origin_id") or card.get("_commander_origin_id")
+    if explicit:
+        return str(explicit)
+    origin = (
+        card.get("oracle_id")
+        or card.get("scryfall_id")
+        or f"{owner_name or card.get('owner') or '?'}:{card.get('name', '?')}"
+    )
+    card["_commander_origin_id"] = str(origin)
+    return str(origin)
+
+
+def commander_damage_key(defender_name, commander_card, owner_name=None):
+    return f"{defender_name}::{commander_origin_id(commander_card, owner_name)}"
+
+
+def commander_damage_target_from_key(key):
+    return str(key).split("::", 1)[0]
+
+
+def commander_damage_lethal_entries(player):
+    ledger = getattr(player, "commander_damage_by_source", None)
+    if ledger:
+        for key, damage in ledger.items():
+            if damage >= 21:
+                yield commander_damage_target_from_key(key), damage, key
+        return
+    for target_name, damage in player.commander_damage.items():
+        if damage >= 21:
+            yield target_name, damage, None
+
+
 def apply_continuous_effects(card, effects):
     """Return a characteristics snapshot after applying continuous effects."""
     result = copy.deepcopy(card)
@@ -2881,6 +2917,7 @@ class Player:
         self.exile = []
         self.life = 40
         self.commander_damage = defaultdict(int)
+        self.commander_damage_by_source = defaultdict(int)
         self.mana_pool = ManaPool()
         self.lands_played_this_turn = 0
         self.max_lands_per_turn = 1
@@ -3280,19 +3317,20 @@ def check_sbas(all_players):
             return True
         if p.eliminated:
             continue
-        for name, dmg in p.commander_damage.items():
-            if dmg >= 21:
-                # Find the player who took this damage and kill them
-                for op in all_players:
-                    if op.name == name and not op.eliminated:
-                        op.life = 0
-                        op.eliminated = True
-                        emit_replay_event(
-                            "player_eliminated",
-                            player=op.name,
-                            reason="commander_damage",
-                        )
-                        return True
+        for name, dmg, source_key in commander_damage_lethal_entries(p):
+            # Find the player who took this damage and kill them
+            for op in all_players:
+                if op.name == name and not op.eliminated:
+                    op.life = 0
+                    op.eliminated = True
+                    emit_replay_event(
+                        "player_eliminated",
+                        player=op.name,
+                        reason="commander_damage",
+                        commander_damage_key=source_key,
+                        commander_damage=dmg,
+                    )
+                    return True
 
     # v9: Poison SBA
     for p in all_players:
@@ -3366,18 +3404,30 @@ def check_sbas(all_players):
                 else:
                     legends[key] = c
 
+    if check_token_lifecycle(all_players):
+        return True
+
     return False
 
 
 
 def check_token_lifecycle(all_players):
     """v9: Token SBAs — tokens cease to exist outside battlefield (CR 110.5f)."""
+    removed = False
     for p in all_players:
         for zone_attr in ["graveyard", "exile", "hand"]:
             zone = getattr(p, zone_attr, [])
             for obj in list(zone):
                 if isinstance(obj, dict) and (obj.get("is_token") or obj.get("tag") == "token"):
                     zone.remove(obj)  # Ceases to exist
+                    removed = True
+                    emit_replay_event(
+                        "token_ceased_to_exist",
+                        player=p.name,
+                        zone=zone_attr,
+                        token=obj.get("name"),
+                    )
+    return removed
 
 def check_sbas_until_stable(all_players):
     """v9: Loop SBAs until no more actions (CR 704.3)."""
@@ -6134,6 +6184,8 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
         if damage_dealt and creature.get("lifelink"):
             gain_life(attacker, damage)
         if damage_dealt and creature.get("is_commander") and creature.get("owner") == attacker.name:
+            source_key = commander_damage_key(target.name, creature, attacker.name)
+            attacker.commander_damage_by_source[source_key] += damage
             attacker.commander_damage[target.name] += damage
 
     marked_damage = defaultdict(int)
@@ -6219,10 +6271,10 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
     combat_damage_step(first_strike_phase=False)
 
     # Check for commander damage kill
-    for name, dmg in attacker.commander_damage.items():
-        if dmg >= 21:
-            for opp in opponents:
-                if opp.name == name: opp.life = 0
+    for name, _, _ in commander_damage_lethal_entries(attacker):
+        for opp in opponents:
+            if opp.name == name:
+                opp.life = 0
 
     emit_replay_event(
         "combat_result",

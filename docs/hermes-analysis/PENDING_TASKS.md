@@ -265,12 +265,14 @@
 **Status 2026-06-10**: ✅ Básica implementada.
 
 **Arquivo**:
-- `test_battle_analyst_v10_3.py`: `CONFORMANCE_SCENARIOS` + testes `test_conformance_*`.
+- `test_battle_analyst_v10_3.py`: `CONFORMANCE_SCENARIOS` + testes de regressão/conformidade.
 
 **Cenários cobertos**:
 - `stack_lifo_405`: resolução LIFO da stack.
 - `commander_damage_ledger_903_10a`: ledger de commander damage persiste após zone change para command zone.
+- `commander_damage_per_origin_903_10a`: múltiplos comandantes acumulam 21 de dano separadamente por origem.
 - `empty_library_draw_104_3c`: draw falho de library vazia perde mesmo com cartas na mão.
+- `token_ceases_outside_battlefield_110_5f`: token em zona não-battlefield deixa de existir via SBA.
 - `blocked_stays_blocked_509_1h`: criatura bloqueada continua bloqueada após blocker sair.
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.

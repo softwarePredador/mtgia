@@ -9,14 +9,14 @@
 | Categoria | Implementado | Parcial | Ausente |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
-| SBAs e Triggers | 6/15 | 2/15 | 7/15 |
-| Commander Rules | 5/8 | 2/8 | 1/8 |
+| SBAs e Triggers | 12/15 | 0/15 | 3/15 |
+| Commander Rules | 5/8 | 1/8 | 2/8 |
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 5/5 | 0/5 | 0/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
-| Zonas e Objetos | 2/5 | 1/5 | 2/5 |
+| Zonas e Objetos | 3/5 | 0/5 | 2/5 |
 | Qualidade/QA | 7/7 | 0/7 | 0/7 |
 
 ---
@@ -48,24 +48,24 @@
 | Life <= 0 | ✅ OK | 2532-2535 | |
 | Draw from empty library | ✅ OK | 2527-2531 | |
 | Commander damage >= 21 | ✅ OK | 2538-2550 | |
-| Deck out | ⚠️ Parcial | 2551-2555 | Condição errada: `not library and not hand` (deveria ser "tentativa de draw em library vazia") |
-| **Creature toughness <= 0 / lethal damage** | ❌ Ausente | — | ✅ FEITO (v9 patch) |
-| **Legend rule** | ❌ Ausente | — | ✅ FEITO (v9 patch) |
-| Token fuera do battlefield | ❌ Ausente | — | Token é destruído em combate, não por SBA |
+| Deck out | ✅ Básico | v9: `Player.draw`, `check_sbas` | `failed_draw_from_empty_library` perde mesmo com cartas na mão |
+| **Creature toughness <= 0 / lethal damage** | ✅ Básico | v9: `check_sbas` | Remove criatura por toughness/lethal damage |
+| **Legend rule** | ✅ Básico | v9: `check_legend_rule` | Mantém a legenda mais recente por timestamp básico |
+| Token fora do battlefield | ✅ Básico | v9: `check_token_lifecycle` | Token em graveyard/exile/hand deixa de existir no SBA loop |
 | Aura/Equipment ilegal | ❌ Ausente | — | |
 | +1/+1 e -1/-1 cancel | ❌ Ausente | — | |
 | Planeswalker 0 loyalty | ✅ Básico | v9: `check_sbas` | loyalty <= 0 move para graveyard |
 | Saga capítulo final | ❌ Ausente | — | |
 | Battle defense 0 | ✅ Básico | v9: `check_sbas` | defense <= 0 move para exile |
-| Commander em GY/exile → CZ (SBA) | ❌ Ausente | — | |
-| **Loop SBA até estabilizar** | ❌ Ausente | — | ✅ FEITO (check_sbas_until_stable) |
+| Commander em GY/exile → CZ (SBA) | ✅ Básico | v9: `ReplacementRegistry` | Zone change de commander para GY/exile/hand/library redireciona para command zone salvo escolha explícita |
+| **Loop SBA até estabilizar** | ✅ Básico | v9: `check_sbas_until_stable` | Loop roda até estabilizar |
 | **APNAP trigger ordering** | ✅ Básico | v9 | Triggers atuais entram como `triggered_ability`; falta player-choice avançado/aninhamento complexo |
 
 **Ações imediatas**:
 - [x] Creature SBA ✅
 - [x] SBA loop ✅
 - [x] Legend rule ✅
-- [ ] Adicionar deck out correto (trigger no draw, não check de biblioteca vazia)
+- [x] Adicionar deck out correto (trigger no draw, não check de biblioteca vazia)
 - [x] APNAP ordering básico para triggers atuais
 
 ---
@@ -75,17 +75,17 @@
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
 | Commander tax (+2 por cast do CZ) | ✅ OK | 2253, 3532-3550 | |
-| Commander damage tracking | ⚠️ Parcial | 2261, 4512-4513 | Keyed por opponent name string, não por commander origin ID |
-| Commander replacement (GY/exile → CZ opcional) | ❌ Ausente | 2828 | Sempre vai ao CZ, sem escolha |
-| Commander replacement (hand/library → CZ opcional) | ❌ Ausente | — | |
+| Commander damage tracking | ✅ Básico | v9: `commander_damage_by_source` | Ledger por `defender::commander_origin_id`; agregado legado por defensor preservado para compatibilidade |
+| Commander replacement (GY/exile → CZ opcional) | ✅ Básico | v9: `ReplacementRegistry` | Redireciona para command zone salvo `commander_replacement_choice` |
+| Commander replacement (hand/library → CZ opcional) | ✅ Básico | v9: `ReplacementRegistry` | Coberto no mesmo pipeline de zone change |
 | Deck construction (100 cards, singleton, color ID) | ⚠️ Parcial | — | Feito no app, não no battle engine |
 | Partner/Background/Friends Forever | ❌ Ausente | — | |
 | Commander ninjutsu do CZ | ❌ Ausente | — | |
 | Color identity de DFC/Adventure | ✅ Básico | v9: `compute_color_identity` | Agrega faces/partes/modos complexos |
 
 **Ações imediatas**:
-- [ ] Commander replacement opcional (GY/exile → CZ)
-- [ ] Commander damage keyed por origin ID, não nome
+- [x] Commander replacement opcional (GY/exile → CZ)
+- [x] Commander damage keyed por origin ID, não nome
 
 ---
 
@@ -144,7 +144,7 @@
 | LKI (last known information) | ❌ Ausente | — | |
 | Command zone | ✅ OK | 2252, 2828 | |
 | Exile (face up/down) | ❌ Ausente | — | |
-| Token lifecycle | ⚠️ Parcial | — | Token existe no battlefield, some ao sair |
+| Token lifecycle | ✅ Básico | v9: `check_token_lifecycle` | Token em graveyard/exile/hand deixa de existir via SBA |
 
 ---
 
