@@ -72,6 +72,14 @@ commander_spec = importlib.util.spec_from_file_location(
 battle_commander_tests = importlib.util.module_from_spec(commander_spec)
 commander_spec.loader.exec_module(battle_commander_tests)
 
+MANA_TESTS_PATH = MODULE_PATH.with_name("battle_mana_tests.py")
+mana_spec = importlib.util.spec_from_file_location(
+    "battle_mana_tests_under_test",
+    MANA_TESTS_PATH,
+)
+battle_mana_tests = importlib.util.module_from_spec(mana_spec)
+mana_spec.loader.exec_module(battle_mana_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -489,29 +497,6 @@ def test_turn_stops_immediately_after_approach_win():
 
     assert active.has_won() is True
     assert any(card["name"] == "Must Stay In Hand" for card in active.hand)
-
-
-def test_mana_sources_do_not_refill_after_spending():
-    active = player("Active")
-    active.battlefield = ["land", "land", "land"]
-    active.refresh_mana_sources(turn=1)
-
-    assert active.available_mana() == 3
-    assert active.spend_mana(3) is True
-    assert active.available_mana() == 0
-    assert active.available_mana() == 0
-
-
-def test_treasures_are_spent_without_refilling_sources():
-    active = player("Active")
-    active.battlefield = ["land"]
-    active.treasures = 2
-    active.refresh_mana_sources(turn=1)
-
-    assert active.available_mana() == 3
-    assert active.spend_mana(2) is True
-    assert active.available_mana() == 1
-    assert active.treasures == 1
 
 
 def test_counterspell_consumes_card_mana_and_counters_target():
@@ -1579,89 +1564,6 @@ def test_player_does_not_counter_own_spell():
     assert active.approach_count == 1
     assert active.hand[0]["name"] == "Own Counter"
     assert active.available_mana() == 2
-
-
-def test_colored_mana_requires_the_correct_color():
-    active = player("Active")
-    active.mana_pool.add("white", 1)
-    active.mana_pool.add_generic(2)
-    white_spell = {"name": "White Spell", "cmc": 2, "mana_cost": "{1}{W}"}
-    blue_spell = {"name": "Blue Spell", "cmc": 2, "mana_cost": "{1}{U}"}
-
-    assert active.can_pay_card(white_spell) is True
-    assert active.can_pay_card(blue_spell) is False
-    assert active.spend_card_mana(white_spell) is True
-    assert active.available_mana() == 1
-
-
-def test_treasure_and_flexible_sources_pay_colored_costs():
-    active = player("Active")
-    active.mana_pool.add("wildcard", 1)
-    active.treasures = 1
-    spell = {"name": "Dimir Spell", "cmc": 2, "mana_cost": "{U}{B}"}
-
-    assert active.can_pay_card(spell) is True
-    assert active.spend_card_mana(spell) is True
-    assert active.available_mana() == 0
-    assert active.treasures == 0
-
-
-def test_basic_lands_refresh_as_colored_sources():
-    active = player("Active")
-    active.battlefield = [
-        {"name": "Plains", "effect": "land"},
-        {"name": "Island", "effect": "land"},
-    ]
-    active.refresh_mana_sources(turn=1)
-
-    assert active.mana_pool.white == 1
-    assert active.mana_pool.blue == 1
-    assert active.can_pay_card({"name": "Azorius", "cmc": 2, "mana_cost": "{W}{U}"})
-
-
-def test_hybrid_and_phyrexian_mana_use_legal_payment_options():
-    white_payer = player("White")
-    white_payer.mana_pool.add("white", 1)
-    hybrid_spell = {"name": "Azorius Hybrid", "cmc": 1, "mana_cost": "{W/U}"}
-
-    assert white_payer.can_pay_card(hybrid_spell) is True
-    assert white_payer.spend_card_mana(hybrid_spell) is True
-    assert white_payer.mana_pool.white == 0
-
-    blue_payer = player("Blue")
-    blue_payer.mana_pool.add("blue", 1)
-
-    assert blue_payer.can_pay_card(hybrid_spell) is True
-    assert blue_payer.spend_card_mana(hybrid_spell) is True
-    assert blue_payer.mana_pool.blue == 0
-
-    red_payer = player("Red")
-    red_payer.mana_pool.add("red", 1)
-
-    assert red_payer.can_pay_card(hybrid_spell) is False
-    assert red_payer.available_mana() == 1
-
-    life_payer = player("Life")
-    life_payer.life = 10
-    phyrexian_spell = {"name": "Phyrexian White", "cmc": 1, "mana_cost": "{W/P}"}
-
-    assert life_payer.can_pay_card(phyrexian_spell) is True
-    assert life_payer.spend_card_mana(phyrexian_spell) is True
-    assert life_payer.life == 8
-
-    mana_payer = player("Mana")
-    mana_payer.life = 10
-    mana_payer.mana_pool.add("white", 1)
-
-    assert mana_payer.spend_card_mana(phyrexian_spell) is True
-    assert mana_payer.life == 10
-    assert mana_payer.mana_pool.white == 0
-
-    low_life_payer = player("Low Life")
-    low_life_payer.life = 1
-
-    assert low_life_payer.can_pay_card(phyrexian_spell) is False
-    assert low_life_payer.life == 1
 
 
 def test_card_oracle_cache_enriches_battle_cards():
@@ -3141,8 +3043,7 @@ if __name__ == "__main__":
         test_combat_emits_structured_event,
         test_end_of_combat_triggers_use_stack_and_apnap_order,
         test_turn_stops_immediately_after_approach_win,
-        test_mana_sources_do_not_refill_after_spending,
-        test_treasures_are_spent_without_refilling_sources,
+        *battle_mana_tests.register_tests(battle, player),
         test_counterspell_consumes_card_mana_and_counters_target,
         test_empty_stack_priority_requires_main_phase,
         test_empty_stack_priority_casts_main_phase_creature,
@@ -3181,10 +3082,6 @@ if __name__ == "__main__":
         test_ward_paid_allows_targeted_removal_to_resolve,
         *battle_combat_tests.register_tests(battle, player),
         test_player_does_not_counter_own_spell,
-        test_colored_mana_requires_the_correct_color,
-        test_treasure_and_flexible_sources_pay_colored_costs,
-        test_basic_lands_refresh_as_colored_sources,
-        test_hybrid_and_phyrexian_mana_use_legal_payment_options,
         test_card_oracle_cache_enriches_battle_cards,
         test_battle_card_rules_table_overrides_fallbacks,
         test_lorehold_miracle_requires_lorehold_on_battlefield,
