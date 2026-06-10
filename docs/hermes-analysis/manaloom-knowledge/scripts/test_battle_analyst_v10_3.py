@@ -1436,89 +1436,6 @@ def test_lands_are_not_instant_or_sorcery_even_with_generated_metadata():
     assert battle.get_card_effect(land).get("instant") is None
 
 
-def test_lorehold_miracle_ignores_lands_and_creatures():
-    events = []
-    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    active = battle.Player(
-        "Lorehold",
-        None,
-        [
-            {
-                "name": "Mana Confluence",
-                "cmc": 0,
-                "type_line": "Land",
-                "oracle_text": "{T}: Add one mana of any color.",
-                "effect": "land",
-                "tag": "land",
-            },
-            {
-                "name": "Drannith Magistrate",
-                "cmc": 2,
-                "type_line": "Creature",
-                "oracle_text": "Your opponents can't cast spells from anywhere other than their hands.",
-            },
-        ],
-        is_human=True,
-    )
-    active.battlefield = [
-        {"name": "Lorehold, the Historian", "effect": "creature", "haste": True},
-        {"name": "Plains", "effect": "land", "type_line": "Land"},
-        {"name": "Mountain", "effect": "land", "type_line": "Land"},
-    ]
-    defender = player("Defender", [card("Draw")])
-
-    battle.play_turn_v8(
-        active,
-        [defender],
-        [active, defender],
-        turn=3,
-        rng=random.Random(31),
-        stack=battle.Stack(),
-    )
-    battle.REPLAY_EVENT_HANDLER = None
-
-    assert not [event for event, _ in events if event == "miracle_cast"]
-
-
-def test_lorehold_miracle_rejects_flash_creatures():
-    events = []
-    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    active = battle.Player(
-        "Lorehold",
-        None,
-        [
-            {
-                "name": "Dualcaster Mage",
-                "cmc": 3,
-                "type_line": "Creature — Human Wizard",
-                "oracle_text": "Flash",
-                "keywords": ["Flash"],
-            },
-        ],
-        is_human=True,
-    )
-    active.battlefield = [
-        {"name": "Lorehold, the Historian", "effect": "creature", "haste": True},
-        {"name": "Plains", "effect": "land", "type_line": "Land"},
-        {"name": "Mountain", "effect": "land", "type_line": "Land"},
-    ]
-    defender = player("Defender", [card("Draw")])
-
-    battle.play_turn_v8(
-        active,
-        [defender],
-        [active, defender],
-        turn=3,
-        rng=random.Random(39),
-        stack=battle.Stack(),
-    )
-    battle.REPLAY_EVENT_HANDLER = None
-
-    assert battle.is_instant({"name": "Dualcaster Mage", "type_line": "Creature — Human Wizard", "keywords": ["Flash"]})
-    assert not battle.is_instant_or_sorcery_spell({"name": "Dualcaster Mage", "type_line": "Creature — Human Wizard", "keywords": ["Flash"]})
-    assert not [event for event, _ in events if event == "miracle_cast"]
-
-
 def test_end_step_window_does_not_cast_lands():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -1906,34 +1823,6 @@ def test_mystical_tutor_finds_instant_or_sorcery_only():
     assert sorcery not in active.library
     assert sorcery in active.hand
     assert mystical in active.graveyard
-
-
-def test_silence_spell_blocks_responses_until_cleanup_only():
-    active = player("Active")
-    responder = player("Responder")
-    responder.hand = [
-        {
-            "name": "Real Counter",
-            "cmc": 2,
-            "tag": "counter",
-            "effect": "counter",
-            "type_line": "Instant",
-        }
-    ]
-    responder.battlefield = ["land", "land"]
-    responder.refresh_mana_sources(turn=3)
-
-    battle.apply_effect_immediate(active, [responder], {"name": "Silence", "cmc": 1, "type_line": "Instant"}, 3, random.Random(78))
-    stack = battle.Stack()
-    spell = {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"}
-    stack.push(spell, active, battle.get_card_effect(spell))
-
-    battle.priority_round(active, [active, responder], stack, 3, random.Random(78))
-
-    assert active.silenced_opponents_until_eot is True
-    assert responder.hand[0]["name"] == "Real Counter"
-    battle.clear_until_eot(active)
-    assert active.silenced_opponents_until_eot is False
 
 
 def test_reanimation_recursion_returns_creature_to_battlefield():
@@ -2655,8 +2544,6 @@ if __name__ == "__main__":
         *battle_card_specific_tests.register_tests(battle, player),
         *battle_replacement_tests.register_tests(battle, player),
         test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,
-        test_lorehold_miracle_ignores_lands_and_creatures,
-        test_lorehold_miracle_rejects_flash_creatures,
         test_end_step_window_does_not_cast_lands,
         test_summoning_sick_creature_cannot_attack_until_next_turn,
         test_creature_loses_summoning_sickness_at_start_of_controller_turn_and_taps_to_attack,
@@ -2673,7 +2560,6 @@ if __name__ == "__main__":
         test_passive_permanent_does_not_draw_or_make_mana_on_resolution,
         test_tutor_to_graveyard_moves_library_card_without_drawing,
         test_mystical_tutor_finds_instant_or_sorcery_only,
-        test_silence_spell_blocks_responses_until_cleanup_only,
         test_reanimation_recursion_returns_creature_to_battlefield,
         test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
         test_classify_loss_covers_poison_effect_and_concede_tags,

@@ -56,14 +56,14 @@ que o usuário vê na análise do deck.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7869 linhas.
-- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 2705 linhas após sete extrações.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 2591 linhas após sete extrações.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` — 330 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` — 151 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_commander_tests.py` — 145 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py` — 112 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py` — 289 linhas extraídas.
-- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py` — 206 linhas extraídas.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py` — 328 linhas extraídas.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
 - `server/lib/ai/optimize_runtime_support.dart` — 2772 linhas.
 
@@ -92,9 +92,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   priority e casting pipeline: stack LIFO, counterspell, janelas de prioridade
   com pilha vazia, custo travado antes de pagamento, X/alternative/additional
   costs, replay de modes/targets e proteção contra counter no próprio spell.
-- Novo módulo `battle_card_specific_tests.py` com 6 regressões card-specific:
+- Novo módulo `battle_card_specific_tests.py` com 9 regressões card-specific:
   três cenários de Lorehold miracle e proteções/interações específicas de
-  `Boros Charm`, `Akroma's Will` e `Silence`.
+  `Boros Charm`, `Akroma's Will` e `Silence`; também cobre filtros Lorehold
+  contra land/creature/flash creature e duração do efeito de Silence até cleanup.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
   os testes 2026, combate, replacement/prevention, Commander, mana/custos e
   stack/casting/card-specific a partir dos módulos extraídos.
