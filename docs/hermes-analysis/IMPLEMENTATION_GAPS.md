@@ -187,7 +187,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Integração avançada de tipos complexos** — Battle back face e efeitos específicos
+1. **Integração avançada de tipos complexos** — efeitos específicos de planeswalker/battle/faces complexas
 2. **Targeting avançado** — multi-target partial resolution e seleção complexa
 3. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 4. **Dashboard/relatório agregado de telemetria** — consolidar snapshots por corpus/cron do Hermes

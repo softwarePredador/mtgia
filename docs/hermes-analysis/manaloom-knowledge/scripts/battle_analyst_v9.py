@@ -645,6 +645,30 @@ def battle_takes_damage(battle_card, amount):
     return True
 
 
+def resolve_battle_back_face(controller, battle_card):
+    """Basic Siege reward: cast/put the back face onto the battlefield."""
+    back_face = battle_card.get("back_face") if isinstance(battle_card, dict) else None
+    if not isinstance(back_face, dict):
+        return None
+    permanent = prepare_entering_permanent(enrich_card(copy.deepcopy(back_face)))
+    permanent["controller"] = controller.name
+    permanent["cast_from_battle_back_face"] = True
+    if is_creature_card(permanent):
+        permanent["effect"] = "creature"
+        permanent["haste"] = has_haste(permanent)
+        permanent["summoning_sick"] = not permanent["haste"]
+        permanent["tapped"] = False
+    controller.battlefield.append(permanent)
+    emit_replay_event(
+        "battle_back_face_cast",
+        player=controller.name,
+        battle=battle_card.get("name", "?"),
+        card=permanent.get("name", "?"),
+        type_line=permanent.get("type_line", ""),
+    )
+    return permanent
+
+
 def get_card_characteristics(card, zone, cast_mode=None):
     """Return characteristics for zone-specific complex card modes."""
     if not isinstance(card, dict):
@@ -3310,6 +3334,7 @@ def check_sbas(all_players):
                 p.battlefield.remove(permanent)
                 p.exile.append(permanent)
                 permanent["battle_defeated"] = True
+                back_face = resolve_battle_back_face(p, permanent)
                 emit_replay_event(
                     "permanent_moved_by_sba",
                     player=p.name,
@@ -3317,6 +3342,7 @@ def check_sbas(all_players):
                     permanent_type="battle",
                     destination="exile",
                     reason="defense_zero",
+                    back_face_cast=back_face.get("name", "?") if back_face else None,
                 )
                 return True
 

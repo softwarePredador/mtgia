@@ -620,6 +620,41 @@ def test_battle_defense_damage_and_sba():
     assert siege["battle_defeated"] is True
 
 
+def test_battle_defeated_casts_back_face():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player("Active")
+        protector = player("Protector")
+        siege = {
+            "name": "Test Siege // Reward Creature",
+            "type_line": "Battle - Siege",
+            "starting_defense": 2,
+            "back_face": {
+                "name": "Reward Creature",
+                "type_line": "Creature",
+                "power": 3,
+                "toughness": 3,
+            },
+        }
+        battle.handle_siege_etb(siege, active, [protector])
+        active.battlefield = [siege]
+
+        assert battle.battle_takes_damage(siege, 2) is True
+        assert battle.check_sbas([active, protector]) is True
+
+        assert siege in active.exile
+        assert siege["battle_defeated"] is True
+        assert len(active.battlefield) == 1
+        assert active.battlefield[0]["name"] == "Reward Creature"
+        assert active.battlefield[0]["effect"] == "creature"
+        assert active.battlefield[0]["cast_from_battle_back_face"] is True
+        assert "battle_back_face_cast" in [event for event, _ in events]
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_dfc_characteristics_and_color_identity_use_all_faces():
     dfc = {
         "name": "Front Face // Back Face",
@@ -3159,6 +3194,7 @@ if __name__ == "__main__":
         test_continuous_effect_dependencies_override_timestamp_within_layer,
         test_planeswalker_loyalty_activation_damage_and_sba,
         test_battle_defense_damage_and_sba,
+        test_battle_defeated_casts_back_face,
         test_dfc_characteristics_and_color_identity_use_all_faces,
         test_adventure_prototype_and_split_characteristics_by_cast_mode,
         test_adventure_resolves_to_exile_then_casts_creature_from_exile,

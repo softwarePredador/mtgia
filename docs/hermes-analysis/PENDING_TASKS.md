@@ -206,9 +206,9 @@
 - Battle/Siege entra com defense e protector.
 - Dano em Battle reduz defense.
 - SBA move Battle com defense <= 0 para exile e marca `battle_defeated`.
+- Se houver `back_face`, a face de trás é lançada/colocada no battlefield como recompensa básica da Siege.
 
 **Limite restante**:
-- Transform/cast da back face de Battle ainda não está modelado.
 - Loyalty abilities ainda são genéricas; efeitos específicos de cada planeswalker não foram implementados.
 
 ---
@@ -230,7 +230,7 @@
 - Color identity agrega mana/colors de faces/partes/adventure/prototype/split.
 
 **Limite restante**:
-- Transform/cast de Battle back face segue pendente no bloco de Battles avançado/suite.
+- Efeitos específicos de faces complexas ainda dependem de regras card-specific.
 
 ---
 
@@ -275,7 +275,7 @@
 
 **Limite restante**:
 - Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
-- Cenários ainda sem suporte formal, como Saga final chapter, Battle back face, active-player concede e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
+- Cenários ainda sem suporte formal, como Saga final chapter, active-player concede e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 
 ---
 
@@ -283,7 +283,7 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6958 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6984 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |
