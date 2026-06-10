@@ -17,7 +17,7 @@
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
-| Qualidade/QA | 6/7 | 1/7 | 0/7 |
+| Qualidade/QA | 7/7 | 0/7 | 0/7 |
 
 ---
 
@@ -190,4 +190,4 @@
 1. **Integração avançada de tipos complexos** — efeitos específicos de planeswalker/battle/faces complexas
 2. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas
 3. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
-4. **Dashboard/relatório agregado de telemetria** — consolidar snapshots por corpus/cron do Hermes
+4. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário

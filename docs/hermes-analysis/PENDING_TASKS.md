@@ -45,7 +45,7 @@
 |---|---|---|---|---|
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal + multi-target básico |
-| 3 | Dashboard/relatório agregado de telemetria | 2-3 dias | Médio | Snapshots JSON |
+| 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 
 ---
 
@@ -242,7 +242,8 @@
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `EngineMetrics`, `set_engine_metrics`, `clear_engine_metrics`, hooks em replay events, `Stack`, `check_sbas_until_stable` e `priority_round`.
-- `test_battle_analyst_v10_3.py`: `test_engine_metrics_collects_core_health_signals`.
+- `engine_metrics_report.py`: agregador sanitizado de snapshots JSON por diretório/arquivo.
+- `test_battle_analyst_v10_3.py`: `test_engine_metrics_collects_core_health_signals`, `test_engine_metrics_snapshot_writes_sanitized_json`, `test_engine_metrics_report_aggregates_sanitized_snapshots`.
 
 **O que foi coberto**:
 - Contadores de `stack_pushes`, `stack_resolutions`, `priority_rounds`, `sba_iterations`, `replacement_events` e movimentos por SBA.
@@ -252,9 +253,10 @@
 - API explícita para ligar/desligar métricas sem alterar o comportamento da simulação.
 - Snapshot JSON sanitizado via `MANALOOM_ENGINE_METRICS_OUT`.
 - Runners Hermes podem gravar snapshots por rodada via `MANALOOM_ENGINE_METRICS_DIR`.
+- Relatório agregado `battle_engine_metrics_report_v1` soma contadores/eventos, max stack depth e amostras curtas de warning sem decklists/replays brutos.
 
 **Limite restante**:
-- Não há dashboard operacional agregado; a saída atual é snapshot JSON por execução para rotinas de QA.
+- Falta apenas plugar o agregador em cron/dashboard operacional se esse painel for necessário.
 
 ---
 
@@ -284,6 +286,7 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7042 |
+| `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |

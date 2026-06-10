@@ -24,6 +24,14 @@ spec = importlib.util.spec_from_file_location("battle_under_test", MODULE_PATH)
 battle = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(battle)
 
+METRICS_REPORT_PATH = MODULE_PATH.with_name("engine_metrics_report.py")
+metrics_report_spec = importlib.util.spec_from_file_location(
+    "engine_metrics_report_under_test",
+    METRICS_REPORT_PATH,
+)
+engine_metrics_report = importlib.util.module_from_spec(metrics_report_spec)
+metrics_report_spec.loader.exec_module(engine_metrics_report)
+
 AUDITOR_PATH = MODULE_PATH.with_name("replay_decision_auditor.py")
 auditor_spec = importlib.util.spec_from_file_location("replay_auditor_under_test", AUDITOR_PATH)
 replay_auditor = importlib.util.module_from_spec(auditor_spec)
@@ -856,6 +864,56 @@ def test_engine_metrics_snapshot_writes_sanitized_json():
         assert "created_at" in saved
     finally:
         battle.clear_engine_metrics()
+
+
+def test_engine_metrics_report_aggregates_sanitized_snapshots():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "one.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "battle_engine_metrics_v1",
+                    "counters": {
+                        "stack_pushes": 2,
+                        "priority_rounds": 3,
+                        "sba_permanent_moves": 1,
+                    },
+                    "event_counts": {"spell_cast": 2},
+                    "max_stack_depth": 4,
+                    "warnings": ["short warning"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        (root / "two.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "battle_engine_metrics_v1",
+                    "counters": {
+                        "stack_pushes": 5,
+                        "replacement_events": 2,
+                    },
+                    "event_counts": {"spell_cast": 1, "replacement_applied": 2},
+                    "max_stack_depth": 2,
+                    "warnings": ["x" * 220],
+                }
+            ),
+            encoding="utf-8",
+        )
+        (root / "ignore.json").write_text('{"schema_version":"other"}', encoding="utf-8")
+
+        report = engine_metrics_report.aggregate_snapshots(root)
+
+    assert report["schema_version"] == "battle_engine_metrics_report_v1"
+    assert report["files_processed"] == 2
+    assert report["files_skipped"] == 1
+    assert report["totals"]["stack_pushes"] == 7
+    assert report["totals"]["priority_rounds"] == 3
+    assert report["totals"]["replacement_events"] == 2
+    assert report["totals"]["sba_permanent_moves"] == 1
+    assert report["event_counts"] == {"replacement_applied": 2, "spell_cast": 3}
+    assert report["max_stack_depth"] == 4
+    assert len(report["warning_samples"][1]) == 160
 
 
 def test_conformance_registry_has_executable_coverage():
@@ -3254,6 +3312,7 @@ if __name__ == "__main__":
         test_adventure_resolves_to_exile_then_casts_creature_from_exile,
         test_engine_metrics_collects_core_health_signals,
         test_engine_metrics_snapshot_writes_sanitized_json,
+        test_engine_metrics_report_aggregates_sanitized_snapshots,
         test_conformance_registry_has_executable_coverage,
         test_conformance_stack_resolves_lifo,
         test_conformance_commander_damage_ledger_persists_across_zone_change,
