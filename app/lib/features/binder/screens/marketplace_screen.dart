@@ -97,6 +97,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                 color: AppTheme.textSecondary,
               ),
               suffixIcon: IconButton(
+                tooltip: 'Limpar busca',
                 icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
                 onPressed: () {
                   _searchController.clear();
@@ -136,16 +137,16 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                     setState(() => _onlyTrade = v);
                     _doSearch();
                   },
-                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.18),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
-                        _onlyTrade ? AppTheme.frost400 : AppTheme.textSecondary,
+                        _onlyTrade ? AppTheme.brass400 : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
-                        _onlyTrade ? AppTheme.frost400 : AppTheme.outlineMuted,
+                        _onlyTrade ? AppTheme.brass400 : AppTheme.outlineMuted,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -342,7 +343,7 @@ class _MarketplaceTrustHeader extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
+        color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
       ),

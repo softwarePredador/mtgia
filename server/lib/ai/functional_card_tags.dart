@@ -122,7 +122,7 @@ class FunctionalDeckSummary {
           'other_copies': otherCopies,
         },
         'source': {
-          'priority': 'persisted_then_heuristic',
+          'priority': 'functional_tags_then_semantic_v2_then_heuristic',
           'persisted_rows': persistedRows,
           'persisted_copies': persistedCopies,
           'heuristic_rows': heuristicRows,
@@ -321,7 +321,10 @@ List<FunctionalCardTag> inferFunctionalCardTags({
   }
 
   if (_looksLikeComboPiece(oracle, normalizedName)) {
-    add('combo_piece', 0.72, 'combo_pattern_text_or_known_name');
+    // Heurística propositalmente abaixo do limiar operacional (0.65):
+    // combo_piece de alta confiança vem de card_function_tags persistido pelo
+    // Commander Spellbook (sync_combos.dart), reduzindo falso positivo textual.
+    add('combo_piece', 0.60, 'combo_pattern_text_or_known_name');
   }
 
   if (_looksLikeEngine(oracle)) {
@@ -434,7 +437,9 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
       countedTags: countedTags,
       minConfidence: minConfidence,
     );
-    final semanticV2 = _readPersistedSemanticV2(card['semantic_tags_v2']) ??
+    final persistedSemanticV2 =
+        _readPersistedSemanticV2(card['semantic_tags_v2']);
+    final semanticV2 = persistedSemanticV2 ??
         inferSemanticCardAnalysisV2(
           name: name,
           typeLine: (card['type_line'] as String?) ?? '',
@@ -452,6 +457,12 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
         .where((tag) =>
             countedTags.contains(tag.tag) && tag.confidence >= minConfidence)
         .toList(growable: false);
+    final semanticV2Tags = persistedSemanticV2?.tags
+            .where((tag) =>
+                countedTags.contains(tag.tag) &&
+                tag.confidence >= minConfidence)
+            .toList(growable: false) ??
+        const <FunctionalCardTag>[];
     final tagObjects = persistedTags.isNotEmpty
         ? persistedTags
             .map((tag) => FunctionalCardTag(
@@ -462,10 +473,12 @@ FunctionalDeckSummary summarizeFunctionalTagsForDeck(
                   evidence: semanticV2.explanationReason,
                 ))
             .toList(growable: false)
-        : inferredTags;
+        : semanticV2Tags.isNotEmpty
+            ? semanticV2Tags
+            : inferredTags;
     final tags = tagObjects.map((tag) => tag.tag).toSet();
 
-    if (persistedTags.isNotEmpty) {
+    if (persistedTags.isNotEmpty || semanticV2Tags.isNotEmpty) {
       persistedRows++;
       persistedCopies += qty;
     } else {
@@ -885,14 +898,25 @@ bool _looksLikeEngine(String oracle) {
 }
 
 bool _looksLikePayoff(String oracle, String normalizedName) {
-  return normalizedName == 'blood artist' ||
-      oracle.contains('for each') ||
-      oracle.contains('whenever') &&
-          (oracle.contains('creature dies') ||
-              oracle.contains('you cast') ||
-              oracle.contains('artifact enters') ||
-              oracle.contains('enchantment enters') ||
-              oracle.contains('you sacrifice'));
+  if (normalizedName == 'blood artist') return true;
+
+  final isCostReductionText =
+      RegExp(r'\bcosts?\s+\{[^}]+\}\s+less').hasMatch(oracle);
+  final isDrawScalingText = oracle.contains('draw a card for each') ||
+      oracle.contains('draw cards equal to');
+  if (oracle.contains('for each') &&
+      !isCostReductionText &&
+      !isDrawScalingText) {
+    return true;
+  }
+
+  if (!oracle.contains('whenever')) return false;
+  return oracle.contains('creature dies') ||
+      oracle.contains('creature enters') ||
+      oracle.contains('you cast') ||
+      oracle.contains('artifact enters') ||
+      oracle.contains('enchantment enters') ||
+      oracle.contains('you sacrifice');
 }
 
 bool _looksLikeEnabler(String oracle, String normalizedName) {
@@ -900,10 +924,26 @@ bool _looksLikeEnabler(String oracle, String normalizedName) {
       normalizedName.contains('boots') ||
       oracle.contains('costs {') && oracle.contains('less to cast') ||
       oracle.contains('you may play an additional land') ||
-      oracle.contains('haste') ||
-      oracle.contains('mill') ||
+      oracle.contains('creatures you control have haste') ||
+      oracle.contains('gains haste') ||
+      oracle.contains('has haste') ||
+      _looksLikeSelfMillSetup(oracle) ||
       oracle.contains('sacrifice another') ||
       oracle.contains('search your library');
+}
+
+bool _looksLikeSelfMillSetup(String oracle) {
+  if (!oracle.contains('mill')) return false;
+  if (oracle.contains('target opponent') ||
+      oracle.contains('target player') ||
+      oracle.contains('each opponent') ||
+      oracle.contains('opponent mills')) {
+    return false;
+  }
+  return oracle.contains('you mill') ||
+      oracle.contains('mill cards') ||
+      oracle.contains('surveil') ||
+      oracle.contains('dredge');
 }
 
 String _inferSpeed(String typeLine, String oracle) {

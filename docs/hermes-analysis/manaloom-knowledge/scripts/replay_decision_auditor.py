@@ -24,6 +24,28 @@ from master_optimizer_common import REPORT_DIR, connect, ensure_optimizer_tables
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPLAY_GENERATOR = SCRIPT_DIR / "battle_replay_v10_3.py"
 
+KNOWN_LAND_NAMES = {
+    "plains",
+    "island",
+    "swamp",
+    "mountain",
+    "forest",
+    "wastes",
+    "high market",
+    "tropical island",
+    "tundra",
+    "otawara, soaring city",
+    "dryad arbor",
+    "gaea's cradle",
+    "havenwood battleground",
+    "mishra's factory",
+    "ancient tomb",
+    "command tower",
+    "exotic orchard",
+    "field of the dead",
+    "reliquary tower",
+}
+
 
 def writable_replay_dir(report: bool) -> Path:
     if not report:
@@ -119,12 +141,44 @@ def defender_life_gaps(event: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def event_type_line(event: dict[str, Any]) -> str:
+    return str(event.get("type_line") or "")
+
+
+def event_is_land(event: dict[str, Any]) -> bool:
+    type_line = event_type_line(event).lower()
+    return event.get("effect") == "land" or "land" in type_line
+
+
+def event_is_instant(event: dict[str, Any]) -> bool:
+    return "instant" in event_type_line(event).lower()
+
+
+def event_is_sorcery(event: dict[str, Any]) -> bool:
+    return "sorcery" in event_type_line(event).lower()
+
+
+def card_detail_keywords(detail: dict[str, Any]) -> set[str]:
+    return {str(keyword) for keyword in detail.get("keywords") or []}
+
+
+def card_detail_is_land(detail: dict[str, Any]) -> bool:
+    name = str(detail.get("name") or "").strip().lower()
+    type_line = str(detail.get("type_line") or "").lower()
+    return "land" in type_line or name in KNOWN_LAND_NAMES
+
+
+def card_detail_is_creature(detail: dict[str, Any]) -> bool:
+    return "creature" in str(detail.get("type_line") or "").lower()
+
+
 def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     latest_combat: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {}
     approach_resolved: dict[tuple[Any, str], int] = {}
     approach_won: set[tuple[Any, str]] = set()
     game_closed: dict[Any, bool] = {}
+    land_plays: dict[tuple[Any, Any, Any], int] = {}
 
     for event in events:
         kind = event.get("event")
@@ -143,12 +197,54 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             discarded = int(event.get("discarded") or 0)
             if hand > 7:
                 add_finding(findings, "critical", event, f"Cleanup ended with hand size {hand} > 7.")
-            if discarded >= 12:
+            # Legitimate wheel/storm turns can discard double digits as long as
+            # cleanup ends at seven. Keep this guard for runaway draw loops.
+            if discarded >= 25:
                 add_finding(
                     findings,
                     "medium",
                     event,
                     f"Cleanup discarded {discarded} cards; inspect draw/hand overflow sequencing.",
+                )
+
+        elif kind == "spell_cast":
+            if event_is_land(event):
+                add_finding(findings, "critical", event, "Land was cast as a spell.")
+
+        elif kind == "land_played":
+            if not event_is_land(event):
+                add_finding(findings, "critical", event, "Non-land was played as a land.")
+            key = (replay_id, event.get("turn"), event.get("player"))
+            land_plays[key] = land_plays.get(key, 0) + 1
+            if land_plays[key] > 1:
+                add_finding(findings, "critical", event, "Player made more than one land play in a turn.")
+
+        elif kind == "end_step_instant":
+            type_line = event_type_line(event)
+            if event_is_land(event):
+                add_finding(findings, "critical", event, "Land was cast during an opponent end step.")
+            elif (
+                type_line
+                and not event_is_instant(event)
+                and event.get("instant_speed_reason") != "flash"
+            ):
+                add_finding(
+                    findings,
+                    "high",
+                    event,
+                    f"Non-instant card was cast during an opponent end step: {type_line}.",
+                )
+
+        elif kind == "miracle_cast":
+            type_line = event_type_line(event)
+            if event_is_land(event):
+                add_finding(findings, "critical", event, "Land was cast via Miracle.")
+            elif type_line and not (event_is_instant(event) or event_is_sorcery(event)):
+                add_finding(
+                    findings,
+                    "critical",
+                    event,
+                    f"Miracle cast a non-instant/non-sorcery card: {type_line}.",
                 )
 
         elif kind == "combat":
@@ -180,6 +276,40 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     )
             if blockers == 0 and target_life <= 0:
                 add_finding(findings, "high", event, "Combat targeted an already-dead player.")
+            for detail in event.get("attackers_detail") or []:
+                if not isinstance(detail, dict):
+                    continue
+                keywords = card_detail_keywords(detail)
+                if card_detail_is_land(detail) and not card_detail_is_creature(detail):
+                    add_finding(
+                        findings,
+                        "critical",
+                        event,
+                        f"Non-creature land attacked as a creature: {detail.get('name', '?')}.",
+                    )
+                if detail.get("summoning_sick") and "haste" not in keywords:
+                    add_finding(
+                        findings,
+                        "critical",
+                        event,
+                        f"Summoning-sick attacker without haste: {detail.get('name', '?')}.",
+                    )
+                if "tapped" in detail:
+                    tapped = bool(detail.get("tapped"))
+                    if "vigilance" in keywords and tapped:
+                        add_finding(
+                            findings,
+                            "high",
+                            event,
+                            f"Vigilance attacker was tapped to attack: {detail.get('name', '?')}.",
+                        )
+                    if "vigilance" not in keywords and not tapped:
+                        add_finding(
+                            findings,
+                            "high",
+                            event,
+                            f"Non-vigilance attacker was not tapped to attack: {detail.get('name', '?')}.",
+                        )
             latest_combat[
                 (replay_id, event.get("turn"), event.get("attacker"), event.get("target"))
             ] = event
@@ -194,9 +324,15 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 total_power = int(combat.get("total_power") or 0)
                 damage = int(event.get("damage_to_player") or 0)
                 target_dead = bool(event.get("target_dead"))
-                if attackers > 0 and blockers == 0 and damage == 0:
+                target_protected = bool(
+                    event.get("target_life_cant_change")
+                    or event.get("target_protection_from_everything")
+                    or combat.get("target_life_cant_change")
+                    or combat.get("target_protection_from_everything")
+                )
+                if attackers > 0 and blockers == 0 and damage == 0 and not target_protected:
                     add_finding(findings, "high", event, "Unblocked combat dealt 0 player damage.")
-                if blockers == 0 and total_power >= target_life > 0 and not target_dead:
+                if blockers == 0 and total_power >= target_life > 0 and not target_dead and not target_protected:
                     add_finding(
                         findings,
                         "high",
@@ -219,6 +355,20 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         elif kind == "removal_resolved":
             available_targets = int(event.get("available_targets") or 0)
+            target_is_creature = event.get("target_is_creature")
+            if target_is_creature is False:
+                continue
+            if event.get("target_effect") in {
+                "commander",
+                "combo",
+                "draw_engine",
+                "silence_opponents",
+                "ramp_engine",
+                "copy_spell",
+                "ripple_engine",
+                "hate_artifact",
+            }:
+                continue
             target_power = event.get("target_power")
             try:
                 target_power_value = int(target_power)
@@ -250,6 +400,14 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     event,
                     f"Board wipe left more protected creatures ({protected}) than destroyed ({destroyed}).",
                 )
+
+        elif kind == "extra_turn_cap_reached":
+            add_finding(
+                findings,
+                "high",
+                event,
+                "Extra-turn loop hit the safety cap before all extra turns were consumed.",
+            )
 
     for key, count in approach_resolved.items():
         if count >= 2 and key not in approach_won:

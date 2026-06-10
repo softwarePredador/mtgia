@@ -44,9 +44,7 @@ class LifeCounterPlayerAppearance {
       background: background ?? this.background,
       nickname: nickname ?? this.nickname,
       backgroundImage:
-          clearBackgroundImage
-              ? null
-              : backgroundImage ?? this.backgroundImage,
+          clearBackgroundImage ? null : backgroundImage ?? this.backgroundImage,
       backgroundImagePartner:
           clearBackgroundImagePartner
               ? null

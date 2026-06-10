@@ -10,7 +10,7 @@ from pathlib import Path
 
 BATTLE_PATH = os.environ.get(
     "BATTLE_ANALYST_PATH",
-    str(Path(__file__).with_name("battle_analyst_v8.py")),
+    str(Path(__file__).with_name("battle_analyst_v9.py")),
 )
 OUT = os.environ.get("REPLAY_OUT", "/tmp/battle_full_replay.txt")
 EVENTS_OUT = os.environ.get("REPLAY_EVENTS_OUT", str(Path(OUT).with_suffix(".jsonl")))
@@ -51,8 +51,13 @@ def main():
                 )
             elif event == "spell_resolved":
                 replay.write(
-                    "  RESOLVE {player}: {card} (CMC={cmc}) [{effect}]\n".format(
-                        **data
+                    "  RESOLVE {player}: {card} (CMC={cmc}) [{effect}] "
+                    "rule={rule_source}/{rule_review_status}\n".format(
+                        **{
+                            **data,
+                            "rule_source": data.get("rule_source", "?"),
+                            "rule_review_status": data.get("rule_review_status", "?"),
+                        }
                     )
                 )
             elif event == "spell_countered":

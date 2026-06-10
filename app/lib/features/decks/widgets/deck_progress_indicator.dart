@@ -126,106 +126,111 @@ class DeckProgressIndicator extends StatelessWidget {
             ? theme.colorScheme.error.withValues(alpha: 0.86)
             : AppTheme.textSecondary;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: toneSurface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: toneBorder, width: 0.9),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  ),
-                  child: Icon(_getStatusIcon(), color: color, size: 16),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        maxCards != null
-                            ? '$totalCards / $maxCards cartas'
-                            : '$totalCards cartas',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: headlineColor,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _getStatusText(),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: supportingColor,
-                          fontWeight:
-                              status == DeckStatus.invalid
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (semanticBadgeLabel != null &&
-                    semanticBadgeLabel!.trim().isNotEmpty) ...[
-                  const SizedBox(width: 8),
-                  _StatusBadge(
-                    label: semanticBadgeLabel!,
-                    color: semanticBadgeColor ?? color,
-                    icon: semanticBadgeIcon,
-                    onTap: onSemanticBadgeTap,
-                  ),
-                ],
-                if (status == DeckStatus.complete)
+    return Semantics(
+      button: onTap != null,
+      enabled: onTap != null,
+      label: 'Progresso do deck: ${_getStatusText()}',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: toneSurface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(color: toneBorder, width: 0.9),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
+                    width: 28,
+                    height: 28,
                     decoration: BoxDecoration(
-                      color: AppTheme.success,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      color: color.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
-                    child: const Text(
-                      'Pronto',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: AppTheme.fontSm,
-                        fontWeight: FontWeight.bold,
+                    child: Icon(_getStatusIcon(), color: color, size: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          maxCards != null
+                              ? '$totalCards / $maxCards cartas'
+                              : '$totalCards cartas',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: headlineColor,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _getStatusText(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: supportingColor,
+                            fontWeight:
+                                status == DeckStatus.invalid
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (semanticBadgeLabel != null &&
+                      semanticBadgeLabel!.trim().isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    _StatusBadge(
+                      label: semanticBadgeLabel!,
+                      color: semanticBadgeColor ?? color,
+                      icon: semanticBadgeIcon,
+                      onTap: onSemanticBadgeTap,
+                    ),
+                  ],
+                  if (status == DeckStatus.complete)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.success,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      ),
+                      child: const Text(
+                        'Pronto',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            if (maxCards != null) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: AppTheme.outlineMuted.withValues(
-                    alpha: 0.65,
-                  ),
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                  minHeight: 5,
-                ),
+                ],
               ),
+              const SizedBox(height: 10),
+              if (maxCards != null) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: AppTheme.outlineMuted.withValues(
+                      alpha: 0.65,
+                    ),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                    minHeight: 5,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -274,10 +279,14 @@ class _StatusBadge extends StatelessWidget {
     );
 
     if (onTap == null) return child;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      child: child,
+    return Semantics(
+      button: true,
+      label: 'Abrir detalhes do progresso do deck',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: child,
+      ),
     );
   }
 }

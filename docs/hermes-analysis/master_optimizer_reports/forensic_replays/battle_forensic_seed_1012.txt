@@ -1,0 +1,321 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #119 (real), Kraum, Ludevic's Opus #86 (real), Tannuk, Memorial Ensign #40 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #119 (real): 1 mulligan(s), 7 cards, 2 lands
+  Kraum, Ludevic's Opus #86 (real): 1 mulligan(s), 7 cards, 2 lands
+  Tannuk, Memorial Ensign #40 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #119 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #119 (real): Expedition Map (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Rograkh, Son of Rohgahh #119 (real): Expedition Map found Minamo, School at Water's Edge (land)
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=1 Grave=2 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=0
+  MANA Tannuk, Memorial Ensign #40 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=1
+  MANA Rograkh, Son of Rohgahh #119 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=2 Grave=2 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=1
+  MANA Kraum, Ludevic's Opus #86 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=1
+  MANA Tannuk, Memorial Ensign #40 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 3 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #119 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=3 Grave=2 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=2
+  MANA Tannuk, Memorial Ensign #40 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=2 Discarded=1
+
+TURN 4 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=5 Grave=2 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 4 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=3
+  MANA Tannuk, Memorial Ensign #40 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 5 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=3 Grave=2 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=6 Grave=2 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 5 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=3
+  MANA Tannuk, Memorial Ensign #40 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 6 - Lorehold | Life=36 Hand=7 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=36 Hand=7 Board=3 Grave=3 Discarded=1
+
+TURN 6 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=6
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=7 Grave=2 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=36 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=36 Hand=7 Board=5 Grave=2 Discarded=1
+
+TURN 6 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=5
+  MANA Tannuk, Memorial Ensign #40 (real): 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 7 - Lorehold | Life=28 Hand=7 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=28 Hand=7 Board=4 Grave=3 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=7
+  MANA Rograkh, Son of Rohgahh #119 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=8 Grave=2 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=32 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=32 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 7 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=5
+  MANA Tannuk, Memorial Ensign #40 (real): 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=7 Grave=3 Discarded=0
+
+TURN 8 - Lorehold | Life=20 Hand=7 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=20 Hand=7 Board=4 Grave=4 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=8
+  MANA Rograkh, Son of Rohgahh #119 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #119 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=11 Grave=2 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #86 (real) | Life=28 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=28 Hand=7 Board=5 Grave=4 Discarded=1
+
+TURN 8 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=7
+  MANA Tannuk, Memorial Ensign #40 (real): 6 available (6 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=7 Grave=4 Discarded=1
+
+TURN 9 - Lorehold | Life=12 Hand=7 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=12 Hand=6 Board=5 Grave=5 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=11
+  MANA Rograkh, Son of Rohgahh #119 (real): 9 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=11 Grave=3 Discarded=1
+
+TURN 9 - Kraum, Ludevic's Opus #86 (real) | Life=24 Hand=7 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=24 Hand=7 Board=6 Grave=4 Discarded=0
+
+TURN 9 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=7
+  MANA Tannuk, Memorial Ensign #40 (real): 6 available (6 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=8)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Lorehold: 4 player damage, target life 4, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=8 Grave=4 Discarded=0
+
+TURN 10 - Lorehold | Life=4 Hand=6 Board=5
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Rite of the Dragoncaller (artifact_or_enchantment)
+  END Lorehold: Life=4 Hand=7 Board=5 Grave=6 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=11
+  MANA Rograkh, Son of Rohgahh #119 (real): 9 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 4 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 10 - Kraum, Ludevic's Opus #86 (real) | Life=24 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 36, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=24 Hand=7 Board=7 Grave=4 Discarded=0
+
+TURN 10 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=8
+  MANA Tannuk, Memorial Ensign #40 (real): 7 available (7 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 3, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Tannuk, Memorial Ensign #40 (real): Harmonize (CMC=4.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 20, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=9 Grave=8 Discarded=2
+
+TURN 11 - Rograkh, Son of Rohgahh #119 (real) | Life=36 Hand=10 Board=11
+  MANA Rograkh, Son of Rohgahh #119 (real): 9 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 16, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=36 Hand=7 Board=11 Grave=8 Discarded=5
+
+TURN 11 - Kraum, Ludevic's Opus #86 (real) | Life=16 Hand=7 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 32, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=16 Hand=7 Board=7 Grave=5 Discarded=0
+
+TURN 11 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=9
+  MANA Tannuk, Memorial Ensign #40 (real): 8 available (8 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 3, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 12, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=6 Board=11 Grave=8 Discarded=0
+
+TURN 12 - Rograkh, Son of Rohgahh #119 (real) | Life=32 Hand=7 Board=11
+  MANA Rograkh, Son of Rohgahh #119 (real): 9 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=32 Hand=7 Board=12 Grave=9 Discarded=1
+
+TURN 12 - Kraum, Ludevic's Opus #86 (real) | Life=12 Hand=7 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 28, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=12 Hand=7 Board=7 Grave=6 Discarded=1
+
+TURN 12 - Tannuk, Memorial Ensign #40 (real) | Life=36 Hand=6 Board=11
+  MANA Tannuk, Memorial Ensign #40 (real): 9 available (9 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 3, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=aggro_low_life, target_life=12)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 7 player damage, target life 5, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=36 Hand=6 Board=12 Grave=8 Discarded=0
+
+TURN 13 - Rograkh, Son of Rohgahh #119 (real) | Life=28 Hand=7 Board=12
+  MANA Rograkh, Son of Rohgahh #119 (real): 10 available (10 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=28 Hand=7 Board=12 Grave=11 Discarded=2
+
+TURN 13 - Kraum, Ludevic's Opus #86 (real) | Life=5 Hand=7 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 24, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=5 Hand=7 Board=8 Grave=6 Discarded=0
+
+TURN 13 - Tannuk, Memorial Ensign #40 (real) | Life=32 Hand=6 Board=12
+  MANA Tannuk, Memorial Ensign #40 (real): 10 available (10 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 4, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=lethal, target_life=5)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Kraum, Ludevic's Opus #86 (real): 7 player damage, target life -2, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #86 (real) (life_zero) <<<
+
+TURN 14 - Rograkh, Son of Rohgahh #119 (real) | Life=24 Hand=7 Board=12
+  MANA Rograkh, Son of Rohgahh #119 (real): 10 available (10 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=24 Hand=7 Board=13 Grave=12 Discarded=1
+
+TURN 14 - Tannuk, Memorial Ensign #40 (real) | Life=28 Hand=7 Board=12
+  MANA Tannuk, Memorial Ensign #40 (real): 10 available (10 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 4, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 7 player damage, target life 17, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=28 Hand=7 Board=13 Grave=8 Discarded=0
+
+TURN 15 - Rograkh, Son of Rohgahh #119 (real) | Life=17 Hand=7 Board=13
+  MANA Rograkh, Son of Rohgahh #119 (real): 11 available (11 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=17 Hand=7 Board=14 Grave=13 Discarded=1
+
+TURN 15 - Tannuk, Memorial Ensign #40 (real) | Life=24 Hand=7 Board=13
+  MANA Tannuk, Memorial Ensign #40 (real): 11 available (11 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 5, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=aggro_low_life, target_life=17)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 7 player damage, target life 10, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=24 Hand=7 Board=14 Grave=8 Discarded=0
+
+TURN 16 - Rograkh, Son of Rohgahh #119 (real) | Life=10 Hand=7 Board=14
+  MANA Rograkh, Son of Rohgahh #119 (real): 12 available (12 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=24)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 4 player damage, target life 20, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=10 Hand=7 Board=14 Grave=15 Discarded=2
+
+TURN 16 - Tannuk, Memorial Ensign #40 (real) | Life=20 Hand=7 Board=14
+  MANA Tannuk, Memorial Ensign #40 (real): 12 available (12 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 6, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=aggro_low_life, target_life=10)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 7 player damage, target life 3, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=20 Hand=7 Board=15 Grave=8 Discarded=0
+
+TURN 17 - Rograkh, Son of Rohgahh #119 (real) | Life=3 Hand=7 Board=14
+  MANA Rograkh, Son of Rohgahh #119 (real): 12 available (12 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Tannuk, Memorial Ensign #40 (real): 0 player damage, target life 20, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=3 Hand=7 Board=15 Grave=16 Discarded=1
+
+TURN 17 - Tannuk, Memorial Ensign #40 (real) | Life=20 Hand=7 Board=15
+  MANA Tannuk, Memorial Ensign #40 (real): 12 available (12 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 6, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Tannuk, Memorial Ensign #40 (real): Explore (CMC=2.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 3 attackers, 0 blockers, 0 gang blocks, 12 power (reason=lethal, target_life=3)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Rograkh, Son of Rohgahh #119 (real): 12 player damage, target life -9, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #119 (real) (life_zero) <<<
+
+GAME OVER - Turn 17
+Winner: Tannuk, Memorial Ensign #40 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=7
+Rograkh, Son of Rohgahh #119 (real): DEAD Life=-9 Hand=7
+Kraum, Ludevic's Opus #86 (real): DEAD Life=-2 Hand=7
+Tannuk, Memorial Ensign #40 (real): ALIVE Life=20 Hand=8

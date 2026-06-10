@@ -75,17 +75,17 @@ class _SplashScreenState extends State<SplashScreen>
             fit: BoxFit.cover,
             semanticLabel: 'ManaLoom splash art',
           ),
-          const DecoratedBox(
+          DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x22000000),
-                  Color(0x00000000),
-                  Color(0x99070A0F),
+                  AppTheme.backgroundAbyss.withValues(alpha: 0.13),
+                  AppTheme.transparent,
+                  AppTheme.backgroundAbyss.withValues(alpha: 0.6),
                 ],
-                stops: [0, 0.46, 1],
+                stops: const [0, 0.46, 1],
               ),
             ),
           ),

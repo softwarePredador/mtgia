@@ -349,22 +349,51 @@ Se um pedido novo nao disser o contrario:
 
 ## Ultima Atualizacao
 
-- data: 2026-03-24
+- data: 2026-05-30
 - status: ativo
-- prioridade atual: consolidar confiabilidade do core de decks e mapear riscos de usabilidade/performance das telas
-- regra funcional nova: o formato escolhido no onboarding precisa chegar intacto nas telas de geracao e importacao
-- regra executiva nova: nenhuma frente secundaria deve competir com a frente de otimizacao de decks enquanto o carro chefe do produto nao atingir nivel de confianca de release
-- regra de UX nova: a home nao pode mostrar estado vazio definitivo antes de buscar os decks reais do usuario
-- regra tecnica nova de confiabilidade: testes de integracao do backend devem ser opt-in por ambiente (`RUN_INTEGRATION_TESTS=1`) e nao podem falhar a suite local por ausencia de servidor
-- regra tecnica nova de consistencia: simulacoes do `OptimizationValidator` devem ser deterministicas para reduzir flakiness de score e aumentar confianca do CI
-- regra documental nova: toda decisao sobre a frente de otimizacao deve consultar `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md` antes de ampliar escopo ou declarar confianca de release
-- regra de resiliencia local: rotas de IA que ja possuem fallback seguro devem tolerar `OPENAI_API_KEY` invalida em `dev/staging`, sem mascarar erro em `prod`
-- regra nova do corpus operacional: o corpus estavel de resolucao Commander foi ampliado para `19` decks validados, incluindo cobertura dirigida de five-color, colorless e `background`
-- regra nova de cobertura dirigida: o bootstrap do corpus passou a aceitar pares de comandantes com `A + B`, e o runner passou a validar `1` ou `2` comandantes legais conforme o deck fonte
-- regra nova de identidade de cor: reminder text inline nao pode mais inflar identidade de cor; o caso de `Blind Obedience` em `Sythis` passou a validar corretamente
-- regra nova de seed confiavel: o bootstrap do corpus nao pode mais completar 100 cartas inflando terrenos quando faltarem spells; nesses casos ele deve falhar com `montagem insuficiente`
-- regra nova de identidade de cor: quando `cards.color_identity` vier vazio/incompleto, a validacao deve inferir identidade pelo `oracle_text` para nao aceitar duals/lands fora da identidade real por lacuna de banco
-- excecao documentada do corpus: `Yuriko, the Tiger's Shadow` ficou fora do corpus estavel apos a rodada de 2026-03-23 por nao conseguir gerar seed saudavel com o material atual de referencia
+- prioridade atual: consolidar confiabilidade do core de decks, reduzir gargalos de codigo, expandir cobertura de Game Changers e bracket policy
+- regra nova: `BracketCategory` enum expandido de 5 para 10 categorias, cobrindo 53/53 Game Changers oficiais
+- regra nova: `card_deck_profiles` integrado ao `filterUnsafeOptimizeSwapsByCardData` para proteger cartas core e priorizar fillers
+- regra nova: Hermes Agent operacional com 14 crons ativos gerando analises, auditorias e IMPLEMENTATION_TASKS.md
+- regra nova: fallback de providers configurado (openrouter → deepseek → opencode-go)
+
+## Aditivo - Estado Atual Em 2026-05-30
+
+### Reducao de Gargalos (F0-F3)
+
+| Arquivo | Antes | Depois | Reducao |
+|---|---|---|---|
+| `optimize_runtime_support.dart` | 4.028 linhas | 2.718 linhas | -1.310 |
+| `optimize/index.dart` | 3.589 linhas | 3.075 linhas | -514 |
+| `optimize_filler_loader_support.dart` | — | 1.310 linhas | novo |
+| `optimize_route_internal.dart` | — | 430 linhas | novo |
+| `optimize_response_support.dart` | — | 144 linhas | novo |
+
+### Semantic Layer V2
+
+- Flag `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES` documentada com todos os valores validos (1/true/yes/on/expanded)
+- Enforcement `partial` configurado com critical roles expandidos atras de flag
+- `_criticalRolesForArchetype` agora inclui `wipe` para todos os arquetipos
+- `_looksLikeOffThemeRoleSwap` alinhado com `_criticalRolesForArchetype`
+
+### Bracket Policy
+
+- `BracketCategory` enum expandido: +5 categorias (boardWipe, cardAdvantage, stax, protection, valueEngine)
+- Heuristicas de deteccao para cada nova categoria
+- Limites por bracket (1-4) para todas as categorias
+
+### Seguranca
+
+- `POST /ai/optimize` passa `userId` para `loadOptimizeDeckContext` (ownership verificado)
+- `GET /ai/optimize/jobs/:id` rejeita jobs com `userId == null`
+- Import route: `strict: requiresCommander` para Commander/Brawl sem comandante
+
+### Validacao
+
+- `dart analyze`: 0 issues
+- `dart test`: 613/613 passando
+- `flutter analyze`: 5 infos (pre-existentes), 0 erros
+- `flutter test`: 589/592 (3 falhas pre-existentes em chat_screen_test.dart)
 
 ## Estrutura Oficial Do Produto
 
@@ -406,11 +435,14 @@ Essas areas aumentam utilidade e retencao, mas nao podem consumir a prioridade d
 
 ### P1 Aberto
 
-- `app/lib/features/decks/screens/deck_details_screen.dart` continua muito grande e concentra logica critica demais em uma unica tela
-- `app/lib/features/decks/providers/deck_provider.dart` ainda carrega responsabilidade excessiva para criacao, importacao, analise, otimizacao e manutencao de cache
-- `server/routes/ai/optimize/index.dart` segue muito acima do tamanho ideal e representa gargalo de manutencao
-- cobertura automatizada do app ainda esta abaixo do ideal para as `25` telas; a maior parte da protecao continua em widgets especificos e no backend
+- `app/lib/features/decks/screens/deck_details_screen.dart` foi reduzida para 1.445 linhas mas voltou a crescer (1.705 no ultimo audit)
+- `app/lib/features/decks/providers/deck_provider.dart` esta em fase residual (899→1.226 linhas, orquestracao voltou a crescer)
+- `server/routes/ai/optimize/index.dart`: reduzido de 3.589 para 3.075 linhas — ainda acima do ideal mas menor
+- `server/lib/ai/optimize_runtime_support.dart`: reduzido de 4.028 para 2.718 linhas — avancou significativamente
+- cobertura automatizada do app ainda esta abaixo do ideal; 25 telas, ~592 testes widget/unit, 103 smoke integration tests
 - validacao manual em device real ainda e necessaria para `scanner`, permissao de camera, push notifications e compartilhamento
+- 29/53 Game Changers oficiais nao eram detectados pelo bracket policy (RESOLVIDO em 2026-05-30)
+- `card_deck_profiles` (670 perfis) nao era consultado pelo optimize (INTEGRADO em 2026-05-30)
 
 ## Norte De Qualidade
 

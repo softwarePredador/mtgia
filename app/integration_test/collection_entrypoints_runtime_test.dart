@@ -5,15 +5,19 @@ import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
 import 'package:manaloom/features/collection/screens/collection_screen.dart';
+import 'package:manaloom/features/market/providers/market_provider.dart';
+import 'package:manaloom/features/market/screens/market_screen.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
 import 'package:manaloom/features/trades/providers/trade_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'runtime_test_helpers.dart';
+import 'visual_capture_helpers.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   testWidgets('collection hub exposes binder and sets entry points', (
     tester,
@@ -38,27 +42,64 @@ void main() {
     await pumpUntilFound(tester, find.text('Coleção'));
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
+    await captureVisualProof(binding, tester, 'collection_01_binder');
 
     await tester.tap(
-      find.widgetWithText(Tab, 'Marketplace'),
+      find.byKey(const Key('collection-tab-market')),
       warnIfMissed: false,
     );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.text('Buscar carta no marketplace...'));
+    await captureVisualProof(binding, tester, 'collection_02_marketplace');
 
-    await tester.tap(find.widgetWithText(Tab, 'Trades'), warnIfMissed: false);
+    await tester.tap(
+      find.byKey(const Key('collection-tab-trades')),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Recebidas'));
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Enviadas'));
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Finalizadas'));
+    await captureVisualProof(binding, tester, 'collection_03_trade_inbox');
 
-    await tester.tap(find.widgetWithText(Tab, 'Coleções'), warnIfMissed: false);
+    await tester.tap(
+      find.byKey(const Key('collection-tab-sets')),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.text('Catálogo de Coleções'));
     await pumpUntilFound(tester, find.byKey(const Key('setsCatalogList')));
+    await captureVisualProof(binding, tester, 'collection_04_sets_catalog');
 
-    await tester.tap(find.widgetWithText(Tab, 'Fichário'), warnIfMissed: false);
+    await tester.tap(
+      find.byKey(const Key('collection-tab-binder')),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
     await pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
+  });
+
+  testWidgets('market screen renders the visual system on live movers state', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => MarketProvider()),
+          ChangeNotifierProvider(create: (_) => MessageProvider()),
+          ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ],
+        child: MaterialApp(
+          title: 'ManaLoom Market Runtime',
+          theme: AppTheme.darkTheme,
+          home: const MarketScreen(),
+        ),
+      ),
+    );
+
+    await pumpUntilFound(tester, find.text('Market'));
+    await pumpUntilFound(tester, find.text('Valorizando'));
+    await tester.pump(const Duration(seconds: 2));
+    await captureVisualProof(binding, tester, 'collection_05_market_screen');
   });
 }

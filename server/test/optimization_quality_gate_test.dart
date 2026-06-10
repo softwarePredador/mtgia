@@ -73,6 +73,61 @@ void main() {
       expect(result.droppedReasons, hasLength(2));
     });
 
+    test('uses persisted functional_tags to protect critical roles (P1.a)', () {
+      // Carta com oracle_text neutro (heurística NÃO detecta board wipe),
+      // mas com functional_tags persistidos = board_wipe.
+      final wipeWithTags = _card(
+        name: 'Silent Sweep',
+        typeLine: 'Sorcery',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Gain 2 life.',
+        functionalTags: const [
+          {'tag': 'board_wipe', 'confidence': 0.9, 'source': 'persisted'},
+        ],
+      );
+      // Mesma carta SEM tags persistidos (controle do experimento).
+      final wipeNoTags = _card(
+        name: 'Silent Sweep',
+        typeLine: 'Sorcery',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Gain 2 life.',
+      );
+      final blandCreature = _card(
+        name: 'Plain Bear',
+        typeLine: 'Creature — Bear',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Vigilance.',
+      );
+
+      // Com tags persistidos: o gate enxerga o papel "wipe" (crítico em
+      // control) e bloqueia a troca que o perderia.
+      final withTags = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Silent Sweep'],
+        additions: const ['Plain Bear'],
+        originalDeck: [wipeWithTags],
+        additionsData: [blandCreature],
+        archetype: 'control',
+      );
+      expect(withTags.removals, isEmpty);
+      expect(withTags.droppedReasons, hasLength(1));
+
+      // Sem tags persistidos: a heurística não reconhece o wipe no texto
+      // neutro, então a troca passa — provando que a proteção veio dos
+      // functional_tags persistidos, não da re-derivação heurística.
+      final withoutTags = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Silent Sweep'],
+        additions: const ['Plain Bear'],
+        originalDeck: [wipeNoTags],
+        additionsData: [blandCreature],
+        archetype: 'control',
+      );
+      expect(withoutTags.removals, equals(const ['Silent Sweep']));
+      expect(withoutTags.droppedReasons, isEmpty);
+    });
+
     test('can reduce aggressive requested scope without false success', () {
       final originalDeck = [
         for (var i = 0; i < 12; i++)
@@ -368,50 +423,129 @@ void main() {
       expect(role, equals('ramp'));
     });
 
-    test('uses theme context for payoff and enabler roles', () {
-      expect(
-        classifyOptimizationFunctionalRole(const {
-          'name': 'Guttersnipe',
-          'type_line': 'Creature — Goblin Shaman',
-          'oracle_text':
-              'Whenever you cast an instant or sorcery spell, this creature deals 2 damage to each opponent.',
-          'archetype': 'spellslinger',
-        }),
-        equals('payoff'),
-      );
+    test('falls back to oracle heuristics when semantic v2 confidence is low',
+        () {
+      final card = {
+        'name': 'Low Confidence Study',
+        'type_line': 'Enchantment',
+        'mana_cost': '{2}{U}',
+        'oracle_text':
+            'Whenever an opponent casts a spell, you may draw a card.',
+        'semantic_tags_v2': const [
+          {
+            'role_confidence': 0.42,
+            'tags': ['removal'],
+          },
+        ],
+      };
 
-      expect(
-        classifyOptimizationFunctionalRole(const {
-          'name': 'Past in Flames',
-          'type_line': 'Sorcery',
-          'oracle_text':
-              'Each instant and sorcery card in your graveyard gains flashback until end of turn.',
-          'theme': 'spellslinger',
-        }),
-        equals('enabler'),
-      );
+      expect(optimizationFunctionalRolesForCard(card, semanticOnly: true),
+          isEmpty);
+      expect(classifyOptimizationFunctionalRole(card), equals('engine'));
+    });
 
-      expect(
-        classifyOptimizationFunctionalRole(const {
-          'name': 'Blood Artist',
-          'type_line': 'Creature — Vampire',
-          'oracle_text':
-              'Whenever Blood Artist or another creature dies, target player loses 1 life and you gain 1 life.',
-          'deck_theme': 'aristocrats',
-        }),
-        equals('payoff'),
-      );
+    test('classifies curated semantic staples before oracle fallback roles',
+        () {
+      final samples = {
+        'Walking Ballista': [
+          'Artifact Creature — Construct',
+          '{4}: Put a +1/+1 counter on Walking Ballista. Remove a +1/+1 counter from Walking Ballista: It deals 1 damage to any target.',
+          'wincon',
+        ],
+        'The One Ring': [
+          'Legendary Artifact',
+          'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
+          'engine',
+        ],
+        'Basalt Monolith': [
+          'Artifact',
+          'Basalt Monolith does not untap during your untap step. {T}: Add {C}{C}{C}. {3}: Untap Basalt Monolith.',
+          'combo_piece',
+        ],
+        'Fierce Guardianship': [
+          'Instant',
+          'If you control a commander, you may cast this spell without paying its mana cost. Counter target noncreature spell.',
+          'protection',
+        ],
+        'Endurance': [
+          'Creature — Elemental Incarnation',
+          'Flash. Reach. When Endurance enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.',
+          'protection',
+        ],
+      };
 
-      expect(
-        classifyOptimizationFunctionalRole(const {
-          'name': 'Anointed Procession',
-          'type_line': 'Enchantment',
-          'oracle_text':
-              'If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.',
-          'theme': 'tokens',
-        }),
-        equals('payoff'),
-      );
+      for (final entry in samples.entries) {
+        final values = entry.value;
+        final role = classifyOptimizationFunctionalRole({
+          'name': entry.key,
+          'type_line': values[0],
+          'oracle_text': values[1],
+        });
+
+        expect(role, equals(values[2]), reason: entry.key);
+      }
+    });
+
+    test('keeps strategic heuristic roles aligned with multi-tag classifier',
+        () {
+      final samples = {
+        'Blood Artist': [
+          'Creature — Vampire',
+          'Whenever Blood Artist or another creature dies, target player loses 1 life and you gain 1 life.',
+          {'payoff'},
+          'payoff',
+        ],
+        'Impact Tremors': [
+          'Enchantment',
+          'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
+          {'payoff'},
+          'payoff',
+        ],
+        'Lightning Greaves': [
+          'Artifact — Equipment',
+          'Equipped creature has haste and shroud. Equip {0}.',
+          {'protection'},
+          'protection',
+        ],
+        'Demonic Tutor': [
+          'Sorcery',
+          'Search your library for a card, put that card into your hand, then shuffle.',
+          {'tutor'},
+          'tutor',
+        ],
+        'Isochron Scepter': [
+          'Artifact',
+          'Imprint — When Isochron Scepter enters the battlefield, you may exile an instant card with mana value 2 or less from your hand. You may copy the exiled card. If you do, you may cast the copy without paying its mana cost.',
+          {'combo_piece'},
+          'combo_piece',
+        ],
+        'Aetherflux Reservoir': [
+          'Artifact',
+          'Whenever you cast a spell, you gain 1 life for each spell you\'ve cast this turn. Pay 50 life: Aetherflux Reservoir deals 50 damage to any target.',
+          {'wincon'},
+          'wincon',
+        ],
+      };
+
+      for (final entry in samples.entries) {
+        final values = entry.value;
+        final card = {
+          'name': entry.key,
+          'type_line': values[0] as String,
+          'oracle_text': values[1] as String,
+        };
+
+        expect(
+          optimizationFunctionalRolesForCard(card),
+          containsAll(values[2] as Set<String>),
+          reason: entry.key,
+        );
+        expect(
+          classifyOptimizationFunctionalRole(card),
+          equals(values[3]),
+          reason: entry.key,
+        );
+      }
     });
 
     test('treats all is dust as wipe and blocks wipe to creature downgrade',
@@ -502,6 +636,76 @@ void main() {
       expect(result.additions, isEmpty);
       expect(result.droppedReasons, hasLength(2));
     });
+
+    test('preserves critical ramp when a card has multiple functional tags',
+        () {
+      final originalDeck = [
+        _card(
+          name: 'Smothering Tithe',
+          typeLine: 'Enchantment',
+          manaCost: '{3}{W}',
+          cmc: 4,
+          oracleText:
+              'Whenever an opponent draws a card, that player may pay {2}. If the player doesn\'t, you create a Treasure token.',
+        ),
+      ];
+      final additions = [
+        _card(
+          name: 'Arcane Signet',
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Smothering Tithe'],
+        additions: const ['Arcane Signet'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, equals(const ['Smothering Tithe']));
+      expect(result.additions, equals(const ['Arcane Signet']));
+      expect(result.droppedReasons, isEmpty);
+    });
+
+    test('blocks loss of secondary protection on multi-function swaps', () {
+      final originalDeck = [
+        _card(
+          name: 'Boros Charm',
+          typeLine: 'Instant',
+          manaCost: '{R}{W}',
+          cmc: 2,
+          oracleText:
+              'Choose one — Boros Charm deals 4 damage to any target; permanents you control gain indestructible until end of turn; or target creature gains double strike until end of turn.',
+        ),
+      ];
+      final additions = [
+        _card(
+          name: 'Lightning Bolt',
+          typeLine: 'Instant',
+          manaCost: '{R}',
+          cmc: 1,
+          oracleText: 'Lightning Bolt deals 3 damage to any target.',
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Boros Charm'],
+        additions: const ['Lightning Bolt'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'aggro',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons.single, contains('protection'));
+    });
   });
 }
 
@@ -512,6 +716,7 @@ Map<String, dynamic> _card({
   required double cmc,
   required String oracleText,
   int quantity = 1,
+  List<Map<String, dynamic>>? functionalTags,
 }) {
   return {
     'name': name,
@@ -520,6 +725,7 @@ Map<String, dynamic> _card({
     'cmc': cmc,
     'oracle_text': oracleText,
     'quantity': quantity,
+    if (functionalTags != null) 'functional_tags': functionalTags,
   };
 }
 
@@ -537,6 +743,7 @@ GoldfishResult _goldfish({
     turn2PlayRate: turn2PlayRate,
     turn3PlayRate: 0.9,
     turn4PlayRate: 0.95,
+    noPlayTurn3Rate: 0.1,
     avgCmc: 3.0,
     landCount: 36,
     cmcDistribution: const {1: 10, 2: 12, 3: 8},

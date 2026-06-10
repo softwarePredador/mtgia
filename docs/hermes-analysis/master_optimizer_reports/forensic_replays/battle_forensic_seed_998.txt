@@ -1,0 +1,329 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Kraum, Ludevic's Opus #86 (real), Elsha of the Infinite #96 (real), Marneus Calgar #64 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Kraum, Ludevic's Opus #86 (real): 0 mulligan(s), 7 cards, 2 lands
+  Elsha of the Infinite #96 (real): 0 mulligan(s), 7 cards, 3 lands
+  Marneus Calgar #64 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Arcane Signet (CMC=2.0) [ramp_permanent] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=2 Grave=1 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Tainted Pact (CMC=2.0) [draw_cards] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=2 Grave=2 Discarded=0
+
+TURN 1 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=0
+  MANA Elsha of the Infinite #96 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=0
+  MANA Marneus Calgar #64 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=5 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Teferi's Protection (CMC=3.0) [phase_out] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=4 Board=2 Grave=2 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=4 Board=3 Grave=3 Discarded=0
+
+TURN 2 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=1
+  MANA Elsha of the Infinite #96 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Marneus Calgar #64 (real) | Life=40 Hand=5 Board=2
+  MANA Marneus Calgar #64 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Swords to Plowshares (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  END Marneus Calgar #64 (real): Life=40 Hand=5 Board=2 Grave=2 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=4 Board=2
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=2 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=4 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=4 Board=5 Grave=3 Discarded=0
+
+TURN 3 - Elsha of the Infinite #96 (real) | Life=40 Hand=6 Board=3
+  MANA Elsha of the Infinite #96 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Marneus Calgar #64 (real) | Life=40 Hand=5 Board=2
+  MANA Marneus Calgar #64 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Marneus Calgar #64 (real): Life=40 Hand=5 Board=3 Grave=2 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 1 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=38)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #86 (real): 0 player damage, target life 38, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=5 Grave=3 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=38 Hand=4 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Valakut Awakening (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=38)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 34, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=38 Hand=4 Board=6 Grave=4 Discarded=0
+
+TURN 4 - Elsha of the Infinite #96 (real) | Life=34 Hand=6 Board=5
+  MANA Elsha of the Infinite #96 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=38)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 34, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=34 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Marneus Calgar #64 (real) | Life=38 Hand=5 Board=3
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Marneus Calgar #64 (real): Life=38 Hand=5 Board=5 Grave=2 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=3 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  END Lorehold: Life=40 Hand=3 Board=5 Grave=4 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=34 Hand=4 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kraum, Ludevic's Opus #86 (real): Demonic Tutor found Force of Will (any)
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=34)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 30, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=34 Hand=4 Board=7 Grave=5 Discarded=0
+
+TURN 5 - Elsha of the Infinite #96 (real) | Life=30 Hand=6 Board=6
+  MANA Elsha of the Infinite #96 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=34)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 30, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=30 Hand=6 Board=7 Grave=0 Discarded=0
+
+TURN 5 - Marneus Calgar #64 (real) | Life=38 Hand=5 Board=5
+  MANA Marneus Calgar #64 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=30)
+  DAMAGE Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 26, target_dead=False
+  END Marneus Calgar #64 (real): Life=38 Hand=5 Board=6 Grave=2 Discarded=0
+
+TURN 6 - Lorehold | Life=40 Hand=3 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Into the Flood Maw (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Marneus Calgar #64 (real): Into the Flood Maw removed Unexpected Windfall from Lorehold
+  END Lorehold: Life=40 Hand=3 Board=4 Grave=6 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=26 Hand=4 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Wheel of Fortune (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=30)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 26, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=26 Hand=7 Board=8 Grave=9 Discarded=3
+
+TURN 6 - Elsha of the Infinite #96 (real) | Life=26 Hand=6 Board=7
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 22, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=26 Hand=6 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Marneus Calgar #64 (real) | Life=38 Hand=4 Board=6
+  MANA Marneus Calgar #64 (real): 6 available (4 sources, 2 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Marneus Calgar #64 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Marneus Calgar #64 (real): Demonic Tutor found Commandeer (any)
+  COMBAT Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 18, target_dead=False
+  END Marneus Calgar #64 (real): Life=38 Hand=5 Board=7 Grave=4 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=3 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  END Lorehold: Life=40 Hand=3 Board=5 Grave=6 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=18 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 8 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 22, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=18 Hand=7 Board=9 Grave=9 Discarded=0
+
+TURN 7 - Elsha of the Infinite #96 (real) | Life=22 Hand=6 Board=8
+  MANA Elsha of the Infinite #96 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=18)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 14, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=22 Hand=6 Board=9 Grave=0 Discarded=0
+
+TURN 7 - Marneus Calgar #64 (real) | Life=38 Hand=5 Board=7
+  MANA Marneus Calgar #64 (real): 7 available (4 sources, 3 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  COMBAT Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 10, target_dead=False
+  RESOLVE Marneus Calgar #64 (real): Mindbreak Trap (CMC=4.0) [draw_cards] rule=curated/verified
+  RESOLVE Marneus Calgar #64 (real): Diabolic Intent (CMC=2.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Marneus Calgar #64 (real): Diabolic Intent found Deadly Rollick (any)
+  END Marneus Calgar #64 (real): Life=38 Hand=6 Board=8 Grave=6 Discarded=0
+
+TURN 8 - Lorehold | Life=40 Hand=3 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #86 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=10)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #86 (real): 7 player damage, target life 3, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=7 Grave=6 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #86 (real) | Life=3 Hand=7 Board=9
+  MANA Kraum, Ludevic's Opus #86 (real): 8 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=22)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 6 player damage, target life 16, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=3 Hand=6 Board=11 Grave=9 Discarded=0
+
+TURN 8 - Elsha of the Infinite #96 (real) | Life=16 Hand=6 Board=9
+  MANA Elsha of the Infinite #96 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 0 player damage, target life 3, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=16 Hand=7 Board=9 Grave=0 Discarded=0
+
+TURN 8 - Marneus Calgar #64 (real) | Life=38 Hand=6 Board=8
+  MANA Marneus Calgar #64 (real): 7 available (4 sources, 3 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Deadly Rollick (CMC=4.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Marneus Calgar #64 (real): Deadly Rollick removed Lorehold, the Historian from Lorehold
+  COMBAT Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Marneus Calgar #64 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life -1, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #86 (real) (life_zero) <<<
+
+TURN 9 - Lorehold | Life=40 Hand=3 Board=6
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=16)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 2 player damage, target life 14, target_dead=False
+  RESOLVE Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=2 Board=7 Grave=7 Discarded=0
+
+TURN 9 - Elsha of the Infinite #96 (real) | Life=14 Hand=7 Board=9
+  MANA Elsha of the Infinite #96 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=38)
+  DAMAGE Elsha of the Infinite #96 (real) -> Marneus Calgar #64 (real): 4 player damage, target life 34, target_dead=False
+  RESOLVE Marneus Calgar #64 (real): Force of Will (CMC=5.0) [counter] rule=curated/verified
+  END Elsha of the Infinite #96 (real): Life=14 Hand=7 Board=9 Grave=1 Discarded=1
+
+TURN 9 - Marneus Calgar #64 (real) | Life=34 Hand=5 Board=9
+  MANA Marneus Calgar #64 (real): 6 available (5 sources, 1 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Marneus Calgar #64 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 10, target_dead=False
+  END Marneus Calgar #64 (real): Life=34 Hand=6 Board=10 Grave=7 Discarded=0
+
+TURN 10 - Lorehold | Life=40 Hand=2 Board=7
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=10)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 3 player damage, target life 7, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=7 Grave=7 Discarded=0
+
+TURN 10 - Elsha of the Infinite #96 (real) | Life=7 Hand=7 Board=9
+  MANA Elsha of the Infinite #96 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=34)
+  DAMAGE Elsha of the Infinite #96 (real) -> Marneus Calgar #64 (real): 4 player damage, target life 30, target_dead=False
+  RESOLVE Marneus Calgar #64 (real): Commandeer (CMC=7.0) [counter] rule=known_cards_manual/verified
+  END Elsha of the Infinite #96 (real): Life=7 Hand=7 Board=9 Grave=2 Discarded=1
+
+TURN 10 - Marneus Calgar #64 (real) | Life=30 Hand=5 Board=10
+  MANA Marneus Calgar #64 (real): 8 available (6 sources, 2 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Imperial Seal (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Marneus Calgar #64 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=7)
+  DAMAGE Marneus Calgar #64 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 3, target_dead=False
+  END Marneus Calgar #64 (real): Life=30 Hand=6 Board=11 Grave=8 Discarded=0
+
+TURN 11 - Lorehold | Life=40 Hand=3 Board=7
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=lethal, target_life=3)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 3 player damage, target life 0, target_dead=True
+  >>> DIED: Elsha of the Infinite #96 (real) (life_zero) <<<
+
+TURN 11 - Marneus Calgar #64 (real) | Life=30 Hand=6 Board=11
+  MANA Marneus Calgar #64 (real): 10 available (7 sources, 3 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Marneus Calgar #64 (real): Life=30 Hand=7 Board=12 Grave=8 Discarded=0
+
+TURN 12 - Lorehold | Life=36 Hand=2 Board=8
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 3 player damage, target life 27, target_dead=False
+  END Lorehold: Life=36 Hand=2 Board=10 Grave=8 Discarded=0
+
+TURN 12 - Marneus Calgar #64 (real) | Life=27 Hand=7 Board=12
+  MANA Marneus Calgar #64 (real): 12 available (8 sources, 4 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Marneus Calgar #64 (real): Life=27 Hand=7 Board=14 Grave=8 Discarded=0
+
+TURN 13 - Lorehold | Life=32 Hand=2 Board=10
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=27)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 8 player damage, target life 19, target_dead=False
+  END Lorehold: Life=32 Hand=2 Board=11 Grave=8 Discarded=0
+
+TURN 13 - Marneus Calgar #64 (real) | Life=19 Hand=7 Board=14
+  MANA Marneus Calgar #64 (real): 15 available (10 sources, 5 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Marneus Calgar #64 (real): Life=19 Hand=7 Board=15 Grave=9 Discarded=1
+
+TURN 14 - Lorehold | Life=28 Hand=2 Board=11
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=19)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 8 player damage, target life 11, target_dead=False
+  END Lorehold: Life=28 Hand=3 Board=11 Grave=9 Discarded=0
+
+TURN 14 - Marneus Calgar #64 (real) | Life=11 Hand=7 Board=15
+  MANA Marneus Calgar #64 (real): 17 available (11 sources, 6 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Marneus Calgar #64 (real): Life=11 Hand=7 Board=17 Grave=9 Discarded=0
+
+TURN 15 - Lorehold | Life=24 Hand=3 Board=11
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=11)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 8 player damage, target life 3, target_dead=False
+  END Lorehold: Life=24 Hand=3 Board=12 Grave=10 Discarded=0
+
+TURN 15 - Marneus Calgar #64 (real) | Life=3 Hand=7 Board=17
+  MANA Marneus Calgar #64 (real): 19 available (12 sources, 7 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=24)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 5 player damage, target life 19, target_dead=False
+  END Marneus Calgar #64 (real): Life=3 Hand=7 Board=18 Grave=10 Discarded=1
+
+TURN 16 - Lorehold | Life=19 Hand=3 Board=12
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Blasphemous Act (CMC=9.0) [board_wipe] rule=known_cards_manual/verified
+  END Lorehold: Life=19 Hand=2 Board=7 Grave=13 Discarded=0
+
+TURN 16 - Marneus Calgar #64 (real) | Life=3 Hand=7 Board=14
+  MANA Marneus Calgar #64 (real): 19 available (12 sources, 7 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Orcish Bowmasters (CMC=2.0) [remove_creature] rule=curated/verified
+  END Marneus Calgar #64 (real): Life=3 Hand=7 Board=16 Grave=12 Discarded=0
+
+TURN 17 - Lorehold | Life=19 Hand=2 Board=7
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  END Lorehold: Life=19 Hand=2 Board=8 Grave=13 Discarded=0
+
+TURN 17 - Marneus Calgar #64 (real) | Life=3 Hand=7 Board=16
+  MANA Marneus Calgar #64 (real): 20 available (13 sources, 7 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Marneus Calgar #64 (real): Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Marneus Calgar #64 (real): Enlightened Tutor found Stridehangar Automaton (artifact_or_enchantment)
+  COMBAT Marneus Calgar #64 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=19)
+  DAMAGE Marneus Calgar #64 (real) -> Lorehold: 19 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+GAME OVER - Turn 17
+Winner: Marneus Calgar #64 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=2
+Kraum, Ludevic's Opus #86 (real): DEAD Life=-1 Hand=6
+Elsha of the Infinite #96 (real): DEAD Life=0 Hand=7
+Marneus Calgar #64 (real): ALIVE Life=3 Hand=9

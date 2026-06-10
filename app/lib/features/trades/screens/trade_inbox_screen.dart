@@ -65,11 +65,11 @@ class _TradeInboxTabContentState extends State<TradeInboxTabContent>
       children: [
         // Sub-tabs dentro da tab Trades
         Material(
-          color: AppTheme.surfaceElevated,
+          color: AppTheme.backgroundAbyss,
           child: TabBar(
             controller: _tabController,
-            indicatorColor: AppTheme.manaViolet,
-            labelColor: AppTheme.manaViolet,
+            indicatorColor: AppTheme.brass400,
+            labelColor: AppTheme.brass400,
             unselectedLabelColor: AppTheme.textSecondary,
             tabs: const [
               Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
@@ -156,8 +156,8 @@ class _TradeInboxScreenState extends State<TradeInboxScreen>
         title: const Text('Trades'),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppTheme.manaViolet,
-          labelColor: AppTheme.manaViolet,
+          indicatorColor: AppTheme.brass400,
+          labelColor: AppTheme.brass400,
           unselectedLabelColor: AppTheme.textSecondary,
           tabs: const [
             Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
@@ -229,7 +229,7 @@ class _TradeListViewState extends State<_TradeListView> {
       builder: (context, provider, _) {
         if (provider.isLoading && provider.trades.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: AppTheme.manaViolet),
+            child: CircularProgressIndicator(color: AppTheme.brass400),
           );
         }
         if (provider.errorMessage != null) {
@@ -248,7 +248,7 @@ class _TradeListViewState extends State<_TradeListView> {
             title: 'Nenhum trade encontrado',
             message:
                 'Quando houver propostas, negociações ou finalizações, elas aparecem aqui.',
-            accent: AppTheme.primarySoft,
+            accent: AppTheme.brass400,
           );
         }
         return RefreshIndicator(
@@ -306,7 +306,7 @@ class _TradeCard extends StatelessWidget {
                     backgroundColor: AppTheme.outlineMuted,
                     child: Text(
                       otherUser.label[0].toUpperCase(),
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: AppTheme.textPrimary),
                     ),
                   ),
                   const SizedBox(width: 10),

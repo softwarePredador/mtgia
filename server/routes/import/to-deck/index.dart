@@ -1,5 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/import_card_lookup_service.dart';
 import '../../../lib/import_list_service.dart';
@@ -136,9 +137,10 @@ Future<Response> _importToDeck(RequestContext context) async {
     final quantity = card['quantity'] as int;
     final isCommander = card['is_commander'] == true;
 
-    final typeLineLower = typeLine.toLowerCase();
-    final isBasicLand = typeLineLower.contains('basic land') ||
-        typeLineLower.contains('basic snow land');
+    final isBasicLand = basic_lands.isBasicLandCard(
+      name: name,
+      typeLine: typeLine,
+    );
 
     if (isCommander || isBasicLand) continue;
 

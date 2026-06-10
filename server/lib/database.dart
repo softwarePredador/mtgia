@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'package:dotenv/dotenv.dart';
 
@@ -9,9 +10,14 @@ class Database {
   bool _connected = false;
 
   // Singleton pattern
-  static final Database _instance = Database._internal();
+  static Database _instance = Database._internal();
   factory Database() => _instance;
   Database._internal();
+
+  @visibleForTesting
+  static void resetForTesting() {
+    _instance = Database._internal();
+  }
 
   /// Verifica se o banco está conectado.
   bool get isConnected => _connected;

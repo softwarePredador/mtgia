@@ -1,0 +1,250 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Sisay, Weatherlight Captain #61 (real), Kinnan, Bonder Prodigy #104 (real), Rograkh, Son of Rohgahh #109 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Sisay, Weatherlight Captain #61 (real): 0 mulligan(s), 7 cards, 5 lands
+  Kinnan, Bonder Prodigy #104 (real): 0 mulligan(s), 7 cards, 3 lands
+  Rograkh, Son of Rohgahh #109 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Sisay, Weatherlight Captain #61 (real) | Life=40 Hand=7 Board=0
+  MANA Sisay, Weatherlight Captain #61 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Sisay, Weatherlight Captain #61 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=7 Board=0
+  MANA Kinnan, Bonder Prodigy #104 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #109 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #109 (real): Expedition Map (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Rograkh, Son of Rohgahh #109 (real): Expedition Map found Deserted Temple (land)
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Sisay, Weatherlight Captain #61 (real) | Life=40 Hand=7 Board=1
+  MANA Sisay, Weatherlight Captain #61 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Sisay, Weatherlight Captain #61 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=7 Board=1
+  MANA Kinnan, Bonder Prodigy #104 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #104 (real): Soul-Guide Lantern (CMC=1.0) [hate_artifact] rule=known_cards_manual/verified
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=1
+  MANA Rograkh, Son of Rohgahh #109 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 3 - Sisay, Weatherlight Captain #61 (real) | Life=40 Hand=7 Board=2
+  MANA Sisay, Weatherlight Captain #61 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Sisay, Weatherlight Captain #61 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=5 Board=4
+  MANA Kinnan, Bonder Prodigy #104 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=2
+  MANA Rograkh, Son of Rohgahh #109 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=3 Discarded=0
+
+TURN 4 - Sisay, Weatherlight Captain #61 (real) | Life=40 Hand=7 Board=3
+  MANA Sisay, Weatherlight Captain #61 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Sisay, Weatherlight Captain #61 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Kinnan, Bonder Prodigy #104 (real) | Life=40 Hand=5 Board=6
+  MANA Kinnan, Bonder Prodigy #104 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 36, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=40 Hand=5 Board=7 Grave=0 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #109 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=3 Discarded=0
+
+TURN 5 - Sisay, Weatherlight Captain #61 (real) | Life=36 Hand=7 Board=5
+  MANA Sisay, Weatherlight Captain #61 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Sisay, Weatherlight Captain #61 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Sisay, Weatherlight Captain #61 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 36, target_dead=False
+  END Sisay, Weatherlight Captain #61 (real): Life=36 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Kinnan, Bonder Prodigy #104 (real) | Life=36 Hand=5 Board=7
+  MANA Kinnan, Bonder Prodigy #104 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 32, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=36 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=1
+
+TURN 6 - Lorehold | Life=40 Hand=5 Board=4
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=28)
+  DAMAGE Lorehold -> Sisay, Weatherlight Captain #61 (real): 2 player damage, target life 26, target_dead=False
+  END Lorehold: Life=40 Hand=7 Board=5 Grave=3 Discarded=0
+
+TURN 6 - Sisay, Weatherlight Captain #61 (real) | Life=26 Hand=7 Board=6
+  MANA Sisay, Weatherlight Captain #61 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Sisay, Weatherlight Captain #61 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Sisay, Weatherlight Captain #61 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 32, target_dead=False
+  END Sisay, Weatherlight Captain #61 (real): Life=26 Hand=7 Board=6 Grave=1 Discarded=1
+
+TURN 6 - Kinnan, Bonder Prodigy #104 (real) | Life=32 Hand=5 Board=8
+  MANA Kinnan, Bonder Prodigy #104 (real): 7 available (6 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=26)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 22, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=32 Hand=5 Board=9 Grave=0 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 18, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 7 - Lorehold | Life=40 Hand=7 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=18)
+  DAMAGE Lorehold -> Sisay, Weatherlight Captain #61 (real): 2 player damage, target life 16, target_dead=False
+  END Lorehold: Life=40 Hand=7 Board=7 Grave=3 Discarded=0
+
+TURN 7 - Sisay, Weatherlight Captain #61 (real) | Life=16 Hand=7 Board=6
+  MANA Sisay, Weatherlight Captain #61 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Sisay, Weatherlight Captain #61 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=32)
+  DAMAGE Sisay, Weatherlight Captain #61 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 28, target_dead=False
+  END Sisay, Weatherlight Captain #61 (real): Life=16 Hand=7 Board=6 Grave=2 Discarded=1
+
+TURN 7 - Kinnan, Bonder Prodigy #104 (real) | Life=28 Hand=5 Board=9
+  MANA Kinnan, Bonder Prodigy #104 (real): 8 available (7 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=16)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 12, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=28 Hand=6 Board=9 Grave=0 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 8, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=5 Grave=4 Discarded=1
+
+TURN 8 - Lorehold | Life=40 Hand=7 Board=7
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=8)
+  DAMAGE Lorehold -> Sisay, Weatherlight Captain #61 (real): 2 player damage, target life 6, target_dead=False
+  END Lorehold: Life=40 Hand=6 Board=10 Grave=3 Discarded=0
+
+TURN 8 - Sisay, Weatherlight Captain #61 (real) | Life=6 Hand=7 Board=6
+  MANA Sisay, Weatherlight Captain #61 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Sisay, Weatherlight Captain #61 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=40)
+  DAMAGE Sisay, Weatherlight Captain #61 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Sisay, Weatherlight Captain #61 (real): Life=6 Hand=7 Board=6 Grave=3 Discarded=1
+
+TURN 8 - Kinnan, Bonder Prodigy #104 (real) | Life=28 Hand=6 Board=9
+  MANA Kinnan, Bonder Prodigy #104 (real): 8 available (7 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=28 Hand=6 Board=9 Grave=1 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=6)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Sisay, Weatherlight Captain #61 (real): 4 player damage, target life 2, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=5 Grave=5 Discarded=1
+
+TURN 9 - Lorehold | Life=32 Hand=6 Board=10
+  MANA Lorehold: 7 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Sisay, Weatherlight Captain #61 (real): 3 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=2)
+  DAMAGE Lorehold -> Sisay, Weatherlight Captain #61 (real): 10 player damage, target life -8, target_dead=True
+  >>> DIED: Sisay, Weatherlight Captain #61 (real) (life_zero) <<<
+
+TURN 9 - Kinnan, Bonder Prodigy #104 (real) | Life=28 Hand=6 Board=9
+  MANA Kinnan, Bonder Prodigy #104 (real): 8 available (7 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #104 (real): Vexing Bauble (CMC=1.0) [hate_artifact] rule=known_cards_manual/verified
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=32)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=28 Hand=6 Board=10 Grave=1 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=7 Board=5 Grave=6 Discarded=0
+
+TURN 10 - Lorehold | Life=24 Hand=5 Board=13
+  MANA Lorehold: 8 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Generous Gift (CMC=3.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Generous Gift removed Sisay, Weatherlight Captain from Sisay, Weatherlight Captain #61 (real)
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #104 (real): 4 attackers, 0 blockers, 0 gang blocks, 12 power (reason=default_low_life, target_life=24)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #104 (real): 12 player damage, target life 12, target_dead=False
+  END Lorehold: Life=24 Hand=5 Board=14 Grave=5 Discarded=0
+
+TURN 10 - Kinnan, Bonder Prodigy #104 (real) | Life=12 Hand=6 Board=10
+  MANA Kinnan, Bonder Prodigy #104 (real): 8 available (7 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=24)
+  DAMAGE Kinnan, Bonder Prodigy #104 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Kinnan, Bonder Prodigy #104 (real): Life=12 Hand=7 Board=10 Grave=1 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #109 (real) | Life=36 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Kinnan, Bonder Prodigy #104 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Kinnan, Bonder Prodigy #104 (real): 4 player damage, target life 8, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=36 Hand=7 Board=5 Grave=7 Discarded=0
+
+TURN 11 - Lorehold | Life=20 Hand=5 Board=14
+  MANA Lorehold: 8 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=known_cards_manual/verified
+  >>> DIED: Kinnan, Bonder Prodigy #104 (real) (life_zero) <<<
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 4 attackers, 0 blockers, 0 gang blocks, 12 power (reason=default_low_life, target_life=19)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 12 player damage, target life 7, target_dead=False
+  END Lorehold: Life=20 Hand=5 Board=15 Grave=7 Discarded=0
+
+TURN 11 - Rograkh, Son of Rohgahh #109 (real) | Life=7 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=7 Hand=7 Board=5 Grave=8 Discarded=1
+
+TURN 12 - Lorehold | Life=16 Hand=5 Board=15
+  MANA Lorehold: 9 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Electroduplicate (CMC=3.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 4 attackers, 0 blockers, 0 gang blocks, 12 power (reason=lethal, target_life=7)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 12 player damage, target life -5, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #109 (real) (life_zero) <<<
+
+GAME OVER - Turn 12
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=16 Hand=4
+Sisay, Weatherlight Captain #61 (real): DEAD Life=-8 Hand=7
+Kinnan, Bonder Prodigy #104 (real): DEAD Life=-9 Hand=7
+Rograkh, Son of Rohgahh #109 (real): DEAD Life=-5 Hand=7

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'cmc_safety.dart';
+import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimization_validator.dart';
 
@@ -22,6 +25,8 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   required List<Map<String, dynamic>> originalDeck,
   required List<Map<String, dynamic>> additionsData,
   required String archetype,
+  String? commanderName,
+  Map<String, Map<String, dynamic>>? cardDeckProfiles,
 }) {
   final pairCount = [
     removals.length,
@@ -52,13 +57,17 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
     final removedRole = classifyOptimizationFunctionalRole(removedCard);
     final addedRole = classifyOptimizationFunctionalRole(addedCard);
+    final removedRoles = _functionalRolesForGate(removedCard);
+    final addedRoles = _functionalRolesForGate(addedCard);
     final cmcDelta = _getCmc(addedCard) - _getCmc(removedCard);
     final rolePreserved = removedRole == addedRole ||
-        (removedRole == 'utility' && addedRole == 'utility');
+        (removedRole == 'utility' && addedRole == 'utility') ||
+        removedRoles.intersection(addedRoles).isNotEmpty;
 
     final criticalRoles = _criticalRolesForArchetype(archetype);
+    final removedCriticalRoles = removedRoles.intersection(criticalRoles);
     final losingCriticalRole =
-        criticalRoles.contains(removedRole) && !rolePreserved;
+        removedCriticalRoles.difference(addedRoles).isNotEmpty;
     final structuralRecoveryUpgrade = structuralRecoveryScenario &&
         _isStructuralRecoveryUpgrade(
           removedCard: removedCard,
@@ -72,6 +81,27 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     final addedIsLand = ((addedCard['type_line'] as String?) ?? '')
         .toLowerCase()
         .contains('land');
+
+    // ── Card deck profiles: protect core cards, prioritize filler removals ──
+    if (cardDeckProfiles != null && cardDeckProfiles.isNotEmpty) {
+      final removalProfile = cardDeckProfiles[removalName.toLowerCase()];
+
+      // Block swaps that try to remove a core card
+      if (removalProfile != null &&
+          removalProfile['importance']?.toString().toLowerCase() == 'core') {
+        droppedReasons.add(
+          '$removalName -> $additionName bloqueada: $removalName é carta CORE neste deck (card_deck_profiles).',
+        );
+        continue;
+      }
+
+      // Allow swaps that remove a filler card even if role is preserved
+      if (removalProfile != null &&
+          removalProfile['importance']?.toString().toLowerCase() == 'filler' &&
+          losingCriticalRole == false) {
+        // Filler cards get a pass — they can be swapped more freely
+      }
+    }
 
     final removedIsLand = removedRole == 'land' ||
         (((removedCard['type_line'] as String?) ?? '')
@@ -108,7 +138,9 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     if (shouldDrop && !structuralRecoveryUpgrade && !landTrimUpgrade) {
       droppedReasons.add(
         '$removalName -> $additionName removida pelo gate: '
-        'papel $removedRole -> $addedRole, delta CMC ${cmcDelta >= 0 ? '+' : ''}$cmcDelta.',
+        'papel $removedRole -> $addedRole, '
+        'funções ${_formatRoles(removedRoles)} -> ${_formatRoles(addedRoles)}, '
+        'delta CMC ${cmcDelta >= 0 ? '+' : ''}$cmcDelta.',
       );
       continue;
     }
@@ -122,6 +154,120 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     additions: safeAdditions,
     droppedReasons: droppedReasons,
   );
+}
+
+Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
+  final primaryRole = classifyOptimizationFunctionalRole(card);
+  final semanticRoles =
+      optimizationFunctionalRolesForCard(card, semanticOnly: true);
+  final inferredRoles = <String>{...semanticRoles};
+  final typeLine = (card['type_line'] as String?) ?? '';
+  final oracleText = (card['oracle_text'] as String?) ?? '';
+
+  if (semanticRoles.isEmpty) {
+    // Prefere os functional_tags PERSISTIDOS (card_function_tags) — fonte de
+    // maior qualidade do que re-derivar heuristicamente. Só cai para o
+    // inferFunctionalCardTags se a carta não tem tags persistidas (P1.a).
+    final persisted = _persistedFunctionalTagsForGate(card);
+    if (persisted.isNotEmpty) {
+      for (final entry in persisted) {
+        if (entry.confidence < 0.65) continue;
+        final role = _gateRoleForFunctionalTag(entry.tag);
+        if (role != null) inferredRoles.add(role);
+      }
+    }
+    if (inferredRoles.isEmpty) {
+      for (final tag in inferFunctionalCardTags(
+        name: (card['name'] as String?) ?? '',
+        typeLine: typeLine,
+        oracleText: oracleText,
+        manaCost: card['mana_cost'] as String?,
+        cmc: card['cmc'],
+      )) {
+        if (tag.confidence < 0.65) continue;
+        final role = _gateRoleForFunctionalTag(tag.tag);
+        if (role != null) inferredRoles.add(role);
+      }
+    }
+  }
+
+  final roles = inferredRoles.isEmpty ? <String>{primaryRole} : inferredRoles;
+  if (!{'draw', 'removal', 'ramp', 'wipe'}.contains(primaryRole)) {
+    roles.add(primaryRole);
+  }
+  if (typeLine.toLowerCase().contains('land')) roles.add('land');
+  return roles;
+}
+
+typedef _PersistedFunctionalTag = ({String tag, double confidence});
+
+/// Lê os functional_tags PERSISTIDOS (card_function_tags) do mapa da carta,
+/// já decodificados (jsonb -> List/Map) ou em string JSON.
+List<_PersistedFunctionalTag> _persistedFunctionalTagsForGate(
+    Map<String, dynamic> card) {
+  var raw = card['functional_tags'];
+  if (raw is String) {
+    if (raw.trim().isEmpty) return const [];
+    try {
+      raw = jsonDecode(raw);
+    } catch (_) {
+      return const [];
+    }
+  }
+  if (raw is! Iterable) return const [];
+  final out = <_PersistedFunctionalTag>[];
+  for (final item in raw) {
+    if (item is Map) {
+      final tag = item['tag']?.toString().trim().toLowerCase();
+      if (tag == null || tag.isEmpty) continue;
+      final conf = (item['confidence'] as num?)?.toDouble() ?? 1.0;
+      out.add((tag: tag, confidence: conf));
+    } else if (item is String) {
+      final tag = item.trim().toLowerCase();
+      if (tag.isNotEmpty) out.add((tag: tag, confidence: 1.0));
+    }
+  }
+  return out;
+}
+
+String? _gateRoleForFunctionalTag(String tag) {
+  return switch (tag) {
+    'board_wipe' => 'wipe',
+    'loot' => 'draw',
+    'ritual' => 'ramp',
+    'token_maker' => 'creature',
+    'aristocrat_payoff' => 'engine',
+    'spellslinger' => 'engine',
+    'artifact_synergy' => 'engine',
+    'enchantment_synergy' => 'engine',
+    'exile_value' => 'draw',
+    'graveyard_synergy' => 'engine',
+    'sacrifice_outlet' => 'engine',
+    'lifegain' => 'utility',
+    'drain' => 'wincon',
+    'etb' => 'utility',
+    'blink' => 'protection',
+    'big_spell' => 'wincon',
+    'payoff' => 'engine',
+    'enabler' => 'utility',
+    'land' ||
+    'ramp' ||
+    'draw' ||
+    'tutor' ||
+    'removal' ||
+    'protection' ||
+    'recursion' ||
+    'wincon' ||
+    'combo_piece' ||
+    'engine' =>
+      tag,
+    _ => null,
+  };
+}
+
+String _formatRoles(Set<String> roles) {
+  final ordered = roles.toList()..sort();
+  return ordered.join('+');
 }
 
 bool _isStructuralRecoveryScenario(List<Map<String, dynamic>> originalDeck) {
@@ -346,10 +492,10 @@ List<String> buildOptimizationRejectionReasons({
 
 Set<String> _criticalRolesForArchetype(String archetype) {
   return switch (archetype.trim().toLowerCase()) {
-    'aggro' => {'creature', 'ramp', 'removal', 'protection'},
-    'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection'},
-    'midrange' => {'removal', 'ramp', 'draw'},
-    _ => {'removal', 'ramp'},
+    'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe', 'wincon'},
+    'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection', 'wincon'},
+    'midrange' => {'removal', 'ramp', 'draw', 'wipe', 'wincon'},
+    _ => {'removal', 'ramp', 'wipe', 'wincon'},
   };
 }
 
@@ -361,8 +507,8 @@ bool _looksLikeOffThemeRoleSwap({
   final normalized = archetype.trim().toLowerCase();
 
   if (normalized == 'aggro' &&
-      {'creature', 'removal', 'protection', 'engine'}.contains(removedRole) &&
-      !{'creature', 'removal', 'protection', 'engine'}.contains(addedRole)) {
+      {'creature', 'ramp', 'removal', 'protection', 'wipe'}.contains(removedRole) &&
+      !{'creature', 'ramp', 'removal', 'protection', 'wipe'}.contains(addedRole)) {
     return true;
   }
 
@@ -373,8 +519,8 @@ bool _looksLikeOffThemeRoleSwap({
   }
 
   if (normalized == 'midrange' &&
-      {'removal', 'ramp', 'draw'}.contains(removedRole) &&
-      !{'removal', 'ramp', 'draw', 'creature', 'protection'}
+      {'removal', 'ramp', 'draw', 'wipe'}.contains(removedRole) &&
+      !{'removal', 'ramp', 'draw', 'wipe', 'creature', 'protection'}
           .contains(addedRole)) {
     return true;
   }

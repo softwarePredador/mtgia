@@ -9,8 +9,7 @@ class LifeCounterDayNightStateStore {
   LifeCounterDayNightStateStore({
     LifeCounterDayNightPreferencesLoader? preferencesLoader,
     this.prefsKey = lifeCounterDayNightStatePrefsKey,
-  }) : _preferencesLoader =
-           preferencesLoader ?? SharedPreferences.getInstance;
+  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
 
   final LifeCounterDayNightPreferencesLoader _preferencesLoader;
   final String prefsKey;

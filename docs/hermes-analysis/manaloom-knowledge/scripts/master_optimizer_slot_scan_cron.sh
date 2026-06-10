@@ -52,10 +52,17 @@ python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --sqlite-db "$SCRIPT_DIR/knowledge.db" \
   --report "$sync_report"
 
-battle_rules_report="$ARTIFACT_DIR/battle_card_rules_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
-python3 "$SCRIPT_DIR/sync_battle_card_rules.py" \
+battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
+python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
   --sqlite-db "$SCRIPT_DIR/knowledge.db" \
-  --apply \
+  --apply-pg \
+  --report "$battle_rules_pg_report"
+
+battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
+python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
+  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+  --apply-sqlite-from-pg \
+  --include-needs-review \
   --report "$battle_rules_report"
 
 preflight_log="$ARTIFACT_DIR/master_optimizer_slot_scan_preflight_$(date -u +%Y%m%d_%H%M%S).log"
@@ -83,6 +90,7 @@ cp "$slot_log" "$ARTIFACT_DIR/latest_master_optimizer_slot_scan.log"
 
 echo "slot_scan=ok"
 echo "sync_report=$sync_report"
+echo "battle_rules_pg_report=$battle_rules_pg_report"
 echo "battle_rules_report=$battle_rules_report"
 echo "preflight_log=$preflight_log"
 echo "baseline_log=$baseline_log"

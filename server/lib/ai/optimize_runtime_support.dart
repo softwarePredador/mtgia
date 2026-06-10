@@ -1,11 +1,15 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
+import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
-import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import 'aggressive_candidate_meta_signal_support.dart';
 import 'functional_card_tags.dart';
 import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
+import 'commander_fallback_policy.dart';
+import 'optimization_functional_roles.dart';
+import 'optimize_filler_loader_support.dart';
+export 'optimize_filler_loader_support.dart';
 
 String normalizeOptimizeReasoning(dynamic value) {
   if (value == null) return '';
@@ -282,11 +286,10 @@ Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) {
   };
 }
 
-bool isBasicLandName(String name) => _isBasicLandName(name);
+bool isBasicLandName(String name) => basic_lands.isBasicLandName(name);
 
 bool isBasicLandTypeLine(String typeLineLower) {
-  return typeLineLower.contains('basic land') ||
-      typeLineLower.contains('basic snow land');
+  return basic_lands.isBasicLandTypeLine(typeLineLower);
 }
 
 int maxCopiesForFormat({
@@ -296,10 +299,9 @@ int maxCopiesForFormat({
 }) {
   final normalizedFormat = deckFormat.toLowerCase();
   final normalizedType = typeLine.toLowerCase();
-  final normalizedName = name.trim().toLowerCase();
 
   final isBasicLand =
-      isBasicLandTypeLine(normalizedType) || _isBasicLandName(normalizedName);
+      isBasicLandTypeLine(normalizedType) || basic_lands.isBasicLandName(name);
   if (isBasicLand) return 999;
 
   if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
@@ -335,1346 +337,6 @@ String basicLandNameForColor(String color) {
     default:
       return 'Wastes';
   }
-}
-
-Future<Map<String, String>> loadBasicLandIds(
-  Pool pool,
-  List<String> names,
-) async {
-  if (names.isEmpty) return const {};
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT name, id::text
-      FROM cards
-      WHERE name = ANY(@names)
-        AND (type_line LIKE 'Basic Land%' OR type_line LIKE 'Basic Snow Land%')
-      ORDER BY name ASC
-    '''),
-    parameters: {'names': names},
-  );
-  final map = <String, String>{};
-  for (final row in result) {
-    final n = row[0] as String;
-    final id = row[1] as String;
-    map[n] = id;
-  }
-  return map;
-}
-
-Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
-  required Pool pool,
-  required Set<String> commanderColorIdentity,
-  required Set<String> excludeNames,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.colors, sub.color_identity, sub.pop_score
-      FROM (
-        SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text,
-          c.name,
-          c.type_line,
-          COALESCE(c.oracle_text, '') AS oracle_text,
-          COALESCE(c.colors, ARRAY[]::text[]) AS colors,
-          COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity,
-          COALESCE(cmi.usage_count, 0) AS pop_score
-        FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line ILIKE '%land%'
-          AND c.type_line NOT ILIKE 'Basic Land%'
-          AND c.type_line NOT ILIKE 'Basic Snow Land%'
-          AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
-          AND c.name NOT LIKE 'A-%'
-          AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-          AND c.name NOT LIKE '%World Champion%'
-          AND c.name NOT LIKE '%Heroes of the Realm%'
-        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
-      ) sub
-      ORDER BY sub.pop_score DESC, LOWER(sub.name) ASC
-      LIMIT 600
-    '''),
-    parameters: {
-      'exclude': excludeNames.toList(),
-    },
-  );
-
-  const premiumLandNames = <String>{
-    'city of brass',
-    'command tower',
-    'exotic orchard',
-    'mana confluence',
-    'path of ancestry',
-    'reflecting pool',
-  };
-
-  final candidates = <Map<String, dynamic>>[];
-  for (final row in result) {
-    final candidate = <String, dynamic>{
-      'id': row[0] as String,
-      'name': row[1] as String,
-      'type_line': (row[2] as String?) ?? '',
-      'oracle_text': (row[3] as String?) ?? '',
-      'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-      'color_identity': (row[5] as List?)?.cast<String>() ?? const <String>[],
-      'pop_score': (row[6] as num?)?.toInt() ?? 0,
-    };
-
-    if (!shouldKeepCommanderFillerCandidate(
-      candidate: candidate,
-      excludeNames: excludeNames,
-      commanderColorIdentity: commanderColorIdentity,
-      enforceCommanderIdentity: true,
-    )) {
-      continue;
-    }
-    if (!landFixesCommanderColors(
-      card: candidate,
-      commanderColorIdentity: commanderColorIdentity,
-    )) {
-      continue;
-    }
-
-    final name = ((candidate['name'] as String?) ?? '').trim().toLowerCase();
-    final oracle = ((candidate['oracle_text'] as String?) ?? '').toLowerCase();
-    final typeLine = ((candidate['type_line'] as String?) ?? '').toLowerCase();
-    final identityCount = resolvedCardIdentityFromParts(
-      colorIdentity: (candidate['color_identity'] as List?)?.cast<String>() ??
-          const <String>[],
-      colors:
-          (candidate['colors'] as List?)?.cast<String>() ?? const <String>[],
-      oracleText: candidate['oracle_text'] as String?,
-    ).length;
-
-    var fixingScore = (candidate['pop_score'] as int?) ?? 0;
-    if (premiumLandNames.contains(name)) fixingScore += 250;
-    if (oracle.contains('add one mana of any color') ||
-        oracle.contains('add one mana of any type')) {
-      fixingScore += 200;
-    }
-    if (oracle.contains('{w}') ||
-        oracle.contains('{u}') ||
-        oracle.contains('{b}') ||
-        oracle.contains('{r}') ||
-        oracle.contains('{g}')) {
-      fixingScore += 40 * identityCount;
-    }
-    if (oracle.contains('search your library for a basic land') ||
-        oracle.contains('search your library for a land')) {
-      fixingScore += 80;
-    }
-    if (typeLine.contains('land')) {
-      fixingScore += 30;
-    }
-    if (oracle.contains('enters tapped')) {
-      fixingScore -= 20;
-    }
-
-    candidates.add({
-      ...candidate,
-      'fixing_score': fixingScore,
-    });
-  }
-
-  candidates.sort((a, b) {
-    final byFixing = ((b['fixing_score'] as int?) ?? 0).compareTo(
-      (a['fixing_score'] as int?) ?? 0,
-    );
-    if (byFixing != 0) return byFixing;
-    final byPop = ((b['pop_score'] as int?) ?? 0).compareTo(
-      (a['pop_score'] as int?) ?? 0,
-    );
-    if (byPop != 0) return byPop;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
-  });
-
-  return dedupeCandidatesByName(candidates).take(limit).toList();
-}
-
-int recommendedLandCountForOptimizeArchetype(String targetArchetype) {
-  final archetype = targetArchetype.toLowerCase();
-  if (archetype.contains('aggro')) return 34;
-  if (archetype.contains('combo')) return 33;
-  if (archetype.contains('control')) return 37;
-  return 35;
-}
-
-Set<String> resolvedCardIdentity(Map<String, dynamic> card) {
-  return resolvedCardIdentityFromParts(
-    colorIdentity:
-        (card['color_identity'] as List?)?.cast<String>() ?? const <String>[],
-    colors: (card['colors'] as List?)?.cast<String>() ?? const <String>[],
-    oracleText: card['oracle_text']?.toString(),
-    manaCost: card['mana_cost']?.toString(),
-  );
-}
-
-Set<String> resolvedCardIdentityFromParts({
-  List<String> colorIdentity = const <String>[],
-  List<String> colors = const <String>[],
-  String? oracleText,
-  String? manaCost,
-}) {
-  return resolveCardColorIdentity(
-    colorIdentity: colorIdentity,
-    colors: colors,
-    oracleText: oracleText,
-    manaCost: manaCost,
-  );
-}
-
-bool landProducesCommanderColors({
-  required Map<String, dynamic> card,
-  required Set<String> commanderColorIdentity,
-}) {
-  if (commanderColorIdentity.isEmpty) return false;
-
-  final oracleText = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-  final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
-  final colorIdentity =
-      (card['color_identity'] as List?)?.cast<String>() ?? const <String>[];
-  final detectedColors = <String>{
-    ...colors.map((c) => c.toUpperCase()),
-    ...colorIdentity.map((c) => c.toUpperCase()),
-  };
-
-  for (final color in commanderColorIdentity) {
-    if (detectedColors.contains(color.toUpperCase())) return true;
-    if (oracleText.contains('{${color.toLowerCase()}}')) return true;
-  }
-
-  if (oracleText.contains('mana of any color') ||
-      oracleText.contains('mana of any type')) {
-    return true;
-  }
-
-  return false;
-}
-
-bool landFixesCommanderColors({
-  required Map<String, dynamic> card,
-  required Set<String> commanderColorIdentity,
-}) {
-  if (commanderColorIdentity.isEmpty) return false;
-  if (landProducesCommanderColors(
-    card: card,
-    commanderColorIdentity: commanderColorIdentity,
-  )) {
-    return true;
-  }
-
-  final oracleText = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-  if (oracleText.contains('search your library for a basic land') ||
-      oracleText.contains('search your library for a land')) {
-    return true;
-  }
-
-  const landTypesByColor = <String, String>{
-    'W': 'plains',
-    'U': 'island',
-    'B': 'swamp',
-    'R': 'mountain',
-    'G': 'forest',
-  };
-
-  for (final entry in landTypesByColor.entries) {
-    if (commanderColorIdentity.contains(entry.key) &&
-        oracleText.contains(entry.value)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-bool isOptimizeStructuralRecoveryScenario({
-  required List<Map<String, dynamic>> allCardData,
-  required Set<String> commanderColorIdentity,
-}) {
-  var totalCards = 0;
-  var landCount = 0;
-  var nonLandCount = 0;
-  var colorProducingLandCount = 0;
-
-  for (final card in allCardData) {
-    final qty = (card['quantity'] as int?) ?? 1;
-    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    totalCards += qty;
-
-    if (typeLine.contains('land')) {
-      landCount += qty;
-      if (landProducesCommanderColors(
-        card: card,
-        commanderColorIdentity: commanderColorIdentity,
-      )) {
-        colorProducingLandCount += qty;
-      }
-    } else {
-      nonLandCount += qty;
-    }
-  }
-
-  if (totalCards == 0) return false;
-
-  final landRatio = landCount / totalCards;
-  return landRatio >= 0.65 ||
-      landCount >= 50 ||
-      nonLandCount <= 20 ||
-      (landCount >= 40 && colorProducingLandCount <= 8);
-}
-
-int computeOptimizeStructuralRecoverySwapTarget({
-  required List<Map<String, dynamic>> allCardData,
-  required Set<String> commanderColorIdentity,
-  required String targetArchetype,
-}) {
-  if (!isOptimizeStructuralRecoveryScenario(
-    allCardData: allCardData,
-    commanderColorIdentity: commanderColorIdentity,
-  )) {
-    return 6;
-  }
-
-  var landCount = 0;
-  var nonLandCount = 0;
-  for (final card in allCardData) {
-    final qty = (card['quantity'] as int?) ?? 1;
-    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) {
-      landCount += qty;
-    } else {
-      nonLandCount += qty;
-    }
-  }
-
-  final recommendedLandCount =
-      recommendedLandCountForOptimizeArchetype(targetArchetype);
-  final excessLands = (landCount - recommendedLandCount).clamp(0, 99);
-  final missingNonLands = (58 - nonLandCount).clamp(0, 99);
-
-  return [12, excessLands, missingNonLands]
-      .reduce((a, b) => a < b ? a : b)
-      .clamp(6, 12);
-}
-
-List<String> buildStructuralRecoveryFunctionalNeeds({
-  required List<Map<String, dynamic>> allCardData,
-  required String targetArchetype,
-  required int limit,
-}) {
-  if (limit <= 0) return const [];
-
-  final archetype = targetArchetype.trim().toLowerCase();
-  final targetProfile = switch (archetype) {
-    'control' => const <String, int>{
-        'draw': 14,
-        'ramp': 12,
-        'removal': 10,
-        'wipe': 4,
-        'protection': 4,
-        'utility': 14,
-      },
-    'combo' => const <String, int>{
-        'draw': 14,
-        'ramp': 12,
-        'tutor': 8,
-        'protection': 6,
-        'utility': 18,
-      },
-    'aggro' => const <String, int>{
-        'creature': 18,
-        'ramp': 8,
-        'draw': 8,
-        'removal': 8,
-        'protection': 4,
-        'utility': 14,
-      },
-    _ => const <String, int>{
-        'draw': 12,
-        'ramp': 10,
-        'removal': 8,
-        'creature': 8,
-        'protection': 4,
-        'utility': 16,
-      },
-  };
-
-  final currentCounts = <String, int>{};
-  for (final card in allCardData) {
-    final qty = (card['quantity'] as int?) ?? 1;
-    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) continue;
-
-    final role = inferOptimizeFunctionalNeed(
-      name: (card['name'] as String?) ?? '',
-      typeLine: (card['type_line'] as String?) ?? '',
-      oracleText: (card['oracle_text'] as String?) ?? '',
-    );
-    currentCounts[role] = (currentCounts[role] ?? 0) + qty;
-  }
-
-  final deficits = <MapEntry<String, int>>[];
-  for (final entry in targetProfile.entries) {
-    final deficit = entry.value - (currentCounts[entry.key] ?? 0);
-    if (deficit > 0) {
-      deficits.add(MapEntry(entry.key, deficit));
-    }
-  }
-
-  deficits.sort((a, b) {
-    final byDeficit = b.value.compareTo(a.value);
-    if (byDeficit != 0) return byDeficit;
-    return a.key.compareTo(b.key);
-  });
-
-  final sequence = <String>[];
-  while (sequence.length < limit && deficits.isNotEmpty) {
-    var addedInRound = false;
-    for (var i = 0; i < deficits.length && sequence.length < limit; i++) {
-      final entry = deficits[i];
-      if (entry.value <= 0) continue;
-      sequence.add(entry.key);
-      deficits[i] = MapEntry(entry.key, entry.value - 1);
-      addedInRound = true;
-    }
-    if (!addedInRound) break;
-  }
-
-  if (sequence.length < limit) {
-    final fallbackNeed = switch (archetype) {
-      'control' => 'draw',
-      'combo' => 'draw',
-      'aggro' => 'creature',
-      _ => 'utility',
-    };
-    while (sequence.length < limit) {
-      sequence.add(fallbackNeed);
-    }
-  }
-
-  return sequence;
-}
-
-Map<String, int> buildRoleTargetProfile(String targetArchetype) {
-  final archetype = targetArchetype.toLowerCase();
-  final baseTargets = <String, int>{
-    'ramp': 10,
-    'draw': 10,
-    'removal': 8,
-    'interaction': 6,
-    'engine': 8,
-    'wincon': 4,
-    'utility': 8,
-  };
-
-  if (archetype.contains('control')) {
-    baseTargets['draw'] = 12;
-    baseTargets['removal'] = 10;
-    baseTargets['interaction'] = 8;
-    baseTargets['wincon'] = 3;
-  } else if (archetype.contains('aggro')) {
-    baseTargets['ramp'] = 8;
-    baseTargets['draw'] = 8;
-    baseTargets['engine'] = 10;
-    baseTargets['wincon'] = 6;
-  } else if (archetype.contains('combo')) {
-    baseTargets['ramp'] = 11;
-    baseTargets['draw'] = 12;
-    baseTargets['interaction'] = 8;
-    baseTargets['wincon'] = 5;
-  }
-
-  return baseTargets;
-}
-
-Map<String, int> buildSlotNeedsForDeck({
-  required List<Map<String, dynamic>> currentDeckCards,
-  required String targetArchetype,
-}) {
-  final baseTargets = buildRoleTargetProfile(targetArchetype);
-
-  final current = <String, int>{
-    'ramp': 0,
-    'draw': 0,
-    'removal': 0,
-    'interaction': 0,
-    'engine': 0,
-    'wincon': 0,
-    'utility': 0,
-  };
-
-  var nonLandTotal = 0;
-  for (final c in currentDeckCards) {
-    final typeLine = ((c['type_line'] as String?) ?? '').toLowerCase();
-    if (typeLine.contains('land')) continue;
-
-    final qty = (c['quantity'] as int?) ?? 1;
-    final role = inferFunctionalRole(
-      name: (c['name'] as String?) ?? '',
-      typeLine: (c['type_line'] as String?) ?? '',
-      oracleText: (c['oracle_text'] as String?) ?? '',
-    );
-    current[role] = (current[role] ?? 0) + qty;
-    nonLandTotal += qty;
-  }
-
-  final needs = <String, int>{};
-  for (final entry in baseTargets.entries) {
-    final deficit = entry.value - (current[entry.key] ?? 0);
-    needs[entry.key] = deficit > 0 ? deficit : 0;
-  }
-
-  if (nonLandTotal < 58) {
-    final missingNonLand = 58 - nonLandTotal;
-    needs['utility'] = (needs['utility'] ?? 0) + missingNonLand;
-  }
-
-  return needs;
-}
-
-Future<List<Map<String, dynamic>>> loadDeterministicSlotFillers({
-  required Pool pool,
-  required List<Map<String, dynamic>> currentDeckCards,
-  required String targetArchetype,
-  required Set<String> commanderColorIdentity,
-  required int? bracket,
-  required Set<String> excludeNames,
-  Set<String>? preferredNames,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final slotNeeds = buildSlotNeedsForDeck(
-    currentDeckCards: currentDeckCards,
-    targetArchetype: targetArchetype,
-  );
-
-  final candidates = await loadCompetitiveNonLandFillers(
-    pool: pool,
-    commanderColorIdentity: commanderColorIdentity,
-    bracket: bracket,
-    excludeNames: excludeNames,
-    limit: limit < 80 ? 240 : (limit * 4),
-  );
-
-  if (candidates.isEmpty) return const [];
-
-  final scored = candidates.map((c) {
-    final name = (c['name'] as String?) ?? '';
-    final typeLine = (c['type_line'] as String?) ?? '';
-    final oracle = (c['oracle_text'] as String?) ?? '';
-    final role = inferFunctionalRole(
-      name: name,
-      typeLine: typeLine,
-      oracleText: oracle,
-    );
-
-    final primaryNeed = slotNeeds[role] ?? 0;
-    final utilityNeed = slotNeeds['utility'] ?? 0;
-    final fromAiSuggestion =
-        (preferredNames ?? const <String>{}).contains(name.toLowerCase());
-    final aiBoost = fromAiSuggestion ? 35 : 0;
-    final score = primaryNeed * 100 +
-        (role == 'utility' ? utilityNeed * 10 : 0) +
-        aiBoost;
-
-    return {
-      ...c,
-      '_role': role,
-      '_score': score,
-    };
-  }).toList();
-
-  scored.sort((a, b) {
-    final scoreA = (a['_score'] as int?) ?? 0;
-    final scoreB = (b['_score'] as int?) ?? 0;
-    final byScore = scoreB.compareTo(scoreA);
-    if (byScore != 0) return byScore;
-    final nameA = (a['name'] as String?) ?? '';
-    final nameB = (b['name'] as String?) ?? '';
-    return nameA.compareTo(nameB);
-  });
-
-  return scored.take(limit).map((e) {
-    return {
-      'id': e['id'],
-      'name': e['name'],
-      'type_line': e['type_line'],
-      'oracle_text': e['oracle_text'],
-      'mana_cost': e['mana_cost'],
-      'colors': e['colors'],
-      'color_identity': e['color_identity'],
-    };
-  }).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
-  required Pool pool,
-  required Set<String> commanderColorIdentity,
-  required Set<String> excludeNames,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final identity = commanderColorIdentity.toList();
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity, c.cmc,
-             mi.meta_deck_count, mi.usage_count
-      FROM card_meta_insights mi
-      JOIN cards c ON LOWER(c.name) = LOWER(mi.card_name)
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND c.type_line NOT ILIKE '%land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-        AND c.name NOT LIKE '%World Champion%'
-        AND c.name NOT LIKE '%Heroes of the Realm%'
-        AND (
-          (
-            c.color_identity IS NOT NULL
-            AND (
-              (
-                c.color_identity IS NOT NULL
-                AND (
-                  c.color_identity <@ @identity::text[]
-                  OR c.color_identity = '{}'
-                )
-              )
-              OR (
-                c.color_identity IS NULL
-                AND (
-                  c.colors <@ @identity::text[]
-                  OR c.colors = '{}'
-                  OR c.colors IS NULL
-                )
-              )
-            )
-          )
-          OR (
-            c.color_identity IS NULL
-            AND (
-              c.colors <@ @identity::text[]
-              OR c.colors = '{}'
-              OR c.colors IS NULL
-            )
-          )
-        )
-      ORDER BY mi.meta_deck_count DESC, mi.usage_count DESC, c.name ASC
-      LIMIT @limit
-    '''),
-    parameters: {
-      'identity': identity,
-      'limit': limit,
-    },
-  );
-
-  final mapped = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-            'cmc': safeToDouble(row[7]),
-            'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
-            'usage_count': (row[9] as num?)?.toInt() ?? 0,
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
-
-  final deduped = dedupeCandidatesByName(mapped);
-  deduped.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
-    if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
-  });
-  return deduped.take(limit).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
-  required Pool pool,
-  required Set<String> commanderColorIdentity,
-  required Set<String> excludeNames,
-  required int? bracket,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final identity = commanderColorIdentity.toList();
-  Log.d(
-      '  [broad] start limit=$limit identity=${identity.join(',')} exclude=${excludeNames.length}');
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity, sub.cmc, sub.meta_deck_count, sub.usage_count
-      FROM (
-        SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity, c.cmc,
-          COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
-          COALESCE(cmi.usage_count, 0) AS usage_count,
-          COALESCE(cmi.usage_count, 0) AS pop_score
-        FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND c.type_line NOT ILIKE '%land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-        AND c.name NOT LIKE '%World Champion%'
-          AND c.name NOT LIKE '%Heroes of the Realm%'
-          AND c.oracle_text IS NOT NULL
-          AND (
-            (
-              c.color_identity IS NOT NULL
-              AND (
-                c.color_identity <@ @identity::text[]
-                OR c.color_identity = '{}'
-              )
-            )
-            OR (
-              c.color_identity IS NULL
-              AND (
-                c.colors <@ @identity::text[]
-                OR c.colors = '{}'
-                OR c.colors IS NULL
-              )
-            )
-          )
-        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
-      ) sub
-      ORDER BY sub.pop_score DESC, RANDOM()
-      LIMIT @limit
-    '''),
-    parameters: {
-      'identity': identity,
-      'limit': limit,
-    },
-  );
-
-  Log.d('  [broad] sql rows=${result.length}');
-
-  var candidates = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-            'cmc': safeToDouble(row[7]),
-            'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
-            'usage_count': (row[9] as num?)?.toInt() ?? 0,
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
-  candidates = dedupeCandidatesByName(candidates);
-  candidates.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
-    if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
-  });
-  Log.d('  [broad] dedup rows=${candidates.length}');
-
-  if (bracket != null && candidates.isNotEmpty) {
-    final decision = applyBracketPolicyToAdditions(
-      bracket: bracket,
-      currentDeckCards: const [],
-      additionsCardsData: candidates.map((c) {
-        return {
-          'name': c['name'],
-          'type_line': c['type_line'],
-          'oracle_text': c['oracle_text'],
-          'quantity': 1,
-        };
-      }),
-    );
-    final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-    final filtered = candidates
-        .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
-        .toList();
-    Log.d(
-        '  [broad] bracket=$bracket allowed=${allowedSet.length} filtered=${filtered.length}');
-    if (filtered.isNotEmpty) {
-      candidates = filtered;
-    }
-  }
-
-  Log.d('  [broad] final rows=${candidates.length}');
-  return dedupeCandidatesByName(candidates).take(limit).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadGuaranteedNonBasicFillers({
-  required Pool pool,
-  required List<Map<String, dynamic>> currentDeckCards,
-  required String targetArchetype,
-  required Set<String> commanderColorIdentity,
-  required int? bracket,
-  required Set<String> excludeNames,
-  required Set<String> preferredNames,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final aggregated = <Map<String, dynamic>>[];
-  final seen = <String>{};
-
-  void addUnique(Iterable<Map<String, dynamic>> items) {
-    for (final item in items) {
-      final name = ((item['name'] as String?) ?? '').trim().toLowerCase();
-      if (name.isEmpty || seen.contains(name)) continue;
-      seen.add(name);
-      aggregated.add(item);
-      if (aggregated.length >= limit) return;
-    }
-  }
-
-  final withBracket = await loadDeterministicSlotFillers(
-    pool: pool,
-    currentDeckCards: currentDeckCards,
-    targetArchetype: targetArchetype,
-    commanderColorIdentity: commanderColorIdentity,
-    bracket: bracket,
-    excludeNames: excludeNames,
-    preferredNames: preferredNames,
-    limit: limit,
-  );
-  addUnique(withBracket);
-
-  if (aggregated.length < limit) {
-    final noBracket = await loadDeterministicSlotFillers(
-      pool: pool,
-      currentDeckCards: currentDeckCards,
-      targetArchetype: targetArchetype,
-      commanderColorIdentity: commanderColorIdentity,
-      bracket: null,
-      excludeNames: excludeNames.union(seen),
-      preferredNames: preferredNames,
-      limit: limit - aggregated.length,
-    );
-    addUnique(noBracket);
-  }
-
-  if (aggregated.length < limit) {
-    final metaFillers = await loadMetaInsightFillers(
-      pool: pool,
-      commanderColorIdentity: commanderColorIdentity,
-      excludeNames: excludeNames.union(seen),
-      limit: limit - aggregated.length,
-    );
-    addUnique(metaFillers);
-  }
-
-  if (aggregated.length < limit) {
-    final broadWithBracket = await loadBroadCommanderNonLandFillers(
-      pool: pool,
-      commanderColorIdentity: commanderColorIdentity,
-      excludeNames: excludeNames.union(seen),
-      bracket: bracket,
-      limit: limit - aggregated.length,
-    );
-    addUnique(broadWithBracket);
-  }
-
-  if (aggregated.length < limit) {
-    final broadNoBracket = await loadBroadCommanderNonLandFillers(
-      pool: pool,
-      commanderColorIdentity: commanderColorIdentity,
-      excludeNames: excludeNames.union(seen),
-      bracket: null,
-      limit: limit - aggregated.length,
-    );
-    addUnique(broadNoBracket);
-  }
-
-  return aggregated.take(limit).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
-  required Pool pool,
-  required Set<String> commanderColorIdentity,
-  required int? bracket,
-  required Set<String> excludeNames,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final identity = commanderColorIdentity.toList();
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity
-      FROM (
-        SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
-          COALESCE(cmi.usage_count, 0) AS pop_score
-        FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line NOT ILIKE '%land%'
-          AND c.name NOT LIKE 'A-%'
-          AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-          AND c.name NOT LIKE '%World Champion%'
-          AND c.name NOT LIKE '%Heroes of the Realm%'
-          AND c.oracle_text IS NOT NULL
-          AND (
-            (
-              c.color_identity IS NOT NULL
-              AND (
-                c.color_identity <@ @identity::text[]
-                OR c.color_identity = '{}'
-              )
-            )
-            OR (
-              c.color_identity IS NULL
-              AND (
-                c.colors <@ @identity::text[]
-                OR c.colors = '{}'
-                OR c.colors IS NULL
-              )
-            )
-          )
-        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
-      ) sub
-      ORDER BY sub.pop_score DESC, RANDOM()
-      LIMIT 600
-    '''),
-    parameters: {
-      'identity': identity,
-    },
-  );
-
-  var candidates = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'mana_cost': (row[4] as String?) ?? '',
-            'colors': (row[5] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[6] as List?)?.cast<String>() ?? const <String>[],
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-          commanderColorIdentity: commanderColorIdentity,
-          enforceCommanderIdentity: true,
-        ),
-      )
-      .toList();
-  candidates = dedupeCandidatesByName(candidates);
-
-  if (candidates.length < limit) {
-    final stapleNames = [
-      'Sol Ring',
-      'Arcane Signet',
-      'Mind Stone',
-      'Fellwar Stone',
-      'Swiftfoot Boots',
-      'Lightning Greaves',
-      'Command Tower',
-      'Demonic Tutor',
-      'Vampiric Tutor',
-      'Rhystic Study',
-      'Necropotence',
-      'Cyclonic Rift',
-      'Swords to Plowshares',
-      'Anguished Unmaking',
-      'Beast Within',
-      'Nature' 's Claim',
-      'Counterspell',
-      'Mana Drain',
-      'Fact or Fiction',
-      'Ponder',
-      'Preordain',
-      'Brainstorm',
-      'Signet',
-      'Talisman',
-      'Dark Ritual',
-      'Reanimate',
-      'Animate Dead',
-      'Eternal Witness',
-      'Regrowth',
-      'Hero' 's Downfall',
-      'Mortify',
-      'Path to Exile',
-      'Generous Gift',
-      'Chaos Warp',
-      'Krosan Grip',
-      'Disenchant',
-      'Return to Nature',
-      'Mana Leak',
-      'Force of Will',
-      'Force of Negation',
-      'Teferi' 's Protection',
-      'Toxic Deluge',
-      'Blasphemous Act',
-      'Boardwipe',
-      'Draw',
-      'Ramp',
-      'Removal'
-    ];
-    final stapleResult = await pool.execute(
-      Sql.named('''
-        SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
-        FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND LOWER(c.name) IN (SELECT LOWER(unnest(@names::text[])))
-          AND (
-            c.color_identity <@ @identity::text[]
-            OR c.color_identity = '{}'
-          )
-      '''),
-      parameters: {
-        'names': stapleNames,
-        'identity': identity,
-      },
-    );
-    final stapleCandidates = stapleResult
-        .map((row) => {
-              'id': row[0] as String,
-              'name': row[1] as String,
-              'type_line': (row[2] as String?) ?? '',
-              'oracle_text': (row[3] as String?) ?? '',
-              'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-              'color_identity':
-                  (row[5] as List?)?.cast<String>() ?? const <String>[],
-            })
-        .where(
-            (c) => !excludeNames.contains((c['name'] as String).toLowerCase()))
-        .toList();
-    candidates.addAll(stapleCandidates);
-    candidates = dedupeCandidatesByName(candidates);
-    if (candidates.isEmpty) {
-      print('[COMPLETE FILLER] Pool vazio, fallback para staples universais.');
-    } else if (stapleCandidates.isNotEmpty) {
-      print(
-          '[COMPLETE FILLER] Pool expandido com staples universais: ${stapleCandidates.length}');
-    }
-  }
-
-  if (bracket != null && candidates.isNotEmpty) {
-    final decision = applyBracketPolicyToAdditions(
-      bracket: bracket,
-      currentDeckCards: const [],
-      additionsCardsData: candidates.map((c) {
-        return {
-          'name': c['name'],
-          'type_line': c['type_line'],
-          'oracle_text': c['oracle_text'],
-          'quantity': 1,
-        };
-      }),
-    );
-    final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-    final filtered = candidates
-        .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
-        .toList();
-
-    if (filtered.isNotEmpty) {
-      candidates = filtered;
-    }
-  }
-
-  return dedupeCandidatesByName(candidates).take(limit).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
-  required Pool pool,
-  required Set<String> excludeNames,
-  required int? bracket,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity
-      FROM (
-        SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
-          COALESCE(cmi.usage_count, 0) AS pop_score
-        FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line NOT ILIKE '%land%'
-          AND c.name NOT LIKE 'A-%'
-          AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-          AND c.name NOT LIKE '%World Champion%'
-          AND c.name NOT LIKE '%Heroes of the Realm%'
-        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
-      ) sub
-      ORDER BY sub.pop_score DESC, RANDOM()
-      LIMIT @limit
-    '''),
-    parameters: {
-      'limit': limit * 3,
-    },
-  );
-
-  var candidates = result
-      .map((row) => {
-            'id': row[0] as String,
-            'name': row[1] as String,
-            'type_line': (row[2] as String?) ?? '',
-            'oracle_text': (row[3] as String?) ?? '',
-            'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
-            'color_identity':
-                (row[5] as List?)?.cast<String>() ?? const <String>[],
-          })
-      .where(
-        (candidate) => shouldKeepCommanderFillerCandidate(
-          candidate: candidate,
-          excludeNames: excludeNames,
-        ),
-      )
-      .toList();
-  candidates = dedupeCandidatesByName(candidates);
-
-  if (bracket != null && candidates.isNotEmpty) {
-    final decision = applyBracketPolicyToAdditions(
-      bracket: bracket,
-      currentDeckCards: const [],
-      additionsCardsData: candidates.map((c) {
-        return {
-          'name': c['name'],
-          'type_line': c['type_line'],
-          'oracle_text': c['oracle_text'],
-          'quantity': 1,
-        };
-      }),
-    );
-    final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-    final filtered = candidates
-        .where((c) => allowedSet.contains((c['name'] as String).toLowerCase()))
-        .toList();
-    if (filtered.isNotEmpty) {
-      candidates = filtered;
-    }
-  }
-
-  return dedupeCandidatesByName(candidates).take(limit).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
-  required Pool pool,
-  required Set<String> commanderColorIdentity,
-  required Set<String> excludeNames,
-  required int limit,
-}) async {
-  if (limit <= 0) return const [];
-
-  Log.d(
-      '  [identity-safe] start limit=$limit identity=${commanderColorIdentity.join(',')} exclude=${excludeNames.length}');
-
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity
-      FROM (
-        SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
-          COALESCE(cmi.usage_count, 0) AS pop_score
-        FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-          AND c.type_line NOT ILIKE '%land%'
-          AND c.name NOT LIKE 'A-%'
-          AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-          AND c.name NOT LIKE '%World Champion%'
-          AND c.name NOT LIKE '%Heroes of the Realm%'
-        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
-      ) sub
-      ORDER BY sub.pop_score DESC, RANDOM()
-      LIMIT 4000
-    '''),
-  );
-
-  Log.d('  [identity-safe] sql rows=${result.length}');
-
-  final filtered = <Map<String, dynamic>>[];
-  for (final row in result) {
-    final id = row[0] as String;
-    final name = row[1] as String;
-    final lowerName = name.toLowerCase();
-    if (excludeNames.contains(lowerName)) continue;
-
-    final typeLine = (row[2] as String?) ?? '';
-    final oracleText = (row[3] as String?) ?? '';
-    final manaCost = (row[4] as String?) ?? '';
-    final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
-    final colorIdentity = (row[6] as List?)?.cast<String>() ?? const <String>[];
-
-    final withinIdentity = isWithinCommanderIdentity(
-      cardIdentity: resolvedCardIdentityFromParts(
-        colorIdentity: colorIdentity,
-        colors: colors,
-        oracleText: oracleText,
-        manaCost: manaCost,
-      ),
-      commanderIdentity: commanderColorIdentity,
-    );
-    if (!withinIdentity) continue;
-    final candidate = {
-      'id': id,
-      'name': name,
-      'type_line': typeLine,
-      'oracle_text': oracleText,
-      'mana_cost': manaCost,
-      'colors': colors,
-      'color_identity': colorIdentity,
-    };
-    if (!shouldKeepCommanderFillerCandidate(
-      candidate: candidate,
-      excludeNames: excludeNames,
-      commanderColorIdentity: commanderColorIdentity,
-      enforceCommanderIdentity: true,
-    )) {
-      continue;
-    }
-
-    filtered.add(candidate);
-  }
-
-  Log.d('  [identity-safe] filtered rows=${filtered.length}');
-
-  return dedupeCandidatesByName(filtered).take(limit).toList();
-}
-
-Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
-  required Pool pool,
-  required Set<String> preferredNames,
-  required Set<String> commanderColorIdentity,
-  required Set<String> excludeNames,
-  required int limit,
-}) async {
-  if (limit <= 0 || preferredNames.isEmpty) return const [];
-
-  final normalizedPreferred = preferredNames
-      .map((name) => name.trim().toLowerCase())
-      .where((name) => name.isNotEmpty)
-      .toSet();
-  if (normalizedPreferred.isEmpty) return const [];
-
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT
-        c.id::text,
-        c.name,
-        c.type_line,
-        c.oracle_text,
-        c.mana_cost,
-        c.colors,
-        c.color_identity,
-        c.cmc,
-        COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
-        COALESCE(cmi.usage_count, 0) AS usage_count
-      FROM cards c
-      LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-      WHERE LOWER(name) = ANY(@preferred::text[])
-        AND type_line NOT ILIKE '%land%'
-      ORDER BY COALESCE(cmi.meta_deck_count, 0) DESC,
-               COALESCE(cmi.usage_count, 0) DESC,
-               c.name ASC
-    '''),
-    parameters: {
-      'preferred': normalizedPreferred.toList(),
-    },
-  );
-
-  final filtered = <Map<String, dynamic>>[];
-  for (final row in result) {
-    final id = row[0] as String;
-    final name = row[1] as String;
-    final lowerName = name.toLowerCase();
-    if (excludeNames.contains(lowerName)) continue;
-
-    final typeLine = (row[2] as String?) ?? '';
-    final oracleText = (row[3] as String?) ?? '';
-    final manaCost = (row[4] as String?) ?? '';
-    final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
-    final colorIdentity = (row[6] as List?)?.cast<String>() ?? const <String>[];
-
-    final withinIdentity = isWithinCommanderIdentity(
-      cardIdentity: resolvedCardIdentityFromParts(
-        colorIdentity: colorIdentity,
-        colors: colors,
-        oracleText: oracleText,
-        manaCost: manaCost,
-      ),
-      commanderIdentity: commanderColorIdentity,
-    );
-    if (!withinIdentity) continue;
-    final candidate = {
-      'id': id,
-      'name': name,
-      'type_line': typeLine,
-      'oracle_text': oracleText,
-      'mana_cost': manaCost,
-      'colors': colors,
-      'color_identity': colorIdentity,
-      'cmc': safeToDouble(row[7]),
-      'meta_deck_count': (row[8] as num?)?.toInt() ?? 0,
-      'usage_count': (row[9] as num?)?.toInt() ?? 0,
-    };
-    if (!shouldKeepCommanderFillerCandidate(
-      candidate: candidate,
-      excludeNames: excludeNames,
-      commanderColorIdentity: commanderColorIdentity,
-      enforceCommanderIdentity: true,
-    )) {
-      continue;
-    }
-
-    filtered.add(candidate);
-  }
-
-  filtered.sort((a, b) {
-    final byQuality = commanderFillerQualityScore(b)
-        .compareTo(commanderFillerQualityScore(a));
-    if (byQuality != 0) return byQuality;
-    return ((a['name'] as String?) ?? '')
-        .compareTo((b['name'] as String?) ?? '');
-  });
-
-  final floor = filtered.length > limit ? 25 : -999;
-  final qualityFiltered = filtered
-      .where((candidate) => commanderFillerQualityScore(candidate) >= floor)
-      .toList();
-  final source = qualityFiltered.isNotEmpty ? qualityFiltered : filtered;
-
-  return dedupeCandidatesByName(source).take(limit).toList();
 }
 
 Future<List<Map<String, dynamic>>> findSynergyReplacements({
@@ -1945,55 +607,6 @@ List<T> dedupeCandidatesByName<T extends Map<String, Object?>>(
   return output;
 }
 
-const _weakCommanderFillerDenylist = <String>{
-  'ancestral reminiscence',
-  'bane\'s contingency',
-  'body of knowledge',
-  'cancel',
-  'diviner\'s portent',
-  'didn\'t say please',
-  'dream fracture',
-  'dreamstone hedron',
-  'forced fruition',
-  'palladium myr',
-  'prismatic lens',
-  'sisay\'s ring',
-  'silver myr',
-  'stonespeaker crystal',
-  'ur-golem\'s eye',
-};
-
-const _premiumCommanderFillerNames = <String>{
-  'arcane denial',
-  'arcane signet',
-  'brainstorm',
-  'chrome mox',
-  'counterspell',
-  'cyclonic rift',
-  'fact or fiction',
-  'fierce guardianship',
-  'force of negation',
-  'force of will',
-  'grim monolith',
-  'lightning greaves',
-  'mana drain',
-  'mana vault',
-  'mental misstep',
-  'mind stone',
-  'mox diamond',
-  'mystical tutor',
-  'negate',
-  'pact of negation',
-  'ponder',
-  'preordain',
-  'rhystic study',
-  'sol ring',
-  'swan song',
-  'swiftfoot boots',
-  'thassa\'s oracle',
-  'thought vessel',
-};
-
 bool shouldKeepCommanderFillerCandidate({
   required Map<String, dynamic> candidate,
   required Set<String> excludeNames,
@@ -2004,7 +617,7 @@ bool shouldKeepCommanderFillerCandidate({
   final name = (rawName is String ? rawName : '').trim().toLowerCase();
   if (name.isEmpty) return false;
   if (excludeNames.contains(name)) return false;
-  if (_weakCommanderFillerDenylist.contains(name)) return false;
+  if (commanderWeakFillerDenylist.contains(name)) return false;
 
   if (enforceCommanderIdentity || commanderColorIdentity.isNotEmpty) {
     final withinIdentity = isWithinCommanderIdentity(
@@ -2038,6 +651,10 @@ int commanderFillerQualityScore(Map<String, dynamic> candidate) {
     name: name,
     typeLine: typeLine,
     oracleText: oracleText,
+    functionalTags: candidate['functional_tags'],
+    semanticTagsV2: candidate['semantic_tags_v2'],
+    manaCost: candidate['mana_cost']?.toString(),
+    cmc: candidate['cmc'],
   );
   final metaDeckCount = (candidate['meta_deck_count'] as num?)?.toInt() ?? 0;
   final usageCount = (candidate['usage_count'] as num?)?.toInt() ?? 0;
@@ -2047,7 +664,7 @@ int commanderFillerQualityScore(Map<String, dynamic> candidate) {
   score += metaDeckCount * 3;
   score += usageCount ~/ 8;
 
-  if (_premiumCommanderFillerNames.contains(name)) {
+  if (commanderPremiumFillerNames.contains(name)) {
     score += 160;
   }
 
@@ -2134,7 +751,26 @@ String inferFunctionalRole({
   required String name,
   required String typeLine,
   required String oracleText,
+  Object? functionalTags,
+  Object? semanticTagsV2,
+  String? manaCost,
+  Object? cmc,
 }) {
+  if (functionalTags != null || semanticTagsV2 != null) {
+    final resolved = resolveCardFunctionalRoles(
+      functionalTags: functionalTags,
+      semanticTagsV2: semanticTagsV2,
+      oracleText: oracleText,
+      typeLine: typeLine,
+      name: name,
+      manaCost: manaCost,
+      cmc: cmc,
+    );
+    if (resolved.isNotEmpty && resolved.source != 'heuristic') {
+      return _legacyOptimizeRoleForResolvedRoles(resolved.roles);
+    }
+  }
+
   final n = name.toLowerCase();
   final t = typeLine.toLowerCase();
   final o = oracleText.toLowerCase();
@@ -2176,6 +812,48 @@ String inferFunctionalRole({
   }
 
   if (t.contains('creature')) return 'engine';
+  return 'utility';
+}
+
+String inferFunctionalRoleForCard(Map<String, dynamic> card) {
+  return inferFunctionalRole(
+    name: (card['name'] as String?) ?? '',
+    typeLine: (card['type_line'] as String?) ?? '',
+    oracleText: (card['oracle_text'] as String?) ?? '',
+    functionalTags: card['functional_tags'],
+    semanticTagsV2: card['semantic_tags_v2'],
+    manaCost: card['mana_cost']?.toString(),
+    cmc: card['cmc'],
+  );
+}
+
+String _legacyOptimizeRoleForResolvedRoles(Set<String> roles) {
+  if (roles.contains('ramp') || roles.contains('ritual')) return 'ramp';
+  if (roles.contains('draw') ||
+      roles.contains('loot') ||
+      roles.contains('exile_value')) return 'draw';
+  if (roles.contains('removal') ||
+      roles.contains('wipe') ||
+      roles.contains('board_wipe')) return 'removal';
+  if (roles.contains('interaction') ||
+      roles.contains('counterspell') ||
+      roles.contains('protection')) return 'interaction';
+  if (roles.contains('wincon') ||
+      roles.contains('combo_piece') ||
+      roles.contains('alt_win')) return 'wincon';
+  if (roles.contains('engine') ||
+      roles.contains('payoff') ||
+      roles.contains('enabler') ||
+      roles.contains('etb') ||
+      roles.contains('blink') ||
+      roles.contains('token_maker') ||
+      roles.contains('sacrifice_outlet') ||
+      roles.contains('graveyard_synergy') ||
+      roles.contains('artifact_synergy') ||
+      roles.contains('enchantment_synergy') ||
+      roles.contains('spellslinger') ||
+      roles.contains('aristocrat_payoff') ||
+      roles.contains('creature')) return 'engine';
   return 'utility';
 }
 
@@ -2799,11 +1477,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         continue;
       }
 
-      final role = inferFunctionalRole(
-        name: (card['name'] as String?) ?? '',
-        typeLine: (card['type_line'] as String?) ?? '',
-        oracleText: (card['oracle_text'] as String?) ?? '',
-      );
+      final role = inferFunctionalRoleForCard(card);
       currentRoleCounts[role] = (currentRoleCounts[role] ?? 0) + qty;
     }
 
@@ -2821,11 +1495,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       final isLand = typeLine.toLowerCase().contains('land');
       if (isLand) continue;
 
-      final role = inferFunctionalRole(
-        name: name,
-        typeLine: typeLine,
-        oracleText: (card['oracle_text'] as String?) ?? '',
-      );
+      final role = inferFunctionalRoleForCard(card);
       final currentRole = currentRoleCounts[role] ?? 0;
       final targetRole = roleTargets[role] ?? 0;
       final surplus = (currentRole - targetRole).clamp(0, 99);
@@ -2851,9 +1521,9 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         recommendedLandCountForOptimizeArchetype(targetArchetype);
     final excessLands = landCount - recommendedLandCount;
 
-    // Evitar cortar terrenos só porque está 1-3 acima do recomendado.
-    // Em decks saudáveis (especialmente control), isso frequentemente aumenta screw.
-    // Mantemos o corte de lands apenas quando há excesso material.
+    // Evitar cortar terrenos sÃ³ porque estÃ¡ 1-3 acima do recomendado.
+    // Em decks saudÃ¡veis (especialmente control), isso frequentemente aumenta screw.
+    // Mantemos o corte de lands apenas quando hÃ¡ excesso material.
     if (excessLands >= 4) {
       for (final card in allCardData) {
         final name = ((card['name'] as String?) ?? '').trim();
@@ -2901,10 +1571,10 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       }
     }
 
-    // Se o deck está "saudável" (sem excesso claro de papéis) o algoritmo por surplus
-    // pode ficar sem alvos e acabar forçando cortes de terrenos (que frequentemente
+    // Se o deck estÃ¡ "saudÃ¡vel" (sem excesso claro de papÃ©is) o algoritmo por surplus
+    // pode ficar sem alvos e acabar forÃ§ando cortes de terrenos (que frequentemente
     // pioram mana screw). Neste caso, preferimos sugerir 1-2 cortes de topo de curva
-    // fora de papéis críticos para abrir espaço a upgrades mais baratos.
+    // fora de papÃ©is crÃ­ticos para abrir espaÃ§o a upgrades mais baratos.
     final nonLandRemovalCount =
         removalCandidates.where((c) => (c['role'] as String?) != 'land').length;
     if (!structuralRecoveryScenario &&
@@ -2938,11 +1608,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
         if (cmc < 6) continue;
 
-        final role = inferFunctionalRole(
-          name: name,
-          typeLine: typeLine,
-          oracleText: (card['oracle_text'] as String?) ?? '',
-        );
+        final role = inferFunctionalRoleForCard(card);
         if (criticalRoles.contains(role)) continue;
 
         final preferredPenalty = preferredNames.contains(lower) ? 220 : 0;
@@ -3219,7 +1885,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       ..['ranked_before_quality_gate'] = true;
   }
 
-  // Em decks já saudáveis, reduzir o número de swaps diminui risco de regressão.
+  // Em decks jÃ¡ saudÃ¡veis, reduzir o nÃºmero de swaps diminui risco de regressÃ£o.
   final maxPairs = structuralRecoveryScenario
       ? computeOptimizeStructuralRecoverySwapTarget(
           allCardData: allCardData,
@@ -3249,7 +1915,7 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
             .toSet()
         : const <String>{};
     final semanticNote = sources.contains(semanticLayerV2Source)
-        ? ' Sinal semântico v2 em shadow mode ajudou o ranking; gates legados continuam valendo.'
+        ? ' Sinal semÃ¢ntico v2 em shadow mode ajudou o ranking; gates legados continuam valendo.'
         : '';
     return {
       'out': candidate['remove'],
@@ -3282,7 +1948,7 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
         returnedSwaps: swaps.length,
       ),
     'reasoning':
-        'O backend priorizou swaps determinísticos para $targetArchetype antes da IA, usando função das cartas, prioridade competitiva do comandante e histórico de rejeição.',
+        'O backend priorizou swaps determinÃ­sticos para $targetArchetype antes da IA, usando funÃ§Ã£o das cartas, prioridade competitiva do comandante e histÃ³rico de rejeiÃ§Ã£o.',
     'swaps': swaps,
   };
 }
@@ -3481,38 +2147,7 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
 }) async {
   if (limit <= 0) return const [];
 
-  const preferred = <String>[
-    'Sol Ring',
-    'Arcane Signet',
-    'Command Tower',
-    'Mind Stone',
-    'Wayfarer\'s Bauble',
-    'Swiftfoot Boots',
-    'Lightning Greaves',
-    'Swords to Plowshares',
-    'Path to Exile',
-    'Beast Within',
-    'Generous Gift',
-    'Counterspell',
-    'Negate',
-    'Arcane Denial',
-    'Brainstorm',
-    'Swan Song',
-    'Mystical Tutor',
-    'Cyclonic Rift',
-    'Rhystic Study',
-    'Ponder',
-    'Preordain',
-    'Fact or Fiction',
-    'Read the Bones',
-    'Cultivate',
-    'Kodama\'s Reach',
-    'Farseek',
-    'Nature\'s Lore',
-    'Three Visits',
-  ];
-
-  final filteredPreferred = preferred
+  final filteredPreferred = universalCommanderFallbackNames
       .where((name) => !excludeNames.contains(name.toLowerCase()))
       .toList();
   if (filteredPreferred.isEmpty) return const [];
@@ -3565,56 +2200,11 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
 }) async {
   if (limit <= 0) return const [];
 
-  final identity = commanderColorIdentity.map((e) => e.toUpperCase()).toSet();
-  final archetype = targetArchetype.toLowerCase();
-  final theme = (detectedTheme ?? '').toLowerCase();
-  final names = <String>{
-    'The One Ring',
-    'Fellwar Stone',
-    'Swiftfoot Boots',
-    'Mystic Remora',
-    'Swan Song',
-    'An Offer You Can\'t Refuse',
-  };
-
-  if (identity.length == 1 && identity.contains('U')) {
-    names.addAll(const {
-      'Fabricate',
-      'Merchant Scroll',
-      'Muddle the Mixture',
-      'Pongify',
-      'Rapid Hybridization',
-      'Reality Shift',
-      'Resculpt',
-      'Spell Pierce',
-      'Solve the Equation',
-      'Windfall',
-      'Whir of Invention',
-    });
-
-    if (archetype.contains('combo') || archetype.contains('control')) {
-      names.addAll(const {
-        'High Tide',
-        'Jace, Wielder of Mysteries',
-        'Long-Term Plans',
-        'Personal Tutor',
-        'Transmute Artifact',
-        'Tezzeret the Seeker',
-      });
-    }
-
-    if (theme.contains('proliferate') || theme.contains('phyrexian')) {
-      names.addAll(const {
-        'Contentious Plan',
-        'Experimental Augury',
-        'Inexorable Tide',
-        'Prologue to Phyresis',
-        'Tekuthal, Inquiry Dominus',
-        'Tezzeret\'s Gambit',
-        'Thrummingbird',
-      });
-    }
-  }
+  final names = commanderFoundationNamesFor(
+    commanderColorIdentity: commanderColorIdentity,
+    targetArchetype: targetArchetype,
+    detectedTheme: detectedTheme,
+  );
 
   final filteredNames = names
       .where((name) => !excludeNames.contains(name.toLowerCase()))
@@ -3992,9 +2582,9 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   String? risk,
 }) {
   final confidenceScore = _confidenceScoreFromLevel(confidenceLevel);
-  final action = type == 'add' ? 'entrada' : 'saída';
+  final action = type == 'add' ? 'entrada' : 'saÃ­da';
   final curveDelta = (cmcAfter - cmcBefore).toStringAsFixed(2);
-  final isBasicLand = _isBasicLandName(name);
+  final isBasicLand = basic_lands.isBasicLandName(name);
   final resolvedRole = (functionalRole == null || functionalRole.trim().isEmpty)
       ? 'utility'
       : functionalRole.trim();
@@ -4010,14 +2600,14 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
     'priority': priority ?? (type == 'add' ? 'High' : 'Medium'),
     'risk': risk ?? (keepTheme ? 'low' : 'medium'),
     'reason':
-        'Sugestão de $action para alinhar o deck ao plano ${targetArchetype.toLowerCase()} e melhorar consistência geral.',
+        'SugestÃ£o de $action para alinhar o deck ao plano ${targetArchetype.toLowerCase()} e melhorar consistÃªncia geral.',
     'confidence': {
       'level': confidenceLevel,
       'score': confidenceScore,
     },
     'impact_estimate': {
-      'curve': 'ΔCMC $curveDelta',
-      'consistency': keepTheme ? 'alta' : 'média',
+      'curve': 'Î”CMC $curveDelta',
+      'consistency': keepTheme ? 'alta' : 'mÃ©dia',
       'synergy': type == 'add' ? 'melhora' : 'ajuste',
       'legality': 'mantida',
       'risk': risk ?? (keepTheme ? 'low' : 'medium'),
@@ -4030,7 +2620,7 @@ double _confidenceScoreFromLevel(String level) {
     case 'alta':
     case 'high':
       return 0.9;
-    case 'média':
+    case 'mÃ©dia':
     case 'media':
     case 'medium':
       return 0.7;
@@ -4179,19 +2769,4 @@ int _toInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
   return int.tryParse(value.toString()) ?? 0;
-}
-
-bool _isBasicLandName(String name) {
-  final normalized = name.trim().toLowerCase();
-  return normalized == 'plains' ||
-      normalized == 'island' ||
-      normalized == 'swamp' ||
-      normalized == 'mountain' ||
-      normalized == 'forest' ||
-      normalized == 'wastes' ||
-      normalized == 'snow-covered plains' ||
-      normalized == 'snow-covered island' ||
-      normalized == 'snow-covered swamp' ||
-      normalized == 'snow-covered mountain' ||
-      normalized == 'snow-covered forest';
 }

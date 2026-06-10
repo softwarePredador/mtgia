@@ -1,0 +1,392 @@
+{
+  "replay_files": [
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_990.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_990.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_991.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_991.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_992.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_992.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_993.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_993.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_994.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_994.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_995.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_995.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_996.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_996.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_997.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_997.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_998.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_998.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_999.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_999.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1000.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1000.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1001.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1001.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1002.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1002.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1003.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1003.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1004.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1004.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1005.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1005.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1006.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1006.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1007.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1007.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1008.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1008.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1009.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1009.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1010.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1010.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1011.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1011.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1012.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1012.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1013.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1013.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1014.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1014.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1015.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1015.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1016.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1016.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1017.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1017.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1018.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1018.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1019.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1019.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1020.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1020.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1021.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1021.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1022.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1022.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1023.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1023.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1024.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1024.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1025.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1025.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1026.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1026.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1027.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1027.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1028.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1028.txt"
+    },
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1029.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_1029.txt"
+    }
+  ],
+  "rule_findings": [],
+  "summary": {
+    "by_effect": {
+      "approach": 8,
+      "board_wipe": 26,
+      "commander": 66,
+      "copy_spell": 54,
+      "counter": 102,
+      "creature": 187,
+      "damage_each_opponent": 4,
+      "deal_damage": 10,
+      "draw_cards": 319,
+      "draw_engine": 146,
+      "equipment_haste_shroud": 18,
+      "extra_turn": 2,
+      "finisher": 52,
+      "hate_artifact": 20,
+      "indestructible": 24,
+      "land": 1051,
+      "land_ramp": 15,
+      "land_recursion": 3,
+      "modal_boros_charm": 22,
+      "overload_recursion": 12,
+      "passive": 16,
+      "phase_creatures": 4,
+      "phase_out": 18,
+      "protect_creature": 2,
+      "pump_all": 4,
+      "ramp_engine": 92,
+      "ramp_permanent": 305,
+      "ramp_ritual": 150,
+      "recursion": 22,
+      "redirect_removal": 36,
+      "remove_artifact_or_3dmg": 8,
+      "remove_creature": 66,
+      "remove_permanent": 74,
+      "silence_opponents": 137,
+      "token_maker": 62,
+      "topdeck_manipulation": 40,
+      "treasure_maker": 8,
+      "tutor": 189
+    },
+    "by_source": {
+      "curated": 2280,
+      "known_cards_manual": 970,
+      "type_line_creature": 124
+    },
+    "by_status": {
+      "fact": 124,
+      "verified": 3250
+    },
+    "card_event_count": 3374,
+    "cards_by_source": {
+      "curated": [
+        "Abstergo Entertainment",
+        "Aetherflux Reservoir",
+        "Agatha's Soul Cauldron",
+        "An Offer You Can't Refuse",
+        "Ancient Den",
+        "Ancient Tomb",
+        "Archivist of Oghma",
+        "Arid Archway",
+        "Arid Mesa",
+        "Basalt Monolith",
+        "Battlefield Forge",
+        "Bayou",
+        "Birds of Paradise",
+        "Birgi, God of Storytelling",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Blood Crypt",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Boseiju, Who Endures",
+        "Boseiju, Who Shelters All",
+        "Brain Freeze",
+        "Breeding Pool",
+        "Cabal Ritual",
+        "Cavern of Souls",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "Cinder Glade",
+        "City of Brass",
+        "City of Traitors",
+        "Clifftop Retreat",
+        "Clock of Omens",
+        "Command Tower",
+        "Crystal Vein",
+        "Culling Ritual",
+        "Culling the Weak",
+        "Cyclonic Rift",
+        "Dark Ritual",
+        "Darksteel Citadel",
+        "Deafening Silence",
+        "Defense Grid"
+      ],
+      "known_cards_manual": [
+        "Abrade",
+        "Approach of the Second Sun",
+        "Arcane Signet",
+        "Artist's Talent",
+        "Assassin's Trophy",
+        "Blasphemous Act",
+        "Blind Obedience",
+        "Boros Charm",
+        "Boros Signet",
+        "Bottle-Cap Blast",
+        "Brainstorm",
+        "Chaos Warp",
+        "Cityscape Leveler",
+        "Cloud of Faeries",
+        "Commandeer",
+        "Cultivate",
+        "Deadly Rollick",
+        "Deflecting Swat",
+        "Delivery Moogle",
+        "Demonic Counsel",
+        "Desperate Ritual",
+        "Diabolic Intent",
+        "Dragon's Rage Channeler",
+        "Enlightened Tutor",
+        "Entomb",
+        "Esper Sentinel",
+        "Expedition Map",
+        "Explore",
+        "Explosive Vegetation",
+        "Forsaken Monument",
+        "Galadriel's Dismissal",
+        "Gamble",
+        "Generous Gift",
+        "Gitaxian Probe",
+        "Glaring Fleshraker",
+        "Goblin Engineer",
+        "Grand Abolisher",
+        "Gravecrawler",
+        "Grist, the Hunger Tide",
+        "Harmonize"
+      ],
+      "type_line_creature": [
+        "Elsha of the Infinite",
+        "Kraum, Ludevic's Opus",
+        "Marneus Calgar",
+        "Rograkh, Son of Rohgahh",
+        "Thrasios, Triton Hero",
+        "Zhulodok, Void Gorger",
+        "Zirda, the Dawnwaker"
+      ]
+    },
+    "cards_by_status": {
+      "fact": [
+        "Elsha of the Infinite",
+        "Kraum, Ludevic's Opus",
+        "Marneus Calgar",
+        "Rograkh, Son of Rohgahh",
+        "Thrasios, Triton Hero",
+        "Zhulodok, Void Gorger",
+        "Zirda, the Dawnwaker"
+      ],
+      "verified": [
+        "Abrade",
+        "Abstergo Entertainment",
+        "Aetherflux Reservoir",
+        "Agatha's Soul Cauldron",
+        "An Offer You Can't Refuse",
+        "Ancient Den",
+        "Ancient Tomb",
+        "Approach of the Second Sun",
+        "Arcane Signet",
+        "Archivist of Oghma",
+        "Arid Archway",
+        "Arid Mesa",
+        "Artist's Talent",
+        "Assassin's Trophy",
+        "Basalt Monolith",
+        "Battlefield Forge",
+        "Bayou",
+        "Birds of Paradise",
+        "Birgi, God of Storytelling",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Blasphemous Act",
+        "Blind Obedience",
+        "Blood Crypt",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Boros Charm",
+        "Boros Signet",
+        "Boseiju, Who Endures",
+        "Boseiju, Who Shelters All",
+        "Bottle-Cap Blast",
+        "Brain Freeze",
+        "Brainstorm",
+        "Breeding Pool",
+        "Cabal Ritual",
+        "Cavern of Souls",
+        "Chain of Vapor",
+        "Chaos Warp",
+        "Chrome Mox",
+        "Cinder Glade",
+        "City of Brass"
+      ]
+    },
+    "unique_cards": 354
+  },
+  "turn_findings": [
+    {
+      "event": "removal_resolved",
+      "finding": "Removal hit a low-power target while multiple targets were available.",
+      "player": "Kraum, Ludevic's Opus #86 (real)",
+      "replay_id": "seed_991",
+      "severity": "low",
+      "turn": 7
+    },
+    {
+      "event": "removal_resolved",
+      "finding": "Removal hit a low-power target while multiple targets were available.",
+      "player": "Elsha of the Infinite #96 (real)",
+      "replay_id": "seed_1013",
+      "severity": "low",
+      "turn": 3
+    },
+    {
+      "event": "turn_end",
+      "finding": "Cleanup discarded 13 cards; inspect draw/hand overflow sequencing.",
+      "player": "Elsha of the Infinite #96 (real)",
+      "replay_id": "seed_1024",
+      "severity": "medium",
+      "turn": 12
+    }
+  ]
+}

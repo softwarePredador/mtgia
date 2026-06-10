@@ -16,7 +16,7 @@ void main() {
         'horizontal_overflow_px': 0.0,
         'vertical_overflow_px': 0.0,
         'visual_skin_applied': true,
-        'ui_font_family': 'Manrope, sans-serif',
+        'ui_font_family': 'Inter, sans-serif',
         'document_fonts_status': 'loaded',
         'ui_font_ready': true,
         'display_font_ready': true,
@@ -36,11 +36,11 @@ void main() {
         'game_timer_count': 1,
         'game_timer_paused_count': 0,
         'game_timer_text': '01:05',
-        'game_timer_font_family': 'Manrope, sans-serif',
+        'game_timer_font_family': 'Inter, sans-serif',
         'game_timer_font_size': 32.0,
         'clock_count': 1,
         'clock_with_game_timer_count': 1,
-        'turn_tracker_font_family': 'Manrope, sans-serif',
+        'turn_tracker_font_family': 'Inter, sans-serif',
         'turn_tracker_font_size': 21.0,
         'player_card_count': 4,
       });
@@ -50,7 +50,7 @@ void main() {
       expect(snapshot.gameTimerPausedCount, 0);
       expect(snapshot.gameTimerText, '01:05');
       expect(snapshot.visualSkinApplied, isTrue);
-      expect(snapshot.uiFontFamily, contains('Manrope'));
+      expect(snapshot.uiFontFamily, contains('Inter'));
       expect(snapshot.documentFontsStatus, 'loaded');
       expect(snapshot.uiFontReady, isTrue);
       expect(snapshot.displayFontReady, isTrue);
@@ -83,7 +83,7 @@ void main() {
         'horizontal_overflow_px': 0.0,
         'vertical_overflow_px': 0.0,
         'visual_skin_applied': true,
-        'ui_font_family': 'Manrope, sans-serif',
+        'ui_font_family': 'Inter, sans-serif',
         'document_fonts_status': 'loaded',
         'ui_font_ready': true,
         'display_font_ready': true,
@@ -102,7 +102,7 @@ void main() {
         'commander_damage_counter_count': 2,
         'clock_count': 1,
         'clock_with_game_timer_count': 1,
-        'turn_tracker_font_family': 'Manrope, sans-serif',
+        'turn_tracker_font_family': 'Inter, sans-serif',
         'turn_tracker_font_size': 21.0,
         'player_card_count': 4,
       });

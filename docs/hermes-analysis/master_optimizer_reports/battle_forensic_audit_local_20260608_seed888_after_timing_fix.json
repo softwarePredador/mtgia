@@ -1,0 +1,146 @@
+{
+  "replay_files": [
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_888.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_888.txt"
+    }
+  ],
+  "rule_findings": [],
+  "summary": {
+    "by_effect": {
+      "approach": 2,
+      "commander": 1,
+      "copy_spell": 4,
+      "counter": 2,
+      "creature": 13,
+      "hate_artifact": 2,
+      "land": 20,
+      "modal_boros_charm": 2,
+      "ramp_permanent": 6,
+      "ramp_ritual": 2,
+      "remove_creature": 2
+    },
+    "by_source": {
+      "curated": 33,
+      "known_cards_manual": 10,
+      "type_line_creature": 13
+    },
+    "by_status": {
+      "fact": 13,
+      "verified": 43
+    },
+    "card_event_count": 56,
+    "cards_by_source": {
+      "curated": [
+        "Ancient Tomb",
+        "Battlefield Forge",
+        "Bloodstained Mire",
+        "Chrome Mox",
+        "City of Brass",
+        "Command Tower",
+        "Emergence Zone",
+        "Gemstone Caverns",
+        "Inspiring Vantage",
+        "Lavaspur Boots",
+        "Lotus Petal",
+        "Mana Confluence",
+        "Minamo, School at Water's Edge",
+        "Misty Rainforest",
+        "Mox Diamond",
+        "Ornithopter of Paradise",
+        "Pact of Negation",
+        "Polluted Delta",
+        "Reiterate",
+        "Reverberate",
+        "Rings of Brighthearth",
+        "Sacred Foundry",
+        "Savannah",
+        "Scalding Tarn",
+        "Scrubland",
+        "Sunbillow Verge",
+        "Sundown Pass",
+        "Urza's Saga",
+        "Windswept Heath"
+      ],
+      "known_cards_manual": [
+        "Approach of the Second Sun",
+        "Boros Charm",
+        "Boros Signet",
+        "Lorehold, the Historian",
+        "Swords to Plowshares",
+        "Vexing Bauble"
+      ],
+      "type_line_creature": [
+        "Arcum Dagsson",
+        "Elvish Spirit Guide",
+        "Endurance",
+        "God-Pharaoh's Statue",
+        "Phyrexian Metamorph",
+        "Quiet Speculation",
+        "Shield Sphere",
+        "Thrasios, Triton Hero",
+        "Timetwister",
+        "Twiddle",
+        "Tymna the Weaver",
+        "Voltaic Servant",
+        "Witch's Mark"
+      ]
+    },
+    "cards_by_status": {
+      "fact": [
+        "Arcum Dagsson",
+        "Elvish Spirit Guide",
+        "Endurance",
+        "God-Pharaoh's Statue",
+        "Phyrexian Metamorph",
+        "Quiet Speculation",
+        "Shield Sphere",
+        "Thrasios, Triton Hero",
+        "Timetwister",
+        "Twiddle",
+        "Tymna the Weaver",
+        "Voltaic Servant",
+        "Witch's Mark"
+      ],
+      "verified": [
+        "Ancient Tomb",
+        "Approach of the Second Sun",
+        "Battlefield Forge",
+        "Bloodstained Mire",
+        "Boros Charm",
+        "Boros Signet",
+        "Chrome Mox",
+        "City of Brass",
+        "Command Tower",
+        "Emergence Zone",
+        "Gemstone Caverns",
+        "Inspiring Vantage",
+        "Lavaspur Boots",
+        "Lorehold, the Historian",
+        "Lotus Petal",
+        "Mana Confluence",
+        "Minamo, School at Water's Edge",
+        "Misty Rainforest",
+        "Mox Diamond",
+        "Ornithopter of Paradise",
+        "Pact of Negation",
+        "Polluted Delta",
+        "Reiterate",
+        "Reverberate",
+        "Rings of Brighthearth",
+        "Sacred Foundry",
+        "Savannah",
+        "Scalding Tarn",
+        "Scrubland",
+        "Sunbillow Verge",
+        "Sundown Pass",
+        "Swords to Plowshares",
+        "Urza's Saga",
+        "Vexing Bauble",
+        "Windswept Heath"
+      ]
+    },
+    "unique_cards": 48
+  },
+  "turn_findings": []
+}

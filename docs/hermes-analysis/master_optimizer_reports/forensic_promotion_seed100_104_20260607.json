@@ -1,0 +1,1696 @@
+{
+  "source_report": "docs\\hermes-analysis\\master_optimizer_reports\\battle_forensic_audit_local_20260607_seeds100_104.json",
+  "promoted_count": 111,
+  "cards": [
+    {
+      "card": "Abrade",
+      "effect_json": {
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 4
+      }
+    },
+    {
+      "card": "Aetherflux Reservoir",
+      "effect_json": {
+        "cmc": 4.0,
+        "effect": "finisher"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "finisher"
+      },
+      "observed_effects": {
+        "finisher": 2
+      }
+    },
+    {
+      "card": "Agatha's Soul Cauldron",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "remove_creature",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_creature": 2
+      }
+    },
+    {
+      "card": "Archdruid's Charm",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Archivist of Oghma",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "draw_engine",
+        "trigger": "opponent_draw"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_engine"
+      },
+      "observed_effects": {
+        "draw_engine": 2
+      }
+    },
+    {
+      "card": "Aven Interrupter",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Basalt Monolith",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 3
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_ritual"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual"
+      },
+      "observed_effects": {
+        "ramp_ritual": 2
+      }
+    },
+    {
+      "card": "Boromir, Warden of the Tower",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "indestructible"
+      },
+      "role": {
+        "category": "protection",
+        "effect": "indestructible"
+      },
+      "observed_effects": {
+        "indestructible": 4
+      }
+    },
+    {
+      "card": "Bridgeworks Battle",
+      "effect_json": {
+        "cmc": 3.0,
+        "count": 1,
+        "effect": "draw_cards"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Chord of Calling",
+      "effect_json": {
+        "cmc": 3.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Chrome Mox",
+      "effect_json": {
+        "cmc": 0.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 7
+      }
+    },
+    {
+      "card": "Clock of Omens",
+      "effect_json": {
+        "cmc": 4.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 4
+      }
+    },
+    {
+      "card": "Crop Rotation",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Cyclonic Rift",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Deafening Silence",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "draw_engine"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_engine"
+      },
+      "observed_effects": {
+        "draw_engine": 2
+      }
+    },
+    {
+      "card": "Delayed Blast Fireball",
+      "effect_json": {
+        "cmc": 3.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Delighted Halfling",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "creature"
+      },
+      "role": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "observed_effects": {
+        "creature": 2
+      }
+    },
+    {
+      "card": "Demonic Consultation",
+      "effect_json": {
+        "cmc": 1.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Dramatic Reversal",
+      "effect_json": {
+        "cmc": 2.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Drannith Magistrate",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "silence_opponents",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "silence_opponents": 6
+      }
+    },
+    {
+      "card": "Dualcaster Mage",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "copy_spell"
+      },
+      "role": {
+        "category": "engine",
+        "effect": "copy_spell"
+      },
+      "observed_effects": {
+        "copy_spell": 4
+      }
+    },
+    {
+      "card": "Electroduplicate",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "token_maker",
+        "token_count": 1,
+        "token_power": 1
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 4
+      }
+    },
+    {
+      "card": "Enduring Vitality",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Faerie Mastermind",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "draw_engine"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_engine"
+      },
+      "observed_effects": {
+        "draw_engine": 4
+      }
+    },
+    {
+      "card": "Fellwar Stone",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 5
+      }
+    },
+    {
+      "card": "Fierce Guardianship",
+      "effect_json": {
+        "cmc": 3.0,
+        "count": 1,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 2
+      }
+    },
+    {
+      "card": "Finale of Devastation",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "pump_all"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "pump_all"
+      },
+      "observed_effects": {
+        "pump_all": 2
+      }
+    },
+    {
+      "card": "Flare of Duplication",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "copy_spell",
+        "instant": true
+      },
+      "role": {
+        "category": "engine",
+        "effect": "copy_spell",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "copy_spell": 4
+      }
+    },
+    {
+      "card": "Flawless Maneuver",
+      "effect_json": {
+        "cmc": 3.0,
+        "duration": 1,
+        "effect": "indestructible",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "indestructible",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "indestructible": 2
+      }
+    },
+    {
+      "card": "Flusterstorm",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 4
+      }
+    },
+    {
+      "card": "Force of Will",
+      "effect_json": {
+        "cmc": 5.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 2
+      }
+    },
+    {
+      "card": "Fyndhorn Elves",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Giver of Runes",
+      "effect_json": {
+        "cmc": 1.0,
+        "duration": 1,
+        "effect": "indestructible"
+      },
+      "role": {
+        "category": "protection",
+        "effect": "indestructible"
+      },
+      "observed_effects": {
+        "indestructible": 6
+      }
+    },
+    {
+      "card": "Grafdigger's Cage",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "silence_opponents"
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents"
+      },
+      "observed_effects": {
+        "silence_opponents": 9
+      }
+    },
+    {
+      "card": "Grim Monolith",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 3
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 3
+      }
+    },
+    {
+      "card": "Hangarback Walker",
+      "effect_json": {
+        "cmc": 0.0,
+        "effect": "token_maker"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 2
+      }
+    },
+    {
+      "card": "Heat Shimmer",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "token_maker",
+        "token_count": 1,
+        "token_power": 1
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 2
+      }
+    },
+    {
+      "card": "High Noon",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "remove_creature",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_creature": 4
+      }
+    },
+    {
+      "card": "Imposter Mech",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 2
+      }
+    },
+    {
+      "card": "Kinnan, Bonder Prodigy",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "topdeck_manipulation"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "topdeck_manipulation"
+      },
+      "observed_effects": {
+        "topdeck_manipulation": 2
+      }
+    },
+    {
+      "card": "Land Tax",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "tutor",
+        "target": "any"
+      },
+      "role": {
+        "category": "tutor",
+        "effect": "tutor",
+        "target": "any"
+      },
+      "observed_effects": {
+        "tutor": 2
+      }
+    },
+    {
+      "card": "Lavaspur Boots",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Lion's Eye Diamond",
+      "effect_json": {
+        "cmc": 0.0,
+        "effect": "ramp_ritual",
+        "mana_produced": 3
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual"
+      },
+      "observed_effects": {
+        "ramp_ritual": 1
+      }
+    },
+    {
+      "card": "Liquimetal Torque",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Llanowar Elves",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Mana Drain",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 2
+      }
+    },
+    {
+      "card": "Mana Geyser",
+      "effect_json": {
+        "cmc": 5.0,
+        "effect": "ramp_ritual",
+        "mana_produced": 1,
+        "manual_override": true
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual"
+      },
+      "observed_effects": {
+        "ramp_ritual": 2
+      }
+    },
+    {
+      "card": "Maskwood Nexus",
+      "effect_json": {
+        "cmc": 4.0,
+        "effect": "token_maker"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 2
+      }
+    },
+    {
+      "card": "Mental Misstep",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 2
+      }
+    },
+    {
+      "card": "Mindbreak Trap",
+      "effect_json": {
+        "cmc": 4.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Monument to Endurance",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_engine"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_engine"
+      },
+      "observed_effects": {
+        "ramp_engine": 2
+      }
+    },
+    {
+      "card": "Moonsilver Key",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "tutor",
+        "target": "artifact_or_enchantment"
+      },
+      "role": {
+        "category": "tutor",
+        "effect": "tutor",
+        "target": "artifact_or_enchantment"
+      },
+      "observed_effects": {
+        "tutor": 2
+      }
+    },
+    {
+      "card": "Mox Amber",
+      "effect_json": {
+        "cmc": 0.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 6
+      }
+    },
+    {
+      "card": "Mox Opal",
+      "effect_json": {
+        "cmc": 0.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 4
+      }
+    },
+    {
+      "card": "Nature's Rhythm",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "recursion"
+      },
+      "role": {
+        "category": "engine",
+        "effect": "recursion"
+      },
+      "observed_effects": {
+        "recursion": 2
+      }
+    },
+    {
+      "card": "Ocelot Pride",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "token_maker"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 2
+      }
+    },
+    {
+      "card": "Orcish Bowmasters",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "remove_creature",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_creature": 2
+      }
+    },
+    {
+      "card": "Orim's Chant",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "silence_opponents",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "silence_opponents": 2
+      }
+    },
+    {
+      "card": "Ornithopter of Paradise",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 2
+      }
+    },
+    {
+      "card": "Paradise Mantle",
+      "effect_json": {
+        "cmc": 0.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Past in Flames",
+      "effect_json": {
+        "cmc": 4.0,
+        "count": 1,
+        "effect": "recursion"
+      },
+      "role": {
+        "category": "engine",
+        "effect": "recursion"
+      },
+      "observed_effects": {
+        "recursion": 2
+      }
+    },
+    {
+      "card": "Pinnacle Monk",
+      "effect_json": {
+        "cmc": 5.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Pongify",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "remove_creature",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_creature": 4
+      }
+    },
+    {
+      "card": "Powerbalance",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "draw_engine"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_engine"
+      },
+      "observed_effects": {
+        "draw_engine": 2
+      }
+    },
+    {
+      "card": "Professional Face-Breaker",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_engine"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_engine"
+      },
+      "observed_effects": {
+        "ramp_engine": 1
+      }
+    },
+    {
+      "card": "Pyroblast",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 6
+      }
+    },
+    {
+      "card": "Pyrokinesis",
+      "effect_json": {
+        "cmc": 6.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Ragavan, Nimble Pilferer",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_engine"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_engine"
+      },
+      "observed_effects": {
+        "ramp_engine": 1
+      }
+    },
+    {
+      "card": "Ranger-Captain of Eos",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "silence_opponents",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "silence_opponents": 8
+      }
+    },
+    {
+      "card": "Recruiter of the Guard",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "tutor",
+        "target": "any"
+      },
+      "role": {
+        "category": "tutor",
+        "effect": "tutor",
+        "target": "any"
+      },
+      "observed_effects": {
+        "tutor": 4
+      }
+    },
+    {
+      "card": "Red Elemental Blast",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 2
+      }
+    },
+    {
+      "card": "Redirect Lightning",
+      "effect_json": {
+        "cmc": 1.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 2
+      }
+    },
+    {
+      "card": "Relic of Legends",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Return the Favor",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "copy_spell",
+        "instant": true
+      },
+      "role": {
+        "category": "engine",
+        "effect": "copy_spell",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "copy_spell": 2
+      }
+    },
+    {
+      "card": "Reverberate",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "copy_spell",
+        "instant": true
+      },
+      "role": {
+        "category": "engine",
+        "effect": "copy_spell",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "copy_spell": 2
+      }
+    },
+    {
+      "card": "Rhystic Study",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "draw_engine"
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_engine"
+      },
+      "observed_effects": {
+        "draw_engine": 2
+      }
+    },
+    {
+      "card": "Rings of Brighthearth",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Ruby Medallion",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 3
+      }
+    },
+    {
+      "card": "Sculpting Steel",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 3
+      }
+    },
+    {
+      "card": "Seething Song",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_ritual",
+        "instant": true,
+        "mana_produced": 5
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "ramp_ritual": 3
+      }
+    },
+    {
+      "card": "Silence",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "silence_opponents",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "silence_opponents": 4
+      }
+    },
+    {
+      "card": "Silver Myr",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Simian Spirit Guide",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_ritual",
+        "instant": true,
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "ramp_ritual": 4
+      }
+    },
+    {
+      "card": "Simic Signet",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Simulacrum Synthesizer",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "token_maker"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 4
+      }
+    },
+    {
+      "card": "Sink into Stupor",
+      "effect_json": {
+        "cmc": 3.0,
+        "count": 1,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Skrelv, Defector Mite",
+      "effect_json": {
+        "cmc": 1.0,
+        "duration": 1,
+        "effect": "indestructible"
+      },
+      "role": {
+        "category": "protection",
+        "effect": "indestructible"
+      },
+      "observed_effects": {
+        "indestructible": 2
+      }
+    },
+    {
+      "card": "Skyclave Apparition",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "token_maker"
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 2
+      }
+    },
+    {
+      "card": "Springleaf Drum",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_ritual"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual"
+      },
+      "observed_effects": {
+        "ramp_ritual": 1
+      }
+    },
+    {
+      "card": "Storm-Kiln Artist",
+      "effect_json": {
+        "cmc": 4.0,
+        "effect": "ramp_engine"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_engine"
+      },
+      "observed_effects": {
+        "ramp_engine": 3
+      }
+    },
+    {
+      "card": "Sundering Eruption",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Swan Song",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "counter",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "counter",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "counter": 2
+      }
+    },
+    {
+      "card": "Talisman of Curiosity",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Talisman of Progress",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_permanent"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Tataru Taru",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "ramp_engine"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_engine"
+      },
+      "observed_effects": {
+        "ramp_engine": 2
+      }
+    },
+    {
+      "card": "Tezzeret, Cruel Captain",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "tutor",
+        "target": "artifact_or_enchantment"
+      },
+      "role": {
+        "category": "tutor",
+        "effect": "tutor",
+        "target": "artifact_or_enchantment"
+      },
+      "observed_effects": {
+        "tutor": 8
+      }
+    },
+    {
+      "card": "Thalia, Guardian of Thraben",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "silence_opponents"
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents"
+      },
+      "observed_effects": {
+        "silence_opponents": 4
+      }
+    },
+    {
+      "card": "Thousand-Year Elixir",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Touch the Spirit Realm",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 2
+      }
+    },
+    {
+      "card": "Treasonous Ogre",
+      "effect_json": {
+        "cmc": 4.0,
+        "effect": "ramp_ritual",
+        "instant": true,
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_ritual",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "ramp_ritual": 1
+      }
+    },
+    {
+      "card": "Twinflame",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "token_maker",
+        "token_count": 1,
+        "token_power": 1
+      },
+      "role": {
+        "category": "wincon",
+        "effect": "token_maker"
+      },
+      "observed_effects": {
+        "token_maker": 2
+      }
+    },
+    {
+      "card": "Valakut Awakening // Valakut Stoneforge",
+      "effect_json": {
+        "cmc": 3.0,
+        "count": 1,
+        "effect": "draw_cards",
+        "instant": true
+      },
+      "role": {
+        "category": "draw",
+        "effect": "draw_cards",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "draw_cards": 4
+      }
+    },
+    {
+      "card": "Voice of Victory",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "silence_opponents",
+        "instant": true
+      },
+      "role": {
+        "category": "protection",
+        "effect": "silence_opponents",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "silence_opponents": 2
+      }
+    },
+    {
+      "card": "Volatile Stormdrake",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "indestructible"
+      },
+      "role": {
+        "category": "protection",
+        "effect": "indestructible"
+      },
+      "observed_effects": {
+        "indestructible": 2
+      }
+    },
+    {
+      "card": "Voltaic Key",
+      "effect_json": {
+        "cmc": 1.0,
+        "effect": "ramp_permanent",
+        "mana_produced": 1
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "observed_effects": {
+        "ramp_permanent": 1
+      }
+    },
+    {
+      "card": "Whir of Invention",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "tutor",
+        "instant": true
+      },
+      "role": {
+        "category": "tutor",
+        "effect": "tutor",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "tutor": 2
+      }
+    },
+    {
+      "card": "Wishclaw Talisman",
+      "effect_json": {
+        "cmc": 2.0,
+        "effect": "tutor"
+      },
+      "role": {
+        "category": "tutor",
+        "effect": "tutor"
+      },
+      "observed_effects": {
+        "tutor": 2
+      }
+    },
+    {
+      "card": "Witch Enchanter",
+      "effect_json": {
+        "cmc": 4.0,
+        "effect": "remove_permanent",
+        "instant": true
+      },
+      "role": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "timing": "instant"
+      },
+      "observed_effects": {
+        "remove_permanent": 4
+      }
+    },
+    {
+      "card": "Worldfire",
+      "effect_json": {
+        "cmc": 9.0,
+        "effect": "board_wipe"
+      },
+      "role": {
+        "category": "wipe",
+        "effect": "board_wipe"
+      },
+      "observed_effects": {
+        "board_wipe": 4
+      }
+    },
+    {
+      "card": "Xorn",
+      "effect_json": {
+        "cmc": 3.0,
+        "effect": "ramp_engine"
+      },
+      "role": {
+        "category": "ramp",
+        "effect": "ramp_engine"
+      },
+      "observed_effects": {
+        "ramp_engine": 1
+      }
+    }
+  ]
+}

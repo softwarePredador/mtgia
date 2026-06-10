@@ -1,6 +1,18 @@
 import 'package:postgres/postgres.dart';
 
+import 'basic_land_utils.dart' as basic_lands;
 import 'color_identity.dart';
+
+/// Normaliza nomes para regra de cópia física.
+///
+/// Cartas split/MDFC podem chegar como nome completo ("Face A // Face B") ou
+/// só pela face frontal ("Face A"). Para limite de cópias, ambas representam a
+/// mesma carta física e precisam compartilhar a mesma chave.
+String normalizePhysicalCardCopyName(String name) {
+  final collapsed = name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  final splitParts = collapsed.split(RegExp(r'\s*//\s*'));
+  return splitParts.first.trim();
+}
 
 class DeckRulesService {
   DeckRulesService(this._session);
@@ -21,8 +33,9 @@ class DeckRulesService {
     final cardsData = await _loadCardsData(cardIds);
     final legalities = await _loadLegalities(cardIds, normalizedFormat);
 
-    // Regras gerais: limite de cópias por NOME (para suportar múltiplas edições)
-    final copiesByName = <String, Map<String, dynamic>>{};
+    // Regras gerais: limite de cópias por carta física.
+    // Isso cobre múltiplas edições e nomes MDFC/split representados por face.
+    final copiesByName = <String, _CopyCounter>{};
     for (final item in cards) {
       final cardId = item['card_id'] as String?;
       if (cardId == null || cardId.isEmpty) continue;
@@ -40,15 +53,13 @@ class DeckRulesService {
       final isBasicLand = _isBasicLandTypeLine(typeLine);
       if (isBasicLand) continue;
 
-      final key = info.name.trim().toLowerCase();
+      final key = normalizePhysicalCardCopyName(info.name);
       final existing = copiesByName[key];
       if (existing == null) {
-        copiesByName[key] = {'name': info.name.trim(), 'qty': quantity};
+        copiesByName[key] = _CopyCounter(info.name.trim(), quantity);
       } else {
-        copiesByName[key] = {
-          'name': existing['name'] as String,
-          'qty': (existing['qty'] as int) + quantity,
-        };
+        existing.quantity += quantity;
+        existing.sourceNames.add(info.name.trim());
       }
     }
 
@@ -60,12 +71,16 @@ class DeckRulesService {
         '[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
     for (final entry in copiesByName.entries) {
       final value = entry.value;
-      final name = value['name'] as String? ?? entry.key;
-      final qty = value['qty'] as int? ?? 0;
+      final name = value.displayName;
+      final qty = value.quantity;
       print('[DEBUG]   "$name" = $qty cópias (commander ignorado)');
       if (qty > limit) {
+        final hasMultipleNames = value.sourceNames.length > 1;
+        final sourceNames = value.sourceNames.join('" / "');
         throw DeckRulesException(
-          'Regra violada: "$name" excede o limite de $limit cópia(s) para o formato $normalizedFormat.',
+          hasMultipleNames
+              ? 'Regra violada: "$sourceNames" contam como a mesma carta física e excedem o limite de $limit cópia(s) para o formato $normalizedFormat.'
+              : 'Regra violada: "$name" excede o limite de $limit cópia(s) para o formato $normalizedFormat.',
           cardName: name,
         );
       }
@@ -217,7 +232,7 @@ class DeckRulesService {
 
       if (!_isCommanderEligible(commanderInfo)) {
         throw DeckRulesException(
-          'Regra violada: "${commanderInfo.name}" não pode ser comandante (precisa ser criatura lendária ou dizer "can be your commander").',
+          'Regra violada: "${commanderInfo.name}" não pode ser comandante (precisa ser criatura lendária, Vehicle/Spacecraft lendário com poder/resistência, ou dizer "can be your commander").',
           cardName: commanderInfo.name,
         );
       }
@@ -239,7 +254,7 @@ class DeckRulesService {
         );
       }
 
-      commanderNameSet.add(info.name.trim().toLowerCase());
+      commanderNameSet.add(normalizePhysicalCardCopyName(info.name));
       commanderIdentitySet.addAll(_resolvedIdentity(info));
     }
 
@@ -251,7 +266,7 @@ class DeckRulesService {
       final isCommander = item['is_commander'] as bool? ?? false;
 
       if (!isCommander &&
-          commanderNameSet.contains(info.name.trim().toLowerCase())) {
+          commanderNameSet.contains(normalizePhysicalCardCopyName(info.name))) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" já está selecionada como comandante e não pode entrar no deck principal.',
           cardName: info.name,
@@ -288,6 +303,14 @@ class DeckRulesService {
     final isLegendary = typeLine.contains('legendary');
     final isCreature = typeLine.contains('creature');
     if (isLegendary && isCreature) return true;
+
+    final isVehicleOrSpacecraft =
+        typeLine.contains('vehicle') || typeLine.contains('spacecraft');
+    final hasPowerToughnessBox = (card.power ?? '').trim().isNotEmpty &&
+        (card.toughness ?? '').trim().isNotEmpty;
+    if (isLegendary && isVehicleOrSpacecraft && hasPowerToughnessBox) {
+      return true;
+    }
 
     // Planeswalkers e outras exceções com texto "can be your commander".
     if (oracle.contains('can be your commander')) return true;
@@ -403,16 +426,13 @@ class DeckRulesService {
   ///   - Snow-Covered:  "Basic Snow Land — Plains/Island/Swamp/Mountain/Forest"
   ///   - Wastes:        "Basic Land" (sem subtipo)
   static bool _isBasicLandTypeLine(String typeLineLower) {
-    // "basic land" cobre normais e Wastes.
-    // "basic snow land" cobre Snow-Covered variants.
-    return typeLineLower.contains('basic land') ||
-        typeLineLower.contains('basic snow land');
+    return basic_lands.isBasicLandTypeLine(typeLineLower);
   }
 
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, power, toughness
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -431,6 +451,8 @@ class DeckRulesService {
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
       final manaCost = row[6] as String?;
+      final power = row[7] as String?;
+      final toughness = row[8] as String?;
 
       map[id] = _CardData(
         id: id,
@@ -440,6 +462,8 @@ class DeckRulesService {
         colors: colors,
         colorIdentity: colorIdentity,
         manaCost: manaCost,
+        power: power,
+        toughness: toughness,
       );
     }
 
@@ -481,6 +505,16 @@ class DeckRulesException implements Exception {
   String toString() => message;
 }
 
+class _CopyCounter {
+  _CopyCounter(String displayName, this.quantity)
+      : displayName = displayName,
+        sourceNames = {displayName};
+
+  final String displayName;
+  int quantity;
+  final Set<String> sourceNames;
+}
+
 class _CardData {
   const _CardData({
     required this.id,
@@ -490,6 +524,8 @@ class _CardData {
     required this.colors,
     required this.colorIdentity,
     required this.manaCost,
+    required this.power,
+    required this.toughness,
   });
 
   final String id;
@@ -499,4 +535,6 @@ class _CardData {
   final List<String> colors;
   final List<String> colorIdentity;
   final String? manaCost;
+  final String? power;
+  final String? toughness;
 }

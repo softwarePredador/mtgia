@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart' show visibleForTesting;
 import '../logger.dart';
 
 /// Serviço para integração com EDHREC JSON API
@@ -16,6 +17,12 @@ class EdhrecService {
   // Cache em memória para evitar requests repetidos no mesmo ciclo de vida do server
   static final Map<String, _CachedResult> _cache = {};
   static final Map<String, _CachedAverageDeckResult> _averageDeckCache = {};
+
+  @visibleForTesting
+  static void clearCache() {
+    _cache.clear();
+    _averageDeckCache.clear();
+  }
   
   /// Busca os dados de co-ocorrência para um comandante específico.
   /// 
@@ -123,6 +130,14 @@ class EdhrecService {
   /// Ex: "Jin-Gitaxias, Core Augur" → "jin-gitaxias-core-augur"
   /// Ex: "Jin-Gitaxias // The Great Synthesis" → "jin-gitaxias"
   String _toSlug(String name) {
+    final slug = slugFor(name);
+    Log.d('EDHREC slug: "$name" → "$slug"');
+    return slug;
+  }
+
+  /// Versão pública/estática do conversor de slug, para reuso em
+  /// serviços de snapshot/trend que precisam da mesma chave do EDHREC.
+  static String slugFor(String name) {
     // Para cartas dupla face (flip/transform), usa apenas a primeira parte
     // Suporta vários formatos: " // ", "//", " / "
     var cleanName = name;
@@ -132,16 +147,13 @@ class EdhrecService {
         break;
       }
     }
-    
-    final slug = cleanName
+
+    return cleanName
         .toLowerCase()
         .replaceAll(RegExp(r'''[,'"]+'''), '') // Remove pontuação
         .replaceAll(RegExp(r'\s+'), '-')       // Espaços → hífens
         .replaceAll(RegExp(r'-+'), '-')        // Remove hífens duplicados
         .replaceAll(RegExp(r'[^a-z0-9-]'), ''); // Só letras, números, hífens
-    
-    Log.d('EDHREC slug: "$name" → "$slug"');
-    return slug;
   }
   
   /// Parse da resposta JSON do EDHREC
@@ -165,17 +177,22 @@ class EdhrecService {
         // Synergy score: -1.0 a 1.0 (1.0 = apenas usado com este commander)
         final synergy = (card['synergy'] as num?)?.toDouble() ?? 0.0;
         
-        // Inclusion %: fração de decks que usa esta carta (0.0 a 1.0)
+        // `inclusion`/`num_decks` = contagem absoluta de decks com a carta.
+        // O ratio real (% de inclusão) é num_decks / potential_decks.
         final inclusion = (card['inclusion'] as num?)?.toDouble() ?? 0.0;
         
         // Número de decks que usam esta carta
         final numDecks = card['num_decks'] as int? ?? 0;
+
+        // Total de decks elegíveis (denominador do ratio de inclusão)
+        final potentialDecks = card['potential_decks'] as int? ?? 0;
         
         cardLists.add(EdhrecCard(
           name: name,
           synergy: synergy,
           inclusion: inclusion,
           numDecks: numDecks,
+          potentialDecks: potentialDecks,
           category: _normalizeCategory(header),
         ));
       }
@@ -406,20 +423,26 @@ class EdhrecCommanderData {
 class EdhrecCard {
   final String name;
   final double synergy; // -1.0 a 1.0 (maior = mais específico para este commander)
-  final double inclusion; // 0.0 a 1.0 (% de decks que usam)
-  final int numDecks; // Número absoluto de decks
+  final double inclusion; // contagem absoluta de decks que incluem a carta (= numDecks)
+  final int numDecks; // Número absoluto de decks com a carta
+  final int potentialDecks; // Total de decks elegíveis (denominador do ratio)
   final String category; // ramp, card_draw, removal, etc
-  
+
   EdhrecCard({
     required this.name,
     required this.synergy,
     required this.inclusion,
     required this.numDecks,
+    this.potentialDecks = 0,
     required this.category,
   });
-  
+
+  /// Fração de decks (0.0 a 1.0) que realmente incluem a carta.
+  double get inclusionRate =>
+      potentialDecks > 0 ? numDecks / potentialDecks : 0.0;
+
   @override
-  String toString() => '$name (syn:${synergy.toStringAsFixed(2)}, inc:${(inclusion*100).toStringAsFixed(0)}%)';
+  String toString() => '$name (syn:${synergy.toStringAsFixed(2)}, inc:${(inclusionRate * 100).toStringAsFixed(0)}%)';
 }
 
 class EdhrecAverageDeckData {

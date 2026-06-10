@@ -237,8 +237,8 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                 icon: const Icon(Icons.casino, size: 20),
                 label: const Text('Comprar 7 cartas'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.manaViolet,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.brass500,
+                  foregroundColor: AppTheme.backgroundAbyss,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
@@ -418,8 +418,8 @@ class _SampleHandWidgetState extends State<SampleHandWidget>
                     icon: const Icon(Icons.casino, size: 18),
                     label: const Text('Nova Mão'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.manaViolet,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.brass500,
+                      foregroundColor: AppTheme.backgroundAbyss,
                     ),
                   ),
                 ),

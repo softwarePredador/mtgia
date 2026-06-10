@@ -210,6 +210,58 @@ void main() {
       expect(drownTags, contains('board_wipe'));
     });
 
+    test('reduces generic payoff and enabler false positives', () {
+      final blasphemousActTags = inferFunctionalCardTags(
+        name: 'Blasphemous Act',
+        typeLine: 'Sorcery',
+        oracleText:
+            'This spell costs {1} less to cast for each creature on the battlefield. Blasphemous Act deals 13 damage to each creature.',
+        manaCost: '{8}{R}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(blasphemousActTags, contains('board_wipe'));
+      expect(blasphemousActTags, isNot(contains('payoff')));
+
+      final glimpseTags = inferFunctionalCardTags(
+        name: 'Glimpse the Unthinkable',
+        typeLine: 'Sorcery',
+        oracleText: 'Target player mills ten cards.',
+        manaCost: '{U}{B}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(glimpseTags, isNot(contains('enabler')));
+
+      final greavesTags = inferFunctionalCardTags(
+        name: 'Lightning Greaves',
+        typeLine: 'Artifact - Equipment',
+        oracleText: 'Equipped creature has haste and shroud. Equip {0}.',
+        manaCost: '{2}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(greavesTags, containsAll({'enabler', 'protection'}));
+
+      final oneRingTags = inferFunctionalCardTags(
+        name: 'The One Ring',
+        typeLine: 'Legendary Artifact',
+        oracleText:
+            'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
+        manaCost: '{4}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(oneRingTags, containsAll({'draw', 'protection'}));
+      expect(oneRingTags, isNot(contains('payoff')));
+
+      final impactTremorsTags = inferFunctionalCardTags(
+        name: 'Impact Tremors',
+        typeLine: 'Enchantment',
+        oracleText:
+            'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
+        manaCost: '{1}{R}',
+      ).map((tag) => tag.tag).toSet();
+
+      expect(impactTremorsTags, contains('payoff'));
+    });
+
     test('summarizes counts and bounded samples using quantities', () {
       final summary = summarizeFunctionalTagsForDeck([
         {
@@ -246,7 +298,8 @@ void main() {
           equals(semanticLayerV2SchemaVersion));
     });
 
-    test('prefers persisted tags and falls back to heuristic tags per row', () {
+    test('prefers persisted tags, semantic v2 and then heuristic tags per row',
+        () {
       final summary = summarizeFunctionalTagsForDeck([
         {
           'name': 'Semantic Cache Hit',
@@ -266,6 +319,25 @@ void main() {
           'functional_tags': const [],
         },
         {
+          'name': 'Semantic V2 Only',
+          'type_line': 'Instant',
+          'oracle_text': '',
+          'quantity': 4,
+          'functional_tags': const [],
+          'semantic_tags_v2': [
+            {
+              'tags': [
+                {'tag': 'removal', 'confidence': 0.91},
+              ],
+              'role_confidence': 0.91,
+              'speed': 'instant_speed',
+              'interaction_scope': 'single_target',
+              'explanation_reason': 'persisted semantic v2 fixture',
+              'source': 'test_semantic_v2',
+            },
+          ],
+        },
+        {
           'name': 'Low Confidence Persisted',
           'type_line': 'Creature',
           'oracle_text': '',
@@ -278,16 +350,24 @@ void main() {
 
       expect(summary.count('draw'), equals(2));
       expect(summary.count('ramp'), equals(1));
-      expect(summary.count('removal'), equals(0));
-      expect(summary.persistedRows, equals(1));
-      expect(summary.persistedCopies, equals(2));
+      expect(summary.count('removal'), equals(4));
+      expect(summary.persistedRows, equals(2));
+      expect(summary.persistedCopies, equals(6));
       expect(summary.heuristicRows, equals(2));
       expect(summary.heuristicCopies, equals(4));
       expect(summary.otherCopies, equals(3));
+      expect(summary.samples['removal'], equals(const ['Semantic V2 Only']));
+      expect(
+        summary.sampleDetails['removal']?.first['evidence'],
+        equals('persisted semantic v2 fixture'),
+      );
 
       final source = summary.toJson()['source'] as Map<String, dynamic>;
-      expect(source['priority'], equals('persisted_then_heuristic'));
-      expect(source['persisted_rows'], equals(1));
+      expect(
+        source['priority'],
+        equals('functional_tags_then_semantic_v2_then_heuristic'),
+      );
+      expect(source['persisted_rows'], equals(2));
     });
   });
 }

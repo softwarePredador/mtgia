@@ -89,7 +89,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         title: const Text('Criar e Otimizar Deck'),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
         actions: const [ShellAppBarActions()],
       ),
       body: ListView(
@@ -140,7 +140,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                         icon: const Icon(Icons.auto_awesome),
                         label: const Text('Gerar com IA'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.frost400,
+                          backgroundColor: AppTheme.brass500,
                           foregroundColor: AppTheme.backgroundAbyss,
                         ),
                       ),
@@ -226,7 +226,7 @@ class _StepCard extends StatelessWidget {
                   style: const TextStyle(
                     color: AppTheme.backgroundAbyss,
                     fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    fontSize: AppTheme.fontSm,
                   ),
                 ),
               ),

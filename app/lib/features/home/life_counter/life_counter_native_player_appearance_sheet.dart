@@ -442,7 +442,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
               border: Border.all(color: AppTheme.outlineMuted),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x66000000),
+                  color: AppTheme.overlayBlack40,
                   blurRadius: 28,
                   offset: Offset(0, 10),
                 ),
@@ -905,38 +905,47 @@ class _BackgroundChip extends StatelessWidget {
     final foreground =
         color.computeLuminance() > 0.55 ? Colors.black : Colors.white;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: 72,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: color,
+    final semanticLabel = 'Selecionar cor $colorValue';
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(
-            color: selected ? AppTheme.textPrimary : Colors.transparent,
-            width: 2,
-          ),
-          boxShadow:
-              selected
-                  ? const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 12,
-                      offset: Offset(0, 6),
-                    ),
-                  ]
-                  : null,
-        ),
-        child: Center(
-          child: Text(
-            colorValue.replaceFirst('#', ''),
-            style: TextStyle(
-              color: foreground,
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w700,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: 72,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              border: Border.all(
+                color: selected ? AppTheme.textPrimary : Colors.transparent,
+                width: 2,
+              ),
+              boxShadow:
+                  selected
+                      ? const [
+                        BoxShadow(
+                          color: AppTheme.overlayBlack20,
+                          blurRadius: 12,
+                          offset: Offset(0, 6),
+                        ),
+                      ]
+                      : null,
+            ),
+            child: Center(
+              child: Text(
+                colorValue.replaceFirst('#', ''),
+                style: TextStyle(
+                  color: foreground,
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ),

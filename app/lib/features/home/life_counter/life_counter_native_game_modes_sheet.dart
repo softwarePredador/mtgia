@@ -110,7 +110,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
             border: Border.all(color: AppTheme.outlineMuted),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x66000000),
+                color: AppTheme.overlayBlack40,
                 blurRadius: 28,
                 offset: Offset(0, 10),
               ),
@@ -201,12 +201,15 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             'The planar deck and die still run inside Lotus. ManaLoom now owns the launch shell for this mode.',
                         available: availability.planechaseAvailable,
                         active: availability.planechaseActive,
-                        preferred: preferredAction ==
-                            LifeCounterGameModesAction.openPlanechase ||
+                        preferred:
                             preferredAction ==
-                                LifeCounterGameModesAction.editPlanechaseCards ||
+                                LifeCounterGameModesAction.openPlanechase ||
                             preferredAction ==
-                                LifeCounterGameModesAction.closePlanechaseCardPool ||
+                                LifeCounterGameModesAction
+                                    .editPlanechaseCards ||
+                            preferredAction ==
+                                LifeCounterGameModesAction
+                                    .closePlanechaseCardPool ||
                             preferredAction ==
                                 LifeCounterGameModesAction.closePlanechase,
                         preferredIntent: preferredIntent,
@@ -219,8 +222,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             LifeCounterGameModesAction.editPlanechaseCards,
                         closeCardPoolAction:
                             LifeCounterGameModesAction.closePlanechaseCardPool,
-                        closeAction:
-                            LifeCounterGameModesAction.closePlanechase,
+                        closeAction: LifeCounterGameModesAction.closePlanechase,
                       ),
                       const SizedBox(height: 10),
                       _GameModeStatusCard(
@@ -232,12 +234,14 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             'Scheme runtime remains embedded for now while the migration contract is prepared.',
                         available: availability.archenemyAvailable,
                         active: availability.archenemyActive,
-                        preferred: preferredAction ==
-                            LifeCounterGameModesAction.openArchenemy ||
+                        preferred:
+                            preferredAction ==
+                                LifeCounterGameModesAction.openArchenemy ||
                             preferredAction ==
                                 LifeCounterGameModesAction.editArchenemyCards ||
                             preferredAction ==
-                                LifeCounterGameModesAction.closeArchenemyCardPool ||
+                                LifeCounterGameModesAction
+                                    .closeArchenemyCardPool ||
                             preferredAction ==
                                 LifeCounterGameModesAction.closeArchenemy,
                         preferredIntent: preferredIntent,
@@ -250,8 +254,7 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                             LifeCounterGameModesAction.editArchenemyCards,
                         closeCardPoolAction:
                             LifeCounterGameModesAction.closeArchenemyCardPool,
-                        closeAction:
-                            LifeCounterGameModesAction.closeArchenemy,
+                        closeAction: LifeCounterGameModesAction.closeArchenemy,
                       ),
                       const SizedBox(height: 10),
                       _GameModeStatusCard(
@@ -264,11 +267,13 @@ class _LifeCounterNativeGameModesSheet extends StatelessWidget {
                         available: availability.bountyAvailable,
                         active: availability.bountyActive,
                         preferred:
-                            preferredAction == LifeCounterGameModesAction.openBounty ||
+                            preferredAction ==
+                                LifeCounterGameModesAction.openBounty ||
                             preferredAction ==
                                 LifeCounterGameModesAction.editBountyCards ||
                             preferredAction ==
-                                LifeCounterGameModesAction.closeBountyCardPool ||
+                                LifeCounterGameModesAction
+                                    .closeBountyCardPool ||
                             preferredAction ==
                                 LifeCounterGameModesAction.closeBounty,
                         preferredIntent: preferredIntent,
@@ -442,7 +447,8 @@ class _GameModeStatusCard extends StatelessWidget {
               ),
             ],
             if (preferred &&
-                preferredIntent == LifeCounterGameModesEntryIntent.editCards) ...[
+                preferredIntent ==
+                    LifeCounterGameModesEntryIntent.editCards) ...[
               const SizedBox(height: 10),
               Text(
                 'Continuing will hand off to the embedded $title card pool editor while ManaLoom keeps ownership of the entry shell.',
@@ -460,7 +466,8 @@ class _GameModeStatusCard extends StatelessWidget {
               onPressed:
                   available && !blockedByActiveModeLimit
                       ? () => Navigator.of(context).pop(
-                        preferredIntent == LifeCounterGameModesEntryIntent.editCards
+                        preferredIntent ==
+                                LifeCounterGameModesEntryIntent.editCards
                             ? editAction
                             : openAction,
                       )
@@ -474,7 +481,8 @@ class _GameModeStatusCard extends StatelessWidget {
                     : cardPoolActive
                     ? 'Return To Embedded Card Pool'
                     : preferred
-                    ? preferredIntent == LifeCounterGameModesEntryIntent.editCards
+                    ? preferredIntent ==
+                            LifeCounterGameModesEntryIntent.editCards
                         ? 'Continue To Embedded Card Pool'
                         : 'Continue With $title'
                     : active
@@ -484,12 +492,15 @@ class _GameModeStatusCard extends StatelessWidget {
             ),
             if (available &&
                 !blockedByActiveModeLimit &&
-                preferredIntent == LifeCounterGameModesEntryIntent.openMode) ...[
+                preferredIntent ==
+                    LifeCounterGameModesEntryIntent.openMode) ...[
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
-                  key: Key('life-counter-native-game-modes-$keyName-edit-cards'),
+                  key: Key(
+                    'life-counter-native-game-modes-$keyName-edit-cards',
+                  ),
                   onPressed: () => Navigator.of(context).pop(editAction),
                   icon: const Icon(Icons.style_outlined),
                   label: const Text('Edit Card Pool'),
@@ -504,7 +515,8 @@ class _GameModeStatusCard extends StatelessWidget {
                   key: Key(
                     'life-counter-native-game-modes-$keyName-close-card-pool',
                   ),
-                  onPressed: () => Navigator.of(context).pop(closeCardPoolAction),
+                  onPressed:
+                      () => Navigator.of(context).pop(closeCardPoolAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
                   label: const Text('Close Embedded Card Pool'),
                 ),
@@ -515,7 +527,9 @@ class _GameModeStatusCard extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
-                  key: Key('life-counter-native-game-modes-$keyName-close-overlay'),
+                  key: Key(
+                    'life-counter-native-game-modes-$keyName-close-overlay',
+                  ),
                   onPressed: () => Navigator.of(context).pop(closeAction),
                   icon: const Icon(Icons.close_fullscreen_rounded),
                   label: const Text('Close Embedded Overlay'),
@@ -628,6 +642,7 @@ Future<void> _showGameModeInfoSheet(
                             key: Key(
                               'life-counter-native-game-modes-${info.keyName}-info-close',
                             ),
+                            tooltip: 'Fechar informações',
                             onPressed: () => Navigator.of(context).pop(),
                             icon: const Icon(Icons.close_rounded),
                             color: AppTheme.textSecondary,
@@ -714,7 +729,8 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
           'Your first roll each turn is free. Every extra roll costs one mana more than the previous roll.',
           'Planeswalk on the planeswalker symbol, trigger chaos on the chaos symbol, and blank faces do nothing.',
         ],
-        tip: 'Tip: long-press the Planechase button to roll the planar die instantly.',
+        tip:
+            'Tip: long-press the Planechase button to roll the planar die instantly.',
       );
     case LifeCounterGameModeKind.archenemy:
       return (
@@ -727,7 +743,8 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
           'Ongoing schemes stay in play until abandoned or completed.',
           'When a scheme is finished, the next one comes from the shared scheme deck.',
         ],
-        tip: 'Tip: keep an eye on ongoing schemes because they stack pressure across turns.',
+        tip:
+            'Tip: keep an eye on ongoing schemes because they stack pressure across turns.',
       );
     case LifeCounterGameModeKind.bounty:
       return (
@@ -740,7 +757,8 @@ _gameModeInfo(LifeCounterGameModeKind modeKind) {
           'If a player completes the bounty, they claim the reward and a new one appears on the next turn.',
           'If no one claims it, the reward level escalates up to level 4.',
         ],
-        tip: 'Tip: Bounty rewards snowball quickly, so unanswered objectives become table-wide pressure.',
+        tip:
+            'Tip: Bounty rewards snowball quickly, so unanswered objectives become table-wide pressure.',
       );
   }
 }

@@ -40,39 +40,19 @@ class _MarketScreenState extends State<MarketScreen>
         return Scaffold(
           backgroundColor: AppTheme.backgroundAbyss,
           appBar: AppBar(
-            title: Row(
-              children: [
-                const Icon(
-                  Icons.trending_up,
-                  color: AppTheme.mythicGold,
-                  size: 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Market',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+            toolbarHeight: 54,
+            title: const Text('Market'),
+            centerTitle: true,
             backgroundColor: AppTheme.backgroundAbyss,
+            surfaceTintColor: AppTheme.transparent,
             elevation: 0,
+            titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontFamily: AppTheme.displayFontFamily,
+              fontSize: AppTheme.fontLg + 1,
+              fontWeight: FontWeight.w700,
+            ),
             actions: [
-              if (provider.moversData != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Center(
-                    child: Text(
-                      '${provider.moversData!.totalTracked} cartas',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontSm,
-                      ),
-                    ),
-                  ),
-                ),
               IconButton(
                 icon: const Icon(Icons.refresh, color: AppTheme.textSecondary),
                 onPressed: provider.isLoading ? null : () => provider.refresh(),
@@ -82,8 +62,8 @@ class _MarketScreenState extends State<MarketScreen>
             ],
             bottom: TabBar(
               controller: _tabController,
-              indicatorColor: AppTheme.mythicGold,
-              labelColor: AppTheme.mythicGold,
+              indicatorColor: AppTheme.brass400,
+              labelColor: AppTheme.brass400,
               unselectedLabelColor: AppTheme.textSecondary,
               tabs: const [
                 Tab(
@@ -156,7 +136,7 @@ class _MarketScreenState extends State<MarketScreen>
   Widget _buildDateHeader(MarketMoversData data) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: AppTheme.surfaceElevated,
+      color: AppTheme.backgroundAbyss,
       child: Row(
         children: [
           const Icon(
@@ -192,13 +172,13 @@ class _MarketScreenState extends State<MarketScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: AppTheme.mythicGold.withValues(alpha: 0.15),
+              color: AppTheme.brass400.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
             child: Text(
               'USD',
               style: TextStyle(
-                color: AppTheme.mythicGold,
+                color: AppTheme.brass400,
                 fontSize: AppTheme.fontSm,
                 fontWeight: FontWeight.bold,
               ),
@@ -215,7 +195,7 @@ class _MarketScreenState extends State<MarketScreen>
     required MarketProvider provider,
   }) {
     return RefreshIndicator(
-      color: AppTheme.mythicGold,
+      color: AppTheme.brass400,
       backgroundColor: AppTheme.surfaceSlate,
       onRefresh: () => provider.refresh(),
       child: ListView.builder(
@@ -237,7 +217,7 @@ class _MarketScreenState extends State<MarketScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(color: AppTheme.mythicGold),
+          CircularProgressIndicator(color: AppTheme.brass500),
           SizedBox(height: 16),
           Text(
             'Carregando dados do mercado...',
@@ -272,7 +252,8 @@ class _MarketScreenState extends State<MarketScreen>
               icon: const Icon(Icons.refresh),
               label: const Text('Tentar novamente'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.manaViolet,
+                backgroundColor: AppTheme.brass500,
+                foregroundColor: AppTheme.backgroundAbyss,
               ),
             ),
           ],
@@ -297,11 +278,7 @@ class _MarketScreenState extends State<MarketScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.hourglass_top,
-              size: 48,
-              color: AppTheme.mythicGold,
-            ),
+            const Icon(Icons.hourglass_top, size: 48, color: AppTheme.brass400),
             const SizedBox(height: 16),
             Text(
               message,
@@ -575,11 +552,11 @@ class _MoverCard extends StatelessWidget {
   Color _rarityColor(String rarity) {
     switch (rarity.toLowerCase()) {
       case 'mythic':
-        return AppTheme.mythicGold;
+        return AppTheme.brass400;
       case 'rare':
-        return AppTheme.mythicGold.withValues(alpha: 0.7);
+        return AppTheme.brass400.withValues(alpha: 0.7);
       case 'uncommon':
-        return AppTheme.primarySoft;
+        return AppTheme.brass400;
       case 'common':
         return AppTheme.textSecondary;
       default:

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/providers/deck_provider.dart';
-import '../../social/screens/user_profile_screen.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../providers/community_provider.dart';
 
@@ -83,7 +83,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         title: Text(_deckData?['name'] ?? 'Deck Público'),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
         actions: [
           if (_deckData != null)
             IconButton(
@@ -94,10 +94,10 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppTheme.primarySoft,
+                          color: AppTheme.brass400,
                         ),
                       )
-                      : const Icon(Icons.copy, color: AppTheme.primarySoft),
+                      : const Icon(Icons.copy, color: AppTheme.brass400),
               tooltip: 'Copiar para meus decks',
               onPressed: _isCopying ? null : _copyDeck,
             ),
@@ -110,7 +110,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+        child: CircularProgressIndicator(color: AppTheme.brass500),
       );
     }
 
@@ -178,13 +178,13 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.manaViolet.withValues(alpha: 0.2),
+                        color: AppTheme.brass400.withValues(alpha: 0.16),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                       ),
                       child: Text(
                         _capitalize(deck['format'] ?? ''),
                         style: const TextStyle(
-                          color: AppTheme.manaViolet,
+                          color: AppTheme.brass400,
                           fontWeight: FontWeight.w600,
                           fontSize: AppTheme.fontSm,
                         ),
@@ -205,30 +205,22 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                       child: GestureDetector(
                         onTap:
                             deck['owner_id'] != null
-                                ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (_) => UserProfileScreen(
-                                            userId: deck['owner_id'] as String,
-                                          ),
-                                    ),
-                                  );
-                                }
+                                ? () => context.push(
+                                  '/community/user/${deck['owner_id']}',
+                                )
                                 : null,
                         child: Text(
                           deck['owner_username'] ?? 'Anônimo',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: AppTheme.primarySoft,
+                            color: AppTheme.brass400,
                             fontSize: AppTheme.fontMd,
                             decoration:
                                 deck['owner_id'] != null
                                     ? TextDecoration.underline
                                     : null,
-                            decorationColor: AppTheme.primarySoft,
+                            decorationColor: AppTheme.brass400,
                           ),
                         ),
                       ),
@@ -261,13 +253,13 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                       const Icon(
                         Icons.auto_awesome,
                         size: 16,
-                        color: AppTheme.mythicGold,
+                        color: AppTheme.brass400,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Sinergia: ${deck['synergy_score']}%',
                         style: const TextStyle(
-                          color: AppTheme.mythicGold,
+                          color: AppTheme.brass400,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -292,7 +284,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppTheme.textPrimary,
                         ),
                       )
                       : const Icon(Icons.file_copy_outlined),
@@ -300,8 +292,8 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                 _isCopying ? 'Copiando...' : 'Copiar Deck para minha coleção',
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primarySoft,
-                foregroundColor: Colors.white,
+                backgroundColor: AppTheme.brass500,
+                foregroundColor: AppTheme.backgroundAbyss,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -317,7 +309,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
             const Text(
               '🏆 Comandante',
               style: TextStyle(
-                color: AppTheme.mythicGold,
+                color: AppTheme.brass400,
                 fontWeight: FontWeight.bold,
                 fontSize: AppTheme.fontLg,
               ),
@@ -343,7 +335,7 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
                 Text(
                   '$type ($totalQty)',
                   style: const TextStyle(
-                    color: AppTheme.primarySoft,
+                    color: AppTheme.brass400,
                     fontWeight: FontWeight.bold,
                     fontSize: AppTheme.fontLg,
                   ),

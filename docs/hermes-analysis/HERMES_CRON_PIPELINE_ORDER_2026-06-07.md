@@ -281,7 +281,7 @@ Purpose:
 
 - Generate replays for baseline and proposed optimized deck.
 - Detect bad attacks, bad blocks, bad spell timing, bad counter/removal use, ignored wincons and tutor mistakes.
-- If the battle AI made bad decisions, fix `battle_analyst_v8.py` before trusting optimizer results.
+- If the battle AI made bad decisions, fix the active engine `battle_analyst_v9.py` before trusting optimizer results.
 
 Current state:
 

@@ -3,6 +3,236 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-04 — Gate premium de validacao visual
+
+Motivo:
+
+- A auditoria UI estatica/Hermes encontrava cores diretas, touch targets e
+  problemas objetivos, mas nao validava no nivel exigido por produto: proporcao
+  real dos cards, planos de fundo, seams de imagem, tipografia, cor de texto em
+  botoes/tabs, poluicao visual e coerencia com `Meus Decks`.
+- Para evitar falso `PASS`, qualquer decisao visual app-facing passa a exigir
+  gate estatico premium + prova viva no iPhone Simulator.
+
+Patch aplicado:
+
+- Criado `server/config/premium_visual_qa_surfaces.json` com matriz de telas,
+  arquivos, capturas obrigatorias e foco de revisao.
+- Criado `server/bin/premium_visual_audit.py` e wrapper
+  `server/bin/premium_visual_audit.sh`.
+- Criado `docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md`.
+- Baseline atual gerada em
+  `docs/qa/manaloom_premium_visual_audit_latest.md`.
+
+Comando:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+python3 server/bin/premium_visual_audit.py \
+  --include-life-counter \
+  --output docs/qa/manaloom_premium_visual_audit_latest.md
+```
+
+Resultado baseline:
+
+- `VISUAL_PREMIUM_QA_RESULT: signals=304 P1=0 P2=304 visual_pass=false`.
+- `visual_pass=false` e intencional: proporcao, background, legibilidade real,
+  poluicao visual e fidelidade ao mockup so podem ser aprovadas apos revisar
+  screenshots do iPhone Simulator.
+
+Regra operacional:
+
+- Sem screenshot revisado, usar no maximo `PASS_STATIC_ONLY` ou
+  `PASS_WITH_RISKS`, nunca `PASS` visual.
+- O gate premium aponta onde revisar; a correcao so deve ser feita quando o
+  screenshot confirmar drift real ou quando o sinal for claramente indevido.
+
+## 2026-06-04 — Hermes UI audit cron endurecida
+
+Motivo:
+
+- O `UI_AUDIT` remoto estava util como radar, mas precisava ficar versionado,
+  menos ruidoso e sem avancar estado quando o Hermes falhasse ou devolvesse
+  resposta incompleta.
+- A cron remota tambem estava usando scripts root-owned e um relatorio sem
+  permissao de escrita para o usuario `hermes`.
+
+Patch aplicado:
+
+- `flutter_ui_static_auditor.py` e wrapper `.sh` foram versionados em
+  `server/bin/`.
+- `ui_audit_pipeline.py` passou a exigir marcador `UI_AUDIT_BATCH_RESULT` antes
+  de atualizar estado e agora escreve o relatorio pelo proprio script.
+- O auditor estatico separa repo de scan (`mtgia-sync`/master) do repo de
+  memoria (`codex/hermes-analysis-docs`).
+- Cron `manaloom-flutter-ui-auditor` no Hermes foi ajustada para `every 180m`.
+- Ownership remoto de scripts e `docs/hermes-analysis` foi corrigido para
+  `hermes:hermes`.
+- Tooltips foram adicionados em acoes claras de UI para zerar o P1 objetivo de
+  `icon_button_missing_tooltip`.
+
+Validacao:
+
+- `python3 -m py_compile server/bin/ui_audit_pipeline.py server/bin/flutter_ui_static_auditor.py`;
+- auditor local com `UI_STATIC_REPORT_FILE=/tmp/...` retornou
+  `UI_AUDIT_RESULT: findings=215 P0=0 P1=0 P2=215`;
+- scripts sincronizados e executados manualmente no Hermes.
+
+Risco restante:
+
+- O auditor UI e estatico. P2 de cor/touch target precisa de prova visual no
+  iPhone Simulator antes de virar correcao obrigatoria.
+
+## 2026-06-04 — Gate seguro para loop Hermes -> App
+
+Motivo:
+
+- O Hermes passou a produzir learned decks consumidos pelo app via
+  `/ai/commander-learning`, mas a publicacao automatica precisava ser separada do
+  aprendizado continuo.
+- Eventos salvos pelo app/backend usavam contagem por linha em vez de quantidade
+  total e podiam registrar o proprio comandante como hot card.
+
+Patch aplicado:
+
+- `deck_learning_events.card_count` agora usa quantidade real e registra
+  `cards_quantity_total`, `commander_quantity` e `main_quantity`.
+- Decks salvos com `card_id` agora resolvem nomes antes de gravar evento de
+  aprendizado.
+- `commander_card_usage` filtra comandante e duplicatas antes de alimentar prompts.
+- `commander_learned_deck.dart` ganhou gate Commander 100/99+1; `--apply` e
+  `--dry-run --strict` falham quando o payload nao passa.
+- `auto_promote_learned_decks.py` exige card list parseada com 100 cartas, 1
+  comandante e 99 main por padrao.
+- `auto_sync_learned_decks.py` virou dry-run estrito por default; publicar no PG
+  exige `--apply` ou `HERMES_AUTO_SYNC_APPLY=1`.
+- Auditoria consolidada em
+  `server/doc/HERMES_APP_LEARNING_SYNC_AUDIT_2026-06-04.md`.
+
+Validacao:
+
+- `dart analyze lib/ai/deck_learning_event_support.dart lib/ai/commander_learned_deck_support.dart routes/decks/index.dart bin/commander_learned_deck.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart`;
+- `dart test test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart -r expanded`;
+- `python3 -m py_compile` nos scripts Hermes de pull/promote/sync/export.
+
+Riscos restantes:
+
+- O loop e autoaprendivel para melhorar prompt e sinais, mas nao deve ser
+  auto-publicavel sem scorecard/runtime por comandante novo.
+- O Hermes segue sem prova visual iOS; qualquer fluxo app-facing novo precisa
+  continuar validado localmente no iPhone Simulator.
+
+## 2026-05-28 — Politica versionada para fallbacks Commander optimize/complete
+
+Motivo:
+
+- Hermes apontou que o runtime de complete/optimize mantinha listas de nomes
+  premium, denylist e staples espalhadas em `optimize_runtime_support.dart`.
+- A correcao precisava ser conservadora: mover a politica para um ponto
+  versionado sem alterar a selecao de cartas em producao.
+
+Patch aplicado:
+
+- Criado `server/lib/ai/commander_fallback_policy.dart` com
+  `commanderFallbackPolicyVersion`.
+- Movidas para a politica versionada as listas de denylist, premium filler,
+  staples de completion, fallbacks universais e foundation fillers contextuais.
+- Tambem foram movidas para a mesma policy as listas de fixing lands premium,
+  nomes high-power e nomes premium usados por candidate quality.
+- `optimize_runtime_support.dart` passa a consumir essa politica e mantém os
+  gates existentes de identidade de cor, legalidade, bracket e qualidade.
+- `candidate_quality_data_support.dart` passa a consumir a policy central para
+  bracket scope high-power e bonus premium.
+
+Validacao:
+
+- Testes adicionados em `server/test/optimize_runtime_support_test.dart` para
+  provar consumo da denylist, bonus premium, staples universais e foundation
+  fillers contextuais.
+- Testes adicionados em `server/test/candidate_quality_data_support_test.dart`
+  para provar bracket high-power e premium name policy.
+
+Riscos restantes:
+
+- Esta etapa centraliza a politica, mas ainda nao substitui a curadoria por
+  tabela DB/backfill operacional. Qualquer mudanca de conteudo da politica deve
+  passar por scorecard optimize antes de deploy.
+
+## 2026-05-28 — Optimize usa multi-tags semanticas v2 nos deltas
+
+Motivo:
+
+- Hermes apontou que o optimize lia `semantic_tags_v2`, mas colapsava cada carta
+  para um unico papel. Isso escondia perdas de papel secundario, por exemplo uma
+  carta `draw + engine` trocada por `removal`.
+
+Patch aplicado:
+
+- Criado `optimizationFunctionalRolesForCard`, que retorna o conjunto de papeis
+  semanticos confiaveis de uma carta quando `semantic_tags_v2` existe.
+- `classifyOptimizationFunctionalRole` continua retornando um papel primario
+  para compatibilidade, mas escolhe a prioridade a partir desse conjunto.
+- `OptimizationValidator` agora calcula `roleDelta` e diagnostics v2 usando
+  todos os papeis semanticos confiaveis, nao apenas o primario.
+- `filterUnsafeOptimizeSwapsByCardData` usa multi-tags v2 quando presentes e
+  preserva o fallback v1 anterior quando v2 nao existe.
+- `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` bloqueia por padrao apenas
+  perdas negativas em `draw`, `removal`, `ramp` e `wipe`; `wincon`,
+  `combo_piece`, `engine`, `payoff`, `enabler` e `protection` ficam
+  review-only.
+- `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES=true` promove `wincon`,
+  `combo_piece`, `engine`, `payoff` e `enabler` para bloqueio critico em
+  ambiente controlado.
+
+Validacao:
+
+- `dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_validator.dart lib/ai/optimization_quality_gate.dart test/optimization_validator_test.dart`;
+- `dart test test/optimization_validator_test.dart test/optimization_quality_gate_test.dart test/optimization_rules_test.dart -r expanded`.
+- backend completo: `dart analyze bin lib routes test` e `dart test`;
+- pos-deploy publico no SHA `cf225841297e3ed033ad97f26c1a651280f4819c`:
+  `semantic_layer_v2_optimize_scorecard.py` com limit 10 atingiu timeout global
+  apos 5 corpora, mas fechou `current_gate_approved_jobs=7`,
+  `semantic_shadow_would_block_approved_jobs=0`, `false_positive_candidates=0`,
+  `false_negative_candidates=0` e `semantic_v2_actual_blocked_jobs=0`.
+
+Riscos restantes:
+
+- A flag de enforcement segue desligada por padrao. Antes de ativar `partial`
+  em producao, rodar novo scorecard publico/controlled com corpora completos
+  sem timeout global.
+- O conteudo da politica de fallbacks complete/optimize ainda e curado por
+  nomes, mas agora fica centralizado em policy data versionada.
+
+## 2026-05-28 — Deck Analysis usa semantic_tags_v2 antes de heuristica
+
+Motivo:
+
+- Hermes apontou que `summarizeFunctionalTagsForDeck` ja carregava
+  `semantic_tags_v2`, mas as contagens de funcoes ainda caiam direto para
+  heuristica quando `card_function_tags` nao existia.
+
+Patch aplicado:
+
+- `summarizeFunctionalTagsForDeck` agora resolve tags por carta na ordem:
+  1. `card_function_tags` persistido;
+  2. `card_semantic_tags_v2.tags` persistido;
+  3. heuristica deterministica v1.
+- `functional_tags.source.priority` passa a reportar
+  `functional_tags_then_semantic_v2_then_heuristic`.
+- `persisted_rows` e `persisted_copies` contabilizam linhas vindas de
+  `card_function_tags` ou `semantic_tags_v2`; heuristica so entra quando as
+  duas fontes persistidas nao existem.
+
+Validacao:
+
+- `dart analyze lib/ai/functional_card_tags.dart test/functional_card_tags_test.dart`;
+- `dart test test/functional_card_tags_test.dart -r expanded`.
+
+Riscos restantes:
+
+- Listas de fallback hardcoded de complete/optimize e rotas experimentais de
+  recomendacoes/weaknesses ainda precisam de uma politica semantica central.
+
 ## 2026-05-18 — Semantic Layer v2 para build/optimize/generate
 
 ### O Porquê
@@ -17494,8 +17724,11 @@ aprovados pelo quality gate atual, o status volta para `BLOCKED`.
 - Em `partial`, a decisao semantica roda somente apos o fluxo atual aprovar a
   otimizacao. O bloqueio fica restrito a deltas negativos de `draw`, `removal`,
   `ramp` ou `wipe`.
-- `protection` permanece review-only: aparece em `review_loss_roles`, mas nao
-  bloqueia.
+- `wincon`, `combo_piece`, `engine`, `payoff`, `enabler` e `protection`
+  permanecem review-only: aparecem em `review_loss_roles`, mas nao bloqueiam.
+- `SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES=true` pode promover
+  `wincon/combo_piece/engine/payoff/enabler` para bloqueio critico em ambiente
+  controlado. Ausente, vazio ou desconhecido resolve para `false`.
 - Requests com `partial` bypassam leitura e escrita do cache persistente de
   optimize para nao misturar respostas geradas com enforcement desligado.
 - Rejeicoes semanticas usam `quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED`
@@ -17739,3 +17972,119 @@ ambiguidade de contagem.
   `DABB9D79-2FDB-4585-94DB-E31F1288EE74`:
   `app/integration_test/deck_functional_tags_runtime_test.dart` PASS,
   `00:10 +1: All tests passed!`.
+
+## 150. Archetypes owner scope hardening - 2026-05-28
+
+### O Que
+
+`POST /ai/archetypes` agora escopa o `deck_id` pelo usuário autenticado antes
+de ler o deck e suas cartas.
+
+### O Porquê
+
+O endpoint sempre exigia token, mas a leitura inicial usava apenas
+`decks.id`. Isso permitiria que um usuário autenticado solicitasse opções de
+arquétipo para um deck privado de outro usuário caso conhecesse o UUID.
+
+### Resultado
+
+- lookup de deck mudou para `id + user_id`;
+- `deck_id` inexistente ou pertencente a outro usuário retorna o mesmo `404`;
+- teste source cobre o guard de ownership;
+- teste live de `/ai/archetypes` cobre cross-account com retorno `404`;
+- contrato API atualizado para explicitar que `deck_id` é owner-scoped.
+
+## 151. Semantic v2 partial optimize route contract test - 2026-05-28
+
+### O Que
+
+O contrato de rejeição semântica v2 do `/ai/optimize` agora tem teste focado em
+nível de rota.
+
+### O Porquê
+
+Antes havia cobertura helper-level para
+`SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial`, mas não havia prova do shape
+que o endpoint entrega quando a Semantic Layer v2 bloqueia uma perda crítica.
+
+### Resultado
+
+- extraído builder puro `buildSemanticV2OptimizeRejectedBody(...)` usado pela
+  rota real;
+- novo teste
+  `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart`;
+- contrato validado para `quality_error.code=OPTIMIZE_SEMANTIC_V2_REJECTED`,
+  `rejection_source=semantic_layer_v2`,
+  `blocked_by_semantic_v2=true`, `critical_loss_roles`, `review_loss_roles` e
+  `optimize_diagnostics.semantic_layer_v2`;
+- `protection` permanece review-only enquanto `draw/removal/ramp/wipe` e roles
+  contextuais críticas podem bloquear em modo `partial`.
+
+## 2026-05-30 — Refatoração weakness-analysis + Wincon Detection + Write-only tables
+
+### Weakness-analysis agora usa adapter F1
+
+- `POST /ai/weakness-analysis` substituiu ~80 linhas de heurísticas oracle_text por
+  `resolveCardFunctionalRoles()` (adapter F1, prioridade: `persistida > semantic_v2 > heurística`)
+- Contagem de ramp/draw/removal/wipes/protection/graveyard/wincon agora usa tags funcionais
+- Detecção de wincon usa `roles.contains('wincon') || roles.contains('combo_piece')`
+- Recomendações hardcoded preservadas como exemplos — não afetam a lógica de classificação
+
+### Wincon como critical role no quality gate
+
+- `_criticalRolesForArchetype()` em `optimization_quality_gate.dart` agora inclui `wincon`
+  para todos os arquétipos (aggro, control, midrange, default)
+- Quality gate bloqueia swaps que removem win conditions do deck
+- `weakness-analysis` reporta `wincon_count` via F1 adapter
+
+### Tabelas Write-only — documentadas como audit logs
+
+Três tabelas operam como audit logs (escritas, nunca lidas pelo runtime). Política:
+- `deck_matchups` — resultados de `POST /ai/simulate-matchup`. Uso futuro: cache de matchup.
+- `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`. Uso futuro: histórico.
+- `ml_prompt_feedback` — helper em `ml_knowledge_service.dart`, sem chamador runtime.
+
+Retenção recomendada: DELETE > 90 dias para evitar acúmulo sem consumidor.
+
+### F1/F3/Bracket — status atual
+
+- Adapter F1 (`resolveCardFunctionalRoles`): unificado em `optimization_functional_roles.dart`
+- F3 modularização: `optimize_filler_loader_support.dart`, `optimize_route_internal.dart`, `optimize_response_support.dart`
+- Bracket expansion: 5 novas categorias (boardWipe, cardAdvantage, stax, protection, valueEngine) — 53/53 GCs detectados
+- `card_deck_profiles` (670 perfis) integrado ao `filterUnsafeOptimizeSwapsByCardData`
+- `_looksLikePayoff` expandido para detectar payoffs de dano direto (Impact Tremors, Guttersnipe)
+
+## 2026-06-04 — Hermes AWS operational audit
+
+Hermes AWS foi validado como camada residente de auditoria/aprendizado, com
+correções operacionais aplicadas no servidor:
+
+- `jobs.json` voltou a ser legível pelo usuário `hermes`;
+- crontab externo ao Hermes foi desativado;
+- jobs centrais do learning loop passaram a ser recorrentes:
+  `pull-learning-events` 30m, `auto-sync-learned-decks` 120m,
+  `auto-promote-learned` 360m;
+- scripts remotos de auto-sync/auto-promote foram alinhados ao `master`
+  `70e170f0`;
+- `mtgia-sync` foi atualizado para executar o importador strict atual;
+- product-code drift acidental na branch de memória foi revertido e preservado
+  como patch em `docs/hermes-analysis/ops-audits`.
+
+Relatório completo:
+`server/doc/HERMES_AWS_OPERATIONAL_AUDIT_2026-06-04.md`.
+
+## 2026-06-04 — Life Counter accessibility/layout pass
+
+Passe focado no Life Counter reduziu achados objetivos de UX estática sem
+redesenhar a mesa:
+
+- `interactive_without_semantics_hint` no Life Counter caiu para zero;
+- teclado de vida usa `DEL` em vez de texto corrompido;
+- overlays de card search, set life e player appearance receberam
+  `Semantics`/`Tooltip`;
+- textos corrompidos user-facing foram corrigidos;
+- prova viva passou no iPhone 15 Pro Max Simulator para base visual, card
+  search, set life e player appearance.
+
+Relatório:
+`server/doc/LIFE_COUNTER_ACCESSIBILITY_LAYOUT_PASS_2026-06-04.md`.

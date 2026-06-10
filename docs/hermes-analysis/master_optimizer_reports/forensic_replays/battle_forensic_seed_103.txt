@@ -1,0 +1,390 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #118 (real), Kinnan, Bonder Prodigy #84 (real), Arcum Dagsson #53 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 1 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #118 (real): 3 mulligan(s), 5 cards, 0 lands
+  Kinnan, Bonder Prodigy #84 (real): 1 mulligan(s), 7 cards, 2 lands
+  Arcum Dagsson #53 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=0
+  MANA Kinnan, Bonder Prodigy #84 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Fellwar Stone (CMC=2.0) [ramp_permanent] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=0
+  MANA Arcum Dagsson #53 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Hangarback Walker (CMC=0.0) [token_maker] rule=curated/verified
+  END Arcum Dagsson #53 (real): Life=40 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=0 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=3
+  MANA Kinnan, Bonder Prodigy #84 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 2 - Arcum Dagsson #53 (real) | Life=40 Hand=6 Board=6
+  MANA Arcum Dagsson #53 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=40)
+  DAMAGE Arcum Dagsson #53 (real) -> Lorehold: 10 player damage, target life 30, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=30 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  END Lorehold: Life=30 Hand=5 Board=4 Grave=1 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #118 (real): Tropical Island (CMC=3.0) [land] rule=curated/verified
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=5
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 3 - Arcum Dagsson #53 (real) | Life=40 Hand=6 Board=7
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=30)
+  DAMAGE Arcum Dagsson #53 (real) -> Lorehold: 10 player damage, target life 20, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=7 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=20 Hand=5 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=manual/verified
+  REMOVAL Lorehold: Path to Exile removed Copy Artifact from Kinnan, Bonder Prodigy #84 (real)
+  END Lorehold: Life=20 Hand=5 Board=4 Grave=2 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=5 Board=2
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=5
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=6 Grave=1 Discarded=0
+
+TURN 4 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=7
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Into the Flood Maw (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Arcum Dagsson #53 (real): Into the Flood Maw removed Flesh Duplicate from Kinnan, Bonder Prodigy #84 (real)
+  COMBAT Arcum Dagsson #53 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=20)
+  DAMAGE Arcum Dagsson #53 (real) -> Lorehold: 10 player damage, target life 10, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=7 Grave=2 Discarded=0
+
+TURN 5 - Lorehold | Life=10 Hand=5 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=10 Hand=5 Board=5 Grave=2 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=4 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=5
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=6 Grave=2 Discarded=0
+
+TURN 5 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=7
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=10)
+  DAMAGE Arcum Dagsson #53 (real) -> Lorehold: 10 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=4 Board=6
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=3 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=6
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=7 Grave=2 Discarded=0
+
+TURN 6 - Arcum Dagsson #53 (real) | Life=40 Hand=8 Board=7
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 5 attackers, 2 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=40)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 6 player damage, target life 34, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=5 Grave=6 Discarded=2
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=34 Hand=3 Board=8
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=34 Hand=3 Board=9 Grave=0 Discarded=0
+
+TURN 7 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=7
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=8 Grave=2 Discarded=0
+
+TURN 7 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=5
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 2 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=34)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 32, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=3 Grave=9 Discarded=1
+
+TURN 8 - Rograkh, Son of Rohgahh #118 (real) | Life=32 Hand=3 Board=9
+  MANA Rograkh, Son of Rohgahh #118 (real): 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=32 Hand=3 Board=10 Grave=0 Discarded=0
+
+TURN 8 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=8
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Breeding Pool (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=8 Grave=2 Discarded=0
+
+TURN 8 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=3
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=32)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 30, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=3 Grave=10 Discarded=1
+
+TURN 9 - Rograkh, Son of Rohgahh #118 (real) | Life=30 Hand=3 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=30 Hand=4 Board=10 Grave=0 Discarded=0
+
+TURN 9 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=8
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=6 Board=8 Grave=2 Discarded=0
+
+TURN 9 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=3
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=30)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 28, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=3 Grave=11 Discarded=1
+
+TURN 10 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=10
+  MANA Rograkh, Son of Rohgahh #118 (real): 7 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=11 Grave=0 Discarded=0
+
+TURN 10 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=6 Board=8
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=6 Board=9 Grave=2 Discarded=0
+
+TURN 10 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=3
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 1 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=28)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 0 player damage, target life 28, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=2 Grave=13 Discarded=1
+
+TURN 11 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=11
+  MANA Rograkh, Son of Rohgahh #118 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=12 Grave=0 Discarded=0
+
+TURN 11 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=6 Board=9
+  MANA Kinnan, Bonder Prodigy #84 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=6 Board=10 Grave=2 Discarded=0
+
+TURN 11 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=2
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=2 Grave=14 Discarded=1
+
+TURN 12 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=12
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=13 Grave=0 Discarded=0
+
+TURN 12 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=6 Board=10
+  MANA Kinnan, Bonder Prodigy #84 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): The One Ring (CMC=4.0) [draw_engine] rule=manual/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=11 Grave=2 Discarded=0
+
+TURN 12 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=2
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=2 Grave=15 Discarded=1
+
+TURN 13 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=13
+  MANA Rograkh, Son of Rohgahh #118 (real): 9 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #118 (real): Tezzeret, Cruel Captain (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Rograkh, Son of Rohgahh #118 (real): Tezzeret, Cruel Captain found Mox Amber (artifact_or_enchantment)
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=14 Grave=1 Discarded=0
+
+TURN 13 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=11
+  MANA Kinnan, Bonder Prodigy #84 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=13 Grave=2 Discarded=0
+
+TURN 13 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=2
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=2 Grave=16 Discarded=1
+
+TURN 14 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=14
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=15 Grave=1 Discarded=0
+
+TURN 14 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=13
+  MANA Kinnan, Bonder Prodigy #84 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=15 Grave=2 Discarded=0
+
+TURN 14 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=2
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=7 Board=2 Grave=17 Discarded=1
+
+TURN 15 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=15
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=16 Grave=1 Discarded=0
+
+TURN 15 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=15
+  MANA Kinnan, Bonder Prodigy #84 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=15 Grave=4 Discarded=2
+
+TURN 15 - Arcum Dagsson #53 (real) | Life=40 Hand=7 Board=2
+  MANA Arcum Dagsson #53 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Arcum Dagsson #53 (real): Life=40 Hand=6 Board=4 Grave=17 Discarded=0
+
+TURN 16 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=16
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=17 Grave=1 Discarded=0
+
+TURN 16 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=6 Board=15
+  MANA Kinnan, Bonder Prodigy #84 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Minamo, School at Water's Edge (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=15 Grave=4 Discarded=0
+
+TURN 16 - Arcum Dagsson #53 (real) | Life=40 Hand=6 Board=4
+  MANA Arcum Dagsson #53 (real): 5 available (3 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=6 Board=6 Grave=17 Discarded=0
+
+TURN 17 - Rograkh, Son of Rohgahh #118 (real) | Life=28 Hand=4 Board=17
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=28 Hand=4 Board=18 Grave=1 Discarded=0
+
+TURN 17 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=15
+  MANA Kinnan, Bonder Prodigy #84 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=15 Grave=6 Discarded=2
+
+TURN 17 - Arcum Dagsson #53 (real) | Life=40 Hand=6 Board=6
+  MANA Arcum Dagsson #53 (real): 6 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Simulacrum Synthesizer (CMC=3.0) [token_maker] rule=curated/verified
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 5 attackers, 4 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=28)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 26, target_dead=False
+  RESOLVE Arcum Dagsson #53 (real): Grafdigger's Cage (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Arcum Dagsson #53 (real): Life=40 Hand=5 Board=8 Grave=22 Discarded=0
+
+TURN 18 - Rograkh, Son of Rohgahh #118 (real) | Life=26 Hand=4 Board=18
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=26 Hand=5 Board=18 Grave=1 Discarded=0
+
+TURN 18 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=15
+  MANA Kinnan, Bonder Prodigy #84 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=16 Grave=7 Discarded=1
+
+TURN 18 - Arcum Dagsson #53 (real) | Life=40 Hand=5 Board=8
+  MANA Arcum Dagsson #53 (real): 6 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Sink into Stupor (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Arcum Dagsson #53 (real): Sink into Stupor removed Disciple of Freyalise from Rograkh, Son of Rohgahh #118 (real)
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=26)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 24, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=4 Board=9 Grave=23 Discarded=0
+
+TURN 19 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=17
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=18 Grave=2 Discarded=0
+
+TURN 19 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=16
+  MANA Kinnan, Bonder Prodigy #84 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=17 Grave=8 Discarded=1
+
+TURN 19 - Arcum Dagsson #53 (real) | Life=40 Hand=4 Board=9
+  MANA Arcum Dagsson #53 (real): 6 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Blinkmoth Nexus (CMC=3.0) [land] rule=curated/verified
+  COMBAT Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 1 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=24)
+  DAMAGE Arcum Dagsson #53 (real) -> Rograkh, Son of Rohgahh #118 (real): 0 player damage, target life 24, target_dead=False
+  END Arcum Dagsson #53 (real): Life=40 Hand=3 Board=9 Grave=24 Discarded=0
+
+TURN 20 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=18
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #118 (real): Spire Garden (CMC=3.0) [land] rule=curated/verified
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=18 Grave=2 Discarded=0
+
+TURN 20 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=17
+  MANA Kinnan, Bonder Prodigy #84 (real): 11 available (9 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=18 Grave=9 Discarded=1
+
+TURN 20 - Arcum Dagsson #53 (real) | Life=40 Hand=3 Board=9
+  MANA Arcum Dagsson #53 (real): 6 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=2 Board=11 Grave=24 Discarded=0
+
+TURN 21 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=18
+  MANA Rograkh, Son of Rohgahh #118 (real): 10 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Fierce Guardianship (CMC=3.0) [counter] rule=curated/verified
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=19 Grave=2 Discarded=0
+
+TURN 21 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=18
+  MANA Kinnan, Bonder Prodigy #84 (real): 12 available (10 sources, 0 treasures, pool={'generic': 12, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Arcum Dagsson #53 (real): Mental Misstep (CMC=1.0) [counter] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=20 Grave=9 Discarded=0
+
+TURN 21 - Arcum Dagsson #53 (real) | Life=40 Hand=0 Board=11
+  MANA Arcum Dagsson #53 (real): 7 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=0 Board=12 Grave=24 Discarded=0
+
+TURN 22 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=19
+  MANA Rograkh, Son of Rohgahh #118 (real): 11 available (9 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=20 Grave=2 Discarded=0
+
+TURN 22 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=20
+  MANA Kinnan, Bonder Prodigy #84 (real): 13 available (11 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Boseiju, Who Endures (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=21 Grave=9 Discarded=0
+
+TURN 22 - Arcum Dagsson #53 (real) | Life=40 Hand=0 Board=12
+  MANA Arcum Dagsson #53 (real): 7 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=0 Board=13 Grave=24 Discarded=0
+
+TURN 23 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=20
+  MANA Rograkh, Son of Rohgahh #118 (real): 13 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=21 Grave=2 Discarded=0
+
+TURN 23 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=21
+  MANA Kinnan, Bonder Prodigy #84 (real): 16 available (12 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Tropical Island (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=22 Grave=9 Discarded=0
+
+TURN 23 - Arcum Dagsson #53 (real) | Life=40 Hand=0 Board=13
+  MANA Arcum Dagsson #53 (real): 7 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 2, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=0 Board=14 Grave=24 Discarded=0
+
+TURN 24 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=21
+  MANA Rograkh, Son of Rohgahh #118 (real): 13 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=22 Grave=2 Discarded=0
+
+TURN 24 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=22
+  MANA Kinnan, Bonder Prodigy #84 (real): 16 available (12 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=25 Grave=10 Discarded=0
+
+TURN 24 - Arcum Dagsson #53 (real) | Life=40 Hand=0 Board=14
+  MANA Arcum Dagsson #53 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 3, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=0 Board=15 Grave=24 Discarded=0
+
+TURN 25 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=5 Board=22
+  MANA Rograkh, Son of Rohgahh #118 (real): 13 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=5 Board=23 Grave=2 Discarded=0
+
+TURN 25 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=7 Board=25
+  MANA Kinnan, Bonder Prodigy #84 (real): 17 available (13 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Rejuvenating Springs (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=28 Grave=10 Discarded=0
+
+TURN 25 - Arcum Dagsson #53 (real) | Life=40 Hand=0 Board=15
+  MANA Arcum Dagsson #53 (real): 8 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 3, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Arcum Dagsson #53 (real): Life=40 Hand=0 Board=16 Grave=24 Discarded=0
+
+GAME OVER - Turn 25
+Winner: none (stall)
+Lorehold: DEAD Life=0 Hand=5
+Rograkh, Son of Rohgahh #118 (real): ALIVE Life=24 Hand=5
+Kinnan, Bonder Prodigy #84 (real): ALIVE Life=40 Hand=7
+Arcum Dagsson #53 (real): ALIVE Life=40 Hand=0

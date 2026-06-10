@@ -89,26 +89,34 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
 
   // ── Imagem grande da carta ──
   Widget _buildCardImage(DeckCardItem card) {
-    return GestureDetector(
-      onTap: () => setState(() => _showEditions = !_showEditions),
-      child: Container(
-        constraints: const BoxConstraints(maxHeight: 360),
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-        child:
-            card.imageUrl != null
-                ? ClipRRect(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  child: CachedNetworkImage(
-                    imageUrl: card.imageUrl!,
-                    fit: BoxFit.contain,
-                    placeholder: (_, __) => _imagePlaceholder(),
-                    errorWidget:
-                        (_, __, ___) =>
-                            _imagePlaceholder(icon: Icons.image_not_supported),
-                  ),
-                )
-                : _imagePlaceholder(icon: Icons.style),
+    return Semantics(
+      button: true,
+      label: 'Alternar edições da carta ${card.name}',
+      child: Tooltip(
+        message: 'Alternar edições',
+        child: GestureDetector(
+          onTap: () => setState(() => _showEditions = !_showEditions),
+          child: Container(
+            constraints: const BoxConstraints(maxHeight: 360),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
+            child:
+                card.imageUrl != null
+                    ? ClipRRect(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      child: CachedNetworkImage(
+                        imageUrl: card.imageUrl!,
+                        fit: BoxFit.contain,
+                        placeholder: (_, __) => _imagePlaceholder(),
+                        errorWidget:
+                            (_, __, ___) => _imagePlaceholder(
+                              icon: Icons.image_not_supported,
+                            ),
+                      ),
+                    )
+                    : _imagePlaceholder(icon: Icons.style),
+          ),
+        ),
       ),
     );
   }
@@ -240,22 +248,29 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
           ),
           const SizedBox(width: 8),
           // Set code (tappable)
-          GestureDetector(
-            onTap: () {
-              setState(() => _showEditions = !_showEditions);
-              HapticFeedback.selectionClick();
-            },
-            child: _badge(
-              Icons.layers_outlined,
-              card.setCode.toUpperCase(),
-              AppTheme.textSecondary,
-              AppTheme.surfaceElevated,
-              chevron: widget.foundCards.length > 1,
+          Semantics(
+            button: true,
+            label: 'Alternar edições do set ${card.setCode.toUpperCase()}',
+            child: Tooltip(
+              message: 'Alternar edições',
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => _showEditions = !_showEditions);
+                  HapticFeedback.selectionClick();
+                },
+                child: _badge(
+                  Icons.layers_outlined,
+                  card.setCode.toUpperCase(),
+                  AppTheme.textSecondary,
+                  AppTheme.surfaceElevated,
+                  chevron: widget.foundCards.length > 1,
+                ),
+              ),
             ),
           ),
           const Spacer(),
           // Retry
-          _iconBtn(Icons.refresh_rounded, widget.onRetry),
+          _iconBtn(widget.onRetry),
           const SizedBox(width: 8),
           // +1 add
           _addButton(() {
@@ -299,12 +314,23 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
                   ),
                 ),
                 const Spacer(),
-                GestureDetector(
-                  onTap: () => setState(() => _showEditions = false),
-                  child: const Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 20,
-                    color: AppTheme.textSecondary,
+                Semantics(
+                  button: true,
+                  label: 'Fechar lista de edições',
+                  child: Tooltip(
+                    message: 'Fechar edições',
+                    child: GestureDetector(
+                      onTap: () => setState(() => _showEditions = false),
+                      child: const SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 20,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -394,16 +420,29 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     );
   }
 
-  Widget _iconBtn(IconData icon, VoidCallback onTap) {
-    return Material(
-      color: AppTheme.surfaceElevated,
-      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Icon(icon, size: 20, color: AppTheme.textSecondary),
+  Widget _iconBtn(VoidCallback onTap) {
+    const label = 'Tentar escanear novamente';
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          color: AppTheme.surfaceElevated,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            onTap: onTap,
+            child: const SizedBox(
+              width: 48,
+              height: 48,
+              child: Icon(
+                Icons.refresh_rounded,
+                size: 20,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -698,6 +737,7 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
                 borderSide: BorderSide.none,
               ),
               suffixIcon: IconButton(
+                tooltip: 'Buscar carta manualmente',
                 icon: const Icon(Icons.search, color: AppTheme.primarySoft),
                 onPressed: () => widget.onManualSearch(_searchController.text),
               ),

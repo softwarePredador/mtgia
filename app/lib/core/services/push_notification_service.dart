@@ -25,10 +25,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// 2. `registerToken()` → envia FCM token pro server
 /// 3. Escuta mensagens foreground/background/terminated
 class PushNotificationService {
-  static final PushNotificationService _instance =
-      PushNotificationService._internal();
+  static PushNotificationService _instance = PushNotificationService._internal();
   factory PushNotificationService() => _instance;
   PushNotificationService._internal();
+
+  @visibleForTesting
+  static void reset() {
+    _instance = PushNotificationService._internal();
+  }
 
   final _api = ApiClient();
   FirebaseMessaging? _messaging;

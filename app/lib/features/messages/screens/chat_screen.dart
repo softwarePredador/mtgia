@@ -70,14 +70,27 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    _messageController.clear();
     final ok = await context.read<MessageProvider>().sendMessage(
       widget.conversationId,
       text,
     );
-    if (ok && mounted) {
+    if (!mounted) return;
+    if (ok) {
+      _messageController.clear();
       _markAsRead();
+      return;
     }
+    if (_messageController.text.trim().isEmpty) {
+      _messageController.text = text;
+      _messageController.selection = TextSelection.collapsed(
+        offset: _messageController.text.length,
+      );
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Não foi possível enviar a mensagem. Tente novamente.'),
+      ),
+    );
   }
 
   @override
@@ -101,13 +114,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
         iconTheme: const IconThemeData(color: AppTheme.textPrimary),
         title: Row(
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppTheme.frost400.withValues(alpha: 0.18),
+              backgroundColor: AppTheme.brass400.withValues(alpha: 0.16),
               backgroundImage:
                   avatarUrl != null && avatarUrl.isNotEmpty
                       ? NetworkImage(avatarUrl)
@@ -117,7 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? Text(
                         label.isNotEmpty ? label[0].toUpperCase() : '?',
                         style: const TextStyle(
-                          color: AppTheme.frost400,
+                          color: AppTheme.brass400,
                           fontWeight: FontWeight.bold,
                           fontSize: AppTheme.fontSm,
                         ),
@@ -146,7 +159,20 @@ class _ChatScreenState extends State<ChatScreen> {
               builder: (context, provider, _) {
                 if (provider.isLoadingMessages && provider.messages.isEmpty) {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppTheme.frost400),
+                    child: CircularProgressIndicator(color: AppTheme.brass400),
+                  );
+                }
+
+                if (provider.error != null && provider.messages.isEmpty) {
+                  return AppStatePanel(
+                    key: const Key('chat-error-state'),
+                    icon: Icons.cloud_off_outlined,
+                    title: 'Não foi possível carregar a conversa',
+                    message:
+                        'Verifique sua conexão e tente carregar as mensagens novamente.',
+                    accent: AppTheme.error,
+                    actionLabel: 'Tentar novamente',
+                    onAction: _loadMessages,
                   );
                 }
 
@@ -157,7 +183,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     title: 'Conversa pronta',
                     message:
                         'Envie uma mensagem curta para combinar trocas, dúvidas ou disponibilidade.',
-                    accent: AppTheme.frost400,
+                    accent: AppTheme.brass400,
                   );
                 }
 
@@ -189,7 +215,7 @@ class _ChatScreenState extends State<ChatScreen> {
               bottom: 8 + MediaQuery.of(context).padding.bottom,
             ),
             decoration: const BoxDecoration(
-              color: AppTheme.surfaceElevated,
+              color: AppTheme.surfaceSlate,
               border: Border(
                 top: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
               ),
@@ -225,6 +251,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   builder: (context, provider, _) {
                     return IconButton(
                       key: const Key('chat-message-send-button'),
+                      tooltip: 'Enviar mensagem',
                       onPressed: provider.isSending ? null : _sendMessage,
                       icon:
                           provider.isSending

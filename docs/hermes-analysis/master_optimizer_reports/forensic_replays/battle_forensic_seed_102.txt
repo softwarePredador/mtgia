@@ -1,0 +1,452 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Winota, Joiner of Forces #73 (real), Magda, Brazen Outlaw #90 (real), Thrasios, Triton Hero #115 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 1 mulligan(s), 7 cards, 4 lands
+  Winota, Joiner of Forces #73 (real): 0 mulligan(s), 7 cards, 2 lands
+  Magda, Brazen Outlaw #90 (real): 0 mulligan(s), 7 cards, 3 lands
+  Thrasios, Triton Hero #115 (real): 1 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 1 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=0
+  MANA Magda, Brazen Outlaw #90 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #115 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #115 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=1
+  MANA Winota, Joiner of Forces #73 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=1
+  MANA Magda, Brazen Outlaw #90 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=6 Board=1
+  MANA Thrasios, Triton Hero #115 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=4
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=4 Board=7 Grave=0 Discarded=0
+
+TURN 3 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=2
+  MANA Winota, Joiner of Forces #73 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=0
+
+TURN 3 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=2
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=6 Board=2
+  MANA Thrasios, Triton Hero #115 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=7
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=3 Board=8 Grave=1 Discarded=0
+
+TURN 4 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=2
+  MANA Winota, Joiner of Forces #73 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=1
+
+TURN 4 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=4
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=5 Board=4
+  MANA Thrasios, Triton Hero #115 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=3 Board=8
+  MANA Lorehold: 9 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Sol Ring (artifact_or_enchantment)
+  END Lorehold: Life=40 Hand=2 Board=10 Grave=2 Discarded=0
+
+TURN 5 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=2
+  MANA Winota, Joiner of Forces #73 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=4 Grave=2 Discarded=0
+
+TURN 5 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=5
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=5 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=40 Hand=2 Board=10
+  MANA Lorehold: 12 available (9 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Elegant Parlor (any)
+  END Lorehold: Life=40 Hand=2 Board=11 Grave=3 Discarded=0
+
+TURN 6 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=4
+  MANA Winota, Joiner of Forces #73 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Archivist of Oghma (CMC=2.0) [draw_engine] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 6 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=6
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Talon Gates of Madara (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Magda, Brazen Outlaw #90 (real): Lightning Bolt (CMC=1.0) [deal_damage] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=6 Board=5
+  MANA Thrasios, Triton Hero #115 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=2 Board=11
+  MANA Lorehold: 13 available (10 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Teferi's Protection (CMC=3.0) [phase_out] rule=manual/verified
+  END Lorehold: Life=40 Hand=1 Board=7 Grave=4 Discarded=0
+
+TURN 7 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=5
+  MANA Winota, Joiner of Forces #73 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=7 Grave=4 Discarded=1
+
+TURN 7 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=6
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 7 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #115 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 8 - Lorehold | Life=40 Hand=1 Board=7
+  MANA Lorehold: 14 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 3})
+  END Lorehold: Life=40 Hand=0 Board=13 Grave=5 Discarded=0
+
+TURN 8 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=7
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Skrelv, Defector Mite (CMC=1.0) [indestructible] rule=curated/verified
+  RESOLVE Winota, Joiner of Forces #73 (real): Redirect Lightning (CMC=1.0) [draw_cards] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=9 Grave=6 Discarded=0
+
+TURN 8 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=7
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Abrade (CMC=2.0) [remove_artifact_or_3dmg] rule=manual/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=7 Grave=2 Discarded=0
+
+TURN 8 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=6 Grave=2 Discarded=1
+
+TURN 9 - Lorehold | Life=40 Hand=0 Board=13
+  MANA Lorehold: 15 available (12 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 4})
+  END Lorehold: Life=40 Hand=0 Board=14 Grave=5 Discarded=0
+
+TURN 9 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=9
+  MANA Winota, Joiner of Forces #73 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=13 Grave=6 Discarded=0
+
+TURN 9 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=7
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Maskwood Nexus (CMC=4.0) [token_maker] rule=curated/verified
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 10 player damage, target life 30, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=12 Grave=3 Discarded=0
+
+TURN 9 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=6 Grave=3 Discarded=1
+
+TURN 10 - Lorehold | Life=30 Hand=0 Board=14
+  MANA Lorehold: 16 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 4})
+  RESOLVE Lorehold: Generous Gift (CMC=3.0) [remove_permanent] rule=manual/verified
+  REMOVAL Lorehold: Generous Gift removed Spirit of the Labyrinth from Winota, Joiner of Forces #73 (real)
+  END Lorehold: Life=30 Hand=0 Board=14 Grave=6 Discarded=0
+
+TURN 10 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=12
+  MANA Winota, Joiner of Forces #73 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=3 Board=15 Grave=7 Discarded=0
+
+TURN 10 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=12
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=30)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 10 player damage, target life 20, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=13 Grave=3 Discarded=0
+
+TURN 10 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=6 Grave=4 Discarded=1
+
+TURN 11 - Lorehold | Life=20 Hand=0 Board=14
+  MANA Lorehold: 16 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 4})
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=20 Hand=0 Board=14 Grave=7 Discarded=0
+
+TURN 11 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=3 Board=15
+  MANA Winota, Joiner of Forces #73 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  RESOLVE Winota, Joiner of Forces #73 (real): Deafening Silence (CMC=1.0) [draw_engine] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=18 Grave=7 Discarded=0
+
+TURN 11 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=13
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 10 player damage, target life 10, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=4 Board=16 Grave=3 Discarded=0
+
+TURN 11 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=6 Grave=5 Discarded=1
+
+TURN 12 - Lorehold | Life=10 Hand=0 Board=14
+  MANA Lorehold: 16 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 4})
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=manual/verified
+  END Lorehold: Life=10 Hand=2 Board=15 Grave=7 Discarded=0
+
+TURN 12 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=18
+  MANA Winota, Joiner of Forces #73 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Ocelot Pride (CMC=1.0) [token_maker] rule=curated/verified
+  COMBAT Winota, Joiner of Forces #73 (real) -> Lorehold: 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=10)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Lorehold: 10 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 12 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=4 Board=16
+  MANA Magda, Brazen Outlaw #90 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Barbarian Ring (CMC=3.0) [land] rule=curated/verified
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Winota, Joiner of Forces #73 (real): 5 attackers, 1 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Winota, Joiner of Forces #73 (real): 8 player damage, target life 32, target_dead=False
+  RESOLVE Magda, Brazen Outlaw #90 (real): Sundering Eruption (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Magda, Brazen Outlaw #90 (real): Sundering Eruption removed Zurzoth, Chaos Rider from Winota, Joiner of Forces #73 (real)
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=1 Board=16 Grave=6 Discarded=0
+
+TURN 12 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #115 (real): Scrubland (CMC=3.0) [land] rule=curated/verified
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=6 Grave=5 Discarded=0
+
+TURN 13 - Winota, Joiner of Forces #73 (real) | Life=32 Hand=3 Board=23
+  MANA Winota, Joiner of Forces #73 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 5 attackers, 2 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 6 player damage, target life 34, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=32 Hand=4 Board=23 Grave=11 Discarded=0
+
+TURN 13 - Magda, Brazen Outlaw #90 (real) | Life=34 Hand=1 Board=16
+  MANA Magda, Brazen Outlaw #90 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Flare of Duplication (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Winota, Joiner of Forces #73 (real): 4 attackers, 2 blockers, 0 gang blocks, 8 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Winota, Joiner of Forces #73 (real): 4 player damage, target life 28, target_dead=False
+  RESOLVE Winota, Joiner of Forces #73 (real): Simian Spirit Guide (CMC=3.0) [ramp_ritual] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=34 Hand=0 Board=16 Grave=8 Discarded=0
+
+TURN 13 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #115 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=7 Grave=5 Discarded=0
+
+TURN 14 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=3 Board=23
+  MANA Winota, Joiner of Forces #73 (real): 10 available (10 sources, 0 treasures, pool={'generic': 7, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 3 attackers, 1 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=34)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 30, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=3 Board=25 Grave=13 Discarded=0
+
+TURN 14 - Magda, Brazen Outlaw #90 (real) | Life=30 Hand=0 Board=16
+  MANA Magda, Brazen Outlaw #90 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Winota, Joiner of Forces #73 (real): 2 attackers, 2 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Winota, Joiner of Forces #73 (real): 0 player damage, target life 28, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=30 Hand=0 Board=15 Grave=10 Discarded=0
+
+TURN 14 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=7
+  MANA Thrasios, Triton Hero #115 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #115 (real): Tropical Island (CMC=3.0) [land] rule=curated/verified
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=7 Grave=5 Discarded=0
+
+TURN 15 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=3 Board=25
+  MANA Winota, Joiner of Forces #73 (real): 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 3, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Aven Interrupter (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Winota, Joiner of Forces #73 (real): Aven Interrupter removed Flywheel Racer from Magda, Brazen Outlaw #90 (real)
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 2 attackers, 1 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=30)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 2 player damage, target life 28, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=4 Board=25 Grave=15 Discarded=0
+
+TURN 15 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=0 Board=14
+  MANA Magda, Brazen Outlaw #90 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=0 Board=15 Grave=11 Discarded=0
+
+TURN 15 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=7
+  MANA Thrasios, Triton Hero #115 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=8 Grave=5 Discarded=0
+
+TURN 16 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=4 Board=25
+  MANA Winota, Joiner of Forces #73 (real): 12 available (12 sources, 0 treasures, pool={'generic': 8, 'white': 3, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 1 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 0 player damage, target life 28, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=4 Board=27 Grave=16 Discarded=0
+
+TURN 16 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=0 Board=15
+  MANA Magda, Brazen Outlaw #90 (real): 8 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=0 Board=16 Grave=11 Discarded=0
+
+TURN 16 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=8
+  MANA Thrasios, Triton Hero #115 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=8 Grave=6 Discarded=1
+
+TURN 17 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=4 Board=27
+  MANA Winota, Joiner of Forces #73 (real): 14 available (13 sources, 0 treasures, pool={'generic': 10, 'white': 3, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=4 Board=30 Grave=16 Discarded=0
+
+TURN 17 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=0 Board=16
+  MANA Magda, Brazen Outlaw #90 (real): 9 available (9 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=0 Board=17 Grave=11 Discarded=0
+
+TURN 17 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=8
+  MANA Thrasios, Triton Hero #115 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=8 Grave=7 Discarded=1
+
+TURN 18 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=4 Board=30
+  MANA Winota, Joiner of Forces #73 (real): 15 available (14 sources, 0 treasures, pool={'generic': 10, 'white': 4, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=4 Board=33 Grave=16 Discarded=0
+
+TURN 18 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=0 Board=17
+  MANA Magda, Brazen Outlaw #90 (real): 10 available (10 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Enlightened Tutor (CMC=1.0) [tutor] rule=manual/verified
+  TUTOR Winota, Joiner of Forces #73 (real): Enlightened Tutor found Mana Vault (artifact_or_enchantment)
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=0 Board=18 Grave=11 Discarded=0
+
+TURN 18 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=8
+  MANA Thrasios, Triton Hero #115 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=8 Grave=8 Discarded=1
+
+TURN 19 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=4 Board=33
+  MANA Winota, Joiner of Forces #73 (real): 16 available (15 sources, 0 treasures, pool={'generic': 11, 'white': 4, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=5 Board=35 Grave=17 Discarded=0
+
+TURN 19 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=0 Board=18
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (11 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Tezzeret, Cruel Captain (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Magda, Brazen Outlaw #90 (real): Tezzeret, Cruel Captain found Lotus Petal (artifact_or_enchantment)
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=0 Board=18 Grave=13 Discarded=0
+
+TURN 19 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=8
+  MANA Thrasios, Triton Hero #115 (real): 9 available (7 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=8 Discarded=0
+
+TURN 20 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=5 Board=35
+  MANA Winota, Joiner of Forces #73 (real): 19 available (16 sources, 0 treasures, pool={'generic': 11, 'white': 4, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=5 Board=38 Grave=17 Discarded=0
+
+TURN 20 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=0 Board=18
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (11 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=manual/verified
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=0 Board=18 Grave=14 Discarded=0
+
+TURN 20 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=9
+  MANA Thrasios, Triton Hero #115 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=9 Discarded=1
+
+TURN 21 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=5 Board=38
+  MANA Winota, Joiner of Forces #73 (real): 19 available (16 sources, 0 treasures, pool={'generic': 11, 'white': 4, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Skyclave Apparition (CMC=3.0) [token_maker] rule=curated/verified
+  RESOLVE Winota, Joiner of Forces #73 (real): Powerbalance (CMC=2.0) [draw_engine] rule=curated/verified
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 5 attackers, 1 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 8 player damage, target life 20, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=7 Board=44 Grave=19 Discarded=0
+
+TURN 21 - Magda, Brazen Outlaw #90 (real) | Life=20 Hand=0 Board=18
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (11 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=20 Hand=0 Board=19 Grave=14 Discarded=0
+
+TURN 21 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=9
+  MANA Thrasios, Triton Hero #115 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=10 Discarded=1
+
+TURN 22 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=7 Board=44
+  MANA Winota, Joiner of Forces #73 (real): 20 available (17 sources, 0 treasures, pool={'generic': 11, 'white': 4, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Winota, Joiner of Forces #73 (real): Shatterskull Smashing (CMC=2.0) [deal_damage] rule=curated/verified
+  RESOLVE Winota, Joiner of Forces #73 (real): Esper Sentinel (CMC=1.0) [draw_engine] rule=manual/verified
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 4 attackers, 1 blockers, 0 gang blocks, 8 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 6 player damage, target life 14, target_dead=False
+  RESOLVE Winota, Joiner of Forces #73 (real): High Noon (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Winota, Joiner of Forces #73 (real): High Noon removed Plundering Barbarian from Magda, Brazen Outlaw #90 (real)
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=7 Board=46 Grave=23 Discarded=1
+
+TURN 22 - Magda, Brazen Outlaw #90 (real) | Life=14 Hand=0 Board=17
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (11 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=14 Hand=0 Board=18 Grave=16 Discarded=0
+
+TURN 22 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=9
+  MANA Thrasios, Triton Hero #115 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #115 (real): Tundra (CMC=3.0) [land] rule=curated/verified
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=10 Discarded=0
+
+TURN 23 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=7 Board=46
+  MANA Winota, Joiner of Forces #73 (real): 21 available (18 sources, 0 treasures, pool={'generic': 11, 'white': 4, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Winota, Joiner of Forces #73 (real): Thalia, Guardian of Thraben (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 3 attackers, 1 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=14)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 10, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=7 Board=50 Grave=24 Discarded=0
+
+TURN 23 - Magda, Brazen Outlaw #90 (real) | Life=10 Hand=0 Board=18
+  MANA Magda, Brazen Outlaw #90 (real): 13 available (12 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Pinnacle Monk (CMC=5.0) [remove_permanent] rule=curated/verified
+  REMOVAL Magda, Brazen Outlaw #90 (real): Pinnacle Monk removed Raph & Leo, Sibling Rivals from Winota, Joiner of Forces #73 (real)
+  RESOLVE Winota, Joiner of Forces #73 (real): Witch Enchanter (CMC=4.0) [remove_permanent] rule=curated/verified
+  REMOVAL Winota, Joiner of Forces #73 (real): Witch Enchanter removed Portal to Phyrexia from Magda, Brazen Outlaw #90 (real)
+  END Magda, Brazen Outlaw #90 (real): Life=10 Hand=0 Board=17 Grave=18 Discarded=0
+
+TURN 23 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=9
+  MANA Thrasios, Triton Hero #115 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=11 Discarded=1
+
+TURN 24 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=7 Board=49
+  MANA Winota, Joiner of Forces #73 (real): 23 available (20 sources, 0 treasures, pool={'generic': 12, 'white': 4, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 2 attackers, 1 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=10)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 2 player damage, target life 8, target_dead=False
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=7 Board=53 Grave=27 Discarded=0
+
+TURN 24 - Magda, Brazen Outlaw #90 (real) | Life=8 Hand=0 Board=17
+  MANA Magda, Brazen Outlaw #90 (real): 13 available (12 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Touch the Spirit Realm (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Winota, Joiner of Forces #73 (real): Touch the Spirit Realm removed Bloodfire Dwarf from Magda, Brazen Outlaw #90 (real)
+  END Magda, Brazen Outlaw #90 (real): Life=8 Hand=0 Board=17 Grave=19 Discarded=0
+
+TURN 24 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=9
+  MANA Thrasios, Triton Hero #115 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=12 Discarded=1
+
+TURN 25 - Winota, Joiner of Forces #73 (real) | Life=28 Hand=6 Board=53
+  MANA Winota, Joiner of Forces #73 (real): 25 available (22 sources, 0 treasures, pool={'generic': 14, 'white': 4, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 1 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=8)
+  DAMAGE Winota, Joiner of Forces #73 (real) -> Magda, Brazen Outlaw #90 (real): 0 player damage, target life 8, target_dead=False
+  RESOLVE Winota, Joiner of Forces #73 (real): Boromir, Warden of the Tower (CMC=3.0) [indestructible] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=28 Hand=6 Board=56 Grave=30 Discarded=0
+
+TURN 25 - Magda, Brazen Outlaw #90 (real) | Life=8 Hand=0 Board=17
+  MANA Magda, Brazen Outlaw #90 (real): 13 available (12 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 6, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Hammerheim (CMC=3.0) [land] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=8 Hand=0 Board=17 Grave=19 Discarded=0
+
+TURN 25 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=9
+  MANA Thrasios, Triton Hero #115 (real): 10 available (8 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=7 Board=9 Grave=13 Discarded=1
+
+GAME OVER - Turn 25
+Winner: none (stall)
+Lorehold: DEAD Life=0 Hand=2
+Winota, Joiner of Forces #73 (real): ALIVE Life=28 Hand=6
+Magda, Brazen Outlaw #90 (real): ALIVE Life=8 Hand=0
+Thrasios, Triton Hero #115 (real): ALIVE Life=40 Hand=7

@@ -171,7 +171,7 @@ class _LifeCounterNativePlayerCounterSheetState
               border: Border.all(color: AppTheme.outlineMuted),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x66000000),
+                  color: AppTheme.overlayBlack40,
                   blurRadius: 28,
                   offset: Offset(0, 10),
                 ),
@@ -433,6 +433,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                   key: const Key(
                                     'life-counter-native-player-counter-minus',
                                   ),
+                                  tooltip: 'Diminuir valor',
                                   onPressed: () => _changeValue(-_step),
                                   icon: const Icon(
                                     Icons.remove_circle_outline_rounded,
@@ -458,6 +459,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                   key: const Key(
                                     'life-counter-native-player-counter-plus',
                                   ),
+                                  tooltip: 'Aumentar valor',
                                   onPressed: () => _changeValue(_step),
                                   icon: const Icon(
                                     Icons.add_circle_outline_rounded,

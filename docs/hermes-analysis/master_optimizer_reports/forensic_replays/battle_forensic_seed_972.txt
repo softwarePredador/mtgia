@@ -1,0 +1,340 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #63 (real), Zirda, the Dawnwaker #69 (real), Magda, Brazen Outlaw #90 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 1 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #63 (real): 3 mulligan(s), 5 cards, 2 lands
+  Zirda, the Dawnwaker #69 (real): 0 mulligan(s), 7 cards, 3 lands
+  Magda, Brazen Outlaw #90 (real): 2 mulligan(s), 6 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #63 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=0
+  MANA Zirda, the Dawnwaker #69 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=0
+  MANA Magda, Brazen Outlaw #90 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=5 Board=1
+  MANA Rograkh, Son of Rohgahh #63 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=1
+  MANA Zirda, the Dawnwaker #69 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=1
+  MANA Magda, Brazen Outlaw #90 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=5 Board=2
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=4
+  MANA Zirda, the Dawnwaker #69 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 3 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=2
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Delayed Blast Fireball (CMC=3.0) [draw_cards] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  RESOLVE Lorehold: Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=2 Board=8 Grave=1 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 4 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=6
+  MANA Zirda, the Dawnwaker #69 (real): 6 available (4 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Tezzeret, Cruel Captain (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Zirda, the Dawnwaker #69 (real): Tezzeret, Cruel Captain found Smothering Tithe (artifact_or_enchantment)
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  RESOLVE Rograkh, Son of Rohgahh #63 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=7 Grave=1 Discarded=0
+
+TURN 4 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=3
+  MANA Magda, Brazen Outlaw #90 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=5 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=36 Hand=2 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 34, target_dead=False
+  END Lorehold: Life=36 Hand=2 Board=10 Grave=1 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 5 - Zirda, the Dawnwaker #69 (real) | Life=34 Hand=5 Board=7
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (5 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=34 Hand=4 Board=9 Grave=1 Discarded=0
+
+TURN 5 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=5
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Vexing Bauble (CMC=1.0) [hate_artifact] rule=known_cards_manual/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=5 Board=6 Grave=1 Discarded=0
+
+TURN 6 - Lorehold | Life=32 Hand=2 Board=10
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Imperial Recruiter (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Imperial Recruiter found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 28, target_dead=False
+  END Lorehold: Life=32 Hand=2 Board=10 Grave=3 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 6 - Zirda, the Dawnwaker #69 (real) | Life=28 Hand=3 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 10 available (6 sources, 2 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Vandalblast (CMC=1.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Zirda, the Dawnwaker #69 (real): Vandalblast removed Monument to Endurance from Lorehold
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  RESOLVE Zirda, the Dawnwaker #69 (real): Sevinne's Reclamation (CMC=3.0) [recursion] rule=curated/verified
+  RESOLVE Zirda, the Dawnwaker #69 (real): Agatha's Soul Cauldron (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Zirda, the Dawnwaker #69 (real): Agatha's Soul Cauldron removed Lorehold, the Historian from Lorehold
+  END Zirda, the Dawnwaker #69 (real): Life=28 Hand=1 Board=10 Grave=3 Discarded=0
+
+TURN 6 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=5 Board=6
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Flare of Duplication (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 2 player damage, target life 26, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=5 Board=7 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=26 Hand=2 Board=8
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=28)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 1 player damage, target life 27, target_dead=False
+  END Lorehold: Life=26 Hand=2 Board=10 Grave=4 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 7 - Zirda, the Dawnwaker #69 (real) | Life=27 Hand=1 Board=10
+  MANA Zirda, the Dawnwaker #69 (real): 11 available (6 sources, 3 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=26)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 5 player damage, target life 21, target_dead=False
+  RESOLVE Zirda, the Dawnwaker #69 (real): Tezzeret, Cruel Captain (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Zirda, the Dawnwaker #69 (real): Tezzeret, Cruel Captain found The One Ring (artifact_or_enchantment)
+  END Zirda, the Dawnwaker #69 (real): Life=27 Hand=1 Board=11 Grave=4 Discarded=0
+
+TURN 7 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=5 Board=7
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=21)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 2 player damage, target life 19, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=5 Board=8 Grave=1 Discarded=0
+
+TURN 8 - Lorehold | Life=19 Hand=2 Board=10
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Generous Gift (CMC=3.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Generous Gift removed Zirda, the Dawnwaker from Zirda, the Dawnwaker #69 (real)
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=27)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 21, target_dead=False
+  END Lorehold: Life=19 Hand=1 Board=11 Grave=5 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 8 - Zirda, the Dawnwaker #69 (real) | Life=21 Hand=1 Board=10
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (6 sources, 6 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Zirda, the Dawnwaker #69 (real): Galadriel's Dismissal (CMC=1.0) [phase_creatures] rule=known_cards_manual/verified
+  END Zirda, the Dawnwaker #69 (real): Life=21 Hand=1 Board=10 Grave=5 Discarded=0
+
+TURN 8 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=5 Board=8
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=19)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 4 player damage, target life 15, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=8 Grave=1 Discarded=0
+
+TURN 9 - Lorehold | Life=15 Hand=1 Board=11
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=21)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 8 player damage, target life 13, target_dead=False
+  END Lorehold: Life=15 Hand=1 Board=12 Grave=5 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #63 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #63 (real): Vexing Bauble (CMC=1.0) [hate_artifact] rule=known_cards_manual/verified
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=13)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 9, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 9 - Zirda, the Dawnwaker #69 (real) | Life=9 Hand=1 Board=10
+  MANA Zirda, the Dawnwaker #69 (real): 14 available (6 sources, 6 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=aggro_low_life, target_life=15)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 player damage, target life 14, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=9 Hand=0 Board=15 Grave=5 Discarded=0
+
+TURN 9 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=8
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Bottle-Cap Blast (CMC=5.0) [deal_damage] rule=known_cards_manual/verified
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Zirda, the Dawnwaker #69 (real): 2 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=9)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Zirda, the Dawnwaker #69 (real): 4 player damage, target life 5, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=5 Board=9 Grave=2 Discarded=0
+
+TURN 10 - Lorehold | Life=14 Hand=1 Board=11
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=5)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 3 player damage, target life 2, target_dead=False
+  END Lorehold: Life=14 Hand=1 Board=12 Grave=5 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #63 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #63 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=2)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Zirda, the Dawnwaker #69 (real): 0 player damage, target life 2, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=7 Grave=2 Discarded=1
+
+TURN 10 - Zirda, the Dawnwaker #69 (real) | Life=2 Hand=0 Board=14
+  MANA Zirda, the Dawnwaker #69 (real): 19 available (8 sources, 9 treasures, pool={'generic': 9, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=14)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 5 player damage, target life 9, target_dead=False
+  RESOLVE Zirda, the Dawnwaker #69 (real): Archivist of Oghma (CMC=2.0) [draw_engine] rule=curated/verified
+  END Zirda, the Dawnwaker #69 (real): Life=2 Hand=2 Board=16 Grave=6 Discarded=0
+
+TURN 10 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=5 Board=9
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Zirda, the Dawnwaker #69 (real): 2 attackers, 2 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=2)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Zirda, the Dawnwaker #69 (real): 0 player damage, target life 2, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=5 Board=9 Grave=4 Discarded=0
+
+TURN 11 - Lorehold | Life=9 Hand=1 Board=12
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 2 attackers, 1 blockers, 0 gang blocks, 3 power (reason=lethal, target_life=2)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 1 player damage, target life 1, target_dead=False
+  END Lorehold: Life=9 Hand=1 Board=14 Grave=5 Discarded=0
+
+TURN 11 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #63 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Zirda, the Dawnwaker #69 (real): 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=1)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Zirda, the Dawnwaker #69 (real): 0 player damage, target life 1, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=8 Grave=3 Discarded=1
+
+TURN 11 - Zirda, the Dawnwaker #69 (real) | Life=1 Hand=2 Board=14
+  MANA Zirda, the Dawnwaker #69 (real): 21 available (8 sources, 11 treasures, pool={'generic': 9, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Deafening Silence (CMC=1.0) [draw_engine] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=9)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 9 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 11 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=5 Board=9
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Zirda, the Dawnwaker #69 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=lethal, target_life=1)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life -5, target_dead=True
+  >>> DIED: Zirda, the Dawnwaker #69 (real) (life_zero) <<<
+
+TURN 12 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=7 Board=8
+  MANA Rograkh, Son of Rohgahh #63 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=7 Board=9 Grave=4 Discarded=1
+
+TURN 12 - Magda, Brazen Outlaw #90 (real) | Life=36 Hand=6 Board=9
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 34, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=36 Hand=6 Board=9 Grave=5 Discarded=0
+
+TURN 13 - Rograkh, Son of Rohgahh #63 (real) | Life=34 Hand=7 Board=9
+  MANA Rograkh, Son of Rohgahh #63 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=34 Hand=7 Board=10 Grave=5 Discarded=1
+
+TURN 13 - Magda, Brazen Outlaw #90 (real) | Life=32 Hand=6 Board=9
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=34)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 28, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=32 Hand=6 Board=10 Grave=5 Discarded=0
+
+TURN 14 - Rograkh, Son of Rohgahh #63 (real) | Life=28 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #63 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=28 Hand=7 Board=10 Grave=7 Discarded=1
+
+TURN 14 - Magda, Brazen Outlaw #90 (real) | Life=28 Hand=6 Board=10
+  MANA Magda, Brazen Outlaw #90 (real): 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 22, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=28 Hand=6 Board=10 Grave=6 Discarded=0
+
+TURN 15 - Rograkh, Son of Rohgahh #63 (real) | Life=22 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #63 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=22 Hand=7 Board=10 Grave=9 Discarded=2
+
+TURN 15 - Magda, Brazen Outlaw #90 (real) | Life=24 Hand=6 Board=10
+  MANA Magda, Brazen Outlaw #90 (real): 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=22)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 16, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=24 Hand=6 Board=11 Grave=6 Discarded=0
+
+TURN 16 - Rograkh, Son of Rohgahh #63 (real) | Life=16 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #63 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 4 player damage, target life 20, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=16 Hand=7 Board=10 Grave=11 Discarded=2
+
+TURN 16 - Magda, Brazen Outlaw #90 (real) | Life=20 Hand=6 Board=11
+  MANA Magda, Brazen Outlaw #90 (real): 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 10, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=20 Hand=6 Board=12 Grave=6 Discarded=0
+
+TURN 17 - Rograkh, Son of Rohgahh #63 (real) | Life=10 Hand=7 Board=10
+  MANA Rograkh, Son of Rohgahh #63 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Magda, Brazen Outlaw #90 (real): 20 player damage, target life 0, target_dead=True
+  >>> DIED: Magda, Brazen Outlaw #90 (real) (commander_damage) <<<
+
+GAME OVER - Turn 17
+Winner: Rograkh, Son of Rohgahh #63 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=1
+Rograkh, Son of Rohgahh #63 (real): ALIVE Life=10 Hand=9
+Zirda, the Dawnwaker #69 (real): DEAD Life=-5 Hand=3
+Magda, Brazen Outlaw #90 (real): DEAD Life=0 Hand=6

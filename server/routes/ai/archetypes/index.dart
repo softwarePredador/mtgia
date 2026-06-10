@@ -32,13 +32,19 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // 1. Fetch Deck Data
+    final userId = context.read<String>();
     final pool = context.read<Pool>();
 
     // Get Deck Info
     final deckLookupStopwatch = Stopwatch()..start();
     final deckResult = await pool.execute(
-      Sql.named('SELECT name, format FROM decks WHERE id = @id'),
-      parameters: {'id': deckId},
+      Sql.named('''
+        SELECT name, format
+        FROM decks
+        WHERE id = @id
+          AND user_id = CAST(@user_id AS uuid)
+      '''),
+      parameters: {'id': deckId, 'user_id': userId},
     );
     deckLookupMs = deckLookupStopwatch.elapsedMilliseconds;
 

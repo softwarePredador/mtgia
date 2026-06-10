@@ -106,14 +106,16 @@ class RateLimiter {
   }
 
   void cleanup() {
-    // Periodicamente limpar IDs antigos para evitar memory leak
-    // (Implementação simplificada - em produção, usar um timer)
     final cutoff =
         DateTime.now().subtract(Duration(seconds: windowSeconds * 2));
     _requestLog.removeWhere((_, timestamps) {
       timestamps.removeWhere((t) => t.isBefore(cutoff));
       return timestamps.isEmpty;
     });
+  }
+
+  void clear() {
+    _requestLog.clear();
   }
 }
 

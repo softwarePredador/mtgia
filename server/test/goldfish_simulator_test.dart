@@ -160,6 +160,22 @@ void main() {
       expect(result.turn4PlayRate, greaterThanOrEqualTo(result.turn3PlayRate));
     });
 
+    test('reports no-play turn 3 risk for decks without early plays', () {
+      final cards = [
+        ..._generateLands(36),
+        ..._generateSpells(64, avgCmc: 4),
+      ];
+
+      final simulator = GoldfishSimulator(cards, simulations: 200);
+      final result = simulator.simulate();
+
+      expect(result.noPlayTurn3Rate, greaterThan(0.90));
+      expect(
+        result.recommendations.any((r) => r.contains('turno 3')),
+        isTrue,
+      );
+    });
+
     test('deterministic with fixed seed', () {
       final cards = [
         ..._generateLands(36),
@@ -274,6 +290,7 @@ void main() {
         turn2PlayRate: 0.82,
         turn3PlayRate: 0.94,
         turn4PlayRate: 0.98,
+        noPlayTurn3Rate: 0.06,
         avgCmc: 3.2,
         landCount: 36,
         cmcDistribution: {1: 10, 2: 15, 3: 20, 4: 12, 5: 7},
@@ -284,6 +301,7 @@ void main() {
       expect(json['consistency_score'], isA<int>());
       expect(json['mana_analysis']['land_count'], equals(36));
       expect(json['curve_analysis']['avg_cmc'], equals(3.2));
+      expect(json['curve_analysis']['no_play_turn_3'], equals(0.06));
       expect(json['recommendations'], isA<List>());
     });
   });

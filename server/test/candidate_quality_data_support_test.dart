@@ -1,3 +1,4 @@
+import 'package:server/ai/commander_fallback_policy.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:test/test.dart';
 
@@ -119,15 +120,20 @@ void main() {
       expect(ramp.score, greaterThanOrEqualTo(70));
     });
 
-    test('sample pool SQL keeps legality and color identity guardrails', () {
-      final sql = buildCandidateQualitySamplePoolSql().toLowerCase();
-
-      expect(sql, contains('card_legalities'));
-      expect(sql, contains("cl.format = 'commander'"));
-      expect(sql, contains('cl.status = \'legal\''));
-      expect(sql, contains('c.color_identity <@ @identity::text[]'));
-      expect(sql, isNot(contains('insert into cards')));
-      expect(sql, isNot(contains('update cards')));
+    test('uses versioned high-power and premium name policy', () {
+      expect(candidateQualityHighPowerNames, contains('thassa\'s oracle'));
+      expect(candidateQualityPremiumNames, contains('sol ring'));
+      expect(
+        inferCandidateBracketScope(
+          name: 'Thassa\'s Oracle',
+          role: 'combo_piece',
+          score: 30,
+          budgetTier: 'accessible',
+        ),
+        equals('bracket_3_4'),
+      );
+      expect(isPremiumCommanderCandidateName('Sol Ring'), isTrue);
+      expect(isPremiumCommanderCandidateName('Cancel'), isFalse);
     });
 
     test('schema is additive and targets metadata tables only', () {

@@ -331,11 +331,10 @@ void main() {
       );
       expect(find.text('Definir como comandante'), findsOneWidget);
       expect(find.text('Adicionar como carta comum'), findsOneWidget);
-      expect(
-        find.textContaining('Você pode definir esta carta agora'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Defina esta carta agora'), findsOneWidget);
 
+      await tester.ensureVisible(find.text('Adicionar como carta comum'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Adicionar como carta comum'));
       await tester.pumpAndSettle();
       final confirmButton = find.byKey(

@@ -70,6 +70,9 @@ ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
 
 -- Índice para busca rápida por nome
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);
+CREATE INDEX IF NOT EXISTS idx_cards_name_lower ON cards (LOWER(name));
+CREATE INDEX IF NOT EXISTS idx_cards_front_name_lower
+ON cards (LOWER(split_part(name, ' // ', 1)));
 -- Índice GIN para buscas por identidade (Commander/Brawl)
 CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity);
 CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords);
@@ -99,6 +102,56 @@ CREATE TABLE IF NOT EXISTS card_legalities (
     status TEXT NOT NULL, -- 'legal', 'banned', 'restricted'
     UNIQUE(card_id, format)
 );
+
+-- 3.1. Semantica executavel de cartas para o simulador Hermes
+-- Fatos oficiais ficam em cards/card_rulings; esta tabela guarda a interpretacao
+-- revisavel que o battle/optimizer consegue executar.
+CREATE TABLE IF NOT EXISTS card_battle_rules (
+    normalized_name TEXT PRIMARY KEY,
+    card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
+    card_name TEXT NOT NULL,
+    effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    source TEXT NOT NULL DEFAULT 'manual',
+    confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
+      CHECK (confidence >= 0 AND confidence <= 1),
+    review_status TEXT NOT NULL DEFAULT 'verified',
+    rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
+    oracle_hash TEXT,
+    notes TEXT,
+    reviewed_by TEXT,
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT chk_card_battle_rules_source CHECK (
+      source IN ('manual', 'curated', 'generated', 'heuristic', 'imported')
+    ),
+    CONSTRAINT chk_card_battle_rules_review_status CHECK (
+      review_status IN (
+        'verified',
+        'active',
+        'needs_review',
+        'rejected',
+        'deprecated'
+      )
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_card_id
+ON card_battle_rules (card_id);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_source_status
+ON card_battle_rules (source, review_status);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_effect
+ON card_battle_rules USING GIN (effect_json);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_deck_role
+ON card_battle_rules USING GIN (deck_role_json);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_name_lower
+ON card_battle_rules (LOWER(card_name));
 
 -- 4. Tabela de Regras do Jogo (Para consulta e IA)
 CREATE TABLE IF NOT EXISTS rules (
@@ -251,6 +304,67 @@ ON external_commander_meta_candidates (commander_name);
 
 CREATE INDEX IF NOT EXISTS idx_external_commander_meta_color_identity
 ON external_commander_meta_candidates USING GIN (color_identity);
+
+-- 9.2. Decks aprendidos/promovidos por pipelines externos (Hermes/ManaLoom)
+-- Fonte runtime do backend para expor listas aprendidas sem depender do Hermes.
+CREATE TABLE IF NOT EXISTS commander_learned_decks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    commander_name TEXT NOT NULL,
+    commander_name_normalized TEXT NOT NULL,
+    deck_name TEXT NOT NULL,
+    source_system TEXT NOT NULL,
+    source_ref TEXT NOT NULL,
+    source_url TEXT,
+    archetype TEXT,
+    card_list TEXT NOT NULL,
+    card_count INTEGER NOT NULL,
+    score NUMERIC,
+    wincon_primary TEXT,
+    wincon_backup TEXT,
+    legal_status TEXT,
+    notes TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    promoted_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_system, source_ref)
+);
+
+CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
+ON commander_learned_decks (commander_name_normalized, is_active, promoted_at DESC, updated_at DESC);
+
+-- 9.1. Eventos de aprendizado para loop Hermes (App -> Hermes)
+-- Registra decks criados/salvos no app para o Hermes consumir e aprender.
+CREATE TABLE IF NOT EXISTS deck_learning_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID NOT NULL,
+    commander_name TEXT,
+    format TEXT NOT NULL,
+    card_count INTEGER NOT NULL DEFAULT 0,
+    source TEXT NOT NULL DEFAULT 'user_created',
+    event_data JSONB DEFAULT '{}'::jsonb,
+    synced_to_hermes BOOLEAN NOT NULL DEFAULT FALSE,
+    synced_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
+ON deck_learning_events (synced_to_hermes, created_at);
+
+-- 9.2. Contador de uso real de cartas por comandante (App usage feedback)
+-- Alimentado a cada deck salvo. Usado pelo generate/reference pra priorizar
+-- cartas com alta adocao real alem das fontes externas (EDHREC, etc).
+CREATE TABLE IF NOT EXISTS commander_card_usage (
+    commander_name_normalized TEXT NOT NULL,
+    card_name_normalized TEXT NOT NULL,
+    usage_count INTEGER NOT NULL DEFAULT 1,
+    last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (commander_name_normalized, card_name_normalized)
+);
+
+CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
+ON commander_card_usage (commander_name_normalized, usage_count DESC);
 
 -- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
 -- Armazena as cartas mais populares de cada formato, atualizada semanalmente

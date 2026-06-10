@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import 'basic_land_utils.dart' as basic_lands;
 import 'card_validation_service.dart';
 import 'color_identity.dart';
 import 'deck_rules_service.dart';
@@ -393,20 +394,11 @@ class GeneratedDeckValidationService {
       final typeLine = typeLineRaw.toLowerCase();
       final hasTypeLine = typeLineRaw.trim().isNotEmpty;
 
-      final nameLower = (card['name'] ?? '').toString().trim().toLowerCase();
-      final isBasicLandByName = nameLower == 'plains' ||
-          nameLower == 'island' ||
-          nameLower == 'swamp' ||
-          nameLower == 'mountain' ||
-          nameLower == 'forest' ||
-          nameLower == 'wastes' ||
-          nameLower.startsWith('snow-covered plains') ||
-          nameLower.startsWith('snow-covered island') ||
-          nameLower.startsWith('snow-covered swamp') ||
-          nameLower.startsWith('snow-covered mountain') ||
-          nameLower.startsWith('snow-covered forest');
-
-      final isBasicLand = typeLine.contains('basic land') || isBasicLandByName;
+      final name = (card['name'] ?? '').toString();
+      final isBasicLand = basic_lands.isBasicLandCard(
+        name: name,
+        typeLine: typeLine,
+      );
 
       final cardColors = identityOf(card);
 
@@ -524,20 +516,11 @@ class GeneratedDeckValidationService {
         if (overflow <= 0) break;
         if (card['is_commander'] == true) continue;
         final typeLine = (card['type_line'] ?? '').toString().toLowerCase();
-        final nameLower = (card['name'] ?? '').toString().trim().toLowerCase();
-        final isBasicLandByName = nameLower == 'plains' ||
-            nameLower == 'island' ||
-            nameLower == 'swamp' ||
-            nameLower == 'mountain' ||
-            nameLower == 'forest' ||
-            nameLower == 'wastes' ||
-            nameLower.startsWith('snow-covered plains') ||
-            nameLower.startsWith('snow-covered island') ||
-            nameLower.startsWith('snow-covered swamp') ||
-            nameLower.startsWith('snow-covered mountain') ||
-            nameLower.startsWith('snow-covered forest');
-        final isBasicLand =
-            typeLine.contains('basic land') || isBasicLandByName;
+        final name = (card['name'] ?? '').toString();
+        final isBasicLand = basic_lands.isBasicLandCard(
+          name: name,
+          typeLine: typeLine,
+        );
         if (!isBasicLand) continue;
 
         final qty = (card['quantity'] as int?) ?? 1;
@@ -742,25 +725,9 @@ class GeneratedDeckValidationService {
   }
 
   static bool _isBasicLandCard(Map<String, dynamic> card) {
-    final typeLine = (card['type_line'] ?? '').toString().toLowerCase();
-    final name = (card['name'] ?? '').toString().trim().toLowerCase();
-    return typeLine.contains('basic land') ||
-        typeLine.contains('basic snow land') ||
-        _isBasicLandName(name);
-  }
-
-  static bool _isBasicLandName(String nameLower) {
-    return nameLower == 'plains' ||
-        nameLower == 'island' ||
-        nameLower == 'swamp' ||
-        nameLower == 'mountain' ||
-        nameLower == 'forest' ||
-        nameLower == 'wastes' ||
-        nameLower.startsWith('snow-covered plains') ||
-        nameLower.startsWith('snow-covered island') ||
-        nameLower.startsWith('snow-covered swamp') ||
-        nameLower.startsWith('snow-covered mountain') ||
-        nameLower.startsWith('snow-covered forest');
+    final typeLine = (card['type_line'] ?? '').toString();
+    final name = (card['name'] ?? '').toString();
+    return basic_lands.isBasicLandCard(name: name, typeLine: typeLine);
   }
 
   static Set<String> _identityOf(Map<String, dynamic> card) {

@@ -1,0 +1,290 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Tannuk, Memorial Ensign #40 (real), Zirda, the Dawnwaker #69 (real), Marneus Calgar #64 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 4 lands
+  Tannuk, Memorial Ensign #40 (real): 0 mulligan(s), 7 cards, 2 lands
+  Zirda, the Dawnwaker #69 (real): 0 mulligan(s), 7 cards, 3 lands
+  Marneus Calgar #64 (real): 0 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Talisman of Conviction (CMC=2.0) [ramp_permanent] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=0
+  MANA Tannuk, Memorial Ensign #40 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=0
+  MANA Zirda, the Dawnwaker #69 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Vexing Bauble (CMC=1.0) [hate_artifact] rule=known_cards_manual/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=0
+  MANA Marneus Calgar #64 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=0 Discarded=0
+
+TURN 2 - Tannuk, Memorial Ensign #40 (real) | Life=40 Hand=7 Board=1
+  MANA Tannuk, Memorial Ensign #40 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=2
+  MANA Zirda, the Dawnwaker #69 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=1
+  MANA Marneus Calgar #64 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=4 Board=5
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Tannuk, Memorial Ensign #40 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=7 Grave=0 Discarded=0
+
+TURN 3 - Tannuk, Memorial Ensign #40 (real) | Life=35 Hand=7 Board=2
+  MANA Tannuk, Memorial Ensign #40 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Tannuk, Memorial Ensign #40 (real): Chaos Warp (CMC=3.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Tannuk, Memorial Ensign #40 (real): Chaos Warp removed Lorehold, the Historian from Lorehold
+  END Tannuk, Memorial Ensign #40 (real): Life=35 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=4
+  MANA Zirda, the Dawnwaker #69 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 3 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=2
+  MANA Marneus Calgar #64 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=6
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=40 Hand=4 Board=8 Grave=0 Discarded=0
+
+TURN 4 - Tannuk, Memorial Ensign #40 (real) | Life=35 Hand=6 Board=3
+  MANA Tannuk, Memorial Ensign #40 (real): 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Tannuk, Memorial Ensign #40 (real): Life=35 Hand=6 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=6
+  MANA Zirda, the Dawnwaker #69 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=35)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 4 player damage, target life 31, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=8 Grave=0 Discarded=0
+
+TURN 4 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=4
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 1 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=31)
+  DAMAGE Marneus Calgar #64 (real) -> Tannuk, Memorial Ensign #40 (real): 0 player damage, target life 31, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=4 Board=8
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Seething Song (CMC=3.0) [ramp_ritual] rule=curated/verified
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=31)
+  DAMAGE Lorehold -> Tannuk, Memorial Ensign #40 (real): 5 player damage, target life 26, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=9 Grave=3 Discarded=0
+
+TURN 5 - Tannuk, Memorial Ensign #40 (real) | Life=26 Hand=6 Board=5
+  MANA Tannuk, Memorial Ensign #40 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Tannuk, Memorial Ensign #40 (real): Explore (CMC=2.0) [draw_cards] rule=known_cards_manual/verified
+  RESOLVE Tannuk, Memorial Ensign #40 (real): Pest Infestation (CMC=1.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Tannuk, Memorial Ensign #40 (real): Pest Infestation removed Talisman of Conviction from Lorehold
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=35)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Marneus Calgar #64 (real): 4 player damage, target life 31, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=26 Hand=5 Board=6 Grave=3 Discarded=0
+
+TURN 5 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=26)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 5 player damage, target life 21, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Marneus Calgar #64 (real) | Life=31 Hand=7 Board=3
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=31 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 6 - Lorehold | Life=40 Hand=1 Board=8
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=21)
+  DAMAGE Lorehold -> Tannuk, Memorial Ensign #40 (real): 5 player damage, target life 16, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=9 Grave=4 Discarded=0
+
+TURN 6 - Tannuk, Memorial Ensign #40 (real) | Life=16 Hand=5 Board=6
+  MANA Tannuk, Memorial Ensign #40 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=31)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Marneus Calgar #64 (real): 4 player damage, target life 27, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=16 Hand=4 Board=8 Grave=5 Discarded=0
+
+TURN 6 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=aggro_low_life, target_life=16)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 5 player damage, target life 11, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=10 Grave=0 Discarded=0
+
+TURN 6 - Marneus Calgar #64 (real) | Life=27 Hand=7 Board=3
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=27 Hand=7 Board=3 Grave=3 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=1 Board=9
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Tannuk, Memorial Ensign #40 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=11)
+  DAMAGE Lorehold -> Tannuk, Memorial Ensign #40 (real): 5 player damage, target life 6, target_dead=False
+  END Lorehold: Life=40 Hand=0 Board=11 Grave=4 Discarded=0
+
+TURN 7 - Tannuk, Memorial Ensign #40 (real) | Life=6 Hand=4 Board=8
+  MANA Tannuk, Memorial Ensign #40 (real): 7 available (7 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  COMBAT Tannuk, Memorial Ensign #40 (real) -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=27)
+  DAMAGE Tannuk, Memorial Ensign #40 (real) -> Marneus Calgar #64 (real): 4 player damage, target life 23, target_dead=False
+  END Tannuk, Memorial Ensign #40 (real): Life=6 Hand=3 Board=10 Grave=5 Discarded=0
+
+TURN 7 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=10
+  MANA Zirda, the Dawnwaker #69 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=lethal, target_life=6)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Tannuk, Memorial Ensign #40 (real): 8 player damage, target life -2, target_dead=True
+  >>> DIED: Tannuk, Memorial Ensign #40 (real) (life_zero) <<<
+
+TURN 7 - Marneus Calgar #64 (real) | Life=23 Hand=7 Board=3
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=23 Hand=7 Board=3 Grave=4 Discarded=1
+
+TURN 8 - Lorehold | Life=40 Hand=0 Board=11
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=23)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 5 player damage, target life 18, target_dead=False
+  END Lorehold: Life=40 Hand=0 Board=12 Grave=4 Discarded=0
+
+TURN 8 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=11
+  MANA Zirda, the Dawnwaker #69 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=aggro_low_life, target_life=18)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 10 player damage, target life 8, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=2 Board=12 Grave=2 Discarded=0
+
+TURN 8 - Marneus Calgar #64 (real) | Life=8 Hand=7 Board=3
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=8 Hand=7 Board=3 Grave=5 Discarded=1
+
+TURN 9 - Lorehold | Life=40 Hand=0 Board=12
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 8, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Fiery Emancipation (artifact_or_enchantment)
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=8)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 5 player damage, target life 3, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=12 Grave=5 Discarded=0
+
+TURN 9 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=2 Board=12
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=3)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Marneus Calgar #64 (real): 10 player damage, target life -7, target_dead=True
+  >>> DIED: Marneus Calgar #64 (real) (life_zero) <<<
+
+TURN 10 - Lorehold | Life=40 Hand=1 Board=12
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 8, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Blasphemous Act (CMC=9.0) [board_wipe] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=11 Grave=6 Discarded=0
+
+TURN 10 - Zirda, the Dawnwaker #69 (real) | Life=35 Hand=2 Board=7
+  MANA Zirda, the Dawnwaker #69 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Zirda, the Dawnwaker #69 (real): Life=35 Hand=2 Board=9 Grave=4 Discarded=0
+
+TURN 11 - Lorehold | Life=40 Hand=1 Board=11
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Teferi's Protection (CMC=3.0) [phase_out] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=1 Board=7 Grave=7 Discarded=0
+
+TURN 11 - Zirda, the Dawnwaker #69 (real) | Life=35 Hand=2 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 0 player damage, target life 40, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=35 Hand=2 Board=9 Grave=5 Discarded=0
+
+TURN 12 - Lorehold | Life=40 Hand=1 Board=7
+  MANA Lorehold: 10 available (10 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Fiery Emancipation (CMC=6.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 5 player damage, target life 25, target_dead=False
+  END Lorehold: Life=40 Hand=0 Board=12 Grave=8 Discarded=0
+
+TURN 12 - Zirda, the Dawnwaker #69 (real) | Life=25 Hand=2 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Zirda, the Dawnwaker #69 (real): Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Zirda, the Dawnwaker #69 (real): Path to Exile removed Lorehold, the Historian from Lorehold
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=25 Hand=2 Board=9 Grave=6 Discarded=0
+
+TURN 13 - Lorehold | Life=36 Hand=0 Board=11
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  END Lorehold: Life=36 Hand=1 Board=12 Grave=8 Discarded=0
+
+TURN 13 - Zirda, the Dawnwaker #69 (real) | Life=25 Hand=2 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=25 Hand=3 Board=9 Grave=6 Discarded=0
+
+TURN 14 - Lorehold | Life=32 Hand=1 Board=12
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=25)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 5 player damage, target life 20, target_dead=False
+  END Lorehold: Life=32 Hand=0 Board=14 Grave=9 Discarded=0
+
+TURN 14 - Zirda, the Dawnwaker #69 (real) | Life=20 Hand=3 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=20 Hand=3 Board=9 Grave=7 Discarded=0
+
+TURN 15 - Lorehold | Life=28 Hand=0 Board=14
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=20)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 8 player damage, target life 12, target_dead=False
+  END Lorehold: Life=28 Hand=0 Board=15 Grave=9 Discarded=0
+
+TURN 15 - Zirda, the Dawnwaker #69 (real) | Life=12 Hand=3 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=28)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=12 Hand=3 Board=10 Grave=7 Discarded=0
+
+TURN 16 - Lorehold | Life=24 Hand=0 Board=15
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Rise of the Eldrazi (CMC=12.0) [remove_permanent] rule=curated/verified
+  REMOVAL Lorehold: Rise of the Eldrazi removed Zirda, the Dawnwaker from Zirda, the Dawnwaker #69 (real)
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=12)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 8 player damage, target life 4, target_dead=False
+  END Lorehold: Life=24 Hand=0 Board=15 Grave=10 Discarded=0
+
+TURN 16 - Zirda, the Dawnwaker #69 (real) | Life=4 Hand=3 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 3 power (reason=aggro_low_life, target_life=24)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 3 player damage, target life 21, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=4 Hand=3 Board=11 Grave=7 Discarded=0
+
+TURN 17 - Lorehold | Life=21 Hand=0 Board=15
+  MANA Lorehold: 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  COMBAT Lorehold -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=lethal, target_life=4)
+  DAMAGE Lorehold -> Zirda, the Dawnwaker #69 (real): 8 player damage, target life -4, target_dead=True
+  >>> DIED: Zirda, the Dawnwaker #69 (real) (life_zero) <<<
+
+GAME OVER - Turn 17
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=21 Hand=0
+Tannuk, Memorial Ensign #40 (real): DEAD Life=-2 Hand=3
+Zirda, the Dawnwaker #69 (real): DEAD Life=-4 Hand=3
+Marneus Calgar #64 (real): DEAD Life=-7 Hand=7

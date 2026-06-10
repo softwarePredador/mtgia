@@ -183,8 +183,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = context.select<AuthProvider, User?>((p) => p.user);
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
+        toolbarHeight: 54,
         title: const Text('Perfil'),
+        centerTitle: true,
+        backgroundColor: AppTheme.backgroundAbyss,
+        surfaceTintColor: AppTheme.transparent,
+        titleTextStyle: theme.textTheme.titleMedium?.copyWith(
+          color: AppTheme.textPrimary,
+          fontFamily: AppTheme.displayFontFamily,
+          fontSize: AppTheme.fontLg + 1,
+          fontWeight: FontWeight.w700,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -200,273 +211,388 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body:
           user == null
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 44,
-                            backgroundColor: theme.colorScheme.primary
-                                .withValues(alpha: 0.2),
-                            backgroundImage:
-                                (user.avatarUrl != null &&
-                                        user.avatarUrl!.trim().isNotEmpty)
-                                    ? CachedNetworkImageProvider(
-                                      user.avatarUrl!,
-                                    )
-                                    : null,
-                            child:
-                                (user.avatarUrl == null ||
-                                        user.avatarUrl!.trim().isEmpty)
-                                    ? Text(
-                                      (user.displayName ?? user.username)
-                                              .trim()
-                                              .isNotEmpty
-                                          ? (user.displayName ?? user.username)
-                                              .trim()
-                                              .characters
-                                              .first
-                                              .toUpperCase()
-                                          : '?',
-                                      style: theme.textTheme.headlineMedium
-                                          ?.copyWith(
-                                            color: theme.colorScheme.primary,
-                                          ),
-                                    )
-                                    : null,
+              : Container(
+                decoration: const BoxDecoration(
+                  gradient: AppTheme.scaffoldGradient,
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceSlate,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.scaffoldBackgroundColor,
-                                  width: 2,
+                          border: Border.all(
+                            color: AppTheme.brass400.withValues(alpha: 0.24),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.backgroundAbyss.withValues(
+                                alpha: 0.18,
+                              ),
+                              blurRadius: 24,
+                              offset: const Offset(0, 12),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 46,
+                                  backgroundColor: AppTheme.brass500.withValues(
+                                    alpha: 0.16,
+                                  ),
+                                  backgroundImage:
+                                      (user.avatarUrl != null &&
+                                              user.avatarUrl!.trim().isNotEmpty)
+                                          ? CachedNetworkImageProvider(
+                                            user.avatarUrl!,
+                                          )
+                                          : null,
+                                  child:
+                                      (user.avatarUrl == null ||
+                                              user.avatarUrl!.trim().isEmpty)
+                                          ? Text(
+                                            (user.displayName ?? user.username)
+                                                    .trim()
+                                                    .isNotEmpty
+                                                ? (user.displayName ??
+                                                        user.username)
+                                                    .trim()
+                                                    .characters
+                                                    .first
+                                                    .toUpperCase()
+                                                : '?',
+                                            style: theme
+                                                .textTheme
+                                                .headlineMedium
+                                                ?.copyWith(
+                                                  color: AppTheme.brass400,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                          )
+                                          : null,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.brass400,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppTheme.backgroundAbyss,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Semantics(
+                                      button: true,
+                                      label: 'Alterar foto de perfil',
+                                      child: Tooltip(
+                                        message: 'Alterar foto de perfil',
+                                        child: InkWell(
+                                          key: const Key(
+                                            'profile-avatar-edit-button',
+                                          ),
+                                          customBorder: const CircleBorder(),
+                                          onTap:
+                                              () => _showAvatarDialog(context),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(6),
+                                            child: Icon(
+                                              Icons.camera_alt,
+                                              size: 16,
+                                              color: AppTheme.backgroundAbyss,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Text(
+                                user.username,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w900,
                                 ),
                               ),
-                              child: InkWell(
-                                key: const Key('profile-avatar-edit-button'),
-                                customBorder: const CircleBorder(),
-                                onTap: () => _showAvatarDialog(context),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(6),
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    size: 16,
-                                    color: Colors.white,
+                            ),
+                            const SizedBox(height: 3),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Text(
+                                user.email,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      _ProfileSectionPanel(
+                        title: 'Configurações',
+                        icon: Icons.auto_awesome_rounded,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextField(
+                              key: const Key('profile-display-name-field'),
+                              controller: _displayNameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nick / Apelido',
+                                hintText: 'Ex: Planeswalker42',
+                                prefixIcon: Icon(Icons.face),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: Text(
+                                'Seu nick público — é como os outros jogadores vão te encontrar na busca e ver nos seus decks. Se não preencher, será usado o nome de usuário (@${user.username}).',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+
+                      _ProfileSectionPanel(
+                        title: 'Localização',
+                        icon: Icons.location_on_outlined,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: Text(
+                                'Informe sua localização para facilitar trocas presenciais com outros jogadores.',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                // Estado dropdown
+                                SizedBox(
+                                  width: 116,
+                                  child: DropdownButtonFormField<String?>(
+                                    key: const Key('profile-state-field'),
+                                    initialValue: _selectedState,
+                                    isExpanded: true,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Estado',
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                    dropdownColor: AppTheme.surfaceSlate,
+                                    items: [
+                                      const DropdownMenuItem<String?>(
+                                        value: null,
+                                        child: Text('--'),
+                                      ),
+                                      ..._brazilStates.map(
+                                        (s) => DropdownMenuItem<String?>(
+                                          value: s,
+                                          child: Text(s),
+                                        ),
+                                      ),
+                                    ],
+                                    onChanged:
+                                        (v) =>
+                                            setState(() => _selectedState = v),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                // Cidade
+                                Expanded(
+                                  child: TextField(
+                                    key: const Key('profile-city-field'),
+                                    controller: _cityController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Cidade',
+                                      hintText: 'Ex: São Paulo',
+                                      prefixIcon: Icon(
+                                        Icons.location_city,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            TextField(
+                              key: const Key('profile-trade-notes-field'),
+                              controller: _tradeNotesController,
+                              maxLines: 3,
+                              maxLength: 500,
+                              decoration: const InputDecoration(
+                                labelText: 'Observação para trocas',
+                                hintText:
+                                    'Ex: Consigo entregar em mãos em SP, ou deixo na loja X em Curitiba...',
+                                prefixIcon: Icon(Icons.info_outline, size: 20),
+                                alignLabelWithHint: true,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              key: const Key('profile-save-button'),
+                              onPressed: _isSaving ? null : _save,
+                              icon:
+                                  _isSaving
+                                      ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                      : const Icon(Icons.save),
+                              label: Text(_isSaving ? 'Salvando...' : 'Salvar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      _ProfileSectionPanel(
+                        title: 'Coleção',
+                        icon: Icons.collections_bookmark_outlined,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                key: const Key('profile-open-binder-button'),
+                                onPressed:
+                                    () => context.push('/collection?tab=0'),
+                                icon: const Icon(Icons.collections_bookmark),
+                                label: const Text('Meu Fichário'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          user.username,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: false,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          user.email,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: false,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    Text(
-                      'Configurações',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      key: const Key('profile-display-name-field'),
-                      controller: _displayNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nick / Apelido',
-                        hintText: 'Ex: Planeswalker42',
-                        prefixIcon: Icon(Icons.face),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        'Seu nick público — é como os outros jogadores vão te encontrar na busca e ver nos seus decks. Se não preencher, será usado o nome de usuário (@${user.username}).',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppTheme.textSecondary,
-                          fontSize: AppTheme.fontSm,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Localização
-                    Text(
-                      'Localização',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        'Informe sua localização para facilitar trocas presenciais com outros jogadores.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppTheme.textSecondary,
-                          fontSize: AppTheme.fontSm,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        // Estado dropdown
-                        SizedBox(
-                          width: 116,
-                          child: DropdownButtonFormField<String?>(
-                            key: const Key('profile-state-field'),
-                            initialValue: _selectedState,
-                            isExpanded: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Estado',
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 14,
-                              ),
-                            ),
-                            dropdownColor: AppTheme.surfaceSlate,
-                            items: [
-                              const DropdownMenuItem<String?>(
-                                value: null,
-                                child: Text('--'),
-                              ),
-                              ..._brazilStates.map(
-                                (s) => DropdownMenuItem<String?>(
-                                  value: s,
-                                  child: Text(s),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                key: const Key(
+                                  'profile-open-marketplace-button',
+                                ),
+                                onPressed:
+                                    () => context.push('/collection?tab=1'),
+                                icon: const Icon(Icons.store),
+                                label: const Text('Marketplace'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                 ),
                               ),
-                            ],
-                            onChanged:
-                                (v) => setState(() => _selectedState = v),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Cidade
-                        Expanded(
-                          child: TextField(
-                            key: const Key('profile-city-field'),
-                            controller: _cityController,
-                            decoration: const InputDecoration(
-                              labelText: 'Cidade',
-                              hintText: 'Ex: São Paulo',
-                              prefixIcon: Icon(Icons.location_city, size: 20),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Observação de troca
-                    TextField(
-                      key: const Key('profile-trade-notes-field'),
-                      controller: _tradeNotesController,
-                      maxLines: 3,
-                      maxLength: 500,
-                      decoration: const InputDecoration(
-                        labelText: 'Observação para trocas',
-                        hintText:
-                            'Ex: Consigo entregar em mãos em SP, ou deixo na loja X em Curitiba...',
-                        prefixIcon: Icon(Icons.info_outline, size: 20),
-                        alignLabelWithHint: true,
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      key: const Key('profile-save-button'),
-                      onPressed: _isSaving ? null : _save,
-                      icon:
-                          _isSaving
-                              ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                              : const Icon(Icons.save),
-                      label: Text(_isSaving ? 'Salvando...' : 'Salvar'),
-                    ),
-                    const SizedBox(height: 32),
-                    const Divider(color: AppTheme.outlineMuted),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Coleção',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            key: const Key('profile-open-binder-button'),
-                            onPressed: () => context.push('/collection?tab=0'),
-                            icon: const Icon(Icons.collections_bookmark),
-                            label: const Text('Meu Fichário'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            key: const Key('profile-open-marketplace-button'),
-                            onPressed: () => context.push('/collection?tab=1'),
-                            icon: const Icon(Icons.store),
-                            label: const Text('Marketplace'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
               ),
+    );
+  }
+}
+
+class _ProfileSectionPanel extends StatelessWidget {
+  const _ProfileSectionPanel({
+    required this.title,
+    required this.icon,
+    required this.child,
+  });
+
+  final String title;
+  final IconData icon;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.backgroundAbyss.withValues(alpha: 0.20),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: AppTheme.brass400),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontFamily: AppTheme.displayFontFamily,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
     );
   }
 }

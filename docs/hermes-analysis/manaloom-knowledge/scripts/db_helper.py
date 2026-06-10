@@ -1,34 +1,82 @@
-"""DB helper using psycopg2 directly (no psql subprocess needed).
-
-Connection details must come from DATABASE_URL in the runtime environment.
-Do not hardcode or print credentials in Hermes artifacts.
-"""
 import os
-import psycopg2
+from pathlib import Path
 from urllib.parse import quote, urlparse
 
+import psycopg2
+
+"""DB helper using psycopg2 directly (no psql subprocess needed).
+
+Connection details must come from DATABASE_URL, DB_* or PG* variables in the
+runtime environment. A local .env is loaded as a convenience for developer
+machines, but secrets must never be hardcoded or printed in Hermes artifacts.
+"""
+
 DB_PARAMS = {}
+_DOTENV_LOADED = False
+
+
+def _dotenv_candidates() -> list[Path]:
+    script_path = Path(__file__).resolve()
+    candidates: list[Path] = []
+    for base in [Path.cwd(), *Path.cwd().parents, script_path.parent, *script_path.parents]:
+        env_path = base / ".env"
+        if env_path not in candidates:
+            candidates.append(env_path)
+    return candidates
+
+
+def load_dotenv_once() -> None:
+    """Load the nearest .env without overriding real runtime env values."""
+    global _DOTENV_LOADED
+    if _DOTENV_LOADED:
+        return
+    _DOTENV_LOADED = True
+
+    for env_path in _dotenv_candidates():
+        if not env_path.is_file():
+            continue
+        for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+        return
 
 
 def get_database_url():
+    load_dotenv_once()
+
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         return database_url
 
-    required = ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASS"]
-    missing = [name for name in required if not os.environ.get(name)]
+    host = os.environ.get("DB_HOST") or os.environ.get("PGHOST")
+    port = os.environ.get("DB_PORT") or os.environ.get("PGPORT") or "5432"
+    db_name = os.environ.get("DB_NAME") or os.environ.get("PGDATABASE")
+    user = os.environ.get("DB_USER") or os.environ.get("PGUSER")
+    password = os.environ.get("DB_PASS") or os.environ.get("PGPASSWORD")
+
+    required = {
+        "DB_HOST/PGHOST": host,
+        "DB_NAME/PGDATABASE": db_name,
+        "DB_USER/PGUSER": user,
+        "DB_PASS/PGPASSWORD": password,
+    }
+    missing = [name for name, value in required.items() if not value]
     if missing:
         raise RuntimeError(
-            "DATABASE_URL is not set and DB_* config is incomplete: "
+            "DATABASE_URL is not set and DB_*/PG* config is incomplete: "
             + ", ".join(missing)
         )
 
-    host = os.environ["DB_HOST"]
-    port = os.environ.get("DB_PORT", "5432")
-    dbname = quote(os.environ["DB_NAME"], safe="")
-    user = quote(os.environ["DB_USER"], safe="")
-    password = quote(os.environ["DB_PASS"], safe="")
-    return f"postgres://{user}:{password}@{host}:{port}/{dbname}"
+    dbname_safe = quote(str(db_name), safe="")
+    user_safe = quote(str(user), safe="")
+    password_safe = quote(str(password), safe="")
+    return f"postgres://{user_safe}:{password_safe}@{host}:{port}/{dbname_safe}"
 
 
 def sanitized_database_target():

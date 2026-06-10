@@ -143,6 +143,122 @@ void main() {
       expect(semantic['role_delta'], containsPair('draw', 1));
     });
 
+    test('semantic v2 diagnostics preserve secondary multi-tag role losses',
+        () async {
+      final originalDeck = [
+        {
+          'name': 'Combo Draw Engine',
+          'type_line': 'Artifact',
+          'mana_cost': '{3}',
+          'oracle_text': '{T}: Draw a card.',
+          'cmc': 3,
+          'quantity': 1,
+          'semantic_tags_v2': [
+            {
+              'tags': [
+                {'tag': 'draw', 'confidence': 0.93},
+                {'tag': 'engine', 'confidence': 0.9},
+              ],
+              'role_confidence': 0.94,
+            }
+          ],
+        },
+        ..._makeLands(36),
+        ..._makeSpells(63, avgCmc: 3),
+      ];
+
+      final optimizedDeck = [
+        {
+          'name': 'Clean Removal',
+          'type_line': 'Instant',
+          'mana_cost': '{1}{B}',
+          'oracle_text': 'Destroy target creature.',
+          'cmc': 2,
+          'quantity': 1,
+          'semantic_tags_v2': [
+            {
+              'tags': [
+                {'tag': 'removal', 'confidence': 0.95},
+              ],
+              'role_confidence': 0.95,
+            }
+          ],
+        },
+        ..._makeLands(36),
+        ..._makeSpells(63, avgCmc: 3),
+      ];
+
+      final report = await validator.validate(
+        originalDeck: originalDeck,
+        optimizedDeck: optimizedDeck,
+        removals: const ['Combo Draw Engine'],
+        additions: const ['Clean Removal'],
+        commanders: const ['Test Commander'],
+        archetype: 'midrange',
+      );
+
+      final semantic = report.functional.toJson()['semantic_layer_v2'] as Map;
+      expect(semantic['role_delta'], containsPair('draw', -1));
+      expect(semantic['role_delta'], containsPair('engine', -1));
+      expect(semantic['role_delta'], containsPair('removal', 1));
+      expect(report.functional.roleDelta['draw'], equals(-1));
+      expect(report.functional.roleDelta['engine'], equals(-1));
+      expect(report.functional.roleDelta['removal'], equals(1));
+    });
+
+    test('semantic diagnostics prefer persisted functional tags before v2', () {
+      final semantic = buildOptimizationSemanticV2Diagnostics(
+        originalDeck: const [
+          {
+            'name': 'Persisted Draw Engine',
+            'type_line': 'Artifact',
+            'mana_cost': '{3}',
+            'oracle_text': 'Legacy text with no semantic v2 payload.',
+            'cmc': 3,
+            'quantity': 1,
+            'functional_tags': [
+              {'tag': 'draw', 'confidence': 0.95},
+              {'tag': 'engine', 'confidence': 0.92},
+            ],
+          },
+        ],
+        optimizedDeck: const [
+          {
+            'name': 'Persisted Ramp Rock',
+            'type_line': 'Artifact',
+            'mana_cost': '{2}',
+            'oracle_text': '{T}: Add one mana of any color.',
+            'cmc': 2,
+            'quantity': 1,
+            'functional_tags': [
+              {'tag': 'ramp', 'confidence': 0.91},
+            ],
+            'semantic_tags_v2': [
+              {
+                'tags': ['utility'],
+                'role_confidence': 0.98,
+              }
+            ],
+          },
+        ],
+        removals: const ['Persisted Draw Engine'],
+        additions: const ['Persisted Ramp Rock'],
+      );
+
+      expect(
+        semantic['role_source_priority'],
+        equals('functional_tags_then_semantic_v2_then_heuristic'),
+      );
+      expect(
+        semantic['role_signal_source_counts'],
+        equals(const {'persisted': 2}),
+      );
+      expect(semantic['role_delta'], containsPair('draw', -1));
+      expect(semantic['role_delta'], containsPair('engine', -1));
+      expect(semantic['role_delta'], containsPair('ramp', 1));
+      expect(semantic['role_delta'], isNot(containsPair('utility', 1)));
+    });
+
     test('semantic v2 enforcement defaults to disabled and is non-blocking',
         () {
       final mode = resolveSemanticV2OptimizeEnforcementMode(null);
@@ -167,15 +283,26 @@ void main() {
       expect(resolveSemanticV2OptimizeEnforcementMode('full'), equals(mode));
       expect(resolveSemanticV2OptimizeEnforcementMode('PARTIAL'),
           equals(SemanticV2OptimizeEnforcementMode.partial));
+      expect(resolveSemanticV2ExpandedCriticalRoles(null), isFalse);
+      expect(resolveSemanticV2ExpandedCriticalRoles(''), isFalse);
+      expect(resolveSemanticV2ExpandedCriticalRoles('true'), isTrue);
+      expect(resolveSemanticV2ExpandedCriticalRoles('1'), isTrue);
       expect(diagnostics['mode'], equals('shadow'));
       expect(diagnostics['enforcement'], equals('disabled'));
       expect(diagnostics['enforcement_mode'], equals('disabled'));
+      expect(diagnostics['expanded_critical_roles'], isFalse);
       expect(diagnostics['critical_loss_roles'], equals(const ['draw']));
       expect(diagnostics['blocked_by_semantic_v2'], isFalse);
     });
 
-    test('semantic v2 partial blocks only critical role losses', () {
-      for (final role in const ['draw', 'removal', 'ramp', 'wipe']) {
+    test('semantic v2 partial blocks critical and contextual role losses', () {
+      // Base critical roles (draw, removal, ramp, wipe) block by default
+      for (final role in const [
+        'draw',
+        'removal',
+        'ramp',
+        'wipe',
+      ]) {
         final decision = evaluateOptimizationSemanticV2Enforcement(
           semanticLayerV2: {
             'role_delta': {role: -1},
@@ -186,6 +313,41 @@ void main() {
         expect(decision.criticalLossRoles, equals([role]));
         expect(decision.reviewLossRoles, isEmpty);
         expect(decision.blockedBySemanticV2, isTrue);
+      }
+
+      // Expanded critical roles (wincon, combo_piece, engine, payoff, enabler)
+      // require expandedCriticalRoles=true to block (default: false = review-only)
+      for (final role in const [
+        'wincon',
+        'combo_piece',
+        'engine',
+        'payoff',
+        'enabler',
+      ]) {
+        // Default (false): review-only, NOT blocking
+        final defaultDecision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+        );
+
+        expect(defaultDecision.criticalLossRoles, isEmpty);
+        expect(defaultDecision.reviewLossRoles, equals([role]));
+        expect(defaultDecision.blockedBySemanticV2, isFalse);
+
+        // With expandedCriticalRoles=true: blocking
+        final expandedDecision = evaluateOptimizationSemanticV2Enforcement(
+          semanticLayerV2: {
+            'role_delta': {role: -1},
+          },
+          mode: SemanticV2OptimizeEnforcementMode.partial,
+          expandedCriticalRoles: true,
+        );
+
+        expect(expandedDecision.criticalLossRoles, equals([role]));
+        expect(expandedDecision.reviewLossRoles, isEmpty);
+        expect(expandedDecision.blockedBySemanticV2, isTrue);
       }
     });
 

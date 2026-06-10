@@ -98,7 +98,7 @@ class _LifeCounterNativeCommanderDamageSheetState
               border: Border.all(color: AppTheme.outlineMuted),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x66000000),
+                  color: AppTheme.overlayBlack40,
                   blurRadius: 28,
                   offset: Offset(0, 10),
                 ),
@@ -465,6 +465,7 @@ class _CommanderDamageStepper extends StatelessWidget {
         ),
         IconButton(
           key: decrementKey,
+          tooltip: 'Diminuir valor',
           onPressed: onDecrement,
           icon: const Icon(Icons.remove_circle_outline_rounded),
           color: AppTheme.textSecondary,
@@ -484,6 +485,7 @@ class _CommanderDamageStepper extends StatelessWidget {
         ),
         IconButton(
           key: incrementKey,
+          tooltip: 'Aumentar valor',
           onPressed: onIncrement,
           icon: const Icon(Icons.add_circle_outline_rounded),
           color: AppTheme.textPrimary,

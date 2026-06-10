@@ -205,7 +205,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         title: const Text('Coleções MTG'),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
         actions: [
           IconButton(
             tooltip: 'Recarregar coleções',
@@ -221,7 +221,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.frost400),
+        child: CircularProgressIndicator(color: AppTheme.brass400),
       );
     }
 
@@ -257,7 +257,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     }
 
     return RefreshIndicator(
-      color: AppTheme.frost400,
+      color: AppTheme.brass400,
       onRefresh: _loadFirstPage,
       child: ListView.separated(
         key: const Key('setsCatalogList'),
@@ -270,7 +270,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
             return const Padding(
               padding: EdgeInsets.all(16),
               child: Center(
-                child: CircularProgressIndicator(color: AppTheme.frost400),
+                child: CircularProgressIndicator(color: AppTheme.brass400),
               ),
             );
           }
@@ -365,7 +365,7 @@ class _CatalogHeader extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                      borderSide: const BorderSide(color: AppTheme.frost400),
+                      borderSide: const BorderSide(color: AppTheme.brass400),
                     ),
                   ),
                 ),
@@ -430,13 +430,13 @@ class _FilterChip extends StatelessWidget {
         label: Text(label),
         selected: selected,
         onSelected: (_) => onSelected(),
-        selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+        selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
         backgroundColor: AppTheme.surfaceSlate,
         side: BorderSide(
-          color: selected ? AppTheme.frost400 : AppTheme.outlineMuted,
+          color: selected ? AppTheme.brass400 : AppTheme.outlineMuted,
         ),
         labelStyle: TextStyle(
-          color: selected ? AppTheme.textPrimary : AppTheme.textSecondary,
+          color: selected ? AppTheme.brass400 : AppTheme.textSecondary,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
         ),
       ),

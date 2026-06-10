@@ -1,14 +1,11 @@
-import 'dart:async';
-import 'dart:convert';
+﻿import 'dart:async';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/card_validation_service.dart';
 import '../../../lib/ai/optimize_analysis_support.dart' as optimize_analysis;
-import '../../../lib/ai/optimize_complete_support.dart' as optimize_complete;
 import '../../../lib/ai/optimize_deck_support.dart' as optimize_deck;
 import '../../../lib/ai/optimize_request_support.dart' as optimize_request;
 import '../../../lib/ai/optimize_state_support.dart' as optimize_state;
@@ -18,17 +15,19 @@ import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
+import '../../../lib/ai/optimize_swap_integrity.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
 import '../../../lib/ai/theme_contextual_rules_service.dart';
-import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/http_responses.dart';
-import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/edh_bracket_policy.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/ai/optimize_route_internal.dart';
+import '../../../lib/ai/optimize_response_support.dart';
+export '../../../lib/ai/optimize_response_support.dart';
 
 int _optimizeRequestCount = 0;
 int _emptySuggestionFallbackTriggeredCount = 0;
@@ -438,12 +437,21 @@ Future<Response> onRequest(RequestContext context) async {
         resolveSemanticV2OptimizeEnforcementMode(
       env['SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT'],
     );
+    final semanticV2ExpandedCriticalRoles =
+        resolveSemanticV2ExpandedCriticalRoles(
+      env['SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES'],
+    );
 
     _optimizeRequestCount++;
 
     if (deckId == null || archetype == null) {
       return badRequest('deck_id and archetype are required');
     }
+
+    if (userId == null || userId.isEmpty) {
+      return unauthorized('Authentication required');
+    }
+    final authenticatedUserId = userId;
 
     // 1. Fetch Deck Data
     final pool = context.read<Pool>();
@@ -454,24 +462,40 @@ Future<Response> onRequest(RequestContext context) async {
       forceSync: forceSyncExecutor,
       asyncRequested: asyncRequested,
     )) {
+      try {
+        await telemetry.trackAsync(
+          'request.deck_access',
+          () => optimize_request.verifyOptimizeDeckAccess(
+            pool: pool,
+            deckId: deckId,
+            userId: authenticatedUserId,
+          ),
+        );
+      } on optimize_request.OptimizeDeckContextException catch (e) {
+        if (e.code == 'DECK_NOT_FOUND') {
+          return notFound('Deck not found');
+        }
+        rethrow;
+      }
+
       final jobId = await telemetry.trackAsync(
         'request.async_job_create',
         () => OptimizeJobStore.create(
           pool: pool,
           deckId: deckId,
           archetype: archetype,
-          userId: userId,
+          userId: authenticatedUserId,
         ),
       );
       final syncPayload = Map<String, dynamic>.from(body)
         ..['_force_sync'] = true
         ..['async'] = false;
       final authorization = context.request.headers['Authorization'];
-      final internalOptimizeUrl = _resolveInternalOptimizeUrl(context.request);
+      final internalOptimizeUrl = resolveInternalOptimizeUrl(context.request);
 
       unawaited(
         runZonedGuarded(
-          () => _processOptimizeModeAsync(
+          () => processOptimizeModeAsync(
             pool: pool,
             jobId: jobId,
             internalOptimizeUrl: internalOptimizeUrl,
@@ -526,8 +550,8 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    // Memória de preferências do usuário (se autenticado):
-    // aplica default somente quando o request não enviar override explícito.
+    // MemÃ³ria de preferÃªncias do usuÃ¡rio (se autenticado):
+    // aplica default somente quando o request nÃ£o enviar override explÃ­cito.
     final userPreferences = await telemetry.trackAsync(
       'request.user_preferences',
       () => loadUserAiPreferences(
@@ -549,6 +573,7 @@ Future<Response> onRequest(RequestContext context) async {
         () => optimize_request.loadOptimizeDeckContext(
           pool: pool,
           deckId: deckId,
+          userId: authenticatedUserId,
           targetArchetype: archetype,
           requestMode: requestMode,
           intensity: intensity.selected,
@@ -662,7 +687,7 @@ Future<Response> onRequest(RequestContext context) async {
           'type': 'rebuild_guided',
           'endpoint': '/ai/rebuild',
           'explanation':
-              'Revise uma reconstrução guiada em draft antes de aplicar ao deck original.',
+              'Revise uma reconstruÃ§Ã£o guiada em draft antes de aplicar ao deck original.',
           'payload': {
             'deck_id': deckId,
             'bracket': bracket,
@@ -775,6 +800,7 @@ Future<Response> onRequest(RequestContext context) async {
           'semantic_layer_v2': withOptimizationSemanticV2EnforcementDiagnostics(
             semanticLayerV2: validationReport!.functional.semanticLayerV2,
             mode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           ),
         };
       }
@@ -787,7 +813,19 @@ Future<Response> onRequest(RequestContext context) async {
       responseBody['timings'] ??= telemetry.snapshot();
       responseBody['stage_telemetry'] ??= responseBody['timings'];
 
-      await _recordOptimizeAnalysisOutcome(
+      // Integridade dos swaps: liga o conjunto remove/add ao estado do deck
+      // (deck_signature) via SHA-256, para o caminho de aplicação verificar
+      // adulteração ou drift de deck antes de mutar deck_cards.
+      if (responseBody['swap_integrity'] == null) {
+        final integrity = buildSwapIntegrityForResponse(
+          deckId: deckId,
+          deckSignature: deckSignature,
+          responseBody: responseBody,
+        );
+        if (integrity != null) responseBody['swap_integrity'] = integrity;
+      }
+
+      await recordOptimizeAnalysisOutcome(
         pool: pool,
         deckId: deckId,
         userId: userId,
@@ -856,7 +894,7 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    // 2. Otimização via DeckOptimizerService (IA + RAG)
+    // 2. OtimizaÃ§Ã£o via DeckOptimizerService (IA + RAG)
     final apiKey = env['OPENAI_API_KEY'];
     final disableCompleteAi = env['OPTIMIZE_COMPLETE_DISABLE_OPENAI'] == '1';
 
@@ -1027,7 +1065,7 @@ Future<Response> onRequest(RequestContext context) async {
     final isCompleteMode = maxTotal != null && currentTotalCards < maxTotal;
 
     if (isCompleteMode) {
-      // Validação rápida antes de criar o job
+      // ValidaÃ§Ã£o rÃ¡pida antes de criar o job
       if (commanders.isEmpty) {
         return Response.json(
           statusCode: HttpStatus.badRequest,
@@ -1044,16 +1082,16 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           deckId: deckId,
           archetype: targetArchetype,
-          userId: userId,
+          userId: authenticatedUserId,
         ),
       );
 
       // Fire-and-forget: processamento pesado roda em background.
-      // A closure captura todas as variáveis do setup (pool, allCardData, etc.)
-      // O Pool é singleton e sobrevive ao ciclo do request.
+      // A closure captura todas as variÃ¡veis do setup (pool, allCardData, etc.)
+      // O Pool Ã© singleton e sobrevive ao ciclo do request.
       unawaited(
         runZonedGuarded(
-          () => _processCompleteModeAsync(
+          () => processCompleteModeAsync(
             jobId: jobId,
             pool: pool,
             deckId: deckId,
@@ -1071,7 +1109,7 @@ Future<Response> onRequest(RequestContext context) async {
             bracket: bracket,
             keepTheme: keepTheme,
             deckAnalysis: deckAnalysis,
-            userId: userId,
+            userId: authenticatedUserId,
             deckSignature: deckSignature,
             cacheKey: cacheKey,
             intensity: intensity,
@@ -1095,7 +1133,7 @@ Future<Response> onRequest(RequestContext context) async {
           'job_id': jobId,
           'status': 'pending',
           'message':
-              'Otimização iniciada em background. Consulte o progresso via polling.',
+              'OtimizaÃ§Ã£o iniciada em background. Consulte o progresso via polling.',
           'poll_url': '/ai/optimize/jobs/$jobId',
           'poll_interval_ms': 2000,
           'total_stages': 6,
@@ -1108,7 +1146,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // ================================================================
-    //  SYNC MODE: optimize simples (troca de cartas) — roda inline
+    //  SYNC MODE: optimize simples (troca de cartas) â€” roda inline
     // ================================================================
     if (deckOptimizer == null) {
       // Mock response for development (optimize-only).
@@ -1194,7 +1232,7 @@ Future<Response> onRequest(RequestContext context) async {
             'quality_error': {
               'code': 'OPTIMIZE_EXECUTION_FAILED',
               'message': executionFailedButPreserved
-                  ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.'
+                  ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudÃ¡vel.'
                   : 'A execucao da otimizacao falhou antes da validacao final.',
               'details':
                   'Falha ao executar optimizeDeck na tentativa primaria.',
@@ -1216,8 +1254,8 @@ Future<Response> onRequest(RequestContext context) async {
         ),
       );
 
-      // Se o modo complete já veio “determinístico” (com card_id/quantity),
-      // devolve diretamente sem passar pelo fluxo antigo de validação por nomes.
+      // Se o modo complete jÃ¡ veio â€œdeterminÃ­sticoâ€ (com card_id/quantity),
+      // devolve diretamente sem passar pelo fluxo antigo de validaÃ§Ã£o por nomes.
       if (jsonResponse['mode'] == 'complete' &&
           jsonResponse['additions_detailed'] is List) {
         final qualityError = jsonResponse['quality_error'];
@@ -1226,7 +1264,7 @@ Future<Response> onRequest(RequestContext context) async {
             statusCode: HttpStatus.unprocessableEntity,
             body: {
               'error':
-                  'Complete mode não atingiu qualidade mínima para montagem competitiva.',
+                  'Complete mode nÃ£o atingiu qualidade mÃ­nima para montagem competitiva.',
               'quality_error': qualityError,
               'mode': 'complete',
               'target_additions': jsonResponse['target_additions'],
@@ -1266,7 +1304,7 @@ Future<Response> onRequest(RequestContext context) async {
             };
           }
 
-          // Colapsa por NOME (não por printing/card_id), aplicando limite de cópias por formato.
+          // Colapsa por NOME (nÃ£o por printing/card_id), aplicando limite de cÃ³pias por formato.
           final aggregatedByName = <String, Map<String, dynamic>>{};
           for (final entry in rawAdditionsDetailed) {
             final cardId = entry['card_id'] as String;
@@ -1373,7 +1411,7 @@ Future<Response> onRequest(RequestContext context) async {
               additions: additionsForAnalysis,
             );
 
-            // 3. Rodar análise no deck virtual
+            // 3. Rodar anÃ¡lise no deck virtual
             final postAnalyzer =
                 DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
             postAnalysisComplete = postAnalyzer.generateAnalysis();
@@ -1421,13 +1459,13 @@ Future<Response> onRequest(RequestContext context) async {
           responseBody['warnings'] = warnings;
         }
 
-        // Incluir quality_warning para adições parciais (PARTIAL)
+        // Incluir quality_warning para adiÃ§Ãµes parciais (PARTIAL)
         final qw = jsonResponse['quality_warning'];
         if (qw is Map) {
           responseBody['quality_warning'] = qw;
         }
 
-        // Incluir consistency_slo para diagnóstico
+        // Incluir consistency_slo para diagnÃ³stico
         final slo = jsonResponse['consistency_slo'];
         if (slo is Map) {
           responseBody['consistency_slo'] = slo;
@@ -1542,9 +1580,9 @@ Future<Response> onRequest(RequestContext context) async {
               emptySuggestionFallbackApplied = true;
               _emptySuggestionFallbackAppliedCount++;
               emptySuggestionFallbackReason =
-                  'IA retornou sugestões vazias; aplicado fallback heurístico orientado a sinergia.';
+                  'IA retornou sugestÃµes vazias; aplicado fallback heurÃ­stico orientado a sinergia.';
               Log.i(
-                  '✅ [AI Optimize] Fallback aplicado com $pairCount swap(s) após retorno vazio da IA.');
+                  'âœ… [AI Optimize] Fallback aplicado com $pairCount swap(s) apÃ³s retorno vazio da IA.');
             }
           }
         }
@@ -1553,26 +1591,26 @@ Future<Response> onRequest(RequestContext context) async {
           if (fallbackRemovalCandidates.isEmpty) {
             _emptySuggestionFallbackNoCandidateCount++;
             emptySuggestionFallbackReason =
-                'IA retornou sugestões vazias e o deck não possui candidatas seguras para remoção.';
+                'IA retornou sugestÃµes vazias e o deck nÃ£o possui candidatas seguras para remoÃ§Ã£o.';
           } else if (emptySuggestionFallbackReplacementCount == 0) {
             _emptySuggestionFallbackNoReplacementCount++;
             emptySuggestionFallbackReason =
-                'IA retornou sugestões vazias e não foi possível encontrar substitutas válidas no fallback.';
+                'IA retornou sugestÃµes vazias e nÃ£o foi possÃ­vel encontrar substitutas vÃ¡lidas no fallback.';
           } else {
             emptySuggestionFallbackReason =
-                'IA retornou sugestões vazias e não foi possível gerar fallback seguro.';
+                'IA retornou sugestÃµes vazias e nÃ£o foi possÃ­vel gerar fallback seguro.';
           }
         }
       }
 
-      // WARN: Se parsing resultou em listas vazias, logar para diagnóstico
+      // WARN: Se parsing resultou em listas vazias, logar para diagnÃ³stico
       if (removals.isEmpty && additions.isEmpty && !isComplete) {
         if (recognizedSuggestionFormat) {
           Log.d(
-              'ℹ️ [AI Optimize] Payload reconhecido, mas sem sugestões úteis (provável filtro/retorno vazio). Keys: ${jsonResponse.keys.toList()}');
+              'â„¹ï¸ [AI Optimize] Payload reconhecido, mas sem sugestÃµes Ãºteis (provÃ¡vel filtro/retorno vazio). Keys: ${jsonResponse.keys.toList()}');
         } else {
           Log.w(
-              '⚠️ [AI Optimize] IA retornou formato não reconhecido. Keys: ${jsonResponse.keys.toList()}');
+              'âš ï¸ [AI Optimize] IA retornou formato nÃ£o reconhecido. Keys: ${jsonResponse.keys.toList()}');
         }
       }
 
@@ -1594,7 +1632,7 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
-      // GARANTIR EQUILÍBRIO NUMÉRICO (Regra de Ouro)
+      // GARANTIR EQUILÃBRIO NUMÃ‰RICO (Regra de Ouro)
       if (!isComplete) {
         final minCount = removals.length < additions.length
             ? removals.length
@@ -1602,7 +1640,7 @@ Future<Response> onRequest(RequestContext context) async {
 
         if (removals.length != additions.length) {
           Log.w(
-            '⚠️ [AI Optimize] Ajustando desequilíbrio: -${removals.length} / +${additions.length} -> $minCount',
+            'âš ï¸ [AI Optimize] Ajustando desequilÃ­brio: -${removals.length} / +${additions.length} -> $minCount',
           );
           removals = removals.take(minCount).toList();
           additions = additions.take(minCount).toList();
@@ -1614,7 +1652,7 @@ Future<Response> onRequest(RequestContext context) async {
       var sanitizedAdditions =
           additions.map(CardValidationService.sanitizeCardName).toList();
 
-      // Remoções devem existir no deck (evita no-ops e contagem final errada).
+      // RemoÃ§Ãµes devem existir no deck (evita no-ops e contagem final errada).
       sanitizedRemovals = sanitizedRemovals
           .where((n) => deckNamesLower.contains(n.toLowerCase()))
           .toList();
@@ -1624,7 +1662,7 @@ Future<Response> onRequest(RequestContext context) async {
           .where((n) => !commanderLower.contains(n.toLowerCase()))
           .toList();
 
-      // Se o usuário pediu "otimizar", mas mantendo o tema, bloqueia remoções de core.
+      // Se o usuÃ¡rio pediu "otimizar", mas mantendo o tema, bloqueia remoÃ§Ãµes de core.
       if (keepTheme) {
         sanitizedRemovals = sanitizedRemovals.where((n) {
           final isCore = coreLower.contains(n.toLowerCase());
@@ -1633,14 +1671,14 @@ Future<Response> onRequest(RequestContext context) async {
         }).toList();
       }
 
-      // Em modo optimize (swaps), evita sugerir adicionar algo que já existe (no-op).
+      // Em modo optimize (swaps), evita sugerir adicionar algo que jÃ¡ existe (no-op).
       if (!isComplete) {
         sanitizedAdditions = sanitizedAdditions
             .where((n) => !deckNamesLower.contains(n.toLowerCase()))
             .toList();
       }
 
-      // Re-balancear após filtros.
+      // Re-balancear apÃ³s filtros.
       if (!isComplete) {
         final minCount = sanitizedRemovals.length < sanitizedAdditions.length
             ? sanitizedRemovals.length
@@ -1661,7 +1699,7 @@ Future<Response> onRequest(RequestContext context) async {
         validByNameLower[n] = v;
       }
 
-      // Filtrar apenas cartas válidas e remover duplicatas
+      // Filtrar apenas cartas vÃ¡lidas e remover duplicatas
       var validRemovals = sanitizedRemovals
           .where((name) {
             return (validation['valid'] as List).any((card) =>
@@ -1670,7 +1708,7 @@ Future<Response> onRequest(RequestContext context) async {
           .toSet()
           .toList();
 
-      // No modo complete, preservamos repetição (para básicos) e ordem.
+      // No modo complete, preservamos repetiÃ§Ã£o (para bÃ¡sicos) e ordem.
       // No modo optimize (swaps), mantemos set para evitar duplicatas.
       var validAdditions = sanitizedAdditions.where((name) {
         return (validation['valid'] as List).any((card) =>
@@ -1680,13 +1718,13 @@ Future<Response> onRequest(RequestContext context) async {
         validAdditions = validAdditions.toSet().toList();
       }
 
-      // DEBUG: Log quantidades antes dos filtros avançados
+      // DEBUG: Log quantidades antes dos filtros avanÃ§ados
       Log.d('Antes dos filtros de cor/bracket:');
       Log.d('  validRemovals.length = ${validRemovals.length}');
       Log.d('  validAdditions.length = ${validAdditions.length}');
 
-      // Filtrar adições ilegais para Commander/Brawl (identidade de cor do comandante).
-      // Observação: para colorless commander (identity vazia), apenas cartas colorless passam.
+      // Filtrar adiÃ§Ãµes ilegais para Commander/Brawl (identidade de cor do comandante).
+      // ObservaÃ§Ã£o: para colorless commander (identity vazia), apenas cartas colorless passam.
       final filteredByColorIdentity = <String>[];
       if (commanders.isNotEmpty && validAdditions.isNotEmpty) {
         final additionsIdentityResult = await pool.execute(
@@ -1724,13 +1762,13 @@ Future<Response> onRequest(RequestContext context) async {
         }).toList();
       }
 
-      // Bracket policy (intermediário): bloqueia cartas "acima do bracket" baseado no deck atual.
+      // Bracket policy (intermediÃ¡rio): bloqueia cartas "acima do bracket" baseado no deck atual.
       // Aplica somente em Commander/Brawl, quando bracket foi enviado.
       final blockedByBracket = <Map<String, dynamic>>[];
       if (bracket != null &&
           commanders.isNotEmpty &&
           validAdditions.isNotEmpty) {
-        // Dados atuais do deck (já temos oracle/type em allCardData + quantity)
+        // Dados atuais do deck (jÃ¡ temos oracle/type em allCardData + quantity)
         final additionsInfoResult = await pool.execute(
           Sql.named('''
             SELECT name, type_line, oracle_text
@@ -1755,23 +1793,23 @@ Future<Response> onRequest(RequestContext context) async {
         );
 
         blockedByBracket.addAll(decision.blocked);
-        // Modo complete pode conter repetição; para a decisão, usamos os nomes únicos do "allowed"
-        // e depois re-aplicamos mantendo repetição quando possível.
+        // Modo complete pode conter repetiÃ§Ã£o; para a decisÃ£o, usamos os nomes Ãºnicos do "allowed"
+        // e depois re-aplicamos mantendo repetiÃ§Ã£o quando possÃ­vel.
         final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
         validAdditions = validAdditions
             .where((n) => allowedSet.contains(n.toLowerCase()))
             .toList();
       }
 
-      // Top-up determinístico no modo complete:
-      // se depois de validações/filtros ainda faltarem cartas para atingir o target, completa com básicos.
+      // Top-up determinÃ­stico no modo complete:
+      // se depois de validaÃ§Ãµes/filtros ainda faltarem cartas para atingir o target, completa com bÃ¡sicos.
       final additionsDetailed = <Map<String, dynamic>>[];
       if (isComplete) {
         final targetAdditions = (jsonResponse['target_additions'] as int?) ?? 0;
         final desired =
             targetAdditions > 0 ? targetAdditions : validAdditions.length;
 
-        // Agrega as adições atuais por nome (quantidade 1 por ocorrência)
+        // Agrega as adiÃ§Ãµes atuais por nome (quantidade 1 por ocorrÃªncia)
         final countsByName = <String, int>{};
         final basicNamesLower =
             basicLandNamesForIdentity(commanderColorIdentity)
@@ -1790,7 +1828,7 @@ Future<Response> onRequest(RequestContext context) async {
           countsByName[n] = current + 1;
         }
 
-        // Se faltar, adiciona básicos para preencher
+        // Se faltar, adiciona bÃ¡sicos para preencher
         var missing =
             desired - countsByName.values.fold<int>(0, (a, b) => a + b);
         Map<String, String> basicsWithIds = const {};
@@ -1824,19 +1862,19 @@ Future<Response> onRequest(RequestContext context) async {
           });
         }
 
-        // Mantém additions como lista simples (única) para UI; o app aplica via additions_detailed.
+        // MantÃ©m additions como lista simples (Ãºnica) para UI; o app aplica via additions_detailed.
         validAdditions =
             additionsDetailed.map((e) => e['name'] as String).toList();
       }
 
-      // Re-aplicar equilíbrio após validação
+      // Re-aplicar equilÃ­brio apÃ³s validaÃ§Ã£o
       // FILOSOFIA: Quando additions < removals, a IA deve SUGERIR NOVAS CARTAS
-      // de sinergia — NÃO preencher com lands genéricos. O propósito é OTIMIZAR.
+      // de sinergia â€” NÃƒO preencher com lands genÃ©ricos. O propÃ³sito Ã© OTIMIZAR.
 
-      // ═══════════════════════════════════════════════════════════
-      // PROTEÇÃO DE TERRENOS (sync optimize): impedir remoção de lands quando
-      // o deck já tem poucos terrenos. Sem isso, um deck com 24 lands pode ficar com 20.
-      // ═══════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+      // PROTEÃ‡ÃƒO DE TERRENOS (sync optimize): impedir remoÃ§Ã£o de lands quando
+      // o deck jÃ¡ tem poucos terrenos. Sem isso, um deck com 24 lands pode ficar com 20.
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       if (!isComplete) {
         final currentLandCount = allCardData.fold<int>(0, (sum, c) {
           final type = ((c['type_line'] as String?) ?? '').toLowerCase();
@@ -1846,7 +1884,7 @@ Future<Response> onRequest(RequestContext context) async {
         const minSafeLands = 28;
 
         if (currentLandCount <= minSafeLands + 3) {
-          // Bloquear remoções de terrenos
+          // Bloquear remoÃ§Ãµes de terrenos
           final landRemovalsBefore = validRemovals.length;
           final landNamesInDeck = <String, String>{};
           for (final card in allCardData) {
@@ -1864,23 +1902,23 @@ Future<Response> onRequest(RequestContext context) async {
           final landBlockedCount = landRemovalsBefore - validRemovals.length;
           if (landBlockedCount > 0) {
             Log.d(
-                '⛔ Land protection: bloqueou $landBlockedCount remoções de terrenos (deck tem $currentLandCount lands, mínimo seguro=$minSafeLands)');
+                'â›” Land protection: bloqueou $landBlockedCount remoÃ§Ãµes de terrenos (deck tem $currentLandCount lands, mÃ­nimo seguro=$minSafeLands)');
           }
         }
       }
 
       if (!isComplete && validRemovals.length != validAdditions.length) {
-        Log.d('Re-balanceamento pós-filtros:');
+        Log.d('Re-balanceamento pÃ³s-filtros:');
         Log.d(
             '  Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
 
         if (validAdditions.length < validRemovals.length) {
-          // CORREÇÃO REAL: Re-consultar a IA para cartas substitutas
+          // CORREÃ‡ÃƒO REAL: Re-consultar a IA para cartas substitutas
           final missingCount = validRemovals.length - validAdditions.length;
           Log.d(
-              '  Faltam $missingCount adições - consultando IA para substitutas sinérgicas');
+              '  Faltam $missingCount adiÃ§Ãµes - consultando IA para substitutas sinÃ©rgicas');
 
-          // Montar lista de cartas a excluir (já existentes + já sugeridas + filtradas)
+          // Montar lista de cartas a excluir (jÃ¡ existentes + jÃ¡ sugeridas + filtradas)
           final excludeNames = <String>{
             ...deckNamesLower,
             ...validAdditions.map((n) => n.toLowerCase()),
@@ -1921,26 +1959,26 @@ Future<Response> onRequest(RequestContext context) async {
                 };
               }
               Log.d(
-                  '  IA sugeriu ${replacementResult.length} substitutas sinérgicas');
+                  '  IA sugeriu ${replacementResult.length} substitutas sinÃ©rgicas');
             }
 
-            // Se AINDA faltar (IA não conseguiu preencher tudo), TRUNCAR remoções
-            // para manter equilíbrio. NÃO preencher com básicos em modo optimize —
-            // trocar spells por lands é degradação, não otimização.
+            // Se AINDA faltar (IA nÃ£o conseguiu preencher tudo), TRUNCAR remoÃ§Ãµes
+            // para manter equilÃ­brio. NÃƒO preencher com bÃ¡sicos em modo optimize â€”
+            // trocar spells por lands Ã© degradaÃ§Ã£o, nÃ£o otimizaÃ§Ã£o.
             if (validAdditions.length < validRemovals.length) {
               final stillMissing = validRemovals.length - validAdditions.length;
               Log.d(
-                  '  Ainda faltam $stillMissing - truncando remoções (não preencher com básicos em optimize)');
+                  '  Ainda faltam $stillMissing - truncando remoÃ§Ãµes (nÃ£o preencher com bÃ¡sicos em optimize)');
               validRemovals =
                   validRemovals.take(validAdditions.length).toList();
             }
           } catch (e) {
             Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
-            // Fallback: truncar remoções para não perder cartas
+            // Fallback: truncar remoÃ§Ãµes para nÃ£o perder cartas
             validRemovals = validRemovals.take(validAdditions.length).toList();
           }
         } else {
-          // Mais adições que remoções: truncar adições
+          // Mais adiÃ§Ãµes que remoÃ§Ãµes: truncar adiÃ§Ãµes
           validAdditions = validAdditions.take(validRemovals.length).toList();
         }
 
@@ -1973,22 +2011,22 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      // --- VERIFICAÇÃO PÓS-OTIMIZAÇÃO (Virtual Deck Analysis) ---
-      // Simular o deck como ficaria se as mudanças fossem aplicadas e re-analisar
+      // --- VERIFICAÃ‡ÃƒO PÃ“S-OTIMIZAÃ‡ÃƒO (Virtual Deck Analysis) ---
+      // Simular o deck como ficaria se as mudanÃ§as fossem aplicadas e re-analisar
       Map<String, dynamic>? postAnalysis;
       List<String> validationWarnings = [];
 
-      // ═══════════════════════════════════════════════════════════
-      // VALIDAÇÃO PÓS-PROCESSAMENTO: Color Identity + EDHREC + Tema
-      // ═══════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+      // VALIDAÃ‡ÃƒO PÃ“S-PROCESSAMENTO: Color Identity + EDHREC + Tema
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-      // 1. Color Identity Warning (se IA sugeriu cartas inválidas)
+      // 1. Color Identity Warning (se IA sugeriu cartas invÃ¡lidas)
       if (filteredByColorIdentity.isNotEmpty) {
         validationWarnings.add(
-            '⚠️ ${filteredByColorIdentity.length} carta(s) sugerida(s) pela IA foram removidas por violar a identidade de cor do commander: ${filteredByColorIdentity.take(3).join(", ")}${filteredByColorIdentity.length > 3 ? "..." : ""}');
+            'âš ï¸ ${filteredByColorIdentity.length} carta(s) sugerida(s) pela IA foram removidas por violar a identidade de cor do commander: ${filteredByColorIdentity.take(3).join(", ")}${filteredByColorIdentity.length > 3 ? "..." : ""}');
       }
 
-      // 2. Validação EDHREC: verificar se additions têm sinergia comprovada
+      // 2. ValidaÃ§Ã£o EDHREC: verificar se additions tÃªm sinergia comprovada
       EdhrecCommanderData? edhrecValidationData;
       List<String> additionsNotInEdhrec = [];
       if (commanders.isNotEmpty && validAdditions.isNotEmpty) {
@@ -2012,10 +2050,10 @@ Future<Response> onRequest(RequestContext context) async {
                       .toStringAsFixed(0);
               if (additionsNotInEdhrec.length > validAdditions.length * 0.5) {
                 validationWarnings.add(
-                    '⚠️ ${additionsNotInEdhrec.length} ($percent%) das cartas sugeridas NÃO aparecem nos dados EDHREC de ${commanders.firstOrNull ?? ""}. Isso pode indicar baixa sinergia: ${additionsNotInEdhrec.take(3).join(", ")}${additionsNotInEdhrec.length > 3 ? "..." : ""}');
+                    'âš ï¸ ${additionsNotInEdhrec.length} ($percent%) das cartas sugeridas NÃƒO aparecem nos dados EDHREC de ${commanders.firstOrNull ?? ""}. Isso pode indicar baixa sinergia: ${additionsNotInEdhrec.take(3).join(", ")}${additionsNotInEdhrec.length > 3 ? "..." : ""}');
               } else if (additionsNotInEdhrec.length >= 3) {
                 validationWarnings.add(
-                    '💡 ${additionsNotInEdhrec.length} carta(s) sugerida(s) não estão nos dados EDHREC - podem ser inovadoras ou de baixa sinergia.');
+                    'ðŸ’¡ ${additionsNotInEdhrec.length} carta(s) sugerida(s) nÃ£o estÃ£o nos dados EDHREC - podem ser inovadoras ou de baixa sinergia.');
               }
             }
           }
@@ -2024,14 +2062,14 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
-      // 3. Comparação de Tema: verificar se tema detectado corresponde aos temas EDHREC
+      // 3. ComparaÃ§Ã£o de Tema: verificar se tema detectado corresponde aos temas EDHREC
       if (edhrecValidationData != null &&
           edhrecValidationData.themes.isNotEmpty) {
         final detectedThemeLower = targetArchetype.toLowerCase();
         final edhrecThemesLower =
             edhrecValidationData.themes.map((t) => t.toLowerCase()).toList();
 
-        // Verificar se o tema detectado tem correspondência nos temas EDHREC
+        // Verificar se o tema detectado tem correspondÃªncia nos temas EDHREC
         bool themeMatch = false;
         for (final edhrecTheme in edhrecThemesLower) {
           if (detectedThemeLower.contains(edhrecTheme) ||
@@ -2043,7 +2081,7 @@ Future<Response> onRequest(RequestContext context) async {
 
         if (!themeMatch) {
           validationWarnings.add(
-              '� Tema detectado "$targetArchetype" não corresponde aos temas populares do EDHREC (${edhrecValidationData.themes.take(3).join(", ")}). O sistema está usando abordagem HÍBRIDA: 70% cartas EDHREC + 30% cartas do seu tema para respeitar sua ideia.');
+              'ï¿½ Tema detectado "$targetArchetype" nÃ£o corresponde aos temas populares do EDHREC (${edhrecValidationData.themes.take(3).join(", ")}). O sistema estÃ¡ usando abordagem HÃBRIDA: 70% cartas EDHREC + 30% cartas do seu tema para respeitar sua ideia.');
         }
       }
 
@@ -2053,13 +2091,14 @@ Future<Response> onRequest(RequestContext context) async {
 
       if (validAdditions.isNotEmpty) {
         try {
-          // 1. Buscar dados completos das cartas sugeridas (para análise de mana/tipo)
+          // 1. Buscar dados completos das cartas sugeridas (para anÃ¡lise de mana/tipo)
           // Usar nomes corretos do DB (via validByNameLower) para evitar problemas de case
           final correctedAdditionNames = validAdditions.map((n) {
             final v = validByNameLower[n.toLowerCase()];
             return (v?['name'] as String?) ?? n;
           }).toList();
-          final semanticV2Select = await _semanticV2SelectSql(pool);
+          final semanticV2Select = await semanticV2SelectSql(pool);
+          final functionalTagsSelect = await functionalTagsSelectSql(pool);
           final additionsDataResult = await pool.execute(
             Sql.named('''
               SELECT DISTINCT ON (LOWER(name))
@@ -2076,7 +2115,8 @@ Future<Response> onRequest(RequestContext context) async {
                        0
                      ) as cmc,
                      oracle_text,
-                     $semanticV2Select
+                     $semanticV2Select,
+                     $functionalTagsSelect
               FROM cards 
               WHERE LOWER(name) = ANY(@names)
               ORDER BY LOWER(name), name
@@ -2096,6 +2136,7 @@ Future<Response> onRequest(RequestContext context) async {
                     'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
                     'oracle_text': (row[5] as String?) ?? '',
                     'semantic_tags_v2': row.length > 6 ? row[6] : null,
+                    'functional_tags': row.length > 7 ? row[7] : null,
                   })
               .toList();
 
@@ -2120,10 +2161,10 @@ Future<Response> onRequest(RequestContext context) async {
                 );
               }
               qualityGateWarnings.add(
-                '🔒 Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
+                'ðŸ”’ Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
               );
               qualityGateWarnings.addAll(
-                gateResult.droppedReasons.map((reason) => '🔒 $reason'),
+                gateResult.droppedReasons.map((reason) => 'ðŸ”’ $reason'),
               );
 
               final safeAdditionNames =
@@ -2142,7 +2183,7 @@ Future<Response> onRequest(RequestContext context) async {
               validAdditions =
                   validAdditions.take(intensity.targetMax).toList();
               qualityGateWarnings.add(
-                '🔒 Escopo aggressive limitado a ${intensity.targetMax} troca(s) após ranking e gate; $overflow candidata(s) excedentes ficaram como reserva.',
+                'ðŸ”’ Escopo aggressive limitado a ${intensity.targetMax} troca(s) apÃ³s ranking e gate; $overflow candidata(s) excedentes ficaram como reserva.',
               );
               final safeAdditionNames =
                   validAdditions.map((name) => name.toLowerCase()).toSet();
@@ -2212,12 +2253,12 @@ Future<Response> onRequest(RequestContext context) async {
             additions: additionsForAnalysis,
           );
 
-          // 3. Rodar Análise no Deck Virtual
+          // 3. Rodar AnÃ¡lise no Deck Virtual
           final postAnalyzer =
               DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
           postAnalysis = postAnalyzer.generateAnalysis();
 
-          // 4. Comparar Antes vs Depois — VALIDAÇÃO QUALITATIVA REAL
+          // 4. Comparar Antes vs Depois â€” VALIDAÃ‡ÃƒO QUALITATIVA REAL
           final preManaAssessment =
               deckAnalysis['mana_base_assessment'] as String? ?? '';
           final postManaAssessment =
@@ -2227,7 +2268,7 @@ Future<Response> onRequest(RequestContext context) async {
 
           if (!preManaIssues && postManaIssues) {
             validationWarnings.add(
-                '⚠️ ATENÇÃO: As sugestões da IA podem piorar sua base de mana.');
+                'âš ï¸ ATENÃ‡ÃƒO: As sugestÃµes da IA podem piorar sua base de mana.');
           }
 
           final preAvgCmc = deckAnalysis['average_cmc'] as String? ?? '0';
@@ -2238,51 +2279,51 @@ Future<Response> onRequest(RequestContext context) async {
           if (effectiveOptimizeArchetype.toLowerCase() == 'aggro' &&
               postCurve > preCurve) {
             validationWarnings.add(
-                '⚠️ ATENÇÃO: O deck está ficando mais lento (CMC aumentou), o que é ruim para Aggro.');
+                'âš ï¸ ATENÃ‡ÃƒO: O deck estÃ¡ ficando mais lento (CMC aumentou), o que Ã© ruim para Aggro.');
           }
 
-          // 5. ANÁLISE DE QUALIDADE DAS TROCAS (Power Level Assessment)
+          // 5. ANÃLISE DE QUALIDADE DAS TROCAS (Power Level Assessment)
           final preTypes =
               deckAnalysis['type_distribution'] as Map<String, dynamic>? ?? {};
           final postTypes =
               postAnalysis['type_distribution'] as Map<String, dynamic>? ?? {};
 
-          // Verificar se a otimização não desbalanceou a distribuição de tipos
+          // Verificar se a otimizaÃ§Ã£o nÃ£o desbalanceou a distribuiÃ§Ã£o de tipos
           final preLands = (preTypes['lands'] as int?) ?? 0;
           final postLands = (postTypes['lands'] as int?) ?? 0;
           if (postLands < preLands - 3) {
             validationWarnings.add(
-                '⚠️ A otimização removeu muitos terrenos ($preLands → $postLands). Isso pode causar problemas de mana.');
+                'âš ï¸ A otimizaÃ§Ã£o removeu muitos terrenos ($preLands â†’ $postLands). Isso pode causar problemas de mana.');
           }
 
-          // Verificar se a curva melhorou para o arquétipo
+          // Verificar se a curva melhorou para o arquÃ©tipo
           if (effectiveOptimizeArchetype.toLowerCase() == 'control' &&
               postCurve < preCurve - 0.5) {
             validationWarnings.add(
-                '💡 O CMC médio diminuiu significativamente ($preAvgCmc → $postAvgCmc). Para Control, isso pode remover respostas de custo alto que são importantes.');
+                'ðŸ’¡ O CMC mÃ©dio diminuiu significativamente ($preAvgCmc â†’ $postAvgCmc). Para Control, isso pode remover respostas de custo alto que sÃ£o importantes.');
           }
 
           // Gerar resumo de melhoria
           final improvements = <String>[];
           if (postCurve < preCurve &&
               effectiveOptimizeArchetype.toLowerCase() != 'control') {
-            improvements.add('CMC médio otimizado: $preAvgCmc → $postAvgCmc');
+            improvements.add('CMC mÃ©dio otimizado: $preAvgCmc â†’ $postAvgCmc');
           }
           if (preManaIssues && !postManaIssues) {
             improvements.add('Base de mana corrigida');
           }
           if ((postTypes['instants'] as int? ?? 0) >
               (preTypes['instants'] as int? ?? 0)) {
-            improvements.add('Mais interação instant-speed adicionada');
+            improvements.add('Mais interaÃ§Ã£o instant-speed adicionada');
           }
 
           if (improvements.isNotEmpty) {
             postAnalysis['improvements'] = improvements;
           }
 
-          // ═══════════════════════════════════════════════════════════
-          // 6. VALIDAÇÃO AUTOMÁTICA (Monte Carlo + Funcional + Critic IA)
-          // ═══════════════════════════════════════════════════════════
+          // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          // 6. VALIDAÃ‡ÃƒO AUTOMÃTICA (Monte Carlo + Funcional + Critic IA)
+          // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           try {
             final themeService = ThemeContextualRulesService(pool);
             final validator = OptimizationValidator(openAiKey: apiKey, themeService: themeService);
@@ -2306,7 +2347,7 @@ Future<Response> onRequest(RequestContext context) async {
             // Se reprovado, alertar
             if (validationReport.verdict == 'reprovado') {
               validationWarnings.insert(0,
-                  '🚫 VALIDAÇÃO: As trocas sugeridas NÃO passaram na validação automática (score: ${validationReport.score}/100).');
+                  'ðŸš« VALIDAÃ‡ÃƒO: As trocas sugeridas NÃƒO passaram na validaÃ§Ã£o automÃ¡tica (score: ${validationReport.score}/100).');
             }
 
             Log.d(
@@ -2340,7 +2381,7 @@ Future<Response> onRequest(RequestContext context) async {
             );
           }
         } catch (e) {
-          Log.e('Erro na verificação pós-otimização: $e');
+          Log.e('Erro na verificaÃ§Ã£o pÃ³s-otimizaÃ§Ã£o: $e');
           return respondWithOptimizeTelemetry(
             statusCode: HttpStatus.internalServerError,
             body: {
@@ -2475,7 +2516,7 @@ Future<Response> onRequest(RequestContext context) async {
                       postAnalysis?['mana_base_assessment']?.toString() ?? '',
                 )
               : <String>[
-                  'A validação final não fechou como "aprovado" (score $responseValidationScore/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
+                  'A validaÃ§Ã£o final nÃ£o fechou como "aprovado" (score $responseValidationScore/100). Optimize sÃ³ retorna sucesso quando a melhoria Ã© aprovada sem ressalvas.',
                 ];
 
           return respondWithOptimizeTelemetry(
@@ -2515,48 +2556,25 @@ Future<Response> onRequest(RequestContext context) async {
           final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
             semanticLayerV2: semanticV2,
             mode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           );
 
           if (semanticV2Decision.blockedBySemanticV2) {
-            final semanticDiagnostics =
-                withOptimizationSemanticV2EnforcementDiagnostics(
+            final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
               semanticLayerV2: semanticV2,
-              mode: semanticV2OptimizeEnforcementMode,
+              enforcementMode: semanticV2OptimizeEnforcementMode,
+              expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
+              validation: optimizationValidationReport.toJson(),
+              removals: validRemovals,
+              additions: validAdditions,
+              deckAnalysis: deckAnalysis,
+              postAnalysis: postAnalysis,
+              validationWarnings: validationWarnings,
             );
-            final semanticReasons = semanticV2Decision.criticalLossRoles
-                .map(
-                  (role) =>
-                      'Semantic Layer v2 detectou perda crítica em "$role".',
-                )
-                .toList();
 
             return respondWithOptimizeTelemetry(
               statusCode: HttpStatus.unprocessableEntity,
-              body: {
-                'error':
-                    'A otimizacao sugerida foi bloqueada pela validacao semantica v2.',
-                'quality_error': {
-                  'code': 'OPTIMIZE_SEMANTIC_V2_REJECTED',
-                  'message':
-                      'As trocas passaram no gate atual, mas a Semantic Layer v2 em modo partial detectou perda critica.',
-                  'rejection_source': 'semantic_layer_v2',
-                  'reasons': semanticReasons,
-                  'critical_loss_roles': semanticV2Decision.criticalLossRoles,
-                  'review_loss_roles': semanticV2Decision.reviewLossRoles,
-                  'blocked_by_semantic_v2': true,
-                  'semantic_layer_v2': semanticDiagnostics,
-                  'validation': optimizationValidationReport.toJson(),
-                },
-                'mode': 'optimize',
-                'removals': validRemovals,
-                'additions': validAdditions,
-                'deck_analysis': deckAnalysis,
-                'post_analysis': postAnalysis,
-                'validation_warnings': validationWarnings,
-                'optimize_diagnostics': {
-                  'semantic_layer_v2': semanticDiagnostics,
-                },
-              },
+              body: semanticRejectionBody,
               postAnalysisOverride: postAnalysis,
               validationReport: optimizationValidationReport,
               removalsOverride: validRemovals,
@@ -2569,7 +2587,7 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
-      // Preparar resposta com avisos sobre cartas inválidas
+      // Preparar resposta com avisos sobre cartas invÃ¡lidas
       final invalidCards = validation['invalid'] as List<String>;
       final suggestions =
           validation['suggestions'] as Map<String, List<String>>;
@@ -2636,7 +2654,7 @@ Future<Response> onRequest(RequestContext context) async {
         'reasoning': normalizeOptimizeReasoning(jsonResponse['reasoning']),
         'deck_analysis': deckAnalysis,
         'post_analysis':
-            postAnalysis, // Retorna a análise futura para o front mostrar
+            postAnalysis, // Retorna a anÃ¡lise futura para o front mostrar
         'validation_warnings': validationWarnings,
         'bracket': bracket,
         'target_additions': jsonResponse['target_additions'],
@@ -2654,7 +2672,7 @@ Future<Response> onRequest(RequestContext context) async {
             'empty_suggestions_fallback_aggregate_persisted':
                 persistedFallbackAggregate,
         },
-        // Validação EDHREC
+        // ValidaÃ§Ã£o EDHREC
         if (edhrecValidationData != null)
           'edhrec_validation': {
             'commander': commanders.firstOrNull ?? "",
@@ -2666,7 +2684,7 @@ Future<Response> onRequest(RequestContext context) async {
           },
       };
 
-      // Gerar additions_detailed apenas para cartas com card_id válido
+      // Gerar additions_detailed apenas para cartas com card_id vÃ¡lido
       responseBody['additions_detailed'] = isComplete
           ? additionsDetailed
               .whereType<Map<String, dynamic>>()
@@ -2711,7 +2729,7 @@ Future<Response> onRequest(RequestContext context) async {
               .where((e) => e != null)
               .toList();
 
-      // Gerar removals_detailed apenas para cartas com card_id válido
+      // Gerar removals_detailed apenas para cartas com card_id vÃ¡lido
       responseBody['removals_detailed'] = validRemovals
           .map((name) {
             final v = validByNameLower[name.toLowerCase()];
@@ -2748,7 +2766,7 @@ Future<Response> onRequest(RequestContext context) async {
         ...(responseBody['additions_detailed'] as List),
       ];
 
-      // CRÍTICO: Balancear additions/removals detailed para manter contagem igual
+      // CRÃTICO: Balancear additions/removals detailed para manter contagem igual
       final addDet = responseBody['additions_detailed'] as List;
       final remDet = responseBody['removals_detailed'] as List;
 
@@ -2760,9 +2778,9 @@ Future<Response> onRequest(RequestContext context) async {
       Log.d('  removals_detailed.length = ${remDet.length}');
       Log.d('  mode = ${jsonResponse['mode']}');
 
-      // Verificar cartas que NÃO foram mapeadas para card_id
+      // Verificar cartas que NÃƒO foram mapeadas para card_id
       if (addDet.length != validAdditions.length) {
-        Log.w('Algumas adições não foram mapeadas para card_id!');
+        Log.w('Algumas adiÃ§Ãµes nÃ£o foram mapeadas para card_id!');
         for (final name in validAdditions) {
           final v = validByNameLower[name.toLowerCase()];
           if (v == null || v['id'] == null) {
@@ -2772,14 +2790,14 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
-      // BALANCEAMENTO FINAL (detailed) - Agora as listas já devem estar equilibradas
-      // pós re-chamada à IA. Este bloco só age se o detailed ainda tiver gap.
+      // BALANCEAMENTO FINAL (detailed) - Agora as listas jÃ¡ devem estar equilibradas
+      // pÃ³s re-chamada Ã  IA. Este bloco sÃ³ age se o detailed ainda tiver gap.
       if (addDet.length < remDet.length && !isComplete) {
         final missingDetailed = remDet.length - addDet.length;
         Log.d(
             '  Gap em detailed: faltam $missingDetailed - construindo de validAdditions');
 
-        // Tentar construir detailed para adições que ainda não estão nele
+        // Tentar construir detailed para adiÃ§Ãµes que ainda nÃ£o estÃ£o nele
         final existingNames = addDet
             .map((e) => (e as Map)['name']?.toString().toLowerCase() ?? '')
             .toSet();
@@ -2800,7 +2818,7 @@ Future<Response> onRequest(RequestContext context) async {
           responseBody['additions_detailed'] = [...addDet, ...newDetailed];
         }
 
-        // Se AINDA faltar, truncar remoções como último recurso
+        // Se AINDA faltar, truncar remoÃ§Ãµes como Ãºltimo recurso
         final finalAddDet2 = responseBody['additions_detailed'] as List;
         if (finalAddDet2.length < remDet.length) {
           responseBody['removals_detailed'] =
@@ -2809,7 +2827,7 @@ Future<Response> onRequest(RequestContext context) async {
               validRemovals.take(finalAddDet2.length).toList();
         }
       } else if (addDet.length > remDet.length && !isComplete) {
-        Log.d('  Truncando adições extras');
+        Log.d('  Truncando adiÃ§Ãµes extras');
         responseBody['additions_detailed'] =
             addDet.take(remDet.length).toList();
         responseBody['additions'] = validAdditions.take(remDet.length).toList();
@@ -2821,11 +2839,11 @@ Future<Response> onRequest(RequestContext context) async {
       Log.d(
           '  Final: additions_detailed=${finalAddDet.length}, removals_detailed=${finalRemDet.length}');
 
-      // ═══════════════════════════════════════════════════════════
-      // VALIDAÇÃO FINAL: Garantir integridade do deck resultante
-      // ═══════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+      // VALIDAÃ‡ÃƒO FINAL: Garantir integridade do deck resultante
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       if (!isComplete) {
-        // 1. Verificar que nenhuma adição é de carta que já existe no deck (exceto basics em formatos não-Commander)
+        // 1. Verificar que nenhuma adiÃ§Ã£o Ã© de carta que jÃ¡ existe no deck (exceto basics em formatos nÃ£o-Commander)
         final additionsDetailedFinal =
             responseBody['additions_detailed'] as List;
         final removalsDetailedFinal = responseBody['removals_detailed'] as List;
@@ -2849,14 +2867,14 @@ Future<Response> onRequest(RequestContext context) async {
           final alreadyInDeck = deckNamesLower.contains(name);
           final beingRemoved = removalNamesFinal.contains(name);
 
-          // Em Commander/Brawl, não-básicos só podem ter 1 cópia.
-          // Se a carta já está no deck e não está sendo removida, é inválida.
+          // Em Commander/Brawl, nÃ£o-bÃ¡sicos sÃ³ podem ter 1 cÃ³pia.
+          // Se a carta jÃ¡ estÃ¡ no deck e nÃ£o estÃ¡ sendo removida, Ã© invÃ¡lida.
           if (alreadyInDeck &&
               !beingRemoved &&
               !isBasic &&
               (deckFormat == 'commander' || deckFormat == 'brawl')) {
             Log.w(
-                '  Validação final: removendo adição duplicada "$name" (já existe no deck)');
+                '  ValidaÃ§Ã£o final: removendo adiÃ§Ã£o duplicada "$name" (jÃ¡ existe no deck)');
             continue;
           }
 
@@ -2864,12 +2882,12 @@ Future<Response> onRequest(RequestContext context) async {
           filteredAdditionNames.add(add['name']?.toString() ?? name);
         }
 
-        // 2. Rebalancear após filtrar adições inválidas
+        // 2. Rebalancear apÃ³s filtrar adiÃ§Ãµes invÃ¡lidas
         if (filteredAdditions.length < additionsDetailedFinal.length) {
           Log.d(
-              '  Validação final: ${additionsDetailedFinal.length - filteredAdditions.length} adições removidas por duplicidade');
+              '  ValidaÃ§Ã£o final: ${additionsDetailedFinal.length - filteredAdditions.length} adiÃ§Ãµes removidas por duplicidade');
 
-          // Truncar remoções para manter equilíbrio
+          // Truncar remoÃ§Ãµes para manter equilÃ­brio
           for (var i = 0;
               i < removalsDetailedFinal.length &&
                   filteredRemovalsToKeep.length < filteredAdditions.length;
@@ -2893,7 +2911,7 @@ Future<Response> onRequest(RequestContext context) async {
           ];
 
           Log.d(
-              '  Validação final pós-rebalanceamento: ${filteredAdditions.length} adições, ${filteredRemovalsToKeep.length} remoções');
+              '  ValidaÃ§Ã£o final pÃ³s-rebalanceamento: ${filteredAdditions.length} adiÃ§Ãµes, ${filteredRemovalsToKeep.length} remoÃ§Ãµes');
         }
 
         // 3. Safety net: ensure additions and removals are exactly balanced
@@ -2936,6 +2954,7 @@ Future<Response> onRequest(RequestContext context) async {
             semanticLayerV2:
                 optimizationValidationReport!.functional.semanticLayerV2,
             mode: semanticV2OptimizeEnforcementMode,
+            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           ),
         };
       }
@@ -2955,12 +2974,12 @@ Future<Response> onRequest(RequestContext context) async {
 
       final warnings = <String, dynamic>{};
 
-      // Adicionar avisos se houver cartas inválidas
+      // Adicionar avisos se houver cartas invÃ¡lidas
       if (invalidCards.isNotEmpty) {
         warnings.addAll({
           'invalid_cards': invalidCards,
           'message':
-              'Algumas cartas sugeridas pela IA não foram encontradas e foram removidas',
+              'Algumas cartas sugeridas pela IA nÃ£o foram encontradas e foram removidas',
           'suggestions': suggestions,
         });
       }
@@ -2971,7 +2990,7 @@ Future<Response> onRequest(RequestContext context) async {
           'commander_identity': commanderColorIdentity.toList(),
           'removed_additions': filteredByColorIdentity,
           'message':
-              'Algumas adições sugeridas pela IA foram removidas por estarem fora da identidade de cor do comandante.',
+              'Algumas adiÃ§Ãµes sugeridas pela IA foram removidas por estarem fora da identidade de cor do comandante.',
         };
       }
 
@@ -2980,16 +2999,22 @@ Future<Response> onRequest(RequestContext context) async {
           'bracket': bracket,
           'blocked_additions': blockedByBracket,
           'message':
-              'Algumas adições sugeridas foram bloqueadas por exceder limites do bracket.',
+              'Algumas adiÃ§Ãµes sugeridas foram bloqueadas por exceder limites do bracket.',
         };
       }
+
+      attachOptimizeBracketPolicyDiagnostics(
+        responseBody,
+        bracket: bracket,
+        blockedByBracket: blockedByBracket,
+      );
 
       if (blockedByTheme.isNotEmpty) {
         warnings['blocked_by_theme'] = {
           'keep_theme': keepTheme,
           'blocked_removals': blockedByTheme,
           'message':
-              'Algumas remoções sugeridas foram bloqueadas para preservar o tema do deck.',
+              'Algumas remoÃ§Ãµes sugeridas foram bloqueadas para preservar o tema do deck.',
         };
       }
 
@@ -3036,7 +3061,7 @@ Future<Response> onRequest(RequestContext context) async {
           preferredColors: commanderColorIdentity.toList(),
         );
       } catch (e) {
-        Log.w('Falha ao persistir cache/preferências de optimize: $e');
+        Log.w('Falha ao persistir cache/preferÃªncias de optimize: $e');
       }
 
       return respondWithOptimizeTelemetry(
@@ -3065,433 +3090,3 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-Future<void> _processOptimizeModeAsync({
-  required Pool pool,
-  required String jobId,
-  required Uri internalOptimizeUrl,
-  required Map<String, dynamic> syncPayload,
-  required String? authorization,
-}) async {
-  await OptimizeJobStore.progress(
-    pool,
-    jobId,
-    stage: 'Preparando optimize agressivo...',
-    stageNumber: 1,
-  );
-
-  final stopwatch = Stopwatch()..start();
-  await OptimizeJobStore.progress(
-    pool,
-    jobId,
-    stage: 'Gerando preview seguro...',
-    stageNumber: 2,
-  );
-
-  final headers = <String, String>{
-    'Content-Type': 'application/json',
-    'X-Internal-AI-Request-Token': InternalAiRequestToken.value,
-    if (authorization != null && authorization.trim().isNotEmpty)
-      'Authorization': authorization,
-  };
-
-  late final http.Response response;
-  try {
-    response = await http
-        .post(
-          internalOptimizeUrl,
-          headers: headers,
-          body: jsonEncode(syncPayload),
-        )
-        .timeout(const Duration(minutes: 3));
-  } on TimeoutException {
-    await OptimizeJobStore.fail(
-      pool,
-      jobId,
-      error: 'Tempo limite excedido ao otimizar deck async.',
-    );
-    return;
-  }
-
-  await OptimizeJobStore.progress(
-    pool,
-    jobId,
-    stage: 'Persistindo resultado...',
-    stageNumber: 5,
-  );
-
-  Map<String, dynamic> resultBody;
-  try {
-    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-    resultBody = decoded is Map<String, dynamic>
-        ? decoded
-        : decoded is Map
-            ? decoded.cast<String, dynamic>()
-            : <String, dynamic>{'value': decoded};
-  } catch (_) {
-    await OptimizeJobStore.fail(
-      pool,
-      jobId,
-      error: 'Optimize async recebeu resposta invalida do executor interno.',
-    );
-    return;
-  }
-
-  resultBody['async'] = {
-    'job_id': jobId,
-    'completed_ms': stopwatch.elapsedMilliseconds,
-    'result_status_code': response.statusCode,
-    'executor': 'optimize_async_job',
-  };
-
-  if (response.statusCode == HttpStatus.ok) {
-    await OptimizeJobStore.complete(pool, jobId, result: resultBody);
-    return;
-  }
-
-  if (response.statusCode == HttpStatus.unprocessableEntity) {
-    final qualityError = resultBody['quality_error'] is Map
-        ? (resultBody['quality_error'] as Map).cast<String, dynamic>()
-        : <String, dynamic>{
-            'code': resultBody['outcome_code']?.toString() ??
-                'OPTIMIZE_ASYNC_QUALITY_REJECTED',
-            'message': resultBody['error']?.toString() ??
-                'Optimize async foi bloqueado pelo gate de qualidade.',
-          };
-    final optimizeDiagnostics = resultBody['optimize_diagnostics'] is Map
-        ? (resultBody['optimize_diagnostics'] as Map).cast<String, dynamic>()
-        : const <String, dynamic>{};
-    final asyncQualityError = <String, dynamic>{
-      ...qualityError,
-      if (resultBody['outcome_code'] != null)
-        'outcome_code': resultBody['outcome_code']?.toString(),
-      if (optimizeDiagnostics.isNotEmpty)
-        'optimize_diagnostics': optimizeDiagnostics,
-    };
-    await OptimizeJobStore.fail(
-      pool,
-      jobId,
-      error: resultBody['error']?.toString() ??
-          'Optimize async nao produziu preview seguro.',
-      qualityError: asyncQualityError,
-    );
-    return;
-  }
-
-  await OptimizeJobStore.fail(
-    pool,
-    jobId,
-    error: resultBody['error']?.toString() ?? 'Falha ao otimizar deck async.',
-  );
-}
-
-Uri _resolveInternalOptimizeUrl(Request request) {
-  return resolveInternalAiRouteUrl(
-    headers: request.headers,
-    requestUri: request.uri,
-    routePath: '/ai/optimize',
-    configuredBaseUrl: Platform.environment['AI_OPTIMIZE_INTERNAL_BASE_URL'],
-    fallbackPort: Platform.environment['PORT']?.trim(),
-  );
-}
-
-Future<String> _semanticV2SelectSql(Pool pool) async {
-  final exists = await _hasOptimizeTable(pool, 'card_semantic_tags_v2');
-  if (!exists) return 'NULL::jsonb AS semantic_tags_v2';
-  return '''
-                     (
-                       SELECT jsonb_agg(jsonb_build_object(
-                         'tags', cstv2.tags,
-                         'role_confidence', cstv2.role_confidence,
-                         'engine', cstv2.engine,
-                         'payoff', cstv2.payoff,
-                         'enabler', cstv2.enabler,
-                         'wincon', cstv2.wincon,
-                         'combo_piece', cstv2.combo_piece
-                       ))
-                       FROM card_semantic_tags_v2 cstv2
-                       WHERE cstv2.card_id = cards.id
-                     ) AS semantic_tags_v2''';
-}
-
-Future<bool> _hasOptimizeTable(Pool pool, String tableName) async {
-  try {
-    final result = await pool.execute(
-      Sql.named("SELECT to_regclass(@name) IS NOT NULL"),
-      parameters: {'name': tableName},
-    );
-    return result.isNotEmpty && result.first[0] == true;
-  } catch (_) {
-    return false;
-  }
-}
-
-Future<void> _recordOptimizeAnalysisOutcome({
-  required Pool pool,
-  required String deckId,
-  required String? userId,
-  required String commanderName,
-  required List<String> commanderColors,
-  required String operationMode,
-  required String requestedMode,
-  required String targetArchetype,
-  required String? detectedTheme,
-  required Map<String, dynamic> deckAnalysis,
-  required Map<String, dynamic>? postAnalysis,
-  required List<String> removals,
-  required List<String> additions,
-  required int statusCode,
-  required Map<String, dynamic>? qualityError,
-  required ValidationReport? validationReport,
-  required List<String> validationWarnings,
-  required List<String> blockedByColorIdentity,
-  required List<Map<String, dynamic>> blockedByBracket,
-  required List<String> commanderPriorityNames,
-  required String commanderPrioritySource,
-  required List<Map<String, dynamic>> deterministicSwapCandidates,
-  required String cacheKey,
-  required int executionTimeMs,
-}) async {
-  await optimize_analysis.recordOptimizeAnalysisOutcome(
-    pool: pool,
-    deckId: deckId,
-    userId: userId,
-    commanderName: commanderName,
-    commanderColors: commanderColors,
-    operationMode: operationMode,
-    requestedMode: requestedMode,
-    targetArchetype: targetArchetype,
-    detectedTheme: detectedTheme,
-    deckAnalysis: deckAnalysis,
-    postAnalysis: postAnalysis,
-    removals: removals,
-    additions: additions,
-    statusCode: statusCode,
-    qualityError: qualityError,
-    validationReport: validationReport,
-    validationWarnings: validationWarnings,
-    blockedByColorIdentity: blockedByColorIdentity,
-    blockedByBracket: blockedByBracket,
-    commanderPriorityNames: commanderPriorityNames,
-    commanderPrioritySource: commanderPrioritySource,
-    deterministicSwapCandidates: deterministicSwapCandidates,
-    cacheKey: cacheKey,
-    executionTimeMs: executionTimeMs,
-  );
-}
-
-/// Processa o modo complete em background (async job).
-/// Chamada via `unawaited()` — NÃO bloqueia a resposta HTTP.
-Future<void> _processCompleteModeAsync({
-  required String jobId,
-  required Pool pool,
-  required String deckId,
-  required String deckFormat,
-  required int maxTotal,
-  required int currentTotalCards,
-  required List<String> commanders,
-  required List<Map<String, dynamic>> allCardData,
-  required Set<String> deckColors,
-  required Set<String> commanderColorIdentity,
-  required Map<String, int> originalCountsById,
-  DeckOptimizerService? optimizer,
-  required DeckThemeProfile themeProfile,
-  required String targetArchetype,
-  required int? bracket,
-  required bool keepTheme,
-  required Map<String, dynamic> deckAnalysis,
-  required String? userId,
-  required String deckSignature,
-  required String? cacheKey,
-  required OptimizeIntensityConfig intensity,
-  required Map<String, dynamic> userPreferences,
-  required bool hasBracketOverride,
-  required bool hasKeepThemeOverride,
-}) async {
-  try {
-    final telemetry = OptimizeStageTelemetry(
-      deckId: deckId,
-      requestMode: 'complete_async',
-      jobId: jobId,
-    );
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Preparando referências do commander...', stageNumber: 1);
-
-    Map<String, dynamic> jsonResponse;
-    final state = optimize_complete.CompleteBuildAccumulator.fromDeck(
-      allCardData: allCardData,
-      originalCountsById: originalCountsById,
-      currentTotalCards: currentTotalCards,
-    );
-    await telemetry.trackAsync(
-      'complete.prepare_commander_seed',
-      () => optimize_complete.prepareCompleteCommanderSeed(
-        pool: pool,
-        commanders: commanders,
-        maxTotal: maxTotal,
-        currentTotalCards: currentTotalCards,
-        state: state,
-        bracket: bracket,
-      ),
-    );
-
-    if (optimizer != null) {
-      await OptimizeJobStore.progress(pool, jobId,
-          stage: 'Consultando IA para sugestões...', stageNumber: 2);
-      await telemetry.trackAsync(
-        'complete.ai_suggestion_loop',
-        () => optimize_complete.runCompleteAiSuggestionLoop(
-          pool: pool,
-          optimizer: optimizer,
-          commanders: commanders,
-          deckColors: deckColors,
-          commanderColorIdentity: commanderColorIdentity,
-          deckFormat: deckFormat,
-          targetArchetype: targetArchetype,
-          bracket: bracket,
-          keepTheme: keepTheme,
-          detectedTheme: themeProfile.theme,
-          coreCards: themeProfile.coreCards,
-          maxTotal: maxTotal,
-          state: state,
-        ),
-      );
-    } else {
-      await OptimizeJobStore.progress(pool, jobId,
-          stage: 'Pulando IA (modo determinístico)...', stageNumber: 2);
-    }
-
-    telemetry.trackSync(
-      'complete.rebalance_land_deficit',
-      () => optimize_complete.rebalanceCompleteDeckForLandDeficit(
-        state: state,
-        maxTotal: maxTotal,
-      ),
-    );
-
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Preenchendo com cartas sinérgicas...', stageNumber: 3);
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Ajustando base de mana...', stageNumber: 4);
-
-    await telemetry.trackAsync(
-      'complete.fill_remainder',
-      () => optimize_complete.fillCompleteDeckRemainder(
-        pool: pool,
-        commanders: commanders,
-        commanderColorIdentity: commanderColorIdentity,
-        deckFormat: deckFormat,
-        targetArchetype: targetArchetype,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        detectedTheme: themeProfile.theme,
-        coreCards: themeProfile.coreCards,
-        maxTotal: maxTotal,
-        state: state,
-      ),
-    );
-
-    jsonResponse = telemetry.trackSync(
-      'complete.build_intermediate_payload',
-      () => optimize_complete.buildCompleteIntermediatePayload(
-        state: state,
-        maxTotal: maxTotal,
-        currentTotalCards: currentTotalCards,
-        targetArchetype: targetArchetype,
-      ),
-    );
-
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Processando resultado final...', stageNumber: 6);
-
-    // Post-processing: validar qualidade e construir resposta
-    if (jsonResponse['mode'] == 'complete' &&
-        jsonResponse['additions_detailed'] is List) {
-      final qualityError = jsonResponse['quality_error'];
-      if (qualityError is Map) {
-        await OptimizeJobStore.fail(
-          pool,
-          jobId,
-          error: 'Complete mode não atingiu qualidade mínima.',
-          qualityError: qualityError.cast<String, dynamic>(),
-        );
-        return;
-      }
-
-      final responseBody = await telemetry.trackAsync(
-        'complete.build_final_response',
-        () => optimize_complete.buildCompleteFinalResponse(
-          pool: pool,
-          deckFormat: deckFormat,
-          originalDeck: allCardData,
-          deckColors: deckColors,
-          keepTheme: keepTheme,
-          theme: themeProfile.toJson(),
-          bracket: bracket,
-          deckAnalysis: deckAnalysis,
-          jsonResponse: jsonResponse,
-        ),
-      );
-      if (cacheKey != null && cacheKey.isNotEmpty) {
-        responseBody['cache'] = {
-          'hit': false,
-          'cache_key': cacheKey,
-        };
-        responseBody['intensity'] = intensity.selected;
-        responseBody['optimize_intensity'] = intensity.toJson(
-          returnedSwaps:
-              (responseBody['additions_detailed'] as List?)?.length ?? 0,
-        );
-        responseBody['preferences'] = {
-          'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
-          'keep_theme': keepTheme,
-          'preferred_bracket': userPreferences['preferred_bracket'],
-        };
-      }
-      responseBody['timings'] = telemetry.snapshot();
-      responseBody['stage_telemetry'] = responseBody['timings'];
-      telemetry.logSummary();
-      if (cacheKey != null && cacheKey.isNotEmpty) {
-        await saveOptimizeCache(
-          pool: pool,
-          cacheKey: cacheKey,
-          userId: userId,
-          deckId: deckId,
-          deckSignature: deckSignature,
-          payload: responseBody,
-        );
-      }
-      await OptimizeJobStore.complete(pool, jobId, result: responseBody);
-    } else {
-      // Fallback: se por algum motivo não veio como complete
-      if (cacheKey != null && cacheKey.isNotEmpty) {
-        jsonResponse['cache'] = {
-          'hit': false,
-          'cache_key': cacheKey,
-        };
-      }
-      jsonResponse['intensity'] = intensity.selected;
-      jsonResponse['optimize_intensity'] = intensity.toJson(
-        returnedSwaps: (jsonResponse['additions_detailed'] as List?)?.length ??
-            (jsonResponse['additions'] as List?)?.length ??
-            0,
-      );
-      jsonResponse['timings'] = telemetry.snapshot();
-      jsonResponse['stage_telemetry'] = jsonResponse['timings'];
-      telemetry.logSummary();
-      if (cacheKey != null && cacheKey.isNotEmpty) {
-        await saveOptimizeCache(
-          pool: pool,
-          cacheKey: cacheKey,
-          userId: userId,
-          deckId: deckId,
-          deckSignature: deckSignature,
-          payload: jsonResponse,
-        );
-      }
-      await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
-    }
-  } catch (e, stackTrace) {
-    Log.e('Background optimize job $jobId failed: $e\n$stackTrace');
-    await OptimizeJobStore.fail(pool, jobId, error: e.toString());
-  }
-}

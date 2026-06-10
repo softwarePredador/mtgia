@@ -449,6 +449,11 @@ void main() {
       );
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_00_binder_editor_add',
+      );
       await _tapVisible(
         tester,
         find.byKey(const Key('binder-editor-save-button')),
@@ -497,6 +502,11 @@ void main() {
       );
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_00b_binder_editor_edit',
+      );
       await _tapVisible(
         tester,
         find.byKey(const Key('binder-editor-save-button')),

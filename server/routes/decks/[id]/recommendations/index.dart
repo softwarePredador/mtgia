@@ -4,7 +4,9 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
+import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/openai_runtime_config.dart';
+import '../../../../lib/ai/edhrec_trend_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.post) {
@@ -13,8 +15,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   return Response(statusCode: HttpStatus.methodNotAllowed);
 }
 
-Future<Response> _generateRecommendations(RequestContext context, String deckId) async {
+Future<Response> _generateRecommendations(
+    RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
+  final userId = context.read<String>();
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final aiConfig = OpenAiRuntimeConfig(env);
   final apiKey = env['OPENAI_API_KEY'];
@@ -22,12 +26,18 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
   try {
     // ─── 1. Buscar dados do deck ──────────────────────────────
     final deckResult = await pool.execute(
-      Sql.named('SELECT name, format, description FROM decks WHERE id = @deckId'),
-      parameters: {'deckId': deckId},
+      Sql.named('''
+        SELECT name, format, description
+        FROM decks
+        WHERE id = CAST(@deckId AS uuid)
+          AND user_id = CAST(@userId AS uuid)
+      '''),
+      parameters: {'deckId': deckId, 'userId': userId},
     );
 
     if (deckResult.isEmpty) {
-      return Response.json(statusCode: HttpStatus.notFound, body: {'error': 'Deck not found'});
+      return Response.json(
+          statusCode: HttpStatus.notFound, body: {'error': 'Deck not found'});
     }
 
     final deck = deckResult.first.toColumnMap();
@@ -62,6 +72,7 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
     final deckCards = <Map<String, dynamic>>[];
     final deckCardNames = <String>{};
     final deckColors = <String>{};
+    final commanderNames = <String>[];
     int totalCards = 0;
     int landCount = 0;
     int creatureCount = 0;
@@ -86,6 +97,7 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       deckColors.addAll(colors);
       deckCardNames.add(name.toLowerCase());
       totalCards += quantity;
+      if (isCommander) commanderNames.add(name);
 
       deckCards.add({
         'name': name,
@@ -109,7 +121,8 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
 
       // Categorias funcionais
       if (oracleText.contains('add {') ||
-          (oracleText.contains('search your library for a') && oracleText.contains('land')) ||
+          (oracleText.contains('search your library for a') &&
+              oracleText.contains('land')) ||
           oracleText.contains('put a land card')) {
         rampCount += quantity;
       }
@@ -118,10 +131,12 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       }
       if (oracleText.contains('destroy target') ||
           oracleText.contains('exile target') ||
-          (oracleText.contains('deal') && oracleText.contains('damage to target'))) {
+          (oracleText.contains('deal') &&
+              oracleText.contains('damage to target'))) {
         removalCount += quantity;
       }
-      if (oracleText.contains('destroy all') || oracleText.contains('exile all')) {
+      if (oracleText.contains('destroy all') ||
+          oracleText.contains('exile all')) {
         boardWipeCount += quantity;
       }
       if (oracleText.contains('hexproof') ||
@@ -137,8 +152,10 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
 
     // Detectar arquétipo
     String archetype = 'midrange';
-    if (avgCMC < 2.5 && creatureRatio > 0.4) archetype = 'aggro';
-    else if (avgCMC > 3.0 && creatureRatio < 0.25) archetype = 'control';
+    if (avgCMC < 2.5 && creatureRatio > 0.4)
+      archetype = 'aggro';
+    else if (avgCMC > 3.0 && creatureRatio < 0.25)
+      archetype = 'control';
     else if (creatureRatio < 0.3) archetype = 'combo';
 
     // Calcular power level
@@ -182,7 +199,8 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       for (final c in cards) {
         addRecommendations.add({
           'card_name': c,
-          'reason': 'Ramp — deck tem apenas $rampCount fontes (recomendado: 10+)',
+          'reason':
+              'Ramp — deck tem apenas $rampCount fontes (recomendado: 10+)',
         });
       }
     }
@@ -200,7 +218,8 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       for (final c in cards) {
         addRecommendations.add({
           'card_name': c,
-          'reason': 'Card draw — deck tem apenas $drawCount fontes (recomendado: 8+)',
+          'reason':
+              'Card draw — deck tem apenas $drawCount fontes (recomendado: 8+)',
         });
       }
     }
@@ -236,7 +255,8 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       for (final c in cards) {
         addRecommendations.add({
           'card_name': c,
-          'reason': 'Board wipe — deck tem apenas $boardWipeCount (recomendado: 2-3)',
+          'reason':
+              'Board wipe — deck tem apenas $boardWipeCount (recomendado: 2-3)',
         });
       }
     }
@@ -263,7 +283,8 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
     if (isCommanderFmt && landCount < 34) {
       addRecommendations.add({
         'card_name': 'Command Tower',
-        'reason': 'Terreno essencial — deck tem apenas $landCount terrenos (recomendado: 35-38)',
+        'reason':
+            'Terreno essencial — deck tem apenas $landCount terrenos (recomendado: 35-38)',
       });
     }
 
@@ -294,14 +315,18 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       if (archetype == 'aggro' && cmc > 5) {
         removeRecommendations.add({
           'card_name': card['name'] as String,
-          'reason': 'CMC ${cmc.toInt()} é alto para aggro — considere alternativas mais baratas',
+          'reason':
+              'CMC ${cmc.toInt()} é alto para aggro — considere alternativas mais baratas',
         });
       } else if (archetype == 'control' && cmc <= 1 && creatureRatio > 0.3) {
         final oracle = card['oracle_text'] as String;
-        if (!oracle.contains('draw') && !oracle.contains('counter') && !oracle.contains('destroy')) {
+        if (!oracle.contains('draw') &&
+            !oracle.contains('counter') &&
+            !oracle.contains('destroy')) {
           removeRecommendations.add({
             'card_name': card['name'] as String,
-            'reason': 'Criatura fraca para control — slot melhor usado com remoção/draw',
+            'reason':
+                'Criatura fraca para control — slot melhor usado com remoção/draw',
           });
         }
       }
@@ -310,13 +335,56 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
     // Terrenos básicos em excesso em deck multicolor
     if (deckColors.length >= 3 && landCount > 38) {
       final basicLands = deckCards.where((c) {
-        final tl = (c['type_line'] as String).toLowerCase();
-        return tl.contains('basic land');
+        return basic_lands.isBasicLandCard(
+          name: c['name'] as String? ?? '',
+          typeLine: c['type_line'] as String? ?? '',
+        );
       }).toList();
       if (basicLands.isNotEmpty && removeRecommendations.length < 5) {
         removeRecommendations.add({
           'card_name': basicLands.last['name'] as String,
-          'reason': 'Terreno básico em excesso — trocar por terreno utilitário ou dual',
+          'reason':
+              'Terreno básico em excesso — trocar por terreno utilitário ou dual',
+        });
+      }
+    }
+
+    // ─── Tendências EDHREC (snapshots) ────────────────────────
+    //    Cartas em ALTA (rising) para o(s) commander(s) que ainda não estão
+    //    no deck viram recomendações com contexto de tendência.
+    final trendingCards = <Map<String, dynamic>>[];
+    if (commanderNames.isNotEmpty) {
+      final trendService = EdhrecTrendService(pool);
+      final seen = <String>{};
+      for (final commander in commanderNames) {
+        try {
+          final trends = await trendService.getCardTrends(commander);
+          for (final t in trends) {
+            if (t.direction != TrendDirection.rising) continue;
+            final lower = t.cardName.toLowerCase();
+            if (deckCardNames.contains(lower)) continue;
+            if (!seen.add(lower)) continue;
+            trendingCards.add({
+              ...t.toJson(),
+              'commander': commander,
+            });
+            if (trendingCards.length >= 8) break;
+          }
+        } catch (e) {
+          print('[WARN] EDHREC trends error for "$commander": $e');
+        }
+        if (trendingCards.length >= 8) break;
+      }
+
+      // Promove as 2 maiores altas a recomendações de adição.
+      for (final t in trendingCards.take(2)) {
+        final name = t['card_name'] as String;
+        if (addRecommendations.any((r) => r['card_name'] == name)) continue;
+        final pct = ((t['delta_inclusion'] as num) * 100).toStringAsFixed(1);
+        addRecommendations.add({
+          'card_name': name,
+          'reason':
+              'Em alta no EDHREC para ${t['commander']} (+$pct% de inclusão recente)',
         });
       }
     }
@@ -325,7 +393,8 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
     final analysis = StringBuffer();
     analysis.write('Deck "$deckName" ($format) — Arquétipo: $archetype. ');
     analysis.write('CMC médio: ${avgCMC.toStringAsFixed(1)}. ');
-    analysis.write('$totalCards cartas ($landCount terrenos, $creatureCount criaturas). ');
+    analysis.write(
+        '$totalCards cartas ($landCount terrenos, $creatureCount criaturas). ');
     if (rampCount < 8) analysis.write('⚠️ Ramp insuficiente. ');
     if (drawCount < 8) analysis.write('⚠️ Card draw baixo. ');
     if (removalCount < 5) analysis.write('⚠️ Pouca remoção. ');
@@ -350,10 +419,11 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
         'average_cmc': avgCMC.toStringAsFixed(2),
       },
       'colors': deckColors.toList(),
+      'trending': trendingCards,
       'source': 'heuristic',
-      'message': 'Análise baseada em heurísticas — configure OPENAI_API_KEY para IA generativa.',
+      'message':
+          'Análise baseada em heurísticas — configure OPENAI_API_KEY para IA generativa.',
     });
-
   } catch (e) {
     print('[ERROR] Failed to generate recommendations: $e');
     return Response.json(
@@ -451,7 +521,8 @@ Future<Response> _callOpenAI({
   required String description,
   required List<Map<String, dynamic>> deckCards,
 }) async {
-  final cardList = deckCards.map((c) => "${c['quantity']}x ${c['name']}").join(', ');
+  final cardList =
+      deckCards.map((c) => "${c['quantity']}x ${c['name']}").join(', ');
   final commanders = deckCards
       .where((c) => c['is_commander'] == true)
       .map((c) => (c['name'] as String?) ?? '')
@@ -459,7 +530,8 @@ Future<Response> _callOpenAI({
       .toList();
   final colors = <String>{};
   for (final card in deckCards) {
-    final cardColors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
+    final cardColors =
+        (card['colors'] as List?)?.cast<String>() ?? const <String>[];
     colors.addAll(cardColors);
   }
 
@@ -524,7 +596,8 @@ Formato obrigatório:
       'messages': [
         {
           'role': 'system',
-          'content': 'Você é um juiz nível 3 e especialista em otimização de decks MTG orientado a decisão do jogador. Avalie cada recomendação considerando: legalidade (identidade de cor, ban list, singleton rule), eficiência (mana value, instant vs sorcery), sinergia com comandante, e impacto em multiplayer (40 vida, 3-4 jogadores). Seja técnico, direto e sempre retorne JSON válido.'
+          'content':
+              'Você é um juiz nível 3 e especialista em otimização de decks MTG orientado a decisão do jogador. Avalie cada recomendação considerando: legalidade (identidade de cor, ban list, singleton rule), eficiência (mana value, instant vs sorcery), sinergia com comandante, e impacto em multiplayer (40 vida, 3-4 jogadores). Seja técnico, direto e sempre retorne JSON válido.'
         },
         {'role': 'user', 'content': prompt},
       ],

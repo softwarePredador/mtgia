@@ -26,7 +26,7 @@ class CardDetailScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 0,
             pinned: true,
-            backgroundColor: AppTheme.surfaceElevated,
+            backgroundColor: AppTheme.backgroundAbyss,
             title: Text(
               card.name,
               style: theme.textTheme.titleMedium?.copyWith(
@@ -35,6 +35,7 @@ class CardDetailScreen extends StatelessWidget {
               ),
             ),
             leading: IconButton(
+              tooltip: 'Voltar',
               icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
               onPressed: () => Navigator.of(context).pop(),
             ),
@@ -133,15 +134,19 @@ class CardDetailScreen extends StatelessWidget {
       context: context,
       barrierColor: AppTheme.backgroundAbyss.withValues(alpha: 0.94),
       builder:
-          (_) => GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              insetPadding: const EdgeInsets.all(16),
-              child: InteractiveViewer(
-                child: CachedCardImage(
-                  imageUrl: card.imageUrl,
-                  fit: BoxFit.contain,
+          (_) => Semantics(
+            button: true,
+            label: 'Fechar imagem da carta',
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Dialog(
+                backgroundColor: AppTheme.transparent,
+                insetPadding: const EdgeInsets.all(16),
+                child: InteractiveViewer(
+                  child: CachedCardImage(
+                    imageUrl: card.imageUrl,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
@@ -220,7 +225,7 @@ class CardDetailScreen extends StatelessWidget {
                 config.label,
                 style: TextStyle(
                   color: config.foreground,
-                  fontSize: 11,
+                  fontSize: AppTheme.fontSm - 1,
                   fontWeight: FontWeight.w800,
                   height: 1,
                 ),
@@ -269,10 +274,18 @@ class CardDetailScreen extends StatelessWidget {
           'C',
         );
       case 'X':
-        return _ManaSymbolStyle(AppTheme.textSecondary, Colors.white, 'X');
+        return _ManaSymbolStyle(
+          AppTheme.textSecondary,
+          AppTheme.textPrimary,
+          'X',
+        );
       default:
         // Numeric or other generic symbols
-        return _ManaSymbolStyle(AppTheme.textSecondary, Colors.white, symbol);
+        return _ManaSymbolStyle(
+          AppTheme.textSecondary,
+          AppTheme.textPrimary,
+          symbol,
+        );
     }
   }
 
@@ -545,7 +558,11 @@ class CardDetailScreen extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         label,
-        style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.w800),
+        style: TextStyle(
+          color: fg,
+          fontSize: AppTheme.fontSm - 1,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }

@@ -7,6 +7,23 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
+void _emitScreenshot(String name, List<int> pngBytes) {
+  final encoded = base64Encode(pngBytes);
+  const chunkSize = 12000;
+  // ignore: avoid_print
+  print('SCREENSHOT_BEGIN $name');
+  for (var offset = 0; offset < encoded.length; offset += chunkSize) {
+    final end =
+        (offset + chunkSize < encoded.length)
+            ? offset + chunkSize
+            : encoded.length;
+    // ignore: avoid_print
+    print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
+  }
+  // ignore: avoid_print
+  print('SCREENSHOT_END $name');
+}
+
 Future<void> _pumpUntilUiSnapshotAvailable(
   WidgetTester tester,
   LotusUiSnapshotStore uiSnapshotStore,
@@ -119,7 +136,7 @@ Future<void> _clickLotusMenuEntry(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('opens Lotus card search overlay from the radial menu', (
     tester,
@@ -160,6 +177,46 @@ void main() {
     expect(searchState['card_search_overlay_open'], isTrue);
     expect(searchState['native_card_search_present'], isFalse);
     expect(searchState['history_overlay_open'], isFalse);
+
+    await screenState.debugRunJavaScript('''
+(() => {
+  const overlay = document.querySelector('.card-search-overlay');
+  const input = overlay?.querySelector('input.search-input, input[type="text"], input, textarea');
+  if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+    const setter = Object.getOwnPropertyDescriptor(
+      Object.getPrototypeOf(input),
+      'value',
+    )?.set;
+    input.focus();
+    if (setter) {
+      setter.call(input, 'Sol Ring');
+    } else {
+      input.value = 'Sol Ring';
+    }
+    input.value = 'Sol Ring';
+    input.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'insertText',
+      data: 'Sol Ring',
+    }));
+    input.dispatchEvent(new KeyboardEvent('keyup', {
+      bubbles: true,
+      cancelable: true,
+      key: 'g',
+    }));
+    input.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    input.blur();
+  }
+})()
+''');
+    await tester.pump(const Duration(seconds: 4));
+
+    await binding.convertFlutterSurfaceToImage();
+    final screenshot = await binding.takeScreenshot(
+      'lotus_card_search_overlay',
+    );
+    _emitScreenshot('lotus_card_search_overlay', screenshot);
 
     await screenState.debugRunJavaScript(
       "document.querySelector('.close-card-search-overlay')?.click();",

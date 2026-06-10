@@ -1,0 +1,268 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Zirda, the Dawnwaker #69 (real), Rograkh, Son of Rohgahh #63 (real), Rograkh, Son of Rohgahh #119 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Zirda, the Dawnwaker #69 (real): 1 mulligan(s), 7 cards, 3 lands
+  Rograkh, Son of Rohgahh #63 (real): 3 mulligan(s), 5 cards, 2 lands
+  Rograkh, Son of Rohgahh #119 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=0
+  MANA Zirda, the Dawnwaker #69 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #63 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=2 Board=3 Grave=2 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #119 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=4 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Electroduplicate (CMC=3.0) [token_maker] rule=curated/verified
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 2 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=1
+  MANA Zirda, the Dawnwaker #69 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #63 (real) | Life=40 Hand=2 Board=3
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=40 Hand=3 Board=3 Grave=2 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #119 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 player damage, target life 39, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=36 Hand=4 Board=5
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #63 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=39)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #63 (real): 1 player damage, target life 38, target_dead=False
+  RESOLVE Rograkh, Son of Rohgahh #119 (real): Mental Misstep (CMC=1.0) [counter] rule=curated/verified
+  END Lorehold: Life=36 Hand=3 Board=6 Grave=2 Discarded=0
+
+TURN 3 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=3
+  MANA Zirda, the Dawnwaker #69 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #63 (real) | Life=38 Hand=3 Board=3
+  MANA Rograkh, Son of Rohgahh #63 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=38 Hand=3 Board=4 Grave=2 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=3 Board=4
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=38)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 player damage, target life 37, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=3 Board=5 Grave=2 Discarded=0
+
+TURN 4 - Lorehold | Life=32 Hand=3 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=37)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 31, target_dead=False
+  END Lorehold: Life=32 Hand=3 Board=8 Grave=2 Discarded=0
+
+TURN 4 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=5
+  MANA Zirda, the Dawnwaker #69 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=31)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #63 (real): 4 player damage, target life 27, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=4 Board=8 Grave=0 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #63 (real) | Life=27 Hand=3 Board=4
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Rograkh, Son of Rohgahh #63 (real): Dramatic Reversal (CMC=2.0) [draw_cards] rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=27 Hand=4 Board=4 Grave=3 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=3 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 5 player damage, target life 23, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=4 Board=5 Grave=2 Discarded=0
+
+TURN 5 - Lorehold | Life=23 Hand=3 Board=8
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=27)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #63 (real): 6 player damage, target life 21, target_dead=False
+  END Lorehold: Life=23 Hand=3 Board=9 Grave=2 Discarded=0
+
+TURN 5 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=4 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=21)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #63 (real): 4 player damage, target life 17, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #63 (real) | Life=17 Hand=4 Board=4
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=23)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 4 player damage, target life 19, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=17 Hand=5 Board=4 Grave=3 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=4 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=19)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 5 player damage, target life 14, target_dead=False
+  RESOLVE Rograkh, Son of Rohgahh #63 (real): An Offer You Can't Refuse (CMC=1.0) [counter] rule=curated/verified
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=4 Board=6 Grave=2 Discarded=0
+
+TURN 6 - Lorehold | Life=14 Hand=3 Board=9
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Reforge the Soul (CMC=5.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #63 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=17)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #63 (real): 8 player damage, target life 9, target_dead=False
+  RESOLVE Lorehold: Faithless Looting (CMC=1.0) [draw_cards] rule=curated/verified
+  END Lorehold: Life=14 Hand=7 Board=11 Grave=6 Discarded=2
+
+TURN 6 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=5 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #63 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=9)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #63 (real): 4 player damage, target life 5, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=6 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #63 (real) | Life=5 Hand=4 Board=4
+  MANA Rograkh, Son of Rohgahh #63 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Rograkh, Son of Rohgahh #63 (real) -> Lorehold: 4 player damage, target life 10, target_dead=False
+  END Rograkh, Son of Rohgahh #63 (real): Life=5 Hand=4 Board=5 Grave=3 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=4 Board=6
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Rograkh, Son of Rohgahh #63 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=lethal, target_life=5)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Rograkh, Son of Rohgahh #63 (real): 5 player damage, target life 0, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #63 (real) (life_zero) <<<
+
+TURN 7 - Lorehold | Life=10 Hand=7 Board=11
+  MANA Lorehold: 8 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 8 player damage, target life 32, target_dead=False
+  END Lorehold: Life=10 Hand=5 Board=13 Grave=8 Discarded=0
+
+TURN 7 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=6 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=10)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 4 player damage, target life 6, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=7 Board=8 Grave=0 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #119 (real) | Life=32 Hand=5 Board=6
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=6)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 5 player damage, target life 1, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=32 Hand=5 Board=7 Grave=2 Discarded=0
+
+TURN 8 - Lorehold | Life=1 Hand=5 Board=13
+  MANA Lorehold: 9 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=32)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 9 player damage, target life 23, target_dead=False
+  RESOLVE Lorehold: The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Electroduplicate (CMC=3.0) [token_maker] rule=curated/verified
+  END Lorehold: Life=1 Hand=3 Board=17 Grave=9 Discarded=0
+
+TURN 8 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Lorehold: 1 attackers, 2 blockers, 1 gang blocks, 4 power (reason=lethal, target_life=1)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Lorehold: 0 player damage, target life 1, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=7 Board=8 Grave=1 Discarded=1
+
+TURN 8 - Rograkh, Son of Rohgahh #119 (real) | Life=23 Hand=5 Board=7
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=lethal, target_life=1)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 6 player damage, target life -5, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 9 - Zirda, the Dawnwaker #69 (real) | Life=40 Hand=7 Board=8
+  MANA Zirda, the Dawnwaker #69 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=23)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 19, target_dead=False
+  RESOLVE Rograkh, Son of Rohgahh #119 (real): Force of Negation (CMC=3.0) [counter] rule=known_cards_manual/verified
+  END Zirda, the Dawnwaker #69 (real): Life=40 Hand=7 Board=9 Grave=1 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #119 (real) | Life=19 Hand=5 Board=7
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 34, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=19 Hand=5 Board=8 Grave=2 Discarded=0
+
+TURN 10 - Zirda, the Dawnwaker #69 (real) | Life=34 Hand=7 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=19)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 15, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=34 Hand=7 Board=9 Grave=2 Discarded=1
+
+TURN 10 - Rograkh, Son of Rohgahh #119 (real) | Life=15 Hand=5 Board=8
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=34)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 28, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=15 Hand=5 Board=9 Grave=2 Discarded=0
+
+TURN 11 - Zirda, the Dawnwaker #69 (real) | Life=28 Hand=7 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=15)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 11, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=28 Hand=7 Board=9 Grave=3 Discarded=1
+
+TURN 11 - Rograkh, Son of Rohgahh #119 (real) | Life=11 Hand=5 Board=9
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Rograkh, Son of Rohgahh #119 (real): Mindbreak Trap (CMC=4.0) [draw_cards] rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 22, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=11 Hand=6 Board=9 Grave=3 Discarded=0
+
+TURN 12 - Zirda, the Dawnwaker #69 (real) | Life=22 Hand=7 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=11)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 7, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=22 Hand=7 Board=9 Grave=4 Discarded=1
+
+TURN 12 - Rograkh, Son of Rohgahh #119 (real) | Life=7 Hand=6 Board=9
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=22)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 16, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=7 Hand=6 Board=10 Grave=3 Discarded=0
+
+TURN 13 - Zirda, the Dawnwaker #69 (real) | Life=16 Hand=7 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=7)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 3, target_dead=False
+  END Zirda, the Dawnwaker #69 (real): Life=16 Hand=7 Board=9 Grave=5 Discarded=0
+
+TURN 13 - Rograkh, Son of Rohgahh #119 (real) | Life=3 Hand=6 Board=10
+  MANA Rograkh, Son of Rohgahh #119 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=control_high_threat, target_life=16)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Zirda, the Dawnwaker #69 (real): 6 player damage, target life 10, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=3 Hand=6 Board=11 Grave=3 Discarded=0
+
+TURN 14 - Zirda, the Dawnwaker #69 (real) | Life=10 Hand=7 Board=9
+  MANA Zirda, the Dawnwaker #69 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Zirda, the Dawnwaker #69 (real) -> Rograkh, Son of Rohgahh #119 (real): 3 player damage, target life 0, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #119 (real) (commander_damage) <<<
+
+GAME OVER - Turn 14
+Winner: Zirda, the Dawnwaker #69 (real) (elimination)
+Lorehold: DEAD Life=-5 Hand=3
+Zirda, the Dawnwaker #69 (real): ALIVE Life=10 Hand=7
+Rograkh, Son of Rohgahh #63 (real): DEAD Life=0 Hand=4
+Rograkh, Son of Rohgahh #119 (real): DEAD Life=0 Hand=6

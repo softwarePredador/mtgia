@@ -32,6 +32,7 @@ import 'features/profile/profile_screen.dart';
 import 'features/scanner/screens/card_scanner_screen.dart';
 import 'features/community/providers/community_provider.dart';
 import 'features/community/screens/community_screen.dart';
+import 'features/community/screens/community_deck_detail_screen.dart';
 import 'features/social/providers/social_provider.dart';
 import 'features/social/screens/user_profile_screen.dart';
 import 'features/social/screens/user_search_screen.dart';
@@ -382,6 +383,13 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                   builder: (context, state) {
                     final userId = state.pathParameters['userId']!;
                     return UserProfileScreen(userId: userId);
+                  },
+                ),
+                GoRoute(
+                  path: 'decks/:deckId',
+                  builder: (context, state) {
+                    final deckId = state.pathParameters['deckId']!;
+                    return CommunityDeckDetailScreen(deckId: deckId);
                   },
                 ),
               ],

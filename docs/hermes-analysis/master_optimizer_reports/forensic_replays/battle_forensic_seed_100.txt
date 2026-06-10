@@ -1,0 +1,448 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Winota, Joiner of Forces #73 (real), Kinnan, Bonder Prodigy #84 (real), Magda, Brazen Outlaw #90 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Winota, Joiner of Forces #73 (real): 0 mulligan(s), 7 cards, 2 lands
+  Kinnan, Bonder Prodigy #84 (real): 1 mulligan(s), 7 cards, 2 lands
+  Magda, Brazen Outlaw #90 (real): 0 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Mana Confluence (CMC=0.0) [land] rule=curated/verified
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=6 Board=0
+  MANA Kinnan, Bonder Prodigy #84 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=1 Grave=1 Discarded=0
+
+TURN 1 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=0
+  MANA Magda, Brazen Outlaw #90 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=4 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=manual/verified
+  TUTOR Lorehold: Gamble found Grand Abolisher (any)
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=2
+  MANA Winota, Joiner of Forces #73 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Blinkmoth Nexus (CMC=3.0) [land] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=1
+  MANA Kinnan, Bonder Prodigy #84 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=4 Board=3
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=3 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=40 Hand=5 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=5 Board=3
+  MANA Winota, Joiner of Forces #73 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=2
+  MANA Kinnan, Bonder Prodigy #84 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Valakut Awakening // Valakut Stoneforge (CMC=3.0) [draw_cards] rule=curated/verified
+  RESOLVE Winota, Joiner of Forces #73 (real): Eiganjo, Seat of the Empire (CMC=0.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 3 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=3 Board=5
+  MANA Magda, Brazen Outlaw #90 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=3 Board=7 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=5 Board=5
+  MANA Lorehold: 6 available (5 sources, 1 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=manual/verified
+  END Lorehold: Life=40 Hand=4 Board=8 Grave=2 Discarded=0
+
+TURN 4 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=5
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=4 Board=4
+  MANA Kinnan, Bonder Prodigy #84 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=3 Board=7
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Mutavault (CMC=3.0) [land] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=2 Board=8 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=4 Board=8
+  MANA Lorehold: 9 available (6 sources, 3 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Reforge the Soul (CMC=5.0) [draw_cards] rule=manual/verified
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  END Lorehold: Life=40 Hand=7 Board=11 Grave=4 Discarded=1
+
+TURN 5 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=6
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  RESOLVE Magda, Brazen Outlaw #90 (real): Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=7 Grave=0 Discarded=0
+
+TURN 5 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=4 Board=5
+  MANA Kinnan, Bonder Prodigy #84 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Red Elemental Blast (CMC=1.0) [counter] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=4 Board=7 Grave=1 Discarded=0
+
+TURN 5 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=8
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=9 Grave=1 Discarded=0
+
+TURN 6 - Lorehold | Life=40 Hand=6 Board=12
+  MANA Lorehold: 10 available (8 sources, 2 treasures, pool={'generic': 3, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Rite of Flame (CMC=1.0) [ramp_ritual] rule=curated/verified
+  RESOLVE Lorehold: Seething Song (CMC=3.0) [ramp_ritual] rule=curated/verified
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=40 Hand=1 Board=16 Grave=6 Discarded=0
+
+TURN 6 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=7
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=4 Board=7
+  MANA Kinnan, Bonder Prodigy #84 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Bridgeworks Battle (CMC=3.0) [draw_cards] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=7 Grave=2 Discarded=0
+
+TURN 6 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=9
+  MANA Magda, Brazen Outlaw #90 (real): 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=10 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=1 Board=16
+  MANA Lorehold: 16 available (11 sources, 5 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  END Lorehold: Life=40 Hand=0 Board=17 Grave=7 Discarded=0
+
+TURN 7 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=8
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=9 Grave=0 Discarded=0
+
+TURN 7 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=7
+  MANA Kinnan, Bonder Prodigy #84 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=4 Board=9 Grave=2 Discarded=0
+
+TURN 7 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=10
+  MANA Magda, Brazen Outlaw #90 (real): 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Hammerheim (CMC=3.0) [land] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=10 Grave=1 Discarded=0
+
+TURN 8 - Lorehold | Life=40 Hand=0 Board=17
+  MANA Lorehold: 20 available (12 sources, 8 treasures, pool={'generic': 5, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  END Lorehold: Life=40 Hand=0 Board=18 Grave=7 Discarded=0
+
+TURN 8 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=9
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=10 Grave=0 Discarded=0
+
+TURN 8 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=4 Board=9
+  MANA Kinnan, Bonder Prodigy #84 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Tree of Tales (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Volatile Stormdrake (CMC=2.0) [indestructible] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=3 Board=9 Grave=3 Discarded=0
+
+TURN 8 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=10
+  MANA Magda, Brazen Outlaw #90 (real): 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=11 Grave=1 Discarded=0
+
+TURN 9 - Lorehold | Life=40 Hand=0 Board=18
+  MANA Lorehold: 24 available (13 sources, 11 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  END Lorehold: Life=40 Hand=0 Board=19 Grave=7 Discarded=0
+
+TURN 9 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=10
+  MANA Winota, Joiner of Forces #73 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=3 Board=12 Grave=0 Discarded=0
+
+TURN 9 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=3 Board=9
+  MANA Kinnan, Bonder Prodigy #84 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=2 Board=11 Grave=3 Discarded=0
+
+TURN 9 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=11
+  MANA Magda, Brazen Outlaw #90 (real): 10 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Grafdigger's Cage (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=12 Grave=1 Discarded=0
+
+TURN 10 - Lorehold | Life=40 Hand=0 Board=19
+  MANA Lorehold: 28 available (14 sources, 14 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  RESOLVE Lorehold: Rise of the Eldrazi (CMC=12.0) [remove_permanent] rule=curated/verified
+  REMOVAL Lorehold: Rise of the Eldrazi removed Anointed Peacekeeper from Winota, Joiner of Forces #73 (real)
+  END Lorehold: Life=40 Hand=0 Board=19 Grave=8 Discarded=0
+
+TURN 10 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=3 Board=11
+  MANA Winota, Joiner of Forces #73 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=3 Board=11 Grave=2 Discarded=0
+
+TURN 10 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=2 Board=11
+  MANA Kinnan, Bonder Prodigy #84 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): The One Ring (CMC=4.0) [draw_engine] rule=manual/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=1 Board=13 Grave=4 Discarded=0
+
+TURN 10 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=12
+  MANA Magda, Brazen Outlaw #90 (real): 10 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Lightning Bolt (CMC=1.0) [deal_damage] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=12 Grave=2 Discarded=0
+
+TURN 11 - Lorehold | Life=40 Hand=0 Board=19
+  MANA Lorehold: 31 available (14 sources, 17 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  RESOLVE Lorehold: Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Lorehold: Life=40 Hand=0 Board=19 Grave=8 Discarded=0
+
+TURN 11 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=3 Board=10
+  MANA Winota, Joiner of Forces #73 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=3 Board=11 Grave=3 Discarded=0
+
+TURN 11 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=1 Board=13
+  MANA Kinnan, Bonder Prodigy #84 (real): 7 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Chord of Calling (CMC=3.0) [draw_cards] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=1 Board=15 Grave=5 Discarded=0
+
+TURN 11 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=12
+  MANA Magda, Brazen Outlaw #90 (real): 10 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=13 Grave=2 Discarded=0
+
+TURN 12 - Lorehold | Life=40 Hand=0 Board=19
+  MANA Lorehold: 34 available (14 sources, 20 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  RESOLVE Lorehold: Mana Confluence (CMC=0.0) [land] rule=curated/verified
+  END Lorehold: Life=40 Hand=0 Board=19 Grave=8 Discarded=0
+
+TURN 12 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=3 Board=11
+  MANA Winota, Joiner of Forces #73 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=11 Grave=3 Discarded=0
+
+TURN 12 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=1 Board=15
+  MANA Kinnan, Bonder Prodigy #84 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=1 Board=17 Grave=5 Discarded=0
+
+TURN 12 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=13
+  MANA Magda, Brazen Outlaw #90 (real): 10 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=14 Grave=2 Discarded=0
+
+TURN 13 - Lorehold | Life=40 Hand=0 Board=19
+  MANA Lorehold: 37 available (14 sources, 23 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  END Lorehold: Life=40 Hand=0 Board=20 Grave=8 Discarded=0
+
+TURN 13 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=11
+  MANA Winota, Joiner of Forces #73 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=4 Board=12 Grave=3 Discarded=0
+
+TURN 13 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=1 Board=17
+  MANA Kinnan, Bonder Prodigy #84 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Waterlogged Grove (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=0 Board=19 Grave=5 Discarded=0
+
+TURN 13 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=14
+  MANA Magda, Brazen Outlaw #90 (real): 10 available (8 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=15 Grave=2 Discarded=0
+
+TURN 14 - Lorehold | Life=40 Hand=0 Board=20
+  MANA Lorehold: 41 available (15 sources, 26 treasures, pool={'generic': 6, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  END Lorehold: Life=40 Hand=0 Board=21 Grave=8 Discarded=0
+
+TURN 14 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=4 Board=12
+  MANA Winota, Joiner of Forces #73 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Thalia, Guardian of Thraben (CMC=2.0) [silence_opponents] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=2 Board=15 Grave=3 Discarded=0
+
+TURN 14 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=0 Board=19
+  MANA Kinnan, Bonder Prodigy #84 (real): 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Rejuvenating Springs (CMC=3.0) [land] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=0 Board=20 Grave=5 Discarded=0
+
+TURN 14 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=15
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=16 Grave=2 Discarded=0
+
+TURN 15 - Lorehold | Life=40 Hand=0 Board=21
+  MANA Lorehold: 45 available (16 sources, 29 treasures, pool={'generic': 7, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  RESOLVE Lorehold: Scroll Rack (CMC=2.0) [topdeck_manipulation] rule=manual/verified
+  RESOLVE Lorehold: Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=0 Board=23 Grave=8 Discarded=0
+
+TURN 15 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=2 Board=15
+  MANA Winota, Joiner of Forces #73 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Winota, Joiner of Forces #73 (real): Boromir, Warden of the Tower (CMC=3.0) [indestructible] rule=curated/verified
+  RESOLVE Winota, Joiner of Forces #73 (real): High Noon (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Winota, Joiner of Forces #73 (real): High Noon removed Nyxbloom Ancient from Kinnan, Bonder Prodigy #84 (real)
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=16 Grave=5 Discarded=0
+
+TURN 15 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=0 Board=19
+  MANA Kinnan, Bonder Prodigy #84 (real): 11 available (11 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=1 Board=20 Grave=6 Discarded=0
+
+TURN 15 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=16
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=17 Grave=2 Discarded=0
+
+TURN 16 - Lorehold | Life=40 Hand=0 Board=23
+  MANA Lorehold: 48 available (16 sources, 32 treasures, pool={'generic': 7, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=40 Hand=0 Board=23 Grave=9 Discarded=0
+
+TURN 16 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=16
+  MANA Winota, Joiner of Forces #73 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=17 Grave=5 Discarded=0
+
+TURN 16 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=1 Board=20
+  MANA Kinnan, Bonder Prodigy #84 (real): 12 available (12 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=2 Board=21 Grave=6 Discarded=0
+
+TURN 16 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=17
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Barbarian Ring (CMC=3.0) [land] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=17 Grave=2 Discarded=0
+
+TURN 17 - Lorehold | Life=40 Hand=0 Board=23
+  MANA Lorehold: 51 available (16 sources, 35 treasures, pool={'generic': 7, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  END Lorehold: Life=40 Hand=0 Board=24 Grave=9 Discarded=0
+
+TURN 17 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=17
+  MANA Winota, Joiner of Forces #73 (real): 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=18 Grave=5 Discarded=0
+
+TURN 17 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=2 Board=21
+  MANA Kinnan, Bonder Prodigy #84 (real): 12 available (12 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 3, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Nature's Rhythm (CMC=2.0) [recursion] rule=curated/verified
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Bridgeworks Battle (CMC=3.0) [draw_cards] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=3 Board=22 Grave=7 Discarded=0
+
+TURN 17 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=17
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=18 Grave=2 Discarded=0
+
+TURN 18 - Lorehold | Life=40 Hand=0 Board=24
+  MANA Lorehold: 55 available (17 sources, 38 treasures, pool={'generic': 8, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  END Lorehold: Life=40 Hand=0 Board=25 Grave=9 Discarded=0
+
+TURN 18 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=18
+  MANA Winota, Joiner of Forces #73 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=18 Grave=6 Discarded=0
+
+TURN 18 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=3 Board=22
+  MANA Kinnan, Bonder Prodigy #84 (real): 13 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 4, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Finale of Devastation (CMC=2.0) [pump_all] rule=curated/verified
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Faerie Mastermind (CMC=2.0) [draw_engine] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=5 Board=23 Grave=8 Discarded=0
+
+TURN 18 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=18
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=19 Grave=2 Discarded=0
+
+TURN 19 - Lorehold | Life=40 Hand=0 Board=25
+  MANA Lorehold: 59 available (18 sources, 41 treasures, pool={'generic': 8, 'white': 3, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  RESOLVE Lorehold: Swords to Plowshares (CMC=1.0) [remove_creature] rule=manual/verified
+  REMOVAL Lorehold: Swords to Plowshares removed Gingerbrute from Winota, Joiner of Forces #73 (real)
+  END Lorehold: Life=40 Hand=0 Board=25 Grave=10 Discarded=0
+
+TURN 19 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=17
+  MANA Winota, Joiner of Forces #73 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Winota, Joiner of Forces #73 (real): Ranger-Captain of Eos (CMC=3.0) [silence_opponents] rule=curated/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=18 Grave=7 Discarded=0
+
+TURN 19 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=5 Board=23
+  MANA Kinnan, Bonder Prodigy #84 (real): 13 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 4, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=27 Grave=8 Discarded=0
+
+TURN 19 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=19
+  MANA Magda, Brazen Outlaw #90 (real): 11 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=20 Grave=2 Discarded=0
+
+TURN 20 - Lorehold | Life=40 Hand=0 Board=25
+  MANA Lorehold: 62 available (18 sources, 44 treasures, pool={'generic': 8, 'white': 3, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=manual/verified
+  END Lorehold: Life=40 Hand=2 Board=26 Grave=10 Discarded=0
+
+TURN 20 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=18
+  MANA Winota, Joiner of Forces #73 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Winota, Joiner of Forces #73 (real): Witch Enchanter (CMC=4.0) [remove_permanent] rule=curated/verified
+  REMOVAL Winota, Joiner of Forces #73 (real): Witch Enchanter removed Phantasmal Image from Kinnan, Bonder Prodigy #84 (real)
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=18 Grave=8 Discarded=0
+
+TURN 20 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=8 Board=26
+  MANA Kinnan, Bonder Prodigy #84 (real): 13 available (13 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 4, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Yavimaya Coast (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Lorehold: Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=30 Grave=11 Discarded=2
+
+TURN 20 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=20
+  MANA Magda, Brazen Outlaw #90 (real): 12 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=20 Grave=3 Discarded=0
+
+TURN 21 - Lorehold | Life=40 Hand=6 Board=27
+  MANA Lorehold: 65 available (18 sources, 47 treasures, pool={'generic': 8, 'white': 3, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 7})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Approach of the Second Sun (CMC=7.0) [approach] rule=manual/verified
+  COMBAT Lorehold -> Kinnan, Bonder Prodigy #84 (real): 1 attackers, 1 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Kinnan, Bonder Prodigy #84 (real): 0 player damage, target life 40, target_dead=False
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Spectator Seating (any)
+  END Lorehold: Life=40 Hand=4 Board=29 Grave=13 Discarded=0
+
+TURN 21 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=18
+  MANA Winota, Joiner of Forces #73 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=19 Grave=8 Discarded=0
+
+TURN 21 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=11 Board=30
+  MANA Kinnan, Bonder Prodigy #84 (real): 16 available (15 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 4, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Moonsilver Key (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kinnan, Bonder Prodigy #84 (real): Moonsilver Key found Mox Opal (artifact_or_enchantment)
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Archdruid's Charm (CMC=3.0) [remove_permanent] rule=curated/verified
+  REMOVAL Kinnan, Bonder Prodigy #84 (real): Archdruid's Charm removed Clarion Conqueror from Winota, Joiner of Forces #73 (real)
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=34 Grave=18 Discarded=5
+
+TURN 21 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=20
+  MANA Magda, Brazen Outlaw #90 (real): 12 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=20 Grave=4 Discarded=0
+
+TURN 22 - Lorehold | Life=40 Hand=6 Board=29
+  MANA Lorehold: 72 available (20 sources, 50 treasures, pool={'generic': 8, 'white': 3, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 8})
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Reverberate (any)
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  RESOLVE Lorehold: Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=manual/verified
+  END Lorehold: Life=40 Hand=6 Board=32 Grave=14 Discarded=0
+
+TURN 22 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=0 Board=18
+  MANA Winota, Joiner of Forces #73 (real): 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=0 Board=19 Grave=9 Discarded=0
+
+TURN 22 - Kinnan, Bonder Prodigy #84 (real) | Life=40 Hand=11 Board=34
+  MANA Kinnan, Bonder Prodigy #84 (real): 18 available (17 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 4, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Breeding Pool (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Tropical Island (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Kinnan, Bonder Prodigy #84 (real): Minamo, School at Water's Edge (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=manual/verified
+  REMOVAL Lorehold: Path to Exile removed Signal Pest from Winota, Joiner of Forces #73 (real)
+  END Kinnan, Bonder Prodigy #84 (real): Life=40 Hand=7 Board=37 Grave=22 Discarded=4
+
+TURN 22 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=0 Board=20
+  MANA Magda, Brazen Outlaw #90 (real): 12 available (10 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 5, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Untimely Malfunction (CMC=2.0) [remove_permanent] rule=curated/verified
+  REMOVAL Magda, Brazen Outlaw #90 (real): Untimely Malfunction removed Slicer, Hired Muscle from Winota, Joiner of Forces #73 (real)
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=0 Board=20 Grave=5 Discarded=0
+
+TURN 23 - Lorehold | Life=40 Hand=8 Board=32
+  MANA Lorehold: 76 available (21 sources, 53 treasures, pool={'generic': 8, 'white': 3, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 8})
+  RESOLVE Lorehold: Approach of the Second Sun (CMC=7.0) [approach] rule=manual/verified
+  >>> WIN: Lorehold (approach) turn 23 <<<
+
+GAME OVER - Turn 23
+Winner: Lorehold (approach)
+Lorehold: ALIVE Life=40 Hand=6
+Winota, Joiner of Forces #73 (real): ALIVE Life=40 Hand=0
+Kinnan, Bonder Prodigy #84 (real): ALIVE Life=40 Hand=9
+Magda, Brazen Outlaw #90 (real): ALIVE Life=40 Hand=0

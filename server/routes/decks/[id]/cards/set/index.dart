@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../../lib/deck_rules_service.dart';
 
 /// POST /decks/:id/cards/set
@@ -89,8 +90,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         };
       }
       final cardName = (cardInfo.first[0] as String).trim();
-      final typeLine = (cardInfo.first[1] as String? ?? '').toLowerCase();
-      final isBasicLand = typeLine.contains('basic land');
+      final typeLine = cardInfo.first[1] as String? ?? '';
+      final isBasicLand = basic_lands.isBasicLandCard(
+        name: cardName,
+        typeLine: typeLine,
+      );
 
       // Validação mínima por carta (permite corrigir decks que já estão inválidos)
       // - Commander/Brawl: nonbasic deve ser exatamente 1.

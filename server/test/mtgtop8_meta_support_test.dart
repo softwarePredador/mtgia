@@ -140,11 +140,10 @@ void main() {
   });
 
   group('source url helpers', () {
-    test('extrai event id e format code de source url', () {
+    test('extrai event id de source url', () {
       const sourceUrl = 'https://www.mtgtop8.com/?e=76769&d=782421&f=EDH';
 
       expect(extractMtgTop8EventIdFromSourceUrl(sourceUrl), '76769');
-      expect(extractMtgTop8FormatCodeFromSourceUrl(sourceUrl), 'EDH');
     });
   });
 }

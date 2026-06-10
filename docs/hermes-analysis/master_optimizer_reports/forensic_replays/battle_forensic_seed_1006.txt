@@ -1,0 +1,236 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #119 (real), Thrasios, Triton Hero #101 (real), Thrasios, Triton Hero #59 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 2 mulligan(s), 6 cards, 3 lands
+  Rograkh, Son of Rohgahh #119 (real): 0 mulligan(s), 7 cards, 2 lands
+  Thrasios, Triton Hero #101 (real): 0 mulligan(s), 7 cards, 2 lands
+  Thrasios, Triton Hero #59 (real): 1 mulligan(s), 7 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=6 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #119 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=1 Grave=1 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #59 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Gamble found Rise of the Eldrazi (any)
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=1
+  MANA Rograkh, Son of Rohgahh #119 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=1
+  MANA Thrasios, Triton Hero #59 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=2 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=2
+  MANA Rograkh, Son of Rohgahh #119 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=6 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #59 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=2 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #59 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=6 Grave=2 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #101 (real) | Life=35 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #101 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=35 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #59 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=35)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 31, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=36 Hand=4 Board=6
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=31)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 26, target_dead=False
+  END Lorehold: Life=36 Hand=4 Board=7 Grave=2 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #101 (real) | Life=26 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=26 Hand=7 Board=7 Grave=0 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #59 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=26)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 22, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=7 Board=7 Grave=0 Discarded=0
+
+TURN 7 - Lorehold | Life=28 Hand=4 Board=7
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=22)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 7 player damage, target life 15, target_dead=False
+  END Lorehold: Life=28 Hand=3 Board=9 Grave=2 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 5 player damage, target life 23, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=6 Grave=2 Discarded=0
+
+TURN 7 - Thrasios, Triton Hero #101 (real) | Life=15 Hand=7 Board=7
+  MANA Thrasios, Triton Hero #101 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=23)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Lorehold: 4 player damage, target life 19, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=15 Hand=7 Board=7 Grave=1 Discarded=1
+
+TURN 7 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=7 Board=7
+  MANA Thrasios, Triton Hero #59 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=15)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Thrasios, Triton Hero #101 (real): 4 player damage, target life 11, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=9 Grave=0 Discarded=0
+
+TURN 8 - Lorehold | Life=19 Hand=3 Board=9
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=11)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 7 player damage, target life 4, target_dead=False
+  END Lorehold: Life=19 Hand=3 Board=10 Grave=3 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=lethal, target_life=4)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Thrasios, Triton Hero #101 (real): 5 player damage, target life -1, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #101 (real) (life_zero) <<<
+
+TURN 8 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=6 Board=9
+  MANA Thrasios, Triton Hero #59 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=19)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 4 player damage, target life 15, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=10 Grave=0 Discarded=0
+
+TURN 9 - Lorehold | Life=15 Hand=3 Board=10
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Rite of the Dragoncaller (CMC=6.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 8 player damage, target life 32, target_dead=False
+  END Lorehold: Life=15 Hand=2 Board=15 Grave=4 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #119 (real) | Life=32 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=control_high_threat, target_life=15)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 5 player damage, target life 10, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=32 Hand=7 Board=8 Grave=2 Discarded=0
+
+TURN 9 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=6 Board=10
+  MANA Thrasios, Triton Hero #59 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=10)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 0 player damage, target life 10, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=40 Hand=6 Board=11 Grave=0 Discarded=0
+
+TURN 10 - Lorehold | Life=10 Hand=2 Board=15
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Faithless Looting (CMC=1.0) [draw_cards] rule=curated/verified
+  RESOLVE Lorehold: Swords to Plowshares (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Swords to Plowshares removed Rograkh, Son of Rohgahh from Rograkh, Son of Rohgahh #119 (real)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 7 attackers, 0 blockers, 0 gang blocks, 28 power (reason=default_low_life, target_life=32)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 28 player damage, target life 4, target_dead=False
+  END Lorehold: Life=10 Hand=2 Board=16 Grave=6 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #119 (real) | Life=4 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #119 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=control_high_threat, target_life=10)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 1 player damage, target life 9, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=4 Hand=7 Board=8 Grave=3 Discarded=1
+
+TURN 10 - Thrasios, Triton Hero #59 (real) | Life=40 Hand=6 Board=11
+  MANA Thrasios, Triton Hero #59 (real): 10 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Rograkh, Son of Rohgahh #119 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Rograkh, Son of Rohgahh #119 (real): 4 player damage, target life 0, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #119 (real) (life_zero) <<<
+
+TURN 11 - Lorehold | Life=9 Hand=2 Board=16
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 7 attackers, 0 blockers, 0 gang blocks, 28 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 28 player damage, target life 12, target_dead=False
+  END Lorehold: Life=9 Hand=2 Board=17 Grave=6 Discarded=0
+
+TURN 11 - Thrasios, Triton Hero #59 (real) | Life=12 Hand=6 Board=12
+  MANA Thrasios, Triton Hero #59 (real): 11 available (11 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #59 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=9)
+  DAMAGE Thrasios, Triton Hero #59 (real) -> Lorehold: 4 player damage, target life 5, target_dead=False
+  END Thrasios, Triton Hero #59 (real): Life=12 Hand=6 Board=13 Grave=0 Discarded=0
+
+TURN 12 - Lorehold | Life=5 Hand=2 Board=17
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 6, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #59 (real): 8 attackers, 0 blockers, 0 gang blocks, 30 power (reason=lethal, target_life=12)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #59 (real): 30 player damage, target life -18, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #59 (real) (life_zero) <<<
+
+GAME OVER - Turn 12
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=5 Hand=3
+Rograkh, Son of Rohgahh #119 (real): DEAD Life=0 Hand=7
+Thrasios, Triton Hero #101 (real): DEAD Life=-1 Hand=7
+Thrasios, Triton Hero #59 (real): DEAD Life=-18 Hand=6

@@ -33,6 +33,10 @@ as fontes canônicas abaixo.
 - Push/FCM: `app/doc/runtime_flow_handoffs/push_delivery_android_sm_a135m_2026-05-11.md`
 - Card entry/import: `docs/qa/manaloom_card_entry_qa_2026-05-08.md`
 - Design Android: `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`
+- Uniformidade de layout iPhone: `docs/qa/manaloom_layout_uniformity_audit_iphone15_2026-05-22.md`
+- Gate visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md` e
+  baseline gerada em `docs/qa/manaloom_premium_visual_audit_latest.md`
+- Prova runtime visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_RUNTIME_PROOF_2026-06-04.md`
 - Icone do app: `docs/qa/manaloom_app_icon_contact_sheet_2026-05-21.png`
 - Splash art: `docs/qa/manaloom_splash_art_preview_2026-05-21.png`
 - Auditoria de docs/artefatos: `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/auth_visual_shell.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -82,332 +83,271 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.transparent,
-        elevation: 0,
-        surfaceTintColor: AppTheme.transparent,
-        leading: IconButton(
-          key: const Key('register-back-button'),
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
-          onPressed: _returnToLogin,
+    return AuthVisualShell(
+      maxWidth: 500,
+      leading: IconButton(
+        key: const Key('register-back-button'),
+        tooltip: 'Voltar para login',
+        style: IconButton.styleFrom(
+          backgroundColor: AppTheme.surfaceSlate.withValues(alpha: 0.78),
+          foregroundColor: AppTheme.textPrimary,
+          side: BorderSide(color: AppTheme.outlineMuted.withValues(alpha: 0.8)),
         ),
+        icon: const Icon(Icons.arrow_back),
+        onPressed: _returnToLogin,
       ),
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceElevated.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                    border: Border.all(
-                      color: AppTheme.outlineMuted,
-                      width: 0.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.backgroundAbyss.withValues(alpha: 0.18),
-                        blurRadius: 16,
-                        offset: const Offset(0, 10),
+      child: Column(
+        children: [
+          const AuthBrandHeader(
+            title: 'Criar Conta',
+            subtitle: 'Comece sua jornada no ManaLoom',
+            eyebrow: 'Comece no ManaLoom',
+            logoSize: 92,
+          ),
+          const SizedBox(height: 20),
+          AuthFormSurface(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Username
+                  TextFormField(
+                    key: const Key('register-username-field'),
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nome de Usuário',
+                      hintText: 'ex: mage42',
+                      helperText:
+                          'Único e permanente — será seu @ no app. Depois você pode escolher um nick no perfil.',
+                      helperMaxLines: 2,
+                      prefixIcon: const Icon(Icons.alternate_email),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                       ),
-                    ],
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Digite um nome de usuário';
+                      }
+                      if (value.length < 3) {
+                        return 'Mínimo 3 caracteres';
+                      }
+                      return null;
+                    },
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primarySoft.withValues(
-                                alpha: 0.14,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusXl,
-                              ),
-                            ),
-                            child: Text(
-                              'Comece no ManaLoom',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: AppTheme.primarySoft,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Criar Conta',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Comece sua jornada no ManaLoom',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
+                  const SizedBox(height: 16),
 
-                        // Username
-                        TextFormField(
-                          key: const Key('register-username-field'),
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            labelText: 'Nome de Usuário',
-                            hintText: 'ex: mage42',
-                            helperText:
-                                'Único e permanente — será seu @ no app. Depois você pode escolher um nick no perfil.',
-                            helperMaxLines: 2,
-                            prefixIcon: const Icon(Icons.alternate_email),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusMd,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: theme.colorScheme.surface,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Digite um nome de usuário';
-                            }
-                            if (value.length < 3) {
-                              return 'Mínimo 3 caracteres';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
+                  // Email
+                  TextFormField(
+                    key: const Key('register-email-field'),
+                    controller: _emailController,
+                    focusNode: _emailFocusNode,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'seu@email.com',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      ),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Digite seu email';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Email inválido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
-                        // Email
-                        TextFormField(
-                          key: const Key('register-email-field'),
-                          controller: _emailController,
-                          focusNode: _emailFocusNode,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            hintText: 'seu@email.com',
-                            prefixIcon: const Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusMd,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: theme.colorScheme.surface,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Digite seu email';
-                            }
-                            if (!value.contains('@')) {
-                              return 'Email inválido';
-                            }
-                            return null;
-                          },
+                  // Senha
+                  TextFormField(
+                    key: const Key('register-password-field'),
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Senha',
+                      hintText: '••••••••',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        tooltip:
+                            _obscurePassword
+                                ? 'Mostrar senha'
+                                : 'Ocultar senha',
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
-                        const SizedBox(height: 16),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      ),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Digite uma senha';
+                      }
+                      if (value.length < 6) {
+                        return 'Senha deve ter no mínimo 6 caracteres';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
-                        // Senha
-                        TextFormField(
-                          key: const Key('register-password-field'),
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            labelText: 'Senha',
-                            hintText: '••••••••',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusMd,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: theme.colorScheme.surface,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Digite uma senha';
-                            }
-                            if (value.length < 6) {
-                              return 'Senha deve ter no mínimo 6 caracteres';
-                            }
-                            return null;
-                          },
+                  // Confirmar Senha
+                  TextFormField(
+                    key: const Key('register-confirm-password-field'),
+                    controller: _confirmPasswordController,
+                    obscureText: _obscureConfirmPassword,
+                    decoration: InputDecoration(
+                      labelText: 'Confirmar Senha',
+                      hintText: '••••••••',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        tooltip:
+                            _obscureConfirmPassword
+                                ? 'Mostrar confirmação de senha'
+                                : 'Ocultar confirmação de senha',
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
-                        const SizedBox(height: 16),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                      ),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Confirme sua senha';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Senhas não correspondem';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 22),
 
-                        // Confirmar Senha
-                        TextFormField(
-                          key: const Key('register-confirm-password-field'),
-                          controller: _confirmPasswordController,
-                          obscureText: _obscureConfirmPassword,
-                          decoration: InputDecoration(
-                            labelText: 'Confirmar Senha',
-                            hintText: '••••••••',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
-                                });
-                              },
+                  // Botão Registrar com gradiente
+                  Consumer<AuthProvider>(
+                    builder: (context, auth, child) {
+                      if (auth.status == AuthStatus.loading) {
+                        return Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusMd,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor: theme.colorScheme.surface,
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Confirme sua senha';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'Senhas não correspondem';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 28),
-
-                        // Botão Registrar com gradiente
-                        Consumer<AuthProvider>(
-                          builder: (context, auth, child) {
-                            if (auth.status == AuthStatus.loading) {
-                              return Container(
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  gradient: AppTheme.primaryGradient,
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusMd,
-                                  ),
-                                ),
-                                child: const Center(
-                                  child: SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppTheme.backgroundAbyss,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            return Container(
-                              height: 52,
-                              decoration: BoxDecoration(
-                                gradient: AppTheme.primaryGradient,
-                                borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusMd,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppTheme.manaViolet.withValues(
-                                      alpha: 0.35,
-                                    ),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Material(
-                                color: AppTheme.transparent,
-                                child: InkWell(
-                                  key: const Key('register-submit-button'),
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusMd,
-                                  ),
-                                  onTap: _handleRegister,
-                                  child: const Center(
-                                    child: Text(
-                                      'Criar Conta',
-                                      style: TextStyle(
-                                        color: AppTheme.backgroundAbyss,
-                                        fontSize: AppTheme.fontLg,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
-                                  ),
+                          child: const Center(
+                            child: SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppTheme.backgroundAbyss,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Link para login
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              'Já tem uma conta? ',
-                              style: theme.textTheme.bodyMedium,
                             ),
-                            TextButton(
-                              key: const Key('register-open-login-button'),
-                              onPressed: _returnToLogin,
-                              child: Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  color: AppTheme.primarySoft,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                          ),
+                        );
+                      }
+                      return Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.brass400.withValues(alpha: 0.28),
+                              blurRadius: 18,
+                              offset: const Offset(0, 7),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                        child: Material(
+                          color: AppTheme.transparent,
+                          child: InkWell(
+                            key: const Key('register-submit-button'),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
+                            onTap: _handleRegister,
+                            child: const Center(
+                              child: Text(
+                                'Criar Conta',
+                                style: TextStyle(
+                                  color: AppTheme.backgroundAbyss,
+                                  fontSize: AppTheme.fontLg,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
+                  const SizedBox(height: 14),
+
+                  // Link para login
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Já tem uma conta? ',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      TextButton(
+                        key: const Key('register-open-login-button'),
+                        onPressed: _returnToLogin,
+                        child: const Text(
+                          'Entrar',
+                          style: TextStyle(
+                            color: AppTheme.brass400,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -169,6 +169,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  tearDown(() {
+    SharedPreferences.setMockInitialValues({});
+    ApiClient.resetForTesting();
+  });
+
   group('DeckProvider.createDeck', () {
     test('fails when batch resolve endpoint fails', () async {
       final apiClient = _FakeApiClient(
@@ -343,6 +348,35 @@ void main() {
       },
       'validation': const {'is_valid': true, 'errors': <String>[]},
     };
+
+    test(
+      'fetchCommanderLearningDecks lists active learned commanders',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/ai/commander-learning':
+                () => ApiResponse(200, {
+                  'available': true,
+                  'count': 1,
+                  'commanders': const [
+                    {
+                      'commander': 'Lorehold, the Historian',
+                      'source_ref': 'learned_deck:82',
+                    },
+                  ],
+                }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        final decks = await provider.fetchCommanderLearningDecks();
+
+        expect(apiClient.getCalls, equals(['/ai/commander-learning']));
+        expect(decks, hasLength(1));
+        expect(decks.first['commander'], equals('Lorehold, the Historian'));
+        expect(decks.first['source_ref'], equals('learned_deck:82'));
+      },
+    );
 
     test(
       'generateDeck uses async by default and completes via polling',
@@ -1088,6 +1122,7 @@ void main() {
                     'is_public': false,
                     'created_at': '2026-03-23T00:00:00.000Z',
                     'card_count': 37,
+                    'color_identity': ['W'],
                   },
                 ]),
             '/decks/deck-1':
@@ -1127,6 +1162,7 @@ void main() {
                     'is_public': false,
                     'created_at': '2026-03-23T00:00:00.000Z',
                     'card_count': 37,
+                    'color_identity': ['W'],
                   },
                 ]),
             '/decks/deck-1':
@@ -1207,6 +1243,7 @@ void main() {
                     'is_public': false,
                     'created_at': '2026-03-23T00:00:00.000Z',
                     'card_count': 37,
+                    'color_identity': ['W'],
                   },
                 ]),
             '/decks/deck-1':
@@ -1282,6 +1319,7 @@ void main() {
                 'is_public': false,
                 'created_at': '2026-03-23T00:00:00.000Z',
                 'card_count': 37,
+                'color_identity': ['W', 'R'],
               },
             ]);
           },

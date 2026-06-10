@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_theme.dart';
 import '../cards/providers/card_provider.dart';
 import '../cards/screens/card_detail_screen.dart';
 import '../decks/models/deck_card_item.dart';
@@ -57,7 +57,7 @@ enum _PlayerSpecialState { none, deckedOut, answerLeft }
 /// - Veneno / Poison counters (10 = derrota)
 /// - Dano de Comandante por oponente (21 = derrota)
 /// - Energy e Experience counters
-/// - HistÃ³rico com undo
+/// - Histórico com undo
 class LifeCounterScreen extends StatefulWidget {
   final Random? randomOverride;
   final bool initialHubExpanded;
@@ -104,14 +104,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   final List<_GameSnapshot> _history = [];
   static const int _maxHistory = 50;
 
-  static const _playerColors = [
-    Color(0xFFFFB51E),
-    Color(0xFFFF0A5B),
-    Color(0xFFCF7AEF),
-    Color(0xFF4B57FF),
-    Color(0xFF44E063),
-    Color(0xFF40B9FF),
-  ];
+  static const _playerColors = AppTheme.lifeCounterPlayerColors;
 
   static const _playerLabels = [
     'Jogador 1',
@@ -361,9 +354,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     bool tieBreaker = false,
   }) {
     HapticFeedback.mediumImpact();
-    final activePlayers = participants ?? {
-      for (int i = 0; i < _playerCount; i++) i,
-    };
+    final activePlayers =
+        participants ?? {for (int i = 0; i < _playerCount; i++) i};
     final results = <int, int>{
       for (final player in activePlayers) player: _random.nextInt(20) + 1,
     };
@@ -524,7 +516,9 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       _experience = List<int>.of(session.experience);
       _commanderCasts = List<int>.of(session.commanderCasts);
       _playerSpecialStates =
-          session.playerSpecialStates.map(_decodePersistedSpecialState).toList();
+          session.playerSpecialStates
+              .map(_decodePersistedSpecialState)
+              .toList();
       _lastPlayerRolls = List<int?>.of(session.lastPlayerRolls);
       _lastHighRolls = List<int?>.of(session.lastHighRolls);
       _highRollWinners = _deriveHighRollWinners(_lastHighRolls);
@@ -556,10 +550,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           curve: Curves.easeOutCubic,
           reverseCurve: Curves.easeInCubic,
         );
-        final scale = Tween<double>(
-          begin: 0.94,
-          end: 1,
-        ).animate(
+        final scale = Tween<double>(begin: 0.94, end: 1).animate(
           CurvedAnimation(
             parent: animation,
             curve: Curves.easeOutCubic,
@@ -580,10 +571,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           opacity: opacity,
           child: SlideTransition(
             position: slide,
-            child: ScaleTransition(
-              scale: scale,
-              child: child,
-            ),
+            child: ScaleTransition(scale: scale, child: child),
           ),
         );
       },
@@ -597,8 +585,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       });
     }
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar configuraÃ§Ãµes',
-        builder:
+      barrierLabel: 'Fechar configurações',
+      builder:
           (ctx) => _SettingsSheet(
             twoPlayerStartingLife: _startingLifeTwoPlayer,
             multiPlayerStartingLife: _startingLifeMultiPlayer,
@@ -619,7 +607,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       });
     }
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar seleÃ§Ã£o de jogadores',
+      barrierLabel: 'Fechar seleção de jogadores',
       builder:
           (ctx) => _PlayersOverlay(
             selectedPlayerCount: _playerCount,
@@ -633,7 +621,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 
   void _showHistoryDialog() {
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar histÃ³rico',
+      barrierLabel: 'Fechar histórico',
       builder:
           (ctx) => _HistoryOverlay(
             lastTableEvent: _lastTableEvent,
@@ -908,9 +896,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                   child: const AbsorbPointer(
                     absorbing: true,
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color(0xA6000000),
-                      ),
+                      decoration: BoxDecoration(color: AppTheme.overlayBlack65),
                     ),
                   ),
                 ),
@@ -990,7 +976,9 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   Widget _buildTwoPlayers() {
     return Column(
       children: [
-        Expanded(child: _buildPlayerSlot(0, quarterTurns: _quarterTurnsForSeat(0))),
+        Expanded(
+          child: _buildPlayerSlot(0, quarterTurns: _quarterTurnsForSeat(0)),
+        ),
         const SizedBox(height: _tableGutter),
         Expanded(child: _buildPlayerSlot(1)),
       ],
@@ -1223,10 +1211,12 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         poison: _poison[playerIndex],
         commanderTax: _commanderCasts[playerIndex] * 2,
         commanderDamageTotal: _totalCommanderDamage(playerIndex),
-        commanderDamageLeadSourceLabel:
-            _commanderDamageLeadSourceLabel(playerIndex),
-        commanderDamageLeadSourceValue:
-            _commanderDamageLeadSourceValue(playerIndex),
+        commanderDamageLeadSourceLabel: _commanderDamageLeadSourceLabel(
+          playerIndex,
+        ),
+        commanderDamageLeadSourceValue: _commanderDamageLeadSourceValue(
+          playerIndex,
+        ),
         lastPlayerRoll: _lastPlayerRolls[playerIndex],
         highRollValue: _lastHighRolls[playerIndex],
         specialState: _playerSpecialStates[playerIndex],
@@ -1332,32 +1322,31 @@ class _TableControlHub extends StatelessWidget {
       _HubPetalSpec(
         key: Key('life-counter-hub-players'),
         label: 'PLAYERS',
-        color: Color(0xFF44E063),
+        color: AppTheme.lifeCounterGreen,
         offset: Offset(-84 * scaleFactor, 0),
         rotation: -pi / 2,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-reset'),
         label: 'RESTART',
-        color: Color(0xFFFFE277),
+        color: AppTheme.lifeCounterRestartYellow,
         offset: Offset(0, -84 * scaleFactor),
         rotation: 0,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-quick-high-roll'),
         label: 'HIGH ROLL',
-        color: Color(0xFF40B9FF),
+        color: AppTheme.lifeCounterBlue,
         offset: Offset(0, 84 * scaleFactor),
         rotation: 0,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-settings'),
         label: 'SETTINGS',
-        color: Color(0xFFB9B4FF),
+        color: AppTheme.lifeCounterSettingsPurple,
         offset: Offset(84 * scaleFactor, 0),
         rotation: pi / 2,
       ),
-    
     ];
 
     final hubSize = (isExpanded ? 256 : 68) * scaleFactor;
@@ -1494,13 +1483,20 @@ class _HubToolsFrame extends StatelessWidget {
               ),
             );
           },
-          child: Material(
-            key: const Key('life-counter-hub-tools'),
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(radius),
-              onTap: onTap,
-              child: SizedBox(width: frameSize, height: frameSize),
+          child: Semantics(
+            button: true,
+            label: 'Abrir ferramentas da mesa',
+            child: Tooltip(
+              message: 'Ferramentas da mesa',
+              child: Material(
+                key: const Key('life-counter-hub-tools'),
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(radius),
+                  onTap: onTap,
+                  child: SizedBox(width: frameSize, height: frameSize),
+                ),
+              ),
             ),
           ),
         ),
@@ -1526,97 +1522,107 @@ class _HubMedallion extends StatelessWidget {
     final ringSize = outerSize * 0.86;
     final iconSize = (isExpanded ? 28 : 23) * scaleFactor;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        key: const Key('life-counter-hub-toggle'),
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          opacity: isExpanded ? 1 : 0.92,
-          child: SizedBox(
-            width: outerSize,
-            height: outerSize,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: outerSize * 1.26,
-                  height: outerSize * 1.26,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF9CE9FF).withValues(
-                          alpha: isExpanded ? 0.2 : 0.11,
-                        ),
-                        blurRadius: isExpanded ? 24 : 14,
-                        spreadRadius: isExpanded ? 2 : 0,
+    return Semantics(
+      button: true,
+      label:
+          isExpanded ? 'Fechar controles da mesa' : 'Abrir controles da mesa',
+      child: Tooltip(
+        message:
+            isExpanded ? 'Fechar controles da mesa' : 'Abrir controles da mesa',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: const Key('life-counter-hub-toggle'),
+            borderRadius: BorderRadius.circular(999),
+            onTap: onTap,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              opacity: isExpanded ? 1 : 0.92,
+              child: SizedBox(
+                width: outerSize,
+                height: outerSize,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: outerSize * 1.26,
+                      height: outerSize * 1.26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF9CE9FF,
+                            ).withValues(alpha: isExpanded ? 0.2 : 0.11),
+                            blurRadius: isExpanded ? 24 : 14,
+                            spreadRadius: isExpanded ? 2 : 0,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  width: outerSize,
-                  height: outerSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: isExpanded ? 0.32 : 0.2),
-                      width: 1.2,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        blurRadius: isExpanded ? 20 : 14,
-                        spreadRadius: 1.5 * scaleFactor,
-                        offset: Offset(0, 8 * scaleFactor),
-                      ),
-                      BoxShadow(
-                        color: const Color(0xFFFFE69A).withValues(
-                          alpha: isExpanded ? 0.08 : 0.04,
-                        ),
-                        blurRadius: isExpanded ? 12 : 8,
-                      ),
-                    ],
-                  ),
-                  child: CustomPaint(
-                    painter: _HubMedallionPainter(
-                      progress: isExpanded ? 1 : 0,
-                    ),
-                    child: SizedBox(
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
                       width: outerSize,
                       height: outerSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(
+                            alpha: isExpanded ? 0.32 : 0.2,
+                          ),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.24),
+                            blurRadius: isExpanded ? 20 : 14,
+                            spreadRadius: 1.5 * scaleFactor,
+                            offset: Offset(0, 8 * scaleFactor),
+                          ),
+                          BoxShadow(
+                            color: const Color(
+                              0xFFFFE69A,
+                            ).withValues(alpha: isExpanded ? 0.08 : 0.04),
+                            blurRadius: isExpanded ? 12 : 8,
+                          ),
+                        ],
+                      ),
+                      child: CustomPaint(
+                        painter: _HubMedallionPainter(
+                          progress: isExpanded ? 1 : 0,
+                        ),
+                        child: SizedBox(width: outerSize, height: outerSize),
+                      ),
                     ),
-                  ),
-                ),
-                Container(
-                  width: ringSize,
-                  height: ringSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: isExpanded ? 0.3 : 0.2),
-                      width: 1.1,
+                    Container(
+                      width: ringSize,
+                      height: ringSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(
+                            alpha: isExpanded ? 0.3 : 0.2,
+                          ),
+                          width: 1.1,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Icon(
-                  isExpanded ? Icons.close_rounded : Icons.menu_rounded,
-                  color: const Color(0xFF0D1117),
-                  size: iconSize,
-                  shadows: [
-                    Shadow(
-                      color: Colors.white.withValues(alpha: 0.36),
-                      blurRadius: 6,
+                    Icon(
+                      isExpanded ? Icons.close_rounded : Icons.menu_rounded,
+                      color: AppTheme.lifeCounterHubIconDark,
+                      size: iconSize,
+                      shadows: [
+                        Shadow(
+                          color: Colors.white.withValues(alpha: 0.36),
+                          blurRadius: 6,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -1642,10 +1648,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF04070E),
-              Color(0xFF121A2B),
-            ],
+            colors: AppTheme.lifeCounterHubShellGradient,
           ).createShader(Offset.zero & size)
           ..isAntiAlias = true;
 
@@ -1654,10 +1657,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFEAFDFF),
-              Color(0xFFB9D7FF),
-            ],
+            colors: AppTheme.lifeCounterHubShellStrokeGradient,
           ).createShader(Offset.zero & size)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.4
@@ -1669,10 +1669,7 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFDF4FF),
-              Color(0xFFD7EDFF),
-            ],
+            colors: AppTheme.lifeCounterHubCoreGradient,
           ).createShader(Offset.zero & size)
           ..isAntiAlias = true;
 
@@ -1684,23 +1681,27 @@ class _HubMedallionPainter extends CustomPainter {
           ..strokeJoin = StrokeJoin.round
           ..isAntiAlias = true;
 
-            final ringStroke =
-            Paint()
-              ..color = const Color(0xFFE5FCFF).withValues(alpha: 0.56 + (0.2 * progress))
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.1
-              ..strokeJoin = StrokeJoin.round
-              ..isAntiAlias = true;
+    final ringStroke =
+        Paint()
+          ..color = const Color(
+            0xFFE5FCFF,
+          ).withValues(alpha: 0.56 + (0.2 * progress))
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true;
 
     final glow =
         Paint()
-              ..color = const Color(0xFF97EEFF).withValues(alpha: 0.12 + (0.05 * progress))
+          ..color = const Color(
+            0xFF97EEFF,
+          ).withValues(alpha: 0.12 + (0.05 * progress))
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
 
     canvas.drawPath(shellPath.shift(const Offset(0, 2)), glow);
     canvas.drawPath(shellPath, shellFill);
     canvas.drawPath(shellPath, shellStroke);
-            canvas.drawPath(ringPath, ringStroke);
+    canvas.drawPath(ringPath, ringStroke);
     canvas.drawPath(corePath, coreFill);
     canvas.drawPath(corePath, coreStroke);
 
@@ -1709,15 +1710,14 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.white.withValues(alpha: 0.18),
-              Colors.transparent,
-            ],
-          ).createShader(Rect.fromCenter(
-            center: center.translate(0, -size.height * 0.16),
-            width: size.width * 0.42,
-            height: size.height * 0.24,
-          ))
+            colors: [Colors.white.withValues(alpha: 0.18), Colors.transparent],
+          ).createShader(
+            Rect.fromCenter(
+              center: center.translate(0, -size.height * 0.16),
+              width: size.width * 0.42,
+              height: size.height * 0.24,
+            ),
+          )
           ..isAntiAlias = true;
 
     canvas.save();
@@ -1767,50 +1767,60 @@ class _HubPetalAction extends StatelessWidget {
     final topTint = Color.lerp(color, Colors.white, 0.2) ?? color;
     final bottomTint = Color.lerp(color, Colors.black, 0.12) ?? color;
 
-    return Material(
-      key: buttonKey,
-      color: const Color.fromARGB(0, 0, 0, 0),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          width: 102 * scaleFactor,
-          height: 40 * scaleFactor,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                topTint.withValues(alpha: visualOpacity),
-                bottomTint.withValues(alpha: visualOpacity),
-              ],
-            ),
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          key: buttonKey,
+          color: const Color.fromARGB(0, 0, 0, 0),
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.black.withValues(alpha: 0.2 * visualOpacity),
-              width: 0.9,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.1 * visualOpacity),
-                blurRadius: 3 * scaleFactor,
-                offset: Offset.zero,
+            onTap: onTap,
+            child: Ink(
+              width: 102 * scaleFactor,
+              height: 40 * scaleFactor,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    topTint.withValues(alpha: visualOpacity),
+                    bottomTint.withValues(alpha: visualOpacity),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.black.withValues(alpha: 0.2 * visualOpacity),
+                  width: 0.9,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.1 * visualOpacity),
+                    blurRadius: 3 * scaleFactor,
+                    offset: Offset.zero,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12 * scaleFactor),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: Colors.black.withValues(alpha: 0.9 * visualOpacity),
-                    fontSize: 13.4 * scaleFactor,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.1,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12 * scaleFactor),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: Colors.black.withValues(
+                          alpha: 0.9 * visualOpacity,
+                        ),
+                        fontSize: 13.4 * scaleFactor,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -1884,7 +1894,10 @@ class _TableOverlayFrame extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: width, maxHeight: maxHeight),
+              constraints: BoxConstraints(
+                maxWidth: width,
+                maxHeight: maxHeight,
+              ),
               child: Stack(
                 children: [
                   Container(
@@ -1918,32 +1931,35 @@ class _TableOverlayFrame extends StatelessWidget {
                           ),
                         ],
                         const SizedBox(height: 18),
-                        Flexible(
-                          child: SingleChildScrollView(
-                            child: child,
-                          ),
-                        ),
+                        Flexible(child: SingleChildScrollView(child: child)),
                       ],
                     ),
                   ),
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(999),
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Ink(
-                          width: 48,
-                          height: 48,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFF2C77),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close_rounded,
-                            color: Colors.white,
+                    child: Semantics(
+                      button: true,
+                      label: 'Fechar painel',
+                      child: Tooltip(
+                        message: 'Fechar painel',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(999),
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Ink(
+                              width: 48,
+                              height: 48,
+                              decoration: const BoxDecoration(
+                                color: AppTheme.lifeCounterPink,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -1993,29 +2009,38 @@ class _PlayerLayoutPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: previewKey,
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(28),
-        child: Ink(
-          width: 176,
-          height: 72,
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFF2C77) : Colors.transparent,
+    final semanticLabel = 'Selecionar layout para $playerCount jogadores';
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: previewKey,
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color:
-                  selected
-                      ? const Color(0xFFFF2C77)
-                      : Colors.white.withValues(alpha: 0.9),
-              width: 2,
+            child: Ink(
+              width: 176,
+              height: 72,
+              decoration: BoxDecoration(
+                color: selected ? AppTheme.lifeCounterPink : Colors.transparent,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color:
+                      selected
+                          ? AppTheme.lifeCounterPink
+                          : Colors.white.withValues(alpha: 0.9),
+                  width: 2,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: _PlayerLayoutGlyph(playerCount: playerCount),
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: _PlayerLayoutGlyph(playerCount: playerCount),
           ),
         ),
       ),
@@ -2055,13 +2080,12 @@ class _PlayerLayoutGlyph extends StatelessWidget {
     if (playerCount == 3) {
       return Column(
         children: [
-          Expanded(child: Row(children: [tile(color: tileAlt), tile(color: tileAlt)])),
+          Expanded(
+            child: Row(children: [tile(color: tileAlt), tile(color: tileAlt)]),
+          ),
           Expanded(
             child: Row(
-              children: [
-                tile(color: tileAlt),
-                Expanded(child: Container()),
-              ],
+              children: [tile(color: tileAlt), Expanded(child: Container())],
             ),
           ),
         ],
@@ -2268,6 +2292,7 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                                   key: const Key(
                                     'life-counter-card-search-clear',
                                   ),
+                                  tooltip: 'Limpar busca',
                                   onPressed: () {
                                     _controller.clear();
                                     provider.clearSearch();
@@ -2297,7 +2322,7 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
-                            color: Color(0xFF40B9FF),
+                            color: AppTheme.lifeCounterBlue,
                             width: 2,
                           ),
                         ),
@@ -2352,9 +2377,11 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                       Column(
                         key: const Key('life-counter-card-search-results'),
                         children: [
-                          for (int i = 0;
-                              i < provider.searchResults.length && i < 8;
-                              i++)
+                          for (
+                            int i = 0;
+                            i < provider.searchResults.length && i < 8;
+                            i++
+                          )
                             Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: _CardSearchResultTile(
@@ -2390,29 +2417,36 @@ class _CardSearchSuggestionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: chipKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.22),
+    return Semantics(
+      button: true,
+      label: 'Buscar $label',
+      child: Tooltip(
+        message: 'Buscar $label',
+        child: Material(
+          key: chipKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.94),
-              width: 1.5,
-            ),
-          ),
-          child: Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.86),
-              fontSize: AppTheme.fontXs,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
+            onTap: onTap,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.22),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  width: 1.5,
+                ),
+              ),
+              child: Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.86),
+                  fontSize: AppTheme.fontXs,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
             ),
           ),
         ),
@@ -2425,91 +2459,94 @@ class _CardSearchResultTile extends StatelessWidget {
   final Key tileKey;
   final DeckCardItem card;
 
-  const _CardSearchResultTile({
-    required this.tileKey,
-    required this.card,
-  });
+  const _CardSearchResultTile({required this.tileKey, required this.card});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: tileKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => CardDetailScreen(card: card),
-            ),
-          );
-        },
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.24),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.94),
-              width: 1.3,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 38,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.style_rounded,
-                  color: Colors.white.withValues(alpha: 0.72),
-                  size: 18,
+    final cardName = card.name;
+    return Semantics(
+      button: true,
+      label: 'Abrir detalhes de $cardName',
+      child: Tooltip(
+        message: 'Abrir $cardName',
+        child: Material(
+          key: tileKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
+              );
+            },
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  width: 1.3,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.96),
-                        fontSize: AppTheme.fontMd,
-                        fontWeight: FontWeight.w800,
-                      ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      [
-                        if (card.typeLine.trim().isNotEmpty) card.typeLine,
-                        if (card.setCode.trim().isNotEmpty)
-                          card.setCode.toUpperCase(),
-                      ].join('  â€¢  '),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.62),
-                        fontSize: AppTheme.fontSm,
-                        fontWeight: FontWeight.w600,
-                        height: 1.25,
-                      ),
+                    child: Icon(
+                      Icons.style_rounded,
+                      color: Colors.white.withValues(alpha: 0.72),
+                      size: 18,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.96),
+                            fontSize: AppTheme.fontMd,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          [
+                            if (card.typeLine.trim().isNotEmpty) card.typeLine,
+                            if (card.setCode.trim().isNotEmpty)
+                              card.setCode.toUpperCase(),
+                          ].join('  •  '),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.62),
+                            fontSize: AppTheme.fontSm,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Icon(
+                    Icons.open_in_new_rounded,
+                    color: Colors.white.withValues(alpha: 0.72),
+                    size: 18,
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              Icon(
-                Icons.open_in_new_rounded,
-                color: Colors.white.withValues(alpha: 0.72),
-                size: 18,
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -2534,7 +2571,7 @@ class _TableBottomRail extends StatelessWidget {
       key: const Key('life-counter-bottom-rail'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F4EC),
+        color: AppTheme.lifeCounterIvory,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: Colors.black.withValues(alpha: 0.15),
@@ -2592,40 +2629,47 @@ class _BottomRailPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: pillKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-          decoration: BoxDecoration(
-            color: Colors.black,
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          key: pillKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+            onTap: onTap,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 15, color: Colors.white),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: AppTheme.fontSm,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.55,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 15, color: Colors.white),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.55,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -2757,7 +2801,7 @@ Path _scaledHexagonPath(Size size, double scale) {
 // ---------------------------------------------------------------------------
 
 /// Painel de um jogador individual com vida, indicadores de poison/commander,
-/// e botÃ£o para abrir contadores extras.
+/// e botão para abrir contadores extras.
 class _PlayerPanel extends StatefulWidget {
   final int panelIndex;
   final String label;
@@ -2850,37 +2894,81 @@ class _PlayerPanelState extends State<_PlayerPanel> {
 
   bool get _isDenseCompact => widget.compact && widget.dense;
 
-  double get _coreStageWidth => _isDenseCompact ? 132 : widget.compact ? 156 : 214;
-  double get _coreStageHeight => _isDenseCompact ? 108 : widget.compact ? 126 : 176;
+  double get _coreStageWidth =>
+      _isDenseCompact
+          ? 132
+          : widget.compact
+          ? 156
+          : 214;
+  double get _coreStageHeight =>
+      _isDenseCompact
+          ? 108
+          : widget.compact
+          ? 126
+          : 176;
 
   Alignment get _normalCoreAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.04 : widget.compact ? 0.05 : 0.035)
+            ? (_isDenseCompact
+                ? 0.04
+                : widget.compact
+                ? 0.05
+                : 0.035)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.04 : widget.compact ? -0.05 : -0.035)
+            ? (_isDenseCompact
+                ? -0.04
+                : widget.compact
+                ? -0.05
+                : -0.035)
             : 0.0;
-    final vertical = _isDenseCompact ? -0.04 : widget.compact ? -0.055 : -0.038;
+    final vertical =
+        _isDenseCompact
+            ? -0.04
+            : widget.compact
+            ? -0.055
+            : -0.038;
     return Alignment(horizontal, vertical);
   }
 
   Alignment get _actionsCoreAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.022 : widget.compact ? 0.03 : 0.02)
+            ? (_isDenseCompact
+                ? 0.022
+                : widget.compact
+                ? 0.03
+                : 0.02)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.022 : widget.compact ? -0.03 : -0.02)
+            ? (_isDenseCompact
+                ? -0.022
+                : widget.compact
+                ? -0.03
+                : -0.02)
             : 0.0;
-    final vertical = _isDenseCompact ? -0.018 : widget.compact ? -0.03 : -0.02;
+    final vertical =
+        _isDenseCompact
+            ? -0.018
+            : widget.compact
+            ? -0.03
+            : -0.02;
     return Alignment(horizontal, vertical);
   }
 
   Alignment get _eventTakeoverAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.014 : widget.compact ? 0.02 : 0.015)
+            ? (_isDenseCompact
+                ? 0.014
+                : widget.compact
+                ? 0.02
+                : 0.015)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.014 : widget.compact ? -0.02 : -0.015)
+            ? (_isDenseCompact
+                ? -0.014
+                : widget.compact
+                ? -0.02
+                : -0.015)
             : 0.0;
     return Alignment(horizontal, 0.0);
   }
@@ -2888,29 +2976,43 @@ class _PlayerPanelState extends State<_PlayerPanel> {
   Alignment get _specialTakeoverAlignment {
     final horizontal =
         widget.quarterTurns == 1
-            ? (_isDenseCompact ? 0.008 : widget.compact ? 0.012 : 0.008)
+            ? (_isDenseCompact
+                ? 0.008
+                : widget.compact
+                ? 0.012
+                : 0.008)
             : widget.quarterTurns == 3
-            ? (_isDenseCompact ? -0.008 : widget.compact ? -0.012 : -0.008)
+            ? (_isDenseCompact
+                ? -0.008
+                : widget.compact
+                ? -0.012
+                : -0.008)
             : 0.0;
     return Alignment(horizontal, 0.0);
   }
 
   Alignment _screenSpaceQuickAdjustAlignment(bool isPlus) {
-    final base = _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
-    final lateral = _isDenseCompact ? 0.68 : widget.compact ? 0.74 : 0.8;
-    return Alignment(
-      base.x + (isPlus ? lateral : -lateral),
-      base.y,
-    );
+    final base =
+        _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
+    final lateral =
+        _isDenseCompact
+            ? 0.68
+            : widget.compact
+            ? 0.74
+            : 0.8;
+    return Alignment(base.x + (isPlus ? lateral : -lateral), base.y);
   }
 
   Alignment _screenSpaceStepIndicatorAlignment(bool isPlus) {
-    final base = _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
-    final lateral = _isDenseCompact ? 0.42 : widget.compact ? 0.46 : 0.52;
-    return Alignment(
-      base.x + (isPlus ? lateral : -lateral),
-      base.y,
-    );
+    final base =
+        _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
+    final lateral =
+        _isDenseCompact
+            ? 0.42
+            : widget.compact
+            ? 0.46
+            : 0.52;
+    return Alignment(base.x + (isPlus ? lateral : -lateral), base.y);
   }
 
   @override
@@ -2948,15 +3050,15 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             : null;
     final baseColor =
         isDeckedOut
-            ? const Color(0xFF4A3A12)
+            ? AppTheme.lifeDeckedOutPanel
             : hasAnswerLeft
-            ? const Color(0xFF1D1D1D)
+            ? AppTheme.lifeAnswerLeftPanel
             : isDefeated
-            ? const Color(0xFF5B3A6C)
+            ? AppTheme.lifeDefeatedPanel
             : isCommanderLethal
-            ? const Color(0xFF341217)
+            ? AppTheme.lifeCommanderLethalPanel
             : isPoisonLethal
-            ? const Color(0xFF122A18)
+            ? AppTheme.lifePoisonLethalPanel
             : widget.color;
     final highRollAccent =
         widget.isHighRollTie ? AppTheme.warning : AppTheme.primarySoft;
@@ -3063,9 +3165,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         },
       ),
       _PlayerInlineAction(
-        actionKey: Key(
-          'life-counter-player-toggle-dead-${widget.panelIndex}',
-        ),
+        actionKey: Key('life-counter-player-toggle-dead-${widget.panelIndex}'),
         icon:
             hasPanelTakeoverState
                 ? Icons.favorite_rounded
@@ -3100,9 +3200,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         ),
       if (!hasPanelTakeoverState)
         _PlayerInlineAction(
-          actionKey: Key(
-            'life-counter-player-mark-left-${widget.panelIndex}',
-          ),
+          actionKey: Key('life-counter-player-mark-left-${widget.panelIndex}'),
           icon: Icons.exit_to_app_rounded,
           label: 'LEFT',
           compact: widget.compact,
@@ -3130,10 +3228,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         color: baseColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color:
-              isCommanderLethal
-                  ? AppTheme.error
-                  : Colors.black,
+          color: isCommanderLethal ? AppTheme.error : Colors.black,
           width: isCommanderLethal ? 3 : 3,
         ),
         boxShadow: const [],
@@ -3169,68 +3264,76 @@ class _PlayerPanelState extends State<_PlayerPanel> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  InkWell(
-                    key: Key('life-counter-life-core-${widget.panelIndex}'),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                    onTap: widget.onOpenSetLife,
-                    onLongPress: () {
-                      setState(() {
-                        _showLifeActions = !_showLifeActions;
-                      });
-                    },
-                    child: SizedBox(
-                      width: _coreStageWidth,
-                      height: _coreStageHeight,
-                      child: Center(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 360),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
-                          transitionBuilder: (child, animation) {
-                            final fade = CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOut,
-                            );
-                            final scale = Tween<double>(
-                              begin: 0.82,
-                              end: 1,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutBack,
+                  Semantics(
+                    button: true,
+                    label:
+                        'Abrir ajuste de vida de ${widget.label}. Toque longo para mostrar acoes rapidas.',
+                    child: Tooltip(
+                      message: 'Ajustar vida de ${widget.label}',
+                      child: InkWell(
+                        key: Key('life-counter-life-core-${widget.panelIndex}'),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                        onTap: widget.onOpenSetLife,
+                        onLongPress: () {
+                          setState(() {
+                            _showLifeActions = !_showLifeActions;
+                          });
+                        },
+                        child: SizedBox(
+                          width: _coreStageWidth,
+                          height: _coreStageHeight,
+                          child: Center(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 360),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              transitionBuilder: (child, animation) {
+                                final fade = CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOut,
+                                );
+                                final scale = Tween<double>(
+                                  begin: 0.82,
+                                  end: 1,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeOutBack,
+                                  ),
+                                );
+                                final slide = Tween<Offset>(
+                                  begin: const Offset(0, 0.05),
+                                  end: Offset.zero,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                );
+                                return FadeTransition(
+                                  opacity: fade,
+                                  child: SlideTransition(
+                                    position: slide,
+                                    child: ScaleTransition(
+                                      scale: scale,
+                                      child: child,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _buildLifeCoreContent(
+                                isDefeated: isDefeated,
+                                isDeckedOut: isDeckedOut,
+                                hasAnswerLeft: hasAnswerLeft,
+                                isCommanderLethal: isCommanderLethal,
+                                isPoisonLethal: isPoisonLethal,
+                                hasHighRoll: hasHighRoll,
+                                dominantValueColor: dominantValueColor,
+                                supportingColor: supportingColor,
+                                eventLabel: eventLabel,
+                                eventValue: eventValue,
                               ),
-                            );
-                            final slide = Tween<Offset>(
-                              begin: const Offset(0, 0.05),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutCubic,
-                              ),
-                            );
-                            return FadeTransition(
-                              opacity: fade,
-                              child: SlideTransition(
-                                position: slide,
-                                child: ScaleTransition(
-                                  scale: scale,
-                                  child: child,
-                                ),
-                              ),
-                            );
-                          },
-                          child: _buildLifeCoreContent(
-                            isDefeated: isDefeated,
-                            isDeckedOut: isDeckedOut,
-                            hasAnswerLeft: hasAnswerLeft,
-                            isCommanderLethal: isCommanderLethal,
-                            isPoisonLethal: isPoisonLethal,
-                            hasHighRoll: hasHighRoll,
-                            dominantValueColor: dominantValueColor,
-                            supportingColor: supportingColor,
-                            eventLabel: eventLabel,
-                            eventValue: eventValue,
+                            ),
                           ),
                         ),
                       ),
@@ -3325,24 +3428,24 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   contentAlignment: _specialTakeoverAlignment,
                   color:
                       isDeckedOut
-                          ? const Color(0xFF2F2407)
+                          ? AppTheme.lifeDeckedOutTakeover
                           : hasAnswerLeft
-                          ? const Color(0xFF121212)
+                          ? AppTheme.lifeAnswerLeftTakeover
                           : isDefeated
-                          ? const Color(0xFF1D1025)
+                          ? AppTheme.lifeDefeatedTakeover
                           : isCommanderLethal
-                          ? const Color(0xFF2B090F)
-                          : const Color(0xFF0C2414),
+                          ? AppTheme.lifeCommanderLethalTakeover
+                          : AppTheme.lifePoisonLethalTakeover,
                   accent:
                       isDeckedOut
-                          ? const Color(0xFFFFD36A)
+                          ? AppTheme.lifeDeckedOutAccent
                           : hasAnswerLeft
-                          ? const Color(0xFFEDEDED)
+                          ? AppTheme.lifeAnswerLeftAccent
                           : isDefeated
-                          ? const Color(0xFFFF5AA9)
+                          ? AppTheme.lifeDefeatedAccent
                           : isCommanderLethal
-                          ? const Color(0xFFFF5B61)
-                          : const Color(0xFF6BFF8D),
+                          ? AppTheme.lifeCommanderLethalAccent
+                          : AppTheme.lifeCounterVictoryGreen,
                   title:
                       isDeckedOut
                           ? 'DECKED OUT.'
@@ -3372,22 +3475,28 @@ class _PlayerPanelState extends State<_PlayerPanel> {
           Positioned.fill(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final centerGap =
-                    (_coreStageWidth + (_isDenseCompact ? 34 : widget.compact ? 40 : 54))
-                        .clamp(120.0, constraints.maxWidth);
-                final sideWidth = ((constraints.maxWidth - centerGap) / 2).clamp(
-                  0.0,
-                  constraints.maxWidth,
-                );
+                final centerGap = (_coreStageWidth +
+                        (_isDenseCompact
+                            ? 34
+                            : widget.compact
+                            ? 40
+                            : 54))
+                    .clamp(120.0, constraints.maxWidth);
+                final sideWidth = ((constraints.maxWidth - centerGap) / 2)
+                    .clamp(0.0, constraints.maxWidth);
 
                 return Row(
                   children: [
                     SizedBox(
                       width: sideWidth,
-                      child: InkWell(
-                        key: widget.decrementZoneKey,
-                        onTap: widget.onDecrement,
-                        child: const SizedBox.expand(),
+                      child: Semantics(
+                        button: true,
+                        label: 'Diminuir vida de ${widget.label}',
+                        child: InkWell(
+                          key: widget.decrementZoneKey,
+                          onTap: widget.onDecrement,
+                          child: const SizedBox.expand(),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -3396,10 +3505,14 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                     ),
                     SizedBox(
                       width: sideWidth,
-                      child: InkWell(
-                        key: widget.incrementZoneKey,
-                        onTap: widget.onIncrement,
-                        child: const SizedBox.expand(),
+                      child: Semantics(
+                        button: true,
+                        label: 'Aumentar vida de ${widget.label}',
+                        child: InkWell(
+                          key: widget.incrementZoneKey,
+                          onTap: widget.onIncrement,
+                          child: const SizedBox.expand(),
+                        ),
                       ),
                     ),
                   ],
@@ -3418,7 +3531,12 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   key: Key('life-counter-step-minus-${widget.panelIndex}'),
                   style: TextStyle(
                     color: supportingColor,
-                    fontSize: _isDenseCompact ? 20 : widget.compact ? 24 : 28,
+                    fontSize:
+                        _isDenseCompact
+                            ? 20
+                            : widget.compact
+                            ? 24
+                            : 28,
                     fontWeight: FontWeight.w800,
                     height: 1,
                   ),
@@ -3436,7 +3554,12 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   key: Key('life-counter-step-plus-${widget.panelIndex}'),
                   style: TextStyle(
                     color: supportingColor,
-                    fontSize: _isDenseCompact ? 20 : widget.compact ? 24 : 28,
+                    fontSize:
+                        _isDenseCompact
+                            ? 20
+                            : widget.compact
+                            ? 24
+                            : 28,
                     fontWeight: FontWeight.w800,
                     height: 1,
                   ),
@@ -3496,13 +3619,11 @@ class _PlayerPanelState extends State<_PlayerPanel> {
     required String? eventLabel,
     required String? eventValue,
   }) {
-    if (
-      isDefeated ||
-      isDeckedOut ||
-      hasAnswerLeft ||
-      isCommanderLethal ||
-      isPoisonLethal
-    ) {
+    if (isDefeated ||
+        isDeckedOut ||
+        hasAnswerLeft ||
+        isCommanderLethal ||
+        isPoisonLethal) {
       return SizedBox(
         key: ValueKey(
           'life-core-special-${widget.panelIndex}-$isDefeated-$isDeckedOut-$hasAnswerLeft-$isCommanderLethal-$isPoisonLethal',
@@ -3559,11 +3680,20 @@ class _PlayerPanelState extends State<_PlayerPanel> {
           style: TextStyle(
             fontFamily: _tableDisplayFontFamily,
             color: dominantValueColor,
-            fontSize: _isDenseCompact ? 104 : widget.compact ? 126 : 184,
+            fontSize:
+                _isDenseCompact
+                    ? 104
+                    : widget.compact
+                    ? 126
+                    : 184,
             fontWeight: FontWeight.w900,
             height: 0.88,
             letterSpacing:
-                _isDenseCompact ? -2.4 : widget.compact ? -3.1 : -3.8,
+                _isDenseCompact
+                    ? -2.4
+                    : widget.compact
+                    ? -3.1
+                    : -3.8,
           ),
         ),
       ),
@@ -3595,44 +3725,70 @@ class _PlayerInlineAction extends StatelessWidget {
     final accent = destructive ? AppTheme.error : AppTheme.textPrimary;
     final isDenseCompact = compact && dense;
 
-    return Material(
-      key: actionKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        onTap: onTap,
-        child: Ink(
-          padding: EdgeInsets.symmetric(
-            horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
-            vertical: isDenseCompact ? 6 : compact ? 8 : 9,
-          ),
-          decoration: BoxDecoration(
-            color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          key: actionKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-            border: Border.all(
-              color: accent.withValues(alpha: destructive ? 0.3 : 0.18),
-              width: 0.8,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: isDenseCompact ? 12 : compact ? 14 : 16, color: accent),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: accent,
-                  fontSize:
-                      isDenseCompact
-                          ? AppTheme.fontXs - 1
-                          : compact
-                          ? AppTheme.fontXs
-                          : AppTheme.fontSm,
-                  fontWeight: FontWeight.w800,
+            onTap: onTap,
+            child: Ink(
+              padding: EdgeInsets.symmetric(
+                horizontal:
+                    isDenseCompact
+                        ? 8
+                        : compact
+                        ? 10
+                        : 12,
+                vertical:
+                    isDenseCompact
+                        ? 6
+                        : compact
+                        ? 8
+                        : 9,
+              ),
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+                borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                border: Border.all(
+                  color: accent.withValues(alpha: destructive ? 0.3 : 0.18),
+                  width: 0.8,
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size:
+                        isDenseCompact
+                            ? 12
+                            : compact
+                            ? 14
+                            : 16,
+                    color: accent,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: accent,
+                      fontSize:
+                          isDenseCompact
+                              ? AppTheme.fontXs - 1
+                              : compact
+                              ? AppTheme.fontXs
+                              : AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -3668,7 +3824,7 @@ class _PlayerCounterConsoleStrip extends StatelessWidget {
           value: '$poison',
           compact: compact,
           dense: dense,
-          accent: const Color(0xFF6BFF8D),
+          accent: AppTheme.lifeCounterVictoryGreen,
           isActive: poison > 0,
         ),
         _PlayerCounterConsoleStat(
@@ -3687,7 +3843,7 @@ class _PlayerCounterConsoleStrip extends StatelessWidget {
           accent:
               commanderDamageTotal >= 21
                   ? AppTheme.error
-                  : const Color(0xFFFFB3A8),
+                  : AppTheme.lifeLowTotalWarning,
           isActive: commanderDamageTotal > 0,
         ),
       ],
@@ -3740,8 +3896,18 @@ class _PlayerCounterConsoleStat extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
-          vertical: isDenseCompact ? 4 : compact ? 5 : 6,
+          horizontal:
+              isDenseCompact
+                  ? 8
+                  : compact
+                  ? 10
+                  : 12,
+          vertical:
+              isDenseCompact
+                  ? 4
+                  : compact
+                  ? 5
+                  : 6,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -3805,8 +3971,18 @@ class _LifeQuickAdjustButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDenseCompact = compact && dense;
     return SizedBox(
-      width: isDenseCompact ? 56 : compact ? 68 : 82,
-      height: isDenseCompact ? 30 : compact ? 38 : 42,
+      width:
+          isDenseCompact
+              ? 56
+              : compact
+              ? 68
+              : 82,
+      height:
+          isDenseCompact
+              ? 30
+              : compact
+              ? 38
+              : 42,
       child: Semantics(
         label: semanticLabel ?? label,
         button: true,
@@ -3828,7 +4004,12 @@ class _LifeQuickAdjustButton extends StatelessWidget {
                     label,
                     style: TextStyle(
                       color: color,
-                      fontSize: isDenseCompact ? 18 : compact ? 22 : 24,
+                      fontSize:
+                          isDenseCompact
+                              ? 18
+                              : compact
+                              ? 22
+                              : 24,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -3890,8 +4071,18 @@ class _PanelTakeoverOverlay extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: accent.withValues(alpha: 0.22 * value),
-                  blurRadius: isDenseCompact ? 16 : compact ? 22 : 32,
-                  spreadRadius: isDenseCompact ? 0.6 : compact ? 1 : 2,
+                  blurRadius:
+                      isDenseCompact
+                          ? 16
+                          : compact
+                          ? 22
+                          : 32,
+                  spreadRadius:
+                      isDenseCompact
+                          ? 0.6
+                          : compact
+                          ? 1
+                          : 2,
                 ),
               ],
             ),
@@ -3909,7 +4100,12 @@ class _PanelTakeoverOverlay extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.98),
-                          fontSize: isDenseCompact ? 26 : compact ? 34 : 44,
+                          fontSize:
+                              isDenseCompact
+                                  ? 26
+                                  : compact
+                                  ? 34
+                                  : 44,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.8,
                           height: 0.95,
@@ -3971,22 +4167,13 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
             ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFF9CD1),
-                Color(0xFFFFF5A3),
-                Color(0xFFB7FFBE),
-                Color(0xFFB5C8FF),
-              ],
+              colors: AppTheme.lifeCounterWinnerGradient,
             )
             : isTie
             ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFFC55A),
-                Color(0xFFFFE596),
-                Color(0xFFFFB764),
-              ],
+              colors: AppTheme.lifeCounterTieGradient,
             )
             : LinearGradient(
               begin: Alignment.topLeft,
@@ -4058,12 +4245,15 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                if (isWinner)
-                  ..._buildConfetti(progress),
-                if (isTie)
-                  ..._buildTieMarkers(progress),
+                if (isWinner) ..._buildConfetti(progress),
+                if (isTie) ..._buildTieMarkers(progress),
                 Positioned(
-                  top: isDenseCompact ? 8 : compact ? 12 : 16,
+                  top:
+                      isDenseCompact
+                          ? 8
+                          : compact
+                          ? 12
+                          : 16,
                   left: 0,
                   right: 0,
                   child: Transform.translate(
@@ -4073,8 +4263,18 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                       child: Center(
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
-                            vertical: isDenseCompact ? 4 : compact ? 5 : 6,
+                            horizontal:
+                                isDenseCompact
+                                    ? 8
+                                    : compact
+                                    ? 10
+                                    : 12,
+                            vertical:
+                                isDenseCompact
+                                    ? 4
+                                    : compact
+                                    ? 5
+                                    : 6,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(
@@ -4115,8 +4315,18 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                     scale: 0.88 + (0.12 * progress),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: isDenseCompact ? 8 : compact ? 10 : 14,
-                        vertical: isDenseCompact ? 12 : compact ? 18 : 24,
+                        horizontal:
+                            isDenseCompact
+                                ? 8
+                                : compact
+                                ? 10
+                                : 14,
+                        vertical:
+                            isDenseCompact
+                                ? 12
+                                : compact
+                                ? 18
+                                : 24,
                       ),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
@@ -4136,8 +4346,18 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                               ? 0.18 * progress
                                               : 0.06 * progress,
                                     ),
-                                    blurRadius: isDenseCompact ? 22 : compact ? 34 : 46,
-                                    spreadRadius: isDenseCompact ? 1 : compact ? 2 : 3,
+                                    blurRadius:
+                                        isDenseCompact
+                                            ? 22
+                                            : compact
+                                            ? 34
+                                            : 46,
+                                    spreadRadius:
+                                        isDenseCompact
+                                            ? 1
+                                            : compact
+                                            ? 2
+                                            : 3,
                                   ),
                                 ],
                               ),
@@ -4152,11 +4372,20 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: _tableDisplayFontFamily,
                                     color: valueColor,
-                                    fontSize: isDenseCompact ? 128 : compact ? 168 : 246,
+                                    fontSize:
+                                        isDenseCompact
+                                            ? 128
+                                            : compact
+                                            ? 168
+                                            : 246,
                                     fontWeight: FontWeight.w900,
                                     height: 0.78,
                                     letterSpacing:
-                                        isDenseCompact ? -2.6 : compact ? -3.2 : -4.0,
+                                        isDenseCompact
+                                            ? -2.6
+                                            : compact
+                                            ? -3.2
+                                            : -4.0,
                                   ),
                                 ),
                               ),
@@ -4164,7 +4393,12 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                             if (resultLabel != null)
                               Padding(
                                 padding: EdgeInsets.only(
-                                  top: isDenseCompact ? 0 : compact ? 2 : 6,
+                                  top:
+                                      isDenseCompact
+                                          ? 0
+                                          : compact
+                                          ? 2
+                                          : 6,
                                 ),
                                 child: Transform.translate(
                                   offset: Offset(0, 8 * (1 - progress)),
@@ -4173,15 +4407,25 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
                                         horizontal:
-                                            isDenseCompact ? 8 : compact ? 10 : 14,
+                                            isDenseCompact
+                                                ? 8
+                                                : compact
+                                                ? 10
+                                                : 14,
                                         vertical:
-                                            isDenseCompact ? 4 : compact ? 5 : 6,
+                                            isDenseCompact
+                                                ? 4
+                                                : compact
+                                                ? 5
+                                                : 6,
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withValues(
                                           alpha: isTie ? 0.82 : 0.76,
                                         ),
-                                        borderRadius: BorderRadius.circular(999),
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
                                         border: Border.all(
                                           color: Colors.white.withValues(
                                             alpha: isTie ? 0.14 : 0.18,
@@ -4226,11 +4470,11 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
 
   List<Widget> _buildConfetti(double progress) {
     const colors = [
-      Color(0xFFFF4C7D),
-      Color(0xFF4A5BFF),
-      Color(0xFFFFC552),
-      Color(0xFF5BDF79),
-      Color(0xFFFFFFFF),
+      AppTheme.lifeCounterPinkText,
+      AppTheme.lifeCounterSettingsRadio,
+      AppTheme.brass400,
+      AppTheme.lifeCounterVictoryGreen,
+      AppTheme.textPrimary,
     ];
     const positions = [
       (-0.78, -0.82, 18.0),
@@ -4550,7 +4794,7 @@ class _TableToolsSheetState extends State<_TableToolsSheet> {
                 _rollOffWinners.length > 1
                     ? 'REROLL TIED PLAYERS'
                     : 'ROLL EVERY PLAYER',
-            accent: const Color(0xFF40B9FF),
+            accent: AppTheme.lifeCounterBlue,
             emphasized: true,
             onTap: _runRollOff,
           ),
@@ -4678,7 +4922,7 @@ class _DiceOverlay extends StatelessWidget {
                 hasPendingHighRollTie
                     ? 'REROLL ONLY TIED PLAYERS'
                     : 'ROLL ALL PLAYERS',
-            accent: const Color(0xFF40B9FF),
+            accent: AppTheme.lifeCounterBlue,
             emphasized: true,
             onTap: () {
               onHighRoll();
@@ -4759,76 +5003,86 @@ class _DiceActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = accent ?? Colors.white;
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
-        onTap: onTap,
-        child: Ink(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: emphasized ? 18 : 16,
-            vertical: emphasized ? 18 : 14,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: emphasized ? 0.56 : 0.32),
+    return Semantics(
+      button: true,
+      label: '$label, $detail',
+      child: Tooltip(
+        message: '$label: $detail',
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
-            border: Border.all(color: borderColor, width: 2),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: emphasized ? 26 : 22,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: emphasized ? 0.8 : 0.5,
-                        height: 1,
+            onTap: onTap,
+            child: Ink(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: emphasized ? 18 : 16,
+                vertical: emphasized ? 18 : 14,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: emphasized ? 0.56 : 0.32),
+                borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
+                border: Border.all(color: borderColor, width: 2),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: emphasized ? 26 : 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: emphasized ? 0.8 : 0.5,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          detail,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.68),
+                            fontSize: AppTheme.fontXs,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.7,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: borderColor.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: borderColor.withValues(alpha: 0.7),
+                        width: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      detail,
+                    child: Text(
+                      emphasized ? 'RUN' : 'GO',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.68),
+                        color: borderColor,
                         fontSize: AppTheme.fontXs,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.7,
-                        height: 1.2,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: borderColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: borderColor.withValues(alpha: 0.7),
-                    width: 1.2,
                   ),
-                ),
-                child: Text(
-                  emphasized ? 'RUN' : 'GO',
-                  style: TextStyle(
-                    color: borderColor,
-                    fontSize: AppTheme.fontXs,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.8,
-                  ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -4966,10 +5220,12 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.74),
+              child: Semantics(
+                button: true,
+                label: 'Fechar ajuste de vida',
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(color: Colors.black.withValues(alpha: 0.74)),
                 ),
               ),
             ),
@@ -5031,7 +5287,9 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                             '9',
                           ])
                             _SetLifeKeypadButton(
-                              buttonKey: Key('life-counter-set-life-digit-$digit'),
+                              buttonKey: Key(
+                                'life-counter-set-life-digit-$digit',
+                              ),
                               label: digit,
                               onTap: () => _appendDigit(digit),
                             ),
@@ -5042,13 +5300,17 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                             destructive: true,
                           ),
                           _SetLifeKeypadButton(
-                            buttonKey: const Key('life-counter-set-life-digit-0'),
+                            buttonKey: const Key(
+                              'life-counter-set-life-digit-0',
+                            ),
                             label: '0',
                             onTap: () => _appendDigit('0'),
                           ),
                           _SetLifeKeypadButton(
-                            buttonKey: const Key('life-counter-set-life-backspace'),
-                            label: 'âŒ«',
+                            buttonKey: const Key(
+                              'life-counter-set-life-backspace',
+                            ),
+                            label: 'DEL',
                             onTap: _backspace,
                           ),
                         ],
@@ -5063,7 +5325,7 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                           child: const Text(
                             'CANCEL',
                             style: TextStyle(
-                              color: Color(0xFFFF2C77),
+                              color: AppTheme.lifeCounterPink,
                               fontSize: AppTheme.fontMd,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 0.8,
@@ -5115,37 +5377,50 @@ class _SetLifeKeypadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(22),
-        onTap: onTap,
-        child: Ink(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            color: const Color(0xFF454257),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
+    final semanticLabel =
+        destructive
+            ? 'Limpar valor'
+            : label == 'DEL'
+            ? 'Apagar ultimo digito'
+            : 'Adicionar digito $label';
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: onTap,
+            child: Ink(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: AppTheme.lifeCounterNeutralChip,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color:
-                    destructive
-                        ? const Color(0xFFFF2C77)
-                        : Colors.white.withValues(alpha: 0.96),
-                fontSize: label == 'âŒ«' ? 22 : 30,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.4,
+              child: Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color:
+                        destructive
+                            ? AppTheme.lifeCounterPink
+                            : Colors.white.withValues(alpha: 0.96),
+                    fontSize: label == 'DEL' ? 17 : 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: label == 'DEL' ? 1.2 : 0.4,
+                  ),
+                ),
               ),
             ),
           ),
@@ -5218,10 +5493,12 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.76),
+              child: Semantics(
+                button: true,
+                label: 'Fechar ajuste de vida',
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(color: Colors.black.withValues(alpha: 0.76)),
                 ),
               ),
             ),
@@ -5385,7 +5662,7 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                                   child: const Text(
                                     'CANCEL',
                                     style: TextStyle(
-                                      color: Color(0xFFFF2C77),
+                                      color: AppTheme.lifeCounterPink,
                                       fontSize: AppTheme.fontMd,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.8,
@@ -5440,41 +5717,56 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          width: 62,
-          height: 62,
-          decoration: BoxDecoration(
-            color: const Color(0xFF171717),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: destructive ? 0.06 : 0.08),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+    final semanticLabel =
+        destructive
+            ? 'Limpar valor'
+            : label == 'DEL'
+            ? 'Apagar ultimo digito'
+            : 'Adicionar digito $label';
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(999),
+            onTap: onTap,
+            child: Ink(
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(
+                color: AppTheme.lifeCounterSheetDark,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withValues(
+                    alpha: destructive ? 0.06 : 0.08,
+                  ),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color:
-                    destructive
-                        ? const Color(0xFFFF2C77)
-                        : Colors.white.withValues(alpha: 0.96),
-                fontSize: label == 'DEL' ? 17 : 30,
-                fontWeight: FontWeight.w900,
-                letterSpacing: label == 'DEL' ? 1.2 : 0.4,
+              child: Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color:
+                        destructive
+                            ? AppTheme.lifeCounterPink
+                            : Colors.white.withValues(alpha: 0.96),
+                    fontSize: label == 'DEL' ? 17 : 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: label == 'DEL' ? 1.2 : 0.4,
+                  ),
+                ),
               ),
             ),
           ),
@@ -5677,16 +5969,14 @@ class _CountersOverlayState extends State<_CountersOverlay> {
         key: const Key('life-counter-counters-sheet'),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _OverlaySectionHeading(
-            widget.playerLabel.toUpperCase(),
-          ),
+          _OverlaySectionHeading(widget.playerLabel.toUpperCase()),
           const SizedBox(height: 12),
           _CounterRow(
             rowKey: const Key('life-counter-poison-row'),
             valueKey: const Key('life-counter-poison-value'),
             icon: Icons.coronavirus,
             label: 'TOXIC',
-            sublabel: _poison >= 10 ? 'â˜  LETAL (â‰¥10)' : '10 = derrota',
+            sublabel: _poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
             value: _poison,
             color: AppTheme.success,
             isLethal: _poison >= 10,
@@ -5696,9 +5986,7 @@ class _CountersOverlayState extends State<_CountersOverlay> {
           const SizedBox(height: 12),
           _CounterRow(
             rowKey: const Key('life-counter-commander-casts-row'),
-            sublabelKey: const Key(
-              'life-counter-commander-casts-sublabel',
-            ),
+            sublabelKey: const Key('life-counter-commander-casts-sublabel'),
             valueKey: const Key('life-counter-commander-casts-value'),
             icon: Icons.local_fire_department_outlined,
             label: 'CAST TAX',
@@ -5732,7 +6020,7 @@ class _CountersOverlayState extends State<_CountersOverlay> {
               child: _CounterRow(
                 icon: Icons.shield,
                 label: 'De ${widget.playerLabels[sourceIdx]}',
-                sublabel: dmg >= 21 ? 'â˜  LETAL (â‰¥21)' : null,
+                sublabel: dmg >= 21 ? '☠ LETAL (≥21)' : null,
                 value: dmg,
                 color: widget.playerColors[sourceIdx],
                 isLethal: dmg >= 21,
@@ -5830,10 +6118,7 @@ class _CommanderDamageQuickOverlayState
                 'life-counter-quick-commander-damage-lethal-summary',
               ),
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: AppTheme.error.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(18),
@@ -6095,11 +6380,7 @@ class _CounterRow extends StatelessWidget {
             ),
           ),
           // Plus button
-          _RoundButton(
-            icon: Icons.add,
-            color: color,
-            onTap: onIncrement,
-          ),
+          _RoundButton(icon: Icons.add, color: color, onTap: onIncrement),
         ],
       ),
     );
@@ -6125,26 +6406,40 @@ class _RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        key: buttonKey,
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color:
-                enabled
-                    ? color.withValues(alpha: 0.15)
-                    : AppTheme.outlineMuted.withValues(alpha: 0.3),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: enabled ? color : AppTheme.textHint,
+    final semanticLabel =
+        icon == Icons.add
+            ? 'Aumentar valor'
+            : icon == Icons.remove
+            ? 'Diminuir valor'
+            : 'Acao do contador';
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: buttonKey,
+            borderRadius: BorderRadius.circular(20),
+            onTap: onTap,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    enabled
+                        ? color.withValues(alpha: 0.15)
+                        : AppTheme.outlineMuted.withValues(alpha: 0.3),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: enabled ? color : AppTheme.textHint,
+              ),
+            ),
           ),
         ),
       ),
@@ -6156,7 +6451,7 @@ class _RoundButton extends StatelessWidget {
 // Settings Overlay
 // ---------------------------------------------------------------------------
 
-/// Overlay de mesa para configurar nÃºmero de jogadores e vida inicial.
+/// Overlay de mesa para configurar número de jogadores e vida inicial.
 class _SettingsSheet extends StatelessWidget {
   final int twoPlayerStartingLife;
   final int multiPlayerStartingLife;
@@ -6296,31 +6591,46 @@ class _StartingLifePresetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Ink(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFFC81E) : Colors.transparent,
+    final semanticLabel = 'Selecionar vida inicial $life';
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: Material(
+          key: buttonKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: selected ? const Color(0xFFFFC81E) : Colors.white,
-              width: 2,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              '$life',
-              style: TextStyle(
-                color: selected ? Colors.black : Colors.white,
-                fontSize: AppTheme.fontLg,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -0.4,
+            onTap: onTap,
+            child: Ink(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color:
+                    selected
+                        ? AppTheme.lifeCounterSettingsSelected
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color:
+                      selected
+                          ? AppTheme.lifeCounterSettingsSelected
+                          : Colors.white,
+                  width: 2,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  '$life',
+                  style: TextStyle(
+                    color: selected ? Colors.black : Colors.white,
+                    fontSize: AppTheme.fontLg,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.4,
+                  ),
+                ),
               ),
             ),
           ),
@@ -6356,14 +6666,22 @@ class _SettingsToggleRow extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: selected ? const Color(0xFF1C78FF) : Colors.white,
+              color:
+                  selected ? AppTheme.lifeCounterSettingsRadio : Colors.white,
               width: 2.2,
             ),
-            color: selected ? const Color(0xFF1C78FF) : Colors.transparent,
+            color:
+                selected
+                    ? AppTheme.lifeCounterSettingsRadio
+                    : Colors.transparent,
           ),
           child:
               selected
-                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
+                  ? const Icon(
+                    Icons.check_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  )
                   : null,
         ),
         const SizedBox(width: 12),

@@ -38,7 +38,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
         title: const Text('Buscar Usuários'),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
       ),
       body: Column(
         children: [
@@ -54,12 +54,10 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
               decoration: InputDecoration(
                 hintText: 'Buscar por nome de usuário...',
                 hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: AppTheme.primarySoft,
-                ),
+                prefixIcon: const Icon(Icons.search, color: AppTheme.brass400),
                 suffixIcon: IconButton(
                   key: const Key('user-search-clear-button'),
+                  tooltip: 'Limpar busca',
                   icon: const Icon(
                     Icons.clear,
                     color: AppTheme.textSecondary,
@@ -90,9 +88,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
               builder: (context, provider, _) {
                 if (provider.isSearching) {
                   return const Center(
-                    child: CircularProgressIndicator(
-                      color: AppTheme.manaViolet,
-                    ),
+                    child: CircularProgressIndicator(color: AppTheme.brass500),
                   );
                 }
 
@@ -205,7 +201,7 @@ class _UserSearchCard extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
+                backgroundColor: AppTheme.brass400.withValues(alpha: 0.16),
                 backgroundImage:
                     user.avatarUrl != null
                         ? CachedNetworkImageProvider(user.avatarUrl!)
@@ -215,7 +211,7 @@ class _UserSearchCard extends StatelessWidget {
                         ? Text(
                           user.username[0].toUpperCase(),
                           style: const TextStyle(
-                            color: AppTheme.manaViolet,
+                            color: AppTheme.brass400,
                             fontWeight: FontWeight.bold,
                             fontSize: AppTheme.fontXl,
                           ),
@@ -250,7 +246,7 @@ class _UserSearchCard extends StatelessWidget {
                         Icon(
                           Icons.style,
                           size: 13,
-                          color: AppTheme.primarySoft.withValues(alpha: 0.7),
+                          color: AppTheme.brass400.withValues(alpha: 0.72),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -264,7 +260,7 @@ class _UserSearchCard extends StatelessWidget {
                         Icon(
                           Icons.people,
                           size: 13,
-                          color: AppTheme.manaViolet.withValues(alpha: 0.7),
+                          color: AppTheme.brass400.withValues(alpha: 0.72),
                         ),
                         const SizedBox(width: 4),
                         Text(

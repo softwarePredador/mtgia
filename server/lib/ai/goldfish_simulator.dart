@@ -12,6 +12,7 @@ class GoldfishResult {
   final double turn2PlayRate;
   final double turn3PlayRate;
   final double turn4PlayRate;
+  final double noPlayTurn3Rate;
   final double avgCmc;
   final int landCount;
   final Map<int, int> cmcDistribution; // CMC -> quantidade
@@ -25,6 +26,7 @@ class GoldfishResult {
     required this.turn2PlayRate,
     required this.turn3PlayRate,
     required this.turn4PlayRate,
+    required this.noPlayTurn3Rate,
     required this.avgCmc,
     required this.landCount,
     required this.cmcDistribution,
@@ -72,6 +74,10 @@ class GoldfishResult {
       recs.add(
           'Curva de 2 mana fraca (${(turn2PlayRate * 100).toStringAsFixed(0)}%). Adicione mais cartas de 2 CMC.');
     }
+    if (noPlayTurn3Rate > 0.12) {
+      recs.add(
+          'Alta taxa sem jogada até o turno 3 (${(noPlayTurn3Rate * 100).toStringAsFixed(0)}%). Priorize ramp, compra ou interação barata.');
+    }
     if (avgCmc > 3.5) {
       recs.add(
           'CMC médio alto (${avgCmc.toStringAsFixed(2)}). Deck pode ser lento; adicione mais cartas baratas.');
@@ -107,6 +113,7 @@ class GoldfishResult {
           'turn_2_play': double.parse(turn2PlayRate.toStringAsFixed(3)),
           'turn_3_play': double.parse(turn3PlayRate.toStringAsFixed(3)),
           'turn_4_play': double.parse(turn4PlayRate.toStringAsFixed(3)),
+          'no_play_turn_3': double.parse(noPlayTurn3Rate.toStringAsFixed(3)),
           'cmc_distribution':
               cmcDistribution.map((k, v) => MapEntry(k.toString(), v)),
         },
@@ -135,6 +142,7 @@ class GoldfishSimulator {
     int turn2Plays = 0;
     int turn3Plays = 0;
     int turn4Plays = 0;
+    int noPlayTurn3Hands = 0;
 
     // Expande o deck (quantidade de cada carta)
     final expandedDeck = _expandDeck();
@@ -181,8 +189,13 @@ class GoldfishSimulator {
       if (draws.length > 1) cardsAvailable.add(draws[1]);
       landsPlayed = _playLandIfPossible(cardsAvailable, landsPlayed,
           colorSources: colorSources);
-      if (_canPlayOnTurn(cardsAvailable, 3, landsPlayed,
-          colorSources: colorSources)) turn3Plays++;
+      final hasTurn3Play = _canPlayOnTurn(cardsAvailable, 3, landsPlayed,
+          colorSources: colorSources);
+      if (hasTurn3Play) {
+        turn3Plays++;
+      } else {
+        noPlayTurn3Hands++;
+      }
 
       // Turno 4
       if (draws.length > 2) cardsAvailable.add(draws[2]);
@@ -201,6 +214,7 @@ class GoldfishSimulator {
       turn2PlayRate: turn2Plays / simulations,
       turn3PlayRate: turn3Plays / simulations,
       turn4PlayRate: turn4Plays / simulations,
+      noPlayTurn3Rate: noPlayTurn3Hands / simulations,
       avgCmc: _calculateAvgCmc(),
       landCount: _countLands(),
       cmcDistribution: _getCmcDistribution(),

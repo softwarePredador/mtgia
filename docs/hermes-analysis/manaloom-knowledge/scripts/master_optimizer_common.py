@@ -29,7 +29,7 @@ REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
-DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v8.py"))
+DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v9.py"))
 
 PROTECTED_CARDS = {
     "Lorehold, the Historian",
@@ -114,12 +114,25 @@ def connect(db_path: Path = DEFAULT_DB) -> sqlite3.Connection:
     return conn
 
 
-def run_command(command: list[str], cwd: Path | None = None, timeout: int = 900) -> tuple[int, str]:
+def run_command(
+    command: list[str],
+    cwd: Path | None = None,
+    timeout: int = 900,
+    env_extra: dict[str, str] | None = None,
+) -> tuple[int, str]:
+    env = os.environ.copy()
+    env.setdefault("PYTHONIOENCODING", "utf-8")
+    env.setdefault("PYTHONUTF8", "1")
+    if env_extra:
+        env.update(env_extra)
     completed = subprocess.run(
         command,
         cwd=str(cwd) if cwd else None,
+        env=env,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         timeout=timeout,
     )
     output = (completed.stdout or "") + ("\n" + completed.stderr if completed.stderr else "")
@@ -167,7 +180,7 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             deck_id INTEGER NOT NULL,
             deck_hash TEXT NOT NULL,
-            battle_version TEXT NOT NULL DEFAULT 'battle_analyst_v8',
+            battle_version TEXT NOT NULL DEFAULT 'battle_analyst_v9',
             games_per_opponent INTEGER NOT NULL,
             opponents INTEGER NOT NULL,
             total_games INTEGER NOT NULL,
@@ -421,7 +434,21 @@ def run_battle(games_per_opponent: int, battle_path: Path = DEFAULT_BATTLE) -> B
     tmp_path = battle_path.with_name("_battle_optimizer_tmp.py")
     tmp_path.write_text(patched, encoding="utf-8")
     try:
-        code, output = run_command([sys.executable, str(tmp_path)], cwd=SCRIPT_DIR, timeout=1200)
+        env_extra = {}
+        metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
+        if metrics_dir:
+            Path(metrics_dir).mkdir(parents=True, exist_ok=True)
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            env_extra["MANALOOM_ENGINE_METRICS_OUT"] = str(
+                Path(metrics_dir)
+                / f"battle_engine_metrics_{battle_path.stem}_{games_per_opponent}_{stamp}.json"
+            )
+        code, output = run_command(
+            [sys.executable, str(tmp_path)],
+            cwd=SCRIPT_DIR,
+            timeout=1200,
+            env_extra=env_extra,
+        )
         if code != 0:
             raise RuntimeError(output[-2000:])
         return parse_battle_output(output, games_per_opponent)
@@ -447,6 +474,26 @@ def card_metadata(conn: sqlite3.Connection, card_name: str) -> sqlite3.Row | Non
     ).fetchone()
 
 
+def battle_rule_deck_category(conn: sqlite3.Connection, card_name: str) -> str | None:
+    table = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='battle_card_rules'"
+    ).fetchone()
+    if not table:
+        return None
+    row = conn.execute(
+        "SELECT deck_role_json FROM battle_card_rules WHERE normalized_name=?",
+        (normalize_name(card_name),),
+    ).fetchone()
+    if not row:
+        return None
+    try:
+        role = json.loads(str(row["deck_role_json"] or "{}"))
+    except Exception:
+        return None
+    category = role.get("category") if isinstance(role, dict) else None
+    return str(category) if category else None
+
+
 def json_list(value: object) -> list[str]:
     if not value:
         return []
@@ -462,16 +509,36 @@ def json_list(value: object) -> list[str]:
 
 
 def deck_commander_identity(conn: sqlite3.Connection, deck_id: int) -> set[str]:
-    row = conn.execute(
-        """
-        SELECT c.color_identity
-        FROM decks d
-        JOIN commanders c ON c.id=d.commander_id
-        WHERE d.id=?
-        """,
-        (deck_id,),
+    raw = "RW"
+    commanders_table = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='commanders'"
     ).fetchone()
-    raw = str(row["color_identity"] if row else "RW")
+    deck_columns = {row[1] for row in conn.execute("PRAGMA table_info(decks)")}
+    if commanders_table and "commander_id" in deck_columns:
+        row = conn.execute(
+            """
+            SELECT c.color_identity
+            FROM decks d
+            JOIN commanders c ON c.id=d.commander_id
+            WHERE d.id=?
+            """,
+            (deck_id,),
+        ).fetchone()
+        raw = str(row["color_identity"] if row else raw)
+    else:
+        row = conn.execute(
+            """
+            SELECT coc.color_identity_json
+            FROM deck_cards dc
+            LEFT JOIN card_oracle_cache coc ON coc.normalized_name=lower(dc.card_name)
+            WHERE dc.deck_id=? AND dc.is_commander=1
+            LIMIT 1
+            """,
+            (deck_id,),
+        ).fetchone()
+        values = json_list(row["color_identity_json"] if row else None)
+        if values:
+            raw = "".join(values)
     return {char for char in raw.upper() if char in {"W", "U", "B", "R", "G"}}
 
 
@@ -493,6 +560,11 @@ def game_changer_names(conn: sqlite3.Connection) -> set[str]:
 
 
 def commander_legality(conn: sqlite3.Connection, card_name: str) -> str | None:
+    table = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='card_legalities'"
+    ).fetchone()
+    if not table:
+        return "legal"
     row = conn.execute(
         """
         SELECT status FROM card_legalities
@@ -562,7 +634,11 @@ def quality_gate_candidate(
         str(removed[0]["type_line"] if removed else ""),
         str(removed[0]["oracle_text"] if removed else ""),
     )
-    added_role = infer_role("", type_line, str(meta["oracle_text"] if meta else ""))
+    added_role = infer_role(
+        battle_rule_deck_category(conn, card_added) or "",
+        type_line,
+        str(meta["oracle_text"] if meta else ""),
+    )
     if removed_role and removed_role != added_role:
         role_count = count_role(rows, removed_role)
         minimum = ROLE_FAMILIES[removed_role]["minimum"]

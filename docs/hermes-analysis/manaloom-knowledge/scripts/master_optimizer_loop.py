@@ -23,13 +23,13 @@ DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
 REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 
 DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
-DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v8.py"
+DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v9.py"
 DEFAULT_BATTLE_TEST = SCRIPT_DIR / "test_battle_analyst_v10_3.py"
 DEFAULT_SLOT_OPTIMIZER = SCRIPT_DIR / "slot_optimizer.py"
 DEFAULT_UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 DEFAULT_SYNC_METADATA = SCRIPT_DIR / "sync_pg_card_metadata_to_hermes.py"
 DEFAULT_SYNC_META_DECKS = SCRIPT_DIR / "sync_pg_meta_decks_to_hermes.py"
-DEFAULT_SYNC_BATTLE_RULES = SCRIPT_DIR / "sync_battle_card_rules.py"
+DEFAULT_SYNC_BATTLE_RULES = SCRIPT_DIR / "sync_battle_card_rules_pg.py"
 DEFAULT_EFFECT_COVERAGE_AUDIT = SCRIPT_DIR / "battle_effect_coverage_audit.py"
 
 ESSENTIAL_TABLES = {
@@ -168,13 +168,20 @@ def run_preflight(args: argparse.Namespace) -> list[CheckResult]:
 
     if not args.skip_tests:
         code, output = run_command(
-            [sys.executable, "-m", "py_compile", str(args.battle), str(args.sync_metadata)]
+            [
+                sys.executable,
+                "-m",
+                "py_compile",
+                str(args.battle),
+                str(args.sync_metadata),
+                str(args.sync_battle_rules),
+            ]
         )
         checks.append(
             CheckResult(
                 "python_compile",
                 "ok" if code == 0 else "error",
-                "battle and metadata sync compile"
+                "battle, metadata sync and battle rules sync compile"
                 if code == 0
                 else output[-500:],
             )
@@ -253,8 +260,9 @@ def print_plan() -> None:
 3. Slot scan: test one swap at a time and always restore baseline.
 4. Full confirm: retest promising swaps with more games.
 5. Quality gate: validate mana, curve, roles, bracket, lands, commander plan.
-6. Replay audit: inspect wrong decisions before trusting optimizer output.
-7. Handoff: write approved swaps, risks, evidence, and battle fixes.
+6. Forensic audit: inspect one fixed-seed battle event by event and flag rule gaps.
+7. Replay audit: inspect wrong decisions before trusting optimizer output.
+8. Handoff: write approved swaps, risks, evidence, and battle fixes.
 """
     )
 

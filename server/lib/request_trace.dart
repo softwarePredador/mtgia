@@ -47,11 +47,3 @@ String resolveRequestId(
 
 RequestTrace getRequestTrace(RequestContext context) =>
     context.read<RequestTrace>();
-
-String? tryGetRequestId(RequestContext context) {
-  try {
-    return getRequestTrace(context).requestId;
-  } catch (_) {
-    return null;
-  }
-}

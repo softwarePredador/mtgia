@@ -25,6 +25,7 @@ Future<Response> onRequest(RequestContext context) async {
     final myDeckId = body['my_deck_id'] as String?;
     final opponentDeckId = body['opponent_deck_id'] as String?;
     final simulationCount = body['simulations'] as int? ?? 50;
+    final userId = context.read<String>();
 
     if (myDeckId == null || opponentDeckId == null) {
       return badRequest('my_deck_id and opponent_deck_id are required');
@@ -34,8 +35,17 @@ Future<Response> onRequest(RequestContext context) async {
     final countersService = ArchetypeCountersService(pool);
 
     // 1. Buscar dados de ambos os decks
-    final myDeckData = await _getDeckData(pool, myDeckId);
-    final opponentDeckData = await _getDeckData(pool, opponentDeckId);
+    final myDeckData = await _getDeckData(
+      pool,
+      myDeckId,
+      userId: userId,
+    );
+    final opponentDeckData = await _getDeckData(
+      pool,
+      opponentDeckId,
+      userId: userId,
+      allowPublicDeck: true,
+    );
 
     if (myDeckData == null) {
       return notFound('Your deck not found');
@@ -73,11 +83,28 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 /// Busca dados completos de um deck
-Future<Map<String, dynamic>?> _getDeckData(Pool pool, String deckId) async {
+Future<Map<String, dynamic>?> _getDeckData(
+  Pool pool,
+  String deckId, {
+  required String userId,
+  bool allowPublicDeck = false,
+}) async {
   try {
     final deckResult = await pool.execute(
-      Sql.named('SELECT id, name, format FROM decks WHERE id = @id'),
-      parameters: {'id': deckId},
+      Sql.named('''
+        SELECT id, name, format
+        FROM decks
+        WHERE id = CAST(@id AS uuid)
+          AND (
+            user_id = CAST(@user_id AS uuid)
+            OR (CAST(@allow_public AS boolean) AND is_public = true)
+          )
+      '''),
+      parameters: {
+        'id': deckId,
+        'user_id': userId,
+        'allow_public': allowPublicDeck,
+      },
     );
 
     if (deckResult.isEmpty) return null;
@@ -352,6 +379,11 @@ Future<Response> _analyzeMatchup({
 
   final winRate = wins / simulationCount;
   final avgTurns = totalTurns / simulationCount;
+  final previousMatchup = await _loadStoredMatchup(
+    pool,
+    myDeck['id'] as String,
+    opponentDeck['id'] as String,
+  );
 
   // Salvar resultado no banco
   try {
@@ -395,6 +427,13 @@ Future<Response> _analyzeMatchup({
       'win_rate_numeric': winRate,
       'average_game_length': avgTurns.toStringAsFixed(1),
     },
+    'stored_matchup': {
+      'previous': previousMatchup,
+      'current': {
+        'win_rate_numeric': winRate,
+        'notes': 'Auto-generated: ${advantages.join(", ")}',
+      },
+    },
     'analysis': {
       'base_win_chance': myScore,
       'advantages': advantages,
@@ -406,6 +445,38 @@ Future<Response> _analyzeMatchup({
     },
     'matchup_verdict': _getMatchupVerdict(winRate),
   });
+}
+
+Future<Map<String, dynamic>?> _loadStoredMatchup(
+  Pool pool,
+  String deckId,
+  String opponentDeckId,
+) async {
+  try {
+    final rows = await pool.execute(
+      Sql.named('''
+        SELECT win_rate, notes, updated_at
+        FROM deck_matchups
+        WHERE deck_id = CAST(@deck_id AS uuid)
+          AND opponent_deck_id = CAST(@opponent_deck_id AS uuid)
+        LIMIT 1
+      '''),
+      parameters: {
+        'deck_id': deckId,
+        'opponent_deck_id': opponentDeckId,
+      },
+    );
+    if (rows.isEmpty) return null;
+    final m = rows.first.toColumnMap();
+    return {
+      'win_rate_numeric': (m['win_rate'] as num?)?.toDouble(),
+      'notes': m['notes'],
+      'updated_at': m['updated_at']?.toString(),
+    };
+  } catch (e) {
+    print('[simulate-matchup] stored matchup unavailable: $e');
+    return null;
+  }
 }
 
 /// Retorna modificador de win rate baseado em matchup de arquétipos

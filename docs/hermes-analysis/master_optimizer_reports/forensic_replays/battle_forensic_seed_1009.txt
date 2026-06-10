@@ -1,0 +1,328 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Kraum, Ludevic's Opus #86 (real), Thrasios, Triton Hero #101 (real), Elsha of the Infinite #96 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 2 mulligan(s), 6 cards, 3 lands
+  Kraum, Ludevic's Opus #86 (real): 1 mulligan(s), 7 cards, 2 lands
+  Thrasios, Triton Hero #101 (real): 0 mulligan(s), 7 cards, 2 lands
+  Elsha of the Infinite #96 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=6 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=0
+  MANA Elsha of the Infinite #96 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=2
+  MANA Lorehold: 4 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=1
+  MANA Kraum, Ludevic's Opus #86 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=3 Grave=1 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Elsha of the Infinite #96 (real) | Life=40 Hand=6 Board=2
+  MANA Elsha of the Infinite #96 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Elsha of the Infinite #96 (real): Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 5 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=5 Grave=1 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 3 - Elsha of the Infinite #96 (real) | Life=40 Hand=6 Board=4
+  MANA Elsha of the Infinite #96 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=5 Board=4
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Lorehold: Swords to Plowshares (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Swords to Plowshares removed Kraum, Ludevic's Opus from Kraum, Ludevic's Opus #86 (real)
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Brain Freeze (CMC=2.0) [finisher] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=4 Board=4 Grave=3 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=1
+
+TURN 4 - Elsha of the Infinite #96 (real) | Life=40 Hand=6 Board=6
+  MANA Elsha of the Infinite #96 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=7 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=36 Hand=4 Board=5
+  MANA Lorehold: 7 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  RESOLVE Lorehold: Giver of Runes (CMC=1.0) [indestructible] rule=curated/verified
+  END Lorehold: Life=36 Hand=3 Board=6 Grave=2 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=4 Board=4
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Faerie Mastermind (CMC=2.0) [draw_engine] rule=curated/verified
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Tainted Pact (CMC=2.0) [draw_cards] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=5 Grave=4 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=2 Grave=3 Discarded=1
+
+TURN 5 - Elsha of the Infinite #96 (real) | Life=40 Hand=6 Board=7
+  MANA Elsha of the Infinite #96 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=40 Hand=7 Board=7 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=32 Hand=3 Board=6
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  END Lorehold: Life=32 Hand=4 Board=6 Grave=2 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Imperial Seal (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=32)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 2 player damage, target life 30, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=6 Grave=5 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=2
+  MANA Thrasios, Triton Hero #101 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=3 Discarded=0
+
+TURN 6 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=7
+  MANA Elsha of the Infinite #96 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=30)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 26, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=40 Hand=7 Board=8 Grave=0 Discarded=0
+
+TURN 7 - Lorehold | Life=26 Hand=4 Board=6
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0})
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=26 Hand=4 Board=8 Grave=2 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=26)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 2 player damage, target life 24, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=6 Grave=7 Discarded=2
+
+TURN 7 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=4 Discarded=1
+
+TURN 7 - Elsha of the Infinite #96 (real) | Life=35 Hand=7 Board=8
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=35 Hand=7 Board=8 Grave=1 Discarded=1
+
+TURN 8 - Lorehold | Life=20 Hand=4 Board=8
+  MANA Lorehold: 9 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Lorehold: Imperial Recruiter (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Imperial Recruiter found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 5 player damage, target life 30, target_dead=False
+  END Lorehold: Life=20 Hand=4 Board=9 Grave=3 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=20)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 2 player damage, target life 18, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=8 Grave=8 Discarded=1
+
+TURN 8 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=5 Discarded=1
+
+TURN 8 - Elsha of the Infinite #96 (real) | Life=30 Hand=7 Board=8
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=18)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 14, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=30 Hand=7 Board=8 Grave=2 Discarded=1
+
+TURN 9 - Lorehold | Life=14 Hand=4 Board=9
+  MANA Lorehold: 10 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  RESOLVE Lorehold: Electroduplicate (CMC=3.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 5 player damage, target life 25, target_dead=False
+  END Lorehold: Life=14 Hand=3 Board=11 Grave=4 Discarded=0
+
+TURN 9 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=14)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 6 player damage, target life 8, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=9 Grave=9 Discarded=1
+
+TURN 9 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=3 Grave=6 Discarded=1
+
+TURN 9 - Elsha of the Infinite #96 (real) | Life=25 Hand=7 Board=8
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 8 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 10 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=9
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=25)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 6 player damage, target life 19, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=10 Grave=12 Discarded=3
+
+TURN 10 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=3
+  MANA Thrasios, Triton Hero #101 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=5 Grave=6 Discarded=0
+
+TURN 10 - Elsha of the Infinite #96 (real) | Life=19 Hand=8 Board=8
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 36, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=19 Hand=7 Board=8 Grave=4 Discarded=2
+
+TURN 11 - Kraum, Ludevic's Opus #86 (real) | Life=36 Hand=7 Board=10
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=19)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 6 player damage, target life 13, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=36 Hand=7 Board=11 Grave=14 Discarded=2
+
+TURN 11 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #101 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=13)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 9, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=5 Grave=7 Discarded=1
+
+TURN 11 - Elsha of the Infinite #96 (real) | Life=9 Hand=7 Board=8
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Elsha of the Infinite #96 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 32, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=9 Hand=7 Board=8 Grave=5 Discarded=1
+
+TURN 12 - Kraum, Ludevic's Opus #86 (real) | Life=32 Hand=7 Board=11
+  MANA Kraum, Ludevic's Opus #86 (real): 8 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Demonic Consultation (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=9)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 6 player damage, target life 3, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=32 Hand=7 Board=13 Grave=16 Discarded=1
+
+TURN 12 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=5
+  MANA Thrasios, Triton Hero #101 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life -1, target_dead=True
+  >>> DIED: Elsha of the Infinite #96 (real) (life_zero) <<<
+
+TURN 13 - Kraum, Ludevic's Opus #86 (real) | Life=32 Hand=7 Board=13
+  MANA Kraum, Ludevic's Opus #86 (real): 10 available (10 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=40)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 6 player damage, target life 34, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=32 Hand=7 Board=14 Grave=18 Discarded=2
+
+TURN 13 - Thrasios, Triton Hero #101 (real) | Life=34 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 28, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Mystical Tutor (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Kraum, Ludevic's Opus #86 (real): Mystical Tutor found Force of Will (any)
+  END Thrasios, Triton Hero #101 (real): Life=34 Hand=7 Board=6 Grave=8 Discarded=1
+
+TURN 14 - Kraum, Ludevic's Opus #86 (real) | Life=28 Hand=7 Board=14
+  MANA Kraum, Ludevic's Opus #86 (real): 11 available (11 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Diabolic Intent (CMC=2.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Kraum, Ludevic's Opus #86 (real): Diabolic Intent found Smothering Tithe (any)
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=34)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 6 player damage, target life 28, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=28 Hand=7 Board=15 Grave=22 Discarded=2
+
+TURN 14 - Thrasios, Triton Hero #101 (real) | Life=28 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 24, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Intuition (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Kraum, Ludevic's Opus #86 (real): Intuition found The One Ring (any)
+  END Thrasios, Triton Hero #101 (real): Life=28 Hand=7 Board=6 Grave=9 Discarded=1
+
+TURN 15 - Kraum, Ludevic's Opus #86 (real) | Life=24 Hand=7 Board=15
+  MANA Kraum, Ludevic's Opus #86 (real): 12 available (12 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=28)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 6 player damage, target life 22, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=24 Hand=7 Board=17 Grave=25 Discarded=2
+
+TURN 15 - Thrasios, Triton Hero #101 (real) | Life=22 Hand=7 Board=6
+  MANA Thrasios, Triton Hero #101 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 20, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=22 Hand=7 Board=7 Grave=9 Discarded=0
+
+TURN 16 - Kraum, Ludevic's Opus #86 (real) | Life=20 Hand=7 Board=17
+  MANA Kraum, Ludevic's Opus #86 (real): 13 available (13 sources, 0 treasures, pool={'generic': 11, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Vampiric Tutor (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=22)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 6 player damage, target life 16, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=20 Hand=7 Board=19 Grave=30 Discarded=4
+
+TURN 16 - Thrasios, Triton Hero #101 (real) | Life=16 Hand=7 Board=7
+  MANA Thrasios, Triton Hero #101 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 16, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Swan Song (CMC=1.0) [counter] rule=curated/verified
+  END Thrasios, Triton Hero #101 (real): Life=16 Hand=7 Board=8 Grave=9 Discarded=0
+
+TURN 17 - Kraum, Ludevic's Opus #86 (real) | Life=16 Hand=6 Board=19
+  MANA Kraum, Ludevic's Opus #86 (real): 15 available (15 sources, 0 treasures, pool={'generic': 13, 'white': 0, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Mana Vault (CMC=1.0) [ramp_permanent] rule=curated/verified
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Mox Diamond (CMC=0.0) [ramp_permanent] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=16)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 6 player damage, target life 10, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=16 Hand=6 Board=24 Grave=31 Discarded=0
+
+TURN 17 - Thrasios, Triton Hero #101 (real) | Life=10 Hand=7 Board=8
+  MANA Thrasios, Triton Hero #101 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 12, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Flusterstorm (CMC=1.0) [counter] rule=curated/verified
+  END Thrasios, Triton Hero #101 (real): Life=10 Hand=7 Board=9 Grave=9 Discarded=0
+
+TURN 18 - Kraum, Ludevic's Opus #86 (real) | Life=12 Hand=6 Board=24
+  MANA Kraum, Ludevic's Opus #86 (real): 23 available (20 sources, 0 treasures, pool={'generic': 16, 'white': 1, 'blue': 1, 'black': 1, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=10)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Thrasios, Triton Hero #101 (real): 10 player damage, target life 0, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #101 (real) (commander_damage) <<<
+
+GAME OVER - Turn 18
+Winner: Kraum, Ludevic's Opus #86 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=3
+Kraum, Ludevic's Opus #86 (real): ALIVE Life=12 Hand=7
+Thrasios, Triton Hero #101 (real): DEAD Life=0 Hand=7
+Elsha of the Infinite #96 (real): DEAD Life=-1 Hand=7

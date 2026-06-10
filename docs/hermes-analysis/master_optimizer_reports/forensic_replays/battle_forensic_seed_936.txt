@@ -1,0 +1,300 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Aang, at the Crossroads #106 (real), Terra, Magical Adept #88 (real), Rograkh, Son of Rohgahh #109 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Aang, at the Crossroads #106 (real): 3 mulligan(s), 5 cards, 1 lands
+  Terra, Magical Adept #88 (real): 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #109 (real): 2 mulligan(s), 6 cards, 3 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Aang, at the Crossroads #106 (real) | Life=40 Hand=5 Board=0
+  MANA Aang, at the Crossroads #106 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=0
+  MANA Terra, Magical Adept #88 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Terra, Magical Adept #88 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #109 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Aang, at the Crossroads #106 (real) | Life=40 Hand=5 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Terra, Magical Adept #88 (real) | Life=40 Hand=6 Board=2
+  MANA Terra, Magical Adept #88 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Terra, Magical Adept #88 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=6 Board=1
+  MANA Rograkh, Son of Rohgahh #109 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=5 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=6 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Scroll Rack (CMC=2.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Aang, at the Crossroads #106 (real) | Life=40 Hand=6 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 3 - Terra, Magical Adept #88 (real) | Life=40 Hand=6 Board=3
+  MANA Terra, Magical Adept #88 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #109 (real) | Life=40 Hand=5 Board=3
+  MANA Rograkh, Son of Rohgahh #109 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=40 Hand=5 Board=4 Grave=1 Discarded=0
+
+TURN 4 - Lorehold | Life=36 Hand=5 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 1 player damage, target life 39, target_dead=False
+  RESOLVE Lorehold: Victory Chimes (CMC=3.0) [draw_engine] rule=known_cards_manual/verified
+  END Lorehold: Life=36 Hand=5 Board=9 Grave=1 Discarded=0
+
+TURN 4 - Aang, at the Crossroads #106 (real) | Life=40 Hand=7 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=1
+
+TURN 4 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=3
+  MANA Terra, Magical Adept #88 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #109 (real) | Life=39 Hand=5 Board=4
+  MANA Rograkh, Son of Rohgahh #109 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=39 Hand=6 Board=4 Grave=1 Discarded=0
+
+TURN 5 - Lorehold | Life=32 Hand=5 Board=9
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Rite of the Dragoncaller (artifact_or_enchantment)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 2 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=39)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 2 player damage, target life 37, target_dead=False
+  END Lorehold: Life=32 Hand=6 Board=10 Grave=2 Discarded=0
+
+TURN 5 - Aang, at the Crossroads #106 (real) | Life=40 Hand=7 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=1 Grave=2 Discarded=1
+
+TURN 5 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=5
+  MANA Terra, Magical Adept #88 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Terra, Magical Adept #88 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 5 - Rograkh, Son of Rohgahh #109 (real) | Life=37 Hand=6 Board=4
+  MANA Rograkh, Son of Rohgahh #109 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=37 Hand=7 Board=4 Grave=1 Discarded=0
+
+TURN 6 - Lorehold | Life=24 Hand=6 Board=10
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 3 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=37)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 7 player damage, target life 30, target_dead=False
+  END Lorehold: Life=24 Hand=6 Board=12 Grave=3 Discarded=0
+
+TURN 6 - Aang, at the Crossroads #106 (real) | Life=40 Hand=7 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=1 Grave=3 Discarded=0
+
+TURN 6 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=5
+  MANA Terra, Magical Adept #88 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Terra, Magical Adept #88 (real) -> Lorehold: 4 player damage, target life 20, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=1
+
+TURN 6 - Rograkh, Son of Rohgahh #109 (real) | Life=30 Hand=7 Board=4
+  MANA Rograkh, Son of Rohgahh #109 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 16, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=30 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 7 - Lorehold | Life=16 Hand=6 Board=12
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Mana Geyser (CMC=5.0) [ramp_ritual] rule=curated/verified
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 3 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 7 player damage, target life 23, target_dead=False
+  END Lorehold: Life=16 Hand=5 Board=14 Grave=4 Discarded=0
+
+TURN 7 - Aang, at the Crossroads #106 (real) | Life=40 Hand=7 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=1 Grave=4 Discarded=1
+
+TURN 7 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=5
+  MANA Terra, Magical Adept #88 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Terra, Magical Adept #88 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=6 Grave=2 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #109 (real) | Life=23 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #109 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=23 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 8 - Lorehold | Life=8 Hand=5 Board=14
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=23)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 9 player damage, target life 14, target_dead=False
+  END Lorehold: Life=8 Hand=5 Board=16 Grave=5 Discarded=0
+
+TURN 8 - Aang, at the Crossroads #106 (real) | Life=40 Hand=7 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=1 Grave=5 Discarded=1
+
+TURN 8 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=6
+  MANA Terra, Magical Adept #88 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Terra, Magical Adept #88 (real) -> Lorehold: 4 player damage, target life 4, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=7 Grave=2 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #109 (real) | Life=14 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #109 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 0 player damage, target life 4, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=14 Hand=7 Board=6 Grave=2 Discarded=1
+
+TURN 9 - Lorehold | Life=4 Hand=5 Board=15
+  MANA Lorehold: 9 available (9 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: The One Ring (CMC=4.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #109 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=14)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #109 (real): 9 player damage, target life 5, target_dead=False
+  END Lorehold: Life=4 Hand=4 Board=19 Grave=7 Discarded=0
+
+TURN 9 - Aang, at the Crossroads #106 (real) | Life=40 Hand=7 Board=1
+  MANA Aang, at the Crossroads #106 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=6 Board=3 Grave=5 Discarded=0
+
+TURN 9 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=7
+  MANA Terra, Magical Adept #88 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Lorehold: 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Terra, Magical Adept #88 (real) -> Lorehold: 0 player damage, target life 4, target_dead=False
+  RESOLVE Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=8 Grave=2 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #109 (real) | Life=5 Hand=7 Board=6
+  MANA Rograkh, Son of Rohgahh #109 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Lorehold: 4 player damage, target life 0, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 10 - Aang, at the Crossroads #106 (real) | Life=40 Hand=6 Board=3
+  MANA Aang, at the Crossroads #106 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Aang, at the Crossroads #106 (real): Life=40 Hand=7 Board=4 Grave=5 Discarded=0
+
+TURN 10 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=8
+  MANA Terra, Magical Adept #88 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=5)
+  DAMAGE Terra, Magical Adept #88 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life 1, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=8 Grave=3 Discarded=1
+
+TURN 10 - Rograkh, Son of Rohgahh #109 (real) | Life=1 Hand=8 Board=6
+  MANA Rograkh, Son of Rohgahh #109 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #109 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Rograkh, Son of Rohgahh #109 (real) -> Aang, at the Crossroads #106 (real): 4 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #109 (real): Life=1 Hand=7 Board=6 Grave=4 Discarded=2
+
+TURN 11 - Aang, at the Crossroads #106 (real) | Life=36 Hand=7 Board=4
+  MANA Aang, at the Crossroads #106 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Aang, at the Crossroads #106 (real) -> Rograkh, Son of Rohgahh #109 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=1)
+  DAMAGE Aang, at the Crossroads #106 (real) -> Rograkh, Son of Rohgahh #109 (real): 4 player damage, target life -3, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #109 (real) (life_zero) <<<
+
+TURN 11 - Terra, Magical Adept #88 (real) | Life=40 Hand=7 Board=8
+  MANA Terra, Magical Adept #88 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 4 player damage, target life 32, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=40 Hand=7 Board=9 Grave=3 Discarded=0
+
+TURN 12 - Aang, at the Crossroads #106 (real) | Life=32 Hand=7 Board=5
+  MANA Aang, at the Crossroads #106 (real): 6 available (4 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 36, target_dead=False
+  END Aang, at the Crossroads #106 (real): Life=32 Hand=7 Board=5 Grave=6 Discarded=1
+
+TURN 12 - Terra, Magical Adept #88 (real) | Life=36 Hand=7 Board=9
+  MANA Terra, Magical Adept #88 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 4 player damage, target life 28, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=36 Hand=7 Board=10 Grave=3 Discarded=0
+
+TURN 13 - Aang, at the Crossroads #106 (real) | Life=28 Hand=7 Board=5
+  MANA Aang, at the Crossroads #106 (real): 6 available (4 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 32, target_dead=False
+  END Aang, at the Crossroads #106 (real): Life=28 Hand=7 Board=5 Grave=7 Discarded=1
+
+TURN 13 - Terra, Magical Adept #88 (real) | Life=32 Hand=7 Board=10
+  MANA Terra, Magical Adept #88 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 4 player damage, target life 24, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=32 Hand=7 Board=10 Grave=4 Discarded=1
+
+TURN 14 - Aang, at the Crossroads #106 (real) | Life=24 Hand=7 Board=5
+  MANA Aang, at the Crossroads #106 (real): 6 available (4 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 28, target_dead=False
+  END Aang, at the Crossroads #106 (real): Life=24 Hand=7 Board=5 Grave=8 Discarded=1
+
+TURN 14 - Terra, Magical Adept #88 (real) | Life=28 Hand=7 Board=10
+  MANA Terra, Magical Adept #88 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 4 player damage, target life 20, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=28 Hand=7 Board=11 Grave=4 Discarded=0
+
+TURN 15 - Aang, at the Crossroads #106 (real) | Life=20 Hand=7 Board=5
+  MANA Aang, at the Crossroads #106 (real): 6 available (4 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=28)
+  DAMAGE Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 24, target_dead=False
+  END Aang, at the Crossroads #106 (real): Life=20 Hand=7 Board=6 Grave=8 Discarded=0
+
+TURN 15 - Terra, Magical Adept #88 (real) | Life=24 Hand=7 Board=11
+  MANA Terra, Magical Adept #88 (real): 10 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 4 player damage, target life 16, target_dead=False
+  END Terra, Magical Adept #88 (real): Life=24 Hand=7 Board=11 Grave=5 Discarded=1
+
+TURN 16 - Aang, at the Crossroads #106 (real) | Life=16 Hand=7 Board=6
+  MANA Aang, at the Crossroads #106 (real): 7 available (5 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Aang, at the Crossroads #106 (real) -> Terra, Magical Adept #88 (real): 4 player damage, target life 20, target_dead=False
+  END Aang, at the Crossroads #106 (real): Life=16 Hand=7 Board=7 Grave=8 Discarded=0
+
+TURN 16 - Terra, Magical Adept #88 (real) | Life=20 Hand=7 Board=11
+  MANA Terra, Magical Adept #88 (real): 10 available (10 sources, 0 treasures, pool={'generic': 10, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Terra, Magical Adept #88 (real) -> Aang, at the Crossroads #106 (real): 16 player damage, target life 0, target_dead=True
+  >>> DIED: Aang, at the Crossroads #106 (real) (life_zero) <<<
+
+GAME OVER - Turn 16
+Winner: Terra, Magical Adept #88 (real) (elimination)
+Lorehold: DEAD Life=0 Hand=3
+Aang, at the Crossroads #106 (real): DEAD Life=0 Hand=7
+Terra, Magical Adept #88 (real): ALIVE Life=20 Hand=8
+Rograkh, Son of Rohgahh #109 (real): DEAD Life=-3 Hand=7

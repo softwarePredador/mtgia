@@ -5,10 +5,71 @@
 > guardrails, use `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`.
 > Nao use um resultado antigo deste arquivo como autorizacao de apply sem
 > revalidar contra o SQLite vivo.
+> Nota operacional 2026-06-09: este diário histórico ainda menciona
+> `battle_analyst_v8.py` em eventos antigos. O engine ativo atual é
+> `battle_analyst_v9.py`; crons/optimizer devem usar v9 via
+> `MANALOOM_BATTLE_SCRIPT` ou fallback atual dos scripts.
 
 > Objetivo: transformar o Hermes em um ciclo confiavel de otimizacao por evidencia:
 > simular, detectar erro, propor swap, testar isolado, confirmar em massa, validar regras,
 > aplicar somente se aprovado e documentar o motivo.
+
+## Validacao Hermes runtime — 2026-06-08
+
+Status: pronto para rodar optimizer em modo review/smoke; auditoria forense da bateria Hermes zerada (`critical/high/medium/low = 0`).
+
+- Runtime Hermes atualizado no container com curadoria adicional de staples reais vistos nos oponentes PG/cEDH, incluindo counters, tutors, rituais, mana rocks, stax/passives, remocao, recursion e criaturas com triggers conservadoras.
+- `silence_spell` foi separado de `silence_opponents`: `Silence`/`Orim's Chant` agora bloqueiam respostas so ate o cleanup; permanentes stax continuam usando efeito permanente.
+- `battle_forensic_audit.py` reconhece `silence_spell` como efeito implementado e de impacto.
+- `materialize_learned_deck_to_deck_cards.py` foi criado para transformar `learned_decks.card_list` em `deck_cards`, colapsando duplicatas nao-basicas e completando ate 100 cartas com basico configuravel.
+- Lorehold `learned_deck_id=14` foi materializado em `deck_id=14`: `quantity=100`, `rows=99`, `commander=1`; o baseline agora nao roda mais com deck vazio.
+- `sync_battle_card_rules.py` agora normaliza regras geradas com `card_oracle_cache` antes de gravar `battle_card_rules`, mantendo o cache alinhado ao runtime de `get_card_effect()`.
+- `treasure_maker` agora aceita `draw_count` e custo `requires_discard_card`; ETBs simples de criatura agora cobrem compra, tokens e recursao conservadora.
+- Sync runtime final de `battle_card_rules`: `manual_rows=463`, `input_rows=2064`, `generated_rows=1601`, `oracle_normalized_rows=204`.
+
+Evidencia real no Hermes/container:
+
+- Testes: `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` passou dentro do container.
+- Sync final: `docs/hermes-analysis/master_optimizer_reports/sync_battle_card_rules_hermes_20260608_after_final_curations.md`.
+- Auditoria forense final zerada: `docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_20260608_222739.md`, seeds `1100-1119`, `critical=0`, `high=0`, `medium=0`, `low=0`, status `ready_for_review`.
+- JSON final: `docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_hermes_20260608_seed1100_1119_final_clean.json`.
+- Baseline smoke do Lorehold deck 14: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260608_223208.md`, baseline id `4`, `lands=31`, `avg_cmc=4.147`, `overall_wr=16.7%`, 12 jogos.
+- Slot scan smoke: `slot_optimizer.py --deck-id 14 --games 1 --max-per-category 1 --phase smoke --reset-current-baseline`, `tested=7`, `blocked=0`, `slot_scan=ok`.
+
+Limites desta evidencia:
+
+- O baseline/slot scan acima sao smoke tests com `--games 1`; validam funcionamento ponta a ponta, nao aprovam swap real.
+- O deck 14 ficou com `99` nomes unicos e `100` cartas por quantidade por causa de duplicatas no `card_list` aprendido; o materializador completa a lista, mas a fonte aprendida deve ser revisada se quisermos uma decklist canonica sem preenchimento automatico.
+- Sync PG foi configurado em 2026-06-09 via `/opt/data/secrets/manaloom-postgres.env`; `sync_battle_card_rules_pg.py --apply-pg` e `--apply-sqlite-from-pg` rodaram contra o Postgres real e a auditoria pos-sync ficou com `critical=0` e `high=0`. Ver `docs/hermes-analysis/HERMES_NEXT_STEPS_2026-06-09.md`.
+
+## Tratativas locais de confianca do optimizer — 2026-06-08
+
+Status: battle/optimizer local voltou a executar ponta a ponta em modo smoke, sem apply.
+
+- `battle_analyst_v8.py` recebeu curadoria manual de cartas reais que estavam travando a auditoria forense do Lorehold contra oponentes PG, incluindo removals, ramp de lands, recursao para campo, tutor para cemiterio, permanentes passivos e engines de alvo.
+- `passive` foi adicionado como efeito reconhecido para cartas cujo texto nao deve virar compra/mana/removal imediato no simulador, evitando estatistica falsa em cards como equipamentos, auras e planeswalkers ainda nao modelados com granularidade completa.
+- `master_optimizer_common.py` agora forca UTF-8 em subprocessos Python, evitando crash Windows por emoji/Unicode no output do battle.
+- `slot_optimizer.py` agora usa `tempfile.gettempdir()` como lock default quando `MANALOOM_SLOT_SCAN_LOCK` nao esta definido, evitando falha local em `\tmp\optimizer_v3.lock`.
+- `deck_commander_identity()` e `commander_legality()` ganharam fallback para o SQLite cache local sem tabelas `commanders`/`card_legalities`; em bancos Hermes completos, as tabelas reais continuam tendo prioridade.
+- `quality_gate_candidate()` agora usa `battle_card_rules.deck_role_json.category` como fallback de role do card adicionado, evitando warning falso quando `card_oracle_cache` nao carrega papel funcional direto.
+
+Evidencia local:
+
+- Testes: `python docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` passou com a suite completa.
+- Preflight: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_20260608_154539.md` aprovado.
+- Auditoria forense 970-989: `battle_forensic_audit_local_20260608_seed970_989_after_lorehold_optimizer_blockers_v4.json` com `0` findings.
+- Auditoria forense 990-1029: `battle_forensic_audit_local_20260608_seed990_1029_after_lorehold_optimizer_blockers_v3.json` com `0` findings.
+- Baseline smoke: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260608_155646.md`, deck 6, 12 jogos, 12 oponentes reais, executou sem mutacao.
+- Slot scan smoke/phase1: `Wheel of Fate` sobre `Reforge the Soul` gravado em `slot_benchmarks`, deck restaurado com 100 cartas.
+- Quality gate: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260608_160429.md`, candidato passou sem warnings.
+- Confirmation curta: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_confirmation_20260608_160520.md`, apenas prova funcional, nao suficiente para apply.
+- Replay audit pos-confirmacao: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_replay_audit_20260608_160605.md`, turno-a-turno limpo em 3 replays frescos.
+- Handoff: `docs/hermes-analysis/master_optimizer_reports/master_optimizer_handoff_20260608_160622.md`, status correto `no_safe_swap_approved` porque o candidato ainda precisa full confirmation.
+
+Limitacao operacional:
+
+- O baseline local com `--games 10` estourou 5 minutos nesta maquina; `--games 1` levou cerca de 47s. Para decisao real de deck, rodar no Hermes/container com janela longa, nao usar o baseline smoke local como metrica de win rate.
+- O candidato `Wheel of Fate` foi validado apenas como prova de fluxo. Ele nao deve ser aplicado sem `full_confirmation`, replay audit e handoff aprovado em amostra robusta.
 
 ## Estado atual
 
@@ -274,27 +335,46 @@ Auditoria de cobertura de efeitos em Hermes, 2026-06-07:
 Arquitetura correta para battle + montagem de deck, 2026-06-07:
 
 - Novo documento canonico: `docs/hermes-analysis/HERMES_BATTLE_DECKBUILDING_RULE_REGISTRY_2026-06-07.md`.
-- Nova tabela operacional: `battle_card_rules`.
+- Nova tabela canonica PG: `card_battle_rules`.
+- Nova tabela/cache operacional SQLite: `battle_card_rules`.
 - Novo modulo: `battle_rule_registry.py`.
-- Novo sync: `sync_battle_card_rules.py`.
-- A tabela separa fatos de carta (`card_oracle_cache`) de interpretacao do simulador (`battle_card_rules`).
+- Novo sync canonico: `sync_battle_card_rules_pg.py`.
+- Sync local legado/fallback: `sync_battle_card_rules.py`.
+- A tabela separa fatos de carta (`cards`/`card_oracle_cache`) de interpretacao do simulador (`card_battle_rules`/`battle_card_rules`).
 - `effect_json` passa a ser a semantica usada pelo battle.
 - `deck_role_json` passa a ser a semantica usada pela montagem/optimizer.
 - `battle_analyst_v8.py` agora consulta `battle_card_rules` antes de `KNOWN_CARDS`, JSON gerado, tags e heuristicas.
 - `slot_optimizer.py` agora mescla `battle_card_rules` por cima de `known_cards_generated.json`; categoria de deck da tabela tem prioridade.
 - Criaturas genericas nao viram categoria confiavel de deckbuilding; continuam `unknown` ate receberem papel explicito.
 - `battle_effect_coverage_audit.py` agora diferencia `battle_rule_manual` e `battle_rule_generated`.
-- Preflight, auto-cycle e slot-scan cron agora sincronizam `battle_card_rules`.
+- Preflight, auto-cycle e slot-scan cron agora sincronizam `card_battle_rules` no PG e refrescam `battle_card_rules` no SQLite.
 - Validacao local: `sync_battle_card_rules.py` populou 1970 regras em banco temporario (`manual=40`, `generated=1930`) e os 32 testes do battle passaram.
+- Validacao Hermes: `sync_battle_card_rules.py --apply` populou o SQLite real com `manual=40` e `generated=689`; os 32 testes passaram; preflight aprovou; smoke de battle com 3 oponentes reais e 6 jogos rodou sem crash (`83.3%` WR, `5W/0L/1S`).
+- Auditoria Hermes apos tabela: `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260607_210708.md`.
 
 Arquivos principais:
 
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py`
+
+Auditoria forense de uma battle:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --seed 42 \
+  --generate 1 \
+  --report
+```
+
+Use esta etapa antes de promover regras `needs_review` para `verified` e antes
+de aceitar swaps como confiaveis para produto.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py`
 - `docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py`
@@ -487,6 +567,36 @@ Interpretação atual:
 - A automacao pode aprender, testar, aplicar no SQLite Hermes e desfazer se o resultado pos-apply piorar.
 - Produto/app continuam protegidos: qualquer copia para deck real exige `optimizer_product_handoffs.status = needs_product_owner_approval` e checklist humano.
 
+## Forensic replay hardening, 2026-06-07
+
+Rodada local executada contra `knowledge.db` sincronizado do PG real e deck Lorehold importado:
+
+- Seed isolada `42`: 207 eventos estruturados, 72 card events, 48 cartas unicas, `findings_total=0`.
+- Lote `100-104`: 2266 eventos estruturados, 881 card events, 337 cartas unicas, `findings_total=0`.
+- Lote `200-204`: 1920 eventos estruturados, 826 card events, 235 cartas unicas, `findings_total=0`.
+- Teste focado `test_battle_analyst_v10_3.py`: 32 checks `PASS`.
+
+Arquivos de evidencia:
+
+- `docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_local_20260607_seed42_layer3.json`
+- `docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_local_20260607_seeds100_104_zero.json`
+- `docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_local_20260607_seeds200_204_zero.json`
+- `docs/hermes-analysis/master_optimizer_reports/forensic_promotion_seed100_104_20260607.json`
+- `docs/hermes-analysis/master_optimizer_reports/forensic_promotion_seed200_204_20260607.json`
+
+Correcoes aplicadas nesta rodada:
+
+- `battle_analyst_v8.py` passou a respeitar `equipment_haste_shroud`, dano direto, gatilhos de spell castada, engines de draw por spell do oponente, custos adicionais de descartar land/sacrificar criatura, threshold de ritual, recursion generica e extra turn simplificado.
+- `battle_rule_registry.py` passou a resolver alias de cartas dupla-face quando o replay usa apenas a face curta e o PG guarda `Face A // Face B`.
+- O normalizador de oracle deixou de confundir recursion de cemiterio com bounce/removal e preserva modais como `remove_artifact_or_3dmg`.
+- PG `card_battle_rules` foi promovido com regras `curated/verified` para cartas observadas nos replays, incluindo lands, mana rocks/dorks, tutors, counters, wheels, recursion, token makers e protecoes.
+
+Limites conscientes que ainda nao impedem o optimizer Hermes-local:
+
+- `extra_turn` registra e agenda metadata simplificada, mas a malha de turn order ainda nao consome turnos extras de forma completa.
+- Algumas cartas promovidas por forensic replay usam abstracao de efeito (`draw_cards`, `tutor`, `ramp_engine`) em vez de resolver cada subtipo de texto oracle.
+- Produto continua bloqueado sem handoff humano; as evidencias acima liberam o loop Hermes-local, nao copia automatica para deck real do app.
+
 ## Criterios de aprovacao
 
 Um pacote de otimizacao so fica aprovado quando tiver:
@@ -508,7 +618,7 @@ Use o Hermes Master Optimizer Loop. Primeiro rode o preflight com relatorio.
 Se passar, rode baseline do battle, slot scan isolado e confirmacao full para os candidatos promissores.
 Pode aplicar no SQLite Hermes local apenas se houver full confirmation aprovada, quality gate verde, hash atual compativel, rollback gerado e post-apply gate configurado.
 Nao aplique no produto automaticamente. Gere handoff com winrate, delta, motivo de cada swap, riscos, replays auditados e proximas correcoes do battle.
-Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix no battle_analyst_v8.py com teste novo em test_battle_analyst_v10_3.py.
+Se encontrar erro de decisao no replay, pare a otimizacao e abra tarefa de fix no engine ativo `battle_analyst_v9.py` com teste novo em `test_battle_analyst_v10_3.py`.
 ```
 
 ## Proximo passo tecnico recomendado

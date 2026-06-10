@@ -1,11 +1,56 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/edh_bracket_policy.dart';
 import '../lib/ai/aggressive_candidate_meta_signal_support.dart';
+import '../lib/ai/commander_fallback_policy.dart';
+import '../lib/ai/functional_card_tags.dart';
 import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
 void main() {
+  group('inferFunctionalRoleForCard', () {
+    test('uses persisted functional tags before legacy text heuristics', () {
+      final role = inferFunctionalRoleForCard({
+        'name': 'Silent Value Piece',
+        'type_line': 'Creature',
+        'oracle_text': 'Whenever this attacks, gain 1 life.',
+        'functional_tags': const [
+          {'tag': 'board_wipe', 'confidence': 0.92, 'source': 'test'},
+        ],
+      });
+
+      expect(role, equals('removal'));
+    });
+
+    test('real combo tag maps to wincon while heuristic tag stays low confidence',
+        () {
+      final tags = inferFunctionalCardTags(
+        name: 'Dramatic Reversal',
+        typeLine: 'Instant',
+        oracleText: 'Untap all nonland permanents you control.',
+      );
+      final heuristicCombo = tags.firstWhere((t) => t.tag == 'combo_piece');
+      expect(heuristicCombo.confidence, lessThan(0.65));
+
+      final role = inferFunctionalRoleForCard({
+        'name': 'Dramatic Reversal',
+        'type_line': 'Instant',
+        'oracle_text': 'Untap all nonland permanents you control.',
+        'functional_tags': const [
+          {
+            'tag': 'combo_piece',
+            'confidence': 0.96,
+            'source': 'commander_spellbook_combo_v1',
+          },
+        ],
+      });
+
+      expect(role, equals('wincon'));
+    });
+  });
+
   group('resolveOptimizeIntensity', () {
     test('omitted intensity remains backward-compatible focused default', () {
       final config = resolveOptimizeIntensity(null);
@@ -231,6 +276,46 @@ void main() {
   });
 
   group('shouldKeepCommanderFillerCandidate', () {
+    test('uses versioned denylist policy for weak commander fillers', () {
+      expect(commanderFallbackPolicyVersion, contains('2026_05_28'));
+      expect(commanderWeakFillerDenylist, contains('cancel'));
+      expect(
+        shouldKeepCommanderFillerCandidate(
+          candidate: {
+            'name': 'Cancel',
+            'mana_cost': '{1}{U}{U}',
+            'oracle_text': 'Counter target spell.',
+            'colors': const ['U'],
+            'color_identity': const ['U'],
+          },
+          excludeNames: const <String>{},
+          commanderColorIdentity: const {'U'},
+          enforceCommanderIdentity: true,
+        ),
+        isFalse,
+      );
+    });
+
+    test('uses versioned premium policy in commander filler scoring', () {
+      final premium = commanderFillerQualityScore({
+        'name': 'Arcane Signet',
+        'type_line': 'Artifact',
+        'oracle_text': '{T}: Add one mana of any color.',
+        'mana_cost': '{2}',
+        'cmc': 2,
+      });
+      final generic = commanderFillerQualityScore({
+        'name': 'Generic Mana Rock',
+        'type_line': 'Artifact',
+        'oracle_text': '{T}: Add one mana of any color.',
+        'mana_cost': '{2}',
+        'cmc': 2,
+      });
+
+      expect(commanderPremiumFillerNames, contains('arcane signet'));
+      expect(premium, greaterThan(generic));
+    });
+
     test(
         'rejects colored spell inferred only from mana cost for colorless commander',
         () {
@@ -307,7 +392,7 @@ void main() {
         expect(
           tags.categories,
           equals({BracketCategory.gameChanger}),
-          reason: '${card['name']} must not consume secondary bracket budgets.',
+          reason: '${card['name']} must not consume secondary budgets.',
         );
       }
     });
@@ -348,6 +433,17 @@ void main() {
       }
     });
 
+    test('detects commander free-cast interaction as free interaction', () {
+      final tags = tagCardForBracket(
+        name: 'Force of Negation',
+        typeLine: 'Instant',
+        oracleText:
+            'If it is not your turn, you may exile a blue card from your hand rather than pay this spell\'s mana cost. Counter target noncreature spell.',
+      );
+
+      expect(tags.categories, contains(BracketCategory.freeInteraction));
+    });
+
     test('blocks power additions above low bracket budgets', () {
       final decision = applyBracketPolicyToAdditions(
         bracket: 1,
@@ -371,6 +467,24 @@ void main() {
 
       expect(decision.allowed, isEmpty);
       expect(decision.blocked.single['name'], equals('Mana Crypt'));
+    });
+
+    test('filler loaders use current deck state for bracket policy', () {
+      final source = File(
+        'lib/ai/optimize_filler_loader_support.dart',
+      ).readAsStringSync();
+      final completeSource = File(
+        'lib/ai/optimize_complete_support.dart',
+      ).readAsStringSync();
+
+      expect(source, isNot(contains('currentDeckCards: const []')));
+      expect(source, isNot(contains('if (filtered.isNotEmpty)')));
+      expect(source, contains('currentDeckCards: currentDeckCards'));
+      expect(completeSource, contains('currentDeckCards: state.virtualDeck'));
+      expect(
+        source,
+        contains('aggregated.length < limit && bracket == null'),
+      );
     });
   });
 
@@ -407,6 +521,38 @@ void main() {
         ),
         isNull,
       );
+    });
+  });
+
+  group('commander fallback policy', () {
+    test('keeps universal and completion staples in policy data', () {
+      expect(
+        universalCommanderFallbackNames.take(3),
+        equals(const ['Sol Ring', 'Arcane Signet', 'Command Tower']),
+      );
+      expect(commanderCompletionStapleNames, contains('Nature\'s Claim'));
+      expect(commanderCompletionStapleNames, contains('Teferi\'s Protection'));
+      expect(commanderPremiumFixingLandNames, contains('command tower'));
+    });
+
+    test('adds mono-blue contextual foundation names without runtime hardcode',
+        () {
+      final base = commanderFoundationNamesFor(
+        commanderColorIdentity: const {'W', 'U'},
+        targetArchetype: 'midrange',
+        detectedTheme: null,
+      );
+      final monoBlueCombo = commanderFoundationNamesFor(
+        commanderColorIdentity: const {'U'},
+        targetArchetype: 'combo control',
+        detectedTheme: 'proliferate',
+      );
+
+      expect(base, contains('The One Ring'));
+      expect(base, isNot(contains('High Tide')));
+      expect(monoBlueCombo, contains('High Tide'));
+      expect(monoBlueCombo, contains('Thrummingbird'));
+      expect(monoBlueCombo, contains('Pongify'));
     });
   });
 

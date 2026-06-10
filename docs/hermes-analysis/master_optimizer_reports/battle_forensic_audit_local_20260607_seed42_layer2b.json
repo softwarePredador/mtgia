@@ -1,0 +1,255 @@
+{
+  "replay_files": [
+    {
+      "events": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_42.jsonl",
+      "text": "C:\\Users\\rafae\\OneDrive\\Documents\\mtgia\\docs\\hermes-analysis\\master_optimizer_reports\\forensic_replays\\battle_forensic_seed_42.txt"
+    }
+  ],
+  "rule_findings": [
+    {
+      "card": "An Offer You Can't Refuse",
+      "effect": "counter",
+      "event": "end_step_instant",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Rograkh, Son of Rohgahh #94 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 9
+    },
+    {
+      "card": "An Offer You Can't Refuse",
+      "effect": "counter",
+      "event": "end_step_instant",
+      "finding": "Runtime effect `counter` differs from registry effect `ramp_engine`.",
+      "phase": "-",
+      "player": "Rograkh, Son of Rohgahh #94 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 9
+    },
+    {
+      "card": "An Offer You Can't Refuse",
+      "effect": "counter",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Rograkh, Son of Rohgahh #94 (real)",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 9
+    },
+    {
+      "card": "An Offer You Can't Refuse",
+      "effect": "counter",
+      "event": "spell_resolved",
+      "finding": "Runtime effect `counter` differs from registry effect `ramp_engine`.",
+      "phase": "-",
+      "player": "Rograkh, Son of Rohgahh #94 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 9
+    },
+    {
+      "card": "Rise of the Eldrazi",
+      "effect": "remove_permanent",
+      "event": "miracle_cast",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Lorehold",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 12
+    },
+    {
+      "card": "Rise of the Eldrazi",
+      "effect": "remove_permanent",
+      "event": "miracle_cast",
+      "finding": "Runtime effect `remove_permanent` differs from registry effect `silence_opponents`.",
+      "phase": "-",
+      "player": "Lorehold",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 12
+    },
+    {
+      "card": "Rise of the Eldrazi",
+      "effect": "remove_permanent",
+      "event": "spell_resolved",
+      "finding": "Game event depended on a needs_review rule.",
+      "phase": "-",
+      "player": "Lorehold",
+      "recommendation": "Review oracle text/rulings, add a regression test if impactful, then promote to verified.",
+      "replay_id": "seed_42",
+      "severity": "high",
+      "turn": 12
+    },
+    {
+      "card": "Rise of the Eldrazi",
+      "effect": "remove_permanent",
+      "event": "spell_resolved",
+      "finding": "Runtime effect `remove_permanent` differs from registry effect `silence_opponents`.",
+      "phase": "-",
+      "player": "Lorehold",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_42",
+      "severity": "low",
+      "turn": 12
+    }
+  ],
+  "summary": {
+    "by_effect": {
+      "commander": 1,
+      "counter": 4,
+      "creature": 10,
+      "deal_damage": 2,
+      "draw_engine": 4,
+      "equipment_haste_shroud": 2,
+      "land": 21,
+      "modal_boros_charm": 2,
+      "overload_recursion": 2,
+      "ramp_engine": 1,
+      "ramp_permanent": 6,
+      "ramp_ritual": 2,
+      "redirect_removal": 4,
+      "remove_creature": 1,
+      "remove_permanent": 6,
+      "token_maker": 2,
+      "tutor": 2
+    },
+    "by_source": {
+      "curated": 43,
+      "generated": 4,
+      "manual": 18,
+      "type_line_creature": 7
+    },
+    "by_status": {
+      "fact": 7,
+      "needs_review": 4,
+      "verified": 61
+    },
+    "card_event_count": 72,
+    "cards_by_source": {
+      "curated": [
+        "Ancient Den",
+        "Ancient Tomb",
+        "Bloodstained Mire",
+        "Chain of Vapor",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Gemstone Caverns",
+        "Great Furnace",
+        "Guttersnipe",
+        "Hexing Squelcher",
+        "Inspiring Vantage",
+        "Lightning Greaves",
+        "Lotus Petal",
+        "Magda, Brazen Outlaw",
+        "Mana Vault",
+        "Misty Rainforest",
+        "Mother of Runes",
+        "Mountain",
+        "Mox Diamond",
+        "Mystic Remora",
+        "Pact of Negation",
+        "Plateau",
+        "Rite of Flame",
+        "Scalding Tarn",
+        "Shatterskull Smashing",
+        "Shinka, the Bloodsoaked Keep",
+        "Smuggler's Copter",
+        "Steam Vents",
+        "Sunbaked Canyon",
+        "Underground Sea",
+        "Untimely Malfunction"
+      ],
+      "generated": [
+        "An Offer You Can't Refuse",
+        "Rise of the Eldrazi"
+      ],
+      "manual": [
+        "Arcane Signet",
+        "Boros Charm",
+        "Deflecting Swat",
+        "Gamble",
+        "Lorehold, the Historian",
+        "Mizzix's Mastery",
+        "Path to Exile",
+        "Sol Ring",
+        "Storm Herd"
+      ],
+      "type_line_creature": [
+        "Dwarven Bloodboiler",
+        "Ishai, Ojutai Dragonspeaker",
+        "Rograkh, Son of Rohgahh",
+        "Stoke the Flames",
+        "Three Tree Mascot",
+        "Valley Floodcaller"
+      ]
+    },
+    "cards_by_status": {
+      "fact": [
+        "Dwarven Bloodboiler",
+        "Ishai, Ojutai Dragonspeaker",
+        "Rograkh, Son of Rohgahh",
+        "Stoke the Flames",
+        "Three Tree Mascot",
+        "Valley Floodcaller"
+      ],
+      "needs_review": [
+        "An Offer You Can't Refuse",
+        "Rise of the Eldrazi"
+      ],
+      "verified": [
+        "Ancient Den",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Bloodstained Mire",
+        "Boros Charm",
+        "Chain of Vapor",
+        "Deflecting Swat",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Gamble",
+        "Gemstone Caverns",
+        "Great Furnace",
+        "Guttersnipe",
+        "Hexing Squelcher",
+        "Inspiring Vantage",
+        "Lightning Greaves",
+        "Lorehold, the Historian",
+        "Lotus Petal",
+        "Magda, Brazen Outlaw",
+        "Mana Vault",
+        "Misty Rainforest",
+        "Mizzix's Mastery",
+        "Mother of Runes",
+        "Mountain",
+        "Mox Diamond",
+        "Mystic Remora",
+        "Pact of Negation",
+        "Path to Exile",
+        "Plateau",
+        "Rite of Flame",
+        "Scalding Tarn",
+        "Shatterskull Smashing",
+        "Shinka, the Bloodsoaked Keep",
+        "Smuggler's Copter",
+        "Sol Ring",
+        "Steam Vents",
+        "Storm Herd",
+        "Sunbaked Canyon",
+        "Underground Sea",
+        "Untimely Malfunction"
+      ]
+    },
+    "unique_cards": 48
+  },
+  "turn_findings": []
+}

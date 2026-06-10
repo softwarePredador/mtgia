@@ -211,15 +211,47 @@ void main() {
         'colors': <String>[],
         'colorIdentity': ['R'],
         'rarity': 'common',
+        'number': '123',
+        'hasFoil': true,
+        'hasNonFoil': false,
         'identifiers': {'scryfallOracleId': 'mountain-id'},
       };
 
       final row = extractSetCardRow(card, 'DSK');
       expect(row, isNotNull);
+      expect(row, hasLength(12));
       expect(row![0], 'mountain-id');
       expect(row[1], 'Mountain');
       expect(row[8], 'DSK');
+      expect(row[10], '123');
+      expect(row[11], isTrue);
       expect(row[7], contains('set=DSK'));
+    });
+
+    test('marca foil false quando set tem apenas non-foil', () {
+      final card = {
+        'name': 'Plain Frame',
+        'hasFoil': false,
+        'hasNonFoil': true,
+        'identifiers': {'scryfallOracleId': 'plain-frame-id'},
+      };
+
+      final row = extractSetCardRow(card, 'TST');
+      expect(row, isNotNull);
+      expect(row![11], isFalse);
+    });
+
+    test('deixa foil null quando set tem foil e non-foil', () {
+      final card = {
+        'name': 'Flexible Frame',
+        'hasFoil': true,
+        'hasNonFoil': true,
+        'identifiers': {'scryfallOracleId': 'flexible-frame-id'},
+      };
+
+      final row = extractSetCardRow(card, 'TST');
+      expect(row, isNotNull);
+      expect(row![11], isNull);
     });
 
     test('retorna null sem oracleId', () {

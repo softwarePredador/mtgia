@@ -261,13 +261,20 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         backgroundColor: AppTheme.backgroundAbyss,
         surfaceTintColor: AppTheme.transparent,
         title: Container(
-          height: 34,
+          height: 38,
           decoration: BoxDecoration(
-            color: AppTheme.surfaceSlate,
+            color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+              color: AppTheme.brass400.withValues(alpha: 0.18),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.42),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: TextField(
             key: const Key('card-search-field'),
@@ -285,13 +292,14 @@ class _CardSearchScreenState extends State<CardSearchScreen>
               border: InputBorder.none,
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
+                horizontal: 14,
+                vertical: 9,
               ),
               suffixIcon:
                   _searchController.text.isEmpty
                       ? null
                       : IconButton(
+                        tooltip: 'Limpar busca',
                         padding: EdgeInsets.zero,
                         visualDensity: VisualDensity.compact,
                         icon: const Icon(Icons.close_rounded, size: 16),
@@ -303,11 +311,14 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                         },
                       ),
               hintStyle: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
+                color: AppTheme.textHint,
+                fontSize: AppTheme.fontSm,
               ),
             ),
-            style: const TextStyle(color: AppTheme.textPrimary, fontSize: 12),
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: AppTheme.fontSm,
+            ),
             cursorColor: AppTheme.textPrimary,
           ),
         ),
@@ -329,11 +340,17 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceSlate,
+                  color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppTheme.outlineMuted.withValues(alpha: 0.75),
+                    color: AppTheme.brass400.withValues(alpha: 0.28),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.brass400.withValues(alpha: 0.08),
+                      blurRadius: 16,
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.tune_rounded,
@@ -352,11 +369,11 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           unselectedLabelColor: AppTheme.textSecondary,
           indicatorSize: TabBarIndicatorSize.label,
           labelStyle: const TextStyle(
-            fontSize: 12,
+            fontSize: AppTheme.fontSm,
             fontWeight: FontWeight.w800,
           ),
           unselectedLabelStyle: const TextStyle(
-            fontSize: 12,
+            fontSize: AppTheme.fontSm,
             fontWeight: FontWeight.w600,
           ),
           tabs: const [Tab(text: 'Cartas'), Tab(text: 'Coleções')],
@@ -365,13 +382,26 @@ class _CardSearchScreenState extends State<CardSearchScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildCardSearchResults(
-            isCommanderFormat: isCommanderFormat,
-            commanderIdentity: commanderIdentity,
-            mustPickCommanderFirst: mustPickCommanderFirst,
-            isCommanderMode: isCommanderMode,
+          DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: AppTheme.scaffoldGradient,
+            ),
+            child: _buildCardSearchResults(
+              isCommanderFormat: isCommanderFormat,
+              commanderIdentity: commanderIdentity,
+              mustPickCommanderFirst: mustPickCommanderFirst,
+              isCommanderMode: isCommanderMode,
+            ),
           ),
-          SetsCatalogScreen(apiClient: widget.setsApiClient, showAppBar: false),
+          DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: AppTheme.scaffoldGradient,
+            ),
+            child: SetsCatalogScreen(
+              apiClient: widget.setsApiClient,
+              showAppBar: false,
+            ),
+          ),
         ],
       ),
     );
@@ -390,7 +420,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         if (provider.isLoading) {
           return const Center(
             key: Key('card-search-loading'),
-            child: CircularProgressIndicator(color: AppTheme.frost400),
+            child: CircularProgressIndicator(color: AppTheme.brass400),
           );
         }
 
@@ -423,7 +453,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                     : widget.isBinderMode
                     ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
                     : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
-            accent: query.length >= 3 ? AppTheme.warning : AppTheme.frost400,
+            accent: query.length >= 3 ? AppTheme.warning : AppTheme.brass400,
           );
         }
 
@@ -455,7 +485,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
-                  child: CircularProgressIndicator(color: AppTheme.frost400),
+                  child: CircularProgressIndicator(color: AppTheme.brass400),
                 ),
               );
             }
@@ -537,20 +567,29 @@ class _SearchResultsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 8),
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Container(
+            width: 3,
+            height: 34,
+            margin: const EdgeInsets.only(right: 10),
+            decoration: BoxDecoration(
+              color: AppTheme.frost400,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Resultados para "$query"',
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  style: theme.textTheme.titleSmall?.copyWith(
                     color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    fontSize: AppTheme.fontMd,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -558,7 +597,7 @@ class _SearchResultsHeader extends StatelessWidget {
                   '$count cartas encontradas',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: AppTheme.textSecondary,
-                    fontSize: 10,
+                    fontSize: AppTheme.fontXs,
                   ),
                 ),
               ],
@@ -570,11 +609,14 @@ class _SearchResultsHeader extends StatelessWidget {
               onPressed: onFilterTap,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                backgroundColor: AppTheme.surfaceElevated,
-                foregroundColor: AppTheme.frost400,
+                backgroundColor: AppTheme.surfaceSlate.withValues(alpha: 0.9),
+                foregroundColor: AppTheme.brass400,
                 textStyle: const TextStyle(
-                  fontSize: 11,
+                  fontSize: AppTheme.fontSm - 1,
                   fontWeight: FontWeight.w700,
+                ),
+                side: BorderSide(
+                  color: AppTheme.brass400.withValues(alpha: 0.25),
                 ),
               ),
               icon: const Icon(Icons.tune_rounded, size: 13),
@@ -609,21 +651,39 @@ class _CardSearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
       child: Material(
-        color: AppTheme.surfaceSlate,
+        color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: InkWell(
           onTap: onOpen,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           child: Container(
-            constraints: const BoxConstraints(minHeight: 76),
-            padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+            constraints: const BoxConstraints(minHeight: 86),
+            padding: const EdgeInsets.fromLTRB(10, 9, 8, 9),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(
-                color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppTheme.surfaceSlate.withValues(alpha: 0.98),
+                  AppTheme.surfaceElevated.withValues(alpha: 0.64),
+                ],
               ),
+              border: Border.all(
+                color:
+                    canAdd
+                        ? AppTheme.brass400.withValues(alpha: 0.20)
+                        : AppTheme.outlineMuted.withValues(alpha: 0.52),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.backgroundAbyss.withValues(alpha: 0.24),
+                  blurRadius: 18,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -632,11 +692,11 @@ class _CardSearchResultTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                   child: CachedCardImage(
                     imageUrl: card.imageUrl,
-                    width: 48,
-                    height: 66,
+                    width: 54,
+                    height: 74,
                   ),
                 ),
-                const SizedBox(width: 11),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,8 +708,9 @@ class _CardSearchResultTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          fontSize: AppTheme.fontMd,
+                          letterSpacing: -0.1,
                         ),
                       ),
                       const SizedBox(height: 1),
@@ -660,7 +721,7 @@ class _CardSearchResultTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: AppTheme.textSecondary,
-                            fontSize: 10,
+                            fontSize: AppTheme.fontXs,
                             height: 1.1,
                           ),
                         ),
@@ -682,15 +743,7 @@ class _CardSearchResultTile extends StatelessWidget {
                           if ((card.manaCost ?? '').trim().isNotEmpty)
                             ManaCostRow(cost: card.manaCost),
                           if ((warning ?? '').isNotEmpty)
-                            Text(
-                              warning!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: AppTheme.warning,
-                                fontSize: 10,
-                              ),
-                            ),
+                            _SearchWarningPill(label: warning!),
                         ],
                       ),
                     ],
@@ -701,8 +754,8 @@ class _CardSearchResultTile extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         canAdd
-                            ? AppTheme.brass500.withValues(alpha: 0.18)
-                            : AppTheme.surfaceElevated,
+                            ? AppTheme.brass500.withValues(alpha: 0.16)
+                            : AppTheme.surfaceElevated.withValues(alpha: 0.72),
                     shape: BoxShape.circle,
                     border: Border.all(
                       color:
@@ -712,8 +765,8 @@ class _CardSearchResultTile extends StatelessWidget {
                     ),
                   ),
                   child: SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: 38,
+                    height: 38,
                     child: IconButton(
                       key: Key('card-search-add-${card.id}'),
                       tooltip: canAdd ? 'Adicionar' : 'Indisponível',
@@ -775,7 +828,7 @@ class _SearchIdentityPips extends StatelessWidget {
                     symbol,
                     style: TextStyle(
                       color: AppTheme.manaPipForeground(symbol),
-                      fontSize: 8,
+                      fontSize: AppTheme.fontMicro,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -804,9 +857,37 @@ class _SearchSetPill extends StatelessWidget {
         label,
         style: const TextStyle(
           color: AppTheme.frost400,
-          fontSize: 9,
+          fontSize: AppTheme.fontTiny,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchWarningPill extends StatelessWidget {
+  const _SearchWarningPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppTheme.warning.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.28)),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          color: AppTheme.warning,
+          fontSize: AppTheme.fontTiny,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -863,6 +944,16 @@ class _AddCardDialogState extends State<_AddCardDialog> {
         isCommanderFormat &&
         isCommanderEligible &&
         (!widget.hasCommanderSelected || widget.requireCommander);
+    final commanderGuidanceMessage =
+        isCommanderFormat && !isCommanderEligible
+            ? 'Esta carta não pode ser comandante. Ela pode entrar apenas como carta comum se respeitar a identidade de cor.'
+            : widget.requireCommander
+            ? 'Você está escolhendo o comandante do deck. Esta carta será definida como comandante.'
+            : widget.preferCommander && showCommanderChoice
+            ? 'Este deck precisa de um comandante. Defina esta carta agora ou adicione como carta comum se preferir escolher outro comandante.'
+            : widget.preferCommander
+            ? 'Este deck precisa de um comandante. Esta carta será definida como comandante.'
+            : null;
 
     return Dialog(
       key: Key('card-search-add-dialog-${widget.card.id}'),
@@ -981,6 +1072,10 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                 ],
               ),
               const SizedBox(height: 14),
+              if (commanderGuidanceMessage != null) ...[
+                _CommanderGuidanceCard(message: commanderGuidanceMessage),
+                const SizedBox(height: 12),
+              ],
               if (showCommanderChoice)
                 _CommanderChoiceCard(
                   isCommander: _isCommander,
@@ -992,29 +1087,6 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                             _isCommander = val;
                             if (_isCommander) _quantity = 1;
                           }),
-                ),
-              if (isCommanderFormat && !isCommanderEligible)
-                const _CommanderGuidanceCard(
-                  message:
-                      'Esta carta não pode ser comandante. Ela pode entrar apenas como carta comum se respeitar a identidade de cor.',
-                )
-              else if (widget.requireCommander)
-                const _CommanderGuidanceCard(
-                  message:
-                      'Você está escolhendo o comandante do deck. Esta carta será definida como comandante.',
-                )
-              else if (widget.preferCommander && showCommanderChoice)
-                const Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: _CommanderGuidanceCard(
-                    message:
-                        'Este deck precisa de um comandante. Você pode definir esta carta agora ou adicioná-la como carta comum.',
-                  ),
-                )
-              else if (widget.preferCommander)
-                const _CommanderGuidanceCard(
-                  message:
-                      'Este deck precisa de um comandante. Esta carta será definida como comandante.',
                 ),
               if (_isSubmitting) ...[
                 const SizedBox(height: 12),
@@ -1069,7 +1141,11 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                           ),
                         ),
                       ),
-                      child: const Text('Adicionar'),
+                      child: Text(
+                        _isCommander || widget.requireCommander
+                            ? 'Definir comandante'
+                            : 'Adicionar',
+                      ),
                     ),
                   ),
                 ],
@@ -1153,24 +1229,34 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      onTap: enabled ? onTap : null,
-      child: Container(
-        width: 30,
-        height: 30,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color:
-              enabled
-                  ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
-                  : AppTheme.surfaceSlate.withValues(alpha: 0.35),
+    final semanticLabel =
+        icon == Icons.remove ? 'Diminuir quantidade' : 'Aumentar quantidade';
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: semanticLabel,
+      child: Tooltip(
+        message: semanticLabel,
+        child: InkWell(
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: enabled ? AppTheme.textPrimary : AppTheme.textHint,
+          onTap: enabled ? onTap : null,
+          child: Container(
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color:
+                  enabled
+                      ? AppTheme.surfaceSlate.withValues(alpha: 0.92)
+                      : AppTheme.surfaceSlate.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: enabled ? AppTheme.textPrimary : AppTheme.textHint,
+            ),
+          ),
         ),
       ),
     );
@@ -1269,7 +1355,7 @@ class _CommanderChoiceRow extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               selected
-                  ? AppTheme.frost400.withValues(alpha: 0.08)
+                  ? AppTheme.brass400.withValues(alpha: 0.08)
                   : AppTheme.transparent,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           border: Border.all(
@@ -1375,7 +1461,10 @@ class _CardSearchEditionSubtitle extends StatelessWidget {
             card.typeLine,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontSm,
+            ),
           ),
         const SizedBox(height: 3),
         CardEditionMetadataLine(

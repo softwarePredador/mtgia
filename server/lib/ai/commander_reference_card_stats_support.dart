@@ -161,13 +161,8 @@ class ReferenceGeneratedDeckEvaluation {
       };
 }
 
-String normalizeCommanderReferenceCardName(String value) {
-  return value
-      .trim()
-      .toLowerCase()
-      .replaceAll(RegExp(r'[\u2018\u2019]'), "'")
-      .replaceAll(RegExp(r'\s+'), ' ');
-}
+String normalizeCommanderReferenceCardName(String value) =>
+    normalizeCommanderReferenceName(value);
 
 List<String> commanderReferenceCardLookupAliases(String cardName) {
   final aliases = <String>{

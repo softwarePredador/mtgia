@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../binder/screens/binder_screen.dart' show BinderTabContent;
@@ -42,50 +41,49 @@ class _CollectionScreenState extends State<CollectionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
+        toolbarHeight: 54,
         title: const Text('Coleção'),
-        backgroundColor: AppTheme.surfaceElevated,
-        actions: [
-          IconButton(
-            key: const Key('collection-open-sets-catalog'),
-            tooltip: 'Catálogo de coleções',
-            onPressed: () => context.push('/collection/sets'),
-            icon: const Icon(Icons.grid_view_rounded),
-          ),
-          IconButton(
-            key: const Key('collection-open-latest-set'),
-            tooltip: 'Última edição',
-            onPressed: () => context.push('/collection/latest-set'),
-            icon: const Icon(Icons.new_releases_outlined),
-          ),
-          const ShellAppBarActions(),
-        ],
+        centerTitle: true,
+        backgroundColor: AppTheme.backgroundAbyss,
+        surfaceTintColor: AppTheme.transparent,
+        titleTextStyle: theme.textTheme.titleMedium?.copyWith(
+          color: AppTheme.textPrimary,
+          fontFamily: AppTheme.displayFontFamily,
+          fontSize: AppTheme.fontLg + 1,
+          fontWeight: FontWeight.w700,
+        ),
+        actions: const [ShellAppBarActions()],
         bottom: TabBar(
           key: const Key('collection-hub-tabs'),
           controller: _tabController,
-          isScrollable: true,
-          labelPadding: const EdgeInsets.symmetric(horizontal: 14),
-          dividerColor: Colors.transparent,
-          indicatorColor: AppTheme.frost400,
-          labelColor: AppTheme.frost400,
+          isScrollable: false,
+          labelPadding: EdgeInsets.zero,
+          dividerColor: AppTheme.transparent,
+          indicatorColor: AppTheme.brass400,
+          labelColor: AppTheme.brass400,
           unselectedLabelColor: AppTheme.textSecondary,
           labelStyle: const TextStyle(
-            fontSize: AppTheme.fontMd,
-            fontWeight: FontWeight.w600,
+            fontSize: AppTheme.fontXs,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: AppTheme.fontXs,
+            fontWeight: FontWeight.w700,
           ),
           tabs: const [
             Tab(
-              icon: Icon(Icons.collections_bookmark, size: 20),
+              key: Key('collection-tab-binder'),
               text: 'Fichário',
+              height: 34,
             ),
-            Tab(icon: Icon(Icons.storefront, size: 20), text: 'Marketplace'),
-            Tab(icon: Icon(Icons.swap_horiz, size: 20), text: 'Trades'),
-            Tab(
-              icon: Icon(Icons.grid_view_rounded, size: 20),
-              text: 'Coleções',
-            ),
+            Tab(key: Key('collection-tab-market'), text: 'Market', height: 34),
+            Tab(key: Key('collection-tab-trades'), text: 'Trades', height: 34),
+            Tab(key: Key('collection-tab-sets'), text: 'Coleções', height: 34),
           ],
         ),
       ),

@@ -70,6 +70,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     );
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(title: const Text('Detalhes do Trade')),
       body: Builder(
         builder: (context) {
@@ -1088,7 +1089,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                   hintText: 'Mensagem sobre este trade...',
                   hintStyle: const TextStyle(color: AppTheme.textHint),
                   filled: true,
-                  fillColor: AppTheme.surfaceElevated,
+                  fillColor: AppTheme.surfaceSlate,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,
@@ -1103,8 +1104,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             const SizedBox(width: 8),
             IconButton(
               key: const ValueKey('trade-message-send-button'),
+              tooltip: 'Enviar mensagem',
               onPressed: sendCurrentMessage,
-              icon: const Icon(Icons.send, color: AppTheme.frost400),
+              icon: const Icon(Icons.send, color: AppTheme.brass400),
             ),
           ],
         ),

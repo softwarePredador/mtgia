@@ -1,2 +1,0 @@
-table,card_id,card_name,tag,role,format,subformat,bracket_scope,budget_tier,commander_name_normalized,commander_name,card_name_normalized,archetype,function,source,score,confidence,penalty,evidence_count,evidence,updated_at
-card_role_scores,cd7bb96f-dbd2-434c-94cb-875ebe8b3a47,"Mr. Wiggles, Helpful Butterfly",,ramp,commander,any,any,unknown,,,,,,deterministic_heuristic_v1,77,,,,mana_or_land_ramp_text,2026-05-05T18:10:38.537788Z

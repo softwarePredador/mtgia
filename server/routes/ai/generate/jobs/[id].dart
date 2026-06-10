@@ -16,7 +16,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
   final userId = context.read<String>();
   final pool = context.read<Pool>();
   final job = await AiGenerateJobStore.get(pool, id);
-  if (job == null || (job.userId != null && job.userId != userId)) {
+  if (job == null || job.userId.isEmpty || job.userId != userId) {
     return Response.json(
       statusCode: HttpStatus.notFound,
       body: {

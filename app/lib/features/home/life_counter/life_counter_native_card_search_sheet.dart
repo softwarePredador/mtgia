@@ -79,7 +79,7 @@ class _LifeCounterNativeCardSearchSheetState
                     border: Border.all(color: AppTheme.outlineMuted),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x66000000),
+                        color: AppTheme.overlayBlack40,
                         blurRadius: 28,
                         offset: Offset(0, 10),
                       ),
@@ -172,6 +172,7 @@ class _LifeCounterNativeCardSearchSheetState
                                               key: const Key(
                                                 'life-counter-native-card-search-clear',
                                               ),
+                                              tooltip: 'Limpar busca',
                                               onPressed: () {
                                                 _controller.clear();
                                                 provider.clearSearch();
@@ -298,26 +299,33 @@ class _CardSearchSuggestionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: chipKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceElevated,
+    return Semantics(
+      button: true,
+      label: 'Buscar $label',
+      child: Tooltip(
+        message: 'Buscar $label',
+        child: Material(
+          key: chipKey,
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: AppTheme.outlineMuted),
-          ),
-          child: Text(
-            label.toUpperCase(),
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: AppTheme.fontXs,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
+            onTap: onTap,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: AppTheme.outlineMuted),
+              ),
+              child: Text(
+                label.toUpperCase(),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: AppTheme.fontXs,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
             ),
           ),
         ),
@@ -334,79 +342,87 @@ class _CardSearchResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: tileKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
-          );
-        },
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceElevated,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.outlineMuted),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 38,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSlate,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.style_rounded,
-                  color: AppTheme.textSecondary,
-                  size: 18,
-                ),
+    final cardName = card.name;
+    return Semantics(
+      button: true,
+      label: 'Abrir detalhes de $cardName',
+      child: Tooltip(
+        message: 'Abrir $cardName',
+        child: Material(
+          key: tileKey,
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
+              );
+            },
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.outlineMuted),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontSize: AppTheme.fontMd,
-                        fontWeight: FontWeight.w800,
-                      ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceSlate,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      [
-                        if (card.typeLine.trim().isNotEmpty) card.typeLine,
-                        if (card.setCode.trim().isNotEmpty)
-                          card.setCode.toUpperCase(),
-                      ].join('  •  '),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontSm,
-                        fontWeight: FontWeight.w600,
-                        height: 1.25,
-                      ),
+                    child: const Icon(
+                      Icons.style_rounded,
+                      color: AppTheme.textSecondary,
+                      size: 18,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: AppTheme.fontMd,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          [
+                            if (card.typeLine.trim().isNotEmpty) card.typeLine,
+                            if (card.setCode.trim().isNotEmpty)
+                              card.setCode.toUpperCase(),
+                          ].join('  •  '),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontSm,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(
+                    Icons.open_in_new_rounded,
+                    color: AppTheme.textSecondary,
+                    size: 18,
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              const Icon(
-                Icons.open_in_new_rounded,
-                color: AppTheme.textSecondary,
-                size: 18,
-              ),
-            ],
+            ),
           ),
         ),
       ),

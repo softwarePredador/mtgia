@@ -203,5 +203,21 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('sem overflow — tablet landscape 820px', (tester) async {
+      final deck = makeDeck(
+        name: 'Atraxa Superfriends',
+        format: 'commander',
+        description: 'Control deck focado em planeswalkers com muitas cores, counter mágicas e remoções eficientes para o formato Commander.',
+        cardCount: 100,
+        synergyScore: 82,
+        commanderName: 'Atraxa, Praetors\' Voice',
+        colorIdentity: ['W', 'U', 'B', 'G'],
+        isPublic: true,
+      );
+      await tester.pumpWidget(buildTestWidget(deck, width: 820));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
   });
 }

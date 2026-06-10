@@ -1,3 +1,4 @@
+import 'commander_fallback_policy.dart';
 import 'functional_card_tags.dart';
 import 'optimization_functional_roles.dart';
 import 'optimize_runtime_support.dart';
@@ -442,7 +443,9 @@ List<CandidateFunctionTag> inferCandidateFunctionTags({
       normalizedName.contains('thassa') && normalizedName.contains('oracle') ||
       normalizedName.contains('dramatic reversal') ||
       normalizedName.contains('isochron scepter')) {
-    add('combo_piece', 0.74, 'combo_pattern_text_or_known_name');
+    // Baixa confiança: a fonte real de combo_piece é card_function_tags
+    // persistida pelo sync do Commander Spellbook.
+    add('combo_piece', 0.60, 'combo_pattern_text_or_known_name');
   }
 
   if (oracle.contains('graveyard') ||
@@ -587,19 +590,8 @@ String inferCandidateBracketScope({
   required String budgetTier,
 }) {
   final normalizedName = normalizeCandidateQualityKey(name);
-  const highPowerNames = {
-    'mana crypt',
-    'mox diamond',
-    'chrome mox',
-    'force of will',
-    'force of negation',
-    'fierce guardianship',
-    'vampiric tutor',
-    'demonic tutor',
-    'thassa\'s oracle',
-  };
 
-  if (highPowerNames.contains(normalizedName) ||
+  if (candidateQualityHighPowerNames.contains(normalizedName) ||
       budgetTier == 'expensive' ||
       role == 'combo_piece' && score >= 60) {
     return 'bracket_3_4';
@@ -609,56 +601,8 @@ String inferCandidateBracketScope({
 }
 
 bool isPremiumCommanderCandidateName(String name) {
-  const premium = {
-    'arcane signet',
-    'sol ring',
-    'swords to plowshares',
-    'path to exile',
-    'cyclonic rift',
-    'counterspell',
-    'rhystic study',
-    'lightning greaves',
-    'swiftfoot boots',
-    'teferi\'s protection',
-    'toxic deluge',
-    'blasphemous act',
-    'beast within',
-    'chaos warp',
-  };
-  return premium.contains(normalizeCandidateQualityKey(name));
-}
-
-String buildCandidateQualitySamplePoolSql() {
-  return '''
-SELECT
-  cqs.card_id::text,
-  cqs.card_name,
-  cqs.function_tags,
-  cqs.best_role_score,
-  cqs.meta_deck_count
-FROM optimize_candidate_quality_summary cqs
-JOIN cards c ON c.id = cqs.card_id
-LEFT JOIN card_legalities cl
-  ON cl.card_id = c.id
-  AND cl.format = 'commander'
-WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-  AND c.type_line NOT ILIKE '%land%'
-  AND (
-    c.color_identity <@ @identity::text[]
-    OR c.color_identity = '{}'
-    OR (
-      c.color_identity IS NULL
-      AND (
-        c.colors <@ @identity::text[]
-        OR c.colors = '{}'
-        OR c.colors IS NULL
-      )
-    )
-  )
-  AND @role = ANY(cqs.scored_roles)
-ORDER BY cqs.best_role_score DESC, cqs.meta_deck_count DESC, cqs.card_name ASC
-LIMIT @limit
-''';
+  return candidateQualityPremiumNames
+      .contains(normalizeCandidateQualityKey(name));
 }
 
 double _estimateManaCostCmc(String manaCost) {

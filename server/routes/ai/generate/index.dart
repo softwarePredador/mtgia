@@ -14,6 +14,7 @@ import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
+import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
@@ -100,6 +101,18 @@ Future<Response> onRequest(RequestContext context) async {
         'Commander reference profile/card stats unavailable; continuing legacy generate path. '
         'error=$error',
       );
+    }
+
+    var usageHotCardsPrompt = '';
+    if (requestedCommanderName != null && requestedCommanderName.isNotEmpty) {
+      try {
+        final hotCards = await loadUsageHotCards(
+          pool: pool,
+          commanderName: requestedCommanderName,
+          limit: 12,
+        );
+        usageHotCardsPrompt = buildUsageHotCardsPrompt(hotCards);
+      } catch (_) {}
     }
     timings['reference_profile_ms'] =
         referenceProfileStopwatch.elapsedMilliseconds;
@@ -358,6 +371,7 @@ Deck construction guidelines:
             buildCommanderReferenceDeckCorpusPrompt(
               referenceDeckCorpusGuidance,
             ),
+            if (usageHotCardsPrompt.isNotEmpty) usageHotCardsPrompt,
           ].where((line) => line.trim().isNotEmpty).join('\n')
         : archetypeReferenceStats.isNotEmpty
             ? buildCommanderReferenceArchetypeStatsPrompt(
@@ -683,6 +697,17 @@ $metaContext
         ),
     };
 
+    // Fire-and-forget: loga deck gerado para aprendizado (mesmo nao salvo)
+    if (format.toLowerCase() == 'commander' && validation.isValid) {
+      unawaited(
+        logGeneratedDeckForLearning(
+          pool: pool,
+          responseBody: responseBody,
+          source: 'ai_generated',
+        ),
+      );
+    }
+
     if (validation.invalidCards.isNotEmpty || validation.warnings.isNotEmpty) {
       responseBody['warnings'] = {
         'invalid_cards': validation.invalidCards,
@@ -789,6 +814,10 @@ Future<Response> _startAiGenerateAsyncJob({
   } catch (_) {
     userId = null;
   }
+  if (userId == null || userId.isEmpty) {
+    return unauthorized('Authentication required');
+  }
+  final authenticatedUserId = userId;
 
   final requestStopwatch = Stopwatch()..start();
   final referenceCacheVersion = await _resolveReferenceGenerateCacheVersion(
@@ -809,7 +838,7 @@ Future<Response> _startAiGenerateAsyncJob({
     pool: pool,
     cacheKey: cacheKey,
     format: format,
-    userId: userId,
+    userId: authenticatedUserId,
   );
 
   final syncPayload = buildAiGenerateSyncPayloadForAsyncJob(body);

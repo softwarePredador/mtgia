@@ -1,0 +1,321 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Elsha of the Infinite #96 (real), Zhulodok, Void Gorger #46 (real), Kraum, Ludevic's Opus #86 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Elsha of the Infinite #96 (real): 1 mulligan(s), 7 cards, 2 lands
+  Zhulodok, Void Gorger #46 (real): 0 mulligan(s), 7 cards, 3 lands
+  Kraum, Ludevic's Opus #86 (real): 3 mulligan(s), 5 cards, 1 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=0
+  MANA Elsha of the Infinite #96 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Elsha of the Infinite #96 (real): Talisman of Creativity (CMC=2.0) [ramp_permanent] rule=known_cards_manual/verified
+  END Elsha of the Infinite #96 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=7 Board=0
+  MANA Zhulodok, Void Gorger #46 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=0
+  MANA Kraum, Ludevic's Opus #86 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Sensei's Divining Top (CMC=1.0) [topdeck_manipulation] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 2 - Elsha of the Infinite #96 (real) | Life=40 Hand=5 Board=3
+  MANA Elsha of the Infinite #96 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 2 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=7 Board=1
+  MANA Zhulodok, Void Gorger #46 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=1
+  MANA Kraum, Ludevic's Opus #86 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=7 Board=5
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=40 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Elsha of the Infinite #96 (real) | Life=39 Hand=5 Board=5
+  MANA Elsha of the Infinite #96 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Elsha of the Infinite #96 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Elsha of the Infinite #96 (real): Chain of Vapor removed Esper Sentinel from Lorehold
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=39 Hand=3 Board=7 Grave=1 Discarded=0
+
+TURN 3 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=3
+  MANA Zhulodok, Void Gorger #46 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=2
+  MANA Kraum, Ludevic's Opus #86 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=36 Hand=9 Board=5
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=36 Hand=7 Board=6 Grave=4 Discarded=1
+
+TURN 4 - Elsha of the Infinite #96 (real) | Life=39 Hand=3 Board=7
+  MANA Elsha of the Infinite #96 (real): 6 available (6 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=39 Hand=2 Board=9 Grave=1 Discarded=0
+
+TURN 4 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=5
+  MANA Zhulodok, Void Gorger #46 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=5 Board=7 Grave=0 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=3
+  MANA Kraum, Ludevic's Opus #86 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=5 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=28 Hand=7 Board=6
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=39)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 5 player damage, target life 34, target_dead=False
+  END Lorehold: Life=28 Hand=7 Board=8 Grave=4 Discarded=0
+
+TURN 5 - Elsha of the Infinite #96 (real) | Life=34 Hand=2 Board=9
+  MANA Elsha of the Infinite #96 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Elsha of the Infinite #96 (real): Artist's Talent (CMC=2.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=28)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 5 player damage, target life 23, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=34 Hand=4 Board=10 Grave=1 Discarded=0
+
+TURN 5 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=5 Board=7
+  MANA Zhulodok, Void Gorger #46 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=23)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 19, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=5 Board=8 Grave=0 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=5
+  MANA Kraum, Ludevic's Opus #86 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=19)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 15, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=15 Hand=7 Board=8
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Imperial Recruiter (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Imperial Recruiter found Storm Herd (any)
+  RESOLVE Lorehold: Faithless Looting (CMC=1.0) [draw_cards] rule=curated/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=34)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 5 player damage, target life 29, target_dead=False
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Blasphemous Act (any)
+  END Lorehold: Life=15 Hand=7 Board=9 Grave=8 Discarded=0
+
+TURN 6 - Elsha of the Infinite #96 (real) | Life=29 Hand=4 Board=10
+  MANA Elsha of the Infinite #96 (real): 7 available (7 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Elsha of the Infinite #96 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=15)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 5 player damage, target life 10, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=29 Hand=4 Board=11 Grave=2 Discarded=0
+
+TURN 6 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=5 Board=8
+  MANA Zhulodok, Void Gorger #46 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=10)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Lorehold: 4 player damage, target life 6, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=6 Board=8 Grave=0 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=5 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=6)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Lorehold: 4 player damage, target life 2, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 7 - Lorehold | Life=2 Hand=7 Board=9
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  RESOLVE Lorehold: Reforge the Soul (CMC=5.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=29)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 5 player damage, target life 24, target_dead=False
+  END Lorehold: Life=2 Hand=7 Board=11 Grave=14 Discarded=5
+
+TURN 7 - Elsha of the Infinite #96 (real) | Life=24 Hand=4 Board=11
+  MANA Elsha of the Infinite #96 (real): 8 available (8 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=lethal, target_life=2)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 5 player damage, target life -3, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+TURN 7 - Zhulodok, Void Gorger #46 (real) | Life=40 Hand=6 Board=8
+  MANA Zhulodok, Void Gorger #46 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 20, target_dead=False
+  RESOLVE Elsha of the Infinite #96 (real): Force of Will (CMC=5.0) [counter] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=40 Hand=7 Board=8 Grave=0 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Valakut Awakening (CMC=3.0) [draw_cards] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=20)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 16, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=6 Grave=1 Discarded=0
+
+TURN 8 - Elsha of the Infinite #96 (real) | Life=16 Hand=3 Board=12
+  MANA Elsha of the Infinite #96 (real): 9 available (9 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Elsha of the Infinite #96 (real): Brainstorm (CMC=1.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 5 player damage, target life 35, target_dead=False
+  RESOLVE Elsha of the Infinite #96 (real): Wheel of Fortune (CMC=3.0) [draw_cards] rule=curated/verified
+  END Elsha of the Infinite #96 (real): Life=16 Hand=7 Board=12 Grave=8 Discarded=4
+
+TURN 8 - Zhulodok, Void Gorger #46 (real) | Life=35 Hand=7 Board=8
+  MANA Zhulodok, Void Gorger #46 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=16)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 12, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=35 Hand=7 Board=9 Grave=0 Discarded=0
+
+TURN 8 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=7 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 5 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=7 Grave=2 Discarded=0
+
+TURN 9 - Elsha of the Infinite #96 (real) | Life=12 Hand=7 Board=12
+  MANA Elsha of the Infinite #96 (real): 9 available (9 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Elsha of the Infinite #96 (real): Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Elsha of the Infinite #96 (real): Gamble found Smothering Tithe (any)
+  COMBAT Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 5 player damage, target life 30, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=12 Hand=6 Board=14 Grave=10 Discarded=0
+
+TURN 9 - Zhulodok, Void Gorger #46 (real) | Life=30 Hand=7 Board=9
+  MANA Zhulodok, Void Gorger #46 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=12)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 8, target_dead=False
+  END Zhulodok, Void Gorger #46 (real): Life=30 Hand=7 Board=10 Grave=0 Discarded=0
+
+TURN 9 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=7
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Brainstorm (CMC=1.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=8)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 4, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=8 Grave=3 Discarded=0
+
+TURN 10 - Elsha of the Infinite #96 (real) | Life=4 Hand=6 Board=14
+  MANA Elsha of the Infinite #96 (real): 10 available (10 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Elsha of the Infinite #96 (real): Gitaxian Probe (CMC=1.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=30)
+  DAMAGE Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 5 player damage, target life 25, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=4 Hand=5 Board=17 Grave=11 Discarded=0
+
+TURN 10 - Zhulodok, Void Gorger #46 (real) | Life=25 Hand=7 Board=10
+  MANA Zhulodok, Void Gorger #46 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Zhulodok, Void Gorger #46 (real): Ugin, the Spirit Dragon (CMC=8.0) [board_wipe] rule=known_cards_manual/verified
+  RESOLVE Elsha of the Infinite #96 (real): Swan Song (CMC=1.0) [counter] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=25 Hand=7 Board=8 Grave=1 Discarded=0
+
+TURN 10 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=6 Board=6
+  MANA Kraum, Ludevic's Opus #86 (real): 6 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  RESOLVE Elsha of the Infinite #96 (real): Mental Misstep (CMC=1.0) [counter] rule=curated/verified
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=6 Board=8 Grave=4 Discarded=0
+
+TURN 11 - Elsha of the Infinite #96 (real) | Life=4 Hand=3 Board=13
+  MANA Elsha of the Infinite #96 (real): 11 available (11 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Elsha of the Infinite #96 (real): Silence (CMC=1.0) [silence_opponents] rule=curated/verified
+  END Elsha of the Infinite #96 (real): Life=4 Hand=2 Board=15 Grave=13 Discarded=0
+
+TURN 11 - Zhulodok, Void Gorger #46 (real) | Life=25 Hand=7 Board=8
+  MANA Zhulodok, Void Gorger #46 (real): 7 available (7 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Elsha of the Infinite #96 (real): Fierce Guardianship (CMC=3.0) [counter] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=25 Hand=7 Board=10 Grave=1 Discarded=0
+
+TURN 11 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=8 Board=8
+  MANA Kraum, Ludevic's Opus #86 (real): 7 available (7 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=4)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Elsha of the Infinite #96 (real): 1 player damage, target life 3, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=10 Grave=6 Discarded=2
+
+TURN 12 - Elsha of the Infinite #96 (real) | Life=3 Hand=1 Board=15
+  MANA Elsha of the Infinite #96 (real): 12 available (11 sources, 1 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Elsha of the Infinite #96 (real): Powerbalance (CMC=2.0) [draw_engine] rule=curated/verified
+  COMBAT Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=25)
+  DAMAGE Elsha of the Infinite #96 (real) -> Zhulodok, Void Gorger #46 (real): 4 player damage, target life 21, target_dead=False
+  END Elsha of the Infinite #96 (real): Life=3 Hand=2 Board=17 Grave=13 Discarded=0
+
+TURN 12 - Zhulodok, Void Gorger #46 (real) | Life=21 Hand=7 Board=10
+  MANA Zhulodok, Void Gorger #46 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life -1, target_dead=True
+  >>> DIED: Elsha of the Infinite #96 (real) (life_zero) <<<
+
+TURN 12 - Kraum, Ludevic's Opus #86 (real) | Life=40 Hand=10 Board=10
+  MANA Kraum, Ludevic's Opus #86 (real): 8 available (8 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Mana Vault (CMC=1.0) [ramp_permanent] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=21)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 5 player damage, target life 16, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=40 Hand=7 Board=13 Grave=8 Discarded=1
+
+TURN 13 - Zhulodok, Void Gorger #46 (real) | Life=16 Hand=7 Board=11
+  MANA Zhulodok, Void Gorger #46 (real): 8 available (8 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 36, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Swan Song (CMC=1.0) [counter] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=16 Hand=7 Board=12 Grave=1 Discarded=0
+
+TURN 13 - Kraum, Ludevic's Opus #86 (real) | Life=36 Hand=6 Board=13
+  MANA Kraum, Ludevic's Opus #86 (real): 12 available (10 sources, 0 treasures, pool={'generic': 7, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=16)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 5 player damage, target life 11, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=36 Hand=6 Board=15 Grave=8 Discarded=0
+
+TURN 14 - Zhulodok, Void Gorger #46 (real) | Life=11 Hand=7 Board=12
+  MANA Zhulodok, Void Gorger #46 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 32, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Dark Ritual (CMC=1.0) [draw_cards] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=11 Hand=7 Board=12 Grave=2 Discarded=1
+
+TURN 14 - Kraum, Ludevic's Opus #86 (real) | Life=32 Hand=6 Board=15
+  MANA Kraum, Ludevic's Opus #86 (real): 13 available (11 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Underworld Breach (CMC=2.0) [recursion] rule=curated/verified
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kraum, Ludevic's Opus #86 (real): Demonic Tutor found Mindbreak Trap (any)
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=11)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 6 player damage, target life 5, target_dead=False
+  END Kraum, Ludevic's Opus #86 (real): Life=32 Hand=7 Board=15 Grave=11 Discarded=1
+
+TURN 15 - Zhulodok, Void Gorger #46 (real) | Life=5 Hand=7 Board=12
+  MANA Zhulodok, Void Gorger #46 (real): 9 available (9 sources, 0 treasures, pool={'generic': 9, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=32)
+  DAMAGE Zhulodok, Void Gorger #46 (real) -> Kraum, Ludevic's Opus #86 (real): 4 player damage, target life 28, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Mental Misstep (CMC=1.0) [counter] rule=curated/verified
+  END Zhulodok, Void Gorger #46 (real): Life=5 Hand=7 Board=13 Grave=2 Discarded=0
+
+TURN 15 - Kraum, Ludevic's Opus #86 (real) | Life=28 Hand=6 Board=15
+  MANA Kraum, Ludevic's Opus #86 (real): 13 available (11 sources, 0 treasures, pool={'generic': 8, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Valakut Awakening (CMC=3.0) [draw_cards] rule=curated/verified
+  RESOLVE Kraum, Ludevic's Opus #86 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Kraum, Ludevic's Opus #86 (real): Chain of Vapor removed Orim's Chant from Lorehold
+  COMBAT Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=lethal, target_life=5)
+  DAMAGE Kraum, Ludevic's Opus #86 (real) -> Zhulodok, Void Gorger #46 (real): 6 player damage, target life -1, target_dead=True
+  >>> DIED: Zhulodok, Void Gorger #46 (real) (life_zero) <<<
+
+GAME OVER - Turn 15
+Winner: Kraum, Ludevic's Opus #86 (real) (elimination)
+Lorehold: DEAD Life=-3 Hand=7
+Elsha of the Infinite #96 (real): DEAD Life=-1 Hand=2
+Zhulodok, Void Gorger #46 (real): DEAD Life=-1 Hand=7
+Kraum, Ludevic's Opus #86 (real): ALIVE Life=28 Hand=5

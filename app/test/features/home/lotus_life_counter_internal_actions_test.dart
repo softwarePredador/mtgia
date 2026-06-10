@@ -161,8 +161,16 @@ Future<void> _captureDebugLogs(
 
 void main() {
   group('LotusLifeCounterScreen internal actions fallback', () {
-    setUp(() {
+    setUp(() async {
       SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    });
+
+    tearDown(() async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
     });
 
     testWidgets('opens native day night from a shell fallback shortcut', (

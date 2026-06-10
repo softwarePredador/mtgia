@@ -545,7 +545,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                 child: const Text(
                   'Aponte para a carta — detecção automática',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: AppTheme.textSecondary,
                     fontSize: AppTheme.fontMd,
                   ),
                 ),
@@ -660,35 +660,42 @@ class _CardScannerScreenState extends State<CardScannerScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  GestureDetector(
-                    onTap: _captureAndProcess,
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          width: 2.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            spreadRadius: 2,
+                  Semantics(
+                    button: true,
+                    label: 'Capturar carta manualmente',
+                    child: Tooltip(
+                      message: 'Capturar carta',
+                      child: GestureDetector(
+                        onTap: _captureAndProcess,
+                        child: Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              width: 2.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 28,
-                          color: Colors.black87,
+                          child: Container(
+                            margin: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 28,
+                              color: AppTheme.backgroundAbyss,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -719,7 +726,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             const Icon(
               Icons.camera_alt_outlined,
               size: 80,
-              color: Colors.white54,
+              color: AppTheme.textHint,
             ),
             const SizedBox(height: 24),
             Text(

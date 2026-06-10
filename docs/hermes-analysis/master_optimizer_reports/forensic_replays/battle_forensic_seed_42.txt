@@ -1,0 +1,207 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Magda, Brazen Outlaw #90 (real), Ishai, Ojutai Dragonspeaker #52 (real), Rograkh, Son of Rohgahh #94 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Magda, Brazen Outlaw #90 (real): 1 mulligan(s), 7 cards, 2 lands
+  Ishai, Ojutai Dragonspeaker #52 (real): 2 mulligan(s), 6 cards, 2 lands
+  Rograkh, Son of Rohgahh #94 (real): 3 mulligan(s), 5 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=0
+  MANA Magda, Brazen Outlaw #90 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=40 Hand=6 Board=0
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #94 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #94 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #94 (real): Life=40 Hand=3 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 2 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=1
+  MANA Magda, Brazen Outlaw #90 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Shatterskull Smashing (CMC=2.0) [deal_damage] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0
+
+TURN 2 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=40 Hand=6 Board=1
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #94 (real) | Life=40 Hand=3 Board=2
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Rograkh, Son of Rohgahh #94 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  END Rograkh, Son of Rohgahh #94 (real): Life=40 Hand=3 Board=2 Grave=2 Discarded=0
+
+TURN 3 - Lorehold | Life=38 Hand=4 Board=4
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=38 Hand=4 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=2
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Untimely Malfunction (CMC=2.0) [remove_permanent] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=6 Board=2 Grave=2 Discarded=0
+
+TURN 3 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=40 Hand=6 Board=2
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #94 (real) | Life=40 Hand=3 Board=2
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Rograkh, Son of Rohgahh #94 (real): Life=40 Hand=3 Board=3 Grave=2 Discarded=0
+
+TURN 4 - Lorehold | Life=38 Hand=4 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=manual/verified
+  END Lorehold: Life=38 Hand=3 Board=7 Grave=2 Discarded=0
+
+TURN 4 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=6 Board=2
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Smuggler's Copter (CMC=2.0) [draw_engine] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=3 Grave=3 Discarded=1
+
+TURN 4 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=40 Hand=7 Board=2
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 4 - Rograkh, Son of Rohgahh #94 (real) | Life=40 Hand=3 Board=3
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Rograkh, Son of Rohgahh #94 (real): Deflecting Swat (CMC=3.0) [redirect_removal] rule=manual/verified
+  RESOLVE Ishai, Ojutai Dragonspeaker #52 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Rograkh, Son of Rohgahh #94 (real): Life=40 Hand=2 Board=3 Grave=4 Discarded=0
+
+TURN 5 - Lorehold | Life=38 Hand=3 Board=7
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=manual/verified
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=manual/verified
+  END Lorehold: Life=38 Hand=1 Board=8 Grave=4 Discarded=0
+
+TURN 5 - Magda, Brazen Outlaw #90 (real) | Life=37 Hand=7 Board=3
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=37 Hand=7 Board=5 Grave=3 Discarded=0
+
+TURN 5 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=37 Hand=6 Board=2
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=37 Hand=7 Board=2 Grave=1 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=2 Board=3
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=3 Board=3 Grave=4 Discarded=0
+
+TURN 6 - Lorehold | Life=38 Hand=1 Board=8
+  MANA Lorehold: 7 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  END Lorehold: Life=38 Hand=1 Board=9 Grave=4 Discarded=0
+
+TURN 6 - Magda, Brazen Outlaw #90 (real) | Life=37 Hand=7 Board=5
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=37 Hand=7 Board=7 Grave=4 Discarded=1
+
+TURN 6 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=37 Hand=7 Board=2
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=37 Hand=6 Board=4 Grave=1 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=3 Board=3
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Rograkh, Son of Rohgahh #94 (real): Gamble (CMC=1.0) [tutor] rule=manual/verified
+  TUTOR Rograkh, Son of Rohgahh #94 (real): Gamble found Flusterstorm (any)
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=4 Board=3 Grave=5 Discarded=0
+
+TURN 7 - Lorehold | Life=38 Hand=1 Board=9
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=manual/verified
+  COMBAT Lorehold -> Magda, Brazen Outlaw #90 (real): 19 attackers, 1 blockers, 0 gang blocks, 38 power (reason=lethal, target_life=37)
+  DAMAGE Lorehold -> Magda, Brazen Outlaw #90 (real): 36 player damage, target life 1, target_dead=False
+  END Lorehold: Life=38 Hand=1 Board=27 Grave=6 Discarded=0
+
+TURN 7 - Magda, Brazen Outlaw #90 (real) | Life=1 Hand=7 Board=7
+  MANA Magda, Brazen Outlaw #90 (real): 5 available (4 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=1 Hand=6 Board=10 Grave=4 Discarded=0
+
+TURN 7 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=37 Hand=6 Board=4
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=37 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=5 Board=3 Grave=5 Discarded=0
+
+TURN 8 - Lorehold | Life=38 Hand=1 Board=27
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COUNTER Rograkh, Son of Rohgahh #94 (real): Flusterstorm countered Path to Exile (cost=1.0)
+  COMBAT Lorehold -> Magda, Brazen Outlaw #90 (real): 18 attackers, 3 blockers, 0 gang blocks, 36 power (reason=lethal, target_life=1)
+  DAMAGE Lorehold -> Magda, Brazen Outlaw #90 (real): 30 player damage, target life -29, target_dead=True
+  >>> DIED: Magda, Brazen Outlaw #90 (real) (life_zero) <<<
+
+TURN 8 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=37 Hand=6 Board=6
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Ishai, Ojutai Dragonspeaker #52 (real): Steam Vents (CMC=3.0) [land] rule=curated/verified
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=37 Hand=6 Board=6 Grave=1 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=5 Board=3 Grave=6 Discarded=0
+
+TURN 9 - Lorehold | Life=38 Hand=0 Board=25
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Ishai, Ojutai Dragonspeaker #52 (real): 15 attackers, 1 blockers, 0 gang blocks, 30 power (reason=default_low_life, target_life=37)
+  DAMAGE Lorehold -> Ishai, Ojutai Dragonspeaker #52 (real): 28 player damage, target life 9, target_dead=False
+  RESOLVE Rograkh, Son of Rohgahh #94 (real): An Offer You Can't Refuse (CMC=1.0) [counter] rule=curated/verified
+  END Lorehold: Life=38 Hand=0 Board=25 Grave=11 Discarded=0
+
+TURN 9 - Ishai, Ojutai Dragonspeaker #52 (real) | Life=9 Hand=6 Board=6
+  MANA Ishai, Ojutai Dragonspeaker #52 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Ishai, Ojutai Dragonspeaker #52 (real): Life=9 Hand=5 Board=8 Grave=1 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=4 Board=4 Grave=6 Discarded=0
+
+TURN 10 - Lorehold | Life=38 Hand=0 Board=25
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 3})
+  COMBAT Lorehold -> Ishai, Ojutai Dragonspeaker #52 (real): 14 attackers, 2 blockers, 0 gang blocks, 28 power (reason=lethal, target_life=9)
+  DAMAGE Lorehold -> Ishai, Ojutai Dragonspeaker #52 (real): 24 player damage, target life -15, target_dead=True
+  >>> DIED: Ishai, Ojutai Dragonspeaker #52 (real) (life_zero) <<<
+
+TURN 10 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=4 Board=4
+  MANA Rograkh, Son of Rohgahh #94 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=4 Board=6 Grave=6 Discarded=0
+
+TURN 11 - Lorehold | Life=38 Hand=0 Board=24
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 3})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #94 (real): 12 attackers, 0 blockers, 0 gang blocks, 24 power (reason=default_low_life, target_life=37)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #94 (real): 24 player damage, target life 13, target_dead=False
+  END Lorehold: Life=38 Hand=0 Board=25 Grave=13 Discarded=0
+
+TURN 11 - Rograkh, Son of Rohgahh #94 (real) | Life=13 Hand=4 Board=6
+  MANA Rograkh, Son of Rohgahh #94 (real): 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Rograkh, Son of Rohgahh #94 (real): Underground Sea (CMC=3.0) [land] rule=curated/verified
+  RESOLVE Rograkh, Son of Rohgahh #94 (real): Mystic Remora (CMC=1.0) [draw_engine] rule=curated/verified
+  END Rograkh, Son of Rohgahh #94 (real): Life=13 Hand=5 Board=7 Grave=6 Discarded=0
+
+TURN 12 - Lorehold | Life=38 Hand=0 Board=25
+  MANA Lorehold: 12 available (9 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 3})
+  RESOLVE Lorehold: Rise of the Eldrazi (CMC=12.0) [remove_permanent] rule=curated/verified
+  REMOVAL Lorehold: Rise of the Eldrazi removed Dwarven Bloodboiler from Magda, Brazen Outlaw #90 (real)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #94 (real): 12 attackers, 0 blockers, 0 gang blocks, 24 power (reason=lethal, target_life=13)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #94 (real): 24 player damage, target life -11, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #94 (real) (life_zero) <<<
+
+GAME OVER - Turn 12
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=38 Hand=0
+Magda, Brazen Outlaw #90 (real): DEAD Life=-29 Hand=6
+Ishai, Ojutai Dragonspeaker #52 (real): DEAD Life=-15 Hand=5
+Rograkh, Son of Rohgahh #94 (real): DEAD Life=-11 Hand=5

@@ -224,7 +224,7 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
         title: Text(
           widget.loadLatest ? 'Última Edição' : set?.code ?? 'Coleção',
         ),
-        backgroundColor: AppTheme.surfaceElevated,
+        backgroundColor: AppTheme.backgroundAbyss,
         actions: [
           IconButton(
             onPressed: _isLoading ? null : _loadSetAndCards,
@@ -240,7 +240,7 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+        child: CircularProgressIndicator(color: AppTheme.brass500),
       );
     }
 
@@ -273,7 +273,7 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
               _cards.isEmpty
                   ? _EmptySetCardsState(set: set, onRefresh: _loadSetAndCards)
                   : RefreshIndicator(
-                    color: AppTheme.manaViolet,
+                    color: AppTheme.brass500,
                     onRefresh: _loadSetAndCards,
                     child: ListView.separated(
                       key: const Key('setCardsList'),
@@ -287,7 +287,7 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
                             padding: EdgeInsets.all(16),
                             child: Center(
                               child: CircularProgressIndicator(
-                                color: AppTheme.manaViolet,
+                                color: AppTheme.brass500,
                               ),
                             ),
                           );
@@ -331,7 +331,7 @@ class _SetHeader extends StatelessWidget {
                 _InfoChip(
                   icon: Icons.confirmation_number_outlined,
                   label: set.code,
-                  accent: AppTheme.mythicGold,
+                  accent: AppTheme.brass400,
                 ),
                 _StatusChip(set: set),
                 _InfoChip(
@@ -513,7 +513,7 @@ class _StatusChip extends StatelessWidget {
     final color = switch (set.status) {
       'future' => AppTheme.primarySoft,
       'new' => AppTheme.success,
-      'current' => AppTheme.mythicGold,
+      'current' => AppTheme.brass400,
       _ => AppTheme.textSecondary,
     };
     return _InfoChip(

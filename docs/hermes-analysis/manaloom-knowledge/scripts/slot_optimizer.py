@@ -2,7 +2,7 @@
 """Safe Lorehold slot scan.
 
 This script proposes and tests isolated swaps only for the current approved
-baseline. It does not edit battle_analyst_v8.py directly and it refuses stale
+baseline. It does not edit the battle engine directly and it refuses stale
 deck state before scanning.
 """
 
@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -36,7 +37,9 @@ from master_optimizer_common import (
 import battle_rule_registry
 
 KC_JSON = SCRIPT_DIR / "known_cards_generated.json"
-LOCK_FILE = Path(os.environ.get("MANALOOM_SLOT_SCAN_LOCK", "/tmp/optimizer_v3.lock"))
+LOCK_FILE = Path(
+    os.environ.get("MANALOOM_SLOT_SCAN_LOCK", str(Path(tempfile.gettempdir()) / "optimizer_v3.lock"))
+)
 
 EFFECT_TO_CATEGORY = {
     "ramp_permanent": "ramp",
@@ -65,6 +68,33 @@ EFFECT_TO_CATEGORY = {
     "recursion": "engine",
     "ripple_engine": "engine",
 }
+# Roles reais do card_deck_analysis → categorias do optimizer
+# Prioridade maxima: evita swaps entre categorias diferentes
+REAL_ROLE_TO_CATEGORY = {
+    "wincon": "wincon",
+    "finisher": "wincon",
+    "combo": "wincon",
+    "removal": "removal",
+    "spot_removal": "removal",
+    "ramp": "ramp",
+    "ritual": "ramp",
+    "mana_rock": "ramp",
+    "draw": "draw",
+    "card_advantage": "draw",
+    "tutor": "tutor",
+    "board_wipe": "wipe",
+    "wipe": "wipe",
+    "protection": "protection",
+    "stax": "protection",
+    "counter": "protection",
+    "recursion": "engine",
+    "graveyard": "engine",
+    "engine": "engine",
+    "value_engine": "engine",
+    "copy": "engine",
+    "land": "land",
+}
+
 
 CATEGORY_TERMS = {
     "draw": ("draw", "card", "wheel", "discard", "exile the top", "impulse"),
@@ -100,6 +130,8 @@ EXTRA_PROTECTED = {
 }
 
 
+_REAL_ROLES_CACHE = {}
+
 def load_known_cards() -> dict[str, dict[str, object]]:
     if KC_JSON.exists():
         with KC_JSON.open("r", encoding="utf-8") as fh:
@@ -123,11 +155,54 @@ def load_known_cards() -> dict[str, dict[str, object]]:
     return known_cards
 
 
+
+def load_real_roles(conn, deck_id: int) -> dict[str, str]:
+    roles = {}
+    # 1. Try card_deck_analysis (detailed role analysis, most reliable)
+    try:
+        rows = conn.execute(
+            "SELECT LOWER(card_name) as name, LOWER(role_in_deck) as role FROM card_deck_analysis WHERE deck_id = ? AND role_in_deck IS NOT NULL AND role_in_deck != ''",
+            (deck_id,),
+        ).fetchall()
+        for row in rows:
+            name = str(row["name"] or "").strip()
+            role = str(row["role"] or "").strip().lower()
+            if name and role:
+                mapped = REAL_ROLE_TO_CATEGORY.get(role)
+                if mapped:
+                    roles[name] = mapped
+    except Exception:
+        pass
+
+    # 2. Fallback: deck_cards.functional_tag (lighter annotation)
+    if not roles:
+        try:
+            rows = conn.execute(
+                "SELECT LOWER(card_name) as name, LOWER(functional_tag) as tag FROM deck_cards WHERE deck_id = ? AND functional_tag IS NOT NULL AND functional_tag != ''",
+                (deck_id,),
+            ).fetchall()
+            for row in rows:
+                name = str(row["name"] or "").strip()
+                tag = str(row["tag"] or "").strip().lower()
+                if name and tag:
+                    mapped = REAL_ROLE_TO_CATEGORY.get(tag)
+                    if mapped:
+                        roles[name] = mapped
+        except Exception:
+            pass
+
+    return roles
+
+
 def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]]) -> str:
     type_line = str(row["type_line"] or "")
     if "Land" in type_line:
         return "land"
     entry = known_cards.get(name, {})
+    # Prioridade 1: role real do card_deck_analysis (evita swap wincon <-> removal)
+    real_role = _REAL_ROLES_CACHE.get(normalize_name(name), "")
+    if real_role and real_role in REAL_ROLE_TO_CATEGORY:
+        return REAL_ROLE_TO_CATEGORY[real_role]
     if entry.get("deck_category"):
         return str(entry["deck_category"])
     effect = str(entry.get("effect") or "")
@@ -298,6 +373,8 @@ def main() -> int:
                 conn.commit()
 
             rows = deck_rows(conn, args.deck_id)
+            global _REAL_ROLES_CACHE
+            _REAL_ROLES_CACHE = load_real_roles(conn, args.deck_id)
             deck_categories = build_deck_categories(rows, known_cards)
             targets = choose_swap_targets(deck_categories)
             candidates, stats = legal_candidates(

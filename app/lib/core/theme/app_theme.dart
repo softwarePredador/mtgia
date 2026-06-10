@@ -17,9 +17,9 @@ import 'package:flutter/material.dart';
 ///   Qualquer cor fora deste arquivo é violação.
 ///
 /// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
-/// FONT SCALE:   fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
+/// FONT SCALE:   fontMicro(8) / fontTiny(9) / fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
-  static const String uiFontFamily = 'Manrope';
+  static const String uiFontFamily = 'Inter';
   static const String displayFontFamily = 'Fraunces';
 
   // Explicit token to avoid using a hardcoded transparent color at call-sites.
@@ -48,8 +48,90 @@ class AppTheme {
   // Text
   static const Color textPrimary = Color(0xFFF3EFE3); // ivory-100
   static const Color textSecondary = Color(0xFFB8C0CC); // mist-300
-  static const Color textHint = Color(0xFF8A93A3); // mist-500 (hints/placeholders)
+  static const Color textHint = Color(
+    0xFF8A93A3,
+  ); // mist-500 (hints/placeholders)
   static const Color outlineMuted = Color(0xFF2B3142); // slate-700
+
+  // ── Shared overlays ───────────────────────────────────────
+  static const Color overlayBlack20 = Color(0x33000000);
+  static const Color overlayBlack40 = Color(0x66000000);
+  static const Color overlayBlack65 = Color(0xA6000000);
+
+  // ── Life Counter / Tabletop tokens ────────────────────────
+  static const List<Color> lifeCounterPlayerColors = [
+    Color(0xFFFFB51E),
+    Color(0xFFFF0A5B),
+    Color(0xFFCF7AEF),
+    Color(0xFF4B57FF),
+    Color(0xFF44E063),
+    Color(0xFF40B9FF),
+  ];
+
+  static const Color lifeCounterYellow = Color(0xFFFFB51E);
+  static const Color lifeCounterPink = Color(0xFFFF2C77);
+  static const Color lifeCounterPinkText = Color(0xFFFF5E9A);
+  static const Color lifeCounterPinkSoft = Color(0x66FF2C77);
+  static const Color lifeCounterPinkSubtle = Color(0x33FF2C77);
+  static const Color lifeCounterSetLifeDanger = Color(0xFFFF7A9C);
+  static const Color lifeCounterBlue = Color(0xFF40B9FF);
+  static const Color lifeCounterGreen = Color(0xFF44E063);
+  static const Color lifeCounterVictoryGreen = Color(0xFF6BFF8D);
+  static const Color lifeCounterIvory = Color(0xFFF7F4EC);
+  static const Color lifeCounterHubIconDark = Color(0xFF0D1117);
+  static const Color lifeCounterRestartYellow = Color(0xFFFFE277);
+  static const Color lifeCounterSettingsPurple = Color(0xFFB9B4FF);
+  static const Color lifeCounterSettingsSelected = Color(0xFFFFC81E);
+  static const Color lifeCounterSettingsRadio = Color(0xFF1C78FF);
+  static const Color lifeCounterNeutralChip = Color(0xFF454257);
+  static const Color lifeCounterSheetDark = Color(0xFF171717);
+
+  static const List<Color> lifeCounterHubShellGradient = [
+    Color(0xFF04070E),
+    Color(0xFF121A2B),
+  ];
+  static const List<Color> lifeCounterHubShellStrokeGradient = [
+    Color(0xFFEAFDFF),
+    Color(0xFFB9D7FF),
+  ];
+  static const List<Color> lifeCounterHubCoreGradient = [
+    Color(0xFFFDF4FF),
+    Color(0xFFD7EDFF),
+  ];
+  static const List<Color> lifeCounterWinnerGradient = [
+    Color(0xFFFF9CD1),
+    Color(0xFFFFF5A3),
+    Color(0xFFB7FFBE),
+    Color(0xFFB5C8FF),
+  ];
+  static const List<Color> lifeCounterTieGradient = [
+    Color(0xFFFFC55A),
+    Color(0xFFFFE596),
+    Color(0xFFFFB764),
+  ];
+  static const List<Color> lifeCounterConfettiColors = [
+    Color(0xFFFF4C7D),
+    Color(0xFF4A5BFF),
+    Color(0xFFFFC552),
+    Color(0xFF5BDF79),
+    Color(0xFFFFFFFF),
+  ];
+
+  static const Color lifeDeckedOutPanel = Color(0xFF4A3A12);
+  static const Color lifeAnswerLeftPanel = Color(0xFF1D1D1D);
+  static const Color lifeDefeatedPanel = Color(0xFF5B3A6C);
+  static const Color lifeCommanderLethalPanel = Color(0xFF341217);
+  static const Color lifePoisonLethalPanel = Color(0xFF122A18);
+  static const Color lifeDeckedOutTakeover = Color(0xFF2F2407);
+  static const Color lifeAnswerLeftTakeover = Color(0xFF121212);
+  static const Color lifeDefeatedTakeover = Color(0xFF1D1025);
+  static const Color lifeCommanderLethalTakeover = Color(0xFF2B090F);
+  static const Color lifePoisonLethalTakeover = Color(0xFF0C2414);
+  static const Color lifeDeckedOutAccent = Color(0xFFFFD36A);
+  static const Color lifeAnswerLeftAccent = Color(0xFFEDEDED);
+  static const Color lifeDefeatedAccent = Color(0xFFFF5AA9);
+  static const Color lifeCommanderLethalAccent = Color(0xFFFF5B61);
+  static const Color lifeLowTotalWarning = Color(0xFFFFB3A8);
 
   // ── Deprecated aliases (backward compat) ────────────────────
   @Deprecated('Use primarySoft instead')
@@ -105,7 +187,9 @@ class AppTheme {
   static const double radiusLg = 16; // large containers, scanner
   static const double radiusXl = 20; // pills, bottom sheets
 
-  // ── Font Size Scale (7 tokens) ────────────────────────────
+  // ── Font Size Scale (9 tokens) ────────────────────────────
+  static const double fontMicro = 8; // dense metadata, compact helper text
+  static const double fontTiny = 9; // compact deck/card metadata
   static const double fontXs = 10; // badges, chips, mini-labels
   static const double fontSm = 12; // captions, labels, metadata
   static const double fontMd = 14; // body text, list items
@@ -239,19 +323,131 @@ class AppTheme {
       displayColor: textPrimary,
     );
 
-    TextStyle? display(TextStyle? s) =>
-        s?.copyWith(fontFamily: displayFontFamily);
+    TextStyle? ui(
+      TextStyle? s, {
+      double? fontSize,
+      FontWeight? fontWeight,
+      double? height,
+      double? letterSpacing,
+    }) => s?.copyWith(
+      fontFamily: uiFontFamily,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
+
+    TextStyle? display(
+      TextStyle? s, {
+      double? fontSize,
+      FontWeight? fontWeight,
+      double? height,
+      double? letterSpacing,
+    }) => s?.copyWith(
+      fontFamily: displayFontFamily,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
 
     return base.copyWith(
-      displayLarge: display(base.displayLarge),
-      displayMedium: display(base.displayMedium),
-      displaySmall: display(base.displaySmall),
-      headlineLarge: display(base.headlineLarge),
-      headlineMedium: display(base.headlineMedium),
-      headlineSmall: display(base.headlineSmall),
-      titleLarge: display(base.titleLarge),
-      titleMedium: display(base.titleMedium),
-      titleSmall: display(base.titleSmall),
+      displayLarge: display(
+        base.displayLarge,
+        fontWeight: FontWeight.w800,
+        height: 1.04,
+        letterSpacing: -0.6,
+      ),
+      displayMedium: display(
+        base.displayMedium,
+        fontWeight: FontWeight.w800,
+        height: 1.04,
+        letterSpacing: -0.4,
+      ),
+      displaySmall: display(
+        base.displaySmall,
+        fontWeight: FontWeight.w800,
+        height: 1.05,
+        letterSpacing: -0.3,
+      ),
+      headlineLarge: display(
+        base.headlineLarge,
+        fontSize: 30,
+        fontWeight: FontWeight.w800,
+        height: 1.08,
+        letterSpacing: -0.2,
+      ),
+      headlineMedium: display(
+        base.headlineMedium,
+        fontSize: 26,
+        fontWeight: FontWeight.w800,
+        height: 1.08,
+        letterSpacing: -0.15,
+      ),
+      headlineSmall: display(
+        base.headlineSmall,
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        height: 1.08,
+      ),
+      titleLarge: display(
+        base.titleLarge,
+        fontSize: fontXl,
+        fontWeight: FontWeight.w800,
+        height: 1.12,
+      ),
+      titleMedium: ui(
+        base.titleMedium,
+        fontSize: fontLg,
+        fontWeight: FontWeight.w700,
+        height: 1.22,
+        letterSpacing: -0.05,
+      ),
+      titleSmall: ui(
+        base.titleSmall,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+        height: 1.20,
+      ),
+      bodyLarge: ui(
+        base.bodyLarge,
+        fontSize: fontLg,
+        fontWeight: FontWeight.w500,
+        height: 1.38,
+      ),
+      bodyMedium: ui(
+        base.bodyMedium,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w500,
+        height: 1.36,
+      ),
+      bodySmall: ui(
+        base.bodySmall,
+        fontSize: fontSm,
+        fontWeight: FontWeight.w500,
+        height: 1.32,
+      ),
+      labelLarge: ui(
+        base.labelLarge,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+        height: 1.16,
+        letterSpacing: 0.05,
+      ),
+      labelMedium: ui(
+        base.labelMedium,
+        fontSize: fontSm,
+        fontWeight: FontWeight.w700,
+        height: 1.14,
+        letterSpacing: 0.05,
+      ),
+      labelSmall: ui(
+        base.labelSmall,
+        fontSize: fontXs,
+        fontWeight: FontWeight.w700,
+        height: 1.12,
+        letterSpacing: 0.08,
+      ),
     );
   }
 
@@ -272,14 +468,22 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: backgroundAbyss,
     textTheme: _buildTextTheme(),
-    appBarTheme: AppBarTheme(
-      backgroundColor: surfaceSlate,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: backgroundAbyss,
       foregroundColor: textPrimary,
       elevation: 0,
       centerTitle: true,
       shadowColor: transparent,
       surfaceTintColor: transparent,
-      shape: const Border(bottom: BorderSide(color: outlineMuted, width: 0.5)),
+      iconTheme: IconThemeData(color: textSecondary, size: 22),
+      actionsIconTheme: IconThemeData(color: textSecondary, size: 22),
+      titleTextStyle: TextStyle(
+        color: textPrimary,
+        fontFamily: displayFontFamily,
+        fontSize: fontLg + 1,
+        fontWeight: FontWeight.w700,
+      ),
+      shape: Border(bottom: BorderSide(color: outlineMuted, width: 0.5)),
     ),
     cardTheme: CardThemeData(
       color: surfaceSlate,
@@ -302,14 +506,51 @@ class AppTheme {
         shadowColor: transparent,
       ),
     ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: brass500,
+        foregroundColor: backgroundAbyss,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+        ),
+      ),
+    ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: frost400,
+        foregroundColor: brass400,
         side: const BorderSide(color: outlineMuted, width: 1),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: brass400,
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: textSecondary,
+        disabledForegroundColor: textHint,
+      ),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: brass500,
+      foregroundColor: backgroundAbyss,
+      elevation: 0,
+      focusElevation: 0,
+      hoverElevation: 0,
+      highlightElevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radiusMd)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -325,7 +566,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        borderSide: const BorderSide(color: frost400, width: 1.5),
+        borderSide: const BorderSide(color: brass400, width: 1.5),
       ),
     ),
     dialogTheme: DialogThemeData(
@@ -348,6 +589,7 @@ class AppTheme {
       backgroundColor: surfaceElevated,
       contentTextStyle: const TextStyle(
         color: textPrimary,
+        fontFamily: uiFontFamily,
         fontSize: fontMd,
         fontWeight: FontWeight.w500,
       ),
@@ -366,6 +608,23 @@ class AppTheme {
       thickness: 0.5,
       space: 1,
     ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: surfaceSlate,
+      selectedItemColor: brass500,
+      unselectedItemColor: textSecondary,
+      selectedLabelStyle: TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontXs,
+        fontWeight: FontWeight.w700,
+      ),
+      unselectedLabelStyle: TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontXs,
+        fontWeight: FontWeight.w500,
+      ),
+      elevation: 0,
+      type: BottomNavigationBarType.fixed,
+    ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: surfaceSlate,
       indicatorColor: brass500.withValues(alpha: 0.15),
@@ -375,12 +634,17 @@ class AppTheme {
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(
+            fontFamily: uiFontFamily,
             fontSize: fontXs,
             fontWeight: FontWeight.w600,
             color: brass500,
           );
         }
-        return const TextStyle(fontSize: fontXs, color: textSecondary);
+        return const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontXs,
+          color: textSecondary,
+        );
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
@@ -389,13 +653,187 @@ class AppTheme {
         return const IconThemeData(color: textSecondary, size: 22);
       }),
     ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: surfaceElevated,
+      surfaceTintColor: transparent,
+      elevation: 0,
+      textStyle: const TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusMd),
+        side: const BorderSide(color: outlineMuted, width: 0.5),
+      ),
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      textStyle: const TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceSlate,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: outlineMuted, width: 0.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: outlineMuted, width: 0.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: brass400, width: 1.2),
+        ),
+      ),
+      menuStyle: MenuStyle(
+        backgroundColor: const WidgetStatePropertyAll(surfaceElevated),
+        surfaceTintColor: const WidgetStatePropertyAll(transparent),
+        elevation: const WidgetStatePropertyAll(0),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMd),
+            side: const BorderSide(color: outlineMuted, width: 0.5),
+          ),
+        ),
+      ),
+    ),
+    menuTheme: MenuThemeData(
+      style: MenuStyle(
+        backgroundColor: const WidgetStatePropertyAll(surfaceElevated),
+        surfaceTintColor: const WidgetStatePropertyAll(transparent),
+        elevation: const WidgetStatePropertyAll(0),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMd),
+            side: const BorderSide(color: outlineMuted, width: 0.5),
+          ),
+        ),
+      ),
+    ),
+    listTileTheme: const ListTileThemeData(
+      iconColor: textSecondary,
+      textColor: textPrimary,
+      selectedColor: brass400,
+      selectedTileColor: surfaceSlate,
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      titleTextStyle: TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+      ),
+      subtitleTextStyle: TextStyle(
+        color: textSecondary,
+        fontFamily: uiFontFamily,
+        fontSize: fontSm,
+      ),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return brass400;
+        if (states.contains(WidgetState.disabled)) return textHint;
+        return textSecondary;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return brass500.withValues(alpha: 0.26);
+        }
+        return outlineMuted;
+      }),
+      trackOutlineColor: const WidgetStatePropertyAll(outlineMuted),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      checkColor: const WidgetStatePropertyAll(backgroundAbyss),
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return brass500;
+        return transparent;
+      }),
+      side: const BorderSide(color: outlineMuted, width: 1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radiusXs),
+      ),
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return brass400;
+        return textHint;
+      }),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return brass400.withValues(alpha: 0.16);
+          }
+          return transparent;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return brass400;
+          return textSecondary;
+        }),
+        side: const WidgetStatePropertyAll(
+          BorderSide(color: outlineMuted, width: 0.5),
+        ),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(
+            fontFamily: uiFontFamily,
+            fontSize: fontSm,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusSm)),
+        ),
+      ),
+    ),
     chipTheme: ChipThemeData(
       backgroundColor: surfaceSlate,
-      selectedColor: frost400.withValues(alpha: 0.18),
-      labelStyle: const TextStyle(fontSize: fontSm, color: textPrimary),
+      selectedColor: brass400.withValues(alpha: 0.16),
+      labelStyle: const TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontSm,
+        color: textPrimary,
+      ),
       side: const BorderSide(color: outlineMuted, width: 0.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusXs),
+      ),
+    ),
+    tooltipTheme: TooltipThemeData(
+      decoration: BoxDecoration(
+        color: surfaceElevated,
+        borderRadius: BorderRadius.circular(radiusSm),
+        border: Border.all(color: outlineMuted, width: 0.5),
+      ),
+      textStyle: const TextStyle(
+        color: textPrimary,
+        fontFamily: uiFontFamily,
+        fontSize: fontSm,
+      ),
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: brass400,
+      selectionColor: brass400.withValues(alpha: 0.28),
+      selectionHandleColor: brass400,
+    ),
+    tabBarTheme: const TabBarThemeData(
+      dividerColor: transparent,
+      indicatorColor: brass400,
+      labelColor: brass400,
+      unselectedLabelColor: textSecondary,
+      labelStyle: TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w700,
+      ),
+      unselectedLabelStyle: TextStyle(
+        fontFamily: uiFontFamily,
+        fontSize: fontMd,
+        fontWeight: FontWeight.w600,
       ),
     ),
   );

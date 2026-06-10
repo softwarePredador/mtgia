@@ -49,7 +49,7 @@ class _LifeCounterNativeDayNightSheetState
             border: Border.all(color: AppTheme.outlineMuted),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x66000000),
+                color: AppTheme.overlayBlack40,
                 blurRadius: 28,
                 offset: Offset(0, 10),
               ),

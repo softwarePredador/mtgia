@@ -1,0 +1,245 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #119 (real), Grist, the Hunger Tide #66 (real), Magda, Brazen Outlaw #90 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #119 (real): 1 mulligan(s), 7 cards, 2 lands
+  Grist, the Hunger Tide #66 (real): 3 mulligan(s), 5 cards, 0 lands
+  Magda, Brazen Outlaw #90 (real): 1 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #119 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0
+
+TURN 1 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=0
+  MANA Magda, Brazen Outlaw #90 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=7 Board=1
+  MANA Lorehold: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=1
+  MANA Rograkh, Son of Rohgahh #119 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=6 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=7 Board=0 Grave=0 Discarded=0
+
+TURN 2 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=1
+  MANA Magda, Brazen Outlaw #90 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Magda, Brazen Outlaw #90 (real): Smuggler's Copter (CMC=2.0) [draw_engine] rule=curated/verified
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=1
+
+TURN 3 - Lorehold | Life=40 Hand=7 Board=2
+  MANA Lorehold: 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Gamble found Storm Herd (any)
+  END Lorehold: Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=2
+  MANA Rograkh, Son of Rohgahh #119 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=2 Grave=1 Discarded=1
+
+TURN 3 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=7 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=1
+
+TURN 3 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=3
+  MANA Magda, Brazen Outlaw #90 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=4 Grave=2 Discarded=1
+
+TURN 4 - Lorehold | Life=40 Hand=7 Board=3
+  MANA Lorehold: 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=6 Board=5 Grave=1 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=2
+  MANA Rograkh, Son of Rohgahh #119 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=3 Grave=1 Discarded=0
+
+TURN 4 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=7 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=0
+
+TURN 4 - Magda, Brazen Outlaw #90 (real) | Life=40 Hand=7 Board=4
+  MANA Magda, Brazen Outlaw #90 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Magda, Brazen Outlaw #90 (real): Life=40 Hand=7 Board=6 Grave=3 Discarded=1
+
+TURN 5 - Lorehold | Life=40 Hand=6 Board=5
+  MANA Lorehold: 4 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Magda, Brazen Outlaw #90 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Magda, Brazen Outlaw #90 (real): 7 player damage, target life 33, target_dead=False
+  END Lorehold: Life=40 Hand=6 Board=7 Grave=1 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=3
+  MANA Rograkh, Son of Rohgahh #119 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=0
+
+TURN 5 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=7 Board=1
+  MANA Grist, the Hunger Tide #66 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=7 Board=1 Grave=2 Discarded=1
+
+TURN 5 - Magda, Brazen Outlaw #90 (real) | Life=33 Hand=7 Board=6
+  MANA Magda, Brazen Outlaw #90 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 3, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=40)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=33 Hand=7 Board=8 Grave=3 Discarded=0
+
+TURN 6 - Lorehold | Life=36 Hand=6 Board=7
+  MANA Lorehold: 5 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Swords to Plowshares (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Swords to Plowshares removed Rograkh, Son of Rohgahh from Rograkh, Son of Rohgahh #119 (real)
+  COMBAT Lorehold -> Magda, Brazen Outlaw #90 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=33)
+  DAMAGE Lorehold -> Magda, Brazen Outlaw #90 (real): 7 player damage, target life 26, target_dead=False
+  END Lorehold: Life=36 Hand=4 Board=9 Grave=2 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=4
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=4 Grave=2 Discarded=1
+
+TURN 6 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=7 Board=1
+  MANA Grist, the Hunger Tide #66 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=7 Board=2 Grave=2 Discarded=0
+
+TURN 6 - Magda, Brazen Outlaw #90 (real) | Life=26 Hand=7 Board=8
+  MANA Magda, Brazen Outlaw #90 (real): 6 available (6 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=36)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=26 Hand=7 Board=9 Grave=4 Discarded=1
+
+TURN 7 - Lorehold | Life=32 Hand=4 Board=9
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Electroduplicate (CMC=3.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Worldfire (any)
+  COMBAT Lorehold -> Magda, Brazen Outlaw #90 (real): 3 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=26)
+  DAMAGE Lorehold -> Magda, Brazen Outlaw #90 (real): 9 player damage, target life 17, target_dead=False
+  END Lorehold: Life=32 Hand=4 Board=10 Grave=4 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #119 (real) | Life=40 Hand=7 Board=4
+  MANA Rograkh, Son of Rohgahh #119 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=40 Hand=7 Board=5 Grave=2 Discarded=0
+
+TURN 7 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=7 Board=2
+  MANA Grist, the Hunger Tide #66 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=7 Board=2 Grave=3 Discarded=1
+
+TURN 7 - Magda, Brazen Outlaw #90 (real) | Life=17 Hand=7 Board=9
+  MANA Magda, Brazen Outlaw #90 (real): 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 4, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Magda, Brazen Outlaw #90 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=aggro_low_life, target_life=32)
+  DAMAGE Magda, Brazen Outlaw #90 (real) -> Lorehold: 4 player damage, target life 28, target_dead=False
+  END Magda, Brazen Outlaw #90 (real): Life=17 Hand=7 Board=10 Grave=5 Discarded=1
+
+TURN 8 - Lorehold | Life=28 Hand=4 Board=10
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Magda, Brazen Outlaw #90 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=10)
+  DAMAGE Lorehold -> Magda, Brazen Outlaw #90 (real): 10 player damage, target life 0, target_dead=True
+  >>> DIED: Magda, Brazen Outlaw #90 (real) (life_zero) <<<
+
+TURN 8 - Rograkh, Son of Rohgahh #119 (real) | Life=33 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=33 Hand=7 Board=5 Grave=3 Discarded=1
+
+TURN 8 - Grist, the Hunger Tide #66 (real) | Life=33 Hand=7 Board=2
+  MANA Grist, the Hunger Tide #66 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=33 Hand=7 Board=2 Grave=4 Discarded=1
+
+TURN 9 - Lorehold | Life=28 Hand=3 Board=10
+  MANA Lorehold: 6 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=33)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 10 player damage, target life 23, target_dead=False
+  END Lorehold: Life=28 Hand=3 Board=11 Grave=6 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #119 (real) | Life=23 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=23 Hand=7 Board=5 Grave=4 Discarded=1
+
+TURN 9 - Grist, the Hunger Tide #66 (real) | Life=33 Hand=7 Board=2
+  MANA Grist, the Hunger Tide #66 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=33 Hand=7 Board=2 Grave=5 Discarded=0
+
+TURN 10 - Lorehold | Life=28 Hand=3 Board=11
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=21)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 10 player damage, target life 11, target_dead=False
+  END Lorehold: Life=28 Hand=3 Board=12 Grave=6 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #119 (real) | Life=11 Hand=7 Board=5
+  MANA Rograkh, Son of Rohgahh #119 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #119 (real): Life=11 Hand=7 Board=7 Grave=4 Discarded=0
+
+TURN 10 - Grist, the Hunger Tide #66 (real) | Life=31 Hand=7 Board=2
+  MANA Grist, the Hunger Tide #66 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=31 Hand=7 Board=3 Grave=5 Discarded=0
+
+TURN 11 - Lorehold | Life=28 Hand=3 Board=12
+  MANA Lorehold: 7 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #119 (real): 5 attackers, 1 blockers, 0 gang blocks, 12 power (reason=lethal, target_life=11)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #119 (real): 10 player damage, target life 1, target_dead=False
+  END Lorehold: Life=28 Hand=3 Board=12 Grave=7 Discarded=0
+
+TURN 11 - Rograkh, Son of Rohgahh #119 (real) | Life=1 Hand=7 Board=7
+  MANA Rograkh, Son of Rohgahh #119 (real): 6 available (6 sources, 0 treasures, pool={'generic': 6, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=control_high_threat, target_life=28)
+  DAMAGE Rograkh, Son of Rohgahh #119 (real) -> Lorehold: 4 player damage, target life 24, target_dead=False
+  END Rograkh, Son of Rohgahh #119 (real): Life=1 Hand=7 Board=7 Grave=5 Discarded=1
+
+TURN 11 - Grist, the Hunger Tide #66 (real) | Life=31 Hand=7 Board=3
+  MANA Grist, the Hunger Tide #66 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=31 Hand=7 Board=3 Grave=6 Discarded=1
+
+TURN 12 - Lorehold | Life=24 Hand=3 Board=12
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found Fiery Emancipation (artifact_or_enchantment)
+  RESOLVE Lorehold: Fiery Emancipation (CMC=6.0) [finisher] rule=curated/verified
+  >>> DIED: Rograkh, Son of Rohgahh #119 (real) (life_zero) <<<
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=31)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 10 player damage, target life 21, target_dead=False
+  END Lorehold: Life=24 Hand=3 Board=12 Grave=9 Discarded=0
+
+TURN 12 - Grist, the Hunger Tide #66 (real) | Life=21 Hand=7 Board=3
+  MANA Grist, the Hunger Tide #66 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=21 Hand=7 Board=3 Grave=7 Discarded=1
+
+TURN 13 - Lorehold | Life=24 Hand=3 Board=12
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=curated/verified
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=11)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 10 player damage, target life 1, target_dead=False
+  END Lorehold: Life=24 Hand=3 Board=12 Grave=10 Discarded=0
+
+TURN 13 - Grist, the Hunger Tide #66 (real) | Life=1 Hand=7 Board=3
+  MANA Grist, the Hunger Tide #66 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=1 Hand=7 Board=3 Grave=8 Discarded=1
+
+TURN 14 - Lorehold | Life=24 Hand=3 Board=12
+  MANA Lorehold: 8 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Land Tax (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Land Tax found Blasphemous Act (any)
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 4 attackers, 0 blockers, 0 gang blocks, 10 power (reason=lethal, target_life=1)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 10 player damage, target life -9, target_dead=True
+  >>> DIED: Grist, the Hunger Tide #66 (real) (life_zero) <<<
+
+GAME OVER - Turn 14
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=24 Hand=4
+Rograkh, Son of Rohgahh #119 (real): DEAD Life=-9 Hand=7
+Grist, the Hunger Tide #66 (real): DEAD Life=-9 Hand=7
+Magda, Brazen Outlaw #90 (real): DEAD Life=0 Hand=7

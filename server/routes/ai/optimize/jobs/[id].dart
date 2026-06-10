@@ -36,7 +36,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
     );
   }
 
-  if (job.userId != null && job.userId != userId) {
+  if (job.userId.isEmpty || job.userId != userId) {
     return Response.json(
       statusCode: HttpStatus.notFound,
       body: {

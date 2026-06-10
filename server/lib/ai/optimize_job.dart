@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
 import '../logger.dart';
@@ -21,12 +22,18 @@ class OptimizeJobStore {
   static final Map<String, OptimizeJob> _memoryJobs = <String, OptimizeJob>{};
   static DateTime? _lastCleanupAt;
 
+  @visibleForTesting
+  static void reset() {
+    _memoryJobs.clear();
+    _lastCleanupAt = null;
+  }
+
   /// Cria um novo job e retorna seu ID.
   static Future<String> create({
     required Pool pool,
     required String deckId,
     required String archetype,
-    String? userId,
+    required String userId,
   }) async {
     unawaited(
       _cleanupIfDue(pool).catchError(
@@ -269,7 +276,7 @@ class OptimizeJob {
   final String id;
   final String deckId;
   final String archetype;
-  final String? userId;
+  final String userId;
 
   String status; // pending, processing, completed, failed
   String stage;
@@ -287,7 +294,7 @@ class OptimizeJob {
     required this.id,
     required this.deckId,
     required this.archetype,
-    this.userId,
+    required this.userId,
     this.status = 'pending',
     this.stage = 'Iniciando...',
     this.stageNumber = 0,
@@ -305,7 +312,7 @@ class OptimizeJob {
       id: row['id'] as String? ?? '',
       deckId: row['deck_id'] as String? ?? '',
       archetype: row['archetype'] as String? ?? '',
-      userId: row['user_id'] as String?,
+      userId: row['user_id'] as String? ?? '',
       status: row['status'] as String? ?? 'pending',
       stage: row['stage'] as String? ?? 'Iniciando...',
       stageNumber: row['stage_number'] as int? ?? 0,

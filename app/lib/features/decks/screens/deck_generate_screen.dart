@@ -26,7 +26,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   String _selectedFormat = 'Commander';
   bool _isGenerating = false;
+  bool _isLoadingLearnedDeck = false;
   Map<String, dynamic>? _generatedDeck;
+  final Map<String, Map<String, dynamic>> _learnedDecksByCommander = {};
   GenerateDeckCancellation? _generateCancellation;
   String _generationProgressMessage = 'Enviando pedido para a IA...';
   int _generationProgressStep = 0;
@@ -35,6 +37,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   void initState() {
     super.initState();
     _selectedFormat = _normalizeFormat(widget.initialFormat) ?? _selectedFormat;
+    _commanderController.addListener(_handleCommanderChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadLearnedDeckAvailability();
+    });
   }
 
   String? _normalizeFormat(String? format) {
@@ -55,6 +61,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   bool get _usesCommanderField {
     final normalized = _selectedFormat.trim().toLowerCase();
     return normalized == 'commander' || normalized == 'brawl';
+  }
+
+  Map<String, dynamic>? get _selectedLearnedDeckSummary {
+    final commander = _selectedCommanderName();
+    if (commander == null || commander.isEmpty) return null;
+    return _learnedDecksByCommander[_normalizeCommanderLookup(commander)];
   }
 
   String? _selectedCommanderName() {
@@ -86,11 +98,52 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   @override
   void dispose() {
     _generateCancellation?.cancel();
+    _commanderController.removeListener(_handleCommanderChanged);
     _promptController.dispose();
     _commanderController.dispose();
     _deckNameController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handleCommanderChanged() {
+    if (!mounted || !_usesCommanderField) return;
+    setState(() {});
+  }
+
+  String _normalizeCommanderLookup(String value) {
+    return value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  String _learnedDeckButtonHelperText(Map<String, dynamic> deck) {
+    final legalStatus = deck['legal_status']?.toString().trim();
+    final legalLabel =
+        legalStatus == 'commander_legal' ? 'legal para Commander' : legalStatus;
+    return legalLabel == null || legalLabel.isEmpty
+        ? 'Deck aprendido disponível: curado pelo Hermes para este comandante.'
+        : 'Deck aprendido disponível: curado pelo Hermes • $legalLabel.';
+  }
+
+  Future<void> _loadLearnedDeckAvailability() async {
+    try {
+      final decks =
+          await context.read<DeckProvider>().fetchCommanderLearningDecks();
+      if (!mounted) return;
+      setState(() {
+        _learnedDecksByCommander
+          ..clear()
+          ..addEntries(
+            decks
+                .map((deck) {
+                  final commander = deck['commander']?.toString().trim() ?? '';
+                  return MapEntry(_normalizeCommanderLookup(commander), deck);
+                })
+                .where((entry) => entry.key.isNotEmpty),
+          );
+      });
+    } catch (_) {
+      return;
+    }
   }
 
   Future<void> _generateDeck() async {
@@ -179,6 +232,90 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
       }
+    }
+  }
+
+  Future<void> _loadLearnedCommanderDeck() async {
+    final commanderName = _selectedCommanderName();
+    if (commanderName == null || commanderName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe o comandante para buscar o deck aprendido.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoadingLearnedDeck = true;
+      _generatedDeck = null;
+      _generationProgressMessage = 'Buscando deck aprendido...';
+      _generationProgressStep = 1;
+    });
+
+    try {
+      final result = await context
+          .read<DeckProvider>()
+          .fetchCommanderLearningDeck(commanderName: commanderName);
+      if (!mounted) return;
+
+      final learning =
+          (result['commander_learning'] as Map?)?.cast<String, dynamic>() ??
+          result;
+      final recommendedDeck =
+          (learning['recommended_deck'] as Map?)?.cast<String, dynamic>() ??
+          const <String, dynamic>{};
+      final cards = (recommendedDeck['cards'] as List?) ?? const [];
+      final commander = recommendedDeck['commander'];
+      if (recommendedDeck.isEmpty || cards.isEmpty) {
+        throw Exception('Nenhum deck aprendido ativo foi encontrado.');
+      }
+
+      final deckName = recommendedDeck['deck_name']?.toString().trim();
+      setState(() {
+        _deckNameController.text =
+            deckName == null || deckName.isEmpty ? 'Deck Aprendido' : deckName;
+        _generatedDeck = {
+          'generated_deck': {'commander': commander, 'cards': cards},
+          'validation':
+              recommendedDeck['validation'] ??
+              recommendedDeck['legality'] ??
+              const {'is_valid': true},
+          'diagnostics': {
+            'source': 'commander_learning',
+            'promoted_deck': learning['promoted_deck'],
+            'recommended_deck': recommendedDeck,
+            'readiness': learning['readiness'],
+          },
+          'warnings': const {'invalid_cards': []},
+        };
+        _isLoadingLearnedDeck = false;
+        _generationProgressStep = 4;
+        _generationProgressMessage = 'Deck aprendido pronto para revisar.';
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = _previewKey.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingLearnedDeck = false;
+      });
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckGenerate,
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -353,6 +490,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       appBar: AppBar(
         title: const Text('Gerador de Decks'),
         leading: IconButton(
+          tooltip: 'Voltar para decks',
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/decks'),
         ),
@@ -469,7 +607,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             // Generate Button (CTA primeiro, para não ficar "abaixo do fold")
             ElevatedButton.icon(
               key: const Key('deck-generate-submit-button'),
-              onPressed: _isGenerating ? null : _generateDeck,
+              onPressed:
+                  _isGenerating || _isLoadingLearnedDeck ? null : _generateDeck,
               icon:
                   _isGenerating
                       ? const SizedBox(
@@ -491,8 +630,22 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
             ),
+            if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
+              const SizedBox(height: 12),
+              _LearnedDeckCallout(
+                calloutKey: const Key('deck-generate-learned-deck-button'),
+                onPressed:
+                    _isGenerating || _isLoadingLearnedDeck
+                        ? null
+                        : _loadLearnedCommanderDeck,
+                loading: _isLoadingLearnedDeck,
+                helperText: _learnedDeckButtonHelperText(
+                  _selectedLearnedDeckSummary!,
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
-            if (_isGenerating) ...[
+            if (_isGenerating || _isLoadingLearnedDeck) ...[
               _GenerateProgressPanel(
                 currentStep: _generationProgressStep,
                 message: _generationProgressMessage,
@@ -502,43 +655,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
             if (_generatedDeck == null) ...[
               // Example Prompts
-              Text(
-                'Ou escolha um exemplo:',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children:
-                    _examplePrompts.map((example) {
-                      return ActionChip(
-                        label: Text(
-                          example,
-                          style: const TextStyle(
-                            fontSize: AppTheme.fontSm,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _promptController.text = example;
-                          });
-                        },
-                        backgroundColor:
-                            theme.colorScheme.surfaceContainerHighest,
-                      );
-                    }).toList(),
+              _ExamplePromptList(
+                prompts: _examplePrompts,
+                onSelected: (example) {
+                  setState(() {
+                    _promptController.text = example;
+                  });
+                },
               ),
               const SizedBox(height: 28),
             ],
 
             // Generated Deck Preview
             if (_generatedDeck != null) ...[
-              const Divider(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
               Row(
                 key: _previewKey,
                 children: [
@@ -560,7 +690,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   height: 1.35,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
               // Deck Name Input
               TextField(
@@ -649,6 +779,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final warnings = _generatedDeck!['warnings'];
     final isMock = _generatedDeck!['is_mock'] == true;
     final validation = _generatedDeck!['validation'];
+    final diagnostics = _generatedDeck!['diagnostics'];
+    final learnedDeckPreview = _learnedDeckPreviewParts(diagnostics);
 
     final invalidCards =
         warnings is Map && warnings['invalid_cards'] is List
@@ -665,11 +797,14 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: theme.colorScheme.outline),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+          width: 0.8,
+        ),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -685,13 +820,62 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 'Total: $totalCards cartas',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+                  color: AppTheme.brass400,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+          if (learnedDeckPreview.isNotEmpty) ...[
+            _LearnedDeckPreviewSummary(parts: learnedDeckPreview),
+            const SizedBox(height: 14),
+          ],
+          if (hasCommander) ...[
+            _PreviewSectionHeader(
+              label: 'Comandante',
+              color: AppTheme.frost400,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '1x $commanderName',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 14),
+          ],
+          _PreviewSectionHeader(
+            label:
+                'Deck principal ($totalMain cartas, ${cardsList.length} linhas)',
+            color: AppTheme.frost400,
+          ),
+          const SizedBox(height: 8),
+          ...cardsList.take(18).map((card) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                '${parseQty(card['quantity'])}x ${card['name']}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textPrimary.withValues(alpha: 0.92),
+                  height: 1.25,
+                ),
+              ),
+            );
+          }),
+          if (cardsList.length > 18)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '+ ${cardsList.length - 18} linhas no deck principal',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
           if (!isValid && validationErrors.isNotEmpty) ...[
+            const SizedBox(height: 16),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -722,85 +906,321 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
           ],
           if (isMock || warnings is Map) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
+            const SizedBox(height: 16),
+            DecoratedBox(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(color: theme.colorScheme.outline),
+                color: AppTheme.surfaceElevated.withValues(alpha: 0.54),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Avisos',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (isMock)
+                      const Text(
+                        'Este deck foi gerado em modo mock (sem OpenAI configurada).',
+                      ),
+                    if (warnings is Map) ...[
+                      if (warnings['message'] != null)
+                        Text(warnings['message'].toString()),
+                      if (warnings['messages'] is List)
+                        ...(warnings['messages'] as List).map(
+                          (m) => Text(m.toString()),
+                        ),
+                      if (invalidCards.isNotEmpty)
+                        Text(
+                          'Cartas removidas por não serem encontradas: '
+                          '${invalidCards.join(', ')}',
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  List<String> _learnedDeckPreviewParts(dynamic diagnostics) {
+    if (diagnostics is! Map || diagnostics['source'] != 'commander_learning') {
+      return const <String>[];
+    }
+    final promotedDeck =
+        (diagnostics['promoted_deck'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+    final recommendedDeck =
+        (diagnostics['recommended_deck'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+
+    String? textValue(Map<String, dynamic> map, String key) {
+      final value = map[key]?.toString().trim();
+      return value == null || value.isEmpty ? null : value;
+    }
+
+    final sourceSystem =
+        textValue(promotedDeck, 'source_system') ??
+        textValue(recommendedDeck, 'source_system') ??
+        'hermes';
+    final sourceRef =
+        textValue(promotedDeck, 'source_ref') ??
+        textValue(recommendedDeck, 'source_ref');
+    final score = promotedDeck['score'] ?? recommendedDeck['score'];
+    final legalStatus =
+        textValue(promotedDeck, 'legal_status') ??
+        textValue(recommendedDeck, 'legal_status');
+    final confidence = textValue(recommendedDeck, 'source_confidence');
+
+    return <String>[
+      'Origem: ${sourceSystem.toUpperCase()}${sourceRef == null ? '' : ' $sourceRef'}',
+      if (score != null) 'Score: $score',
+      if (legalStatus != null) 'Legalidade: $legalStatus',
+      if (confidence != null) 'Confiança: $confidence',
+    ];
+  }
+}
+
+class _LearnedDeckCallout extends StatelessWidget {
+  final Key calloutKey;
+  final VoidCallback? onPressed;
+  final bool loading;
+  final String helperText;
+
+  const _LearnedDeckCallout({
+    required this.calloutKey,
+    required this.onPressed,
+    required this.loading,
+    required this.helperText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final enabled = onPressed != null;
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      child: InkWell(
+        key: calloutKey,
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 160),
+          opacity: enabled ? 1 : 0.58,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceSlate,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              border: Border.all(
+                color: AppTheme.brass400.withValues(alpha: 0.34),
+                width: 0.8,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppTheme.brass400.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                  child: Center(
+                    child:
+                        loading
+                            ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : const Icon(
+                              Icons.school_outlined,
+                              size: 17,
+                              color: AppTheme.brass400,
+                            ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loading
+                            ? 'Buscando deck aprendido...'
+                            : 'Usar deck aprendido do comandante',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: AppTheme.brass400,
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        helperText,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary.withValues(alpha: 0.84),
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExamplePromptList extends StatelessWidget {
+  final List<String> prompts;
+  final ValueChanged<String> onSelected;
+
+  const _ExamplePromptList({required this.prompts, required this.onSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ou escolha um ponto de partida',
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: AppTheme.textSecondary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...prompts.asMap().entries.map((entry) {
+          final index = entry.key;
+          final prompt = entry.value;
+          final isLast = index == prompts.length - 1;
+
+          return InkWell(
+            onTap: () => onSelected(prompt),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: index == 0 ? 2 : 8,
+                bottom: isLast ? 2 : 8,
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    'Avisos',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.secondary,
+                  Icon(
+                    Icons.north_east_rounded,
+                    size: 14,
+                    color: AppTheme.frost400.withValues(alpha: 0.72),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      prompt,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.25,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  if (isMock)
-                    const Text(
-                      'Este deck foi gerado em modo mock (sem OpenAI configurada).',
-                    ),
-                  if (warnings is Map) ...[
-                    if (warnings['message'] != null)
-                      Text(warnings['message'].toString()),
-                    if (warnings['messages'] is List)
-                      ...(warnings['messages'] as List).map(
-                        (m) => Text(m.toString()),
-                      ),
-                    if (invalidCards.isNotEmpty)
-                      Text(
-                        'Cartas removidas por não serem encontradas: '
-                        '${invalidCards.join(', ')}',
-                      ),
-                  ],
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-          ],
-          if (hasCommander) ...[
-            Text(
-              'Comandante',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.secondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, left: 8),
-              child: Text(
-                '1x $commanderName',
-                style: theme.textTheme.bodyMedium,
-              ),
-            ),
-          ],
+          );
+        }),
+      ],
+    );
+  }
+}
+
+class _LearnedDeckPreviewSummary extends StatelessWidget {
+  final List<String> parts;
+
+  const _LearnedDeckPreviewSummary({required this.parts});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(left: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: AppTheme.frost400.withValues(alpha: 0.78),
+            width: 2,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text(
-            'Deck principal (${cardsList.length} linhas)',
+            'Deck aprendido Hermes',
             style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.secondary,
+              color: AppTheme.frost400,
+              fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 8),
-          ...cardsList.map((card) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 4, left: 8),
+          const SizedBox(height: 6),
+          ...parts.map(
+            (part) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
               child: Text(
-                '${parseQty(card['quantity'])}x ${card['name']}',
-                style: theme.textTheme.bodyMedium,
+                part,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textPrimary.withValues(alpha: 0.88),
+                  height: 1.28,
+                ),
               ),
-            );
-          }),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _PreviewSectionHeader extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _PreviewSectionHeader({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Text(
+      label,
+      style: theme.textTheme.titleSmall?.copyWith(
+        color: color,
+        fontWeight: FontWeight.w800,
+        height: 1.2,
       ),
     );
   }

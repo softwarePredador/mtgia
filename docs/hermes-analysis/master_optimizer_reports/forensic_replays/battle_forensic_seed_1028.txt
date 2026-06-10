@@ -1,0 +1,182 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Elsha of the Infinite #96 (real), Marneus Calgar #64 (real), Grist, the Hunger Tide #66 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Elsha of the Infinite #96 (real): 1 mulligan(s), 7 cards, 2 lands
+  Marneus Calgar #64 (real): 1 mulligan(s), 7 cards, 4 lands
+  Grist, the Hunger Tide #66 (real): 3 mulligan(s), 5 cards, 1 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Marneus Calgar #64 (real): Pact of Negation (CMC=0.0) [counter] rule=curated/verified
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=0
+  MANA Elsha of the Infinite #96 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=0
+  MANA Marneus Calgar #64 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0
+
+TURN 1 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=0
+  MANA Grist, the Hunger Tide #66 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Grand Abolisher (CMC=2.0) [silence_opponents] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 2 - Elsha of the Infinite #96 (real) | Life=40 Hand=7 Board=1
+  MANA Elsha of the Infinite #96 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 2 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=1
+  MANA Marneus Calgar #64 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 2 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=1
+  MANA Grist, the Hunger Tide #66 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Grist, the Hunger Tide #66 (real): Skullclamp (CMC=1.0) [passive] rule=known_cards_manual/verified
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=5 Board=2 Grave=0 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=4
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 7 player damage, target life 33, target_dead=False
+  END Lorehold: Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 3 - Elsha of the Infinite #96 (real) | Life=33 Hand=6 Board=3
+  MANA Elsha of the Infinite #96 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=33 Hand=7 Board=4 Grave=0 Discarded=0
+
+TURN 3 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=2
+  MANA Marneus Calgar #64 (real): 2 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0
+
+TURN 3 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=2
+  MANA Grist, the Hunger Tide #66 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=4 Board=4 Grave=0 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=5 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Molten Duplication (CMC=2.0) [token_maker] rule=curated/verified
+  RESOLVE Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=33)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 7 player damage, target life 26, target_dead=False
+  END Lorehold: Life=40 Hand=5 Board=9 Grave=1 Discarded=0
+
+TURN 4 - Elsha of the Infinite #96 (real) | Life=26 Hand=7 Board=4
+  MANA Elsha of the Infinite #96 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Elsha of the Infinite #96 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=40)
+  DAMAGE Elsha of the Infinite #96 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  RESOLVE Lorehold: Pyroblast (CMC=1.0) [counter] rule=curated/verified
+  END Elsha of the Infinite #96 (real): Life=26 Hand=7 Board=4 Grave=1 Discarded=1
+
+TURN 4 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=3
+  MANA Marneus Calgar #64 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=5 Grave=0 Discarded=0
+
+TURN 4 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=4 Board=4
+  MANA Grist, the Hunger Tide #66 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=5 Board=4 Grave=0 Discarded=0
+
+TURN 5 - Lorehold | Life=36 Hand=4 Board=9
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  RESOLVE Lorehold: Rise of the Eldrazi (CMC=12.0) [remove_permanent] rule=curated/verified
+  REMOVAL Lorehold: Rise of the Eldrazi removed Elsha of the Infinite from Elsha of the Infinite #96 (real)
+  RESOLVE Lorehold: Reforge the Soul (CMC=5.0) [draw_cards] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=26)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 9 player damage, target life 17, target_dead=False
+  END Lorehold: Life=36 Hand=7 Board=10 Grave=6 Discarded=3
+
+TURN 5 - Elsha of the Infinite #96 (real) | Life=17 Hand=7 Board=3
+  MANA Elsha of the Infinite #96 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Elsha of the Infinite #96 (real): Life=17 Hand=7 Board=3 Grave=2 Discarded=1
+
+TURN 5 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=5
+  MANA Marneus Calgar #64 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Marneus Calgar #64 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=17)
+  DAMAGE Marneus Calgar #64 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 13, target_dead=False
+  END Marneus Calgar #64 (real): Life=40 Hand=6 Board=6 Grave=0 Discarded=0
+
+TURN 5 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=4
+  MANA Grist, the Hunger Tide #66 (real): 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Grist, the Hunger Tide #66 (real): Life=40 Hand=5 Board=6 Grave=0 Discarded=0
+
+TURN 6 - Lorehold | Life=36 Hand=7 Board=10
+  MANA Lorehold: 7 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  RESOLVE Lorehold: Heat Shimmer (CMC=3.0) [token_maker] rule=curated/verified
+  COMBAT Lorehold -> Elsha of the Infinite #96 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=13)
+  DAMAGE Lorehold -> Elsha of the Infinite #96 (real): 9 player damage, target life 4, target_dead=False
+  RESOLVE Lorehold: Recruiter of the Guard (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Recruiter of the Guard found Storm Herd (any)
+  RESOLVE Lorehold: Enlightened Tutor (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Enlightened Tutor found The One Ring (artifact_or_enchantment)
+  END Lorehold: Life=36 Hand=7 Board=12 Grave=9 Discarded=0
+
+TURN 6 - Elsha of the Infinite #96 (real) | Life=4 Hand=7 Board=3
+  MANA Elsha of the Infinite #96 (real): 5 available (3 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Path to Exile removed Marneus Calgar from Marneus Calgar #64 (real)
+  END Elsha of the Infinite #96 (real): Life=4 Hand=7 Board=4 Grave=2 Discarded=0
+
+TURN 6 - Marneus Calgar #64 (real) | Life=40 Hand=6 Board=5
+  MANA Marneus Calgar #64 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=7 Board=5 Grave=0 Discarded=0
+
+TURN 6 - Grist, the Hunger Tide #66 (real) | Life=40 Hand=5 Board=6
+  MANA Grist, the Hunger Tide #66 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Elsha of the Infinite #96 (real): 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=4)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Elsha of the Infinite #96 (real): 4 player damage, target life 0, target_dead=True
+  >>> DIED: Elsha of the Infinite #96 (real) (life_zero) <<<
+
+TURN 7 - Lorehold | Life=36 Hand=6 Board=12
+  MANA Lorehold: 8 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Seething Song (CMC=3.0) [ramp_ritual] rule=curated/verified
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 5 attackers, 0 blockers, 0 gang blocks, 10 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 10 player damage, target life 30, target_dead=False
+  END Lorehold: Life=36 Hand=5 Board=31 Grave=12 Discarded=0
+
+TURN 7 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=5
+  MANA Marneus Calgar #64 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=7 Board=5 Grave=1 Discarded=1
+
+TURN 7 - Grist, the Hunger Tide #66 (real) | Life=30 Hand=6 Board=6
+  MANA Grist, the Hunger Tide #66 (real): 4 available (4 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Grist, the Hunger Tide #66 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=36)
+  DAMAGE Grist, the Hunger Tide #66 (real) -> Lorehold: 4 player damage, target life 32, target_dead=False
+  END Grist, the Hunger Tide #66 (real): Life=30 Hand=7 Board=6 Grave=0 Discarded=0
+
+TURN 8 - Lorehold | Life=32 Hand=5 Board=31
+  MANA Lorehold: 9 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Drannith Magistrate (CMC=2.0) [silence_opponents] rule=curated/verified
+  COMBAT Lorehold -> Grist, the Hunger Tide #66 (real): 23 attackers, 0 blockers, 0 gang blocks, 46 power (reason=lethal, target_life=30)
+  DAMAGE Lorehold -> Grist, the Hunger Tide #66 (real): 46 player damage, target life -16, target_dead=True
+  >>> DIED: Grist, the Hunger Tide #66 (real) (life_zero) <<<
+
+TURN 8 - Marneus Calgar #64 (real) | Life=40 Hand=7 Board=5
+  MANA Marneus Calgar #64 (real): 5 available (5 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Marneus Calgar #64 (real): Life=40 Hand=7 Board=7 Grave=1 Discarded=0
+
+TURN 9 - Lorehold | Life=32 Hand=5 Board=33
+  MANA Lorehold: 10 available (9 sources, 0 treasures, pool={'generic': 5, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  RESOLVE Lorehold: Imperial Recruiter (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Lorehold: Imperial Recruiter found Blasphemous Act (any)
+  COMBAT Lorehold -> Marneus Calgar #64 (real): 24 attackers, 0 blockers, 0 gang blocks, 47 power (reason=lethal, target_life=40)
+  DAMAGE Lorehold -> Marneus Calgar #64 (real): 47 player damage, target life -7, target_dead=True
+  >>> DIED: Marneus Calgar #64 (real) (life_zero) <<<
+
+GAME OVER - Turn 9
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=32 Hand=4
+Elsha of the Infinite #96 (real): DEAD Life=0 Hand=7
+Marneus Calgar #64 (real): DEAD Life=-7 Hand=7
+Grist, the Hunger Tide #66 (real): DEAD Life=-16 Hand=7

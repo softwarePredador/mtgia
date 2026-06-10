@@ -10,8 +10,8 @@ abstract final class LotusVisualSkinStyleIds {
 String get lotusInjectedVisualSkinScript {
   final css = '''
 @font-face {
-  font-family: "Manrope";
-  src: url("fonts/Manrope.ttf") format("truetype");
+  font-family: "Inter";
+  src: url("fonts/Inter.ttf") format("truetype");
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
@@ -26,7 +26,7 @@ String get lotusInjectedVisualSkinScript {
 }
 
 :root {
-  --manaloom-ui-font: "Manrope", BlinkMacSystemFont, -apple-system, "Segoe UI",
+  --manaloom-ui-font: "Inter", BlinkMacSystemFont, -apple-system, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   --manaloom-display-font: "Fraunces", "Iowan Old Style", "Palatino Linotype",
     "Book Antiqua", Georgia, serif;
@@ -41,7 +41,9 @@ String get lotusInjectedVisualSkinScript {
   --manaloom-shell-text-muted: rgba(207, 215, 233, 0.76);
   --manaloom-shell-accent: #78a8ff;
   --manaloom-shell-accent-strong: #9ac2ff;
-  --manaloom-shell-accent-warm: #f3c46b;
+  --manaloom-shell-accent-warm: #d89a2f;
+  --manaloom-shell-accent-warm-strong: #f2bc49;
+  --manaloom-shell-border-warm: rgba(216, 154, 47, 0.42);
   --manaloom-shell-radius: 22px;
   --manaloom-shell-pill-radius: 999px;
   --manaloom-shell-backdrop: saturate(1.12) blur(16px);
@@ -61,15 +63,128 @@ body {
 }
 
 ${LotusDomSelectors.playerCard} {
-  filter: saturate(0.84) brightness(0.96) contrast(0.99);
+  --manaloom-player-accent: rgba(216, 154, 47, 0.78);
+  --manaloom-player-accent-soft: rgba(216, 154, 47, 0.26);
+  --manaloom-player-accent-faint: rgba(216, 154, 47, 0.1);
+  --manaloom-player-glow: rgba(216, 154, 47, 0.2);
+  filter: saturate(0.62) brightness(0.88) contrast(1.03);
+  border-radius: calc(var(--borderRadius) * 1.15);
+  box-shadow:
+    inset 0 0 0 1px var(--manaloom-player-accent-soft),
+    inset 0 0 34px var(--manaloom-player-accent-faint),
+    0 18px 34px rgba(0, 0, 0, 0.26);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n + 1) {
+  --manaloom-player-accent: rgba(242, 188, 73, 0.82);
+  --manaloom-player-accent-soft: rgba(242, 188, 73, 0.34);
+  --manaloom-player-accent-faint: rgba(242, 188, 73, 0.14);
+  --manaloom-player-glow: rgba(242, 188, 73, 0.24);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n + 2) {
+  --manaloom-player-accent: rgba(120, 168, 255, 0.82);
+  --manaloom-player-accent-soft: rgba(120, 168, 255, 0.34);
+  --manaloom-player-accent-faint: rgba(120, 168, 255, 0.14);
+  --manaloom-player-glow: rgba(120, 168, 255, 0.24);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n + 3) {
+  --manaloom-player-accent: rgba(154, 124, 255, 0.82);
+  --manaloom-player-accent-soft: rgba(154, 124, 255, 0.34);
+  --manaloom-player-accent-faint: rgba(154, 124, 255, 0.14);
+  --manaloom-player-glow: rgba(154, 124, 255, 0.24);
+}
+
+${LotusDomSelectors.playerCard}:nth-of-type(4n) {
+  --manaloom-player-accent: rgba(78, 214, 145, 0.82);
+  --manaloom-player-accent-soft: rgba(78, 214, 145, 0.34);
+  --manaloom-player-accent-faint: rgba(78, 214, 145, 0.14);
+  --manaloom-player-glow: rgba(78, 214, 145, 0.24);
 }
 
 ${LotusDomSelectors.playerCard} .player-card-inner:not(.option-card):not(.color-card) {
   border-radius: calc(var(--borderRadius) * 1.15);
+  background:
+    radial-gradient(circle at 78% 18%, var(--manaloom-player-glow), transparent 35%),
+    radial-gradient(circle at 42% 52%, var(--bg, rgba(21, 29, 45, 0.94)), transparent 50%),
+    radial-gradient(circle at 20% 82%, var(--manaloom-player-accent-faint), transparent 40%),
+    linear-gradient(145deg, rgba(4, 8, 18, 0.9), rgba(8, 14, 30, 0.96)) !important;
+  background-blend-mode: screen, soft-light, screen, normal;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -20px 28px rgba(1, 6, 16, 0.18),
-    0 12px 24px rgba(1, 8, 22, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px var(--manaloom-player-accent-soft),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.025),
+    inset 0 -28px 42px rgba(1, 6, 16, 0.36),
+    inset 0 0 42px var(--manaloom-player-accent-faint),
+    0 12px 24px rgba(1, 8, 22, 0.22);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life {
+  position: absolute !important;
+  background:
+    radial-gradient(circle at center, var(--manaloom-player-accent-faint), transparent 48%),
+    rgba(5, 9, 20, 0.08) !important;
+  box-shadow:
+    inset 0 0 90px rgba(2, 6, 16, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:after,
+${LotusDomSelectors.playerCard} .decrease-button.life:after {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: var(--manaloom-ui-font);
+  font-size: clamp(32px, 13vw, 68px);
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(247, 241, 226, 0.52);
+  text-shadow:
+    0 0 14px var(--manaloom-player-accent-soft),
+    0 4px 14px rgba(1, 7, 18, 0.48);
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:after {
+  content: "+";
+}
+
+${LotusDomSelectors.playerCard} .decrease-button.life:after {
+  content: "−";
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:before,
+${LotusDomSelectors.playerCard} .decrease-button.life:before {
+  color: rgba(247, 241, 226, 0.68) !important;
+  text-shadow:
+    0 0 10px var(--manaloom-player-accent-soft),
+    0 4px 12px rgba(1, 7, 18, 0.36) !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life,
+${LotusDomSelectors.playerCard} .decrease-button.life,
+${LotusDomSelectors.playerCard} .increase-button.life .font,
+${LotusDomSelectors.playerCard} .decrease-button.life .font,
+${LotusDomSelectors.playerCard} .increase-button.life .char-plus,
+${LotusDomSelectors.playerCard} .decrease-button.life .char-minus {
+  --fontColor: rgba(247, 241, 226, 0.68) !important;
+  color: rgba(247, 241, 226, 0.68) !important;
+  fill: rgba(247, 241, 226, 0.68) !important;
+  stroke: rgba(247, 241, 226, 0.68) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.68) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 8px var(--manaloom-player-accent-soft)) !important;
+}
+
+${LotusDomSelectors.playerCard} .increase-button.life:active,
+${LotusDomSelectors.playerCard} .decrease-button.life:active {
+  background:
+    radial-gradient(circle at center, var(--manaloom-player-accent-soft), transparent 54%),
+    rgba(5, 9, 20, 0.16) !important;
 }
 
 ${LotusDomSelectors.playerCard} .player-name,
@@ -90,12 +205,17 @@ ${LotusDomSelectors.playerCard} .player-name-input {
 
 ${LotusDomSelectors.playerCard} .player-life-count {
   filter: drop-shadow(0 14px 22px rgba(2, 7, 19, 0.28));
+  color: rgba(247, 241, 226, 0.94) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.94) !important;
 }
 
 ${LotusDomSelectors.playerCard} .player-life-count .font {
+  --fontColor: var(--fontWhite) !important;
+  color: rgba(247, 241, 226, 0.94) !important;
+  -webkit-text-fill-color: rgba(247, 241, 226, 0.94) !important;
   text-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.08),
-    0 10px 18px rgba(1, 7, 18, 0.22);
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 20px rgba(1, 7, 18, 0.5);
 }
 
 ${LotusDomSelectors.playerCard} .counters-on-card .counter {
@@ -518,6 +638,429 @@ ${LotusDomSelectors.optionCard} h3 {
   display: none !important;
 }
 
+.settings-overlay,
+.life-history-overlay,
+.card-search-overlay {
+  font-family: var(--manaloom-ui-font) !important;
+  color: var(--manaloom-shell-text) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(216, 154, 47, 0.12), transparent 32%),
+    radial-gradient(circle at 90% 12%, rgba(120, 168, 255, 0.08), transparent 30%),
+    linear-gradient(180deg, rgb(5, 10, 22), rgb(2, 6, 16)) !important;
+  text-transform: none !important;
+}
+
+.settings-overlay *,
+.life-history-overlay *,
+.card-search-overlay * {
+  font-family: var(--manaloom-ui-font) !important;
+  text-transform: none !important;
+}
+
+.settings-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 0 !important;
+  max-width: 100vw !important;
+  transform: none !important;
+  display: block !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 24px) 22px
+    calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
+  box-sizing: border-box !important;
+  overflow: auto !important;
+}
+
+.settings-overlay::before,
+.card-search-overlay::before {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  font-family: var(--manaloom-display-font) !important;
+  font-size: 30px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: rgb(247, 241, 226) !important;
+  text-align: left !important;
+}
+
+.settings-overlay::before {
+  content: "Configurações" !important;
+}
+
+.card-search-overlay::before {
+  content: "Buscar carta" !important;
+  position: absolute !important;
+  left: 22px !important;
+  top: calc(env(safe-area-inset-top, 0px) + 24px) !important;
+  z-index: 2 !important;
+}
+
+.settings-overlay .settings-headline,
+.settings-overlay h1,
+.settings-overlay h2,
+.settings-overlay h3,
+.life-history-overlay .game-name,
+.life-history-overlay .timeline-label,
+.life-history-overlay .meta-label,
+.card-search-overlay .results-wrapper .card-name {
+  font-family: var(--manaloom-display-font) !important;
+  color: rgb(247, 241, 226) !important;
+  letter-spacing: -0.01em !important;
+}
+
+.settings-overlay .settings-headline {
+  position: relative !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  font-size: 0 !important;
+}
+
+.settings-overlay .settings-headline::after {
+  content: "Preferências da mesa" !important;
+  display: block !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 15px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  color: var(--manaloom-shell-text-muted) !important;
+  text-align: left !important;
+}
+
+.settings-overlay .settings-overlay-list {
+  position: relative !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: calc(100vw - 44px) !important;
+  margin: 0 !important;
+  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 88px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.settings-overlay .settings-list-item {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background:
+    linear-gradient(180deg, rgba(13, 22, 42, 0.8), rgba(6, 11, 24, 0.72)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 26px rgba(1, 8, 22, 0.18) !important;
+}
+
+.settings-overlay .settings-label,
+.settings-overlay .in-list-label {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: var(--manaloom-display-font) !important;
+  font-size: 20px !important;
+  line-height: 1.05 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  text-align: left !important;
+  color: rgb(247, 241, 226) !important;
+}
+
+.settings-overlay .settings-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 46px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 11px 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  border-radius: 15px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background:
+    linear-gradient(180deg, rgba(15, 25, 47, 0.76), rgba(8, 13, 27, 0.72)) !important;
+  color: rgba(247, 241, 226, 0.94) !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 15px !important;
+  line-height: 1.15 !important;
+  font-weight: 750 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+.settings-overlay .settings-select.subentry {
+  width: calc(100% - 18px) !important;
+  margin-left: 18px !important;
+  opacity: 0.92 !important;
+}
+
+.settings-overlay .settings-select.subsubentry {
+  width: calc(100% - 36px) !important;
+  margin-left: 36px !important;
+  opacity: 0.86 !important;
+}
+
+.settings-overlay .settings-select > div {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.settings-overlay .settings-select span {
+  display: block !important;
+  max-width: 100% !important;
+  color: var(--manaloom-shell-text-muted) !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.settings-overlay .settings-select::before,
+.settings-overlay .settings-select::after {
+  flex: 0 0 auto !important;
+}
+
+.settings-overlay .close-settings-overlay-btn,
+.life-history-overlay .close-life-history-overlay-btn,
+.card-search-overlay .close-card-search-overlay {
+  position: absolute !important;
+  top: calc(env(safe-area-inset-top, 0px) + 18px) !important;
+  right: 18px !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 15px !important;
+  background:
+    linear-gradient(180deg, rgba(16, 24, 44, 0.96), rgba(7, 12, 25, 0.94)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 22px rgba(1, 8, 22, 0.24) !important;
+  color: rgba(247, 241, 226, 0.92) !important;
+}
+
+.settings-overlay .close-settings-overlay-btn::before,
+.settings-overlay .close-settings-overlay-btn::after,
+.life-history-overlay .close-life-history-overlay-btn::before,
+.life-history-overlay .close-life-history-overlay-btn::after,
+.card-search-overlay .close-card-search-overlay::before,
+.card-search-overlay .close-card-search-overlay::after {
+  background: rgba(247, 241, 226, 0.92) !important;
+}
+
+.settings-overlay input,
+.settings-overlay textarea,
+.settings-overlay select,
+.settings-overlay .input,
+.life-history-overlay input,
+.card-search-overlay input.search-input {
+  min-height: 44px !important;
+  box-sizing: border-box !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background:
+    linear-gradient(180deg, rgba(13, 22, 42, 0.92), rgba(6, 11, 24, 0.9)) !important;
+  color: rgba(247, 241, 226, 0.96) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.settings-overlay input::placeholder,
+.settings-overlay textarea::placeholder,
+.card-search-overlay input.search-input::placeholder {
+  color: rgba(207, 215, 233, 0.5) !important;
+}
+
+.settings-overlay .btn,
+.settings-overlay button,
+.settings-overlay .set-value-btn,
+.life-history-overlay .all-games-btn,
+.life-history-overlay .set-value-btn,
+.card-search-overlay label,
+.card-search-overlay .view-all-prints-btn {
+  min-height: 38px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--manaloom-shell-border-warm) !important;
+  background:
+    linear-gradient(180deg, rgba(216, 154, 47, 0.96), rgba(186, 126, 28, 0.96)) !important;
+  color: #170f04 !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 12px 22px rgba(216, 154, 47, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.settings-overlay .restart-btn {
+  background:
+    linear-gradient(180deg, rgba(161, 61, 74, 0.96), rgba(104, 28, 42, 0.96)) !important;
+  color: rgba(247, 241, 226, 0.96) !important;
+  box-shadow:
+    0 12px 22px rgba(104, 28, 42, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+.settings-overlay .restart-btn.inactive,
+.settings-overlay .btn.inactive {
+  background:
+    linear-gradient(180deg, rgba(18, 27, 47, 0.82), rgba(8, 13, 27, 0.82)) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(207, 215, 233, 0.5) !important;
+  box-shadow: none !important;
+}
+
+.settings-overlay .toggle,
+.settings-overlay .checkbox,
+.settings-overlay .radio,
+.settings-overlay [class*="toggle"],
+.settings-overlay [class*="checkbox"],
+.settings-overlay [class*="radio"] {
+  border-color: rgba(120, 168, 255, 0.4) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(7, 13, 26, 0.18) !important;
+}
+
+.settings-overlay .active,
+.settings-overlay .selected,
+.life-history-overlay .active,
+.card-search-overlay label.active {
+  color: rgb(247, 241, 226) !important;
+}
+
+.life-history-overlay {
+  overflow: auto !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
+}
+
+.life-history-overlay .life-history-header,
+.life-history-overlay .history-meta-header,
+.life-history-overlay .life-history-timeline,
+.life-history-overlay .life-history-row,
+.life-history-overlay .empty-timeline-overlay {
+  background:
+    linear-gradient(180deg, rgba(13, 22, 42, 0.78), rgba(6, 11, 24, 0.7)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 26px rgba(1, 8, 22, 0.2) !important;
+}
+
+.life-history-overlay .life-history-header,
+.life-history-overlay .history-meta-header {
+  border-radius: 22px !important;
+  margin: 10px 12px 14px !important;
+}
+
+.life-history-overlay .life-history-row,
+.life-history-overlay .empty-timeline-overlay {
+  border-radius: 16px !important;
+  margin-inline: 12px !important;
+}
+
+.life-history-overlay .life-history-cell,
+.life-history-overlay .meta-value,
+.life-history-overlay .player-name,
+.life-history-overlay .stat-value,
+.card-search-overlay .card-meta,
+.card-search-overlay .artist-label {
+  color: var(--manaloom-shell-text-muted) !important;
+}
+
+.life-history-overlay .change-cell.active.positive {
+  color: rgba(78, 214, 145, 0.96) !important;
+}
+
+.life-history-overlay .change-cell.active.negative {
+  color: rgba(255, 104, 130, 0.96) !important;
+}
+
+.card-search-overlay {
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 72px) 18px
+    calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+  box-sizing: border-box !important;
+}
+
+.card-search-overlay:after {
+  background:
+    linear-gradient(180deg, rgba(4, 8, 18, 0.96), rgba(2, 6, 16, 0.98)) !important;
+}
+
+.card-search-overlay .giphy-switch {
+  top: calc(env(safe-area-inset-top, 0px) + 20px) !important;
+  left: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(16, 24, 44, 0.96), rgba(7, 12, 25, 0.94)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(247, 241, 226, 0.9) !important;
+}
+
+.card-search-overlay .results-wrapper {
+  width: 100% !important;
+  height: auto !important;
+  max-height: calc(100vh - 210px) !important;
+  padding: 0 0 18px !important;
+  gap: 14px !important;
+  z-index: 2 !important;
+}
+
+.card-search-overlay .results-wrapper .card-image,
+.card-search-overlay.menu-card-search .card-image-wrapper {
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 14px 24px rgba(1, 8, 22, 0.32) !important;
+}
+
+.card-search-overlay input.search-input {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 0 18px !important;
+  font-size: 16px !important;
+  text-align: left !important;
+}
+
 .first-time-user-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -689,12 +1232,20 @@ ${LotusDomSelectors.optionCard} h3 {
   min-height: 50px !important;
   padding: 12px 24px !important;
   border-radius: 999px !important;
-  background: linear-gradient(180deg, #ff2f86, #f31269) !important;
+  background:
+    linear-gradient(
+      180deg,
+      var(--manaloom-shell-accent-warm-strong),
+      var(--manaloom-shell-accent-warm)
+    ) !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: 16px !important;
   font-weight: 800 !important;
   letter-spacing: 0.01em !important;
-  color: #fff !important;
+  color: #170f04 !important;
+  box-shadow:
+    0 14px 24px rgba(216, 154, 47, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 .first-time-user-overlay .commander-card.hide {
@@ -737,6 +1288,7 @@ ${LotusDomSelectors.optionCard} h3 {
   box-shadow: var(--manaloom-shell-shadow);
   backdrop-filter: var(--manaloom-shell-backdrop);
   background:
+    radial-gradient(circle at 82% 0%, rgba(216, 154, 47, 0.12), transparent 34%),
     linear-gradient(180deg, rgba(12, 21, 40, 0.97), rgba(6, 11, 24, 0.94));
 }
 
@@ -806,6 +1358,8 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .manaloom-proof-title {
+  position: relative !important;
+  z-index: 2 !important;
   width: 100% !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: clamp(16px, 4.8vw, 22px) !important;
@@ -816,7 +1370,30 @@ ${LotusDomSelectors.optionCard} h3 {
   color: var(--manaloom-shell-text) !important;
 }
 
+.manaloom-proof-step {
+  position: relative !important;
+  z-index: 2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 28px !important;
+  padding: 7px 12px !important;
+  border: 1px solid var(--manaloom-shell-border-warm) !important;
+  border-radius: 999px !important;
+  background: rgba(216, 154, 47, 0.12) !important;
+  color: var(--manaloom-shell-accent-warm-strong) !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
 .manaloom-proof-body {
+  position: relative !important;
+  z-index: 2 !important;
   width: 100% !important;
   font-family: var(--manaloom-ui-font) !important;
   font-size: clamp(13px, 4vw, 18px) !important;
@@ -829,6 +1406,8 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .manaloom-proof-actions {
+  position: relative !important;
+  z-index: 2 !important;
   width: 100% !important;
   display: flex !important;
   align-items: stretch !important;
@@ -855,8 +1434,42 @@ ${LotusDomSelectors.optionCard} h3 {
   gap: 14px !important;
   overflow: hidden !important;
   backdrop-filter: none !important;
+  isolation: isolate !important;
+  opacity: 1 !important;
   background:
+    radial-gradient(circle at 78% 0%, rgba(216, 154, 47, 0.13), transparent 30%),
     linear-gradient(180deg, rgb(10, 16, 30), rgb(5, 9, 20)) !important;
+}
+
+[data-manaloom-visual-proof="true"].commander-damage-overlay .font,
+[data-manaloom-visual-proof="true"].own-commander-damage-hint-overlay .font,
+[data-manaloom-visual-proof="true"].turn-tracker-hint-overlay .font,
+[data-manaloom-visual-proof="true"].manaloom-turn-tracker-proof .font,
+[data-manaloom-visual-proof="true"].show-counters-hint-overlay .font,
+[data-manaloom-visual-proof="true"].manaloom-show-counters-proof .font {
+  display: none !important;
+}
+
+[data-manaloom-visual-proof-backdrop="true"] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483646 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(216, 154, 47, 0.08), transparent 34%),
+    linear-gradient(180deg, rgb(6, 11, 23), rgb(3, 7, 17)) !important;
+}
+
+[data-manaloom-visual-proof="true"].commander-damage-overlay,
+[data-manaloom-visual-proof="true"].own-commander-damage-hint-overlay,
+[data-manaloom-visual-proof="true"].turn-tracker-hint-overlay,
+[data-manaloom-visual-proof="true"].manaloom-turn-tracker-proof,
+[data-manaloom-visual-proof="true"].show-counters-hint-overlay,
+[data-manaloom-visual-proof="true"].manaloom-show-counters-proof {
+  z-index: 2147483647 !important;
 }
 
 .commander-damage-overlay .btn-wrapper,
@@ -869,7 +1482,8 @@ ${LotusDomSelectors.optionCard} h3 {
   display: flex !important;
   align-items: stretch !important;
   justify-content: center !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
 }
 
 .commander-damage-overlay .btn,
@@ -879,13 +1493,31 @@ ${LotusDomSelectors.optionCard} h3 {
 .show-counters-hint-overlay .btn,
 .manaloom-show-counters-proof .btn {
   flex: 1 1 0 !important;
-  max-width: 180px !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 44px !important;
+  padding: 10px 12px !important;
   border-radius: 999px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: linear-gradient(180deg, #ff2f86, #f31269) !important;
-  color: #fff !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  font-size: clamp(10px, 3vw, 13px) !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  background:
+    linear-gradient(
+      180deg,
+      var(--manaloom-shell-accent-warm-strong),
+      var(--manaloom-shell-accent-warm)
+    ) !important;
+  color: #170f04 !important;
+  box-shadow:
+    0 12px 22px rgba(216, 154, 47, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
 }
 
 .own-commander-damage-hint-overlay .font,
@@ -1043,7 +1675,7 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
 
   const fontSet = document.fonts;
   if (fontSet && typeof fontSet.load === 'function') {
-    fontSet.load('400 16px "Manrope"').catch(() => {});
+    fontSet.load('400 16px "Inter"').catch(() => {});
     fontSet.load('650 16px "Fraunces"').catch(() => {});
   }
 })();
@@ -1161,11 +1793,42 @@ String get _visualProofChromeCleanupScript => '''
 ''';
 
 String get _visualProofIsolatedCanvasScript => '''
-  Array.from(document.body.children).forEach((node) => {
+  document.body.classList.add('manaloom-visual-proof-active');
+  document.getElementById('manaloom-visual-proof-isolation-style')?.remove();
+  const isolationStyle = document.createElement('style');
+  isolationStyle.id = 'manaloom-visual-proof-isolation-style';
+  isolationStyle.textContent = `
+    body.manaloom-visual-proof-active {
+      background: linear-gradient(180deg, rgb(6, 11, 23), rgb(3, 7, 17)) !important;
+    }
+    body.manaloom-visual-proof-active .player-card,
+    body.manaloom-visual-proof-active .menu-button,
+    body.manaloom-visual-proof-active .turn-time-tracker,
+    body.manaloom-visual-proof-active .game-timer,
+    body.manaloom-visual-proof-active .current-time-clock,
+    body.manaloom-visual-proof-active .close-controls-backdrop {
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    body.manaloom-visual-proof-active [data-manaloom-visual-proof="true"],
+    body.manaloom-visual-proof-active [data-manaloom-visual-proof="true"] * {
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  `;
+  document.head.appendChild(isolationStyle);
+
+  Array.from(document.body.querySelectorAll('*')).forEach((node) => {
     if (!(node instanceof HTMLElement)) {
       return;
     }
+    if (node.closest('[data-manaloom-visual-proof="true"]')) {
+      return;
+    }
     node.style.setProperty('visibility', 'hidden', 'important');
+    node.style.setProperty('opacity', '0', 'important');
     node.style.setProperty('pointer-events', 'none', 'important');
   });
   document.body.style.setProperty(
@@ -1196,14 +1859,20 @@ String _buildSimpleVisualProofScript({
 $_visualProofIsolatedCanvasScript
 
   const overlay = document.createElement('div');
+  const backdrop = document.createElement('div');
+  backdrop.setAttribute('data-manaloom-visual-proof', 'true');
+  backdrop.setAttribute('data-manaloom-visual-proof-backdrop', 'true');
+
   overlay.className = $overlayClassJson;
   overlay.setAttribute('data-manaloom-visual-proof', 'true');
   overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
   overlay.innerHTML =
+    '<div class="manaloom-proof-step">Etapa 1</div>' +
     '<div class="manaloom-proof-title">' + $titleJson + '</div>' +
     '<div class="manaloom-proof-body">' + $textJson + '</div>' +
     '<div class="manaloom-proof-actions">' + $buttonsHtmlJson + '</div>';
 
+  document.body.appendChild(backdrop);
   document.body.appendChild(overlay);
 })();
 ''';

@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-07T22:45:03.357224+00:00",
+  "dry_run": false,
+  "postgres_target": "143.198.230.247:5433/halder",
+  "requested_unique_names": 1973,
+  "postgres_cards_matched": 2180,
+  "sqlite_cache_alias_rows": 2033,
+  "unresolved_count": 0,
+  "unresolved_sample": [],
+  "postgres_columns_present": [
+    "cmc",
+    "color_identity",
+    "colors",
+    "keywords",
+    "mana_cost",
+    "oracle_text",
+    "power",
+    "scryfall_id",
+    "toughness",
+    "type_line"
+  ],
+  "field_coverage": {
+    "mana_cost": 1999,
+    "oracle_text": 2179,
+    "colors": 1646,
+    "color_identity": 1746,
+    "power": 529,
+    "toughness": 529,
+    "keywords": 900
+  }
+}

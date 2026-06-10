@@ -24,6 +24,11 @@ class PerformanceService {
 
   PerformanceService._();
 
+  @visibleForTesting
+  static void reset() {
+    _instance = null;
+  }
+
   FirebasePerformance? _performance;
   bool _isEnabled = false;
 

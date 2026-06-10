@@ -5,6 +5,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
+void _emitScreenshot(String name, List<int> pngBytes) {
+  final encoded = base64Encode(pngBytes);
+  const chunkSize = 12000;
+  // ignore: avoid_print
+  print('SCREENSHOT_BEGIN $name');
+  for (var offset = 0; offset < encoded.length; offset += chunkSize) {
+    final end =
+        (offset + chunkSize < encoded.length)
+            ? offset + chunkSize
+            : encoded.length;
+    // ignore: avoid_print
+    print('SCREENSHOT_CHUNK $name ${encoded.substring(offset, end)}');
+  }
+  // ignore: avoid_print
+  print('SCREENSHOT_END $name');
+}
+
 Future<Map<String, dynamic>?> _probeLotusDomViaShellBridge(
   WidgetTester tester,
   dynamic screenState, {
@@ -251,6 +268,12 @@ void main() {
       final menuState = await _readOverlayState(tester, screenState);
       expect(menuState['menu_overlay_open'], isTrue);
 
+      await binding.convertFlutterSurfaceToImage();
+      final menuScreenshot = await binding.takeScreenshot(
+        'lotus_radial_menu_overlay',
+      );
+      _emitScreenshot('lotus_radial_menu_overlay', menuScreenshot);
+
       await _clickLotusMenuEntry(screenState, <String>[
         '.menu-button-overlay .life-history-btn',
       ]);
@@ -259,6 +282,11 @@ void main() {
       final historyState = await _readOverlayState(tester, screenState);
       expect(historyState['history_overlay_open'], isTrue);
       expect(historyState['native_history_present'], isFalse);
+
+      final historyScreenshot = await binding.takeScreenshot(
+        'lotus_history_overlay',
+      );
+      _emitScreenshot('lotus_history_overlay', historyScreenshot);
 
       await _runStep('close_history_overlay', () {
         return screenState.debugRunJavaScript(
