@@ -44,7 +44,7 @@
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
-| 2 | Multi-target partial resolution | 3-5 dias | Alto | Targeting formal básico + ward single-target |
+| 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal + multi-target básico |
 | 3 | Dashboard/relatório agregado de telemetria | 2-3 dias | Médio | Snapshots JSON |
 
 ---
@@ -283,7 +283,7 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 6984 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7042 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
 | `master_optimizer_baseline.py` | Baseline (WR do deck) | ~100 |

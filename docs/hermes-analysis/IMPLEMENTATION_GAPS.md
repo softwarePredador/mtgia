@@ -12,7 +12,7 @@
 | SBAs e Triggers | 6/15 | 2/15 | 7/15 |
 | Commander Rules | 5/8 | 2/8 | 1/8 |
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
-| Targeting | 4/5 | 1/5 | 0/5 |
+| Targeting | 5/5 | 0/5 | 0/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
@@ -112,10 +112,10 @@
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
 | Seleção de alvos legais | ✅ Básico | v9: `target_matches_type`, `is_legal_target`, `removal_target_candidates` | Remoções filtram target type, hexproof, shroud, protection e proteção global |
-| Alvos ilegais na resolução (partial resolution) | ⚠️ Parcial | v9: `targeting_decision` | Single-target removal valida antes de resolver; multi-target partial resolution ainda não modelado |
+| Alvos ilegais na resolução (partial resolution) | ✅ Básico | v9: `targeting_decision`, `resolve_multi_target_removal` | Single-target valida antes de resolver; multi-target declarado resolve alvos legais e ignora ilegais |
 | Hexproof/Shroud | ✅ OK | — | Respeitado via `can_target` |
 | Protection | ✅ Básico | v9: `is_legal_target` | `protection_from` por cor e `protection_from_everything` bloqueiam alvo |
-| Ward | ✅ Básico | v9: `check_ward`, `apply_effect_immediate` | Remoção single-target é anulada se ward não for pago; pagamento permite resolução. Multi-target/abilities ainda ficam no bloco de partial resolution avançado |
+| Ward | ✅ Básico | v9: `check_ward`, `apply_effect_immediate`, `resolve_multi_target_removal` | Remoção é anulada para o alvo com ward não pago; pagamento permite resolução. Abilities card-specific ainda ficam fora do modelo genérico |
 
 ---
 
@@ -188,6 +188,6 @@
 ## Próximos Passos (Ordem de Impacto)
 
 1. **Integração avançada de tipos complexos** — efeitos específicos de planeswalker/battle/faces complexas
-2. **Targeting avançado** — multi-target partial resolution e seleção complexa
+2. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas
 3. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 4. **Dashboard/relatório agregado de telemetria** — consolidar snapshots por corpus/cron do Hermes

@@ -1126,6 +1126,60 @@ def test_removal_replay_includes_formal_targeting_metadata():
         battle.REPLAY_EVENT_HANDLER = previous_handler
 
 
+def test_multi_target_removal_partially_resolves_legal_targets():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_known = battle.KNOWN_CARDS.get("Forked Removal")
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        caster = player("Caster")
+        opponent = player("Opponent")
+        legal_target = {
+            "name": "Legal Target",
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        illegal_target = {
+            "name": "Illegal Target",
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "shroud": True,
+        }
+        opponent.battlefield = [legal_target, illegal_target]
+        battle.KNOWN_CARDS["Forked Removal"] = {
+            "effect": "remove_creature",
+            "target": "creature",
+            "declared_targets": [
+                {"target": legal_target, "controller": opponent},
+                {"target": illegal_target, "controller": opponent},
+            ],
+        }
+        spell = {
+            "name": "Forked Removal",
+            "type_line": "Instant",
+            "colors": ["B"],
+        }
+
+        battle.apply_effect_immediate(caster, [opponent], spell, turn=6, rng=random.Random(140))
+
+        assert legal_target not in opponent.battlefield
+        assert illegal_target in opponent.battlefield
+        assert spell in caster.graveyard
+        multi_event = next(data for event, data in events if event == "multi_target_resolution")
+        assert multi_event["resolved"] == ["Legal Target"]
+        assert multi_event["illegal"] == ["Illegal Target"]
+    finally:
+        if previous_known is None:
+            battle.KNOWN_CARDS.pop("Forked Removal", None)
+        else:
+            battle.KNOWN_CARDS["Forked Removal"] = previous_known
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_ward_counters_targeted_removal_when_unpaid():
     events = []
     previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -3211,6 +3265,7 @@ if __name__ == "__main__":
         test_formal_targeting_respects_protection_from_source_color,
         test_formal_targeting_keeps_ward_as_legal_target,
         test_removal_replay_includes_formal_targeting_metadata,
+        test_multi_target_removal_partially_resolves_legal_targets,
         test_ward_counters_targeted_removal_when_unpaid,
         test_ward_paid_allows_targeted_removal_to_resolve,
         test_only_attacked_player_can_block,

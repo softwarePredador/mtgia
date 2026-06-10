@@ -3476,6 +3476,61 @@ def targeting_decision(spell, target, controller, *, target_controller=None, tar
         "target_controller": getattr(target_controller, "name", None),
     }
 
+
+def controller_for_target(players, target):
+    for candidate in players:
+        if target in getattr(candidate, "battlefield", []):
+            return candidate
+    return None
+
+
+def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng):
+    """Resolve declared removal targets independently (CR 608.2b partial resolution)."""
+    declared_targets = effect_data.get("declared_targets") or []
+    if not declared_targets:
+        return False
+    target_type = str(effect_data.get("target") or "").lower()
+    if not target_type:
+        target_type = "creature" if effect_data.get("effect") == "remove_creature" else "nonland_permanent"
+
+    resolved = []
+    illegal = []
+    ward_countered = []
+    players = [player] + list(opponents)
+    for entry in declared_targets:
+        target = entry.get("target") if isinstance(entry, dict) else entry
+        target_controller = (
+            entry.get("controller") if isinstance(entry, dict) else None
+        ) or controller_for_target(players, target)
+        decision = targeting_decision(
+            card,
+            target,
+            player,
+            target_controller=target_controller,
+            target_type=target_type,
+        )
+        if not decision["target_legal"] or target_controller is None:
+            illegal.append(decision["target_name"])
+            continue
+        if check_ward(target, card, player, rng):
+            ward_countered.append(decision["target_name"])
+            continue
+        move_creature_from_battlefield(target_controller, target)
+        resolved.append(decision["target_name"])
+
+    emit_replay_event(
+        "multi_target_resolution",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_type=target_type,
+        declared=len(declared_targets),
+        resolved=resolved,
+        illegal=illegal,
+        ward_countered=ward_countered,
+        turn=turn,
+    )
+    return True
+
 def game_winner(all_players):
     return next((player for player in all_players if player.has_won()), None)
 
@@ -5399,6 +5454,9 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         return_graveyard_lands_to_battlefield(player, card, turn, opponents=opponents)
         finish_resolved_spell(player, card, turn=turn)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
+        if resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng):
+            finish_resolved_spell(player, card, turn=turn)
+            return
         for opp in opponents:
             target_type = str(effect_data.get("target") or "").lower()
             if not target_type:
