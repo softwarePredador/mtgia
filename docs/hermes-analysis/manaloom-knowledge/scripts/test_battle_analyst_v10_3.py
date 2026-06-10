@@ -64,6 +64,14 @@ replacement_spec = importlib.util.spec_from_file_location(
 battle_replacement_tests = importlib.util.module_from_spec(replacement_spec)
 replacement_spec.loader.exec_module(battle_replacement_tests)
 
+COMMANDER_TESTS_PATH = MODULE_PATH.with_name("battle_commander_tests.py")
+commander_spec = importlib.util.spec_from_file_location(
+    "battle_commander_tests_under_test",
+    COMMANDER_TESTS_PATH,
+)
+battle_commander_tests = importlib.util.module_from_spec(commander_spec)
+commander_spec.loader.exec_module(battle_commander_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -1223,100 +1231,6 @@ def test_conformance_stack_resolves_lifo():
     assert resolved == ["Third Spell", "Second Spell", "First Spell"]
 
 
-def test_conformance_commander_damage_ledger_persists_across_zone_change():
-    attacker = player("Commander Player")
-    defender = player("Defender")
-    commander = {
-        "name": "Ledger Commander",
-        "type_line": "Legendary Creature",
-        "effect": "creature",
-        "power": 11,
-        "toughness": 11,
-        "is_commander": True,
-        "owner": attacker.name,
-    }
-    attacker.battlefield = [commander]
-
-    battle.combat_damage_steps(
-        attacker,
-        [defender],
-        defender,
-        [commander],
-        [(commander, [])],
-        turn=1,
-    )
-    assert attacker.commander_damage[defender.name] == 11
-    assert battle.move_creature_from_battlefield(attacker, commander, reason="destroyed") == "command_zone"
-
-    attacker.battlefield = [commander]
-    battle.combat_damage_steps(
-        attacker,
-        [defender],
-        defender,
-        [commander],
-        [(commander, [])],
-        turn=2,
-    )
-    battle.check_sbas_until_stable([attacker, defender])
-
-    assert attacker.commander_damage[defender.name] == 22
-    assert defender.eliminated is True
-
-
-def test_commander_damage_is_tracked_per_commander_origin():
-    attacker = player("Partner Player")
-    defender = player("Defender")
-    commander_a = {
-        "name": "Partner A",
-        "type_line": "Legendary Creature",
-        "effect": "creature",
-        "power": 11,
-        "toughness": 11,
-        "is_commander": True,
-        "owner": attacker.name,
-        "commander_origin_id": "partner-a-origin",
-    }
-    commander_b = {
-        "name": "Partner B",
-        "type_line": "Legendary Creature",
-        "effect": "creature",
-        "power": 10,
-        "toughness": 10,
-        "is_commander": True,
-        "owner": attacker.name,
-        "commander_origin_id": "partner-b-origin",
-    }
-
-    attacker.battlefield = [commander_a, commander_b]
-    battle.combat_damage_steps(
-        attacker,
-        [defender],
-        defender,
-        [commander_a, commander_b],
-        [(commander_a, []), (commander_b, [])],
-        turn=1,
-    )
-    battle.check_sbas_until_stable([attacker, defender])
-
-    assert attacker.commander_damage[defender.name] == 21
-    assert attacker.commander_damage_by_source["Defender::partner-a-origin"] == 11
-    assert attacker.commander_damage_by_source["Defender::partner-b-origin"] == 10
-    assert defender.eliminated is False
-
-    battle.combat_damage_steps(
-        attacker,
-        [defender],
-        defender,
-        [commander_a],
-        [(commander_a, [])],
-        turn=2,
-    )
-    battle.check_sbas_until_stable([attacker, defender])
-
-    assert attacker.commander_damage_by_source["Defender::partner-a-origin"] == 22
-    assert defender.eliminated is True
-
-
 def test_conformance_failed_draw_from_empty_library_loses():
     active = player("Active")
     active.hand = [card("Still in hand")]
@@ -2347,46 +2261,6 @@ def test_contextual_haste_text_does_not_grant_self_haste():
     assert battle.has_haste(spider_punk) is True
 
 
-def test_commander_destroyed_in_combat_returns_to_command_zone():
-    attacker = player("Attacker")
-    defender = player("Defender")
-    commander = battle.enrich_card({
-        "name": "Tiny Commander",
-        "effect": "creature",
-        "type_line": "Legendary Creature",
-        "power": 1,
-        "toughness": 1,
-        "summoning_sick": False,
-        "tapped": False,
-        "is_commander": True,
-    })
-    blocker = battle.enrich_card({
-        "name": "Big Blocker",
-        "effect": "creature",
-        "type_line": "Creature",
-        "power": 3,
-        "toughness": 3,
-        "summoning_sick": False,
-        "tapped": False,
-    })
-    attacker.battlefield = [commander]
-    defender.battlefield = [blocker]
-    defender.life = 1
-
-    battle.combat_phase_v8(
-        attacker,
-        [defender],
-        [attacker, defender],
-        turn=5,
-        rng=random.Random(69),
-        stack=battle.Stack(),
-    )
-
-    assert commander not in attacker.battlefield
-    assert commander in attacker.command_zone
-    assert commander not in attacker.graveyard
-
-
 def test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard():
     active = player("Active")
     token = battle.create_creature_token(active, name="Soldier Token", power=1, toughness=1)
@@ -3293,8 +3167,7 @@ if __name__ == "__main__":
         *battle_rules_2026_tests.register_tests(battle, player),
         test_conformance_registry_has_executable_coverage,
         test_conformance_stack_resolves_lifo,
-        test_conformance_commander_damage_ledger_persists_across_zone_change,
-        test_commander_damage_is_tracked_per_commander_origin,
+        *battle_commander_tests.register_tests(battle, player),
         test_conformance_failed_draw_from_empty_library_loses,
         test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves,
         test_conformance_apnap_trigger_order_is_lifo_after_stack_placement,
@@ -3332,7 +3205,6 @@ if __name__ == "__main__":
         test_engine_creature_enters_with_summoning_sickness,
         test_permanent_activated_removal_text_does_not_become_free_removal,
         test_contextual_haste_text_does_not_grant_self_haste,
-        test_commander_destroyed_in_combat_returns_to_command_zone,
         test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard,
         test_token_sba_removes_tokens_from_non_battlefield_zones,
         test_artifact_removal_does_not_destroy_creature_target_by_mistake,
