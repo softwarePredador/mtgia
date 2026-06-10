@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 19/25 itens implementados no battle_analyst_v9.py (5900+ linhas).
-> 6 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 20/25 itens implementados no battle_analyst_v9.py (6100+ linhas).
+> 5 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -30,8 +30,8 @@
 | ✅ | Prioridade com pilha vazia | v9:priority_round/run_priority_loop |
 | ✅ | Passos de combate formais | v9:beginning/declare/damage/end combat steps |
 | ✅ | Casting pipeline 601.2 mínimo | v9:CastingContext/begin_cast_context/commit_cast_payment |
+| ✅ | Replacement/Prevention mínimo | v9:ReplacementRegistry/ReplacementEvent |
 | ⏳ | Layers 1-7 (continuous effects) | P1 |
-| ⏳ | Replacement/Prevention effects | P1 |
 | ⏳ | Planeswalkers + Battles | P2 |
 | ⏳ | DFC/Adventure/Prototype | P2 |
 | ⏳ | Telemetria de saúde do motor | P2 |
@@ -43,7 +43,7 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Replacement effects | 5-7 dias | Alto | — |
+| 1 | Replacement/prevention avançado | 5-7 dias | Alto | registry mínima |
 | 2 | Casting pipeline 601.2 avançado | 5-7 dias | Alto | 601.2 mínimo |
 | 3 | Layers 1-7 | 7-10 dias | Alto | #1 |
 | 4 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
@@ -143,45 +143,23 @@
 
 ### 5. Replacement/Prevention Effects
 
-**Gap**: Completamente ausente. Nenhum efeito de substituição ou prevenção.
+**Status 2026-06-10**: ✅ Mínimo implementado / ⚠️ CR 616 completo pendente.
 
-**Arquivo**: Novo módulo ou adição ao v9
+**Arquivos**:
+- `battle_analyst_v9.py`: `ReplacementEvent`, `ReplacementRegistry`, integração em `change_life`, `deal_damage`, `gain_life`, `move_creature_from_battlefield`.
+- `test_battle_analyst_v10_3.py`: `test_replacement_registry_prevents_damage_before_life_mutation`, `test_replacement_registry_moves_commander_to_command_zone`.
 
-**Implementação**:
-```python
-class ReplacementRegistry:
-    """Registro de efeitos de replacement/prevention ativos."""
-    
-    @staticmethod
-    def process_event(event, affected_player):
-        """Aplica replacement effects em ordem (CR 614, 616)."""
-        applicable = ReplacementRegistry.find_applicable(event, affected_player)
-        
-        while applicable:
-            if len(applicable) == 1:
-                chosen = applicable[0]
-            else:
-                # Self-replacement > control-change > APNAP (CR 616.1)
-                chosen = ReplacementRegistry.choose_order(event, applicable, affected_player)
-            
-            event = chosen.replace(event)
-            applicable = ReplacementRegistry.find_applicable(event, affected_player)
-        
-        # Prevention (CR 615) — only for damage events
-        if event.type == "damage":
-            preventions = find_prevention_effects(event)
-            for p in preventions:
-                event.amount = max(0, event.amount - p.shield_amount)
-        
-        return event  # Event is now final, execute it
+**O que foi coberto**:
+- Dano é processado por prevention antes de mutar vida.
+- `life_cant_change` e `protection_from_everything` passam por evento centralizado.
+- Ganho/perda de vida usa replacement antes de alterar life total.
+- Commander em zone change para graveyard é redirecionado para command zone por registry mínima.
+- Evento `replacement_applied` expõe `replacement_pipeline=replacement_prevention_minimal`.
 
-# Exemplo: Commander replacement
-ReplacementRegistry.register(
-    match=lambda e: e.type == "zone_change" and e.card.get("is_commander") 
-                    and e.to_zone in ("graveyard", "exile", "hand", "library"),
-    replace=lambda e: setattr(e, "to_zone", "command_zone") if e.owner_chooses() else e
-)
-```
+**Limite restante**:
+- Ainda não existe escolha APNAP real entre múltiplos replacement effects concorrentes.
+- Prevention shields com quantidade limitada ainda não existem.
+- Replacement para exile/hand/library e efeitos self-replacement específicos ainda precisam de casos dedicados.
 
 **Regra**: CR 614 (Replacement), CR 615 (Prevention), CR 616 (Interaction)
 

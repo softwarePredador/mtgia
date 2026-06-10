@@ -3158,23 +3158,137 @@ def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
     return len(creatures)
 
 
+class ReplacementEvent:
+    """Minimal replacement/prevention event used before mutating game state."""
+
+    def __init__(
+        self,
+        event_type,
+        *,
+        affected_player=None,
+        card=None,
+        amount=0,
+        delta=0,
+        from_zone=None,
+        to_zone=None,
+        source=None,
+        reason=None,
+    ):
+        self.event_type = event_type
+        self.affected_player = affected_player
+        self.card = card
+        self.amount = amount
+        self.delta = delta
+        self.from_zone = from_zone
+        self.to_zone = to_zone
+        self.source = source
+        self.reason = reason
+        self.prevented = False
+        self.replacements = []
+
+    def mark_prevented(self, replacement):
+        self.prevented = True
+        self.amount = 0
+        self.delta = 0
+        self.replacements.append(replacement)
+
+    def to_replay_fields(self):
+        return {
+            "replacement_pipeline": "replacement_prevention_minimal",
+            "event_type": self.event_type,
+            "affected_player": getattr(self.affected_player, "name", None),
+            "card": self.card.get("name", "?") if isinstance(self.card, dict) else self.card,
+            "amount": self.amount,
+            "delta": self.delta,
+            "from_zone": self.from_zone,
+            "to_zone": self.to_zone,
+            "source": self.source,
+            "reason": self.reason,
+            "prevented": self.prevented,
+            "replacements": list(self.replacements),
+        }
+
+
+class ReplacementRegistry:
+    """Minimal deterministic replacement/prevention processor (CR 614-616/615)."""
+
+    @staticmethod
+    def process_event(event):
+        if event.event_type == "damage":
+            ReplacementRegistry._apply_damage_prevention(event)
+        elif event.event_type == "life_change":
+            ReplacementRegistry._apply_life_change_replacement(event)
+        elif event.event_type == "zone_change":
+            ReplacementRegistry._apply_zone_change_replacement(event)
+        if event.replacements:
+            emit_replay_event("replacement_applied", **event.to_replay_fields())
+        return event
+
+    @staticmethod
+    def _apply_damage_prevention(event):
+        player = event.affected_player
+        if player is None or event.amount <= 0:
+            return
+        if player.life_cant_change:
+            event.mark_prevented("life_total_cant_change")
+        elif player.protection_from_everything:
+            event.mark_prevented("protection_from_everything")
+
+    @staticmethod
+    def _apply_life_change_replacement(event):
+        player = event.affected_player
+        if player is None or not event.delta:
+            return
+        if player.life_cant_change:
+            event.mark_prevented("life_total_cant_change")
+        elif player.protection_from_everything:
+            event.mark_prevented("protection_from_everything")
+
+    @staticmethod
+    def _apply_zone_change_replacement(event):
+        card = event.card
+        if not isinstance(card, dict) or not card.get("is_commander"):
+            return
+        if event.to_zone not in ("graveyard", "exile", "hand", "library"):
+            return
+        choice = card.get("commander_replacement_choice", "command_zone")
+        if choice == event.to_zone:
+            return
+        event.to_zone = "command_zone"
+        event.replacements.append("commander_to_command_zone")
+
+
 def change_life(player, delta):
-    if delta and (player.life_cant_change or player.protection_from_everything):
+    event = ReplacementRegistry.process_event(
+        ReplacementEvent("life_change", affected_player=player, delta=delta)
+    )
+    if event.prevented or not event.delta:
         return False
-    player.life += delta
+    player.life += event.delta
     return True
 
 
 def deal_damage(player, amount):
     if amount <= 0:
         return False
-    return change_life(player, -amount)
+    event = ReplacementRegistry.process_event(
+        ReplacementEvent("damage", affected_player=player, amount=amount, delta=-amount)
+    )
+    if event.prevented or event.amount <= 0:
+        return False
+    player.life -= event.amount
+    return True
 
 
 def gain_life(player, amount, cap=40):
-    if amount <= 0 or player.life_cant_change or player.protection_from_everything:
+    if amount <= 0:
         return False
-    player.life = min(cap, player.life + amount)
+    event = ReplacementRegistry.process_event(
+        ReplacementEvent("life_change", affected_player=player, delta=amount)
+    )
+    if event.prevented or event.delta <= 0:
+        return False
+    player.life = min(cap, player.life + event.delta)
     return True
 
 
@@ -3191,7 +3305,7 @@ def get_lki(creature):
         "cmc": creature.get("cmc", 0),
     }
 
-def move_creature_from_battlefield(owner, creature):
+def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
     """Move a dead/sacrificed creature to the correct zone for this simulator."""
 
     # v9: LKI snapshot before zone change (CR 608.2g, 400.7)
@@ -3212,9 +3326,18 @@ def move_creature_from_battlefield(owner, creature):
     if creature in owner.battlefield:
         owner.battlefield.remove(creature)
     if creature.get("is_commander"):
-        # v9: Commander replacement (CR 903.9a) - owner MAY move to CZ
-        choice = creature.get("commander_replacement_choice", "command_zone")
-        if choice != "graveyard":
+        event = ReplacementRegistry.process_event(
+            ReplacementEvent(
+                "zone_change",
+                affected_player=owner,
+                card=creature,
+                from_zone="battlefield",
+                to_zone="graveyard",
+                source=source,
+                reason=reason,
+            )
+        )
+        if event.to_zone == "command_zone":
             owner.command_zone.append(creature)
             return "command_zone"
     if creature.get("tag") == "token" or "token" in str(creature.get("type_line") or "").lower():

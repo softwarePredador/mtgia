@@ -1011,6 +1011,52 @@ def test_life_cant_change_prevents_damage_and_life_gain():
     assert active.life == 20
 
 
+def test_replacement_registry_prevents_damage_before_life_mutation():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append({"event": event, **data})
+    active = player("Active")
+    active.life = 3
+    active.life_cant_change = True
+
+    assert battle.deal_damage(active, 5) is False
+
+    assert active.life == 3
+    replacement = next(event for event in events if event["event"] == "replacement_applied")
+    assert replacement["replacement_pipeline"] == "replacement_prevention_minimal"
+    assert replacement["event_type"] == "damage"
+    assert replacement["prevented"] is True
+    assert replacement["replacements"] == ["life_total_cant_change"]
+
+
+def test_replacement_registry_moves_commander_to_command_zone():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append({"event": event, **data})
+    active = player("Active")
+    commander = {
+        "name": "Test Commander",
+        "type_line": "Legendary Creature",
+        "is_commander": True,
+        "owner": "Active",
+    }
+    active.battlefield = [commander]
+
+    destination = battle.move_creature_from_battlefield(
+        active,
+        commander,
+        reason="destroy",
+        source="test",
+        all_players=[active],
+    )
+
+    assert destination == "command_zone"
+    assert commander in active.command_zone
+    assert commander not in active.graveyard
+    replacement = next(event for event in events if event["event"] == "replacement_applied")
+    assert replacement["event_type"] == "zone_change"
+    assert replacement["to_zone"] == "command_zone"
+    assert replacement["replacements"] == ["commander_to_command_zone"]
+
+
 def test_lands_are_not_instant_or_sorcery_even_with_generated_metadata():
     land = {
         "name": "Mana Confluence",
@@ -2240,6 +2286,8 @@ if __name__ == "__main__":
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_silence_effect_blocks_counterspell_responses,
         test_life_cant_change_prevents_damage_and_life_gain,
+        test_replacement_registry_prevents_damage_before_life_mutation,
+        test_replacement_registry_moves_commander_to_command_zone,
         test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,
         test_lorehold_miracle_ignores_lands_and_creatures,
         test_lorehold_miracle_rejects_flash_creatures,

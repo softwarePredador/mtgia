@@ -14,7 +14,7 @@
 | Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 1/5 | 1/5 | 3/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
-| Efeitos Contínuos | 0/5 | 0/5 | 5/5 |
+| Efeitos Contínuos | 0/5 | 1/5 | 4/5 |
 | Tipos Complexos | 1/6 | 2/6 | 3/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
 | Qualidade/QA | 3/6 | 1/6 | 2/6 |
@@ -155,7 +155,7 @@
 | Layer 2-6 (control, text, type, color, abilities) | ❌ Ausente | — | |
 | Layer 7 (P/T com subcamadas) | ❌ Ausente | — | |
 | Timestamps e dependencies | ❌ Ausente | — | |
-| Replacement/prevention effects | ❌ Ausente | — | |
+| Replacement/prevention effects | ⚠️ Parcial | v9: `ReplacementRegistry` | Prevention/life/commander zone-change mínimos; falta CR 616 completo |
 
 ---
 
@@ -184,7 +184,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Replacement/prevention effects** — aplicar ordem CR 616 de forma determinística
+1. **Replacement/prevention avançado** — aplicar ordem CR 616 de forma determinística
 2. **Casting pipeline 601.2 avançado** — modes, X, custos alternativos/adicionais e targeting formal
 3. **Layers 1-7** — efeitos contínuos com timestamp/dependência
 4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
