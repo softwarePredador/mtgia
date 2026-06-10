@@ -232,7 +232,7 @@ class DeckRulesService {
 
       if (!_isCommanderEligible(commanderInfo)) {
         throw DeckRulesException(
-          'Regra violada: "${commanderInfo.name}" não pode ser comandante (precisa ser criatura lendária ou dizer "can be your commander").',
+          'Regra violada: "${commanderInfo.name}" não pode ser comandante (precisa ser criatura lendária, Vehicle/Spacecraft lendário com poder/resistência, ou dizer "can be your commander").',
           cardName: commanderInfo.name,
         );
       }
@@ -303,6 +303,14 @@ class DeckRulesService {
     final isLegendary = typeLine.contains('legendary');
     final isCreature = typeLine.contains('creature');
     if (isLegendary && isCreature) return true;
+
+    final isVehicleOrSpacecraft =
+        typeLine.contains('vehicle') || typeLine.contains('spacecraft');
+    final hasPowerToughnessBox = (card.power ?? '').trim().isNotEmpty &&
+        (card.toughness ?? '').trim().isNotEmpty;
+    if (isLegendary && isVehicleOrSpacecraft && hasPowerToughnessBox) {
+      return true;
+    }
 
     // Planeswalkers e outras exceções com texto "can be your commander".
     if (oracle.contains('can be your commander')) return true;
@@ -424,7 +432,7 @@ class DeckRulesService {
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, power, toughness
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -443,6 +451,8 @@ class DeckRulesService {
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
       final manaCost = row[6] as String?;
+      final power = row[7] as String?;
+      final toughness = row[8] as String?;
 
       map[id] = _CardData(
         id: id,
@@ -452,6 +462,8 @@ class DeckRulesService {
         colors: colors,
         colorIdentity: colorIdentity,
         manaCost: manaCost,
+        power: power,
+        toughness: toughness,
       );
     }
 
@@ -512,6 +524,8 @@ class _CardData {
     required this.colors,
     required this.colorIdentity,
     required this.manaCost,
+    required this.power,
+    required this.toughness,
   });
 
   final String id;
@@ -521,4 +535,6 @@ class _CardData {
   final List<String> colors;
   final List<String> colorIdentity;
   final String? manaCost;
+  final String? power;
+  final String? toughness;
 }

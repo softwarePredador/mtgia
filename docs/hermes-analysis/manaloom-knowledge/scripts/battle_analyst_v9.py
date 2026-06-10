@@ -319,6 +319,8 @@ class CastingContext:
         x_value=0,
         targets=None,
         additional_costs=None,
+        source_zone="hand",
+        alternative_cost_kind=None,
     ):
         self.card = card
         self.controller = controller
@@ -330,6 +332,8 @@ class CastingContext:
         self.x_value = max(0, int(x_value or 0))
         self.targets = list(targets or [])
         self.additional_costs = list(additional_costs or [])
+        self.source_zone = source_zone
+        self.alternative_cost_kind = alternative_cost_kind
         self.locked_cost = None
         self.effect_data = {}
         self.is_legal = False
@@ -346,6 +350,8 @@ class CastingContext:
             "modes": list(self.modes),
             "targets": list(self.targets),
             "role": self.role,
+            "source_zone": self.source_zone,
+            "alternative_cost_kind": self.alternative_cost_kind,
         }
 
 
@@ -385,6 +391,8 @@ def begin_cast_context(
     x_value=0,
     targets=None,
     additional_costs=None,
+    source_zone="hand",
+    alternative_cost_kind=None,
 ):
     """Announce and lock cost for a simplified CR 601.2 cast."""
     ctx = CastingContext(
@@ -398,6 +406,8 @@ def begin_cast_context(
         x_value=x_value,
         targets=targets,
         additional_costs=additional_costs,
+        source_zone=source_zone,
+        alternative_cost_kind=alternative_cost_kind,
     )
     ctx.effect_data = effect_data or get_card_effect(card)
     ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase)
@@ -686,6 +696,16 @@ def get_card_characteristics(card, zone, cast_mode=None):
         result.setdefault("parent_name", card.get("name"))
         result["cast_mode"] = "adventure"
         return result
+    if cast_mode == "omen" and card.get("omen"):
+        result = copy.deepcopy(card["omen"])
+        result.setdefault("parent_name", card.get("name"))
+        result["cast_mode"] = "omen"
+        return result
+    if cast_mode == "prepare" and card.get("prepare"):
+        result = copy.deepcopy(card["prepare"])
+        result.setdefault("parent_name", card.get("name"))
+        result["cast_mode"] = "prepare"
+        return result
     if cast_mode == "prototype" and card.get("prototype"):
         result = copy.deepcopy(card["prototype"])
         result.setdefault("parent_name", card.get("name"))
@@ -721,8 +741,296 @@ def adventure_spell_card(card):
     return spell
 
 
+def modern_ability_word_signals(card):
+    """Telemetry-only detection for modern ability words.
+
+    These words do not enforce rules by themselves; they mark cards that need
+    spent-mana, zone-change or spell-targeting context.
+    """
+    if not isinstance(card, dict):
+        return []
+    text = str(card.get("oracle_text", "") or "").lower()
+    signals = []
+    for word in (
+        "void",
+        "repartee",
+        "opus",
+        "increment",
+        "infusion",
+        "converge",
+    ):
+        if re.search(rf"\b{word}\b", text):
+            signals.append(word)
+    return signals
+
+
+def is_warp_card(card):
+    return isinstance(card, dict) and bool(card.get("warp_cost") or card.get("warp"))
+
+
+def cast_warp_spell_from_hand(player, card, turn, phase):
+    """Cast a permanent for its warp cost and schedule end-step exile."""
+    if phase not in MAIN_PHASES or not is_warp_card(card) or card not in player.hand:
+        return False
+    warp_cost = card.get("warp_cost") or card.get("warp")
+    effect_data = get_card_effect(card)
+    ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="warp",
+        alternative_cost=warp_cost,
+        source_zone="hand",
+        alternative_cost_kind="warp",
+    )
+    if not commit_cast_payment(ctx):
+        return False
+    player.hand.remove(card)
+    permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+    permanent["_warped_this_turn"] = True
+    permanent["_warp_pending_exile_turn"] = turn
+    permanent["_warp_recast_available"] = False
+    if is_creature_card(permanent):
+        permanent["effect"] = "creature"
+        permanent["haste"] = has_haste(permanent)
+        permanent["summoning_sick"] = not permanent["haste"]
+        permanent["tapped"] = False
+    player.battlefield.append(permanent)
+    emit_replay_event(
+        "warp_cast",
+        player=player.name,
+        card=card.get("name", "?"),
+        warp_cost=warp_cost,
+        turn=turn,
+        phase=phase,
+        **ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    return True
+
+
+def process_warp_end_step(player, turn):
+    """Exile warped permanents at the next end step and allow future recast."""
+    moved = []
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict) or not permanent.get("_warped_this_turn"):
+            continue
+        if permanent.get("_warp_pending_exile_turn") != turn:
+            continue
+        player.battlefield.remove(permanent)
+        permanent["_warped_this_turn"] = False
+        permanent["_warp_recast_available"] = True
+        move_to_exile(player, permanent, reason="warp", turn=turn)
+        moved.append(permanent.get("name", "?"))
+    if moved:
+        emit_replay_event("warp_exiled_end_step", player=player.name, cards=moved, turn=turn)
+    return moved
+
+
+def cast_warp_card_from_exile(player, card, turn, phase):
+    """Recast a card previously exiled by warp using its normal cost."""
+    if phase not in MAIN_PHASES or not isinstance(card, dict):
+        return False
+    if not card.get("_warp_recast_available") or card not in player.exile:
+        return False
+    effect_data = get_card_effect(card)
+    ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="warp_recast",
+        source_zone="exile",
+    )
+    if not commit_cast_payment(ctx):
+        return False
+    player.exile.remove(card)
+    permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+    permanent.pop("_warp_recast_available", None)
+    permanent.pop("_exile_reason", None)
+    if is_creature_card(permanent):
+        permanent["effect"] = "creature"
+        permanent["haste"] = has_haste(permanent)
+        permanent["summoning_sick"] = not permanent["haste"]
+        permanent["tapped"] = False
+    player.battlefield.append(permanent)
+    emit_replay_event(
+        "warp_recast_from_exile",
+        player=player.name,
+        card=card.get("name", "?"),
+        turn=turn,
+        phase=phase,
+        **ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    return True
+
+
+def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, turn, phase, stack, rng):
+    """Cast an instant/sorcery from graveyard for flashback, exiling on resolution."""
+    if not isinstance(card, dict) or card not in player.graveyard:
+        return False
+    flashback_cost = card.get("flashback_cost") or card.get("flashback")
+    if not flashback_cost:
+        return False
+    if not is_instant(card) and not (is_sorcery(card) and phase in MAIN_PHASES):
+        return False
+    effect_data = get_card_effect(card)
+    ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="flashback",
+        alternative_cost=flashback_cost,
+        source_zone="graveyard",
+        alternative_cost_kind="flashback",
+    )
+    if not commit_cast_payment(ctx):
+        return False
+    player.graveyard.remove(card)
+    flashback_copy = copy.deepcopy(card)
+    flashback_copy["_flashback_cast"] = True
+    emit_replay_event(
+        "flashback_cast",
+        player=player.name,
+        card=card.get("name", "?"),
+        flashback_cost=flashback_cost,
+        turn=turn,
+        phase=phase,
+        **ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    trigger_spell_cast_engines(
+        player, all_players, flashback_copy, turn, phase, stack=stack, active_player=player
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        flashback_copy,
+        turn,
+        phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    stack.push(flashback_copy, player, effect_data)
+    return True
+
+
+def is_station_card(card):
+    return isinstance(card, dict) and (
+        "station" in str(card.get("type_line", "")).lower()
+        or bool(card.get("station_threshold"))
+    )
+
+
+def activate_station_ability(player, station, tapper, phase, stack):
+    """Minimal station action: tap another creature and add charge counters."""
+    if phase not in MAIN_PHASES or not stack.empty():
+        return False
+    if station not in player.battlefield or tapper not in player.battlefield:
+        return False
+    if station is tapper or not is_station_card(station) or not is_battlefield_creature(tapper):
+        return False
+    if tapper.get("tapped") or tapper.get("summoning_sick"):
+        return False
+    tapper["tapped"] = True
+    added = int(tapper.get("power") or 0)
+    station["charge_counters"] = int(station.get("charge_counters") or 0) + max(0, added)
+    threshold = int(station.get("station_threshold") or station.get("unlock_threshold") or 0)
+    if threshold and station["charge_counters"] >= threshold:
+        station["station_online"] = True
+        if is_vehicle_or_spacecraft_card(station):
+            station["effect"] = "creature"
+    emit_replay_event(
+        "station_activated",
+        player=player.name,
+        card=station.get("name", "?"),
+        tapper=tapper.get("name", "?"),
+        counters_added=max(0, added),
+        total_counters=station["charge_counters"],
+        station_online=bool(station.get("station_online")),
+        phase=phase,
+    )
+    return True
+
+
+def prepare_spell_copy(player, source_card, prepared_creature, turn):
+    """Create a castable prepared copy in exile linked to a creature."""
+    if not isinstance(source_card, dict) or not isinstance(prepared_creature, dict):
+        return None
+    prepared_copy = get_card_characteristics(source_card, "exile", cast_mode="prepare")
+    prepared_copy["_prepared_copy"] = True
+    prepared_copy["_prepared_source_name"] = source_card.get("name")
+    prepared_copy["_prepared_creature_id"] = id(prepared_creature)
+    prepared_copy["_prepared_available"] = True
+    move_to_exile(player, prepared_copy, reason="prepare", turn=turn)
+    emit_replay_event(
+        "prepared_copy_created",
+        player=player.name,
+        source=source_card.get("name", "?"),
+        card=prepared_copy.get("name", "?"),
+        prepared_creature=prepared_creature.get("name", "?"),
+        turn=turn,
+    )
+    return prepared_copy
+
+
+def cleanup_prepared_copies(player, prepared_creature):
+    """Remove prepared copies when the linked creature is no longer prepared."""
+    removed = []
+    creature_id = id(prepared_creature)
+    for card in list(player.exile):
+        if isinstance(card, dict) and card.get("_prepared_creature_id") == creature_id:
+            player.exile.remove(card)
+            removed.append(card.get("name", "?"))
+    if removed:
+        emit_replay_event(
+            "prepared_copies_removed",
+            player=player.name,
+            prepared_creature=prepared_creature.get("name", "?"),
+            cards=removed,
+        )
+    return removed
+
+
+def resolve_paradigm_spell(player, card, turn):
+    """Track a resolved Paradigm spell as a future first-main copy source."""
+    if not isinstance(card, dict):
+        return None
+    paradigm_card = copy.deepcopy(card)
+    paradigm_card["_paradigm_available"] = True
+    move_to_exile(player, paradigm_card, reason="paradigm", turn=turn)
+    emit_replay_event(
+        "paradigm_exiled",
+        player=player.name,
+        card=card.get("name", "?"),
+        turn=turn,
+    )
+    return paradigm_card
+
+
+def create_lander_token(player, name="Lander Token"):
+    token = create_creature_token(
+        player,
+        name=name,
+        power=1,
+        toughness=1,
+        artifact=True,
+    )
+    token["subtype"] = "Lander"
+    token["lander_token"] = True
+    return token
+
+
 def finish_countered_spell(player, card):
     """Move a countered spell to the correct graveyard object."""
+    if isinstance(card, dict) and card.get("_flashback_cast"):
+        move_to_exile(player, card, reason="flashback_countered")
+        return
     if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
         parent = copy.deepcopy(card["_adventure_parent"])
         parent.pop("_adventure_available", None)
@@ -747,6 +1055,15 @@ def move_to_exile(player, card, *, face_down=False, public=None, reason=None, tu
 
 def finish_resolved_spell(player, card, turn=None):
     """Move a resolved nonpermanent spell, honoring Adventure's exile replacement."""
+    if isinstance(card, dict) and card.get("_flashback_cast"):
+        move_to_exile(player, card, reason="flashback", turn=turn)
+        emit_replay_event(
+            "flashback_exiled",
+            player=player.name,
+            card=card.get("name", "?"),
+            turn=turn,
+        )
+        return
     if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
         parent = copy.deepcopy(card["_adventure_parent"])
         parent["_adventure_available"] = True
@@ -786,7 +1103,16 @@ def compute_color_identity(card):
     if not isinstance(card, dict):
         return []
     parts = [card]
-    for key in ("front_face", "back_face", "adventure", "prototype", "half_a", "half_b"):
+    for key in (
+        "front_face",
+        "back_face",
+        "adventure",
+        "omen",
+        "prepare",
+        "prototype",
+        "half_a",
+        "half_b",
+    ):
         if isinstance(card.get(key), dict):
             parts.append(card[key])
     ordered = ["white", "blue", "black", "red", "green"]
@@ -2808,6 +3134,40 @@ def is_creature_card(card):
     if not isinstance(card, dict):
         return False
     return "creature" in str(card.get("type_line") or "").lower()
+
+
+def has_power_toughness_box(card):
+    """Return true when a card has printed power/toughness boxes."""
+    if not isinstance(card, dict):
+        return False
+    for key in ("power", "toughness"):
+        value = card.get(key)
+        if value is None:
+            return False
+        if isinstance(value, str) and not value.strip():
+            return False
+    return True
+
+
+def is_vehicle_or_spacecraft_card(card):
+    type_line = str(card.get("type_line", "") if isinstance(card, dict) else "").lower()
+    return "vehicle" in type_line or "spacecraft" in type_line
+
+
+def is_commander_eligible_card(card):
+    """Small 2026 Commander eligibility helper for the battle engine."""
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line", "")).lower()
+    oracle = str(card.get("oracle_text", "") or "").lower()
+    is_legendary = "legendary" in type_line
+    if is_legendary and "creature" in type_line:
+        return True
+    if "can be your commander" in oracle:
+        return True
+    if is_legendary and is_vehicle_or_spacecraft_card(card) and has_power_toughness_box(card):
+        return True
+    return False
 
 
 def is_modeled_battle_card(card):
@@ -5353,7 +5713,36 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
 
     if is_main_phase:
         for exiled_card in list(player.exile):
+            if cast_warp_card_from_exile(player, exiled_card, turn, phase):
+                if note_action():
+                    return True
+                break
             if cast_adventure_creature_from_exile(player, exiled_card, turn, phase):
+                if note_action():
+                    return True
+                break
+
+        for graveyard_card in list(player.graveyard):
+            if cast_flashback_spell_from_graveyard(
+                player,
+                graveyard_card,
+                opponents,
+                all_players,
+                turn,
+                phase,
+                stack,
+                rng,
+            ):
+                while not stack.empty():
+                    priority_round(player, all_players, stack, turn, rng)
+                    if game_winner(all_players):
+                        return True
+                if note_action():
+                    return True
+                break
+
+        for warp_card in list(player.hand):
+            if cast_warp_spell_from_hand(player, warp_card, turn, phase):
                 if note_action():
                     return True
                 break
@@ -6300,7 +6689,70 @@ def declare_attackers_step(attacker, opponents, turn):
         attackers_detail=[replay_card_snapshot(card) for card in attackers],
         turn=turn,
     )
-    return attackers, alive_defenders, target, target_reason
+    attack_groups = assign_attackers_to_defenders(
+        attacker,
+        attackers,
+        alive_defenders,
+        target,
+        target_reason,
+    )
+    if len(attack_groups) > 1:
+        emit_replay_event(
+            "multi_defender_attack",
+            attacker=attacker.name,
+            groups=[
+                {
+                    "target": defender.name,
+                    "attackers": [card.get("name", "?") for card in group_attackers],
+                }
+                for defender, group_attackers in attack_groups
+            ],
+            turn=turn,
+        )
+    return attackers, alive_defenders, target, target_reason, attack_groups
+
+
+def assign_attackers_to_defenders(attacker, attackers, alive_defenders, primary_target, target_reason):
+    """Allow Commander free-for-all attacks against multiple defending players."""
+    if (
+        len(alive_defenders) <= 1
+        or len(attackers) <= 1
+        or target_reason in ("lethal", "known_approach")
+    ):
+        return [(primary_target, list(attackers))]
+
+    if attacker.strategy in ("aggro", "rush"):
+        ordered_defenders = sorted(alive_defenders, key=lambda defender: defender.life)
+    elif attacker.strategy == "control":
+        ordered_defenders = sorted(
+            alive_defenders,
+            key=lambda defender: (
+                -defender.threat_level,
+                -sum(
+                    card.get("power", 0)
+                    for card in defender.battlefield
+                    if is_battlefield_creature(card)
+                ),
+                defender.life,
+            ),
+        )
+    else:
+        ordered_defenders = sorted(
+            alive_defenders,
+            key=lambda defender: (defender.life, -defender.threat_level),
+        )
+
+    grouped = {defender.name: [defender, []] for defender in ordered_defenders}
+    for index, creature in enumerate(
+        sorted(attackers, key=lambda card: card.get("power", 2), reverse=True)
+    ):
+        defender = ordered_defenders[index % len(ordered_defenders)]
+        grouped[defender.name][1].append(creature)
+    return [
+        (defender, group_attackers)
+        for defender, group_attackers in grouped.values()
+        if group_attackers
+    ]
 
 
 def combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rng):
@@ -6595,14 +7047,34 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     declared = declare_attackers_step(attacker, opponents, turn)
     if not declared:
         return
-    attackers, alive_defenders, target, target_reason = declared
+    attackers, alive_defenders, target, target_reason, attack_groups = declared
 
     total_power = sum(a.get("power", 2) for a in attackers)
     combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rng)
     if not attackers:
         return
 
-    block_assignments = declare_blockers_step(target, attackers, turn, rng)
+    live_attack_groups = [
+        (group_target, [card for card in group_attackers if card in attackers])
+        for group_target, group_attackers in attack_groups
+    ]
+    live_attack_groups = [
+        (group_target, group_attackers)
+        for group_target, group_attackers in live_attack_groups
+        if group_attackers
+    ]
+    if not live_attack_groups:
+        return
+
+    grouped_block_assignments = [
+        (group_target, group_attackers, declare_blockers_step(group_target, group_attackers, turn, rng))
+        for group_target, group_attackers in live_attack_groups
+    ]
+    block_assignments = [
+        assignment
+        for _, _, group_assignments in grouped_block_assignments
+        for assignment in group_assignments
+    ]
     combat_target_life_before = target.life
     combat_attacker_life_before = attacker.life
 
@@ -6627,6 +7099,13 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         ],
         attackers=len(attackers),
         attackers_detail=[replay_card_snapshot(card) for card in attackers],
+        attack_groups=[
+            {
+                "target": group_target.name,
+                "attackers": [replay_card_snapshot(card) for card in group_attackers],
+            }
+            for group_target, group_attackers in live_attack_groups
+        ],
         blockers=sum(len(blockers) for _, blockers in block_assignments),
         blockers_detail=[
             {
@@ -6640,7 +7119,15 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         turn=turn,
     )
 
-    combat_damage_steps(attacker, opponents, target, attackers, block_assignments, turn)
+    for group_target, group_attackers, group_block_assignments in grouped_block_assignments:
+        combat_damage_steps(
+            attacker,
+            opponents,
+            group_target,
+            group_attackers,
+            group_block_assignments,
+            turn,
+        )
     end_of_combat_step(attacker, all_players, turn, rng, stack)
 
 def play_turn_v8(player, opponents, all_players, turn, rng, stack):
@@ -6787,6 +7274,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     for c in player.battlefield:
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and not c.get("burden"):
             player.draw(1, rng)
+    process_warp_end_step(player, turn)
     
     # ── OPPONENT END STEP INTERACTION (NEW) ──
     # All opponents can cast instants on this player's end step

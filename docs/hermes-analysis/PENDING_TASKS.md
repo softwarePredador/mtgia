@@ -3,6 +3,12 @@
 > **Handoff: 2026-06-09.**  
 > 25/25 itens implementados no battle_analyst_v9.py (6900+ linhas).
 > 0 macros pendentes nesta lista. Gaps avançados continuam rastreados em `IMPLEMENTATION_GAPS.md`.
+>
+> **Atualização 2026-06-10.**
+> Nova rodada oficial CR/Commander 2026 adicionou 9 cenários de conformidade:
+> Vehicle/Spacecraft commander, hybrid identity strict, Warp, Station, Prepare,
+> Omen, Flashback, multi-defender Commander combat e modern ability-word telemetry.
+> Todos estão cobertos em `test_battle_analyst_v10_3.py`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -36,6 +42,7 @@
 | ✅ | DFC/Adventure/Prototype/Split básico | v9:get_card_characteristics/compute_color_identity |
 | ✅ | Telemetria de saúde do motor | v9:EngineMetrics |
 | ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
+| ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 
 ---
 
@@ -46,6 +53,7 @@
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal + multi-target básico |
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
+| 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 
 ---
 

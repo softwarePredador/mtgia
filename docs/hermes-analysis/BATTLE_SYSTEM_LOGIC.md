@@ -3,7 +3,7 @@
 > Documento canônico da lógica de simulação de batalha, otimização e validação.
 > Tudo que é usado e pensado em cada etapa do pipeline de análise de deck.
 
-Última atualização: 2026-06-09
+Última atualização: 2026-06-10
 
 ---
 
@@ -81,6 +81,13 @@ Verificadas após cada spell resolver:
 | Lifelink | Ganho de vida ao causar dano |
 | Haste | Lorehold não tem summoning sickness |
 | Counterspells | Oponentes podem counterar spells com threat_score alto |
+| Vehicle/Spacecraft commander | Legendary Vehicle/Spacecraft com power/toughness é elegível como commander |
+| Warp | Custo alternativo, exílio no end step e recast posterior do exile |
+| Station | Tap de outra criatura adiciona charge counters e destrava Spacecraft |
+| Omen/Prepare/Paradigm | Características/cópias/exile tracking básicos |
+| Flashback | Cast do graveyard e exile replacement ao resolver/ser counterado |
+| Ability-word telemetry | Void/Repartee/Opus/Increment/Infusion/Converge como sinais, sem enforcement |
+| Multi-defender combat | Atacantes podem ser distribuídos entre múltiplos defensores em Commander |
 
 ### 2.5 Sistema de Replay (REPLAY_EVENT_HANDLER)
 
@@ -123,6 +130,20 @@ load_learned_opponents():
 | MAX_TURNS | 35 | Teto de turnos (após = stall) |
 | PLAYERS | 4 | Jogadores por partida |
 | RNG_SEED | 42 | Seed fixa para reprodutibilidade |
+
+### 2.8 Cobertura de regras oficiais 2026
+
+Rodada de 2026-06-10 alinhada com `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
+
+O engine agora distingue:
+- `source_zone` e `alternative_cost_kind` no contexto de cast.
+- `warp`, `flashback` e casts futuros do exile/graveyard.
+- `omen`, `prepare`, `prototype`, `adventure`, split e DFC em `get_card_characteristics`.
+- elegibilidade Commander para Legendary Vehicle/Spacecraft com P/T.
+- distribuição de atacantes contra múltiplos defensores.
+
+Limite intencional: isso ainda é simulação Commander prática. Não é judge engine
+completo para todas as interações CR 613/616 nem para todo texto card-specific.
 
 ---
 

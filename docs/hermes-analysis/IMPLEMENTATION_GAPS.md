@@ -18,6 +18,7 @@
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
 | Zonas e Objetos | 5/5 | 0/5 | 0/5 |
 | Qualidade/QA | 7/7 | 0/7 | 0/7 |
+| Regras oficiais 2026 | 9/11 | 2/11 | 0/11 |
 
 ---
 
@@ -82,6 +83,8 @@
 | Partner/Background/Friends Forever | ❌ Ausente | — | |
 | Commander ninjutsu do CZ | ❌ Ausente | — | |
 | Color identity de DFC/Adventure | ✅ Básico | v9: `compute_color_identity` | Agrega faces/partes/modos complexos |
+| Legendary Vehicle/Spacecraft com P/T como commander | ✅ Básico | server + v9 | `DeckRulesService` e `is_commander_eligible_card` cobrem regra 2026 |
+| Hybrid mana em Commander | ✅ Guardado | server + v9 | Continua contando como todas as cores; sem regra "or" |
 
 **Ações imediatas**:
 - [x] Commander replacement opcional (GY/exile → CZ)
@@ -188,7 +191,27 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Integração avançada de tipos complexos** — efeitos específicos de planeswalker/battle/faces complexas
+1. **Integração avançada de tipos complexos** — efeitos específicos de Omen/Prepare/Paradigm/Station por carta concreta
 2. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas
 3. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 4. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário
+
+---
+
+## 10. Regras oficiais 2026 / Mecânicas modernas (P1-P2)
+
+Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
+
+| Item | Status | Implementação | Limite restante |
+|---|---|---|---|
+| Omen cards | ✅ Básico | `get_card_characteristics(..., cast_mode="omen")` e `compute_color_identity` | Efeitos card-specific por carta concreta |
+| Station cards | ✅ Básico | `activate_station_ability` | Escolha humana/interativa de criatura a stationar |
+| Spacecraft | ✅ Básico | `is_vehicle_or_spacecraft_card`, `activate_station_ability` | Efeitos específicos de cada Spacecraft |
+| Warp | ✅ Básico | `cast_warp_spell_from_hand`, `process_warp_end_step`, `cast_warp_card_from_exile` | Interações card-specific e permissões complexas |
+| Prepare / Preparation cards | ✅ Básico | `prepare_spell_copy`, `cleanup_prepared_copies` | Cast completo da cópia preparada por UI/interação |
+| Paradigm | ✅ Telemetria básica | `resolve_paradigm_spell` | Cópia automática na primeira main phase futura |
+| Flashback | ✅ Básico | `cast_flashback_spell_from_graveyard`, exile replacement | Custos/restrições específicas por carta |
+| Lander tokens | ✅ Básico | `create_lander_token` | Token variants por carta concreta |
+| Void/Repartee/Opus/Increment/Infusion/Converge | ✅ Telemetria | `modern_ability_word_signals` | Sem enforcement porque ability words não têm efeito próprio |
+| Multiplayer attack distribution | ✅ Básico | `assign_attackers_to_defenders` + `multi_defender_attack` | Requirements/restrictions avançadas |
+| No sideboard/outside-game em Commander | ⚠️ Documentado | gap registrado nesta seção | Validar rotas/deck construction se o produto expuser sideboard/wishboard |

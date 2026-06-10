@@ -111,13 +111,16 @@ void main() {
       expect(isBasicLandTypeLine('basic snow land — forest'), isTrue);
     });
 
-    test('"basic snow land" does NOT contain "basic land" as substring (root cause)', () {
+    test(
+        '"basic snow land" does NOT contain "basic land" as substring (root cause)',
+        () {
       // Documenta o motivo do bug original: a string NÃO é um substring de si.
       expect('basic snow land — island'.contains('basic land'), isFalse);
 
       // Mas a função corrigida lida com isso adicionando a segunda condição:
       expect(isBasicLandTypeLine('basic snow land — island'), isTrue,
-          reason: 'isBasicLandTypeLine deve detectar Snow-Covered basics apesar do bug do contains');
+          reason:
+              'isBasicLandTypeLine deve detectar Snow-Covered basics apesar do bug do contains');
     });
 
     test('Non-basic lands are NOT detected as basic', () {
@@ -287,46 +290,46 @@ void main() {
   // ─────────────────────────────────────────────────────────────────────────
   group('Minimum Deck Size Validation (non-Commander formats)', () {
     test('Standard deck with 60 cards passes (strict)', () {
-      final error = validateMinDeckSize(
-          format: 'standard', totalCards: 60, strict: true);
+      final error =
+          validateMinDeckSize(format: 'standard', totalCards: 60, strict: true);
       expect(error, isNull);
     });
 
     test('Standard deck with 61 cards passes (strict)', () {
-      final error = validateMinDeckSize(
-          format: 'standard', totalCards: 61, strict: true);
+      final error =
+          validateMinDeckSize(format: 'standard', totalCards: 61, strict: true);
       expect(error, isNull);
     });
 
     test('Standard deck with 59 cards fails (strict)', () {
-      final error = validateMinDeckSize(
-          format: 'standard', totalCards: 59, strict: true);
+      final error =
+          validateMinDeckSize(format: 'standard', totalCards: 59, strict: true);
       expect(error, isNotNull);
       expect(error, contains('60'));
       expect(error, contains('59'));
     });
 
     test('Modern deck with 60 cards passes', () {
-      final error = validateMinDeckSize(
-          format: 'modern', totalCards: 60, strict: true);
+      final error =
+          validateMinDeckSize(format: 'modern', totalCards: 60, strict: true);
       expect(error, isNull);
     });
 
     test('Legacy deck with 60 cards passes', () {
-      final error = validateMinDeckSize(
-          format: 'legacy', totalCards: 60, strict: true);
+      final error =
+          validateMinDeckSize(format: 'legacy', totalCards: 60, strict: true);
       expect(error, isNull);
     });
 
     test('Vintage deck with 59 cards fails (strict)', () {
-      final error = validateMinDeckSize(
-          format: 'vintage', totalCards: 59, strict: true);
+      final error =
+          validateMinDeckSize(format: 'vintage', totalCards: 59, strict: true);
       expect(error, isNotNull);
     });
 
     test('Pauper deck with 59 cards fails (strict)', () {
-      final error = validateMinDeckSize(
-          format: 'pauper', totalCards: 59, strict: true);
+      final error =
+          validateMinDeckSize(format: 'pauper', totalCards: 59, strict: true);
       expect(error, isNotNull);
     });
 
@@ -344,8 +347,8 @@ void main() {
     });
 
     test('Brawl format is exempt from 60-card minimum check', () {
-      final error = validateMinDeckSize(
-          format: 'brawl', totalCards: 30, strict: true);
+      final error =
+          validateMinDeckSize(format: 'brawl', totalCards: 30, strict: true);
       expect(error, isNull);
     });
   });
@@ -436,11 +439,13 @@ void main() {
     });
 
     test('Enchantment Creature (Gods) is detected as creature', () {
-      expect(getMainType('Legendary Enchantment Creature — God'), equals('Creature'));
+      expect(getMainType('Legendary Enchantment Creature — God'),
+          equals('Creature'));
     });
 
     test('Legendary Planeswalker detected correctly', () {
-      expect(getMainType('Legendary Planeswalker — Jace'), equals('Planeswalker'));
+      expect(
+          getMainType('Legendary Planeswalker — Jace'), equals('Planeswalker'));
     });
   });
 
@@ -541,33 +546,71 @@ void main() {
           t.contains('background');
     }
 
-    bool isCommanderEligible(String typeLine, String oracleText) {
+    bool isCommanderEligible(
+      String typeLine,
+      String oracleText, {
+      String? power,
+      String? toughness,
+    }) {
       final t = typeLine.toLowerCase();
       final o = oracleText.toLowerCase();
       if (t.contains('legendary') && t.contains('creature')) return true;
+      final isLegendaryVehicleOrSpacecraft = t.contains('legendary') &&
+          (t.contains('vehicle') || t.contains('spacecraft'));
+      final hasPowerToughnessBox = (power ?? '').trim().isNotEmpty &&
+          (toughness ?? '').trim().isNotEmpty;
+      if (isLegendaryVehicleOrSpacecraft && hasPowerToughnessBox) return true;
       if (o.contains('can be your commander')) return true;
       // Background enchantments NAO sao elegiveis como comandante solo.
       return false;
     }
 
     test('Legendary Creature is eligible', () {
-      expect(isCommanderEligible('Legendary Creature — Phyrexian Praetor', ''), isTrue);
+      expect(isCommanderEligible('Legendary Creature — Phyrexian Praetor', ''),
+          isTrue);
     });
 
     test('Planeswalker with can-be-your-commander text is eligible', () {
       expect(
-        isCommanderEligible(
-            'Legendary Planeswalker — Urza',
+        isCommanderEligible('Legendary Planeswalker — Urza',
             'Urza, Lord Protector can be your commander.'),
         isTrue,
+      );
+    });
+
+    test('Legendary Vehicle or Spacecraft with power/toughness is eligible',
+        () {
+      expect(
+        isCommanderEligible(
+          'Legendary Artifact — Vehicle',
+          '',
+          power: '5',
+          toughness: '5',
+        ),
+        isTrue,
+      );
+      expect(
+        isCommanderEligible(
+          'Legendary Artifact — Spacecraft',
+          '',
+          power: '3',
+          toughness: '4',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Legendary Vehicle without power/toughness is not eligible', () {
+      expect(
+        isCommanderEligible('Legendary Artifact — Vehicle', ''),
+        isFalse,
       );
     });
 
     test('Background enchantment alone is NOT eligible as solo commander', () {
       // Bug fix: antes retornava true por causa do if (_isBackground) return true
       expect(
-        isCommanderEligible(
-            'Legendary Enchantment — Background',
+        isCommanderEligible('Legendary Enchantment — Background',
             'Choose this Background when you create your character.'),
         isFalse,
       );
@@ -589,5 +632,4 @@ void main() {
       expect(isCommanderEligible('Instant', ''), isFalse);
     });
   });
-
 }
