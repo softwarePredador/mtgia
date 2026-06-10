@@ -196,6 +196,125 @@ def register_tests(battle, player):
         assert active.has_won() is True
         assert responder.hand[0]["name"] == "Real Counter"
 
+    def test_lorehold_miracle_ignores_lands_and_creatures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = battle.Player(
+            "Lorehold",
+            None,
+            [
+                {
+                    "name": "Mana Confluence",
+                    "cmc": 0,
+                    "type_line": "Land",
+                    "oracle_text": "{T}: Add one mana of any color.",
+                    "effect": "land",
+                    "tag": "land",
+                },
+                {
+                    "name": "Drannith Magistrate",
+                    "cmc": 2,
+                    "type_line": "Creature",
+                    "oracle_text": "Your opponents can't cast spells from anywhere other than their hands.",
+                },
+            ],
+            is_human=True,
+        )
+        active.battlefield = [
+            {"name": "Lorehold, the Historian", "effect": "creature", "haste": True},
+            {"name": "Plains", "effect": "land", "type_line": "Land"},
+            {"name": "Mountain", "effect": "land", "type_line": "Land"},
+        ]
+        defender = player("Defender", [_card("Draw")])
+
+        battle.play_turn_v8(
+            active,
+            [defender],
+            [active, defender],
+            turn=3,
+            rng=random.Random(31),
+            stack=battle.Stack(),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert not [event for event, _ in events if event == "miracle_cast"]
+
+    def test_lorehold_miracle_rejects_flash_creatures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = battle.Player(
+            "Lorehold",
+            None,
+            [
+                {
+                    "name": "Dualcaster Mage",
+                    "cmc": 3,
+                    "type_line": "Creature — Human Wizard",
+                    "oracle_text": "Flash",
+                    "keywords": ["Flash"],
+                },
+            ],
+            is_human=True,
+        )
+        active.battlefield = [
+            {"name": "Lorehold, the Historian", "effect": "creature", "haste": True},
+            {"name": "Plains", "effect": "land", "type_line": "Land"},
+            {"name": "Mountain", "effect": "land", "type_line": "Land"},
+        ]
+        defender = player("Defender", [_card("Draw")])
+
+        battle.play_turn_v8(
+            active,
+            [defender],
+            [active, defender],
+            turn=3,
+            rng=random.Random(39),
+            stack=battle.Stack(),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        dualcaster = {
+            "name": "Dualcaster Mage",
+            "type_line": "Creature — Human Wizard",
+            "keywords": ["Flash"],
+        }
+        assert battle.is_instant(dualcaster)
+        assert not battle.is_instant_or_sorcery_spell(dualcaster)
+        assert not [event for event, _ in events if event == "miracle_cast"]
+
+    def test_silence_spell_blocks_responses_until_cleanup_only():
+        active = player("Active")
+        responder = player("Responder")
+        responder.hand = [
+            {
+                "name": "Real Counter",
+                "cmc": 2,
+                "tag": "counter",
+                "effect": "counter",
+                "type_line": "Instant",
+            }
+        ]
+        responder.battlefield = ["land", "land"]
+        responder.refresh_mana_sources(turn=3)
+
+        battle.apply_effect_immediate(
+            active,
+            [responder],
+            {"name": "Silence", "cmc": 1, "type_line": "Instant"},
+            3,
+            random.Random(78),
+        )
+        stack = battle.Stack()
+        spell = {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"}
+        stack.push(spell, active, battle.get_card_effect(spell))
+
+        battle.priority_round(active, [active, responder], stack, 3, random.Random(78))
+
+        assert active.silenced_opponents_until_eot is True
+        assert responder.hand[0]["name"] == "Real Counter"
+        battle.clear_until_eot(active)
+        assert active.silenced_opponents_until_eot is False
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -203,4 +322,7 @@ def register_tests(battle, player):
         test_boros_charm_protects_creatures_until_cleanup,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_silence_effect_blocks_counterspell_responses,
+        test_lorehold_miracle_ignores_lands_and_creatures,
+        test_lorehold_miracle_rejects_flash_creatures,
+        test_silence_spell_blocks_responses_until_cleanup_only,
     ]
