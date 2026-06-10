@@ -3,10 +3,14 @@
 > Mapeamento da "Especificação técnica de regras faltantes para o ManaLoom Commander"
 > para o código atual do battle_analyst_v9.py (engine ativo).
 > Status: 2026-06-10
+> Fonte oficial revalidada nesta rodada:
+> `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
+> Esta lista separa battle engine/regras de gaps de produto/UX. Itens visuais
+> não devem entrar aqui.
 
 ## Resumo
 
-| Categoria | Implementado | Parcial | Ausente |
+| Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
 | SBAs e Triggers | 15/15 | 0/15 | 0/15 |
@@ -18,7 +22,7 @@
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
 | Zonas e Objetos | 5/5 | 0/5 | 0/5 |
 | Qualidade/QA | 7/7 | 0/7 | 0/7 |
-| Regras oficiais 2026 | 9/11 | 2/11 | 0/11 |
+| Regras oficiais 2026 | 5/12 | 5/12 | 2/12 tracked |
 
 ---
 
@@ -183,7 +187,7 @@
 | Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
 |---|---:|---|---|
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7869 | ⚠️ Split necessário | Extrair rules/helpers por domínio mantendo conformance suite verde |
-| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 2591 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana, stack/casting e card-specific extraídos; continuar com regressões gerais |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 2360 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana, stack/casting, card-specific e targeting extraídos; continuar com regressões gerais |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` | 304 | ✅ Extraído | Mantém cenários e testes oficiais 2026 isolados |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` | 330 | ✅ Extraído | Mantém regressões de combate isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` | 151 | ✅ Extraído | Mantém regressões de replacement/prevention isoladas |
@@ -191,6 +195,7 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py` | 112 | ✅ Extraído | Mantém regressões diretas de mana/custos isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py` | 289 | ✅ Extraído | Mantém regressões de stack, priority e casting pipeline 601.2 isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py` | 328 | ✅ Extraído | Mantém regressões card-specific de Lorehold, Boros Charm, Akroma's Will e Silence isoladas |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_targeting_tests.py` | 241 | ✅ Extraído | Mantém regressões de targeting formal, hexproof/protection/ward, metadata e multi-target partial resolution isoladas |
 | `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
@@ -211,8 +216,8 @@
 ## Próximos Passos (Ordem de Impacto)
 
 1. **Integração avançada de tipos complexos** — efeitos específicos de Omen/Prepare/Paradigm/Station por carta concreta
-2. **Modularização segura** — começar por suites/testes Hermes e depois route/runtime de optimize
-3. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas
+2. **Modularização segura** — continuar por suites/testes Hermes e depois route/runtime de optimize
+3. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas; o bloco formal mínimo já está isolado em `battle_targeting_tests.py`
 4. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 5. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário
 
@@ -224,14 +229,15 @@ Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
 
 | Item | Status | Implementação | Limite restante |
 |---|---|---|---|
-| Omen cards | ✅ Básico | `get_card_characteristics(..., cast_mode="omen")` e `compute_color_identity` | Efeitos card-specific por carta concreta |
-| Station cards | ✅ Básico | `activate_station_ability` | Escolha humana/interativa de criatura a stationar |
-| Spacecraft | ✅ Básico | `is_vehicle_or_spacecraft_card`, `activate_station_ability` | Efeitos específicos de cada Spacecraft |
-| Warp | ✅ Básico | `cast_warp_spell_from_hand`, `process_warp_end_step`, `cast_warp_card_from_exile` | Interações card-specific e permissões complexas |
-| Prepare / Preparation cards | ✅ Básico | `prepare_spell_copy`, `cleanup_prepared_copies` | Cast completo da cópia preparada por UI/interação |
-| Paradigm | ✅ Telemetria básica | `resolve_paradigm_spell` | Cópia automática na primeira main phase futura |
+| Omen cards | ✅ Parcial | `get_card_characteristics(..., cast_mode="omen")` e `compute_color_identity` | Efeitos card-specific por carta concreta |
+| Station cards | ✅ Parcial | `activate_station_ability` | Escolha humana/interativa de criatura a stationar |
+| Spacecraft | ✅ Parcial | `is_vehicle_or_spacecraft_card`, `activate_station_ability` | Efeitos específicos de cada Spacecraft |
+| Warp | ✅ Parcial | `cast_warp_spell_from_hand`, `process_warp_end_step`, `cast_warp_card_from_exile` | Interações card-specific e permissões complexas |
+| Prepare / Preparation cards | ✅ Parcial | `prepare_spell_copy`, `cleanup_prepared_copies` | Cast completo da cópia preparada por UI/interação |
+| Paradigm | ⚠️ Tracked Gap | `resolve_paradigm_spell` rastreia a fonte | Cópia automática na primeira main phase futura |
 | Flashback | ✅ Básico | `cast_flashback_spell_from_graveyard`, exile replacement | Custos/restrições específicas por carta |
 | Lander tokens | ✅ Básico | `create_lander_token` | Token variants por carta concreta |
 | Void/Repartee/Opus/Increment/Infusion/Converge | ✅ Telemetria | `modern_ability_word_signals` | Sem enforcement porque ability words não têm efeito próprio |
 | Multiplayer attack distribution | ✅ Básico | `assign_attackers_to_defenders` + `multi_defender_attack` | Requirements/restrictions avançadas |
-| No sideboard/outside-game em Commander | ⚠️ Documentado | gap registrado nesta seção | Validar rotas/deck construction se o produto expuser sideboard/wishboard |
+| Hybrid mana em Commander | ✅ Guardado | servidor + v9 preservam identidade combinada | Não flexibilizar; Wizards confirmou que a regra não mudou em 2026-02-09 |
+| No sideboard/outside-game em Commander | ⚠️ Tracked Gap | gap registrado nesta seção | Validar rotas/deck construction se o produto expuser sideboard/wishboard |

@@ -28,6 +28,9 @@
 > `battle_stack_casting_tests.py`; regressões card-specific/Lorehold foram
 > movidas para `battle_card_specific_tests.py`, mantendo
 > `test_battle_analyst_v10_3.py` como runner único.
+> Targeting formal também foi movido para `battle_targeting_tests.py`,
+> cobrindo hexproof, protection, ward, metadata e partial resolution de
+> multi-target.
 
 ---
 
@@ -69,6 +72,7 @@
 | ✅ | Quinta extração da suite Hermes | `battle_mana_tests.py` |
 | ✅ | Sexta extração da suite Hermes | `battle_stack_casting_tests.py` |
 | ✅ | Sétima extração da suite Hermes | `battle_card_specific_tests.py` |
+| ✅ | Oitava extração da suite Hermes | `battle_targeting_tests.py` |
 
 ---
 
@@ -77,7 +81,7 @@
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
-| 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal + multi-target básico |
+| 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
@@ -318,6 +322,7 @@
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.
 - `hybrid_phyrexian_payment_601_2h`: mana híbrida colorida e Phyrexian colorida usam alternativas legais de pagamento.
+- `targeting_formal_minimal`: hexproof, protection, ward, replay metadata e partial resolution multi-target ficam isolados em `battle_targeting_tests.py`.
 
 **Limite restante**:
 - Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
@@ -330,6 +335,8 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7869 |
+| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 2360 |
+| `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
