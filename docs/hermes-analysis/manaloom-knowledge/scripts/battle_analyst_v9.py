@@ -188,6 +188,115 @@ def card_mana_cost(card, additional_generic=0):
     return parsed
 
 
+class CastingContext:
+    """Minimal CR 601.2 casting context with locked cost and legality state."""
+
+    def __init__(self, card, controller, phase, *, additional_generic=0, role="normal"):
+        self.card = card
+        self.controller = controller
+        self.phase = phase
+        self.additional_generic = additional_generic
+        self.role = role
+        self.modes = []
+        self.alternative_cost = None
+        self.x_value = 0
+        self.targets = []
+        self.locked_cost = None
+        self.effect_data = {}
+        self.is_legal = False
+        self.paid = False
+
+    def to_replay_fields(self):
+        return {
+            "cast_pipeline": "601.2_minimal",
+            "locked_cost": replay_cost_snapshot(self.locked_cost),
+            "additional_generic": self.additional_generic,
+            "role": self.role,
+        }
+
+
+def replay_cost_snapshot(cost):
+    if not isinstance(cost, dict):
+        return cost
+    return {
+        "generic": cost.get("generic", 0),
+        "colored": dict(cost.get("colored", {})),
+        "hybrid": [list(options) for options in cost.get("hybrid", [])],
+    }
+
+
+def can_cast_in_phase(card, effect_data, phase):
+    if is_effective_land(card):
+        return False
+    if effect_data.get("effect") == "counter":
+        return False
+    if effect_data.get("effect") == "creature" and phase not in MAIN_PHASES:
+        return False
+    if is_sorcery(card) and phase not in MAIN_PHASES:
+        return False
+    return True
+
+
+def begin_cast_context(
+    player,
+    card,
+    phase,
+    *,
+    additional_generic=0,
+    effect_data=None,
+    role="normal",
+):
+    """Announce and lock cost for a simplified CR 601.2 cast."""
+    ctx = CastingContext(
+        card,
+        player,
+        phase,
+        additional_generic=additional_generic,
+        role=role,
+    )
+    ctx.effect_data = effect_data or get_card_effect(card)
+    ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase)
+    ctx.locked_cost = card_mana_cost(card, additional_generic)
+    emit_replay_event(
+        "cast_announced",
+        player=player.name,
+        card=card.get("name", "?"),
+        effect=ctx.effect_data.get("effect", "unknown"),
+        phase=phase,
+        **ctx.to_replay_fields(),
+        **replay_rule_fields(ctx.effect_data),
+    )
+    return ctx
+
+
+def commit_cast_payment(ctx):
+    """Pay the previously locked cost. Returns False without mutating hand/stack."""
+    if not ctx.is_legal:
+        emit_replay_event(
+            "cast_illegal",
+            player=ctx.controller.name,
+            card=ctx.card.get("name", "?"),
+            phase=ctx.phase,
+            reason="illegal_timing_or_type",
+            **ctx.to_replay_fields(),
+        )
+        return False
+    if not ctx.controller.can_pay(ctx.locked_cost):
+        emit_replay_event(
+            "cast_illegal",
+            player=ctx.controller.name,
+            card=ctx.card.get("name", "?"),
+            phase=ctx.phase,
+            reason="cannot_pay_locked_cost",
+            **ctx.to_replay_fields(),
+        )
+        return False
+    ctx.paid = ctx.controller.spend_mana(ctx.locked_cost)
+    if not ctx.paid:
+        return False
+    return True
+
+
 def source_colors(source):
     """Return pool colors a source can produce; unknown legacy sources are generic."""
     if source == "land":
@@ -3938,41 +4047,51 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     # 1. Cast commander from command zone (main phase only)
     if is_main_phase and player.command_zone:
         cmd = player.command_zone[0]
+        already_there = any(isinstance(c, dict) and c.get("name") == cmd.get("name") for c in player.battlefield)
+        if already_there:
+            cmd = None
+    if is_main_phase and player.command_zone and cmd is not None:
+        cmd_eff = get_card_effect(cmd)
+        cast_ctx = begin_cast_context(
+            player,
+            cmd,
+            phase,
+            additional_generic=player.commander_tax,
+            effect_data=cmd_eff,
+            role="commander",
+        )
         cost = cmd["cmc"] + player.commander_tax
-        if player.can_pay_card(cmd, player.commander_tax):
-            already_there = any(isinstance(c, dict) and c.get("name") == cmd.get("name") for c in player.battlefield)
-            if not already_there:
-                player.command_zone.pop(0)
-                cmd_copy = enrich_card(cmd)
-                cmd_eff = get_card_effect(cmd)
-                haste = has_haste(cmd_copy)
-                if is_creature_card(cmd_copy):
-                    default_stat = max(2, int(float(cmd_copy.get("cmc") or cost or 2)))
-                    cmd_copy["effect"] = "creature"
-                    cmd_copy["power"] = cmd_copy.get("power") or default_stat
-                    cmd_copy["toughness"] = cmd_copy.get("toughness") or cmd_copy.get("power") or default_stat
-                cmd_copy["summoning_sick"] = not haste
-                cmd_copy["haste"] = haste
-                if cmd_eff.get("effect") != "land_recursion_creature":
-                    player.battlefield.append(cmd_copy)
-                player.spend_card_mana(cmd, player.commander_tax)
-                player.commander_tax += 2
-                emit_replay_event(
-                    "commander_cast",
-                    player=player.name,
-                    card=cmd.get("name", "?"),
-                    effect=cmd_eff.get("effect", "unknown"),
-                    type_line=cmd_copy.get("type_line", ""),
-                    cost=cost,
-                    turn=turn,
-                    phase=phase,
-                    **replay_rule_fields(cmd_eff),
-                )
-                if cmd_eff.get("effect") == "land_recursion_creature":
-                    resolve_land_recursion_creature(player, cmd_copy, cmd_eff, turn)
-                mana = player.available_mana()
-                if note_action():
-                    return True
+        if commit_cast_payment(cast_ctx):
+            player.command_zone.pop(0)
+            cmd_copy = enrich_card(cmd)
+            haste = has_haste(cmd_copy)
+            if is_creature_card(cmd_copy):
+                default_stat = max(2, int(float(cmd_copy.get("cmc") or cost or 2)))
+                cmd_copy["effect"] = "creature"
+                cmd_copy["power"] = cmd_copy.get("power") or default_stat
+                cmd_copy["toughness"] = cmd_copy.get("toughness") or cmd_copy.get("power") or default_stat
+            cmd_copy["summoning_sick"] = not haste
+            cmd_copy["haste"] = haste
+            if cmd_eff.get("effect") != "land_recursion_creature":
+                player.battlefield.append(cmd_copy)
+            player.commander_tax += 2
+            emit_replay_event(
+                "commander_cast",
+                player=player.name,
+                card=cmd.get("name", "?"),
+                effect=cmd_eff.get("effect", "unknown"),
+                type_line=cmd_copy.get("type_line", ""),
+                cost=cost,
+                turn=turn,
+                phase=phase,
+                **cast_ctx.to_replay_fields(),
+                **replay_rule_fields(cmd_eff),
+            )
+            if cmd_eff.get("effect") == "land_recursion_creature":
+                resolve_land_recursion_creature(player, cmd_copy, cmd_eff, turn)
+            mana = player.available_mana()
+            if note_action():
+                return True
 
     # 2. Ramp (main phase only)
     if is_main_phase:
@@ -3989,9 +4108,11 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         ]
         for c in ramp_cards[:2]:
             if c in player.hand and player.can_pay_card(c):
-                player.hand.remove(c)
-                player.spend_card_mana(c)
                 eff = get_card_effect(c)
+                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="ramp")
+                if not commit_cast_payment(cast_ctx):
+                    continue
+                player.hand.remove(c)
                 emit_replay_event(
                     "spell_cast",
                     player=player.name,
@@ -4001,7 +4122,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     cmc=c.get("cmc", 0),
                     turn=turn,
                     phase=phase,
-                    role="ramp",
+                    **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
                 if not pay_additional_card_costs(player, c, eff, turn=turn):
@@ -4067,9 +4188,11 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         if wincons:
             c = wincons[0]
             if c in player.hand and player.can_pay_card(c):
-                player.hand.remove(c)
-                player.spend_card_mana(c)
                 eff = get_card_effect(c)
+                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="high_threat")
+                if not commit_cast_payment(cast_ctx):
+                    return False
+                player.hand.remove(c)
                 emit_replay_event(
                     "spell_cast",
                     player=player.name,
@@ -4080,7 +4203,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     threat_score=scored[0][1],
                     turn=turn,
                     phase=phase,
-                    role="high_threat",
+                    **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
                 trigger_spell_cast_engines(
@@ -4117,8 +4240,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             eff = get_card_effect(c)
             if eff.get("effect") == "creature":
                 if not is_main_phase: continue  # creatures only in main phase
+                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="creature")
+                if not commit_cast_payment(cast_ctx):
+                    continue
                 player.hand.remove(c)
-                player.spend_card_mana(c)
                 c_copy = enrich_card({**c, **eff})
                 c_copy["effect"] = "creature"
                 c_copy["haste"] = has_haste(c_copy)
@@ -4136,6 +4261,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     effect=eff.get("effect", "creature"),
                     turn=turn,
                     phase=phase,
+                    **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
                 if eff.get("etb_land_ramp_count"):
@@ -4199,8 +4325,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if note_action():
                     return True
             else:
+                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="normal")
+                if not commit_cast_payment(cast_ctx):
+                    continue
                 player.hand.remove(c)
-                player.spend_card_mana(c)
                 emit_replay_event(
                     "spell_cast",
                     player=player.name,
@@ -4210,7 +4338,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     cmc=c.get("cmc", 0),
                     turn=turn,
                     phase=phase,
-                    role="normal",
+                    **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
                 trigger_spell_cast_engines(

@@ -298,6 +298,64 @@ def test_main_phase_priority_loop_casts_bounded_empty_stack_actions():
     ]
 
 
+def test_casting_context_locks_cost_before_payment():
+    active = player("Active")
+    spell = {"name": "Locked Cost Spell", "cmc": 2, "mana_cost": "{1}{U}", "type_line": "Sorcery"}
+    active.mana_pool.add("blue", 1)
+    active.mana_pool.add_generic(1)
+
+    ctx = battle.begin_cast_context(active, spell, "precombat_main")
+    spell["mana_cost"] = "{9}{U}"
+
+    assert ctx.locked_cost["generic"] == 1
+    assert dict(ctx.locked_cost["colored"]) == {"blue": 1}
+    assert battle.commit_cast_payment(ctx) is True
+    assert active.available_mana() == 0
+
+
+def test_casting_context_rejects_illegal_timing_without_payment():
+    active = player("Active")
+    spell = {"name": "Timing Creature", "cmc": 2, "effect": "creature", "type_line": "Creature"}
+    active.hand = [spell]
+    active.mana_pool.add_generic(2)
+    stack = battle.Stack()
+
+    ctx = battle.begin_cast_context(active, spell, "end_step", effect_data=battle.get_card_effect(spell))
+
+    assert battle.commit_cast_payment(ctx) is False
+    assert active.available_mana() == 2
+    assert active.hand == [spell]
+    assert stack.empty()
+
+
+def test_cast_spells_emits_minimal_601_pipeline_fields():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player("Active")
+        active.hand = [card("Pipeline Bear", cmc=2, effect="creature", power=2)]
+        active.mana_pool.add_generic(2)
+
+        assert battle.cast_spells_v8(
+            active,
+            [],
+            [active],
+            2,
+            "precombat_main",
+            battle.Stack(),
+            random.Random(109),
+            max_actions=1,
+        ) is True
+
+        cast_event = next(data for event, data in events if event == "creature_cast")
+        assert cast_event["cast_pipeline"] == "601.2_minimal"
+        assert cast_event["locked_cost"]["generic"] == 2
+        assert cast_event["role"] == "creature"
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+
 def test_only_attacked_player_can_block():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2156,6 +2214,9 @@ if __name__ == "__main__":
         test_empty_stack_priority_requires_main_phase,
         test_empty_stack_priority_casts_main_phase_creature,
         test_main_phase_priority_loop_casts_bounded_empty_stack_actions,
+        test_casting_context_locks_cost_before_payment,
+        test_casting_context_rejects_illegal_timing_without_payment,
+        test_cast_spells_emits_minimal_601_pipeline_fields,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,

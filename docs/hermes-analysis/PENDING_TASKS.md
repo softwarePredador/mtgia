@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 18/25 itens implementados no battle_analyst_v9.py (5800+ linhas).
-> 7 pendentes de alta complexidade — requerem refatoração arquitetural.
+> 19/25 itens implementados no battle_analyst_v9.py (5900+ linhas).
+> 6 pendentes de alta complexidade — requerem refatoração arquitetural.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -29,7 +29,7 @@
 | ✅ | APNAP trigger ordering básico | v9:2444, 2752, tests |
 | ✅ | Prioridade com pilha vazia | v9:priority_round/run_priority_loop |
 | ✅ | Passos de combate formais | v9:beginning/declare/damage/end combat steps |
-| ⏳ | Casting pipeline 601.2 | P1 |
+| ✅ | Casting pipeline 601.2 mínimo | v9:CastingContext/begin_cast_context/commit_cast_payment |
 | ⏳ | Layers 1-7 (continuous effects) | P1 |
 | ⏳ | Replacement/Prevention effects | P1 |
 | ⏳ | Planeswalkers + Battles | P2 |
@@ -43,9 +43,9 @@
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Casting pipeline 601.2 | 5-7 dias | Alto | prioridade |
-| 2 | Replacement effects | 5-7 dias | Alto | — |
-| 3 | Layers 1-7 | 7-10 dias | Alto | #2 |
+| 1 | Replacement effects | 5-7 dias | Alto | — |
+| 2 | Casting pipeline 601.2 avançado | 5-7 dias | Alto | 601.2 mínimo |
+| 3 | Layers 1-7 | 7-10 dias | Alto | #1 |
 | 4 | Planeswalkers/Battles | 3-4 dias | Médio | combate/casting |
 | 5 | DFC/Adventure/Prototype | 4-5 dias | Médio | #1 |
 | 6 | Telemetria de saúde | 2-3 dias | Médio | — |
@@ -71,7 +71,7 @@
 
 **Regra**: CR 603.3, CR 603.3b
 
-**Limite restante**: escolha manual de ordenação pelo jogador e triggers aninhadas complexas ainda precisam de suite própria, junto com o pipeline 601.2.
+**Limite restante**: escolha manual de ordenação pelo jogador e triggers aninhadas complexas ainda precisam de suite própria, junto com o pipeline 601.2 avançado.
 
 ---
 
@@ -89,7 +89,7 @@
 - `run_priority_loop` aplica janelas vazias de main phase de forma limitada e resolve a stack/triggers entre ações.
 - O turno usa `run_priority_loop` nas duas main phases.
 
-**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores; isso será aprofundado junto do casting pipeline 601.2 e combate formal.
+**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores; isso será aprofundado junto do casting pipeline 601.2 avançado e combate formal.
 
 **Regra**: CR 117.3, CR 117.4
 
@@ -97,73 +97,24 @@
 
 ### 3. Casting Pipeline 601.2
 
-**Gap**: Custo calculado inline como `cmd["cmc"] + player.commander_tax` sem lock-in formal. Sem suporte a custos alternativos (kicker, flashback), X spells, hybrid/Phyrexian mana.
+**Status 2026-06-10**: ✅ Mínimo implementado / ⚠️ avançado pendente.
 
-**Arquivo**: `battle_analyst_v9.py:3524-3820` (cast_spells_v8 e funções relacionadas)
+**Arquivos**:
+- `battle_analyst_v9.py`: `CastingContext`, `begin_cast_context`, `commit_cast_payment`, integração em `cast_spells_v8`.
+- `test_battle_analyst_v10_3.py`: `test_casting_context_locks_cost_before_payment`, `test_casting_context_rejects_illegal_timing_without_payment`, `test_cast_spells_emits_minimal_601_pipeline_fields`.
 
-**Implementação**:
-```python
-class CastingContext:
-    """Estado durante o processo de casting (CR 601.2)."""
-    def __init__(self, card, controller):
-        self.card = card
-        self.controller = controller
-        self.modes = []
-        self.alternative_cost = None
-        self.x_value = 0
-        self.targets = []
-        self.divisions = {}
-        self.locked_cost = {}
-        self.is_legal = False
-        self.additional_costs = []
-        self.cost_increasers = []
-        self.cost_reducers = []
+**O que foi coberto**:
+- Announce/evento `cast_announced` antes de pagamento.
+- Custo travado via `locked_cost` antes do pagamento.
+- Custo de comandante inclui `commander_tax` como `additional_generic`.
+- Timing básico impede creature/sorcery fora de main phase.
+- Pagamento usa `Player.spend_mana` sobre o custo travado.
+- Eventos de cast carregam `cast_pipeline=601.2_minimal`, `locked_cost`, `additional_generic` e `role`.
 
-def cast_spell_v9(player, card, stack, opponents):
-    """Pipeline completo de casting (CR 601.2a-601.2h)."""
-    ctx = CastingContext(card, player)
-    
-    # 601.2a: Announce, move to stack
-    stack.push(card)
-    
-    # 601.2b: Choose modes, alternative costs, X
-    ctx.modes = choose_modes(card)
-    if has_alternative_cost(card):
-        ctx.alternative_cost = choose_alternative(card)
-    if has_x(card):
-        ctx.x_value = choose_x(player)
-    
-    # 601.2c: Choose targets
-    ctx.targets = choose_targets(card, player, opponents)
-    
-    # 601.2d: Divide effects (damage, counters)
-    if requires_division(card):
-        ctx.divisions = divide_effects(card, ctx.targets)
-    
-    # 601.2e: Check legality
-    if not legal_cast(ctx.targets):
-        revert_illegal_action(card, stack)  # CR 733.1
-        return False
-    
-    # 601.2f: Determine total cost
-    base = ctx.alternative_cost or card.get("mana_cost", {})
-    additions = commander_tax(card, player) + kicker_cost(ctx)
-    increases = sum_increasers(card, player)
-    reductions = sum_reducers(card, player)
-    total = base["generic"] + additions + max(0, increases - reductions)
-    ctx.locked_cost = total  # LOCK — no more changes
-    
-    # 601.2g: Activate mana abilities, pay costs
-    if not can_pay(player, total):
-        revert_illegal_action(card, stack)
-        return False
-    pay_costs(player, total)
-    
-    # 601.2h: Spell becomes cast
-    card["is_cast"] = True
-    emit_triggers("when_cast", card, player)
-    return True
-```
+**Limite restante**:
+- Ainda não escolhe formalmente modes, X, alternative costs, kicker/flashback/prototype ou divisão de efeitos.
+- Targeting formal ainda fica no bloco próprio de targeting.
+- Hybrid/Phyrexian e spend restrictions seguem pendentes.
 
 **Regra**: CR 601.2a-601.2h
 

@@ -2,7 +2,7 @@
 
 > Mapeamento da "Especificação técnica de regras faltantes para o ManaLoom Commander"
 > para o código atual do battle_analyst_v9.py (engine ativo).
-> Status: 2026-06-09
+> Status: 2026-06-10
 
 ## Resumo
 
@@ -11,7 +11,7 @@
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
 | SBAs e Triggers | 4/15 | 2/15 | 9/15 |
 | Commander Rules | 4/8 | 2/8 | 2/8 |
-| Mana e Custos | 1/6 | 1/6 | 4/6 |
+| Mana e Custos | 1/6 | 2/6 | 3/6 |
 | Targeting | 1/5 | 1/5 | 3/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 0/5 | 0/5 | 5/5 |
@@ -94,14 +94,15 @@
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
 | Custo de mana básico | ✅ OK | 3532 | `cost = cmd["cmc"] + player.commander_tax` |
-| Pipeline 601.2 (modes→targets→cost→lock→pay) | ❌ Ausente | — | Custo é calculado inline, sem lock-in formal |
+| Pipeline 601.2 (modes→targets→cost→lock→pay) | ⚠️ Parcial | v9: `CastingContext` | Pipeline mínimo com announce, legality, cost lock e pay; faltam modes/X/alt costs/targeting formal |
 | Custos alternativos (kicker, flashback, etc.) | ❌ Ausente | — | |
 | X spells | ❌ Ausente | — | |
 | Hybrid/Phyrexian mana | ❌ Ausente | — | |
 | Mana pool com spend restrictions | ⚠️ Parcial | 2288, 2311 | ManaPool existe mas sem restrictions |
 
 **Ações imediatas**:
-- [ ] Pipeline 601.2 mínimo: lock-in de custo antes de pagar
+- [x] Pipeline 601.2 mínimo: lock-in de custo antes de pagar
+- [ ] Expandir 601.2 para modes, X, alternative/additional costs e targeting formal
 
 ---
 
@@ -183,7 +184,7 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Prioridade com pilha vazia** — main phases devem ter janela de prioridade formal
-2. **Casting pipeline 601.2** — lock-in de custo
-3. **Replacement/prevention effects** — aplicar ordem CR 616 de forma determinística
+1. **Replacement/prevention effects** — aplicar ordem CR 616 de forma determinística
+2. **Casting pipeline 601.2 avançado** — modes, X, custos alternativos/adicionais e targeting formal
+3. **Layers 1-7** — efeitos contínuos com timestamp/dependência
 4. **Suite de conformidade** — cobrir triggers aninhadas, escolha de ordenação e regressões v9
