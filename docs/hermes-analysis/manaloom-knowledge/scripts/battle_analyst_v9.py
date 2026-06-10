@@ -6526,6 +6526,58 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
     )
 
 
+def trigger_end_of_combat(all_players, active_player, turn, stack):
+    """Queue generic beginning-of-end-of-combat triggered abilities."""
+    for controller in all_players:
+        for permanent in list(controller.battlefield):
+            if not isinstance(permanent, dict) or permanent.get("trigger") != "end_of_combat":
+                continue
+            effect = permanent.get("trigger_effect") or permanent.get("effect") or "none"
+            draw_count = int(permanent.get("trigger_draw_count") or permanent.get("draw_count") or 0)
+            life_gain = int(permanent.get("trigger_life_gain") or permanent.get("life_gain") or 0)
+
+            def resolve_end_combat_trigger(
+                controller=controller,
+                permanent=permanent,
+                effect=effect,
+                draw_count=draw_count,
+                life_gain=life_gain,
+            ):
+                drawn = []
+                gained = 0
+                if effect in ("draw", "end_of_combat_draw") and draw_count > 0:
+                    drawn = controller.draw(draw_count)
+                if effect in ("gain_life", "end_of_combat_gain_life") and life_gain > 0:
+                    before = controller.life
+                    gain_life(controller, life_gain)
+                    gained = max(0, controller.life - before)
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=controller.name,
+                    card=permanent.get("name", "?"),
+                    trigger="end_of_combat",
+                    effect=effect,
+                    cards_drawn=len(drawn),
+                    life_gained=gained,
+                    turn=turn,
+                )
+
+            resolve_or_enqueue_trigger(
+                controller,
+                permanent,
+                "end_of_combat",
+                resolve_end_combat_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "trigger_effect": effect,
+                    "trigger_draw_count": draw_count,
+                    "trigger_life_gain": life_gain,
+                },
+            )
+
+
 def end_of_combat_step(attacker, all_players, turn, rng, stack):
     emit_replay_event(
         "combat_step",
@@ -6533,6 +6585,8 @@ def end_of_combat_step(attacker, all_players, turn, rng, stack):
         active_player=attacker.name,
         turn=turn,
     )
+    trigger_end_of_combat(all_players, attacker, turn, stack)
+    flush_triggers_in_apnap(attacker, all_players, stack)
     run_priority_loop(attacker, all_players, stack, turn, "end_of_combat", rng)
 
 

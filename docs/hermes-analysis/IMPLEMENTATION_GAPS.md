@@ -124,7 +124,7 @@
 
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
-| Declaração de atacantes | ❌ Ausente | 4315-4332 | Todos atacam automaticamente |
+| Declaração de atacantes | ⚠️ Parcial | v9: `declare_attackers_step` | Função formal existe, mas escolha ainda é heurística/automática |
 | Declaração de bloqueadores | ⚠️ Parcial | 4421-4462 | Bloqueadores calculados, não declarados |
 | Blocked state persistente | ✅ OK | — | Bloqueado permanece mesmo se blocker morre |
 | First/Double strike | ✅ OK | 4576-4580 | |
@@ -132,7 +132,7 @@
 | Deathtouch | ✅ OK | 4523-4528 | |
 | Lifelink | ✅ OK | 4510-4511 | |
 | Damage assignment multiplayer | ⚠️ Parcial | 4372-4418 | Só ataca 1 oponente por vez |
-| End of combat triggers | ❌ Ausente | — | |
+| End of combat triggers | ✅ Básico | v9: `trigger_end_of_combat` | Permanentes com `trigger=end_of_combat` entram na stack por APNAP e resolvem efeitos genéricos seguros |
 | Requirements/restrictions (must attack, can't attack alone) | ❌ Ausente | — | |
 
 ---
@@ -171,7 +171,7 @@
 | Quality gate | ✅ OK | master_optimizer_quality_gate.py | |
 | Taxonomia canônica de derrota | ✅ Básico | `classify_loss` | Cobre `poison`, `effect_says_lose`, `concede` e tags heurísticas de screw/flood/mulligan/value |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
-| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 14 cenários versionados em `CONFORMANCE_SCENARIOS` |
+| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 15 cenários versionados em `CONFORMANCE_SCENARIOS` |
 | Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
 
 ---

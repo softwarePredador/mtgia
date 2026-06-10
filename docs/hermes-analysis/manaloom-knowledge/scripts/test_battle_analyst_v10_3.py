@@ -113,6 +113,11 @@ CONFORMANCE_SCENARIOS = [
         "purpose": "A creature remains blocked after all blockers leave combat.",
     },
     {
+        "id": "end_of_combat_trigger_511_3",
+        "rule": "CR 511.3, 603.3b",
+        "purpose": "End of combat triggered abilities are put on the stack in APNAP order.",
+    },
+    {
         "id": "apnap_trigger_order_603_3b",
         "rule": "CR 603.3b",
         "purpose": "Triggers are placed on the stack in APNAP order.",
@@ -367,6 +372,58 @@ def test_combat_emits_structured_event():
         "combat_damage",
         "end_of_combat",
     ]
+
+
+def test_end_of_combat_triggers_use_stack_and_apnap_order():
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player("Active", [{"name": "Active Draw"}])
+        nonactive = player("Nonactive", [{"name": "Nonactive Draw"}])
+        active.battlefield = [
+            {
+                "name": "Active End Engine",
+                "trigger": "end_of_combat",
+                "trigger_effect": "draw",
+                "trigger_draw_count": 1,
+            }
+        ]
+        nonactive.battlefield = [
+            {
+                "name": "Nonactive End Engine",
+                "trigger": "end_of_combat",
+                "trigger_effect": "draw",
+                "trigger_draw_count": 1,
+            }
+        ]
+        stack = battle.Stack()
+
+        battle.end_of_combat_step(
+            active,
+            [active, nonactive],
+            turn=4,
+            rng=random.Random(4),
+            stack=stack,
+        )
+
+        assert stack.empty()
+        assert [card["name"] for card in active.hand] == ["Active Draw"]
+        assert [card["name"] for card in nonactive.hand] == ["Nonactive Draw"]
+        put_on_stack = [
+            data["player"]
+            for event, data in events
+            if event == "trigger_put_on_stack" and data.get("trigger") == "end_of_combat"
+        ]
+        assert put_on_stack == ["Active", "Nonactive"]
+        resolved = [
+            data["player"]
+            for event, data in events
+            if event == "trigger_resolved" and data.get("trigger") == "end_of_combat"
+        ]
+        assert resolved == ["Nonactive", "Active"]
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
 
 
 def test_turn_stops_immediately_after_approach_win():
@@ -1106,6 +1163,7 @@ def test_conformance_registry_has_executable_coverage():
         "zone_change_lki_identity_400_7",
         "exile_visibility_406_3",
         "blocked_stays_blocked_509_1h",
+        "end_of_combat_trigger_511_3",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
         "hybrid_phyrexian_payment_601_2h",
@@ -3616,6 +3674,7 @@ if __name__ == "__main__":
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
         test_combat_emits_structured_event,
+        test_end_of_combat_triggers_use_stack_and_apnap_order,
         test_turn_stops_immediately_after_approach_win,
         test_mana_sources_do_not_refill_after_spending,
         test_treasures_are_spent_without_refilling_sources,
