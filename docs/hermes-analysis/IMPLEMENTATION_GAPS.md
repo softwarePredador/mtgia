@@ -187,7 +187,7 @@
 | Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
 |---|---:|---|---|
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7869 | ⚠️ Split necessário | Extrair rules/helpers por domínio mantendo conformance suite verde |
-| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 626 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana, stack/casting, card-specific, targeting, summoning sickness, zone transitions, card import/oracle, turn flow, SBA/zone metadata, permanents complexos, continuous effects, engine metrics e conformance extraídos; continuar com loss taxonomy, token/land recursion, auditoria de decisões e triggers |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 414 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana, stack/casting, card-specific, targeting, summoning sickness, zone transitions, card import/oracle, turn flow, SBA/zone metadata, permanents complexos, continuous effects, engine metrics, conformance e event triggers extraídos; continuar com loss taxonomy, token/land recursion e auditoria de decisões |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` | 304 | ✅ Extraído | Mantém cenários e testes oficiais 2026 isolados |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` | 330 | ✅ Extraído | Mantém regressões de combate isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` | 151 | ✅ Extraído | Mantém regressões de replacement/prevention isoladas |
@@ -205,6 +205,7 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_continuous_effects_tests.py` | 155 | ✅ Extraído | Mantém regressões de continuous effects/layers, sublayers 7b-7e, timestamps e dependencies isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_engine_metrics_tests.py` | 133 | ✅ Extraído | Mantém regressões de EngineMetrics, snapshot JSON sanitizado e agregador de métricas isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` | 201 | ✅ Extraído | Mantém registry base de conformidade e regressões transversais de blocked/APNAP/prevention isoladas |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` | 228 | ✅ Extraído | Mantém regressões de replay events, fim de combate, APNAP/timestamp e spell-cast trigger isoladas |
 | `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |

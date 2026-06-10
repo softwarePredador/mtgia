@@ -56,6 +56,9 @@
 > cobrindo contadores, snapshots JSON sanitizados e agregação de métricas.
 > Conformance também foi movido para `battle_conformance_tests.py`, cobrindo a
 > registry base e regressões transversais de blocked/APNAP/prevention.
+> Replay events/triggers também foram movidos para
+> `battle_event_trigger_tests.py`, cobrindo evento estruturado de combate,
+> triggers de fim de combate, APNAP/timestamp e spell-cast trigger.
 
 ---
 
@@ -107,6 +110,7 @@
 | ✅ | Décima quinta extração da suite Hermes | `battle_continuous_effects_tests.py` |
 | ✅ | Décima sexta extração da suite Hermes | `battle_engine_metrics_tests.py` |
 | ✅ | Décima sétima extração da suite Hermes | `battle_conformance_tests.py` |
+| ✅ | Décima oitava extração da suite Hermes | `battle_event_trigger_tests.py` |
 
 ---
 
@@ -130,7 +134,7 @@
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `_pending_triggers`, `enqueue_trigger`, `flush_triggers_in_apnap`, `resolve_or_enqueue_trigger`, `triggered_ability` no `priority_round`.
-- `test_battle_analyst_v10_3.py`: `test_apnap_trigger_order_puts_nonactive_trigger_on_top`, `test_same_controller_triggers_keep_timestamp_stack_order`.
+- `battle_event_trigger_tests.py`: `test_apnap_trigger_order_puts_nonactive_trigger_on_top`, `test_same_controller_triggers_keep_timestamp_stack_order`.
 
 **O que foi coberto**:
 - Triggers entram na stack como `triggered_ability`.
@@ -198,7 +202,7 @@
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `beginning_of_combat_step`, `declare_attackers_step`, `declare_blockers_step`, `combat_damage_steps`, `end_of_combat_step`.
-- `test_battle_analyst_v10_3.py`: `test_combat_emits_structured_event` valida sequência `combat_step`.
+- `battle_event_trigger_tests.py`: `test_combat_emits_structured_event` valida sequência `combat_step`.
 
 **O que foi coberto**:
 - Evento formal `combat_step` para `beginning_of_combat`.
@@ -369,7 +373,7 @@
 | Arquivo | Descrição | Linhas |
 |---|---|---|
 | `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 | 7869 |
-| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 626 |
+| `test_battle_analyst_v10_3.py` | Runner único da suite Hermes após extrações iniciais | 414 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
 | `battle_zone_transition_tests.py` | Regressões isoladas de zone transitions, tokens, tutor, ramp, recursion e reanimation | 229 |
@@ -380,6 +384,7 @@
 | `battle_continuous_effects_tests.py` | Regressões isoladas de continuous effects/layers, timestamps e dependencies | 155 |
 | `battle_engine_metrics_tests.py` | Regressões isoladas de EngineMetrics, snapshot sanitizado e report agregado | 133 |
 | `battle_conformance_tests.py` | Registry base de conformidade e regressões transversais blocked/APNAP/prevention | 201 |
+| `battle_event_trigger_tests.py` | Regressões isoladas de replay events, APNAP/timestamp e spell-cast trigger | 228 |
 | `engine_metrics_report.py` | Agregador sanitizado de snapshots de telemetria | 104 |
 | `battle_analyst_v8.py` | Engine legado/histórico; não usar como default operacional | 5263 |
 | `master_optimizer_common.py` | Funções comuns do optimizer | ~700 |
