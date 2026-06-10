@@ -2859,6 +2859,18 @@ def test_failed_draw_from_empty_library_loses_even_with_cards_in_hand():
     assert active.life == 0
 
 
+def test_classify_loss_covers_poison_effect_and_concede_tags():
+    loser = player("Loser")
+    loser.poison = 10
+    loser.lost_by_effect = True
+    loser.conceded = True
+
+    tags = battle.classify_loss(loser, [], turn=5, result="loss", reason="test")
+
+    assert tags[:3] == ["concede", "effect_says_lose", "poison"]
+    assert battle.classify_loss(loser, [], turn=5, result="win", reason="test") == []
+
+
 def test_extra_turns_are_taken_before_next_player():
     events = []
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -3580,6 +3592,7 @@ if __name__ == "__main__":
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_reanimation_recursion_returns_creature_to_battlefield,
         test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
+        test_classify_loss_covers_poison_effect_and_concede_tags,
         test_extra_turns_are_taken_before_next_player,
         test_token_maker_tokens_are_sick_unless_rule_grants_haste,
         test_token_maker_counts_dict_lands_for_land_based_tokens,

@@ -168,9 +168,9 @@
 | WDWR/WPWR | ✅ OK | card_impact_analyzer.py | |
 | Forensic audit | ✅ OK | battle_forensic_audit.py | |
 | Quality gate | ✅ OK | master_optimizer_quality_gate.py | |
-| Taxonomia canônica de derrota | ⚠️ Parcial | classify_loss | Faltam: poison, effect_says_lose, concede |
+| Taxonomia canônica de derrota | ✅ Básico | `classify_loss` | Cobre `poison`, `effect_says_lose`, `concede` e tags heurísticas de screw/flood/mulligan/value |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
-| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 6 cenários versionados em `CONFORMANCE_SCENARIOS` |
+| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 11 cenários versionados em `CONFORMANCE_SCENARIOS` |
 | Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
 
 ---
