@@ -134,7 +134,7 @@
 | Trample | ⚠️ Parcial | 4567-4568 | Funciona mas sem order formal |
 | Deathtouch | ✅ OK | 4523-4528 | |
 | Lifelink | ✅ OK | 4510-4511 | |
-| Damage assignment multiplayer | ⚠️ Parcial | 4372-4418 | Só ataca 1 oponente por vez |
+| Damage assignment multiplayer | ✅ Básico | v9: `assign_attackers_to_defenders`, `multi_defender_attack` | Atacantes podem ser distribuídos entre múltiplos defensores; requirements/restrictions avançadas ainda pendem |
 | End of combat triggers | ✅ Básico | v9: `trigger_end_of_combat` | Permanentes com `trigger=end_of_combat` entram na stack por APNAP e resolvem efeitos genéricos seguros |
 | Requirements/restrictions (must attack, can't attack alone) | ❌ Ausente | — | |
 
@@ -183,12 +183,13 @@
 | Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
 |---|---:|---|---|
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7869 | ⚠️ Split necessário | Extrair rules/helpers por domínio mantendo conformance suite verde |
-| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 3142 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander e mana extraídos; continuar com stack/casting/card-specific |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 2880 | ⚠️ Split em andamento | Regras 2026, combate, replacement, commander, mana e stack/casting extraídos; continuar com card-specific |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` | 304 | ✅ Extraído | Mantém cenários e testes oficiais 2026 isolados |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` | 330 | ✅ Extraído | Mantém regressões de combate isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py` | 151 | ✅ Extraído | Mantém regressões de replacement/prevention isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_commander_tests.py` | 145 | ✅ Extraído | Mantém regressões Commander isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py` | 112 | ✅ Extraído | Mantém regressões diretas de mana/custos isoladas |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py` | 289 | ✅ Extraído | Mantém regressões de stack, priority e casting pipeline 601.2 isoladas |
 | `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
