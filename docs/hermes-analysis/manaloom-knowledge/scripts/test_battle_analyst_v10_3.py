@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Focused regression checks for the v10.3 battle/replay fixes.
+"""Focused regression checks for the active battle_analyst_v9 engine.
+
+The filename preserves the historical v10.3 replay-suite label, but
+MODULE_PATH defaults to battle_analyst_v9.py unless BATTLE_ANALYST_PATH is set.
 
 Run from this directory with:
     python3 test_battle_analyst_v10_3.py
