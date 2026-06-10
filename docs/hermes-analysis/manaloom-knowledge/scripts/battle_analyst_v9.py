@@ -3448,6 +3448,54 @@ def check_illegal_attachments(all_players):
     return False
 
 
+def is_saga_permanent(card):
+    return isinstance(card, dict) and "saga" in str(card.get("type_line") or "").lower()
+
+
+def _saga_final_chapter(permanent):
+    for key in ("final_chapter", "chapter_count", "max_chapter"):
+        value = numeric_stat(permanent.get(key))
+        if value:
+            return max(1, value)
+    chapters = permanent.get("saga_chapters") or permanent.get("chapters")
+    if isinstance(chapters, (list, tuple)) and chapters:
+        return len(chapters)
+    return None
+
+
+def _saga_lore_counters(permanent):
+    for key in ("lore_counters", "chapter", "current_chapter"):
+        value = numeric_stat(permanent.get(key))
+        if value is not None:
+            return max(0, value)
+    return 0
+
+
+def check_saga_final_chapter(all_players):
+    """v9: Basic Saga SBA after the final chapter ability is no longer pending."""
+    for p in all_players:
+        for permanent in list(p.battlefield):
+            if not is_saga_permanent(permanent):
+                continue
+            final_chapter = _saga_final_chapter(permanent)
+            if not final_chapter:
+                continue
+            if permanent.get("chapter_ability_pending"):
+                continue
+            if _saga_lore_counters(permanent) < final_chapter:
+                continue
+            p.battlefield.remove(permanent)
+            p.graveyard.append(permanent)
+            emit_replay_event(
+                "saga_sacrificed_by_sba",
+                player=p.name,
+                card=permanent.get("name"),
+                final_chapter=final_chapter,
+            )
+            return True
+    return False
+
+
 def check_sbas(all_players):
     """v8: State-Based Actions after each spell resolution."""
     for p in all_players:
@@ -3489,6 +3537,9 @@ def check_sbas(all_players):
         return True
 
     if check_illegal_attachments(all_players):
+        return True
+
+    if check_saga_final_chapter(all_players):
         return True
 
     # v9: Creature SBAs

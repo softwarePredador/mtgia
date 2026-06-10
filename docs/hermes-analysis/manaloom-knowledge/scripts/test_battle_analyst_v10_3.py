@@ -93,6 +93,11 @@ CONFORMANCE_SCENARIOS = [
         "purpose": "Illegal Auras go to graveyard and illegal Equipment becomes unattached.",
     },
     {
+        "id": "saga_final_chapter_sba_704_5s",
+        "rule": "CR 704.5s",
+        "purpose": "A Saga with final chapter reached is sacrificed after its chapter ability is done.",
+    },
+    {
         "id": "blocked_stays_blocked_509_1h",
         "rule": "CR 509.1h",
         "purpose": "A creature remains blocked after all blockers leave combat.",
@@ -197,6 +202,30 @@ def test_illegal_aura_goes_to_graveyard_and_equipment_detaches():
         "moved_to_graveyard",
         "detached",
     ]
+
+
+def test_saga_final_chapter_sacrifices_after_pending_ability_resolves():
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    active = player("Active")
+    saga = {
+        "name": "Test Saga",
+        "type_line": "Enchantment — Saga",
+        "lore_counters": 3,
+        "final_chapter": 3,
+        "chapter_ability_pending": True,
+    }
+    active.battlefield = [saga]
+
+    battle.check_sbas_until_stable([active])
+    assert saga in active.battlefield
+
+    saga["chapter_ability_pending"] = False
+    battle.check_sbas_until_stable([active])
+
+    assert saga not in active.battlefield
+    assert saga in active.graveyard
+    assert any(event == "saga_sacrificed_by_sba" for event, _ in events)
 
 
 def test_draw_step_runs_once_with_multiple_permanents():
@@ -1008,6 +1037,7 @@ def test_conformance_registry_has_executable_coverage():
         "token_ceases_outside_battlefield_110_5f",
         "plus_minus_counter_cancel_704_5q",
         "illegal_attachment_sba_704_5m_n",
+        "saga_final_chapter_sba_704_5s",
         "blocked_stays_blocked_509_1h",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
@@ -3455,6 +3485,7 @@ if __name__ == "__main__":
         test_cleanup_runs_with_previously_eliminated_player,
         test_plus_minus_counters_cancel_as_sba,
         test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
+        test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
         test_combat_emits_structured_event,
