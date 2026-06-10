@@ -236,15 +236,16 @@ KNOWN_LAND_NAMES = {
 def parse_mana_cost(cost, fallback_cmc=0):
     """Parse a mana cost into generic, colored, and flexible hybrid symbols."""
     if isinstance(cost, (int, float)):
-        return {"generic": int(cost), "colored": defaultdict(int), "hybrid": []}
+        return {"generic": int(cost), "colored": defaultdict(int), "hybrid": [], "phyrexian": []}
     if not cost:
         return {
             "generic": int(float(fallback_cmc or 0)),
             "colored": defaultdict(int),
             "hybrid": [],
+            "phyrexian": [],
         }
 
-    parsed = {"generic": 0, "colored": defaultdict(int), "hybrid": []}
+    parsed = {"generic": 0, "colored": defaultdict(int), "hybrid": [], "phyrexian": []}
     for raw_symbol in re.findall(r"\{([^}]+)\}", str(cost).upper()):
         symbol = raw_symbol.strip()
         if symbol.isdigit():
@@ -254,14 +255,13 @@ def parse_mana_cost(cost, fallback_cmc=0):
         elif symbol in MANA_SYMBOL_TO_POOL:
             parsed["colored"][MANA_SYMBOL_TO_POOL[symbol]] += 1
         elif "/" in symbol:
-            options = [
-                MANA_SYMBOL_TO_POOL[part]
-                for part in symbol.split("/")
-                if part in MANA_SYMBOL_TO_POOL
-            ]
-            if options:
+            parts = symbol.split("/")
+            options = [MANA_SYMBOL_TO_POOL[part] for part in parts if part in MANA_SYMBOL_TO_POOL]
+            if "P" in parts and options:
+                parsed["phyrexian"].append(options[0])
+            elif options:
                 parsed["hybrid"].append(options)
-            elif any(part.isdigit() for part in symbol.split("/")):
+            elif any(part.isdigit() for part in parts):
                 parsed["generic"] += 1
         else:
             parsed["generic"] += 1
@@ -273,6 +273,7 @@ def merge_mana_costs(base, addition):
     for color, amount in addition.get("colored", {}).items():
         base["colored"][color] += amount
     base["hybrid"].extend(addition.get("hybrid", []))
+    base.setdefault("phyrexian", []).extend(addition.get("phyrexian", []))
     return base
 
 
@@ -355,6 +356,7 @@ def replay_cost_snapshot(cost):
         "generic": cost.get("generic", 0),
         "colored": dict(cost.get("colored", {})),
         "hybrid": [list(options) for options in cost.get("hybrid", [])],
+        "phyrexian": list(cost.get("phyrexian", [])),
     }
 
 
@@ -2985,6 +2987,7 @@ class Player:
         )
         pool = self.mana_pool.snapshot()
         treasures = self.treasures
+        life_payment = 0
 
         for color, required in parsed["colored"].items():
             paid = min(pool[color], required)
@@ -2996,6 +2999,18 @@ class Player:
             if missing > treasures:
                 return None
             treasures -= missing
+
+        for color in parsed.get("phyrexian", []):
+            if pool[color] > 0:
+                pool[color] -= 1
+            elif pool["wildcard"] > 0:
+                pool["wildcard"] -= 1
+            elif treasures > 0:
+                treasures -= 1
+            elif self.life - life_payment >= 2:
+                life_payment += 2
+            else:
+                return None
 
         for options in parsed["hybrid"]:
             chosen = next((color for color in options if pool[color] > 0), None)
@@ -3018,7 +3033,7 @@ class Player:
         if generic > treasures:
             return None
         treasures -= generic
-        return pool, treasures
+        return pool, treasures, life_payment
 
     def can_pay(self, cost):
         return self._payment_plan(cost) is not None
@@ -3031,9 +3046,11 @@ class Player:
         plan = self._payment_plan(cost)
         if plan is None:
             return False
-        pool, self.treasures = plan
+        pool, self.treasures, life_payment = plan
         for color, amount in pool.items():
             setattr(self.mana_pool, color, amount)
+        if life_payment:
+            self.life -= life_payment
         return True
 
     def spend_card_mana(self, card, additional_generic=0):

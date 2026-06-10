@@ -117,6 +117,11 @@ CONFORMANCE_SCENARIOS = [
         "rule": "CR 615",
         "purpose": "Prevention replacement applies before damage mutates life.",
     },
+    {
+        "id": "hybrid_phyrexian_payment_601_2h",
+        "rule": "CR 601.2h, 107.4e, 107.4f",
+        "purpose": "Basic hybrid and colored Phyrexian mana are payable through legal alternatives.",
+    },
 ]
 
 
@@ -1071,6 +1076,7 @@ def test_conformance_registry_has_executable_coverage():
         "blocked_stays_blocked_509_1h",
         "apnap_trigger_order_603_3b",
         "prevention_before_damage_615",
+        "hybrid_phyrexian_payment_601_2h",
     }
 
     scenario_ids = {scenario["id"] for scenario in CONFORMANCE_SCENARIOS}
@@ -1703,6 +1709,51 @@ def test_basic_lands_refresh_as_colored_sources():
     assert active.mana_pool.white == 1
     assert active.mana_pool.blue == 1
     assert active.can_pay_card({"name": "Azorius", "cmc": 2, "mana_cost": "{W}{U}"})
+
+
+def test_hybrid_and_phyrexian_mana_use_legal_payment_options():
+    white_payer = player("White")
+    white_payer.mana_pool.add("white", 1)
+    hybrid_spell = {"name": "Azorius Hybrid", "cmc": 1, "mana_cost": "{W/U}"}
+
+    assert white_payer.can_pay_card(hybrid_spell) is True
+    assert white_payer.spend_card_mana(hybrid_spell) is True
+    assert white_payer.mana_pool.white == 0
+
+    blue_payer = player("Blue")
+    blue_payer.mana_pool.add("blue", 1)
+
+    assert blue_payer.can_pay_card(hybrid_spell) is True
+    assert blue_payer.spend_card_mana(hybrid_spell) is True
+    assert blue_payer.mana_pool.blue == 0
+
+    red_payer = player("Red")
+    red_payer.mana_pool.add("red", 1)
+
+    assert red_payer.can_pay_card(hybrid_spell) is False
+    assert red_payer.available_mana() == 1
+
+    life_payer = player("Life")
+    life_payer.life = 10
+    phyrexian_spell = {"name": "Phyrexian White", "cmc": 1, "mana_cost": "{W/P}"}
+
+    assert life_payer.can_pay_card(phyrexian_spell) is True
+    assert life_payer.spend_card_mana(phyrexian_spell) is True
+    assert life_payer.life == 8
+
+    mana_payer = player("Mana")
+    mana_payer.life = 10
+    mana_payer.mana_pool.add("white", 1)
+
+    assert mana_payer.spend_card_mana(phyrexian_spell) is True
+    assert mana_payer.life == 10
+    assert mana_payer.mana_pool.white == 0
+
+    low_life_payer = player("Low Life")
+    low_life_payer.life = 1
+
+    assert low_life_payer.can_pay_card(phyrexian_spell) is False
+    assert low_life_payer.life == 1
 
 
 def test_multiple_blockers_can_gang_block():
@@ -3579,6 +3630,7 @@ if __name__ == "__main__":
         test_colored_mana_requires_the_correct_color,
         test_treasure_and_flexible_sources_pay_colored_costs,
         test_basic_lands_refresh_as_colored_sources,
+        test_hybrid_and_phyrexian_mana_use_legal_payment_options,
         test_multiple_blockers_can_gang_block,
         test_trample_assigns_excess_damage_to_defender,
         test_deathtouch_assigns_one_lethal_damage_per_blocker,

@@ -113,7 +113,7 @@
 
 **Limite restante**:
 - Targeting formal ainda fica no bloco próprio de targeting.
-- Hybrid/Phyrexian e spend restrictions seguem pendentes no bloco de mana.
+- Hybrid/Phyrexian básico cobre `{W/U}` e `{W/P}`; `{2/W}`, `{2/P}` e spend restrictions seguem pendentes no bloco de mana.
 
 **Regra**: CR 601.2a-601.2h
 
@@ -280,10 +280,11 @@
 - `blocked_stays_blocked_509_1h`: criatura bloqueada continua bloqueada após blocker sair.
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.
+- `hybrid_phyrexian_payment_601_2h`: mana híbrida colorida e Phyrexian colorida usam alternativas legais de pagamento.
 
 **Limite restante**:
 - Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
-- Cenários ainda sem suporte formal, como Saga final chapter, active-player concede e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
+- Cenários ainda sem suporte formal, como active-player concede, `{2/W}`/`{2/P}` e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 
 ---
 

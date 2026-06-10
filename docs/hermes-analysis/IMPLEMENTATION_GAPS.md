@@ -11,7 +11,7 @@
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
 | SBAs e Triggers | 15/15 | 0/15 | 0/15 |
 | Commander Rules | 5/8 | 1/8 | 2/8 |
-| Mana e Custos | 1/6 | 2/6 | 3/6 |
+| Mana e Custos | 2/6 | 4/6 | 0/6 |
 | Targeting | 5/5 | 0/5 | 0/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
@@ -97,13 +97,14 @@
 | Pipeline 601.2 (modes→targets→cost→lock→pay) | ⚠️ Parcial | v9: `CastingContext` | Contexto captura modes/targets/X/alt/additional costs; targeting legal formal fica separado |
 | Custos alternativos (kicker, flashback, etc.) | ⚠️ Parcial | v9: `alternative_cost`, `additional_costs` | Suporte contextual/custo travado; falta semântica card-specific |
 | X spells | ✅ Básico | v9: `x_value` | X entra no custo travado |
-| Hybrid/Phyrexian mana | ❌ Ausente | — | |
+| Hybrid/Phyrexian mana | ⚠️ Parcial | v9: `parse_mana_cost`, `Player._payment_plan` | Cobre híbrido colorido `{W/U}` e Phyrexian colorido `{W/P}`; `{2/W}`, `{2/P}` e restrições card-specific seguem pendentes |
 | Mana pool com spend restrictions | ⚠️ Parcial | 2288, 2311 | ManaPool existe mas sem restrictions |
 
 **Ações imediatas**:
 - [x] Pipeline 601.2 mínimo: lock-in de custo antes de pagar
 - [x] Expandir 601.2 para modes, X e alternative/additional costs
 - [x] Levar targeting legal formal para o bloco Targeting
+- [x] Adicionar pagamento básico de hybrid colorido e Phyrexian colorido
 
 ---
 
@@ -170,7 +171,7 @@
 | Quality gate | ✅ OK | master_optimizer_quality_gate.py | |
 | Taxonomia canônica de derrota | ✅ Básico | `classify_loss` | Cobre `poison`, `effect_says_lose`, `concede` e tags heurísticas de screw/flood/mulligan/value |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
-| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 12 cenários versionados em `CONFORMANCE_SCENARIOS` |
+| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 13 cenários versionados em `CONFORMANCE_SCENARIOS` |
 | Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
 
 ---
