@@ -17,7 +17,7 @@
 | Efeitos Contínuos | 4/5 | 1/5 | 0/5 |
 | Tipos Complexos | 4/6 | 2/6 | 0/6 |
 | Zonas e Objetos | 2/5 | 1/5 | 2/5 |
-| Qualidade/QA | 4/6 | 1/6 | 1/6 |
+| Qualidade/QA | 5/7 | 1/7 | 1/7 |
 
 ---
 
@@ -170,6 +170,8 @@
 | Quality gate | ✅ OK | master_optimizer_quality_gate.py | |
 | Taxonomia canônica de derrota | ⚠️ Parcial | classify_loss | Faltam: poison, effect_says_lose, concede |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
+| Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 6 cenários versionados em `CONFORMANCE_SCENARIOS` |
+| Persistência operacional da telemetria | ❌ Ausente | — | Snapshots ainda não são gravados por corpus/cron |
 
 ---
 

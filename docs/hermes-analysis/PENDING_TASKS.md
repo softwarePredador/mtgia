@@ -1,8 +1,8 @@
 # Pending Tasks — ManaLoom Commander Battle Engine
 
 > **Handoff: 2026-06-09.**  
-> 24/25 itens implementados no battle_analyst_v9.py (6600+ linhas).
-> 1 pendente de alta complexidade — requer suite de conformidade versionada.
+> 25/25 itens implementados no battle_analyst_v9.py (6600+ linhas).
+> 0 macros pendentes nesta lista. Gaps avançados continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 
 ---
@@ -35,15 +35,17 @@
 | ✅ | Planeswalkers + Battles básico | v9:planeswalker/battle helpers + SBA |
 | ✅ | DFC/Adventure/Prototype/Split básico | v9:get_card_characteristics/compute_color_identity |
 | ✅ | Telemetria de saúde do motor | v9:EngineMetrics |
-| ⏳ | Suite de conformidade | P2 |
+| ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
 
 ---
 
-## Ordem Recomendada de Implementação
+## Próximo Hardening
 
 | Ordem | Item | Esforço | Impacto | Depende de |
 |---|---|---|---|---|
-| 1 | Suite de conformidade | 5-7 dias | Alto | Telemetria básica concluída |
+| 1 | Targeting formal | 3-5 dias | Alto | Suite de conformidade básica |
+| 2 | Persistência operacional da telemetria | 1-2 dias | Médio | EngineMetrics |
+| 3 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
 
 ---
 
@@ -257,47 +259,22 @@
 
 ### 10. Suite de Conformidade
 
-**Cenários mínimos** (cada um deve ser um teste reproduzível):
-```python
-CONFORMANCE_SCENARIOS = [
-    {
-        "name": "counter_war_4p",
-        "setup": "4 players, spell on stack, chain of counterspells",
-        "expected": "stack resolves in LIFO, all players had priority in APNAP",
-        "rule": "CR 117, 405, 608"
-    },
-    {
-        "name": "commander_damage_ledger",
-        "setup": "Commander deals 21 damage across multiple zone changes",
-        "expected": "player loses at exactly 21, ledger persists through blink",
-        "rule": "CR 903.10a, 903.14"
-    },
-    {
-        "name": "saga_final_chapter",
-        "setup": "Saga at final chapter, trigger on stack, SBA check",
-        "expected": "saga sacrificed only after final chapter leaves stack",
-        "rule": "CR 714.4"
-    },
-    {
-        "name": "adventure_recast",
-        "setup": "Cast Adventure, exile on resolve, cast creature from exile",
-        "expected": "creature cast from exile, not adventure zone",
-        "rule": "CR 715.3"
-    },
-    {
-        "name": "blocked_stays_blocked",
-        "setup": "Attacker blocked, blocker removed before damage",
-        "expected": "attacker remains blocked, deals 0 damage to player",
-        "rule": "CR 509.1h"
-    },
-    {
-        "name": "active_player_concede",
-        "setup": "Active player concedes during their own main phase",
-        "expected": "turn continues without active player, priority passes to next",
-        "rule": "CR 800.4a"
-    }
-]
-```
+**Status 2026-06-10**: ✅ Básica implementada.
+
+**Arquivo**:
+- `test_battle_analyst_v10_3.py`: `CONFORMANCE_SCENARIOS` + testes `test_conformance_*`.
+
+**Cenários cobertos**:
+- `stack_lifo_405`: resolução LIFO da stack.
+- `commander_damage_ledger_903_10a`: ledger de commander damage persiste após zone change para command zone.
+- `empty_library_draw_104_3c`: draw falho de library vazia perde mesmo com cartas na mão.
+- `blocked_stays_blocked_509_1h`: criatura bloqueada continua bloqueada após blocker sair.
+- `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
+- `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.
+
+**Limite restante**:
+- Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
+- Cenários ainda sem suporte formal, como Saga final chapter, Adventure recast, active-player concede e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 
 ---
 

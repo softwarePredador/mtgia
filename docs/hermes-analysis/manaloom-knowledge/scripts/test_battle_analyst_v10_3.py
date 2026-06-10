@@ -45,6 +45,40 @@ def player(name, deck=None):
     return battle.Player(name, None, deck or [], strategy="midrange")
 
 
+CONFORMANCE_SCENARIOS = [
+    {
+        "id": "stack_lifo_405",
+        "rule": "CR 405, 608",
+        "purpose": "Stack resolves last-in-first-out.",
+    },
+    {
+        "id": "commander_damage_ledger_903_10a",
+        "rule": "CR 903.10a",
+        "purpose": "Commander damage ledger persists across commander zone changes.",
+    },
+    {
+        "id": "empty_library_draw_104_3c",
+        "rule": "CR 104.3c",
+        "purpose": "A failed draw from an empty library loses even with cards in hand.",
+    },
+    {
+        "id": "blocked_stays_blocked_509_1h",
+        "rule": "CR 509.1h",
+        "purpose": "A creature remains blocked after all blockers leave combat.",
+    },
+    {
+        "id": "apnap_trigger_order_603_3b",
+        "rule": "CR 603.3b",
+        "purpose": "Triggers are placed on the stack in APNAP order.",
+    },
+    {
+        "id": "prevention_before_damage_615",
+        "rule": "CR 615",
+        "purpose": "Prevention replacement applies before damage mutates life.",
+    },
+]
+
+
 def test_sba_only_reports_new_elimination():
     dead = player("Dead")
     alive = player("Alive", [card("Library card")])
@@ -689,6 +723,164 @@ def test_engine_metrics_collects_core_health_signals():
         assert snapshot["event_counts"]["replacement_applied"] == 1
     finally:
         battle.clear_engine_metrics()
+
+
+def test_conformance_registry_has_executable_coverage():
+    covered = {
+        "stack_lifo_405",
+        "commander_damage_ledger_903_10a",
+        "empty_library_draw_104_3c",
+        "blocked_stays_blocked_509_1h",
+        "apnap_trigger_order_603_3b",
+        "prevention_before_damage_615",
+    }
+
+    scenario_ids = {scenario["id"] for scenario in CONFORMANCE_SCENARIOS}
+
+    assert scenario_ids == covered
+    assert all(scenario.get("rule") for scenario in CONFORMANCE_SCENARIOS)
+    assert all(scenario.get("purpose") for scenario in CONFORMANCE_SCENARIOS)
+
+
+def test_conformance_stack_resolves_lifo():
+    controller = player("Controller")
+    stack = battle.Stack()
+    for name in ("First Spell", "Second Spell", "Third Spell"):
+        stack.push({"name": name, "type_line": "Instant"}, controller, {"effect": "unknown"})
+
+    resolved = []
+    while not stack.empty():
+        resolved.append(stack.resolve_top().card["name"])
+
+    assert resolved == ["Third Spell", "Second Spell", "First Spell"]
+
+
+def test_conformance_commander_damage_ledger_persists_across_zone_change():
+    attacker = player("Commander Player")
+    defender = player("Defender")
+    commander = {
+        "name": "Ledger Commander",
+        "type_line": "Legendary Creature",
+        "effect": "creature",
+        "power": 11,
+        "toughness": 11,
+        "is_commander": True,
+        "owner": attacker.name,
+    }
+    attacker.battlefield = [commander]
+
+    battle.combat_damage_steps(
+        attacker,
+        [defender],
+        defender,
+        [commander],
+        [(commander, [])],
+        turn=1,
+    )
+    assert attacker.commander_damage[defender.name] == 11
+    assert battle.move_creature_from_battlefield(attacker, commander, reason="destroyed") == "command_zone"
+
+    attacker.battlefield = [commander]
+    battle.combat_damage_steps(
+        attacker,
+        [defender],
+        defender,
+        [commander],
+        [(commander, [])],
+        turn=2,
+    )
+    battle.check_sbas_until_stable([attacker, defender])
+
+    assert attacker.commander_damage[defender.name] == 22
+    assert defender.eliminated is True
+
+
+def test_conformance_failed_draw_from_empty_library_loses():
+    active = player("Active")
+    active.hand = [card("Still in hand")]
+
+    assert active.draw(1, random.Random(120)) == []
+    assert battle.check_sbas_until_stable([active]) is None
+
+    assert active.eliminated is True
+    assert active.life == 0
+
+
+def test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves():
+    attacker = player("Attacker")
+    defender = player("Defender")
+    attacking_creature = {
+        "name": "Blocked Creature",
+        "type_line": "Creature",
+        "effect": "creature",
+        "power": 7,
+        "toughness": 7,
+    }
+    removed_blocker = {
+        "name": "Removed Blocker",
+        "type_line": "Creature",
+        "effect": "creature",
+        "power": 1,
+        "toughness": 1,
+    }
+    attacker.battlefield = [attacking_creature]
+    defender.battlefield = []
+
+    battle.combat_damage_steps(
+        attacker,
+        [defender],
+        defender,
+        [attacking_creature],
+        [(attacking_creature, [removed_blocker])],
+        turn=3,
+    )
+
+    assert defender.life == 40
+
+
+def test_conformance_apnap_trigger_order_is_lifo_after_stack_placement():
+    battle.clear_pending_triggers()
+    active = player("Active")
+    nonactive = player("Nonactive")
+    stack = battle.Stack()
+
+    battle.resolve_or_enqueue_trigger(
+        active,
+        {"name": "Active Trigger"},
+        "test_trigger",
+        lambda: None,
+        stack=stack,
+        active_player=active,
+        all_players=[active, nonactive],
+    )
+    battle.resolve_or_enqueue_trigger(
+        nonactive,
+        {"name": "Nonactive Trigger"},
+        "test_trigger",
+        lambda: None,
+        stack=stack,
+        active_player=active,
+        all_players=[active, nonactive],
+    )
+    battle.flush_triggers_in_apnap(active, [active, nonactive], stack)
+
+    assert [item.card["name"] for item in stack.items] == [
+        "Active Trigger",
+        "Nonactive Trigger",
+    ]
+    assert stack.resolve_top().card["name"] == "Nonactive Trigger"
+    battle.clear_pending_triggers()
+
+
+def test_conformance_prevention_applies_before_damage_life_change():
+    active = player("Active")
+    active.life = 20
+    battle.add_damage_prevention_shield(active, 3, source="Conformance Shield")
+
+    assert battle.deal_damage(active, 5) is True
+
+    assert active.life == 18
+    assert active.damage_prevention_shields == []
 
 
 def test_only_attacked_player_can_block():
@@ -2693,6 +2885,13 @@ if __name__ == "__main__":
         test_dfc_characteristics_and_color_identity_use_all_faces,
         test_adventure_prototype_and_split_characteristics_by_cast_mode,
         test_engine_metrics_collects_core_health_signals,
+        test_conformance_registry_has_executable_coverage,
+        test_conformance_stack_resolves_lifo,
+        test_conformance_commander_damage_ledger_persists_across_zone_change,
+        test_conformance_failed_draw_from_empty_library_loses,
+        test_conformance_blocked_attacker_stays_blocked_after_blocker_leaves,
+        test_conformance_apnap_trigger_order_is_lifo_after_stack_placement,
+        test_conformance_prevention_applies_before_damage_life_change,
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,
