@@ -224,7 +224,8 @@
 | `server/lib/ai/optimize_functional_role_support.dart` | 323 | ✅ Extraído | Centraliza inferência funcional, matching de necessidades e score de substituta; runtime mantém export compatível |
 | `server/lib/ai/optimize_removal_candidate_support.dart` | 274 | ✅ Extraído | Centraliza seleção determinística de cartas a cortar, incluindo excesso de lands, proteção de core cards e escopo agressivo |
 | `server/lib/ai/optimize_swap_candidate_support.dart` | 491 | ✅ Extraído | Centraliza `findSynergyReplacements`, ranking de pares de swap e montagem determinística de candidatos sem acoplar ao runtime monolítico; runtime mantém export compatível |
-| `server/lib/ai/optimize_filler_loader_support.dart` | 1419 | ⚠️ Parcial | Centraliza fillers, lands, structural recovery e utilitários de dedupe/identity/quality; ciclo circular com runtime removido |
+| `server/lib/ai/optimize_filler_loader_support.dart` | 1222 | ⚠️ Parcial | Centraliza loaders SQL de fillers, lands e structural recovery; helpers puros de dedupe/identity/quality foram extraídos para `optimize_filler_candidate_support.dart` |
+| `server/lib/ai/optimize_filler_candidate_support.dart` | 203 | ✅ Modularizado | Dedupe por nome, filtro de identidade Commander, score de filler e helpers de land fixing com teste isolado |
 | `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimize_candidate_quality_support.dart` | 327 | ✅ Extraído | Centraliza sinais de qualidade agressiva, ranking, buckets de rejeição e loader SQL com export compatível no runtime |
 | `server/lib/ai/optimize_archetype_support.dart` | 29 | ✅ Extraído | Centraliza resolução de arquétipo efetivo para optimize, rebuild e deck-state analysis |

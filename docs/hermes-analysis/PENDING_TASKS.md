@@ -152,10 +152,14 @@
 > runtime.
 > Terceiro split do runtime de optimize concluído: inferência funcional,
 > matching de necessidades e score de substitutas foram movidos para
-> `optimize_functional_role_support.dart`; dedupe, filtro de identidade e score
-> de fillers ficaram em `optimize_filler_loader_support.dart`. Isso removeu o
-> ciclo circular `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`
-> e preservou exports compatíveis pelo runtime.
+> `optimize_functional_role_support.dart`. O ciclo circular
+> `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart` foi
+> removido e os exports compatíveis foram preservados pelo runtime.
+> Oitavo split do runtime de optimize concluído: dedupe, filtro de identidade
+> Commander, score de fillers e helpers de land fixing foram movidos para
+> `optimize_filler_candidate_support.dart`, reduzindo
+> `optimize_filler_loader_support.dart` para 1222 linhas e mantendo o loader
+> focado em SQL/structural recovery.
 > Quarto split do runtime de optimize concluído: seleção determinística de
 > cartas a cortar foi movida para `optimize_removal_candidate_support.dart`,
 > preservando export público pelo runtime e wrappers da rota. O módulo cobre

@@ -18159,13 +18159,17 @@ uniforme em vez de depender de guardas manuais por rota.
 - Extraído `server/lib/ai/optimize_fallback_telemetry_support.dart` para
   centralizar escrita e aggregate de `ai_optimize_fallback_telemetry`, com
   helper puro de aggregate testável sem banco.
-- `server/lib/ai/optimize_filler_loader_support.dart` passou a concentrar
-  dedupe, filtro de identidade Commander e score de fillers, removendo o ciclo
-  circular com `optimize_runtime_support.dart`.
+- Extraído `server/lib/ai/optimize_filler_candidate_support.dart` para
+  centralizar dedupe, filtro de identidade Commander, score de fillers e land
+  fixing sem acoplar esses helpers aos loaders SQL.
+- `server/lib/ai/optimize_filler_loader_support.dart` preserva exports
+  compatíveis e agora foca em fillers, lands e structural recovery.
 - `optimize_runtime_support.dart` preserva exports compatíveis e caiu para 551
   linhas; próximo corte seguro é preferências de IA ou loaders de referência do
   comandante com teste isolado.
 - Validações focadas:
+  - `dart analyze lib/ai/optimize_filler_candidate_support.dart lib/ai/optimize_filler_loader_support.dart test/optimize_filler_candidate_support_test.dart`: PASS.
+  - `dart test test/optimize_filler_candidate_support_test.dart test/optimize_runtime_support_test.dart test/optimize_complete_support_test.dart --reporter compact`: PASS.
   - `dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_filler_loader_support.dart lib/ai/optimize_functional_role_support.dart routes/ai/optimize/index.dart test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart`: PASS.
   - `dart test test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
   - `dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_removal_candidate_support.dart lib/ai/optimize_filler_loader_support.dart routes/ai/optimize/index.dart test/optimize_removal_candidate_support_test.dart test/optimize_learning_pipeline_test.dart`: PASS.

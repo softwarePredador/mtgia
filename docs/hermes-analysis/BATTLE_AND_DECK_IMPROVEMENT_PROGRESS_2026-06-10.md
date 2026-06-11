@@ -93,8 +93,32 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com vinte e uma extrações/testes de suporte, seis
-splits do engine e vinte e sete splits da rota/runtime de optimize concluídos.
+**Status:** em andamento, com vinte e duas extrações/testes de suporte, seis
+splits do engine e vinte e oito splits da rota/runtime de optimize concluídos.
+
+### Revisão complementar 2026-06-11 — split de candidate helpers do optimize filler
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/lib/ai/optimize_filler_loader_support.dart` ainda misturava loaders
+  SQL com helpers puros de dedupe, filtro de identidade Commander, score de
+  fillers e land fixing.
+- Isso mantinha a superfície de teste de política de candidatos acoplada ao
+  arquivo de loaders/structural recovery.
+
+**Entregue:**
+- Criado `server/lib/ai/optimize_filler_candidate_support.dart`.
+- `optimize_filler_loader_support.dart` passou a importar/exportar o suporte
+  novo para preservar compatibilidade com callers legados e o runtime.
+- Criado `server/test/optimize_filler_candidate_support_test.dart` cobrindo:
+  dedupe por nome, bloqueio por exclusão/off-identity, aceitação de colorless,
+  score de premium filler vs group draw trap, penalidade de utility cara e land
+  fixing sem inflar identidade de fetchland.
+
+**Validação local:**
+- `dart analyze lib/ai/optimize_filler_candidate_support.dart lib/ai/optimize_filler_loader_support.dart test/optimize_filler_candidate_support_test.dart`.
+- `dart test test/optimize_filler_candidate_support_test.dart test/optimize_runtime_support_test.dart test/optimize_complete_support_test.dart --reporter compact`.
 
 ### Revisão complementar 2026-06-11 — feedback ML do optimize
 
@@ -183,7 +207,7 @@ splits do engine e vinte e sete splits da rota/runtime de optimize concluídos.
   dados completos de adições/análise virtual pós-swap/execução do
   `OptimizationValidator`. A rota ainda deve seguir reduzindo até ficar como
   orquestrador fino.
-- `server/lib/ai/optimize_runtime_support.dart` — 551 linhas após sete splits.
+- `server/lib/ai/optimize_runtime_support.dart` — 551 linhas após oito splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
   direta e delegação pelo runtime.
@@ -206,6 +230,11 @@ splits do engine e vinte e sete splits da rota/runtime de optimize concluídos.
   caminho sem banco e export compatível pelo runtime.
 - `server/test/optimize_candidate_quality_support_test.dart` — 97 linhas
   cobrindo ranking, buckets e export compatível pelo runtime.
+- `server/lib/ai/optimize_filler_candidate_support.dart` — 203 linhas extraídas
+  do filler loader para dedupe, identidade Commander, score de fillers e land
+  fixing.
+- `server/test/optimize_filler_candidate_support_test.dart` — cobertura direta
+  dos helpers puros e preservação de export compatível pelo loader/runtime.
 - `server/lib/ai/optimize_archetype_support.dart` — helper único para resolver
   o arquétipo efetivo entre request genérico/específico e detecção do deck.
 - `server/test/optimize_archetype_support_test.dart` — cobre requests
