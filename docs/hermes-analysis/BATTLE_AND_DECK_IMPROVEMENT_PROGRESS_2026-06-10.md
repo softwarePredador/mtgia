@@ -87,8 +87,9 @@ do engine concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2822 linhas após splits de
-  resposta/diagnóstico, envelope async, parsing inicial e payload final da rota.
+- `server/routes/ai/optimize/index.dart` — 2790 linhas após splits de
+  resposta/diagnóstico, envelope async, parsing inicial, payload final e
+  warnings finais da rota.
 - `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
@@ -116,6 +117,11 @@ do engine concluídos.
 - `server/test/optimize_route_payload_support_test.dart` — 147 linhas cobrindo
   balanceamento final, filtro de duplicidade Commander/Brawl e reconstrução de
   `recommendations`.
+- `server/lib/ai/optimize_route_warnings_support.dart` — 61 linhas extraídas da
+  rota.
+- `server/test/optimize_route_warnings_support_test.dart` — 89 linhas cobrindo
+  warnings finais de cartas inválidas, identidade de cor, bracket, tema e
+  fallback vazio.
 
 **Decisão:**
 Não misturar refactors grandes com correções funcionais. A primeira extração
@@ -218,6 +224,8 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - Novo módulo Dart `optimize_route_payload_support.dart` centraliza
   balanceamento/filtro final de sugestões e corrige `recommendations` stale
   após truncamento, safety net ou remoção de duplicatas.
+- Novo módulo Dart `optimize_route_warnings_support.dart` centraliza warnings
+  finais da rota sem alterar o shape público de `warnings`.
 - `test_battle_analyst_v10_3.py` não contém mais `def test_` inline; ele carrega
   módulos, constrói os helpers/registry e executa a lista agregada.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
@@ -239,6 +247,8 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - `dart test test/optimize_route_request_support_test.dart test/optimize_route_async_support_test.dart test/optimize_route_response_support_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart -r expanded`
 - `dart analyze lib/ai/optimize_route_payload_support.dart routes/ai/optimize/index.dart test/optimize_route_payload_support_test.dart`
 - `dart test test/optimize_route_payload_support_test.dart test/optimize_route_request_support_test.dart test/optimize_route_async_support_test.dart test/optimize_route_response_support_test.dart test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart -r expanded`
+- `dart analyze lib/ai/optimize_route_warnings_support.dart routes/ai/optimize/index.dart test/optimize_route_warnings_support_test.dart`
+- `dart test test/optimize_route_warnings_support_test.dart test/optimize_route_payload_support_test.dart test/optimize_route_request_support_test.dart test/optimize_route_async_support_test.dart test/optimize_route_response_support_test.dart test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - Hermes/AWS pós-push:
   - `battle_passes=130`.
   - analyze focado em `commander_eligibility`, `DeckRulesService`, rota
@@ -282,9 +292,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    isolou SBAs, anexos ilegais, Saga final, lifecycle de token e loop de
    estabilização com callbacks explícitos de replay/métricas/zone move.
 2. Continuar extraindo blocos da rota `routes/ai/optimize/index.dart`: os
-   cortes de response/diagnostics, envelope async, parsing inicial e payload
-   final já foram feitos; os próximos cortes seguros são warnings/diagnostics
-   finais e blocos de fallback/retry.
+   cortes de response/diagnostics, envelope async, parsing inicial, payload
+   final e warnings finais já foram feitos; os próximos cortes seguros são
+   blocos de fallback/retry e diagnostics finais repetidos.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
