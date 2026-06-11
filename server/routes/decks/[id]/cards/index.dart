@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/basic_land_utils.dart' as basic_lands;
+import '../../../../lib/commander_eligibility.dart';
 import '../../../../lib/deck_rules_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -61,7 +62,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
       final cardInfoResult = await session.execute(
         Sql.named(
-            'SELECT id::text, name, type_line, oracle_text, colors, color_identity FROM cards WHERE id = @id LIMIT 1'),
+            'SELECT id::text, name, type_line, oracle_text, colors, color_identity, power, toughness FROM cards WHERE id = @id LIMIT 1'),
         parameters: {'id': cardId},
       );
       if (cardInfoResult.isEmpty) {
@@ -77,6 +78,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final colorIdentity =
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
+      final power = row[6] as String?;
+      final toughness = row[7] as String?;
 
       // Legalidade (banned/not_legal/restricted)
       final legalityResult = await session.execute(
@@ -111,11 +114,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           );
         }
 
-        final typeLower = typeLine;
-        final oracleLower = (oracleText ?? '').toLowerCase();
-        final eligible = (typeLower.contains('legendary') &&
-                typeLower.contains('creature')) ||
-            oracleLower.contains('can be your commander');
+        final eligible = isCommanderEligibleCard(
+          typeLine: typeLine,
+          oracleText: oracleText,
+          power: power,
+          toughness: toughness,
+        );
         if (!eligible) {
           throw DeckRulesException(
               'Regra violada: "$cardName" não pode ser comandante.');

@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart';
 
 import 'basic_land_utils.dart' as basic_lands;
+import 'commander_eligibility.dart';
 import 'color_identity.dart';
 
 /// Normaliza nomes para regra de cópia física.
@@ -297,32 +298,18 @@ class DeckRulesService {
   }
 
   bool _isCommanderEligible(_CardData card) {
-    final typeLine = card.typeLine.toLowerCase();
-    final oracle = (card.oracleText ?? '').toLowerCase();
-
-    final isLegendary = typeLine.contains('legendary');
-    final isCreature = typeLine.contains('creature');
-    if (isLegendary && isCreature) return true;
-
-    final isVehicleOrSpacecraft =
-        typeLine.contains('vehicle') || typeLine.contains('spacecraft');
-    final hasPowerToughnessBox = (card.power ?? '').trim().isNotEmpty &&
-        (card.toughness ?? '').trim().isNotEmpty;
-    if (isLegendary && isVehicleOrSpacecraft && hasPowerToughnessBox) {
-      return true;
-    }
-
-    // Planeswalkers e outras exceções com texto "can be your commander".
-    if (oracle.contains('can be your commander')) return true;
-
     // Nota: Background enchantments NÃO são elegíveis como comandante solo.
     // Eles só podem ser usados como comandante quando PAREADOS com uma criatura
     // que tenha "Choose a Background" (2 comandantes).
     // O par é validado por _validateCommanderStyle → _validatePartnerPairing.
     // No loop de 2 comandantes, o Background é aceito via guarda _isBackground(info)
     // na condição: `if (!_isCommanderEligible(info) && !_isBackground(info))`.
-
-    return false;
+    return isCommanderEligibleCard(
+      typeLine: card.typeLine,
+      oracleText: card.oracleText,
+      power: card.power,
+      toughness: card.toughness,
+    );
   }
 
   /// Verifica se a carta é um Background (encantamento lendário com subtipo Background)

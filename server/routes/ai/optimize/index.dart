@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
@@ -15,6 +15,8 @@ import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
+import '../../../lib/ai/optimize_route_response_support.dart'
+    as optimize_route_response;
 import '../../../lib/ai/optimize_swap_integrity.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
@@ -597,18 +599,6 @@ Future<Response> onRequest(RequestContext context) async {
     final deckSignature = deckContext.deckSignature;
     final cacheKey = deckContext.cacheKey;
 
-    int responseSwapCount(Map<String, dynamic> responseBody) {
-      final mode = responseBody['mode']?.toString() ?? effectiveMode;
-      if (mode == 'complete') {
-        return (responseBody['additions_detailed'] as List?)?.length ??
-            (responseBody['additions'] as List?)?.length ??
-            0;
-      }
-      final removalsCount = (responseBody['removals'] as List?)?.length ?? 0;
-      final additionsCount = (responseBody['additions'] as List?)?.length ?? 0;
-      return removalsCount < additionsCount ? removalsCount : additionsCount;
-    }
-
     final cachedResponse = semanticV2OptimizeEnforcementMode ==
             SemanticV2OptimizeEnforcementMode.disabled
         ? await telemetry.trackAsync(
@@ -620,23 +610,19 @@ Future<Response> onRequest(RequestContext context) async {
           )
         : null;
     if (cachedResponse != null) {
-      cachedResponse['cache'] = {
-        'hit': true,
-        'cache_key': cacheKey,
-      };
-      cachedResponse['intensity'] ??= intensity.selected;
-      cachedResponse['optimize_intensity'] ??= intensity.toJson(
-        returnedSwaps: responseSwapCount(cachedResponse),
+      final responseBody = optimize_route_response.buildCachedOptimizeResponse(
+        cachedResponse: cachedResponse,
+        cacheKey: cacheKey,
+        intensity: intensity,
+        effectiveMode: effectiveMode,
+        timings: telemetry.snapshot(),
+        hasBracketOverride: hasBracketOverride,
+        hasKeepThemeOverride: hasKeepThemeOverride,
+        keepTheme: keepTheme,
+        userPreferences: userPreferences,
       );
-      cachedResponse['timings'] = telemetry.snapshot();
-      cachedResponse['stage_telemetry'] = cachedResponse['timings'];
       telemetry.logSummary();
-      cachedResponse['preferences'] = {
-        'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
-        'keep_theme': keepTheme,
-        'preferred_bracket': userPreferences['preferred_bracket'],
-      };
-      return Response.json(body: cachedResponse);
+      return Response.json(body: responseBody);
     }
 
     final commanders = deckContext.commanders;
@@ -669,37 +655,18 @@ Future<Response> onRequest(RequestContext context) async {
       required String trigger,
       String qualityCode = 'OPTIMIZE_REBUILD_GUIDED',
     }) {
-      return {
-        'mode': 'rebuild_guided',
-        'outcome_code': 'rebuild_guided',
-        'intensity': intensity.selected,
-        'optimize_intensity': intensity.toJson(returnedSwaps: 0),
-        'message': explanation,
-        'quality_error': {
-          'code': qualityCode,
-          'message': explanation,
-          'trigger': trigger,
-          'reasons': deckState.reasons,
-          'recommended_mode': deckState.recommendedMode,
-          'repair_plan': deckState.repairPlan,
-        },
-        'next_action': {
-          'type': 'rebuild_guided',
-          'endpoint': '/ai/rebuild',
-          'explanation':
-              'Revise uma reconstruÃ§Ã£o guiada em draft antes de aplicar ao deck original.',
-          'payload': {
-            'deck_id': deckId,
-            'bracket': bracket,
-            'archetype': effectiveOptimizeArchetype,
-            'theme': themeProfile.theme,
-            'rebuild_scope': 'auto',
-            'save_mode': 'draft_clone',
-          },
-        },
-        'deck_analysis': deckAnalysis,
-        'theme': themeProfile.toJson(),
-      };
+      return optimize_route_response.buildOptimizeRebuildGuidedOutcome(
+        explanation: explanation,
+        trigger: trigger,
+        qualityCode: qualityCode,
+        intensity: intensity,
+        deckState: deckState,
+        deckId: deckId,
+        bracket: bracket,
+        archetype: effectiveOptimizeArchetype,
+        themeProfile: themeProfile,
+        deckAnalysis: deckAnalysis,
+      );
     }
 
     final commanderNameForLogs =
@@ -713,50 +680,21 @@ Future<Response> onRequest(RequestContext context) async {
     final aggressiveRejectionReasonBuckets = <String, int>{};
 
     void mergeAggressiveRejectionBuckets(Map<String, int> buckets) {
-      for (final entry in buckets.entries) {
-        aggressiveRejectionReasonBuckets[entry.key] =
-            (aggressiveRejectionReasonBuckets[entry.key] ?? 0) + entry.value;
-      }
+      optimize_route_response.mergeOptimizeReasonBuckets(
+        aggressiveRejectionReasonBuckets,
+        buckets,
+      );
     }
 
     Map<String, dynamic> buildAggressiveCandidateQualityDiagnostics({
       int? returnedSwaps,
     }) {
-      final requested =
-          (aggressiveCandidateQualityDiagnostics['requested_target_swaps']
-                  as int?) ??
-              intensity.targetMax;
-      final returned = returnedSwaps ?? 0;
-      final lowCoverage =
-          aggressiveCandidateQualityDiagnostics['low_candidate_coverage'] ??
-              false;
-      return {
-        'requested_target_swaps': requested,
-        'removal_candidates':
-            aggressiveCandidateQualityDiagnostics['removal_candidates'] ?? 0,
-        'replacement_candidates':
-            aggressiveCandidateQualityDiagnostics['replacement_candidates'] ??
-                0,
-        'pairs_generated':
-            aggressiveCandidateQualityDiagnostics['pairs_generated'] ?? 0,
-        'rejected_reason_buckets': aggressiveRejectionReasonBuckets,
-        'returned_swaps': returned,
-        'safety_reduced_scope':
-            returned < requested || aggressiveRejectionReasonBuckets.isNotEmpty,
-        'low_candidate_coverage': lowCoverage,
-        'ranked_before_quality_gate': aggressiveCandidateQualityDiagnostics[
-                'ranked_before_quality_gate'] ??
-            false,
-        'candidate_sources':
-            aggressiveCandidateQualityDiagnostics['candidate_sources'] ??
-                const <String>[],
-        'utility_signal': optimize_support.buildAggressiveOptimizeUtilitySignal(
-          requestedSwaps: requested,
-          returnedSwaps: returned,
-          rejectionBuckets: aggressiveRejectionReasonBuckets,
-          lowCandidateCoverage: lowCoverage == true,
-        ),
-      };
+      return optimize_route_response.buildAggressiveCandidateQualityDiagnostics(
+        diagnostics: aggressiveCandidateQualityDiagnostics,
+        rejectionReasonBuckets: aggressiveRejectionReasonBuckets,
+        intensity: intensity,
+        returnedSwaps: returnedSwaps,
+      );
     }
 
     Future<Response> respondWithOptimizeTelemetry({
@@ -775,7 +713,10 @@ Future<Response> onRequest(RequestContext context) async {
       responseBody['intensity'] ??= intensity.selected;
       responseBody['optimize_intensity'] ??= intensity.toJson(
         candidateSwaps: deterministicSwapCandidates.length,
-        returnedSwaps: responseSwapCount(responseBody),
+        returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+          responseBody: responseBody,
+          effectiveMode: effectiveMode,
+        ),
       );
       if (intensity.selected == 'aggressive') {
         final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
@@ -786,7 +727,10 @@ Future<Response> onRequest(RequestContext context) async {
           ...existingDiagnostics,
           'aggressive_candidate_quality':
               buildAggressiveCandidateQualityDiagnostics(
-            returnedSwaps: responseSwapCount(responseBody),
+            returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+              responseBody: responseBody,
+              effectiveMode: effectiveMode,
+            ),
           ),
         };
       }
@@ -2307,7 +2251,8 @@ Future<Response> onRequest(RequestContext context) async {
           final improvements = <String>[];
           if (postCurve < preCurve &&
               effectiveOptimizeArchetype.toLowerCase() != 'control') {
-            improvements.add('CMC mÃ©dio otimizado: $preAvgCmc â†’ $postAvgCmc');
+            improvements
+                .add('CMC mÃ©dio otimizado: $preAvgCmc â†’ $postAvgCmc');
           }
           if (preManaIssues && !postManaIssues) {
             improvements.add('Base de mana corrigida');
@@ -2326,7 +2271,8 @@ Future<Response> onRequest(RequestContext context) async {
           // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           try {
             final themeService = ThemeContextualRulesService(pool);
-            final validator = OptimizationValidator(openAiKey: apiKey, themeService: themeService);
+            final validator = OptimizationValidator(
+                openAiKey: apiKey, themeService: themeService);
             final validationReport = await validator.validate(
               originalDeck: allCardData,
               optimizedDeck: virtualDeck,
@@ -2939,7 +2885,10 @@ Future<Response> onRequest(RequestContext context) async {
       responseBody['intensity'] = intensity.selected;
       responseBody['optimize_intensity'] = intensity.toJson(
         candidateSwaps: deterministicSwapCandidates.length,
-        returnedSwaps: responseSwapCount(responseBody),
+        returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+          responseBody: responseBody,
+          effectiveMode: effectiveMode,
+        ),
         qualityGateDropped: qualityGateDroppedCount,
       );
       if (optimizationValidationReport?.functional.semanticLayerV2.isNotEmpty ==
@@ -2967,7 +2916,10 @@ Future<Response> onRequest(RequestContext context) async {
           ...existingDiagnostics,
           'aggressive_candidate_quality':
               buildAggressiveCandidateQualityDiagnostics(
-            returnedSwaps: responseSwapCount(responseBody),
+            returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
+              responseBody: responseBody,
+              effectiveMode: effectiveMode,
+            ),
           ),
         };
       }
@@ -3089,4 +3041,3 @@ Future<Response> onRequest(RequestContext context) async {
     return internalServerError('Failed to optimize deck', details: e);
   }
 }
-

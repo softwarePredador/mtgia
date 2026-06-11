@@ -78,6 +78,10 @@
 > buckets de rejeição e loader SQL foram movidos para
 > `optimize_candidate_quality_support.dart`, mantendo export público pelo
 > runtime.
+> Terceiro split/align de optimize concluído: response/cache/diagnostics da rota
+> foram movidos para `optimize_route_response_support.dart`. A elegibilidade
+> Commander 2026 foi centralizada em `commander_eligibility.dart` e agora cobre
+> também `POST /decks/:id/cards`, não só `DeckRulesService`.
 
 ---
 
@@ -112,6 +116,7 @@
 | ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
+| ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + rota incremental |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
 | ✅ | Segunda extração da suite Hermes | `battle_combat_tests.py` |
 | ✅ | Terceira extração da suite Hermes | `battle_replacement_tests.py` |
@@ -143,6 +148,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
+| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_response_support.dart` verde |
 
 ---
 

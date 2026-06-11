@@ -118,7 +118,13 @@ void main() {
   bool isCommanderEligible(Map<String, dynamic> card) {
     final typeLine = (card['type_line'] as String? ?? '').toLowerCase();
     final oracle = (card['oracle_text'] as String? ?? '').toLowerCase();
+    final hasPowerToughnessBox =
+        (card['power']?.toString().trim().isNotEmpty ?? false) &&
+            (card['toughness']?.toString().trim().isNotEmpty ?? false);
     return (typeLine.contains('legendary') && typeLine.contains('creature')) ||
+        (typeLine.contains('legendary') &&
+            (typeLine.contains('vehicle') || typeLine.contains('spacecraft')) &&
+            hasPowerToughnessBox) ||
         oracle.contains('can be your commander');
   }
 
