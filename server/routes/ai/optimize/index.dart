@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
-import '../../../lib/color_identity.dart';
 import '../../../lib/card_validation_service.dart';
 import '../../../lib/ai/optimize_analysis_support.dart' as optimize_analysis;
 import '../../../lib/ai/optimize_deck_support.dart' as optimize_deck;
@@ -16,6 +15,8 @@ import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
     as optimize_route_async;
+import '../../../lib/ai/optimize_route_color_identity_filter_support.dart'
+    as optimize_route_color_identity_filter;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
@@ -1575,16 +1576,15 @@ Future<Response> onRequest(RequestContext context) async {
           ).toList();
         }
 
-        validAdditions = validAdditions.where((name) {
-          final identity =
-              identityByName[name.toLowerCase()] ?? const <String>[];
-          final ok = isWithinCommanderIdentity(
-            cardIdentity: identity,
-            commanderIdentity: commanderColorIdentity,
-          );
-          if (!ok) filteredByColorIdentity.add(name);
-          return ok;
-        }).toList();
+        final colorIdentityFilter = optimize_route_color_identity_filter
+            .filterOptimizeAdditionsByCommanderIdentity(
+          validAdditions: validAdditions,
+          identityByName: identityByName,
+          commanderColorIdentity: commanderColorIdentity,
+        );
+        validAdditions = colorIdentityFilter.additions;
+        filteredByColorIdentity
+            .addAll(colorIdentityFilter.filteredByColorIdentity);
       }
 
       // Bracket policy (intermediÃ¡rio): bloqueia cartas "acima do bracket" baseado no deck atual.
