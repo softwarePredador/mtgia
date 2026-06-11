@@ -229,6 +229,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/commander_eligibility_test.dart test/mtg_rules_validation_test.dart test/color_identity_test.dart -r expanded`: 81 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh 211d5b01`: `PASS`; observações de risco
     foram cobertas pela rodada adicional de regras Commander/color identity.
+- Hermes/AWS pós-push do split async (`b2f51ade`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_async_support`, rota `ai/optimize` e
+    teste async: sem issues.
+  - `dart test test/optimize_route_async_support_test.dart test/optimize_route_response_support_test.dart -r expanded`: `All tests passed`.
+  - `dart test test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart -r expanded`: 39 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh b2f51ad`: `PASS`; risco de cobertura
+    integrada mitigado pela rodada adicional de pipeline/route contract.
 
 ## Etapa 4 — Próximas pendências reais
 
