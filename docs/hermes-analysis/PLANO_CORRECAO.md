@@ -80,8 +80,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
     `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
     wrappers/helpers em request trace, Commander Reference, MTGTop8, candidate
-    quality, optimize utility samples e `MLKnowledgeService.recordFeedback`.
-    Novo achado app-side: `ApiClient.loadTokenFromDisk()` diz ser chamado no
+    quality e optimize utility samples. `MLKnowledgeService.recordFeedback`
+    deixou esta lista em 2026-06-11 (`f32c0e28`): `/ai/optimize` agora chama
+    `optimize_feedback.recordOptimizeMlFeedback(...)`. Novo achado app-side:
+    `ApiClient.loadTokenFromDisk()` diz ser chamado no
     boot, mas nao tem chamada em `app/lib`; o boot real usa
     `AuthProvider.initialize` + `ApiClient.setToken`. A API manual/custom
     metrics/debug de `PerformanceService` e conveniencias EDHREC/cache
