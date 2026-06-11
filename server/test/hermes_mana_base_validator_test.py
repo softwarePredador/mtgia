@@ -95,6 +95,53 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
             self.assertEqual(results[0].status, "INCOMPLETE")
             self.assertEqual(results[1].status, "NO_PROFILE")
 
+    def test_schema_without_commander_id_infers_commander_from_deck_cards(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            artifacts = Path(tmp) / "artifacts"
+            profile_dir = artifacts / "commander_reference_profile_test" / "profiles"
+            profile_dir.mkdir(parents=True)
+            (profile_dir / "lorehold_the_historian.json").write_text(
+                json.dumps({"role_targets": {"lands": {"min": 30, "max": 34}}})
+            )
+            conn = sqlite3.connect(":memory:")
+            conn.execute(
+                """
+                CREATE TABLE decks (
+                    id INTEGER PRIMARY KEY,
+                    deck_name TEXT,
+                    archetype TEXT
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE deck_cards (
+                    id INTEGER PRIMARY KEY,
+                    deck_id INTEGER,
+                    card_name TEXT,
+                    quantity INTEGER,
+                    functional_tag TEXT,
+                    is_commander INTEGER,
+                    cmc REAL
+                )
+                """
+            )
+            conn.execute("INSERT INTO decks VALUES (1, 'Runtime Lorehold', 'unknown')")
+            conn.executemany(
+                "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    (1, 1, "Lorehold, the Historian", 1, "draw", 1, 5),
+                    (2, 1, "Plains", 31, "land", 0, 0),
+                    (3, 1, "Spell", 68, "engine", 0, 2),
+                ],
+            )
+
+            results = module.validate(conn, artifacts)
+
+            self.assertEqual(results[0].commander, "Lorehold, the Historian")
+            self.assertEqual(results[0].status, "OK")
+
 
 if __name__ == "__main__":
     unittest.main()
