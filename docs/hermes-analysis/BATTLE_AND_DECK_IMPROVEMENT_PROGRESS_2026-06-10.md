@@ -52,16 +52,17 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com dezenove extrações de testes e cinco splits
+**Status:** em andamento, com dezenove extrações de testes e seis splits
 do engine concluídos.
 
 **Arquivos que precisam split dedicado:**
-- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7285 linhas após cinco splits do engine.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py` — 101 linhas extraídas do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_characteristics_support.py` — 173 linhas extraídas do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_land_support.py` — 110 linhas extraídas do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py` — 118 linhas extraídas do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_support.py` — 231 linhas extraídas do engine.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py` — 381 linhas extraídas do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 238 linhas após dezenove extrações; agora atua como runner/orquestrador fino.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` — 330 linhas extraídas.
@@ -186,12 +187,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 ## Etapa 4 — Próximas pendências reais
 
 **Prioridade atual:**
-1. Continuar o split do engine `battle_analyst_v9.py` por domínio. Os cinco
+1. Continuar o split do engine `battle_analyst_v9.py` por domínio. Os seis
    cortes seguros (`battle_mana_cost_support.py` e
    `battle_card_characteristics_support.py`, `battle_land_support.py`,
-   `battle_zone_transition_support.py`, `battle_replacement_support.py`) já
-   isolaram helpers de baixo risco; o próximo candidato é SBA helpers ou a rota
-   de optimize.
+   `battle_zone_transition_support.py`, `battle_replacement_support.py` e
+   `battle_sba_support.py`) já
+   isolaram helpers de baixo risco; o sexto corte (`battle_sba_support.py`)
+   isolou SBAs, anexos ilegais, Saga final, lifecycle de token e loop de
+   estabilização com callbacks explícitos de replay/métricas/zone move.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
 3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente

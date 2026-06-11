@@ -62,14 +62,15 @@
 > Regressões auxiliares restantes também foram movidas para
 > `battle_misc_regression_tests.py`, deixando `test_battle_analyst_v10_3.py`
 > como runner/orquestrador fino sem `def test_` inline.
-> Cinco splits do engine principal concluídos: helpers puros de mana/custo foram
+> Seis splits do engine principal concluídos: helpers puros de mana/custo foram
 > movidos para `battle_mana_cost_support.py`, helpers de características de
 > carta/identidade Commander foram movidos para
 > `battle_card_characteristics_support.py`, e helpers de lands/fontes foram
 > movidos para `battle_land_support.py`; helpers de zona/LKI/resolution foram
 > movidos para `battle_zone_transition_support.py`; replacement/prevention foi
-> movido para `battle_replacement_support.py`, reduzindo `battle_analyst_v9.py`
-> para 7285 linhas sem alterar a suite de 130 testes.
+> movido para `battle_replacement_support.py`; SBAs, anexos ilegais, Saga final
+> e token lifecycle foram movidos para `battle_sba_support.py`, reduzindo
+> `battle_analyst_v9.py` para 7017 linhas sem alterar a suite de 130 testes.
 
 ---
 
@@ -384,12 +385,13 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 após cinco splits de baixo risco | 7285 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 após seis splits de baixo risco | 7017 |
 | `battle_mana_cost_support.py` | Helpers puros de mana/custo usados pelo engine de batalha | 101 |
 | `battle_card_characteristics_support.py` | Helpers puros de características, faces/modos, identidade de cor e elegibilidade Commander | 173 |
 | `battle_land_support.py` | Helpers puros de lands, cores de fontes e normalização de nomes | 110 |
 | `battle_zone_transition_support.py` | Helpers parametrizados de zone transitions, LKI, exile e spell resolution | 118 |
 | `battle_replacement_support.py` | Replacement/prevention, vida, dano, ganho de vida e escudos de prevenção | 231 |
+| `battle_sba_support.py` | SBAs, anexos ilegais, Saga final, token lifecycle e loop de estabilização | 381 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
