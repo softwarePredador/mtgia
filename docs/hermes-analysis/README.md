@@ -4,12 +4,18 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-06-07
+Updated: 2026-06-11
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 ## Triagens recentes
+
+- `BRANCH_RETENTION_AUDIT_2026-06-11.md`
+  - Politica de retencao de branches: manter somente `master` e
+    `codex/hermes-analysis-docs`.
+  - Define `master` como fonte canonica e `codex/hermes-analysis-docs` como
+    fila/staging Hermes, sem merge bruto para `master`.
 
 - `HERMES_DOCS_TRIAGE_2026-06-11.md`
   - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch
