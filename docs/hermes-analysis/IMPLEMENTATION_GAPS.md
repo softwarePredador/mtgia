@@ -181,7 +181,7 @@
 | Taxonomia canônica de derrota | ✅ Básico | `classify_loss` | Cobre `poison`, `effect_says_lose`, `concede` e tags heurísticas de screw/flood/mulligan/value |
 | Telemetria de saúde do motor | ✅ Básico | v9: `EngineMetrics` | Contadores de stack, priority, SBA, replacements e replay events |
 | Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 15 cenários versionados em `CONFORMANCE_SCENARIOS` |
-| Persistência operacional da telemetria | ✅ Básico | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR` | Snapshots JSON sanitizados por run do optimizer quando env var é definida |
+| Persistência operacional da telemetria | ✅ Operacional | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR`, `master_optimizer_auto_cycle_cron.sh`, `engine_metrics_report.py` | Auto-cycle gera snapshots por rodada e publica `latest_engine_metrics_report.json` sanitizado |
 | Diagnóstico de roles do optimize | ✅ OK | `optimization_functional_roles.dart`, `optimization_validator_test.dart` | `role_delta` usa `functional_tags` persistido antes de `semantic_tags_v2`, alinhando decisão de swap com a análise exibida ao usuário |
 
 ### 9.1 Arquivos grandes / modularização (P1)

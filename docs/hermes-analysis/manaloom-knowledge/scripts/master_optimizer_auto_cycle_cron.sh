@@ -26,6 +26,8 @@ FULL_CONFIRM_MIN_SCAN_DELTA="${MANALOOM_AUTO_FULL_CONFIRM_MIN_SCAN_DELTA:-0.5}"
 APPLY_MIN_DELTA="${MANALOOM_AUTO_APPLY_MIN_DELTA:-1.0}"
 POST_APPLY_MIN_DELTA="${MANALOOM_AUTO_POST_APPLY_MIN_DELTA:-0.0}"
 LOCK_FILE="${MANALOOM_AUTO_CYCLE_LOCK:-/tmp/manaloom-master-optimizer-auto-cycle.lock}"
+RUN_STAMP="$(date -u +%Y%m%d_%H%M%S)"
+ENGINE_METRICS_DIR="${MANALOOM_ENGINE_METRICS_DIR:-$ARTIFACT_DIR/engine_metrics/$RUN_STAMP}"
 
 mkdir -p "$REPORT_DIR" "$ARTIFACT_DIR"
 
@@ -62,8 +64,10 @@ export MANALOOM_HERMES_SCRIPT_DIR="$SCRIPT_DIR"
 export MANALOOM_KNOWLEDGE_DB="${MANALOOM_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}"
 export MANALOOM_KNOWN_CARDS_OUT="${MANALOOM_KNOWN_CARDS_OUT:-$SCRIPT_DIR/known_cards_generated.json}"
 export MANALOOM_SLOT_SCAN_LOCK="${MANALOOM_SLOT_SCAN_LOCK:-/tmp/manaloom-master-optimizer-auto-cycle-slot.lock}"
+export MANALOOM_ENGINE_METRICS_DIR="$ENGINE_METRICS_DIR"
+mkdir -p "$MANALOOM_ENGINE_METRICS_DIR"
 
-log="$ARTIFACT_DIR/master_optimizer_auto_cycle_$(date -u +%Y%m%d_%H%M%S).log"
+log="$ARTIFACT_DIR/master_optimizer_auto_cycle_${RUN_STAMP}.log"
 apply_out="$(mktemp)"
 
 {
@@ -79,6 +83,7 @@ apply_out="$(mktemp)"
   echo "full_confirm_games=$FULL_CONFIRM_GAMES"
   echo "apply_min_delta=$APPLY_MIN_DELTA"
   echo "post_apply_min_delta=$POST_APPLY_MIN_DELTA"
+  echo "engine_metrics_dir=$MANALOOM_ENGINE_METRICS_DIR"
 
   echo "== pg meta decks sync =="
   python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
@@ -216,6 +221,14 @@ apply_out="$(mktemp)"
   else
     echo "auto_cycle_apply=no_candidate_or_blocked"
   fi
+
+  echo "== engine metrics aggregate =="
+  metrics_report="$ARTIFACT_DIR/engine_metrics_report_${RUN_STAMP}.json"
+  python3 "$SCRIPT_DIR/engine_metrics_report.py" \
+    --input-dir "$MANALOOM_ENGINE_METRICS_DIR" \
+    --output "$metrics_report"
+  cp "$metrics_report" "$ARTIFACT_DIR/latest_engine_metrics_report.json"
+  echo "engine_metrics_report=$metrics_report"
 
   echo "master_optimizer_auto_cycle=ok"
 } | tee "$log"

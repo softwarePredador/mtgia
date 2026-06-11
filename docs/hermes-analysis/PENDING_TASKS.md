@@ -262,10 +262,9 @@
 |---|---|---|---|---|
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
-| 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
-| 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
-| 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: revisar blocos remanescentes de orquestração e extrair apenas quando houver support test isolado | 1-2 dias | Médio | `optimize_route_final_gate_support.dart` verde |
+| 3 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
+| 4 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
+| 5 | Próximo split da rota optimize: revisar blocos remanescentes de orquestração e extrair apenas quando houver support test isolado | 1-2 dias | Médio | `optimize_route_final_gate_support.dart` verde |
 
 ### Ordem revalidada 2026-06-11
 
@@ -469,7 +468,7 @@
 
 ### 9. Telemetria de Saúde do Motor
 
-**Status 2026-06-10**: ✅ Básico implementado.
+**Status 2026-06-11**: ✅ Operacional implementado.
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `EngineMetrics`, `set_engine_metrics`, `clear_engine_metrics`, hooks em replay events, `Stack`, `check_sbas_until_stable` e `priority_round`.
@@ -485,9 +484,11 @@
 - Snapshot JSON sanitizado via `MANALOOM_ENGINE_METRICS_OUT`.
 - Runners Hermes podem gravar snapshots por rodada via `MANALOOM_ENGINE_METRICS_DIR`.
 - Relatório agregado `battle_engine_metrics_report_v1` soma contadores/eventos, max stack depth e amostras curtas de warning sem decklists/replays brutos.
+- `master_optimizer_auto_cycle_cron.sh` define `MANALOOM_ENGINE_METRICS_DIR` por rodada e gera `latest_engine_metrics_report.json` ao final.
+- `master_optimizer_loop.py --preflight` valida a presença do agregador.
 
 **Limite restante**:
-- Falta apenas plugar o agregador em cron/dashboard operacional se esse painel for necessário.
+- Dashboard visual dedicado ainda é opcional; o artefato JSON operacional já fica disponível para Hermes/Codex.
 
 ---
 

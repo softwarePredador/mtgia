@@ -730,6 +730,17 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `IMPLEMENTATION_TASKS.md` foi alinhado ao código vivo: Game Changers
     oficiais permanecem multi-tag por decisão atual de produto/testes, não
     `gameChanger` exclusivo.
+- Fechamento operacional da telemetria agregada do battle engine:
+  - `master_optimizer_auto_cycle_cron.sh` agora define
+    `MANALOOM_ENGINE_METRICS_DIR` por rodada, permitindo que todas as chamadas
+    de `run_battle(...)` gravem snapshots sanitizados.
+  - Ao final do auto-cycle, o cron executa `engine_metrics_report.py` e salva
+    relatório timestampado em `$ARTIFACT_DIR`, além de
+    `latest_engine_metrics_report.json` para consumo rápido por Hermes/Codex.
+  - `master_optimizer_loop.py --preflight` passou a exigir
+    `engine_metrics_report.py` como dependência operacional.
+  - `test_engine_metrics_operational_wiring.py` cobre o wiring do cron e do
+    preflight sem executar o ciclo pesado.
 
 ## Etapa 4 — Próximas pendências reais
 

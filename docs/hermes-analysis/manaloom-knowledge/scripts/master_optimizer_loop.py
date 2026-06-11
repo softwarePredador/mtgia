@@ -31,6 +31,7 @@ DEFAULT_SYNC_METADATA = SCRIPT_DIR / "sync_pg_card_metadata_to_hermes.py"
 DEFAULT_SYNC_META_DECKS = SCRIPT_DIR / "sync_pg_meta_decks_to_hermes.py"
 DEFAULT_SYNC_BATTLE_RULES = SCRIPT_DIR / "sync_battle_card_rules_pg.py"
 DEFAULT_EFFECT_COVERAGE_AUDIT = SCRIPT_DIR / "battle_effect_coverage_audit.py"
+DEFAULT_ENGINE_METRICS_REPORT = SCRIPT_DIR / "engine_metrics_report.py"
 
 ESSENTIAL_TABLES = {
     "deck_cards",
@@ -129,6 +130,7 @@ def run_preflight(args: argparse.Namespace) -> list[CheckResult]:
         "metadata_sync": args.sync_metadata,
         "battle_rules_sync": args.sync_battle_rules,
         "effect_coverage_audit": args.effect_coverage_audit,
+        "engine_metrics_report": args.engine_metrics_report,
     }
     for name, path in required_files.items():
         checks.append(
@@ -286,6 +288,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sync-meta-decks", type=Path, default=DEFAULT_SYNC_META_DECKS)
     parser.add_argument("--sync-battle-rules", type=Path, default=DEFAULT_SYNC_BATTLE_RULES)
     parser.add_argument("--effect-coverage-audit", type=Path, default=DEFAULT_EFFECT_COVERAGE_AUDIT)
+    parser.add_argument("--engine-metrics-report", type=Path, default=DEFAULT_ENGINE_METRICS_REPORT)
     return parser.parse_args()
 
 
