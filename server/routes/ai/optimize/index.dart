@@ -18,6 +18,8 @@ import '../../../lib/ai/optimize_route_async_support.dart'
     as optimize_route_async;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
+import '../../../lib/ai/optimize_route_diagnostics_support.dart'
+    as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
@@ -2546,20 +2548,16 @@ Future<Response> onRequest(RequestContext context) async {
         'validation_warnings': validationWarnings,
         'bracket': bracket,
         'target_additions': jsonResponse['target_additions'],
-        'optimize_diagnostics': {
-          'empty_suggestions_fallback': {
-            'triggered': emptySuggestionFallbackTriggered,
-            'applied': emptySuggestionFallbackApplied,
-            'candidate_count': emptySuggestionFallbackCandidateCount,
-            'replacement_count': emptySuggestionFallbackReplacementCount,
-            'pair_count': emptySuggestionFallbackPairCount,
-          },
-          'empty_suggestions_fallback_aggregate':
-              _buildEmptyFallbackAggregate(),
-          if (persistedFallbackAggregate != null)
-            'empty_suggestions_fallback_aggregate_persisted':
-                persistedFallbackAggregate,
-        },
+        'optimize_diagnostics':
+            optimize_route_diagnostics.buildEmptySuggestionFallbackDiagnostics(
+          triggered: emptySuggestionFallbackTriggered,
+          applied: emptySuggestionFallbackApplied,
+          candidateCount: emptySuggestionFallbackCandidateCount,
+          replacementCount: emptySuggestionFallbackReplacementCount,
+          pairCount: emptySuggestionFallbackPairCount,
+          aggregate: _buildEmptyFallbackAggregate(),
+          persistedAggregate: persistedFallbackAggregate,
+        ),
         // ValidaÃ§Ã£o EDHREC
         if (edhrecValidationData != null)
           'edhrec_validation': {
@@ -2674,35 +2672,28 @@ Future<Response> onRequest(RequestContext context) async {
       );
       if (optimizationValidationReport?.functional.semanticLayerV2.isNotEmpty ==
           true) {
-        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
-            ? (responseBody['optimize_diagnostics'] as Map)
-                .cast<String, dynamic>()
-            : <String, dynamic>{};
-        responseBody['optimize_diagnostics'] = {
-          ...existingDiagnostics,
-          'semantic_layer_v2': withOptimizationSemanticV2EnforcementDiagnostics(
+        optimize_route_diagnostics.attachOptimizeDiagnostic(
+          responseBody,
+          key: 'semantic_layer_v2',
+          value: withOptimizationSemanticV2EnforcementDiagnostics(
             semanticLayerV2:
                 optimizationValidationReport!.functional.semanticLayerV2,
             mode: semanticV2OptimizeEnforcementMode,
             expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
           ),
-        };
+        );
       }
       if (intensity.selected == 'aggressive') {
-        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
-            ? (responseBody['optimize_diagnostics'] as Map)
-                .cast<String, dynamic>()
-            : <String, dynamic>{};
-        responseBody['optimize_diagnostics'] = {
-          ...existingDiagnostics,
-          'aggressive_candidate_quality':
-              buildAggressiveCandidateQualityDiagnostics(
+        optimize_route_diagnostics.attachOptimizeDiagnostic(
+          responseBody,
+          key: 'aggressive_candidate_quality',
+          value: buildAggressiveCandidateQualityDiagnostics(
             returnedSwaps: optimize_route_response.countOptimizeResponseSwaps(
               responseBody: responseBody,
               effectiveMode: effectiveMode,
             ),
           ),
-        };
+        );
       }
 
       attachOptimizeBracketPolicyDiagnostics(

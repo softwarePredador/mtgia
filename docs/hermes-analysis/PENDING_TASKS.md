@@ -94,6 +94,9 @@
 > Sétimo split de optimize concluído: warnings finais da rota foram movidos
 > para `optimize_route_warnings_support.dart`, preservando o contrato de
 > cartas inválidas, identidade de cor, bracket, tema e fallback vazio.
+> Oitavo split de optimize concluído: diagnostics finais da rota foram movidos
+> para `optimize_route_diagnostics_support.dart`, preservando
+> `optimize_diagnostics` e merges sem sobrescrita.
 
 ---
 
@@ -160,7 +163,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_warnings_support.dart` verde |
+| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_diagnostics_support.dart` verde |
 
 ---
 
@@ -423,6 +426,8 @@
 | `optimize_candidate_quality_support_test.dart` | Cobertura direta de ranking, buckets e export compatível pelo runtime | 97 |
 | `optimize_route_warnings_support.dart` | Warnings finais de optimize para cartas inválidas, cor, bracket, tema e fallback vazio | 61 |
 | `optimize_route_warnings_support_test.dart` | Cobertura direta do contrato de warnings finais da rota optimize | 89 |
+| `optimize_route_diagnostics_support.dart` | Diagnostics finais de optimize para fallback vazio e merge incremental sem sobrescrever chaves existentes | 37 |
+| `optimize_route_diagnostics_support_test.dart` | Cobertura direta do contrato de `optimize_diagnostics` e merge incremental | 88 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
