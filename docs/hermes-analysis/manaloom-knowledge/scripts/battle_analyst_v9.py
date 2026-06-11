@@ -68,6 +68,14 @@ from battle_replacement_support import (
     deal_damage as _deal_damage,
     gain_life as _gain_life,
 )
+from battle_sba_support import (
+    cancel_plus_minus_counters as _cancel_plus_minus_counters,
+    check_illegal_attachments as _check_illegal_attachments,
+    check_saga_final_chapter as _check_saga_final_chapter,
+    check_sbas as _check_sbas,
+    check_sbas_until_stable as _check_sbas_until_stable,
+    check_token_lifecycle as _check_token_lifecycle,
+)
 
 try:
     import battle_rule_registry
@@ -3372,338 +3380,62 @@ def mulligan_decision(hand):
     lands = sum(1 for c in hand if is_land(c))  # v10.2
     return (2 <= lands <= 5), 7
 
-PLUS_ONE_COUNTER_KEYS = ("plus_one_counters", "plus1_counters", "+1/+1_counters")
-MINUS_ONE_COUNTER_KEYS = ("minus_one_counters", "minus1_counters", "-1/-1_counters")
-
-
-def _counter_total(card, keys):
-    total = 0
-    for key in keys:
-        value = numeric_stat(card.get(key))
-        if value:
-            total += max(0, value)
-    return total
-
-
-def _replace_counter_aliases(card, keys, canonical_key, value):
-    for key in keys:
-        card.pop(key, None)
-    card[canonical_key] = max(0, int(value or 0))
-
-
 def cancel_plus_minus_counters(all_players):
-    """v9: +1/+1 and -1/-1 counters cancel as a state-based action."""
-    for p in all_players:
-        for permanent in list(p.battlefield):
-            if not isinstance(permanent, dict):
-                continue
-            plus = _counter_total(permanent, PLUS_ONE_COUNTER_KEYS)
-            minus = _counter_total(permanent, MINUS_ONE_COUNTER_KEYS)
-            cancel = min(plus, minus)
-            if cancel <= 0:
-                continue
-            _replace_counter_aliases(
-                permanent,
-                PLUS_ONE_COUNTER_KEYS,
-                "plus_one_counters",
-                plus - cancel,
-            )
-            _replace_counter_aliases(
-                permanent,
-                MINUS_ONE_COUNTER_KEYS,
-                "minus_one_counters",
-                minus - cancel,
-            )
-            emit_replay_event(
-                "counters_cancelled",
-                player=p.name,
-                card=permanent.get("name"),
-                cancelled=cancel,
-                plus_one_remaining=permanent["plus_one_counters"],
-                minus_one_remaining=permanent["minus_one_counters"],
-            )
-            return True
-    return False
-
-
-def is_aura_permanent(card):
-    return isinstance(card, dict) and "aura" in str(card.get("type_line") or "").lower()
-
-
-def is_equipment_permanent(card):
-    return isinstance(card, dict) and "equipment" in str(card.get("type_line") or "").lower()
-
-
-def _attached_target_reference(permanent):
-    return (
-        permanent.get("attached_to")
-        or permanent.get("equipped_to")
-        or permanent.get("enchanting")
+    return _cancel_plus_minus_counters(
+        all_players,
+        numeric_stat=numeric_stat,
+        emit_replay_event=emit_replay_event,
     )
 
 
-def _find_attached_target(reference, all_players):
-    if not reference:
-        return None
-    for player_obj in all_players:
-        for candidate in getattr(player_obj, "battlefield", []):
-            if not isinstance(candidate, dict):
-                continue
-            if candidate is reference:
-                return candidate
-            if isinstance(reference, str) and candidate.get("name") == reference:
-                return candidate
-    return None
-
-
-def _clear_attachment(permanent):
-    permanent.pop("attached_to", None)
-    permanent.pop("equipped_to", None)
-    permanent.pop("enchanting", None)
-
-
-def _attachment_is_legal(permanent, target):
-    if target is None:
-        return False
-    text = f"{permanent.get('oracle_text', '')} {permanent.get('type_line', '')}".lower()
-    if is_equipment_permanent(permanent):
-        return is_battlefield_creature(target)
-    if is_aura_permanent(permanent):
-        if "enchant land" in text:
-            return is_effective_land(target)
-        if "enchant artifact" in text:
-            return is_artifact_permanent(target)
-        if "enchant player" in text:
-            return False
-        return is_battlefield_creature(target)
-    return True
-
-
 def check_illegal_attachments(all_players):
-    """v9: Basic Aura/Equipment SBA handling for illegal attachments."""
-    for p in all_players:
-        for permanent in list(p.battlefield):
-            if not isinstance(permanent, dict):
-                continue
-            if not (is_aura_permanent(permanent) or is_equipment_permanent(permanent)):
-                continue
-            reference = _attached_target_reference(permanent)
-            if is_equipment_permanent(permanent) and not reference:
-                continue
-            target = _find_attached_target(reference, all_players)
-            legal = _attachment_is_legal(permanent, target)
-            if legal:
-                continue
-            if is_aura_permanent(permanent):
-                p.battlefield.remove(permanent)
-                p.graveyard.append(permanent)
-                emit_replay_event(
-                    "attachment_sba",
-                    player=p.name,
-                    card=permanent.get("name"),
-                    permanent_type="aura",
-                    action="moved_to_graveyard",
-                )
-                return True
-            _clear_attachment(permanent)
-            emit_replay_event(
-                "attachment_sba",
-                player=p.name,
-                card=permanent.get("name"),
-                permanent_type="equipment",
-                action="detached",
-            )
-            return True
-    return False
-
-
-def is_saga_permanent(card):
-    return isinstance(card, dict) and "saga" in str(card.get("type_line") or "").lower()
-
-
-def _saga_final_chapter(permanent):
-    for key in ("final_chapter", "chapter_count", "max_chapter"):
-        value = numeric_stat(permanent.get(key))
-        if value:
-            return max(1, value)
-    chapters = permanent.get("saga_chapters") or permanent.get("chapters")
-    if isinstance(chapters, (list, tuple)) and chapters:
-        return len(chapters)
-    return None
-
-
-def _saga_lore_counters(permanent):
-    for key in ("lore_counters", "chapter", "current_chapter"):
-        value = numeric_stat(permanent.get(key))
-        if value is not None:
-            return max(0, value)
-    return 0
+    return _check_illegal_attachments(
+        all_players,
+        is_battlefield_creature=is_battlefield_creature,
+        is_effective_land=is_effective_land,
+        is_artifact_permanent=is_artifact_permanent,
+        emit_replay_event=emit_replay_event,
+    )
 
 
 def check_saga_final_chapter(all_players):
-    """v9: Basic Saga SBA after the final chapter ability is no longer pending."""
-    for p in all_players:
-        for permanent in list(p.battlefield):
-            if not is_saga_permanent(permanent):
-                continue
-            final_chapter = _saga_final_chapter(permanent)
-            if not final_chapter:
-                continue
-            if permanent.get("chapter_ability_pending"):
-                continue
-            if _saga_lore_counters(permanent) < final_chapter:
-                continue
-            p.battlefield.remove(permanent)
-            p.graveyard.append(permanent)
-            emit_replay_event(
-                "saga_sacrificed_by_sba",
-                player=p.name,
-                card=permanent.get("name"),
-                final_chapter=final_chapter,
-            )
-            return True
-    return False
+    return _check_saga_final_chapter(
+        all_players,
+        numeric_stat=numeric_stat,
+        emit_replay_event=emit_replay_event,
+    )
 
 
 def check_sbas(all_players):
-    """v8: State-Based Actions after each spell resolution."""
-    for p in all_players:
-        if getattr(p, "failed_draw_from_empty_library", False) and not p.eliminated:
-            p.life = 0
-            p.eliminated = True
-            emit_replay_event("player_eliminated", player=p.name, reason="draw_from_empty_library")
-            return True
-        if p.life <= 0 and not p.eliminated:
-            p.eliminated = True
-            emit_replay_event("player_eliminated", player=p.name, reason="life_zero")
-            return True
-        if p.eliminated:
-            continue
-        for name, dmg, source_key in commander_damage_lethal_entries(p):
-            # Find the player who took this damage and kill them
-            for op in all_players:
-                if op.name == name and not op.eliminated:
-                    op.life = 0
-                    op.eliminated = True
-                    emit_replay_event(
-                        "player_eliminated",
-                        player=op.name,
-                        reason="commander_damage",
-                        commander_damage_key=source_key,
-                        commander_damage=dmg,
-                    )
-                    return True
-
-    # v9: Poison SBA
-    for p in all_players:
-        if getattr(p, "poison", 0) >= 10 and not p.eliminated:
-            p.life = 0
-            p.eliminated = True
-            emit_replay_event("player_eliminated", player=p.name, reason="poison")
-            return True
-
-    if cancel_plus_minus_counters(all_players):
-        return True
-
-    if check_illegal_attachments(all_players):
-        return True
-
-    if check_saga_final_chapter(all_players):
-        return True
-
-    # v9: Creature SBAs
-    for p in all_players:
-        for c in list(p.battlefield):
-            if not isinstance(c, dict):
-                continue
-            toughness = c.get("toughness", 1)
-            damage = c.get("damage_marked", 0)
-            if (toughness <= 0 or damage >= toughness) and not c.get("indestructible"):
-                move_creature_from_battlefield(p, c, "sba_lethal", None, all_players)
-                return True
-
-    # v9: Planeswalker/Battle SBAs
-    for p in all_players:
-        for permanent in list(p.battlefield):
-            if not isinstance(permanent, dict):
-                continue
-            if is_planeswalker_permanent(permanent) and int(permanent.get("loyalty", 0) or 0) <= 0:
-                p.battlefield.remove(permanent)
-                p.graveyard.append(permanent)
-                emit_replay_event(
-                    "permanent_moved_by_sba",
-                    player=p.name,
-                    card=permanent.get("name", "?"),
-                    permanent_type="planeswalker",
-                    destination="graveyard",
-                    reason="loyalty_zero",
-                )
-                return True
-            if is_battle_permanent(permanent) and int(permanent.get("defense", 0) or 0) <= 0:
-                p.battlefield.remove(permanent)
-                move_to_exile(p, permanent, reason="battle_defeated")
-                permanent["battle_defeated"] = True
-                back_face = resolve_battle_back_face(p, permanent)
-                emit_replay_event(
-                    "permanent_moved_by_sba",
-                    player=p.name,
-                    card=permanent.get("name", "?"),
-                    permanent_type="battle",
-                    destination="exile",
-                    reason="defense_zero",
-                    back_face_cast=back_face.get("name", "?") if back_face else None,
-                )
-                return True
-
-    # v9: Legend rule
-    legends = {}
-    for p in all_players:
-        for c in list(p.battlefield):
-            if not isinstance(c, dict):
-                continue
-            if c.get("is_legendary") or "Legendary" in str(c.get("type_line", "")):
-                key = c.get("name", c.get("card_name", ""))
-                if not key: continue
-                if key in legends:
-                    existing = legends[key]
-                    if c.get("_bt", 0) > existing.get("_bt", 0):
-                        move_creature_from_battlefield(existing.get("_ctrl", p), existing, "sba_legend", None, all_players)
-                        legends[key] = c
-                    else:
-                        move_creature_from_battlefield(p, c, "sba_legend", None, all_players)
-                        return True
-                else:
-                    legends[key] = c
-
-    if check_token_lifecycle(all_players):
-        return True
-
-    return False
-
+    return _check_sbas(
+        all_players,
+        commander_damage_lethal_entries=commander_damage_lethal_entries,
+        numeric_stat=numeric_stat,
+        cancel_plus_minus_counters_func=cancel_plus_minus_counters,
+        check_illegal_attachments_func=check_illegal_attachments,
+        check_saga_final_chapter_func=check_saga_final_chapter,
+        check_token_lifecycle_func=check_token_lifecycle,
+        move_creature_from_battlefield=move_creature_from_battlefield,
+        move_to_exile=move_to_exile,
+        resolve_battle_back_face=resolve_battle_back_face,
+        is_planeswalker_permanent=is_planeswalker_permanent,
+        is_battle_permanent=is_battle_permanent,
+        emit_replay_event=emit_replay_event,
+    )
 
 
 def check_token_lifecycle(all_players):
-    """v9: Token SBAs — tokens cease to exist outside battlefield (CR 110.5f)."""
-    removed = False
-    for p in all_players:
-        for zone_attr in ["graveyard", "exile", "hand"]:
-            zone = getattr(p, zone_attr, [])
-            for obj in list(zone):
-                if isinstance(obj, dict) and (obj.get("is_token") or obj.get("tag") == "token"):
-                    zone.remove(obj)  # Ceases to exist
-                    removed = True
-                    emit_replay_event(
-                        "token_ceased_to_exist",
-                        player=p.name,
-                        zone=zone_attr,
-                        token=obj.get("name"),
-                    )
-    return removed
+    return _check_token_lifecycle(
+        all_players,
+        emit_replay_event=emit_replay_event,
+    )
 
 def check_sbas_until_stable(all_players):
-    """v9: Loop SBAs until no more actions (CR 704.3)."""
-    while check_sbas(all_players):
-        record_engine_metric("sba_iterations")
+    return _check_sbas_until_stable(
+        all_players,
+        check_sbas_func=check_sbas,
+        record_engine_metric=record_engine_metric,
+    )
 
 
 
