@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-11 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-11 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -283,29 +283,29 @@ esse dado como sinal de produto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-10 07:00 UTC no checkout local `570ecfbc`.
-  `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
-  `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
-  contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
-  `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
-  `getRequestTrace`/`tryGetRequestId`,
+  novamente em 2026-06-11 07:00 UTC no checkout local `13a10128`.
+  O auditor textual executou com sucesso (`205` arquivos backend, `0` imports
+  quebrados), mas continua sem grafo de chamadas e sobrescreve o historico manual
+  quando o marker gerado nao existe; a mutacao automatica foi restaurada antes
+  do update manual. Achados atuais: `server/lib/sync_cards_utils.dart` voltou a
+  ficar test-only enquanto `server/bin/sync_cards.dart` mantem copias privadas
+  para parte do contrato; `swap_integrity` e emitido pelo optimize, mas
+  `verifySwapIntegrity` nao e chamado no app/backend; a extracao de
+  `optimize_response_support.dart` permanece parcial (`buildOptimizeResponse` e
+  o top-level `respondWithOptimizeTelemetry` nao estao no fluxo real); wrappers
+  app sem chamador runtime (`BinderProvider.applyFilters`,
+  `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`); e helpers de
+  suporte sem chamada confirmada em request trace, Commander Reference,
+  optimize utility sample, ML feedback, `ApiClient.loadTokenFromDisk`,
+  performance manual/debug, EDHREC/cache, CMC safety/intensity/counters/push.
+  Claims antigas contra `tryGetRequestId`,
   `normalizedCommanderReferenceCandidate`,
-  `buildLoreholdReferenceCardStatsFromProfile`,
-  `extractMtgTop8FormatCodeFromSourceUrl`,
-  `buildCandidateQualitySamplePoolSql`,
-  `summarizeAggressiveOptimizeUtilitySamples`,
-  `MLKnowledgeService.recordFeedback`, `ApiClient.loadTokenFromDisk`, a API
-  manual/custom metrics/debug de `PerformanceService`, conveniencias EDHREC/cache
-  (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
-  `EndpointCache.clearExpired`) e novos candidatos de baixa superficie:
-  `BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
-  `DeckProvider.clearAllCache`, `hasSuspiciousNonLandCmc`,
-  `OptimizeIntensityConfig.clampRequestedSwapCount`,
-  `ArchetypeCountersService.upsertCounter` e
-  `PushNotificationService.sendToMultipleTokens`. Controles positivos:
-  observabilidade automatica (`init`, `PerformanceNavigatorObserver` e
-  `traceAsync` em smoke), `safeCmcForOptimization`, EDHREC `getHighSynergyCards`,
-  `NotificationService.create` -> `sendToUser`, e filtros vivos que usam
+  `extractMtgTop8FormatCodeFromSourceUrl` e
+  `buildCandidateQualitySamplePoolSql` estao stale porque esses simbolos nao
+  existem mais neste checkout. Controles positivos: `buildSemanticV2OptimizeRejectedBody`,
+  `attachOptimizeBracketPolicyDiagnostics`, `safeCmcForOptimization`,
+  `getHighSynergyCards`, `EndpointCache.get/set`, `sendToUser`, observabilidade
+  automatica (`init`, observer e `traceAsync`) e os fluxos app que usam
   `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-10 15:00 UTC no checkout local `7cdd8a6e`. `deck_matchups` e

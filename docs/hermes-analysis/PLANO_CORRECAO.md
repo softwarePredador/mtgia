@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-11 03:00 UTC
+> Data: 2026-06-11 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -84,26 +84,28 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-10 07:00 UTC como **ABERTO neste checkout `570ecfbc`**.
-    `sync_cards_utils.dart` segue importado apenas por teste, enquanto
-    `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
-    contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
-    `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
-    wrappers/helpers em request trace, Commander Reference, MTGTop8, candidate
-    quality, optimize utility samples, `MLKnowledgeService.recordFeedback`,
-    `ApiClient.loadTokenFromDisk`, API manual/custom metrics/debug de
-    `PerformanceService` e conveniencias EDHREC/cache (`getTopByCategory`,
-    `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
-    `EndpointCache.clearExpired`). Novos candidatos adicionados nesta rodada:
-    `BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
-    `DeckProvider.clearAllCache`, `hasSuspiciousNonLandCmc`,
-    `OptimizeIntensityConfig.clampRequestedSwapCount`,
-    `ArchetypeCountersService.upsertCounter` e
-    `PushNotificationService.sendToMultipleTokens`. Controles positivos:
-    observabilidade automatica (`init`, observer de tela e `traceAsync` em
-    smoke), `safeCmcForOptimization`, EDHREC `getHighSynergyCards`,
-    `NotificationService.create` -> `sendToUser`, e os fluxos app que usam
-    `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
+    2026-06-11 07:00 UTC como **ABERTO neste checkout `13a10128`**.
+    O auditor textual executou com sucesso (`205` arquivos backend, `0` imports
+    quebrados), mas nao prova ausencia de chamadas e sobrescreve o historico manual
+    se o marker gerado nao existir; a saida automatica foi restaurada antes da
+    atualizacao manual. Achados atuais: `sync_cards_utils.dart` esta test-only
+    enquanto `server/bin/sync_cards.dart` mantem copias privadas/fluxo Python
+    para parte do contrato; `verifySwapIntegrity` nao e chamado apesar de
+    `swap_integrity` ser anexado pelo optimize; `buildOptimizeResponse` e o
+    top-level `respondWithOptimizeTelemetry` de `optimize_response_support.dart`
+    nao sao usados pelo fluxo real da rota; wrappers app sem chamada
+    (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+    `DeckProvider.clearAllCache`); e helpers de suporte sem chamada confirmada
+    em request trace, Commander Reference, optimize utility sample, ML feedback,
+    `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
+    safety/intensity/counters/push. As claims antigas contra `tryGetRequestId`,
+    `normalizedCommanderReferenceCandidate`,
+    `extractMtgTop8FormatCodeFromSourceUrl` e
+    `buildCandidateQualitySamplePoolSql` estao stale porque os simbolos nao
+    existem mais neste checkout. Controles positivos: semantic/bracket response
+    helpers vivos, `safeCmcForOptimization`, `getHighSynergyCards`,
+    `EndpointCache.get/set`, `sendToUser`, observabilidade automatica e fluxos
+    app que usam `fetchBinderDirect`/`fetchPublicDecks`.
 13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
     checkout local `89261c8d` em 2026-06-10 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`, e o import historico
@@ -541,80 +543,104 @@ SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-07 07:00 UTC:** **REABERTO no checkout local
-`codex/hermes-analysis-docs@82bb454e`**. As anotacoes historicas de resolucao em
-outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
-presentes e sem chamador runtime confirmado; a rodada tambem encontrou um helper
-app-side novo sem chamada.
+**Status 2026-06-11 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`13a10128`**. As anotacoes historicas de resolucao em outros SHAs nao
+representam automaticamente o estado desta branch. A rodada atual removeu
+claims stale contra simbolos que nao existem mais (`tryGetRequestId`,
+`normalizedCommanderReferenceCandidate`,
+`extractMtgTop8FormatCodeFromSourceUrl` e
+`buildCandidateQualitySamplePoolSql`) e adicionou dois achados de maior impacto:
+`verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser emitido, e
+builders de response do optimize que continuam fora do fluxo real.
 
 - **Evidência**:
-  - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:116`, `:161` e
-    `:172` definem helpers cobertos por `server/test/sync_cards_test.dart`, mas
+  - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:121`, `:178` e
+    `:189` definem helpers cobertos por `server/test/sync_cards_test.dart`, mas
     `rg "sync_cards_utils"` nao encontrou import desse arquivo em `server/bin`,
     `server/lib` runtime ou rotas. `server/bin/sync_cards.dart:64` chama
     `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
     `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
-    `_extractCardRowFromSet`, definido em `:662`-`:710`.
-  - `server/lib/request_trace.dart:48` e `:51` definem
-    `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
-    `context.read<RequestTrace>()` diretamente, por exemplo
+    `_extractCardRowFromSet`, definido em `:662`-`:710`; o full sync atual
+    delega para `server/bin/sync_cards_full_fast.py`.
+  - `server/routes/ai/optimize/index.dart:752`-`:758` anexa
+    `swap_integrity`, mas `verifySwapIntegrity` em
+    `server/lib/ai/optimize_swap_integrity.dart:112`-`:134` nao tem chamador em
+    `server` ou `app`.
+  - `server/lib/ai/optimize_response_support.dart:92` e `:125` definem
+    `buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry`; a rota
+    ainda define uma funcao local homonima em
+    `server/routes/ai/optimize/index.dart:689`, e as chamadas da rota resolvem
+    para a funcao local. Controles positivos: `buildSemanticV2OptimizeRejectedBody`
+    e `attachOptimizeBracketPolicyDiagnostics` do mesmo arquivo sao chamados.
+  - `server/lib/request_trace.dart:48` define `getRequestTrace`; os
+    consumidores reais usam `context.read<RequestTrace>()` diretamente, por
+    exemplo
     `server/lib/auth_middleware.dart:57`, `server/lib/observability.dart:225`,
     `server/routes/trades/index.dart:332` e
     `server/routes/conversations/[id]/messages.dart:249`.
-  - `server/lib/ai/commander_reference_profile_support.dart:49` define
-    `normalizedCommanderReferenceCandidate`; consumidores ativos usam
-    `normalizeCommanderReferenceName` diretamente.
-  - `server/lib/ai/commander_reference_card_stats_support.dart:257` define
+  - `server/lib/ai/commander_reference_card_stats_support.dart:252` define
     `buildLoreholdReferenceCardStatsFromProfile`, mas a busca encontrou apenas
-    teste e definicao; o builder generico e usado no runtime em `:368`.
-  - `server/lib/meta/mtgtop8_meta_support.dart:139` define
-    `extractMtgTop8FormatCodeFromSourceUrl`; a busca encontrou apenas teste e
-    definicao. O helper de event id vizinho segue usado pelo reparo operacional.
-  - `server/lib/ai/candidate_quality_data_support.dart:631` define
-    `buildCandidateQualitySamplePoolSql`; o runner operacional monta pools por
-    `_loadCandidateCards`/`_buildSampleCandidatePools`.
-  - `server/lib/ai/optimize_runtime_support.dart:3326` define
+    teste e definicao; o builder generico e usado no mesmo arquivo em `:363`.
+  - `server/lib/ai/optimize_runtime_support.dart:1671` define
     `summarizeAggressiveOptimizeUtilitySamples`; a busca encontrou apenas teste
     e definicao.
-  - `app/lib/core/api/api_client.dart:128` define
+  - `app/lib/core/api/api_client.dart:140` define
     `ApiClient.loadTokenFromDisk()`, cujo comentario diz que e chamado 1x no
     boot, mas `rg "loadTokenFromDisk" app/lib app/test app/integration_test`
-    encontrou somente a definicao. O boot real le `auth_token` em
-    `app/lib/features/auth/providers/auth_provider.dart:37`-`:46` e chama
-    `ApiClient.setToken(savedToken)`.
-  - `app/lib/core/services/performance_service.dart:110`, `:130`, `:200`,
-    `:210`, `:220` e `:248` expõem traces/metricas/debug manuais sem chamador
+    encontrou somente a definicao.
+  - `app/lib/core/services/performance_service.dart:115`, `:135`, `:205`,
+    `:215`, `:225` e `:253` expoem traces/metricas/debug manuais sem chamador
     em `app/lib`, `app/test` ou `app/integration_test`; o app usa `init` em
-    `app/lib/main.dart:121`, `PerformanceNavigatorObserver` chama
-    `startScreenTrace`/`stopScreenTrace` em `performance_service.dart:295`,
-    `:307`, `:334` e `:339`, e `traceAsync` aparece no smoke de observabilidade.
-  - `server/lib/ai/edhrec_service.dart:333`, `:355`, `:363` e `:399` expõem
+    `app/lib/main.dart:122`, `PerformanceNavigatorObserver` em
+    `app/lib/main.dart:209`, e `traceAsync` aparece no smoke de observabilidade.
+  - `server/lib/ai/edhrec_service.dart:350`, `:372`, `:380` e `:416` expoem
     `getTopByCategory`, `calculateFitScore`, `cleanupCache` e `isHighSynergy`
     sem chamador confirmado. Controle positivo: `getHighSynergyCards` e chamado
     em `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`.
   - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
     sem chamada confirmada; `EndpointCache.instance.get/set` seguem vivos em
     rotas de cards, sets, archetypes e generate performance support.
+  - `app/lib/features/binder/providers/binder_provider.dart:639`,
+    `app/lib/features/community/providers/community_provider.dart:179` e
+    `app/lib/features/decks/providers/deck_provider.dart:1067` definem
+    `applyFilters`, `clearFilters` e `clearAllCache` sem chamada runtime
+    confirmada; os fluxos app usam `fetchBinderDirect`, `fetchPublicDecks` e
+    invalidacao especifica de deck.
+  - `server/lib/ai/cmc_safety.dart:64`,
+    `server/lib/ai/optimize_runtime_support.dart:76`,
+    `server/lib/archetype_counters_service.dart:204` e
+    `server/lib/push_notification_service.dart:295` definem helpers sem chamada
+    runtime confirmada; controles vivos existem para `safeCmcForOptimization`,
+    uso de `ArchetypeCountersService` em rotas de analise/simulacao e
+    `sendToUser`.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
   porque o teste cobre uma copia que nao participa do CLI operacional.
 - **Ação recomendada**:
   1. decidir se `sync_cards_utils.dart` e fonte compartilhada real ou harness
      legado; se for fonte real, importar no CLI e remover as copias privadas;
-  2. para cada wrapper test-only, ligar ao runner/rota esperado ou remover o
+  2. decidir se `swap_integrity` e contrato operacional; se for, chamar
+     `verifySwapIntegrity` antes da mutacao de deck e cobrir hash/deck antigo;
+  3. completar a extracao de `optimize_response_support.dart` ou remover
+     builders/exportacoes que nao participam do fluxo real;
+  4. para cada wrapper test-only, ligar ao runner/rota esperado ou remover o
      helper e o teste correspondente;
-  3. remover `ApiClient.loadTokenFromDisk()`/comentario ou religar
+  5. remover `ApiClient.loadTokenFromDisk()`/comentario ou religar
      explicitamente ao boot se esse for o contrato desejado;
-  4. manter `PerformanceService` como API publica apenas se houver plano de
+  6. manter `PerformanceService` como API publica apenas se houver plano de
      observabilidade mobile/manual traces; caso contrario, simplificar para
      `init` + observer + `traceAsync`;
-  5. transformar conveniencias EDHREC/cache sem consumidor em private/remover,
+  7. transformar conveniencias EDHREC/cache sem consumidor em private/remover,
      ou ligar a rotina real com teste;
-  6. continuar usando busca de chamadores como guardrail antes de adicionar
+  8. continuar usando busca de chamadores como guardrail antes de adicionar
      novos helpers publicos.
 - **Validação**:
   - `grep -RIn "sync_cards_utils" server` encontra o binario ativo, ou o arquivo
     deixa de existir;
+  - teste de apply/optimize falha com `swap_integrity.hash` invalido ou
+    `deck_signature` antigo, se o campo continuar app-facing;
+  - `rg "buildOptimizeResponse|respondWithOptimizeTelemetry"` mostra um unico
+    contrato de response vivo, sem builder top-level e funcao local divergentes;
   - `dart analyze` e testes focados do sync/Commander Reference/meta/candidate
     quality continuam verdes;
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
