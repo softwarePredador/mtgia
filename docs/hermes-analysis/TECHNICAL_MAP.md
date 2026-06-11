@@ -302,27 +302,18 @@ esse dado como sinal de produto.
   automatica (`init`, observer e `traceAsync`) e os fluxos app que usam
   `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-10 15:00 UTC no checkout local `7cdd8a6e`. `deck_matchups` e
-  `deck_weakness_reports` continuam write-only no produto atual;
-  `ml_prompt_feedback` tem helper de insert sem chamador e apenas contadores
-  operacionais como `/ai/ml-status`; `commander_reference_decks` e
-  `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
-  runtime confirmado, enquanto o produto le o agregado
-  `commander_reference_deck_analysis`. A varredura focada de DDL versus
-  operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente
-  `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com
-  write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como
-  achado manual por ser raw corpus apagado/reinserido sem leitura de produto
-  confirmada. Nenhum novo candidato foi confirmado; `commander_reference_deck_analysis`
-  e as tabelas de candidate quality/jobs/cache/telemetry foram separadas como
-  controles positivos por terem leitores runtime, writes e/ou runners dedicados
-  confirmados. A revalidacao tambem ajustou a formulacao para nao confundir
-  schema/audit/counts com consumidores de produto. Ajuste da rodada de
-  coerencia de 2026-06-10 23:00 UTC: no checkout `1554a1e5`,
-  `commander_learned_decks`, `deck_learning_events` e `commander_card_usage`
-  existem em `server/database_setup.sql` e em `server/lib/ai/*`; portanto, a
-  afirmacao de que esses nomes aparecem somente em docs historicos esta stale
-  para a branch atual.
+  em 2026-06-11 15:00 UTC no checkout local `76ec897f`. As claims antigas
+  contra `deck_matchups` e `deck_weakness_reports` estao stale nesta branch:
+  ambas agora tem leitura runtime e campos retornados no payload das rotas
+  experimentais (`stored_matchup` em `/ai/simulate-matchup` e `history` em
+  `/ai/weakness-analysis`). `deck_learning_events`, `commander_card_usage` e
+  `commander_learned_decks` tambem sao controles positivos atuais por terem
+  writers/readers em rotas/jobs do loop Hermes. Permanecem como riscos menores:
+  `commander_reference_decks` e `commander_reference_deck_cards` persistem raw
+  corpus sem `SELECT/JOIN` direto confirmado, enquanto o produto le o agregado
+  `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem insert helper
+  sem chamador, leitura apenas `COUNT(*)` em `/ai/ml-status` e nenhum DDL local
+  encontrado neste checkout.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

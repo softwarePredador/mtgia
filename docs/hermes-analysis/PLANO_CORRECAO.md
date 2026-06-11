@@ -45,15 +45,16 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    allowed/allowed-with-caution. `edh_bracket_policy.dart` continua excecao
    intencional por regra externa/curadoria de bracket, com teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-10 15:00 UTC no checkout
-   `7cdd8a6e`; a rodada de coerencia de 2026-06-10 23:00 UTC nao refez essa
-   auditoria de tabelas. Ajuste de stale claim: no checkout `1554a1e5`,
-   `commander_learned_decks`, `deck_learning_events` e `commander_card_usage`
-   existem em `server/database_setup.sql` e em `server/lib/ai/*`; portanto,
-   qualquer formulacao dizendo que esses nomes aparecem apenas em docs
-   historicos nao vale para a branch atual. O foco aberto desta rodada e
-   documentar o contrato app-facing de `/ai/commander-learning`, nao reclassificar
-   o uso de todas as tabelas.
+   revalidado na rotacao local Codex de 2026-06-11 15:00 UTC no checkout
+   `76ec897f`. As claims antigas contra `deck_matchups` e
+   `deck_weakness_reports` estao stale: ambas agora sao lidas no runtime e
+   retornadas no payload das proprias rotas experimentais. Tambem nao devem ser
+   tratadas como sem uso `commander_learned_decks`, `deck_learning_events` e
+   `commander_card_usage`, que possuem writers/readers no loop Hermes. Restam
+   como riscos menores as raws `commander_reference_decks` /
+   `commander_reference_deck_cards` sem leitor direto confirmado e
+   `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
+   `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-11 03:00 UTC no checkout `57f52c45`.
    `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
@@ -771,39 +772,38 @@ builders de response do optimize que continuam fora do fluxo real.
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-10 15:00 UTC: REVALIDADO no checkout `7cdd8a6e`.** A rodada local focada em
-  `postgresql-tables-not-used` nao encontrou novos consumidores runtime para os
-  pontos abaixo. `schema_migrations` foi explicitamente mantida fora do achado
-  por ser tabela interna do migrador. Uma varredura focada de DDL versus
-  `FROM/JOIN/INSERT/UPDATE/DELETE` encontrou 53 tabelas criadas no recorte de
-  codigo e somente `commander_reference_decks`, `deck_matchups` e
-  `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards`
-  foi mantida como achado manual por ser raw corpus apagado/reinserido sem
-  leitura de produto confirmada. `ml_prompt_feedback`
-  tem apenas leitura de `COUNT(*)` operacional e helper de insert sem chamador.
-  A revalidacao ajustou a formulacao para nao tratar schema/audit/counts como
-  consumidores de produto. `battle_simulations`,
-  `format_staples`, `archetype_counters`, `archetype_patterns`,
-  `synergy_packages`, `activation_funnel_events` e `ai_user_preferences` foram
-  separados como controles positivos por terem leitores runtime ou runners
-  dedicados confirmados.
+- **Status 2026-06-11 15:00 UTC: REVALIDADO no checkout `76ec897f`.** A rodada
+  local focada em `postgresql-tables-not-used` atualizou o status dos achados
+  historicos. `deck_matchups` e `deck_weakness_reports` nao continuam
+  write-only: ambas agora possuem leitores runtime e campos retornados no
+  payload das rotas. `schema_migrations` segue fora do achado por ser tabela
+  interna do migrador. Uma varredura focada de DDL versus
+  `FROM/JOIN/INSERT/UPDATE/DELETE` encontrou 47 declaracoes de tabela no
+  recorte auditado, incluindo uma tabela SQLite local (`user_learning_events`)
+  excluida dos achados PostgreSQL. O risco remanescente fica restrito a raws do
+  Commander Reference Corpus sem leitor direto confirmado e a
+  `ml_prompt_feedback`, que nao tem DDL local no checkout atual, possui helper
+  de insert sem chamador e aparece em `/ai/ml-status` apenas como `COUNT(*)`.
 - **Evidência**:
-  - `deck_matchups` é definida em `server/database_setup.sql:169` e recebe
-    upsert em `server/routes/ai/simulate-matchup/index.dart:360`, mas nao ha
-    leitor de produto confirmado; a referencia fora da rota e
-    `server/bin/update_schema.dart:16`, que derruba/recria schema e nao consome
-    `win_rate`/`notes`.
-  - `deck_weakness_reports` é definida em `server/database_setup.sql:370` e
-    `server/bin/migrate_create_missing_tables.dart:97`, recebe insert em
-    `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha
-    `SELECT/JOIN/UPDATE/DELETE` de produto confirmado; o campo `addressed`
-    tambem nao tem fluxo de update confirmado.
-  - `ml_prompt_feedback` é definida em
-    `server/bin/migrate_ml_knowledge.dart:159`, mas o unico insert fica no
-    helper `MLKnowledgeService.recordFeedback`
+  - `deck_matchups` é definida em `server/database_setup.sql:222`; a rota
+    `/ai/simulate-matchup` le o historico anterior por `_loadStoredMatchup` em
+    `server/routes/ai/simulate-matchup/index.dart:382`, executa
+    `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:456`-`:463`,
+    grava o upsert em `:390`-`:403` e retorna `stored_matchup.previous` em
+    `:430`-`:435`. Portanto, a claim write-only esta stale.
+  - `deck_weakness_reports` é definida em `server/database_setup.sql:484`; a
+    rota `/ai/weakness-analysis` grava reports em
+    `server/routes/ai/weakness-analysis/index.dart:480`-`:499`, chama
+    `_loadWeaknessHistory` em `:506`, le resumo por severidade em `:572`-`:579`,
+    le recentes em `:588`-`:595` e retorna `history` em `:559`. Portanto, a
+    claim write-only esta stale, embora `addressed` ainda nao tenha update
+    confirmado.
+  - `ml_prompt_feedback` nao tem `CREATE TABLE` local encontrado em
+    `server/database_setup.sql`, `server/lib`, `server/routes`, `server/bin`,
+    `server/test` ou `app/lib` neste checkout. O insert fica apenas no helper
+    `MLKnowledgeService.recordFeedback`
     (`server/lib/ml_knowledge_service.dart:251`, SQL em `:264`), sem chamador
-    encontrado por busca focada de `recordFeedback(` em
-    `server/lib`, `server/routes`, `server/bin`, `server/test` ou `app/lib`;
+    encontrado por busca focada de `recordFeedback(` em `server` ou `app`;
     `/ai/ml-status` apenas conta rows em
     `server/routes/ai/ml-status/index.dart:98`.
   - `commander_reference_decks` e `commander_reference_deck_cards` sao definidas
@@ -811,22 +811,22 @@ builders de response do optimize que continuam fora do fluxo real.
     `:1200`, recebem insert/delete/insert em `:1245`, `:1329` e `:1345`, mas
     nao possuem `SELECT/JOIN` confirmado; o produto consome o agregado
     `commander_reference_deck_analysis` em `:389`.
-- **Impacto**: acumulacao de dados sem produto/operacao consumindo o historico,
-  retencao indefinida e falsa impressao de que ha cache, dashboard, workflow
-  persistente ou loop de aprendizado alimentado por essas persistencias.
+- **Impacto**: para as raws Commander Reference, acumulacao de dados sem
+  politica documentada de lineage/retencao ou reprocessamento. Para
+  `ml_prompt_feedback`, risco de schema drift e falsa impressao de coleta ativa
+  de feedback quando nao ha chamador nem consumidor do payload.
 - **Ação recomendada**:
-  1. escolher entre manter como log bruto com retencao documentada, criar
-     consumidor real ou remover a persistencia dessas rotas experimentais;
-  2. ligar `ml_prompt_feedback` a um fluxo real de feedback ou remover o helper
-     ate haver coleta ativa;
-  3. documentar as tabelas raw do Commander Reference Corpus como lineage/audit,
+  1. documentar as tabelas raw do Commander Reference Corpus como lineage/audit,
      com retencao e job de reprocessamento, ou persistir apenas o agregado
      consumido;
-  4. se mantiver, adicionar endpoint/job/UI que leia os dados e teste de contrato;
-  5. se remover, criar migration/cleanup seguro e atualizar
+  2. ligar `ml_prompt_feedback` a um fluxo real de feedback com DDL/migration
+     versionada, ou remover o helper/count ate haver coleta ativa;
+  3. se mantiver qualquer persistencia raw, adicionar endpoint/job/UI que leia
+     os dados e teste de contrato;
+  4. se remover, criar migration/cleanup seguro e atualizar
      `API_CONTRACTS_AND_DATA_MAP.md`.
 - **Validação**:
-  - `grep -RInE "^[[:space:]]*(FROM|JOIN)[[:space:]]+(deck_matchups|deck_weakness_reports|commander_reference_decks|commander_reference_deck_cards)\\b" server/routes server/lib server/bin app`
+  - `grep -RInE "^[[:space:]]*(FROM|JOIN)[[:space:]]+(commander_reference_decks|commander_reference_deck_cards)\\b" server/routes server/lib server/bin app`
     encontra consumidores reais de leitura, ou a persistencia deixa de existir
     com decisao documentada;
   - `grep -RIn "recordFeedback" server app` encontra chamador real, caso a
@@ -898,9 +898,9 @@ builders de response do optimize que continuam fora do fluxo real.
    ou terem contrato interno explicito.
 4. **Quarto**: atacar duplicações de maior risco no domínio de optimize/IA.
 5. **Quinto**: modularizar os arquivos gigantes do otimizador com testes de regressão.
-6. **Sexto**: decidir destino das tabelas write-only/parciais
-   (`deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback` e raws do
-   Commander Reference Corpus) antes de expandir novas persistencias analiticas.
+6. **Sexto**: decidir destino das tabelas write-only/parciais remanescentes
+   (`ml_prompt_feedback` e raws do Commander Reference Corpus) antes de
+   expandir novas persistencias analiticas.
 
 Resolvido em `origin/master@32418bc6`: teste de contrato de rota para
 `SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial` /
