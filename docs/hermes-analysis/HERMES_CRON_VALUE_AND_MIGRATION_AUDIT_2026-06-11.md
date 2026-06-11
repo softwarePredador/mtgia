@@ -1,0 +1,203 @@
+# Hermes Cron Value And Migration Audit — 2026-06-11
+
+> Objetivo: auditar todas as crons Hermes uma a uma, validar se ainda agregam
+> valor depois das melhorias de branch/protocolo e preparar a migração gradual
+> para o servidor ManaLoom.
+
+## Resumo executivo
+
+Estado após ajustes em AWS/Hermes:
+
+| Métrica | Antes | Depois |
+|---|---:|---:|
+| Jobs cadastrados | 25 | 25 |
+| Jobs habilitados | 17 | 13 |
+| Jobs pausados | 8 | 12 |
+
+Decisão principal:
+
+- Manter alta frequência apenas para crons determinísticas/script-only que
+  alimentam aprendizado, sync e preflight.
+- Reduzir frequência de crons com LLM/provider porque elas já bateram 429 e
+  geram muito ruído quando não há dado novo.
+- Pausar auditorias genéricas que duplicam o fluxo pós-push do Codex ou já
+  causaram conflito de documentação.
+- Manter jobs pesados de optimizer como execução manual até virarem rotinas do
+  servidor ManaLoom com isolamento, locks e métricas.
+
+## Evidência operacional
+
+Coleta feita no container Hermes:
+
+```bash
+cd /opt/data/workspace/mtgia
+git fetch --all --prune
+git status --short --branch
+python3 -m json.tool /opt/data/cron/jobs.json
+bash -n /opt/data/scripts/manaloom-hermes-report-only.sh \
+  /opt/data/scripts/manaloom-post-push-audit.sh \
+  /opt/data/scripts/manaloom-master-watchdog.sh
+```
+
+Observações:
+
+- O workspace Hermes foi alinhado em `master`.
+- Remotes reais restantes: `origin/master` e `origin/codex/hermes-analysis-docs`.
+- `jobs.json` chegou a ficar `root:root 600`, impedindo leitura pelo scheduler.
+  Foi corrigido com `/opt/data/scripts/fix-cron-perms.sh`.
+- Após a correção, o scheduler recalculou `next_run_at`; os primeiros outputs
+  novos ficam esperados após `2026-06-11T13:05:27Z`.
+- Portanto, esta auditoria valida configuração e função; resultados novos
+  pós-ajuste ainda precisam ser observados na próxima rodada.
+
+## Crons habilitadas
+
+| Cron | Cadência | Função real | Valor para ManaLoom | Decisão |
+|---|---:|---|---|---|
+| `manaloom-master-watchdog` | 30m | Detecta mudança em `origin/master` | Útil enquanto Hermes precisa reagir a push sem webhook | Manter temporário; migrar para webhook/CI |
+| `manaloom-pull-learning-events` | 30m | Puxa eventos de aprendizado do backend | Essencial para loop IA/humano | Manter; migrar para job server |
+| `lorehold-knowncards-validator` | 30m | Valida cards conhecidos contra knowledge DB/battle | Útil para qualidade do corpus Lorehold | Manter; migrar para suite server |
+| `manaloom-master-optimizer-preflight` | 60m | Sincroniza metadados, regras e roda preflight | Essencial antes de qualquer optimizer | Manter; migrar para job server isolado |
+| `manaloom-knowledge-import` | 120m | Importa conhecimento Hermes de forma segura/dry-run | Útil para consolidar aprendizado | Manter; migrar para ingest server |
+| `manaloom-auto-sync-learned-decks` | 120m | Sincroniza learned decks aprovados | Essencial para botão/deck aprendido no app | Manter; migrar para backend job |
+| `manaloom-auto-promote-learned` | 360m | Promove learned decks elegíveis | Útil para reduzir intervenção manual | Manter; migrar para backend job com auditoria |
+| `manaloom-commander-knowledge-deep` | 360m | Extrai padrões por comandante | Útil, mas dependente de provider | Manter com menor cadência; migrar para mineração determinística |
+| `manaloom-knowledge-synthesis` | 360m | Transforma achados MTG em tasks | Útil como ponte Hermes → Codex | Manter com menor cadência; sempre triado por Codex |
+| `manaloom-gamechanger-research` | 720m | Pesquisa gamechangers e gaps de ranking | Útil, mas corpus já está majoritariamente coberto | Manter baixa cadência |
+| `manaloom-mana-base-validator` | 720m | Valida base de mana dos decks | Útil para qualidade de deckbuilding | Manter baixa cadência; migrar para backend metrics |
+| `mtg-rules-auditor` | 720m | Audita regras MTG contra pipeline | Útil como guardrail técnico | Manter baixa cadência; migrar para testes/golden scenarios |
+| `manaloom-cron-governor-report` | 720m | Audita saúde da frota de crons | Útil enquanto Hermes existir | Manter até migração; depois trocar por health interno |
+
+## Crons pausadas
+
+| Cron | Motivo |
+|---|---|
+| `manaloom-hermes-normal-audit` | Duplicava o report-only pós-push do Codex e gastava provider; agora Codex chama Hermes quando há push real. |
+| `manaloom-hermes-weekly-parallel-audit` | Auditoria ampla gerava conflito/ruído e falhou em runs anteriores por git/provider. |
+| `manaloom-manager-watchdog` | Watchdog legado; substituído por governador report-only. |
+| `manaloom-tag-accuracy-reporter` | Achado é valioso, mas a versão agent bateu limite mensal; deve virar script/server job antes de reativar. |
+| `manaloom-code-structure-auditor` | Auditoria ampla já causou conflito de docs; deve rodar manualmente com triagem Codex. |
+| `manaloom-logic-coherence-auditor` | Já estava pausada; manter manual até existir harness determinístico. |
+| `lorehold-knowncards-generator` | Gerador foi substituído pelo fluxo atual de validator/import; manter pausado. |
+| `lorehold-universal-optimizer` | Antigo, com risco de apply/erro; substituído por preflight/slot-scan/manual. |
+| `manaloom-master-optimizer-slot-scan` | Pesado; manter manual até isolamento no servidor. |
+| `manaloom-master-optimizer-end-to-end` | Prova completa pesada; manual até ter janela controlada. |
+| `manaloom-master-optimizer-loop` | One-shot vencido; manter desligado. |
+| `manaloom-flutter-ui-auditor` | One-shot vencido; validação visual deve ser feita por Codex/simulator, não por Linux Hermes. |
+
+## Mudanças aplicadas no runtime
+
+Arquivo ajustado:
+
+- `/opt/data/cron/jobs.json`
+
+Backup criado:
+
+- `/opt/data/cron/jobs.json.bak_codex_cron_value_audit_20260611_124613`
+
+Mudanças:
+
+- Habilitadas passaram de 17 para 13.
+- Pausadas passaram de 8 para 12.
+- Crons agent/provider de baixo valor ou duplicadas foram pausadas.
+- Cadência das crons agent úteis foi reduzida:
+  - commander knowledge: 180m → 360m
+  - gamechanger research: 180m → 720m
+  - mana base validator: 360m → 720m
+  - knowledge synthesis: 240m → 360m
+  - MTG rules auditor: 180m → 720m
+
+## Impacto prático no projeto
+
+### Impacto imediato
+
+- Menos risco de Hermes gerar documentação conflitante.
+- Menos consumo de provider e menor chance de `429`.
+- Mais foco nas rotinas que realmente alimentam app/IA:
+  - eventos de aprendizado;
+  - learned decks;
+  - known cards;
+  - preflight do optimizer;
+  - validações de mana/regras em baixa cadência.
+
+### Impacto ainda não provado
+
+Ainda não há output novo após o ajuste, porque a próxima execução pós-correção
+começa a partir de `2026-06-11T13:05:27Z`.
+
+Próxima evidência necessária:
+
+```bash
+find /opt/data/cron/output -type f -name '*.md' \
+  -printf '%TY-%Tm-%TdT%TH:%TM:%TS %p\n' | sort -r | head
+```
+
+Validar se os jobs de `13:05Z` produziram:
+
+- `manaloom-master-watchdog`
+- `manaloom-pull-learning-events`
+- `lorehold-knowncards-validator`
+
+## Caminho para remover Hermes
+
+### Fase 1 — Manter Hermes como observador e laboratório
+
+Status atual.
+
+- Hermes coleta e testa aprendizado.
+- Codex implementa produto em `master`.
+- Branch docs é staging, não fonte canônica.
+
+### Fase 2 — Migrar jobs determinísticos para o servidor ManaLoom
+
+Prioridade:
+
+1. `pull-learning-events`
+2. `auto-sync-learned-decks`
+3. `auto-promote-learned`
+4. `knowledge-import`
+5. `knowncards-validator`
+6. `master-optimizer-preflight`
+
+Formato recomendado:
+
+- Dart/Python CLI versionado no repo principal ou job backend;
+- tabela de auditoria para cada execução;
+- lock por job;
+- endpoint/health para último sucesso;
+- logs sanitizados.
+
+### Fase 3 — Converter crons agent em testes/dados determinísticos
+
+Converter:
+
+- `mana-base-validator` → métrica backend + teste por deck.
+- `mtg-rules-auditor` → golden scenarios de regras.
+- `tag-accuracy-reporter` → script de score por tag.
+- `gamechanger-research` → atualização controlada de dados/ranking.
+- `commander-knowledge-deep` → minerador de padrões por comandante.
+
+### Fase 4 — Aposentar Hermes
+
+Hermes pode ser desligado quando:
+
+- todos os sync/import/promote rodam no servidor;
+- scorecards e validators estão versionados;
+- Codex não depende de docs branch para descobrir estado;
+- app/backend têm endpoints/artefatos para learned decks e métricas;
+- auditorias genéricas foram substituídas por CI/testes/provas vivas.
+
+## Próxima ação recomendada
+
+Não reativar crons pausadas agora.
+
+Próximo passo técnico:
+
+1. Esperar ou forçar uma rodada leve pós-ajuste.
+2. Validar outputs de `watchdog`, `pull-learning-events` e
+   `knowncards-validator`.
+3. Começar migração pelo trio:
+   - `pull-learning-events`;
+   - `auto-sync-learned-decks`;
+   - `auto-promote-learned`.
+

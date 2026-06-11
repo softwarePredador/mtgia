@@ -26,6 +26,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Snapshot do runtime AWS depois do prune de branches e ajuste das crons.
   - Registra jobs habilitados/pausados, scripts alterados e validações feitas.
 
+- `HERMES_CRON_VALUE_AND_MIGRATION_AUDIT_2026-06-11.md`
+  - Auditoria uma a uma das crons Hermes, com decisão de manter/pausar e plano
+    para migrar o loop para o servidor ManaLoom.
+
 - `HERMES_DOCS_TRIAGE_2026-06-11.md`
   - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch
     `codex/hermes-analysis-docs`.
