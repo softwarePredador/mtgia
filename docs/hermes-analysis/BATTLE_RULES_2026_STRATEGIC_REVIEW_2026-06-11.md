@@ -13,7 +13,8 @@
 | `https://magic.wizards.com/en/formats/commander` | Commander é 99+1, color identity, command zone, commander tax, 21 commander damage e free-for-all com ataque a múltiplos jogadores. | Produto e Hermes devem tratar multi-defender como Commander normal, não exceção. |
 | `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Hybrid mana não mudou; continua funcionando como "and" para identidade Commander. | Não implementar modelo "or" sem novo update oficial. |
 | `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Station, Spacecraft, Warp, Void, Lander e Vehicle/Spacecraft commander. | Suporte mínimo está correto; efeitos específicos por carta ficam por corpus. |
-| `https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes` | Release notes detalham station counters, striations e Vehicle/Spacecraft commander. | Usar para regressões quando novas Spacecraft entrarem no corpus. |
+| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Update oficial que adiciona regras de Lander `111.10u`, Station Cards `721`, Station `702.184` e Warp `702.185`. | Fonte primária para números de regra e status de conformance. |
+| `https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes` | Release notes detalham station counters, striations, Warp e regra de Commander para Vehicle/Spacecraft. | Fonte suplementar para regressões card-specific futuras. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-mechanics` | Prepare, Repartee, Opus, Infusion, Flashback, Increment, Paradigm e Converge. | Ability words entram como telemetria; Prepare/Omen/Paradigm exigem card-specific só quando usados. |
 
 ## Rechecagem oficial 2026-06-11
@@ -45,6 +46,18 @@
 | Lander | Implemented básico | `create_lander_token` | Variantes por carta só quando necessário. |
 | Void/Repartee/Opus/Increment/Infusion/Converge | Telemetry | `modern_ability_word_signals` | Não virar enforcement pesado; ability words não têm regra própria. |
 | No sideboard/outside-game Commander | Tracked Gap | Produto não expõe sideboard operacional; meta import usa sideboard como fonte de commander em EDH/cEDH. | Revalidar se surgir wishboard/sideboard no app/API. |
+
+## Status do plano solicitado em 2026-06-11
+
+| Etapa | Status atual | Evidência | Decisão |
+|---|---|---|---|
+| 1. Documentação e matriz de gaps | Implemented | Este documento, `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`, `IMPLEMENTATION_GAPS.md`, `PENDING_TASKS.md` | Manter como primeira etapa obrigatória antes de qualquer regra nova. |
+| 2. Commander legality 2026 | Implemented | `commander_eligibility.dart`, `commander_eligibility_test.dart`, `magic_rules_source_test.dart` | Não abrir nova implementação salvo drift real. |
+| 3. Warp / Flashback / cast-from-exile | Partial mínimo | `battle_rules_2026_tests.py` cobre warp e flashback básicos | Evoluir somente por carta real no corpus. |
+| 4. Station / Spacecraft | Partial mínimo | `activate_station_ability`, conformance Station/Spacecraft | Múltiplas striations e escolha humana ficam tracked gap. |
+| 5. Prepare / Omen / Paradigm | Partial mínimo | helpers de characteristics/copy/exile tracking | Não implementar efeito genérico pesado sem carta concreta. |
+| 6. Multiplayer combat Commander | Implemented básico | `assign_attackers_to_defenders`, evento `multi_defender_attack` | Requirements por defensor e blockers APNAP ficam gap separado. |
+| 7. Ability words como telemetry | Implemented como sinal | `modern_ability_word_signals` | Continuar sem enforcement porque ability words não têm texto de regra próprio. |
 
 ## Ordem real de execução
 

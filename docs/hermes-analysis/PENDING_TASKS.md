@@ -47,6 +47,9 @@
 > 20 dias permanece prático: manter suporte mínimo testado e implementar
 > card-specific apenas com corpus/replay/evidência. Nova matriz:
 > `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
+> A rechecagem complementar usa `Edge of Eternities Update Bulletin` como fonte
+> primária para os números novos `111.10u`, `721`, `702.184` e `702.185`.
+> Mechanics/release notes continuam como suporte operacional/card-specific.
 >
 > **Atualização 2026-06-11 — CMC app-facing hardening.**
 > O backend passou a carregar `cards.cmc` no resolver de import/deck generation,
@@ -291,6 +294,18 @@
 | 4 | Station/Spacecraft card-specific | Spacecraft real em deck aprendido/simulado | Replay + conformance + regra no registry |
 | 5 | Prepare/Omen/Paradigm card-specific | Carta real usada pelo usuário/Hermes | Teste com resolução esperada e sem falso positivo semântico |
 | 6 | Multiplayer combat avançado | Falha de replay envolvendo múltiplos defensores | Teste com defensor escolhido, blockers APNAP e dano por commander |
+
+### Gate de decisão para os próximos 20 dias
+
+Não abrir implementação genérica nova para Warp, Station, Prepare, Omen,
+Paradigm ou ability words sem pelo menos um dos sinais abaixo:
+
+| Sinal | Ação permitida |
+|---|---|
+| Carta real aparece em deck aprendido/simulado e gera replay incorreto | Implementar handler card-specific + teste focado |
+| Usuário importa/salva deck com carta moderna e validação falha por regra já oficial | Corrigir validação/legality primeiro |
+| Hermes report-only aponta divergência com arquivo/linha e teste reproduzível | Corrigir código e atualizar matriz |
+| Apenas novidade teórica sem corpus nem falha | Manter como tracked gap, sem código |
 
 ---
 

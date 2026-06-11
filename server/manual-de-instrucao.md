@@ -18106,3 +18106,27 @@ redesenhar a mesa:
 
 Relatório:
 `server/doc/LIFE_COUNTER_ACCESSIBILITY_LAYOUT_PASS_2026-06-04.md`.
+
+## 2026-06-11 — Revisão estratégica oficial do Battle Engine
+
+Rechecagem de regras concluída contra fontes oficiais Wizards vigentes:
+
+- `https://magic.wizards.com/en/rules` aponta para Comprehensive Rules
+  efetivas em 2026-04-17;
+- Commander oficial permanece 99+1, identidade de cor, command zone,
+  commander tax, 21 commander damage e free-for-all com ataque a múltiplos
+  jogadores;
+- Commander Brackets 2026-02-09 confirmou que hybrid mana não mudou e continua
+  contando como todas as cores híbridas;
+- Edge of Eternities Update Bulletin é a fonte primária para Lander `111.10u`,
+  Station Cards `721`, Station `702.184` e Warp `702.185`;
+- Secrets of Strixhaven Mechanics cobre Prepare, Repartee, Opus, Infusion,
+  Flashback, Increment, Paradigm e Converge.
+
+Decisão de produto/engenharia: manter ManaLoom como simulador Commander prático,
+não judge engine completo. O suporte mínimo para Vehicle/Spacecraft commander,
+hybrid estrito, Warp, Station, Prepare/Omen/Paradigm, Flashback,
+multi-defender combat e ability-word telemetry já está rastreado em
+`docs/hermes-analysis/BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
+Novas regras modernas só devem virar implementação card-specific com carta real
+no corpus, replay incorreto e teste focado.

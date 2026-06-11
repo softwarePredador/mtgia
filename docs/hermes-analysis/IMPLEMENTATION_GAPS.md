@@ -269,6 +269,10 @@
 
 Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md` e
 `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
+Fonte primária para números novos de Edge of Eternities:
+`https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin`.
+Fonte Commander/hybrid: `https://magic.wizards.com/en/formats/commander` e
+`https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026`.
 
 | Item | Status | Implementação | Limite restante |
 |---|---|---|---|
@@ -289,6 +293,17 @@ Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md` e
 
 O suporte atual é intencionalmente mínimo e orientado a simulação Commander.
 Não transformar `battle_analyst_v9.py` em judge engine completo neste ciclo.
+As etapas do plano estratégico estão classificadas assim:
+
+| Etapa | Classificação atual |
+|---|---|
+| Documentação/matriz oficial | Implemented |
+| Commander legality 2026 e hybrid estrito | Implemented |
+| Warp/Flashback/cast-from-exile | Partial mínimo testado |
+| Station/Spacecraft | Partial mínimo testado |
+| Prepare/Omen/Paradigm | Partial mínimo testado |
+| Multiplayer Commander combat | Implemented básico |
+| Ability words modernos | Telemetry, sem enforcement |
 
 Ordem de implementação quando houver corpus concreto:
 

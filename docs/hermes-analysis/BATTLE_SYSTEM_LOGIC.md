@@ -3,7 +3,7 @@
 > Documento canônico da lógica de simulação de batalha, otimização e validação.
 > Tudo que é usado e pensado em cada etapa do pipeline de análise de deck.
 
-Última atualização: 2026-06-10
+Última atualização: 2026-06-11
 
 Revisão estratégica oficial: 2026-06-11
 (`BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`).
@@ -152,6 +152,9 @@ Atualização 2026-06-11: a revisão oficial confirmou que o próximo trabalho d
 regras deve ser card-specific e orientado por corpus. Warp, Station,
 Prepare/Omen/Paradigm e ability words não devem ganhar enforcement genérico
 pesado sem carta real, replay e teste focado.
+Para Edge of Eternities, o `Update Bulletin` é a fonte primária dos números
+novos de regra (`111.10u`, `721`, `702.184`, `702.185`); mechanics/release
+notes são usadas como explicação operacional e card-specific.
 
 ---
 
