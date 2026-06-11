@@ -126,3 +126,7 @@ evita que as crons voltem a falhar por banco SQLite readonly.
 Regra de branch nova: scripts operacionais que executam optimizer/sync devem
 fazer checkout de `master`; apenas crons de memória, documentação e report-only
 podem trabalhar em `codex/hermes-analysis-docs`.
+
+Esses scripts não devem mascarar falha de checkout/pull com `|| true`. Se o
+checkout de `master` falhar, o job deve falhar alto para evitar execução de
+código stale da branch de memória.

@@ -22,9 +22,9 @@ trap 'rm -f "$LOCK_FILE"' EXIT
 
 cd "$REPO"
 git config --global --add safe.directory "$REPO" >/dev/null 2>&1 || true
-git fetch --quiet origin master || true
-git checkout master >/dev/null 2>&1 || true
-git pull --ff-only origin master >/dev/null 2>&1 || true
+git fetch --quiet origin master
+git checkout master >/dev/null
+git pull --ff-only origin master >/dev/null
 
 if [[ -f "$SECRET_ENV" ]]; then
   set -a

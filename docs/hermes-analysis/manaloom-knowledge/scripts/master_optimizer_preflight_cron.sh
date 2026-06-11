@@ -15,9 +15,9 @@ git config --global --add safe.directory "$REPO" >/dev/null 2>&1 || true
 # Operational optimizer code must run from canonical master. Memory/report
 # crons may use codex/hermes-analysis-docs, but preflight must not execute stale
 # branch docs scripts.
-git fetch --quiet origin master || true
-git checkout master >/dev/null 2>&1 || true
-git pull --ff-only origin master >/dev/null 2>&1 || true
+git fetch --quiet origin master
+git checkout master >/dev/null
+git pull --ff-only origin master >/dev/null
 
 if [[ -f "$SECRET_ENV" ]]; then
   set -a
