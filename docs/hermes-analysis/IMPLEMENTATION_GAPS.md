@@ -133,16 +133,16 @@
 
 | Item | Status | Linhas v8 | Ação |
 |---|---|---|---|
-| Declaração de atacantes | ⚠️ Parcial | v9: `declare_attackers_step` | Função formal existe, mas escolha ainda é heurística/automática |
+| Declaração de atacantes | ⚠️ Parcial | v9: `declare_attackers_step`, `apply_basic_attack_requirements` | Função formal existe, com suporte básico a `must_attack*` e `cant_attack_alone`; escolha ainda é heurística/automática |
 | Declaração de bloqueadores | ⚠️ Parcial | 4421-4462 | Bloqueadores calculados, não declarados |
 | Blocked state persistente | ✅ OK | — | Bloqueado permanece mesmo se blocker morre |
 | First/Double strike | ✅ OK | 4576-4580 | |
 | Trample | ⚠️ Parcial | 4567-4568 | Funciona mas sem order formal |
 | Deathtouch | ✅ OK | 4523-4528 | |
 | Lifelink | ✅ OK | 4510-4511 | |
-| Damage assignment multiplayer | ✅ Básico | v9: `assign_attackers_to_defenders`, `multi_defender_attack` | Atacantes podem ser distribuídos entre múltiplos defensores; requirements/restrictions avançadas ainda pendem |
+| Damage assignment multiplayer | ✅ Básico | v9: `assign_attackers_to_defenders`, `multi_defender_attack` | Atacantes podem ser distribuídos entre múltiplos defensores; requirements/restrictions por defensor ainda pendem |
 | End of combat triggers | ✅ Básico | v9: `trigger_end_of_combat` | Permanentes com `trigger=end_of_combat` entram na stack por APNAP e resolvem efeitos genéricos seguros |
-| Requirements/restrictions (must attack, can't attack alone) | ❌ Ausente | — | |
+| Requirements/restrictions (must attack, can't attack alone) | ✅ Básico | v9: `must_attack_if_able`, `cant_attack_alone`, `apply_basic_attack_requirements` | Cobre flags explícitas `must_attack*` e `cant_attack_alone`; custos/requisitos por defensor, "attacks if able" condicionais e escolha interativa seguem fora |
 
 ---
 
@@ -278,7 +278,7 @@ Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md` e
 | Flashback | ✅ Básico | `cast_flashback_spell_from_graveyard`, exile replacement | Custos/restrições específicas por carta |
 | Lander tokens | ✅ Básico | `create_lander_token` | Token variants por carta concreta |
 | Void/Repartee/Opus/Increment/Infusion/Converge | ✅ Telemetria | `modern_ability_word_signals` | Sem enforcement porque ability words não têm efeito próprio |
-| Multiplayer attack distribution | ✅ Básico | `assign_attackers_to_defenders` + `multi_defender_attack` | Requirements/restrictions avançadas |
+| Multiplayer attack distribution | ✅ Básico | `assign_attackers_to_defenders` + `multi_defender_attack` | Requirements/restrictions por defensor e escolha interativa |
 | Hybrid mana em Commander | ✅ Guardado | servidor + v9 preservam identidade combinada | Não flexibilizar; Wizards confirmou que a regra não mudou em 2026-02-09 |
 | No sideboard/outside-game em Commander | ⚠️ Tracked Gap | gap registrado nesta seção | Validar rotas/deck construction se o produto expuser sideboard/wishboard |
 
@@ -296,6 +296,8 @@ Ordem de implementação quando houver corpus concreto:
 3. **Prepare/Omen/Paradigm** — adicionar resolução completa apenas por carta
    usada; manter características/cópia/exile tracking como base genérica.
 4. **Multiplayer combat avançado** — requirements/restrictions por defensor,
-   blockers em APNAP e efeitos que referenciam "defending player".
+   custos para atacar, blockers em APNAP e efeitos que referenciam
+   "defending player". O suporte genérico a `must_attack*` e
+   `cant_attack_alone` já existe como camada básica.
 5. **Ability-word telemetry** — permanecer como sinal semântico; enforcement só
    se o texto da carta tiver regra executável própria.

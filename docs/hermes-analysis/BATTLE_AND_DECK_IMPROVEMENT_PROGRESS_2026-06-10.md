@@ -645,6 +645,19 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     genérico legal.
   - O gap remanescente foi reduzido para restrições arbitrárias/card-specific,
     não para restrições genéricas por categoria de spell.
+- Fechamento local do gap de combat requirements básicos:
+  - `battle_analyst_v9.py` agora separa a seleção de atacantes em
+    `should_attack_with_creature(...)` e `apply_basic_attack_requirements(...)`
+    antes de tapar permanentes.
+  - `must_attack*`/`attacks_each_combat_if_able` permite que criatura de poder
+    0 ataque quando apta, cobrindo o caso básico de "attacks each combat if
+    able" sem tentar resolver todos os requisitos da CR 508.
+  - `cant_attack_alone`/`cannot_attack_alone` impede ataque solitário sem tapar
+    a criatura, mas permite o ataque quando outro atacante também foi escolhido.
+  - `battle_combat_tests.py` cobre os três cenários: must-attack de poder 0,
+    cannot-attack-alone sozinho e cannot-attack-alone acompanhado.
+  - O gap remanescente foi reduzido para custos para atacar, requisitos por
+    defensor, restrições condicionais complexas e escolha interativa.
 
 ## Etapa 4 — Próximas pendências reais
 

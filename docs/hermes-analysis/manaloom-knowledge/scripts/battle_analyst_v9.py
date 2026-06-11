@@ -5920,25 +5920,51 @@ def beginning_of_combat_step(attacker, opponents, all_players, turn, rng, stack)
     run_priority_loop(attacker, all_players, stack, turn, "beginning_of_combat", rng)
 
 
+def must_attack_if_able(creature):
+    return bool(
+        creature.get("must_attack")
+        or creature.get("must_attack_if_able")
+        or creature.get("must_attack_each_combat_if_able")
+        or creature.get("attacks_each_combat_if_able")
+    )
+
+
+def cant_attack_alone(creature):
+    return bool(
+        creature.get("cant_attack_alone")
+        or creature.get("cannot_attack_alone")
+        or creature.get("can't_attack_alone")
+    )
+
+
+def should_attack_with_creature(creature):
+    try:
+        attack_power = int(creature.get("power", 0) or 0)
+    except (TypeError, ValueError):
+        attack_power = 0
+    return attack_power > 0 or creature.get("attack_trigger") or must_attack_if_able(creature)
+
+
+def apply_basic_attack_requirements(candidates):
+    if len(candidates) == 1 and cant_attack_alone(candidates[0]):
+        return []
+    return candidates
+
+
 def declare_attackers_step(attacker, opponents, turn):
     creatures = attacker.untapped_creatures()
     if not creatures:
         return None
 
-    attackers = []
-    for c in creatures:
-        try:
-            attack_power = int(c.get("power", 0) or 0)
-        except (TypeError, ValueError):
-            attack_power = 0
-        if attack_power <= 0 and not c.get("attack_trigger"):
-            continue
-        if not c.get("summoning_sick", False) or has_haste(c):
-            if not has_vigilance(c):
-                c["tapped"] = True
-            attackers.append(c)
+    attackers = apply_basic_attack_requirements(
+        [creature for creature in creatures if should_attack_with_creature(creature)]
+    )
     if not attackers:
         return None
+
+    for creature in attackers:
+        if not has_vigilance(creature):
+            creature["tapped"] = True
 
     alive_defenders = [o for o in opponents if o.is_alive()]
     if not alive_defenders:

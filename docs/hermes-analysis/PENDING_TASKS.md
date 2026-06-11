@@ -20,6 +20,14 @@
 > oficial na CR 107.4 vigente; permanecem pendentes apenas restrições
 > arbitrárias/card-specific e APNAP/pass sequence completa.
 >
+> **Atualização 2026-06-11 — combat requirements básicos.**
+> Fechado o gap ausente de requirements/restrictions simples na declaração de
+> atacantes: `must_attack*` permite atacar mesmo com poder 0 se a criatura
+> estiver apta, e `cant_attack_alone` impede ataque solitário sem tapar o
+> permanente. O modelo continua automático/heurístico; requisitos por defensor,
+> custos para atacar, restrições condicionais complexas e escolha interativa
+> permanecem em `IMPLEMENTATION_GAPS.md`.
+>
 > **Atualização 2026-06-11 — revisão estratégica oficial.**
 > A pesquisa oficial foi rechecada contra Wizards Rules, Commander, Commander
 > Brackets 2026-02-09, Edge of Eternities e Secrets of Strixhaven. O plano de
@@ -330,7 +338,7 @@
 - Evento formal `combat_step` para `end_of_combat`.
 - Eventos legados `combat` e `combat_result` preservados para consumidores atuais.
 
-**Limite restante**: atacantes/bloqueadores ainda são escolhidos por heurística automática; requirements/restrictions avançadas e escolha interativa ficam pendentes para a suite de conformidade e casting pipeline.
+**Limite restante**: atacantes/bloqueadores ainda são escolhidos por heurística automática; requirements/restrictions por defensor, custos para atacar, restrições condicionais complexas e escolha interativa ficam pendentes para a suite de conformidade e casting pipeline.
 
 ---
 
