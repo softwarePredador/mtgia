@@ -75,6 +75,8 @@ Correção versionada:
   quantidade e preservando comandante/tag funcional.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py`
   cobre o caso de duplicata que quebrava a cron.
+- scripts operacionais de optimizer/knowncards foram ajustados para fazer
+  checkout de `master`, evitando executar código antigo da branch de memória.
 
 ## Crons habilitadas
 

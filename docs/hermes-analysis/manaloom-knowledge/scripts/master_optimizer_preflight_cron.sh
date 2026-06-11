@@ -12,11 +12,12 @@ mkdir -p "$REPORT_DIR" "$ARTIFACT_DIR"
 cd "$REPO"
 git config --global --add safe.directory "$REPO" >/dev/null 2>&1 || true
 
-# Keep code fresh when the workspace is clean enough; do not force-reset a dirty
-# Hermes workspace because knowledge.db and cron reports are runtime artifacts.
-git fetch --quiet origin codex/hermes-analysis-docs || true
-git checkout codex/hermes-analysis-docs >/dev/null 2>&1 || true
-git pull --ff-only origin codex/hermes-analysis-docs >/dev/null 2>&1 || true
+# Operational optimizer code must run from canonical master. Memory/report
+# crons may use codex/hermes-analysis-docs, but preflight must not execute stale
+# branch docs scripts.
+git fetch --quiet origin master || true
+git checkout master >/dev/null 2>&1 || true
+git pull --ff-only origin master >/dev/null 2>&1 || true
 
 if [[ -f "$SECRET_ENV" ]]; then
   set -a
@@ -36,6 +37,12 @@ python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
   --limit "${MANALOOM_META_DECK_SYNC_LIMIT:-120}" \
   --min-cards "${MANALOOM_META_DECK_SYNC_MIN_CARDS:-80}" \
   --apply | tee "$meta_decks_log"
+
+target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
+python3 "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
+  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+  --target-deck-id "${MANALOOM_OPTIMIZER_DECK_ID:-6}" \
+  --apply | tee "$target_deck_log"
 
 sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
@@ -65,6 +72,7 @@ fi
 
 echo "master_optimizer_preflight=ok"
 echo "meta_decks_log=$meta_decks_log"
+echo "target_deck_log=$target_deck_log"
 echo "sync_report=$sync_report"
 echo "battle_rules_pg_report=$battle_rules_pg_report"
 echo "battle_rules_report=$battle_rules_report"

@@ -115,7 +115,14 @@ Correções:
 - ownership de `/opt/data/workspace/mtgia`, `/opt/data/cron`,
   `/opt/data/artifacts` e `/opt/data/scripts` restaurado para `hermes:hermes`;
 - sync do target deck ajustado no repo para agregar duplicatas antes do insert.
+- crons operacionais versionadas (`preflight`, `knowncards`, `slot-scan`,
+  `auto-cycle`) ajustadas para executar código de `master`, não da branch
+  `codex/hermes-analysis-docs`.
 
 Regra operacional nova: pulls do checkout Hermes devem ser feitos como usuário
 `hermes`, ou então seguidos de `chown -R hermes:hermes` nos caminhos acima. Isso
 evita que as crons voltem a falhar por banco SQLite readonly.
+
+Regra de branch nova: scripts operacionais que executam optimizer/sync devem
+fazer checkout de `master`; apenas crons de memória, documentação e report-only
+podem trabalhar em `codex/hermes-analysis-docs`.
