@@ -77,14 +77,16 @@ def main():
     """)
     events = cur.fetchall()
 
+    sqlite = sqlite3.connect(SQLITE_DB)
+    _ensure_tables(sqlite)
+
     if not events:
         print("Nenhum evento novo.")
+        sqlite.commit()
+        sqlite.close()
         cur.close()
         conn.close()
         return 0
-
-    sqlite = sqlite3.connect(SQLITE_DB)
-    _ensure_tables(sqlite)
 
     imported = 0
     for ev in events:
