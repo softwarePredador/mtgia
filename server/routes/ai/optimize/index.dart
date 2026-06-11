@@ -22,6 +22,8 @@ import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
+import '../../../lib/ai/optimize_route_quality_rejection_support.dart'
+    as optimize_route_quality_rejection;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
@@ -2075,24 +2077,17 @@ Future<Response> onRequest(RequestContext context) async {
 
               return respondWithOptimizeTelemetry(
                 statusCode: HttpStatus.unprocessableEntity,
-                body: {
-                  'error':
-                      'Nenhuma troca segura restou apos o gate de qualidade da otimizacao.',
-                  'quality_error': {
-                    'code': 'OPTIMIZE_NO_SAFE_SWAPS',
-                    'message':
-                        'As trocas sugeridas pioravam funcao, curva ou consistencia do deck.',
-                    'dropped_swaps': qualityGateWarnings,
-                  },
-                  'mode': 'optimize',
-                  'optimize_intensity': intensity.toJson(
+                body: optimize_route_quality_rejection
+                    .buildNoSafeSwapsRejectedBody(
+                  optimizeIntensity: intensity.toJson(
                     candidateSwaps: deterministicSwapCandidates.length,
                     returnedSwaps: 0,
                     qualityGateDropped: qualityGateDroppedCount,
                   ),
-                  'removals': validRemovals,
-                  'additions': validAdditions,
-                },
+                  droppedSwaps: qualityGateWarnings,
+                  removals: validRemovals,
+                  additions: validAdditions,
+                ),
                 removalsOverride: validRemovals,
                 additionsOverride: validAdditions,
                 validationWarningsOverride: qualityGateWarnings,
@@ -2321,23 +2316,15 @@ Future<Response> onRequest(RequestContext context) async {
 
           return respondWithOptimizeTelemetry(
             statusCode: HttpStatus.unprocessableEntity,
-            body: {
-              'error':
-                  'A otimizacao sugerida nao passou no gate final de qualidade.',
-              'quality_error': {
-                'code': 'OPTIMIZE_QUALITY_REJECTED',
-                'message':
-                    'As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.',
-                'reasons': effectiveRejectionReasons,
-                'validation': optimizationValidationReport.toJson(),
-              },
-              'mode': 'optimize',
-              'removals': validRemovals,
-              'additions': validAdditions,
-              'deck_analysis': deckAnalysis,
-              'post_analysis': postAnalysis,
-              'validation_warnings': validationWarnings,
-            },
+            body: optimize_route_quality_rejection.buildQualityRejectedBody(
+              reasons: effectiveRejectionReasons,
+              validation: optimizationValidationReport.toJson(),
+              removals: validRemovals,
+              additions: validAdditions,
+              deckAnalysis: deckAnalysis,
+              postAnalysis: postAnalysis,
+              validationWarnings: validationWarnings,
+            ),
             postAnalysisOverride: postAnalysis,
             validationReport: optimizationValidationReport,
             removalsOverride: validRemovals,
@@ -2382,23 +2369,15 @@ Future<Response> onRequest(RequestContext context) async {
 
           return respondWithOptimizeTelemetry(
             statusCode: HttpStatus.unprocessableEntity,
-            body: {
-              'error':
-                  'A otimizacao sugerida nao passou no gate final de qualidade.',
-              'quality_error': {
-                'code': 'OPTIMIZE_QUALITY_REJECTED',
-                'message':
-                    'As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.',
-                'reasons': serializedValidationReasons,
-                'validation': responseValidationJson,
-              },
-              'mode': 'optimize',
-              'removals': validRemovals,
-              'additions': validAdditions,
-              'deck_analysis': deckAnalysis,
-              'post_analysis': postAnalysis,
-              'validation_warnings': validationWarnings,
-            },
+            body: optimize_route_quality_rejection.buildQualityRejectedBody(
+              reasons: serializedValidationReasons,
+              validation: responseValidationJson,
+              removals: validRemovals,
+              additions: validAdditions,
+              deckAnalysis: deckAnalysis,
+              postAnalysis: postAnalysis,
+              validationWarnings: validationWarnings,
+            ),
             postAnalysisOverride: postAnalysis,
             validationReport: optimizationValidationReport,
             removalsOverride: validRemovals,

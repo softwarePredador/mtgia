@@ -213,7 +213,7 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` | 201 | ✅ Extraído | Mantém registry base de conformidade e regressões transversais de blocked/APNAP/prevention isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` | 228 | ✅ Extraído | Mantém regressões de replay events, fim de combate, APNAP/timestamp e spell-cast trigger isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` | 198 | ✅ Extraído | Mantém regressões auxiliares de loss taxonomy, token/land recursion, proteção de jogador e auditoria isoladas |
-| `server/routes/ai/optimize/index.dart` | 2752 | ⚠️ Split iniciado | Response/cache, envelope async, request parsing, payload final, warnings finais, diagnostics finais e fallback vazio foram movidos; manter rota como orquestração fina e mover retry/quality gate para support services |
+| `server/routes/ai/optimize/index.dart` | 2731 | ⚠️ Split iniciado | Response/cache, envelope async, request parsing, payload final, warnings finais, diagnostics finais, fallback vazio e payloads de rejeição foram movidos; manter rota como orquestração fina e mover retry orchestration/validação pós-processamento para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2386 | ⚠️ Split iniciado | Cache e quality ranking foram movidos para support dedicado; ainda falta extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimize_candidate_quality_support.dart` | 327 | ✅ Extraído | Centraliza sinais de qualidade agressiva, ranking, buckets de rejeição e loader SQL com export compatível no runtime |
@@ -224,6 +224,7 @@
 | `server/lib/ai/optimize_route_warnings_support.dart` | 61 | ✅ Extraído | Centraliza montagem de warnings finais de optimize: cartas inválidas, identidade de cor, bracket, tema e fallback vazio |
 | `server/lib/ai/optimize_route_diagnostics_support.dart` | 37 | ✅ Extraído | Centraliza `optimize_diagnostics` de fallback vazio e merge incremental de diagnostics sem sobrescrita |
 | `server/lib/ai/optimize_route_empty_fallback_support.dart` | 103 | ✅ Extraído | Centraliza seleção de candidatas de remoção, aplicação de swaps e razões do fallback de sugestões vazias |
+| `server/lib/ai/optimize_route_quality_rejection_support.dart` | 48 | ✅ Extraído | Centraliza payloads de rejeição `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED` |
 | `server/lib/commander_eligibility.dart` | 23 | ✅ Extraído | Centraliza elegibilidade Commander 2026 para DeckRulesService e rotas incrementais |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
 | `server/lib/ai/optimization_functional_roles.dart` | 768 | Aceitável por enquanto | Manter coeso; split só se crescer com novas políticas |

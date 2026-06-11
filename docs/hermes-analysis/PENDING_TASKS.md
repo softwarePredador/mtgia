@@ -100,6 +100,9 @@
 > Nono split de optimize concluído: fallback de sugestões vazias foi movido
 > para `optimize_route_empty_fallback_support.dart`, preservando seleção de
 > candidatas, aplicação de swaps e razões de falha.
+> Décimo split de optimize concluído: payloads de rejeição do quality gate
+> foram movidos para `optimize_route_quality_rejection_support.dart`,
+> preservando `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED`.
 
 ---
 
@@ -166,7 +169,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_empty_fallback_support.dart` verde |
+| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_quality_rejection_support.dart` verde |
 
 ---
 
@@ -433,6 +436,8 @@
 | `optimize_route_diagnostics_support_test.dart` | Cobertura direta do contrato de `optimize_diagnostics` e merge incremental | 88 |
 | `optimize_route_empty_fallback_support.dart` | Seleção de candidatas, aplicação de swaps e razões do fallback de sugestões vazias | 103 |
 | `optimize_route_empty_fallback_support_test.dart` | Cobertura direta do fallback vazio sem depender de banco/OpenAI | 108 |
+| `optimize_route_quality_rejection_support.dart` | Payloads de rejeição do quality gate para no-safe-swaps e quality rejected | 48 |
+| `optimize_route_quality_rejection_support_test.dart` | Cobertura direta dos contratos `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED` | 65 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
