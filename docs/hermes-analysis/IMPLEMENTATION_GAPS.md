@@ -213,13 +213,14 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` | 201 | ✅ Extraído | Mantém registry base de conformidade e regressões transversais de blocked/APNAP/prevention isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` | 228 | ✅ Extraído | Mantém regressões de replay events, fim de combate, APNAP/timestamp e spell-cast trigger isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` | 198 | ✅ Extraído | Mantém regressões auxiliares de loss taxonomy, token/land recursion, proteção de jogador e auditoria isoladas |
-| `server/routes/ai/optimize/index.dart` | 2981 | ⚠️ Split iniciado | Response/cache/diagnostics, envelope async e request parsing foram movidos; manter rota como orquestração fina e mover payload final para support services |
+| `server/routes/ai/optimize/index.dart` | 2822 | ⚠️ Split iniciado | Response/cache/diagnostics, envelope async, request parsing e payload final foram movidos; manter rota como orquestração fina e mover warnings/fallback para support services |
 | `server/lib/ai/optimize_runtime_support.dart` | 2386 | ⚠️ Split iniciado | Cache e quality ranking foram movidos para support dedicado; ainda falta extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimize_candidate_quality_support.dart` | 327 | ✅ Extraído | Centraliza sinais de qualidade agressiva, ranking, buckets de rejeição e loader SQL com export compatível no runtime |
 | `server/lib/ai/optimize_route_response_support.dart` | 136 | ✅ Extraído | Centraliza contagem de swaps, resposta cacheada, diagnostics agressivos e payload `rebuild_guided` |
 | `server/lib/ai/optimize_route_async_support.dart` | 179 | ✅ Extraído | Centraliza criação de job, fire-and-forget e payloads `202 Accepted` de optimize/complete async |
 | `server/lib/ai/optimize_route_request_support.dart` | 65 | ✅ Extraído | Centraliza parsing inicial de request, defaults, overrides e tri-state de async |
+| `server/lib/ai/optimize_route_payload_support.dart` | 186 | ✅ Extraído | Centraliza balanceamento/filtro final de sugestões e mantém `recommendations` alinhado ao payload final |
 | `server/lib/commander_eligibility.dart` | 23 | ✅ Extraído | Centraliza elegibilidade Commander 2026 para DeckRulesService e rotas incrementais |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
 | `server/lib/ai/optimization_functional_roles.dart` | 768 | Aceitável por enquanto | Manter coeso; split só se crescer com novas políticas |

@@ -88,6 +88,9 @@
 > Quinto split de optimize concluído: parsing inicial do request foi movido para
 > `optimize_route_request_support.dart`, preservando defaults e quirks legados
 > com teste unitário.
+> Sexto split de optimize concluído: balanceamento/filtro final de sugestões
+> foi movido para `optimize_route_payload_support.dart`, corrigindo
+> `recommendations` stale após truncamento, safety net ou remoção de duplicatas.
 
 ---
 
@@ -154,7 +157,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_request_support.dart` verde |
+| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_payload_support.dart` verde |
 
 ---
 
