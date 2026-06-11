@@ -520,6 +520,31 @@ CREATE INDEX IF NOT EXISTS idx_ai_logs_endpoint ON ai_logs (endpoint);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_created ON ai_logs (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_success ON ai_logs (success);
 
+-- 14.0.1 Feedback do pipeline ML/prompt de optimize
+-- Recebe feedback automático de qualidade das respostas de /ai/optimize.
+CREATE TABLE IF NOT EXISTS ml_prompt_feedback (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    archetype TEXT NOT NULL,
+    commander_name TEXT,
+    cards_accepted TEXT[] NOT NULL DEFAULT '{}',
+    cards_rejected TEXT[] NOT NULL DEFAULT '{}',
+    effectiveness_score INTEGER,
+    user_comment TEXT,
+    prompt_version TEXT NOT NULL DEFAULT 'v1.1-hybrid',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_ml_prompt_feedback_effectiveness_score
+        CHECK (effectiveness_score IS NULL OR (effectiveness_score >= 1 AND effectiveness_score <= 10))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_deck_created
+    ON ml_prompt_feedback (deck_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_user_created
+    ON ml_prompt_feedback (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_archetype_created
+    ON ml_prompt_feedback (LOWER(archetype), created_at DESC);
+
 -- 14.1 Telemetria de fallback do /ai/optimize (persistente)
 -- Registra eficácia do fallback de sugestões vazias para análise histórica.
 CREATE TABLE IF NOT EXISTS ai_optimize_fallback_telemetry (

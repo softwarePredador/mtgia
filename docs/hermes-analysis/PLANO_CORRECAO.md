@@ -48,7 +48,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    Reference dos riscos reais. `edh_bracket_policy.dart` continua excecao
    intencional por regra externa/curadoria de bracket, mas precisa manter
    fonte/versionamento/teste dedicado.
-7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e`. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador operacional em `/ai/ml-status`. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
+7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e` e atualizado em 2026-06-11. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` deixou de ser "helper sem chamador": `/ai/optimize` agora registra feedback automático via `optimize_feedback.recordOptimizeMlFeedback(...)`, com schema declarado em `database_setup.sql`/`verify_schema.dart` e contador em `/ai/ml-status`. O risco restante é usar esse histórico para seleção/score de prompts, não coletá-lo. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.
    `LifeCounterScreen` segue
@@ -693,8 +693,9 @@ app-side novo sem chamada.
   codigo e somente `commander_reference_decks`, `deck_matchups` e
   `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards`
   foi mantida como achado manual por ser raw corpus apagado/reinserido sem
-  leitura de produto confirmada. `ml_prompt_feedback`
-  tem apenas leitura de `COUNT(*)` operacional. `battle_simulations`,
+  leitura de produto confirmada. `ml_prompt_feedback` agora tem writer runtime
+  em `/ai/optimize`, schema verificado e leitura de `COUNT(*)` operacional.
+  `battle_simulations`,
   `format_staples`, `archetype_counters`, `archetype_patterns`,
   `synergy_packages`, `activation_funnel_events` e `ai_user_preferences` foram
   separados como controles positivos por terem leitores runtime ou runners
@@ -709,14 +710,12 @@ app-side novo sem chamada.
     `server/routes/ai/weakness-analysis/index.dart:374`, mas nao ha leitura em
     `app/lib`, `server/bin`, `server/lib` ou `server/routes`; o campo
     `addressed` tambem nao tem fluxo de update confirmado.
-  - `ml_prompt_feedback` é definida em
-    `server/bin/migrate_ml_knowledge.dart:159`, mas o unico insert fica no
-    helper `MLKnowledgeService.recordFeedback`
-    (`server/lib/ml_knowledge_service.dart:251`, SQL em `:264`), sem chamador
-    encontrado por busca focada de `recordFeedback(` em
-    `server/lib`, `server/routes`, `server/bin`, `server/test` ou `app/lib`;
-    `/ai/ml-status` apenas conta rows em
-    `server/routes/ai/ml-status/index.dart:98`.
+  - `ml_prompt_feedback` é definida em `server/database_setup.sql` e
+    `server/bin/verify_schema.dart`, recebe insert via
+    `MLKnowledgeService.recordFeedback` e tem chamador runtime em
+    `server/routes/ai/optimize/index.dart` por meio de
+    `server/lib/ai/optimize_feedback_support.dart`; `/ai/ml-status` conta rows
+    e exige a tabela no check de schema ML.
   - `commander_reference_decks` e `commander_reference_deck_cards` sao definidas
     em `server/lib/ai/commander_reference_deck_corpus_support.dart:1177` e
     `:1200`, recebem insert/delete/insert em `:1245`, `:1329` e `:1345`, mas
@@ -728,8 +727,8 @@ app-side novo sem chamada.
 - **Ação recomendada**:
   1. escolher entre manter como log bruto com retencao documentada, criar
      consumidor real ou remover a persistencia dessas rotas experimentais;
-  2. ligar `ml_prompt_feedback` a um fluxo real de feedback ou remover o helper
-     ate haver coleta ativa;
+  2. usar o histórico de `ml_prompt_feedback` em métrica/seleção de prompt
+     quando houver volume suficiente; a coleta ativa já existe;
   3. documentar as tabelas raw do Commander Reference Corpus como lineage/audit,
      com retencao e job de reprocessamento, ou persistir apenas o agregado
      consumido;

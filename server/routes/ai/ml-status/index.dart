@@ -4,10 +4,10 @@ import '../../../lib/database.dart';
 import '../../../lib/http_responses.dart';
 
 /// GET /ai/ml-status
-/// 
+///
 /// Retorna o status do sistema de Machine Learning (Imitation Learning),
 /// incluindo estatísticas das tabelas de conhecimento e métricas de performance.
-/// 
+///
 /// Response:
 /// {
 ///   "status": "active",
@@ -37,24 +37,25 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     // Verificar se as tabelas existem
     final tablesExist = await _checkTablesExist(conn);
-    
+
     if (!tablesExist) {
       return Response.json(body: {
         'status': 'not_initialized',
-        'message': 'ML tables not found. Run: dart run bin/migrate_ml_knowledge.dart',
+        'message':
+            'ML tables not found. Apply server/database_setup.sql or the active DB migration pipeline.',
         'setup_required': true,
       });
     }
 
     // Buscar estatísticas das tabelas de conhecimento
     final stats = await _getKnowledgeStats(conn);
-    
+
     // Buscar estado do modelo
     final modelState = await _getModelState(conn);
-    
+
     // Buscar métricas de performance
     final performance = await _getPerformanceMetrics(conn);
-    
+
     return Response.json(body: {
       'status': stats['total_knowledge'] > 0 ? 'active' : 'empty',
       'model_version': modelState['model_version'] ?? 'unknown',
@@ -63,11 +64,10 @@ Future<Response> onRequest(RequestContext context) async {
       'last_extraction': modelState['last_updated_at'],
       'extraction_stats': modelState['extraction_stats'],
     });
-
   } catch (e) {
     return internalServerError('Failed to load ML status', details: e);
   }
-  // Note: Do not close the connection - Database is a singleton and the pool 
+  // Note: Do not close the connection - Database is a singleton and the pool
   // should remain open for other requests
 }
 
@@ -75,10 +75,16 @@ Future<bool> _checkTablesExist(dynamic conn) async {
   try {
     final result = await conn.execute('''
       SELECT COUNT(*)::int as count FROM information_schema.tables 
-      WHERE table_name IN ('card_meta_insights', 'synergy_packages', 'archetype_patterns', 'ml_learning_state')
+      WHERE table_name IN (
+        'card_meta_insights',
+        'synergy_packages',
+        'archetype_patterns',
+        'ml_learning_state',
+        'ml_prompt_feedback'
+      )
     ''');
     final count = result.first.toColumnMap()['count'];
-    return (count is int ? count : int.tryParse(count.toString()) ?? 0) >= 4;
+    return (count is int ? count : int.tryParse(count.toString()) ?? 0) >= 5;
   } catch (e) {
     print('[ML-Status] Error checking tables: $e');
     return false;
@@ -92,18 +98,23 @@ int _toInt(dynamic value) {
 }
 
 Future<Map<String, dynamic>> _getKnowledgeStats(dynamic conn) async {
-  final cardInsights = await conn.execute('SELECT COUNT(*)::int as c FROM card_meta_insights');
-  final synergies = await conn.execute('SELECT COUNT(*)::int as c FROM synergy_packages');
-  final patterns = await conn.execute('SELECT COUNT(*)::int as c FROM archetype_patterns');
-  final feedback = await conn.execute('SELECT COUNT(*)::int as c FROM ml_prompt_feedback');
-  final metaDecks = await conn.execute('SELECT COUNT(*)::int as c FROM meta_decks');
-  
+  final cardInsights =
+      await conn.execute('SELECT COUNT(*)::int as c FROM card_meta_insights');
+  final synergies =
+      await conn.execute('SELECT COUNT(*)::int as c FROM synergy_packages');
+  final patterns =
+      await conn.execute('SELECT COUNT(*)::int as c FROM archetype_patterns');
+  final feedback =
+      await conn.execute('SELECT COUNT(*)::int as c FROM ml_prompt_feedback');
+  final metaDecks =
+      await conn.execute('SELECT COUNT(*)::int as c FROM meta_decks');
+
   final cardCount = _toInt(cardInsights.first.toColumnMap()['c']);
   final synergyCount = _toInt(synergies.first.toColumnMap()['c']);
   final patternCount = _toInt(patterns.first.toColumnMap()['c']);
   final feedbackCount = _toInt(feedback.first.toColumnMap()['c']);
   final metaDeckCount = _toInt(metaDecks.first.toColumnMap()['c']);
-  
+
   return {
     'card_insights': cardCount,
     'synergy_packages': synergyCount,
@@ -123,23 +134,23 @@ Future<Map<String, dynamic>> _getModelState(dynamic conn) async {
       ORDER BY last_updated_at DESC
       LIMIT 1
     ''');
-    
+
     if (result.isEmpty) {
       return {'model_version': 'not_configured'};
     }
-    
+
     final row = result.first.toColumnMap();
     Map<String, dynamic>? extractionStats;
-    
+
     if (row['active_rules'] != null) {
       try {
-        final rules = row['active_rules'] is String 
-            ? jsonDecode(row['active_rules']) 
+        final rules = row['active_rules'] is String
+            ? jsonDecode(row['active_rules'])
             : row['active_rules'];
         extractionStats = rules['extraction_stats'] as Map<String, dynamic>?;
       } catch (_) {}
     }
-    
+
     return {
       'model_version': row['model_version']?.toString(),
       'last_updated_at': row['last_updated_at']?.toString(),
@@ -160,16 +171,18 @@ Future<Map<String, dynamic>> _getPerformanceMetrics(dynamic conn) async {
       FROM optimization_analysis_logs
       WHERE test_timestamp > NOW() - INTERVAL '30 days'
     ''');
-    
+
     if (result.isEmpty) {
       return {'total_optimizations': 0, 'avg_effectiveness_score': null};
     }
-    
+
     final row = result.first.toColumnMap();
     return {
       'total_optimizations': _toInt(row['total_optimizations']),
-      'avg_effectiveness_score': row['avg_effectiveness'] != null 
-          ? (row['avg_effectiveness'] is num ? (row['avg_effectiveness'] as num).toDouble() : double.tryParse(row['avg_effectiveness'].toString()))
+      'avg_effectiveness_score': row['avg_effectiveness'] != null
+          ? (row['avg_effectiveness'] is num
+              ? (row['avg_effectiveness'] as num).toDouble()
+              : double.tryParse(row['avg_effectiveness'].toString()))
           : null,
     };
   } catch (e) {

@@ -10,6 +10,16 @@
 > aliases restantes preservam API interna sem manter lista divergente. Nao abrir
 > nova tarefa para `_isBasicLandName` sem revalidar contra o codigo atual.
 
+> Atualizacao Codex 2026-06-11: achados abaixo que dizem que
+> `MLKnowledgeService.recordFeedback` ou `ml_prompt_feedback` nao possuem
+> chamador runtime tambem sao historicos. O status vivo e resolvido para coleta:
+> `/ai/optimize` chama `optimize_feedback.recordOptimizeMlFeedback(...)`, a
+> tabela foi declarada em `server/database_setup.sql` e
+> `server/bin/verify_schema.dart`, e `/ai/ml-status` exige/conta a tabela. O
+> risco restante e usar esse historico para selecao de prompts, nao alimenta-lo.
+> Referencias antigas a `server/bin/migrate_ml_knowledge.dart` tambem precisam
+> ser revalidadas, pois esse arquivo nao existe no checkout vivo atual.
+
 > Atualizacao local Codex: 2026-06-07 19:00 UTC
 > Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`

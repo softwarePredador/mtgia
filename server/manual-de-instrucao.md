@@ -18042,7 +18042,9 @@ que o endpoint entrega quando a Semantic Layer v2 bloqueia uma perda crítica.
 Três tabelas operam como audit logs (escritas, nunca lidas pelo runtime). Política:
 - `deck_matchups` — resultados de `POST /ai/simulate-matchup`. Uso futuro: cache de matchup.
 - `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`. Uso futuro: histórico.
-- `ml_prompt_feedback` — helper em `ml_knowledge_service.dart`, sem chamador runtime.
+- `ml_prompt_feedback` — alimentada por `/ai/optimize` via
+  `optimize_feedback.recordOptimizeMlFeedback(...)`; segue como histórico
+  operacional para futura métrica/seleção de prompts.
 
 Retenção recomendada: DELETE > 90 dias para evitar acúmulo sem consumidor.
 

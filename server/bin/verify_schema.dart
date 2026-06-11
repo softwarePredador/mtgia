@@ -151,6 +151,19 @@ void main() async {
         'addressed',
         'created_at'
       ],
+      'ml_prompt_feedback': [
+        'id',
+        'deck_id',
+        'user_id',
+        'archetype',
+        'commander_name',
+        'cards_accepted',
+        'cards_rejected',
+        'effectiveness_score',
+        'user_comment',
+        'prompt_version',
+        'created_at'
+      ],
       'ai_optimize_fallback_telemetry': [
         'id',
         'user_id',

@@ -271,8 +271,10 @@ mantidos como texto solto.
   `buildLoreholdReferenceCardStatsFromProfile`,
   `extractMtgTop8FormatCodeFromSourceUrl`,
   `buildCandidateQualitySamplePoolSql`,
-  `summarizeAggressiveOptimizeUtilitySamples` e
-  `MLKnowledgeService.recordFeedback`. Novo achado app-side:
+  `summarizeAggressiveOptimizeUtilitySamples`. `MLKnowledgeService.recordFeedback`
+  deixou de ser achado nessa categoria em 2026-06-11 porque `/ai/optimize`
+  passou a chamar `optimize_feedback.recordOptimizeMlFeedback(...)` dentro de
+  `respondWithOptimizeTelemetry`. Novo achado app-side:
   `ApiClient.loadTokenFromDisk()` diz ser chamado 1x no boot, mas `rg`
   encontrou somente a definicao; o boot real le `auth_token` via
   `AuthProvider.initialize` e chama `ApiClient.setToken`. A API manual/custom
@@ -284,8 +286,10 @@ mantidos como texto solto.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-07 15:00 UTC no checkout local `52f6084e`. `deck_matchups` e
   `deck_weakness_reports` continuam write-only no produto atual;
-  `ml_prompt_feedback` tem helper de insert sem chamador e apenas contador em
-  `/ai/ml-status`; `commander_reference_decks` e
+  `ml_prompt_feedback` agora tem writer runtime em `/ai/optimize`, schema em
+  `database_setup.sql`/`verify_schema.dart` e contador operacional em
+  `/ai/ml-status`; o risco restante é consumir esse histórico para seleção de
+  prompt, não coletá-lo. `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   runtime confirmado, enquanto o produto le o agregado
   `commander_reference_deck_analysis`. A varredura focada de DDL versus

@@ -639,37 +639,33 @@ cd server && dart test test/basic_land_utils_test.dart test/mtg_rules_validation
 
 ---
 
-### [P2] Conectar `MLKnowledgeService.recordFeedback` a um fluxo runtime — tabela `ml_prompt_feedback` existe mas nunca é alimentada, impedindo ciclo de aprendizado com qualidade de prompts
+### [P2] ✅ Resolvido 2026-06-11: conectar `MLKnowledgeService.recordFeedback` a fluxo runtime de optimize — `ml_prompt_feedback` passa a ser alimentada automaticamente
 
-**Conhecimento MTG:** O optimize pipeline gera prompts para IA que sugerem swaps de cartas. A qualidade desses prompts afeta diretamente a qualidade das recomendações. Sem um ciclo de feedback, o sistema não sabe se prompts anteriores produziram boas ou más recomendações — e não pode melhorar. O Domain Skill documenta que "o optimize pipeline não aprende com o uso real" (Gap 8).
+**Conhecimento MTG:** O optimize pipeline gera prompts para IA que sugerem swaps de cartas. A qualidade desses prompts afeta diretamente a qualidade das recomendações. Sem um ciclo de feedback, o sistema não sabe se prompts anteriores produziram boas ou más recomendações — e não pode melhorar.
 
-**Evidencia no código:**
-- `server/lib/ml_knowledge_service.dart:251-264` — `recordFeedback()` método que insere em `ml_prompt_feedback` com campos: `prompt_id`, `rating`, `comment`, `user_id`. Totalmente implementado mas sem caller.
-- `rg "recordFeedback\(" server/lib/ server/routes/ server/bin/` → **ZERO chamadas** fora da definição.
-- `rg "ml_prompt_feedback" server/lib/ server/routes/` → Apenas a definição da tabela (schema SQL) e o INSERT dentro de `recordFeedback`. Nenhum SELECT.
-- `server/routes/ai/optimize/index.dart` — A rota de optimize chama `MLKnowledgeService` para contexto (`getMLContext`) mas NUNCA chama `recordFeedback` após receber a resposta da IA.
+**Evidência atual no código:**
+- `server/routes/ai/optimize/index.dart` chama `optimize_feedback.recordOptimizeMlFeedback(...)` dentro de `respondWithOptimizeTelemetry`, após montar telemetry/log de análise.
+- `server/lib/ai/optimize_feedback_support.dart` converte resultado do optimize em feedback automático: cartas aceitas, cartas rejeitadas, score 1-5 e comentário sanitizado.
+- `server/lib/ml_knowledge_service.dart` segue como writer canônico em `recordFeedback(...)`.
+- `server/database_setup.sql` declara `ml_prompt_feedback` e índices operacionais.
+- `server/bin/verify_schema.dart` inclui `ml_prompt_feedback` no schema esperado.
+- `server/routes/ai/ml-status/index.dart` trata `ml_prompt_feedback` como tabela obrigatória do schema ML antes de contar registros.
 
-**Gap:** O feedback loop de qualidade de prompts está completamente quebrado. A tabela `ml_prompt_feedback` tem schema, tem método de escrita, mas não tem caller. Nenhum fluxo (app, rota, cron) registra se um prompt de optimize produziu boas recomendações. O sistema não pode aprender quais tipos de prompt funcionam melhor para diferentes comandantes/arquetipos.
+**Status:** Resolvido para coleta automática server-side. O gap original "helper sem chamador" não é mais válido.
 
-**Impacto:** `P2` — O optimize pipeline nunca melhora a qualidade dos prompts porque não coleta feedback. Sem dados em `ml_prompt_feedback`, qualquer futuro sistema de "prompt quality scoring" ou "prompt selection" não tem dados para treinar. A funcionalidade de `MLKnowledgeService.getPromptQualityMetrics` (se existir) operaria sobre tabela vazia.
+**Impacto:** A partir de cada resposta de `/ai/optimize`, o backend passa a registrar feedback mínimo sobre sucesso, rejeição de qualidade, blockers de identidade/bracket e warnings. Isso cria base histórica para ranking futuro de templates/prompts por comandante/arquetipo.
 
-**Risco:** P2 — Sem feedback, o sistema não aprende. As mesmas estratégias de prompt (boas ou ruins) são repetidas indefinidamente. Afeta a qualidade de longo prazo das recomendações de swap.
+**Risco restante:** Ainda não há endpoint manual de feedback do usuário nem seleção ativa de prompt baseada em métricas históricas. Isso fica como evolução futura; não deve ser reaberto como "tabela sem writer".
 
-**Ação recomendada:**
-1. Adicionar chamada a `recordFeedback` no endpoint de optimize após processar a resposta da IA:
-   - Capturar o `prompt_id` usado (ou gerar um hash do prompt)
-   - Se a IA retornou swaps válidos → `rating >= 3`
-   - Se a IA retornou erro/alucinação → `rating <= 2`
-2. Adicionar endpoint `POST /api/optimize/feedback` para o app Flutter reportar feedback do usuário sobre recomendações (rating manual)
-3. Criar `getPromptQualityMetrics()` em `MLKnowledgeService` que agrega ratings por tipo de prompt/comandante para uso futuro
-4. (Futuro) Usar métricas de qualidade para selecionar templates de prompt que historicamente produziram melhores resultados
+**Ação futura recomendada:**
+1. Adicionar feedback manual do usuário após aplicar/recusar sugestões.
+2. Criar agregação de qualidade por commander/archetype/prompt_version.
+3. Usar métricas históricas apenas como sinal de ranking, não como gate duro.
 
 **Validação:**
 ```bash
-cd server && dart analyze lib/ml_knowledge_service.dart
-cd server && dart test test/ml_knowledge_service_test.dart
-# Verificar que ml_prompt_feedback tem rows após optimize:
-psql -h 143.198.230.247 -p 5433 -U postgres -d halder -c "SELECT COUNT(*) FROM ml_prompt_feedback"
+cd server && dart analyze lib/ai/optimize_feedback_support.dart lib/ml_knowledge_service.dart routes/ai/optimize/index.dart routes/ai/ml-status/index.dart bin/verify_schema.dart test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart
+cd server && dart test test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart --reporter compact
 ```
 
 ---
@@ -748,7 +744,7 @@ rg "deck_weakness_reports" server/lib/ server/routes/ --count
 |:-:|:----------|:-----|:-------|
 | 1 | P1 | Unificar heurísticas `_looksLike{Wincon,Engine,ComboPiece,Payoff,Enabler}` entre `functional_card_tags.dart` e `optimization_functional_roles.dart` | STRUCTURE_AUDIT 2026-06-05 (divergent heuristic implementations) |
 | 2 | P2 | ✅ Resolvido 2026-06-11: centralizar `_isBasicLandName` em utilitário único com normalização canônica | STRUCTURE_AUDIT 2026-06-05 (4 conflicting implementations) |
-| 3 | P2 | Conectar `MLKnowledgeService.recordFeedback` a fluxo runtime — tabela `ml_prompt_feedback` nunca alimentada | STRUCTURE_AUDIT 2026-06-05 (functions not called: recordFeedback) |
+| 3 | P2 | ✅ Resolvido 2026-06-11: `MLKnowledgeService.recordFeedback` conectado ao fluxo runtime de `/ai/optimize`; `ml_prompt_feedback` declarada no schema e verificador | STRUCTURE_AUDIT 2026-06-05 (functions not called: recordFeedback) |
 | 4 | P2 | Expandir `_run_validation.py` para buscar profiles batch_c | Commander Knowledge Skill (Mana Base Validator Exec #2 limitations) |
 | 5 | P3 | Adicionar consumidor de leitura para `deck_weakness_reports` — tabela write-only | STRUCTURE_AUDIT 2026-05-28 (postgresql-tables-not-used) |
 

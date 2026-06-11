@@ -33,6 +33,7 @@ import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
+import '../../../lib/ai/optimize_feedback_support.dart' as optimize_feedback;
 import '../../../lib/ai/optimize_route_final_gate_support.dart'
     as optimize_route_final_gate;
 import '../../../lib/ai/optimize_route_quality_rejection_support.dart'
@@ -747,6 +748,21 @@ Future<Response> onRequest(RequestContext context) async {
       );
       responseBody['timings'] ??= telemetry.snapshot();
       responseBody['stage_telemetry'] ??= responseBody['timings'];
+      final resolvedRemovals = removalsOverride ??
+          ((responseBody['removals'] as List?)?.map((e) => '$e').toList() ??
+              const <String>[]);
+      final resolvedAdditions = additionsOverride ??
+          ((responseBody['additions'] as List?)?.map((e) => '$e').toList() ??
+              const <String>[]);
+      final resolvedQualityError = responseBody['quality_error'] is Map
+          ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
+          : null;
+      final resolvedValidationWarnings = validationWarningsOverride.isNotEmpty
+          ? validationWarningsOverride
+          : ((responseBody['validation_warnings'] as List?)
+                  ?.map((e) => '$e')
+                  .toList() ??
+              const <String>[]);
 
       // Integridade dos swaps: liga o conjunto remove/add ao estado do deck
       // (deck_signature) via SHA-256, para o caminho de aplicação verificar
@@ -772,23 +788,12 @@ Future<Response> onRequest(RequestContext context) async {
         detectedTheme: themeProfile.theme,
         deckAnalysis: deckAnalysis,
         postAnalysis: postAnalysisOverride,
-        removals: removalsOverride ??
-            ((responseBody['removals'] as List?)?.map((e) => '$e').toList() ??
-                const <String>[]),
-        additions: additionsOverride ??
-            ((responseBody['additions'] as List?)?.map((e) => '$e').toList() ??
-                const <String>[]),
+        removals: resolvedRemovals,
+        additions: resolvedAdditions,
         statusCode: statusCode,
-        qualityError: responseBody['quality_error'] is Map
-            ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
-            : null,
+        qualityError: resolvedQualityError,
         validationReport: validationReport,
-        validationWarnings: validationWarningsOverride.isNotEmpty
-            ? validationWarningsOverride
-            : ((responseBody['validation_warnings'] as List?)
-                    ?.map((e) => '$e')
-                    .toList() ??
-                const <String>[]),
+        validationWarnings: resolvedValidationWarnings,
         blockedByColorIdentity: blockedByColorIdentityOverride,
         blockedByBracket: blockedByBracketOverride,
         commanderPriorityNames: optimizeCommanderPriorityNames,
@@ -796,6 +801,24 @@ Future<Response> onRequest(RequestContext context) async {
         deterministicSwapCandidates: deterministicSwapCandidates,
         cacheKey: cacheKey,
         executionTimeMs: requestStopwatch.elapsedMilliseconds,
+      );
+      await optimize_feedback.recordOptimizeMlFeedback(
+        connection: pool,
+        feedback: optimize_feedback.buildOptimizeMlFeedback(
+          deckId: deckId,
+          userId: userId,
+          archetype: targetArchetype,
+          commanderName: commanderNameForLogs,
+          operationMode: responseBody['mode']?.toString() ?? effectiveMode,
+          outcomeCode: responseBody['outcome_code']?.toString() ?? 'unknown',
+          statusCode: statusCode,
+          removals: resolvedRemovals,
+          additions: resolvedAdditions,
+          qualityError: resolvedQualityError,
+          validationWarnings: resolvedValidationWarnings,
+          blockedByColorIdentity: blockedByColorIdentityOverride,
+          blockedByBracket: blockedByBracketOverride,
+        ),
       );
 
       telemetry.logSummary();

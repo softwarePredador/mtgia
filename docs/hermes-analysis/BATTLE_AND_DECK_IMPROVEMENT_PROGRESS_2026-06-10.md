@@ -93,6 +93,29 @@ que o usuário vê na análise do deck.
 **Status:** em andamento, com dezenove extrações de testes, seis splits
 do engine e dezenove splits da rota/runtime de optimize concluídos.
 
+### Revisão complementar 2026-06-11 — feedback ML do optimize
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `MLKnowledgeService.recordFeedback` existia, mas o optimize não chamava o
+  writer em runtime.
+- `ml_prompt_feedback` era lida apenas como contador em `/ai/ml-status` e nem
+  estava declarada no schema principal/verificador.
+
+**Entregue:**
+- `server/lib/ai/optimize_feedback_support.dart` converte respostas de
+  `/ai/optimize` em feedback automático de ML: cartas aceitas, cartas
+  rejeitadas, score 1-5 e comentário sanitizado.
+- `server/routes/ai/optimize/index.dart` registra esse feedback dentro de
+  `respondWithOptimizeTelemetry`, depois do log de análise.
+- `server/database_setup.sql`, `server/bin/verify_schema.dart` e
+  `/ai/ml-status` agora tratam `ml_prompt_feedback` como parte real do schema ML.
+
+**Validação local:**
+- `dart analyze lib/ai/optimize_feedback_support.dart lib/ml_knowledge_service.dart routes/ai/optimize/index.dart routes/ai/ml-status/index.dart bin/verify_schema.dart test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart`.
+- `dart test test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart --reporter compact`.
+
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py` — 101 linhas extraídas do engine.
