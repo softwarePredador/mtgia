@@ -118,6 +118,7 @@ class HermesCronGovernorReportTest(unittest.TestCase):
 
             self.assertIn("OK | `script with residual provider`", report)
             self.assertIn("P3 | `paused missing`", report)
+            self.assertIn("enabled_provider_dependent: 0", report)
 
     def test_load_jobs_accepts_object_or_list_shape(self) -> None:
         module = _load_module()

@@ -151,7 +151,9 @@ def build_report(jobs: list[dict[str, Any]], output_dir: Path, scripts_dir: Path
 
     enabled = [r for r in rows if r["job"].get("enabled")]
     paused = [r for r in rows if not r["job"].get("enabled")]
-    provider_enabled = [r for r in enabled if r["job"].get("provider")]
+    provider_enabled = [
+        r for r in enabled if r["job"].get("provider") and not r["job"].get("script")
+    ]
     flagged = [r for r in rows if r["risk"] != "OK"]
 
     lines = [
