@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 """Import pasted Lorehold decklists into knowledge.db.
 
 Default mode is dry-run. Use --apply to write.
@@ -23,6 +22,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -160,13 +160,39 @@ def parse_blocks(text: str, default_name: str, default_source: str, default_arch
 
 
 def oracle_for(cur: sqlite3.Cursor, name: str) -> dict:
-    row = cur.execute(
-        'SELECT oracle_text, cmc, type_line, functional_tag FROM card_oracle_data WHERE lower(card_name)=lower(?)',
-        (name,),
-    ).fetchone()
+    normalized = name.strip().lower()
+    row = None
+    if table_exists(cur, "card_oracle_cache"):
+        row = cur.execute(
+            """
+            SELECT oracle_text, cmc, type_line, '' AS functional_tag
+            FROM card_oracle_cache
+            WHERE normalized_name=?
+            LIMIT 1
+            """,
+            (normalized,),
+        ).fetchone()
+    if row is None and table_exists(cur, "card_oracle_data"):
+        row = cur.execute(
+            """
+            SELECT oracle_text, cmc, type_line, functional_tag
+            FROM card_oracle_data
+            WHERE lower(card_name)=lower(?)
+            LIMIT 1
+            """,
+            (name,),
+        ).fetchone()
     if not row:
         return {'oracle_text': '', 'cmc': None, 'type_line': '', 'functional_tag': ''}
     return {'oracle_text': row[0] or '', 'cmc': row[1], 'type_line': row[2] or '', 'functional_tag': row[3] or ''}
+
+
+def table_exists(cur: sqlite3.Cursor, table: str) -> bool:
+    row = cur.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+        (table,),
+    ).fetchone()
+    return row is not None
 
 
 def infer_role(name: str, oracle: dict) -> str:

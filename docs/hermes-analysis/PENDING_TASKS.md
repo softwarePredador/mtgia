@@ -52,9 +52,17 @@
 > O backend passou a carregar `cards.cmc` no resolver de import/deck generation,
 > propagar `cmc` internamente no `GeneratedDeckValidationService`, alertar CMC
 > não-terreno suspeito/divergente e consultar `cmc` em `DeckRulesService`.
-> O que ainda não está fechado é operacional: backfill/sync do SQLite Hermes e
-> scripts Python que importam decks aprendidos precisam persistir `cards.cmc`
-> como fonte autoritativa.
+>
+> **Atualização 2026-06-11 — CMC Hermes operational sync.**
+> O código operacional Hermes também foi fechado: `sync_pg_card_metadata_to_hermes.py`
+> sincroniza `card_oracle_cache`, faz backfill idempotente de
+> `deck_cards.cmc/type_line/oracle_text`, reporta explicitamente SQLite vazio
+> ou sem `deck_cards`, e `import_lorehold_decks.py` prefere esse cache antes da
+> tabela histórica. As crons `known_cards_generator_cron.sh` e
+> `known_cards_validator_cron.sh` rodam o sync antes de gerar/validar cartas.
+> Resta executar no AWS com `knowledge.db` populado e exigir
+> `deck_cards_table_present=true` + `suspicious_nonland_zero_cmc_after=0` para
+> o corpus alvo.
 >
 > **Atualização 2026-06-10 — etapa deck-improvement.**
 > O diagnóstico/gate semântico do optimize deixou de depender apenas de

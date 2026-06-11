@@ -8,13 +8,26 @@
 
 | Fonte | Fato usado no ManaLoom | Decisão |
 |---|---|---|
-| `https://magic.wizards.com/en/rules` | Comprehensive Rules atuais apontam para `MagicCompRules 20260417.txt`. | `server/magicrules.txt` deve continuar preso ao snapshot 2026-04-17 até novo update oficial. |
-| `https://media.wizards.com/2026/downloads/MagicCompRules%2020260417.txt` | Regras efetivas em 2026-04-17; contém CR 720/721/722, 702.184/702.185, 802 e 903. | Usar como fonte local de teste e auditoria. |
+| `https://magic.wizards.com/en/rules` | Página oficial expõe downloads DOCX/PDF/TXT das Comprehensive Rules atuais. | `server/magicrules.txt` deve continuar preso ao snapshot 2026-04-17 até novo update oficial. |
+| `https://media.wizards.com/2026/downloads/MagicCompRules%2020260417.txt` / `.pdf` | Regras efetivas em 2026-04-17; contém CR 720/721/722, 702.184/702.185, 802 e 903. | Usar TXT local para testes automáticos e PDF/TXT oficial como fonte de auditoria. |
 | `https://magic.wizards.com/en/formats/commander` | Commander é 99+1, color identity, command zone, commander tax, 21 commander damage e free-for-all com ataque a múltiplos jogadores. | Produto e Hermes devem tratar multi-defender como Commander normal, não exceção. |
 | `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Hybrid mana não mudou; continua funcionando como "and" para identidade Commander. | Não implementar modelo "or" sem novo update oficial. |
 | `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Station, Spacecraft, Warp, Void, Lander e Vehicle/Spacecraft commander. | Suporte mínimo está correto; efeitos específicos por carta ficam por corpus. |
 | `https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes` | Release notes detalham station counters, striations e Vehicle/Spacecraft commander. | Usar para regressões quando novas Spacecraft entrarem no corpus. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-mechanics` | Prepare, Repartee, Opus, Infusion, Flashback, Increment, Paradigm e Converge. | Ability words entram como telemetria; Prepare/Omen/Paradigm exigem card-specific só quando usados. |
+
+## Rechecagem oficial 2026-06-11
+
+- A fonte de verdade continua sendo a página oficial de Rules da Wizards; ela
+  aponta para as versões DOCX/PDF/TXT atuais das Comprehensive Rules.
+- O snapshot local `server/magicrules.txt` já contém as âncoras guardiãs:
+  Omen `720`, Station `721`/`702.184`, Preparation `722`, Warp `702.185`,
+  attack multiple players `802`, Commander `903.3`/`903.12c` e hybrid mana em
+  `107.4e`.
+- A política de Commander permanece estrita para mana híbrida: não aplicar a
+  proposta "or" sem update oficial posterior.
+- A lista de gaps abaixo é deliberadamente uma matriz de produto/simulação, não
+  uma promessa de judge engine completo.
 
 ## Status ManaLoom por regra
 

@@ -236,13 +236,17 @@ python3 -c "import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloo
 
 ### [P1] CMC Correction: Script de correcao em lote para 142 cartas com CMC=0.0 + hardening do `_getCmc()` com warning ativo
 
-**Status em 2026-06-11:** PARCIALMENTE RESOLVIDO no backend/app-facing.
+**Status em 2026-06-11:** RESOLVIDO no código backend/app-facing e no código
+operacional Hermes; PENDENTE apenas a execução do sync no AWS com `knowledge.db`
+populado.
 `resolveImportCardNames(...)` agora carrega `cards.cmc`; `GeneratedDeckValidationService`
 propaga esse campo internamente e emite warning para CMC não-terreno
 ausente/zerado suspeito; `CardValidationService.validateDeckCards(...)`
 compara CMC informado contra `cards.cmc`; `DeckRulesService._loadCardsData(...)`
-passou a consultar `cmc`. Continua pendente o backfill/sync operacional da base
-SQLite Hermes e dos scripts Python de importação aprendida.
+passou a consultar `cmc`. `sync_pg_card_metadata_to_hermes.py` agora faz
+backfill de `deck_cards.cmc/type_line/oracle_text` a partir de
+`card_oracle_cache`, `import_lorehold_decks.py` prefere esse cache autoritativo
+e as crons `known_cards_*` executam o sync antes de operar.
 
 **Conhecimento MTG:** O TAG_ACCURACY_REPORT (2026-06-05) documenta que 142 cartas (26.2%) tem CMC=0.0. A corrupcao se espalhou de 1 deck para TODOS os 7. Cartas como Sol Ring (CMC=1), Mana Vault (1), Boros Signet (2), Aetherflux Reservoir (4) estao com CMC=0.0. Atraxa (deck 9, 100 cartas) importada com 29 CMCs invalidos.
 
@@ -251,8 +255,12 @@ SQLite Hermes e dos scripts Python de importação aprendida.
 - `server/lib/generated_deck_validation_service.dart` — emite warning de CMC suspeito no fluxo de validação de decks gerados/importados.
 - `server/lib/card_validation_service.dart` — compara CMC informado contra `cards.cmc` no validador genérico.
 - `server/lib/deck_rules_service.dart` — `_loadCardsData()` agora consulta `cmc`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py` — backfill idempotente de `deck_cards` a partir do cache PG.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py` — prova backfill e dry-run em SQLite in-memory.
 
-**Gap remanescente:** Importação/sync Python e SQLite Hermes ainda precisam de rotina própria de backfill e prevenção para sempre usar `cards.cmc` do PG como fonte autoritativa.
+**Gap remanescente:** Executar a rotina no Hermes/AWS após popular `knowledge.db`
+com decks reais; o report precisa mostrar `deck_cards_table_present=true` e
+`suspicious_nonland_zero_cmc_after=0` para o corpus alvo.
 **Impacto:** P1 — GoldfishSimulator, quality gate, e mulligan usam CMC corrompido.
 **Risco:** P1 — Se o SQLite Hermes ficar desatualizado, crons de mulligan/optimizer podem continuar usando CMC local corrompido.
 
@@ -260,12 +268,13 @@ SQLite Hermes e dos scripts Python de importação aprendida.
 1. ~~Adicionar `cmc` ao SELECT em `_loadCardsData()`~~
 2. ~~Carregar `cmc` no resolver de nomes usado por import/deck generation~~
 3. ~~Emitir warning app-facing quando CMC resolvido for suspeito~~
-4. Rodar backfill/sync SQLite Hermes para atualizar registros locais com `cards.cmc`
-5. Ajustar scripts Python de importação aprendida para sempre persistirem CMC autoritativo
+4. ~~Criar rotina Hermes para corrigir SQLite local e scripts Python de importação aprendida~~
+5. Rodar a rotina no Hermes/AWS com DB populado e anexar o report operacional
 
 **Validacao:**
 ```bash
-cd server && dart analyze lib/ai/optimization_quality_gate.dart && dart analyze lib/deck_rules_service.dart
+cd server && dart test test/generated_deck_validation_service_test.dart test/cmc_safety_test.dart
+cd docs/hermes-analysis/manaloom-knowledge/scripts && python3 test_sync_pg_card_metadata_to_hermes.py
 ```
 
 ---
@@ -756,10 +765,11 @@ rg "deck_weakness_reports" server/lib/ server/routes/ --count
 
 ### [P1] Deck Import: Validar CMC das cartas importadas contra a tabela `cards` do PostgreSQL — previne corrupção de dados que afeta toda a pipeline de análise
 
-**Status em 2026-06-11:** PARCIALMENTE RESOLVIDO no backend. O caminho de
-resolução/import app-facing passa a carregar `cards.cmc` e gerar warnings de
-integridade; o payload público foi preservado. Backfill/sync SQLite Hermes e
-scripts Python continuam como pendência operacional separada.
+**Status em 2026-06-11:** RESOLVIDO no código. O caminho de resolução/import
+app-facing passa a carregar `cards.cmc` e gerar warnings de integridade; o
+payload público foi preservado. A rotina Hermes de backfill/sync de
+`deck_cards.cmc` existe e está testada; falta apenas execução operacional no
+AWS com `knowledge.db` populado.
 
 **Conhecimento MTG:** O VALIDATOR_LOG v3.23 (2026-06-02) documenta corrupção massiva de CMC na importação do deck Lorehold: 14+ cartas com `CMC=0.0` (Sol Ring, Mana Vault, Boros Signet, Orim's Chant, etc.) e 6 cartas com `CMC=NULL` (Aetherflux Reservoir, Past in Flames, Electroduplicate, etc.). A CMC média reportada de 2.15 é subestimada — a CMC real do deck está ~2.8-3.0. Todos os cálculos downstream (curva de mana, Mulligan Simulation T3, GoldfishSimulator keepable, quality gate ΔCMC) são afetados.
 
@@ -769,8 +779,12 @@ scripts Python continuam como pendência operacional separada.
 - `server/lib/card_validation_service.dart` — `_getCardInfo()` retorna `mana_cost`/`cmc` e `validateDeckCards()` compara contra o valor informado.
 - `server/lib/deck_rules_service.dart` — `_loadCardsData()` consulta e armazena `cmc` em `_CardData`.
 - `server/lib/ai/cmc_safety.dart` — funções compartilhadas identificam CMC suspeito e recuperam fallback por `mana_cost`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py` — corrige `deck_cards.cmc/type_line/oracle_text` a partir de `card_oracle_cache`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py` — usa `card_oracle_cache` antes de `card_oracle_data`.
 
-**Gap remanescente:** Quando um deck é importado por scripts Python/Hermes fora da API, os valores locais de CMC ainda podem não ser regravados a partir de `cards.cmc`. Esse backfill/sync precisa ser tratado no pipeline Hermes.
+**Gap remanescente:** Operacional: rodar o sync no Hermes/AWS depois de popular
+`knowledge.db` com decks reais. Se o banco continuar vazio, o relatório expõe
+`deck_cards_table_present=false`.
 
 **Impacto:** `P1` — Dados corrompidos em cadeia. Swaps podem ser aprovados/rejeitados baseados em ΔCMC errado. O Mulligan Simulation reporta T3 inflado (mascara color screw). A análise de curva de mana mostra valores incorretos para o usuário. O problema é silencioso — não há logs, warnings, ou alertas.
 
@@ -780,12 +794,14 @@ scripts Python continuam como pendência operacional separada.
 1. ~~Adicionar campo `cmc` à `_CardData` e ao SELECT de `DeckRulesService`~~
 2. ~~Carregar `cmc` no resolver de import/localized/split~~
 3. ~~Emitir warning em validação app-facing para CMC suspeito/divergente~~
-4. Criar/rodar rotina Hermes para corrigir SQLite local e scripts Python de importação aprendida
+4. ~~Criar rotina Hermes para corrigir SQLite local e scripts Python de importação aprendida~~
+5. Rodar rotina no AWS e anexar relatório `deck_cards_backfill`
 
 **Validação:**
 ```bash
 cd server && dart analyze lib/deck_rules_service.dart lib/card_validation_service.dart lib/generated_deck_validation_service.dart lib/import_card_lookup_service.dart
 cd server && dart test test/generated_deck_validation_service_test.dart test/cmc_safety_test.dart
+cd docs/hermes-analysis/manaloom-knowledge/scripts && python3 test_sync_pg_card_metadata_to_hermes.py
 ```
 
 ---

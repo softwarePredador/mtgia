@@ -697,6 +697,21 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - O gap remanescente é operacional: backfill/correção da base SQLite Hermes
     e scripts Python de import/sync precisam continuar usando `cards.cmc` como
     fonte autoritativa.
+- Fechamento do código operacional de sync CMC Hermes:
+  - `sync_pg_card_metadata_to_hermes.py` agora copia `cmc`, `type_line` e
+    `oracle_text` do `card_oracle_cache` autoritativo para `deck_cards` quando
+    a tabela existe, com relatório explícito de linhas totais, matches,
+    updates de CMC e non-lands ainda suspeitos.
+  - O modo `--dry-run` calcula o que seria atualizado sem mutar SQLite.
+  - `import_lorehold_decks.py` passa a preferir `card_oracle_cache` antes da
+    tabela histórica `card_oracle_data`.
+  - `known_cards_generator_cron.sh` e `known_cards_validator_cron.sh` executam
+    o sync de metadata antes de gerar/validar `known_cards_generated.json`.
+  - Teste isolado `test_sync_pg_card_metadata_to_hermes.py` cobre backfill real
+    e dry-run in-memory.
+  - O risco restante é executar essa rotina no Hermes/AWS com `knowledge.db`
+    populado; se o DB estiver vazio, o relatório agora deixa isso explícito
+    (`deck_cards_table_present=false`) em vez de parecer sucesso silencioso.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -724,9 +739,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
    mantendo wrappers/exports compatíveis.
-4. Rodar backfill/sync operacional de CMC na base Hermes/SQLite e revisar
-   scripts Python que importam decks aprendidos para não persistirem CMC
-   corrompido.
+4. Executar no Hermes/AWS a sequência operacional de seed/sync (`meta_decks` ou
+   target deck real → `sync_pg_card_metadata_to_hermes.py`) e verificar o
+   relatório `deck_cards_backfill` até `suspicious_nonland_zero_cmc_after=0`
+   para os decks alvo.
 5. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
    quando houver corpus concreto usando essas cartas.
 6. Revalidar drift restante entre analysis/generate/optimize depois do split

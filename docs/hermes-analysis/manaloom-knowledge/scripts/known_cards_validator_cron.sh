@@ -40,6 +40,12 @@ export MANALOOM_HERMES_SCRIPT_DIR="$SCRIPT_DIR"
 export MANALOOM_KNOWLEDGE_DB="${MANALOOM_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}"
 export MANALOOM_KNOWN_CARDS_OUT="${MANALOOM_KNOWN_CARDS_OUT:-$SCRIPT_DIR/known_cards_generated.json}"
 
+sync_report="$ARTIFACT_DIR/card_metadata_sync_$(date -u +%Y%m%d_%H%M%S).json"
+python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+  --report "$sync_report"
+cp "$sync_report" "$ARTIFACT_DIR/latest_card_metadata_sync.json"
+
 log="$ARTIFACT_DIR/known_cards_validator_$(date -u +%Y%m%d_%H%M%S).log"
 python3 "$SCRIPT_DIR/kc_validator.py" | tee "$log"
 cp "$log" "$ARTIFACT_DIR/latest_known_cards_validator.log"
