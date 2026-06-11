@@ -28,6 +28,13 @@
 > custos para atacar, restrições condicionais complexas e escolha interativa
 > permanecem em `IMPLEMENTATION_GAPS.md`.
 >
+> **Atualização 2026-06-11 — APNAP pass sequence básico.**
+> `priority_round` agora emite `priority_pass` em ordem APNAP para janelas de
+> pilha vazia e antes de resolver o topo da pilha sem resposta. Isso torna a
+> sequência formal auditável por replay/teste, preservando o modelo atual de IA.
+> Ainda não há escolha humana/interativa nem varredura completa de todas as
+> ações card-specific de cada jogador.
+>
 > **Atualização 2026-06-11 — revisão estratégica oficial.**
 > A pesquisa oficial foi rechecada contra Wizards Rules, Commander, Commander
 > Brackets 2026-02-09, Edge of Eternities e Secrets of Strixhaven. O plano de
@@ -287,7 +294,7 @@
 - `run_priority_loop` aplica janelas vazias de main phase de forma limitada e resolve a stack/triggers entre ações.
 - O turno usa `run_priority_loop` nas duas main phases.
 
-**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores; isso será aprofundado junto do casting pipeline 601.2 avançado e combate formal.
+**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores nem varredura de todas as ações card-specific possíveis; isso será aprofundado junto do casting pipeline 601.2 avançado e combate formal.
 
 **Regra**: CR 117.3, CR 117.4
 

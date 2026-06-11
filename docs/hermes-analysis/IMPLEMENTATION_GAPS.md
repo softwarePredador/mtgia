@@ -34,7 +34,7 @@
 |---|---|---|---|
 | Fases completas (untap,upkeep,draw,main1,combat,main2,end,cleanup) | ✅ Parcial | 4605-4828 | Upkeep só tem One Ring trigger. Falta janela de prioridade no upkeep |
 | Passos de combate (beg.combat,decl.atk,decl.blk,damage,end.combat) | ⚠️ Parcial | 4773-5065 | Funções formais existem; faltam escolhas/restrições avançadas |
-| Prioridade formal (APNAP pass sequence) | ⚠️ Parcial | 2563-2620 | `run_priority_loop` cobre ações vazias do active player; falta pass sequence completa para todos |
+| Prioridade formal (APNAP pass sequence) | ✅ Básico | v9: `priority_order_from`, `emit_priority_pass_sequence`, `priority_round` | Passes APNAP são emitidos para pilha vazia e antes de resolver topo sem resposta; escolha humana/interativa e respostas card-specific seguem fora |
 | Prioridade com pilha vazia | ✅ OK | 2563-2645 | `priority_round(..., phase=main)` permite ação sorcery-speed e o turno usa `run_priority_loop` |
 | Sem prioridade em untap/resolução | ✅ OK | 4622-4633 | Untap não chama priority |
 | Passos/fases extras (extra turn, extra combat) | ⚠️ Parcial | 4789-4828 | `play_turn_sequence_v8` suporta extra turn, mas não extra combat/phase |

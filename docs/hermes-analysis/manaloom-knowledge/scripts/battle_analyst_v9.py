@@ -3756,6 +3756,35 @@ def game_winner(all_players):
 MAIN_PHASES = {"precombat_main", "postcombat_main"}
 
 
+def priority_order_from(active_player, all_players):
+    if active_player in all_players:
+        idx = all_players.index(active_player)
+        ordered = [all_players[(idx + i) % len(all_players)] for i in range(len(all_players))]
+    else:
+        ordered = list(all_players)
+    return [player for player in ordered if player.is_alive()]
+
+
+def emit_priority_pass_sequence(active_player, all_players, turn, phase=None, reason=None, stack_item=None):
+    order = priority_order_from(active_player, all_players)
+    record_engine_metric("priority_passes", len(order))
+    stack_top = None
+    if stack_item is not None:
+        stack_top = stack_item.card.get("name", "?") if isinstance(stack_item.card, dict) else str(stack_item.card)
+    for index, player in enumerate(order, start=1):
+        emit_replay_event(
+            "priority_pass",
+            active_player=active_player.name,
+            player=player.name,
+            pass_index=index,
+            phase=phase,
+            reason=reason,
+            stack_top=stack_top,
+            turn=turn,
+        )
+    return order
+
+
 def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     """v9: Priority round with optional empty-stack window during main phases."""
     record_engine_metric("priority_rounds")
@@ -3778,12 +3807,16 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 check_sbas_until_stable(all_players)
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
+        emit_priority_pass_sequence(
+            active_player,
+            all_players,
+            turn,
+            phase=phase,
+            reason="empty_stack",
+        )
         return False
 
-    idx = all_players.index(active_player)
-    order = []
-    for i in range(len(all_players)):
-        order.append(all_players[(idx + i) % len(all_players)])
+    order = priority_order_from(active_player, all_players)
 
     # v8.2: Score the top spell
     top_item = stack.items[-1] if stack.items else None
@@ -3824,6 +3857,14 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     return True
 
     # No one responded — resolve
+    emit_priority_pass_sequence(
+        active_player,
+        all_players,
+        turn,
+        phase=phase,
+        reason="stack_top_no_response",
+        stack_item=top_item,
+    )
     item = stack.resolve_top()
     if item:
         if item.effect_data.get("effect") == "triggered_ability":

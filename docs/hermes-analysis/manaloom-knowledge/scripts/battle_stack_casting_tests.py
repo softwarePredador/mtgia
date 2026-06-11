@@ -104,6 +104,60 @@ def register_tests(battle, player):
             "Priority Bear B",
         ]
 
+    def test_empty_stack_priority_emits_apnap_pass_sequence():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            next_player = player("Next")
+            last_player = player("Last")
+            stack = battle.Stack()
+
+            assert battle.priority_round(
+                active,
+                [active, next_player, last_player],
+                stack,
+                2,
+                random.Random(110),
+                phase="beginning_of_combat",
+            ) is False
+
+            passes = [data for event, data in events if event == "priority_pass"]
+            assert [entry["player"] for entry in passes] == ["Active", "Next", "Last"]
+            assert {entry["reason"] for entry in passes} == {"empty_stack"}
+            assert all(entry["phase"] == "beginning_of_combat" for entry in passes)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    def test_stack_resolution_emits_apnap_pass_sequence_before_resolve():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            stack = battle.Stack()
+            spell = {"name": "Unanswered Spell", "cmc": 1, "type_line": "Sorcery"}
+            stack.push(spell, active, battle.get_card_effect(spell))
+
+            battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                2,
+                random.Random(111),
+                phase="precombat_main",
+            )
+
+            passes = [data for event, data in events if event == "priority_pass"]
+            assert [entry["player"] for entry in passes] == ["Active", "Responder"]
+            assert {entry["reason"] for entry in passes} == {"stack_top_no_response"}
+            assert {entry["stack_top"] for entry in passes} == {"Unanswered Spell"}
+            assert stack.empty()
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
     def test_casting_context_locks_cost_before_payment():
         active = player("Active")
         spell = {
@@ -279,6 +333,8 @@ def register_tests(battle, player):
         test_empty_stack_priority_requires_main_phase,
         test_empty_stack_priority_casts_main_phase_creature,
         test_main_phase_priority_loop_casts_bounded_empty_stack_actions,
+        test_empty_stack_priority_emits_apnap_pass_sequence,
+        test_stack_resolution_emits_apnap_pass_sequence_before_resolve,
         test_casting_context_locks_cost_before_payment,
         test_casting_context_locks_x_alternative_and_additional_costs,
         test_casting_context_replay_exposes_modes_targets_and_x_value,

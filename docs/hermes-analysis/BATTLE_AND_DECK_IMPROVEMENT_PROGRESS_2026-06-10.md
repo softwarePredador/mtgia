@@ -658,6 +658,17 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     cannot-attack-alone sozinho e cannot-attack-alone acompanhado.
   - O gap remanescente foi reduzido para custos para atacar, requisitos por
     defensor, restrições condicionais complexas e escolha interativa.
+- Fechamento local do gap APNAP pass sequence básico:
+  - `battle_analyst_v9.py` ganhou `priority_order_from(...)` e
+    `emit_priority_pass_sequence(...)`, mantendo a ordem active-player,
+    non-active players por rotação da mesa.
+  - `priority_round(...)` agora emite eventos `priority_pass` em janelas de
+    pilha vazia e antes de resolver o topo da pilha quando ninguém responde.
+  - `battle_stack_casting_tests.py` cobre ordem APNAP em pilha vazia e no caso
+    de spell não respondido antes da resolução.
+  - O gap remanescente foi reduzido para escolha humana/interativa e varredura
+    completa de ações card-specific por jogador, não para a existência de
+    sequência APNAP auditável.
 
 ## Etapa 4 — Próximas pendências reais
 
