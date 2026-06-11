@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
@@ -17,6 +16,8 @@ import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
     as optimize_route_async;
+import '../../../lib/ai/optimize_route_request_support.dart'
+    as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
     as optimize_route_response;
 import '../../../lib/ai/optimize_swap_integrity.dart';
@@ -408,33 +409,27 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final body = await context.request.json() as Map<String, dynamic>;
-    final deckId = body['deck_id'] as String?;
-    final archetype = body['archetype'] as String?;
-    final bracketRaw = body['bracket'];
-    final parsedBracket =
-        bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
-    final parsedKeepTheme = body['keep_theme'] as bool?;
-    final requestedModeRaw =
-        body['mode']?.toString().trim().toLowerCase() ?? '';
-    final requestMode =
-        requestedModeRaw.contains('complete') ? 'complete' : 'optimize';
-    final intensity = resolveOptimizeIntensity(body['intensity']);
+    final routeRequest = optimize_route_request.parseOptimizeRouteRequest(body);
+    final deckId = routeRequest.deckId;
+    final archetype = routeRequest.archetype;
+    final parsedBracket = routeRequest.parsedBracket;
+    final parsedKeepTheme = routeRequest.parsedKeepTheme;
+    final requestMode = routeRequest.requestMode;
+    final intensity = routeRequest.intensity;
     if (!intensity.valid) {
       return badRequest(
         'intensity must be light, focused, aggressive or rebuild.',
       );
     }
     final requestStopwatch = Stopwatch()..start();
-    final forceSyncExecutor =
-        body['_force_sync'] == true || body['force_sync'] == true;
-    final asyncRequested =
-        body.containsKey('async') ? body['async'] == true : null;
+    final forceSyncExecutor = routeRequest.forceSyncExecutor;
+    final asyncRequested = routeRequest.asyncRequested;
     final telemetry = OptimizeStageTelemetry(
-      deckId: deckId ?? 'unknown',
+      deckId: routeRequest.telemetryDeckId,
       requestMode: requestMode,
     );
-    final hasBracketOverride = body.containsKey('bracket');
-    final hasKeepThemeOverride = body.containsKey('keep_theme');
+    final hasBracketOverride = routeRequest.hasBracketOverride;
+    final hasKeepThemeOverride = routeRequest.hasKeepThemeOverride;
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final semanticV2OptimizeEnforcementMode =
         resolveSemanticV2OptimizeEnforcementMode(
