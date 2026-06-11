@@ -266,7 +266,7 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
                     f"Selected PG deck has no commander row: pg_deck_id={pg_deck_id}."
                 )
             cur.execute(
-                """
+                f"""
                 SELECT
                   c.name,
                   dc.quantity,
