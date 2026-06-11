@@ -94,6 +94,10 @@ Novo achado de qualidade:
 - O pull de eventos importou vários registros com `card_count=0` ou `card_count=1`.
   Isso confirma o loop operacional, mas esses eventos devem ser tratados como
   parciais/telemetria, não como aprendizado de deck completo.
+- Correção aplicada: `server/bin/pull_learning_events.py` classifica eventos em
+  `trainable_commander_deck`, `partial_telemetry` ou
+  `non_commander_telemetry`, com `training_eligible=1` somente para Commander
+  com comandante e `card_count >= 90`.
 
 ## Crons habilitadas
 
@@ -186,8 +190,9 @@ Validar se a próxima rodada agendada produz sem erro:
 
 Backlog técnico aberto:
 
-- filtrar ou marcar `deck_learning_events` parciais (`card_count < 90`) antes de
-  alimentar qualquer score de aprendizado por comandante.
+- garantir que consumidores futuros consultem `training_eligible=1` para
+  scores de aprendizado por comandante, mantendo `partial_telemetry` apenas como
+  sinal operacional/diagnóstico.
 
 ## Caminho para remover Hermes
 
