@@ -90,14 +90,14 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2594 linhas após splits de
+- `server/routes/ai/optimize/index.dart` — 2515 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
   pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
   identidade de cor/filtro de bracket/top-up determinístico do modo complete e
-  proteção de remoção de lands/reequilíbrio pós-filtros da rota. O último split
-  aumentou levemente a rota por tipagem explícita de orquestração, mas isolou
-  estado e regras puras em teste dedicado.
+  proteção de remoção de lands/reequilíbrio pós-filtros/coleta EDHREC/query de
+  dados completos de adições/análise virtual pós-swap. A rota ainda deve seguir
+  reduzindo até ficar como orquestrador fino.
 - `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
