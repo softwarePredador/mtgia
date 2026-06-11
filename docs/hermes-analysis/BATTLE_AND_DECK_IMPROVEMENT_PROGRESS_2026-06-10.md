@@ -501,6 +501,19 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     `ai/optimize` e teste de pós-validação: sem issues.
   - `dart test test/optimize_route_post_validation_support_test.dart test/optimize_route_rebalance_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 37 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh 247859d6`: `PASS`; sem riscos.
+- Split local da query de dados completos das adições/quality gate:
+  - Criado `server/lib/ai/optimize_route_addition_data_support.dart`.
+  - Criado `server/test/optimize_route_addition_data_support_test.dart`.
+  - A rota `server/routes/ai/optimize/index.dart` removeu SQL inline para
+    dados completos de adições em modo complete e optimize normal.
+  - Validação local focada:
+    - `dart analyze lib/ai/optimize_route_addition_data_support.dart routes/ai/optimize/index.dart test/optimize_route_addition_data_support_test.dart`: sem issues.
+    - `dart test test/optimize_route_addition_data_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 35 testes, `All tests passed`.
+  - Validação local ampliada:
+    - `dart analyze bin lib routes test`: sem issues.
+    - `dart test test/optimize_route_addition_data_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimize_route_rebalance_support_test.dart test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 52 testes, `All tests passed`.
+    - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
+    - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -520,8 +533,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    orchestration/filtro inicial de sugestões/filtro de identidade de cor/filtro
    de bracket/top-up determinístico de básicos no modo complete/proteção de
    remoção de terrenos/reequilíbrio pós-filtros/coleta EDHREC pós-processamento
-   já foram feitos; o próximo corte seguro é extrair a query de dados completos
-   das adições/quality gate.
+   e query de dados completos das adições/quality gate já foram feitos; o
+   próximo corte seguro é extrair a orquestração de análise virtual/validação
+   automática.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,

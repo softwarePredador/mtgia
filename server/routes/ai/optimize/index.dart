@@ -15,6 +15,8 @@ import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
     as optimize_route_async;
+import '../../../lib/ai/optimize_route_addition_data_support.dart'
+    as optimize_route_addition_data;
 import '../../../lib/ai/optimize_route_bracket_policy_filter_support.dart'
     as optimize_route_bracket_policy_filter;
 import '../../../lib/ai/optimize_route_color_identity_filter_support.dart'
@@ -1259,38 +1261,11 @@ Future<Response> onRequest(RequestContext context) async {
 
           // === Gerar post_analysis para modo complete ===
           try {
-            // 1. Buscar dados completos das cartas adicionadas
-            final additionsDataResult = await pool.execute(
-              Sql.named('''
-              SELECT name, type_line, mana_cost, colors, 
-                     COALESCE(
-                       (SELECT SUM(
-                         CASE 
-                           WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
-                           WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
-                           WHEN m[1] = 'X' THEN 0
-                           ELSE 1
-                         END
-                       ) FROM regexp_matches(mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
-                       0
-                     ) as cmc,
-                     oracle_text
-              FROM cards 
-              WHERE id = ANY(@ids)
-            '''),
-              parameters: {'ids': ids},
+            final additionsData = await optimize_route_addition_data
+                .fetchOptimizeAdditionDataByIds(
+              pool,
+              ids: ids,
             );
-
-            final additionsData = additionsDataResult
-                .map((row) => {
-                      'name': (row[0] as String?) ?? '',
-                      'type_line': (row[1] as String?) ?? '',
-                      'mana_cost': (row[2] as String?) ?? '',
-                      'colors': (row[3] as List?)?.cast<String>() ?? [],
-                      'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
-                      'oracle_text': (row[5] as String?) ?? '',
-                    })
-                .toList();
 
             final additionsForAnalysis = additionsDetailed.map((add) {
               final data = additionsData.firstWhere(
@@ -1866,54 +1841,12 @@ Future<Response> onRequest(RequestContext context) async {
 
       if (validAdditions.isNotEmpty) {
         try {
-          // 1. Buscar dados completos das cartas sugeridas (para anÃ¡lise de mana/tipo)
-          // Usar nomes corretos do DB (via validByNameLower) para evitar problemas de case
-          final correctedAdditionNames = validAdditions.map((n) {
-            final v = validByNameLower[n.toLowerCase()];
-            return (v?['name'] as String?) ?? n;
-          }).toList();
-          final semanticV2Select = await semanticV2SelectSql(pool);
-          final functionalTagsSelect = await functionalTagsSelectSql(pool);
-          final additionsDataResult = await pool.execute(
-            Sql.named('''
-              SELECT DISTINCT ON (LOWER(name))
-                     name, type_line, mana_cost, colors, 
-                     COALESCE(
-                       (SELECT SUM(
-                         CASE 
-                           WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
-                           WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
-                           WHEN m[1] = 'X' THEN 0
-                           ELSE 1
-                         END
-                       ) FROM regexp_matches(mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
-                       0
-                     ) as cmc,
-                     oracle_text,
-                     $semanticV2Select,
-                     $functionalTagsSelect
-              FROM cards 
-              WHERE LOWER(name) = ANY(@names)
-              ORDER BY LOWER(name), name
-            '''),
-            parameters: {
-              'names':
-                  correctedAdditionNames.map((n) => n.toLowerCase()).toList()
-            },
+          var additionsData = await optimize_route_addition_data
+              .fetchOptimizeAdditionDataForQualityGate(
+            pool,
+            validAdditions: validAdditions,
+            validByNameLower: validByNameLower,
           );
-
-          var additionsData = additionsDataResult
-              .map((row) => {
-                    'name': (row[0] as String?) ?? '',
-                    'type_line': (row[1] as String?) ?? '',
-                    'mana_cost': (row[2] as String?) ?? '',
-                    'colors': (row[3] as List?)?.cast<String>() ?? [],
-                    'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
-                    'oracle_text': (row[5] as String?) ?? '',
-                    'semantic_tags_v2': row.length > 6 ? row[6] : null,
-                    'functional_tags': row.length > 7 ? row[7] : null,
-                  })
-              .toList();
 
           if (!isComplete) {
             final gateResult = filterUnsafeOptimizeSwapsByCardData(
