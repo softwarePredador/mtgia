@@ -28,6 +28,8 @@ import '../../../lib/ai/optimize_route_post_validation_support.dart'
     as optimize_route_post_validation;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
+import '../../../lib/ai/optimize_route_retry_support.dart'
+    as optimize_route_retry;
 import '../../../lib/ai/optimize_route_response_support.dart'
     as optimize_route_response;
 import '../../../lib/ai/optimize_route_warnings_support.dart'
@@ -1089,12 +1091,11 @@ Future<Response> onRequest(RequestContext context) async {
             metaEvidenceContext: optimizeMetaEvidenceContext,
           ),
         );
-        aiResponse['mode'] ??= 'optimize';
-        aiResponse['strategy_source'] ??= deterministicFirstEnabled
-            ? 'ai_after_deterministic_fallback'
-            : 'ai_primary';
-        aiResponse['fallback_trigger'] ??= trigger;
-        return aiResponse;
+        return optimize_route_retry.attachAiOptimizeAttemptMetadata(
+          aiResponse: aiResponse,
+          deterministicFirstEnabled: deterministicFirstEnabled,
+          trigger: trigger,
+        );
       } catch (e, stackTrace) {
         Log.e('Optimization failed: $e\nStack trace:\n$stackTrace');
         return null;
@@ -2045,21 +2046,21 @@ Future<Response> onRequest(RequestContext context) async {
             }
 
             if (validRemovals.isEmpty || validAdditions.isEmpty) {
-              if (shouldRetryOptimizeWithAiFallback(
+              final retryPlan =
+                  optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
                 deterministicFirstEnabled: deterministicFirstEnabled,
                 fallbackAlreadyAttempted: optimizeFallbackAttempted,
                 strategySource: jsonResponse['strategy_source']?.toString(),
                 qualityErrorCode: 'OPTIMIZE_NO_SAFE_SWAPS',
                 isComplete: isComplete,
-              )) {
+              );
+              if (retryPlan.shouldRetry && retryPlan.trigger != null) {
                 optimizeFallbackAttempted = true;
                 final aiFallbackResponse = await runAiOptimizeAttempt(
-                  trigger: 'deterministic_rejected_no_safe_swaps',
+                  trigger: retryPlan.trigger!,
                 );
                 if (aiFallbackResponse != null) {
-                  Log.i(
-                    'Deterministic-first caiu em NO_SAFE_SWAPS; reexecutando optimize via IA.',
-                  );
+                  Log.i(retryPlan.logMessage ?? 'Retry de optimize via IA.');
                   jsonResponse = aiFallbackResponse;
                   continue optimizeAttemptLoop;
                 }
@@ -2233,21 +2234,21 @@ Future<Response> onRequest(RequestContext context) async {
             : const <String>[];
 
         if (hardQualityRejected || effectiveRejectionReasons.isNotEmpty) {
-          if (shouldRetryOptimizeWithAiFallback(
+          final retryPlan =
+              optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
             deterministicFirstEnabled: deterministicFirstEnabled,
             fallbackAlreadyAttempted: optimizeFallbackAttempted,
             strategySource: jsonResponse['strategy_source']?.toString(),
             qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
             isComplete: isComplete,
-          )) {
+          );
+          if (retryPlan.shouldRetry && retryPlan.trigger != null) {
             optimizeFallbackAttempted = true;
             final aiFallbackResponse = await runAiOptimizeAttempt(
-              trigger: 'deterministic_rejected_quality_gate',
+              trigger: retryPlan.trigger!,
             );
             if (aiFallbackResponse != null) {
-              Log.i(
-                'Deterministic-first caiu no gate final de qualidade; reexecutando optimize via IA.',
-              );
+              Log.i(retryPlan.logMessage ?? 'Retry de optimize via IA.');
               jsonResponse = aiFallbackResponse;
               continue optimizeAttemptLoop;
             }
