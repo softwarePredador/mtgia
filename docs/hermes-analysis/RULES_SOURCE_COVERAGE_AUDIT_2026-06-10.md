@@ -36,7 +36,7 @@
 
 | Área | Status ManaLoom | Implementação | Próxima ação |
 |---|---|---|---|
-| Legendary Vehicle/Spacecraft commander | `Implemented` | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness. | Manter teste de regra 903.3/903.12c e rota incremental. |
+| Legendary Vehicle/Spacecraft commander | `Implemented` | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness; `is_commander=true` é rejeitado fora de Commander/Brawl pelo serviço compartilhado. | Manter teste de regra 903.3/903.12c, rota incremental e bloqueio central de slot de comandante. |
 | Brawl legendary planeswalker commander | `Implemented` | `commander_eligibility.dart` aceita planeswalker lendário somente quando `format == brawl`; Commander padrão permanece estrito. | Manter `commander_eligibility_test.dart` e validação completa via `DeckRulesService`. |
 | Hybrid color identity | `Implemented` | Mantida como identidade combinada, sem flexibilização. Coberta por `color_identity_test.dart` e conformance Hermes. | Não implementar modelo "or" enquanto a Wizards não alterar a regra. |
 | Warp | `Partial` | Cast por custo alternativo, exílio no end step e recast normal do exile. | Só adicionar efeitos card-specific quando aparecerem no corpus. |
@@ -86,6 +86,11 @@ Na mesma revisão foi corrigido um drift de Brawl: CR 903.12c permite
 planeswalker lendário como comandante de Brawl. O helper compartilhado agora
 recebe `format`, mantendo Commander estrito por padrão e liberando planeswalker
 apenas em `brawl`.
+
+Correção complementar: o `DeckRulesService` passou a rejeitar qualquer payload
+com `is_commander=true` quando `format` não é Commander/Brawl. Isso cobre
+criação, update, import e endpoints incrementais que delegam ao serviço, em vez
+de depender de guardas manuais por rota.
 
 ## Próxima auditoria obrigatória
 

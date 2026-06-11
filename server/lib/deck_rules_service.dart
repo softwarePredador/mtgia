@@ -27,6 +27,10 @@ class DeckRulesService {
     bool strict = false,
   }) async {
     final normalizedFormat = format.toLowerCase();
+    validateCommanderSlotAllowedForFormat(
+      format: normalizedFormat,
+      cards: cards,
+    );
 
     final cardIds = cards.map((c) => c['card_id']).whereType<String>().toList();
     if (cardIds.isEmpty) return;
@@ -64,10 +68,7 @@ class DeckRulesService {
       }
     }
 
-    final limit =
-        (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
-            ? 1
-            : 4;
+    final limit = isCommanderStyleFormat(normalizedFormat) ? 1 : 4;
     print(
         '[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
     for (final entry in copiesByName.entries) {
@@ -108,10 +109,7 @@ class DeckRulesService {
       final typeLine = info.typeLine.toLowerCase();
       final isBasicLand = _isBasicLandTypeLine(typeLine);
 
-      final limit =
-          (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
-              ? 1
-              : 4;
+      final limit = isCommanderStyleFormat(normalizedFormat) ? 1 : 4;
 
       // Commanders são validados separadamente pela regra quantity == 1
       // Aqui só validamos cartas normais
@@ -148,7 +146,7 @@ class DeckRulesService {
     }
 
     // Regras específicas de Commander/Brawl (MVP para o fluxo que você descreveu)
-    if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
+    if (isCommanderStyleFormat(normalizedFormat)) {
       await _validateCommanderStyle(
         format: normalizedFormat,
         cards: cards,
@@ -485,6 +483,19 @@ class DeckRulesService {
       manaCost: card.manaCost,
     );
   }
+}
+
+void validateCommanderSlotAllowedForFormat({
+  required String format,
+  required List<Map<String, dynamic>> cards,
+}) {
+  if (isCommanderStyleFormat(format)) return;
+  final hasCommanderSlot =
+      cards.any((card) => card['is_commander'] as bool? ?? false);
+  if (!hasCommanderSlot) return;
+  throw DeckRulesException(
+    'Regra violada: is_commander só é permitido em Commander/Brawl.',
+  );
 }
 
 class DeckRulesException implements Exception {

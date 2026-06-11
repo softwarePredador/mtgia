@@ -34,6 +34,10 @@
 - Vehicle/Spacecraft commander deve ser ancorado no Edge of Eternities Update
   Bulletin, não apenas no artigo de mecânicas, porque o bulletin cita
   explicitamente `903.3`/`903.12c`.
+- Correção aplicada após esta revisão: o slot `is_commander=true` agora é
+  bloqueado centralmente pelo `DeckRulesService` para formatos que não sejam
+  Commander/Brawl. Antes, algumas rotas tinham guarda própria e outras
+  dependiam implicitamente de validação posterior.
 - A lista de gaps abaixo é deliberadamente uma matriz de produto/simulação, não
   uma promessa de judge engine completo.
 
@@ -41,7 +45,7 @@
 
 | Área | Status | Evidência local | Próxima ação |
 |---|---|---|---|
-| Vehicle/Spacecraft commander | Implemented | `server/lib/commander_eligibility.dart`, `server/test/commander_eligibility_test.dart`, `battle_rules_2026_tests.py` | Manter teste guardião de CR 903.3. |
+| Vehicle/Spacecraft commander | Implemented | `server/lib/commander_eligibility.dart`, `server/lib/deck_rules_service.dart`, `server/test/commander_eligibility_test.dart`, `battle_rules_2026_tests.py` | Manter teste guardião de CR 903.3 e bloqueio de `is_commander` fora de Commander/Brawl. |
 | Hybrid identity strict | Implemented | `server/test/color_identity_test.dart`, `server/test/magic_rules_source_test.dart`, `battle_rules_2026_tests.py` | Não flexibilizar. |
 | Commander attack multiple players | Implemented básico | `assign_attackers_to_defenders`, `battle_rules_2026_tests.py` | Requirements/restrictions avançadas ficam gap separado. |
 | Warp | Partial | `cast_warp_spell_from_hand`, `process_warp_end_step`, `cast_warp_card_from_exile` | Adicionar efeitos por carta quando aparecer no corpus real. |
@@ -59,7 +63,7 @@
 | Etapa | Status atual | Evidência | Decisão |
 |---|---|---|---|
 | 1. Documentação e matriz de gaps | Implemented | Este documento, `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`, `IMPLEMENTATION_GAPS.md`, `PENDING_TASKS.md` | Manter como primeira etapa obrigatória antes de qualquer regra nova. |
-| 2. Commander legality 2026 | Implemented | `commander_eligibility.dart`, `commander_eligibility_test.dart`, `magic_rules_source_test.dart` | Não abrir nova implementação salvo drift real. |
+| 2. Commander legality 2026 | Implemented | `commander_eligibility.dart`, `deck_rules_service.dart`, `commander_eligibility_test.dart`, `magic_rules_source_test.dart` | Drift real corrigido: `is_commander=true` agora é rejeitado em formatos não Commander/Brawl pelo serviço compartilhado. |
 | 3. Warp / Flashback / cast-from-exile | Partial mínimo | `battle_rules_2026_tests.py` cobre warp e flashback básicos | Evoluir somente por carta real no corpus. |
 | 4. Station / Spacecraft | Partial mínimo | `activate_station_ability`, conformance Station/Spacecraft | Múltiplas striations e escolha humana ficam tracked gap. |
 | 5. Prepare / Omen / Paradigm | Partial mínimo | helpers de characteristics/copy/exile tracking | Não implementar efeito genérico pesado sem carta concreta. |

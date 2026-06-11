@@ -19,6 +19,8 @@
   Warp, Station, Flashback, Omen, Prepare, Paradigm, Lander, ability-word
   telemetry e combate multi-defensor.
 - `DeckRulesService` aceita Legendary Vehicle/Spacecraft com power/toughness.
+- `DeckRulesService` bloqueia `is_commander=true` em formatos não
+  Commander/Brawl, cobrindo rotas que delegam ao serviço compartilhado.
 - A rota incremental `POST /decks/:id/cards` agora usa a mesma elegibilidade
   Commander 2026 compartilhada, evitando divergência entre validação completa
   e adição manual de comandante.
@@ -30,6 +32,7 @@
 - `dart test test/mtg_rules_validation_test.dart`.
 - `dart test test/color_identity_test.dart test/mtg_rules_validation_test.dart`.
 - `dart test test/commander_eligibility_test.dart test/mtg_rules_validation_test.dart -r expanded`.
+- `dart test test/commander_eligibility_test.dart test/magic_rules_source_test.dart test/color_identity_test.dart test/mtg_rules_validation_test.dart --reporter compact`.
 - Hermes report-only pós-push: `PASS`.
 
 ### Revisão complementar 2026-06-11 — snapshot oficial e Brawl

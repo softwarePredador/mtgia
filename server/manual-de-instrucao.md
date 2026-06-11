@@ -18136,6 +18136,12 @@ Nenhuma implementação genérica adicional foi autorizada por esta rechecagem:
 Warp/Station/Prepare/Omen/Paradigm já têm suporte mínimo guardião, enquanto
 ability words permanecem telemetry/semântica.
 
+Correção complementar desta rodada: `DeckRulesService` passou a bloquear
+centralmente qualquer payload com `is_commander=true` quando o formato não é
+Commander/Brawl. Isso cobre criação, update, import e endpoints incrementais
+que delegam validação ao serviço, mantendo a regra de slot de comandante
+uniforme em vez de depender de guardas manuais por rota.
+
 ## 2026-06-11 — Optimize runtime modularization pass
 
 - Extraído `server/lib/ai/optimize_functional_role_support.dart` para

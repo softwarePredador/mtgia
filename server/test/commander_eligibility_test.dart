@@ -1,7 +1,18 @@
 import 'package:server/commander_eligibility.dart';
+import 'package:server/deck_rules_service.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('isCommanderStyleFormat', () {
+    test('only Commander and Brawl allow commander slots', () {
+      expect(isCommanderStyleFormat('commander'), isTrue);
+      expect(isCommanderStyleFormat('Commander'), isTrue);
+      expect(isCommanderStyleFormat('brawl'), isTrue);
+      expect(isCommanderStyleFormat('standard'), isFalse);
+      expect(isCommanderStyleFormat('modern'), isFalse);
+    });
+  });
+
   group('isCommanderEligibleCard', () {
     test('accepts legendary creatures', () {
       expect(
@@ -81,6 +92,47 @@ void main() {
         isFalse,
       );
       expect(isCommanderEligibleCard(typeLine: 'Artifact'), isFalse);
+    });
+  });
+
+  group('validateCommanderSlotAllowedForFormat', () {
+    test('rejects commander slot flags outside Commander/Brawl', () {
+      expect(
+        () => validateCommanderSlotAllowedForFormat(
+          format: 'standard',
+          cards: const [
+            {'card_id': 'card-1', 'quantity': 1, 'is_commander': true},
+          ],
+        ),
+        throwsA(
+          isA<DeckRulesException>().having(
+            (e) => e.message,
+            'message',
+            contains('Commander/Brawl'),
+          ),
+        ),
+      );
+    });
+
+    test('allows commander slot flags in Commander/Brawl', () {
+      expect(
+        () => validateCommanderSlotAllowedForFormat(
+          format: 'commander',
+          cards: const [
+            {'card_id': 'card-1', 'quantity': 1, 'is_commander': true},
+          ],
+        ),
+        returnsNormally,
+      );
+      expect(
+        () => validateCommanderSlotAllowedForFormat(
+          format: 'brawl',
+          cards: const [
+            {'card_id': 'card-1', 'quantity': 1, 'is_commander': true},
+          ],
+        ),
+        returnsNormally,
+      );
     });
   });
 }

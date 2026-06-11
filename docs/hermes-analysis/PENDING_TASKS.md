@@ -50,6 +50,9 @@
 > A rechecagem complementar usa `Edge of Eternities Update Bulletin` como fonte
 > primária para os números novos `111.10u`, `721`, `702.184` e `702.185`.
 > Mechanics/release notes continuam como suporte operacional/card-specific.
+> Correção complementar: `DeckRulesService` agora bloqueia `is_commander=true`
+> em formatos não Commander/Brawl, cobrindo rotas que delegam validação ao
+> serviço compartilhado.
 >
 > **Atualização 2026-06-11 — CMC app-facing hardening.**
 > O backend passou a carregar `cards.cmc` no resolver de import/deck generation,
@@ -272,7 +275,7 @@
 | ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
-| ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + rota incremental |
+| ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + `DeckRulesService` + rota incremental |
 | ✅ | Archetype resolution compartilhado | `optimize_archetype_support.dart` |
 | ✅ | Strategic role tags compartilhados | `resolveCardFunctionalRoles` em `functional_card_tags.dart` |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
