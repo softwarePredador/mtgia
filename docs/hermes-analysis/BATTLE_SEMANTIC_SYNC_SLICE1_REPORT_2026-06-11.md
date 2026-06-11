@@ -465,6 +465,47 @@ The generated runtime artifacts were stashed on Hermes as
 `post-ruleset-smoke-artifacts-20260611T195539Z`; the SQLite state remained
 persisted after stash.
 
+## Slice 3 logical-rule validation
+
+Hermes AWS pulled `master` at `55af86c4`, created a real SQLite backup and
+applied the `logical_rule_key`/dedupe snapshot:
+
+`docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-logical-rule-55af86c4.20260611T201027Z`
+
+Report-only and apply gates agreed:
+
+| Check | Result |
+|---|---|
+| cards seen/written | `100 / 100` |
+| total quantity | `100` |
+| commanders | `1` |
+| battle rules seen/written | `100 / 98` |
+| battle rules deduped | `2` |
+| rules missing `logical_rule_key` | `0` |
+| distinct `deck_hash` values | `1` |
+| distinct `semantics_hash` values | `1` |
+| distinct `ruleset_hash` values | `1` |
+| premium Mox policy for Lorehold | no Chrome Mox, Mox Diamond or Mox Opal present |
+
+Remote baseline/slot smoke after apply:
+
+| Check | Result |
+|---|---|
+| latest baseline id | `3` |
+| baseline games | `36` |
+| baseline `deck_hash` length | `64` |
+| baseline `semantics_hash` length | `64` |
+| baseline `ruleset_hash` length | `64` |
+| slot phase | `logical_rule_smoke` |
+| slot rows with semantic hash | `8` |
+| slot rows with ruleset hash | `8` |
+| rules with `logical_rule_key` | `98` |
+| deck restored after smoke | `100` rows, `100` quantity, `1` commander |
+
+The generated runtime artifacts were stashed on Hermes as
+`post-logical-rule-smoke-artifacts-20260611T201410Z`; the SQLite state remained
+persisted after stash.
+
 ## Next recommended step
 
 Proceed to the next controlled slice:
@@ -472,8 +513,6 @@ Proceed to the next controlled slice:
 1. keep all Lorehold swaps report-only until owner review confirms candidate
    quality;
 2. run a larger sample before applying any candidate;
-3. apply the local Slice 3 `logical_rule_key`/dedupe change to Hermes AWS after
-   backup and report-only validation;
-4. define trusted derivation policy before letting `card_battle_rules` create
+3. define trusted derivation policy before letting `card_battle_rules` create
    `card_function_tags`;
-5. keep backend/product as source of truth; Hermes proposes and reports only.
+4. keep backend/product as source of truth; Hermes proposes and reports only.

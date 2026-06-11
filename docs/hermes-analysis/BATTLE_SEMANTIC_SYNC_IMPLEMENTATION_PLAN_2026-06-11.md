@@ -121,12 +121,12 @@ semantic policy: reviewing Lorehold candidates, expanding sample size and only
 then deciding whether trusted `card_battle_rules` should derive missing
 `card_function_tags`.
 
-Local Slice 3 status: implemented but not yet applied to Hermes AWS. The
+Slice 3 status: implemented and applied to Hermes AWS after backup. The
 snapshot now adds a stable `logical_rule_key` to every battle rule and dedupes
 equivalent rules by face/variant/effect/deck role before writing
-`battle_rules_json` and calculating `ruleset_hash`. A PostgreSQL-to-temporary
-SQLite smoke for Lorehold kept `100` cards, `1` commander, wrote `98` rules
-with logical keys and deduped `2` equivalent rules.
+`battle_rules_json` and calculating `ruleset_hash`. Local and remote
+PostgreSQL-to-SQLite smokes for Lorehold kept `100` cards, `1` commander,
+wrote `98` rules with logical keys and deduped `2` equivalent rules.
 
 ### Backend app-facing simulator
 
@@ -581,7 +581,7 @@ Slice 2 implemented and applied on Hermes AWS on 2026-06-11:
 5. Propagate baseline semantic/ruleset hashes through baseline, slot scan,
    quality gate and apply rollback metadata.
 
-Slice 3 implemented locally on 2026-06-11:
+Slice 3 implemented locally and applied on Hermes AWS on 2026-06-11:
 
 1. Add `logical_rule_key` to normalized battle rules.
 2. Deduplicate equivalent `battle_rules_json` entries by
@@ -593,13 +593,17 @@ Slice 3 implemented locally on 2026-06-11:
 5. Prove with PG -> temp SQLite Lorehold smoke:
    `100` cards, `100` quantity, `1` commander, `98` rules with
    `logical_rule_key`, `2` deduped rules.
+6. Apply on Hermes AWS with backup
+   `knowledge.db.pre-logical-rule-55af86c4.20260611T201027Z`.
+7. Remote smoke:
+   baseline `id=3`, `36` games, phase `logical_rule_smoke`, `8` slot rows
+   carrying semantic/ruleset hashes, `98` rules with `logical_rule_key`, deck
+   restored to `100` cards and `1` commander.
 
 Current next work:
 
 1. Review Lorehold report-only candidates before any apply.
 2. Expand sample size before trusting any swap.
-3. Apply Slice 3 to Hermes AWS after backup/report-only, then run a small
-   ruleset smoke.
-4. Define trusted derivation policy before deriving `card_function_tags` from
+3. Define trusted derivation policy before deriving `card_function_tags` from
    `card_battle_rules`.
-5. Keep battle execution unchanged until these policies and tests exist.
+4. Keep battle execution unchanged until these policies and tests exist.

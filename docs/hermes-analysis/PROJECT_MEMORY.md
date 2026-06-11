@@ -14,7 +14,7 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Master HEAD observado no apply Hermes: 76d828d2 (2026-06-11, Track Hermes ruleset hash in optimizer)
+- Master HEAD observado no apply Hermes: 55af86c4 (2026-06-11, Deduplicate Hermes battle rules by logical key)
 - Relatorio mestre atual: `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
 - Backend tests: 599 (2026-06-04 14:10Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
 
@@ -88,6 +88,12 @@ Ao responder sobre o ManaLoom:
   100 cartas, 1 comandante, um `deck_hash`, um `semantics_hash`, um
   `ruleset_hash`, baseline `id=2` com 60 jogos e 7 benchmarks
   `ruleset_hash_smoke` contendo hashes semântico e de regras.
+- Hermes AWS aplicou o Slice 3 `logical_rule_key` em 2026-06-11 com backup
+  `knowledge.db.pre-logical-rule-55af86c4.20260611T201027Z`; invariantes
+  pós-smoke: 100 cartas, 1 comandante, 98 regras com `logical_rule_key`, 0
+  regras sem chave lógica, 2 regras equivalentes deduplicadas, baseline `id=3`
+  com 36 jogos e 8 benchmarks `logical_rule_smoke` contendo hashes semântico e
+  de regras.
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 
