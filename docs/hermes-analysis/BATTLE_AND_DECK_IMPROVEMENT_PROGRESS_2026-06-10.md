@@ -57,7 +57,7 @@ que o usuário vê na análise do deck.
 ## Etapa 3 — Auditoria de modularização
 
 **Status:** em andamento, com dezenove extrações de testes, seis splits
-do engine e treze splits da rota/runtime de optimize concluídos.
+do engine e quatorze splits da rota/runtime de optimize concluídos.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
@@ -90,7 +90,8 @@ do engine e treze splits da rota/runtime de optimize concluídos.
 - `server/routes/ai/optimize/index.dart` — 2632 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
-  pós-processamento/retry orchestration/filtro inicial de sugestões da rota.
+  pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
+  identidade de cor da rota.
 - `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
@@ -151,6 +152,11 @@ do engine e treze splits da rota/runtime de optimize concluídos.
 - `server/test/optimize_route_suggestion_filter_support_test.dart` — 70 linhas
   cobrindo filtro inicial de removals/additions, comandante, core cards,
   duplicatas e modo complete.
+- `server/lib/ai/optimize_route_color_identity_filter_support.dart` — 38
+  linhas extraídas da rota.
+- `server/test/optimize_route_color_identity_filter_support_test.dart` — 51
+  linhas cobrindo filtro de identidade de cor, comandante colorless e dados de
+  identidade ausentes.
 
 **Decisão:**
 Não misturar refactors grandes com correções funcionais. A primeira extração
@@ -273,6 +279,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   filtros iniciais de sugestões antes de `validateCardNames`: balanceamento,
   sanitização, proteção de comandante/core cards, bloqueio de no-op e
   preservação de repetições em modo complete.
+- Novo módulo Dart `optimize_route_color_identity_filter_support.dart`
+  centraliza o filtro puro de adições por identidade de cor do commander,
+  deixando a rota responsável apenas pelo SELECT que monta `identityByName`.
 - `test_battle_analyst_v10_3.py` não contém mais `def test_` inline; ele carrega
   módulos, constrói os helpers/registry e executa a lista agregada.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
@@ -308,6 +317,8 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - `dart test test/optimize_route_retry_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - `dart analyze lib/ai/optimize_route_suggestion_filter_support.dart routes/ai/optimize/index.dart test/optimize_route_suggestion_filter_support_test.dart`
 - `dart test test/optimize_route_suggestion_filter_support_test.dart test/optimize_route_retry_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
+- `dart analyze lib/ai/optimize_route_color_identity_filter_support.dart routes/ai/optimize/index.dart test/optimize_route_color_identity_filter_support_test.dart`
+- `dart test test/optimize_route_color_identity_filter_support_test.dart test/optimize_route_suggestion_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - Hermes/AWS pós-push:
   - `battle_passes=130`.
   - analyze focado em `commander_eligibility`, `DeckRulesService`, rota
@@ -406,8 +417,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    cortes de response/cache, envelope async, parsing inicial, payload final,
    warnings finais, diagnostics finais, fallback de sugestões vazias e payloads
    de rejeição do quality gate, validação pós-processamento e retry
-   orchestration/filtro inicial de sugestões já foram feitos; os próximos
-   cortes seguros são validações de cor/bracket ainda acopladas a SQL.
+   orchestration/filtro inicial de sugestões/filtro de identidade de cor já
+   foram feitos; o próximo corte seguro é validação de bracket ainda acoplada a
+   SQL.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
