@@ -211,6 +211,15 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - `dart test test/commander_eligibility_test.dart test/mtg_rules_validation_test.dart -r expanded`
 - `dart analyze lib/ai/optimize_route_response_support.dart routes/ai/optimize/index.dart test/optimize_route_response_support_test.dart`
 - `dart test test/optimize_route_response_support_test.dart test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart -r expanded`
+- Hermes/AWS pós-push:
+  - `battle_passes=130`.
+  - analyze focado em `commander_eligibility`, `DeckRulesService`, rota
+    incremental de cards, `optimize_route_response_support` e rota
+    `ai/optimize`: sem issues.
+  - `dart test test/commander_eligibility_test.dart test/optimize_route_response_support_test.dart -r expanded`: `All tests passed`.
+  - `dart test test/commander_eligibility_test.dart test/mtg_rules_validation_test.dart test/color_identity_test.dart -r expanded`: 81 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 211d5b01`: `PASS`; observações de risco
+    foram cobertas pela rodada adicional de regras Commander/color identity.
 
 ## Etapa 4 — Próximas pendências reais
 
