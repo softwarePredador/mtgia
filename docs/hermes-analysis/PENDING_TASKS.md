@@ -62,9 +62,11 @@
 > Regressões auxiliares restantes também foram movidas para
 > `battle_misc_regression_tests.py`, deixando `test_battle_analyst_v10_3.py`
 > como runner/orquestrador fino sem `def test_` inline.
-> Primeiro split do engine principal concluído: helpers puros de mana/custo
-> foram movidos para `battle_mana_cost_support.py`, reduzindo
-> `battle_analyst_v9.py` para 7792 linhas sem alterar a suite de 130 testes.
+> Dois splits do engine principal concluídos: helpers puros de mana/custo foram
+> movidos para `battle_mana_cost_support.py` e helpers de características de
+> carta/identidade Commander foram movidos para
+> `battle_card_characteristics_support.py`, reduzindo `battle_analyst_v9.py`
+> para 7640 linhas sem alterar a suite de 130 testes.
 
 ---
 
@@ -379,8 +381,9 @@
 
 | Arquivo | Descrição | Linhas |
 |---|---|---|
-| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 após primeiro split de helpers puros | 7792 |
+| `battle_analyst_v9.py` | Engine de batalha com todas as melhorias v9 após dois splits de helpers puros | 7640 |
 | `battle_mana_cost_support.py` | Helpers puros de mana/custo usados pelo engine de batalha | 101 |
+| `battle_card_characteristics_support.py` | Helpers puros de características, faces/modos, identidade de cor e elegibilidade Commander | 173 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |

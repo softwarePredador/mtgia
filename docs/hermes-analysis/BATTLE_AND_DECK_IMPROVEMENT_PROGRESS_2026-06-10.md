@@ -52,12 +52,13 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com dezenove extrações de testes e um primeiro split
+**Status:** em andamento, com dezenove extrações de testes e dois splits
 do engine concluídos.
 
 **Arquivos que precisam split dedicado:**
-- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7792 linhas após o primeiro split do engine.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7640 linhas após dois splits do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py` — 101 linhas extraídas do engine.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_characteristics_support.py` — 173 linhas extraídas do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` — 238 linhas após dezenove extrações; agora atua como runner/orquestrador fino.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` — 304 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` — 330 linhas extraídas.
@@ -151,6 +152,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   `MANA_SYMBOL_TO_POOL`, parser de custo, merge de custos, contagem de X/Y/Z,
   custo de carta e snapshot de custo para replay. O split reduz dependência do
   arquivo principal sem tocar em jogador, pilha ou resolução.
+- Novo módulo `battle_card_characteristics_support.py` com helpers puros de
+  características de carta: faces/modos (DFC, adventure, omen, prepare,
+  prototype, split), identidade de cor, leitura de listas JSON, checagem de
+  criatura, Vehicle/Spacecraft e elegibilidade Commander 2026.
 - `test_battle_analyst_v10_3.py` não contém mais `def test_` inline; ele carrega
   módulos, constrói os helpers/registry e executa a lista agregada.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
@@ -160,16 +165,16 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   não foi removida.
 
 **Validação:**
-- `python3 -m py_compile battle_mana_cost_support.py battle_misc_regression_tests.py battle_event_trigger_tests.py battle_conformance_tests.py battle_engine_metrics_tests.py battle_continuous_effects_tests.py battle_permanents_complex_tests.py battle_sba_zone_tests.py battle_turn_flow_tests.py battle_card_import_tests.py battle_zone_transition_tests.py battle_summoning_sickness_tests.py battle_targeting_tests.py battle_card_specific_tests.py battle_stack_casting_tests.py battle_mana_tests.py battle_commander_tests.py battle_replacement_tests.py battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
+- `python3 -m py_compile battle_mana_cost_support.py battle_card_characteristics_support.py battle_misc_regression_tests.py battle_event_trigger_tests.py battle_conformance_tests.py battle_engine_metrics_tests.py battle_continuous_effects_tests.py battle_permanents_complex_tests.py battle_sba_zone_tests.py battle_turn_flow_tests.py battle_card_import_tests.py battle_zone_transition_tests.py battle_summoning_sickness_tests.py battle_targeting_tests.py battle_card_specific_tests.py battle_stack_casting_tests.py battle_mana_tests.py battle_commander_tests.py battle_replacement_tests.py battle_combat_tests.py battle_rules_2026_tests.py test_battle_analyst_v10_3.py battle_analyst_v9.py`
 - `python3 test_battle_analyst_v10_3.py`
 
 ## Etapa 4 — Próximas pendências reais
 
 **Prioridade atual:**
-1. Continuar o split do engine `battle_analyst_v9.py` por domínio. O primeiro
-   corte seguro (`battle_mana_cost_support.py`) já isolou helpers puros; os
-   próximos candidatos são color identity/card characteristics ou zone
-   transition helpers.
+1. Continuar o split do engine `battle_analyst_v9.py` por domínio. Os dois
+   cortes seguros (`battle_mana_cost_support.py` e
+   `battle_card_characteristics_support.py`) já isolaram helpers puros; o
+   próximo candidato é zone transition helpers.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
 3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
