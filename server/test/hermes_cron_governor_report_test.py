@@ -37,7 +37,9 @@ class HermesCronGovernorReportTest(unittest.TestCase):
 
             failed_dir = outputs / "agent-job"
             failed_dir.mkdir()
-            (failed_dir / "latest.md").write_text("RuntimeError: HTTP 429: limit\n")
+            (failed_dir / "latest.md").write_text(
+                "# Cron Job: agent job (FAILED)\n\n## Error\nRuntimeError: HTTP 429: limit\n"
+            )
 
             jobs = [
                 {
@@ -65,6 +67,17 @@ class HermesCronGovernorReportTest(unittest.TestCase):
             self.assertIn("enabled_provider_dependent: 1", report)
             self.assertIn("P1 `agent job`", report)
             self.assertIn("HTTP 429", report)
+
+    def test_python_scripts_are_valid_script_targets(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            script = scripts / "job.py"
+            script.write_text("#!/usr/bin/env python3\nprint('ok')\n")
+
+            self.assertEqual(module._script_state(scripts, "job.py"), "ok")
 
     def test_load_jobs_accepts_object_or_list_shape(self) -> None:
         module = _load_module()

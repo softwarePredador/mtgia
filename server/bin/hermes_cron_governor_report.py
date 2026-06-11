@@ -69,8 +69,18 @@ def _read_evidence(output_dir: Path, job_id: str) -> CronEvidence:
     text = latest.read_text(errors="replace")
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     excerpt = " | ".join(lines[:6])[:500]
-    markers = tuple(marker for marker in ERROR_MARKERS if marker.lower() in text.lower())
+    markers = _failure_markers(text)
     return CronEvidence(latest, latest.stat().st_size, excerpt, markers)
+
+
+def _failure_markers(text: str) -> tuple[str, ...]:
+    """Return markers only for actual cron failure blocks, not historical prose."""
+    lower = text.lower()
+    header = "\n".join(text.splitlines()[:8]).lower()
+    has_failure_block = "(failed)" in header or "\n## error" in lower or "script exited with code" in lower
+    if not has_failure_block:
+        return ()
+    return tuple(marker for marker in ERROR_MARKERS if marker.lower() in lower)
 
 
 def _script_state(scripts_dir: Path, script_name: str | None) -> str:
@@ -79,6 +89,8 @@ def _script_state(scripts_dir: Path, script_name: str | None) -> str:
     path = scripts_dir / script_name
     if not path.exists():
         return "missing"
+    if path.suffix == ".py":
+        return "ok"
     if not os.access(path, os.X_OK):
         return "not_executable"
     return "ok"
