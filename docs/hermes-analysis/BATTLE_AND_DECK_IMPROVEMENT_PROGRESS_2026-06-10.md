@@ -90,14 +90,15 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2515 linhas após splits de
+- `server/routes/ai/optimize/index.dart` — 2522 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
   pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
   identidade de cor/filtro de bracket/top-up determinístico do modo complete e
   proteção de remoção de lands/reequilíbrio pós-filtros/coleta EDHREC/query de
-  dados completos de adições/análise virtual pós-swap. A rota ainda deve seguir
-  reduzindo até ficar como orquestrador fino.
+  dados completos de adições/análise virtual pós-swap/execução do
+  `OptimizationValidator`. A rota ainda deve seguir reduzindo até ficar como
+  orquestrador fino.
 - `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
@@ -542,6 +543,16 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_virtual_analysis_support_test.dart test/optimize_route_addition_data_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 30 testes, `All tests passed`.
   - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
   - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
+- Split local da execução do `OptimizationValidator`:
+  - Criado `server/lib/ai/optimize_route_validator_support.dart`.
+  - Criado `server/test/optimize_route_validator_support_test.dart`.
+  - A rota `server/routes/ai/optimize/index.dart` moveu a execução injetável do
+    validator, persistência de `postAnalysis.validation` e warnings de
+    reprovação para support dedicado. O próximo corte fica limitado à decisão
+    de rejeição/retry final.
+  - Validação local focada:
+    - `dart analyze lib/ai/optimize_route_validator_support.dart routes/ai/optimize/index.dart test/optimize_route_validator_support_test.dart`: sem issues.
+    - `dart test test/optimize_route_validator_support_test.dart test/optimize_route_virtual_analysis_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 28 testes, `All tests passed`.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -561,9 +572,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    orchestration/filtro inicial de sugestões/filtro de identidade de cor/filtro
    de bracket/top-up determinístico de básicos no modo complete/proteção de
    remoção de terrenos/reequilíbrio pós-filtros/coleta EDHREC pós-processamento
-   query de dados completos das adições/quality gate e análise virtual
-   pós-swap já foram feitos; o próximo corte seguro é extrair a execução do
-   `OptimizationValidator` e a rejeição final.
+   query de dados completos das adições/quality gate, análise virtual pós-swap
+   e execução do `OptimizationValidator` já foram feitos; o próximo corte
+   seguro é extrair a decisão de rejeição/retry final.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,

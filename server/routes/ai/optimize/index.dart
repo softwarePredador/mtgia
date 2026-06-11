@@ -47,6 +47,8 @@ import '../../../lib/ai/optimize_route_suggestion_filter_support.dart'
     as optimize_route_suggestion_filter;
 import '../../../lib/ai/optimize_route_virtual_analysis_support.dart'
     as optimize_route_virtual_analysis;
+import '../../../lib/ai/optimize_route_validator_support.dart'
+    as optimize_route_validator;
 import '../../../lib/ai/optimize_route_warnings_support.dart'
     as optimize_route_warnings;
 import '../../../lib/ai/optimize_swap_integrity.dart';
@@ -1967,31 +1969,36 @@ Future<Response> onRequest(RequestContext context) async {
             final themeService = ThemeContextualRulesService(pool);
             final validator = OptimizationValidator(
                 openAiKey: apiKey, themeService: themeService);
-            final validationReport = await validator.validate(
+            final validationResult =
+                await optimize_route_validator.runOptimizeRouteValidation(
+              validate: ({
+                required originalDeck,
+                required optimizedDeck,
+                required removals,
+                required additions,
+                required commanders,
+                required archetype,
+              }) =>
+                  validator.validate(
+                originalDeck: originalDeck,
+                optimizedDeck: optimizedDeck,
+                removals: removals,
+                additions: additions,
+                commanders: commanders,
+                archetype: archetype,
+              ),
               originalDeck: allCardData,
               optimizedDeck: virtualDeck,
               removals: validRemovals,
               additions: validAdditions,
               commanders: commanders,
               archetype: effectiveOptimizeArchetype,
+              postAnalysis: postAnalysis,
+              existingValidationWarnings: validationWarnings,
             );
-
-            postAnalysis['validation'] = validationReport.toJson();
-            optimizationValidationReport = validationReport;
-
-            // Adicionar warnings do validador
-            for (final w in validationReport.warnings) {
-              validationWarnings.add(w);
-            }
-
-            // Se reprovado, alertar
-            if (validationReport.verdict == 'reprovado') {
-              validationWarnings.insert(0,
-                  'ðŸš« VALIDAÃ‡ÃƒO: As trocas sugeridas NÃƒO passaram na validaÃ§Ã£o automÃ¡tica (score: ${validationReport.score}/100).');
-            }
-
-            Log.d(
-                'Validation score: ${validationReport.score}/100 verdict: ${validationReport.verdict}');
+            postAnalysis = validationResult.postAnalysis;
+            validationWarnings = validationResult.validationWarnings;
+            optimizationValidationReport = validationResult.validationReport;
           } catch (validationError) {
             Log.e('Validation failed: $validationError');
             return respondWithOptimizeTelemetry(
