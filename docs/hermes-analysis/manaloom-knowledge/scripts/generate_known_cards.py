@@ -2,6 +2,11 @@
 import sqlite3, subprocess, os, re, json
 from pathlib import Path
 
+from learned_deck_completeness import (
+    learned_deck_completeness,
+    parse_learned_card_list,
+)
+
 DEFAULT_SCRIPT_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts")
 SCRIPT_DIR = Path(os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", DEFAULT_SCRIPT_DIR))
 DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", str(SCRIPT_DIR / "knowledge.db"))
@@ -62,23 +67,26 @@ def _safe_cmc(val):
 # 1. Collect all Lorehold cards
 conn = sqlite3.connect(DB)
 all_cards = set()
+skipped_partial_decks = 0
 for row in conn.execute(
-    "SELECT card_list FROM learned_decks "
+    "SELECT commander, card_list, card_count FROM learned_decks "
     "WHERE commander LIKE '%Lorehold%' AND card_list IS NOT NULL"
 ):
-    try:
-        cards = json.loads(row[0])
-        for card in cards:
-            all_cards.add(card["name"])
-    except:
-        for line in row[0].strip().split("\n"):
-            line = line.strip()
-            if not line: continue
-            parts = line.split(" ", 1)
-            if len(parts) == 2 and parts[0].isdigit():
-                all_cards.add(parts[1])
+    summary = learned_deck_completeness(
+        row[1],
+        commander=row[0],
+        declared_quantity=row[2],
+    )
+    if not summary.eligible_for_training(min_total=90):
+        skipped_partial_decks += 1
+        continue
+    for card in parse_learned_card_list(row[1]):
+        all_cards.add(card.name)
 
-print(f"Total Lorehold cards: {len(all_cards)}")
+print(
+    f"Total Lorehold cards: {len(all_cards)} "
+    f"(skipped_partial_decks={skipped_partial_decks})"
+)
 
 # 2. Existing handcrafted
 battle_path = os.environ.get(

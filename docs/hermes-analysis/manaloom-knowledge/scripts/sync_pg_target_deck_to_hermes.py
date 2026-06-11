@@ -47,6 +47,7 @@ def parse_args() -> argparse.Namespace:
         default=os.environ.get("MANALOOM_TARGET_DECK_NAME_LIKE", "%Runtime Lorehold Learned%"),
     )
     parser.add_argument("--target-deck-id", type=int, default=6)
+    parser.add_argument("--min-total-cards", type=int, default=90)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--report")
     return parser.parse_args()
@@ -188,6 +189,16 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
                 "total_qty": int(deck_row[7]),
                 "commander": deck_row[8],
             }
+            if deck["total_qty"] < args.min_total_cards:
+                raise RuntimeError(
+                    "Selected PG deck is partial: "
+                    f"total_qty={deck['total_qty']}, min_total_cards={args.min_total_cards}, "
+                    f"pg_deck_id={pg_deck_id}. Refusing to sync phantom deck."
+                )
+            if not deck["commander"]:
+                raise RuntimeError(
+                    f"Selected PG deck has no commander row: pg_deck_id={pg_deck_id}."
+                )
             cur.execute(
                 """
                 SELECT

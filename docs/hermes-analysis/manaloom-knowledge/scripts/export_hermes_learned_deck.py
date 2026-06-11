@@ -10,6 +10,8 @@ Uso:
 import json, sqlite3, sys, os, re
 from datetime import datetime, timezone
 
+from learned_deck_completeness import learned_deck_completeness
+
 def parse_card_list(card_list_text):
     cards = []
     for line in card_list_text.strip().split("\n"):
@@ -151,6 +153,25 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
 
     score = compute_score(db, wincon_primary, wincon_backup)
     target_deck_id = row["target_deck_id"]
+    completeness = learned_deck_completeness(
+        card_list,
+        commander=commander,
+        declared_quantity=card_count,
+    )
+    if not completeness.is_full_commander_deck():
+        print(
+            "Learned deck incompleto; export bloqueado: "
+            f"learned_deck:{learned_id_val} total={completeness.total_with_commander} "
+            f"main={completeness.main_quantity} "
+            f"commander_in_list={completeness.commander_quantity_in_list}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    output_card_list = card_list
+    output_card_count = completeness.total_with_commander
+    if completeness.commander_quantity_in_list == 0:
+        output_card_list = f"1 {commander}\n{str(card_list or '').strip()}"
 
     # Prefer decks table counts if available
     deck_row = db.execute(
@@ -180,8 +201,8 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
         "source_ref": f"learned_deck:{learned_id_val}",
         "commander_name": commander,
         "deck_name": deck_name,
-        "card_list": card_list,
-        "card_count": card_count,
+        "card_list": output_card_list,
+        "card_count": output_card_count,
         "is_active": True,
         "score": score,
         "wincon_primary": wincon_primary,

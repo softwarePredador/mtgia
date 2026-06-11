@@ -28,6 +28,8 @@ import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 
+from learned_deck_completeness import learned_deck_completeness
+
 
 DB = Path('/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
 COMMANDER = os.environ.get("HERMES_IMPORT_COMMANDER", "Lorehold, the Historian")
@@ -260,10 +262,23 @@ def import_decks(decks: list[DeckBlock], apply: bool) -> None:
         source_url = deck.source_url or f'manual-import:{h}'
         card_list = '\n'.join(f'{c.quantity} {c.name}' for c in deck.cards)
         card_count = sum(c.quantity for c in deck.cards)
+        completeness = learned_deck_completeness(
+            card_list,
+            commander=COMMANDER,
+            declared_quantity=card_count,
+        )
         existing = cur.execute('SELECT learned_deck_id FROM lorehold_import_runs WHERE deck_hash=?', (h,)).fetchone()
         if not existing:
             existing = cur.execute('SELECT id FROM learned_decks WHERE source_url=?', (source_url,)).fetchone()
         print(f"Deck: {deck.name} | cards={card_count} | unique={len(deck.cards)} | hash={h}")
+        if not completeness.is_full_commander_deck():
+            print(
+                "  SKIP partial learned deck "
+                f"(total_with_commander={completeness.total_with_commander}, "
+                f"main={completeness.main_quantity}, "
+                f"commander_in_list={completeness.commander_quantity_in_list})"
+            )
+            continue
         if existing:
             print(f"  SKIP duplicate (learned_deck_id={existing[0]})")
             continue

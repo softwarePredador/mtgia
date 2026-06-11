@@ -10,17 +10,24 @@
 > **Metodo:** Cruzamento do conhecimento MTG (VALIDATOR_LOG 2026-06-02 — pipeline integrity crisis + CMC corruption, GAME_CHANGERS.md — 53 GCs com double-counting detectado, SCOUT_LOG — Lorehold maturity, TAG_ACCURACY — payoff 35% accuracy) com codigo Dart (edh_bracket_policy, optimization_quality_gate, optimization_functional_roles, goldfish_simulator)
 > **Base de conhecimento:** VALIDATOR_LOG (deck rebuild + 37 CMCs corrompidos + 20 unknown tags + only 3 removals), GAME_CHANGERS (53 GCs com 23 double-tagged), tag_accuracy (payoff 35%, enabler 50%), SCOUT_LOG (deck em maturidade persistente)
 > **Novas tasks nesta execucao:** 5 (1xP1, 4xP2) — Game Changer double-counting fix, payoff tag accuracy improvement, contextual enabler/payoff heuristics, goldfish CMC validation hardening, GC list sync mechanism
-> **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting resolvido em `server/lib/edh_bracket_policy.dart`; testes adicionados em `server/test/optimize_runtime_support_test.dart` garantindo que Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle consumam apenas `gameChanger`.
+> **Atualizacao Codex 2026-06-06:** P1 Game Changer double-counting foi reavaliado contra o codigo vivo. A politica atual preserva `gameChanger` + papeis secundarios (`fastMana`, `tutor`, `freeInteraction`, `infiniteCombo`) para diagnostico e budgets multi-tag; testes em `server/test/optimize_runtime_support_test.dart` e `server/test/edh_bracket_policy_test.dart` cobrem Mana Vault, Demonic Tutor, Force of Will e Thassa's Oracle.
 > **Atualizacao Codex 2026-06-06:** P2 payoff/enabler contextual resolvido em `server/lib/ai/optimization_functional_roles.dart`; testes em `server/test/optimization_quality_gate_test.dart` cobrem spellslinger, aristocrats e tokens.
 > **Atualizacao Codex 2026-06-06:** P2 goldfish CMC hardening resolvido em `server/lib/ai/cmc_safety.dart`; `GoldfishSimulator`, `OptimizationValidator` e `OptimizationSwapGate` agora recuperam CMC pelo `mana_cost` quando o CMC bruto esta corrompido e tratam CMC desconhecido non-land como custo alto, nunca como carta gratis.
 > **Atualizacao Codex 2026-06-06:** P2 Game Changer drift guard resolvido com bloco Dart gerado a partir do SQLite, script `docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py --check` e teste cobrindo lista com 53 entradas + nome MDFC de Tergrid.
 > **Atualizacao Codex 2026-06-09:** P1 Job Polling NULL `user_id` resolvido no backend. `OptimizeJob` e `AiGenerateJob` agora usam `userId` non-nullable no modelo, rows legadas com `user_id=NULL` viram owner vazio e os pollers `/ai/optimize/jobs/:id` e `/ai/generate/jobs/:id` retornam 404 para jobs sem dono ou de outro usuario. `AiGenerateJobStore.create` exige `required String userId`, e a rota async de generate retorna `Authentication required` antes de criar job sem usuario. Testes: `ai_optimize_authorization_source_test.dart`, `ai_generate_job_authorization_source_test.dart`, `ai_generate_performance_support_test.dart`.
 
-### [P1] Bracket Policy: Corrigir Double-Counting de Game Changers — 23/53 GCs (43%) consomem budget de DUAS categorias simultaneamente
+### [P1][OBSOLETO/RESOLVIDO COMO MULTI-TAG] Bracket Policy: double-counting de Game Changers
 
-**Status em 2026-06-06:** RESOLVIDO. `tagCardForBracket()` retorna exclusivamente `{BracketCategory.gameChanger}` para cartas da lista oficial antes de avaliar fast mana/tutor/free interaction/infinite combo. `countBracketCategories()` agora inicializa `gameChanger` e os testes focados cobrem a regressao.
+**Status em 2026-06-11:** OBSOLETO como tarefa de implementacao. A premissa "somente `gameChanger`" foi substituida pela estrategia multi-tag: cartas oficiais Game Changer preservam `gameChanger` e tambem papeis mecanicos secundarios. Isso e usado como diagnostico/budget de risco, nao como erro de regra. Nao alterar o codigo para early-return exclusivo sem nova decisao de produto.
 
-**Conhecimento MTG:** Os Game Changers oficiais sao uma categoria UNICA que consome slots do budget de GC. Uma carta como Mana Vault DEVE consumir APENAS o slot de `gameChanger`, nao o slot de `fastMana` tambem. O bracket system oficial (mtgcommander.net) define que Game Changers sao contados separadamente das outras categorias. O entendimento correto e: se uma carta e Game Changer, ela conta EXCLUSIVAMENTE contra o limite de Game Changers do bracket, independentemente de sua funcao mecanica (fast mana, tutor, etc.).
+**Evidencia viva:**
+- `server/test/optimize_runtime_support_test.dart` — `preserves secondary tags for official Game Changers` espera `gameChanger` + papel secundario.
+- `server/test/optimize_runtime_support_test.dart` — `game changer budget also consumes secondary role budgets` valida budget multi-tag.
+- `server/test/edh_bracket_policy_test.dart` — `keeps official gamechanger names tagged without suppressing roles`.
+
+**Conclusao operacional:** manter esta secao apenas como historico do problema original. A acao recomendada antiga abaixo nao deve ser executada.
+
+**Conhecimento historico original:** esta tarefa nasceu de uma leitura inicial de que Game Changers deveriam consumir apenas budget de GC. A politica atual do ManaLoom divergiu disso de proposito: `gameChanger` e uma tag oficial, mas papeis secundarios continuam preservados para explicar risco funcional e limitar concentracao de fast mana/tutor/free interaction quando a decisao de produto assim exigir.
 
 **Evidencia no codigo:**
 - `server/lib/edh_bracket_policy.dart:101-103` — `_fastManaNames` check adiciona `fastMana`.
@@ -39,17 +46,17 @@
 - Um deck com 3 tutor GCs (ex: Demonic + Vampiric + Mystical) consome TODOS os 3 slots de GC, deixando 0 slots para Rhystic Study, The One Ring, etc.
 - O budget de `tutor` (max 6) fica parcialmente consumido por cartas que NAO deveriam contar contra ele.
 
-**Gap:** `tagCardForBracket()` acumula categorias sem priorizar `gameChanger`. Se uma carta e Game Changer, nao deveria consumir budget de outras categorias — deveria consumir APENAS o slot de `gameChanger`.
+**Gap historico:** `tagCardForBracket()` acumula categorias. Isso era tratado como bug, mas agora e comportamento esperado e coberto por teste.
 
-**Impacto:** P1 — Falsos bloqueios em adicao de cartas. 43% dos GCs sao bloqueados prematuramente. Um deck bracket 3 pode ser bloqueado de adicionar GCs validos porque o sistema consome budget duplo. A logica de bracket fica inconsistente com as regras oficiais.
+**Impacto atual:** Nenhuma acao de codigo pendente neste item. Qualquer alteracao para `gameChanger` exclusivo deve passar por nova decisao de produto e nova matriz de testes.
 
-**Risco:** P1 — Afeta diretamente a experiencia do usuario: decks sao bloqueados de adicionar cartas que seriam legais no bracket. A deteccao por nome (`_gameChangerNames`) funciona, mas a logica de budget e quebrada pelo double-counting.
+**Risco atual:** Reabrir esta tarefa automaticamente criaria regressao contra os testes multi-tag atuais.
 
-**Acao recomendada:**
-1. Em `tagCardForBracket()`: se a carta esta em `_gameChangerNames`, retornar APENAS `{BracketCategory.gameChanger}` (early return antes dos outros checks).
+**Acao recomendada antiga (NAO EXECUTAR sem nova decisao):**
+1. Em `tagCardForBracket()`: se a carta esta em `_gameChangerNames`, retornar somente `{BracketCategory.gameChanger}`.
 2. OU: apos todos os checks, se `categories.contains(BracketCategory.gameChanger)`, remover as outras categorias.
 3. Atualizar `applyBracketPolicyToAdditions()` para tratar GCs como categoria exclusiva.
-4. Adicionar teste unitario confirmando que Mana Vault retorna APENAS `gameChanger`.
+4. Adicionar teste unitario confirmando que Mana Vault retorna somente `gameChanger`.
 
 **Validacao:**
 ```bash
@@ -372,6 +379,8 @@ cd server && dart analyze lib/ai/optimization_validator.dart && dart test test/a
 
 ### [P1] Deck Import: Adicionar validacao de completude — verificar que o numero de cartas importadas corresponde ao total esperado (previne pipeline operando sobre decks fantasmas)
 
+**Atualizacao Codex 2026-06-11:** PARCIALMENTE RESOLVIDO na camada Hermes/local. Foi adicionado guard compartilhado em `docs/hermes-analysis/manaloom-knowledge/scripts/learned_deck_completeness.py`; `generate_known_cards.py` ignora learned decks com menos de 90 cartas; `materialize_learned_deck_to_deck_cards.py` deixa de preencher decks parciais com terrenos basicos por padrao; `export_hermes_learned_deck.py` bloqueia export parcial e normaliza lista main-99 + comandante; `import_lorehold_decks.py` so aceita deck Commander completo. O backend PG de learned decks ja possui gate forte em `server/lib/ai/commander_learned_deck_support.dart` (100 total, 1 comandante, 99 main). Ainda nao foi adicionada coluna `import_completeness` em `decks`, pois isso exigiria migracao/schema separado.
+
 **Conhecimento MTG:** O Commander Knowledge Deep S42-43 (2026-06-05) documenta que 3 dos 8 decks no SQLite estao gravemente incompletos:
 - Korvold, Fae-Cursed King: 11/100 cartas importadas (89 cartas faltando)
 - Kinnan, Bonder Prodigy: 13/100 cartas importadas (87 cartas faltando)
@@ -408,6 +417,8 @@ cd server && dart test test/deck_rules_service_test.dart
 ---
 
 ### [P1] Commander Selection: Query both `decks` AND `learned_decks` tables — verificar `total_cards >= 90` em pelo menos uma tabela antes de selecionar comandante para otimizacao
+
+**Atualizacao Codex 2026-06-11:** PARCIALMENTE RESOLVIDO no pipeline Hermes. `sync_pg_meta_decks_to_hermes.py` agora usa `--min-cards=90` por padrao e `sync_pg_target_deck_to_hermes.py` recusa deck PG alvo com `total_qty < 90` ou sem comandante. Isso reduz o risco de crons/battle tooling selecionarem seeds parciais. A validacao do endpoint de optimize do app permanece baseada no deck do usuario e nas regras atuais do backend; nao foi introduzido bloqueio global por comandante desconhecido para evitar falsos negativos em decks reais recem-criados.
 
 **Conhecimento MTG:** O Multi-Commander Evolution Pipeline (Execucao #1, 2026-06-04, documentado no Commander Knowledge Deep S42-43) descobriu empiricamente que comandantes podem ter dados parciais:
 - Korvold: 11/100 cards em `decks` (89% vazio)

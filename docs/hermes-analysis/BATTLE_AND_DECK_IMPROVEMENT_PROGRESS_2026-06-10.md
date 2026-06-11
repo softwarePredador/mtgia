@@ -712,6 +712,24 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - O risco restante é executar essa rotina no Hermes/AWS com `knowledge.db`
     populado; se o DB estiver vazio, o relatório agora deixa isso explícito
     (`deck_cards_table_present=false`) em vez de parecer sucesso silencioso.
+- Fechamento parcial dos guards contra learned decks fantasmas:
+  - `learned_deck_completeness.py` centraliza parsing de `learned_decks.card_list`
+    em JSON/texto e calcula `parsed_quantity`, `total_with_commander`,
+    `main_quantity` e elegibilidade minima.
+  - `generate_known_cards.py` ignora learned decks Lorehold com menos de 90
+    cartas para não aprender tags a partir de seeds parciais.
+  - `materialize_learned_deck_to_deck_cards.py` não preenche mais decks
+    parciais com terrenos basicos por padrão; preenchimento artificial exige
+    `--allow-fill-basic` e deve ficar restrito a fixtures.
+  - `export_hermes_learned_deck.py` bloqueia export parcial e normaliza listas
+    main-99 adicionando o comandante quando ele está apenas na coluna
+    `commander`.
+  - `import_lorehold_decks.py`, `sync_pg_meta_decks_to_hermes.py` e
+    `sync_pg_target_deck_to_hermes.py` receberam guardrails contra import/sync
+    de decks `<90` cartas ou sem comandante.
+  - `IMPLEMENTATION_TASKS.md` foi alinhado ao código vivo: Game Changers
+    oficiais permanecem multi-tag por decisão atual de produto/testes, não
+    `gameChanger` exclusivo.
 
 ## Etapa 4 — Próximas pendências reais
 
