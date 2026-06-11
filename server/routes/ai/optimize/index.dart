@@ -22,6 +22,8 @@ import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
     as optimize_route_response;
+import '../../../lib/ai/optimize_route_warnings_support.dart'
+    as optimize_route_warnings;
 import '../../../lib/ai/optimize_swap_integrity.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
@@ -2703,59 +2705,25 @@ Future<Response> onRequest(RequestContext context) async {
         };
       }
 
-      final warnings = <String, dynamic>{};
-
-      // Adicionar avisos se houver cartas invÃ¡lidas
-      if (invalidCards.isNotEmpty) {
-        warnings.addAll({
-          'invalid_cards': invalidCards,
-          'message':
-              'Algumas cartas sugeridas pela IA nÃ£o foram encontradas e foram removidas',
-          'suggestions': suggestions,
-        });
-      }
-
-      // Adicionar avisos se houver cartas filtradas por identidade de cor
-      if (filteredByColorIdentity.isNotEmpty) {
-        warnings['filtered_by_color_identity'] = {
-          'commander_identity': commanderColorIdentity.toList(),
-          'removed_additions': filteredByColorIdentity,
-          'message':
-              'Algumas adiÃ§Ãµes sugeridas pela IA foram removidas por estarem fora da identidade de cor do comandante.',
-        };
-      }
-
-      if (blockedByBracket.isNotEmpty) {
-        warnings['blocked_by_bracket'] = {
-          'bracket': bracket,
-          'blocked_additions': blockedByBracket,
-          'message':
-              'Algumas adiÃ§Ãµes sugeridas foram bloqueadas por exceder limites do bracket.',
-        };
-      }
-
       attachOptimizeBracketPolicyDiagnostics(
         responseBody,
         bracket: bracket,
         blockedByBracket: blockedByBracket,
       );
 
-      if (blockedByTheme.isNotEmpty) {
-        warnings['blocked_by_theme'] = {
-          'keep_theme': keepTheme,
-          'blocked_removals': blockedByTheme,
-          'message':
-              'Algumas remoÃ§Ãµes sugeridas foram bloqueadas para preservar o tema do deck.',
-        };
-      }
-
-      if (emptySuggestionFallbackReason != null) {
-        warnings['empty_suggestions_handling'] = {
-          'recognized_format': recognizedSuggestionFormat,
-          'fallback_applied': emptySuggestionFallbackApplied,
-          'message': emptySuggestionFallbackReason,
-        };
-      }
+      final warnings = optimize_route_warnings.buildOptimizeWarnings(
+        invalidCards: invalidCards,
+        suggestions: suggestions,
+        filteredByColorIdentity: filteredByColorIdentity,
+        commanderColorIdentity: commanderColorIdentity,
+        blockedByBracket: blockedByBracket,
+        bracket: bracket,
+        blockedByTheme: blockedByTheme,
+        keepTheme: keepTheme,
+        emptySuggestionFallbackReason: emptySuggestionFallbackReason,
+        recognizedSuggestionFormat: recognizedSuggestionFormat,
+        emptySuggestionFallbackApplied: emptySuggestionFallbackApplied,
+      );
 
       if (warnings.isNotEmpty) {
         responseBody['warnings'] = warnings;
