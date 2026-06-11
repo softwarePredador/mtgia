@@ -18188,12 +18188,20 @@ na command zone, não para validação de deck no servidor.
 - Extraído `server/lib/ai/optimize_filler_candidate_support.dart` para
   centralizar dedupe, filtro de identidade Commander, score de fillers e land
   fixing sem acoplar esses helpers aos loaders SQL.
+- Extraído `server/lib/ai/optimize_complete_mana_support.dart` para
+  centralizar limite de básicos, demanda de cores e plano ponderado de terrenos
+  básicos do modo `complete`, mantendo export compatível por
+  `optimize_complete_support.dart`.
 - `server/lib/ai/optimize_filler_loader_support.dart` preserva exports
   compatíveis e agora foca em fillers, lands e structural recovery.
+- `server/lib/ai/optimize_complete_support.dart` preserva exports compatíveis
+  e caiu para 1450 linhas; o suporte de mana novo tem 118 linhas.
 - `optimize_runtime_support.dart` preserva exports compatíveis e caiu para 551
   linhas; próximo corte seguro é preferências de IA ou loaders de referência do
   comandante com teste isolado.
 - Validações focadas:
+  - `dart analyze lib/ai/optimize_complete_mana_support.dart lib/ai/optimize_complete_support.dart test/optimize_complete_support_test.dart`: PASS.
+  - `dart test test/optimize_complete_support_test.dart --reporter compact`: PASS.
   - `dart analyze lib/ai/optimize_route_outcome_support.dart routes/ai/optimize/index.dart test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart`: PASS.
   - `dart test test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart --reporter compact`: PASS.
   - `dart analyze lib/ai/optimize_filler_candidate_support.dart lib/ai/optimize_filler_loader_support.dart test/optimize_filler_candidate_support_test.dart`: PASS.

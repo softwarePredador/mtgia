@@ -246,6 +246,8 @@
 | `server/lib/ai/optimize_route_land_removal_protection_support.dart` | 62 | ✅ Extraído | Centraliza proteção contra remoção de terrenos quando a contagem de lands está baixa |
 | `server/lib/ai/optimize_route_rebalance_support.dart` | 128 | ✅ Extraído | Centraliza plano de reequilíbrio pós-filtros, aplicação de substitutas e truncamento final |
 | `server/lib/ai/optimize_route_final_gate_support.dart` | 156 | ✅ Extraído | Centraliza decisão final de quality gate, validação serializada e Semantic Layer v2 após o `OptimizationValidator` |
+| `server/lib/ai/optimize_complete_support.dart` | 1450 | ⚠️ Split iniciado | Orquestra modo complete DB-backed; helpers puros de mana foram extraídos para suporte dedicado, mas o arquivo ainda concentra seed/filler/final response |
+| `server/lib/ai/optimize_complete_mana_support.dart` | 118 | ✅ Extraído | Centraliza limite de básicos, demanda de cores e plano ponderado de terrenos básicos do modo complete com export compatível |
 | `server/lib/commander_eligibility.dart` | 23 | ✅ Extraído | Centraliza elegibilidade Commander 2026 para DeckRulesService e rotas incrementais |
 | `server/lib/commander_pairing.dart` | 105 | ✅ Extraído | Centraliza pares Partner, Partner with, Background, Friends Forever, Doctor's companion e normalização de nome físico |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |

@@ -178,6 +178,35 @@ splits do engine e trinta splits da rota/runtime de optimize concluídos.
 - `dart analyze lib/commander_pairing.dart lib/deck_rules_service.dart test/commander_pairing_test.dart test/commander_eligibility_test.dart test/deck_rules_service_test.dart`.
 - `dart test test/commander_pairing_test.dart test/commander_eligibility_test.dart test/deck_rules_service_test.dart --reporter compact`.
 
+### Revisão complementar 2026-06-11 — split de mana do optimize complete
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/lib/ai/optimize_complete_support.dart` ainda concentrava helpers
+  puros de balanceamento de mana junto da orquestração DB-backed do modo
+  `complete`.
+- Esses helpers já tinham teste de suporte e podiam ser extraídos sem tocar no
+  contrato HTTP nem no executor async/sync.
+
+**Entregue:**
+- Criado `server/lib/ai/optimize_complete_mana_support.dart`.
+- Movidos `calculateCompleteMaxBasicAdditions`,
+  `buildCompleteColorDemandMap` e `buildWeightedBasicLandPlan` para o novo
+  módulo.
+- `optimize_complete_support.dart` mantém `export` compatível, então imports
+  legados continuam funcionando.
+- `optimize_complete_support.dart` caiu para 1450 linhas e o novo suporte ficou
+  em 118 linhas.
+- `optimize_complete_support_test.dart` ganhou cobertura direta para fallback
+  de demanda por identidade de cor quando a carta não tem símbolos explícitos
+  no `mana_cost`.
+
+**Validação local:**
+- `dart format lib/ai/optimize_complete_mana_support.dart lib/ai/optimize_complete_support.dart test/optimize_complete_support_test.dart`.
+- `dart analyze lib/ai/optimize_complete_mana_support.dart lib/ai/optimize_complete_support.dart test/optimize_complete_support_test.dart`.
+- `dart test test/optimize_complete_support_test.dart --reporter compact`.
+
 ### Revisão complementar 2026-06-11 — split de candidate helpers do optimize filler
 
 **Status:** concluída localmente.

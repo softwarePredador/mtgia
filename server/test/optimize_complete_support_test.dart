@@ -83,6 +83,28 @@ void main() {
 
       expect(plan, equals(const ['Wastes', 'Wastes', 'Wastes']));
     });
+
+    test(
+        'buildCompleteColorDemandMap falls back to color identity when mana cost has no explicit symbols',
+        () {
+      final demand = buildCompleteColorDemandMap(
+        currentDeck: [
+          _card(
+            name: 'Colorless Simic Spell',
+            typeLine: 'Sorcery',
+            manaCost: '{3}',
+            oracleText: 'Draw a card.',
+            quantity: 2,
+            colors: const ['G', 'U'],
+            cmc: 3,
+          ),
+        ],
+        commanderColorIdentity: {'G', 'U'},
+      );
+
+      expect(demand['G'], equals(2));
+      expect(demand['U'], equals(2));
+    });
   });
 }
 

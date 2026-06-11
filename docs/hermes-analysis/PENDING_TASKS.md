@@ -72,6 +72,14 @@
 > de substring em `Partner with`. O battle engine segue rastreado como parcial
 > para UX/interação completa de dois commanders na command zone.
 >
+> **Atualização 2026-06-11 — optimize complete mana support extraído.**
+> Helpers puros de balanceamento de mana do modo `complete` saíram de
+> `optimize_complete_support.dart` para `optimize_complete_mana_support.dart`.
+> `calculateCompleteMaxBasicAdditions`, `buildCompleteColorDemandMap` e
+> `buildWeightedBasicLandPlan` agora têm módulo fino/export compatível e teste
+> direto de fallback por identidade de cor. `optimize_complete_support.dart`
+> caiu para 1450 linhas; o novo suporte tem 118 linhas.
+>
 > **Atualização 2026-06-11 — CMC Hermes operational sync.**
 > O código operacional Hermes também foi fechado: `sync_pg_card_metadata_to_hermes.py`
 > sincroniza `card_oracle_cache`, faz backfill idempotente de
@@ -303,6 +311,7 @@
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 | ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + `DeckRulesService` + rota incremental |
 | ✅ | Commander pair validation compartilhada | `commander_pairing.dart` + `DeckRulesService` |
+| ✅ | Mana support do optimize complete compartilhado | `optimize_complete_mana_support.dart` + export compatível |
 | ✅ | Archetype resolution compartilhado | `optimize_archetype_support.dart` |
 | ✅ | Strategic role tags compartilhados | `resolveCardFunctionalRoles` em `functional_card_tags.dart` |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
@@ -335,7 +344,7 @@
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
 | 3 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 4 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de preferências de IA ou loaders de referência do comandante e extrair apenas com support test isolado | 1-2 dias | Médio | Teste de support dedicado verde antes do movimento |
+| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de preferências de IA ou loaders de referência do comandante e extrair apenas com support test isolado | 1-2 dias | Médio | Suporte de mana do complete já extraído; novo split só com teste dedicado verde antes do movimento |
 
 ### Ordem revalidada 2026-06-11
 
