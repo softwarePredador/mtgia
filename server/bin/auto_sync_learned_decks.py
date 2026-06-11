@@ -36,6 +36,7 @@ ARTIFACT_DIR = os.environ.get(
 TRACKING_FILE = os.path.join(ARTIFACT_DIR, "synced_learned_ids.txt")
 SERVER_DIR = os.path.join(SYNC_PROJECT_DIR, "server")
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+REQUIRED_CARD_COUNT = int(os.environ.get("HERMES_AUTO_SYNC_REQUIRED_CARD_COUNT", "100"))
 
 ENV_FILES = [
     os.path.join(SERVER_DIR, ".env"),
@@ -73,6 +74,53 @@ def _export_script_path():
     raise FileNotFoundError("export_hermes_learned_deck.py nao encontrado")
 
 
+def _table_exists(db, table_name):
+    return (
+        db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            (table_name,),
+        ).fetchone()
+        is not None
+    )
+
+
+def _find_promoted_rows(db):
+    if not _table_exists(db, "learned_decks") or not _table_exists(
+        db,
+        "deck_promotions",
+    ):
+        return []
+    return db.execute(
+        """
+        SELECT ld.id, ld.commander, ld.deck_name, ld.card_count, dp.promoted_at
+        FROM learned_decks ld
+        JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
+        WHERE ld.card_count = ?
+          AND ld.commander != ''
+        ORDER BY dp.promoted_at DESC
+        """,
+        (REQUIRED_CARD_COUNT,),
+    ).fetchall()
+
+
+def _count_invalid_promoted_rows(db):
+    if not _table_exists(db, "learned_decks") or not _table_exists(
+        db,
+        "deck_promotions",
+    ):
+        return 0
+    return db.execute(
+        """
+        SELECT COUNT(*)
+        FROM learned_decks ld
+        JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
+        WHERE COALESCE(ld.card_count, 0) != ?
+           OR ld.commander = ''
+        """,
+        (REQUIRED_CARD_COUNT,),
+    ).fetchone()[0]
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Auto-sync Hermes learned decks")
     parser.add_argument("--apply", action="store_true", help="Aplica no PG")
@@ -90,16 +138,18 @@ def main(argv=None):
         )
 
     db = sqlite3.connect(SQLITE_DB)
-    rows = db.execute("""
-        SELECT ld.id, ld.commander, ld.deck_name, ld.card_count, dp.promoted_at
-        FROM learned_decks ld
-        JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
-        ORDER BY dp.promoted_at DESC
-    """).fetchall()
+    rows = _find_promoted_rows(db)
+    invalid_promoted = _count_invalid_promoted_rows(db)
     db.close()
 
+    if invalid_promoted:
+        print(
+            "INVALID_PROMOTED_SKIPPED_BY_QUERY "
+            f"count={invalid_promoted} required_card_count={REQUIRED_CARD_COUNT}"
+        )
+
     if not rows:
-        print("Nenhum deck promovido encontrado.")
+        print("Nenhum deck promovido elegivel encontrado.")
         return 0
 
     synced_ids = set()
@@ -109,7 +159,7 @@ def main(argv=None):
             if line.isdigit():
                 synced_ids.add(int(line))
 
-    applied, dry_run_ok, already_synced, skipped, invalid_skipped, failed = 0, 0, 0, 0, 0, 0
+    applied, dry_run_ok, already_synced, skipped, invalid_skipped, failed = 0, 0, 0, 0, invalid_promoted, 0
 
     for deck_id, commander, deck_name, card_count, promoted_at in rows:
         # Lorehold — freio manual de Mox

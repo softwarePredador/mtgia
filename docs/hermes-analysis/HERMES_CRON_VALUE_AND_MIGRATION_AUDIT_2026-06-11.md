@@ -102,6 +102,20 @@ Novo achado de qualidade:
   ficou com `16` eventos `trainable_commander_deck`, `22`
   `partial_telemetry` e `4` `non_commander_telemetry`.
 
+Novo achado no auto-sync de decks aprendidos (`2026-06-11T13:55Z`):
+
+- `manaloom-auto-sync-learned-decks` estava tentando reprocessar learned decks
+  promovidos antigos que não eram Commander completos. O caso observado foi
+  Korvold `learned_id=7`, declarado com `card_count=90`, que o importador
+  rejeitou como inválido.
+- Correção aplicada: `server/bin/auto_sync_learned_decks.py` agora só seleciona
+  promoted rows com comandante preenchido e `card_count=100`; promoted rows
+  inválidos são contados como `INVALID_PROMOTED_SKIPPED_BY_QUERY`, sem chamar o
+  importador Dart.
+- Validação local adicionada em `server/test/auto_sync_learned_decks_test.py`
+  cobre seleção apenas de decks Commander 100/99+1 e ausência segura das tabelas
+  SQLite esperadas.
+
 ## Crons habilitadas
 
 | Cron | Cadência | Função real | Valor para ManaLoom | Decisão |
@@ -172,10 +186,22 @@ Mudanças:
   - preflight do optimizer;
   - validações de mana/regras em baixa cadência.
 
+### Impacto já observado após as melhorias
+
+- `manaloom-master-watchdog` voltou a detectar avanço real em `origin/master`.
+- `manaloom-master-optimizer-preflight` passou com `status: approved`,
+  `deck_cards=100`, `learned_decks=120` e duplicatas colapsadas.
+- `manaloom-pull-learning-events` importou eventos reais e passou a classificar
+  quais registros podem treinar deck completo.
+- `manaloom-auto-sync-learned-decks` agora tem guardrail para não insistir em
+  promoted rows incompletos; isso reduz ruído e evita tentativas repetidas
+  contra o importador Commander.
+
 ### Impacto ainda não provado
 
-Ainda falta observar uma rodada completa depois da correção de ownership e do
-fix de duplicatas no sync do target deck.
+Ainda falta observar uma rodada completa agendada, não apenas manual, depois da
+correção de ownership, do fix de duplicatas no sync do target deck, da
+classificação de eventos de aprendizado e do guardrail de auto-sync.
 
 Próxima evidência necessária no Hermes remoto:
 
