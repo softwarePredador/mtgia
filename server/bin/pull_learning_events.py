@@ -7,7 +7,7 @@ Faz parte do loop App → Hermes:
 Execucao idempotente: eventos ja sincronizados sao ignorados.
 """
 
-import json, os, sqlite3, sys, subprocess
+import json, os, sqlite3, sys
 from datetime import datetime, timezone
 
 import psycopg2
@@ -150,6 +150,17 @@ def _ensure_tables(sqlite):
             event_data TEXT DEFAULT '{}',
             created_at TEXT,
             imported_at TEXT
+        )
+    """)
+    sqlite.execute("""
+        CREATE TABLE IF NOT EXISTS commanders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            color_identity TEXT DEFAULT '',
+            first_analyzed TEXT,
+            last_analyzed TEXT,
+            deck_count INTEGER DEFAULT 0,
+            insight_count INTEGER DEFAULT 0
         )
     """)
 

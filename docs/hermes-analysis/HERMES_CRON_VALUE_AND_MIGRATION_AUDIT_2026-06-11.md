@@ -77,6 +77,9 @@ Correção versionada:
   cobre o caso de duplicata que quebrava a cron.
 - scripts operacionais de optimizer/knowncards foram ajustados para fazer
   checkout de `master`, evitando executar código antigo da branch de memória.
+- `server/bin/pull_learning_events.py` agora inicializa a tabela SQLite
+  `commanders`, desbloqueando importação de eventos de aprendizado em bancos
+  Hermes recém-recriados.
 
 ## Crons habilitadas
 
