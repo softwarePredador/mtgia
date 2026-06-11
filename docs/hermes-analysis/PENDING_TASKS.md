@@ -396,6 +396,7 @@
 | `battle_replacement_support.py` | Replacement/prevention, vida, dano, ganho de vida e escudos de prevenção | 231 |
 | `battle_sba_support.py` | SBAs, anexos ilegais, Saga final, token lifecycle e loop de estabilização | 381 |
 | `optimize_cache_support.dart` | Assinatura de deck, cache key e persistência de cache do optimize | 119 |
+| `optimize_cache_support_test.dart` | Cobertura direta de cache key, hash estável e wrapper do runtime | 77 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
