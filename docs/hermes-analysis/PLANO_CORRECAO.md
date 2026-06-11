@@ -821,5 +821,6 @@ Considerar a frente de estrutura saneada quando:
 
 - o auditor não reportar imports existentes como ausentes;
 - `dart analyze` do backend estiver verde no fluxo local documentado;
-- a duplicação/similaridade restante de alto risco em IA semantica, `resolveOptimizeArchetype`, terrenos basicos e helpers HTTP cair significativamente;
+- a duplicação/similaridade restante de alto risco em IA semantica, terrenos
+  basicos/snow basics e helpers HTTP cair significativamente;
 - os maiores arquivos do domínio de optimize reduzirem tamanho e responsabilidade.
