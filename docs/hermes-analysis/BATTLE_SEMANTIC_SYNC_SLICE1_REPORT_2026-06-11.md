@@ -472,6 +472,8 @@ Proceed to the next controlled slice:
 1. keep all Lorehold swaps report-only until owner review confirms candidate
    quality;
 2. run a larger sample before applying any candidate;
-3. define `logical_rule_key` and trusted derivation policy before letting
-   `card_battle_rules` create `card_function_tags`;
-4. keep backend/product as source of truth; Hermes proposes and reports only.
+3. apply the local Slice 3 `logical_rule_key`/dedupe change to Hermes AWS after
+   backup and report-only validation;
+4. define trusted derivation policy before letting `card_battle_rules` create
+   `card_function_tags`;
+5. keep backend/product as source of truth; Hermes proposes and reports only.

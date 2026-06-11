@@ -71,6 +71,14 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                                 "deck_role": {"category": "ramp"},
                             },
                             {
+                                "rule_version": 3,
+                                "source": "generated",
+                                "review_status": "needs_review",
+                                "confidence": 0.2,
+                                "effect": {"effect": "ramp_permanent"},
+                                "deck_role": {"category": "ramp"},
+                            },
+                            {
                                 "rule_version": 1,
                                 "source": "manual",
                                 "review_status": "needs_review",
@@ -108,6 +116,9 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             self.assertEqual(stats["duplicate_rows_collapsed"], 0)
             self.assertEqual(stats["quantity_written"], 3)
             self.assertEqual(stats["commanders"], 1)
+            self.assertEqual(stats["battle_rules_seen"], 4)
+            self.assertEqual(stats["battle_rules_written"], 3)
+            self.assertEqual(stats["battle_rules_deduped"], 1)
             self.assertEqual(len(stats["deck_hash"]), 64)
             self.assertEqual(len(stats["semantics_hash"]), 64)
             self.assertEqual(len(stats["ruleset_hash"]), 64)
@@ -147,7 +158,11 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             self.assertEqual(rows[1]["quantity"], 1)
             self.assertEqual(rows[1]["functional_tag"], "ramp")
             self.assertEqual(sync.parse_json_value(rows[1]["functional_tags_json"], []), ["ramp", "artifact"])
-            self.assertEqual(len(sync.parse_json_value(rows[1]["battle_rules_json"], [])), 2)
+            sol_ring_rules = sync.parse_json_value(rows[1]["battle_rules_json"], [])
+            self.assertEqual(len(sol_ring_rules), 2)
+            self.assertEqual(sol_ring_rules[0]["source"], "manual")
+            self.assertEqual(sol_ring_rules[0]["review_status"], "verified")
+            self.assertTrue(sol_ring_rules[0]["logical_rule_key"].startswith("battle_rule_v1:"))
             self.assertEqual(rows[1]["deck_hash"], stats["deck_hash"])
             self.assertEqual(rows[1]["semantics_hash"], stats["semantics_hash"])
             self.assertEqual(rows[1]["ruleset_hash"], stats["ruleset_hash"])
@@ -245,6 +260,42 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
         self.assertIn("group by cbr.card_id", sql)
         self.assertNotIn("left join lateral", sql)
         self.assertNotIn("limit 1", sql)
+
+    def test_normalize_battle_rules_dedupes_equivalent_rules_by_logical_key(self) -> None:
+        rules = sync.normalize_battle_rules(
+            [
+                {
+                    "rule_version": 1,
+                    "source": "generated",
+                    "review_status": "needs_review",
+                    "confidence": 0.3,
+                    "effect": {"effect": "draw_cards", "amount": 1},
+                    "deck_role": {"category": "draw"},
+                },
+                {
+                    "rule_version": 1,
+                    "source": "manual",
+                    "review_status": "verified",
+                    "confidence": 0.9,
+                    "effect": {"effect": "draw_cards", "amount": 1},
+                    "deck_role": {"category": "draw"},
+                },
+                {
+                    "rule_version": 1,
+                    "source": "manual",
+                    "review_status": "verified",
+                    "confidence": 0.9,
+                    "effect": {"effect": "draw_cards", "amount": 2},
+                    "deck_role": {"category": "draw"},
+                },
+            ]
+        )
+
+        self.assertEqual(len(rules), 2)
+        amount_one = next(rule for rule in rules if rule["effect"]["amount"] == 1)
+        self.assertEqual(amount_one["source"], "manual")
+        self.assertEqual(amount_one["review_status"], "verified")
+        self.assertNotEqual(rules[0]["logical_rule_key"], rules[1]["logical_rule_key"])
 
 
 if __name__ == "__main__":

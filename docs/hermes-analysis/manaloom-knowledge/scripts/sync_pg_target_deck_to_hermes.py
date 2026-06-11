@@ -65,6 +65,22 @@ TAG_PRIORITY = {
     "unknown": 999,
 }
 
+REVIEW_STATUS_PRIORITY = {
+    "verified": 0,
+    "active": 1,
+    "needs_review": 2,
+    "rejected": 8,
+    "deprecated": 9,
+}
+
+SOURCE_PRIORITY = {
+    "manual": 0,
+    "curated": 1,
+    "generated": 4,
+    "imported": 5,
+    "heuristic": 6,
+}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -115,6 +131,103 @@ def stable_json(value: Any) -> str:
 
 def stable_json_text(value: Any, fallback: Any) -> str:
     return stable_json(parse_json_value(value, fallback))
+
+
+def _first_present(*values: Any) -> Any:
+    for value in values:
+        if value not in (None, "", [], {}):
+            return value
+    return None
+
+
+def logical_rule_key(rule: dict[str, Any]) -> str:
+    """Return a stable key for equivalent battle rules.
+
+    The key intentionally excludes provenance/review metadata. Two rows that
+    encode the same face/variant/effect/deck role should collapse to the best
+    reviewed exemplar while still preserving all unique executable semantics.
+    """
+    effect = parse_json_value(rule.get("effect"), {})
+    deck_role = parse_json_value(rule.get("deck_role"), {})
+    if not isinstance(effect, dict):
+        effect = {}
+    if not isinstance(deck_role, dict):
+        deck_role = {}
+    payload = {
+        "effect": effect,
+        "deck_role": deck_role,
+        "face_name": _first_present(
+            rule.get("face_name"),
+            effect.get("face_name"),
+            deck_role.get("face_name"),
+        ),
+        "face_index": _first_present(
+            rule.get("face_index"),
+            effect.get("face_index"),
+            deck_role.get("face_index"),
+        ),
+        "variant_kind": _first_present(
+            rule.get("variant_kind"),
+            effect.get("variant_kind"),
+            deck_role.get("variant_kind"),
+        ),
+        "ability_kind": _first_present(
+            rule.get("ability_kind"),
+            effect.get("ability_kind"),
+            deck_role.get("ability_kind"),
+        ),
+        "timing_window": _first_present(
+            rule.get("timing_window"),
+            effect.get("timing_window"),
+            deck_role.get("timing_window"),
+        ),
+        "source_zone": _first_present(
+            rule.get("source_zone"),
+            effect.get("source_zone"),
+            deck_role.get("source_zone"),
+        ),
+    }
+    digest = hashlib.sha256(stable_json(payload).encode("utf-8")).hexdigest()
+    return f"battle_rule_v1:{digest[:32]}"
+
+
+def _rule_rank(rule: dict[str, Any]) -> tuple[Any, ...]:
+    review_status = str(rule.get("review_status") or "").lower()
+    source = str(rule.get("source") or "").lower()
+    confidence = float(rule.get("confidence") or 0.0)
+    rule_version = int(rule.get("rule_version") or 0)
+    return (
+        REVIEW_STATUS_PRIORITY.get(review_status, 7),
+        SOURCE_PRIORITY.get(source, 7),
+        -confidence,
+        -rule_version,
+        stable_json(rule),
+    )
+
+
+def normalize_battle_rules(value: Any) -> list[dict[str, Any]]:
+    """Normalize and dedupe battle rules without collapsing distinct behavior."""
+    raw_rules = parse_json_value(value, [])
+    if not isinstance(raw_rules, list):
+        return []
+    selected: dict[str, dict[str, Any]] = {}
+    for item in raw_rules:
+        if not isinstance(item, dict):
+            continue
+        rule = dict(item)
+        key = str(rule.get("logical_rule_key") or logical_rule_key(rule))
+        rule["logical_rule_key"] = key
+        current = selected.get(key)
+        if current is None or _rule_rank(rule) < _rule_rank(current):
+            selected[key] = rule
+    return sorted(
+        selected.values(),
+        key=lambda rule: (
+            REVIEW_STATUS_PRIORITY.get(str(rule.get("review_status") or "").lower(), 7),
+            SOURCE_PRIORITY.get(str(rule.get("source") or "").lower(), 7),
+            str(rule.get("logical_rule_key") or ""),
+        ),
+    )
 
 
 def normalize_functional_tags(value: Any, fallback_tag: str | None = None) -> list[str]:
@@ -294,10 +407,9 @@ def normalize_snapshot_cards(cards: list[dict[str, Any]]) -> list[dict[str, Any]
             card.get("semantic_tags_v2_json"),
             [],
         )
-        normalized["battle_rules_json"] = stable_json_text(
-            card.get("battle_rules_json"),
-            [],
-        )
+        battle_rules = normalize_battle_rules(card.get("battle_rules_json"))
+        normalized["battle_rules"] = battle_rules
+        normalized["battle_rules_json"] = stable_json(battle_rules)
         aggregated[key] = normalized
         names[name_key] = key
 
@@ -662,6 +774,16 @@ def write_sqlite(
         "cards_seen": len(cards),
         "quantity_seen": sum(int(card["quantity"]) for card in cards),
         "duplicate_rows_collapsed": 0,
+        "battle_rules_seen": sum(
+            len(parse_json_value(card.get("battle_rules_json"), []))
+            for card in cards
+            if isinstance(parse_json_value(card.get("battle_rules_json"), []), list)
+        ),
+        "battle_rules_written": sum(
+            len(parse_json_value(card.get("battle_rules_json"), []))
+            for card in snapshot_cards
+            if isinstance(parse_json_value(card.get("battle_rules_json"), []), list)
+        ),
         "cards_written": 0,
         "quantity_written": 0,
         "commanders": sum(1 for card in snapshot_cards if card["is_commander"]),
@@ -670,6 +792,9 @@ def write_sqlite(
         "ruleset_hash": ruleset_hash,
         "sync_run_id": sync_run_id,
     }
+    stats["battle_rules_deduped"] = (
+        stats["battle_rules_seen"] - stats["battle_rules_written"]
+    )
     if deck_total_qty and stats["quantity_seen"] != deck_total_qty:
         raise RuntimeError(
             "Fetched deck quantity mismatch before SQLite write: "

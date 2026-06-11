@@ -356,8 +356,10 @@ target deck para Hermes sem usar `LEFT JOIN LATERAL (...) LIMIT 1` para
 SQLite runtime real do Hermes foi executada em 2026-06-11 com backup e
 validação. O gap permanece aberto por política e cobertura: scripts
 históricos/manuais ainda podem assumir `functional_tag` único, e a derivação de
-`card_battle_rules` para `card_function_tags` ainda precisa de taxonomia,
-dedupe lógico, gate de confiança/revisão e limpeza de stale tags.
+`card_battle_rules` para `card_function_tags` ainda precisa de taxonomia, gate
+de confiança/revisão e limpeza de stale tags. O dedupe lógico por
+`logical_rule_key` foi implementado localmente no sync, mas ainda precisa de
+rollout controlado no Hermes AWS.
 
 ### Evidência
 
@@ -475,8 +477,7 @@ Ainda pendente:
    `Furygale Flocking` e `The Battle of Bywater`.
 11. Adicionar derivação controlada de `card_battle_rules` para
    `card_function_tags` somente depois de definir taxonomia canônica,
-   `logical_rule_key`, gate de `source/review_status/confidence` e limpeza de
-   stale tags.
+   gate de `source/review_status/confidence` e limpeza de stale tags.
 
 Concluído no Slice 2:
 
@@ -487,6 +488,15 @@ Concluído no Slice 2:
    `60` jogos, `7` linhas de `slot_benchmarks` na phase `ruleset_hash_smoke`
    contendo `baseline_semantics_hash` e `baseline_ruleset_hash`, deck restaurado
    com `100` rows, `100` quantity e `1` commander.
+
+Concluído localmente no Slice 3:
+
+13. Implementar `logical_rule_key` no snapshot Hermes, deduplicar regras
+    equivalentes por face/variante/efeito/papel e manter o melhor exemplar por
+    prioridade de `review_status`, `source`, `confidence` e `rule_version`.
+    Smoke PG -> SQLite temporário de Lorehold: `100` cards, `100` quantity,
+    `1` commander, `100` regras vistas, `98` regras escritas, `2` deduped e
+    `0` regras sem `logical_rule_key`.
 
 ### Testes obrigatórios antes de merge
 
@@ -572,7 +582,7 @@ Hermes + testes.
 |---|---|---|---|
 | P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
-| P1 | Derivação de regra executável para função de deck ainda não tem política segura | `card_battle_rules` agora é preservado em `battle_rules_json`/`ruleset_hash`, mas ainda não deve virar `card_function_tags` automaticamente | Definir `logical_rule_key`, taxonomia canônica, gate de source/review/confidence e cleanup de stale tags antes de qualquer derivação |
+| P1 | Derivação de regra executável para função de deck ainda não tem política segura | `card_battle_rules` agora é preservado em `battle_rules_json`/`ruleset_hash`; Slice 3 local adiciona `logical_rule_key`, mas ainda não deve virar `card_function_tags` automaticamente | Aplicar Slice 3 no Hermes AWS; depois definir taxonomia canônica, gate de source/review/confidence e cleanup de stale tags antes de qualquer derivação |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
@@ -593,7 +603,9 @@ smoke remoto confirmou `100` rows, `100` quantity, `1` commander, um
 `deck_hash`, um `semantics_hash`, um `ruleset_hash` e `7` benchmarks
 `ruleset_hash_smoke` com ambos hashes. Pendente real: revisar candidatos
 Lorehold, ampliar amostra e definir política de derivação de
-`card_battle_rules`.
+`card_battle_rules`. Slice 3 local adicionou `logical_rule_key` e dedupe lógico
+ao sync, com smoke PG -> SQLite temporário mantendo 100/1 e deduplicando 2
+regras equivalentes.
 
 ### Ordem recomendada de implementação
 
@@ -601,12 +613,13 @@ Lorehold, ampliar amostra e definir política de derivação de
    qualquer apply.
 2. Rodar nova amostra maior report-only para confirmar que `ruleset_hash` não
    mascara alteração semântica/regra como alteração estrutural.
-3. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
+3. Aplicar Slice 3 no Hermes AWS com backup/report-only e smoke curto.
+4. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
-4. Formalizar identidade semântica de carta e faces antes de expandir regras
+5. Formalizar identidade semântica de carta e faces antes de expandir regras
    DFC/MDFC.
-5. Só depois evoluir learned decks para dois comandantes.
-6. Só depois usar feedback ML como input de política.
+6. Só depois evoluir learned decks para dois comandantes.
+7. Só depois usar feedback ML como input de política.
 
 ### Critério de bloqueio
 
