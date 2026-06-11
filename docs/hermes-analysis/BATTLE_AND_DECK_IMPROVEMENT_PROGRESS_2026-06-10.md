@@ -514,6 +514,18 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     - `dart test test/optimize_route_addition_data_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimize_route_rebalance_support_test.dart test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 52 testes, `All tests passed`.
     - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
     - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
+- Hermes/AWS pós-push do split addition-data (`c694776b`):
+  - O comando agente interativo via `/opt/hermes/bin/hermes -z` não retornou em
+    180s para um prompt report-only curto; a etapa foi substituída por
+    validação determinística no container.
+  - `git pull --ff-only origin master`: `REMOTE_HEAD=c694776beed3feacd4237ea8109e29a2062c5f15`.
+  - `dart analyze lib/ai/optimize_route_addition_data_support.dart routes/ai/optimize/index.dart test/optimize_route_addition_data_support_test.dart`: sem issues.
+  - `dart test test/optimize_route_addition_data_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 35 testes, `All tests passed`.
+  - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
+  - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
+  - Risco operacional separado: o modo agente Hermes não é confiável para
+    report-only curto neste momento; comandos determinísticos no container
+    continuam funcionais.
 
 ## Etapa 4 — Próximas pendências reais
 
