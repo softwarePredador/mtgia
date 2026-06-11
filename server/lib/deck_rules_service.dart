@@ -420,7 +420,7 @@ class DeckRulesService {
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, power, toughness
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc, power, toughness
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -439,8 +439,9 @@ class DeckRulesService {
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
       final manaCost = row[6] as String?;
-      final power = row[7] as String?;
-      final toughness = row[8] as String?;
+      final cmc = (row[7] as num?)?.toDouble();
+      final power = row[8] as String?;
+      final toughness = row[9] as String?;
 
       map[id] = _CardData(
         id: id,
@@ -450,6 +451,7 @@ class DeckRulesService {
         colors: colors,
         colorIdentity: colorIdentity,
         manaCost: manaCost,
+        cmc: cmc,
         power: power,
         toughness: toughness,
       );
@@ -512,6 +514,7 @@ class _CardData {
     required this.colors,
     required this.colorIdentity,
     required this.manaCost,
+    required this.cmc,
     required this.power,
     required this.toughness,
   });
@@ -523,6 +526,7 @@ class _CardData {
   final List<String> colors;
   final List<String> colorIdentity;
   final String? manaCost;
+  final double? cmc;
   final String? power;
   final String? toughness;
 }

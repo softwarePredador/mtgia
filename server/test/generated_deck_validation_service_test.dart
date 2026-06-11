@@ -204,6 +204,38 @@ void main() {
       expect(repository.lastResolvedItems.single['name'], equals('Mountain'));
     });
 
+    test('warns when resolved non-land CMC is suspiciously zero', () async {
+      final service = GeneratedDeckValidationService(
+        _FakeGeneratedDeckRepository(
+          cardsByName: {
+            'mana vault': {
+              'id': 'mana-vault-id',
+              'name': 'Mana Vault',
+              'type_line': 'Artifact',
+              'mana_cost': '{1}',
+              'cmc': 0,
+            },
+            'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
+          },
+        ),
+      );
+
+      final result = await service.validate(
+        format: 'standard',
+        cards: [
+          {'name': 'Mana Vault', 'quantity': 1},
+          {'name': 'Mountain', 'quantity': 59},
+        ],
+      );
+
+      expect(result.isValid, isTrue);
+      expect(
+        result.warnings.join('\n'),
+        contains('Integridade CMC: 1 carta(s)'),
+      );
+      expect(result.warnings.join('\n'), contains('Mana Vault'));
+    });
+
     test(
         'fails commander generation when unresolved cards break exact deck size',
         () async {

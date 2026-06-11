@@ -682,6 +682,21 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     extra antes da segunda main phase.
   - O gap remanescente foi reduzido para fases extras arbitrárias e textos
     card-specific de cartas concretas.
+- Fechamento parcial do gap de integridade CMC no backend:
+  - `resolveImportCardNames(...)` agora carrega `cards.cmc` nos caminhos de
+    match exato, nome localizado e split/MDFC, preservando o campo autoritativo
+    para validação e auditoria.
+  - `GeneratedDeckValidationService` propaga `cmc` internamente e adiciona
+    warning quando uma carta não-terreno chega com `cmc` ausente/zerado
+    suspeito contra `mana_cost`, sem alterar o payload público do app.
+  - `CardValidationService.validateDeckCards(...)` compara `cmc` informado
+    pelo chamador contra `cards.cmc` e emite warnings de divergência ou dado
+    autoritativo suspeito.
+  - `DeckRulesService._loadCardsData(...)` passou a consultar `cmc`, fechando
+    o drift documentado em que a validação de deck não lia o campo.
+  - O gap remanescente é operacional: backfill/correção da base SQLite Hermes
+    e scripts Python de import/sync precisam continuar usando `cards.cmc` como
+    fonte autoritativa.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -709,7 +724,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
    mantendo wrappers/exports compatíveis.
-4. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
+4. Rodar backfill/sync operacional de CMC na base Hermes/SQLite e revisar
+   scripts Python que importam decks aprendidos para não persistirem CMC
+   corrompido.
+5. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
    quando houver corpus concreto usando essas cartas.
-5. Revalidar drift restante entre analysis/generate/optimize depois do split
+6. Revalidar drift restante entre analysis/generate/optimize depois do split
    estrutural.

@@ -24,7 +24,7 @@
 | Tipos Complexos | 5/6 | 1/6 | 0/6 |
 | Zonas e Objetos | 5/5 | 0/5 | 0/5 |
 | Qualidade/QA | 7/7 | 0/7 | 0/7 |
-| Regras oficiais 2026 | 5/12 | 6/12 | 1/12 tracked |
+| Regras oficiais 2026 | 10/12 | 2/12 | 0/12 tracked |
 
 ---
 

@@ -48,6 +48,14 @@
 > card-specific apenas com corpus/replay/evidência. Nova matriz:
 > `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 >
+> **Atualização 2026-06-11 — CMC app-facing hardening.**
+> O backend passou a carregar `cards.cmc` no resolver de import/deck generation,
+> propagar `cmc` internamente no `GeneratedDeckValidationService`, alertar CMC
+> não-terreno suspeito/divergente e consultar `cmc` em `DeckRulesService`.
+> O que ainda não está fechado é operacional: backfill/sync do SQLite Hermes e
+> scripts Python que importam decks aprendidos precisam persistir `cards.cmc`
+> como fonte autoritativa.
+>
 > **Atualização 2026-06-10 — etapa deck-improvement.**
 > O diagnóstico/gate semântico do optimize deixou de depender apenas de
 > `semantic_tags_v2` para `role_delta`: agora usa a mesma precedência do produto

@@ -236,21 +236,32 @@ python3 -c "import sqlite3; conn = sqlite3.connect('docs/hermes-analysis/manaloo
 
 ### [P1] CMC Correction: Script de correcao em lote para 142 cartas com CMC=0.0 + hardening do `_getCmc()` com warning ativo
 
+**Status em 2026-06-11:** PARCIALMENTE RESOLVIDO no backend/app-facing.
+`resolveImportCardNames(...)` agora carrega `cards.cmc`; `GeneratedDeckValidationService`
+propaga esse campo internamente e emite warning para CMC não-terreno
+ausente/zerado suspeito; `CardValidationService.validateDeckCards(...)`
+compara CMC informado contra `cards.cmc`; `DeckRulesService._loadCardsData(...)`
+passou a consultar `cmc`. Continua pendente o backfill/sync operacional da base
+SQLite Hermes e dos scripts Python de importação aprendida.
+
 **Conhecimento MTG:** O TAG_ACCURACY_REPORT (2026-06-05) documenta que 142 cartas (26.2%) tem CMC=0.0. A corrupcao se espalhou de 1 deck para TODOS os 7. Cartas como Sol Ring (CMC=1), Mana Vault (1), Boros Signet (2), Aetherflux Reservoir (4) estao com CMC=0.0. Atraxa (deck 9, 100 cartas) importada com 29 CMCs invalidos.
 
 **Evidencia no codigo:**
-- `server/lib/ai/optimization_quality_gate.dart:459-465` — `_getCmc()` retorna 0 silenciosamente.
-- `server/lib/deck_rules_service.dart:412-447` — `_loadCardsData()` nao consulta `cmc`.
+- `server/lib/ai/cmc_safety.dart` — fallback conservador já recupera CMC por `mana_cost` e evita tratar non-land desconhecido como grátis.
+- `server/lib/generated_deck_validation_service.dart` — emite warning de CMC suspeito no fluxo de validação de decks gerados/importados.
+- `server/lib/card_validation_service.dart` — compara CMC informado contra `cards.cmc` no validador genérico.
+- `server/lib/deck_rules_service.dart` — `_loadCardsData()` agora consulta `cmc`.
 
-**Gap:** Importacao Python nao consulta `cards.cmc` do PG. `_getCmc()` aceita 0 sem warning.
+**Gap remanescente:** Importação/sync Python e SQLite Hermes ainda precisam de rotina própria de backfill e prevenção para sempre usar `cards.cmc` do PG como fonte autoritativa.
 **Impacto:** P1 — GoldfishSimulator, quality gate, e mulligan usam CMC corrompido.
-**Risco:** P1 — Bug replicavel. Toda nova importacao herda o problema.
+**Risco:** P1 — Se o SQLite Hermes ficar desatualizado, crons de mulligan/optimizer podem continuar usando CMC local corrompido.
 
 **Acao recomendada:**
-1. Script `scripts/fix_cmc_batch.py`: atualizar `deck_cards.cmc` a partir do PG `cards.cmc`
-2. Adicionar `cmc` ao SELECT em `_loadCardsData()`
-3. Warning em `_getCmc()` para CMC null/zero em cartas nao-land
-4. Script de importacao: sempre usar PG `cards.cmc` como autoritativo
+1. ~~Adicionar `cmc` ao SELECT em `_loadCardsData()`~~
+2. ~~Carregar `cmc` no resolver de nomes usado por import/deck generation~~
+3. ~~Emitir warning app-facing quando CMC resolvido for suspeito~~
+4. Rodar backfill/sync SQLite Hermes para atualizar registros locais com `cards.cmc`
+5. Ajustar scripts Python de importação aprendida para sempre persistirem CMC autoritativo
 
 **Validacao:**
 ```bash
@@ -745,38 +756,36 @@ rg "deck_weakness_reports" server/lib/ server/routes/ --count
 
 ### [P1] Deck Import: Validar CMC das cartas importadas contra a tabela `cards` do PostgreSQL — previne corrupção de dados que afeta toda a pipeline de análise
 
+**Status em 2026-06-11:** PARCIALMENTE RESOLVIDO no backend. O caminho de
+resolução/import app-facing passa a carregar `cards.cmc` e gerar warnings de
+integridade; o payload público foi preservado. Backfill/sync SQLite Hermes e
+scripts Python continuam como pendência operacional separada.
+
 **Conhecimento MTG:** O VALIDATOR_LOG v3.23 (2026-06-02) documenta corrupção massiva de CMC na importação do deck Lorehold: 14+ cartas com `CMC=0.0` (Sol Ring, Mana Vault, Boros Signet, Orim's Chant, etc.) e 6 cartas com `CMC=NULL` (Aetherflux Reservoir, Past in Flames, Electroduplicate, etc.). A CMC média reportada de 2.15 é subestimada — a CMC real do deck está ~2.8-3.0. Todos os cálculos downstream (curva de mana, Mulligan Simulation T3, GoldfishSimulator keepable, quality gate ΔCMC) são afetados.
 
 **Evidencia no código:**
-- `server/lib/deck_rules_service.dart:412-447` — `_loadCardsData()` consulta `id, name, type_line, oracle_text, colors, color_identity, mana_cost` da tabela `cards` do PG, mas **não consulta `cmc`**. A classe `_CardData` (linhas 484-502) não tem campo `cmc`.
-- `server/lib/card_validation_service.dart:67-80` — `_findCard()` consulta apenas `id, name`. Sem validação de CMC.
-- `server/lib/ai/optimization_quality_gate.dart:459-465` — `_getCmc()` retorna `0` silenciosamente quando `cmc` é `null` ou inválido, propagando dados corrompidos para o quality gate.
-- `rg "cmc" server/lib/deck_rules_service.dart server/lib/card_validation_service.dart` → **ZERO resultados**. Nenhum serviço de validação verifica CMC.
+- `server/lib/import_card_lookup_service.dart` — queries de exact/localized/split agora retornam `c.cmc`.
+- `server/lib/generated_deck_validation_service.dart` — cards resolvidos carregam `cmc` internamente e geram warning de integridade.
+- `server/lib/card_validation_service.dart` — `_getCardInfo()` retorna `mana_cost`/`cmc` e `validateDeckCards()` compara contra o valor informado.
+- `server/lib/deck_rules_service.dart` — `_loadCardsData()` consulta e armazena `cmc` em `_CardData`.
+- `server/lib/ai/cmc_safety.dart` — funções compartilhadas identificam CMC suspeito e recuperam fallback por `mana_cost`.
 
-**Gap:** Quando um deck é importado (via script Python ou API), os valores de CMC nas cartas não são validados contra a tabela `cards` do PostgreSQL (fonte autoritativa com 33.795 cartas). Cartas com CMC=0.0 ou CMC=NULL são aceitas sem warning, corrompendo todos os cálculos downstream: GoldfishSimulator (keepable/T3 rate inflado), quality gate (ΔCMC errado), filler loader (curva de mana errada), e mana base validator.
+**Gap remanescente:** Quando um deck é importado por scripts Python/Hermes fora da API, os valores locais de CMC ainda podem não ser regravados a partir de `cards.cmc`. Esse backfill/sync precisa ser tratado no pipeline Hermes.
 
 **Impacto:** `P1` — Dados corrompidos em cadeia. Swaps podem ser aprovados/rejeitados baseados em ΔCMC errado. O Mulligan Simulation reporta T3 inflado (mascara color screw). A análise de curva de mana mostra valores incorretos para o usuário. O problema é silencioso — não há logs, warnings, ou alertas.
 
 **Risco:** P1 — Corrupção de dados se propaga para todas as camadas de análise sem detecção. Afeta diretamente a confiabilidade do optimize pipeline e da exibição de métricas para o usuário.
 
 **Ação recomendada:**
-1. Adicionar campo `final double? cmc` à classe `_CardData` em `deck_rules_service.dart:484-502`
-2. Adicionar `cmc` ao SELECT em `_loadCardsData()` (linha 415): `SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc`
-3. Em `_getCmc()` (optimization_quality_gate.dart:459-465), adicionar `developer.log` warning quando CMC é null/zero para cartas não-land:
-   ```dart
-   if (cmc == null || (cmc is num && cmc == 0)) {
-     developer.log('WARNING: card has null/zero CMC', name: card['name']);
-   }
-   ```
-4. Criar `validateCardCmc()` em `card_validation_service.dart` que compara o CMC importado contra o CMC do PG e retorna warning se diferir
-5. No script Python de importação (`auto_sync_learned_decks.py`), sempre consultar `cards.cmc` do PG e usar esse valor como autoritativo
+1. ~~Adicionar campo `cmc` à `_CardData` e ao SELECT de `DeckRulesService`~~
+2. ~~Carregar `cmc` no resolver de import/localized/split~~
+3. ~~Emitir warning em validação app-facing para CMC suspeito/divergente~~
+4. Criar/rodar rotina Hermes para corrigir SQLite local e scripts Python de importação aprendida
 
 **Validação:**
 ```bash
-cd server && dart analyze lib/deck_rules_service.dart
-cd server && dart analyze lib/card_validation_service.dart
-cd server && dart analyze lib/ai/optimization_quality_gate.dart
-cd server && dart test test/deck_rules_service_test.dart
+cd server && dart analyze lib/deck_rules_service.dart lib/card_validation_service.dart lib/generated_deck_validation_service.dart lib/import_card_lookup_service.dart
+cd server && dart test test/generated_deck_validation_service_test.dart test/cmc_safety_test.dart
 ```
 
 ---
