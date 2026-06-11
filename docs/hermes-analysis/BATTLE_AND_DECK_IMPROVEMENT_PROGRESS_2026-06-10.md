@@ -279,6 +279,13 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_payload_support_test.dart test/optimize_route_request_support_test.dart test/optimize_route_async_support_test.dart test/optimize_route_response_support_test.dart test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 52 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh e1a1d6e6`: `PASS`; risco médio por caminho
     runtime mitigado por testes unitários do payload e pipeline/route contract.
+- Hermes/AWS pós-push do split warnings (`69f0cb3b`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_warnings_support`, rota `ai/optimize` e
+    teste de warnings finais: sem issues.
+  - `dart test test/optimize_route_warnings_support_test.dart test/optimize_route_payload_support_test.dart test/optimize_route_request_support_test.dart test/optimize_route_async_support_test.dart test/optimize_route_response_support_test.dart test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 55 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 69f0cb3b`: `PASS`; sem `RISK` novo, mudança
+    classificada como extração pura sem alteração comportamental.
 
 ## Etapa 4 — Próximas pendências reais
 
