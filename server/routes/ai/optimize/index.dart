@@ -16,6 +16,8 @@ import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
     as optimize_route_async;
+import '../../../lib/ai/optimize_route_payload_support.dart'
+    as optimize_route_payload;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
@@ -2645,180 +2647,19 @@ Future<Response> onRequest(RequestContext context) async {
           .where((e) => e != null)
           .toList();
 
-      responseBody['recommendations'] = [
-        ...(responseBody['removals_detailed'] as List),
-        ...(responseBody['additions_detailed'] as List),
-      ];
-
-      // CRÃTICO: Balancear additions/removals detailed para manter contagem igual
-      final addDet = responseBody['additions_detailed'] as List;
-      final remDet = responseBody['removals_detailed'] as List;
-
-      // DEBUG: Log detalhado para rastrear desbalanceamentos
-      Log.d('Balanceamento final:');
-      Log.d('  validAdditions.length = ${validAdditions.length}');
-      Log.d('  validRemovals.length = ${validRemovals.length}');
-      Log.d('  additions_detailed.length = ${addDet.length}');
-      Log.d('  removals_detailed.length = ${remDet.length}');
-      Log.d('  mode = ${jsonResponse['mode']}');
-
-      // Verificar cartas que NÃƒO foram mapeadas para card_id
-      if (addDet.length != validAdditions.length) {
-        Log.w('Algumas adiÃ§Ãµes nÃ£o foram mapeadas para card_id!');
-        for (final name in validAdditions) {
-          final v = validByNameLower[name.toLowerCase()];
-          if (v == null || v['id'] == null) {
-            Log.w(
-                '  Carta sem card_id: "$name" (key: "${name.toLowerCase()}")');
-          }
-        }
-      }
-
-      // BALANCEAMENTO FINAL (detailed) - Agora as listas jÃ¡ devem estar equilibradas
-      // pÃ³s re-chamada Ã  IA. Este bloco sÃ³ age se o detailed ainda tiver gap.
-      if (addDet.length < remDet.length && !isComplete) {
-        final missingDetailed = remDet.length - addDet.length;
-        Log.d(
-            '  Gap em detailed: faltam $missingDetailed - construindo de validAdditions');
-
-        // Tentar construir detailed para adiÃ§Ãµes que ainda nÃ£o estÃ£o nele
-        final existingNames = addDet
-            .map((e) => (e as Map)['name']?.toString().toLowerCase() ?? '')
-            .toSet();
-        final newDetailed = <Map<String, dynamic>>[];
-        for (final name in validAdditions) {
-          if (existingNames.contains(name.toLowerCase())) continue;
-          final v = validByNameLower[name.toLowerCase()];
-          if (v != null && v['id'] != null) {
-            newDetailed.add({
-              'name': v['name'] ?? name,
-              'card_id': v['id'],
-              'quantity': 1,
-            });
-            existingNames.add(name.toLowerCase());
-          }
-        }
-        if (newDetailed.isNotEmpty) {
-          responseBody['additions_detailed'] = [...addDet, ...newDetailed];
-        }
-
-        // Se AINDA faltar, truncar remoÃ§Ãµes como Ãºltimo recurso
-        final finalAddDet2 = responseBody['additions_detailed'] as List;
-        if (finalAddDet2.length < remDet.length) {
-          responseBody['removals_detailed'] =
-              remDet.take(finalAddDet2.length).toList();
-          responseBody['removals'] =
-              validRemovals.take(finalAddDet2.length).toList();
-        }
-      } else if (addDet.length > remDet.length && !isComplete) {
-        Log.d('  Truncando adiÃ§Ãµes extras');
-        responseBody['additions_detailed'] =
-            addDet.take(remDet.length).toList();
-        responseBody['additions'] = validAdditions.take(remDet.length).toList();
-      }
-
-      // Log final
-      final finalAddDet = responseBody['additions_detailed'] as List;
-      final finalRemDet = responseBody['removals_detailed'] as List;
-      Log.d(
-          '  Final: additions_detailed=${finalAddDet.length}, removals_detailed=${finalRemDet.length}');
-
-      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-      // VALIDAÃ‡ÃƒO FINAL: Garantir integridade do deck resultante
-      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-      if (!isComplete) {
-        // 1. Verificar que nenhuma adiÃ§Ã£o Ã© de carta que jÃ¡ existe no deck (exceto basics em formatos nÃ£o-Commander)
-        final additionsDetailedFinal =
-            responseBody['additions_detailed'] as List;
-        final removalsDetailedFinal = responseBody['removals_detailed'] as List;
-        final removalNamesFinal = removalsDetailedFinal
-            .whereType<Map>()
-            .map((e) => (e['name']?.toString() ?? '').toLowerCase())
-            .where((n) => n.isNotEmpty)
-            .toSet();
-
-        final filteredAdditions = <dynamic>[];
-        final filteredAdditionNames = <String>[];
-        final filteredRemovalsToKeep = <dynamic>[];
-        final filteredRemovalNames = <String>[];
-
-        for (final add in additionsDetailedFinal) {
-          if (add is! Map) continue;
-          final name = (add['name']?.toString() ?? '').toLowerCase();
-          if (name.isEmpty) continue;
-
-          final isBasic = isBasicLandName(name);
-          final alreadyInDeck = deckNamesLower.contains(name);
-          final beingRemoved = removalNamesFinal.contains(name);
-
-          // Em Commander/Brawl, nÃ£o-bÃ¡sicos sÃ³ podem ter 1 cÃ³pia.
-          // Se a carta jÃ¡ estÃ¡ no deck e nÃ£o estÃ¡ sendo removida, Ã© invÃ¡lida.
-          if (alreadyInDeck &&
-              !beingRemoved &&
-              !isBasic &&
-              (deckFormat == 'commander' || deckFormat == 'brawl')) {
-            Log.w(
-                '  ValidaÃ§Ã£o final: removendo adiÃ§Ã£o duplicada "$name" (jÃ¡ existe no deck)');
-            continue;
-          }
-
-          filteredAdditions.add(add);
-          filteredAdditionNames.add(add['name']?.toString() ?? name);
-        }
-
-        // 2. Rebalancear apÃ³s filtrar adiÃ§Ãµes invÃ¡lidas
-        if (filteredAdditions.length < additionsDetailedFinal.length) {
-          Log.d(
-              '  ValidaÃ§Ã£o final: ${additionsDetailedFinal.length - filteredAdditions.length} adiÃ§Ãµes removidas por duplicidade');
-
-          // Truncar remoÃ§Ãµes para manter equilÃ­brio
-          for (var i = 0;
-              i < removalsDetailedFinal.length &&
-                  filteredRemovalsToKeep.length < filteredAdditions.length;
-              i++) {
-            filteredRemovalsToKeep.add(removalsDetailedFinal[i]);
-            final rem = removalsDetailedFinal[i];
-            if (rem is Map) {
-              filteredRemovalNames.add(rem['name']?.toString() ?? '');
-            }
-          }
-
-          responseBody['additions_detailed'] = filteredAdditions;
-          responseBody['additions'] = filteredAdditionNames;
-          responseBody['removals_detailed'] = filteredRemovalsToKeep;
-          responseBody['removals'] = filteredRemovalNames;
-
-          // Rebuild recommendations
-          responseBody['recommendations'] = [
-            ...filteredRemovalsToKeep,
-            ...filteredAdditions,
-          ];
-
-          Log.d(
-              '  ValidaÃ§Ã£o final pÃ³s-rebalanceamento: ${filteredAdditions.length} adiÃ§Ãµes, ${filteredRemovalsToKeep.length} remoÃ§Ãµes');
-        }
-
-        // 3. Safety net: ensure additions and removals are exactly balanced
-        {
-          final finalAdditions = responseBody['additions_detailed'] as List;
-          final finalRemovals = responseBody['removals_detailed'] as List;
-          if (finalAdditions.length != finalRemovals.length) {
-            Log.w(
-                '  Safety net: additions(${finalAdditions.length}) != removals(${finalRemovals.length}), rebalancing');
-            final minLen = finalAdditions.length < finalRemovals.length
-                ? finalAdditions.length
-                : finalRemovals.length;
-            responseBody['additions_detailed'] =
-                finalAdditions.take(minLen).toList();
-            responseBody['additions'] =
-                (responseBody['additions'] as List).take(minLen).toList();
-            responseBody['removals_detailed'] =
-                finalRemovals.take(minLen).toList();
-            responseBody['removals'] =
-                (responseBody['removals'] as List).take(minLen).toList();
-          }
-        }
-      }
+      optimize_route_payload.balanceOptimizeDetailedPayload(
+        responseBody: responseBody,
+        validAdditions: validAdditions,
+        validRemovals: validRemovals,
+        validByNameLower: validByNameLower,
+        isComplete: isComplete,
+      );
+      optimize_route_payload.enforceOptimizeFinalPayloadIntegrity(
+        responseBody: responseBody,
+        deckNamesLower: deckNamesLower,
+        deckFormat: deckFormat,
+        isComplete: isComplete,
+      );
 
       responseBody['intensity'] = intensity.selected;
       responseBody['optimize_intensity'] = intensity.toJson(
