@@ -17,6 +17,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Define `master` como fonte canonica e `codex/hermes-analysis-docs` como
     fila/staging Hermes, sem merge bruto para `master`.
 
+- `CODEX_HERMES_COLLABORATION_PROTOCOL_2026-06-11.md`
+  - Contrato operacional entre Codex local e Hermes/AWS.
+  - Use para decidir quando Hermes pode escrever docs, quando Codex deve chamar
+    report-only e como transformar achados Hermes em tarefas reais.
+
 - `HERMES_DOCS_TRIAGE_2026-06-11.md`
   - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch
     `codex/hermes-analysis-docs`.
