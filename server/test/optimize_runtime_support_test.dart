@@ -24,7 +24,8 @@ void main() {
       expect(role, equals('removal'));
     });
 
-    test('real combo tag maps to wincon while heuristic tag stays low confidence',
+    test(
+        'real combo tag maps to wincon while heuristic tag stays low confidence',
         () {
       final tags = inferFunctionalCardTags(
         name: 'Dramatic Reversal',
@@ -357,32 +358,51 @@ void main() {
   });
 
   group('bracket safety', () {
-    test('counts official Game Changers only as Game Changers', () {
-      for (final card in const [
+    test('preserves secondary tags for official Game Changers', () {
+      for (final entry in const [
         {
-          'name': 'Mana Vault',
-          'type_line': 'Artifact',
-          'oracle_text': '{T}: Add {C}{C}{C}.',
+          'card': {
+            'name': 'Mana Vault',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {C}{C}{C}.',
+          },
+          'expected': {BracketCategory.gameChanger, BracketCategory.fastMana},
         },
         {
-          'name': 'Demonic Tutor',
-          'type_line': 'Sorcery',
-          'oracle_text':
-              'Search your library for a card, put that card into your hand, then shuffle.',
+          'card': {
+            'name': 'Demonic Tutor',
+            'type_line': 'Sorcery',
+            'oracle_text':
+                'Search your library for a card, put that card into your hand, then shuffle.',
+          },
+          'expected': {BracketCategory.gameChanger, BracketCategory.tutor},
         },
         {
-          'name': 'Force of Will',
-          'type_line': 'Instant',
-          'oracle_text':
-              'You may pay 1 life and exile a blue card from your hand rather than pay this spell\'s mana cost.',
+          'card': {
+            'name': 'Force of Will',
+            'type_line': 'Instant',
+            'oracle_text':
+                'You may pay 1 life and exile a blue card from your hand rather than pay this spell\'s mana cost.',
+          },
+          'expected': {
+            BracketCategory.gameChanger,
+            BracketCategory.freeInteraction,
+          },
         },
         {
-          'name': 'Thassa\'s Oracle',
-          'type_line': 'Creature',
-          'oracle_text':
-              'When this creature enters, look at the top X cards of your library.',
+          'card': {
+            'name': 'Thassa\'s Oracle',
+            'type_line': 'Creature',
+            'oracle_text':
+                'When this creature enters, look at the top X cards of your library.',
+          },
+          'expected': {
+            BracketCategory.gameChanger,
+            BracketCategory.infiniteCombo,
+          },
         },
       ]) {
+        final card = entry['card']! as Map<String, String>;
         final tags = tagCardForBracket(
           name: card['name']!,
           typeLine: card['type_line']!,
@@ -391,13 +411,13 @@ void main() {
 
         expect(
           tags.categories,
-          equals({BracketCategory.gameChanger}),
-          reason: '${card['name']} must not consume secondary budgets.',
+          equals(entry['expected']),
+          reason: '${card['name']} must preserve secondary diagnostics.',
         );
       }
     });
 
-    test('game changer budget does not consume fast mana budget', () {
+    test('game changer budget also consumes secondary role budgets', () {
       final counts = countBracketCategories(const [
         {
           'name': 'Mana Vault',
@@ -408,7 +428,7 @@ void main() {
       ]);
 
       expect(counts[BracketCategory.gameChanger], equals(1));
-      expect(counts[BracketCategory.fastMana], equals(0));
+      expect(counts[BracketCategory.fastMana], equals(1));
     });
 
     test('official game changer list stays complete and handles MDFC names',
@@ -429,7 +449,10 @@ void main() {
           oracleText: '',
         );
 
-        expect(tags.categories, equals({BracketCategory.gameChanger}));
+        expect(
+          tags.categories,
+          equals({BracketCategory.gameChanger, BracketCategory.valueEngine}),
+        );
       }
     });
 

@@ -15,6 +15,8 @@ import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
     as optimize_route_async;
+import '../../../lib/ai/optimize_route_bracket_policy_filter_support.dart'
+    as optimize_route_bracket_policy_filter;
 import '../../../lib/ai/optimize_route_color_identity_filter_support.dart'
     as optimize_route_color_identity_filter;
 import '../../../lib/ai/optimize_route_payload_support.dart'
@@ -43,7 +45,6 @@ import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/theme_contextual_rules_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
-import '../../../lib/edh_bracket_policy.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/ai/optimize_route_internal.dart';
@@ -1603,27 +1604,26 @@ Future<Response> onRequest(RequestContext context) async {
           parameters: {'names': validAdditions},
         );
         final additionsInfo = additionsInfoResult
-            .map((r) => {
-                  'name': r[0] as String,
-                  'type_line': r[1] as String? ?? '',
-                  'oracle_text': r[2] as String? ?? '',
-                  'quantity': 1,
-                })
+            .map(
+              (row) => optimize_route_bracket_policy_filter
+                  .buildOptimizeBracketAdditionCardData(
+                name: row[0],
+                typeLine: row[1],
+                oracleText: row[2],
+              ),
+            )
             .toList();
 
-        final decision = applyBracketPolicyToAdditions(
+        final bracketFilter = optimize_route_bracket_policy_filter
+            .filterOptimizeAdditionsByBracketPolicy(
           bracket: bracket,
           currentDeckCards: allCardData,
           additionsCardsData: additionsInfo,
+          validAdditions: validAdditions,
         );
 
-        blockedByBracket.addAll(decision.blocked);
-        // Modo complete pode conter repetiÃ§Ã£o; para a decisÃ£o, usamos os nomes Ãºnicos do "allowed"
-        // e depois re-aplicamos mantendo repetiÃ§Ã£o quando possÃ­vel.
-        final allowedSet = decision.allowed.map((e) => e.toLowerCase()).toSet();
-        validAdditions = validAdditions
-            .where((n) => allowedSet.contains(n.toLowerCase()))
-            .toList();
+        blockedByBracket.addAll(bracketFilter.blockedByBracket);
+        validAdditions = bracketFilter.additions;
       }
 
       // Top-up determinÃ­stico no modo complete:

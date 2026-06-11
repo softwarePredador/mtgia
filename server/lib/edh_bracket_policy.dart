@@ -123,7 +123,7 @@ BracketTagResult tagCardForBracket({
   final o = oracleText.toLowerCase();
 
   if (_isOfficialGameChangerName(n)) {
-    return BracketTagResult({BracketCategory.gameChanger});
+    categories.add(BracketCategory.gameChanger);
   }
 
   if (_fastManaNames.contains(n)) {
@@ -184,7 +184,7 @@ BracketTagResult tagCardForBracket({
   }
 
   // Value engine: gera valor recorrente todo turno
-  if (_knownValueEngineNames.contains(n)) {
+  if (_isKnownValueEngineName(n)) {
     categories.add(BracketCategory.valueEngine);
   }
 
@@ -415,6 +415,11 @@ bool _isOfficialGameChangerName(String name) {
     if (variants.any(officialVariants.contains)) return true;
   }
   return false;
+}
+
+bool _isKnownValueEngineName(String name) {
+  final variants = _normalizedBracketNameVariants(name);
+  return variants.any(_knownValueEngineNames.contains);
 }
 
 Set<String> _normalizedBracketNameVariants(String name) {

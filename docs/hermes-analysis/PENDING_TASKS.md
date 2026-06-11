@@ -118,6 +118,12 @@
 > movido para `optimize_route_color_identity_filter_support.dart`, preservando
 > a regra de comandante colorless e o comportamento legado para identidade
 > ausente.
+> Décimo quinto split de optimize concluído: filtro de bracket foi movido para
+> `optimize_route_bracket_policy_filter_support.dart`, preservando bloqueio por
+> orçamento de bracket e repetições válidas da lista de adições.
+> Correção adicional: Game Changers oficiais agora preservam tags secundárias
+> no classificador de bracket. A premissa antiga de "somente gameChanger" foi
+> substituída por multi-tag para melhorar diagnostics e orçamento de papéis.
 
 ---
 
@@ -184,7 +190,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: validação de bracket com SQL | 1-2 dias | Médio | `optimize_route_color_identity_filter_support.dart` verde |
+| 6 | Próximo split da rota optimize: top-up determinístico de básicos no modo complete | 1-2 dias | Médio | `optimize_route_bracket_policy_filter_support.dart` verde |
 
 ---
 
@@ -461,6 +467,8 @@
 | `optimize_route_suggestion_filter_support_test.dart` | Cobertura direta do filtro inicial de removals/additions e modo complete | 70 |
 | `optimize_route_color_identity_filter_support.dart` | Filtro puro de adições por identidade de cor do comandante | 38 |
 | `optimize_route_color_identity_filter_support_test.dart` | Cobertura direta de identidade mono-color, colorless e dados ausentes | 51 |
+| `optimize_route_bracket_policy_filter_support.dart` | Filtro de adições por política de bracket preservando ordem/repetição | 47 |
+| `optimize_route_bracket_policy_filter_support_test.dart` | Cobertura direta de bloqueio por bracket, repetições e normalização da query | 74 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |

@@ -213,7 +213,7 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` | 201 | ✅ Extraído | Mantém registry base de conformidade e regressões transversais de blocked/APNAP/prevention isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` | 228 | ✅ Extraído | Mantém regressões de replay events, fim de combate, APNAP/timestamp e spell-cast trigger isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` | 198 | ✅ Extraído | Mantém regressões auxiliares de loss taxonomy, token/land recursion, proteção de jogador e auditoria isoladas |
-| `server/routes/ai/optimize/index.dart` | 2632 | ⚠️ Split iniciado | Response/cache, envelope async, request parsing, payload final, warnings finais, diagnostics finais, fallback vazio, payloads de rejeição, validação pós-processamento, retry orchestration, filtro inicial de sugestões e filtro de identidade de cor foram movidos; manter rota como orquestração fina e mover validação de bracket com SQL para support service |
+| `server/routes/ai/optimize/index.dart` | 2632 | ⚠️ Split iniciado | Response/cache, envelope async, request parsing, payload final, warnings finais, diagnostics finais, fallback vazio, payloads de rejeição, validação pós-processamento, retry orchestration, filtro inicial de sugestões, filtro de identidade de cor e filtro de bracket foram movidos; manter rota como orquestração fina e mover top-up deterministic/complete para support service |
 | `server/lib/ai/optimize_runtime_support.dart` | 2386 | ⚠️ Split iniciado | Cache e quality ranking foram movidos para support dedicado; ainda falta extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimize_candidate_quality_support.dart` | 327 | ✅ Extraído | Centraliza sinais de qualidade agressiva, ranking, buckets de rejeição e loader SQL com export compatível no runtime |
@@ -229,6 +229,7 @@
 | `server/lib/ai/optimize_route_retry_support.dart` | 64 | ✅ Extraído | Centraliza plano de retry deterministic-first → IA e metadata de respostas IA |
 | `server/lib/ai/optimize_route_suggestion_filter_support.dart` | 76 | ✅ Extraído | Centraliza balanceamento/sanitização inicial de sugestões, proteção de comandante/core e filtro de no-op |
 | `server/lib/ai/optimize_route_color_identity_filter_support.dart` | 38 | ✅ Extraído | Centraliza filtro puro de adições por identidade de cor do comandante |
+| `server/lib/ai/optimize_route_bracket_policy_filter_support.dart` | 47 | ✅ Extraído | Centraliza filtro de adições por política de bracket preservando ordem/repetição da lista validada |
 | `server/lib/commander_eligibility.dart` | 23 | ✅ Extraído | Centraliza elegibilidade Commander 2026 para DeckRulesService e rotas incrementais |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
 | `server/lib/ai/optimization_functional_roles.dart` | 768 | Aceitável por enquanto | Manter coeso; split só se crescer com novas políticas |

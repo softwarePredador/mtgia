@@ -18,10 +18,13 @@ void main() {
       );
 
       expect(cultivate.categories, isNot(contains(BracketCategory.tutor)));
+      expect(
+          cultivate.categories, isNot(contains(BracketCategory.gameChanger)));
       expect(demonicTutor.categories, contains(BracketCategory.tutor));
+      expect(demonicTutor.categories, contains(BracketCategory.gameChanger));
     });
 
-    test('keeps known false-positive gamechanger names untagged by default',
+    test('keeps official gamechanger names tagged without suppressing roles',
         () {
       final field = tagCardForBracket(
         name: 'Field of the Dead',
@@ -36,8 +39,8 @@ void main() {
             'Each nonland card in your graveyard has escape. The escape cost is equal to the card\'s mana cost plus exile three other cards from your graveyard.',
       );
 
-      expect(field.categories, isEmpty);
-      expect(breach.categories, isEmpty);
+      expect(field.categories, contains(BracketCategory.gameChanger));
+      expect(breach.categories, contains(BracketCategory.gameChanger));
     });
 
     test('detects curated free interaction even when oracle text is missing',
@@ -50,6 +53,7 @@ void main() {
 
       expect(tags.categories, contains(BracketCategory.freeInteraction));
       expect(tags.categories, contains(BracketCategory.protection));
+      expect(tags.categories, contains(BracketCategory.gameChanger));
     });
 
     test('detects curated fast mana lands', () {
@@ -65,6 +69,7 @@ void main() {
         );
 
         expect(tags.categories, contains(BracketCategory.fastMana));
+        expect(tags.categories, contains(BracketCategory.gameChanger));
       }
     });
 
@@ -76,6 +81,7 @@ void main() {
       );
 
       expect(tags.categories, contains(BracketCategory.valueEngine));
+      expect(tags.categories, contains(BracketCategory.gameChanger));
     });
   });
 }
