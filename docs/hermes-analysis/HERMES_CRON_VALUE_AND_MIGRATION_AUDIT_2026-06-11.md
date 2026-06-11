@@ -81,6 +81,20 @@ Correção versionada:
   `commanders`, desbloqueando importação de eventos de aprendizado em bancos
   Hermes recém-recriados.
 
+Validação remota após correções (`2026-06-11T13:25Z`):
+
+| Job manual | Resultado | Observação |
+|---|---|---|
+| `manaloom-master-optimizer-preflight.sh` | PASS; `status: approved`. | `deck_cards=100`, `learned_decks=120`, `duplicate_rows_collapsed=4`, cache oracle e battle rules sincronizados. |
+| `pull_learning_events.sh` | PASS; `TOTALS imported=42`. | Erro de SQLite readonly e tabela `commanders` ausente resolvidos. |
+| `known_cards_validator_cron.sh` | SKIPPED por lock ativo. | Lock recente é comportamento esperado; próxima rodada deve validar com `learned_decks` já populado. |
+
+Novo achado de qualidade:
+
+- O pull de eventos importou vários registros com `card_count=0` ou `card_count=1`.
+  Isso confirma o loop operacional, mas esses eventos devem ser tratados como
+  parciais/telemetria, não como aprendizado de deck completo.
+
 ## Crons habilitadas
 
 | Cron | Cadência | Função real | Valor para ManaLoom | Decisão |
@@ -163,12 +177,17 @@ find /opt/data/cron/output -type f -name '*.md' \
   -printf '%TY-%Tm-%TdT%TH:%TM:%TS %p\n' | sort -r | head
 ```
 
-Validar se a próxima rodada produz sem erro:
+Validar se a próxima rodada agendada produz sem erro:
 
 - `manaloom-master-watchdog`
 - `manaloom-pull-learning-events`
 - `lorehold-knowncards-validator`
 - `manaloom-master-optimizer-preflight`
+
+Backlog técnico aberto:
+
+- filtrar ou marcar `deck_learning_events` parciais (`card_count < 90`) antes de
+  alimentar qualquer score de aprendizado por comandante.
 
 ## Caminho para remover Hermes
 
