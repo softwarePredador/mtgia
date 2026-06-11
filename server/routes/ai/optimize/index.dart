@@ -21,6 +21,8 @@ import '../../../lib/ai/optimize_route_color_identity_filter_support.dart'
     as optimize_route_color_identity_filter;
 import '../../../lib/ai/optimize_route_complete_top_up_support.dart'
     as optimize_route_complete_top_up;
+import '../../../lib/ai/optimize_route_land_removal_protection_support.dart'
+    as optimize_route_land_removal_protection;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
@@ -1665,39 +1667,17 @@ Future<Response> onRequest(RequestContext context) async {
       // FILOSOFIA: Quando additions < removals, a IA deve SUGERIR NOVAS CARTAS
       // de sinergia â€” NÃƒO preencher com lands genÃ©ricos. O propÃ³sito Ã© OTIMIZAR.
 
-      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-      // PROTEÃ‡ÃƒO DE TERRENOS (sync optimize): impedir remoÃ§Ã£o de lands quando
-      // o deck jÃ¡ tem poucos terrenos. Sem isso, um deck com 24 lands pode ficar com 20.
-      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       if (!isComplete) {
-        final currentLandCount = allCardData.fold<int>(0, (sum, c) {
-          final type = ((c['type_line'] as String?) ?? '').toLowerCase();
-          if (!type.contains('land')) return sum;
-          return sum + ((c['quantity'] as int?) ?? 1);
-        });
-        const minSafeLands = 28;
+        final landProtectionResult = optimize_route_land_removal_protection
+            .applyOptimizeLandRemovalProtection(
+          removals: validRemovals,
+          allCardData: allCardData,
+        );
+        validRemovals = landProtectionResult.removals;
 
-        if (currentLandCount <= minSafeLands + 3) {
-          // Bloquear remoÃ§Ãµes de terrenos
-          final landRemovalsBefore = validRemovals.length;
-          final landNamesInDeck = <String, String>{};
-          for (final card in allCardData) {
-            final type = ((card['type_line'] as String?) ?? '').toLowerCase();
-            if (type.contains('land')) {
-              landNamesInDeck[((card['name'] as String?) ?? '').toLowerCase()] =
-                  (card['type_line'] as String?) ?? '';
-            }
-          }
-
-          validRemovals = validRemovals.where((name) {
-            return !landNamesInDeck.containsKey(name.toLowerCase());
-          }).toList();
-
-          final landBlockedCount = landRemovalsBefore - validRemovals.length;
-          if (landBlockedCount > 0) {
-            Log.d(
-                'â›” Land protection: bloqueou $landBlockedCount remoÃ§Ãµes de terrenos (deck tem $currentLandCount lands, mÃ­nimo seguro=$minSafeLands)');
-          }
+        if (landProtectionResult.blockedCount > 0) {
+          Log.d(
+              'Land protection: blocked ${landProtectionResult.blockedCount} land removals (deck has ${landProtectionResult.currentLandCount} lands, safe minimum=${landProtectionResult.minSafeLands})');
         }
       }
 
