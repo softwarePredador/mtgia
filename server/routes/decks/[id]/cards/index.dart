@@ -119,6 +119,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           oracleText: oracleText,
           power: power,
           toughness: toughness,
+          format: format,
         );
         if (!eligible) {
           throw DeckRulesException(

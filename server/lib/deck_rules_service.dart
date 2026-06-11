@@ -231,7 +231,7 @@ class DeckRulesService {
         throw DeckRulesException('Regra violada: comandante não encontrado.');
       }
 
-      if (!_isCommanderEligible(commanderInfo)) {
+      if (!_isCommanderEligible(commanderInfo, format: format)) {
         throw DeckRulesException(
           'Regra violada: "${commanderInfo.name}" não pode ser comandante (precisa ser criatura lendária, Vehicle/Spacecraft lendário com poder/resistência, ou dizer "can be your commander").',
           cardName: commanderInfo.name,
@@ -248,7 +248,7 @@ class DeckRulesService {
       final info = cardsData[cmdId];
       if (info == null) continue;
 
-      if (!_isCommanderEligible(info) && !_isBackground(info)) {
+      if (!_isCommanderEligible(info, format: format) && !_isBackground(info)) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" não pode ser comandante.',
           cardName: info.name,
@@ -297,7 +297,7 @@ class DeckRulesService {
     }
   }
 
-  bool _isCommanderEligible(_CardData card) {
+  bool _isCommanderEligible(_CardData card, {required String format}) {
     // Nota: Background enchantments NÃO são elegíveis como comandante solo.
     // Eles só podem ser usados como comandante quando PAREADOS com uma criatura
     // que tenha "Choose a Background" (2 comandantes).
@@ -309,6 +309,7 @@ class DeckRulesService {
       oracleText: card.oracleText,
       power: card.power,
       toughness: card.toughness,
+      format: format,
     );
   }
 
