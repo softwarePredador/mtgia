@@ -18147,11 +18147,15 @@ ability words permanecem telemetry/semântica.
 - Extraído `server/lib/ai/optimize_swap_candidate_support.dart` para centralizar
   `findSynergyReplacements`, construção determinística de pares de swap e
   diagnostics agressivos de candidates.
+- Extraído `server/lib/ai/optimize_payload_support.dart` para centralizar
+  normalização de payload, intensidade, parser de sugestões, response shaping,
+  retry deterministic-first e recommendation detail.
 - `server/lib/ai/optimize_filler_loader_support.dart` passou a concentrar
   dedupe, filtro de identidade Commander e score de fillers, removendo o ciclo
   circular com `optimize_runtime_support.dart`.
-- `optimize_runtime_support.dart` preserva exports compatíveis e caiu para 1179
-  linhas; próximo corte seguro é fallback/recovery estrutural com teste isolado.
+- `optimize_runtime_support.dart` preserva exports compatíveis e caiu para 692
+  linhas; próximo corte seguro é telemetry/persistência de fallback,
+  preferências de IA ou loaders de referência do comandante com teste isolado.
 - Validações focadas:
   - `dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_filler_loader_support.dart lib/ai/optimize_functional_role_support.dart routes/ai/optimize/index.dart test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart`: PASS.
   - `dart test test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
@@ -18159,5 +18163,7 @@ ability words permanecem telemetry/semântica.
   - `dart test test/optimize_removal_candidate_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
   - `dart analyze lib/ai/optimize_swap_candidate_support.dart lib/ai/optimize_runtime_support.dart lib/ai/optimize_complete_support.dart routes/ai/optimize/index.dart test/optimize_swap_candidate_support_test.dart`: PASS.
   - `dart test test/optimize_swap_candidate_support_test.dart test/optimize_removal_candidate_support_test.dart test/optimize_runtime_support_test.dart test/optimize_learning_pipeline_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_payload_support.dart lib/ai/optimize_runtime_support.dart routes/ai/optimize/index.dart test/optimize_payload_support_test.dart`: PASS.
+  - `dart test test/optimize_payload_support_test.dart test/optimize_runtime_support_test.dart test/optimize_learning_pipeline_test.dart test/optimization_final_validation_test.dart --reporter compact`: PASS.
   - `dart analyze bin lib routes test`: PASS.
   - `dart test --concurrency=2 --reporter compact`: PASS, 630 testes.
