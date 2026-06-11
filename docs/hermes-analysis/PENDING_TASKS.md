@@ -58,6 +58,10 @@
 > O backend passou a carregar `cards.cmc` no resolver de import/deck generation,
 > propagar `cmc` internamente no `GeneratedDeckValidationService`, alertar CMC
 > não-terreno suspeito/divergente e consultar `cmc` em `DeckRulesService`.
+> Correção complementar: `DeckRulesService` agora aceita `cards.cmc` retornado
+> pelo driver PostgreSQL como `num` ou `String`, evitando `500` em fluxos
+> DB-backed de criação/validação/optimize quando a coluna numérica vem
+> serializada como texto.
 >
 > **Atualização 2026-06-11 — CMC Hermes operational sync.**
 > O código operacional Hermes também foi fechado: `sync_pg_card_metadata_to_hermes.py`
@@ -245,6 +249,11 @@
 > `outcome_code` foi movida para `optimize_route_outcome_support.dart`, com
 > wrapper compatível na rota e teste unitário direto para outcomes de sucesso,
 > no-op seguro, near-peak, needs-repair, execution_failed e blocked.
+> Vigésimo segundo split/reuse de optimize concluído: o modo `complete`
+> síncrono da rota passou a reutilizar
+> `optimize_complete.buildCompleteFinalResponse(...)`, removendo duplicação
+> com o executor async e preservando os campos de rota (`intensity`,
+> `optimize_intensity`, `timings`, `stage_telemetry`).
 > Hardening adicional: `rebuild_guided` deixou de gerar terreno básico com
 > `card_id` vazio, resolve identidade por `mana_cost/oracle_text`, carrega
 > básicos por subtipo (`Island // Island` incluso) e passa nos cenários live

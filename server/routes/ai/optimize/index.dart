@@ -11,6 +11,7 @@ import '../../../lib/ai/optimize_stage_telemetry.dart';
 import '../../../lib/ai/otimizacao.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
+import '../../../lib/ai/optimize_complete_support.dart' as optimize_complete;
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
@@ -1163,178 +1164,22 @@ Future<Response> onRequest(RequestContext context) async {
           );
         }
 
-        final rawAdditionsDetailed =
-            (jsonResponse['additions_detailed'] as List)
-                .whereType<Map>()
-                .map((m) {
-                  final mm = m.cast<String, dynamic>();
-                  return {
-                    'card_id': mm['card_id']?.toString(),
-                    'quantity': mm['quantity'] as int? ?? 1,
-                  };
-                })
-                .where((m) => (m['card_id'] as String?)?.isNotEmpty ?? false)
-                .toList();
-
-        final ids =
-            rawAdditionsDetailed.map((e) => e['card_id'] as String).toList();
-        final cardInfoById = <String, Map<String, String>>{};
-        var additionsDetailed = <Map<String, dynamic>>[];
-        Map<String, dynamic>? postAnalysisComplete;
-
-        if (ids.isNotEmpty) {
-          final r = await pool.execute(
-            Sql.named(
-                'SELECT id::text, name, type_line FROM cards WHERE id = ANY(@ids)'),
-            parameters: {'ids': ids},
-          );
-          for (final row in r) {
-            cardInfoById[row[0] as String] = {
-              'name': row[1] as String,
-              'type_line': (row[2] as String?) ?? '',
-            };
-          }
-
-          // Colapsa por NOME (nÃ£o por printing/card_id), aplicando limite de cÃ³pias por formato.
-          final aggregatedByName = <String, Map<String, dynamic>>{};
-          for (final entry in rawAdditionsDetailed) {
-            final cardId = entry['card_id'] as String;
-            final cardInfo = cardInfoById[cardId];
-            if (cardInfo == null) continue;
-
-            final name = cardInfo['name'] ?? '';
-            final typeLine = cardInfo['type_line'] ?? '';
-            if (name.trim().isEmpty) continue;
-
-            final maxCopies = maxCopiesForFormat(
-              deckFormat: deckFormat,
-              typeLine: typeLine,
-              name: name,
-            );
-
-            final existing = aggregatedByName[name.toLowerCase()];
-            final currentQty = (existing?['quantity'] as int?) ?? 0;
-            final incomingQty = (entry['quantity'] as int?) ?? 1;
-            final allowedToAdd = (maxCopies - currentQty).clamp(0, incomingQty);
-            if (allowedToAdd <= 0) continue;
-
-            if (existing == null) {
-              aggregatedByName[name.toLowerCase()] = {
-                'card_id': cardId,
-                'quantity': allowedToAdd,
-                'name': name,
-                'type_line': typeLine,
-              };
-            } else {
-              aggregatedByName[name.toLowerCase()] = {
-                ...existing,
-                'quantity': currentQty + allowedToAdd,
-              };
-            }
-          }
-
-          additionsDetailed = aggregatedByName.values
-              .map((e) => {
-                    'card_id': e['card_id'],
-                    'quantity': e['quantity'],
-                    'name': e['name'],
-                    'is_basic_land':
-                        isBasicLandName(((e['name'] as String?) ?? '').trim()),
-                  })
-              .toList();
-
-          // === Gerar post_analysis para modo complete ===
-          try {
-            final additionsData = await optimize_route_addition_data
-                .fetchOptimizeAdditionDataByIds(
-              pool,
-              ids: ids,
-            );
-
-            final additionsForAnalysis = additionsDetailed.map((add) {
-              final data = additionsData.firstWhere(
-                (d) =>
-                    (d['name'] as String).toLowerCase() ==
-                    ((add['name'] as String?) ?? '').toLowerCase(),
-                orElse: () => {
-                  'name': add['name'] ?? '',
-                  'type_line': '',
-                  'mana_cost': '',
-                  'colors': <String>[],
-                  'cmc': 0.0,
-                  'oracle_text': '',
-                },
-              );
-              return {
-                ...data,
-                'quantity': (add['quantity'] as int?) ?? 1,
-              };
-            }).toList();
-            final virtualDeck = buildVirtualDeckForAnalysis(
-              originalDeck: allCardData,
-              additions: additionsForAnalysis,
-            );
-
-            // 3. Rodar anÃ¡lise no deck virtual
-            final postAnalyzer =
-                DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
-            postAnalysisComplete = postAnalyzer.generateAnalysis();
-          } catch (e) {
-            Log.w('Falha ao gerar post_analysis para modo complete: $e');
-          }
-        }
-
-        final responseBody = {
-          'mode': 'complete',
-          'intensity': intensity.selected,
-          'optimize_intensity': intensity.toJson(
-            returnedSwaps: additionsDetailed.length,
-          ),
-          'constraints': {
-            'keep_theme': keepTheme,
-          },
-          'theme': themeProfile.toJson(),
-          'bracket': bracket,
-          'target_additions': jsonResponse['target_additions'],
-          'iterations': jsonResponse['iterations'],
-          'additions':
-              additionsDetailed.map((e) => e['name'] ?? e['card_id']).toList(),
-          'additions_detailed': additionsDetailed
-              .map((e) => {
-                    'card_id': e['card_id'],
-                    'quantity': e['quantity'],
-                    'name': e['name'],
-                    'is_basic_land': e['is_basic_land'] ??
-                        isBasicLandName(((e['name'] as String?) ?? '').trim()),
-                  })
-              .toList(),
-          'removals': const <String>[],
-          'removals_detailed': const <Map<String, dynamic>>[],
-          'reasoning': jsonResponse['reasoning'] ?? '',
-          'deck_analysis': deckAnalysis,
-          'post_analysis': postAnalysisComplete,
-          'validation_warnings': const <String>[],
-        };
-
-        final warnings = (jsonResponse['warnings'] is Map)
-            ? (jsonResponse['warnings'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
-        if (warnings.isNotEmpty) {
-          responseBody['warnings'] = warnings;
-        }
-
-        // Incluir quality_warning para adiÃ§Ãµes parciais (PARTIAL)
-        final qw = jsonResponse['quality_warning'];
-        if (qw is Map) {
-          responseBody['quality_warning'] = qw;
-        }
-
-        // Incluir consistency_slo para diagnÃ³stico
-        final slo = jsonResponse['consistency_slo'];
-        if (slo is Map) {
-          responseBody['consistency_slo'] = slo;
-        }
-
+        final responseBody = await optimize_complete.buildCompleteFinalResponse(
+          pool: pool,
+          deckFormat: deckFormat,
+          originalDeck: allCardData,
+          deckColors: deckColors,
+          keepTheme: keepTheme,
+          theme: themeProfile.toJson(),
+          bracket: bracket,
+          deckAnalysis: deckAnalysis,
+          jsonResponse: jsonResponse,
+        );
+        responseBody['intensity'] = intensity.selected;
+        responseBody['optimize_intensity'] = intensity.toJson(
+          returnedSwaps:
+              (responseBody['additions_detailed'] as List?)?.length ?? 0,
+        );
         responseBody['timings'] = telemetry.snapshot();
         responseBody['stage_telemetry'] = responseBody['timings'];
 

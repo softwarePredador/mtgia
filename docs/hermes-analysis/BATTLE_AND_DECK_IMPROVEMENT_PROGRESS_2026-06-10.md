@@ -93,8 +93,8 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com vinte e três extrações/testes de suporte, seis
-splits do engine e vinte e nove splits da rota/runtime de optimize concluídos.
+**Status:** em andamento, com vinte e quatro extrações/testes de suporte, seis
+splits do engine e trinta splits da rota/runtime de optimize concluídos.
 
 ### Revisão complementar 2026-06-11 — split de outcome code do optimize
 
@@ -118,6 +118,37 @@ splits do engine e vinte e nove splits da rota/runtime de optimize concluídos.
 **Validação local:**
 - `dart analyze lib/ai/optimize_route_outcome_support.dart routes/ai/optimize/index.dart test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart`.
 - `dart test test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart --reporter compact`.
+
+### Revisão complementar 2026-06-11 — final response complete e CMC PostgreSQL
+
+**Status:** concluída localmente.
+
+**Problemas validados:**
+- O modo `complete` síncrono de `/ai/optimize` ainda duplicava a montagem de
+  resposta final que já existia em `optimize_complete_support.dart` e que
+  também é usada pelo executor async.
+- A execução DB-backed de `ai_optimize_flow_test.dart` expôs um erro real em
+  `DeckRulesService`: `cards.cmc` retornado pelo PostgreSQL podia chegar como
+  `String`, mas o serviço fazia cast direto para `num?`, gerando `500` em
+  criação/validação de deck com cartas.
+
+**Entregue:**
+- `server/routes/ai/optimize/index.dart` passou a reutilizar
+  `optimize_complete.buildCompleteFinalResponse(...)` no modo `complete`,
+  mantendo `intensity`, `optimize_intensity`, `timings` e
+  `stage_telemetry` como campos de rota.
+- `server/lib/deck_rules_service.dart` ganhou
+  `parseDeckRulesCmcValue(...)`, aceitando `num`, `String` numérica e valores
+  inválidos de forma tolerante.
+- Criado `server/test/deck_rules_service_test.dart` para cobrir o parser sem
+  banco.
+
+**Validação local:**
+- `dart analyze lib/deck_rules_service.dart test/deck_rules_service_test.dart routes/ai/optimize/index.dart`.
+- `dart test test/deck_rules_service_test.dart test/commander_eligibility_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_complete_support_test.dart --reporter compact`.
+- `PORT=8082 dart run .dart_frog/server.dart` +
+  `dart test test/ai_optimize_flow_test.dart --reporter compact`: `+10 ~1`,
+  com skip esperado na stress matrix.
 
 ### Revisão complementar 2026-06-11 — split de candidate helpers do optimize filler
 

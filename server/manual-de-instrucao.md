@@ -18142,6 +18142,21 @@ Commander/Brawl. Isso cobre criação, update, import e endpoints incrementais
 que delegam validação ao serviço, mantendo a regra de slot de comandante
 uniforme em vez de depender de guardas manuais por rota.
 
+Rechecagem complementar: a matriz `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`
+já cobre o plano estratégico de regras modernas. O suporte mínimo para
+Vehicle/Spacecraft commander, hybrid estrito, Warp, Station, Prepare/Omen/
+Paradigm, Flashback, combate multi-defensor e ability-word telemetry está
+implementado/testado como simulador Commander prático. Novas regras genéricas
+só devem ser promovidas quando houver carta real no corpus, replay incorreto e
+teste focado; caso contrário permanecem tracked gap.
+
+Hardening encontrado por teste DB-backed: `DeckRulesService` agora aceita
+`cards.cmc` retornado pelo PostgreSQL como `num` ou `String`. Antes, o cast
+direto para `num?` podia gerar `500` em fluxos de criação/validação/optimize
+quando a coluna numérica vinha serializada como texto. Cobertura:
+`server/test/deck_rules_service_test.dart` e `ai_optimize_flow_test.dart` com
+servidor local em `127.0.0.1:8082`.
+
 ## 2026-06-11 — Optimize runtime modularization pass
 
 - Extraído `server/lib/ai/optimize_functional_role_support.dart` para

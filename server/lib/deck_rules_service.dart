@@ -437,7 +437,7 @@ class DeckRulesService {
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
       final manaCost = row[6] as String?;
-      final cmc = (row[7] as num?)?.toDouble();
+      final cmc = parseDeckRulesCmcValue(row[7]);
       final power = row[8] as String?;
       final toughness = row[9] as String?;
 
@@ -504,6 +504,13 @@ class DeckRulesException implements Exception {
   final String? cardName;
   @override
   String toString() => message;
+}
+
+double? parseDeckRulesCmcValue(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
 }
 
 class _CopyCounter {
