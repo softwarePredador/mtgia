@@ -526,6 +526,22 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - Risco operacional separado: o modo agente Hermes não é confiável para
     report-only curto neste momento; comandos determinísticos no container
     continuam funcionais.
+- Split local da análise virtual pós-swap:
+  - Criado `server/lib/ai/optimize_route_virtual_analysis_support.dart`.
+  - Criado `server/test/optimize_route_virtual_analysis_support_test.dart`.
+  - A rota `server/routes/ai/optimize/index.dart` removeu a montagem inline de
+    `additionsForAnalysis`, `virtualDeck`, `DeckArchetypeAnalyzerCore` e
+    summary antes/depois; a execução do `OptimizationValidator` permanece
+    inline como próximo corte.
+  - Validação local focada:
+    - `dart analyze lib/ai/optimize_route_virtual_analysis_support.dart routes/ai/optimize/index.dart test/optimize_route_virtual_analysis_support_test.dart`: sem issues.
+    - `dart test test/optimize_route_virtual_analysis_support_test.dart test/optimize_route_addition_data_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 30 testes, `All tests passed`.
+- Hermes/AWS pós-push do split virtual-analysis (`0149bf18`):
+  - `git pull --ff-only origin master`: `REMOTE_HEAD=0149bf18274d1a2d3a8f8e214741707f7300c047`.
+  - `dart analyze lib/ai/optimize_route_virtual_analysis_support.dart routes/ai/optimize/index.dart test/optimize_route_virtual_analysis_support_test.dart`: sem issues.
+  - `dart test test/optimize_route_virtual_analysis_support_test.dart test/optimize_route_addition_data_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 30 testes, `All tests passed`.
+  - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
+  - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -545,9 +561,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    orchestration/filtro inicial de sugestões/filtro de identidade de cor/filtro
    de bracket/top-up determinístico de básicos no modo complete/proteção de
    remoção de terrenos/reequilíbrio pós-filtros/coleta EDHREC pós-processamento
-   e query de dados completos das adições/quality gate já foram feitos; o
-   próximo corte seguro é extrair a orquestração de análise virtual/validação
-   automática.
+   query de dados completos das adições/quality gate e análise virtual
+   pós-swap já foram feitos; o próximo corte seguro é extrair a execução do
+   `OptimizationValidator` e a rejeição final.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,

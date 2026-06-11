@@ -45,6 +45,8 @@ import '../../../lib/ai/optimize_route_response_support.dart'
     as optimize_route_response;
 import '../../../lib/ai/optimize_route_suggestion_filter_support.dart'
     as optimize_route_suggestion_filter;
+import '../../../lib/ai/optimize_route_virtual_analysis_support.dart'
+    as optimize_route_virtual_analysis;
 import '../../../lib/ai/optimize_route_warnings_support.dart'
     as optimize_route_warnings;
 import '../../../lib/ai/optimize_swap_integrity.dart';
@@ -1944,33 +1946,19 @@ Future<Response> onRequest(RequestContext context) async {
             }
           }
 
-          final additionsForAnalysis = buildOptimizeAdditionEntries(
-            requestedAdditions: validAdditions,
-            additionsData: additionsData,
-          );
-          final virtualDeck = buildVirtualDeckForAnalysis(
+          final virtualPostAnalysis =
+              optimize_route_virtual_analysis.buildOptimizeVirtualPostAnalysis(
             originalDeck: allCardData,
-            removals: validRemovals,
-            additions: additionsForAnalysis,
-          );
-
-          // 3. Rodar AnÃ¡lise no Deck Virtual
-          final postAnalyzer =
-              DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
-          postAnalysis = postAnalyzer.generateAnalysis();
-
-          // 4. Comparar Antes vs Depois — validação qualitativa real.
-          final postValidationSummary =
-              optimize_route_post_validation.buildPostAnalysisValidationSummary(
+            validRemovals: validRemovals,
+            validAdditions: validAdditions,
+            additionsData: additionsData,
+            deckColors: deckColors,
             deckAnalysis: deckAnalysis,
-            postAnalysis: postAnalysis,
             effectiveOptimizeArchetype: effectiveOptimizeArchetype,
           );
-          validationWarnings.addAll(postValidationSummary.warnings);
-
-          if (postValidationSummary.improvements.isNotEmpty) {
-            postAnalysis['improvements'] = postValidationSummary.improvements;
-          }
+          final virtualDeck = virtualPostAnalysis.virtualDeck;
+          postAnalysis = virtualPostAnalysis.postAnalysis;
+          validationWarnings.addAll(virtualPostAnalysis.validationWarnings);
 
           // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           // 6. VALIDAÃ‡ÃƒO AUTOMÃTICA (Monte Carlo + Funcional + Critic IA)
