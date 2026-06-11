@@ -382,6 +382,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_retry_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 34 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh 92a4083a`: `PASS`; risco baixo de wiring
     por refactor interno, sem mudança de contrato público.
+- Hermes/AWS pós-push do split suggestion-filter (`9ced572b`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_suggestion_filter_support`, rota
+    `ai/optimize` e teste de filtro inicial: sem issues.
+  - `dart test test/optimize_route_suggestion_filter_support_test.dart test/optimize_route_retry_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 32 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 9ced572b`: `PASS`; risco baixo de
+    fidelidade de extração, mitigado por teste dedicado e pipeline/route
+    contract remotos.
 
 ## Etapa 4 — Próximas pendências reais
 
