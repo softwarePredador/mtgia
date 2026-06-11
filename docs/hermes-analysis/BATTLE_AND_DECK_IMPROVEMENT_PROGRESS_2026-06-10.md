@@ -57,7 +57,7 @@ que o usuário vê na análise do deck.
 ## Etapa 3 — Auditoria de modularização
 
 **Status:** em andamento, com dezenove extrações de testes, seis splits
-do engine e doze splits da rota/runtime de optimize concluídos.
+do engine e treze splits da rota/runtime de optimize concluídos.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
@@ -87,10 +87,10 @@ do engine e doze splits da rota/runtime de optimize concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2671 linhas após splits de
+- `server/routes/ai/optimize/index.dart` — 2632 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
-  pós-processamento/retry orchestration da rota.
+  pós-processamento/retry orchestration/filtro inicial de sugestões da rota.
 - `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
@@ -146,6 +146,11 @@ do engine e doze splits da rota/runtime de optimize concluídos.
   rota.
 - `server/test/optimize_route_retry_support_test.dart` — 105 linhas cobrindo
   planos de fallback IA e metadata dos retornos de optimize.
+- `server/lib/ai/optimize_route_suggestion_filter_support.dart` — 76 linhas
+  extraídas da rota.
+- `server/test/optimize_route_suggestion_filter_support_test.dart` — 70 linhas
+  cobrindo filtro inicial de removals/additions, comandante, core cards,
+  duplicatas e modo complete.
 
 **Decisão:**
 Não misturar refactors grandes com correções funcionais. A primeira extração
@@ -264,6 +269,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - Novo módulo Dart `optimize_route_retry_support.dart` centraliza o plano de
   retry de deterministic-first para IA e a aplicação de metadata (`mode`,
   `strategy_source`, `fallback_trigger`) nos retornos de optimize.
+- Novo módulo Dart `optimize_route_suggestion_filter_support.dart` centraliza
+  filtros iniciais de sugestões antes de `validateCardNames`: balanceamento,
+  sanitização, proteção de comandante/core cards, bloqueio de no-op e
+  preservação de repetições em modo complete.
 - `test_battle_analyst_v10_3.py` não contém mais `def test_` inline; ele carrega
   módulos, constrói os helpers/registry e executa a lista agregada.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
@@ -297,6 +306,8 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - `dart test test/optimize_route_post_validation_support_test.dart test/optimize_route_quality_rejection_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - `dart analyze lib/ai/optimize_route_retry_support.dart routes/ai/optimize/index.dart test/optimize_route_retry_support_test.dart`
 - `dart test test/optimize_route_retry_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
+- `dart analyze lib/ai/optimize_route_suggestion_filter_support.dart routes/ai/optimize/index.dart test/optimize_route_suggestion_filter_support_test.dart`
+- `dart test test/optimize_route_suggestion_filter_support_test.dart test/optimize_route_retry_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - Hermes/AWS pós-push:
   - `battle_passes=130`.
   - analyze focado em `commander_eligibility`, `DeckRulesService`, rota
@@ -387,8 +398,8 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    cortes de response/cache, envelope async, parsing inicial, payload final,
    warnings finais, diagnostics finais, fallback de sugestões vazias e payloads
    de rejeição do quality gate, validação pós-processamento e retry
-   orchestration já foram feitos; os próximos cortes seguros são blocos de
-   validação/filtro de sugestões ainda acoplados a SQL.
+   orchestration/filtro inicial de sugestões já foram feitos; os próximos
+   cortes seguros são validações de cor/bracket ainda acopladas a SQL.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,

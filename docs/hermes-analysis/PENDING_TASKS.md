@@ -111,6 +111,9 @@
 > para IA e metadata dos retornos foram movidos para
 > `optimize_route_retry_support.dart`, preservando o `continue` do loop dentro
 > da rota.
+> Décimo terceiro split de optimize concluído: filtro inicial de sugestões foi
+> movido para `optimize_route_suggestion_filter_support.dart`, preservando
+> balanceamento, sanitização, proteção de comandante/core cards e modo complete.
 
 ---
 
@@ -177,7 +180,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: filtros/validações SQL | 1-2 dias | Médio | `optimize_route_retry_support.dart` verde |
+| 6 | Próximo split da rota optimize: validações de cor/bracket com SQL | 1-2 dias | Médio | `optimize_route_suggestion_filter_support.dart` verde |
 
 ---
 
@@ -450,6 +453,8 @@
 | `optimize_route_post_validation_support_test.dart` | Cobertura direta dos builders de validação pós-processamento da rota optimize | 106 |
 | `optimize_route_retry_support.dart` | Plano de retry deterministic-first para IA e metadata dos retornos de optimize | 64 |
 | `optimize_route_retry_support_test.dart` | Cobertura direta de retry no-safe-swaps, quality rejected e preservação de metadata explícita | 105 |
+| `optimize_route_suggestion_filter_support.dart` | Balanceamento/sanitização inicial de sugestões, proteção de comandante/core e filtro de no-op | 76 |
+| `optimize_route_suggestion_filter_support_test.dart` | Cobertura direta do filtro inicial de removals/additions e modo complete | 70 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |

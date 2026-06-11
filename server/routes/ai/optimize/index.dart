@@ -32,6 +32,8 @@ import '../../../lib/ai/optimize_route_retry_support.dart'
     as optimize_route_retry;
 import '../../../lib/ai/optimize_route_response_support.dart'
     as optimize_route_response;
+import '../../../lib/ai/optimize_route_suggestion_filter_support.dart'
+    as optimize_route_suggestion_filter;
 import '../../../lib/ai/optimize_route_warnings_support.dart'
     as optimize_route_warnings;
 import '../../../lib/ai/optimize_swap_integrity.dart';
@@ -1496,60 +1498,19 @@ Future<Response> onRequest(RequestContext context) async {
         }
       }
 
-      // GARANTIR EQUILÃBRIO NUMÃ‰RICO (Regra de Ouro)
-      if (!isComplete) {
-        final minCount = removals.length < additions.length
-            ? removals.length
-            : additions.length;
-
-        if (removals.length != additions.length) {
-          Log.w(
-            'âš ï¸ [AI Optimize] Ajustando desequilÃ­brio: -${removals.length} / +${additions.length} -> $minCount',
-          );
-          removals = removals.take(minCount).toList();
-          additions = additions.take(minCount).toList();
-        }
-      }
-
-      var sanitizedRemovals =
-          removals.map(CardValidationService.sanitizeCardName).toList();
-      var sanitizedAdditions =
-          additions.map(CardValidationService.sanitizeCardName).toList();
-
-      // RemoÃ§Ãµes devem existir no deck (evita no-ops e contagem final errada).
-      sanitizedRemovals = sanitizedRemovals
-          .where((n) => deckNamesLower.contains(n.toLowerCase()))
-          .toList();
-
-      // Nunca remover comandantes.
-      sanitizedRemovals = sanitizedRemovals
-          .where((n) => !commanderLower.contains(n.toLowerCase()))
-          .toList();
-
-      // Se o usuÃ¡rio pediu "otimizar", mas mantendo o tema, bloqueia remoÃ§Ãµes de core.
-      if (keepTheme) {
-        sanitizedRemovals = sanitizedRemovals.where((n) {
-          final isCore = coreLower.contains(n.toLowerCase());
-          if (isCore) blockedByTheme.add(n);
-          return !isCore;
-        }).toList();
-      }
-
-      // Em modo optimize (swaps), evita sugerir adicionar algo que jÃ¡ existe (no-op).
-      if (!isComplete) {
-        sanitizedAdditions = sanitizedAdditions
-            .where((n) => !deckNamesLower.contains(n.toLowerCase()))
-            .toList();
-      }
-
-      // Re-balancear apÃ³s filtros.
-      if (!isComplete) {
-        final minCount = sanitizedRemovals.length < sanitizedAdditions.length
-            ? sanitizedRemovals.length
-            : sanitizedAdditions.length;
-        sanitizedRemovals = sanitizedRemovals.take(minCount).toList();
-        sanitizedAdditions = sanitizedAdditions.take(minCount).toList();
-      }
+      final initialSuggestionFilters = optimize_route_suggestion_filter
+          .buildInitialOptimizeSuggestionFilters(
+        removals: removals,
+        additions: additions,
+        deckNamesLower: deckNamesLower,
+        commanderLower: commanderLower,
+        coreLower: coreLower,
+        keepTheme: keepTheme,
+        isComplete: isComplete,
+      );
+      var sanitizedRemovals = initialSuggestionFilters.removals;
+      var sanitizedAdditions = initialSuggestionFilters.additions;
+      blockedByTheme.addAll(initialSuggestionFilters.blockedByTheme);
 
       // Validar todas as cartas sugeridas
       final allSuggestions = [...sanitizedRemovals, ...sanitizedAdditions];
