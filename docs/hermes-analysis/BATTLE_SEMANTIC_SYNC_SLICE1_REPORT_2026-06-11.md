@@ -506,6 +506,24 @@ The generated runtime artifacts were stashed on Hermes as
 `post-logical-rule-smoke-artifacts-20260611T201410Z`; the SQLite state remained
 persisted after stash.
 
+## Slice 4 derivation report-only
+
+The next policy bridge is intentionally report-only:
+
+| Check | Result |
+|---|---|
+| script | `derive_functional_tags_from_battle_rules.py` |
+| apply | `false` |
+| source proposed | `card_battle_rules_v1` |
+| gate | `card_id`, `verified/active`, `manual/curated`, confidence >= `0.75`, derivable tag |
+| PG rules seen | `3156` |
+| new candidates | `102` |
+| already present | `248` |
+| rejected by gate | `2806` |
+
+No candidate from this report should be written to `card_function_tags` until
+the sample is reviewed and stale-cleanup semantics are implemented.
+
 ## Next recommended step
 
 Proceed to the next controlled slice:
@@ -513,6 +531,6 @@ Proceed to the next controlled slice:
 1. keep all Lorehold swaps report-only until owner review confirms candidate
    quality;
 2. run a larger sample before applying any candidate;
-3. define trusted derivation policy before letting `card_battle_rules` create
-   `card_function_tags`;
+3. review the `card_battle_rules_v1` derivation candidates and define stale
+   cleanup semantics before allowing any apply;
 4. keep backend/product as source of truth; Hermes proposes and reports only.

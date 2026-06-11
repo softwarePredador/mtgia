@@ -604,6 +604,14 @@ Current next work:
 
 1. Review Lorehold report-only candidates before any apply.
 2. Expand sample size before trusting any swap.
-3. Define trusted derivation policy before deriving `card_function_tags` from
-   `card_battle_rules`.
+3. Review the report-only derivation candidates before any
+   `card_battle_rules_v1` write to `card_function_tags`.
 4. Keep battle execution unchanged until these policies and tests exist.
+
+Slice 4 report-only derivation status:
+
+1. Added `derive_functional_tags_from_battle_rules.py` as proposal-only.
+2. Gates: `card_id` required, `review_status IN ('verified','active')`,
+   `source IN ('manual','curated')`, confidence >= `0.75`, derivable tag only.
+3. PG report-only smoke: `3156` rules seen, `102` new candidates, `248`
+   already present, `2806` rejected by gate. No PG writes were performed.

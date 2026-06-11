@@ -94,6 +94,10 @@ Ao responder sobre o ManaLoom:
   regras sem chave lógica, 2 regras equivalentes deduplicadas, baseline `id=3`
   com 36 jogos e 8 benchmarks `logical_rule_smoke` contendo hashes semântico e
   de regras.
+- `derive_functional_tags_from_battle_rules.py` existe apenas como report-only:
+  smoke PG em 2026-06-11 viu 3156 regras, propôs 102 novos candidatos
+  `card_battle_rules_v1`, encontrou 248 tags já presentes e rejeitou 2806 por
+  gate. Nenhum apply em `card_function_tags` está liberado sem revisão.
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 

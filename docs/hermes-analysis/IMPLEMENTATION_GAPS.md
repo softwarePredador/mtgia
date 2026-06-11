@@ -503,6 +503,15 @@ Concluído no Slice 3:
     com `baseline_semantics_hash` e `baseline_ruleset_hash`, deck restaurado
     com `100` rows, `100` quantity, `1` commander e sem Mox premium.
 
+Concluído no Slice 4 report-only:
+
+15. Criar `derive_functional_tags_from_battle_rules.py` para propor, sem
+    aplicar, candidatos `card_function_tags` derivados de regras confiáveis.
+    Gate atual: `card_id` obrigatório, `review_status` `verified/active`,
+    `source` `manual/curated`, confidence >= `0.75` e tag derivável.
+    Smoke PG report-only: `3156` regras vistas, `102` novos candidatos, `248`
+    já presentes e `2806` rejeitados por gate; `apply=false`.
+
 ### Testes obrigatórios antes de merge
 
 - Unit test do helper SQL: uma carta com duas `card_battle_rules` e duas
@@ -587,7 +596,7 @@ Hermes + testes.
 |---|---|---|---|
 | P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
-| P1 | Derivação de regra executável para função de deck ainda não tem política segura | `card_battle_rules` agora é preservado em `battle_rules_json`/`ruleset_hash`; Slice 3 adicionou `logical_rule_key`, mas ainda não deve virar `card_function_tags` automaticamente | Definir taxonomia canônica, gate de source/review/confidence e cleanup de stale tags antes de qualquer derivação |
+| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only (`102` novos no smoke PG), mas não escreve `card_function_tags` | Revisar amostra, ajustar taxonomia e só então criar caminho de apply com cleanup de stale tags |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
@@ -611,6 +620,8 @@ Lorehold, ampliar amostra e definir política de derivação de
 `card_battle_rules`. Slice 3 adicionou `logical_rule_key` e dedupe lógico ao
 sync, com smoke PG -> SQLite temporário e Hermes AWS real mantendo 100/1,
 deduplicando 2 regras equivalentes e gravando 98 regras com chave lógica.
+Slice 4 adicionou derivação report-only de `card_battle_rules_v1` para
+`card_function_tags`, sem escrita em PG.
 
 ### Ordem recomendada de implementação
 
@@ -618,12 +629,14 @@ deduplicando 2 regras equivalentes e gravando 98 regras com chave lógica.
    qualquer apply.
 2. Rodar nova amostra maior report-only para confirmar que `ruleset_hash` não
    mascara alteração semântica/regra como alteração estrutural.
-3. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
+3. Revisar os 102 candidatos report-only de `card_battle_rules_v1`; ajustar
+   mapeamento/taxonomia antes de qualquer apply.
+4. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
-4. Formalizar identidade semântica de carta e faces antes de expandir regras
+5. Formalizar identidade semântica de carta e faces antes de expandir regras
    DFC/MDFC.
-5. Só depois evoluir learned decks para dois comandantes.
-6. Só depois usar feedback ML como input de política.
+6. Só depois evoluir learned decks para dois comandantes.
+7. Só depois usar feedback ML como input de política.
 
 ### Critério de bloqueio
 
