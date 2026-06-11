@@ -79,6 +79,46 @@ class HermesCronGovernorReportTest(unittest.TestCase):
 
             self.assertEqual(module._script_state(scripts, "job.py"), "ok")
 
+    def test_script_jobs_ignore_residual_provider_and_paused_missing_is_p3(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scripts = root / "scripts"
+            outputs = root / "output"
+            scripts.mkdir()
+            outputs.mkdir()
+            script = scripts / "job.sh"
+            script.write_text("#!/usr/bin/env bash\nexit 0\n")
+            script.chmod(0o755)
+
+            report = module.build_report(
+                [
+                    {
+                        "id": "script-provider",
+                        "name": "script with residual provider",
+                        "enabled": True,
+                        "script": "job.sh",
+                        "provider": "opencode-go",
+                        "model": "deepseek-v4-flash",
+                        "schedule_display": "every 120m",
+                        "last_status": "ok",
+                    },
+                    {
+                        "id": "paused-missing",
+                        "name": "paused missing",
+                        "enabled": False,
+                        "script": "missing.sh",
+                        "schedule_display": "once",
+                        "last_status": None,
+                    },
+                ],
+                outputs,
+                scripts,
+            )
+
+            self.assertIn("OK | `script with residual provider`", report)
+            self.assertIn("P3 | `paused missing`", report)
+
     def test_load_jobs_accepts_object_or_list_shape(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:

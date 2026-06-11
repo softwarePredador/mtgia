@@ -99,14 +99,15 @@ def _script_state(scripts_dir: Path, script_name: str | None) -> str:
 def _risk_for(job: dict[str, Any], evidence: CronEvidence, script_state: str) -> str:
     enabled = bool(job.get("enabled"))
     provider = job.get("provider")
+    script = job.get("script")
     last_status = job.get("last_status")
     if script_state in {"missing", "not_executable"}:
-        return "P0"
+        return "P0" if enabled else "P3"
     if enabled and evidence.markers:
         return "P1"
     if enabled and last_status in {"error", "failed"}:
         return "P1"
-    if enabled and provider:
+    if enabled and provider and not script:
         return "P2"
     if not enabled and evidence.markers:
         return "P3"
