@@ -186,10 +186,11 @@
 
 | Arquivo | Linhas em 2026-06-10 | Status | Próxima ação |
 |---|---:|---|---|
-| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7549 | ⚠️ Split iniciado | Três cortes moveram helpers puros de mana/custo, características/identidade e lands/fontes; continuar por zone transitions mantendo conformance suite verde |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` | 7475 | ⚠️ Split iniciado | Quatro cortes moveram helpers de mana/custo, características/identidade, lands/fontes e zone transitions; continuar por SBA/replacement ou optimize mantendo conformance suite verde |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py` | 101 | ✅ Extraído | Centraliza parser/merge/snapshot de custo de mana sem dependência de fluxo de jogo |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_characteristics_support.py` | 173 | ✅ Extraído | Centraliza faces/modos, identidade de cor e elegibilidade Commander sem dependência de fluxo de jogo |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_land_support.py` | 110 | ✅ Extraído | Centraliza lands conhecidas, cores de fontes, normalização de nomes e `is_land` |
+| `docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py` | 118 | ✅ Extraído | Centraliza zone transitions parametrizadas, LKI, exile e resolution sem acoplar diretamente ao engine global |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` | 238 | ✅ Orquestrador fino | Todos os `def test_` foram extraídos para módulos por domínio; runner mantém imports, helpers, registry e lista agregada |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py` | 304 | ✅ Extraído | Mantém cenários e testes oficiais 2026 isolados |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py` | 330 | ✅ Extraído | Mantém regressões de combate isoladas |

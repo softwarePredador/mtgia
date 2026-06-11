@@ -53,6 +53,13 @@ from battle_land_support import (
     normalize_card_name,
     source_colors,
 )
+from battle_zone_transition_support import (
+    finish_countered_spell as _finish_countered_spell,
+    finish_resolved_spell as _finish_resolved_spell,
+    get_lki,
+    move_creature_from_battlefield as _move_creature_from_battlefield,
+    move_to_exile,
+)
 
 try:
     import battle_rule_registry
@@ -830,57 +837,17 @@ def create_lander_token(player, name="Lander Token"):
 
 
 def finish_countered_spell(player, card):
-    """Move a countered spell to the correct graveyard object."""
-    if isinstance(card, dict) and card.get("_flashback_cast"):
-        move_to_exile(player, card, reason="flashback_countered")
-        return
-    if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
-        parent = copy.deepcopy(card["_adventure_parent"])
-        parent.pop("_adventure_available", None)
-        player.graveyard.append(parent)
-        return
-    player.graveyard.append(card)
-
-
-def move_to_exile(player, card, *, face_down=False, public=None, reason=None, turn=None):
-    """Move a card to exile while preserving minimal face-up/face-down metadata."""
-    if isinstance(card, dict):
-        is_face_down = bool(face_down)
-        card["_exile_face_down"] = is_face_down
-        card["_exile_public"] = (not is_face_down) if public is None else bool(public)
-        if reason:
-            card["_exile_reason"] = reason
-        if turn is not None:
-            card["_exile_turn"] = turn
-    player.exile.append(card)
-    return card
+    return _finish_countered_spell(player, card, move_to_exile_func=move_to_exile)
 
 
 def finish_resolved_spell(player, card, turn=None):
-    """Move a resolved nonpermanent spell, honoring Adventure's exile replacement."""
-    if isinstance(card, dict) and card.get("_flashback_cast"):
-        move_to_exile(player, card, reason="flashback", turn=turn)
-        emit_replay_event(
-            "flashback_exiled",
-            player=player.name,
-            card=card.get("name", "?"),
-            turn=turn,
-        )
-        return
-    if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
-        parent = copy.deepcopy(card["_adventure_parent"])
-        parent["_adventure_available"] = True
-        parent["_last_adventure_name"] = card.get("name")
-        move_to_exile(player, parent, reason="adventure", turn=turn)
-        emit_replay_event(
-            "adventure_exiled",
-            player=player.name,
-            card=parent.get("name", "?"),
-            adventure=card.get("name", "?"),
-            turn=turn,
-        )
-        return
-    player.graveyard.append(card)
+    return _finish_resolved_spell(
+        player,
+        card,
+        turn=turn,
+        move_to_exile_func=move_to_exile,
+        emit_replay_event=emit_replay_event,
+    )
 
 
 def commander_origin_id(card, owner_name=None):
@@ -4380,57 +4347,16 @@ def add_damage_prevention_shield(player, amount, source="prevention"):
 
 
 
-def get_lki(creature):
-    """v9: Get Last Known Information for a creature (CR 608.2g)."""
-    if isinstance(creature, dict) and "_lki_snapshot" in creature:
-        return creature["_lki_snapshot"]
-    # Fallback: derive from current state
-    return {
-        "name": creature.get("name", creature.get("card_name", "")),
-        "power": creature.get("power", 0),
-        "toughness": creature.get("toughness", 0),
-        "cmc": creature.get("cmc", 0),
-    }
-
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
-    """Move a dead/sacrificed creature to the correct zone for this simulator."""
-    if not isinstance(creature, dict):
-        return "none"
-
-    # v9: LKI snapshot before zone change (CR 608.2g, 400.7)
-    creature["_lki_snapshot"] = {
-        "name": creature.get("name", creature.get("card_name", "")),
-        "power": creature.get("power", 0),
-        "toughness": creature.get("toughness", 0),
-        "cmc": creature.get("cmc", 0),
-        "type_line": creature.get("type_line", ""),
-        "is_commander": creature.get("is_commander", False),
-        "owner": creature.get("owner", creature.get("controller", "")),
-    }
-    # v9: Zone change counter — new identity (CR 400.7)
-    creature["_zone_id"] = creature.get("_zone_id", 0) + 1
-    creature["_last_zone"] = "battlefield"
-    if creature in owner.battlefield:
-        owner.battlefield.remove(creature)
-    if creature.get("is_commander"):
-        event = ReplacementRegistry.process_event(
-            ReplacementEvent(
-                "zone_change",
-                affected_player=owner,
-                card=creature,
-                from_zone="battlefield",
-                to_zone="graveyard",
-                source=source,
-                reason=reason,
-            )
-        )
-        if event.to_zone == "command_zone":
-            owner.command_zone.append(creature)
-            return "command_zone"
-    if creature.get("tag") == "token" or "token" in str(creature.get("type_line") or "").lower():
-        return "vanished_token"
-    owner.graveyard.append(creature)
-    return "graveyard"
+    return _move_creature_from_battlefield(
+        owner,
+        creature,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+        replacement_registry=ReplacementRegistry,
+        replacement_event_cls=ReplacementEvent,
+    )
 
 
 def is_artifact_permanent(card):
