@@ -15,12 +15,13 @@ import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
+import '../../../lib/ai/optimize_route_async_support.dart'
+    as optimize_route_async;
 import '../../../lib/ai/optimize_route_response_support.dart'
     as optimize_route_response;
 import '../../../lib/ai/optimize_swap_integrity.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
-import '../../../lib/ai/optimize_job.dart';
 import '../../../lib/ai/theme_contextual_rules_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
@@ -480,14 +481,12 @@ Future<Response> onRequest(RequestContext context) async {
         rethrow;
       }
 
-      final jobId = await telemetry.trackAsync(
-        'request.async_job_create',
-        () => OptimizeJobStore.create(
-          pool: pool,
-          deckId: deckId,
-          archetype: archetype,
-          userId: authenticatedUserId,
-        ),
+      final jobId = await optimize_route_async.createOptimizeAsyncJob(
+        telemetry: telemetry,
+        pool: pool,
+        deckId: deckId,
+        archetype: archetype,
+        userId: authenticatedUserId,
       );
       final syncPayload = Map<String, dynamic>.from(body)
         ..['_force_sync'] = true
@@ -495,60 +494,25 @@ Future<Response> onRequest(RequestContext context) async {
       final authorization = context.request.headers['Authorization'];
       final internalOptimizeUrl = resolveInternalOptimizeUrl(context.request);
 
-      unawaited(
-        runZonedGuarded(
-          () => processOptimizeModeAsync(
-            pool: pool,
-            jobId: jobId,
-            internalOptimizeUrl: internalOptimizeUrl,
-            syncPayload: syncPayload,
-            authorization: authorization,
-          ),
-          (error, stackTrace) {
-            Log.e(
-              'Background optimize job $jobId crashed: $error\n$stackTrace',
-            );
-            unawaited(
-              OptimizeJobStore.fail(
-                pool,
-                jobId,
-                error: 'Falha interna ao processar optimize async.',
-              ),
-            );
-          },
-        ),
+      optimize_route_async.startOptimizeModeAsyncJob(
+        pool: pool,
+        jobId: jobId,
+        internalOptimizeUrl: internalOptimizeUrl,
+        syncPayload: syncPayload,
+        authorization: authorization,
       );
-
-      final timings = {
-        'deck_id': deckId,
-        'request_mode': requestMode,
-        'job_id': jobId,
-        'total_ms': requestStopwatch.elapsedMilliseconds,
-        'accepted_ms': requestStopwatch.elapsedMilliseconds,
-        'stages_ms': telemetry.snapshot()['stages_ms'],
-      };
 
       telemetry.logSummary();
       return Response.json(
         statusCode: HttpStatus.accepted,
-        body: {
-          'job_id': jobId,
-          'status': 'pending',
-          'mode': 'optimize',
-          'message':
-              'Optimize agressivo iniciado em background. Acompanhe o progresso via polling.',
-          'poll_url': '/ai/optimize/jobs/$jobId',
-          'poll_interval_ms': 1000,
-          'total_stages': 6,
-          'intensity': intensity.selected,
-          'optimize_intensity': intensity.toJson(returnedSwaps: 0),
-          'async': {
-            'accepted_ms': requestStopwatch.elapsedMilliseconds,
-            'executor': 'optimize_async_job',
-          },
-          'timings': timings,
-          'stage_telemetry': timings,
-        },
+        body: optimize_route_async.buildOptimizeModeAsyncAcceptedBody(
+          deckId: deckId,
+          requestMode: requestMode,
+          jobId: jobId,
+          elapsedMs: requestStopwatch.elapsedMilliseconds,
+          telemetrySnapshot: telemetry.snapshot(),
+          intensity: intensity,
+        ),
       );
     }
 
@@ -1020,72 +984,51 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      final jobId = await telemetry.trackAsync(
-        'request.async_job_create',
-        () => OptimizeJobStore.create(
-          pool: pool,
-          deckId: deckId,
-          archetype: targetArchetype,
-          userId: authenticatedUserId,
-        ),
+      final jobId = await optimize_route_async.createOptimizeAsyncJob(
+        telemetry: telemetry,
+        pool: pool,
+        deckId: deckId,
+        archetype: targetArchetype,
+        userId: authenticatedUserId,
       );
 
       // Fire-and-forget: processamento pesado roda em background.
       // A closure captura todas as variÃ¡veis do setup (pool, allCardData, etc.)
       // O Pool Ã© singleton e sobrevive ao ciclo do request.
-      unawaited(
-        runZonedGuarded(
-          () => processCompleteModeAsync(
-            jobId: jobId,
-            pool: pool,
-            deckId: deckId,
-            deckFormat: deckFormat,
-            maxTotal: maxTotal,
-            currentTotalCards: currentTotalCards,
-            commanders: commanders,
-            allCardData: allCardData,
-            deckColors: deckColors,
-            commanderColorIdentity: commanderColorIdentity,
-            originalCountsById: originalCountsById,
-            optimizer: disableCompleteAi ? null : deckOptimizer,
-            themeProfile: themeProfile,
-            targetArchetype: targetArchetype,
-            bracket: bracket,
-            keepTheme: keepTheme,
-            deckAnalysis: deckAnalysis,
-            userId: authenticatedUserId,
-            deckSignature: deckSignature,
-            cacheKey: cacheKey,
-            intensity: intensity,
-            userPreferences: userPreferences,
-            hasBracketOverride: hasBracketOverride,
-            hasKeepThemeOverride: hasKeepThemeOverride,
-          ),
-          (error, stackTrace) {
-            Log.e(
-                'Background optimize job $jobId crashed: $error\n$stackTrace');
-            unawaited(
-              OptimizeJobStore.fail(pool, jobId, error: error.toString()),
-            );
-          },
-        ),
+      optimize_route_async.startCompleteModeAsyncJob(
+        jobId: jobId,
+        pool: pool,
+        deckId: deckId,
+        deckFormat: deckFormat,
+        maxTotal: maxTotal,
+        currentTotalCards: currentTotalCards,
+        commanders: commanders,
+        allCardData: allCardData,
+        deckColors: deckColors,
+        commanderColorIdentity: commanderColorIdentity,
+        originalCountsById: originalCountsById,
+        optimizer: disableCompleteAi ? null : deckOptimizer,
+        themeProfile: themeProfile,
+        targetArchetype: targetArchetype,
+        bracket: bracket,
+        keepTheme: keepTheme,
+        deckAnalysis: deckAnalysis,
+        userId: authenticatedUserId,
+        deckSignature: deckSignature,
+        cacheKey: cacheKey,
+        intensity: intensity,
+        userPreferences: userPreferences,
+        hasBracketOverride: hasBracketOverride,
+        hasKeepThemeOverride: hasKeepThemeOverride,
       );
 
       return Response.json(
         statusCode: HttpStatus.accepted,
-        body: {
-          'job_id': jobId,
-          'status': 'pending',
-          'message':
-              'OtimizaÃ§Ã£o iniciada em background. Consulte o progresso via polling.',
-          'poll_url': '/ai/optimize/jobs/$jobId',
-          'poll_interval_ms': 2000,
-          'total_stages': 6,
-          'intensity': intensity.selected,
-          'optimize_intensity': intensity.toJson(returnedSwaps: 0),
-          'timings': telemetry.snapshot(),
-          'stage_telemetry': telemetry.snapshot(),
-        },
+        body: optimize_route_async.buildCompleteModeAsyncAcceptedBody(
+          jobId: jobId,
+          telemetrySnapshot: telemetry.snapshot(),
+          intensity: intensity,
+        ),
       );
     }
 
