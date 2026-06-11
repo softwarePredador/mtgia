@@ -401,6 +401,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `manaloom-hermes-report-only.sh 9ced572b`: `PASS`; risco baixo de
     fidelidade de extração, mitigado por teste dedicado e pipeline/route
     contract remotos.
+- Hermes/AWS pós-push do split color-identity-filter (`8bd2fe69`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_color_identity_filter_support`, rota
+    `ai/optimize` e teste de identidade de cor: sem issues.
+  - `dart test test/optimize_route_color_identity_filter_support_test.dart test/optimize_route_suggestion_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 31 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 8bd2fe69`: `PASS`; risco baixo de wiring
+    em endpoint core, mitigado por teste unitário e pipeline/route contract
+    remotos.
 
 ## Etapa 4 — Próximas pendências reais
 
