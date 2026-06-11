@@ -41,6 +41,16 @@ class PullLearningEventsSchemaTest(unittest.TestCase):
                     )
                     """
                 )
+                conn.execute(
+                    """
+                    INSERT INTO user_learning_events (
+                        event_id, deck_id, commander, format, card_count
+                    )
+                    VALUES
+                        ('event-full', 'deck-1', 'Talrand, Sky Summoner', 'commander', 100),
+                        ('event-partial', 'deck-2', 'Atraxa, Praetors'' Voice', 'commander', 1)
+                    """
+                )
 
                 module._ensure_tables(conn)
 
@@ -83,6 +93,23 @@ class PullLearningEventsSchemaTest(unittest.TestCase):
                 self.assertEqual(
                     conn.execute("SELECT count(*) FROM commanders").fetchone()[0],
                     1,
+                )
+                statuses = {
+                    row[0]: (row[1], row[2])
+                    for row in conn.execute(
+                        """
+                        SELECT event_id, learning_status, training_eligible
+                        FROM user_learning_events
+                        """
+                    ).fetchall()
+                }
+                self.assertEqual(
+                    statuses["event-full"],
+                    ("trainable_commander_deck", 1),
+                )
+                self.assertEqual(
+                    statuses["event-partial"],
+                    ("partial_telemetry", 0),
                 )
             finally:
                 conn.close()

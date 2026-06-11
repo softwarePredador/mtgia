@@ -216,6 +216,7 @@ def _ensure_tables(sqlite):
         "learning_reason",
         "TEXT DEFAULT ''",
     )
+    _backfill_learning_classification(sqlite)
     sqlite.execute("""
         CREATE TABLE IF NOT EXISTS commanders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -269,6 +270,35 @@ def _classify_learning_event(fmt, card_count, commander):
         "learning_status": "trainable_commander_deck",
         "learning_reason": f"card_count={count}>=min={MIN_TRAINING_CARD_COUNT}",
     }
+
+
+def _backfill_learning_classification(sqlite):
+    rows = sqlite.execute(
+        """
+        SELECT event_id, format, card_count, commander
+        FROM user_learning_events
+        WHERE learning_status IS NULL
+           OR learning_status = ''
+           OR learning_status = 'unknown'
+        """
+    ).fetchall()
+    for event_id, fmt, card_count, commander in rows:
+        classification = _classify_learning_event(fmt, card_count, commander)
+        sqlite.execute(
+            """
+            UPDATE user_learning_events
+            SET training_eligible = ?,
+                learning_status = ?,
+                learning_reason = ?
+            WHERE event_id = ?
+            """,
+            (
+                1 if classification["training_eligible"] else 0,
+                classification["learning_status"],
+                classification["learning_reason"],
+                event_id,
+            ),
+        )
 
 
 def _import_commander(sqlite, name):
