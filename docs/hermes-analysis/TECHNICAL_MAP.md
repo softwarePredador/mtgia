@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-09 23:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-11 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -209,19 +209,18 @@ mtgia/
 - **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-10 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases localizados, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, os profiles/seeds de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes, weakness suggestions, mock runtime, prompt runtime e meta shell strategy por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `meta_deck_commander_shell_support.dart`, `/ai/optimize` quando `deckOptimizer == null`, `/decks/:id/recommendations`, `/ai/weakness-analysis`, `prompt.md` e `prompt_complete.md`). `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-10 03:00 UTC no checkout local `11e9be38`. `LifeCounterScreen` segue
+  2026-06-11 03:00 UTC no checkout local `57f52c45`. `LifeCounterScreen` segue
   legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
   `DeckCard` e `DeckProgressChip` continuam sem uso runtime confirmado nas
-  listagens; `LotusPresentationMode` nao e importado/chamado pelo Lotus; e
-  `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface` aparecem somente no
-  proprio `auth_visual_shell.dart`, enquanto login/register constroem a UI
-  inline. Controles positivos descartaram `LotusLifeCounterScreen`,
-  `DeckProgressIndicator`, observers de navegacao, scanner, latest-set e
-  candidatos backend de baixa contagem (`BattleSimulator`,
-  `DistributedRateLimiter`, `RebuildGuidedService`, `SynergyEngine`). Uma
-  varredura textual ampla de classes publicas foi usada apenas como triagem;
-  DTOs/helpers vivos dentro do proprio arquivo nao foram reportados como codigo
-  morto sem evidencia adicional.
+  listagens; e `LotusPresentationMode` nao e importado/chamado pelo Lotus. A
+  claim anterior contra `AuthVisualShell`, `AuthBrandHeader` e
+  `AuthFormSurface` esta stale: login/register agora importam e instanciam os
+  tres widgets. Controles positivos descartaram `LotusLifeCounterScreen`,
+  `DeckProgressIndicator`, o shell auth e candidatos backend de baixa contagem
+  (`BattleSimulator`, `DistributedRateLimiter`, `RebuildGuidedService`,
+  `SynergyEngine`). Uma varredura textual ampla de classes publicas foi usada
+  apenas como triagem; DTOs/helpers vivos dentro do proprio arquivo nao foram
+  reportados como codigo morto sem evidencia adicional.
 
 ## Pipeline semantico de cartas
 
