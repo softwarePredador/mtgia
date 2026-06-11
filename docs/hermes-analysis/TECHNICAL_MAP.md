@@ -187,9 +187,12 @@ mtgia/
   delegar para `optimize_archetype_support.dart`. Os roles estratégicos
   `wincon/combo_piece/engine/payoff/enabler` também deixaram de ter cópias
   privadas em `functional_card_tags.dart` e agora consultam
-  `resolveCardFunctionalRoles`. Ainda persistem duplicações relevantes em
-  variantes de `_isBasicLandName`, utilitarios de request/log e trust
-  SQL/serializer em trades/marketplace.
+  `resolveCardFunctionalRoles`. Basic/snow basic lands agora usam
+  `server/lib/basic_land_utils.dart` como fonte canônica; o wrapper público em
+  `optimize_runtime_support.dart` e o alias `basicLandNames` em
+  `commander_reference_deck_corpus_support.dart` existem apenas para preservar
+  APIs internas. Ainda persistem duplicações relevantes em utilitarios de
+  request/log e trust SQL/serializer em trades/marketplace.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e

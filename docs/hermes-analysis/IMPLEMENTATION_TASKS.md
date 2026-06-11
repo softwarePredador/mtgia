@@ -592,8 +592,9 @@ consultar esse adapter para `wincon`, `combo_piece`, `engine`, `payoff` e
 **Impacto:** o tagger exibido na análise e o classificador usado por
 optimize/validator/quality gate deixam de discordar nesses roles estratégicos.
 
-**Próxima pendência relacionada:** centralizar basic/snow lands, descrita na
-task P2 seguinte.
+**Próxima pendência relacionada:** conectar feedback runtime de qualidade de
+prompt/optimize (`MLKnowledgeService.recordFeedback`) e continuar a redução de
+drift em trust/request/log/CMC.
 
 **Validação:**
 ```bash
@@ -603,39 +604,37 @@ cd server && dart test test/functional_card_tags_test.dart test/optimization_qua
 
 ---
 
-### [P2] Centralizar `_isBasicLandName` em utilitário único de domínio — 4 implementações com normalização diferente causam validação inconsistente de terrenos básicos
+### [P2] ✅ Resolvido em 2026-06-11 — Centralizar `_isBasicLandName` em utilitário único de domínio
 
 **Conhecimento MTG:** Terrenos básicos (Plains, Island, Swamp, Mountain, Forest, Wastes, e suas variantes Snow-Covered) são fundamentais para as regras de deckbuilding do Commander: singleton não se aplica a eles, e a contagem correta afeta validação de legalidade, análise de mana base, e simulação de mulligan. Diferentes partes do sistema precisam concordar sobre o que constitui um "basic land" — especialmente as variantes Snow-Covered e Wastes.
 
-**Evidencia no código:** 4 implementações diferentes da mesma pergunta de domínio, com normalização divergente:
+**Status:** resolvido no código com fonte canônica em
+`server/lib/basic_land_utils.dart`. O arquivo expõe
+`regularBasicLandNames`, `snowBasicLandNames`, `basicLandNames`,
+`normalizeBasicLandName`, `isBasicLandName`, `isBasicLandTypeLine` e
+`isBasicLandCard`.
 
-1. `server/lib/ai/optimize_runtime_support.dart:4184-4197` — `isBasicLandName` público: compara nomes exatos com hífen para snow-covered lands (`snow-covered plains`). Expõe `isBasicLandName` como API pública (linha 285).
+**Evidência atual:**
 
-2. `server/lib/generated_deck_validation_service.dart:752-764` — `_isBasicLandName` privado: usa `startsWith('snow-covered ')` com espaço, sem hífen. Aceita prefixo parcial — "snow covered plains" (com espaço duplo ou sem hífen) seria tratado como basic.
+- `server/lib/basic_land_utils.dart`: normaliza hifens Unicode, case e
+  espaços; cobre basics regulares, Wastes e variantes Snow-Covered, incluindo
+  `Snow-Covered Wastes`.
+- `server/lib/ai/optimize_runtime_support.dart`: preserva a API pública
+  `isBasicLandName` como wrapper fino para o utilitário canônico.
+- `server/lib/ai/commander_reference_deck_corpus_support.dart`: preserva o
+  símbolo público `basicLandNames` como alias de `basic_lands.basicLandNames`,
+  sem manter lista local divergente.
+- Testes de regras/optimize importam `package:server/basic_land_utils.dart`
+  em vez de copiar helpers privados.
 
-3. `server/lib/meta/meta_deck_reference_support.dart:890-903` — `_isBasicLandName` privado: aceita snow lands com espaço normal (`snow covered plains`) em vez de hífen. Comportamento intermediário entre #1 e #2.
+**Impacto:** validação de singleton/copy-limit, optimize, Commander
+Reference e testes passam a responder a mesma pergunta de domínio com a mesma
+normalização. Snow basics deixam de depender do fluxo que processou o deck.
 
-4. `server/routes/ai/commander-reference/index.dart:621-629` — `_isBasicLandName` privado: reconhece APENAS as 6 basics não-snow (Plains, Island, Swamp, Mountain, Forest, Wastes). Snow-Covered lands NÃO são reconhecidas como básicas nesta rota.
-
-**Gap:** Um deck com Snow-Covered Plains pode ser validado como legal (singleton bypass) por `generated_deck_validation_service.dart` mas tratado como não-básico por `commander-reference/index.dart`. A análise de mana base em `optimize_runtime_support.dart` conta Snow-Covered Plains como básica, mas `meta_deck_reference_support.dart` pode normalizar o nome de forma diferente, causando mismatch em referências.
-
-**Impacto:** `P2` — Inconsistência entre validadores pode causar falsos positivos/negativos na validação de singleton (deck rejeitado como tendo 2 Snow-Covered Plains quando na verdade são 2 terrenos básicos permitidos), ou falso positivo de legalidade (deck aprovado com "duplicata" de Wastes que um validador conta como básica e outro não). 
-
-**Risco:** P2 — Afeta edge cases com Snow-Covered lands e Wastes. A maioria dos decks usa basics normais (não afetados pela divergência). Mas quando ocorre, o comportamento é inconsistente entre rotas.
-
-**Ação recomendada:**
-1. Criar `server/lib/domain/basic_land_utils.dart` com função canônica `bool isBasicLandName(String name)` que:
-   - Normaliza o nome (trim, lowercase)
-   - Verifica as 5 basic land types + Wastes
-   - Trata Snow-Covered variants com ambos os formatos (hífen e espaço)
-2. Atualizar os 4 call sites para importar e usar a função canônica
-3. Adicionar testes unitários cobrindo: nomes normais, Snow-Covered (com e sem hífen), Wastes, e casos negativos (non-basic lands com "forest" no nome como "Tropical Forest")
-
-**Validação:**
+**Validação executável:**
 ```bash
-cd server && dart analyze lib/domain/basic_land_utils.dart
-cd server && dart test test/domain/basic_land_utils_test.dart
-cd server && dart test test/generated_deck_validation_service_test.dart
+cd server && dart analyze lib/basic_land_utils.dart lib/ai/commander_reference_deck_corpus_support.dart test/basic_land_utils_test.dart test/mtg_rules_validation_test.dart test/optimization_final_validation_test.dart test/optimization_rules_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_flow_test.dart
+cd server && dart test test/basic_land_utils_test.dart test/mtg_rules_validation_test.dart test/optimization_final_validation_test.dart test/optimization_rules_test.dart test/optimization_pipeline_integration_test.dart --reporter compact
 ```
 
 ---
@@ -748,7 +747,7 @@ rg "deck_weakness_reports" server/lib/ server/routes/ --count
 | # | Prioridade | Task | Origem |
 |:-:|:----------|:-----|:-------|
 | 1 | P1 | Unificar heurísticas `_looksLike{Wincon,Engine,ComboPiece,Payoff,Enabler}` entre `functional_card_tags.dart` e `optimization_functional_roles.dart` | STRUCTURE_AUDIT 2026-06-05 (divergent heuristic implementations) |
-| 2 | P2 | Centralizar `_isBasicLandName` em utilitário único com normalização canônica | STRUCTURE_AUDIT 2026-06-05 (4 conflicting implementations) |
+| 2 | P2 | ✅ Resolvido 2026-06-11: centralizar `_isBasicLandName` em utilitário único com normalização canônica | STRUCTURE_AUDIT 2026-06-05 (4 conflicting implementations) |
 | 3 | P2 | Conectar `MLKnowledgeService.recordFeedback` a fluxo runtime — tabela `ml_prompt_feedback` nunca alimentada | STRUCTURE_AUDIT 2026-06-05 (functions not called: recordFeedback) |
 | 4 | P2 | Expandir `_run_validation.py` para buscar profiles batch_c | Commander Knowledge Skill (Mana Base Validator Exec #2 limitations) |
 | 5 | P3 | Adicionar consumidor de leitura para `deck_weakness_reports` — tabela write-only | STRUCTURE_AUDIT 2026-05-28 (postgresql-tables-not-used) |

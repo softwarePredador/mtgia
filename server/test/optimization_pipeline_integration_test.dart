@@ -1,3 +1,4 @@
+import 'package:server/basic_land_utils.dart';
 import 'package:test/test.dart';
 
 import '../routes/ai/optimize/index.dart' as optimize_route;
@@ -12,21 +13,6 @@ import '../routes/ai/optimize/index.dart' as optimize_route;
 /// 4. The pipeline never produces an invalid deck state
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-bool _isBasicLandName(String name) {
-  final n = name.trim().toLowerCase();
-  return n == 'plains' ||
-      n == 'island' ||
-      n == 'swamp' ||
-      n == 'mountain' ||
-      n == 'forest' ||
-      n == 'wastes' ||
-      n == 'snow-covered plains' ||
-      n == 'snow-covered island' ||
-      n == 'snow-covered swamp' ||
-      n == 'snow-covered mountain' ||
-      n == 'snow-covered forest';
-}
 
 /// Simulates the entire post-AI validation pipeline:
 /// 1. Parse AI response
@@ -79,7 +65,7 @@ Map<String, dynamic> simulateOptimizePipeline({
     final removalSet = removals.map((n) => n.toLowerCase()).toSet();
     additions = additions.where((n) {
       final lower = n.toLowerCase();
-      final isBasic = _isBasicLandName(lower);
+      final isBasic = isBasicLandName(lower);
       final alreadyInDeck = deckNamesLower.contains(lower);
       final beingRemoved = removalSet.contains(lower);
       return isBasic || !alreadyInDeck || beingRemoved;
@@ -312,7 +298,7 @@ void main() {
           equals(['Luminarch Aspirant', 'Grateful Apparition']));
       // Verify no basic lands in additions
       for (final name in result['additions'] as List) {
-        expect(_isBasicLandName(name as String), isFalse,
+        expect(isBasicLandName(name as String), isFalse,
             reason: 'Optimize should not add basic lands as swaps: $name');
       }
     });
@@ -999,7 +985,8 @@ void main() {
       expect(outcome, equals('near_peak'));
     });
 
-    test('derive outcome code maps healthy execution failure to safe preserve', () {
+    test('derive outcome code maps healthy execution failure to safe preserve',
+        () {
       const healthyDeckState = optimize_route.DeckOptimizationState(
         status: 'healthy',
         recommendedMode: 'optimize',

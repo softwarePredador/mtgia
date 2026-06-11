@@ -4,6 +4,12 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
+> Atualizacao Codex 2026-06-11: os achados de basic/snow basic lands abaixo
+> sao historicos quando citam quatro variantes locais. O status vivo e
+> resolvido: `server/lib/basic_land_utils.dart` e a fonte canonica; wrappers e
+> aliases restantes preservam API interna sem manter lista divergente. Nao abrir
+> nova tarefa para `_isBasicLandName` sem revalidar contra o codigo atual.
+
 > Atualizacao local Codex: 2026-06-07 19:00 UTC
 > Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
@@ -106,25 +112,17 @@ incorporados, e os achados abaixo vieram de leitura direta e `rg` focado.
 - **O que falsifica:** testes cruzados provando que as divergencias sao
   intencionais por dominio e que a UI/optimize documentam essa diferenca.
 
-#### P1/P2 — Basic/snow basic lands continuam com variantes incompatíveis
+#### P1/P2 — RESOLVIDO 2026-06-11 — Basic/snow basic lands deixaram de usar variantes incompatíveis
 
-- **Simbolos:** `isBasicLandName`/`_isBasicLandName` em
-  `server/lib/ai/optimize_runtime_support.dart:285` e `:4184`-`:4197`,
-  `server/lib/generated_deck_validation_service.dart:752`-`:763`,
-  `server/lib/meta/meta_deck_reference_support.dart:890`-`:903` e
-  `server/routes/ai/commander-reference/index.dart:621`-`:628`.
-- **Divergencia observada:** optimize exige nomes snow com hifen exato
-  (`snow-covered plains` etc.); generated validation usa `startsWith` para snow
-  basics; meta reference usa nomes normalizados com espaco (`snow covered
-  plains`); commander-reference reconhece apenas basics e `wastes`, sem snow.
-- **Por que parece duplicado/similar:** os quatro fluxos decidem se uma carta
-  deve receber tratamento de terreno basico/copia livre, mas nao compartilham a
-  mesma normalizacao.
-- **O que valida:** extrair helper unico para basic/snow basic por nome e
-  type_line, com testes para hifen, espaco, sufixos de face/printing e
-  `wastes`.
-- **O que falsifica:** decisao explicita de que commander-reference deve
-  excluir snow basics, com teste cobrindo esse contrato.
+- **Status vivo:** `server/lib/basic_land_utils.dart` centraliza
+  `regularBasicLandNames`, `snowBasicLandNames`, `basicLandNames`,
+  normalizacao de hifen/espaco/case, `isBasicLandName`,
+  `isBasicLandTypeLine` e `isBasicLandCard`.
+- **Compatibilidade preservada:** `optimize_runtime_support.dart` mantem wrapper
+  publico fino; `commander_reference_deck_corpus_support.dart` mantem
+  `basicLandNames` como alias do utilitario canonico.
+- **Cobertura:** testes de regras/optimize importam o utilitario e cobrem
+  `Wastes`, snow basics e `Snow-Covered Wastes`.
 
 #### P2 — Trust social tem SQL e serializer duplicados
 

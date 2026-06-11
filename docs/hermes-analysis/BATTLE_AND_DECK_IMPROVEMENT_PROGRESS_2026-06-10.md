@@ -765,6 +765,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     `optimizationFunctionalRolesForCard`, incluindo `Impact Tremors`,
     `Isochron Scepter`, `The One Ring`, `Aetherflux Reservoir` e
     `Demonic Tutor`.
+- Fechamento do drift de terrenos básicos/snow basics:
+  - `server/lib/basic_land_utils.dart` é a fonte canônica para nomes regulares,
+    snow basics, normalização e checagem por `type_line`.
+  - `optimize_runtime_support.dart` preserva apenas wrapper público fino e
+    `commander_reference_deck_corpus_support.dart` preserva `basicLandNames`
+    como alias do utilitário canônico.
+  - Testes de regras e optimize passaram a importar o helper compartilhado,
+    incluindo cobertura explícita para `Snow-Covered Wastes`.
 
 ## Etapa 4 — Próximas pendências reais
 

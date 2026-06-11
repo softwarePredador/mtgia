@@ -1,3 +1,4 @@
+import 'package:server/basic_land_utils.dart';
 import 'package:test/test.dart';
 
 import '../routes/ai/optimize/index.dart' as optimize_route;
@@ -8,27 +9,6 @@ import '../routes/ai/optimize/index.dart' as optimize_route;
 /// 3. Duplicate detection in additions
 /// 4. Balance enforcement
 
-// Re-export test helpers that mirror the functions in index.dart
-bool _isBasicLandName(String name) {
-  final normalized = name.trim().toLowerCase();
-  return normalized == 'plains' ||
-      normalized == 'island' ||
-      normalized == 'swamp' ||
-      normalized == 'mountain' ||
-      normalized == 'forest' ||
-      normalized == 'wastes' ||
-      normalized == 'snow-covered plains' ||
-      normalized == 'snow-covered island' ||
-      normalized == 'snow-covered swamp' ||
-      normalized == 'snow-covered mountain' ||
-      normalized == 'snow-covered forest';
-}
-
-bool _isBasicLandTypeLine(String typeLineLower) {
-  return typeLineLower.contains('basic land') ||
-      typeLineLower.contains('basic snow land');
-}
-
 /// Mirror of _maxCopiesForFormat with the fix applied:
 /// Checks both type_line AND name for basic land detection.
 int _maxCopiesForFormat({
@@ -37,11 +17,7 @@ int _maxCopiesForFormat({
   required String name,
 }) {
   final normalizedFormat = deckFormat.toLowerCase();
-  final normalizedType = typeLine.toLowerCase();
-  final normalizedName = name.trim().toLowerCase();
-
-  final isBasicLand =
-      _isBasicLandTypeLine(normalizedType) || _isBasicLandName(normalizedName);
+  final isBasicLand = isBasicLandCard(name: name, typeLine: typeLine);
   if (isBasicLand) return 999;
 
   if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
@@ -56,9 +32,8 @@ List<Map<String, dynamic>> simulateVirtualDeckRemoval(
   List<Map<String, dynamic>> originalDeck,
   List<String> removals,
 ) {
-  final virtualDeck = originalDeck
-      .map((c) => Map<String, dynamic>.from(c))
-      .toList();
+  final virtualDeck =
+      originalDeck.map((c) => Map<String, dynamic>.from(c)).toList();
 
   final removalCountsByName = <String, int>{};
   for (final name in removals) {
@@ -90,11 +65,13 @@ List<Map<String, dynamic>> validateAdditions({
     final name = (add['name']?.toString() ?? '').toLowerCase();
     if (name.isEmpty) continue;
 
-    final isBasic = _isBasicLandName(name);
+    final isBasic = isBasicLandName(name);
     final alreadyInDeck = deckNamesLower.contains(name);
     final beingRemoved = removalNamesLower.contains(name);
 
-    if (alreadyInDeck && !beingRemoved && !isBasic &&
+    if (alreadyInDeck &&
+        !beingRemoved &&
+        !isBasic &&
         (deckFormat == 'commander' || deckFormat == 'brawl')) {
       continue; // Skip duplicate
     }
@@ -190,8 +167,7 @@ void main() {
       final result = simulateVirtualDeckRemoval(deck, ['Sol Ring']);
       expect(result.length, equals(4));
       expect(result.any((c) => c['name'] == 'Sol Ring'), isFalse);
-      expect(
-          result.where((c) => c['name'] == 'Island').length, equals(3));
+      expect(result.where((c) => c['name'] == 'Island').length, equals(3));
     });
 
     test('removes 2 copies of Island when 2 are in removal list', () {
@@ -388,22 +364,23 @@ void main() {
       final additions = ['Sol Ring', 'Rhystic Study', 'Counterspell'];
 
       for (final name in additions) {
-        expect(_isBasicLandName(name), isFalse,
+        expect(isBasicLandName(name), isFalse,
             reason: '$name should not be a basic land');
       }
     });
 
     test('basic land names are properly detected', () {
-      expect(_isBasicLandName('Plains'), isTrue);
-      expect(_isBasicLandName('island'), isTrue);
-      expect(_isBasicLandName('SWAMP'), isTrue);
-      expect(_isBasicLandName('Mountain'), isTrue);
-      expect(_isBasicLandName('Forest'), isTrue);
-      expect(_isBasicLandName('Wastes'), isTrue);
-      expect(_isBasicLandName('Snow-Covered Plains'), isTrue);
-      expect(_isBasicLandName('Sol Ring'), isFalse);
-      expect(_isBasicLandName('Breeding Pool'), isFalse);
-      expect(_isBasicLandName('Command Tower'), isFalse);
+      expect(isBasicLandName('Plains'), isTrue);
+      expect(isBasicLandName('island'), isTrue);
+      expect(isBasicLandName('SWAMP'), isTrue);
+      expect(isBasicLandName('Mountain'), isTrue);
+      expect(isBasicLandName('Forest'), isTrue);
+      expect(isBasicLandName('Wastes'), isTrue);
+      expect(isBasicLandName('Snow-Covered Plains'), isTrue);
+      expect(isBasicLandName('Snow-Covered Wastes'), isTrue);
+      expect(isBasicLandName('Sol Ring'), isFalse);
+      expect(isBasicLandName('Breeding Pool'), isFalse);
+      expect(isBasicLandName('Command Tower'), isFalse);
     });
   });
 
@@ -417,8 +394,7 @@ void main() {
       final additions = ['New A', 'New B', 'New C'];
 
       // After optimize: count = original - removals + additions
-      final resultCount =
-          originalCount - removals.length + additions.length;
+      final resultCount = originalCount - removals.length + additions.length;
       expect(resultCount, equals(originalCount),
           reason:
               'Optimize mode must keep deck at exactly the same card count');
@@ -434,8 +410,7 @@ void main() {
         removals = removals.take(additions.length).toList();
       }
 
-      final resultCount =
-          originalCount - removals.length + additions.length;
+      final resultCount = originalCount - removals.length + additions.length;
       expect(resultCount, equals(originalCount));
     });
   });

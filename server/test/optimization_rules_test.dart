@@ -1,3 +1,4 @@
+import 'package:server/basic_land_utils.dart';
 import 'package:test/test.dart';
 
 import '../lib/color_identity.dart';
@@ -23,26 +24,6 @@ import '../lib/deck_rules_service.dart';
 int _copyLimitForFormat(String format) {
   final f = format.toLowerCase();
   return (f == 'commander' || f == 'brawl') ? 1 : 4;
-}
-
-bool _isBasicLandTypeLine(String typeLine) {
-  final t = typeLine.toLowerCase();
-  return t.contains('basic land') || t.contains('basic snow land');
-}
-
-bool _isBasicLandName(String name) {
-  final n = name.trim().toLowerCase();
-  return n == 'plains' ||
-      n == 'island' ||
-      n == 'swamp' ||
-      n == 'mountain' ||
-      n == 'forest' ||
-      n == 'wastes' ||
-      n == 'snow-covered plains' ||
-      n == 'snow-covered island' ||
-      n == 'snow-covered swamp' ||
-      n == 'snow-covered mountain' ||
-      n == 'snow-covered forest';
 }
 
 /// Verifica se um deck commander respeita o máximo de cartas
@@ -165,7 +146,7 @@ void main() {
 
       test('TC007: Commander — Basic Land com 30 cópias não viola', () {
         final typeLine = 'Basic Land — Island';
-        final isBasic = _isBasicLandTypeLine(typeLine);
+        final isBasic = isBasicLandTypeLine(typeLine);
         expect(isBasic, isTrue);
         // Básicos são isentos de limite
         final qty = 30;
@@ -185,25 +166,26 @@ void main() {
       });
 
       test('TC010: Snow-Covered Island é tratado como básico pelo nome', () {
-        expect(_isBasicLandName('Snow-Covered Island'), isTrue);
-        expect(_isBasicLandName('snow-covered forest'), isTrue);
+        expect(isBasicLandName('Snow-Covered Island'), isTrue);
+        expect(isBasicLandName('snow-covered forest'), isTrue);
+        expect(isBasicLandName('Snow-Covered Wastes'), isTrue);
       });
 
       test('TC011: Snow-Covered Island é tratado como básico pelo type_line',
           () {
-        expect(_isBasicLandTypeLine('Basic Snow Land — Island'), isTrue);
-        expect(_isBasicLandTypeLine('basic snow land — forest'), isTrue);
+        expect(isBasicLandTypeLine('Basic Snow Land — Island'), isTrue);
+        expect(isBasicLandTypeLine('basic snow land — forest'), isTrue);
       });
 
       test('TC012: Wastes é básico pelo nome', () {
-        expect(_isBasicLandName('Wastes'), isTrue);
-        expect(_isBasicLandName('wastes'), isTrue);
+        expect(isBasicLandName('Wastes'), isTrue);
+        expect(isBasicLandName('wastes'), isTrue);
       });
 
       test('TC013: Non-basic land não é básico', () {
-        expect(_isBasicLandTypeLine('Land — Forest Plains'), isFalse);
-        expect(_isBasicLandTypeLine('Legendary Land'), isFalse);
-        expect(_isBasicLandName('Command Tower'), isFalse);
+        expect(isBasicLandTypeLine('Land — Forest Plains'), isFalse);
+        expect(isBasicLandTypeLine('Legendary Land'), isFalse);
+        expect(isBasicLandName('Command Tower'), isFalse);
       });
 
       test('TC013b: MDFC/split front face shares the same physical copy key',
@@ -472,7 +454,7 @@ void main() {
 
     test('TC037: Basic Land com quantity=10 é válido (sem limite)', () {
       final typeLine = 'Basic Land — Island';
-      final isBasic = _isBasicLandTypeLine(typeLine);
+      final isBasic = isBasicLandTypeLine(typeLine);
       expect(isBasic, isTrue);
       final shouldReject = !isBasic && 10 > _copyLimitForFormat('standard');
       expect(shouldReject, isFalse);

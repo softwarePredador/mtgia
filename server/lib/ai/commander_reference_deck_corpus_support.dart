@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
+import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../import_card_lookup_service.dart';
 import 'commander_reference_card_stats_support.dart';
@@ -13,19 +14,7 @@ const commanderReferenceDeckAnalysisTable = 'commander_reference_deck_analysis';
 const commanderReferenceDeckCorpusPromptPolicyVersion =
     'reference_deck_corpus_v4';
 
-const basicLandNames = {
-  'plains',
-  'island',
-  'swamp',
-  'mountain',
-  'forest',
-  'wastes',
-  'snow-covered plains',
-  'snow-covered island',
-  'snow-covered swamp',
-  'snow-covered mountain',
-  'snow-covered forest',
-};
+const basicLandNames = basic_lands.basicLandNames;
 
 class CommanderReferenceDeckCardInput {
   const CommanderReferenceDeckCardInput({

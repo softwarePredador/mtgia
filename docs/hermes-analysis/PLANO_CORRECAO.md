@@ -20,9 +20,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    2026-06-11. `resolveOptimizeArchetype` foi removido do risco por delegar
    para `optimize_archetype_support.dart`; os roles estratégicos
    `wincon/combo_piece/engine/payoff/enabler` também passaram a reutilizar
-   `resolveCardFunctionalRoles` em `functional_card_tags.dart`. Os maiores
-   riscos restantes são terrenos básicos/snow basics, trust social, logs
-   sociais/follow, condição de carta e CMC/tipo.
+   `resolveCardFunctionalRoles` em `functional_card_tags.dart`. O drift de
+   terrenos básicos/snow basics foi fechado em 2026-06-11 com
+   `server/lib/basic_land_utils.dart`. Os maiores riscos restantes são trust
+   social, logs sociais/follow, condição de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
    `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
@@ -162,11 +163,12 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-11: PARCIAL.** `resolveOptimizeArchetype` foi unificado e
-  os roles estratégicos `wincon`, `combo_piece`, `engine`, `payoff` e
-  `enabler` agora usam o adapter único `resolveCardFunctionalRoles` também na
-  geração de `functional_tags`; demais duplicações abaixo continuam abertas
-  conforme domínio.
+- **Status 2026-06-11: PARCIAL.** `resolveOptimizeArchetype` foi unificado, os
+  roles estratégicos `wincon`, `combo_piece`, `engine`, `payoff` e `enabler`
+  agora usam o adapter único `resolveCardFunctionalRoles` também na geração de
+  `functional_tags`, e basic/snow basic lands passaram a usar
+  `server/lib/basic_land_utils.dart` como fonte canônica. As duplicações
+  restantes abaixo continuam abertas conforme domínio.
 - **Evidência**:
   - Resolvido: `resolveOptimizeArchetype` agora delega para
     `server/lib/ai/optimize_archetype_support.dart`, com teste em
@@ -179,11 +181,11 @@ Histórico do problema:
     consulta `resolveCardFunctionalRoles` para os roles estratégicos. O teste
     `functional_card_tags_test.dart` prova alinhamento com
     `optimizationFunctionalRolesForCard`.
-  - `_isBasicLandName` aparece em quatro locais com variantes para snow lands:
-    `server/lib/ai/optimize_runtime_support.dart:4184`-`:4196`,
-    `server/lib/generated_deck_validation_service.dart:752`-`:763`,
-    `server/lib/meta/meta_deck_reference_support.dart:890`-`:903` e
-    `server/routes/ai/commander-reference/index.dart:621`-`:628`.
+  - Resolvido: basic/snow basic lands agora usam
+    `server/lib/basic_land_utils.dart`. `optimize_runtime_support.dart`
+    preserva somente wrapper público fino, `commander_reference_deck_corpus_support.dart`
+    preserva `basicLandNames` como alias do utilitário e testes de regras/optimize
+    importam o helper em vez de copiar `_isBasicLandName`.
   - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
     `_buildTrustInsight` duplicam o mesmo trust em listagem/detalhe de trades
     (`server/routes/trades/index.dart:557`-`:635`,
@@ -214,8 +216,8 @@ Histórico do problema:
      efetivo;
   2. manter `resolveCardFunctionalRoles` como adapter único de roles funcionais
      para análise, optimize, validator e quality gate;
-  3. extrair helper unico para terrenos basicos/snow basics e usar em validate,
-     optimize, meta e commander-reference;
+  3. manter `basic_land_utils.dart` como fonte única para terrenos básicos/snow
+     basics e não reintroduzir listas locais em novos fluxos;
   4. agrupar duplicacoes de menor risco por dominio (trust social, request/log,
      condicao de carta, CMC/tipo), mantendo wrappers locais so quando o contrato
      divergente for intencional e testado.
@@ -228,7 +230,8 @@ Histórico do problema:
     mesmo adapter usado pelo optimize;
   - uma carta com papeis multiplos preserva roles secundarios no validator e na
     aba de analise;
-  - snow basics tem comportamento igual nos quatro fluxos;
+  - ✅ snow basics tem comportamento igual nos fluxos cobertos e `Snow-Covered
+    Wastes` está em teste;
   - listagem/detalhe de trades e marketplace continuam retornando o mesmo shape
     de `trust`;
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
@@ -828,6 +831,6 @@ Considerar a frente de estrutura saneada quando:
 
 - o auditor não reportar imports existentes como ausentes;
 - `dart analyze` do backend estiver verde no fluxo local documentado;
-- a duplicação/similaridade restante de alto risco em IA semantica, terrenos
-  basicos/snow basics e helpers HTTP cair significativamente;
+- a duplicação/similaridade restante de alto risco em IA semantica e helpers
+  HTTP cair significativamente;
 - os maiores arquivos do domínio de optimize reduzirem tamanho e responsabilidade.
