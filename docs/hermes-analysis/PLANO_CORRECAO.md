@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-11 19:00 UTC
+> Data: 2026-06-11 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,18 +20,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `.dart_frog/server.dart` em runtime, e `dart analyze bin/local_test_server.dart`
    retornou `No issues found`.
 5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
-   `server/lib`**: **REVALIDADO no checkout local `1554a1e5` em 2026-06-10
+   `server/lib`**: **REVALIDADO no checkout local `6ce57c64` em 2026-06-11
    23:00 UTC**. Os riscos anteriores de ownership em `POST /ai/optimize`,
-   `POST /ai/archetypes` e polling de jobs async estao stale nesta branch:
-   optimize exige usuario, verifica acesso por `deck_id + user_id`, cria jobs
-   com `String userId`, polling rejeita `job.userId.isEmpty`, e archetypes
-   tambem escopa o deck por `id + user_id`. O contexto principal de optimize
-   agora carrega `card_function_tags` junto de `semantic_tags_v2`. Permanecem
-   abertos tres gaps: o app emite `deck_rebuild_created`, mas `_allowedEvents`
-   rejeita o evento; `GET /ai/commander-learning` e consumido pela tela de
-   geracao e passa por rota/helper/tabela reais, mas nao esta no API contract
-   map; e a consulta automatica de learned decks usa middleware de IA custosa
-   apesar de ser leitura local de `commander_learned_decks`.
+   `POST /ai/archetypes` e polling de jobs async seguem stale nesta branch:
+   optimize exige usuario, passa `userId` para o loader owner-scoped, jobs
+   rejeitam owner vazio/diferente, e archetypes escopa deck por `id + user_id`.
+   O contexto principal de optimize continua carregando `card_function_tags`
+   junto de `semantic_tags_v2`. Permanecem abertos tres gaps: o app emite/testa
+   `deck_rebuild_created`, mas `_allowedEvents` rejeita o evento; `GET
+   /ai/commander-learning` e consumido pela tela de geracao e passa por
+   rota/helper/tabela reais, mas nao esta no API contract map; e a consulta
+   automatica de learned decks herda middleware de IA custosa apesar de ser
+   leitura local de `commander_learned_decks`, sem chamada LLM/externa no
+   handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-11 05:30 UTC no checkout `f1de55ef`. `commander_fallback_policy.dart`
    agora existe e centraliza parte relevante das listas de optimize/complete e
@@ -697,8 +698,8 @@ builders de response do optimize que continuam fora do fluxo real.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-10 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `1554a1e5`. Os achados anteriores de ownership em `/ai/optimize`,
+- **Status 2026-06-11 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `6ce57c64`. Os achados anteriores de ownership em `/ai/optimize`,
   `/ai/archetypes` e jobs async de optimize/generate estao resolvidos nesta
   branch e foram removidos da lista de acoes abertas. A lacuna ativa agora e
   mais estreita: activation telemetry rejeita um evento emitido pelo app,
@@ -708,9 +709,8 @@ builders de response do optimize que continuam fora do fluxo real.
 - **Evidencia atualizada**:
   - O app envia `POST /ai/optimize` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`. A rota
-    exige usuario autenticado em `server/routes/ai/optimize/index.dart:451`-`:454`,
-    verifica acesso antes de criar job async em `:466`-`:488` e passa
-    `authenticatedUserId` para `loadOptimizeDeckContext` em `:569`-`:580`.
+    exige usuario autenticado em `server/routes/ai/optimize/index.dart:479`-`:480`
+    e passa `authenticatedUserId` para `loadOptimizeDeckContext` em `:560`-`:575`.
     O helper consulta `decks` por `id + user_id` em
     `server/lib/ai/optimize_request_support.dart:64`-`:84`.
   - O contexto principal de optimize carrega `$semanticV2Select` e
@@ -730,8 +730,11 @@ builders de response do optimize que continuam fora do fluxo real.
     `deck_rebuild_created` quando rebuild cria draft; a rota
     `server/routes/users/me/activation-events/index.dart:10`-`:18` nao inclui
     esse evento em `_allowedEvents` e rejeita fora da lista em `:46`-`:48`.
-  - `app/lib/features/decks/screens/deck_generate_screen.dart:41`-`:43` carrega
-    learned decks no primeiro frame; o provider chama
+    `app/test/features/decks/providers/deck_provider_test.dart:874`-`:891`
+    espera explicitamente esse evento no provider.
+  - `app/lib/features/decks/screens/deck_generate_screen.dart:36`-`:43` carrega
+    learned decks no primeiro frame; `:127`-`:143` indexa a disponibilidade por
+    comandante; o provider chama
     `GET /ai/commander-learning` em
     `app/lib/features/decks/providers/deck_provider.dart:804`-`:824` e a rota
     retorna `commanders[]` em
@@ -743,7 +746,7 @@ builders de response do optimize que continuam fora do fluxo real.
   - A rota de learned decks le `commander_learned_decks` em
     `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:110`-`:132`;
     o schema/modelo fica em
-    `server/lib/ai/commander_learned_deck_support.dart:7` e `:285`-`:311`.
+    `server/lib/ai/commander_learned_deck_support.dart:7` e `:283`-`:315`.
     `rg "/ai/commander-learning" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
     nao encontrou contrato, e `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:315`
     nao lista `commander_learned_decks` nos data sources.
@@ -752,7 +755,8 @@ builders de response do optimize que continuam fora do fluxo real.
     `server/lib/plan_middleware.dart:35`-`:53` bloqueia quando a cota de IA
     acaba, e `server/lib/rate_limit_middleware.dart:167`-`:170`/`:381`-`:397`
     aplica bucket AI de 10/min em producao. O handler de commander-learning e
-    leitura local de PG, sem chamada OpenAI.
+    leitura local de PG; busca focada por `OpenAI|openai|http` encontrou apenas
+    o import de `http_responses.dart`.
 - **Impacto**: o risco de acesso cross-owner nos fluxos principais de optimize
   foi removido nesta branch. Os riscos remanescentes sao de confiabilidade e
   contrato: telemetria de rebuild some silenciosamente, um endpoint consumido
