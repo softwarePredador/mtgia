@@ -98,6 +98,9 @@ Novo achado de qualidade:
   `trainable_commander_deck`, `partial_telemetry` ou
   `non_commander_telemetry`, com `training_eligible=1` somente para Commander
   com comandante e `card_count >= 90`.
+- Validação remota pós-backfill (`2026-06-11T13:41Z`): `user_learning_events`
+  ficou com `16` eventos `trainable_commander_deck`, `22`
+  `partial_telemetry` e `4` `non_commander_telemetry`.
 
 ## Crons habilitadas
 
