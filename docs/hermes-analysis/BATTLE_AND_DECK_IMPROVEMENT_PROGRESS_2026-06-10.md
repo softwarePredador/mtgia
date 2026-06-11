@@ -12,6 +12,9 @@
 - Matriz oficial de regras em `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
 - Atualização de `IMPLEMENTATION_GAPS.md`, `PENDING_TASKS.md` e
   `BATTLE_SYSTEM_LOGIC.md`.
+- Rechecagem oficial de Commander Brackets: o update de 2026-02-09 mantém
+  hybrid identity estrita, e o update de 2025-10-21 lista Game Changers que
+  também precisam preservar tags secundárias como tutor, fast mana e proteção.
 - Suporte mínimo para Vehicle/Spacecraft commander, hybrid identity estrita,
   Warp, Station, Flashback, Omen, Prepare, Paradigm, Lander, ability-word
   telemetry e combate multi-defensor.
@@ -57,7 +60,7 @@ que o usuário vê na análise do deck.
 ## Etapa 3 — Auditoria de modularização
 
 **Status:** em andamento, com dezenove extrações de testes, seis splits
-do engine e quatorze splits da rota/runtime de optimize concluídos.
+do engine e quinze splits da rota/runtime de optimize concluídos.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
@@ -91,7 +94,7 @@ do engine e quatorze splits da rota/runtime de optimize concluídos.
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
   pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
-  identidade de cor da rota.
+  identidade de cor/filtro de bracket da rota.
 - `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
@@ -157,6 +160,11 @@ do engine e quatorze splits da rota/runtime de optimize concluídos.
 - `server/test/optimize_route_color_identity_filter_support_test.dart` — 51
   linhas cobrindo filtro de identidade de cor, comandante colorless e dados de
   identidade ausentes.
+- `server/lib/ai/optimize_route_bracket_policy_filter_support.dart` — 47
+  linhas extraídas da rota.
+- `server/test/optimize_route_bracket_policy_filter_support_test.dart` — 74
+  linhas cobrindo bloqueio por bracket, repetições permitidas e normalização de
+  dados vindos da query.
 
 **Decisão:**
 Não misturar refactors grandes com correções funcionais. A primeira extração
@@ -282,6 +290,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - Novo módulo Dart `optimize_route_color_identity_filter_support.dart`
   centraliza o filtro puro de adições por identidade de cor do commander,
   deixando a rota responsável apenas pelo SELECT que monta `identityByName`.
+- Novo módulo Dart `optimize_route_bracket_policy_filter_support.dart`
+  centraliza a aplicação da política de bracket sobre adições já resolvidas,
+  preservando ordem/repetição da lista validada pela rota.
+- Correção funcional em `edh_bracket_policy.dart`: cartas oficiais Game
+  Changer não encerram mais o classificador cedo; agora preservam tags
+  secundárias como `fastMana`, `tutor`, `freeInteraction`, `valueEngine` e
+  `infiniteCombo`. Isso deixa diagnostics e orçamento de bracket mais fiéis ao
+  papel real da carta.
 - `test_battle_analyst_v10_3.py` não contém mais `def test_` inline; ele carrega
   módulos, constrói os helpers/registry e executa a lista agregada.
 - `test_battle_analyst_v10_3.py` continua sendo o runner único, mas registra
@@ -319,6 +335,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - `dart test test/optimize_route_suggestion_filter_support_test.dart test/optimize_route_retry_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - `dart analyze lib/ai/optimize_route_color_identity_filter_support.dart routes/ai/optimize/index.dart test/optimize_route_color_identity_filter_support_test.dart`
 - `dart test test/optimize_route_color_identity_filter_support_test.dart test/optimize_route_suggestion_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
+- `dart analyze lib/ai/optimize_route_bracket_policy_filter_support.dart routes/ai/optimize/index.dart test/optimize_route_bracket_policy_filter_support_test.dart`
+- `dart test test/optimize_route_bracket_policy_filter_support_test.dart test/optimize_route_color_identity_filter_support_test.dart test/optimize_route_suggestion_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
+- `dart analyze lib/edh_bracket_policy.dart test/edh_bracket_policy_test.dart test/optimize_runtime_support_test.dart`
+- `dart test test/edh_bracket_policy_test.dart test/optimize_runtime_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - Hermes/AWS pós-push:
   - `battle_passes=130`.
   - analyze focado em `commander_eligibility`, `DeckRulesService`, rota
@@ -425,9 +445,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    cortes de response/cache, envelope async, parsing inicial, payload final,
    warnings finais, diagnostics finais, fallback de sugestões vazias e payloads
    de rejeição do quality gate, validação pós-processamento e retry
-   orchestration/filtro inicial de sugestões/filtro de identidade de cor já
-   foram feitos; o próximo corte seguro é validação de bracket ainda acoplada a
-   SQL.
+   orchestration/filtro inicial de sugestões/filtro de identidade de cor/filtro
+   de bracket já foram feitos; o próximo corte seguro é extrair top-up
+   determinístico de básicos no modo complete.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
