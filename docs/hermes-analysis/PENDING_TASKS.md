@@ -35,6 +35,12 @@
 > Ainda não há escolha humana/interativa nem varredura completa de todas as
 > ações card-specific de cada jogador.
 >
+> **Atualização 2026-06-11 — extra combat básico.**
+> `extra_combat` agora agenda combates adicionais, opcionalmente destapa
+> criaturas do controlador e é consumido em `play_turn_v8` antes da postcombat
+> main com cap anti-loop. Fases extras arbitrárias e textos card-specific
+> permanecem fora do modelo genérico.
+>
 > **Atualização 2026-06-11 — revisão estratégica oficial.**
 > A pesquisa oficial foi rechecada contra Wizards Rules, Commander, Commander
 > Brackets 2026-02-09, Edge of Eternities e Secrets of Strixhaven. O plano de
@@ -72,8 +78,8 @@
 > cobrindo cache oracle, rules table verificada, lands não conjuradas como
 > instant/sorcery, artefatos curados e sync de regras normalizado por oracle.
 > Turn flow/draw também foi movido para `battle_turn_flow_tests.py`, cobrindo
-> draw step único, Approach win/turn stop, failed draw, extra turns e
-> Unexpected Windfall discard/draw/treasure.
+> draw step único, Approach win/turn stop, failed draw, extra turns, extra
+> combats básicos e Unexpected Windfall discard/draw/treasure.
 > SBA/zone metadata também foi movido para `battle_sba_zone_tests.py`, cobrindo
 > eliminação nova, cleanup, counters, anexos ilegais, Saga final, LKI/zone id
 > e exile visibility.

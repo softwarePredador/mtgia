@@ -113,6 +113,72 @@ def register_tests(battle, player, card):
         assert [event for event, _ in events].count("turn_start") == 2
         assert any(event == "extra_turn_taken" for event, _ in events)
 
+    def test_extra_combat_effect_schedules_and_untaps_creatures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Tapped Attacker",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "tapped": True,
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {
+                "name": "Relentless Assault Test",
+                "effect": "extra_combat",
+                "combats": 1,
+                "type_line": "Sorcery",
+            },
+            turn=4,
+            rng=random.Random(47),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.extra_combats == 1
+        assert active.battlefield[0]["tapped"] is False
+        assert any(event == "extra_combat_scheduled" for event, _ in events)
+
+    def test_extra_combat_is_taken_before_postcombat_main():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active", [card("Draw 1"), card("Draw 2"), card("Draw 3")])
+        defender = player("Defender", [card("Opp Draw")])
+        defender.life = 40
+        active.extra_combats = 1
+        active.battlefield = [
+            {
+                "name": "Vigilant Attacker",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": False,
+                "tapped": False,
+                "vigilance": True,
+            }
+        ]
+
+        battle.play_turn_v8(
+            active,
+            [defender],
+            [active, defender],
+            turn=4,
+            rng=random.Random(48),
+            stack=battle.Stack(),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.extra_combats == 0
+        assert [event for event, _ in events].count("combat") == 2
+        assert any(event == "extra_combat_taken" for event, _ in events)
+        assert defender.life == 36
+
     def test_treasure_maker_can_discard_draw_and_create_treasures():
         active = player("Caster")
         active.hand = [{"name": "Discard Me", "cmc": 1, "type_line": "Sorcery"}]
@@ -143,5 +209,7 @@ def register_tests(battle, player, card):
         test_conformance_failed_draw_from_empty_library_loses,
         test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
         test_extra_turns_are_taken_before_next_player,
+        test_extra_combat_effect_schedules_and_untaps_creatures,
+        test_extra_combat_is_taken_before_postcombat_main,
         test_treasure_maker_can_discard_draw_and_create_treasures,
     ]

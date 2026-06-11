@@ -2771,8 +2771,22 @@ def get_card_effect(card):
     effect = card.get("effect", "")
     effect_map = {"ramp": "ramp_permanent", "removal": "remove_creature",
                   "board_wipe": "board_wipe", "wincon": "finisher", "draw": "draw_cards",
-                  "counter": "counter", "land": "land"}
+                  "counter": "counter", "land": "land", "extra_combat": "extra_combat"}
     if effect in effect_map:
+        if effect == "extra_combat":
+            return normalize_effect_by_oracle(
+                card,
+                with_rule_metadata(
+                    {
+                        "effect": "extra_combat",
+                        "combats": card.get("combats", card.get("extra_combats", 1)),
+                        "untap_creatures": card.get("untap_creatures", True),
+                    },
+                    source="card_effect_field",
+                    review_status="heuristic",
+                    confidence=0.25,
+                ),
+            )
         if effect == "ramp":
             return normalize_effect_by_oracle(
                 card,
@@ -3016,6 +3030,7 @@ class Player:
         self.approach_revealed = []  # v8.1: opponents who know approach was cast
         self.extra_turns = 0
         self.extra_turn_loss_pending = 0
+        self.extra_combats = 0
         self.eliminated = False
         self.poison = 0  # v9
         self.win_reason = None
@@ -4003,6 +4018,9 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
 
     if effect_name == "extra_turn":
         return 65
+
+    if effect_name == "extra_combat":
+        return 45
 
     # ── PROTECTION ──
     if effect_name in ("phase_out", "indestructible"):
@@ -5869,6 +5887,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             turn=turn,
         )
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "extra_combat":
+        combats = int(effect_data.get("combats") or effect_data.get("extra_combats") or 1)
+        player.extra_combats += max(0, combats)
+        if effect_data.get("untap_creatures", True):
+            for permanent in player.battlefield:
+                if is_battlefield_creature(permanent):
+                    permanent["tapped"] = False
+        emit_replay_event(
+            "extra_combat_scheduled",
+            player=player.name,
+            card=card.get("name", "?"),
+            extra_combats=player.extra_combats,
+            untap_creatures=bool(effect_data.get("untap_creatures", True)),
+            turn=turn,
+        )
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "exile_value":
         # Dance with Calamity — exile top X, play for free
         X = max(3, player.available_mana() // 2)
@@ -6641,6 +6675,34 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         if game_winner(all_players):
             return
         if check_sbas(all_players): return
+        extra_combats_taken = 0
+        while (
+            player.is_alive()
+            and player.extra_combats > 0
+            and not game_winner(all_players)
+            and extra_combats_taken < 3
+        ):
+            player.extra_combats -= 1
+            extra_combats_taken += 1
+            emit_replay_event(
+                "extra_combat_taken",
+                player=player.name,
+                turn=turn,
+                extra_combat_index=extra_combats_taken,
+                remaining_extra_combats=player.extra_combats,
+            )
+            combat_phase_v8(player, opponents, all_players, turn, rng, stack)
+            if game_winner(all_players):
+                return
+            if check_sbas(all_players): return
+        if player.extra_combats > 0 and extra_combats_taken >= 3:
+            emit_replay_event(
+                "extra_combat_cap_reached",
+                player=player.name,
+                turn=turn,
+                remaining_extra_combats=player.extra_combats,
+                cap=3,
+            )
 
     # ── POSTCOMBAT MAIN ──
     total_mana = player.available_mana()

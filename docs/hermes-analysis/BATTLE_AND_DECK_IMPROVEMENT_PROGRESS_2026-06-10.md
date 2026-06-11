@@ -669,6 +669,19 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - O gap remanescente foi reduzido para escolha humana/interativa e varredura
     completa de ações card-specific por jogador, não para a existência de
     sequência APNAP auditável.
+- Fechamento local do gap de extra combat básico:
+  - `Player` agora possui contador `extra_combats`, separado de `extra_turns`.
+  - `get_card_effect(...)` aceita `effect=extra_combat` em cartas/modelos ad
+    hoc, preservando `combats`/`extra_combats` e `untap_creatures`.
+  - `apply_effect_immediate(...)` agenda combates adicionais, opcionalmente
+    destapa criaturas do controlador e emite `extra_combat_scheduled`.
+  - `play_turn_v8(...)` consome combates adicionais antes da postcombat main,
+    com cap anti-loop e eventos `extra_combat_taken` /
+    `extra_combat_cap_reached`.
+  - `battle_turn_flow_tests.py` cobre agendamento/untap e execução de combate
+    extra antes da segunda main phase.
+  - O gap remanescente foi reduzido para fases extras arbitrárias e textos
+    card-specific de cartas concretas.
 
 ## Etapa 4 — Próximas pendências reais
 

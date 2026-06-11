@@ -37,7 +37,7 @@
 | Prioridade formal (APNAP pass sequence) | ✅ Básico | v9: `priority_order_from`, `emit_priority_pass_sequence`, `priority_round` | Passes APNAP são emitidos para pilha vazia e antes de resolver topo sem resposta; escolha humana/interativa e respostas card-specific seguem fora |
 | Prioridade com pilha vazia | ✅ OK | 2563-2645 | `priority_round(..., phase=main)` permite ação sorcery-speed e o turno usa `run_priority_loop` |
 | Sem prioridade em untap/resolução | ✅ OK | 4622-4633 | Untap não chama priority |
-| Passos/fases extras (extra turn, extra combat) | ⚠️ Parcial | 4789-4828 | `play_turn_sequence_v8` suporta extra turn, mas não extra combat/phase |
+| Passos/fases extras (extra turn, extra combat) | ✅ Básico | v9: `extra_turns`, `extra_combats`, `play_turn_v8` | Extra turn e extra combat são suportados com cap anti-loop; fases extras arbitrárias seguem fora |
 | Ações especiais (play land, morph) | ✅ OK | 4675-4700 | Land play tratado como ação especial |
 | First draw em multiplayer | ✅ OK | 4642 | Ninguém pula draw no turno 1 |
 
