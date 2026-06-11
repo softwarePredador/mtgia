@@ -171,7 +171,7 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2522 linhas após splits de
+- `server/routes/ai/optimize/index.dart` — 2521 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
   pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
@@ -180,7 +180,7 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
   dados completos de adições/análise virtual pós-swap/execução do
   `OptimizationValidator`. A rota ainda deve seguir reduzindo até ficar como
   orquestrador fino.
-- `server/lib/ai/optimize_runtime_support.dart` — 1666 linhas após quatro splits.
+- `server/lib/ai/optimize_runtime_support.dart` — 1179 linhas após cinco splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
   direta e delegação pelo runtime.
@@ -196,6 +196,11 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
 - `server/test/optimize_removal_candidate_support_test.dart` — cobertura direta
   de proteção contra corte indevido de lands, corte de lands em excesso e
   escopo agressivo.
+- `server/lib/ai/optimize_swap_candidate_support.dart` — 491 linhas extraídas
+  do runtime para `findSynergyReplacements`, pares de swap determinísticos e
+  diagnostics agressivos de candidates.
+- `server/test/optimize_swap_candidate_support_test.dart` — 66 linhas cobrindo
+  caminho sem banco e export compatível pelo runtime.
 - `server/test/optimize_candidate_quality_support_test.dart` — 97 linhas
   cobrindo ranking, buckets e export compatível pelo runtime.
 - `server/lib/ai/optimize_archetype_support.dart` — helper único para resolver
@@ -847,6 +852,13 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - O runtime mantém export compatível; wrappers da rota e testes legados
     continuam chamando a mesma API.
   - `optimize_runtime_support.dart` caiu para 1666 linhas.
+- Quinto split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_swap_candidate_support.dart` centraliza
+    `findSynergyReplacements`, construção de pares determinísticos e diagnostics
+    agressivos de candidates.
+  - O runtime mantém export compatível; rota, complete support e testes legados
+    continuam acessando a API pelo caminho antigo.
+  - `optimize_runtime_support.dart` caiu para 1179 linhas.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -870,11 +882,11 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    execução do `OptimizationValidator` e decisão final pós-validator já foram
    feitos; o próximo corte seguro é avaliar se ainda há blocos grandes de
    orquestração que possam virar support sem esconder o fluxo principal.
-3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os quatro
+3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os cinco
    cortes atuais moveram assinatura/cache, quality ranking/loader,
-   inferência/scoring funcional e seleção de remoções para supports próprios,
-   mantendo wrappers/exports compatíveis. Próximo corte seguro: swap building
-   ou fallback/recovery estrutural com teste isolado antes de mover.
+   inferência/scoring funcional, seleção de remoções e swap building para
+   supports próprios, mantendo wrappers/exports compatíveis. Próximo corte
+   seguro: fallback/recovery estrutural com teste isolado antes de mover.
 4. Executar no Hermes/AWS a sequência operacional de seed/sync (`meta_decks` ou
    target deck real → `sync_pg_card_metadata_to_hermes.py`) e verificar o
    relatório `deck_cards_backfill` até `suspicious_nonland_zero_cmc_after=0`
